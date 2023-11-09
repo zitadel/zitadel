@@ -1,0 +1,487 @@
+Login:
+  Title: Vítejte zpět!
+  Description: Zadejte své přihlašovací údaje.
+  TitleLinking: Přihlášení pro propojení uživatele
+  DescriptionLinking: Zadejte své přihlašovací údaje pro propojení vašeho externího účtu.
+  LoginNameLabel: Přihlašovací jméno
+  UsernamePlaceHolder: uživatelské jméno
+  LoginnamePlaceHolder: uzivatelskejmeno@doména
+  ExternalUserDescription: Přihlášení s externím účtem.
+  MustBeMemberOfOrg: Uživatel musí být členem organizace {{.OrgName}}.
+  RegisterButtonText: Registrovat
+  NextButtonText: Další
+
+LDAP:
+  Title: Přihlášení
+  Description: Zadejte své přihlašovací údaje.
+  LoginNameLabel: Přihlašovací jméno
+  PasswordLabel: Heslo
+  NextButtonText: Další
+
+SelectAccount:
+  Title: Vyberte účet
+  Description: Použijte svůj účet
+  TitleLinking: Vyberte účet pro propojení uživatele
+  DescriptionLinking: Vyberte účet pro propojení s vaším externím uživatelem.
+  OtherUser: Jiný uživatel
+  SessionState0: aktivní
+  SessionState1: Odhlášen
+  MustBeMemberOfOrg: Uživatel musí být členem organizace {{.OrgName}}.
+
+Password:
+  Title: Heslo
+  Description: Zadejte své přihlašovací údaje.
+  PasswordLabel: Heslo
+  MinLength: Minimální délka
+  HasUppercase: Velké písmeno
+  HasLowercase: Malé písmeno
+  HasNumber: Číslo
+  HasSymbol: Symbol
+  Confirmation: Potvrzení shody
+  ResetLinkText: Obnovit heslo
+  BackButtonText: Zpět
+  NextButtonText: Další
+
+UsernameChange:
+  Title: Změna uživatelského jména
+  Description: Nastavte své nové uživatelské jméno
+  UsernameLabel: Uživatelské jméno
+  CancelButtonText: Zrušit
+  NextButtonText: Další
+
+UsernameChangeDone:
+  Title: Uživatelské jméno bylo změněno
+  Description: Vaše uživatelské jméno bylo úspěšně změněno.
+  NextButtonText: Další
+
+InitPassword:
+  Title: Nastavit heslo
+  Description: Obdrželi jste kód, který musíte vložit níže, abyste nastavili své nové heslo.
+  CodeLabel: Kód
+  NewPasswordLabel: Nové heslo
+  NewPasswordConfirmLabel: Potvrzení hesla
+  ResendButtonText: Znovu poslat kód
+  NextButtonText: Další
+
+InitPasswordDone:
+  Title: Heslo nastaveno
+  Description: Heslo bylo úspěšně nastaveno
+  NextButtonText: Další
+  CancelButtonText: Zrušit
+
+InitUser:
+  Title: Aktivovat uživatele
+  Description: Ověřte váš e-mail pomocí níže uvedeného kódu a nastavte své heslo.
+  CodeLabel: Kód
+  NewPasswordLabel: Nové heslo
+  NewPasswordConfirm: Potvrzení hesla
+  NextButtonText: Další
+  ResendButtonText: Znovu poslat kód
+
+InitUserDone:
+  Title: Uživatel aktivován
+  Description: E-mail ověřen a heslo úspěšně nastaveno
+  NextButtonText: Další
+  CancelButtonText: Zrušit
+
+InitMFAPrompt:
+  Title: Nastavení 2-faktorové autentizace
+  Description: 2-faktorová autentizace vám poskytuje další zabezpečení pro váš uživatelský účet. Tím je zajištěno, že k vašemu účtu máte přístup pouze vy.
+  Provider0: Aplikace pro ověřování (např. Google/Microsoft Authenticator, Authy)
+  Provider1: Zařízením závislé (např. FaceID, Windows Hello, Otisk prstu)
+  Provider3: OTP SMS
+  Provider4: OTP E-mail
+  NextButtonText: Další
+  SkipButtonText: Přeskočit
+
+InitMFAOTP:
+  Title: 2-Faktorové ověření
+  Description: Vytvořte svou 2-faktorovou autentizaci. Stáhněte si ověřovací aplikaci, pokud ji ještě nemáte.
+  OTPDescription: Naskenujte kód svou ověřovací aplikací (např. Google/Microsoft Authenticator, Authy) nebo zkopírujte tajemství a vložte níže vygenerovaný kód.
+  SecretLabel: Tajemství
+  CodeLabel: Kód
+  NextButtonText: Další
+  CancelButtonText: Zrušit
+
+InitMFAOTPSMS:
+  Title: 2-Faktorové ověření
+  DescriptionPhone: Vytvořte svou 2-faktorovou autentizaci. Zadejte své telefonní číslo k jeho ověření.
+  DescriptionCode: Vytvořte svou 2-faktorovou autentizaci. Zadejte obdržený kód k ověření vašeho telefonního čísla.
+  PhoneLabel: Telefon
+  CodeLabel: Kód
+  EditButtonText: Upravit
+  ResendButtonText: Znovu poslat kód
+  NextButtonText: Další
+
+InitMFAU2F:
+  Title: Přidat bezpečnostní klíč
+  Description: Bezpečnostní klíč je ověřovací metoda, která může být integrována do vašeho telefonu, používat Bluetooth nebo se přímo zapojit do USB portu vašeho počítače.
+  TokenNameLabel: Název bezpečnostního klíče / zařízení
+  NotSupported: WebAuthN není podporován vaším prohlížečem. Ujistěte se, že máte aktuální verzi, nebo použijte jiný (např. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Přidat bezpečnostní klíč
+  ErrorRetry: Zkuste to znovu, vytvořte novou výzvu nebo vyberte jinou metodu.
+
+InitMFADone:
+  Title: 2-Faktor ověřen
+  Description: Skvělé! Úspěšně jste nastavili svou 2-faktorovou autentizaci a váš účet je nyní mnohem bezpečnější. Faktor musí být zadán při každém přihlášení.
+  NextButtonText: Další
+  CancelButtonText: Zrušit
+
+MFAProvider:
+  Provider0: Aplikace pro ověřování (např. Google/Microsoft Authenticator, Authy)
+  Provider1: Zařízením závislé (např. FaceID, Windows Hello, Otisk prstu)
+  Provider3: OTP SMS
+  Provider4: OTP E-mail
+  ChooseOther: nebo vyberte jinou možnost
+
+VerifyMFAOTP:
+  Title: Ověřte 2-Faktor
+  Description: Ověřte váš druhý faktor
+  CodeLabel: Kód
+  NextButtonText: Další
+
+VerifyOTP:
+  Title: Ověřte 2-Faktor
+  Description: Ověřte váš druhý faktor
+  CodeLabel: Kód
+  ResendButtonText: Znovu poslat kód
+  NextButtonText: Další
+
+VerifyMFAU2F:
+  Title: 2-Faktorové ověření
+  Description: Ověřte váš 2-Faktor pomocí registrovaného zařízení (např. FaceID, Windows Hello, Otisk prstu)
+  NotSupported: WebAuthN není podporován vaším prohlížečem. Ujistěte se, že používáte nejnovější verzi, nebo změňte prohlížeč na podporovaný (Chrome, Safari, Firefox)
+  ErrorRetry: Zkuste to znovu, vytvořte nový požadavek nebo vyberte jinou metodu.
+  ValidateTokenButtonText: Ověřte 2-Faktor
+
+Passwordless:
+  Title: Bezheslové přihlášení
+  Description: Přihlaste se pomocí ověřovacích metod poskytnutých vaším zařízením, jako je FaceID, Windows Hello nebo Otisk prstu.
+  NotSupported: WebAuthN není podporován vaším prohlížečem. Ujistěte se, že máte aktuální verzi, nebo použijte jiný (např. Chrome, Safari, Firefox).
+  ErrorRetry: Zkuste to znovu, vytvořte novou výzvu nebo vyberte jinou metodu.
+  LoginWithPwButtonText: Přihlásit se heslem
+  ValidateTokenButtonText: Přihlásit se bez hesla
+
+PasswordlessPrompt:
+  Title: Nastavení bezheslového přihlášení
+  Description: Chcete nastavit přihlášení bez hesla? (Ověřovací metody vašeho zařízení, jako je FaceID, Windows Hello nebo Otisk prstu)
+  DescriptionInit: Musíte nastavit přihlášení bez hesla. Použijte odkaz, který jste obdrželi, pro registraci vašeho zařízení.
+  PasswordlessButtonText: Přihlásit se bez hesla
+  NextButtonText: Další
+  SkipButtonText: Přeskočit
+
+PasswordlessRegistration:
+  Title: Nastavení bezheslového přihlášení
+  Description: Přidejte své ověření zadáním názvu (např. MůjMobil, MacBook atd.) a poté kliknutím na tlačítko 'Registrovat bez hesla' níže.
+  TokenNameLabel: Název zařízení
+  NotSupported: WebAuthN není podporován vaším prohlížečem. Ujistěte se, že máte aktuální verzi, nebo použijte jiný (např. Chrome, Safari, Firefox).
+  RegisterTokenButtonText: Registrovat bez hesla
+  ErrorRetry: Zkuste to znovu, vytvořte novou výzvu nebo vyberte jinou metodu.
+
+PasswordlessRegistrationDone:
+  Title: Nastavení bezheslového přihlášení dokončeno
+  Description: Zařízení pro přihlášení bez hesla úspěšně přidáno.
+  DescriptionClose: Nyní můžete toto okno zavřít.
+  NextButtonText: Další
+  CancelButtonText: Zrušit
+
+PasswordChange:
+  Title: Změna hesla
+  Description: Změňte si heslo. Zadejte své staré a nové heslo.
+  OldPasswordLabel: Staré heslo
+  NewPasswordLabel: Nové heslo
+  NewPasswordConfirmLabel: Potvrzení hesla
+  CancelButtonText: Zrušit
+  NextButtonText: Další
+  Footer: Patička
+
+PasswordChangeDone:
+  Title: Změna hesla
+  Description: Vaše heslo bylo úspěšně změněno.
+  NextButtonText: Další
+
+PasswordResetDone:
+  Title: Odkaz na resetování hesla odeslán
+  Description: Pro dokončení změny hesla zkontrolujte váš e-mail a postupujte podle instrukcí.
+  NextButtonText: Další
+
+EmailVerification:
+  Title: Ověření e-mailu
+  Description: Poslali jsme vám e-mail pro ověření vaší adresy. Zadejte kód do níže uvedeného formuláře.
+  CodeLabel: Kód
+  NextButtonText: Další
+  ResendButtonText: Znovu poslat kód
+
+EmailVerificationDone:
+  Title: Ověření e-mailu
+  Description: Vaše e-mailová adresa byla úspěšně ověřena.
+  NextButtonText: Další
+  CancelButtonText: Zrušit
+  LoginButtonText: Přihlásit se
+
+RegisterOption:
+  Title: Možnosti registrace
+  Description: Vyberte si, jak se chcete zaregistrovat
+  RegisterUsernamePasswordButtonText: Pomocí uživatelského jména a hesla
+  ExternalLoginDescription: nebo se zaregistrujte s externím uživatelem
+  LoginButtonText: Přihlásit se
+
+RegistrationUser:
+  Title: Registrace
+  Description: Zadejte své uživatelské údaje. Váš e-mail bude použit jako vaše přihlašovací jméno.
+  DescriptionOrgRegister: Zadejte své uživatelské údaje.
+  EmailLabel: E-mail
+  UsernameLabel: Uživatelské jméno
+  FirstnameLabel: Křestní jméno
+  LastnameLabel: Příjmení
+  LanguageLabel: Jazyk
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  GenderLabel: Pohlaví
+  Female: Žena
+  Male: Muž
+  Diverse: různorodé / X
+  PasswordLabel: Heslo
+  PasswordConfirmLabel: Potvrzení hesla
+  TosAndPrivacyLabel: Obchodní podmínky
+  TosConfirm: Souhlasím s
+  TosLinkText: obchodními podmínkami
+  PrivacyConfirm: Souhlasím se
+  PrivacyLinkText: zásadami ochrany osobních údajů
+  ExternalLogin: nebo se zaregistrujte s externím uživatelem
+  BackButtonText: Přihlásit se
+  NextButtonText: Další
+
+ExternalRegistrationUserOverview:
+  Title: Registrace externího uživatele
+  Description: Vaše uživatelské údaje byly převzaty z vybraného poskytovatele. Nyní je můžete změnit nebo doplnit.
+  EmailLabel: E-mail
+  UsernameLabel: Uživatelské jméno
+  FirstnameLabel: Křestní jméno
+  LastnameLabel: Příjmení
+  NicknameLabel: Přezdívka
+  PhoneLabel: Telefonní číslo
+  LanguageLabel: Jazyk
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  TosAndPrivacyLabel: Obchodní podmínky
+  TosConfirm: Souhlasím s
+  TosLinkText: obchodními podmínkami
+  PrivacyConfirm: Souhlasím se
+  PrivacyLinkText: zásadami ochrany osobních údajů
+  ExternalLogin: nebo se zaregistrujte s externím uživatelem
+  BackButtonText: Zpět
+  NextButtonText: Uložit
+
+RegistrationOrg:
+  Title: Registrace organizace
+  Description: Zadejte název vaší organizace a uživatelské údaje.
+  OrgNameLabel: Název organizace
+  EmailLabel: E-mail
+  UsernameLabel: Uživatelské jméno
+  FirstnameLabel: Křestní jméno
+  LastnameLabel: Příjmení
+  PasswordLabel: Heslo
+  PasswordConfirmLabel: Potvrzení hesla
+  TosAndPrivacyLabel: Obchodní podmínky
+  TosConfirm: Souhlasím s
+  TosLinkText: obchodními podmínkami
+  PrivacyConfirm: Souhlasím se
+  PrivacyLinkText: zásadami ochrany osobních údajů
+  SaveButtonText: Vytvořit organizaci
+
+LoginSuccess:
+  Title: Úspěšné přihlášení
+  AutoRedirectDescription: Budete automaticky přesměrováni zpět do vaší aplikace. Pokud ne, klikněte na tlačítko níže. Poté můžete okno zavřít.
+  RedirectedDescription: Nyní můžete okno zavřít.
+  NextButtonText: Další
+
+LogoutDone:
+  Title: Odhlášení proběhlo úspěšně
+  Description: Byli jste úspěšně odhlášeni.
+  LoginButtonText: Přihlásit se
+
+LinkingUsersDone:
+  Title: Propojení uživatele
+  Description: Uživatel propojen.
+  CancelButtonText: Zrušit
+  NextButtonText: Další
+
+ExternalNotFound:
+  Title: Externí uživatel nenalezen
+  Description: Externí uživatel nebyl nalezen. Chcete propojit svého uživatele nebo automaticky zaregistrovat nového?
+  LinkButtonText: Propojit
+  AutoRegisterButtonText: Registrovat
+  TosAndPrivacyLabel: Obchodní podmínky
+  TosConfirm: Souhlasím s
+  TosLinkText: obchodními podmínkami
+  PrivacyConfirm: Souhlasím s
+  PrivacyLinkText: zásadami ochrany osobních údajů
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+DeviceAuth:
+  Title: Autorizace zařízení
+  UserCode:
+    Label: Uživatelský kód
+    Description: Zadejte uživatelský kód zobrazený na zařízení.
+    ButtonNext: Další
+  Action:
+    Description: Povolte přístup zařízení.
+    GrantDevice: chystáte se povolit zařízení
+    AccessToScopes: přístup k následujícím rozsahům
+    Button:
+      Allow: Povolit
+      Deny: Zamítnout
+  Done:
+    Description: Hotovo.
+    Approved: Autorizace zařízení schválena. Nyní se můžete vrátit k zařízení.
+    Denied: Autorizace zařízení zamítnuta. Nyní se můžete vrátit k zařízení.
+
+Footer:
+  PoweredBy: Provozováno pomocí
+  Tos: Obchodní podmínky
+  PrivacyPolicy: Zásady ochrany osobních údajů
+  Help: Pomoc
+  SupportEmail: E-mailová podpora
+
+SignIn: Přihlašte se pomocí {{.Provider}}
+
+Errors:
+  Internal: Došlo k interní chybě
+  AuthRequest:
+    NotFound: Authrequest nebyl nalezen
+    UserAgentNotCorresponding: User Agent neodpovídá
+    UserAgentNotFound: ID User Agenta nebylo nalezeno
+    TokenNotFound: Token nebyl nalezen
+    RequestTypeNotSupported: Typ požadavku není podporován
+    MissingParameters: Chybějící požadované parametry
+  User:
+    NotFound: Uživatel nebyl nalezen
+    AlreadyExists: Uživatel již existuje
+    Inactive: Uživatel je neaktivní
+    NotFoundOnOrg: Uživatel nebyl nalezen ve zvolené organizaci
+    NotAllowedOrg: Uživatel není členem požadované organizace
+    NotMatchingUserID: ID uživatele a uživatele v authrequestu se neshodují
+    UserIDMissing: ID uživatele chybí
+    Invalid: Neplatná uživatelská data
+    DomainNotAllowedAsUsername: Doména je již rezervována a nelze ji použít jako uživatelské jméno
+    NotAllowedToLink: Uživatel nemá povoleno propojení s externím poskytovatelem přihlášení
+    Profile:
+      NotFound: Profil nenalezen
+      NotChanged: Profil nebyl změněn
+      Empty: Profil je prázdný
+      FirstNameEmpty: Jméno v profilu je prázdné
+      LastNameEmpty: Příjmení v profilu je prázdné
+      IDMissing: Chybí ID profilu
+    Email:
+      NotFound: E-mail nenalezen
+      Invalid: E-mail je neplatný
+      AlreadyVerified: E-mail je již ověřen
+      NotChanged: E-mail nebyl změněn
+      Empty: E-mail je prázdný
+      IDMissing: Chybí ID e-mailu
+    Phone:
+      NotFound: Telefon nenalezen
+      Invalid: Telefon je neplatný
+      AlreadyVerified: Telefon již byl ověřen
+      Empty: Telefon je prázdný
+      NotChanged: Telefon nebyl změněn
+    Address:
+      NotFound: Adresa nenalezena
+      NotChanged: Adresa nebyla změněna
+    Username:
+      AlreadyExists: Uživatelské jméno již je obsazené
+      Reserved: Uživatelské jméno není volné
+      Empty: Uživatelské jméno je prázdné
+    Password:
+      ConfirmationWrong: Potvrzení hesla je nesprávné
+      Empty: Heslo je prázdné
+      Invalid: Heslo je neplatné
+      InvalidAndLocked: Heslo je neplatné a uživatel je uzamčen, kontaktujte svého správce.
+      NotChanged: Nové heslo nesmí být stejné jako stávající heslo
+    UsernameOrPassword:
+      Invalid: Uživatelské jméno nebo heslo je neplatné
+    PasswordComplexityPolicy:
+      NotFound: Zásady složitosti hesla nenalezeny
+      MinLength: Heslo je příliš krátké
+      HasLower: Heslo musí obsahovat malé písmeno
+      HasUpper: Heslo musí obsahovat velké písmeno
+      HasNumber: Heslo musí obsahovat číslo
+      HasSymbol: Heslo musí obsahovat symbol
+    Code:
+      Expired: Kód vypršel
+      Invalid: Kód je neplatný
+      Empty: Kód je prázdný
+      CryptoCodeNil: Krypto kód je nulový
+      NotFound: Kód nebyl nalezen
+      GeneratorAlgNotSupported: Nepodporovaný algoritmus generátoru
+    EmailVerify:
+      UserIDEmpty: ID uživatele je prázdné
+    ExternalData:
+      CouldNotRead: Externí data nebylo možné správně přečíst
+    MFA:
+      NoProviders: Žádní dostupní poskytovatelé vícefaktorového ověřování
+      OTP:
+        AlreadyReady: Vícefaktorové OTP (jednorázové heslo) je již nastaveno
+        NotExisting: Vícefaktorové OTP (jednorázové heslo) neexistuje
+        InvalidCode: Neplatný kód
+        NotReady: Vícefaktorové OTP (jednorázové heslo) není připraveno
+    Locked: Uživatel je uzamčen
+    SomethingWentWrong: Něco se pokazilo
+    NotActive: Uživatel není aktivní
+    ExternalIDP:
+      IDPTypeNotImplemented: Typ IDP není implementován
+      NotAllowed: Externí poskytovatel přihlášení není povolen
+      IDPConfigIDEmpty: ID konfigurace poskytovatele identity je prázdné
+      ExternalUserIDEmpty: Externí ID uživatele je prázdné
+      UserDisplayNameEmpty: Zobrazované jméno uživatele je prázdné
+      NoExternalUserData: Nebyla přijata žádná externí uživatelská data
+      CreationNotAllowed: Vytvoření nového uživatele není na tomto poskytovateli povoleno
+      LinkingNotAllowed: Propojení uživatele není na tomto poskytovateli povoleno
+    GrantRequired: Přihlášení není možné. Uživatel musí mít alespoň jeden oprávnění na aplikaci. Prosím, kontaktujte svého správce.
+    ProjectRequired: Přihlášení není možné. Organizace uživatele musí být přidělena k projektu. Prosím, kontaktujte svého správce.
+  IdentityProvider:
+    InvalidConfig: Konfigurace poskytovatele identity je neplatná
+  IAM:
+    LockoutPolicy:
+      NotExisting: Zásady uzamčení neexistují
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registrace není povolena
+  DeviceAuth:
+    NotExisting: Kód uživatelského zařízení neexistuje
+
+optional: (volitelné)

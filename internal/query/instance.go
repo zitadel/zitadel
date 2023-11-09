@@ -291,7 +291,7 @@ func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 	return sq.Select(
 			InstanceColumnID.identifier(),
 			countColumn.identifier(),
-		).From(instanceTable.identifier()).
+		).Distinct().From(instanceTable.identifier()).
 			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)),
 		func(builder sq.SelectBuilder) sq.SelectBuilder {
 			return sq.Select(

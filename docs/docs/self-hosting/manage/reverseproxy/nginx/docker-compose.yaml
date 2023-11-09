@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+
+  proxy-disabled-tls:
+    image: "nginx:1.25.3-alpine"
+    volumes:
+      - "./nginx-disabled-tls.conf:/etc/nginx/nginx.conf:ro"
+    ports:
+      - "80:80"
+    depends_on:
+      zitadel-disabled-tls:
+        condition: 'service_healthy'
+
+  proxy-external-tls:
+    image: "nginx:1.25.3-alpine"
+    volumes:
+      - "./nginx-external-tls.conf:/etc/nginx/nginx.conf:ro"
+      - "./selfsigned.crt:/etc/certs/selfsigned.crt:ro"
+      - "./selfsigned.key:/etc/certs/selfsigned.key:ro"
+    ports:
+      - "443:443"
+    depends_on:
+      zitadel-external-tls:
+        condition: 'service_healthy'
+
+  proxy-enabled-tls:
+    image: "nginx:1.25.3-alpine"
+    volumes:
+      - "./nginx-enabled-tls.conf:/etc/nginx/nginx.conf:ro"
+      - "./selfsigned.crt:/etc/certs/selfsigned.crt:ro"
+      - "./selfsigned.key:/etc/certs/selfsigned.key:ro"
+    ports:
+      - "443:443"
+    depends_on:
+      zitadel-enabled-tls:
+        condition: 'service_healthy'

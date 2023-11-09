@@ -2,6 +2,7 @@ import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import localeBg from '@angular/common/locales/bg';
 import localeDe from '@angular/common/locales/de';
+import localeCs from '@angular/common/locales/cs';
 import localeEn from '@angular/common/locales/en';
 import localeEs from '@angular/common/locales/es';
 import localeFr from '@angular/common/locales/fr';
@@ -11,6 +12,7 @@ import localeMk from '@angular/common/locales/mk';
 import localePl from '@angular/common/locales/pl';
 import localePt from '@angular/common/locales/pt';
 import localeZh from '@angular/common/locales/zh';
+import localeRu from '@angular/common/locales/ru';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -89,6 +91,10 @@ registerLocaleData(localePt);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/pt.json'));
 registerLocaleData(localeMk);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/mk.json'));
+registerLocaleData(localeRu);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/ru.json'));
+registerLocaleData(localeCs);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/cs.json'));
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {

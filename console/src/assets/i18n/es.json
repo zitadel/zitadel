@@ -1060,7 +1060,9 @@
       "zh": "简体中文",
       "bg": "Български",
       "pt": "Portuguese",
-      "mk": "Македонски"
+      "mk": "Македонски",
+      "cs": "Čeština",
+      "ru": "Русский"
     },
     "SMTP": {
       "TITLE": "Ajustes SMTP",
@@ -1271,7 +1273,9 @@
         "zh": "简体中文",
         "bg": "Български",
         "pt": "Portuguese",
-        "mk": "Македонски"
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificación de email realizada",
@@ -2157,7 +2161,9 @@
     "zh": "简体中文",
     "bg": "Български",
     "pt": "Portuguese",
-    "mk": "Македонски"
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский"
   },
   "MEMBER": {
     "ADD": "Añadir un Mánager",
