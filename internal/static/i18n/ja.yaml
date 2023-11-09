@@ -306,7 +306,7 @@ Errors:
       NotActive: プロジェクトグラントはアクティブではありません
       NotInactive: プロジェクトグラントは非アクティブではありません
   IAM:
-    NotFound: インスタンスが見つかりません
+    NotFound: インスタンスが見つかりません https://zitadel.com/docs/self-hosting/manage/custom-domain
     Member:
       RolesNotChanged: ロールは変更されていません
     MemberInvalid: 無効なメンバーです

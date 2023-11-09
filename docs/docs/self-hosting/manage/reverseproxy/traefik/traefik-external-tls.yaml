@@ -1,0 +1,27 @@
+log:
+  level: "DEBUG"
+providers:
+  file:
+    filename: "/etc/traefik/traefik.yaml"
+entrypoints:
+  web:
+    address: ":443"
+http:
+  routers:
+    router:
+      entryPoints:
+        - "web"
+      service: "zitadel"
+      rule: 'PathPrefix(`/`)'
+      tls: {}
+  services:
+    zitadel:
+      loadBalancer:
+        servers:
+          - url: "h2c://zitadel-external-tls:8080"
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/certs/selfsigned.crt
+        keyFile: /etc/certs/selfsigned.key

@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+
+  zitadel-disabled-tls:
+    extends:
+      service: zitadel-init
+    command: 'start-from-setup --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
+    environment:
+      - ZITADEL_EXTERNALPORT=80
+      - ZITADEL_EXTERNALSECURE=false
+      - ZITADEL_TLS_ENABLED=false
+    depends_on:
+      zitadel-init:
+        condition: 'service_completed_successfully'
+      db:
+        condition: 'service_healthy'
+
+  zitadel-external-tls:
+    extends:
+      service: zitadel-init
+    command: 'start-from-setup --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
+    environment:
+      - ZITADEL_EXTERNALPORT=443
+      - ZITADEL_EXTERNALSECURE=true
+      - ZITADEL_TLS_ENABLED=false
+    depends_on:
+      zitadel-init:
+        condition: 'service_completed_successfully'
+      db:
+        condition: 'service_healthy'
+
+  zitadel-enabled-tls:
+    extends:
+      service: zitadel-init
+    command: 'start-from-setup --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
+    environment:
+      - ZITADEL_EXTERNALPORT=443
+      - ZITADEL_EXTERNALSECURE=true
+      - ZITADEL_TLS_ENABLED=true
+      - ZITADEL_TLS_CERTPATH=/etc/certs/selfsigned.crt
+      - ZITADEL_TLS_KEYPATH=/etc/certs/selfsigned.key
+    volumes:
+      - ./selfsigned.crt:/etc/certs/selfsigned.crt
+      - ./selfsigned.key:/etc/certs/selfsigned.key
+    depends_on:
+      zitadel-init:
+        condition: 'service_completed_successfully'
+      db:
+        condition: 'service_healthy'
+
+  zitadel-init:
+    user: '$UID'
+    image: '${ZITADEL_IMAGE:-ghcr.io/zitadel/zitadel:latest}'
+    command: 'init --config /zitadel.yaml'
+    depends_on:
+      db:
+        condition: 'service_healthy'
+    environment:
+      # Using an external domain other than localhost proofs, that the proxy configuration works.
+      # If ZITADEL can't resolve a requests original host to this domain,
+      # it will return a 404 Instance not found error.
+      - ZITADEL_EXTERNALDOMAIN=127.0.0.1.sslip.io
+      # ZITADEL accesses the database via the docker network.
+      - ZITADEL_DATABASE_COCKROACH_HOST=db
+      # In case something doesn't work as expected,
+      # it can be handy to be able to read the access logs.
+      - ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED=true
+      # For convenience, ZITADEL should not ask to change the initial admin users password.
+      - ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED=false
+    healthcheck:
+      test: ["CMD", "/app/zitadel", "ready"]
+      interval: '10s'
+      timeout: '5s'
+      retries: 5
+      start_period: '10s'
+
+  db:
+    restart: 'always'
+    image: 'cockroachdb/cockroach:latest'
+    command: 'start-single-node --insecure --http-addr :9090'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9090/health?ready=1']
+      interval: '10s'
+      timeout: '30s'
+      retries: 5
+      start_period: '20s'
+    ports:
+      - "26257:26257"
+      - "9090:9090"

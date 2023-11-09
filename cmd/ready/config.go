@@ -9,12 +9,14 @@ import (
 
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/config/hook"
+	"github.com/zitadel/zitadel/internal/config/network"
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
 type Config struct {
 	Log  *logging.Config
 	Port uint16
+	TLS  network.TLS
 }
 
 func MustNewConfig(v *viper.Viper) *Config {

@@ -317,7 +317,7 @@ Errors:
       NotActive: 项目授权不是启用状态
       NotInactive: 项目授权不是停用状态
   IAM:
-    NotFound: 实例未找到
+    NotFound: 实例未找到。查看 https://zitadel.com/docs/self-hosting/manage/custom-domain
     Member:
       RolesNotChanged: 角色没有改变
     MemberInvalid: 成员无效

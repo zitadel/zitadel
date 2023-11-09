@@ -319,7 +319,7 @@ Errors:
       NotActive: Грантът по проекта не е активен
       NotInactive: Грантът по проекта не е неактивен
   IAM:
-    NotFound: Екземплярът не е намерен
+    NotFound: Екземплярът не е намерен. Вижте https://zitadel.com/docs/self-hosting/manage/custom-domain
     Member:
       RolesNotChanged: Ролите не са сменени
     MemberInvalid: Членът е невалиден
