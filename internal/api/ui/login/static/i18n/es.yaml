@@ -246,6 +246,8 @@ RegistrationUser:
   Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
   GenderLabel: Género
   Female: Mujer
   Male: Hombre
@@ -282,6 +284,8 @@ ExternalRegistrationUserOverview:
   Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
   TosAndPrivacyLabel: Términos y condiciones
   TosConfirm: Acepto los
   TosLinkText: TDS
@@ -346,6 +350,8 @@ ExternalNotFound:
   Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
   
 Footer:
   PoweredBy: Powered By

@@ -65,8 +65,13 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 			wm.PasswordCheckFailedCount += 1
 		case *user.HumanPasswordCheckSucceededEvent:
 			wm.PasswordCheckFailedCount = 0
+		case *user.UserLockedEvent:
+			wm.UserState = domain.UserStateLocked
 		case *user.UserUnlockedEvent:
 			wm.PasswordCheckFailedCount = 0
+			if wm.UserState != domain.UserStateDeleted {
+				wm.UserState = domain.UserStateActive
+			}
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
 		case *user.HumanPasswordHashUpdatedEvent:
@@ -92,6 +97,7 @@ func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanPasswordCheckSucceededType,
 			user.HumanPasswordHashUpdatedType,
 			user.UserRemovedType,
+			user.UserLockedType,
 			user.UserUnlockedType,
 			user.UserV1AddedType,
 			user.UserV1RegisteredType,
@@ -107,6 +113,9 @@ func (wm *HumanPasswordWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 	if wm.ResourceOwner != "" {
 		query.ResourceOwner(wm.ResourceOwner)
+	}
+	if wm.WriteModel.ProcessedSequence != 0 {
+		query.SequenceGreater(wm.WriteModel.ProcessedSequence)
 	}
 	return query
 }
