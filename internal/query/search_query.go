@@ -2,6 +2,7 @@ package query
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"time"
 
@@ -92,27 +93,26 @@ func (q *IsNullQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 func (q *IsNullQuery) comp() sq.Sqlizer {
 	return sq.Eq{q.Column.identifier(): nil}
 }
-
 func (q *IsNullQuery) Col() Column {
 	return q.Column
 }
 
-type orQuery struct {
+type OrQuery struct {
 	queries []SearchQuery
 }
 
-func newOrQuery(queries ...SearchQuery) (*orQuery, error) {
+func NewOrQuery(queries ...SearchQuery) (*OrQuery, error) {
 	if len(queries) == 0 {
 		return nil, ErrMissingColumn
 	}
-	return &orQuery{queries: queries}, nil
+	return &OrQuery{queries: queries}, nil
 }
 
-func (q *orQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *OrQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
 }
 
-func (q *orQuery) comp() sq.Sqlizer {
+func (q *OrQuery) comp() sq.Sqlizer {
 	or := make(sq.Or, len(q.queries))
 	for i, query := range q.queries {
 		or[i] = query.comp()
@@ -120,7 +120,66 @@ func (q *orQuery) comp() sq.Sqlizer {
 	return or
 }
 
-func (q *orQuery) Col() Column {
+type AndQuery struct {
+	queries []SearchQuery
+}
+
+func (q *AndQuery) Col() Column {
+	return Column{}
+}
+func NewAndQuery(queries ...SearchQuery) (*AndQuery, error) {
+	if len(queries) == 0 {
+		return nil, ErrMissingColumn
+	}
+	return &AndQuery{queries: queries}, nil
+}
+
+func (q *AndQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (q *AndQuery) comp() sq.Sqlizer {
+	and := make(sq.And, len(q.queries))
+	for i, query := range q.queries {
+		and[i] = query.comp()
+	}
+	return and
+}
+
+type NotQuery struct {
+	query SearchQuery
+}
+
+func (q *NotQuery) Col() Column {
+	return q.query.Col()
+}
+func NewNotQuery(query SearchQuery) (*NotQuery, error) {
+	if query == nil {
+		return nil, ErrMissingColumn
+	}
+	return &NotQuery{query: query}, nil
+}
+
+func (q *NotQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (notQ NotQuery) ToSql() (sql string, args []interface{}, err error) {
+	querySql, queryArgs, queryErr := notQ.query.comp().ToSql()
+	// Handle the error from the query's ToSql() function.
+	if queryErr != nil {
+		return "", queryArgs, queryErr
+	}
+	// Construct the SQL statement.
+	sql = fmt.Sprintf("NOT (%s)", querySql)
+	return sql, queryArgs, nil
+}
+
+func (q *NotQuery) comp() sq.Sqlizer {
+	return q
+}
+
+func (q *OrQuery) Col() Column {
 	return Column{}
 }
 

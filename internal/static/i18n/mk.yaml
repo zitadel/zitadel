@@ -51,6 +51,7 @@ Errors:
   Notification:
     NoDomain: Не е пронајден домен за пораката
   User:
+    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: Корисникот не е пронајден
     AlreadyExists: Корисникот веќе постои
     NotFoundOnOrg: Корисникот не е пронајден во избраната организација

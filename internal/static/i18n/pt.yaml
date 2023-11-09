@@ -51,6 +51,7 @@ Errors:
   Notification:
     NoDomain: Nenhum domínio encontrado para a mensagem
   User:
+    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: Usuário não pôde ser encontrado
     AlreadyExists: Usuário já existe
     NotFoundOnOrg: Usuário não pôde ser encontrado na organização escolhida
