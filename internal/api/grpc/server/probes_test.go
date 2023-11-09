@@ -109,7 +109,7 @@ func Test_validate(t *testing.T) {
 		validations map[string]ValidationFunction
 	}
 	type res struct {
-		want map[string]error
+		want map[string]any
 	}
 	tests := []struct {
 		name string
@@ -126,7 +126,7 @@ func Test_validate(t *testing.T) {
 				},
 			},
 			res{
-				map[string]error{},
+				map[string]any{},
 			},
 		},
 		{
@@ -142,7 +142,7 @@ func Test_validate(t *testing.T) {
 				},
 			},
 			res{
-				map[string]error{
+				map[string]any{
 					"error": errors.ThrowInternal(nil, "id", "message"),
 				},
 			},
