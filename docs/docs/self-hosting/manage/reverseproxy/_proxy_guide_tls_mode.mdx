@@ -1,0 +1,90 @@
+import CodeBlock from '@theme/CodeBlock';
+
+export const Description = ({mode, link}) => {
+    let desc
+    switch (mode) {
+        case "disabled":
+            desc = <>Neither {link} nor ZITADEL terminates TLS.
+                Nevertheless, {link} forwards unencrypted HTTP/2 traffic, aka h2c, to ZITADEL.</>;
+            break;
+        case "external":
+            desc = <>{link} terminates TLS and forwards the requests to ZITADEL via unencrypted h2c.
+                This example uses an unsafe self-signed certificate for {link}</>;
+            break;
+        case "enabled":
+            desc = <>{link} terminates TLS and forwards the requests to ZITADEL via encrypted HTTP/2.
+                This example uses an unsafe self-signed certificate for {link} and the same for ZITADEL.</>;
+            break;
+    }
+    return (
+        <>
+            {desc}
+            <>By executing the commands below, you will download the files necessary to run ZITADEL behind {link} with the following config:</>
+        </>)
+}
+
+export const Commands = ({mode, name, lower, configfilename}) => {
+    let genCert = '# Generate a self signed certificate and key.\nopenssl req -x509 -batch -subj "/CN=127.0.0.1.sslip.io/O=ZITADEL Demo" -nodes -newkey rsa:2048 -keyout ./selfsigned.key -out ./selfsigned.crt\n\n';
+    let connPort = "443"
+    let connInsecureFlag = "--insecure "
+    let connScheme = "https"
+    let grpcPlainTextFlag = ""
+    if (mode === "disabled") {
+        genCert = ''
+        connPort = "80"
+        grpcPlainTextFlag = "--plaintext "
+        connScheme = "http"
+        // We only need that flag for TLS connections with the self-signed cert
+        connInsecureFlag = ""
+    }
+    return (
+        <div>
+            <CodeBlock language="bash">
+                {'# Download the configuration files.'}{'\n'}
+                {'export ZITADEL_CONFIG_FILES=https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/reverseproxy\n'}
+                {`wget $\{ZITADEL_CONFIG_FILES\}/docker-compose.yaml -O docker-compose-base.yaml`}{'\n'}
+                {'wget $\{ZITADEL_CONFIG_FILES\}/'}{lower}{'/docker-compose.yaml -O docker-compose-'}{lower}{'.yaml'}{'\n'}
+                {'wget $\{ZITADEL_CONFIG_FILES\}/'}{lower}{'/'}{configfilename}{' -O '}{configfilename}{'\n'}
+                {'\n'}
+                {genCert}
+                {'# Run the database, ZITADEL and '}{name}{'.'}{'\n'}
+                {'docker compose --file docker-compose-base.yaml --file docker-compose-'}{lower}{'.yaml up --detach proxy-'}{mode}{'-tls'}{'\n'}
+                {'\n'}
+                {'# Test that gRPC and HTTP APIs work. Empty brackets like {} means success.\n'}
+                {'sleep 3\n'}
+                {'grpcurl '}{connInsecureFlag}{grpcPlainTextFlag}{'127.0.0.1.sslip.io:'}{connPort}{' zitadel.admin.v1.AdminService/Healthz\n'}
+                {'curl '}{connInsecureFlag}{connScheme}{'://127.0.0.1.sslip.io:'}{connPort}{'/admin/v1/healthz\n'}
+            </CodeBlock>
+        </div>
+    )
+}
+
+export const LoginURL = ({mode}) => {
+    let scheme = "https";
+    if (mode === "disabled") {
+        scheme = "http"
+    }
+    const url = scheme + "://127.0.0.1.sslip.io/ui/console";
+    return <a href={url}>{url}</a>
+}
+
+<Description mode={props.mode} name={props.providername} link={props.link}/>
+
+<details open>
+    <summary>{props.configfilename}</summary>
+    <CodeBlock>{props.configfilecontent}</CodeBlock>
+</details>
+
+<Commands mode={props.mode} name={props.providername} lower={props.lower} configfilename={props.configfilename}/>
+
+<>When the docker compose command exits successfully, go to <LoginURL mode={props.mode}/> and log in:</>
+
+- **username**: *zitadel-admin@<span></span>zitadel.127.0.0.1.sslip.io*
+- **password**: *Password1!*
+
+If the console loads normally, you know that the HTTP and gRPC-Web and gRPC APIs are working correctly.
+
+<CodeBlock language="bash">
+    {'# You can now stop the database, ZITADEL and '}{props.providername}{'.'}{'\n'}
+    {'docker compose --file docker-compose-base.yaml --file docker-compose-'}{props.lower}{'.yaml down'}{'\n'}
+</CodeBlock>

@@ -1383,6 +1383,415 @@ func TestNumberComparisonFromMethod(t *testing.T) {
 	}
 }
 
+func TestNewOrQuery(t *testing.T) {
+
+	type args struct {
+		queries []SearchQuery
+	}
+
+	singleCorrectQuery, _ := NewTextQuery(testCol, "hello", TextEquals)
+
+	tests := []struct {
+		name    string
+		args    args
+		want    *OrQuery
+		wantErr func(error) bool
+	}{
+		{
+			name: "empty values",
+			args: args{
+				queries: []SearchQuery{},
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, ErrMissingColumn)
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				queries: []SearchQuery{singleCorrectQuery},
+			},
+			want: &OrQuery{
+				queries: []SearchQuery{singleCorrectQuery},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewOrQuery(tt.args.queries...)
+			if err != nil && tt.wantErr == nil {
+				t.Errorf("NewOrQuery() no error expected got %v", err)
+				return
+			} else if tt.wantErr != nil && !tt.wantErr(err) {
+				t.Errorf("NewOrQuery() unexpeted error = %v", err)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewOrQuery() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+func TestOrQuery_comp(t *testing.T) {
+	q1, _ := NewTextQuery(testCol, "hello1", TextEquals)
+	q2, _ := NewTextQuery(testCol, "hello2", TextEquals)
+	q3, _ := NewTextQuery(testCol2, "world1", TextEquals)
+	q4, _ := NewTextQuery(testCol2, "world2", TextEquals)
+	orq, _ := NewOrQuery(q3, q4)
+
+	type fields struct {
+		queries []SearchQuery
+	}
+	type want struct {
+		query interface{}
+		isNil bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   want
+	}{
+		{
+			name: "single input",
+			fields: fields{
+				queries: []SearchQuery{q1},
+			},
+			want: want{
+				query: sq.Or{sq.Eq{"test_table.test_col": "hello1"}},
+			},
+		},
+		{
+			name: "multi input",
+			fields: fields{
+				queries: []SearchQuery{q1, q2},
+			},
+			want: want{
+				query: sq.Or{sq.Eq{"test_table.test_col": "hello1"}, sq.Eq{"test_table.test_col": "hello2"}},
+			},
+		},
+		{
+			name: "nested inputs",
+			fields: fields{
+				queries: []SearchQuery{q1, orq},
+			},
+			want: want{
+				query: sq.Or{sq.Eq{"test_table.test_col": "hello1"}, sq.Or{sq.Eq{"test_table2.test_col2": "world1"}, sq.Eq{"test_table2.test_col2": "world2"}}},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &OrQuery{
+				queries: tt.fields.queries,
+			}
+			query := s.comp()
+			if query == nil && tt.want.isNil {
+				return
+			} else if tt.want.isNil && query != nil {
+				t.Error("query should not be nil")
+			}
+
+			if !reflect.DeepEqual(query, tt.want.query) {
+				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, query, query)
+			}
+		})
+	}
+}
+func TestNewAndQuery(t *testing.T) {
+
+	type args struct {
+		queries []SearchQuery
+	}
+
+	singleCorrectQuery, _ := NewTextQuery(testCol, "hello", TextEquals)
+
+	tests := []struct {
+		name    string
+		args    args
+		want    *AndQuery
+		wantErr func(error) bool
+	}{
+		{
+			name: "empty values",
+			args: args{
+				queries: []SearchQuery{},
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, ErrMissingColumn)
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				queries: []SearchQuery{singleCorrectQuery},
+			},
+			want: &AndQuery{
+				queries: []SearchQuery{singleCorrectQuery},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewAndQuery(tt.args.queries...)
+			if err != nil && tt.wantErr == nil {
+				t.Errorf("NewAndQuery() no error expected got %v", err)
+				return
+			} else if tt.wantErr != nil && !tt.wantErr(err) {
+				t.Errorf("NewAndQuery() unexpeted error = %v", err)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewAndQuery() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestAndQuery_comp(t *testing.T) {
+	q1, _ := NewTextQuery(testCol, "hello1", TextEquals)
+	q2, _ := NewTextQuery(testCol, "hello2", TextEquals)
+	q3, _ := NewTextQuery(testCol2, "world1", TextEquals)
+	q4, _ := NewTextQuery(testCol2, "world2", TextEquals)
+	andq, _ := NewAndQuery(q3, q4)
+
+	type fields struct {
+		queries []SearchQuery
+	}
+	type want struct {
+		query interface{}
+		isNil bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   want
+	}{
+		{
+			name: "single input",
+			fields: fields{
+				queries: []SearchQuery{q1},
+			},
+			want: want{
+				query: sq.And{sq.Eq{"test_table.test_col": "hello1"}},
+			},
+		},
+		{
+			name: "multi input",
+			fields: fields{
+				queries: []SearchQuery{q1, q2},
+			},
+			want: want{
+				query: sq.And{sq.Eq{"test_table.test_col": "hello1"}, sq.Eq{"test_table.test_col": "hello2"}},
+			},
+		},
+		{
+			name: "nested inputs",
+			fields: fields{
+				queries: []SearchQuery{q1, andq},
+			},
+			want: want{
+				query: sq.And{sq.Eq{"test_table.test_col": "hello1"}, sq.And{sq.Eq{"test_table2.test_col2": "world1"}, sq.Eq{"test_table2.test_col2": "world2"}}},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &AndQuery{
+				queries: tt.fields.queries,
+			}
+			query := s.comp()
+			if query == nil && tt.want.isNil {
+				return
+			} else if tt.want.isNil && query != nil {
+				t.Error("query should not be nil")
+			}
+
+			if !reflect.DeepEqual(query, tt.want.query) {
+				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, query, query)
+			}
+		})
+	}
+}
+
+func TestNewNotQuery(t *testing.T) {
+
+	type args struct {
+		query SearchQuery
+	}
+
+	singleCorrectQuery, _ := NewTextQuery(testCol, "hello", TextEquals)
+
+	tests := []struct {
+		name    string
+		args    args
+		want    *NotQuery
+		wantErr func(error) bool
+	}{
+		{
+			name: "empty query",
+			args: args{
+				query: nil,
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, ErrMissingColumn)
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				query: singleCorrectQuery,
+			},
+			want: &NotQuery{
+				query: singleCorrectQuery,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewNotQuery(tt.args.query)
+			if err != nil && tt.wantErr == nil {
+				t.Errorf("NewNotQuery() no error expected got %v", err)
+				return
+			} else if tt.wantErr != nil && !tt.wantErr(err) {
+				t.Errorf("NewNotQuery() unexpeted error = %v", err)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewNotQuery() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNotQuery_comp(t *testing.T) {
+	q1, _ := NewTextQuery(testCol, "hello1", TextEquals)
+
+	type fields struct {
+		query SearchQuery
+	}
+	type want struct {
+		query interface{}
+		isNil bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   want
+	}{
+		{
+			name: "single input",
+			fields: fields{
+				query: q1,
+			},
+			want: want{
+				query: &NotQuery{query: q1},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &NotQuery{
+				query: tt.fields.query,
+			}
+			query := s.comp()
+			if query == nil && tt.want.isNil {
+				return
+			} else if tt.want.isNil && query != nil {
+				t.Error("query should not be nil")
+			}
+
+			if !reflect.DeepEqual(query, tt.want.query) {
+				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, query, query)
+			}
+		})
+	}
+}
+func TestNotQuery_ToSql(t *testing.T) {
+	q, _ := NewTextQuery(testCol, "hello1", TextEquals)
+	type fields struct {
+		query SearchQuery
+	}
+	type want struct {
+		query string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   want
+	}{
+		{
+			name: "single input",
+			fields: fields{
+				query: q,
+			},
+			want: want{
+				query: "NOT (test_table.test_col = hello1)",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &NotQuery{
+				query: tt.fields.query,
+			}
+			queryStr, _, err := s.ToSql()
+			if err != nil {
+				t.Error("an error raised ")
+			}
+			if queryStr == tt.want.query {
+				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, queryStr, queryStr)
+			}
+		})
+	}
+}
+
+func TestAndOrQueryCombo(t *testing.T) {
+	q1, _ := NewTextQuery(testCol, "hello1", TextEquals)
+	q2, _ := NewTextQuery(testCol, "hello2", TextEquals)
+	q3, _ := NewTextQuery(testCol2, "world1", TextEquals)
+	q4, _ := NewTextQuery(testCol2, "world2", TextEquals)
+	andq, _ := NewAndQuery(q3, q4)
+	orq, _ := NewOrQuery(q1, q2, andq)
+
+	type fields struct {
+		query SearchQuery
+	}
+	type want struct {
+		query interface{}
+		isNil bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   want
+	}{
+		{
+			name: "OR containing AND query",
+			fields: fields{
+				query: orq,
+			},
+			want: want{
+				query: sq.Or{sq.Eq{"test_table.test_col": "hello1"}, sq.Eq{"test_table.test_col": "hello2"}, sq.And{sq.Eq{"test_table2.test_col2": "world1"}, sq.Eq{"test_table2.test_col2": "world2"}}},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := tt.fields.query
+			query := s.comp()
+			if query == nil && tt.want.isNil {
+				return
+			} else if tt.want.isNil && query != nil {
+				t.Error("query should not be nil")
+			}
+
+			if !reflect.DeepEqual(query, tt.want.query) {
+				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, query, query)
+			}
+		})
+	}
+}
+
 func TestNewInTextQuery(t *testing.T) {
 	type args struct {
 		column Column
