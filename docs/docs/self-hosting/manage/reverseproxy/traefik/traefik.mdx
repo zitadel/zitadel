@@ -16,6 +16,8 @@ export const link = <a href="https://doc.traefik.io/traefik/">{providername}</a>
 
 <ProxyGuideOverview link={link} compose={Compose}></ProxyGuideOverview>
 
+You can either setup your environment for <a href={'#tls-mode-disabled'}>TLS mode disabled</a>, <a href={'#tls-mode-external'}>TLS mode external</a> or <a href={'#tls-mode-enabled'}>TLS mode enabled</a>.
+
 ## TLS mode disabled
 
 <ProxyGuideTLSMode mode="disabled" configfilename="traefik-disabled-tls.yaml" configfilecontent={ConfigDisabled} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
@@ -27,3 +29,7 @@ export const link = <a href="https://doc.traefik.io/traefik/">{providername}</a>
 ## TLS mode enabled
 
 <ProxyGuideTLSMode mode="enabled" configfilename="traefik-enabled-tls.yaml" configfilecontent={ConfigEnabled} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
+
+## More Information
+
+<ProxyGuideMore></ProxyGuideMore>
