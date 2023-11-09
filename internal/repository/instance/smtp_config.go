@@ -85,15 +85,15 @@ func SMTPConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error
 
 type SMTPConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-
-	FromAddress    *string             `json:"senderAddress,omitempty"`
-	FromName       *string             `json:"senderName,omitempty"`
-	ReplyToAddress *string             `json:"replyToAddress,omitempty"`
-	TLS            *bool               `json:"tls,omitempty"`
-	Host           *string             `json:"host,omitempty"`
-	User           *string             `json:"user,omitempty"`
-	Password       *crypto.CryptoValue `json:"password,omitempty"`
-	ProviderType   *uint32             `json:"providerType,omitempty"`
+	ID                   string              `json:"id,omitempty"`
+	FromAddress          *string             `json:"senderAddress,omitempty"`
+	FromName             *string             `json:"senderName,omitempty"`
+	ReplyToAddress       *string             `json:"replyToAddress,omitempty"`
+	TLS                  *bool               `json:"tls,omitempty"`
+	Host                 *string             `json:"host,omitempty"`
+	User                 *string             `json:"user,omitempty"`
+	Password             *crypto.CryptoValue `json:"password,omitempty"`
+	ProviderType         *uint32             `json:"providerType,omitempty"`
 }
 
 func (e *SMTPConfigChangedEvent) Payload() interface{} {
@@ -107,6 +107,7 @@ func (e *SMTPConfigChangedEvent) UniqueConstraints() []*eventstore.UniqueConstra
 func NewSMTPConfigChangeEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	id string,
 	changes []SMTPConfigChanges,
 ) (*SMTPConfigChangedEvent, error) {
 	if len(changes) == 0 {
@@ -118,6 +119,7 @@ func NewSMTPConfigChangeEvent(
 			aggregate,
 			SMTPConfigChangedEventType,
 		),
+		ID: id,
 	}
 	for _, change := range changes {
 		change(changeEvent)
@@ -126,6 +128,12 @@ func NewSMTPConfigChangeEvent(
 }
 
 type SMTPConfigChanges func(event *SMTPConfigChangedEvent)
+
+func ChangeSMTPConfigID(id string) func(event *SMTPConfigChangedEvent) {
+	return func(e *SMTPConfigChangedEvent) {
+		e.ID = id
+	}
+}
 
 func ChangeSMTPConfigTLS(tls bool) func(event *SMTPConfigChangedEvent) {
 	return func(e *SMTPConfigChangedEvent) {
@@ -169,6 +177,12 @@ func ChangeSMTPConfigProviderType(providerType uint32) func(event *SMTPConfigCha
 	}
 }
 
+func ChangeSMTPConfigSMTPPassword(password *crypto.CryptoValue) func(event *SMTPConfigChangedEvent) {
+	return func(e *SMTPConfigChangedEvent) {
+		e.Password = password
+	}
+}
+
 func SMTPConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &SMTPConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -191,6 +205,7 @@ type SMTPConfigPasswordChangedEvent struct {
 func NewSMTPConfigPasswordChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	id string,
 	password *crypto.CryptoValue,
 ) *SMTPConfigPasswordChangedEvent {
 	return &SMTPConfigPasswordChangedEvent{

@@ -162,6 +162,9 @@ func (p *smtpConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 	if e.User != nil {
 		columns = append(columns, handler.NewCol(SMTPConfigColumnSMTPUser, *e.User))
 	}
+	if e.Password != nil {
+		columns = append(columns, handler.NewCol(SMTPConfigColumnSMTPPassword, *e.Password))
+	}
 	if e.ProviderType != nil {
 		columns = append(columns, handler.NewCol(SMTPConfigColumnProviderType, *e.ProviderType))
 	}
@@ -169,6 +172,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 		e,
 		columns,
 		[]handler.Condition{
+			handler.NewCond(SMTPConfigColumnID, e.ID),
 			handler.NewCond(SMTPConfigColumnAggregateID, e.Aggregate().ID),
 			handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 		},
@@ -189,6 +193,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigPasswordChanged(event eventstore.
 			handler.NewCol(SMTPConfigColumnSMTPPassword, e.Password),
 		},
 		[]handler.Condition{
+			handler.NewCond(SMTPConfigColumnID, e.ID),
 			handler.NewCond(SMTPConfigColumnAggregateID, e.Aggregate().ID),
 			handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 		},

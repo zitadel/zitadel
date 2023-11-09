@@ -6,62 +6,153 @@ import (
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
-	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
-func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.Config) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareAddSMTPConfig(instanceAgg, config.From, config.FromName, config.ReplyToAddress, config.SMTP.Host, config.SMTP.User, []byte(config.SMTP.Password), config.Tls, config.SMTP.ProviderType)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config *smtp.Config) (string, *domain.ObjectDetails, error) {
+	id, err := c.idGenerator.Next()
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+
+	from := strings.TrimSpace(config.From)
+	if from == "" {
+		return "", nil, errors.ThrowInvalidArgument(nil, "INST-ASv2d", "Errors.Invalid.Argument")
+	}
+
+	replyTo := strings.TrimSpace(config.ReplyToAddress)
+	hostAndPort := strings.TrimSpace(config.SMTP.Host)
+
+	if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
+		return "", nil, errors.ThrowInvalidArgument(nil, "INST-9JdRe", "Errors.Invalid.Argument")
+	}
+
+	var smtpPassword *crypto.CryptoValue
+	if config.SMTP.Password != "" {
+		smtpPassword, err = crypto.Encrypt([]byte(config.SMTP.Password), c.smtpEncryption)
+		if err != nil {
+			return "", nil, err
+		}
+	}
+
+	// TODO @n40lab
+	// err = checkSenderAddress(writeModel)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreatedAt(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
-	}, nil
+
+	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigAddedEvent(
+		ctx,
+		iamAgg,
+		id,
+		config.Tls,
+		config.From,
+		config.FromName,
+		replyTo,
+		hostAndPort,
+		config.SMTP.User,
+		smtpPassword,
+		config.SMTP.ProviderType,
+	))
+
+	if err != nil {
+		return "", nil, err
+	}
+	err = AppendAndReduce(smtpConfigWriteModel, pushedEvents...)
+	if err != nil {
+		return "", nil, err
+	}
+	return id, writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *smtp.Config) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareChangeSMTPConfig(instanceAgg, config.From, config.FromName, config.ReplyToAddress, config.SMTP.Host, config.SMTP.User, config.Tls, config.SMTP.ProviderType)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
+func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id string, config *smtp.Config) (*domain.ObjectDetails, error) {
+	if id == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "SMS-e9jwf", "Errors.IDMissing")
+	}
+
+	from := strings.TrimSpace(config.From)
+	if from == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "INST-ASv2d", "Errors.Invalid.Argument")
+	}
+
+	replyTo := strings.TrimSpace(config.ReplyToAddress)
+	hostAndPort := strings.TrimSpace(config.SMTP.Host)
+	if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
+		return nil, errors.ThrowInvalidArgument(nil, "INST-Kv875", "Errors.Invalid.Argument")
+	}
+
+	var smtpPassword *crypto.CryptoValue
+	var err error
+	if config.SMTP.Password != "" {
+		smtpPassword, err = crypto.Encrypt([]byte(config.SMTP.Password), c.smtpEncryption)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id)
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+
+	if !smtpConfigWriteModel.State.Exists() {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-7j8gv", "Errors.SMTPConfig.NotFound")
+	}
+
+	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
+
+	changedEvent, hasChanged, err := smtpConfigWriteModel.NewChangedEvent(
+		ctx,
+		iamAgg,
+		id,
+		config.Tls,
+		from,
+		config.FromName,
+		replyTo,
+		hostAndPort,
+		config.SMTP.User,
+		smtpPassword,
+		config.SMTP.ProviderType,
+	)
+
+	if !hasChanged {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-lh3op", "Errors.NoChangesFound")
+	}
+
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreatedAt(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
-	}, nil
+	err = AppendAndReduce(smtpConfigWriteModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string) (*domain.ObjectDetails, error) {
+func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, instanceID, id string, password string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	// TODO @n40lab empty string ID or not?
-	smtpConfigWriteModel, err := getSMTPConfigWriteModel(ctx, c.eventstore.Filter, "", "")
+	// TODO @n40lab test
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id)
 	if err != nil {
 		return nil, err
 	}
 	if !smtpConfigWriteModel.State.Exists() {
 		return nil, errors.ThrowNotFound(nil, "COMMAND-3n9ls", "Errors.SMTPConfig.NotFound")
 	}
+
 	var smtpPassword *crypto.CryptoValue
 	if password != "" {
 		smtpPassword, err = crypto.Encrypt([]byte(password), c.smtpEncryption)
@@ -69,237 +160,137 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string
 			return nil, err
 		}
 	}
-	events, err := c.eventstore.Push(ctx, instance.NewSMTPConfigPasswordChangedEvent(
+
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigPasswordChangedEvent(
 		ctx,
 		&instanceAgg.Aggregate,
+		id,
 		smtpPassword))
 	if err != nil {
 		return nil, err
 	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreatedAt(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
-	}, nil
+	err = AppendAndReduce(smtpConfigWriteModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+
+	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ActivateSMTPConfig(ctx context.Context, req *admin_pb.ActivateSMTPConfigRequest, currentProviderID string) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareActivateSMTPConfig(instanceAgg, req.Id, currentProviderID)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
-	if err != nil {
-		return nil, err
-	}
-	events, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
-		return nil, err
-	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreatedAt(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
-	}, nil
-}
+func (c *Commands) ActivateSMTPConfig(ctx context.Context, instanceID, id, activatedId string) (*domain.ObjectDetails, error) {
+	var pushedEvents []eventstore.Event
 
-func (c *Commands) DeactivateSMTPConfig(ctx context.Context, req *admin_pb.DeactivateSMTPConfigRequest) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareDeactivateSMTPConfig(instanceAgg, req.Id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
-	if err != nil {
-		return nil, err
+	if id == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "SMTP-nm56k", "Errors.IDMissing")
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
-		return nil, err
-	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreatedAt(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
-	}, nil
-}
 
-func (c *Commands) RemoveSMTPConfig(ctx context.Context, id string) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareRemoveSMTPConfig(instanceAgg, id)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
-	if err != nil {
-		return nil, err
-	}
-	events, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
-		return nil, err
-	}
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreatedAt(),
-		ResourceOwner: events[len(events)-1].Aggregate().InstanceID,
-	}, nil
-}
-
-func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, replyTo, hostAndPort, user string, password []byte, tls bool, providerType uint32) preparation.Validation {
-	return func() (preparation.CreateCommands, error) {
-		if from = strings.TrimSpace(from); from == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-mruNY", "Errors.Invalid.Argument")
+	if len(activatedId) > 0 {
+		smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, activatedId)
+		if err != nil {
+			return nil, err
 		}
 
-		replyTo = strings.TrimSpace(replyTo)
-		hostAndPort = strings.TrimSpace(hostAndPort)
-
-		if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-9JdRe", "Errors.Invalid.Argument")
-		}
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			fromSplitted := strings.Split(from, "@")
-			senderDomain := fromSplitted[len(fromSplitted)-1]
-			// TODO @n40lab empty string ID or not?
-			writeModel, err := getSMTPConfigWriteModel(ctx, filter, "", senderDomain)
-			if err != nil {
-				return nil, err
-			}
-
-			err = checkSenderAddress(writeModel)
-			if err != nil {
-				return nil, err
-			}
-			var smtpPassword *crypto.CryptoValue
-			if password != nil {
-				smtpPassword, err = crypto.Encrypt(password, c.smtpEncryption)
-				if err != nil {
-					return nil, err
-				}
-			}
-
-			configID, err := c.idGenerator.Next()
-			if err != nil {
-				return nil, err
-			}
-
-			return []eventstore.Command{
-				instance.NewSMTPConfigAddedEvent(
-					ctx,
-					&a.Aggregate,
-					configID,
-					tls,
-					from,
-					name,
-					replyTo,
-					hostAndPort,
-					user,
-					smtpPassword,
-					providerType,
-				),
-			}, nil
-		}, nil
-	}
-}
-
-func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, replyTo, hostAndPort, user string, tls bool, providerType uint32) preparation.Validation {
-	return func() (preparation.CreateCommands, error) {
-		if from = strings.TrimSpace(from); from == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-ASv2d", "Errors.Invalid.Argument")
+		if !smtpConfigWriteModel.State.Exists() {
+			return nil, caos_errs.ThrowNotFound(nil, "COMMAND-jg8ir", "Errors.SMTPConfig.NotFound")
 		}
 
-		replyTo = strings.TrimSpace(replyTo)
-		hostAndPort = strings.TrimSpace(hostAndPort)
-		if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-Kv875", "Errors.Invalid.Argument")
+		if smtpConfigWriteModel.State == domain.SMTPConfigStateInactive {
+			return nil, caos_errs.ThrowNotFound(nil, "COMMAND-eh6kd", "Errors.SMTPConfig.AlreadyDeactivated")
 		}
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			fromSplitted := strings.Split(from, "@")
-			senderDomain := fromSplitted[len(fromSplitted)-1]
-			// TODO @n40lab empty string ID or not?
-			writeModel, err := getSMTPConfigWriteModel(ctx, filter, "", senderDomain)
-			if err != nil {
-				return nil, err
-			}
-			if !writeModel.State.Exists() {
-				return nil, errors.ThrowNotFound(nil, "INST-Svq1a", "Errors.SMTPConfig.NotFound")
-			}
-			err = checkSenderAddress(writeModel)
-			if err != nil {
-				return nil, err
-			}
-			changedEvent, hasChanged, err := writeModel.NewChangedEvent(
-				ctx,
-				&a.Aggregate,
-				tls,
-				from,
-				name,
-				replyTo,
-				hostAndPort,
-				user,
-				providerType,
-			)
-			if err != nil {
-				return nil, err
-			}
-			if !hasChanged {
-				return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-m0o3f", "Errors.NoChangesFound")
-			}
-			return []eventstore.Command{
-				changedEvent,
-			}, nil
-		}, nil
+		iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
+		pushedEvents, err = c.eventstore.Push(ctx, instance.NewSMTPConfigDeactivatedEvent(
+			ctx,
+			iamAgg,
+			activatedId))
+		if err != nil {
+			return nil, err
+		}
 	}
+
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id)
+	if err != nil {
+		return nil, err
+	}
+
+	if !smtpConfigWriteModel.State.Exists() {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-kg8yr", "Errors.SMTPConfig.NotFound")
+	}
+
+	if smtpConfigWriteModel.State == domain.SMTPConfigStateActive {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-ed3lr", "Errors.SMTPConfig.AlreadyActive")
+	}
+
+	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
+	pushedEvents, err = c.eventstore.Push(ctx, instance.NewSMTPConfigActivatedEvent(
+		ctx,
+		iamAgg,
+		id))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(smtpConfigWriteModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) prepareActivateSMTPConfig(a *instance.Aggregate, id, currentProviderID string) preparation.Validation {
-	return func() (preparation.CreateCommands, error) {
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := getSMTPConfigWriteModel(ctx, filter, id, "")
-			if err != nil {
-				return nil, err
-			}
-			if !writeModel.State.Exists() {
-				return nil, errors.ThrowNotFound(nil, "INST-T8xs8", "Errors.SMTPConfig.NotFound")
-			}
-			if len(currentProviderID) > 0 {
-				return []eventstore.Command{
-					instance.NewSMTPConfigDeactivatedEvent(ctx, &a.Aggregate, currentProviderID),
-					instance.NewSMTPConfigActivatedEvent(ctx, &a.Aggregate, id),
-				}, nil
-			}
-			return []eventstore.Command{
-				instance.NewSMTPConfigActivatedEvent(ctx, &a.Aggregate, id),
-			}, nil
-
-		}, nil
+func (c *Commands) DeactivateSMTPConfig(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
+	if id == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "SMTP-98ikl", "Errors.IDMissing")
 	}
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id)
+	if err != nil {
+		return nil, err
+	}
+	if !smtpConfigWriteModel.State.Exists() {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-k39PJ", "Errors.SMTPConfig.NotFound")
+	}
+	if smtpConfigWriteModel.State == domain.SMTPConfigStateInactive {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-km8g3", "Errors.SMTPConfig.AlreadyDeactivated")
+	}
+
+	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigDeactivatedEvent(
+		ctx,
+		iamAgg,
+		id))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(smtpConfigWriteModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) prepareDeactivateSMTPConfig(a *instance.Aggregate, id string) preparation.Validation {
-	return func() (preparation.CreateCommands, error) {
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := getSMTPConfigWriteModel(ctx, filter, id, "")
-			if err != nil {
-				return nil, err
-			}
-			if !writeModel.State.Exists() {
-				return nil, errors.ThrowNotFound(nil, "INST-Sfefg", "Errors.SMTPConfig.NotFound")
-			}
-			return []eventstore.Command{
-				instance.NewSMTPConfigDeactivatedEvent(ctx, &a.Aggregate, id),
-			}, nil
-		}, nil
+func (c *Commands) RemoveSMTPConfig(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
+	if id == "" {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "SMTP-7f5cv", "Errors.IDMissing")
 	}
-}
 
-func (c *Commands) prepareRemoveSMTPConfig(a *instance.Aggregate, id string) preparation.Validation {
-	return func() (preparation.CreateCommands, error) {
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := getSMTPConfigWriteModel(ctx, filter, id, "")
-			if err != nil {
-				return nil, err
-			}
-			if !writeModel.State.Exists() {
-				return nil, errors.ThrowNotFound(nil, "INST-Sfefg", "Errors.SMTPConfig.NotFound")
-			}
-			return []eventstore.Command{
-				instance.NewSMTPConfigRemovedEvent(ctx, &a.Aggregate, id),
-			}, nil
-		}, nil
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id)
+	if err != nil {
+		return nil, err
 	}
+	if !smtpConfigWriteModel.State.Exists() {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-kg8rt", "Errors.SMTPConfig.NotFound")
+	}
+
+	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigRemovedEvent(
+		ctx,
+		iamAgg,
+		id))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(smtpConfigWriteModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
 }
 
 func checkSenderAddress(writeModel *InstanceSMTPConfigWriteModel) error {
@@ -312,16 +303,12 @@ func checkSenderAddress(writeModel *InstanceSMTPConfigWriteModel) error {
 	return nil
 }
 
-func getSMTPConfigWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, id, domain string) (_ *InstanceSMTPConfigWriteModel, err error) {
-	writeModel := NewInstanceSMTPConfigWriteModel(authz.GetInstance(ctx).InstanceID(), id, domain)
-	events, err := filter(ctx, writeModel.Query())
+func (c *Commands) getSMTPConfig(ctx context.Context, instanceID, id string) (_ *InstanceSMTPConfigWriteModel, err error) {
+	writeModel := NewIAMSMTPConfigWriteModel(authz.GetInstance(ctx).InstanceID(), id)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}
-	if len(events) == 0 {
-		return writeModel, nil
-	}
-	writeModel.AppendEvents(events...)
-	err = writeModel.Reduce()
-	return writeModel, err
+
+	return writeModel, nil
 }

@@ -29,7 +29,7 @@ func (s *Server) GetSMTPConfigById(ctx context.Context, req *admin_pb.GetSMTPCon
 }
 
 func (s *Server) AddSMTPConfig(ctx context.Context, req *admin_pb.AddSMTPConfigRequest) (*admin_pb.AddSMTPConfigResponse, error) {
-	details, err := s.command.AddSMTPConfig(ctx, AddSMTPToConfig(req))
+	id, details, err := s.command.AddSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), AddSMTPToConfig(req))
 	if err != nil {
 		return nil, err
 	}
@@ -38,11 +38,12 @@ func (s *Server) AddSMTPConfig(ctx context.Context, req *admin_pb.AddSMTPConfigR
 			details.Sequence,
 			details.EventDate,
 			details.ResourceOwner),
+		Id: id,
 	}, nil
 }
 
 func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPConfigRequest) (*admin_pb.UpdateSMTPConfigResponse, error) {
-	details, err := s.command.ChangeSMTPConfig(ctx, UpdateSMTPToConfig(req))
+	details, err := s.command.ChangeSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, UpdateSMTPToConfig(req))
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +56,7 @@ func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPC
 }
 
 func (s *Server) RemoveSMTPConfig(ctx context.Context, req *admin_pb.RemoveSMTPConfigRequest) (*admin_pb.RemoveSMTPConfigResponse, error) {
-	details, err := s.command.RemoveSMTPConfig(ctx, req.Id)
+	details, err := s.command.RemoveSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +69,7 @@ func (s *Server) RemoveSMTPConfig(ctx context.Context, req *admin_pb.RemoveSMTPC
 }
 
 func (s *Server) UpdateSMTPConfigPassword(ctx context.Context, req *admin_pb.UpdateSMTPConfigPasswordRequest) (*admin_pb.UpdateSMTPConfigPasswordResponse, error) {
-	details, err := s.command.ChangeSMTPConfigPassword(ctx, req.Password)
+	details, err := s.command.ChangeSMTPConfigPassword(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, req.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +97,6 @@ func (s *Server) ListSMTPConfigs(ctx context.Context, req *admin_pb.ListSMTPConf
 }
 
 func (s *Server) ActivateSMTPConfig(ctx context.Context, req *admin_pb.ActivateSMTPConfigRequest) (*admin_pb.ActivateSMTPConfigResponse, error) {
-
 	// Get the ID of current SMTP active provider if any
 	currentActiveProviderID := ""
 	smtp, err := s.query.SMTPConfigByAggregateID(ctx, authz.GetInstance(ctx).InstanceID())
@@ -104,7 +104,7 @@ func (s *Server) ActivateSMTPConfig(ctx context.Context, req *admin_pb.ActivateS
 		currentActiveProviderID = smtp.ID
 	}
 
-	result, err := s.command.ActivateSMTPConfig(ctx, req, currentActiveProviderID)
+	result, err := s.command.ActivateSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, currentActiveProviderID)
 	if err != nil {
 		return nil, err
 
@@ -116,7 +116,7 @@ func (s *Server) ActivateSMTPConfig(ctx context.Context, req *admin_pb.ActivateS
 }
 
 func (s *Server) DeactivateSMTPConfig(ctx context.Context, req *admin_pb.DeactivateSMTPConfigRequest) (*admin_pb.DeactivateSMTPConfigResponse, error) {
-	result, err := s.command.DeactivateSMTPConfig(ctx, req)
+	result, err := s.command.DeactivateSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
 	if err != nil {
 		return nil, err
 

@@ -405,7 +405,7 @@ service AdminService {
 
     rpc UpdateSMTPConfig(UpdateSMTPConfigRequest) returns (UpdateSMTPConfigResponse) {
         option (google.api.http) = {
-            put: "/smtp";
+            put: "/smtp/{id}";
             body: "*"
         };
 
@@ -422,7 +422,7 @@ service AdminService {
 
     rpc UpdateSMTPConfigPassword(UpdateSMTPConfigPasswordRequest) returns (UpdateSMTPConfigPasswordResponse) {
         option (google.api.http) = {
-            put: "/smtp/password";
+            put: "/smtp/{id}/password";
             body: "*"
         };
 
@@ -4076,6 +4076,7 @@ message AddSMTPConfigRequest {
 
 message AddSMTPConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
 }
 
 message UpdateSMTPConfigRequest {
@@ -4128,6 +4129,7 @@ message UpdateSMTPConfigRequest {
     ];
     bool is_active = 8;
     SMTPProviderType provider_type = 9;
+    string id = 10 [(validate.rules).string = {min_len: 1, max_len: 100}];
 }
 
 message UpdateSMTPConfigResponse {
@@ -4140,6 +4142,7 @@ message UpdateSMTPConfigPasswordRequest {
             example: "\"this-is-my-updated-password\"";
         }
     ];
+    string id = 2 [(validate.rules).string = {min_len: 1, max_len: 100}];
 }
 
 message UpdateSMTPConfigPasswordResponse {

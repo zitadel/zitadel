@@ -412,21 +412,22 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		)
 	}
 
-	if setup.SMTPConfiguration != nil {
-		validations = append(validations,
-			c.prepareAddSMTPConfig(
-				instanceAgg,
-				setup.SMTPConfiguration.From,
-				setup.SMTPConfiguration.FromName,
-				setup.SMTPConfiguration.ReplyToAddress,
-				setup.SMTPConfiguration.SMTP.Host,
-				setup.SMTPConfiguration.SMTP.User,
-				[]byte(setup.SMTPConfiguration.SMTP.Password),
-				setup.SMTPConfiguration.Tls,
-				setup.SMTPConfiguration.SMTP.ProviderType,
-			),
-		)
-	}
+	// TODO @n40lab refactor instance
+	// if setup.SMTPConfiguration != nil {
+	// 	validations = append(validations,
+	// 		c.prepareAddSMTPConfig(
+	// 			instanceAgg,
+	// 			setup.SMTPConfiguration.From,
+	// 			setup.SMTPConfiguration.FromName,
+	// 			setup.SMTPConfiguration.ReplyToAddress,
+	// 			setup.SMTPConfiguration.SMTP.Host,
+	// 			setup.SMTPConfiguration.SMTP.User,
+	// 			[]byte(setup.SMTPConfiguration.SMTP.Password),
+	// 			setup.SMTPConfiguration.Tls,
+	// 			setup.SMTPConfiguration.SMTP.ProviderType,
+	// 		),
+	// 	)
+	// }
 
 	if setup.OIDCSettings != nil {
 		validations = append(validations,

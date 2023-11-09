@@ -27,14 +27,13 @@ type InstanceSMTPConfigWriteModel struct {
 	smtpSenderAddressMatchesInstanceDomain bool
 }
 
-func NewInstanceSMTPConfigWriteModel(instanceID, id, domain string) *InstanceSMTPConfigWriteModel {
+func NewIAMSMTPConfigWriteModel(instanceID, id string) *InstanceSMTPConfigWriteModel {
 	return &InstanceSMTPConfigWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   instanceID,
 			ResourceOwner: instanceID,
 		},
-		domain: domain,
-		ID:     id,
+		ID: id,
 	}
 }
 
@@ -97,6 +96,10 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 				wm.ProviderType = *e.ProviderType
 			}
 		case *instance.SMTPConfigRemovedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+
 			wm.TLS = false
 			wm.SenderName = ""
 			wm.SenderAddress = ""
@@ -106,6 +109,16 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 			wm.Password = nil
 			wm.ProviderType = 0
 			wm.State = domain.SMTPConfigStateRemoved
+		case *instance.SMTPConfigActivatedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.State = domain.SMTPConfigStateActive
+		case *instance.SMTPConfigDeactivatedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.State = domain.SMTPConfigStateInactive
 		case *instance.DomainAddedEvent:
 			wm.domainState = domain.InstanceDomainStateActive
 		case *instance.DomainRemovedEvent:
@@ -142,9 +155,13 @@ func (wm *InstanceSMTPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (wm *InstanceSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, tls bool, fromAddress, fromName, replyToAddress, smtpHost, smtpUser string, providerType uint32) (*instance.SMTPConfigChangedEvent, bool, error) {
+func (wm *InstanceSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id string, tls bool, fromAddress, fromName, replyToAddress, smtpHost, smtpUser string, smtpPassword *crypto.CryptoValue, providerType uint32) (*instance.SMTPConfigChangedEvent, bool, error) {
 	changes := make([]instance.SMTPConfigChanges, 0)
 	var err error
+
+	if wm.ID != id {
+		changes = append(changes, instance.ChangeSMTPConfigID(id))
+	}
 
 	if wm.TLS != tls {
 		changes = append(changes, instance.ChangeSMTPConfigTLS(tls))
@@ -164,14 +181,16 @@ func (wm *InstanceSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, agg
 	if wm.User != smtpUser {
 		changes = append(changes, instance.ChangeSMTPConfigSMTPUser(smtpUser))
 	}
+	if smtpPassword != nil {
+		changes = append(changes, instance.ChangeSMTPConfigSMTPPassword(smtpPassword))
+	}
 	if wm.ProviderType != providerType {
 		changes = append(changes, instance.ChangeSMTPConfigProviderType(providerType))
 	}
-
 	if len(changes) == 0 {
 		return nil, false, nil
 	}
-	changeEvent, err := instance.NewSMTPConfigChangeEvent(ctx, aggregate, changes)
+	changeEvent, err := instance.NewSMTPConfigChangeEvent(ctx, aggregate, id, changes)
 	if err != nil {
 		return nil, false, err
 	}

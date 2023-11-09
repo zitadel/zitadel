@@ -37,7 +37,7 @@ import {
 export class SMTPProviderComponent {
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
-  public id: string | null = '';
+  public id: string = '';
   public providerDefaultSetting: ProviderDefaultSettings = GenericDefaultSettings;
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
@@ -112,7 +112,7 @@ export class SMTPProviderComponent {
       });
 
       if (!this.router.url.endsWith('/create')) {
-        this.id = this.route.snapshot.paramMap.get('id');
+        this.id = this.route.snapshot.paramMap.get('id') || '';
         if (this.id) {
           this.fetchData(this.id);
         }
@@ -173,6 +173,7 @@ export class SMTPProviderComponent {
   private updateData(): Promise<UpdateSMTPConfigResponse.AsObject | AddSMTPConfigResponse> {
     if (this.hasSMTPConfig) {
       const req = new UpdateSMTPConfigRequest();
+      req.setId(this.id);
       req.setTls(this.tls?.value ?? false);
 
       if (this.hostAndPort && this.hostAndPort.value) {
