@@ -308,7 +308,7 @@ Errors:
       NotActive: Грант проекта не активен
       NotInactive: Грант проекта не неактивен
   IAM:
-    NotFound: Экземпляр не найден
+    NotFound: Экземпляр не найден. Проверьте https://zitadel.com/docs/self-hosting/manage/custom-domain
     Member:
       RolesNotChanged: Роли не изменились
     MemberInvalid: Участник недействителен

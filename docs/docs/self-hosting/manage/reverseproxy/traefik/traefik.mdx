@@ -1,0 +1,35 @@
+---
+title: Configure ZITADEL with Traefik
+sidebar_label: Traefik
+---
+
+import ProxyGuideOverview from '../_proxy_guide_overview.mdx';
+import ProxyGuideTLSMode from '../_proxy_guide_tls_mode.mdx';
+import Compose from "!!raw-loader!./docker-compose.yaml";
+import ConfigDisabled from "!!raw-loader!./traefik-disabled-tls.yaml";
+import ConfigExternal from "!!raw-loader!./traefik-external-tls.yaml";
+import ConfigEnabled from "!!raw-loader!./traefik-enabled-tls.yaml";
+
+export const providername = 'Traefik';
+export const lower = "traefik";
+export const link = <a href="https://doc.traefik.io/traefik/">{providername}</a>;
+
+<ProxyGuideOverview link={link} compose={Compose}></ProxyGuideOverview>
+
+You can either setup your environment for <a href={'#tls-mode-disabled'}>TLS mode disabled</a>, <a href={'#tls-mode-external'}>TLS mode external</a> or <a href={'#tls-mode-enabled'}>TLS mode enabled</a>.
+
+## TLS mode disabled
+
+<ProxyGuideTLSMode mode="disabled" configfilename="traefik-disabled-tls.yaml" configfilecontent={ConfigDisabled} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
+
+## TLS mode external
+
+<ProxyGuideTLSMode mode="external" configfilename="traefik-external-tls.yaml" configfilecontent={ConfigExternal} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
+
+## TLS mode enabled
+
+<ProxyGuideTLSMode mode="enabled" configfilename="traefik-enabled-tls.yaml" configfilecontent={ConfigEnabled} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
+
+## More Information
+
+<ProxyGuideMore></ProxyGuideMore>

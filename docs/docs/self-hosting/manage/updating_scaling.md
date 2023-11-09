@@ -61,6 +61,8 @@ ZITADEL uses the privileged and preexisting database user configured in `Databas
 - If not already done, it grants the necessary permissions ZITADEL needs to the non privileged user.
 - If they don’t exist already, it creates all schemas and some basic tables.
 
+The init phase is idempotent if executed with the same binary version.
+
 ### The Setup Phase
 
 During `zitadel setup`, ZITADEL creates projection tables and migrates existing data.
@@ -70,7 +72,10 @@ When deploying a new ZITADEL version,
 make sure the setup phase runs before you roll out the new `zitadel start` processes.
 The setup phase is executed in subsequent steps
 whereas a new version's execution takes over where the last execution stopped.
-Therefore, configuration changes relevant for the setup phase won’t take effect in regard to the setup execution.
+
+Some configuration changes are only applied during the setup phase, like ExternalDomain, ExternalPort and ExternalSecure.
+
+The setup phase is idempotent if executed with the same binary version.
 
 ### The Runtime Phase
 
