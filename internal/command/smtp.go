@@ -304,7 +304,7 @@ func checkSenderAddress(writeModel *InstanceSMTPConfigWriteModel) error {
 }
 
 func (c *Commands) getSMTPConfig(ctx context.Context, instanceID, id string) (_ *InstanceSMTPConfigWriteModel, err error) {
-	writeModel := NewIAMSMTPConfigWriteModel(authz.GetInstance(ctx).InstanceID(), id)
+	writeModel := NewIAMSMTPConfigWriteModel(instanceID, id)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

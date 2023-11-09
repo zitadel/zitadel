@@ -32,6 +32,7 @@ func NewIAMSMTPConfigWriteModel(instanceID, id string) *InstanceSMTPConfigWriteM
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   instanceID,
 			ResourceOwner: instanceID,
+			InstanceID:    instanceID,
 		},
 		ID: id,
 	}
@@ -61,6 +62,9 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *instance.SMTPConfigAddedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
 			wm.TLS = e.TLS
 			wm.Host = e.Host
 			wm.User = e.User
@@ -71,6 +75,9 @@ func (wm *InstanceSMTPConfigWriteModel) Reduce() error {
 			wm.ProviderType = e.ProviderType
 			wm.State = domain.SMTPConfigStateInactive
 		case *instance.SMTPConfigChangedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
 			if e.TLS != nil {
 				wm.TLS = *e.TLS
 			}
