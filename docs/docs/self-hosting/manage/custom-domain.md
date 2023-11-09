@@ -61,5 +61,5 @@ You can immediately access the ZITADEL Console an APIs using these subdomains wi
 ## More Information
 
 - [Check out the production-near loadbalancing example with Traefik](/self-hosting/deploy/loadbalancing-example)
-- [Explore some concrete proxy configuration examples for ZITADEL using the domain 127.0.0.1.sslip.io](/self-hosting/manage/reverseproxy)
+- [Explore some concrete proxy configuration examples for ZITADEL using the domain 127.0.0.1.sslip.io](/self-hosting/manage/reverseproxy/reverse_proxy)
 
