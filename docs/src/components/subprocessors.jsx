@@ -10,7 +10,7 @@ export function SubProcessorTable() {
     in: "India",
     de: "Germany",
     ee: "Estonia",
-    lk: "Sri Lanka",
+    nl: "Netherlands",
     ro: "Romania",
   }
   const processors = [
@@ -121,14 +121,14 @@ export function SubProcessorTable() {
       enduserdata: false
     },
     {
-      entity: "Remote Lanka (Pvt) Ltd",
+      entity: "Remote Europe Holding, B.V.",
       purpose: "Global payroll",
       hosting: undefined,
-      country: country_list.lk,
+      country: country_list.nl,
       enduserdata: false
     },
     {
-      entity: "Clickhouse, Inc. ",
+      entity: "Clickhouse, Inc.",
       purpose: "Data warehouse services",
       hosting: country_list.us,
       country: country_list.us,
