@@ -243,6 +243,7 @@ RegistrationUser:
   Portuguese: Português
   Macedonian: Македонски
   Czech: Čeština
+  Russian: Русский
   GenderLabel: Gênero
   Female: Feminino
   Male: Masculino
@@ -268,17 +269,19 @@ ExternalRegistrationUserOverview:
   NicknameLabel: Apelido
   PhoneLabel: Número de telefone
   LanguageLabel: Idioma
-  German: Alemão
-  English: Inglês
+  German: Deutsch
+  English: English
   Italian: Italiano
-  French: Francês
-  Chinese: Chinês simplificado
-  Japanese: Japonês
-  Polish: Polonês
-  Spanish: Espanhol
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
   Czech: Čeština
+  Russian: Русский
   TosAndPrivacyLabel: Termos e condições
   TosConfirm: Eu aceito os
   TosLinkText: termos de serviço
@@ -332,18 +335,20 @@ ExternalNotFound:
   TosLinkText: termos de serviço
   PrivacyConfirm: Eu aceito a
   PrivacyLinkText: política de privacidade
-  German: Alemão
-  English: Inglês
+  German: Deutsch
+  English: English
   Italian: Italiano
-  French: Francês
-  Chinese: Chinês simplificado
-  Polish: Polonês
-  Japanese: Japonês
-  Spanish: Espanhol
-  Bulgarian: Búlgaro
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
   Czech: Čeština
+  Russian: Русский
+
 DeviceAuth:
   Title: Autorização de dispositivo
   UserCode:

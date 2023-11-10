@@ -317,7 +317,7 @@ Errors:
       NotActive: Grant projektu není aktivní
       NotInactive: Grant projektu není neaktivní
   IAM:
-    NotFound: Instance nenalezena
+    NotFound: Instance nenalezena. Podívejte se na https://zitadel.com/docs/self-hosting/manage/custom-domain
     Member:
       RolesNotChanged: Role nebyly změněny
     MemberInvalid: Člen je neplatný

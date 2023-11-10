@@ -1061,7 +1061,8 @@
       "bg": "Български",
       "pt": "Portuguese",
       "mk": "Македонски",
-      "cs": "Čeština"
+      "cs": "Čeština",
+      "ru": "Русский"
     },
     "SMTP": {
       "TITLE": "SMTP設定",
@@ -1268,7 +1269,8 @@
         "bg": "Български",
         "pt": "Portuguese",
         "mk": "Македонски",
-        "cs": "Čeština"
+        "cs": "Čeština",
+        "ru": "Русский"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -2153,7 +2155,8 @@
     "bg": "Български",
     "pt": "Portuguese",
     "mk": "Македонски",
-    "cs": "Čeština"
+    "cs": "Čeština",
+    "ru": "Русский"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

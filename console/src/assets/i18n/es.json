@@ -1061,7 +1061,8 @@
       "bg": "Български",
       "pt": "Portuguese",
       "mk": "Македонски",
-      "cs": "Čeština"
+      "cs": "Čeština",
+      "ru": "Русский"
     },
     "SMTP": {
       "TITLE": "Ajustes SMTP",
@@ -1273,7 +1274,8 @@
         "bg": "Български",
         "pt": "Portuguese",
         "mk": "Македонски",
-        "cs": "Čeština"
+        "cs": "Čeština",
+        "ru": "Русский"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificación de email realizada",
@@ -2158,7 +2160,8 @@
     "bg": "Български",
     "pt": "Portuguese",
     "mk": "Македонски",
-    "cs": "Čeština"
+    "cs": "Čeština",
+    "ru": "Русский"
   },
   "MEMBER": {
     "ADD": "Añadir un Mánager",

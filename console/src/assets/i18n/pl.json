@@ -1060,7 +1060,8 @@
       "bg": "Български",
       "pt": "Portuguese",
       "mk": "Македонски",
-      "cs": "Čeština"
+      "cs": "Čeština",
+      "ru": "Русский"
     },
     "SMTP": {
       "TITLE": "Ustawienia SMTP",
@@ -1272,7 +1273,8 @@
         "bg": "Български",
         "pt": "Portuguese",
         "mk": "Македонски",
-        "cs": "Čeština"
+        "cs": "Čeština",
+        "ru": "Русский"
       },
       "KEYS": {
         "emailVerificationDoneText": "Weryfikacja adresu e-mail zakończona",
@@ -2162,7 +2164,8 @@
     "bg": "Български",
     "pt": "Portuguese",
     "mk": "Македонски",
-    "cs": "Čeština"
+    "cs": "Čeština",
+    "ru": "Русский"
   },
   "MEMBER": {
     "ADD": "Dodaj managera",

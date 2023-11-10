@@ -149,7 +149,7 @@ func NewUserGrantWithGrantedQuery(owner string) (SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return newOrQuery(orgQuery, projectQuery)
+	return NewOrQuery(orgQuery, projectQuery)
 }
 
 func NewUserGrantContainsRolesSearchQuery(roles ...string) (SearchQuery, error) {
