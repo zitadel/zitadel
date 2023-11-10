@@ -1173,8 +1173,8 @@ func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOpti
 	}
 }
 
-func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domain.AuthRequest, identityProviderID string) []idp.Param {
-	params := make([]idp.Param, 1, 2)
+func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domain.AuthRequest, identityProviderID string) []idp.Parameter {
+	params := make([]idp.Parameter, 1, 2)
 	params[0] = idp.UserAgentID(authReq.AgentID)
 
 	if authReq.UserID != "" && identityProviderID != "" {
@@ -1184,17 +1184,17 @@ func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domai
 			return params
 		}
 		if len(links.Links) == 1 {
-			return append(params, idp.UsernameParam(links.Links[0].ProvidedUsername))
+			return append(params, idp.LoginHintParam(links.Links[0].ProvidedUsername))
 		}
 	}
 	if authReq.UserName != "" {
-		return append(params, idp.UsernameParam(authReq.UserName))
+		return append(params, idp.LoginHintParam(authReq.UserName))
 	}
 	if authReq.LoginName != "" {
-		return append(params, idp.UsernameParam(authReq.LoginName))
+		return append(params, idp.LoginHintParam(authReq.LoginName))
 	}
 	if authReq.LoginHint != "" {
-		return append(params, idp.UsernameParam(authReq.LoginHint))
+		return append(params, idp.LoginHintParam(authReq.LoginHint))
 	}
 	return params
 }

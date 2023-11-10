@@ -71,7 +71,7 @@ func WithRelyingPartyOption(option rp.Option) ProviderOpts {
 	}
 }
 
-// WithSelectAccount adds the select_account prompt to the auth request
+// WithSelectAccount adds the select_account prompt to the auth request (if no login_hint is set)
 func WithSelectAccount() ProviderOpts {
 	return func(p *Provider) {
 		p.authOptions = append(p.authOptions, func(loginHintSet bool) rp.AuthURLOpt {
@@ -136,11 +136,11 @@ func (p *Provider) Name() string {
 
 // BeginAuth implements the [idp.Provider] interface.
 // It will create a [Session] with an OIDC authorization request as AuthURL.
-func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Param) (idp.Session, error) {
+func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Parameter) (idp.Session, error) {
 	opts := make([]rp.AuthURLOpt, 0)
 	var loginHintSet bool
 	for _, param := range params {
-		if username, ok := param.(idp.UsernameParam); ok {
+		if username, ok := param.(idp.LoginHintParam); ok {
 			loginHintSet = true
 			opts = append(opts, loginHint(string(username)))
 		}

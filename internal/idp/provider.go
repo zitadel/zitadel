@@ -11,7 +11,7 @@ import (
 // Provider is the minimal implementation for a 3rd party authentication provider
 type Provider interface {
 	Name() string
-	BeginAuth(ctx context.Context, state string, params ...Param) (Session, error)
+	BeginAuth(ctx context.Context, state string, params ...Parameter) (Session, error)
 	IsLinkingAllowed() bool
 	IsCreationAllowed() bool
 	IsAutoCreation() bool
@@ -35,14 +35,17 @@ type User interface {
 	GetProfile() string
 }
 
-type Param interface {
+// Parameter allows to pass specific parameter to the BeginAuth function
+type Parameter interface {
 	setValue()
 }
 
+// UserAgentID allows to pass the user agent ID of the auth request to BeginAuth
 type UserAgentID string
 
 func (p UserAgentID) setValue() {}
 
-type UsernameParam string
+// LoginHintParam allows to pass a login_hint to BeginAuth
+type LoginHintParam string
 
-func (p UsernameParam) setValue() {}
+func (p LoginHintParam) setValue() {}

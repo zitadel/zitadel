@@ -23,7 +23,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 		encryptionAlg func(t *testing.T) crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		params []idp.Param
+		params []idp.Parameter
 	}
 	type want struct {
 		session idp.Session
@@ -67,7 +67,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 				},
 			},
 			args: args{
-				params: []idp.Param{
+				params: []idp.Parameter{
 					idp.UserAgentID("agent"),
 				},
 			},

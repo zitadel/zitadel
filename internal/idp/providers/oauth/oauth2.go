@@ -87,11 +87,11 @@ func (p *Provider) Name() string {
 
 // BeginAuth implements the [idp.Provider] interface.
 // It will create a [Session] with an OAuth2.0 authorization request as AuthURL.
-func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Param) (idp.Session, error) {
+func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Parameter) (idp.Session, error) {
 	opts := make([]rp.AuthURLOpt, 0)
 	var loginHintSet bool
 	for _, param := range params {
-		if username, ok := param.(idp.UsernameParam); ok {
+		if username, ok := param.(idp.LoginHintParam); ok {
 			loginHintSet = true
 			opts = append(opts, loginHint(string(username)))
 		}

@@ -91,7 +91,7 @@ func (p *Provider) Name() string {
 // BeginAuth implements the [idp.Provider] interface.
 // It will create a [Session] with an AuthURL, pointing to the jwtEndpoint
 // with the authRequest and encrypted userAgent ids.
-func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Param) (idp.Session, error) {
+func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Parameter) (idp.Session, error) {
 	userAgentID, err := userAgentIDFromParams(params...)
 	if err != nil {
 		return nil, err
@@ -111,7 +111,7 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Pa
 	return &Session{AuthURL: redirect.String()}, nil
 }
 
-func userAgentIDFromParams(params ...idp.Param) (string, error) {
+func userAgentIDFromParams(params ...idp.Parameter) (string, error) {
 	for _, param := range params {
 		if id, ok := param.(idp.UserAgentID); ok {
 			return string(id), nil
