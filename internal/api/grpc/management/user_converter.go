@@ -24,7 +24,7 @@ import (
 
 func ListUsersRequestToModel(req *mgmt_pb.ListUsersRequest) (*query.UserSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries, err := user_grpc.UserQueriesToQuery(req.Queries)
+	queries, err := user_grpc.UserQueriesToQuery(req.Queries, 0 /*start from level 0*/)
 	if err != nil {
 		return nil, err
 	}

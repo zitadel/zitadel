@@ -248,6 +248,7 @@ service SessionService {
 message ListSessionsRequest{
   zitadel.object.v2beta.ListQuery query = 1;
   repeated SearchQuery queries = 2;
+  zitadel.session.v2beta.SessionFieldName sorting_column = 3;
 }
 
 message ListSessionsResponse{
