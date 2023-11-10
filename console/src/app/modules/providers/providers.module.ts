@@ -29,6 +29,7 @@ import { ProviderLDAPComponent } from './provider-ldap/provider-ldap.component';
 import { ProviderOAuthComponent } from './provider-oauth/provider-oauth.component';
 import { ProviderOIDCComponent } from './provider-oidc/provider-oidc.component';
 import { ProvidersRoutingModule } from './providers-routing.module';
+import { ProviderSamlSpComponent } from './provider-saml-sp/provider-saml-sp.component';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import { ProvidersRoutingModule } from './providers-routing.module';
     ProviderOAuthComponent,
     ProviderLDAPComponent,
     ProviderAppleComponent,
+    ProviderSamlSpComponent,
   ],
   imports: [
     ProvidersRoutingModule,

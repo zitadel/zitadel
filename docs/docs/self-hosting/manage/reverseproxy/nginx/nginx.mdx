@@ -1,0 +1,35 @@
+---
+title: Configure ZITADEL with NGINX
+sidebar_label: NGINX
+---
+
+import ProxyGuideOverview from '../_proxy_guide_overview.mdx';
+import ProxyGuideTLSMode from '../_proxy_guide_tls_mode.mdx';
+import Compose from "!!raw-loader!./docker-compose.yaml";
+import ConfigDisabled from "!!raw-loader!./nginx-disabled-tls.conf";
+import ConfigExternal from "!!raw-loader!./nginx-external-tls.conf";
+import ConfigEnabled from "!!raw-loader!./nginx-enabled-tls.conf";
+
+export const providername = 'NGINX';
+export const lower = "nginx";
+export const link = <a href="https://nginx.com/">{providername}</a>;
+
+<ProxyGuideOverview link={link} compose={Compose}></ProxyGuideOverview>
+
+You can either setup your environment for <a href={'#tls-mode-disabled'}>TLS mode disabled</a>, <a href={'#tls-mode-external'}>TLS mode external</a> or <a href={'#tls-mode-enabled'}>TLS mode enabled</a>.
+
+## TLS mode disabled
+
+<ProxyGuideTLSMode mode="disabled" configfilename="nginx-disabled-tls.conf" configfilecontent={ConfigDisabled} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
+
+## TLS mode external
+
+<ProxyGuideTLSMode mode="external" configfilename="nginx-external-tls.conf" configfilecontent={ConfigExternal} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
+
+## TLS mode enabled
+
+<ProxyGuideTLSMode mode="enabled" configfilename="nginx-enabled-tls.conf" configfilecontent={ConfigEnabled} providername={providername} link={link} lower={lower}></ProxyGuideTLSMode>
+
+## More Information
+
+<ProxyGuideMore></ProxyGuideMore>
