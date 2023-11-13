@@ -72,7 +72,7 @@ type userInfoResult struct {
 }
 
 func (s *Server) getUserInfo(ctx context.Context, userID string, rc chan<- *userInfoResult) {
-	userInfo, err := s.storage.query.GetOIDCUserInfo(ctx, userID)
+	userInfo, err := s.query.GetOIDCUserInfo(ctx, userID)
 	rc <- &userInfoResult{
 		userInfo: userInfo,
 		err:      err,

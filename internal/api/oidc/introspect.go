@@ -148,9 +148,9 @@ func (s *Server) clientFromCredentials(ctx context.Context, cc *op.ClientCredent
 		if _, err := oidc.ParseToken(cc.ClientAssertion, claims); err != nil {
 			return nil, oidc.ErrUnauthorizedClient().WithParent(err)
 		}
-		client, err = s.storage.query.GetIntrospectionClientByID(ctx, claims.Issuer, true)
+		client, err = s.query.GetIntrospectionClientByID(ctx, claims.Issuer, true)
 	} else {
-		client, err = s.storage.query.GetIntrospectionClientByID(ctx, cc.ClientID, false)
+		client, err = s.query.GetIntrospectionClientByID(ctx, cc.ClientID, false)
 	}
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, oidc.ErrUnauthorizedClient().WithParent(err)
@@ -195,7 +195,7 @@ func (s *Server) introspectionToken(ctx context.Context, accessToken string, rc 
 		}
 
 		if strings.HasPrefix(tokenID, command.IDPrefixV2) {
-			token, err := s.storage.query.ActiveAccessTokenByToken(ctx, tokenID)
+			token, err := s.query.ActiveAccessTokenByToken(ctx, tokenID)
 			if err != nil {
 				rc <- &introspectionTokenResult{err: err}
 				return nil, err
@@ -203,7 +203,7 @@ func (s *Server) introspectionToken(ctx context.Context, accessToken string, rc 
 			return introspectionTokenResultV2(tokenID, subject, token), nil
 		}
 
-		token, err := s.storage.repo.TokenByIDs(ctx, subject, tokenID)
+		token, err := s.repo.TokenByIDs(ctx, subject, tokenID)
 		if err != nil {
 			return nil, errz.ThrowPermissionDenied(err, "OIDC-Dsfb2", "token is not valid or has expired")
 		}

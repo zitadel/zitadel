@@ -119,8 +119,8 @@ func NewServer(
 	}
 
 	server := &Server{
-		storage:             storage,
 		LegacyServer:        op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
+		repo:                repo,
 		query:               query,
 		command:             command,
 		keySet:              newKeySet(context.TODO(), time.Hour, query.GetActivePublicKeyByID),
