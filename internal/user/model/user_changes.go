@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/golang/protobuf/ptypes/timestamp"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type UserChanges struct {
@@ -10,12 +10,12 @@ type UserChanges struct {
 }
 
 type UserChange struct {
-	ChangeDate        *timestamp.Timestamp `json:"changeDate,omitempty"`
-	EventType         string               `json:"eventType,omitempty"`
-	Sequence          uint64               `json:"sequence,omitempty"`
-	ModifierID        string               `json:"modifierUser,omitempty"`
-	ModifierName      string               `json:"-"`
-	ModifierLoginName string               `json:"-"`
-	ModifierAvatarURL string               `json:"-"`
-	Data              interface{}          `json:"data,omitempty"`
+	ChangeDate        *timestamppb.Timestamp `json:"changeDate,omitempty"`
+	EventType         string                 `json:"eventType,omitempty"`
+	Sequence          uint64                 `json:"sequence,omitempty"`
+	ModifierID        string                 `json:"modifierUser,omitempty"`
+	ModifierName      string                 `json:"-"`
+	ModifierLoginName string                 `json:"-"`
+	ModifierAvatarURL string                 `json:"-"`
+	Data              interface{}            `json:"data,omitempty"`
 }
