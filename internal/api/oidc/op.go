@@ -108,10 +108,10 @@ func NewServer(
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "OIDC-D3gq1", "cannot create options: %w")
 	}
-	provider, err := op.NewForwardedOpenIDProvider(
-		"",
+	provider, err := op.NewProvider(
 		opConfig,
 		storage,
+		op.IssuerFromForwardedOrHost("", op.WithIssuerFromCustomHeaders("forwarded", "x-zitadel-forwarded")),
 		options...,
 	)
 	if err != nil {
