@@ -61,7 +61,7 @@ require (
 	github.com/superseriousbusiness/exifremove v0.0.0-20210330092427-6acd27eac203
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/zitadel/logging v0.5.0
-	github.com/zitadel/oidc/v3 v3.2.1
+	github.com/zitadel/oidc/v3 v3.2.2-0.20231113172801-f6bd17e8db69
 	github.com/zitadel/passwap v0.4.0
 	github.com/zitadel/saml v0.1.2
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.46.0
