@@ -1,6 +1,7 @@
 package login
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -39,6 +40,10 @@ type registerOrgData struct {
 
 func (l *Login) handleRegisterOrg(w http.ResponseWriter, r *http.Request) {
 	data := new(registerOrgFormData)
+	if err := l.checkIfPublicOrgRegistrationIsAllowed(r); err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 	authRequest, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authRequest, err)
@@ -49,6 +54,10 @@ func (l *Login) handleRegisterOrg(w http.ResponseWriter, r *http.Request) {
 
 func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 	data := new(registerOrgFormData)
+	if err := l.checkIfPublicOrgRegistrationIsAllowed(r); err != nil {
+		w.WriteHeader(http.StatusConflict)
+		return
+	}
 	authRequest, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authRequest, err)
@@ -117,6 +126,10 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 		l.customTexts(r.Context(), translator, "")
 	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegisterOrg], data, nil)
+}
+
+func (l *Login) checkIfPublicOrgRegistrationIsAllowed(r *http.Request) error {
+	return errors.New("implement me")
 }
 
 func (d registerOrgFormData) toUserDomain() *domain.Human {
