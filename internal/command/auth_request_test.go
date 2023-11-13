@@ -164,9 +164,8 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient")
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		tokenVerifier   func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
-		checkPermission domain.PermissionCheck
+		eventstore    *eventstore.Eventstore
+		tokenVerifier func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
 	}
 	type args struct {
 		ctx              context.Context
@@ -192,10 +191,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
-				checkPermission: newMockPermissionCheckNotAllowed(),
+				tokenVerifier: newMockTokenVerifierValid(),
 			},
 			args{
 				ctx:       mockCtx,
@@ -235,10 +231,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 						),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
-				checkPermission: newMockPermissionCheckAllowed(),
+				tokenVerifier: newMockTokenVerifierValid(),
 			},
 			args{
 				ctx:       mockCtx,
@@ -274,10 +267,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 						),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
-				checkPermission: newMockPermissionCheckAllowed(),
+				tokenVerifier: newMockTokenVerifierValid(),
 			},
 			args{
 				ctx:              authz.NewMockContext("instanceID", "orgID", "wrongLoginClient"),
@@ -316,10 +306,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					),
 					expectFilter(),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
-				checkPermission: newMockPermissionCheckNotAllowed(),
+				tokenVerifier: newMockTokenVerifierValid(),
 			},
 			args{
 				ctx:       mockCtx,
@@ -391,57 +378,6 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			},
 		},
 		{
-			"missing permission",
-			fields{
-				eventstore: eventstoreExpect(t,
-					expectFilter(
-						eventFromEventPusher(
-							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_id", "instanceID").Aggregate,
-								"loginClient",
-								"clientID",
-								"redirectURI",
-								"state",
-								"nonce",
-								[]string{"openid"},
-								[]string{"audience"},
-								domain.OIDCResponseTypeCode,
-								nil,
-								nil,
-								nil,
-								nil,
-								nil,
-								nil,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							session.NewAddedEvent(mockCtx,
-								&session.NewAggregate("sessionID", "instance1").Aggregate,
-								&domain.UserAgent{
-									FingerprintID: gu.Ptr("fp1"),
-									IP:            net.ParseIP("1.2.3.4"),
-									Description:   gu.Ptr("firefox"),
-									Header:        http.Header{"foo": []string{"bar"}},
-								},
-							)),
-					),
-				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
-				checkPermission: newMockPermissionCheckNotAllowed(),
-			},
-			args{
-				ctx:       mockCtx,
-				id:        "V2_id",
-				sessionID: "sessionID",
-			},
-			res{
-				wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
-			},
-		},
-		{
 			"invalid session token",
 			fields{
 				eventstore: eventstoreExpect(t,
@@ -478,9 +414,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 							)),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return caos_errs.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid")
-				},
+				tokenVerifier: newMockTokenVerifierInvalid(),
 			},
 			args{
 				ctx:          mockCtx,
@@ -549,10 +483,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 						),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
-				checkPermission: newMockPermissionCheckAllowed(),
+				tokenVerifier: newMockTokenVerifierValid(),
 			},
 			args{
 				ctx:          mockCtx,
@@ -637,10 +568,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 						),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
-				checkPermission: newMockPermissionCheckAllowed(),
+				tokenVerifier: newMockTokenVerifierValid(),
 			},
 			args{
 				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient"),
@@ -675,7 +603,6 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			c := &Commands{
 				eventstore:           tt.fields.eventstore,
 				sessionTokenVerifier: tt.fields.tokenVerifier,
-				checkPermission:      tt.fields.checkPermission,
 			}
 			details, got, err := c.LinkSessionToAuthRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLoginClient)
 			require.ErrorIs(t, err, tt.res.wantErr)

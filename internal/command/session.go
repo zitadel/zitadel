@@ -313,7 +313,7 @@ func (c *Commands) UpdateSession(ctx context.Context, sessionID, sessionToken st
 	if err != nil {
 		return nil, err
 	}
-	if err := c.sessionPermission(ctx, sessionWriteModel, sessionToken, domain.PermissionSessionWrite); err != nil {
+	if err := c.sessionTokenVerifier(ctx, sessionToken, sessionWriteModel.AggregateID, sessionWriteModel.TokenID); err != nil {
 		return nil, err
 	}
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
@@ -334,7 +334,7 @@ func (c *Commands) terminateSession(ctx context.Context, sessionID, sessionToken
 		return nil, err
 	}
 	if mustCheckToken {
-		if err := c.sessionPermission(ctx, sessionWriteModel, sessionToken, domain.PermissionSessionDelete); err != nil {
+		if err := c.checkSessionTerminationPermission(ctx, sessionWriteModel, sessionToken); err != nil {
 			return nil, err
 		}
 	}
@@ -387,13 +387,17 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, m
 	return changed, nil
 }
 
-// sessionPermission will check that the provided sessionToken is correct or
-// if empty, check that the caller is granted the necessary permission
-func (c *Commands) sessionPermission(ctx context.Context, sessionWriteModel *SessionWriteModel, sessionToken, permission string) (err error) {
-	if sessionToken == "" {
-		return c.checkPermission(ctx, permission, authz.GetCtxData(ctx).OrgID, sessionWriteModel.AggregateID)
+// checkSessionTerminationPermission will check that the provided sessionToken is correct or
+// if empty, check that the caller is either terminating the own session or
+// is granted the "session.delete" permission on the resource owner of the authenticated user.
+func (c *Commands) checkSessionTerminationPermission(ctx context.Context, model *SessionWriteModel, token string) error {
+	if token != "" {
+		return c.sessionTokenVerifier(ctx, token, model.AggregateID, model.TokenID)
 	}
-	return c.sessionTokenVerifier(ctx, sessionToken, sessionWriteModel.AggregateID, sessionWriteModel.TokenID)
+	if model.UserID != "" && model.UserID == authz.GetCtxData(ctx).UserID {
+		return nil
+	}
+	return c.checkPermission(ctx, domain.PermissionSessionDelete, model.UserResourceOwner, model.UserID)
 }
 
 func sessionTokenCreator(idGenerator id.Generator, sessionAlg crypto.EncryptionAlgorithm) func(sessionID string) (id string, token string, err error) {
