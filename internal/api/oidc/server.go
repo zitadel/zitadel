@@ -26,6 +26,7 @@ type Server struct {
 	fallbackLogger      *slog.Logger
 	hashAlg             crypto.HashAlgorithm
 	signingKeyAlgorithm string
+	assetAPIPrefix      func(ctx context.Context) string
 }
 
 func endpoints(endpointConfig *EndpointConfig) op.Endpoints {

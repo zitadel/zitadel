@@ -60,7 +60,7 @@ func (s *Server) getUserInfoWithRoles(ctx context.Context, userID, projectID str
 		}
 	}
 
-	userInfo := userInfoToOIDC(userInfoResult.userInfo, scope)
+	userInfo := userInfoToOIDC(userInfoResult.userInfo, scope, s.assetAPIPrefix(ctx))
 	setUserInfoRoleClaims(userInfo, assertRolesResult.projectsRoles)
 
 	return userInfo, s.userinfoFlows(ctx, userInfoResult.userInfo, assertRolesResult.userGrants, userInfo)
@@ -150,7 +150,7 @@ func (s *Server) assertRoles(ctx context.Context, userID, projectID string, scop
 	}
 }
 
-func userInfoToOIDC(user *query.OIDCUserInfo, scope []string) *oidc.UserInfo {
+func userInfoToOIDC(user *query.OIDCUserInfo, scope []string, assetPrefix string) *oidc.UserInfo {
 	out := new(oidc.UserInfo)
 	for _, s := range scope {
 		switch s {
@@ -159,7 +159,7 @@ func userInfoToOIDC(user *query.OIDCUserInfo, scope []string) *oidc.UserInfo {
 		case oidc.ScopeEmail:
 			out.UserInfoEmail = userInfoEmailToOIDC(user.User)
 		case oidc.ScopeProfile:
-			out.UserInfoProfile = userInfoProfileToOidc(user.User)
+			out.UserInfoProfile = userInfoProfileToOidc(user.User, assetPrefix)
 		case oidc.ScopePhone:
 			out.UserInfoPhone = userInfoPhoneToOIDC(user.User)
 		case oidc.ScopeAddress:
@@ -192,14 +192,14 @@ func userInfoEmailToOIDC(user *query.User) oidc.UserInfoEmail {
 	return oidc.UserInfoEmail{}
 }
 
-func userInfoProfileToOidc(user *query.User) oidc.UserInfoProfile {
+func userInfoProfileToOidc(user *query.User, assetPrefix string) oidc.UserInfoProfile {
 	if human := user.Human; human != nil {
 		return oidc.UserInfoProfile{
-			Name:       human.DisplayName,
-			GivenName:  human.FirstName,
-			FamilyName: human.LastName,
-			Nickname:   human.NickName,
-			// Picture:    domain.AvatarURL(o.assetAPIPrefix(ctx), user.ResourceOwner, user.Human.AvatarKey),
+			Name:              human.DisplayName,
+			GivenName:         human.FirstName,
+			FamilyName:        human.LastName,
+			Nickname:          human.NickName,
+			Picture:           domain.AvatarURL(assetPrefix, user.ResourceOwner, user.Human.AvatarKey),
 			Gender:            getGender(human.Gender),
 			Locale:            oidc.NewLocale(human.PreferredLanguage),
 			UpdatedAt:         oidc.FromTime(user.ChangeDate),
