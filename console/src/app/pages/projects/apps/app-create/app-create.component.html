@@ -385,9 +385,14 @@
           <span class="left cnsl-secondary-text">
             {{ 'APP.SAML.CERTIFICATE' | translate }}
           </span>
-          <a href="/saml/v2/certificate" class="cert" target="_blank" rel="noreferrer">{{
-            'APP.SAML.DOWNLOADCERT' | translate
-          }}</a>
+          <a
+            *ngIf="samlCertificateURL$ | async as samlCertificateURL"
+            href="{{ samlCertificateURL }}"
+            class="cert"
+            rel="noreferrer"
+            download
+            >{{ 'APP.SAML.DOWNLOADCERT' | translate }}</a
+          >
         </div>
       </ng-container>
 
