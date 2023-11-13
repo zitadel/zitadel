@@ -109,10 +109,10 @@ func NewServer(
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "OIDC-D3gq1", "cannot create options: %w")
 	}
-	provider, err := op.NewForwardedOpenIDProvider(
-		"",
+	provider, err := op.NewProvider(
 		opConfig,
 		storage,
+		op.IssuerFromForwardedOrHost("", op.WithIssuerFromCustomHeaders("forwarded", "x-zitadel-forwarded")),
 		options...,
 	)
 	if err != nil {
@@ -120,11 +120,12 @@ func NewServer(
 	}
 
 	server := &Server{
-		storage:        storage,
-		LegacyServer:   op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
-		query:          query,
-		fallbackLogger: fallbackLogger,
-		hashAlg:        crypto.NewBCrypt(10), // as we are only verifying in oidc, the cost is already part of the hash string and the config here is irrelevant.
+		storage:             storage,
+		LegacyServer:        op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
+		query:               query,
+		fallbackLogger:      fallbackLogger,
+		hashAlg:             crypto.NewBCrypt(10), // as we are only verifying in oidc, the cost is already part of the hash string and the config here is irrelevant.
+		signingKeyAlgorithm: config.SigningKeyAlgorithm,
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	server.Handler = op.RegisterLegacyServer(server, op.WithHTTPMiddleware(

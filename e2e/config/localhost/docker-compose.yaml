@@ -22,7 +22,7 @@ services:
     ports:
     - "8080:8080"
     healthcheck:
-      test: ["CMD", "/app/zitadel", "ready"]
+      test: ["CMD", "/app/zitadel", "ready", "--config", "/zitadel.yaml" ]
       interval: '10s'
       timeout: '5s'
       retries: 5

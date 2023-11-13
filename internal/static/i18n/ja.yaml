@@ -51,6 +51,7 @@ Errors:
   Notification:
     NoDomain: メッセージのドメインが見つかりません
   User:
+    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: ユーザーが見つかりません
     AlreadyExists: 既に存在するユーザーです
     NotFoundOnOrg: ユーザーが選択した組織内で見つかりません
@@ -306,7 +307,7 @@ Errors:
       NotActive: プロジェクトグラントはアクティブではありません
       NotInactive: プロジェクトグラントは非アクティブではありません
   IAM:
-    NotFound: インスタンスが見つかりません
+    NotFound: インスタンスが見つかりません https://zitadel.com/docs/self-hosting/manage/custom-domain
     Member:
       RolesNotChanged: ロールは変更されていません
     MemberInvalid: 無効なメンバーです
@@ -480,6 +481,8 @@ Errors:
   Session:
     NotExisting: セッションが存在しない
     Terminated: セッションはすでに終了しています
+    Expired: セッションの有効期限が切れました
+    PositiveLifetime: セッションの有効期間は 0 未満であってはなりません
     Token:
       Invalid: セッショントークンが無効です
     WebAuthN:

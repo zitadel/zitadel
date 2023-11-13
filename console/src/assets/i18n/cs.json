@@ -1,0 +1,2251 @@
+{
+  "APP_NAME": "ZITADEL",
+  "PAGINATOR": {
+    "PREVIOUS": "Předchozí",
+    "NEXT": "Další",
+    "COUNT": "Celkem",
+    "MORE": "Více"
+  },
+  "FOOTER": {
+    "LINKS": {
+      "CONTACT": "Kontakt",
+      "TOS": "Podmínky služby",
+      "PP": "Zásady ochrany soukromí"
+    },
+    "THEME": {
+      "DARK": "Tmavý",
+      "LIGHT": "Světlý"
+    }
+  },
+  "HOME": {
+    "WELCOME": "Začněte s ZITADEL",
+    "DISCLAIMER": "ZITADEL zachází s vašimi daty důvěrně a bezpečně.",
+    "DISCLAIMERLINK": "Další informace",
+    "DOCUMENTATION": {
+      "TITLE": "Dokumentace",
+      "DESCRIPTION": "Rychlý start se ZITADEL."
+    },
+    "GETSTARTED": {
+      "TITLE": "Začněte s ZITADEL",
+      "DESCRIPTION": "Rychlý start se ZITADEL."
+    },
+    "QUICKSTARTS": {
+      "LABEL": "První kroky",
+      "TITLE": "Rychlý start",
+      "DESCRIPTION": "Rychlý start se ZITADEL."
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "Zkratky",
+      "SETTINGS": "Dostupné zkratky",
+      "PROJECTS": "Projekty",
+      "REORDER": "Podržte a přetáhněte dlaždici k přesunutí",
+      "ADD": "Podržte a přetáhněte dlaždici pro přidání"
+    }
+  },
+  "ONBOARDING": {
+    "DESCRIPTION": "Váš začáteční proces",
+    "MOREDESCRIPTION": "více zkratek",
+    "COMPLETED": "dokončeno",
+    "DISMISS": "Ne, děkuji, jsem profesionál.",
+    "CARD": {
+      "TITLE": "Nastavte Váš ZITADEL",
+      "DESCRIPTION": "Tento seznam pomáhá nastavit vaši instanci a provede vás nejdůležitějšími kroky"
+    },
+    "MILESTONES": {
+      "instance.policy.label.added": {
+        "title": "Nastavte vaši značku",
+        "description": "Definujte barvu a tvar vašeho přihlašovacího okna a nahrajte vaše logo a ikony.",
+        "action": "Nastavit branding"
+      },
+      "instance.smtp.config.added": {
+        "title": "Nastavte vaše SMTP nastavení",
+        "description": "Nastavte vlastní nastavení mailového serveru.",
+        "action": "Nastavit SMTP"
+      },
+      "PROJECT_CREATED": {
+        "title": "Vytvořte projekt",
+        "description": "Přidejte projekt a definujte jeho role a oprávnění.",
+        "action": "Vytvořit projekt"
+      },
+      "APPLICATION_CREATED": {
+        "title": "Zaregistrujte svou aplikaci",
+        "description": "Zaregistrujte svou webovou, nativní, api nebo saml aplikaci a nastavte proces ověřování.",
+        "action": "Zaregistrovat aplikaci"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Přihlašte se do své aplikace",
+        "description": "Integrujte vaši aplikaci se ZITADEL pro autentizaci a otestujte ji přihlášením se vaším administrátorským uživatelem.",
+        "action": "Přihlásit se"
+      },
+      "user.human.added": {
+        "title": "Přidat uživatele",
+        "description": "Přidejte uživatele vaší aplikace",
+        "action": "Přidat uživatele"
+      },
+      "user.grant.added": {
+        "title": "Přidělit uživatelům přístup",
+        "description": "Umožněte uživatelům přístup k vaší aplikaci a nastavte jejich role.",
+        "action": "Přidělit uživatelské přístupy"
+      }
+    }
+  },
+  "MENU": {
+    "INSTANCE": "Instance",
+    "DASHBOARD": "Domů",
+    "PERSONAL_INFO": "Osobní informace",
+    "DOCUMENTATION": "Dokumentace",
+    "INSTANCEOVERVIEW": "Instance",
+    "ORGS": "Organizace",
+    "VIEWS": "Pohledy",
+    "EVENTS": "Události",
+    "FAILEDEVENTS": "Selhané události",
+    "ORGANIZATION": "Organizace",
+    "PROJECT": "Projekty",
+    "PROJECTOVERVIEW": "Přehled",
+    "PROJECTGRANTS": "Pověření",
+    "ROLES": "Role",
+    "GRANTEDPROJECT": "Pověřené projekty",
+    "HUMANUSERS": "Uživatelé",
+    "MACHINEUSERS": "Systémoví uživatelé",
+    "LOGOUT": "Odhlásit všechny uživatele",
+    "NEWORG": "Nová organizace",
+    "IAMADMIN": "Jste administrátor IAM. Vezměte prosím na vědomí, že máte rozšířená oprávnění.",
+    "SHOWORGS": "Zobrazit všechny organizace",
+    "GRANTS": "Autorizace",
+    "ACTIONS": "Akce",
+    "PRIVACY": "Soukromí",
+    "TOS": "Podmínky služby",
+    "OPENSHORTCUTSTOOLTIP": "Pro zobrazení klávesových zkratek stiskněte ?",
+    "SETTINGS": "Nastavení",
+    "CUSTOMERPORTAL": "Zákaznický portál"
+  },
+  "ACTIONS": {
+    "ACTIONS": "Akce",
+    "FILTER": "Filtr",
+    "RENAME": "Přejmenovat",
+    "SET": "Nastavit",
+    "COPY": "Kopírovat do schránky",
+    "COPIED": "Zkopírováno do schránky.",
+    "RESET": "Obnovit",
+    "RESETDEFAULT": "Obnovit na výchozí",
+    "RESETTO": "Obnovit na: ",
+    "RESETCURRENT": "Obnovit aktuální",
+    "SHOW": "Zobrazit",
+    "HIDE": "Skrýt",
+    "SAVE": "Uložit",
+    "SAVENOW": "Uložit nyní",
+    "NEW": "Nový",
+    "ADD": "Přidat",
+    "CREATE": "Vytvořit",
+    "CONTINUE": "Pokračovat",
+    "BACK": "Zpět",
+    "CLOSE": "Zavřít",
+    "CLEAR": "Vyčistit",
+    "CANCEL": "Zrušit",
+    "INFO": "Informace",
+    "OK": "OK",
+    "SELECT": "Vybrat",
+    "VIEW": "Zobrazit",
+    "SELECTIONDELETE": "Smazat výběr",
+    "DELETE": "Smazat",
+    "REMOVE": "Odstranit",
+    "VERIFY": "Ověřit",
+    "FINISH": "Dokončit",
+    "FINISHED": "Zavřít",
+    "CHANGE": "Změnit",
+    "REACTIVATE": "Reaktivovat",
+    "ACTIVATE": "Aktivovat",
+    "DEACTIVATE": "Deaktivovat",
+    "REFRESH": "Obnovit",
+    "LOGIN": "Přihlásit se",
+    "EDIT": "Upravit",
+    "PIN": "Připnout / Odepnout",
+    "CONFIGURE": "Konfigurovat",
+    "SEND": "Odeslat",
+    "NEWVALUE": "Nová hodnota",
+    "RESTORE": "Obnovit",
+    "CONTINUEWITHOUTSAVE": "Pokračovat bez uložení",
+    "OF": "z",
+    "PREVIOUS": "Předchozí",
+    "NEXT": "Další",
+    "MORE": "více",
+    "STEP": "Krok",
+    "SETUP": "Nastavit",
+    "UNSAVEDCHANGES": "Neuložené změny",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Jste si jisti, že chcete zahodit tuto akci? Vaše akce bude ztracena",
+        "CANCEL": "Zrušit",
+        "DISCARD": "Zahodit"
+      }
+    },
+    "TABLE": {
+      "SHOWUSER": "Zobrazit uživatele {{value}}"
+    }
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Má kontrolu nad celou instancí, včetně všech organizací",
+    "IAM_OWNER_VIEWER": "Má oprávnění prohlížet celou instanci, včetně všech organizací",
+    "IAM_ORG_MANAGER": "Má oprávnění vytvářet a spravovat organizace",
+    "IAM_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele",
+    "ORG_OWNER": "Má oprávnění nad celou organizací",
+    "ORG_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele organizace",
+    "ORG_OWNER_VIEWER": "Má oprávnění prohlížet celou organizaci",
+    "ORG_USER_PERMISSION_EDITOR": "Má oprávnění spravovat uživatelská pověření",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Má oprávnění spravovat pověření projektu",
+    "ORG_PROJECT_CREATOR": "Má oprávnění vytvářet své vlastní projekty a podřízená nastavení",
+    "PROJECT_OWNER": "Má oprávnění nad celým projektem",
+    "PROJECT_OWNER_VIEWER": "Má oprávnění prohlížet celý projekt",
+    "PROJECT_OWNER_GLOBAL": "Má oprávnění nad celým projektem",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Má oprávnění prohlížet celý projekt",
+    "PROJECT_GRANT_OWNER": "Má oprávnění spravovat pověření projektu",
+    "PROJECT_GRANT_OWNER_VIEWER": "Má oprávnění prohlížet pověření projektu"
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "Všechna nastavení organizace a tabulky v konzole jsou založeny na vybrané organizaci. Klikněte na toto tlačítko, chcete-li přepnout organizaci nebo vytvořit novou."
+    },
+    "INSTANCE": {
+      "TEXT": "Klikněte sem pro přístup k nastavením instance. Vezměte prosím na vědomí, že máte přístup k tomuto tlačítku pouze pokud máte rozšířená oprávnění."
+    },
+    "PROFILE": {
+      "TEXT": "Zde můžete přepínat mezi vašimi uživatelskými účty a spravovat vaše relace a profil."
+    },
+    "NAV": {
+      "TEXT": "Tato navigace se mění na základě vaší vybrané organizace nahoře nebo vaší instance"
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "Kontext organizace se změnil."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "Pohled byl právě změněn na instanci!"
+    }
+  },
+  "FILTER": {
+    "TITLE": "Filtr",
+    "STATE": "Stav",
+    "DISPLAYNAME": "Zobrazované jméno uživatele",
+    "EMAIL": "Email",
+    "USERNAME": "Uživatelské jméno",
+    "ORGNAME": "Název organizace",
+    "PROJECTNAME": "Název projektu",
+    "RESOURCEOWNER": "Vlastník zdroje",
+    "METHODS": {
+      "5": "obsahuje",
+      "7": "končí s",
+      "1": "rovná se"
+    }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Klávesové zkratky",
+    "UNDERORGCONTEXT": "Na stránkách organizace",
+    "SIDEWIDE": "Globální zkratky",
+    "SHORTCUTS": {
+      "HOME": "<strong>G</strong>o to <strong>H</strong>ome - Domů",
+      "INSTANCE": "<strong>G</strong>o to <strong>I</strong>nstance - Instance",
+      "ORG": "<strong>G</strong>o to <strong>O</strong>rganization - Organizace",
+      "ORGSETTINGS": "<strong>G</strong>o to Organization <strong>S</strong>ettings - Nastavení organizace",
+      "ORGSWITCHER": "Změnit organizaci",
+      "ME": "Přejít na vlastní profil",
+      "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects - Projekty",
+      "USERS": "<strong>G</strong>o to <strong>U</strong>sers - Uživatelé",
+      "USERGRANTS": "<strong>G</strong>o to <strong>A</strong>uthorizations - Oprávnění",
+      "ACTIONS": "<strong>G</strong>o to Actions and <strong>F</strong>lows - Akce a postupy",
+      "DOMAINS": "<strong>G</strong>o to <strong>D</strong>omains - Domény"
+    }
+  },
+  "RESOURCEID": "ID zdroje",
+  "NAME": "Název",
+  "VERSION": "Verze",
+  "TABLE": {
+    "NOROWS": "Žádná data"
+  },
+  "ERRORS": {
+    "REQUIRED": "Prosím vyplňte toto pole.",
+    "ATLEASTONE": "Zadejte alespoň jednu hodnotu.",
+    "TOKENINVALID": {
+      "TITLE": "Platnost vašeho autorizačního tokenu vypršela.",
+      "DESCRIPTION": "Klikněte na tlačítko níže pro opětovné přihlášení."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Vyčerpali jste kvótu pro autentizované požadavky.",
+      "DESCRIPTION": "Odstraňte nebo zvyšte limit kvóty pro tuto instanci ZITADEL."
+    },
+    "INVALID_FORMAT": "Formát je neplatný.",
+    "NOTANEMAIL": "Zadaná hodnota není e-mailová adresa.",
+    "MINLENGTH": "Musí být dlouhé alespoň {{requiredLength}} znaků.",
+    "UPPERCASEMISSING": "Musí obsahovat velké písmeno.",
+    "LOWERCASEMISSING": "Musí obsahovat malé písmeno.",
+    "SYMBOLERROR": "Musí obsahovat symbol nebo interpunkční znaménko.",
+    "NUMBERERROR": "Musí obsahovat číslici.",
+    "PWNOTEQUAL": "Zadaná hesla se neshodují.",
+    "PHONE": "Telefonní číslo musí začínat s +."
+  },
+  "USER": {
+    "SETTINGS": {
+      "TITLE": "Nastavení",
+      "GENERAL": "Obecné",
+      "IDP": "Poskytovatelé identity",
+      "SECURITY": "Heslo a zabezpečení",
+      "KEYS": "Klíče",
+      "PAT": "Osobní přístupové tokeny",
+      "USERGRANTS": "Oprávnění",
+      "MEMBERSHIPS": "Členství",
+      "METADATA": "Metadata"
+    },
+    "TITLE": "Osobní informace",
+    "DESCRIPTION": "Správa osobních informací a nastavení zabezpečení.",
+    "PAGES": {
+      "LIST": "Uživatelé",
+      "TITLE": "Uživatel",
+      "DESCRIPTION": "Vytvořte nové uživatele ve vaší organizaci a spravujte stávající.",
+      "LISTMACHINE": "Systémoví uživatelé",
+      "DESCRIPTIONMACHINE": "Vytvořte a spravujte systémové uživatele vaší organizace",
+      "DETAIL": "Detail",
+      "CREATE": "Vytvořit",
+      "MY": "Moje informace",
+      "LOGINNAMES": "Přihlašovací jména",
+      "LOGINMETHODS": "Přihlašovací metody",
+      "LOGINNAMESDESC": "To jsou vaše přihlašovací jména:",
+      "NOUSER": "Žádný přidružený uživatel.",
+      "REACTIVATE": "Reaktivovat",
+      "DEACTIVATE": "Deaktivovat",
+      "FILTER": "Filtr",
+      "STATE": "Stav",
+      "DELETE": "Smazat uživatele",
+      "UNLOCK": "Odemknout uživatele",
+      "GENERATESECRET": "Generovat klientský tajný klíč",
+      "REMOVESECRET": "Odstranit klientský tajný klíč",
+      "LOCKEDDESCRIPTION": "Tento uživatel byl zablokován kvůli překročení maximálního počtu pokusů o přihlášení a před dalším použitím musí být odemknut.",
+      "DELETEACCOUNT": "Smazat účet",
+      "DELETEACCOUNT_DESC": "Pokud provedete tuto akci, budete odhlášeni a už nebudete mít přístup k vašemu účtu. Tato akce je nevratná, prosím pokračujte s opatrností.",
+      "DELETEACCOUNT_BTN": "Smazat účet",
+      "DELETEACCOUNT_SUCCESS": "Účet byl úspěšně smazán!"
+    },
+    "DETAILS": {
+      "DATECREATED": "Vytvořeno",
+      "DATECHANGED": "Změněno"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Smazat uživatele",
+      "DELETE_SELF_TITLE": "Smazat účet",
+      "DELETE_DESCRIPTION": "Chystáte se trvale smazat uživatele. Jste si jisti?",
+      "DELETE_SELF_DESCRIPTION": "Chystáte se trvale smazat váš osobní účet. Tím se odhlásíte a smažete svého uživatele. Tuto akci nelze vzít zpět!",
+      "DELETE_AUTH_DESCRIPTION": "Chystáte se trvale smazat váš osobní účet. Jste si jisti?",
+      "TYPEUSERNAME": "Napište '{{value}}', abyste potvrdili a smazali uživatele.",
+      "USERNAME": "Přihlašovací jméno",
+      "DELETE_BTN": "Smazat trvale"
+    },
+    "SENDEMAILDIALOG": {
+      "TITLE": "Poslat upozornění e-mailem",
+      "DESCRIPTION": "Klikněte na tlačítko níže pro odeslání upozornění na současnou e-mailovou adresu nebo změňte e-mailovou adresu v poli.",
+      "NEWEMAIL": "Nová e-mailová adresa"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Tajný klíč klienta",
+      "CLIENTSECRET_DESCRIPTION": "Zkopírujte a uchovejte tajný klíč klienta na bezpečném místě, po zavření dialogového okna již nebude k dispozici."
+    },
+    "TABLE": {
+      "DEACTIVATE": "Deaktivovat",
+      "ACTIVATE": "Aktivovat",
+      "CHANGEDATE": "Poslední změna",
+      "CREATIONDATE": "Vytvořeno",
+      "TYPES": {
+        "HUMAN": "Uživatelé",
+        "MACHINE": "Systémoví uživatelé"
+      },
+      "FILTER": {
+        "0": "Filtr pro Zobrazované jméno",
+        "1": "Filtr pro Uživatelské jméno",
+        "2": "filtr pro Zobrazované jméno",
+        "3": "filtr pro Uživatelské jméno",
+        "4": "filtr pro E-mail",
+        "5": "filtr pro Zobrazované jméno",
+        "10": "filtr pro název organizace",
+        "12": "filtr pro název projektu"
+      },
+      "EMPTY": "Žádné záznamy"
+    },
+    "PASSWORDLESS": {
+      "SEND": "Odeslat registrační odkaz",
+      "TABLETYPE": "Typ",
+      "TABLESTATE": "Stav",
+      "NAME": "Jméno",
+      "EMPTY": "Není nastaveno žádné zařízení",
+      "TITLE": "Bezheslová autentizace",
+      "DESCRIPTION": "Přidat metody autentizace založené na WebAuthn pro přihlášení do ZITADEL bez hesla.",
+      "MANAGE_DESCRIPTION": "Spravujte metody druhého faktoru vašich uživatelů.",
+      "U2F": "Přidat metodu",
+      "U2F_DIALOG_TITLE": "Ověřit autentizátor",
+      "U2F_DIALOG_DESCRIPTION": "Zadejte název pro vaše zařízení používané pro bezheslové přihlášení",
+      "U2F_SUCCESS": "Bezheslová autentizace úspěšně vytvořena!",
+      "U2F_ERROR": "Během nastavení došlo k chybě!",
+      "U2F_NAME": "Název autentizátoru",
+      "TYPE": {
+        "0": "Nejsou definovány žádné MFA",
+        "1": "Jednorázové heslo (OTP)",
+        "2": "Otisk prstu, bezpečnostní klíče, Face ID a další"
+      },
+      "STATE": {
+        "0": "Žádný stav",
+        "1": "Není připraveno",
+        "2": "Připraveno",
+        "3": "Smazáno"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Odstranit metodu bezheslové autentizace",
+        "DELETE_DESCRIPTION": "Chystáte se odstranit metodu bezheslové autentizace. Jste si jisti?",
+        "ADD_TITLE": "Bezheslová autentizace",
+        "ADD_DESCRIPTION": "Vyberte jednu z dostupných možností pro vytvoření metody bezheslové autentizace.",
+        "SEND_DESCRIPTION": "Pošlete si registrační odkaz na vaši e-mailovou adresu.",
+        "SEND": "Odeslat registrační odkaz",
+        "SENT": "E-mail byl úspěšně odeslán. Zkontrolujte vaši poštovní schránku pro pokračování v nastavení.",
+        "QRCODE_DESCRIPTION": "Generovat QR kód pro skenování s jiným zařízením.",
+        "QRCODE": "Generovat QR kód",
+        "QRCODE_SCAN": "Skenovat tento QR kód pro pokračování v nastavení na vašem zařízení.",
+        "NEW_DESCRIPTION": "Použijte toto zařízení pro nastavení bezheslového přihlášení.",
+        "NEW": "Přidat nové"
+      }
+    },
+    "MFA": {
+      "TABLETYPE": "Typ",
+      "TABLESTATE": "Stav",
+      "NAME": "Jméno",
+      "EMPTY": "Žádní další faktory",
+      "TITLE": "Vícefaktorová autentizace",
+      "DESCRIPTION": "Přidat druhý faktor pro zajištění optimální bezpečnosti vašeho účtu.",
+      "MANAGE_DESCRIPTION": "Spravujte metody druhého faktoru vašich uživatelů.",
+      "ADD": "Přidat faktor",
+      "OTP": "Autentizační aplikace pro TOTP (časově omezené jednorázové heslo)",
+      "OTP_DIALOG_TITLE": "Přidat OTP",
+      "OTP_DIALOG_DESCRIPTION": "Naskenujte QR kód pomocí autentizační aplikace a zadejte kód níže pro ověření a aktivaci metody OTP.",
+      "U2F": "Otisk prstu, bezpečnostní klíče, Face ID a další",
+      "U2F_DIALOG_TITLE": "Ověřit faktor",
+      "U2F_DIALOG_DESCRIPTION": "Zadejte název pro vaše univerzální vícefaktorové zařízení.",
+      "U2F_SUCCESS": "Faktor úspěšně přidán!",
+      "U2F_ERROR": "Během nastavení došlo k chybě!",
+      "U2F_NAME": "Název autentizátoru",
+      "OTPSMS": "OTP (jednorázové heslo) s SMS",
+      "OTPEMAIL": "OTP (jednorázové heslo) s e-mailem",
+      "SETUPOTPSMSDESCRIPTION": "Chcete nastavit toto telefonní číslo jako druhý faktor OTP (jednorázové heslo)?",
+      "OTPSMSSUCCESS": "Faktor OTP byl úspěšně nastaven.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Váš telefon musí být ověřen, aby bylo možné použít tuto metodu.",
+      "OTPEMAILSUCCESS": "Faktor OTP byl úspěšně nastaven.",
+      "TYPE": {
+        "0": "Není definována žádná MFA",
+        "1": "Jednorázové heslo (OTP)",
+        "2": "Otisk prstu, bezpečnostní klíče, Face ID a další"
+      },
+      "STATE": {
+        "0": "Žádný stav",
+        "1": "Není připraveno",
+        "2": "Připraveno",
+        "3": "Smazáno"
+      },
+      "DIALOG": {
+        "MFA_DELETE_TITLE": "Odstranit druhý faktor",
+        "MFA_DELETE_DESCRIPTION": "Chystáte se odstranit druhý faktor. Jste si jisti?",
+        "ADD_MFA_TITLE": "Přidat druhý faktor",
+        "ADD_MFA_DESCRIPTION": "Vyberte jednu z následujících možností."
+      }
+    },
+    "EXTERNALIDP": {
+      "TITLE": "Externí poskytovatelé identity",
+      "DESC": "",
+      "IDPCONFIGID": "ID konfigurace IDP",
+      "IDPNAME": "Název IDP",
+      "USERDISPLAYNAME": "Externí jméno",
+      "EXTERNALUSERID": "Externí ID uživatele",
+      "EMPTY": "Nebyl nalezen žádný externí IDP",
+      "DIALOG": {
+        "DELETE_TITLE": "Odebrat IDP",
+        "DELETE_DESCRIPTION": "Chystáte se odstranit poskytovatele identity od uživatele. Opravdu chcete pokračovat?"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Vytvořit nového uživatele",
+      "DESCRIPTION": "Prosím, uveďte požadované informace.",
+      "NAMEANDEMAILSECTION": "Jméno a e-mail",
+      "GENDERLANGSECTION": "Pohlaví a jazyk",
+      "PHONESECTION": "Telefonní čísla",
+      "PASSWORDSECTION": "Prvotní heslo",
+      "ADDRESSANDPHONESECTION": "Telefonní číslo",
+      "INITMAILDESCRIPTION": "Pokud jsou vybrány obě možnosti, nebude odeslán e-mail pro inicializaci. Pokud je vybrána pouze jedna z možností, bude odeslán e-mail pro poskytnutí/ověření údajů."
+    },
+    "CODEDIALOG": {
+      "TITLE": "Ověření telefonního čísla",
+      "DESCRIPTION": "Zadejte kód, který jste obdrželi textovou zprávou, pro ověření vašeho telefonního čísla.",
+      "CODE": "Kód"
+    },
+    "DATA": {
+      "STATE": "Stav",
+      "STATE0": "Neznámý",
+      "STATE1": "Aktivní",
+      "STATE2": "Neaktivní",
+      "STATE3": "Smazaný",
+      "STATE4": "Zablokovaný",
+      "STATE5": "Pozastavený",
+      "STATE6": "Počáteční"
+    },
+    "PROFILE": {
+      "TITLE": "Profil",
+      "EMAIL": "E-mail",
+      "PHONE": "Telefonní číslo",
+      "PHONE_HINT": "Použijte symbol + následovaný mezinárodním kódem země, nebo ze seznamu vyberte zemi a nakonec zadejte telefonní číslo",
+      "USERNAME": "Uživatelské jméno",
+      "CHANGEUSERNAME": "upravit",
+      "CHANGEUSERNAME_TITLE": "Změna uživatelského jména",
+      "CHANGEUSERNAME_DESC": "Zadejte nové jméno do pole níže.",
+      "FIRSTNAME": "Křestní jméno",
+      "LASTNAME": "Příjmení",
+      "NICKNAME": "Přezdívka",
+      "DISPLAYNAME": "Zobrazované jméno",
+      "PREFERREDLOGINNAME": "Preferované přihlašovací jméno",
+      "PREFERRED_LANGUAGE": "Jazyk",
+      "GENDER": "Pohlaví",
+      "PASSWORD": "Heslo",
+      "AVATAR": {
+        "UPLOADTITLE": "Nahrát profilový obrázek",
+        "UPLOADBTN": "Vybrat soubor",
+        "UPLOAD": "Nahrát",
+        "CURRENT": "Současný obrázek",
+        "PREVIEW": "Náhled",
+        "DELETESUCCESS": "Úspěšně smazáno!",
+        "CROPPERERROR": "Při nahrávání souboru došlo k chybě. Pokud je to nutné, zkuste jiný formát a velikost."
+      },
+      "COUNTRY": "Země"
+    },
+    "MACHINE": {
+      "TITLE": "Detaily systémového uživatele",
+      "USERNAME": "Uživatelské jméno",
+      "NAME": "Název",
+      "DESCRIPTION": "Popis",
+      "KEYSTITLE": "Klíče",
+      "KEYSDESC": "Definujte své klíče a přidejte volitelné datum expirace.",
+      "TOKENSTITLE": "Osobní přístupové tokeny",
+      "TOKENSDESC": "Osobní přístupové tokeny fungují jako běžné OAuth přístupové tokeny.",
+      "ID": "ID klíče",
+      "TYPE": "Typ",
+      "EXPIRATIONDATE": "Datum expirace",
+      "CHOOSEDATEAFTER": "Zadejte platné datum expirace po",
+      "CHOOSEEXPIRY": "Vyberte datum expirace",
+      "CREATIONDATE": "Datum vytvoření",
+      "KEYDETAILS": "Detaily klíče",
+      "ACCESSTOKENTYPE": "Typ přístupového tokenu",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
+      "ADD": {
+        "TITLE": "Přidat klíč",
+        "DESCRIPTION": "Vyberte typ klíče a zvolte volitelné datum expirace."
+      },
+      "ADDED": {
+        "TITLE": "Klíč byl vytvořen",
+        "DESCRIPTION": "Stáhněte klíč, protože po zavření tohoto dialogu nebude viditelný!"
+      },
+      "KEYTYPES": {
+        "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Smazat klíč",
+          "DESCRIPTION": "Chcete smazat vybraný klíč? Tato akce je nevratná."
+        }
+      }
+    },
+    "PASSWORD": {
+      "TITLE": "Heslo",
+      "LABEL": "Bezpečné heslo pomáhá chránit účet",
+      "DESCRIPTION": "Zadejte nové heslo podle níže uvedené politiky.",
+      "OLD": "Současné heslo",
+      "NEW": "Nové heslo",
+      "CONFIRM": "Potvrďte nové heslo",
+      "NEWINITIAL": "Heslo",
+      "CONFIRMINITIAL": "Potvrzení hesla",
+      "RESET": "Resetovat současné heslo",
+      "SET": "Nastavit nové heslo",
+      "RESENDNOTIFICATION": "Odeslat odkaz pro reset hesla",
+      "REQUIRED": "Některá povinná pole nejsou vyplněna.",
+      "MINLENGTHERROR": "Musí být alespoň {{value}} znaků dlouhé."
+    },
+    "ID": "ID",
+    "EMAIL": "E-mail",
+    "PHONE": "Telefonní číslo",
+    "PHONEEMPTY": "Není definováno telefonní číslo",
+    "PHONEVERIFIED": "Telefonní číslo ověřeno.",
+    "EMAILVERIFIED": "E-mail ověřen",
+    "NOTVERIFIED": "neověřeno",
+    "PREFERRED_LOGINNAME": "Preferované přihlašovací jméno",
+    "ISINITIAL": "Uživatel ještě není aktivní.",
+    "LOGINMETHODS": {
+      "TITLE": "Kontaktní informace",
+      "DESCRIPTION": "Poskytnuté informace se používají k zasílání důležitých informací, jako jsou e-maily pro reset hesla.",
+      "EMAIL": {
+        "TITLE": "E-mail",
+        "VALID": "ověřeno",
+        "ISVERIFIED": "E-mail ověřen",
+        "ISVERIFIEDDESC": "Pokud je e-mail označen jako ověřený, nebude požadována žádná žádost o ověření e-mailu.",
+        "RESEND": "Znovu odeslat ověřovací e-mail",
+        "EDITTITLE": "Změnit e-mail",
+        "EDITDESC": "Zadejte nový e-mail do pole níže."
+      },
+      "PHONE": {
+        "TITLE": "Telefon",
+        "VALID": "ověřeno",
+        "RESEND": "Znovu odeslat ověřovací textovou zprávu",
+        "EDITTITLE": "Změnit číslo",
+        "EDITVALUE": "Telefonní číslo",
+        "EDITDESC": "Zadejte nové telefonní číslo do pole níže.",
+        "DELETETITLE": "Smazat telefonní číslo",
+        "DELETEDESC": "Opravdu chcete smazat telefonní číslo",
+        "OTPSMSREMOVALWARNING": "Tento účet používá toto telefonní číslo jako druhý faktor. Po provedení této akce ho nebudete moci používat."
+      },
+      "RESENDCODE": "Znovu odeslat kód",
+      "ENTERCODE": "Ověřit",
+      "ENTERCODE_DESC": "Ověřovací kód"
+    },
+    "GRANTS": {
+      "TITLE": "Uživatelské oprávnění",
+      "DESCRIPTION": "Udělte tomuto uživateli přístup k určitým projektům",
+      "CREATE": {
+        "TITLE": "Vytvořit uživatelské oprávnění",
+        "DESCRIPTION": "Vyhledejte organizaci, projekt a příslušné role projektu."
+      },
+      "PROJECTNAME": "Název projektu",
+      "PROJECT-OWNED": "Projekt",
+      "PROJECT-GRANTED": "Přidělený projekt",
+      "FILTER": {
+        "0": "filtr pro uživatele",
+        "1": "filtr pro doménu",
+        "2": "filtr pro název projektu",
+        "3": "filtr pro název role"
+      }
+    },
+    "STATE": {
+      "0": "Neznámý",
+      "1": "Aktivní",
+      "2": "Neaktivní",
+      "3": "Smazaný",
+      "4": "Uzamčený",
+      "5": "Pozastavený",
+      "6": "Počáteční"
+    },
+    "SEARCH": {
+      "ADDITIONAL": "Přihlašovací jméno (současná organizace)",
+      "ADDITIONAL-EXTERNAL": "Přihlašovací jméno (externí organizace)"
+    },
+    "TARGET": {
+      "SELF": "Pokud chcete udělit oprávnění uživateli z jiné organizace",
+      "EXTERNAL": "Udělit oprávnění uživateli vaší organizace",
+      "CLICKHERE": "klikněte zde"
+    },
+    "SIGNEDOUT": "Byli jste odhlášeni. Klikněte na tlačítko „Přihlásit se“ pro opětovné přihlášení.",
+    "SIGNEDOUT_BTN": "Přihlásit se",
+    "EDITACCOUNT": "Upravit účet",
+    "ADDACCOUNT": "Přihlásit se s jiným účtem",
+    "RESENDINITIALEMAIL": "Znovu odeslat aktivační e-mail",
+    "RESENDEMAILNOTIFICATION": "Znovu odeslat e-mailové upozornění",
+    "TOAST": {
+      "CREATED": "Uživatel úspěšně vytvořen.",
+      "SAVED": "Profil úspěšně uložen.",
+      "USERNAMECHANGED": "Uživatelské jméno změněno.",
+      "EMAILSAVED": "E-mail úspěšně uložen.",
+      "INITEMAILSENT": "Počáteční e-mail odeslán.",
+      "PHONESAVED": "Telefonní číslo úspěšně uloženo.",
+      "PHONEREMOVED": "Telefonní číslo bylo odstraněno.",
+      "PHONEVERIFIED": "Telefonní číslo úspěšně ověřeno.",
+      "PHONEVERIFICATIONSENT": "Kód pro ověření telefonu odeslán.",
+      "EMAILVERIFICATIONSENT": "Kód pro ověření e-mailu odeslán.",
+      "OTPREMOVED": "OTP odstraněn.",
+      "U2FREMOVED": "Faktor odstraněn.",
+      "PASSWORDLESSREMOVED": "Bezheslové přihlášení odstraněno.",
+      "INITIALPASSWORDSET": "Počáteční heslo nastaveno.",
+      "PASSWORDNOTIFICATIONSENT": "Oznámení o změně hesla odesláno.",
+      "PASSWORDCHANGED": "Heslo úspěšně změněno.",
+      "REACTIVATED": "Uživatel znovu aktivován.",
+      "DEACTIVATED": "Uživatel deaktivován.",
+      "SELECTEDREACTIVATED": "Vybraní uživatelé znovu aktivováni.",
+      "SELECTEDDEACTIVATED": "Vybraní uživatelé deaktivováni.",
+      "SELECTEDKEYSDELETED": "Vybrané klíče smazány.",
+      "KEYADDED": "Klíč přidán!",
+      "MACHINEADDED": "Systémový uživatel vytvořen!",
+      "DELETED": "Uživatel úspěšně smazán!",
+      "UNLOCKED": "Uživatel úspěšně odemčen!",
+      "PASSWORDLESSREGISTRATIONSENT": "Odkaz pro registraci odeslán úspěšně.",
+      "SECRETGENERATED": "Tajemství úspěšně vygenerováno!",
+      "SECRETREMOVED": "Tajemství úspěšně odstraněno!"
+    },
+    "MEMBERSHIPS": {
+      "TITLE": "Manažerské role v ZITADEL",
+      "DESCRIPTION": "Zde jsou všechna členská oprávnění uživatele. Můžete je upravovat také na stránkách detailů organizace, projektu nebo IAM.",
+      "ORGCONTEXT": "Vidíte všechny organizace a projekty, které souvisí s aktuálně vybranou organizací.",
+      "USERCONTEXT": "Vidíte všechny organizace a projekty, na které máte oprávnění. Včetně jiných organizací.",
+      "CREATIONDATE": "Datum vytvoření",
+      "CHANGEDATE": "Poslední změna",
+      "DISPLAYNAME": "Zobrazované jméno",
+      "REMOVE": "Odebrat",
+      "TYPE": "Typ",
+      "ORGID": "ID organizace",
+      "UPDATED": "Členství bylo aktualizováno.",
+      "NOPERMISSIONTOEDIT": "Nemáte potřebná oprávnění pro úpravu rolí!",
+      "TYPES": {
+        "UNKNOWN": "Neznámý",
+        "ORG": "Organizace",
+        "PROJECT": "Projekt",
+        "GRANTEDPROJECT": "Přidělený projekt"
+      }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "Token",
+      "ADD": {
+        "TITLE": "Vygenerovat nový osobní přístupový token",
+        "DESCRIPTION": "Stanovte vlastní datum expirace tokenu.",
+        "CHOOSEEXPIRY": "Vyberte datum expirace",
+        "CHOOSEDATEAFTER": "Zadejte platné datum expirace. Po ..."
+      },
+      "ADDED": {
+        "TITLE": "Osobní přístupový token",
+        "DESCRIPTION": "Ujistěte se, že jste si svůj osobní přístupový token zkopírovali. Později ho již nelze zobrazit."
+      },
+      "DELETE": {
+        "TITLE": "Smazat token",
+        "DESCRIPTION": "Chystáte se smazat osobní přístupový token. Jste si jisti?"
+      },
+      "DELETED": "Token byl úspěšně smazán."
+    }
+  },
+  "METADATA": {
+    "TITLE": "Metadata",
+    "KEY": "Klíč",
+    "VALUE": "Hodnota",
+    "ADD": "Přidat záznam",
+    "SAVE": "Uložit",
+    "EMPTY": "Žádná metadata",
+    "SETSUCCESS": "Prvek byl úspěšně uložen",
+    "REMOVESUCCESS": "Prvek byl úspěšně smazán"
+  },
+  "FLOWS": {
+    "TITLE": "Akce a Toky",
+    "DESCRIPTION": "Definujte skripty, které se mají vykonat při určité události.",
+    "ACTIONSTITLE": "Akce",
+    "ACTIONSDESCRIPTION": "Toto jsou vaše skripty, které můžete spustit v tokech.",
+    "FLOWSTITLE": "Toky",
+    "FLOWSDESCRIPTION": "Toky určitého typu spouštějí akce v čase spouštěče.",
+    "ID": "ID",
+    "NAME": "Název",
+    "STATE": "Stav",
+    "STATES": {
+      "0": "bez stavu",
+      "1": "neaktivní",
+      "2": "aktivní"
+    },
+    "ADDTRIGGER": "Přidat spouštěč",
+    "FLOWCHANGED": "Tok byl úspěšně změněn",
+    "FLOWCLEARED": "Tok byl úspěšně resetován",
+    "TIMEOUT": "Časový limit",
+    "TIMEOUTINSEC": "Časový limit v sekundách",
+    "ALLOWEDTOFAIL": "Povoleno selhat",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Varování",
+      "DESCRIPTION": "Pokud tuto nastavení zrušíte, může to způsobit, že uživatelé vaší organizace nebudou moci přihlašovat. Dále nebudete moci přístupovat do konzoly pro zrušení akce. Doporučujeme vytvořit administrátorského uživatele v samostatné organizaci nebo nejprve testovat skripty v prostředí pro vývoj nebo vývojové organizaci."
+    },
+    "SCRIPT": "Skript",
+    "FLOWTYPE": "Typ toku",
+    "TRIGGERTYPE": "Typ spouštěče",
+    "ACTIONS": "Akce",
+    "ACTIONSMAX": "Na základě vaší úrovně máte k dispozici omezený počet Akcí ({{value}}). Ujistěte se, že deaktivujete ty, které nepotřebujete, nebo zvažte upgrade vaší úrovně.",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "Vytvořit akci"
+      },
+      "UPDATE": {
+        "TITLE": "Aktualizovat akci"
+      },
+      "DELETEACTION": {
+        "TITLE": "Smazat akci?",
+        "DESCRIPTION": "Chystáte se smazat akci. Tuto akci nelze vrátit zpět. Jste si jisti?",
+        "DELETE_SUCCESS": "Akce byla úspěšně smazána."
+      },
+      "CLEAR": {
+        "TITLE": "Vyčistit tok?",
+        "DESCRIPTION": "Chystáte se resetovat tok spolu s jeho spouštěči a akcemi. Tuto změnu nelze obnovit. Jste si jisti?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Smazat vybrané akce?",
+        "DESCRIPTION": "Jste si jisti, že chcete smazat vybrané akce z toku?"
+      }
+    },
+    "TOAST": {
+      "ACTIONSSET": "Akce nastaveny",
+      "ACTIONREACTIVATED": "Akce byly úspěšně reaktivovány",
+      "ACTIONDEACTIVATED": "Akce byly úspěšně deaktivovány"
+    }
+  },
+  "IAM": {
+    "TITLE": "Instance",
+    "DESCRIPTION": "Spravujte nastavení vaší instance a organizace",
+    "POLICIES": {
+      "TITLE": "Systémové politiky a nastavení přístupu",
+      "DESCRIPTION": "Spravujte vaše globální politiky a nastavení přístupu k managementu."
+    },
+    "EVENTSTORE": {
+      "TITLE": "Administrace úložiště systému IAM",
+      "DESCRIPTION": "Správa nastavení ukládání systému ZIDATEL."
+    },
+    "MEMBER": {
+      "TITLE": "Manažeři",
+      "DESCRIPTION": "Tito manažeři mají oprávnění provádět změny ve vaší instanci."
+    },
+    "PAGES": {
+      "STATE": "Stav",
+      "DOMAINLIST": "Vlastní domény"
+    },
+    "STATE": {
+      "0": "Nespecifikovaný",
+      "1": "Vytváří se",
+      "2": "Běží",
+      "3": "Zastavuje se",
+      "4": "Zastavený"
+    },
+    "VIEWS": {
+      "TITLE": "Pohledy",
+      "DESCRIPTION": "Tato karta zobrazuje vaše ZITADEL pohledy.",
+      "VIEWNAME": "Název",
+      "DATABASE": "Databáze",
+      "SEQUENCE": "Sekvence",
+      "EVENTTIMESTAMP": "Časové razítko",
+      "LASTSPOOL": "Úspěšné spouštění",
+      "ACTIONS": "Akce",
+      "CLEAR": "Vyčistit",
+      "CLEARED": "Pohled byl úspěšně vyčištěn!",
+      "DIALOG": {
+        "VIEW_CLEAR_TITLE": "Vyčistit pohled",
+        "VIEW_CLEAR_DESCRIPTION": "Chystáte se vyčistit pohled. Vyčištění pohledu zahájí proces, během kterého mohou být data pro koncové uživatele nedostupná. Jste si opravdu jisti?"
+      }
+    },
+    "FAILEDEVENTS": {
+      "TITLE": "Selhané Události",
+      "DESCRIPTION": "Tato karta zobrazuje vaše selhané události.",
+      "VIEWNAME": "Název",
+      "DATABASE": "Databáze",
+      "FAILEDSEQUENCE": "dotčená sekvence",
+      "FAILURECOUNT": "Počet selhání",
+      "LASTFAILED": "Poslední selhání",
+      "ERRORMESSAGE": "Chybová zpráva",
+      "ACTIONS": "Akce",
+      "DELETE": "Odstranit",
+      "DELETESUCCESS": "Selhané události byly odstraněny."
+    },
+    "EVENTS": {
+      "TITLE": "Události",
+      "DESCRIPTION": "Tento pohled zobrazuje všechny nastalé události.",
+      "EDITOR": "Editor",
+      "EDITORID": "ID editora",
+      "AGGREGATE": "Agregát",
+      "AGGREGATEID": "ID agregátu",
+      "AGGREGATETYPE": "Typ agregátu",
+      "RESOURCEOWNER": "Vlastník zdroje",
+      "SEQUENCE": "Sekvence",
+      "CREATIONDATE": "Datum vytvoření",
+      "TYPE": "Typ",
+      "PAYLOAD": "Obsah",
+      "FILTERS": {
+        "BTN": "Filtr",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrovat podle Editora"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Typ agregátu",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filtrovat podle Agregátu"
+        },
+        "TYPE": {
+          "TYPELABEL": "Typ",
+          "CHECKBOX": "Filtrovat podle Typu"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filtrovat podle Vlastníka zdroje"
+        },
+        "SEQUENCE": {
+          "LABEL": "Sekvence",
+          "CHECKBOX": "Filtrovat podle Sekvence",
+          "SORT": "Třídění",
+          "ASC": "Vzestupně",
+          "DESC": "Sestupně"
+        },
+        "CREATIONDATE": {
+          "LABEL": "Datum vytvoření",
+          "CHECKBOX": "Filtrovat podle Datumu vytvoření"
+        },
+        "OTHER": "jiný",
+        "OTHERS": "jiné"
+      },
+      "DIALOG": {
+        "TITLE": "Detail Události"
+      }
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Manažer odstraněn.",
+      "MEMBERSADDED": "Manažeři přidáni.",
+      "MEMBERADDED": "Manažer přidán.",
+      "MEMBERCHANGED": "Manažer změněn.",
+      "ROLEREMOVED": "Role odstraněna.",
+      "ROLECHANGED": "Role změněna.",
+      "REACTIVATED": "Reaktivováno",
+      "DEACTIVATED": "Deaktivováno"
+    }
+  },
+  "ORG": {
+    "PAGES": {
+      "NAME": "Název",
+      "ID": "ID",
+      "CREATIONDATE": "Datum vytvoření",
+      "DATECHANGED": "Změněno",
+      "FILTER": "Filtr",
+      "FILTERPLACEHOLDER": "Filtrujte podle jmen",
+      "LIST": "Organizace",
+      "LISTDESCRIPTION": "Vyberte organizaci.",
+      "ACTIVE": "Aktivní",
+      "CREATE": "Vytvořit organizaci",
+      "DEACTIVATE": "Deaktivovat organizaci",
+      "REACTIVATE": "Reaktivovat organizaci",
+      "NOPERMISSION": "Nemáte oprávnění přistupovat k nastavení organizace.",
+      "USERSELFACCOUNT": "Použijte svůj osobní účet jako vlastníka organizace",
+      "ORGDETAIL_TITLE": "Zadejte název a doménu vaší nové organizace.",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Zadejte název vaší nové organizace.",
+      "ORGDETAILUSER_TITLE": "Konfigurace vlastníka organizace",
+      "DELETE": "Smazat organizaci",
+      "DEFAULTLABEL": "Výchozí",
+      "SETASDEFAULT": "Nastavit jako výchozí organizaci",
+      "DEFAULTORGSET": "Výchozí organizace byla úspěšně změněna",
+      "RENAME": {
+        "ACTION": "Přejmenovat",
+        "TITLE": "Přejmenování organizace",
+        "DESCRIPTION": "Zadejte nový název pro vaši organizaci",
+        "BTN": "Přejmenovat"
+      },
+      "ORGDOMAIN": {
+        "TITLE": "Ověření vlastnictví domény organizace",
+        "VERIFICATION": "Pro ověření vlastnictví vaší domény je potřeba stáhnout ověřovací soubor a nahrát jej na uvedené URL níže, nebo umístit záznam TXT Record DNS pro uvedené URL. Pro dokončení klikněte na tlačítko a proveďte ověření.",
+        "VERIFICATION_SKIP": "Ověření můžete nyní přeskočit a pokračovat ve vytváření vaší organizace, ale pro používání vaší organizace je třeba tento krok dokončit!",
+        "VERIFICATION_VALIDATION_DESC": "Tokeny jsou pravidelně kontrolovány, aby bylo zajištěno, že jste stále vlastníkem domény.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Požádat o nový token",
+        "VERIFICATION_NEWTOKEN_DESC": "Pokud si přejete požádat o nový token, vyberte preferovanou metodu. Pokud chcete ověřit stávající token, klikněte na tlačítko výše.",
+        "VERIFICATION_VALIDATION_ONGOING": "Token pro ověření byl již požadován. Klikněte na tlačítko a spusťte ověřovací kontrolu.",
+        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Typ tokenu:",
+        "VERIFICATION_SUCCESSFUL": "Doména byla úspěšně ověřena!",
+        "REQUESTNEWTOKEN": "Požadovat nový token",
+        "TYPES": {
+          "1": "HTTP",
+          "2": "DNS"
+        }
+      },
+      "DOWNLOAD_FILE": "Stáhnout soubor",
+      "SELECTORGTOOLTIP": "Vybrat tuto organizaci.",
+      "PRIMARYDOMAIN": "Primární doména",
+      "STATE": "Stav",
+      "USEPASSWORD": "Nastavit počáteční heslo",
+      "USEPASSWORDDESC": "Uživatel nemusí během inicializace nastavovat heslo."
+    },
+    "LIST": {
+      "TITLE": "Organizace",
+      "DESCRIPTION": "Organizace ve vaší instanci"
+    },
+    "DOMAINS": {
+      "NEW": "Přidat doménu",
+      "TITLE": "Ověřené domény",
+      "DESCRIPTION": "Konfigurujte domény vaší organizace. Tato doména může být použita pro zjišťování domény a připojení uživatelských jmen.",
+      "SETPRIMARY": "Nastavit jako primární",
+      "DELETE": {
+        "TITLE": "Smazat doménu",
+        "DESCRIPTION": "Chystáte se smazat jednu z vašich domén."
+      },
+      "ADD": {
+        "TITLE": "Přidat doménu",
+        "DESCRIPTION": "Chystáte se přidat doménu pro vaši organizaci. Po úspěšném procesu bude možné doménu použít pro zjišťování domény a jako příponu pro vaše uživatele."
+      }
+    },
+    "STATE": {
+      "0": "Nedefinováno",
+      "1": "Aktivní",
+      "2": "Deaktivováno"
+    },
+    "MEMBER": {
+      "TITLE": "Manažeři organizace",
+      "DESCRIPTION": "Definujte uživatele, kteří mohou měnit preference vaší organizace."
+    },
+    "TOAST": {
+      "UPDATED": "Organizace byla úspěšně aktualizována.",
+      "DEACTIVATED": "Organizace deaktivována.",
+      "REACTIVATED": "Organizace reaktivována.",
+      "DOMAINADDED": "Doména přidána.",
+      "DOMAINREMOVED": "Doména odstraněna.",
+      "MEMBERADDED": "Manažer přidán.",
+      "MEMBERREMOVED": "Manažer odstraněn.",
+      "MEMBERCHANGED": "Manažer změněn.",
+      "SETPRIMARY": "Nastavena primární doména.",
+      "DELETED": "Organizace úspěšně smazána",
+      "ORG_WAS_DELETED": "Organizace byla smazána."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Deaktivovat organizaci",
+        "DESCRIPTION": "Chystáte se deaktivovat vaši organizaci. Uživatelé se poté nebudou moci přihlásit. Jste si jistí, že chcete pokračovat?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Reaktivovat organizaci",
+        "DESCRIPTION": "Chystáte se reaktivovat vaši organizaci. Uživatelé budou moci opět se přihlásit. Jste si jistí, že chcete pokračovat?"
+      },
+      "DELETE": {
+        "TITLE": "Smazat organizaci",
+        "DESCRIPTION": "Chystáte se smazat vaši organizaci. Tím zahájíte proces, kde budou všechna data související s organizací smazána. Tuto akci prozatím nelze vrátit zpět.",
+        "TYPENAME": "Napište '{{value}}', pro smazání vaší organizace.",
+        "ORGNAME": "Název",
+        "BTN": "Smazat"
+      }
+    }
+  },
+  "SETTINGS": {
+    "INSTANCE": {
+      "TITLE": "Nastavení instance",
+      "DESCRIPTION": "Tato nastavení se budou aplikovat na všechny vaše organizace, pokud nebyla přepsána."
+    },
+    "ORG": {
+      "TITLE": "Nastavení organizace",
+      "DESCRIPTION": "Tato nastavení rozšiřují a přepisují nastavení vaší instance."
+    },
+    "LIST": {
+      "GENERAL": "Obecné",
+      "LOGIN": "Chování při přihlášení a bezpečnost",
+      "LOCKOUT": "Blokování",
+      "COMPLEXITY": "Složitost hesla",
+      "NOTIFICATIONS": "Oznámení",
+      "SMTP_PROVIDER": "Poskytovatel SMTP",
+      "SMS_PROVIDER": "Poskytovatel SMS/Telefonu",
+      "NOTIFICATIONS_DESC": "Nastavení SMTP a SMS",
+      "MESSAGETEXTS": "Texty zpráv",
+      "IDP": "Poskytovatelé identity",
+      "VERIFIED_DOMAINS": "Ověřené domény",
+      "DOMAIN": "Nastavení domény",
+      "LOGINTEXTS": "Texty přihlašovací stránky",
+      "BRANDING": "Branding",
+      "PRIVACYPOLICY": "Zásady ochrany osobních údajů",
+      "OIDC": "Životnost a expirace OIDC tokenu",
+      "SECRETS": "Generátor tajemství",
+      "SECURITY": "Bezpečnostní nastavení"
+    },
+    "GROUPS": {
+      "NOTIFICATIONS": "Oznámení",
+      "LOGIN": "Přihlášení a přístup",
+      "DOMAIN": "Doména",
+      "TEXTS": "Texty a jazyky",
+      "APPEARANCE": "Vzhled",
+      "OTHER": "Ostatní"
+    }
+  },
+  "SETTING": {
+    "DEFAULTLANGUAGE": "Výchozí jazyk",
+    "LANGUAGE": {
+      "de": "Deutsch",
+      "en": "English",
+      "es": "Español",
+      "fr": "Français",
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
+      "zh": "简体中文",
+      "bg": "Български",
+      "pt": "Portuguese",
+      "mk": "Македонски",
+      "cs": "Čeština",
+      "ru": "Русский"
+    },
+    "SMTP": {
+      "TITLE": "Nastavení SMTP",
+      "SENDERADDRESS": "E-mailová adresa odesílatele",
+      "SENDERNAME": "Jméno odesílatele",
+      "REPLYTOADDRESS": "Adresa pro odpovědi",
+      "HOSTANDPORT": "Hostitel a port",
+      "USER": "Uživatel",
+      "PASSWORD": "Heslo",
+      "SETPASSWORD": "Nastavit SMTP heslo",
+      "PASSWORDSET": "SMTP heslo bylo úspěšně nastaveno.",
+      "TLS": "Zabezpečení transportní vrstvy (TLS)",
+      "SAVED": "Úspěšně uloženo!",
+      "REQUIREDWARN": "Pro odesílání oznámení z vaší domény musíte zadat vaše SMTP údaje."
+    },
+    "SMS": {
+      "TITLE": "Nastavení SMS",
+      "PROVIDERS": "Poskytovatelé",
+      "PROVIDER": "Poskytovatel SMS",
+      "ADDPROVIDER": "Přidat poskytovatele SMS",
+      "ADDPROVIDERDESCRIPTION": "Vyberte jednoho z dostupných poskytovatelů a zadejte požadované údaje.",
+      "REMOVEPROVIDER": "Odebrat poskytovatele",
+      "REMOVEPROVIDER_DESC": "Chystáte se smazat konfiguraci poskytovatele. Chcete pokračovat?",
+      "SMSPROVIDERSTATE": {
+        "0": "Nespecifikováno",
+        "1": "Aktivní",
+        "2": "Neaktivní"
+      },
+      "ACTIVATED": "Poskytovatel aktivován.",
+      "DEACTIVATED": "Poskytovatel deaktivován.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Číslo odesílatele",
+        "ADDED": "Twilio bylo úspěšně přidáno.",
+        "UPDATED": "Twilio bylo úspěšně aktualizováno.",
+        "REMOVED": "Twilio bylo odebráno",
+        "CHANGETOKEN": "Změnit token",
+        "SETTOKEN": "Nastavit token",
+        "TOKENSET": "Token byl úspěšně nastaven."
+      }
+    },
+    "OIDC": {
+      "TITLE": "Nastavení OIDC",
+      "ACCESSTOKENLIFETIME": "Životnost přístupového tokenu",
+      "IDTOKENLIFETIME": "Životnost ID tokenu",
+      "REFRESHTOKENEXPIRATION": "Expirace obnovovacího tokenu",
+      "REFRESHTOKENIDLEEXPIRATION": "Expirace nečinného obnovovacího tokenu",
+      "INHOURS": "hodin",
+      "INDAYS": "Dnů"
+    },
+    "SECRETS": {
+      "TITLE": "Generátor tajemství",
+      "TYPES": "Typy tajemství",
+      "TYPE": {
+        "1": "Inicializační e-mail",
+        "2": "Ověření e-mailem",
+        "3": "Ověření telefonem",
+        "4": "Resetování hesla",
+        "5": "Inicializace bez hesla",
+        "6": "Tajemství pomocí aplikace",
+        "7": "Jednorázové heslo (OTP) - SMS",
+        "8": "Jednorázové heslo (OTP) - E-mail"
+      },
+      "ADDGENERATOR": "Definovat generátor tajemství",
+      "GENERATORTYPE": "Typ",
+      "EXPIRY": "Expirace (v hodinách)",
+      "INCLUDEDIGITS": "Zahrnout čísla",
+      "INCLUDESYMBOLS": "Zahrnout symboly",
+      "INCLUDELOWERLETTERS": "Zahrnout malá písmena",
+      "INCLUDEUPPERLETTERS": "Zahrnout velká písmena",
+      "LENGTH": "Délka",
+      "UPDATED": "Nastavení aktualizováno."
+    },
+    "SECURITY": {
+      "DESCRIPTION": "Toto nastavení nastaví CSP tak, aby povolovalo vkládání ze sady povolených domén. Všimněte si, že povolením použití iFrame riskujete umožnění clickjackingu.",
+      "IFRAMEENABLED": "Povolit iFrame",
+      "ALLOWEDORIGINS": "Povolené URL"
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Resetovat nastavení",
+        "DEFAULTDESCRIPTION": "Chystáte se resetovat vaše nastavení na výchozí konfiguraci vaší instance. Opravdu chcete pokračovat?",
+        "LOGINPOLICY_DESCRIPTION": "Upozornění: Pokud budete pokračovat, nastavení poskytovatele identity bude také resetováno na nastavení instance."
+      }
+    }
+  },
+  "POLICY": {
+    "TITLE": "Prozkoumat nastavení",
+    "DESCRIPTION": "Přednastavené konfigurace, které zlepšují vaši bezpečnost.",
+    "APPLIEDTO": "Aplikováno na",
+    "PWD_COMPLEXITY": {
+      "TITLE": "Složitost hesla",
+      "DESCRIPTION": "Zajišťuje, že všechna nastavená hesla odpovídají specifickému vzoru",
+      "SYMBOLANDNUMBERERROR": "Musí obsahovat číslici a symbol/interpunkční znaménko.",
+      "SYMBOLERROR": "Musí zahrnovat symbol/interpunkční znaménko.",
+      "NUMBERERROR": "Musí obsahovat číslici.",
+      "PATTERNERROR": "Heslo nesplňuje požadovaný vzor."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Oznámení",
+      "DESCRIPTION": "Určuje, při jakých změnách budou odesílána oznámení.",
+      "PASSWORDCHANGE": "Změna hesla"
+    },
+    "PRIVATELABELING": {
+      "TITLE": "Branding",
+      "DESCRIPTION": "Upravte si přihlašovací stránku podle svého stylu a změňte její chování.",
+      "PREVIEW_DESCRIPTION": "Změny politiky budou automaticky nasazeny v náhledovém prostředí.",
+      "BTN": "Vybrat soubor",
+      "ACTIVATEPREVIEW": "Aplikovat konfiguraci",
+      "DARK": "Tmavý režim",
+      "LIGHT": "Světlý režim",
+      "CHANGEVIEW": "Změnit zobrazení",
+      "ACTIVATED": "Změny politiky jsou nyní AKTIVNÍ",
+      "THEME": "Téma",
+      "COLORS": "Barvy",
+      "FONT": "Font",
+      "ADVANCEDBEHAVIOR": "Pokročilé chování",
+      "DROP": "Přetáhněte obrázek sem nebo",
+      "RELEASE": "Uvolněte",
+      "DROPFONT": "Přetáhněte soubor s fontem sem",
+      "RELEASEFONT": "Uvolněte",
+      "USEOFLOGO": "Vaše logo bude použito jak na přihlašovací stránce, tak v e-mailech, zatímco ikona je používána pro menší prvky uživatelského rozhraní, jako je přepínač organizací v konzole",
+      "MAXSIZE": "Maximální velikost je omezena na 524 kB",
+      "EMAILNOSVG": "Formát souboru SVG není podporován v e-mailech. Proto nahrajte své logo ve formátu PNG nebo jiném podporovaném formátu.",
+      "MAXSIZEEXCEEDED": "Překročena maximální velikost 524 kB.",
+      "NOSVGSUPPORTED": "SVG nejsou podporována!",
+      "FONTINLOGINONLY": "Font je momentálně zobrazen pouze v přihlašovacím rozhraní.",
+      "BACKGROUNDCOLOR": "Barva pozadí",
+      "PRIMARYCOLOR": "Primární barva",
+      "WARNCOLOR": "Varovná barva",
+      "FONTCOLOR": "Barva fontu",
+      "VIEWS": {
+        "PREVIEW": "Náhled",
+        "CURRENT": "Současná konfigurace"
+      },
+      "PREVIEW": {
+        "TITLE": "Přihlášení",
+        "SECOND": "přihlaste se pomocí vašeho ZITADEL účtu.",
+        "ERROR": "Uživatel nebyl nalezen!",
+        "PRIMARYBUTTON": "další",
+        "SECONDARYBUTTON": "registrovat"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Automatický režim",
+        "THEME_MODE_LIGHT": "Pouze světlý režim",
+        "THEME_MODE_DARK": "Pouze tmavý režim"
+      }
+    },
+    "PWD_AGE": {
+      "TITLE": "Stáří hesla",
+      "DESCRIPTION": "Můžete nastavit politiku pro stáří hesel. Tato politika vydá varování po uplynutí konkrétního času stáří."
+    },
+    "PWD_LOCKOUT": {
+      "TITLE": "Politika uzamčení",
+      "DESCRIPTION": "Nastavte maximální počet pokusů o zadání hesla, po kterém budou účty zablokovány."
+    },
+    "DOMAIN_POLICY": {
+      "TITLE": "Nastavení domény"
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Branding",
+      "BTN": "Vybrat soubor",
+      "DESCRIPTION": "Přizpůsobte vzhled přihlašovací stránky",
+      "ACTIVATEPREVIEW": "Aktivovat konfiguraci"
+    },
+    "LOGIN_POLICY": {
+      "TITLE": "Nastavení přihlášení",
+      "DESCRIPTION": "Definujte, jak mohou být uživatelé ověřováni a nakonfigurujte poskytovatele identity",
+      "DESCRIPTIONCREATEADMIN": "Uživatelé si mohou vybrat z dostupných poskytovatelů identity níže.",
+      "DESCRIPTIONCREATEMGMT": "Uživatelé si mohou vybrat z dostupných poskytovatelů identity níže. Poznámka: Můžete použít poskytovatele nastavené systémem, jakož i poskytovatele nastavené pouze pro vaši organizaci.",
+      "ADVANCED": "Pokročilé",
+      "LIFETIMEDURATIONS": "Doba trvání přihlášení",
+      "SAVED": "Úspěšně uloženo!"
+    },
+    "PRIVACY_POLICY": {
+      "TITLE": "Zásady ochrany osobních údajů a Podmínky služby",
+      "DESCRIPTION": "Nastavte odkazy na vaše Zásady ochrany osobních údajů a Podmínky služby",
+      "TOSLINK": "Odkaz na Podmínky služby",
+      "POLICYLINK": "Odkaz na Zásady ochrany osobních údajů",
+      "HELPLINK": "Odkaz na pomoc",
+      "SUPPORTEMAIL": "E-mailová podpora",
+      "SAVED": "Úspěšně uloženo!",
+      "RESET_TITLE": "Obnovit výchozí hodnoty",
+      "RESET_DESCRIPTION": "Chystáte se obnovit výchozí odkazy pro Podmínky služby a Zásady ochrany osobních údajů. Opravdu chcete pokračovat?"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE": "Texty přihlašovací stránky",
+      "DESCRIPTION": "Definujte své texty pro přihlašovací stránku. Pokud jsou texty prázdné, použije se výchozí hodnota zobrazená jako zástupný text.",
+      "DESCRIPTION_SHORT": "Definujte své texty pro přihlašovací stránku.",
+      "NEWERVERSIONEXISTS": "Existuje novější verze",
+      "CURRENTDATE": "Současná konfigurace",
+      "CHANGEDATE": "Novější verze od",
+      "KEYNAME": "Přihlašovací obrazovka / Rozhraní",
+      "RESET_TITLE": "Obnovit výchozí hodnoty",
+      "RESET_DESCRIPTION": "Chystáte se obnovit všechny výchozí hodnoty. Všechny vaše změny budou trvale smazány. Opravdu chcete pokračovat?",
+      "UNSAVED_TITLE": "Pokračovat bez uložení?",
+      "UNSAVED_DESCRIPTION": "Provedli jste změny bez uložení. Chcete je nyní uložit?",
+      "LOCALE": "Kód jazyka",
+      "LOCALES": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский"
+      },
+      "KEYS": {
+        "emailVerificationDoneText": "Ověření e-mailu dokončeno",
+        "emailVerificationText": "Ověření e-mailu",
+        "externalUserNotFoundText": "Externí uživatel nenalezen",
+        "footerText": "Zápatí",
+        "initMfaDoneText": "Inicializace MFA dokončena",
+        "initMfaOtpText": "Inicializace MFA",
+        "initMfaPromptText": "Výzva k inicializaci MFA",
+        "initMfaU2fText": "Inicializace Univerzálního druhého faktoru",
+        "initPasswordDoneText": "Inicializace hesla dokončena",
+        "initPasswordText": "Inicializace hesla",
+        "initializeDoneText": "Inicializace uživatele dokončena",
+        "initializeUserText": "Inicializace uživatele",
+        "linkingUserDoneText": "Propojení uživatele dokončeno",
+        "loginText": "Přihlášení",
+        "logoutText": "Odhlášení",
+        "mfaProvidersText": "Poskytovatelé MFA",
+        "passwordChangeDoneText": "Změna hesla dokončena",
+        "passwordChangeText": "Změna hesla",
+        "passwordResetDoneText": "Reset hesla dokončen",
+        "passwordText": "Heslo",
+        "registrationOptionText": "Možnosti registrace",
+        "registrationOrgText": "Registrace organizace",
+        "registrationUserText": "Registrace uživatele",
+        "selectAccountText": "Výběr účtu",
+        "successLoginText": "Přihlášení úspěšné",
+        "usernameChangeDoneText": "Změna uživatelského jména dokončena",
+        "usernameChangeText": "Změna uživatelského jména",
+        "verifyMfaOtpText": "Ověřit OTP",
+        "verifyMfaU2fText": "Ověřit Univerzální druhý faktor",
+        "passwordlessPromptText": "Výzva k bezheslovému přístupu",
+        "passwordlessRegistrationDoneText": "Bezheslová registrace dokončena",
+        "passwordlessRegistrationText": "Bezheslová registrace",
+        "passwordlessText": "Bezheslový",
+        "externalRegistrationUserOverviewText": "Přehled o externí registraci uživatelů"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TITLE": "Texty zpráv",
+      "DESCRIPTION": "Definujte své texty pro notifikační e-maily.",
+      "TYPE": "Notifikace",
+      "TYPES": {
+        "INIT": "Inicializace",
+        "VE": "Ověření e-mailu",
+        "VP": "Ověření telefonu",
+        "VSO": "Ověření SMS OTP",
+        "VEO": "Ověření e-mailu OTP",
+        "PR": "Reset hesla",
+        "DC": "Nárok na doménu",
+        "PL": "Bezheslový",
+        "PC": "Změna hesla"
+      },
+      "CHIPS": {
+        "firstname": "Křestní jméno",
+        "lastname": "Příjmení",
+        "code": "Kód",
+        "preferredLoginName": "Preferované přihlašovací jméno",
+        "displayName": "Zobrazovaný název",
+        "nickName": "Přezdívka",
+        "loginnames": "Přihlašovací jména",
+        "domain": "Doména",
+        "lastEmail": "Poslední e-mail",
+        "lastPhone": "Poslední telefon",
+        "verifiedEmail": "Ověřený e-mail",
+        "verifiedPhone": "Ověřený telefon",
+        "changedate": "Datum změny",
+        "username": "Uživatelské jméno",
+        "tempUsername": "Dočasné uživatelské jméno",
+        "otp": "Jednorázové heslo",
+        "verifyUrl": "Ověřovací URL jednorázového hesla"
+      },
+      "TOAST": {
+        "UPDATED": "Vlastní texty uloženy."
+      }
+    },
+    "DEFAULTLABEL": "Současná nastavení odpovídají standardu vaší instance.",
+    "BTN_INSTALL": "Nastavit",
+    "BTN_EDIT": "Upravit",
+    "DATA": {
+      "DESCRIPTION": "Popis",
+      "MINLENGTH": "minimální délka",
+      "HASNUMBER": "obsahuje číslo",
+      "HASSYMBOL": "obsahuje symbol",
+      "HASLOWERCASE": "obsahuje malá písmena",
+      "HASUPPERCASE": "obsahuje velká písmena",
+      "SHOWLOCKOUTFAILURES": "zobrazit neúspěšné pokusy o uzamčení",
+      "MAXATTEMPTS": "Maximální počet pokusů o heslo",
+      "EXPIREWARNDAYS": "Upozornění na expiraci po dni",
+      "MAXAGEDAYS": "Maximální stáří v dnech",
+      "USERLOGINMUSTBEDOMAIN": "Přidat doménu organizace jako příponu k přihlašovacím jménům",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Pokud povolíte toto nastavení, všechna přihlašovací jména budou doplněna o doménu organizace. Pokud je toto nastavení zakázáno, musíte zajistit, aby byla uživatelská jména jedinečná napříč všemi organizacemi.",
+      "VALIDATEORGDOMAINS": "Požadováno ověření domény organizace (DNS nebo HTTP výzva)",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "Adresa odesílatele SMTP odpovídá doméně instance",
+      "ALLOWUSERNAMEPASSWORD": "Povoleno uživatelské jméno a heslo",
+      "ALLOWEXTERNALIDP": "Povoleno externí IDP",
+      "ALLOWREGISTER": "Registrace povolena",
+      "ALLOWUSERNAMEPASSWORD_DESC": "Je povoleno klasické přihlášení s uživatelským jménem a heslem.",
+      "ALLOWEXTERNALIDP_DESC": "Přihlášení je povoleno pro níže uvedené poskytovatele identity.",
+      "ALLOWREGISTER_DESC": "Pokud je možnost vybrána, objeví se při přihlášení další krok pro registraci uživatele.",
+      "FORCEMFA": "Vynutit MFA",
+      "FORCEMFA_DESC": "Pokud je možnost vybrána, uživatelé musí pro přihlášení nastavit druhý faktor.",
+      "FORCEMFALOCALONLY": "Vynutit MFA pouze pro lokálně ověřené uživatele",
+      "FORCEMFALOCALONLY_DESC": "Pokud je možnost vybrána, lokálně ověření uživatelé musí pro přihlášení nastavit druhý faktor.",
+      "HIDEPASSWORDRESET": "Skrýt reset hesla",
+      "HIDEPASSWORDRESET_DESC": "Pokud je možnost vybrána, uživatel nemůže během přihlašovacího procesu resetovat své heslo.",
+      "HIDELOGINNAMESUFFIX": "Skrýt příponu přihlašovacího jména",
+      "HIDELOGINNAMESUFFIX_DESC": "Skryje příponu přihlašovacího jména v přihlašovacím rozhraní",
+      "IGNOREUNKNOWNUSERNAMES": "Ignorovat neznámá uživatelská jména",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Pokud je možnost vybrána, obrazovka pro zadání hesla se zobrazí během přihlašovacího procesu i v případě, že nebyl uživatel nalezen. Chyba při kontrole hesla neodhalí, zda bylo špatné uživatelské jméno nebo heslo.",
+      "ALLOWDOMAINDISCOVERY": "Povolit objevování domény",
+      "ALLOWDOMAINDISCOVERY_DESC": "Pokud je možnost vybrána, přípona (@domain.com) neznámého uživatelského jména zadávaného na přihlašovací obrazovce bude porovnána s doménami organizace a při úspěchu dojde k přesměrování na registraci dané organizace.",
+      "DISABLELOGINWITHEMAIL": "Zakázat přihlášení s e-mailovou adresou",
+      "DISABLELOGINWITHPHONE": "Zakázat přihlášení s telefonním číslem",
+      "DEFAULTREDIRECTURI": "Výchozí URI přesměrování",
+      "DEFAULTREDIRECTURI_DESC": "Definuje, kam bude uživatel přesměrován, pokud bylo přihlášení zahájeno bez kontextu aplikace (např. z e-mailu)",
+      "ERRORMSGPOPUP": "Zobrazit chybu v dialogovém okně",
+      "DISABLEWATERMARK": "Skrýt vodoznak",
+      "DISABLEWATERMARK_DESC": "Skrýt vodoznak Powered by ZITADEL v přihlašovacím rozhraní",
+      "PASSWORDCHECKLIFETIME": "Životnost kontroly hesla",
+      "EXTERNALLOGINCHECKLIFETIME": "Životnost kontroly externího přihlášení",
+      "MFAINITSKIPLIFETIME": "Životnost počáteční MFA",
+      "SECONDFACTORCHECKLIFETIME": "Životnost kontroly druhého faktoru",
+      "MULTIFACTORCHECKLIFETIME": "Životnost kontroly vícefaktorové autentizace",
+      "INHOURS": "hodin"
+    },
+    "RESET": "Resetovat na výchozí hodnoty instance",
+    "CREATECUSTOM": "Vytvořit vlastní pravidlo",
+    "TOAST": {
+      "SET": "Pravidlo úspěšně nastaveno!",
+      "RESETSUCCESS": "Pravidlo úspěšně resetováno!",
+      "UPLOADSUCCESS": "Nahrávání úspěšné!",
+      "DELETESUCCESS": "Úspěšně smazáno!",
+      "UPLOADFAILED": "Nahrávání selhalo!"
+    }
+  },
+  "ORG_DETAIL": {
+    "TITLE": "Organizace",
+    "DESCRIPTION": "Zde můžete upravovat konfiguraci vaší organizace a spravovat členy.",
+    "DETAIL": {
+      "TITLE": "Detail",
+      "NAME": "Název",
+      "DOMAIN": "Doména",
+      "STATE": {
+        "0": "Nedefinováno",
+        "1": "Aktivní",
+        "2": "Neaktivní"
+      }
+    },
+    "MEMBER": {
+      "TITLE": "Členové",
+      "USERNAME": "Uživatelské jméno",
+      "DISPLAYNAME": "Zobrazované jméno",
+      "LOGINNAME": "Přihlašovací jméno",
+      "EMAIL": "E-mail",
+      "ROLES": "Role",
+      "ADD": "Přidat člena",
+      "ADDDESCRIPTION": "Zadejte jména uživatelů, kteří mají být přidáni."
+    },
+    "TABLE": {
+      "TOTAL": "Celkem záznamů",
+      "SELECTION": "Vybrané prvky",
+      "DEACTIVATE": "Deaktivovat uživatele",
+      "ACTIVATE": "Aktivovat uživatele",
+      "DELETE": "Odstranit uživatele",
+      "CLEAR": "Zrušit výběr"
+    }
+  },
+  "PROJECT": {
+    "PAGES": {
+      "TITLE": "Projekt",
+      "DESCRIPTION": "Zde můžete definovat aplikace, spravovat role a umožnit jiným organizacím používat váš projekt.",
+      "DELETE": "Odstranit projekt",
+      "LIST": "Projekty",
+      "LISTDESCRIPTION": "Pokud nenajdete projekt, kontaktujte vlastníka projektu nebo někoho s příslušnými právy pro získání přístupu k projektu.",
+      "DETAIL": "Detail",
+      "CREATE": "Vytvořit projekt",
+      "CREATE_DESC": "Vložte název vašeho projektu.",
+      "ROLE": "Role",
+      "NOITEMS": "Žádné projekty",
+      "ZITADELPROJECT": "Tato nastavení jsou základní nastavení instance projektu ZITADEL. Pozor: Pokud provedete změny, ZITADEL se nemusí chovat podle očekávání.",
+      "TYPE": {
+        "OWNED": "Vlastní projekty",
+        "GRANTED": "Přidělené projekty",
+        "OWNED_SINGULAR": "Vlastní projekt",
+        "GRANTED_SINGULAR": "Přidělený projekt"
+      },
+      "PRIVATELABEL": {
+        "TITLE": "Nastavení brandingu",
+        "0": {
+          "TITLE": "Nespecifikováno",
+          "DESC": "Jakmile je uživatel identifikován, zobrazí se branding organizace identifikovaného uživatele, předtím než se zobrazí výchozí systém."
+        },
+        "1": {
+          "TITLE": "Použít nastavení projektu",
+          "DESC": "Bude zobrazen branding organizace, která vlastní projekt"
+        },
+        "2": {
+          "TITLE": "Použít nastavení organizace uživatele",
+          "DESC": "Bude zobrazen branding organizace projektu, ale jakmile je uživatel identifikován, zobrazí se nastavení organizace identifikovaného uživatele."
+        },
+        "DIALOG": {
+          "TITLE": "Nastavení brandingu",
+          "DESCRIPTION": "Vyberte chování přihlašování při používání projektu."
+        }
+      },
+      "PINNED": "Připnuté",
+      "ALL": "Vše",
+      "CREATEDON": "Vytvořeno dne",
+      "LASTMODIFIED": "Poslední změna dne",
+      "ADDNEW": "Vytvořit nový projekt",
+      "DIALOG": {
+        "REACTIVATE": {
+          "TITLE": "Reaktivovat projekt",
+          "DESCRIPTION": "Opravdu chcete reaktivovat váš projekt?"
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deaktivovat projekt",
+          "DESCRIPTION": "Opravdu chcete deaktivovat váš projekt?"
+        },
+        "DELETE": {
+          "TITLE": "Odstranit projekt",
+          "DESCRIPTION": "Opravdu chcete odstranit váš projekt?",
+          "TYPENAME": "Pro trvalé odstranění napište název projektu."
+        }
+      }
+    },
+    "SETTINGS": {
+      "TITLE": "Nastavení",
+      "DESCRIPTION": ""
+    },
+    "STATE": {
+      "TITLE": "Stav",
+      "0": "Nedefinován",
+      "1": "Aktivní",
+      "2": "Neaktivní"
+    },
+    "TYPE": {
+      "TITLE": "Typ",
+      "0": "Neznámý typ",
+      "1": "Vlastní",
+      "2": "Přidělený"
+    },
+    "NAME": "Název",
+    "NAMEDIALOG": {
+      "TITLE": "Přejmenovat projekt",
+      "DESCRIPTION": "Zadejte nový název pro váš projekt",
+      "NAME": "Nový název"
+    },
+    "MEMBER": {
+      "TITLE": "Správci",
+      "TITLEDESC": "Správci mohou podle své role provádět změny v tomto projektu.",
+      "DESCRIPTION": "Tito správci mohou mít možnost editovat váš projekt.",
+      "USERNAME": "Uživatelské jméno",
+      "DISPLAYNAME": "Zobrazované jméno",
+      "LOGINNAME": "Loginname",
+      "EMAIL": "E-mail",
+      "ROLES": "Role",
+      "USERID": "ID uživatele"
+    },
+    "GRANT": {
+      "EMPTY": "Žádná povolení k organizacím.",
+      "TITLE": "Povolení k projektu",
+      "DESCRIPTION": "Umožněte jiné organizaci využívat váš projekt.",
+      "EDITTITLE": "Upravit oprávnění",
+      "CREATE": {
+        "TITLE": "Vytvořit povolení pro organizaci",
+        "SEL_USERS": "Vyberte uživatele, kterým chcete povolit přístup",
+        "SEL_PROJECT": "Vyhledejte projekt",
+        "SEL_ROLES": "Vyberte role, které chcete do povolení přidat",
+        "SEL_USER": "Vybrat uživatele",
+        "SEL_ORG": "Vyhledat organizaci",
+        "SEL_ORG_DESC": "Vyhledejte organizaci, které chcete povolit přístup.",
+        "ORG_DESCRIPTION": "Chystáte se povolit uživateli organizace {{name}} přístup.",
+        "ORG_DESCRIPTION_DESC": "Změňte kontext v hlavičce výše pro povolení přístupu uživateli jiné organizace.",
+        "SEL_ORG_FORMFIELD": "Organizace",
+        "FOR_ORG": "Povolení je vytvořeno pro:"
+      },
+      "DETAIL": {
+        "TITLE": "Povolení k projektu",
+        "DESC": "Můžete vybrat, které role může určená organizace využívat, a zvolit správce",
+        "MEMBERTITLE": "Správci",
+        "MEMBERDESC": "Toto jsou správci povolené organizace. Přidejte uživatele, kteří by měli získat přístup k editaci dat projektu.",
+        "PROJECTNAME": "Název projektu",
+        "GRANTEDORG": "Povolená organizace",
+        "RESOURCEOWNER": "Vlastník zdroje"
+      },
+      "STATE": "Stav",
+      "STATES": {
+        "1": "Aktivní",
+        "2": "Neaktivní"
+      },
+      "ALL": "Vše",
+      "SHOWDETAIL": "Zobrazit detaily",
+      "USER": "Uživatel",
+      "MEMBERS": "Správci",
+      "ORG": "Organizace",
+      "PROJECTNAME": "Název projektu",
+      "GRANTEDORG": "Povolená organizace",
+      "GRANTEDORGDOMAIN": "Doména",
+      "RESOURCEOWNER": "Vlastník zdroje",
+      "GRANTEDORGNAME": "Název organizace",
+      "GRANTID": "ID povolení",
+      "CREATIONDATE": "Datum vytvoření",
+      "CHANGEDATE": "Naposledy změněno",
+      "DATES": "Data",
+      "ROLENAMESLIST": "Role",
+      "NOROLES": "Žádné role",
+      "TYPE": "Typ",
+      "TOAST": {
+        "PROJECTGRANTUSERGRANTADDED": "Povolení k projektu bylo vytvořeno.",
+        "PROJECTGRANTADDED": "Povolení k projektu bylo vytvořeno.",
+        "PROJECTGRANTCHANGED": "Povolení k projektu bylo změněno.",
+        "PROJECTGRANTMEMBERADDED": "Správce povolení byl přidán.",
+        "PROJECTGRANTMEMBERCHANGED": "Správce povolení byl změněn.",
+        "PROJECTGRANTMEMBERREMOVED": "Správce povolení byl odebrán.",
+        "PROJECTGRANTUPDATED": "Povolení k projektu bylo aktualizováno."
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Smazat povolení k projektu",
+        "DELETE_DESCRIPTION": "Chystáte se smazat povolení k projektu. Jste si jistí?"
+      },
+      "ROLES": "Role v projektu"
+    },
+    "APP": {
+      "TITLE": "Aplikace",
+      "NAME": "Název",
+      "NAMEREQUIRED": "Název je vyžadován."
+    },
+    "ROLE": {
+      "EMPTY": "Zatím nebyla vytvořena žádná role.",
+      "ADDNEWLINE": "Přidat další roli",
+      "KEY": "Klíč",
+      "TITLE": "Role",
+      "DESCRIPTION": "Definujte některé role, které lze použít pro vytváření povolení projektů.",
+      "NAME": "Název",
+      "DISPLAY_NAME": "Zobrazovaný název",
+      "GROUP": "Skupina",
+      "ACTIONS": "Akce",
+      "ADDTITLE": "Vytvořit roli",
+      "ADDDESCRIPTION": "Zadejte údaje pro novou roli.",
+      "EDITTITLE": "Upravit roli",
+      "EDITDESCRIPTION": "Zadejte nové údaje pro roli.",
+      "DELETE": "Smazat roli",
+      "CREATIONDATE": "Vytvořeno",
+      "CHANGEDATE": "Naposledy upraveno",
+      "SELECTGROUPTOOLTIP": "Vybrat všechny role ve skupině {{group}}.",
+      "OPTIONS": "Možnosti",
+      "ASSERTION": "Potvrzení rolí při autentizaci",
+      "ASSERTION_DESCRIPTION": "Informace o roli jsou odesílány z uživatelského koncového bodu a v závislosti na nastavení vaší aplikace v tokenech a dalších typech.",
+      "CHECK": "Kontrola oprávnění při autentizaci",
+      "CHECK_DESCRIPTION": "Je-li nastaveno, uživatelé smějí být autentizováni pouze v případě, že je jim přiřazena jakákoliv role.",
+      "DIALOG": {
+        "DELETE_TITLE": "Smazat roli",
+        "DELETE_DESCRIPTION": "Chystáte se smazat roli projektu. Jste si jisti?"
+      }
+    },
+    "HAS_PROJECT": "Kontrola projektu při autentizaci",
+    "HAS_PROJECT_DESCRIPTION": "Je kontrolováno, zda organizace uživatele má tento projekt. Pokud ne, uživatel nemůže být autentizován.",
+    "TABLE": {
+      "TOTAL": "Celkem:",
+      "SELECTION": "Vybrané elementy",
+      "DEACTIVATE": "Deaktivovat projekt",
+      "ACTIVATE": "Aktivovat projekt",
+      "DELETE": "Smazat projekt",
+      "ORGNAME": "Název organizace",
+      "ORGDOMAIN": "Doména organizace",
+      "STATE": "Stav",
+      "TYPE": "Typ",
+      "CREATIONDATE": "Vytvořeno",
+      "CHANGEDATE": "Naposledy upraveno",
+      "RESOURCEOWNER": "Vlastník",
+      "SHOWTABLE": "Zobrazit tabulku",
+      "SHOWGRID": "Zobrazit mřížku",
+      "EMPTY": "Nenalezen žádný projekt"
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Správce odstraněn.",
+      "MEMBERSADDED": "Správci přidáni.",
+      "MEMBERADDED": "Správce přidán.",
+      "MEMBERCHANGED": "Správce změněn.",
+      "ROLESCREATED": "Role vytvořeny.",
+      "ROLEREMOVED": "Role odstraněna.",
+      "ROLECHANGED": "Role změněna.",
+      "REACTIVATED": "Reaktivováno.",
+      "DEACTIVATED": "Deaktivováno.",
+      "CREATED": "Projekt vytvořen.",
+      "UPDATED": "Projekt změněn.",
+      "GRANTUPDATED": "Povolení změněno.",
+      "DELETED": "Projekt smazán."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Smazat roli",
+      "DELETE_DESCRIPTION": "Chystáte se smazat roli. Jste si jisti?"
+    }
+  },
+  "NEXTSTEPS": {
+    "TITLE": "Další kroky"
+  },
+  "IDP": {
+    "LIST": {
+      "TITLE": "Poskytovatelé identity",
+      "DESCRIPTION": "Spravujte konfiguraci poskytovatele identity, která pak může být aktivována ve vašem nastavení přihlášení.",
+      "ACTIVETITLE": "Aktivní poskytovatelé identity"
+    },
+    "CREATE": {
+      "TITLE": "Přidat poskytovatele",
+      "DESCRIPTION": "Vyberte jednoho nebo více z následujících poskytovatelů.",
+      "STEPPERTITLE": "Vytvořit poskytovatele",
+      "OIDC": {
+        "TITLE": "OIDC",
+        "DESCRIPTION": "Zadejte požadovaná data pro vašeho OIDC poskytovatele."
+      },
+      "OAUTH": {
+        "TITLE": "OAuth",
+        "DESCRIPTION": "Zadejte požadovaná data pro vašeho OAuth poskytovatele."
+      },
+      "JWT": {
+        "TITLE": "JWT",
+        "DESCRIPTION": "Zadejte požadovaná data pro vašeho JWT poskytovatele."
+      },
+      "GOOGLE": {
+        "TITLE": "Google",
+        "DESCRIPTION": "Zadejte přihlašovací údaje pro vašeho poskytovatele identity Google"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab",
+        "DESCRIPTION": "Zadejte přihlašovací údaje pro vašeho poskytovatele identity Gitlab"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab – samostatně hostovaný",
+        "DESCRIPTION": "Zadejte přihlašovací údaje pro vašeho samostatně hostovaného poskytovatele identity Gitlab"
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server",
+        "DESCRIPTION": "Zadejte přihlašovací údaje pro vašeho poskytovatele identity GitHub Enterprise Server"
+      },
+      "GITHUB": {
+        "TITLE": "Github",
+        "DESCRIPTION": "Zadejte přihlašovací údaje pro vašeho poskytovatele identity Github"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft",
+        "DESCRIPTION": "Zadejte přihlašovací údaje pro vašeho poskytovatele identity Microsoft"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Zadejte přihlašovací údaje pro vašeho LDAP poskytovatele"
+      },
+      "APPLE": {
+        "TITLE": "Přihlásit se pomocí Apple",
+        "DESCRIPTION": "Zadejte přihlašovací údaje pro vašeho poskytovatele identity Apple"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Poskytovatel identity",
+      "DESCRIPTION": "Aktualizujte konfiguraci poskytovatele",
+      "DATECREATED": "Vytvořeno",
+      "DATECHANGED": "Změněno"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Automatické vytvoření",
+      "ISAUTOCREATION_DESC": "Pokud je vybráno, účet bude vytvořen, pokud ještě neexistuje.",
+      "ISAUTOUPDATE": "Automatická aktualizace",
+      "ISAUTOUPDATE_DESC": "Pokud je vybráno, účty jsou aktualizovány při opětovné autentizaci.",
+      "ISCREATIONALLOWED": "Je povoleno vytváření účtu",
+      "ISCREATIONALLOWED_DESC": "Určuje, zda lze vytvářet účty.",
+      "ISLINKINGALLOWED": "Je povoleno propojení účtů",
+      "ISLINKINGALLOWED_DESC": "Určuje, zda lze identitu propojit s existujícím účtem."
+    },
+    "OWNERTYPES": {
+      "0": "neznámý",
+      "1": "Instance",
+      "2": "Organizace"
+    },
+    "STATES": {
+      "1": "aktivní",
+      "2": "neaktivní"
+    },
+    "AZUREADTENANTTYPES": {
+      "3": "ID tenantu",
+      "0": "Společný",
+      "1": "Organizace",
+      "2": "Spotřebitelé"
+    },
+    "AZUREADTENANTTYPE": "Typ tenantu",
+    "AZUREADTENANTID": "ID tenantu",
+    "EMAILVERIFIED": "E-mail ověřen",
+    "NAMEHINT": "Pokud je uvedeno, zobrazí se v přihlašovacím rozhraní.",
+    "OPTIONAL": "volitelný",
+    "LDAPATTRIBUTES": "LDAP Atributy",
+    "UPDATEBINDPASSWORD": "aktualizovat heslo pro vazbu",
+    "UPDATECLIENTSECRET": "aktualizovat tajemství klienta",
+    "ADD": "Přidat poskytovatele identity",
+    "TYPE": "Typ",
+    "OWNER": "Vlastník",
+    "ID": "ID",
+    "NAME": "Název",
+    "AUTHORIZATIONENDPOINT": "Koncový bod autorizace",
+    "TOKENENDPOINT": "Koncový bod tokenu",
+    "USERENDPOINT": "Uživatelský koncový bod",
+    "IDATTRIBUTE": "ID atribut",
+    "AVAILABILITY": "Dostupnost",
+    "AVAILABLE": "dostupný",
+    "AVAILABLEBUTINACTIVE": "dostupný, ale neaktivní",
+    "SETAVAILABLE": "nastavit jako dostupné",
+    "SETUNAVAILABLE": "nastavit jako nedostupné",
+    "CONFIG": "Konfigurace",
+    "STATE": "Stav",
+    "ISSUER": "Vystavatel",
+    "SCOPESLIST": "Seznam oprávnění",
+    "CLIENTID": "ID klienta",
+    "CLIENTSECRET": "Tajemství klienta",
+    "LDAPCONNECTION": "Spojení",
+    "LDAPUSERBINDING": "Vazba uživatele",
+    "BASEDN": "Základní Dn",
+    "BINDDN": "Dn pro vazbu",
+    "BINDPASSWORD": "Heslo pro vazbu",
+    "SERVERS": "Servery",
+    "STARTTLS": "STARTTLS",
+    "TIMEOUT": "Časový limit v sekundách",
+    "USERBASE": "Základ uživatele",
+    "USERFILTERS": "Filtry uživatele",
+    "USEROBJECTCLASSES": "Třídy objektů uživatele",
+    "REQUIRED": "požadováno",
+    "LDAPIDATTRIBUTE": "ID atribut",
+    "AVATARURLATTRIBUTE": "Atribut URL avatara",
+    "DISPLAYNAMEATTRIBUTE": "Atribut zobrazovaného jména",
+    "EMAILATTRIBUTEATTRIBUTE": "Atribut e-mailu",
+    "EMAILVERIFIEDATTRIBUTE": "Atribut ověření e-mailu",
+    "FIRSTNAMEATTRIBUTE": "Atribut křestního jména",
+    "LASTNAMEATTRIBUTE": "Atribut příjmení",
+    "NICKNAMEATTRIBUTE": "Atribut přezdívky",
+    "PHONEATTRIBUTE": "Atribut telefonu",
+    "PHONEVERIFIEDATTRIBUTE": "Atribut ověření telefonu",
+    "PREFERREDLANGUAGEATTRIBUTE": "Atribut preferovaného jazyka",
+    "PREFERREDUSERNAMEATTRIBUTE": "Atribut preferovaného uživatelského jména",
+    "PROFILEATTRIBUTE": "Atribut profilu",
+    "IDPDISPLAYNAMMAPPING": "Mapování zobrazovaného jména IDP",
+    "USERNAMEMAPPING": "Mapování uživatelského jména",
+    "DATES": "Data",
+    "CREATIONDATE": "Datum vytvoření",
+    "CHANGEDATE": "Datum poslední změny",
+    "DEACTIVATE": "Deaktivovat",
+    "ACTIVATE": "Aktivovat",
+    "DELETE": "Odstranit",
+    "DELETE_TITLE": "Odstranit IDP",
+    "DELETE_DESCRIPTION": "Chystáte se odstranit poskytovatele identity. Výsledné změny jsou nevratné. Opravdu to chcete udělat?",
+    "REMOVE_WARN_TITLE": "Odebrat IDP",
+    "REMOVE_WARN_DESCRIPTION": "Chystáte se odebrat poskytovatele identity. To odstraní výběr dostupného IDP pro vaše uživatele a již registrovaní uživatelé se nebudou moci znovu přihlásit. Jste si jisti, že chcete pokračovat?",
+    "DELETE_SELECTION_TITLE": "Odstranit IDP",
+    "DELETE_SELECTION_DESCRIPTION": "Chystáte se odstranit poskytovatele identity. Výsledné změny jsou nevratné. Opravdu to chcete udělat?",
+    "EMPTY": "Žádný IDP není dostupný",
+    "OIDC": {
+      "GENERAL": "Obecné informace",
+      "TITLE": "OIDC Konfigurace",
+      "DESCRIPTION": "Zadejte data pro OIDC poskytovatele identity."
+    },
+    "JWT": {
+      "TITLE": "Konfigurace JWT",
+      "DESCRIPTION": "Zadejte data pro poskytovatele identity JWT.",
+      "HEADERNAME": "Název hlavičky",
+      "JWTENDPOINT": "JWT koncový bod",
+      "JWTKEYSENDPOINT": "Koncový bod klíčů JWT"
+    },
+    "APPLE": {
+      "TEAMID": "ID týmu",
+      "KEYID": "ID klíče",
+      "PRIVATEKEY": "Soukromý klíč",
+      "UPDATEPRIVATEKEY": "Aktualizovat soukromý klíč",
+      "UPLOADPRIVATEKEY": "Nahrát soukromý klíč",
+      "KEYMAXSIZEEXCEEDED": "Maximální velikost 5kB překročena."
+    },
+    "TOAST": {
+      "SAVED": "Úspěšně uloženo.",
+      "REACTIVATED": "IDP reaktivován.",
+      "DEACTIVATED": "IDP deaktivován.",
+      "SELECTEDREACTIVATED": "Vybraní IDP byli reaktivováni.",
+      "SELECTEDDEACTIVATED": "Vybraní IDP byli deaktivováni.",
+      "SELECTEDKEYSDELETED": "Vybraní IDP byli smazáni.",
+      "DELETED": "IDP byl úspěšně odstraněn!",
+      "ADDED": "Úspěšně přidáno.",
+      "REMOVED": "Úspěšně odebráno."
+    },
+    "ISIDTOKENMAPPING": "Mapování z ID tokenu",
+    "ISIDTOKENMAPPING_DESC": "Pokud je vybráno, informace o poskytovateli jsou mapovány z ID tokenu, nikoli z koncového bodu userinfo."
+  },
+  "MFA": {
+    "LIST": {
+      "MULTIFACTORTITLE": "Bezheslové přihlášení",
+      "MULTIFACTORDESCRIPTION": "Definujte zde vaše vícefaktorové možnosti pro bezheslové ověřování.",
+      "SECONDFACTORTITLE": "Vícefaktorové ověřování",
+      "SECONDFACTORDESCRIPTION": "Definujte další možné faktory, kterými lze zabezpečit ověřování heslem."
+    },
+    "CREATE": {
+      "TITLE": "Nový faktor",
+      "DESCRIPTION": "Vyberte typ vašeho nového faktoru."
+    },
+    "DELETE": {
+      "TITLE": "Odstranit faktor",
+      "DESCRIPTION": "Chystáte se odstranit faktor z nastavení přihlášení. Jste si jisti?"
+    },
+    "TOAST": {
+      "ADDED": "Úspěšně přidáno.",
+      "SAVED": "Úspěšně uloženo.",
+      "DELETED": "Úspěšně odstraněno"
+    },
+    "TYPE": "Typ",
+    "MULTIFACTORTYPES": {
+      "0": "Neznámý",
+      "1": "Otisk prstu, bezpečnostní klíče, Face ID a další"
+    },
+    "SECONDFACTORTYPES": {
+      "0": "Neznámý",
+      "1": "Jednorázové heslo pomocí autentizační aplikace (TOTP)",
+      "2": "Otisk prstu, bezpečnostní klíče, Face ID a další",
+      "3": "Jednorázové heslo e-mailem (Email OTP)",
+      "4": "Jednorázové heslo SMS (SMS OTP)"
+    }
+  },
+  "LOGINPOLICY": {
+    "CREATE": {
+      "TITLE": "Nastavení přihlášení",
+      "DESCRIPTION": "Definujte, jak se vaši uživatelé mohou ověřit ve vaší organizaci."
+    },
+    "IDPS": "Poskytovatelé identity",
+    "ADDIDP": {
+      "TITLE": "Přidat poskytovatele identity",
+      "DESCRIPTION": "Pro ověření můžete vybrat předdefinované nebo vlastní vytvořené poskytovatele.",
+      "SELECTIDPS": "Poskytovatelé identity"
+    },
+    "PASSWORDLESS": "Přihlášení bez hesla",
+    "PASSWORDLESSTYPE": {
+      "0": "Nepovoleno",
+      "1": "Povoleno"
+    }
+  },
+  "APP": {
+    "LIST": "Aplikace",
+    "COMPLIANCE": "OIDC Kompatibilita",
+    "URLS": "URL adresy",
+    "CONFIGURATION": "Konfigurace",
+    "TOKEN": "Nastavení tokenu",
+    "PAGES": {
+      "TITLE": "Aplikace",
+      "ID": "ID",
+      "DESCRIPTION": "Zde můžete upravovat data vaší aplikace a její konfiguraci.",
+      "CREATE": "Vytvořit aplikaci",
+      "CREATE_SELECT_PROJECT": "Nejprve vyberte váš projekt",
+      "CREATE_NEW_PROJECT": "nebo vytvořte nový <a href='{{url}}' title='Vytvořit projekt'>zde</a>.",
+      "CREATE_DESC_TITLE": "Zadejte podrobnosti vaší aplikace krok za krokem",
+      "CREATE_DESC_SUB": "Doporučená konfigurace bude automaticky generována.",
+      "STATE": "Stav",
+      "DATECREATED": "Vytvořeno",
+      "DATECHANGED": "Změněno",
+      "URLS": "URL adresy",
+      "DELETE": "Smazat aplikaci",
+      "DETAIL": {
+        "TITLE": "Detail",
+        "STATE": {
+          "0": "Nedefinováno",
+          "1": "Aktivní",
+          "2": "Neaktivní"
+        }
+      },
+      "DIALOG": {
+        "CONFIG": {
+          "TITLE": "Změnit OIDC Konfiguraci"
+        },
+        "DELETE": {
+          "TITLE": "Smazat aplikaci",
+          "DESCRIPTION": "Opravdu chcete smazat tuto aplikaci?"
+        }
+      },
+      "NEXTSTEPS": {
+        "TITLE": "Další kroky",
+        "0": {
+          "TITLE": "Přidat role",
+          "DESC": "Zadejte role vašeho projektu"
+        },
+        "1": {
+          "TITLE": "Přidat uživatele",
+          "DESC": "Přidat nové uživatele vaší organizace"
+        },
+        "2": {
+          "TITLE": "Pomoc & Podpora",
+          "DESC": "Přečtěte si naši dokumentaci o vytváření aplikací nebo kontaktujte naši podporu"
+        }
+      }
+    },
+    "NAMEDIALOG": {
+      "TITLE": "Přejmenovat aplikaci",
+      "DESCRIPTION": "Zadejte nový název pro vaši aplikaci",
+      "NAME": "Nový název"
+    },
+    "NAME": "Název",
+    "TYPE": "Typ aplikace",
+    "AUTHMETHOD": "Metoda autentizace",
+    "AUTHMETHODSECTION": "Metoda autentizace",
+    "GRANT": "Typy pověření",
+    "ADDITIONALORIGINS": "Další origins",
+    "ADDITIONALORIGINSDESC": "Pokud chcete přidat k vaší aplikaci další origins (původy), které nejsou používány jako přesměrování, můžete to udělat zde.",
+    "ORIGINS": "Origins (původy)",
+    "NOTANORIGIN": "Zadaná hodnota není původ",
+    "PROSWITCH": "Jsem profesionál. Přeskočit tohoto průvodce.",
+    "NAMEANDTYPESECTION": "Název a typ",
+    "TITLEFIRST": "Název aplikace",
+    "TYPETITLE": "Typ aplikace",
+    "OIDC": {
+      "WELLKNOWN": "Další odkazy lze získat z <a href='{{url}}' title='Discovery endpoint' target='_blank'>objevovacího koncového bodu</a>.",
+      "INFO": {
+        "ISSUER": "Vydavatel",
+        "CLIENTID": "ID klienta"
+      },
+      "CURRENT": "Aktuální konfigurace",
+      "TOKENSECTIONTITLE": "Možnosti AuthToken",
+      "REDIRECTSECTIONTITLE": "Nastavení přesměrování",
+      "REDIRECTTITLE": "Určete URI, kam se přesměruje přihlášení.",
+      "POSTREDIRECTTITLE": "Toto je URI přesměrování po odhlášení.",
+      "REDIRECTDESCRIPTIONWEB": "URI pro přesměrování musí začínat na https://. http:// je platný pouze v povoleném vývojovém režimu.",
+      "REDIRECTDESCRIPTIONNATIVE": "URI pro přesměrování musí začínat vaším vlastním protokolem, http://127.0.0.1, http://[::1] nebo http://localhost.",
+      "REDIRECTNOTVALID": "Toto URI pro přesměrování není platné.",
+      "COMMAORENTERSEPERATION": "oddělte ↵",
+      "TYPEREQUIRED": "Typ je vyžadován.",
+      "TITLE": "OIDC Konfigurace",
+      "CLIENTID": "ID klienta",
+      "CLIENTSECRET": "Tajemství klienta",
+      "CLIENTSECRET_NOSECRET": "S vaším vybraným způsobem autentizace není požadováno žádné tajemství a proto není dostupné.",
+      "CLIENTSECRET_DESCRIPTION": "Uchovávejte toto tajemství klienta na bezpečném místě, jakmile je dialog zavřen, nelze jej již znovu zobrazit.",
+      "REGENERATESECRET": "Regenerovat tajemství klienta",
+      "DEVMODE": "Vývojový režim",
+      "DEVMODE_ENABLED": "Povoleno",
+      "DEVMODE_DISABLED": "Zakázáno",
+      "DEVMODEDESC": "Pozor: S povoleným vývojovým režimem nebudou URI pro přesměrování ověřovány.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Přeskočit stránku úspěchu přihlášení",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Přeskočit stránku úspěchu po přihlášení pro tuto nativní aplikaci.",
+      "REDIRECT": "URI pro přesměrování",
+      "REDIRECTSECTION": "URI pro přesměrování",
+      "POSTLOGOUTREDIRECT": "URI po odhlášení",
+      "RESPONSESECTION": "Typy odpovědí",
+      "GRANTSECTION": "Typy pověření",
+      "GRANTTITLE": "Vyberte typy pověření. Poznámka: Implicitní je dostupné pouze pro aplikace založené na prohlížeči.",
+      "APPTYPE": {
+        "0": "Web",
+        "1": "User Agent",
+        "2": "Nativní"
+      },
+      "RESPONSETYPE": "Typy odpovědí",
+      "RESPONSE": {
+        "0": "Kód",
+        "1": "ID Token",
+        "2": "Token-ID Token"
+      },
+      "REFRESHTOKEN": "Obnovovací Token",
+      "GRANTTYPE": "Typy grantů",
+      "GRANT": {
+        "0": "Autorizační kód",
+        "1": "Implicitní",
+        "2": "Obnovovací Token",
+        "3": "Kód zařízení"
+      },
+      "AUTHMETHOD": {
+        "0": "Základní",
+        "1": "Post",
+        "2": "Žádný",
+        "3": "Private Key JWT"
+      },
+      "TOKENTYPE": "Typ Auth Token",
+      "TOKENTYPE0": "Bearer Token",
+      "TOKENTYPE1": "JWT",
+      "UNSECUREREDIRECT": "Doufám, že víte, co děláte.",
+      "OVERVIEWSECTION": "Přehled",
+      "OVERVIEWTITLE": "Nyní jste hotovi. Projděte si vaši konfiguraci.",
+      "ACCESSTOKENROLEASSERTION": "Přidat role uživatele do access tokenu",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Pokud je vybráno, požadované role ověřeného uživatele jsou přidány do access tokenu.",
+      "IDTOKENROLEASSERTION": "Role uživatele uvnitř ID tokenu",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Pokud je vybráno, požadované role ověřeného uživatele jsou přidány do ID tokenu.",
+      "IDTOKENUSERINFOASSERTION": "Informace o uživateli uvnitř ID tokenu",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Umožňuje klientům získávat nároky (claims) na profil, email, telefon a adresu z ID tokenu.",
+      "CLOCKSKEW": "Umožňuje klientům zvládnout rozdíl času mezi OP a klientem. Doba trvání (0-5s) bude přidána k nároku exp a odečtena od iats, auth_time a nbf.",
+      "RECOMMENDED": "doporučeno",
+      "NOTRECOMMENDED": "nedoporučeno",
+      "SELECTION": {
+        "APPTYPE": {
+          "WEB": {
+            "TITLE": "Web",
+            "DESCRIPTION": "Běžné webové aplikace jako .net, PHP, Node.js, Java, atd."
+          },
+          "NATIVE": {
+            "TITLE": "Nativní",
+            "DESCRIPTION": "Mobilní aplikace, desktop, chytrá zařízení, atd."
+          },
+          "USERAGENT": {
+            "TITLE": "Uživatelský Agent",
+            "DESCRIPTION": "Single Page Aplikace (SPA) a obecně všechny JS frameworky spouštěné v prohlížečích"
+          }
+        }
+      }
+    },
+    "API": {
+      "INFO": {
+        "CLIENTID": "Client Id"
+      },
+      "REGENERATESECRET": "Obnovit Client Secret",
+      "SELECTION": {
+        "TITLE": "API",
+        "DESCRIPTION": "API obecně"
+      },
+      "AUTHMETHOD": {
+        "0": "Základní",
+        "1": "Private Key JWT"
+      }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "SAML Aplikace"
+      },
+      "CONFIGSECTION": "SAML Konfigurace",
+      "CHOOSEMETADATASOURCE": "Poskytněte vaši SAML konfiguraci použitím jedné z následujících možností:",
+      "METADATAOPT1": "Možnost 1. Specifikujte url, kde je umístěn metadata soubor",
+      "METADATAOPT2": "Možnost 2. Nahrajte soubor obsahující vaše metadata XML",
+      "METADATAOPT3": "Možnost 3. Vytvořte na počkání minimální metadata soubor poskytující ENTITYID a ACS URL",
+      "UPLOAD": "Nahrát XML soubor",
+      "METADATA": "Metadata",
+      "METADATAFROMFILE": "Metadata ze souboru",
+      "CREATEMETADATA": "Vytvořit metadata",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS koncová URL"
+    },
+    "AUTHMETHODS": {
+      "CODE": {
+        "TITLE": "Kód",
+        "DESCRIPTION": "Vyměňte autorizační kód za tokeny"
+      },
+      "PKCE": {
+        "TITLE": "PKCE",
+        "DESCRIPTION": "Použijte náhodný hash místo statického klient tajemství pro větší bezpečnost"
+      },
+      "POST": {
+        "TITLE": "POST",
+        "DESCRIPTION": "Pošlete client_id a client_secret jako část formuláře"
+      },
+      "PK_JWT": {
+        "TITLE": "Private Key JWT",
+        "DESCRIPTION": "Použijte privátní klíč pro autorizaci vaší aplikace"
+      },
+      "BASIC": {
+        "TITLE": "Základní",
+        "DESCRIPTION": "Autentizace s uživatelským jménem a heslem"
+      },
+      "IMPLICIT": {
+        "TITLE": "Implicitní",
+        "DESCRIPTION": "Získejte tokeny přímo z autorizačního koncového bodu"
+      },
+      "DEVICECODE": {
+        "TITLE": "Kód zařízení",
+        "DESCRIPTION": "Autorizujte zařízení na počítači nebo smartphonu."
+      },
+      "CUSTOM": {
+        "TITLE": "Vlastní",
+        "DESCRIPTION": "Vaše nastavení neodpovídá žádné jiné možnosti."
+      }
+    },
+    "TOAST": {
+      "REACTIVATED": "Aplikace reaktivována.",
+      "DEACTIVATED": "Aplikace deaktivována.",
+      "OIDCUPDATED": "Aplikace aktualizována.",
+      "APIUPDATED": "Aplikace aktualizována",
+      "UPDATED": "Aplikace aktualizována.",
+      "CREATED": "Aplikace vytvořena.",
+      "CLIENTSECRETREGENERATED": "klient tajemství regenerováno.",
+      "DELETED": "Aplikace smazána.",
+      "CONFIGCHANGED": "Zjištěny změny!"
+    }
+  },
+  "GENDERS": {
+    "0": "Neznámé",
+    "1": "Žena",
+    "2": "Muž",
+    "3": "Jiné"
+  },
+  "LANGUAGES": {
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文",
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский"
+  },
+  "MEMBER": {
+    "ADD": "Přidat manažera",
+    "CREATIONTYPE": "Typ vytvoření",
+    "CREATIONTYPES": {
+      "3": "IAM",
+      "2": "Organizace",
+      "0": "Vlastní projekt",
+      "1": "Přidělený projekt",
+      "4": "Projekt"
+    },
+    "EDITROLE": "Upravit role",
+    "EDITFOR": "Upravit role pro uživatele: {{value}}",
+    "DIALOG": {
+      "DELETE_TITLE": "Odebrat manažera",
+      "DELETE_DESCRIPTION": "Chystáte se odebrat manažera. Jste si jisti?"
+    }
+  },
+  "ROLESLABEL": "Role",
+  "GRANTS": {
+    "TITLE": "Autorizace",
+    "DESC": "To jsou všechny autorizace vaší organizace.",
+    "DELETE": "Smazat autorizaci",
+    "EMPTY": "Nebyla nalezena žádná autorizace",
+    "ADD": "Vytvořit autorizaci",
+    "ADD_BTN": "Nové",
+    "PROJECT": {
+      "TITLE": "Autorizace",
+      "DESCRIPTION": "Definujte autorizace pro určený projekt. Všimněte si, že můžete vidět pouze záznamy projektů a uživatelů, pro které máte oprávnění."
+    },
+    "USER": {
+      "TITLE": "Autorizace",
+      "DESCRIPTION": "Definujte autorizace pro určeného uživatele. Všimněte si, že můžete vidět pouze záznamy projektů a uživatelů, pro které máte oprávnění."
+    },
+    "CREATE": {
+      "TITLE": "Vytvořit autorizaci",
+      "DESCRIPTION": "Vyhledejte organizaci, projekt a odpovídající role."
+    },
+    "EDIT": {
+      "TITLE": "Změnit autorizaci"
+    },
+    "DETAIL": {
+      "TITLE": "Detail autorizace",
+      "DESCRIPTION": "Zde můžete vidět všechny detaily autorizace."
+    },
+    "TOAST": {
+      "UPDATED": "Autorizace aktualizována.",
+      "REMOVED": "Autorizace odebrána",
+      "BULKREMOVED": "Autorizace odebrány."
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Smazat autorizaci",
+      "DELETE_DESCRIPTION": "Chystáte se smazat autorizaci. Chcete pokračovat?",
+      "BULK_DELETE_TITLE": "Smazat autorizace",
+      "BULK_DELETE_DESCRIPTION": "Chystáte se smazat více autorizací. Chcete pokračovat?"
+    }
+  },
+  "CHANGES": {
+    "LISTTITLE": "Poslední změny",
+    "BOTTOM": "Dorazili jste na konec seznamu.",
+    "LOADMORE": "Načíst více",
+    "ORG": {
+      "TITLE": "Aktivita",
+      "DESCRIPTION": "Zde můžete vidět nejnovější události, které generovaly změnu v organizaci."
+    },
+    "PROJECT": {
+      "TITLE": "Aktivita",
+      "DESCRIPTION": "Zde můžete vidět nejnovější události, které generovaly změnu v projektu."
+    },
+    "USER": {
+      "TITLE": "Aktivita",
+      "DESCRIPTION": "Zde můžete vidět nejnovější události, které generovaly změnu u uživatele."
+    }
+  }
+}
