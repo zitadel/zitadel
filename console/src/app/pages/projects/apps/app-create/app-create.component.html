@@ -381,6 +381,19 @@
             </span>
           </span>
         </div>
+        <div class="row">
+          <span class="left cnsl-secondary-text">
+            {{ 'APP.SAML.CERTIFICATE' | translate }}
+          </span>
+          <a
+            *ngIf="samlCertificateURL$ | async as samlCertificateURL"
+            href="{{ samlCertificateURL }}"
+            class="cert"
+            rel="noreferrer"
+            download
+            >{{ 'APP.SAML.DOWNLOADCERT' | translate }}</a
+          >
+        </div>
       </ng-container>
 
       <div class="app-create-actions">

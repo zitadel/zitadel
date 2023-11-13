@@ -2087,6 +2087,8 @@
       "UPLOAD": "XMLファイルをアップロードする",
       "METADATA": "メタデータ",
       "METADATAFROMFILE": "ファイルからのメタデータ",
+      "CERTIFICATE": "SAML証明書",
+      "DOWNLOADCERT": "SAML証明書をダウンロードする",
       "CREATEMETADATA": "メタデータの作成",
       "ENTITYID": "Entity ID",
       "ACSURL": "ACS endpoint URL"
