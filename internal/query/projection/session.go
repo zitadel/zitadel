@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	SessionsProjectionTable = "projections.sessions8_1"
+	SessionsProjectionTable = "projections.sessions8"
 
 	SessionColumnID                     = "id"
 	SessionColumnCreationDate           = "creation_date"
@@ -25,7 +25,7 @@ const (
 	SessionColumnInstanceID             = "instance_id"
 	SessionColumnCreator                = "creator"
 	SessionColumnUserID                 = "user_id"
-	SessionColumnUserRespourceOwner     = "user_resource_owner"
+	SessionColumnUserResourceOwner      = "user_resource_owner"
 	SessionColumnUserCheckedAt          = "user_checked_at"
 	SessionColumnPasswordCheckedAt      = "password_checked_at"
 	SessionColumnIntentCheckedAt        = "intent_checked_at"
@@ -65,7 +65,7 @@ func (*sessionProjection) Init() *old_handler.Check {
 			handler.NewColumn(SessionColumnInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(SessionColumnCreator, handler.ColumnTypeText),
 			handler.NewColumn(SessionColumnUserID, handler.ColumnTypeText, handler.Nullable()),
-			handler.NewColumn(SessionColumnUserRespourceOwner, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(SessionColumnUserResourceOwner, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SessionColumnUserCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnPasswordCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnIntentCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
@@ -215,7 +215,7 @@ func (p *sessionProjection) reduceUserChecked(event eventstore.Event) (*handler.
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
 			handler.NewCol(SessionColumnUserID, e.UserID),
-			handler.NewCol(SessionColumnUserRespourceOwner, e.UserResourceOwner),
+			handler.NewCol(SessionColumnUserResourceOwner, e.UserResourceOwner),
 			handler.NewCol(SessionColumnUserCheckedAt, e.CheckedAt),
 		},
 		[]handler.Condition{
