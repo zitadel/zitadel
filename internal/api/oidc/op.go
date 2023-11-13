@@ -45,6 +45,7 @@ type Config struct {
 	DeviceAuth                        *DeviceAuthorizationConfig
 	DefaultLoginURLV2                 string
 	DefaultLogoutURLV2                string
+	Features                          Features
 }
 
 type EndpointConfig struct {
@@ -61,6 +62,10 @@ type EndpointConfig struct {
 type Endpoint struct {
 	Path string
 	URL  string
+}
+
+type Features struct {
+	ExperimentalIntrospection bool
 }
 
 type OPStorage struct {
@@ -120,6 +125,7 @@ func NewServer(
 
 	server := &Server{
 		LegacyServer:        op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
+		features:            config.Features,
 		repo:                repo,
 		query:               query,
 		command:             command,

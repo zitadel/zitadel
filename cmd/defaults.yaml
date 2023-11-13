@@ -314,6 +314,8 @@ OIDC:
       Path: /oauth/v2/device_authorization # ZITADEL_OIDC_CUSTOMENDPOINTS_DEVICEAUTH_PATH
   DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
   DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
+  Features:
+    ExperimentalIntrospection: true
 
 SAML:
   ProviderConfig:
