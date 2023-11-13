@@ -27,7 +27,6 @@ import (
 )
 
 const (
-	// TODO: remove declarations: (moved to domain package)
 	ScopeProjectRolePrefix  = "urn:zitadel:iam:org:project:role:"
 	ScopeProjectsRoles      = "urn:zitadel:iam:org:projects:roles"
 	ClaimProjectRoles       = "urn:zitadel:iam:org:project:roles"
@@ -179,6 +178,21 @@ func (o *OPStorage) SetUserinfoFromRequest(ctx context.Context, userinfo *oidc.U
 func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection *oidc.IntrospectionResponse, tokenID, subject, clientID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
+		token, err := o.query.ActiveAccessTokenByToken(ctx, tokenID)
+		if err != nil {
+			return err
+		}
+		projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
+		if err != nil {
+			return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
+		}
+		return o.introspect(ctx, introspection,
+			tokenID, token.UserID, token.ClientID, clientID, projectID,
+			token.Audience, token.Scope,
+			token.AccessTokenCreation, token.AccessTokenExpiration)
+	}
 
 	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
 	if err != nil {
@@ -370,7 +384,7 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, us
 	if err != nil {
 		return err
 	}
-	setUserInfoRoleClaims(userInfo, projectRoles)
+	o.setUserInfoRoleClaims(userInfo, projectRoles)
 
 	return o.userinfoFlows(ctx, user, userGrants, userInfo)
 }
@@ -432,7 +446,7 @@ func (o *OPStorage) setUserInfoResourceOwner(ctx context.Context, userInfo *oidc
 	return nil
 }
 
-func setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
+func (o *OPStorage) setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
 	if roles != nil && len(roles.projects) > 0 {
 		if roles, ok := roles.projects[roles.requestProjectID]; ok {
 			userInfo.AppendClaims(ClaimProjectRoles, roles)

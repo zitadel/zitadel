@@ -45,6 +45,6 @@ select json_build_object(
 			left join machine m on u.id = m.user_id
 		) r
 	),
-	'organization', (select organization from org),
+	'org', (select organization from org),
 	'metadata', (select metadata from metadata)
 );

@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
+
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query"
@@ -22,6 +23,7 @@ type Server struct {
 
 	query   *query.Queries
 	command *command.Commands
+	keySet  *keySetCache
 
 	fallbackLogger      *slog.Logger
 	hashAlg             crypto.HashAlgorithm

@@ -186,7 +186,7 @@ func (s *Server) introspectionToken(ctx context.Context, accessToken string, rc 
 			}
 			tokenID, subject = split[0], split[1]
 		} else {
-			verifier := op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), s.storage.keySet)
+			verifier := op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), s.keySet)
 			claims, err := op.VerifyAccessToken[*oidc.AccessTokenClaims](ctx, accessToken, verifier)
 			if err != nil {
 				return nil, err

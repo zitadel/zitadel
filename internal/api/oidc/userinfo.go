@@ -248,6 +248,17 @@ func setUserInfoOrgClaims(user *query.OIDCUserInfo, out *oidc.UserInfo) {
 	}
 }
 
+func setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
+	if roles != nil && len(roles.projects) > 0 {
+		if roles, ok := roles.projects[roles.requestProjectID]; ok {
+			userInfo.AppendClaims(ClaimProjectRoles, roles)
+		}
+		for projectID, roles := range roles.projects {
+			userInfo.AppendClaims(fmt.Sprintf(ClaimProjectRolesFormat, projectID), roles)
+		}
+	}
+}
+
 func (s *Server) userinfoFlows(ctx context.Context, user *query.OIDCUserInfo, userGrants *query.UserGrants, userInfo *oidc.UserInfo) error {
 	queriedActions, err := s.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, user.User.ResourceOwner, false)
 	if err != nil {

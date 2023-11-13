@@ -387,6 +387,7 @@ func (wm *PublicKeyReadModel) Reduce() error {
 
 func (wm *PublicKeyReadModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateTypes(keypair.AggregateType).

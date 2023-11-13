@@ -9,12 +9,16 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 //go:embed embed/userinfo_by_id.sql
 var oidcUserInfoQuery string
 
 func (q *Queries) GetOIDCUserInfo(ctx context.Context, userID string) (_ *OIDCUserInfo, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	userInfo := new(OIDCUserInfo)
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
 		var data []byte

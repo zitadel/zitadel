@@ -36,7 +36,7 @@ func UserMetadataListFromQuery(c *actions.FieldConfig, metadata *query.UserMetad
 
 func UserMetadataListFromSlice(c *actions.FieldConfig, metadata []query.UserMetadata) goja.Value {
 	result := &userMetadataList{
-		// Count was the only field ever queries from the DB in the old implementation,
+		// Count was the only field ever queried from the DB in the old implementation,
 		// so Sequence and LastRun are omitted.
 		Count:    uint64(len(metadata)),
 		Metadata: make([]*userMetadata, len(metadata)),
