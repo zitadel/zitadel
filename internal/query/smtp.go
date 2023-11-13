@@ -117,7 +117,6 @@ type SMTPConfig struct {
 }
 
 func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (config *SMTPConfig, err error) {
-	// TODO @n40lab
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -139,7 +138,6 @@ func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID strin
 }
 
 func (q *Queries) SMTPConfigByID(ctx context.Context, aggregateID, id string) (config *SMTPConfig, err error) {
-	// TODO @n40lab Test
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

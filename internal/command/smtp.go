@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -152,7 +153,6 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id s
 
 func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, instanceID, id string, password string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	// TODO @n40lab test
 	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
 	if err != nil {
 		return nil, err
@@ -319,4 +319,78 @@ func (c *Commands) getSMTPConfig(ctx context.Context, instanceID, id, domain str
 	}
 
 	return writeModel, nil
+}
+
+// TODO: SetUpInstance still uses this and would be removed as soon as deprecated PrepareCommands is removed
+func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, replyTo, hostAndPort, user string, password []byte, tls bool, providerType uint32) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+
+		if from = strings.TrimSpace(from); from == "" {
+			return nil, errors.ThrowInvalidArgument(nil, "INST-mruNY", "Errors.Invalid.Argument")
+		}
+
+		replyTo = strings.TrimSpace(replyTo)
+
+		hostAndPort = strings.TrimSpace(hostAndPort)
+		if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
+			return nil, errors.ThrowInvalidArgument(nil, "INST-9JdRe", "Errors.Invalid.Argument")
+		}
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			id, err := c.idGenerator.Next()
+			if err != nil {
+				return nil, errors.ThrowInternal(nil, "INST-9JdRe", "Errors.Invalid.Argument")
+			}
+
+			fromSplitted := strings.Split(from, "@")
+			senderDomain := fromSplitted[len(fromSplitted)-1]
+			writeModel, err := getSMTPConfigWriteModel(ctx, filter, id, senderDomain)
+			if err != nil {
+				return nil, err
+			}
+			if writeModel.State == domain.SMTPConfigStateActive {
+				return nil, errors.ThrowAlreadyExists(nil, "INST-W3VS2", "Errors.SMTPConfig.AlreadyExists")
+			}
+			err = checkSenderAddress(writeModel)
+			if err != nil {
+				return nil, err
+			}
+			var smtpPassword *crypto.CryptoValue
+			if password != nil {
+				smtpPassword, err = crypto.Encrypt(password, c.smtpEncryption)
+				if err != nil {
+					return nil, err
+				}
+			}
+			return []eventstore.Command{
+				instance.NewSMTPConfigAddedEvent(
+					ctx,
+					&a.Aggregate,
+					id,
+					tls,
+					from,
+					name,
+					replyTo,
+					hostAndPort,
+					user,
+					smtpPassword,
+					providerType,
+				),
+			}, nil
+		}, nil
+	}
+}
+
+// TODO: SetUpInstance still uses this and would be removed as soon as deprecated PrepareCommands is removed
+func getSMTPConfigWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, id, domain string) (_ *InstanceSMTPConfigWriteModel, err error) {
+	writeModel := NewIAMSMTPConfigWriteModel(authz.GetInstance(ctx).InstanceID(), id, domain)
+	events, err := filter(ctx, writeModel.Query())
+	if err != nil {
+		return nil, err
+	}
+	if len(events) == 0 {
+		return writeModel, nil
+	}
+	writeModel.AppendEvents(events...)
+	err = writeModel.Reduce()
+	return writeModel, err
 }
