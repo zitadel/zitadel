@@ -24,12 +24,12 @@ type UserMetadataList struct {
 }
 
 type UserMetadata struct {
-	CreationDate  time.Time
-	ChangeDate    time.Time
-	ResourceOwner string
-	Sequence      uint64
-	Key           string
-	Value         []byte
+	CreationDate  time.Time `json:"creation_date,omitempty"`
+	ChangeDate    time.Time `json:"change_date,omitempty"`
+	ResourceOwner string    `json:"resource_owner,omitempty"`
+	Sequence      uint64    `json:"sequence,omitempty"`
+	Key           string    `json:"key,omitempty"`
+	Value         []byte    `json:"value,omitempty"`
 }
 
 type UserMetadataSearchQueries struct {

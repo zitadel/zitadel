@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -19,7 +20,8 @@ type Server struct {
 	storage *OPStorage
 	*op.LegacyServer
 
-	query *query.Queries
+	query   *query.Queries
+	command *command.Commands
 
 	fallbackLogger *slog.Logger
 	hashAlg        crypto.HashAlgorithm

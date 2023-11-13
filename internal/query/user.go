@@ -28,32 +28,32 @@ type Users struct {
 }
 
 type User struct {
-	ID                 string
-	CreationDate       time.Time
-	ChangeDate         time.Time
-	ResourceOwner      string
-	Sequence           uint64
-	State              domain.UserState
-	Type               domain.UserType
-	Username           string
-	LoginNames         database.TextArray[string]
-	PreferredLoginName string
-	Human              *Human
-	Machine            *Machine
+	ID                 string                     `json:"id,omitempty"`
+	CreationDate       time.Time                  `json:"creation_date,omitempty"`
+	ChangeDate         time.Time                  `json:"change_date,omitempty"`
+	ResourceOwner      string                     `json:"resource_owner,omitempty"`
+	Sequence           uint64                     `json:"sequence,omitempty"`
+	State              domain.UserState           `json:"state,omitempty"`
+	Type               domain.UserType            `json:"type,omitempty"`
+	Username           string                     `json:"username,omitempty"`
+	LoginNames         database.TextArray[string] `json:"login_names,omitempty"`
+	PreferredLoginName string                     `json:"preferred_login_name,omitempty"`
+	Human              *Human                     `json:"human,omitempty"`
+	Machine            *Machine                   `json:"machine,omitempty"`
 }
 
 type Human struct {
-	FirstName         string
-	LastName          string
-	NickName          string
-	DisplayName       string
-	AvatarKey         string
-	PreferredLanguage language.Tag
-	Gender            domain.Gender
-	Email             domain.EmailAddress
-	IsEmailVerified   bool
-	Phone             domain.PhoneNumber
-	IsPhoneVerified   bool
+	FirstName         string              `json:"first_name,omitempty"`
+	LastName          string              `json:"last_name,omitempty"`
+	NickName          string              `json:"nick_name,omitempty"`
+	DisplayName       string              `json:"display_name,omitempty"`
+	AvatarKey         string              `json:"avatar_key,omitempty"`
+	PreferredLanguage language.Tag        `json:"preferred_language,omitempty"`
+	Gender            domain.Gender       `json:"gender,omitempty"`
+	Email             domain.EmailAddress `json:"email,omitempty"`
+	IsEmailVerified   bool                `json:"is_email_verified,omitempty"`
+	Phone             domain.PhoneNumber  `json:"phone,omitempty"`
+	IsPhoneVerified   bool                `json:"is_phone_verified,omitempty"`
 }
 
 type Profile struct {
@@ -92,10 +92,10 @@ type Phone struct {
 }
 
 type Machine struct {
-	Name            string
-	Description     string
-	HasSecret       bool
-	AccessTokenType domain.OIDCTokenType
+	Name            string               `json:"name,omitempty"`
+	Description     string               `json:"description,omitempty"`
+	HasSecret       bool                 `json:"has_secret,omitempty"`
+	AccessTokenType domain.OIDCTokenType `json:"access_token_type,omitempty"`
 }
 
 type NotifyUser struct {
