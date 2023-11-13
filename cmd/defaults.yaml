@@ -954,6 +954,7 @@ InternalAuthZ:
         - "project.grant.member.delete"
         - "events.read"
         - "milestones.read"
+        - "session.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1031,6 +1032,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "session.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1054,6 +1056,7 @@ InternalAuthZ:
         - "project.grant.write"
         - "project.grant.delete"
         - "project.grant.member.read"
+        - "session.delete"
     - Role: "ORG_OWNER"
       Permissions:
         - "org.read"
@@ -1103,6 +1106,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "session.delete"
     - Role: "ORG_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1117,6 +1121,7 @@ InternalAuthZ:
         - "policy.read"
         - "project.read"
         - "project.role.read"
+        - "session.delete"
     - Role: "ORG_OWNER_VIEWER"
       Permissions:
         - "org.read"

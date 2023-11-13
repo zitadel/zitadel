@@ -142,6 +142,7 @@ func (wm *SessionWriteModel) reduceAdded(e *session.AddedEvent) {
 
 func (wm *SessionWriteModel) reduceUserChecked(e *session.UserCheckedEvent) {
 	wm.UserID = e.UserID
+	wm.UserResourceOwner = e.UserResourceOwner
 	wm.UserCheckedAt = e.CheckedAt
 }
 

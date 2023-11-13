@@ -660,6 +660,77 @@ func TestServer_SetSession_expired(t *testing.T) {
 	require.Error(t, err)
 }
 
+func TestServer_DeleteSession_token(t *testing.T) {
+	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{})
+	require.NoError(t, err)
+
+	_, err = Client.DeleteSession(CTX, &session.DeleteSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: gu.Ptr("invalid"),
+	})
+	require.Error(t, err)
+
+	_, err = Client.DeleteSession(CTX, &session.DeleteSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: gu.Ptr(createResp.GetSessionToken()),
+	})
+	require.NoError(t, err)
+}
+
+func TestServer_DeleteSession_own_session(t *testing.T) {
+	// create two users for the test and a session each to get tokens for authorization
+	user1 := Tester.CreateHumanUser(CTX)
+	Tester.SetUserPassword(CTX, user1.GetUserId(), integration.UserPassword)
+	_, token1, _, _ := Tester.CreatePasswordSession(t, CTX, user1.GetUserId(), integration.UserPassword)
+
+	user2 := Tester.CreateHumanUser(CTX)
+	Tester.SetUserPassword(CTX, user2.GetUserId(), integration.UserPassword)
+	_, token2, _, _ := Tester.CreatePasswordSession(t, CTX, user2.GetUserId(), integration.UserPassword)
+
+	// create a new session for the first user
+	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{
+					UserId: user1.GetUserId(),
+				},
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// delete the new (user1) session must not be possible with user (has no permission)
+	_, err = Client.DeleteSession(Tester.WithAuthorizationToken(context.Background(), token2), &session.DeleteSessionRequest{
+		SessionId: createResp.GetSessionId(),
+	})
+	require.Error(t, err)
+
+	// delete the new (user1) session by himself
+	_, err = Client.DeleteSession(Tester.WithAuthorizationToken(context.Background(), token1), &session.DeleteSessionRequest{
+		SessionId: createResp.GetSessionId(),
+	})
+	require.NoError(t, err)
+}
+
+func TestServer_DeleteSession_with_permission(t *testing.T) {
+	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{
+					UserId: User.GetUserId(),
+				},
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// delete the new session by ORG_OWNER
+	_, err = Client.DeleteSession(Tester.WithAuthorization(context.Background(), integration.OrgOwner), &session.DeleteSessionRequest{
+		SessionId: createResp.GetSessionId(),
+	})
+	require.NoError(t, err)
+}
+
 func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 	// create new, empty session
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{})
