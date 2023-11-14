@@ -91,13 +91,10 @@ func (p *Provider) Name() string {
 // BeginAuth implements the [idp.Provider] interface.
 // It will create a [Session] with an AuthURL, pointing to the jwtEndpoint
 // with the authRequest and encrypted userAgent ids.
-func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (idp.Session, error) {
-	if len(params) < 1 {
-		return nil, ErrMissingUserAgentID
-	}
-	userAgentID, ok := params[0].(string)
-	if !ok {
-		return nil, ErrMissingUserAgentID
+func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Parameter) (idp.Session, error) {
+	userAgentID, err := userAgentIDFromParams(params...)
+	if err != nil {
+		return nil, err
 	}
 	redirect, err := url.Parse(p.jwtEndpoint)
 	if err != nil {
@@ -112,6 +109,15 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (
 	q.Set(queryUserAgentID, base64.RawURLEncoding.EncodeToString(nonce))
 	redirect.RawQuery = q.Encode()
 	return &Session{AuthURL: redirect.String()}, nil
+}
+
+func userAgentIDFromParams(params ...idp.Parameter) (string, error) {
+	for _, param := range params {
+		if id, ok := param.(idp.UserAgentID); ok {
+			return string(id), nil
+		}
+	}
+	return "", ErrMissingUserAgentID
 }
 
 // IsLinkingAllowed implements the [idp.Provider] interface.
