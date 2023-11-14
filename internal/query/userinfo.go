@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	_ "embed"
 	"encoding/json"
-	"fmt"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -19,16 +18,17 @@ func (q *Queries) GetOIDCUserInfo(ctx context.Context, userID string) (_ *OIDCUs
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	userInfo := new(OIDCUserInfo)
+	var data []byte
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		var data []byte
-		if err := row.Scan(&data); err != nil {
-			return err
-		}
-		return json.Unmarshal(data, userInfo)
+		return row.Scan(&data)
 	}, oidcUserInfoQuery, userID, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
-		return nil, fmt.Errorf("get oidc user info: %w", err)
+		return nil, errors.ThrowInternal(err, "QUERY-Oath6", "Errors.Internal")
+	}
+
+	userInfo := new(OIDCUserInfo)
+	if err = json.Unmarshal(data, userInfo); err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-Vohs6", "Errors.Internal")
 	}
 	if userInfo.User == nil {
 		return nil, errors.ThrowNotFound(nil, "QUERY-ahs4S", "Errors.User.NotFound")
@@ -40,9 +40,11 @@ func (q *Queries) GetOIDCUserInfo(ctx context.Context, userID string) (_ *OIDCUs
 type OIDCUserInfo struct {
 	User     *User          `json:"user,omitempty"`
 	Metadata []UserMetadata `json:"metadata,omitempty"`
-	Org      *struct {
-		ID            string `json:"id,omitempty"`
-		Name          string `json:"name,omitempty"`
-		PrimaryDomain string `json:"primary_domain,omitempty"`
-	} `json:"org,omitempty"`
+	Org      *userInfoOrg   `json:"org,omitempty"`
+}
+
+type userInfoOrg struct {
+	ID            string `json:"id,omitempty"`
+	Name          string `json:"name,omitempty"`
+	PrimaryDomain string `json:"primary_domain,omitempty"`
 }
