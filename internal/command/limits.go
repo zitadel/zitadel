@@ -13,8 +13,8 @@ import (
 )
 
 type SetLimits struct {
-	AuditLogRetention          *time.Duration `json:"auditLogRetention,omitempty"`
-	AllowPublicOrgRegistration *bool          `json:"allowPublicOrgRegistration,omitempty"`
+	AuditLogRetention             *time.Duration `json:"auditLogRetention,omitempty"`
+	DisallowPublicOrgRegistration *bool          `json:"disallowPublicOrgRegistration,omitempty"`
 }
 
 // SetLimits creates new limits or updates existing limits.
@@ -87,7 +87,7 @@ func (c *Commands) SetLimitsCommand(a *limits.Aggregate, wm *limitsWriteModel, s
 	return func() (preparation.CreateCommands, error) {
 		if setLimits == nil ||
 			setLimits.AuditLogRetention == nil &&
-				setLimits.AllowPublicOrgRegistration == nil {
+				setLimits.DisallowPublicOrgRegistration == nil {
 			return nil, errors.ThrowInvalidArgument(nil, "COMMAND-4M9vs", "Errors.Limits.NoneSpecified")
 		}
 		return func(ctx context.Context, _ preparation.FilterToQueryReducer) ([]eventstore.Command, error) {

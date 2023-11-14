@@ -15,9 +15,9 @@ const (
 
 // SetEvent describes that limits are added or modified and contains only changed properties
 type SetEvent struct {
-	*eventstore.BaseEvent      `json:"-"`
-	AuditLogRetention          *time.Duration `json:"auditLogRetention,omitempty"`
-	AllowPublicOrgRegistration *bool          `json:"allowPublicOrgRegistration,omitempty"`
+	*eventstore.BaseEvent         `json:"-"`
+	AuditLogRetention             *time.Duration `json:"auditLogRetention,omitempty"`
+	DisallowPublicOrgRegistration *bool          `json:"disallowPublicOrgRegistration,omitempty"`
 }
 
 func (e *SetEvent) Payload() any {
@@ -53,9 +53,9 @@ func ChangeAuditLogRetention(auditLogRetention *time.Duration) LimitsChange {
 	}
 }
 
-func ChangeAllowPublicOrgRegistration(allow *bool) LimitsChange {
+func ChangeDisallowPublicOrgRegistration(disallow *bool) LimitsChange {
 	return func(e *SetEvent) {
-		e.AllowPublicOrgRegistration = allow
+		e.DisallowPublicOrgRegistration = disallow
 	}
 }
 

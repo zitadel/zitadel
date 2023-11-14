@@ -50,7 +50,7 @@ var (
 		table: limitSettingsTable,
 	}
 	LimitsColumnAllowPublicOrgRegistration = Column{
-		name:  projection.LimitsColumnAllowPublicOrgRegistration,
+		name:  projection.LimitsColumnDisallowPublicOrgRegistration,
 		table: limitSettingsTable,
 	}
 )

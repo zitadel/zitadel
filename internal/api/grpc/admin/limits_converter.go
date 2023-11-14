@@ -8,5 +8,5 @@ import (
 )
 
 func instanceLimitsPbToCommand(req *admin.SetInstanceLimitsRequest) *command.SetLimits {
-	return &command.SetLimits{AllowPublicOrgRegistration: gu.Ptr(!req.GetDisallowPublicOrgRegistration())}
+	return &command.SetLimits{DisallowPublicOrgRegistration: gu.Ptr(req.GetDisallowPublicOrgRegistration())}
 }

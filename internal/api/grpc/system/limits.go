@@ -2,9 +2,9 @@ package system
 
 import (
 	"context"
-	"github.com/zitadel/zitadel/internal/repository/limits"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/repository/limits"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
 

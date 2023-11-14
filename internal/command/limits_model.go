@@ -9,9 +9,9 @@ import (
 
 type limitsWriteModel struct {
 	eventstore.WriteModel
-	rollingAggregateID         string
-	auditLogRetention          *time.Duration
-	allowPublicOrgRegistration *bool
+	rollingAggregateID            string
+	auditLogRetention             *time.Duration
+	disallowPublicOrgRegistration *bool
 }
 
 // newLimitsWriteModel aggregateId is filled by reducing unit matching events
@@ -47,13 +47,13 @@ func (wm *limitsWriteModel) Reduce() error {
 			if e.AuditLogRetention != nil {
 				wm.auditLogRetention = e.AuditLogRetention
 			}
-			if e.AllowPublicOrgRegistration != nil {
-				wm.allowPublicOrgRegistration = e.AllowPublicOrgRegistration
+			if e.DisallowPublicOrgRegistration != nil {
+				wm.disallowPublicOrgRegistration = e.DisallowPublicOrgRegistration
 			}
 		case *limits.ResetEvent:
 			wm.rollingAggregateID = ""
 			wm.auditLogRetention = nil
-			wm.allowPublicOrgRegistration = nil
+			wm.disallowPublicOrgRegistration = nil
 		}
 	}
 	if err := wm.WriteModel.Reduce(); err != nil {
@@ -74,8 +74,8 @@ func (wm *limitsWriteModel) NewChanges(setLimits *SetLimits) (changes []limits.L
 	if setLimits.AuditLogRetention != nil && (wm.auditLogRetention == nil || *wm.auditLogRetention != *setLimits.AuditLogRetention) {
 		changes = append(changes, limits.ChangeAuditLogRetention(setLimits.AuditLogRetention))
 	}
-	if setLimits.AllowPublicOrgRegistration != nil && (wm.allowPublicOrgRegistration == nil || *wm.allowPublicOrgRegistration != *setLimits.AllowPublicOrgRegistration) {
-		changes = append(changes, limits.ChangeAllowPublicOrgRegistration(setLimits.AllowPublicOrgRegistration))
+	if setLimits.DisallowPublicOrgRegistration != nil && (wm.disallowPublicOrgRegistration == nil || *wm.disallowPublicOrgRegistration != *setLimits.DisallowPublicOrgRegistration) {
+		changes = append(changes, limits.ChangeDisallowPublicOrgRegistration(setLimits.DisallowPublicOrgRegistration))
 	}
 	return changes
 }

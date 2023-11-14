@@ -8001,7 +8001,6 @@ message ListMilestonesResponse {
 }
 
 message SetInstanceLimitsRequest {
-    // explicitly disallow so the zero value false doesn't surprisingly turn off org registration
     bool disallow_public_org_registration = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "if disallowPublicOrgRegistration is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";

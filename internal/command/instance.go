@@ -116,9 +116,7 @@ type InstanceSetup struct {
 		Items []*SetQuota
 	}
 	Features map[domain.Feature]any
-	Limits   *struct {
-		AuditLogRetention *time.Duration
-	}
+	Limits   *SetLimits
 }
 
 type SecretGenerators struct {
@@ -453,9 +451,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	}
 
 	if setup.Limits != nil {
-		validations = append(validations, c.SetLimitsCommand(limitsAgg, &limitsWriteModel{}, &SetLimits{
-			AuditLogRetention: setup.Limits.AuditLogRetention,
-		}))
+		validations = append(validations, c.SetLimitsCommand(limitsAgg, &limitsWriteModel{}, setup.Limits))
 	}
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
