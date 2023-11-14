@@ -1,13 +1,13 @@
 with usr as (
 	select id, creation_date, change_date, sequence, state, resource_owner, username
-	from projections.users8 u
+	from projections.users9 u
 	where id = $1
 	and instance_id = $2
 ),
 human as (
 	select $1 as user_id, row_to_json(r) as human from (
 		select first_name, last_name, nick_name, display_name, avatar_key, email, is_email_verified, phone, is_phone_verified
-		from projections.users8_humans
+		from projections.users9_humans
 		where user_id = $1
 		and instance_id = $2
 	) r
@@ -15,7 +15,7 @@ human as (
 machine as (
 	select $1 as user_id, row_to_json(r) as machine from (
 		select name, description
-		from projections.users8_machines
+		from projections.users9_machines
 		where user_id = $1
 		and instance_id = $2
 	) r

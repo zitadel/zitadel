@@ -170,10 +170,6 @@ var (
 		name:  projection.UserTypeCol,
 		table: userTable,
 	}
-	UserOwnerRemovedCol = Column{
-		name:  projection.UserOwnerRemovedCol,
-		table: userTable,
-	}
 
 	userLoginNamesTable                 = loginNameTable.setAlias("login_names")
 	userLoginNamesUserIDCol             = LoginNameUserIDCol.setTable(userLoginNamesTable)
@@ -327,7 +323,6 @@ var (
 )
 
 func addUserWithoutOwnerRemoved(eq map[string]interface{}) {
-	eq[UserOwnerRemovedCol.identifier()] = false
 	eq[userLoginNamesOwnerRemovedUserCol.identifier()] = false
 	eq[userLoginNamesOwnerRemovedPolicyCol.identifier()] = false
 	eq[userLoginNamesOwnerRemovedDomainCol.identifier()] = false
@@ -397,7 +392,7 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwner
 	return user, err
 }
 
-func (q *Queries) GetHumanProfile(ctx context.Context, userID string, withOwnerRemoved bool, queries ...SearchQuery) (profile *Profile, err error) {
+func (q *Queries) GetHumanProfile(ctx context.Context, userID string, queries ...SearchQuery) (profile *Profile, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -408,9 +403,6 @@ func (q *Queries) GetHumanProfile(ctx context.Context, userID string, withOwnerR
 	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -424,7 +416,7 @@ func (q *Queries) GetHumanProfile(ctx context.Context, userID string, withOwnerR
 	return profile, err
 }
 
-func (q *Queries) GetHumanEmail(ctx context.Context, userID string, withOwnerRemoved bool, queries ...SearchQuery) (email *Email, err error) {
+func (q *Queries) GetHumanEmail(ctx context.Context, userID string, queries ...SearchQuery) (email *Email, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -435,9 +427,6 @@ func (q *Queries) GetHumanEmail(ctx context.Context, userID string, withOwnerRem
 	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -451,7 +440,7 @@ func (q *Queries) GetHumanEmail(ctx context.Context, userID string, withOwnerRem
 	return email, err
 }
 
-func (q *Queries) GetHumanPhone(ctx context.Context, userID string, withOwnerRemoved bool, queries ...SearchQuery) (phone *Phone, err error) {
+func (q *Queries) GetHumanPhone(ctx context.Context, userID string, queries ...SearchQuery) (phone *Phone, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -462,9 +451,6 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, withOwnerRem
 	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -566,7 +552,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, w
 	return users, err
 }
 
-func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwner string, withOwnerRemoved bool) (isUnique bool, err error) {
+func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwner string) (isUnique bool, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -597,9 +583,6 @@ func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwn
 		query = q.toQuery(query)
 	}
 	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
-	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return false, errors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatment")
