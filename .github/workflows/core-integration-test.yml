@@ -15,7 +15,8 @@ on:
 
 jobs:
   postgres:
-    runs-on: ubuntu-latest
+    runs-on: 
+      group: zitadel-ci
     services:
       postgres:
         image: postgres
