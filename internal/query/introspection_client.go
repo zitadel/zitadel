@@ -5,8 +5,6 @@ import (
 	"database/sql"
 	_ "embed"
 
-	"github.com/jackc/pgtype"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
@@ -33,11 +31,7 @@ func (q *Queries) GetIntrospectionClientByID(ctx context.Context, clientID strin
 	)
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		var publicKeys pgtype.ByteaArray
-		if err := row.Scan(&client.ClientID, &client.ClientSecret, &client.ProjectID, &publicKeys); err != nil {
-			return err
-		}
-		return publicKeys.AssignTo(&client.PublicKeys)
+		return row.Scan(&client.ClientID, &client.ClientSecret, &client.ProjectID, &client.PublicKeys)
 	},
 		introspectionClientByIDQuery,
 		instanceID, clientID, getKeys,

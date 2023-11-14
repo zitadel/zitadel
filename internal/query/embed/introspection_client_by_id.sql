@@ -18,6 +18,6 @@ keys as (
 		and expiration > current_timestamp
 	group by identifier
 )
-select apps.project_id, config.client_secret, keys.public_keys from config
+select config.client_id, config.client_secret, apps.project_id, keys.public_keys from config
 join projections.apps5 apps on apps.id = config.app_id
 left join keys on keys.client_id = config.client_id;
