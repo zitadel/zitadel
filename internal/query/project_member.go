@@ -86,7 +86,6 @@ func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQue
 	eq := sq.Eq{ProjectMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		addProjectMemberWithoutOwnerRemoved(eq)
-		addLoginNameWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {

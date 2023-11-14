@@ -100,7 +100,6 @@ func (q *Queries) ProjectGrantMembers(ctx context.Context, queries *ProjectGrant
 	eq := sq.Eq{ProjectGrantMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
 		addProjectGrantMemberWithoutOwnerRemoved(eq)
-		addLoginNameWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {

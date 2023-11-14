@@ -29,7 +29,7 @@ var (
 		` projections.sessions7.creator,` +
 		` projections.sessions7.user_id,` +
 		` projections.sessions7.user_checked_at,` +
-		` projections.login_names2.login_name,` +
+		` projections.login_names3.login_name,` +
 		` projections.users8_humans.display_name,` +
 		` projections.users8.resource_owner,` +
 		` projections.sessions7.password_checked_at,` +
@@ -47,7 +47,7 @@ var (
 		` projections.sessions7.user_agent_header,` +
 		` projections.sessions7.expiration` +
 		` FROM projections.sessions7` +
-		` LEFT JOIN projections.login_names2 ON projections.sessions7.user_id = projections.login_names2.user_id AND projections.sessions7.instance_id = projections.login_names2.instance_id` +
+		` LEFT JOIN projections.login_names3 ON projections.sessions7.user_id = projections.login_names3.user_id AND projections.sessions7.instance_id = projections.login_names3.instance_id` +
 		` LEFT JOIN projections.users8_humans ON projections.sessions7.user_id = projections.users8_humans.user_id AND projections.sessions7.instance_id = projections.users8_humans.instance_id` +
 		` LEFT JOIN projections.users8 ON projections.sessions7.user_id = projections.users8.id AND projections.sessions7.instance_id = projections.users8.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
@@ -60,7 +60,7 @@ var (
 		` projections.sessions7.creator,` +
 		` projections.sessions7.user_id,` +
 		` projections.sessions7.user_checked_at,` +
-		` projections.login_names2.login_name,` +
+		` projections.login_names3.login_name,` +
 		` projections.users8_humans.display_name,` +
 		` projections.users8.resource_owner,` +
 		` projections.sessions7.password_checked_at,` +
@@ -74,7 +74,7 @@ var (
 		` projections.sessions7.expiration,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.sessions7` +
-		` LEFT JOIN projections.login_names2 ON projections.sessions7.user_id = projections.login_names2.user_id AND projections.sessions7.instance_id = projections.login_names2.instance_id` +
+		` LEFT JOIN projections.login_names3 ON projections.sessions7.user_id = projections.login_names3.user_id AND projections.sessions7.instance_id = projections.login_names3.instance_id` +
 		` LEFT JOIN projections.users8_humans ON projections.sessions7.user_id = projections.users8_humans.user_id AND projections.sessions7.instance_id = projections.users8_humans.instance_id` +
 		` LEFT JOIN projections.users8 ON projections.sessions7.user_id = projections.users8.id AND projections.sessions7.instance_id = projections.users8.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)

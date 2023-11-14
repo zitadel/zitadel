@@ -175,14 +175,11 @@ var (
 		table: userTable,
 	}
 
-	userLoginNamesTable                 = loginNameTable.setAlias("login_names")
-	userLoginNamesUserIDCol             = LoginNameUserIDCol.setTable(userLoginNamesTable)
-	userLoginNamesNameCol               = LoginNameNameCol.setTable(userLoginNamesTable)
-	userLoginNamesInstanceIDCol         = LoginNameInstanceIDCol.setTable(userLoginNamesTable)
-	userLoginNamesOwnerRemovedUserCol   = LoginNameOwnerRemovedUserCol.setTable(userLoginNamesTable)
-	userLoginNamesOwnerRemovedPolicyCol = LoginNameOwnerRemovedPolicyCol.setTable(userLoginNamesTable)
-	userLoginNamesOwnerRemovedDomainCol = LoginNameOwnerRemovedDomainCol.setTable(userLoginNamesTable)
-	userLoginNamesListCol               = Column{
+	userLoginNamesTable         = loginNameTable.setAlias("login_names")
+	userLoginNamesUserIDCol     = LoginNameUserIDCol.setTable(userLoginNamesTable)
+	userLoginNamesNameCol       = LoginNameNameCol.setTable(userLoginNamesTable)
+	userLoginNamesInstanceIDCol = LoginNameInstanceIDCol.setTable(userLoginNamesTable)
+	userLoginNamesListCol       = Column{
 		name:  "loginnames",
 		table: userLoginNamesTable,
 	}
@@ -190,14 +187,11 @@ var (
 		name:  "loginnames_lower",
 		table: userLoginNamesTable,
 	}
-	userPreferredLoginNameTable                 = loginNameTable.setAlias("preferred_login_name")
-	userPreferredLoginNameUserIDCol             = LoginNameUserIDCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameCol                   = LoginNameNameCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameIsPrimaryCol          = LoginNameIsPrimaryCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameInstanceIDCol         = LoginNameInstanceIDCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameOwnerRemovedUserCol   = LoginNameOwnerRemovedUserCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameOwnerRemovedPolicyCol = LoginNameOwnerRemovedPolicyCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameOwnerRemovedDomainCol = LoginNameOwnerRemovedDomainCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameTable         = loginNameTable.setAlias("preferred_login_name")
+	userPreferredLoginNameUserIDCol     = LoginNameUserIDCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameCol           = LoginNameNameCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameIsPrimaryCol  = LoginNameIsPrimaryCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameInstanceIDCol = LoginNameInstanceIDCol.setTable(userPreferredLoginNameTable)
 )
 
 var (
@@ -328,12 +322,6 @@ var (
 
 func addUserWithoutOwnerRemoved(eq map[string]interface{}) {
 	eq[UserOwnerRemovedCol.identifier()] = false
-	eq[userLoginNamesOwnerRemovedUserCol.identifier()] = false
-	eq[userLoginNamesOwnerRemovedPolicyCol.identifier()] = false
-	eq[userLoginNamesOwnerRemovedDomainCol.identifier()] = false
-	eq[userPreferredLoginNameOwnerRemovedUserCol.identifier()] = false
-	eq[userPreferredLoginNameOwnerRemovedPolicyCol.identifier()] = false
-	eq[userPreferredLoginNameOwnerRemovedDomainCol.identifier()] = false
 }
 
 func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, withOwnerRemoved bool, queries ...SearchQuery) (user *User, err error) {
@@ -752,16 +740,10 @@ func prepareLoginNamesQuery() (string, []interface{}, error) {
 		"ARRAY_AGG("+userLoginNamesNameCol.identifier()+")::TEXT[] AS "+userLoginNamesListCol.name,
 		"ARRAY_AGG(LOWER("+userLoginNamesNameCol.identifier()+"))::TEXT[] AS "+userLoginNamesLowerListCol.name,
 		userLoginNamesInstanceIDCol.identifier(),
-		userLoginNamesOwnerRemovedUserCol.identifier(),
-		userLoginNamesOwnerRemovedPolicyCol.identifier(),
-		userLoginNamesOwnerRemovedDomainCol.identifier(),
 	).From(userLoginNamesTable.identifier()).
 		GroupBy(
 			userLoginNamesUserIDCol.identifier(),
 			userLoginNamesInstanceIDCol.identifier(),
-			userLoginNamesOwnerRemovedUserCol.identifier(),
-			userLoginNamesOwnerRemovedPolicyCol.identifier(),
-			userLoginNamesOwnerRemovedDomainCol.identifier(),
 		).ToSql()
 }
 
@@ -770,9 +752,6 @@ func preparePreferredLoginNamesQuery() (string, []interface{}, error) {
 		userPreferredLoginNameUserIDCol.identifier(),
 		userPreferredLoginNameCol.identifier(),
 		userPreferredLoginNameInstanceIDCol.identifier(),
-		userPreferredLoginNameOwnerRemovedUserCol.identifier(),
-		userPreferredLoginNameOwnerRemovedPolicyCol.identifier(),
-		userPreferredLoginNameOwnerRemovedDomainCol.identifier(),
 	).From(userPreferredLoginNameTable.identifier()).
 		Where(sq.Eq{
 			userPreferredLoginNameIsPrimaryCol.identifier(): true,
