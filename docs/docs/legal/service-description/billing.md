@@ -28,7 +28,7 @@ The quota is reset to zero with the start of a new billing period.
 Daily Active Users (DAU) are counted as users who authenticate or refresh their token during the given day.
 To calculate the monthly quota we take the sum of DAU over a given month.
 Included are users that either login with local accounts or users that login with an external identity provider.
-Service user who authenticate or access the management API are counted against Daily Active Users.
+Service users that authenticate or access the management API are counted against Daily Active Users.
 
 ### Active external identity providers
 
