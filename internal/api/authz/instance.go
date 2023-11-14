@@ -28,12 +28,13 @@ type InstanceVerifier interface {
 }
 
 type instance struct {
-	id        string
-	domain    string
-	projectID string
-	appID     string
-	clientID  string
-	orgID     string
+	id                              string
+	domain                          string
+	projectID                       string
+	appID                           string
+	clientID                        string
+	orgID                           string
+	publicOrgRegistrationDisallowed bool
 }
 
 func (i *instance) InstanceID() string {

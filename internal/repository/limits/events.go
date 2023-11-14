@@ -15,8 +15,9 @@ const (
 
 // SetEvent describes that limits are added or modified and contains only changed properties
 type SetEvent struct {
-	*eventstore.BaseEvent `json:"-"`
-	AuditLogRetention     *time.Duration `json:"auditLogRetention,omitempty"`
+	*eventstore.BaseEvent      `json:"-"`
+	AuditLogRetention          *time.Duration `json:"auditLogRetention,omitempty"`
+	AllowPublicOrgRegistration *bool          `json:"allowPublicOrgRegistration,omitempty"`
 }
 
 func (e *SetEvent) Payload() any {
@@ -52,10 +53,25 @@ func ChangeAuditLogRetention(auditLogRetention *time.Duration) LimitsChange {
 	}
 }
 
+func ChangeAllowPublicOrgRegistration(allow *bool) LimitsChange {
+	return func(e *SetEvent) {
+		e.AllowPublicOrgRegistration = allow
+	}
+}
+
 var SetEventMapper = eventstore.GenericEventMapper[SetEvent]
+
+type ResetProperty int
+
+const (
+	ResetUnknownProperty ResetProperty = iota
+	ResetAuditLogRetention
+	ResetAllowPublicOrgRegistration
+)
 
 type ResetEvent struct {
 	*eventstore.BaseEvent `json:"-"`
+	Properties            []ResetProperty `json:"properties,omitempty"`
 }
 
 func (e *ResetEvent) Payload() any {
@@ -73,6 +89,7 @@ func (e *ResetEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 func NewResetEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
+	properties ...ResetProperty,
 ) *ResetEvent {
 	return &ResetEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
@@ -80,6 +97,7 @@ func NewResetEvent(
 			aggregate,
 			ResetEventType,
 		),
+		Properties: properties,
 	}
 }
 

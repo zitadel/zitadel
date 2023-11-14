@@ -3795,6 +3795,71 @@ service AdminService {
             description: "Returns a list of reached instance usage milestones."
         };
     }
+
+    // Sets instance level IAM limits
+    rpc SetInstanceLimits(SetInstanceLimitsRequest) returns (SetInstanceLimitsResponse) {
+        option (google.api.http) = {
+            put: "/limits"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.limits.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Limits"];
+            responses: {
+                key: "200";
+                value: {
+                    description: "Instance limits set";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "At least one limit must be specified";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
+
+    // Resets instance level IAM limits
+    rpc ResetInstanceLimits(ResetInstanceLimitsRequest) returns (ResetInstanceLimitsResponse) {
+        option (google.api.http) = {
+            delete: "/limits"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.limits.delete";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Limits"];
+            responses: {
+                key: "200";
+                value: {
+                    description: "Limits are reset to the system defaults";
+                };
+            };
+            responses: {
+                key: "404";
+                value: {
+                    description: "Limits are already set to the system defaults";
+                    schema: {
+                        json_schema: {
+                            ref: "#/definitions/rpcStatus";
+                        };
+                    };
+                };
+            };
+        };
+    }
 }
 
 
@@ -7934,3 +7999,23 @@ message ListMilestonesResponse {
     zitadel.v1.ListDetails details = 1;
     repeated zitadel.milestone.v1.Milestone result = 2;
 }
+
+message SetInstanceLimitsRequest {
+    // explicitly disallow so the zero value false doesn't surprisingly turn off org registration
+    bool disallow_public_org_registration = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "if disallowPublicOrgRegistration is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
+        }
+    ];
+}
+
+message SetInstanceLimitsResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetInstanceLimitsRequest {}
+
+message ResetInstanceLimitsResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
