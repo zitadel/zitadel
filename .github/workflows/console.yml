@@ -24,7 +24,7 @@ jobs:
       cache_key: ${{ steps.cache.outputs.cache-primary-key }}
       cache_path: ${{ env.cache_path }}
     runs-on: 
-      group: zitadel-ci
+      group:  zitadel-public
     steps:
         - 
           uses: actions/checkout@v3

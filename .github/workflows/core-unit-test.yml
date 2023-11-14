@@ -16,7 +16,7 @@ on:
 jobs:
   test:
     runs-on: 
-      group: zitadel-ci
+      group: zitadel-public
     steps:
       - 
         uses: actions/checkout@v3

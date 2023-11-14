@@ -15,8 +15,8 @@ on:
 
 jobs:
   postgres:
-    runs-on: 
-      group: zitadel-ci
+    runs-on:
+      group: zitadel-public
     services:
       postgres:
         image: postgres
