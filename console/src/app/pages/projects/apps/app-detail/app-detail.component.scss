@@ -288,3 +288,14 @@
   justify-content: flex-end;
   margin-top: 1rem;
 }
+
+.link a {
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  font-family: inherit;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

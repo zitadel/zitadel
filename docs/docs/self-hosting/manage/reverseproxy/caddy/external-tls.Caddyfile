@@ -1,0 +1,4 @@
+https://127.0.0.1.sslip.io {
+	tls /etc/certs/selfsigned.crt /etc/certs/selfsigned.key
+	reverse_proxy h2c://zitadel-external-tls:8080
+}

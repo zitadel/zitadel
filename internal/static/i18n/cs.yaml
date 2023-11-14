@@ -1,0 +1,1249 @@
+Errors:
+  Internal: Došlo k interní chybě
+  NoChangesFound: Nebyly nalezeny žádné změny
+  OriginNotAllowed: Tento "Origin" není povolen
+  IDMissing: Chybí ID
+  ResourceOwnerMissing: Chybí organizace vlastníka zdroje
+  RemoveFailed: Odstranění se nezdařilo
+  ProjectionName:
+    Invalid: Neplatný název projekce
+  Assets:
+    EmptyKey: Klíč aktiva je prázdný
+    Store:
+      NotInitialized: Úložiště aktiv není inicializováno
+      NotConfigured: Úložiště aktiv není nakonfigurováno
+    Bucket:
+      Internal: Interní chyba při vytváření bucketu
+      AlreadyExists: Bucket již existuje
+      CreateFailed: Bucket nebyl vytvořen
+      ListFailed: Seznam bucketů nelze přečíst
+      RemoveFailed: Bucket nebyl odstraněn
+      SetPublicFailed: Nepodařilo se nastavit bucket jako veřejný
+    Object:
+      PutFailed: Objekt nebyl vytvořen
+      GetFailed: Objekt nelze přečíst
+      NotFound: Objekt nebyl nalezen
+      PresignedTokenFailed: Nepodařilo se vytvořit podepsaný token
+      ListFailed: Seznam objektů nelze přečíst
+      RemoveFailed: Objekt se nepodařilo odstranit
+  Limit:
+    ExceedsDefault: Limit překračuje výchozí limit
+  Limits:
+    NotFound: Limity nebyly nalezeny
+    NoneSpecified: Nebyly určeny žádné limity
+  Language:
+    NotParsed: Jazyk nelze určit
+  OIDCSettings:
+    NotFound: Konfigurace OIDC nebyla nalezena
+    AlreadyExists: Konfigurace OIDC již existuje
+  SecretGenerator:
+    AlreadyExists: Generátor tajemství již existuje
+    TypeMissing: Chybí typ generátoru tajemství
+    NotFound: Generátor tajemství nebyl nalezen
+  SMSConfig:
+    NotFound: Konfigurace SMS nebyla nalezena
+    AlreadyActive: Konfigurace SMS je již aktivní
+    AlreadyDeactivated: Konfigurace SMS je již deaktivovaná
+  SMTPConfig:
+    NotFound: Konfigurace SMTP nebyla nalezena
+    AlreadyExists: Konfigurace SMTP již existuje
+    SenderAdressNotCustomDomain: Adresa odesílatele musí být nakonfigurována jako vlastní doména na instanci.
+  Notification:
+    NoDomain: Pro zprávu nebyla nalezena žádná doména
+  User:
+    NotFound: Uživatel nenalezen
+    AlreadyExists: Uživatel již existuje
+    NotFoundOnOrg: Uživatel v dané organizaci nenalezen
+    NotAllowedOrg: Uživatel není členem požadované organizace
+    UserIDMissing: Chybí ID uživatele
+    UserIDWrong: "Požadovaný uživatel se neshoduje s ověřeným uživatelem"
+    DomainPolicyNil: Politika organizace je prázdná
+    EmailAsUsernameNotAllowed: E-mail není povolen jako uživatelské jméno
+    Invalid: Data uživatele jsou neplatná
+    DomainNotAllowedAsUsername: Doména je již rezervována a nemůže být použita jako uživatelské jméno
+    AlreadyInactive: Uživatel již je neaktivní
+    NotInactive: Uživatel není neaktivní
+    CantDeactivateInitial: Uživatel ve stavu initial může být pouze smazán, nikoli deaktivován
+    ShouldBeActiveOrInitial: Uživatel není aktivní ani v počátečním stavu
+    AlreadyInitialised: Uživatel je již inicializován
+    NotInitialised: Uživatel ještě není inicializován
+    NotLocked: Uživatel není zamčený
+    NoChanges: Nebyly nalezeny žádné změny
+    InitCodeNotFound: Inicializační kód nenalezen
+    UsernameNotChanged: Uživatelské jméno nezměněno
+    InvalidURLTemplate: Šablona URL je neplatná
+    Profile:
+      NotFound: Profil nenalezen
+      NotChanged: Profil nezměněn
+      Empty: Profil je prázdný
+      FirstNameEmpty: Jméno v profilu je prázdné
+      LastNameEmpty: Příjmení v profilu je prázdné
+      IDMissing: Chybí ID profilu
+    Email:
+      NotFound: E-mail nenalezen
+      Invalid: E-mail je neplatný
+      AlreadyVerified: E-mail je již ověřen
+      NotChanged: E-mail nezměněn
+      Empty: E-mail je prázdný
+      IDMissing: Chybí ID e-mailu
+    Phone:
+      NotFound: Telefon nenalezen
+      Invalid: Telefon je neplatný
+      AlreadyVerified: Telefon již ověřen
+      Empty: Telefon je prázdný
+      NotChanged: Telefon nezměněn
+    Address:
+      NotFound: Adresa nenalezena
+      NotChanged: Adresa nezměněna
+    Machine:
+      Key:
+        NotFound: Klíč stroje nenalezen
+        AlreadyExisting: Klíč stroje již existuje
+      Secret:
+        NotExisting: Tajemství neexistuje
+        Invalid: Tajemství je neplatné
+        CouldNotGenerate: Tajemství nelze vygenerovat
+    PAT:
+      NotFound: Osobní přístupový token nenalezen
+    NotHuman: Uživatel musí být fyzická osoba
+    NotMachine: Uživatel musí být systémový uživatel / technická entita
+    WrongType: Nepovolen pro tento typ uživatele
+    NotAllowedToLink: Uživatel nemá povolení propojit se s externím poskytovatelem přihlášení
+    Username:
+      AlreadyExists: Uživatelské jméno již obsazeno
+      Reserved: Uživatelské jméno je rezervováno
+      Empty: Uživatelské jméno je prázdné
+    Code:
+      Empty: Kód je prázdný
+      NotFound: Kód nenalezen
+      Expired: Kód vypršel
+      GeneratorAlgNotSupported: Nepodporovaný algoritmus generátoru
+    Password:
+      NotFound: Heslo nenalezeno
+      Empty: Heslo je prázdné
+      Invalid: Heslo je neplatné
+      NotSet: Uživatel nenastavil heslo
+      NotChanged: Nové heslo nesmí být stejné jako současné heslo
+      NotSupported: Kódování hash hesla není podporováno
+    PasswordComplexityPolicy:
+      NotFound: Politika složitosti hesla nenalezena
+      MinLength: Heslo je příliš krátké
+      MinLengthNotAllowed: Daná minimální délka není povolena
+      HasLower: Heslo musí obsahovat malá písmena
+      HasUpper: Heslo musí obsahovat velká písmena
+      HasNumber: Heslo musí obsahovat číslo
+      HasSymbol: Heslo musí obsahovat symbol
+    ExternalIDP:
+      Invalid: Externí IDP je neplatné
+      IDPConfigNotExisting: Konfigurace poskytovatele IDP je pro tuto organizaci neplatná
+      NotAllowed: Externí IDP není v této organizaci povoleno
+      MinimumExternalIDPNeeded: Musí být přidán alespoň jeden IDP
+      AlreadyExists: Externí IDP již obsazeno
+      NotFound: Externí IDP nenalezeno
+      LoginFailed: Přihlášení přes externí IDP selhalo
+    MFA:
+      OTP:
+        AlreadyReady: Vícefaktorové OTP (OneTimePassword) je již nastaveno
+        NotExisting: Vícefaktorové OTP (OneTimePassword) neexistuje
+        NotReady: Vícefaktorové OTP (OneTimePassword) není připraveno
+        InvalidCode: Neplatný kód
+      U2F:
+        NotExisting: U2F neexistuje
+      Passwordless:
+        NotExisting: Bezheslové přihlášení neexistuje
+    WebAuthN:
+      NotFound: WebAuthN token nenalezen
+      BeginRegisterFailed: Registrace WebAuthN selhala
+      MarshalError: Chyba při marshalingu dat
+      ErrorOnParseCredential: Chyba při analýze údajů pověření
+      CreateCredentialFailed: Chyba při vytváření pověření
+      BeginLoginFailed: Přihlášení WebAuthN selhalo
+      ValidateLoginFailed: Chyba při ověření přihlašovacích údajů
+      CloneWarning: Pověření mohou být klonována
+    RefreshToken:
+      Invalid: Obnovovací token je neplatný
+      NotFound: Obnovovací token nenalezen
+  Instance:
+    NotFound: Instance nenalezena
+    AlreadyExists: Instance již existuje
+    NotChanged: Instance nezměněna
+  Org:
+    AlreadyExists: Název organizace je již obsazen
+    Invalid: Organizace je neplatná
+    AlreadyDeactivated: Organizace je již deaktivována
+    AlreadyActive: Organizace je již aktivní
+    Empty: Organizace je prázdná
+    NotFound: Organizace nenalezena
+    NotChanged: Organizace nezměněna
+    DefaultOrgNotDeletable: Výchozí organizace nesmí být smazána
+    ZitadelOrgNotDeletable: Organizaci s projektem ZITADEL nelze smazat
+    InvalidDomain: Neplatná doména
+    DomainMissing: Doména chybí
+    DomainNotOnOrg: Doména v organizaci neexistuje
+    DomainNotVerified: Doména není ověřena
+    DomainAlreadyVerified: Doména je již ověřena
+    DomainVerificationTypeInvalid: Typ ověření domény je neplatný
+    DomainVerificationMissing: Ověření domény ještě nebylo zahájeno
+    DomainVerificationFailed: Ověření domény selhalo
+    DomainVerificationTXTNotFound: Záznam _zitadel-challenge TXT pro vaši doménu nebyl nalezen. Zkontrolujte, zda jste jej přidali na váš DNS server, nebo počkejte, až se nový záznam rozšíří
+    DomainVerificationTXTNoMatch: Záznam _zitadel-challenge TXT byl pro vaši doménu nalezen, ale neobsahuje správný token. Zkontrolujte, zda jste na váš DNS server přidali správný token, nebo počkejte, až se nový záznam rozšíří
+    DomainVerificationHTTPNotFound: Soubor obsahující výzvu nebyl nalezen na očekávané URL. Zkontrolujte, zda jste soubor nahráli na správné místo s právy ke čtení
+    DomainVerificationHTTPNoMatch: Soubor obsahující výzvu byl nalezen na očekávané URL, ale neobsahuje správný token. Zkontrolujte jeho obsah
+    DomainVerificationTimeout: Při dotazování DNS serveru došlo k timeoutu
+    PrimaryDomainNotDeletable: Primární doména nesmí být smazána
+    DomainNotFound: Doména nenalezena
+    MemberIDMissing: Chybí ID člena
+    MemberNotFound: Člen organizace nenalezen
+    InvalidMember: Člen organizace je neplatný
+    UserIDMissing: Chybí ID uživatele
+    PolicyAlreadyExists: Politika již existuje
+    PolicyNotExisting: Politika neexistuje
+    IdpInvalid: Konfigurace IDP je neplatná
+    IdpNotExisting: Konfigurace IDP neexistuje
+    OIDCConfigInvalid: Konfigurace OIDC IDP je neplatná
+    IdpIsNotOIDC: Konfigurace IDP není typu OIDC
+    Domain:
+      AlreadyExists: Doména již existuje
+      InvalidCharacter: Pro doménu jsou povoleny pouze alfanumerické znaky, . a -
+      EmptyString: Neplatné nečíselné a nealfabetické znaky byly nahrazeny prázdnými místy a výsledná doména je prázdný řetězec
+    IDP:
+      InvalidSearchQuery: Neplatný vyhledávací dotaz
+      ClientIDMissing: Chybí ClientID
+      TeamIDMissing: Chybí TeamID
+      KeyIDMissing: Chybí KeyID
+      PrivateKeyMissing: Chybí privátní klíč
+    LoginPolicy:
+      NotFound: Přihlašovací politika nenalezena
+      Invalid: Přihlašovací politika je neplatná
+      RedirectURIInvalid: Výchozí URI přesměrování je neplatné
+      NotExisting: Přihlašovací politika neexistuje
+      AlreadyExists: Přihlašovací politika již existuje
+      IdpProviderAlreadyExisting: Poskytovatel identity již existuje
+      IdpProviderNotExisting: Poskytovatel identity neexistuje
+      RegistrationNotAllowed: Registrace není povolena
+      UsernamePasswordNotAllowed: Přihlášení pomocí uživatelského jména/hesla není povoleno
+      MFA:
+        AlreadyExists: Multifaktor již existuje
+        NotExisting: Multifaktor neexistuje
+        Unspecified: Multifaktor je neplatný
+    MailTemplate:
+      NotFound: Výchozí šablona e-mailu nenalezena
+      NotChanged: Výchozí šablona e-mailu nebyla změněna
+      AlreadyExists: Výchozí šablona e-mailu již existuje
+      Invalid: Výchozí šablona e-mailu je neplatná
+    CustomMessageText:
+      NotFound: Výchozí text zprávy nenalezen
+      NotChanged: Výchozí text zprávy nebyl změněn
+      AlreadyExists: Výchozí text zprávy již existuje
+      Invalid: Výchozí text zprávy je neplatný
+    PasswordComplexityPolicy:
+      NotFound: Politika složitosti hesla nenalezena
+      Empty: Politika složitosti hesla je prázdná
+      NotExisting: Politika složitosti hesla neexistuje
+      AlreadyExists: Politika složitosti hesla již existuje
+    PasswordLockoutPolicy:
+      NotFound: Politika blokování hesla nenalezena
+      Empty: Politika blokování hesla je prázdná
+      NotExisting: Politika blokování hesla neexistuje
+      AlreadyExists: Politika blokování hesla již existuje
+    PasswordAgePolicy:
+      NotFound: Politika stáří hesla nenalezena
+      Empty: Politika stáří hesla je prázdná
+      NotExisting: Politika stáří hesla neexistuje
+      AlreadyExists: Politika stáří hesla již existuje
+    OrgIAMPolicy:
+      Empty: Politika IAM organizace je prázdná
+      NotExisting: Politika IAM organizace neexistuje
+      AlreadyExists: Politika IAM organizace již existuje
+    NotificationPolicy:
+      NotFound: Politika oznámení nenalezena
+      NotChanged: Politika oznámení nezměněna
+      AlreadyExists: Politika oznámení již existuje
+    LabelPolicy:
+      NotFound: Politika privátních štítků nenalezena
+      NotChanged: Politika privátních štítků nebyla změněna
+  Project:
+    ProjectIDMissing: Chybí ID projektu
+    AlreadyExists: Projekt již v organizaci existuje
+    OrgNotExisting: Organizace neexistuje
+    UserNotExisting: Uživatel neexistuje
+    CouldNotGenerateClientSecret: Nepodařilo se vygenerovat tajný klíč klienta
+    Invalid: Projekt je neplatný
+    NotActive: Projekt není aktivní
+    NotInactive: Projekt není deaktivován
+    NotFound: Projekt nebyl nalezen
+    UserIDMissing: Chybí ID uživatele
+    Member:
+      NotFound: Člen projektu nenalezen
+      Invalid: Člen projektu je neplatný
+      AlreadyExists: Člen projektu již existuje
+      NotExisting: Člen projektu neexistuje
+    MinimumOneRoleNeeded: Je nutné přidat alespoň jednu roli
+    Role:
+      AlreadyExists: Role již existuje
+      Invalid: Role je neplatná
+      NotExisting: Role neexistuje
+    IDMissing: Chybí ID
+    App:
+      AlreadyExists: Aplikace již existuje
+      NotFound: Aplikace nebyla nalezena
+      Invalid: Aplikace je neplatná
+      NotExisting: Aplikace neexistuje
+      NotActive: Aplikace není aktivní
+      NotInactive: Aplikace není neaktivní
+      OIDCConfigInvalid: Konfigurace OIDC je neplatná
+      APIConfigInvalid: Konfigurace API je neplatná
+      SAMLConfigInvalid: Konfigurace SAML je neplatná
+      IsNotOIDC: Aplikace není typu OIDC
+      IsNotAPI: Aplikace není typu API
+      IsNotSAML: Aplikace není typu SAML
+      SAMLMetadataMissing: Chybí metadata SAML
+      SAMLMetadataFormat: Chyba formátu metadat SAML
+      SAMLEntityIDAlreadyExisting: SAML EntityID již existuje
+      OIDCAuthMethodNoSecret: Vybraná OIDC Auth metoda nevyžaduje tajný klíč
+      APIAuthMethodNoSecret: Vybraná API Auth metoda nevyžaduje tajný klíč
+      AuthMethodNoPrivateKeyJWT: Vybraná metoda ověření nevyžaduje klíč
+      ClientSecretInvalid: Tajný klíč klienta je neplatný
+      Key:
+        AlreadyExisting: Klíč aplikace již existuje
+        NotFound: Klíč aplikace nebyl nalezen
+    RequiredFieldsMissing: Některá povinná pole chybí
+    Grant:
+      AlreadyExists: Grant projektu již existuje
+      NotFound: Grant nebyl nalezen
+      Invalid: Grant projektu je neplatný
+      NotExisting: Grant projektu neexistuje
+      HasNotExistingRole: Jedna z rolí v projektu neexistuje
+      NotActive: Grant projektu není aktivní
+      NotInactive: Grant projektu není neaktivní
+  IAM:
+    NotFound: Instance nenalezena. Podívejte se na https://zitadel.com/docs/self-hosting/manage/custom-domain
+    Member:
+      RolesNotChanged: Role nebyly změněny
+    MemberInvalid: Člen je neplatný
+    MemberAlreadyExisting: Člen již existuje
+    MemberNotExisting: Člen neexistuje
+    IDMissing: Chybí Id
+    IAMProjectIDMissing: Chybí Id IAM projektu
+    IamProjectAlreadySet: Id IAM projektu bylo již nastaveno
+    IdpInvalid: Konfigurace IDP je neplatná
+    IdpNotExisting: Konfigurace IDP neexistuje
+    OIDCConfigInvalid: Konfigurace OIDC IDP je neplatná
+    IdpIsNotOIDC: Konfigurace IDP není typu oidc
+    LoginPolicyInvalid: Přihlašovací politika je neplatná
+    LoginPolicyNotExisting: Přihlašovací politika neexistuje
+    IdpProviderInvalid: Poskytovatel identity je neplatný
+    LoginPolicy:
+      NotFound: Výchozí přihlašovací politika nenalezena
+      NotChanged: Výchozí přihlašovací politika nebyla změněna
+      NotExisting: Výchozí přihlašovací politika neexistuje
+      AlreadyExists: Výchozí přihlašovací politika již existuje
+      RedirectURIInvalid: Výchozí Redirect URI je neplatné
+      MFA:
+        AlreadyExists: Vícefaktorové ověřování již existuje
+        NotExisting: Vícefaktorové ověřování neexistuje
+        Unspecified: Vícefaktorové ověřování je neplatné
+      IDP:
+        AlreadyExists: Poskytovatel identity již existuje
+        NotExisting: Poskytovatel identity neexistuje
+        Invalid: Poskytovatel identity je neplatný
+      IDPConfig:
+        AlreadyExists: Konfigurace poskytovatele identity již existuje
+        NotInactive: Konfigurace poskytovatele identity není neaktivní
+        NotActive: Konfigurace poskytovatele identity není aktivní
+    LabelPolicy:
+      NotFound: Výchozí zásady privátního štítku nenalezeny
+      NotChanged: Výchozí zásady privátního štítku nebyly změněny
+    MailTemplate:
+      NotFound: Výchozí šablona e-mailu nenalezena
+      NotChanged: Výchozí šablona e-mailu nebyla změněna
+      AlreadyExists: Výchozí šablona e-mailu již existuje
+      Invalid: Výchozí šablona e-mailu je neplatná
+    CustomMessageText:
+      NotFound: Výchozí text zprávy nenalezen
+      NotChanged: Výchozí text zprávy nebyl změněn
+      AlreadyExists: Výchozí text zprávy již existuje
+      Invalid: Výchozí text zprávy je neplatný
+    PasswordComplexityPolicy:
+      NotFound: Výchozí zásady složitosti hesla nenalezeny
+      NotExisting: Výchozí zásady složitosti hesla neexistují
+      AlreadyExists: Výchozí zásady složitosti hesla již existují
+      Empty: Výchozí zásady složitosti hesla jsou prázdné
+      NotChanged: Výchozí zásady složitosti hesla nebyly změněny
+    PasswordAgePolicy:
+      NotFound: Výchozí zásady stáří hesla nenalezeny
+      NotExisting: Výchozí zásady stáří hesla neexistují
+      AlreadyExists: Výchozí zásady stáří hesla již existují
+      Empty: Výchozí zásady stáří hesla jsou prázdné
+      NotChanged: Výchozí zásady stáří hesla nebyly změněny
+    PasswordLockoutPolicy:
+      NotFound: Výchozí zásady uzamčení hesla nenalezeny
+      NotExisting: Výchozí zásady uzamčení hesla neexistují
+      AlreadyExists: Výchozí zásady uzamčení hesla již existují
+      Empty: Výchozí zásady uzamčení hesla jsou prázdné
+      NotChanged: Výchozí zásady uzamčení hesla nebyly změněny
+    DomainPolicy:
+      NotFound: Zásady IAM organizace nenalezeny
+      Empty: Zásady IAM organizace jsou prázdné
+      NotExisting: Zásady IAM organizace neexistují
+      AlreadyExists: Zásady IAM organizace již existují
+      NotChanged: Zásady IAM organizace nebyly změněny
+    NotificationPolicy:
+      NotFound: Výchozí zásady oznámení nenalezeny
+      NotChanged: Výchozí zásady oznámení nebyly změněny
+      AlreadyExists: Výchozí zásady oznámení již existují
+  Policy:
+    AlreadyExists: Zásada již existuje
+    Label:
+      Invalid:
+        PrimaryColor: Hlavní barva nemá platnou hodnotu Hex barvy
+        BackgroundColor: Barva pozadí nemá platnou hodnotu Hex barvy
+        WarnColor: Upozornění barva nemá platnou hodnotu Hex barvy
+        FontColor: Barva písma nemá platnou hodnotu Hex barvy
+        PrimaryColorDark: Hlavní barva (tmavý režim) nemá platnou hodnotu Hex barvy
+        BackgroundColorDark: Barva pozadí (tmavý režim) nemá platnou hodnotu Hex barvy
+        WarnColorDark: Upozornění barva (tmavý režim) nemá platnou hodnotu Hex barvy
+        FontColorDark: Barva písma (tmavý režim) nemá platnou hodnotu Hex barvy
+  UserGrant:
+    AlreadyExists: Uživatelský grant již existuje
+    NotFound: Uživatelský grant nenalezen
+    Invalid: Uživatelský grant je neplatný
+    NotChanged: Uživatelský grant nebyl změněn
+    IDMissing: Chybí Id
+    NotActive: Uživatelský grant není aktivní
+    NotInactive: Uživatelský grant není deaktivován
+    NoPermissionForProject: Uživatel nemá na tomto projektu žádná oprávnění
+    RoleKeyNotFound: Role nenalezena
+  Member:
+    AlreadyExists: Člen již existuje
+  IDPConfig:
+    AlreadyExists: Konfigurace IDP s tímto názvem již existuje
+    NotExisting: Konfigurace poskytovatele identity neexistuje
+  Changes:
+    NotFound: Historie nenalezena
+    AuditRetention: Historie je mimo dobu uchovávání auditního protokolu
+  Token:
+    NotFound: Token nenalezen
+    Invalid: Token je neplatný
+  UserSession:
+    NotFound: UserSession nenalezena
+  Key:
+    ExpireBeforeNow: Datum expirace je v minulosti
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: Vícefaktorové ověření je nastaveno jako povinné, ale nejsou nakonfigurovány žádní poskytovatelé. Kontaktujte prosím vašeho systémového administrátora.
+  Step:
+    Started:
+      AlreadyExists: Krok již byl zahájen
+    Done:
+      AlreadyExists: Krok již byl dokončen
+  CustomText:
+    AlreadyExists: Vlastní text již existuje
+    Invalid: Vlastní text je neplatný
+    NotFound: Vlastní text nenalezen
+  TranslationFile:
+    ReadError: Chyba při čtení souboru s překlady
+    MergeError: Soubor s překlady nebyl možné sloučit s vlastními překlady
+    NotFound: Soubor s překlady neexistuje
+  Metadata:
+    NotFound: Metadata nenalezena
+    NoData: Seznam metadat je prázdný
+    Invalid: Metadata jsou neplatná
+    KeyNotExisting: Jeden nebo více klíčů neexistuje
+  Action:
+    Invalid: Akce je neplatná
+    NotFound: Akce nenalezena
+    NotActive: Akce není aktivní
+    NotInactive: Akce není neaktivní
+    MaxAllowed: Není dovoleno více aktivních akcí
+  Flow:
+    FlowTypeMissing: Chybí typ toku
+    Empty: Tok je již prázdný
+    WrongTriggerType: Typ spouštěče je neplatný
+    NoChanges: Žádné změny
+    ActionIDsNotExist: ID akcí neexistují
+  Query:
+    CloseRows: SQL příkaz nemohl být dokončen
+    SQLStatement: SQL příkaz nemohl být vytvořen
+    InvalidRequest: Požadavek je neplatný
+  Quota:
+    AlreadyExists: Kvóta pro tuto jednotku již existuje
+    NotFound: Kvóta pro tuto jednotku nenalezena
+    Invalid:
+      CallURL: URL volání kvóty je neplatné
+      Percent: Procento kvóty je nižší než 1
+      Unimplemented: Kvóty pro tuto jednotku nejsou implementovány
+      Amount: Množství kvóty je nižší než 1
+      ResetInterval: Interval resetování kvóty je kratší než minuta
+      Noop: Neomezená kvóta bez oznámení nemá žádný účinek
+    Access:
+      Exhausted: Kvóta pro autentizované požadavky je vyčerpána
+    Execution:
+      Exhausted: Kvóta pro sekundy provádění je vyčerpána
+  LogStore:
+    Access:
+      StorageFailed: Ukládání přístupového logu do databáze selhalo
+      ScanFailed: Dotaz na využití pro autentizované požadavky selhal
+    Execution:
+      StorageFailed: Ukládání logu provádění akcí do databáze selhalo
+      ScanFailed: Dotaz na využití pro sekundy provádění akcí selhal
+  Session:
+    NotExisting: Sezení neexistuje
+    Terminated: Sezení již bylo ukončeno
+    Token:
+      Invalid: Token sezení je neplatný
+    WebAuthN:
+      NoChallenge: Sezení bez výzvy WebAuthN
+  Intent:
+    IDPMissing: V požadavku chybí IDP ID
+    IDPInvalid: IDP je pro požadavek neplatné
+    ResponseInvalid: Odpověď IDP je neplatná
+    SuccessURLMissing: V požadavku chybí úspěšná URL
+    FailureURLMissing: V požadavku chybí URL selhání
+    StateMissing: V požadavku chybí parametr stavu
+    NotStarted: Záměr nebyl zahájen nebo již byl ukončen
+    NotSucceeded: Záměr nebyl úspěšný
+    TokenCreationFailed: Vytvoření tokenu selhalo
+    InvalidToken: Token záměru je neplatný
+    OtherUser: Záměr určený pro jiného uživatele
+  AuthRequest:
+    AlreadyExists: Požadavek na autentizaci již existuje
+    NotExisting: Požadavek na autentizaci neexistuje
+    WrongLoginClient: Požadavek na autentizaci vytvořen jiným klientem přihlášení
+  OIDCSession:
+    RefreshTokenInvalid: Obnovovací token je neplatný
+    Token:
+      Invalid: Token je neplatný
+      Expired: Token vypršel
+    InvalidClient: Token nebyl vydán pro tohoto klienta
+  Feature:
+    NotExisting: Funkce neexistuje
+    TypeNotSupported: Typ funkce není podporován
+    InvalidValue: Neplatná hodnota pro tuto funkci
+
+AggregateTypes:
+  action: Akce
+  instance: Instance
+  key_pair: Pár klíčů
+  org: Organizace
+  project: Projekt
+  user: Uživatel
+  usergrant: Uživatelský grant
+  quota: Kvóta
+  feature: Funkce
+
+EventTypes:
+  user:
+    added: Uživatel přidán
+    selfregistered: Uživatel se zaregistroval sám
+    initialization:
+      code:
+        added: Inicializační kód vygenerován
+        sent: Inicializační kód odeslán
+      check:
+        succeeded: Kontrola inicializace byla úspěšná
+        failed: Kontrola inicializace selhala
+    token:
+      added: Přístupový token vytvořen
+      removed: Přístupový token odstraněn
+    username:
+      reserved: Uživatelské jméno rezervováno
+      released: Uživatelské jméno uvolněno
+      changed: Uživatelské jméno změněno
+    email:
+      reserved: E-mailová adresa rezervována
+      released: E-mailová adresa uvolněna
+      changed: E-mailová adresa změněna
+      verified: E-mailová adresa ověřena
+      verification:
+        failed: Ověření e-mailové adresy selhalo
+      code:
+        added: Vygenerován ověřovací kód e-mailové adresy
+        sent: Ověřovací kód e-mailové adresy odeslán
+    machine:
+      added: Technický uživatel přidán
+      changed: Technický uživatel změněn
+      key:
+        added: Klíč přidán
+        removed: Klíč odstraněn
+      secret:
+        set: Tajemství nastaveno
+        removed: Tajemství odstraněno
+        check:
+          succeeded: Kontrola tajemství byla úspěšná
+          failed: Kontrola tajemství selhala
+    human:
+      added: Osoba přidána
+      selfregistered: Osoba se zaregistrovala sama
+      avatar:
+        added: Avatar přidán
+        removed: Avatar odstraněn
+      initialization:
+        code:
+          added: Inicializační kód vygenerován
+          sent: Inicializační kód odeslán
+        check:
+          succeeded: Kontrola inicializace byla úspěšná
+          failed: Kontrola inicializace selhala
+      username:
+        reserved: Uživatelské jméno rezervováno
+        released: Uživatelské jméno uvolněno
+      email:
+        changed: E-mailová adresa změněna
+        verified: E-mailová adresa ověřena
+        verification:
+          failed: Ověření e-mailové adresy selhalo
+        code:
+          added: Vygenerován ověřovací kód e-mailové adresy
+          sent: Ověřovací kód e-mailové adresy odeslán
+      password:
+        changed: Heslo změněno
+        code:
+          added: Kód hesla vygenerován
+          sent: Kód hesla odeslán
+        check:
+          succeeded: Kontrola hesla byla úspěšná
+          failed: Kontrola hesla selhala
+        change:
+          sent: Žádost o změnu hesla odeslána
+        hash:
+          updated: Hash hesla aktualizován
+      externallogin:
+        check:
+          succeeded: Externí přihlášení bylo úspěšné
+      externalidp:
+        added: Externí IDP přidáno
+        removed: Externí IDP odstraněno
+        cascade:
+          removed: Kaskádně odstraněno externí IDP
+        id:
+          migrated: Externí UserID IDP byl migrován
+      phone:
+        changed: Telefonní číslo změněno
+        verified: Telefonní číslo ověřeno
+        verification:
+          failed: Ověření telefonního čísla selhalo
+        code:
+          added: Kód telefonního čísla vygenerován
+          sent: Kód telefonního čísla odeslán
+        removed: Telefonní číslo odstraněno
+      profile:
+        changed: Uživatelský profil změněn
+      address:
+        changed: Adresa uživatele změněna
+      mfa:
+        otp:
+          added: OTP pro vícefaktorové ověření přidáno
+          verified: OTP pro vícefaktorové ověření ověřeno
+          removed: OTP pro vícefaktorové ověření odstraněno
+          check:
+            succeeded: Kontrola OTP pro vícefaktorové ověření byla úspěšná
+            failed: Kontrola OTP pro vícefaktorové ověření selhala
+          sms:
+            added: SMS pro vícefaktorové OTP přidána
+            removed: SMS pro vícefaktorové OTP odstraněna
+            code:
+              added: Kód pro vícefaktorové OTP SMS přidán
+              sent: Kód pro vícefaktorové OTP SMS odeslán
+            check:
+              succeeded: Kontrola vícefaktorového OTP SMS byla úspěšná
+              failed: Kontrola vícefaktorového OTP SMS selhala
+          email:
+            added: E-mail pro vícefaktorové OTP přidán
+            removed: E-mail pro vícefaktorové OTP odstraněn
+            code:
+              added: Kód pro vícefaktorové OTP e-mail přidán
+              sent: Kód pro vícefaktorové OTP e-mail odeslán
+            check:
+              succeeded: Kontrola vícefaktorového OTP e-mailu byla úspěšná
+              failed: Kontrola vícefaktorového OTP e-mailu selhala
+        u2f:
+          token:
+            added: Token U2F pro vícefaktorové ověření přidán
+            verified: Token U2F pro vícefaktorové ověření ověřen
+            removed: Token U2F pro vícefaktorové ověření odstraněn
+            begin:
+              login: Kontrola U2F pro vícefaktorové přihlášení započata
+            check:
+              succeeded: Kontrola U2F pro vícefaktorové přihlášení byla úspěšná
+              failed: Kontrola U2F pro vícefaktorové přihlášení selhala
+            signcount:
+              changed: Kontrolní součet pro Token U2F pro vícefaktorové ověření byl změněn
+        init:
+          skipped: Inicializace vícefaktorového ověření přeskočena
+      passwordless:
+        token:
+          added: Token pro přihlášení bez hesla přidán
+          verified: Token pro přihlášení bez hesla ověřen
+          removed: Token pro přihlášení bez hesla odstraněn
+          begin:
+            login: Kontrola přihlášení bez hesla započata
+          check:
+            succeeded: Kontrola přihlášení bez hesla byla úspěšná
+            failed: Kontrola přihlášení bez hesla selhala
+          signcount:
+            changed: Kontrolní součet pro Token přihlášení bez hesla byl změněn
+        initialization:
+          code:
+            added: Inicializační kód pro přihlášení bez hesla přidán
+            sent: Inicializační kód pro přihlášení bez hesla odeslán
+            requested: Inicializační kód pro přihlášení bez hesla požadován
+            check:
+              succeeded: Kontrola inicializačního kódu pro přihlášení bez hesla byla úspěšná
+              failed: Kontrola inicializačního kódu pro přihlášení bez hesla selhala
+      signed:
+        out: Uživatel odhlášen
+      refresh:
+        token:
+          added: Obnovovací token vytvořen
+          renewed: Obnovovací token obnoven
+          removed: Obnovovací token odstraněn
+    locked: Uživatel zamčen
+    unlocked: Uživatel odemčen
+    deactivated: Uživatel deaktivován
+    reactivated: Uživatel reaktivován
+    removed: Uživatel odstraněn
+    password:
+      changed: Heslo změněno
+      code:
+        added: Kód hesla vygenerován
+        sent: Kód hesla odeslán
+      check:
+        succeeded: Kontrola hesla byla úspěšná
+        failed: Kontrola hesla selhala
+    phone:
+      changed: Telefonní číslo změněno
+      verified: Telefonní číslo ověřeno
+      verification:
+        failed: Ověření telefonního čísla selhalo
+      code:
+        added: Kód telefonního čísla vygenerován
+        sent: Kód telefonního čísla odeslán
+      removed: Telefonní číslo odstraněno
+    profile:
+      changed: Profil uživatele změněn
+    address:
+      changed: Adresa uživatele změněna
+    mfa:
+      otp:
+        added: Vícefaktorové OTP přidáno
+        verified: Vícefaktorové OTP ověřeno
+        removed: Vícefaktorové OTP odstraněno
+        check:
+          succeeded: Kontrola vícefaktorového OTP byla úspěšná
+          failed: Kontrola vícefaktorového OTP selhala
+        init:
+          skipped: Inicializace vícefaktorového OTP přeskočena
+      init:
+        skipped: Inicializace vícefaktorové ověřování přeskočena
+    signed:
+      out: Uživatel odhlášen
+    grant:
+      added: Autorizace přidána
+      changed: Autorizace změněna
+      removed: Autorizace odstraněna
+      deactivated: Autorizace deaktivována
+      reactivated: Autorizace reaktivována
+      reserved: Autorizace rezervována
+      released: Autorizace uvolněna
+      cascade:
+        removed: Autorizace odstraněna
+        changed: Autorizace změněna
+    metadata:
+      set: Metadata uživatele nastavena
+      removed: Metadata uživatele odstraněna
+      removed.all: Všechna metadata uživatele odstraněna
+    domain:
+      claimed: Doména nárokována
+      claimed.sent: Oznámení o nárokování domény odesláno
+    pat:
+      added: Osobní přístupový token přidán
+      removed: Osobní přístupový token odstraněn
+  org:
+    added: Organizace přidána
+    changed: Organizace změněna
+    deactivated: Organizace deaktivována
+    reactivated: Organizace reaktivována
+    removed: Organizace odstraněna
+    domain:
+      added: Doména přidána
+      verification:
+        added: Ověření domény přidáno
+        failed: Ověření domény selhalo
+      verified: Doména ověřena
+      removed: Doména odstraněna
+      primary:
+        set: Hlavní doména nastavena
+      reserved: Doména rezervována
+      released: Doména uvolněna
+    name:
+      reserved: Název organizace rezervován
+      released: Název organizace uvolněn
+    member:
+      added: Člen organizace přidán
+      changed: Člen organizace změněn
+      removed: Člen organizace odstraněn
+      cascade:
+        removed: Kaskádově odstraněn člen organizace
+    iam:
+      policy:
+        added: Systémová politika přidána
+        changed: Systémová politika změněna
+        removed: Systémová politika odstraněna
+    idp:
+      config:
+        added: Konfigurace IDP přidána
+        changed: Konfigurace IDP změněna
+        removed: Konfigurace IDP odstraněna
+        deactivated: Konfigurace IDP deaktivována
+        reactivated: Konfigurace IDP reaktivována
+      oidc:
+        config:
+          added: Konfigurace OIDC IDP přidána
+          changed: Konfigurace OIDC IDP změněna
+      saml:
+        config:
+          added: Konfigurace SAML IDP přidána
+          changed: Konfigurace SAML IDP změněna
+      jwt:
+        config:
+          added: Konfigurace JWT IDP přidána
+          changed: Konfigurace JWT IDP změněna
+    customtext:
+      set: Vlastní text nastaven
+      removed: Vlastní text odstraněn
+      template:
+        removed: Šablona vlastního textu odstraněna
+    policy:
+      login:
+        added: Politika přihlášení přidána
+        changed: Politika přihlášení změněna
+        removed: Politika přihlášení odstraněna
+        idpprovider:
+          added: Poskytovatel identity přidán do politiky přihlášení
+          removed: Poskytovatel identity odstraněn z politiky přihlášení
+          cascade:
+            removed: Poskytovatel identity kaskádově odstraněn z politiky přihlášení
+        secondfactor:
+          added: Druhý faktor přidán do politiky přihlášení
+          removed: Druhý faktor odstraněn z politiky přihlášení
+        multifactor:
+          added: Vícefaktorové ověření přidáno do politiky přihlášení
+          removed: Vícefaktorové ověření odstraněno z politiky přihlášení
+      password:
+        complexity:
+          added: Politika složitosti hesla přidána
+          changed: Politika složitosti hesla změněna
+          removed: Politika složitosti hesla odstraněna
+        age:
+          added: Politika stáří hesla přidána
+          changed: Politika stáří hesla změněna
+          removed: Politika stáří hesla odstraněna
+        lockout:
+          added: Politika uzamčení účtu přidána
+          changed: Politika uzamčení účtu změněna
+          removed: Politika uzamčení účtu odstraněna
+      label:
+        added: Politika označení přidána
+        changed: Politika označení změněna
+        activated: Politika označení aktivována
+        removed: Politika označení odstraněna
+        logo:
+          added: Logo přidáno do politiky označení
+          removed: Logo odstraněno z politiky označení
+          dark:
+            added: Logo (tmavý režim) přidáno do politiky označení
+            removed: Logo (tmavý režim) odstraněno z politiky označení
+        icon:
+          added: Ikona přidána do politiky označení
+          removed: Ikona odstraněna z politiky označení
+          dark:
+            added: Ikona (tmavý režim) přidána do politiky označení
+            removed: Ikona (tmavý režim) odstraněna z politiky označení
+        font:
+          added: Písmo přidáno do politiky označení
+          removed: Písmo odstraněno z politiky označení
+        assets:
+          removed: Aktiva odstraněna z politiky označení
+      privacy:
+        added: Politika soukromí a obchodní podmínky přidány
+        changed: Politika soukromí a obchodní podmínky změněny
+        removed: Politika soukromí a obchodní podmínky odstraněny
+      domain:
+        added: Doménová politika přidána
+        changed: Doménová politika změněna
+        removed: Doménová politika odstraněna
+      lockout:
+        added: Politika uzamčení přidána
+        changed: Politika uzamčení změněna
+        removed: Politika uzamčení odstraněna
+      notification:
+        added: Politika oznámení přidána
+        changed: Politika oznámení změněna
+        removed: Politika oznámení odstraněna
+    flow:
+      trigger_actions:
+        set: Akce nastavena
+        cascade:
+          removed: Akce kaskádově odstraněny
+        removed: Akce odstraněny
+      cleared: Průběh vymazán
+    mail:
+      template:
+        added: Šablona e-mailu přidána
+        changed: Šablona e-mailu změněna
+        removed: Šablona e-mailu odstraněna
+      text:
+        added: Text e-mailu přidán
+        changed: Text e-mailu změněn
+        removed: Text e-mailu odstraněn
+    metadata:
+      removed: Metadata odstraněna
+      removed.all: Všechna metadata odstraněna
+      set: Metadata nastavena
+  project:
+    added: Projekt přidán
+    changed: Projekt změněn
+    deactivated: Projekt deaktivován
+    reactivated: Projekt reaktivován
+    removed: Projekt odstraněn
+    member:
+      added: Člen projektu přidán
+      changed: Člen projektu změněn
+      removed: Člen projektu odstraněn
+      cascade:
+        removed: Člen projektu kaskádově odstraněn
+    role:
+      added: Role v projektu přidána
+      changed: Role v projektu změněna
+      removed: Role v projektu odstraněna
+    grant:
+      added: Přístupová práva k managementu přidána
+      changed: Přístupová práva k managementu změněna
+      removed: Přístupová práva k managementu odstraněna
+      deactivated: Přístupová práva k managementu deaktivována
+      reactivated: Přístupová práva k managementu reaktivována
+      cascade:
+        changed: Přístupová práva k managementu změněna kaskádově
+      member:
+        added: Člen s přístupovými právy k managementu přidán
+        changed: Člen s přístupovými právy k managementu změněn
+        removed: Člen s přístupovými právy k managementu odstraněn
+        cascade:
+          removed: Člen s přístupovými právy k managementu odstraněn kaskádově
+    application:
+      added: Aplikace přidána
+      changed: Aplikace změněna
+      removed: Aplikace odstraněna
+      deactivated: Aplikace deaktivována
+      reactivated: Aplikace reaktivována
+      oidc:
+        secret:
+          check:
+            succeeded: Kontrola tajného klíče OIDC klienta byla úspěšná
+            failed: Kontrola tajného klíče OIDC klienta selhala
+        key:
+          added: Klíč aplikace přidán
+          removed: Klíč aplikace odstraněn
+      config:
+        saml:
+          added: Konfigurace SAML přidána
+          changed: Konfigurace SAML změněna
+        oidc:
+          added: Konfigurace OIDC přidána
+          changed: Konfigurace OIDC změněna
+          secret:
+            changed: Tajný klíč OIDC změněn
+        api:
+          added: Konfigurace API přidána
+          changed: Konfigurace API změněna
+          secret:
+            changed: Tajný klíč API změněn
+  policy:
+    password:
+      complexity:
+        added: Politika složitosti hesla přidána
+        changed: Politika složitosti hesla změněna
+      age:
+        added: Politika stáří hesla přidána
+        changed: Politika stáří hesla změněna
+      lockout:
+        added: Politika uzamčení hesla přidána
+        changed: Politika uzamčení hesla změněna
+  iam:
+    setup:
+      started: Nastavení ZITADEL zahájeno
+      done: Nastavení ZITADEL dokončeno
+    global:
+      org:
+        set: Globální organizace nastavena
+    project:
+      iam:
+        set: Projekt ZITADEL nastaven
+    member:
+      added: Člen ZITADEL přidán
+      changed: Člen ZITADEL změněn
+      removed: Člen ZITADEL odstraněn
+      cascade:
+        removed: Člen ZITADEL kaskádově odstraněn
+    idp:
+      config:
+        added: Konfigurace IDP přidána
+        changed: Konfigurace IDP změněna
+        removed: Konfigurace IDP odstraněna
+        deactivated: Konfigurace IDP deaktivována
+        reactivated: Konfigurace IDP reaktivována
+      oidc:
+        config:
+          added: Konfigurace OIDC IDP přidána
+          changed: Konfigurace OIDC IDP změněna
+      saml:
+        config:
+          added: Konfigurace SAML IDP přidána
+          changed: Konfigurace SAML IDP změněna
+      jwt:
+        config:
+          added: Konfigurace JWT přidána k poskytovateli identity
+          changed: Konfigurace JWT odstraněna od poskytovatele identity
+    customtext:
+      set: Text nastaven
+      removed: Text odstraněn
+    policy:
+      login:
+        added: Přidána výchozí přihlašovací politika
+        changed: Změněna výchozí přihlašovací politika
+        idpprovider:
+          added: Poskytovatel identity přidán do výchozí přihlašovací politiky
+          removed: Poskytovatel identity odstraněn z výchozí přihlašovací politiky
+      label:
+        added: Politika označení přidána
+        changed: Politika označení změněna
+        activated: Politika označení aktivována
+        logo:
+          added: Logo přidáno do politiky označení
+          removed: Logo odstraněno z politiky označení
+          dark:
+            added: Logo (tmavý režim) přidáno do politiky označení
+            removed: Logo (tmavý režim) odstraněno z politiky označení
+        icon:
+          added: Ikona přidána do politiky označení
+          removed: Ikona odstraněna z politiky označení
+          dark:
+            added: Ikona (tmavý režim) přidána do politiky označení
+            removed: Ikona (tmavý režim) odstraněna z politiky označení
+        font:
+          added: Písmo přidáno do politiky označení
+          removed: Písmo odstraněno z politiky označení
+        assets:
+          removed: Aktiva odstraněna z politiky označení
+    default:
+      language:
+        set: Výchozí jazyk nastaven
+    oidc:
+      settings:
+        added: Konfigurace OIDC přidána
+        changed: Konfigurace OIDC změněna
+        removed: Konfigurace OIDC odstraněna
+    secret:
+      generator:
+        added: Generátor tajemství přidán
+        changed: Generátor tajemství změněn
+        removed: Generátor tajemství odstraněn
+    smtp:
+      config:
+        added: Konfigurace SMTP přidána
+        changed: Konfigurace SMTP změněna
+        password:
+          changed: Tajemství konfigurace SMTP změněno
+    sms:
+      config:
+        twilio:
+          added: Poskytovatel SMS Twilio přidán
+          changed: Poskytovatel SMS Twilio změněn
+          token:
+            changed: Token poskytovatele SMS Twilio změněn
+          removed: Poskytovatel SMS Twilio odstraněn
+          activated: Poskytovatel SMS Twilio aktivován
+          deactivated: Poskytovatel SMS Twilio deaktivován
+  key_pair:
+    added: Pár klíčů přidán
+    certificate:
+      added: Certifikát přidán
+  action:
+    added: Akce přidána
+    changed: Akce změněna
+    deactivated: Akce deaktivována
+    reactivated: Akce reaktivována
+    removed: Akce odstraněna
+  instance:
+    added: Instance přidána
+    changed: Instance změněna
+    customtext:
+      removed: Vlastní text odstraněn
+      set: Vlastní text nastaven
+      template:
+        removed: Šablona vlastního textu odstraněna
+    default:
+      language:
+        set: Výchozí jazyk nastaven
+      org:
+        set: Výchozí organizace nastavena
+    domain:
+      added: Doména přidána
+      primary:
+        set: Primární doména nastavena
+      removed: Doména odstraněna
+    iam:
+      console:
+        set: Aplikace ZITADEL Console nastavena
+      project:
+        set: Projekt ZITADEL nastaven
+    mail:
+      template:
+        added: Šablona e-mailu přidána
+        changed: Šablona e-mailu změněna
+      text:
+        added: Text e-mailu přidán
+        changed: Text e-mailu změněn
+    member:
+      added: Člen instance přidán
+      changed: Člen instance změněn
+      removed: Člen instance odstraněn
+      cascade:
+        removed: Člen instance kaskádově odstraněn
+    notification:
+      provider:
+        debug:
+          fileadded: Souborový debugovací poskytovatel notifikací přidán
+          filechanged: Souborový debugovací poskytovatel notifikací změněn
+          fileremoved: Souborový debugovací poskytovatel notifikací odstraněn
+          logadded: Logovací debugovací poskytovatel notifikací přidán
+          logchanged: Logovací debugovací poskytovatel notifikací změněn
+          logremoved: Logovací debugovací poskytovatel notifikací odstraněn
+    oidc:
+      settings:
+        added: Nastavení OIDC přidáno
+        changed: Nastavení OIDC změněno
+    policy:
+      domain:
+        added: Politika domény přidána
+        changed: Politika domény změněna
+      label:
+        activated: Politika označení aktivována
+        added: Politika označení přidána
+        assets:
+          removed: Asset odstraněn z politiky označení
+        changed: Politika označení změněna
+        font:
+          added: Písmo přidáno do politiky označení
+          removed: Písmo odstraněno z politiky označení
+        icon:
+          added: Ikona přidána do politiky označení
+          removed: Ikona odstraněna z politiky označení
+          dark:
+            added: Ikona přidána do tmavé politiky označení
+            removed: Ikona odstraněna z tmavé politiky označení
+        logo:
+          added: Logo přidáno do politiky označení
+          removed: Logo odstraněno z politiky označení
+          dark:
+            added: Logo přidáno do tmavé politiky označení
+            removed: Logo odstraněno z tmavé politiky označení
+      lockout:
+        added: Politika uzamčení přidána
+        changed: Politika uzamčení změněna
+      login:
+        added: Politika přihlášení přidána
+        changed: Politika přihlášení změněna
+        idpprovider:
+          added: Poskytovatel identity přidán do politiky přihlášení
+          cascade:
+            removed: Poskytovatel identity kaskádově odstraněn z politiky přihlášení
+          removed: Poskytovatel identity odstraněn z politiky přihlášení
+        multifactor:
+          added: Vícefaktorové ověřování přidáno do politiky přihlášení
+          removed: Vícefaktorové ověřování odstraněno z politiky přihlášení
+        secondfactor:
+          added: Druhý faktor přidán do politiky přihlášení
+          removed: Druhý faktor odstraněn z politiky přihlášení
+      password:
+        age:
+          added: Politika stáří hesla přidána
+          changed: Politika stáří hesla změněna
+        complexity:
+          added: Politika složitosti hesla přidána
+          changed: Politika složitosti hesla odstraněna
+      privacy:
+        added: Politika ochrany soukromí přidána
+        changed: Politika ochrany soukromí změněna
+      security:
+        set: Bezpečnostní politika nastavena
+
+    removed: Instance odstraněna
+    secret:
+      generator:
+        added: Generátor tajemství přidán
+        changed: Generátor tajemství změněn
+        removed: Generátor tajemství odstraněn
+    sms:
+      configtwilio:
+        activated: Konfigurace SMS Twilio aktivována
+        added: Konfigurace SMS Twilio přidána
+        changed: Konfigurace SMS Twilio změněna
+        deactivated: Konfigurace SMS Twilio deaktivována
+        removed: Konfigurace SMS Twilio odstraněna
+        token:
+          changed: Token konfigurace SMS Twilio změněn
+    smtp:
+      config:
+        added: Konfigurace SMTP přidána
+        changed: Konfigurace SMTP změněna
+        password:
+          changed: Heslo konfigurace SMTP změněno
+        removed: Konfigurace SMTP odstraněna
+
+Application:
+  OIDC:
+    UnsupportedVersion: Vaše verze OIDC není podporována
+    V1:
+      NotCompliant: Vaše konfigurace není v souladu a liší se od standardu OIDC 1.0.
+      NoRedirectUris: Musí být zaregistrována alespoň jedna redirect uri.
+      NotAllCombinationsAreAllowed: Konfigurace je v souladu, ale nejsou povoleny všechny možné kombinace.
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: Pro typ udělení kódu jsou povoleny pouze http redirect uri pro apptype web.
+          CustomOnlyForNative: Typ udělení kódu dovoluje pouze vlastní redirect uri pro apptype native (např. appname:// )
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: Typ udělení implicit neumožňuje vlastní redirect uri
+          HttpNotAllowed: Typ udělení implicit neumožňuje http redirect uri
+          HttpLocalhostOnlyForNative: Http://localhost redirect uri je povolena pouze pro nativní aplikace.
+      Native:
+        AuthMethodType:
+          NotNone: Nativní aplikace by měly mít authmethodtype none.
+        RedirectUris:
+          MustBeHttpLocalhost: Redirect URI musí začínat vlastním protokolem, http://127.0.0.1, http://[::1] nebo http://localhost.
+      UserAgent:
+        AuthMethodType:
+          NotNone: Aplikace user agent by měla mít authmethodtype none.
+      GrantType:
+        Refresh:
+          NoAuthCode: Refresh Token je povolen pouze v kombinaci s Authorization Code.
+
+Action:
+  Flow:
+    Type:
+      Unspecified: Nespecifikováno
+      ExternalAuthentication: Externí autentizace
+      CustomiseToken: Doplňkový token
+      InternalAuthentication: Interní autentizace
+      CustomizeSAMLResponse: Doplňková SAMLResponse
+  TriggerType:
+    Unspecified: Nespecifikováno
+    PostAuthentication: Po autentizaci
+    PreCreation: Před vytvořením
+    PostCreation: Po vytvoření
+    PreUserinfoCreation: Před vytvořením userinfo
+    PreAccessTokenCreation: Před vytvořením access tokenu
+    PreSAMLResponseCreation: Před vytvořením SAMLResponse

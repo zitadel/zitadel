@@ -1,0 +1,20 @@
+log:
+  level: "DEBUG"
+providers:
+  file:
+    filename: "/etc/traefik/traefik.yaml"
+entrypoints:
+  web:
+    address: ":80"
+http:
+  routers:
+    router:
+      entryPoints:
+        - "web"
+      service: "zitadel"
+      rule: 'PathPrefix(`/`)'
+  services:
+    zitadel:
+      loadBalancer:
+        servers:
+          - url: "h2c://zitadel-disabled-tls:8080"

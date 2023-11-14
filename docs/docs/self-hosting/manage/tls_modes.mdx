@@ -2,14 +2,24 @@
 title: TLS Modes
 ---
 
-To allow ZITADEL to be run on any kind of infrastructure it allows to configure on how tho handle TLS connections.
-There are three mode of operation: `external`, `enabled`, `disabled`.
+To run ZITADEL on any kind of infrastructure, you can configure on how to handle TLS connections.
+There are three modes of operation: `disabled`, `external`, `enabled`.
 
 Generally this command is set as argument while starting ZITADEL. For example like this:
 
 ```bash
 zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
 ```
+
+## Disabled
+
+With the mode `disabled`, you instruct ZITADEL to await all connections with plain http without TLS.
+
+:::caution
+
+Be aware this is not a secure setup and should only be used for test systems!
+
+:::
 
 ## External
 
@@ -19,8 +29,8 @@ However ZITADEL delegates the management of TLS connections to a reverseproxy, w
 ## Enabled
 
 When using the mode `enabled` ZITADEL is setup to await incoming connections in an encrypted fashion.
-Wether it is from a client directly, a reverseproxy or web application firewall.
-This allows http connections to be secured at the transport level the whole way.
+Whether it is from a client directly, a reverse proxy or web application firewall.
+This allows HTTP connections to be secured at the transport level the whole way.
 
 If you use the mode `enabled` you need to configure ZITADEL with the necessary TLS settings.
 
@@ -42,17 +52,10 @@ TLS:
   Cert: #<bas64 encoded content of a pem file>
 ```
 
-## Disabled
+## More Information
 
-With the mode `disabled` ZITADEL is instructed to await all connections with plain http without TLS.
+Beware that ZITADEL uses HTTP/2 for all its connections.
+If you are using the mode `external` or `disabled` make sure to verify h2c compatibility.
 
-:::caution
-
-Be aware this is not a secure setup and should only be used for test systems!
-
-:::
-
-## HTTP/2
-
-To allow ZITADEL to function properly please make sure that HTTP/2 is enabled. If you are using the mode `external` or `disabled` make sure to verify h2c compatibilty.
-You can read more about how ZITADEL utilizes in our [HTTP/2 docs](/self-hosting/manage/http2).
+- [Read more abouth how ZITADEL utilizes HTTP/2](/self-hosting/manage/http2).
+- [Explore some concrete proxy configuration examples for ZITADEL](/self-hosting/manage/reverseproxy/reverse_proxy).

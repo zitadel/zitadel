@@ -51,6 +51,7 @@ Errors:
   Notification:
     NoDomain: 未找到对应的域名
   User:
+    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: 找不到用户
     AlreadyExists: 用户已存在
     NotFoundOnOrg: 在所选组织中找不到用户
@@ -317,7 +318,7 @@ Errors:
       NotActive: 项目授权不是启用状态
       NotInactive: 项目授权不是停用状态
   IAM:
-    NotFound: 实例未找到
+    NotFound: 实例未找到。查看 https://zitadel.com/docs/self-hosting/manage/custom-domain
     Member:
       RolesNotChanged: 角色没有改变
     MemberInvalid: 成员无效

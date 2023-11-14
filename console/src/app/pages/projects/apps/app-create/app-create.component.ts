@@ -7,7 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Buffer } from 'buffer';
 import { Subject, Subscription } from 'rxjs';
-import { debounceTime, takeUntil } from 'rxjs/operators';
+import { debounceTime, map, takeUntil } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import {
@@ -28,7 +28,6 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { MatLegacySlideToggleChange } from '@angular/material/legacy-slide-toggle';
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
 import {
   BASIC_AUTH_METHOD,
@@ -41,6 +40,7 @@ import {
   POST_METHOD,
 } from '../authmethods';
 import { API_TYPE, AppCreateType, NATIVE_TYPE, RadioItemAppType, SAML_TYPE, USER_AGENT_TYPE, WEB_TYPE } from '../authtypes';
+import { EnvironmentService } from 'src/app/services/environment.service';
 
 const MAX_ALLOWED_SIZE = 1 * 1024 * 1024;
 
@@ -119,6 +119,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
   public requestRedirectValuesSubject$: Subject<void> = new Subject();
+  public samlCertificateURL$ = this.envSvc.env.pipe(map((env) => `${env.issuer}/saml/v2/certificate`));
 
   constructor(
     private router: Router,
@@ -129,6 +130,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
     private fb: UntypedFormBuilder,
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
+    private envSvc: EnvironmentService,
   ) {
     this.form = this.fb.group({
       name: ['', [requiredValidator]],
