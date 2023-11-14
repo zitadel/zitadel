@@ -192,8 +192,10 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (instanc
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerInstanceProjection")
 		ctx, err = projection.InstanceProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	stmt, scan := prepareInstanceDomainQuery(ctx, q.client, authz.GetInstance(ctx).RequestedDomain())
@@ -289,7 +291,7 @@ func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 	return sq.Select(
 			InstanceColumnID.identifier(),
 			countColumn.identifier(),
-		).From(instanceTable.identifier()).
+		).Distinct().From(instanceTable.identifier()).
 			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)),
 		func(builder sq.SelectBuilder) sq.SelectBuilder {
 			return sq.Select(

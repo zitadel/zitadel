@@ -18,5 +18,6 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, OTPEmailCheckedType, eventstore.GenericEventMapper[OTPEmailCheckedEvent]).
 		RegisterFilterEventMapper(AggregateType, TokenSetType, TokenSetEventMapper).
 		RegisterFilterEventMapper(AggregateType, MetadataSetType, MetadataSetEventMapper).
+		RegisterFilterEventMapper(AggregateType, LifetimeSetType, eventstore.GenericEventMapper[LifetimeSetEvent]).
 		RegisterFilterEventMapper(AggregateType, TerminateType, TerminateEventMapper)
 }

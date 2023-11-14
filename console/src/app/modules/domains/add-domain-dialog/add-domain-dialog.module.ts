@@ -10,6 +10,6 @@ import { AddDomainDialogComponent } from './add-domain-dialog.component';
 
 @NgModule({
   declarations: [AddDomainDialogComponent],
-  imports: [CommonModule, TranslateModule, MatDialogModule, MatButtonModule, InputModule, FormsModule],
+  imports: [CommonModule, TranslateModule, MatButtonModule, InputModule, MatDialogModule, FormsModule],
 })
 export class AddDomainDialogModule {}

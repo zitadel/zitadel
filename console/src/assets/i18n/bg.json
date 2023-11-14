@@ -1053,7 +1053,9 @@
       "zh": "简体中文",
       "bg": "Български",
       "pt": "Portuguese",
-      "mk": "Македонски"
+      "mk": "Македонски",
+      "cs": "Čeština",
+      "ru": "Русский"
     },
     "SMTP": {
       "TITLE": "SMTP настройки",
@@ -1264,7 +1266,9 @@
         "zh": "简体中文",
         "bg": "Български",
         "pt": "Portuguese",
-        "mk": "Македонски"
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский"
       },
       "KEYS": {
         "emailVerificationDoneText": "Проверката на имейл е извършена",
@@ -2082,6 +2086,8 @@
       "UPLOAD": "Качете XML файл",
       "METADATA": "Метаданни",
       "METADATAFROMFILE": "Метаданни от файл",
+      "CERTIFICATE": "SAML сертификат",
+      "DOWNLOADCERT": "Изтеглете SAML сертификат",
       "CREATEMETADATA": "Създайте метаданни",
       "ENTITYID": "Entity ID",
       "ACSURL": "ACS endpoint URL"
@@ -2149,7 +2155,9 @@
     "zh": "简体中文",
     "bg": "Български",
     "pt": "португалски",
-    "mk": "Македонски"
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский"
   },
   "MEMBER": {
     "ADD": "Добавяне на мениджър",
