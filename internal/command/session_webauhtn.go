@@ -29,9 +29,9 @@ func (s *SessionCommands) getHumanWebAuthNTokens(ctx context.Context, userVerifi
 }
 
 func (s *SessionCommands) getHumanWebAuthNTokenReadModel(ctx context.Context, userVerification domain.UserVerificationRequirement) (readModel HumanWebAuthNTokensReadModel, err error) {
-	readModel = NewHumanU2FTokensReadModel(s.sessionWriteModel.UserID, s.sessionWriteModel.ResourceOwner)
+	readModel = NewHumanU2FTokensReadModel(s.sessionWriteModel.UserID, "")
 	if userVerification == domain.UserVerificationRequirementRequired {
-		readModel = NewHumanPasswordlessTokensReadModel(s.sessionWriteModel.UserID, s.sessionWriteModel.ResourceOwner)
+		readModel = NewHumanPasswordlessTokensReadModel(s.sessionWriteModel.UserID, "")
 	}
 	err = s.eventstore.FilterToQueryReducer(ctx, readModel)
 	if err != nil {
