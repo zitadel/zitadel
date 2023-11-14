@@ -23,7 +23,7 @@ machine as (
 metadata as (
 	select json_agg(row_to_json(r)) as metadata from (
 		select creation_date, change_date, sequence, resource_owner, key, encode(value, 'base64') as value
-		from projections.user_metadata4
+		from projections.user_metadata5
 		where user_id = $1
 		and instance_id = $2
 	) r
