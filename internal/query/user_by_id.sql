@@ -23,7 +23,6 @@ join
   projections.login_names2_policies p
   on
     u.instance_id = p.instance_id
-    AND u.resource_owner = p.resource_owner
     AND (
       (p.is_default = TRUE AND p.instance_id = $2)
       OR (p.instance_id = $2 AND p.resource_owner = u.resource_owner)
@@ -38,7 +37,7 @@ SELECT
   , u.state
   , u.type
   , u.username
-  , (select array_agg(ln.login_name)::TEXT[] login_names from login_names ln group by ln.user_id, ln.instance_id) loginnames
+  , (select array_agg(ln.login_name)::TEXT[] login_names from login_names ln group by ln.user_id, ln.instance_id) login_names
   , (select ln.login_name login_names_lower from login_names ln where ln.is_primary is true) preferred_login_name
   , h.user_id
   , h.first_name

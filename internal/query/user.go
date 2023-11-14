@@ -184,11 +184,11 @@ var (
 	userLoginNamesOwnerRemovedPolicyCol = LoginNameOwnerRemovedPolicyCol.setTable(userLoginNamesTable)
 	userLoginNamesOwnerRemovedDomainCol = LoginNameOwnerRemovedDomainCol.setTable(userLoginNamesTable)
 	userLoginNamesListCol               = Column{
-		name:  "loginnames",
+		name:  "login_names",
 		table: userLoginNamesTable,
 	}
 	userLoginNamesLowerListCol = Column{
-		name:  "loginnames_lower",
+		name:  "login_names_lower",
 		table: userLoginNamesTable,
 	}
 	userPreferredLoginNameTable                 = loginNameTable.setAlias("preferred_login_name")
@@ -348,9 +348,6 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 		triggerUserProjections(ctx)
 	}
 
-	_, userSpan := tracing.NewNamedSpan(ctx, "DatabaseQuery")
-	defer userSpan.End()
-
 	err = q.client.QueryRowContext(ctx,
 		func(row *sql.Row) error {
 			user, err = scanUser(row)
@@ -371,15 +368,12 @@ func (q *Queries) GetUserByLoginName(ctx context.Context, shouldTriggered bool, 
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		ctx = q.userTrigger(ctx)
+		triggerUserProjections(ctx)
 	}
 
 	loginNameSplit := strings.Split(loginName, "@")
 	domain := loginNameSplit[len(loginNameSplit)-1]
-	username := strings.TrimSuffix(loginName, domain)
-
-	_, userSpan := tracing.NewNamedSpan(ctx, "DatabaseQuery")
-	defer userSpan.End()
+	username := strings.Join(loginNameSplit[:len(loginNameSplit)-1], "@")
 
 	err = q.client.QueryRowContext(ctx,
 		func(row *sql.Row) error {
@@ -514,11 +508,8 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		ctx = triggerUserProjections(ctx)
+		triggerUserProjections(ctx)
 	}
-
-	_, userSpan := tracing.NewNamedSpan(ctx, "DatabaseQuery")
-	defer userSpan.End()
 
 	err = q.client.QueryRowContext(ctx,
 		func(row *sql.Row) error {
@@ -540,15 +531,12 @@ func (q *Queries) GetNotifyUserByLoginName(ctx context.Context, shouldTriggered 
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggered {
-		ctx = triggerUserProjections(ctx)
+		triggerUserProjections(ctx)
 	}
 
 	loginNameSplit := strings.Split(loginName, "@")
 	domain := loginNameSplit[len(loginNameSplit)-1]
 	username := strings.TrimSuffix(loginName, domain)
-
-	_, userSpan := tracing.NewNamedSpan(ctx, "DatabaseQuery")
-	defer userSpan.End()
 
 	err = q.client.QueryRowContext(ctx,
 		func(row *sql.Row) error {
