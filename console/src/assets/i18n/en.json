@@ -2114,6 +2114,8 @@
       "UPLOAD": "Upload XML file",
       "METADATA": "Metadata",
       "METADATAFROMFILE": "Metadata from file",
+      "CERTIFICATE": "SAML certificate",
+      "DOWNLOADCERT": "Download SAML certificate",
       "CREATEMETADATA": "Create metadata",
       "ENTITYID": "Entity ID",
       "ACSURL": "ACS endpoint URL"

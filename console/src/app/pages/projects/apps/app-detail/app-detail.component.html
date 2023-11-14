@@ -414,10 +414,11 @@
           </cnsl-card>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting === 'urls'">
+        <ng-container *ngIf="currentSetting === 'urls' && !app?.samlConfig">
           <cnsl-card title=" {{ 'APP.URLS' | translate }}" *ngIf="environmentMap$ | async as environmentMap">
             <cnsl-info-section *ngIf="environmentMap.issuer">
               <div
+                class="link"
                 [innerHtml]="
                   'APP.OIDC.WELLKNOWN' | translate: { url: environmentMap['issuer'] + '/.well-known/openid-configuration' }
                 "
@@ -461,6 +462,65 @@
                     </div>
                   </div></ng-container
                 >
+              </div>
+            </div>
+          </cnsl-card>
+        </ng-container>
+
+        <ng-container *ngIf="currentSetting === 'urls' && samlForm && app?.samlConfig">
+          <cnsl-card title=" {{ 'APP.URLS' | translate }}" *ngIf="environmentMap$ | async as environmentMap">
+            <div class="app-info-row">
+              <div class="app-info-wrapper" *ngIf="environmentMap['samlCertificateURL']">
+                <p class="app-info-row-title cnsl-secondary-text">{{ 'APP.SAML.CERTIFICATE' | translate }}</p>
+                <div class="app-copy-row">
+                  <div class="environment">
+                    <button
+                      [disabled]="copied === environmentMap['samlCertificateURL']"
+                      [matTooltip]="
+                        (copied !== environmentMap['samlCertificateURL'] ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate
+                      "
+                      cnslCopyToClipboard
+                      [valueToCopy]="environmentMap['samlCertificateURL']"
+                      (copiedValue)="copied = environmentMap['samlCertificateURL']"
+                    >
+                      {{ environmentMap['samlCertificateURL'] }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="app-info-wrapper" *ngIf="environmentMap['samlSSO']">
+                <p class="app-info-row-title cnsl-secondary-text">Single Sign On (SSO)</p>
+                <div class="app-copy-row">
+                  <div class="environment">
+                    <button
+                      [disabled]="copied === environmentMap['samlSSO']"
+                      [matTooltip]="(copied !== environmentMap['samlSSO'] ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
+                      cnslCopyToClipboard
+                      [valueToCopy]="environmentMap['samlSSO']"
+                      (copiedValue)="copied = environmentMap['samlSSO']"
+                    >
+                      {{ environmentMap['samlSSO'] }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="app-info-wrapper" *ngIf="environmentMap['samlSLO']">
+                <p class="app-info-row-title cnsl-secondary-text">Single Logoout (SLO)</p>
+                <div class="app-copy-row">
+                  <div class="environment">
+                    <button
+                      [disabled]="copied === environmentMap['samlSLO']"
+                      [matTooltip]="(copied !== environmentMap['samlSLO'] ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
+                      cnslCopyToClipboard
+                      [valueToCopy]="environmentMap['samlSLO']"
+                      (copiedValue)="copied = environmentMap['samlSLO']"
+                    >
+                      {{ environmentMap['samlSLO'] }}
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </cnsl-card>

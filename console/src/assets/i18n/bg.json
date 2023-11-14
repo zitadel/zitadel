@@ -2086,6 +2086,8 @@
       "UPLOAD": "Качете XML файл",
       "METADATA": "Метаданни",
       "METADATAFROMFILE": "Метаданни от файл",
+      "CERTIFICATE": "SAML сертификат",
+      "DOWNLOADCERT": "Изтеглете SAML сертификат",
       "CREATEMETADATA": "Създайте метаданни",
       "ENTITYID": "Entity ID",
       "ACSURL": "ACS endpoint URL"

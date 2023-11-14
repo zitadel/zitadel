@@ -2093,6 +2093,8 @@
       "UPLOAD": "Поставете XML датотека",
       "METADATA": "Метаподатоци",
       "METADATAFROMFILE": "Метаподатоци од датотека",
+      "CERTIFICATE": "SAML сертификат",
+      "DOWNLOADCERT": "Преземете SAML сертификат",
       "CREATEMETADATA": "Креирајте метаподатоци",
       "ENTITYID": "Entity ID",
       "ACSURL": "ACS endpoint URL"
