@@ -38,8 +38,8 @@ type registerOrgData struct {
 }
 
 func (l *Login) handleRegisterOrg(w http.ResponseWriter, r *http.Request) {
-	allowed, err := l.publicOrgRegistrationIsAllowed(r)
-	if !allowed || err != nil {
+	disallowed, err := l.publicOrgRegistrationIsDisallowed(r)
+	if disallowed || err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -53,8 +53,8 @@ func (l *Login) handleRegisterOrg(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
-	allowed, err := l.publicOrgRegistrationIsAllowed(r)
-	if !allowed || err != nil {
+	disallowed, err := l.publicOrgRegistrationIsDisallowed(r)
+	if disallowed || err != nil {
 		w.WriteHeader(http.StatusConflict)
 		return
 	}
@@ -129,15 +129,18 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegisterOrg], data, nil)
 }
 
-func (l *Login) publicOrgRegistrationIsAllowed(r *http.Request) (bool, error) {
+func (l *Login) publicOrgRegistrationIsDisallowed(r *http.Request) (bool, error) {
 	limits, err := l.query.Limits(r.Context(), authz.GetInstance(r.Context()).InstanceID())
+	if caos_errs.IsNotFound(err) {
+		return false, nil
+	}
 	if err != nil {
 		return false, err
 	}
-	if limits.AllowPublicOrgRegistration != nil {
-		return *limits.AllowPublicOrgRegistration, nil
+	if limits.DisallowPublicOrgRegistration != nil {
+		return *limits.DisallowPublicOrgRegistration, nil
 	}
-	return true, nil
+	return false, nil
 }
 
 func (d registerOrgFormData) toUserDomain() *domain.Human {
