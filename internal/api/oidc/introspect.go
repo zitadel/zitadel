@@ -23,7 +23,7 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if !s.features.ExperimentalIntrospection {
+	if s.features.LegacyIntrospection {
 		return s.LegacyServer.Introspect(ctx, r)
 	}
 
