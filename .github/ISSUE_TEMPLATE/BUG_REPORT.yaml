@@ -1,12 +1,13 @@
 name: Bug Report
-description: "Create a bug report to help us improve ZITADEL. Click [here](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#product-management) to see how we process your issue."
+description: "Create a bug report to help us improve ZITADEL."
 title: "[Bug]: "
 labels: ["bug"]
 body:
 - type: markdown
   attributes:
     value: |
-      Thanks for taking the time to fill out this bug report!
+      Thanks for taking the time to fill out this bug report!  
+      Learn more in our [contribution guide](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#product-management) on how we will process your issue.
 - type: checkboxes
   id: preflight
   attributes:
