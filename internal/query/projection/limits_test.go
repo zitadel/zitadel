@@ -115,7 +115,7 @@ func TestLimitsProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceLimitsReset specific properties",
+			name: "reduceLimitsReset single property",
 			args: args{
 				event: getEvent(testEvent(
 					limits.ResetEventType,
