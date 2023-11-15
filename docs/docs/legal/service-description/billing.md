@@ -18,21 +18,21 @@ Customer and ZITADEL may agree on an individual per-customer pricing via an Ente
 
 ## Billing Metrics
 
-### Monthly quota
+### Monthly amount
 
-Monthly quota means the available usage per measure for one billing period.
-The quota is reset to zero with the start of a new billing period.
+Monthly amount means the available usage per measure for one billing period.
+The amount is reset to zero with the start of a new billing period.
 
 ### Daily active user (DAU)
 
 Daily Active Users (DAU) are counted as users who authenticate or refresh their token during the given day.
-To calculate the monthly quota we take the sum of DAU over a given month.
+To calculate the monthly amount we take the sum of DAU over a given month.
 Included are users that either login with local accounts or users that login with an external identity provider.
 Service users that authenticate or access the management API are counted against Daily Active Users.
 
 ### Active external identity providers
 
-To calculate the monthly quota we take maximum activated external identity providers on each day over a given month.
+To calculate the monthly amount we take maximum activated external identity providers on each day over a given month.
 Excluded are configured identity providers that are not activated.
 
 ### Action minutes
