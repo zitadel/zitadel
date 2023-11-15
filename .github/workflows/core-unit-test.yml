@@ -15,7 +15,8 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: 
+      group: zitadel-public
     steps:
       - 
         uses: actions/checkout@v3
