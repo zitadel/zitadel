@@ -23,6 +23,8 @@ func TestServer_Limits_DisallowPublicOrgRegistration(t *testing.T) {
 	domain, _, iamOwnerCtx := Tester.UseIsolatedInstance(ctx, SystemCTX)
 	regOrgUrl, err := url.Parse("http://" + domain + ":8080/ui/login/register/org")
 	require.NoError(t, err)
+	// The CSRF cookie must be sent with every request.
+	// We can simulate a browser session using a cookie jar.
 	jar, err := cookiejar.New(nil)
 	require.NoError(t, err)
 	browserSession := &http.Client{Jar: jar}
@@ -75,6 +77,7 @@ func awaitPostFormResponse(t *testing.T, ctx context.Context, client *http.Clien
 		})
 		require.NoError(t, err)
 		return resp.StatusCode == expectCode
+
 	})
 }
 
