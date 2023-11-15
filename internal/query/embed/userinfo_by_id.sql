@@ -1,3 +1,6 @@
+-- deallocate q;
+-- prepare q (text, text, text[]) as
+
 with usr as (
 	select id, creation_date, change_date, sequence, state, resource_owner, username
 	from projections.users9 u
@@ -20,6 +23,7 @@ machine as (
 		and instance_id = $2
 	) r
 ),
+-- find the user's metadata
 metadata as (
 	select json_agg(row_to_json(r)) as metadata from (
 		select creation_date, change_date, sequence, resource_owner, key, encode(value, 'base64') as value
@@ -28,14 +32,46 @@ metadata as (
 		and instance_id = $2
 	) r
 ),
-org as (
+-- get all user grants, needed for the orgs query
+user_grants as (
+	select id, grant_id, state, creation_date, change_date, sequence, user_id, roles, resource_owner, project_id
+	from projections.user_grants3
+	where user_id = $1
+	and instance_id = $2
+	and project_id = any($3)
+),
+-- filter all orgs we are interested in.
+orgs as (
+	select id, name, primary_domain
+	from projections.orgs1
+	where id in (
+		select resource_owner from user_grants
+		union
+		select resource_owner from usr
+	)
+	and instance_id = $2
+),
+-- find the user's org
+user_org as (
 	select row_to_json(r) as organization from (
 		select name, primary_domain
-		from projections.orgs1 o
+		from orgs o
 		join usr u on o.id = u.resource_owner
-		where instance_id = $2
+	) r
+),
+-- join user grants to orgs, projects and user
+grants as (
+	select json_agg(row_to_json(r)) as grants from (
+		select g.*,
+			o.name as org_name, o.primary_domain as org_primary_domain,
+			p.name as project_name, u.resource_owner as user_resource_owner
+		from user_grants g
+		left join orgs o on o.id = g.resource_owner
+		left join projections.projects3 p on p.id = g.project_id
+		left join usr u on u.id = g.user_id
 	) r
 )
+-- build the final result JSON
 select json_build_object(
 	'user', (
 		select row_to_json(r) as usr from (
@@ -45,6 +81,9 @@ select json_build_object(
 			left join machine m on u.id = m.user_id
 		) r
 	),
-	'org', (select organization from org),
-	'metadata', (select metadata from metadata)
+	'org', (select organization from user_org),
+	'metadata', (select metadata from metadata),
+	'user_grants', (select grants from grants)
 );
+
+-- execute q('231965491734773762','230690539048009730', '{"236645808328409090","240762134579904514"}')

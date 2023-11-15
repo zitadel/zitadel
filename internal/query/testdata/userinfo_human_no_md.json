@@ -24,5 +24,6 @@
       "name": "demo",
       "primary_domain": "demo.localhost"
     },
-    "metadata": null
+    "metadata": null,
+    "user_grants": null
   }

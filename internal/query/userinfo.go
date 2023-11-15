@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -14,14 +15,17 @@ import (
 //go:embed embed/userinfo_by_id.sql
 var oidcUserInfoQuery string
 
-func (q *Queries) GetOIDCUserInfo(ctx context.Context, userID string) (_ *OIDCUserInfo, err error) {
+func (q *Queries) GetOIDCUserInfo(ctx context.Context, userID string, roleAudience []string) (_ *OIDCUserInfo, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	var data []byte
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
 		return row.Scan(&data)
-	}, oidcUserInfoQuery, userID, authz.GetInstance(ctx).InstanceID())
+	},
+		oidcUserInfoQuery,
+		userID, authz.GetInstance(ctx).InstanceID(), database.TextArray[string](roleAudience),
+	)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Oath6", "Errors.Internal")
 	}
@@ -38,9 +42,10 @@ func (q *Queries) GetOIDCUserInfo(ctx context.Context, userID string) (_ *OIDCUs
 }
 
 type OIDCUserInfo struct {
-	User     *User          `json:"user,omitempty"`
-	Metadata []UserMetadata `json:"metadata,omitempty"`
-	Org      *userInfoOrg   `json:"org,omitempty"`
+	User       *User          `json:"user,omitempty"`
+	Metadata   []UserMetadata `json:"metadata,omitempty"`
+	Org        *userInfoOrg   `json:"org,omitempty"`
+	UserGrants []UserGrant    `json:"user_grants,omitempty"`
 }
 
 type userInfoOrg struct {

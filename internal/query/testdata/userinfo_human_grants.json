@@ -42,5 +42,45 @@
         "value": "YmFy"
       }
     ],
-    "user_grants": null
+    "user_grants": [
+      {
+        "id": "240749256523120642",
+        "grant_id": "",
+        "state": 1,
+        "creation_date": "2023-11-14T20:28:59.168208+00:00",
+        "change_date": "2023-11-14T20:50:58.822391+00:00",
+        "sequence": 2,
+        "user_id": "231965491734773762",
+        "roles": [
+          "role1",
+          "role2"
+        ],
+        "resource_owner": "231848297847848962",
+        "project_id": "236645808328409090",
+        "org_name": "demo",
+        "org_primary_domain": "demo.localhost",
+        "project_name": "tests",
+        "user_resource_owner": "231848297847848962"
+      },
+      {
+        "id": "240762315572510722",
+        "grant_id": "",
+        "state": 1,
+        "creation_date": "2023-11-14T22:38:42.967317+00:00",
+        "change_date": "2023-11-14T22:38:42.967317+00:00",
+        "sequence": 1,
+        "user_id": "231965491734773762",
+        "roles": [
+          "role3",
+          "role4"
+        ],
+        "resource_owner": "231848297847848962",
+        "project_id": "240762134579904514",
+        "org_name": "demo",
+        "org_primary_domain": "demo.localhost",
+        "project_name": "tests2",
+        "user_resource_owner": "231848297847848962"
+      }
+    ]
   }
+  

@@ -795,7 +795,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	if len(requestedRoles) > 0 {
 		for _, requestedRole := range requestedRoles {
 			for _, grant := range grants.UserGrants {
-				checkGrantedRoles(roles, grant, requestedRole, grant.ProjectID == projectID)
+				checkGrantedRoles(roles, *grant, requestedRole, grant.ProjectID == projectID)
 			}
 		}
 		return grants, roles, nil
@@ -838,7 +838,7 @@ func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) 
 	}, nil
 }
 
-func checkGrantedRoles(roles *projectsRoles, grant *query.UserGrant, requestedRole string, isRequested bool) {
+func checkGrantedRoles(roles *projectsRoles, grant query.UserGrant, requestedRole string, isRequested bool) {
 	for _, grantedRole := range grant.Roles {
 		if requestedRole == grantedRole {
 			roles.Add(grant.ProjectID, grantedRole, grant.ResourceOwner, grant.OrgPrimaryDomain, isRequested)
@@ -852,6 +852,26 @@ type projectsRoles struct {
 	projects map[string]projectRoles
 
 	requestProjectID string
+}
+
+func newProjectRoles(projectID string, grants []query.UserGrant, requestedRoles []string) *projectsRoles {
+	roles := new(projectsRoles)
+	// if specific roles where requested, check if they are granted and append them in the roles list
+	if len(requestedRoles) > 0 {
+		for _, requestedRole := range requestedRoles {
+			for _, grant := range grants {
+				checkGrantedRoles(roles, grant, requestedRole, grant.ProjectID == projectID)
+			}
+		}
+		return roles
+	}
+	// no specific roles were requested, so convert any grants into roles
+	for _, grant := range grants {
+		for _, role := range grant.Roles {
+			roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID)
+		}
+	}
+	return roles
 }
 
 func (p *projectsRoles) Add(projectID, roleKey, orgID, domain string, isRequested bool) {
