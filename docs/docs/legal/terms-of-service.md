@@ -2,6 +2,9 @@
 title: Terms of Service Agreement
 custom_edit_url: null
 --- 
+
+Last updated on November 15, 2023
+
 ## General
 
 ### Introduction
@@ -217,12 +220,6 @@ The exclusive place of jurisdiction is St. Gallen, Switzerland.
 ### Severability clause
 
 Should any provision of these TOS be or become invalid, this shall not affect the validity of the remaining TOS. The invalid provision will be replaced by a valid one which approximates the invalid one as much as possible.
-
-### Entry into force
-
-This Agreement shall enter into force as of Juli 15, 2022.
-
-Last revised: November 8, 2023
 
 ### Amendments
 

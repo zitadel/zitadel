@@ -4,6 +4,8 @@ sidebar_label: Brand and Trademark Policy
 custom_edit_url: null
 ---
 
+Last updated on November 15, 2023
+
 This policy is an annex to the [Terms of Service](../terms-of-service) that clarifies how you may use our brands and trademarks under fair use.
 
 We reserve the right to object to any use or misuse of brands and trademarks in any jurisdiction worldwide.
@@ -41,9 +43,3 @@ To ensure the logo is used as intended, we provide specific examples below and r
 - Modification of our brands and trademarks
 - Integration of our brands and trademarks into your own brands and trademarks
 - Suggesting affiliation, endorsement, or partnership without our consent
-
-## Entry into force
-
-This policy is valid from November 9, 2023.
-
-Last revised November 9, 2023

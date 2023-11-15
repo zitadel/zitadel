@@ -3,6 +3,8 @@ title: Acceptable Use Policy
 custom_edit_url: null
 --- 
 
+Last updated on November 15, 2023
+
 This policy is an annex to the [Terms of Service](../terms-of-service) and clarifies your obligations while using our Services.
 
 ## Use
@@ -36,9 +38,3 @@ You agree to adhere to the following fair use limits:
 
 We may suspend or terminate your usage of our Services for any violation of this Acceptable Use Policy.
 You will not be entitled to any Financial Credit or compensation for any interruptions caused by violation of this policy.
-
-## Entry into force
-
-This policy is valid from November 9, 2023.
-
-Last revised November 9, 2023

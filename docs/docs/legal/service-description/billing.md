@@ -4,9 +4,9 @@ sidebar_label: Billing
 custom_edit_url: null
 --- 
 
-This annex of the [Framework Agreement](../terms-of-service) describes the pricing and billing of our Services.
+Last updated on November 15, 2023
 
-Last revised: November 9, 2023
+This annex of the [Framework Agreement](../terms-of-service) describes the pricing and billing of our Services.
 
 ## Pricing
 
