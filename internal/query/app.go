@@ -329,15 +329,12 @@ func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string, withOw
 	return app, err
 }
 
-func (q *Queries) ProjectByClientID(ctx context.Context, appID string, withOwnerRemoved bool) (project *Project, err error) {
+func (q *Queries) ProjectByClientID(ctx context.Context, appID string) (project *Project, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	stmt, scan := prepareProjectByAppQuery(ctx, q.client)
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		eq[ProjectColumnOwnerRemoved.identifier()] = false
-	}
 	query, args, err := stmt.Where(sq.And{
 		eq,
 		sq.Or{

@@ -29,7 +29,7 @@ var (
 		", projections.users8_humans.avatar_key" +
 		", projections.users8.type" +
 		", COUNT(*) OVER () " +
-		"FROM projections.project_members3 AS members " +
+		"FROM projections.project_members4 AS members " +
 		"LEFT JOIN projections.users8_humans " +
 		"ON members.user_id = projections.users8_humans.user_id " +
 		"AND members.instance_id = projections.users8_humans.instance_id " +

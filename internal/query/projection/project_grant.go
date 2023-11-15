@@ -15,20 +15,18 @@ import (
 )
 
 const (
-	ProjectGrantProjectionTable = "projections.project_grants3"
+	ProjectGrantProjectionTable = "projections.project_grants4"
 
-	ProjectGrantColumnGrantID           = "grant_id"
-	ProjectGrantColumnCreationDate      = "creation_date"
-	ProjectGrantColumnChangeDate        = "change_date"
-	ProjectGrantColumnSequence          = "sequence"
-	ProjectGrantColumnState             = "state"
-	ProjectGrantColumnResourceOwner     = "resource_owner"
-	ProjectGrantColumnInstanceID        = "instance_id"
-	ProjectGrantColumnProjectID         = "project_id"
-	ProjectGrantColumnGrantedOrgID      = "granted_org_id"
-	ProjectGrantColumnRoleKeys          = "granted_role_keys"
-	ProjectGrantColumnOwnerRemoved      = "owner_removed"
-	ProjectGrantColumnGrantedOrgRemoved = "granted_org_removed"
+	ProjectGrantColumnGrantID       = "grant_id"
+	ProjectGrantColumnCreationDate  = "creation_date"
+	ProjectGrantColumnChangeDate    = "change_date"
+	ProjectGrantColumnSequence      = "sequence"
+	ProjectGrantColumnState         = "state"
+	ProjectGrantColumnResourceOwner = "resource_owner"
+	ProjectGrantColumnInstanceID    = "instance_id"
+	ProjectGrantColumnProjectID     = "project_id"
+	ProjectGrantColumnGrantedOrgID  = "granted_org_id"
+	ProjectGrantColumnRoleKeys      = "granted_role_keys"
 )
 
 type projectGrantProjection struct{}
@@ -54,14 +52,10 @@ func (*projectGrantProjection) Init() *old_handler.Check {
 			handler.NewColumn(ProjectGrantColumnProjectID, handler.ColumnTypeText),
 			handler.NewColumn(ProjectGrantColumnGrantedOrgID, handler.ColumnTypeText),
 			handler.NewColumn(ProjectGrantColumnRoleKeys, handler.ColumnTypeTextArray, handler.Nullable()),
-			handler.NewColumn(ProjectGrantColumnOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
-			handler.NewColumn(ProjectGrantColumnGrantedOrgRemoved, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(ProjectGrantColumnInstanceID, ProjectGrantColumnGrantID),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{ProjectGrantColumnResourceOwner})),
 			handler.WithIndex(handler.NewIndex("granted_org", []string{ProjectGrantColumnGrantedOrgID})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{ProjectGrantColumnOwnerRemoved})),
-			handler.WithIndex(handler.NewIndex("granted_org_removed", []string{ProjectGrantColumnGrantedOrgRemoved})),
 		),
 	)
 }

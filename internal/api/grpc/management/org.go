@@ -267,7 +267,7 @@ func (s *Server) ListOrgMembers(ctx context.Context, req *mgmt_pb.ListOrgMembers
 	if err != nil {
 		return nil, err
 	}
-	members, err := s.query.OrgMembers(ctx, queries, false)
+	members, err := s.query.OrgMembers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}

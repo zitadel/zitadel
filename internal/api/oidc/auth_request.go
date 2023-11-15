@@ -39,7 +39,7 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 }
 
 func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.AuthRequest, hintUserID, loginClient string) (op.AuthRequest, error) {
-	project, err := o.query.ProjectByClientID(ctx, req.ClientID, false)
+	project, err := o.query.ProjectByClientID(ctx, req.ClientID)
 	if err != nil {
 		return nil, err
 	}
@@ -436,7 +436,7 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
 	}
-	project, err := o.query.ProjectByID(ctx, false, projectID, false)
+	project, err := o.query.ProjectByID(ctx, false, projectID)
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-w4wIn", "Errors.Internal")
 	}
@@ -447,7 +447,7 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
-	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
+	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
@@ -470,7 +470,7 @@ func (o *OPStorage) assertProjectRoleScopesByProject(ctx context.Context, projec
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
-	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
+	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
@@ -486,7 +486,7 @@ func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.T
 	if err != nil {
 		return errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
-	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
+	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return err
 	}
