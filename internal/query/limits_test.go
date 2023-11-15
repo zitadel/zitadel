@@ -21,7 +21,7 @@ var (
 		" projections.limits2.resource_owner," +
 		" projections.limits2.sequence," +
 		" projections.limits2.audit_log_retention," +
-		" projections.limits2.allow_public_org_registration" +
+		" projections.limits2.disallow_public_org_registration" +
 		" FROM projections.limits2" +
 		" AS OF SYSTEM TIME '-1 ms'",
 	)
@@ -33,7 +33,7 @@ var (
 		"resource_owner",
 		"sequence",
 		"audit_log_retention",
-		"allow_public_org_registration",
+		"disallow_public_org_registration",
 	}
 )
 
