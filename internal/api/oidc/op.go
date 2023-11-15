@@ -65,7 +65,8 @@ type Endpoint struct {
 }
 
 type Features struct {
-	LegacyIntrospection bool
+	TriggerIntrospectionProjections bool
+	LegacyIntrospection             bool
 }
 
 type OPStorage struct {

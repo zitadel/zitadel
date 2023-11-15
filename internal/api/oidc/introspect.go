@@ -5,18 +5,15 @@ import (
 	"database/sql"
 	"errors"
 	"slices"
-	"strings"
 	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
-	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	errz "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/user/model"
 )
 
 func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionRequest]) (resp *op.Response, err error) {
@@ -84,6 +81,14 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 	if err != nil {
 		return nil, err
 	}
+
+	// TODO: can we get rid of this seperate query?
+	if token.isPAT {
+		if err = s.assertClientScopesForPAT(ctx, token.accessToken, client.clientID, client.projectID); err != nil {
+			return nil, err
+		}
+	}
+
 	if err = validateIntrospectionAudience(token.audience, client.clientID, client.projectID); err != nil {
 		return nil, err
 	}
@@ -165,89 +170,18 @@ func (s *Server) clientFromCredentials(ctx context.Context, cc *op.ClientCredent
 }
 
 type introspectionTokenResult struct {
-	tokenID         string
-	userID          string
-	subject         string
-	clientID        string
-	audience        []string
-	scope           []string
-	tokenCreation   time.Time
-	tokenExpiration time.Time
-	isPAT           bool
-
+	*accessToken
 	err error
 }
 
-func (s *Server) introspectionToken(ctx context.Context, accessToken string, rc chan<- *introspectionTokenResult) {
+func (s *Server) introspectionToken(ctx context.Context, tkn string, rc chan<- *introspectionTokenResult) {
 	ctx, span := tracing.NewSpan(ctx)
-
-	result, err := func() (_ *introspectionTokenResult, err error) {
-		var tokenID, subject string
-
-		if tokenIDSubject, err := s.Provider().Crypto().Decrypt(accessToken); err == nil {
-			split := strings.Split(tokenIDSubject, ":")
-			if len(split) != 2 {
-				return nil, errors.New("invalid token format")
-			}
-			tokenID, subject = split[0], split[1]
-		} else {
-			verifier := op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), s.keySet)
-			claims, err := op.VerifyAccessToken[*oidc.AccessTokenClaims](ctx, accessToken, verifier)
-			if err != nil {
-				return nil, err
-			}
-			tokenID, subject = claims.JWTID, claims.Subject
-		}
-
-		if strings.HasPrefix(tokenID, command.IDPrefixV2) {
-			token, err := s.query.ActiveAccessTokenByToken(ctx, tokenID)
-			if err != nil {
-				rc <- &introspectionTokenResult{err: err}
-				return nil, err
-			}
-			return introspectionTokenResultV2(tokenID, subject, token), nil
-		}
-
-		token, err := s.repo.TokenByIDs(ctx, subject, tokenID)
-		if err != nil {
-			return nil, errz.ThrowPermissionDenied(err, "OIDC-Dsfb2", "token is not valid or has expired")
-		}
-		return introspectionTokenResultV1(tokenID, subject, token), nil
-	}()
-
+	token, err := s.verifyAccessToken(ctx, tkn)
 	span.EndWithError(err)
 
-	if err != nil {
-		rc <- &introspectionTokenResult{err: err}
-		return
-	}
-	rc <- result
-}
-
-func introspectionTokenResultV1(tokenID, subject string, token *model.TokenView) *introspectionTokenResult {
-	return &introspectionTokenResult{
-		tokenID:         tokenID,
-		userID:          token.UserID,
-		subject:         subject,
-		clientID:        token.ApplicationID,
-		audience:        token.Audience,
-		scope:           token.Scopes,
-		tokenCreation:   token.CreationDate,
-		tokenExpiration: token.Expiration,
-		isPAT:           token.IsPAT,
-	}
-}
-
-func introspectionTokenResultV2(tokenID, subject string, token *query.OIDCSessionAccessTokenReadModel) *introspectionTokenResult {
-	return &introspectionTokenResult{
-		tokenID:         tokenID,
-		userID:          token.UserID,
-		subject:         subject,
-		clientID:        token.ClientID,
-		audience:        token.Audience,
-		scope:           token.Scope,
-		tokenCreation:   token.AccessTokenCreation,
-		tokenExpiration: token.AccessTokenExpiration,
+	rc <- &introspectionTokenResult{
+		accessToken: token,
+		err:         err,
 	}
 }
 

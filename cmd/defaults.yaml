@@ -315,6 +315,8 @@ OIDC:
   DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
   DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
   Features:
+    # Wheter projection triggers are used in the new Introspection implementation.
+    TriggerIntrospectionProjections: false
     # Allows fallback to the Legacy Introspection implementation
     LegacyIntrospection: false
 
