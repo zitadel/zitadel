@@ -115,11 +115,11 @@ func (p *limitsProjection) reduceLimitsReset(event eventstore.Event) (*handler.S
 		handler.NewCond(LimitsColumnInstanceID, e.Aggregate().InstanceID),
 		handler.NewCond(LimitsColumnResourceOwner, e.Aggregate().ResourceOwner),
 	}
-	if e.Properties == nil {
+	if e.OnlyReset == nil {
 		return handler.NewDeleteStatement(e, cond), nil
 	}
 	var resetPropertyColumns []handler.Column
-	for _, property := range e.Properties {
+	for _, property := range e.OnlyReset {
 		switch property {
 		case limits.ResetAuditLogRetention:
 			resetPropertyColumns = append(resetPropertyColumns, handler.NewCol(LimitsColumnAuditLogRetention, nil))

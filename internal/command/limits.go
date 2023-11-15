@@ -56,7 +56,7 @@ func (c *Commands) SetLimits(
 	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
 
-func (c *Commands) ResetLimits(ctx context.Context, resourceOwner string, properties ...limits.ResetProperty) (*domain.ObjectDetails, error) {
+func (c *Commands) ResetLimits(ctx context.Context, resourceOwner string, onlyReset ...limits.ResetProperty) (*domain.ObjectDetails, error) {
 	instanceId := authz.GetInstance(ctx).InstanceID()
 	wm, err := c.getLimitsWriteModel(ctx, instanceId, resourceOwner)
 	if err != nil {
@@ -66,7 +66,7 @@ func (c *Commands) ResetLimits(ctx context.Context, resourceOwner string, proper
 		return nil, errors.ThrowNotFound(nil, "COMMAND-9JToT", "Errors.Limits.NotFound")
 	}
 	aggregate := limits.NewAggregate(wm.AggregateID, instanceId, resourceOwner)
-	events := []eventstore.Command{limits.NewResetEvent(ctx, &aggregate.Aggregate, properties...)}
+	events := []eventstore.Command{limits.NewResetEvent(ctx, &aggregate.Aggregate, onlyReset...)}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err

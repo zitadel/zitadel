@@ -71,7 +71,7 @@ const (
 
 type ResetEvent struct {
 	*eventstore.BaseEvent `json:"-"`
-	Properties            []ResetProperty `json:"properties,omitempty"`
+	OnlyReset             []ResetProperty `json:"properties,omitempty"`
 }
 
 func (e *ResetEvent) Payload() any {
@@ -89,7 +89,7 @@ func (e *ResetEvent) SetBaseEvent(b *eventstore.BaseEvent) {
 func NewResetEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	properties ...ResetProperty,
+	onlyReset ...ResetProperty,
 ) *ResetEvent {
 	return &ResetEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
@@ -97,7 +97,7 @@ func NewResetEvent(
 			aggregate,
 			ResetEventType,
 		),
-		Properties: properties,
+		OnlyReset: onlyReset,
 	}
 }
 

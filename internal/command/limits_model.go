@@ -51,13 +51,13 @@ func (wm *limitsWriteModel) Reduce() error {
 				wm.disallowPublicOrgRegistration = e.DisallowPublicOrgRegistration
 			}
 		case *limits.ResetEvent:
-			if e.Properties == nil {
+			if e.OnlyReset == nil {
 				wm.rollingAggregateID = ""
 				wm.auditLogRetention = nil
 				wm.disallowPublicOrgRegistration = nil
 				break
 			}
-			for _, property := range e.Properties {
+			for _, property := range e.OnlyReset {
 				switch property {
 				case limits.ResetAuditLogRetention:
 					wm.auditLogRetention = nil
