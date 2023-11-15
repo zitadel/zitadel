@@ -674,7 +674,7 @@ func (s *Server) getTriggerActions(ctx context.Context, org string, processedAct
 	triggerActions := make([]*management_pb.SetTriggerActionsRequest, 0)
 
 	for _, flowType := range flowTypes {
-		flow, err := s.query.GetFlow(ctx, flowType, org, false)
+		flow, err := s.query.GetFlow(ctx, flowType, org)
 		if err != nil {
 			return nil, err
 		}

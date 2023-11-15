@@ -458,7 +458,7 @@ func (o *OPStorage) setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projec
 }
 
 func (o *OPStorage) userinfoFlows(ctx context.Context, user *query.User, userGrants *query.UserGrants, userInfo *oidc.UserInfo) error {
-	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, user.ResourceOwner, false)
+	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, user.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -649,7 +649,7 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userG
 	if err != nil {
 		return nil, err
 	}
-	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreAccessTokenCreation, user.ResourceOwner, false)
+	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreAccessTokenCreation, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}

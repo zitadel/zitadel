@@ -216,7 +216,7 @@ func setUserinfo(user *query.User, userinfo models.AttributeSetter, attributes [
 
 func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, userGrants *query.UserGrants) (map[string]*customAttribute, error) {
 	customAttributes := make(map[string]*customAttribute, 0)
-	queriedActions, err := p.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomizeSAMLResponse, domain.TriggerTypePreSAMLResponseCreation, user.ResourceOwner, false)
+	queriedActions, err := p.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomizeSAMLResponse, domain.TriggerTypePreSAMLResponseCreation, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
