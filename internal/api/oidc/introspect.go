@@ -23,6 +23,10 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 	if s.features.LegacyIntrospection {
 		return s.LegacyServer.Introspect(ctx, r)
 	}
+	if s.features.TriggerIntrospectionProjections {
+		// Execute all triggers in one concurrent sweep.
+		ctx = query.TriggerIntrospectionProjections(ctx)
+	}
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()

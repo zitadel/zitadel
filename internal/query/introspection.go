@@ -8,8 +8,19 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
+
+var introspectionTriggerHandlers = append(oidcUserInfoTriggerHandlers,
+	projection.AppProjection,
+	projection.OIDCSettingsProjection,
+	projection.AuthNKeyProjection,
+)
+
+func TriggerIntrospectionProjections(ctx context.Context) context.Context {
+	return triggerBatch(ctx, introspectionTriggerHandlers...)
+}
 
 type IntrospectionClient struct {
 	ClientID     string

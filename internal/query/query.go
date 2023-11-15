@@ -11,6 +11,8 @@ import (
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
@@ -18,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
@@ -32,6 +35,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/session"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type Queries struct {
@@ -145,4 +149,26 @@ func init() {
 	cleanStaticQueries(
 		&authRequestByIDQuery,
 	)
+}
+
+// triggerBatch calls Trigger on every handler in a seperate Go routine.
+// The returned context is the context returned by the Trigger that finishes last.
+func triggerBatch(ctx context.Context, handlers ...*handler.Handler) context.Context {
+	ctxChan := make(chan context.Context)
+
+	for _, h := range handlers {
+		go func(ctx context.Context, h *handler.Handler, ctxChan chan<- context.Context) {
+			name := h.ProjectionName()
+			_, traceSpan := tracing.NewNamedSpan(ctx, fmt.Sprintf("Trigger%s", name))
+			newCtx, err := h.Trigger(ctx, handler.WithAwaitRunning())
+			logging.OnError(err).WithField("projection", name).Debug("trigger failed")
+			traceSpan.EndWithError(err)
+			ctxChan <- newCtx
+		}(ctx, h, ctxChan)
+	}
+
+	for i := 0; i < len(handlers); i++ {
+		ctx = <-ctxChan
+	}
+	return ctx
 }

@@ -5,11 +5,9 @@ import (
 	"database/sql"
 	errs "errors"
 	"strings"
-	"sync"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -17,7 +15,6 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -709,24 +706,8 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 	)
 }
 
-func triggerUserProjections(ctx context.Context) {
-	wg := sync.WaitGroup{}
-	wg.Add(2)
-	func() {
-		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerUserProjection")
-		_, err := projection.UserProjection.Trigger(ctx, handler.WithAwaitRunning())
-		logging.OnError(err).Debug("trigger failed")
-		traceSpan.EndWithError(err)
-		wg.Done()
-	}()
-	func() {
-		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerLoginNameProjection")
-		_, err := projection.LoginNameProjection.Trigger(ctx, handler.WithAwaitRunning())
-		traceSpan.EndWithError(err)
-		logging.OnError(err).Debug("trigger failed")
-		wg.Done()
-	}()
-	wg.Wait()
+func triggerUserProjections(ctx context.Context) context.Context {
+	return triggerBatch(ctx, projection.UserProjection, projection.LoginNameProjection)
 }
 
 func prepareLoginNamesQuery() (string, []interface{}, error) {

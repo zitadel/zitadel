@@ -9,8 +9,22 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
+
+var oidcUserInfoTriggerHandlers = []*handler.Handler{
+	projection.UserProjection,
+	projection.UserMetadataProjection,
+	projection.UserGrantProjection,
+	projection.OrgProjection,
+	projection.ProjectProjection,
+}
+
+func TriggerOIDCUserInfoProjections(ctx context.Context) context.Context {
+	return triggerBatch(ctx, oidcUserInfoTriggerHandlers...)
+}
 
 //go:embed embed/userinfo_by_id.sql
 var oidcUserInfoQuery string
