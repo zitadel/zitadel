@@ -73,7 +73,7 @@ You might be able to retrieve logs only for a limited period of time based on yo
 
 Custom domains mean domains that you can configure to reach your ZITADEL instance.
 By default ZITADEL creates a custom domain for you when creating new instances.
-Each additional custom domain is charged.
+Besides the included amount each additional custom domain is charged.
 
 ## Payment cycle
 
