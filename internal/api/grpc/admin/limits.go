@@ -3,11 +3,10 @@ package admin
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/pkg/grpc/admin"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/repository/limits"
+	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 func (s *Server) SetInstanceLimits(ctx context.Context, req *admin.SetInstanceLimitsRequest) (*admin.SetInstanceLimitsResponse, error) {
