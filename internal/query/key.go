@@ -358,6 +358,7 @@ type PublicKeyReadModel struct {
 	Algorithm string
 	Key       *crypto.CryptoValue
 	Expiry    time.Time
+	Usage     domain.KeyUsage
 }
 
 func NewPublicKeyReadModel(keyID, resourceOwner string) *PublicKeyReadModel {
@@ -380,6 +381,7 @@ func (wm *PublicKeyReadModel) Reduce() error {
 			wm.Algorithm = e.Algorithm
 			wm.Key = e.PublicKey.Key
 			wm.Expiry = e.PublicKey.Expiry
+			wm.Usage = e.Usage
 		}
 	}
 	return wm.ReadModel.Reduce()
@@ -427,7 +429,7 @@ func (q *Queries) GetActivePublicKeyByID(ctx context.Context, keyID string, curr
 			sequence:      model.ProcessedSequence,
 			resourceOwner: model.ResourceOwner,
 			algorithm:     model.Algorithm,
-			// use: , TBD, what events update this and do we need it?
+			use:           model.Usage,
 		},
 		expiry:    model.Expiry,
 		publicKey: publicKey,
