@@ -9,8 +9,8 @@ import (
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 	api_trace "go.opentelemetry.io/otel/trace"
 
-	otel_resource "github.com/zitadel/zitadel/internal/telemetry/otel"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	otel_resource "github.com/zitadel/zitadel/v2/internal/telemetry/otel"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
 )
 
 type Tracer struct {

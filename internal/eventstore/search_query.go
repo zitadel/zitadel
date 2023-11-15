@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 // SearchQueryBuilder represents the builder for your filter

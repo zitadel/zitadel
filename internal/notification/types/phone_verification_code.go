@@ -3,8 +3,8 @@ package types
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/domain"
 )
 
 func (notify Notify) SendPhoneVerificationCode(ctx context.Context, code string) error {

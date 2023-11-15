@@ -1,4 +1,4 @@
-module github.com/zitadel/zitadel/tools
+module github.com/zitadel/zitadel/v2/tools
 
 go 1.15
 

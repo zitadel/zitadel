@@ -3,7 +3,7 @@ package login
 import (
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/domain"
 )
 
 const (

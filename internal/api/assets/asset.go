@@ -11,13 +11,13 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	http_util "github.com/zitadel/zitadel/internal/api/http"
-	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/id"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/v2/internal/api/http"
+	http_mw "github.com/zitadel/zitadel/v2/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/id"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/static"
 )
 
 const (

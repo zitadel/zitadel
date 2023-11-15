@@ -3,10 +3,10 @@ package management
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
-	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	policy_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/policy"
+	mgmt_pb "github.com/zitadel/zitadel/v2/pkg/grpc/management"
 )
 
 func (s *Server) GetPrivacyPolicy(ctx context.Context, _ *mgmt_pb.GetPrivacyPolicyRequest) (*mgmt_pb.GetPrivacyPolicyResponse, error) {

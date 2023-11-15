@@ -8,9 +8,9 @@ import (
 	"github.com/dop251/goja_nodejs/console"
 	"github.com/sirupsen/logrus"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/logstore"
-	"github.com/zitadel/zitadel/internal/logstore/record"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/logstore"
+	"github.com/zitadel/zitadel/v2/internal/logstore/record"
 )
 
 var (

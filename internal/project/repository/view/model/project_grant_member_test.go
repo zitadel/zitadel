@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"testing"
 
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	es_model "github.com/zitadel/zitadel/internal/project/repository/eventsourcing/model"
-	"github.com/zitadel/zitadel/internal/repository/project"
+	es_models "github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	es_model "github.com/zitadel/zitadel/v2/internal/project/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/v2/internal/repository/project"
 )
 
 func mockProjectGrantMemberData(member *es_model.ProjectGrantMember) []byte {

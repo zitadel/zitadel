@@ -6,13 +6,13 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/command/preparation"
-	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/org"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/command/preparation"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/repository/org"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
 )
 
 type AddLoginPolicy struct {

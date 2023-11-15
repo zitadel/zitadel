@@ -1,4 +1,4 @@
-module github.com/zitadel/zitadel
+module github.com/zitadel/zitadel/v2
 
 go 1.21
 

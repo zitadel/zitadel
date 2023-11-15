@@ -6,13 +6,13 @@ import (
 	statik_fs "github.com/rakyll/statik/fs"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/notification/handlers"
-	_ "github.com/zitadel/zitadel/internal/notification/statik"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/notification/handlers"
+	_ "github.com/zitadel/zitadel/v2/internal/notification/statik"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/query/projection"
 )
 
 func Start(

@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/logging"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
 )
 
 type AuthRequest struct {

@@ -5,10 +5,10 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	object "github.com/zitadel/zitadel/v2/pkg/grpc/object/v2beta"
 )
 
 func DomainToDetailsPb(objectDetail *domain.ObjectDetails) *object.Details {

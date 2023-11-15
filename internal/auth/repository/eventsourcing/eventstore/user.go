@@ -3,13 +3,13 @@ package eventstore
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
-	"github.com/zitadel/zitadel/internal/config/systemdefaults"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/query"
-	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/auth/repository/eventsourcing/view"
+	"github.com/zitadel/zitadel/v2/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	usr_view "github.com/zitadel/zitadel/v2/internal/user/repository/view"
 )
 
 type UserRepo struct {

@@ -4,14 +4,14 @@ import (
 	"context"
 	"strconv"
 
-	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/milestone"
-	"github.com/zitadel/zitadel/internal/repository/project"
-	"github.com/zitadel/zitadel/internal/repository/user"
+	internal_authz "github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	old_handler "github.com/zitadel/zitadel/v2/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/v2/internal/repository/instance"
+	"github.com/zitadel/zitadel/v2/internal/repository/milestone"
+	"github.com/zitadel/zitadel/v2/internal/repository/project"
+	"github.com/zitadel/zitadel/v2/internal/repository/user"
 )
 
 const (

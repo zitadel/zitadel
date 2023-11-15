@@ -12,14 +12,14 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/grpc"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	object_pb "github.com/zitadel/zitadel/v2/pkg/grpc/object/v2beta"
+	user "github.com/zitadel/zitadel/v2/pkg/grpc/user/v2beta"
 )
 
 var ignoreTypes = []protoreflect.FullName{"google.protobuf.Duration", "google.protobuf.Struct"}

@@ -4,12 +4,12 @@ import (
 	"context"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/command/preparation"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/v2/internal/command/preparation"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/v2/internal/repository/user"
 )
 
 type AddMachineKey struct {

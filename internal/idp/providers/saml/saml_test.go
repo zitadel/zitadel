@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/idp/providers/saml/requesttracker"
+	"github.com/zitadel/zitadel/v2/internal/idp/providers/saml/requesttracker"
 )
 
 func TestProvider_Options(t *testing.T) {

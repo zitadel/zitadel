@@ -3,7 +3,7 @@ package handlers
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
 )
 
 func (n *NotificationQueries) IsAlreadyHandled(ctx context.Context, event eventstore.Event, data map[string]interface{}, aggregateType eventstore.AggregateType, eventTypes ...eventstore.EventType) (bool, error) {

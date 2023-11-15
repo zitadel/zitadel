@@ -13,14 +13,14 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	objpb "github.com/zitadel/zitadel/pkg/grpc/object"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	objpb "github.com/zitadel/zitadel/v2/pkg/grpc/object"
 
-	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/query"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	object "github.com/zitadel/zitadel/v2/pkg/grpc/object/v2beta"
+	session "github.com/zitadel/zitadel/v2/pkg/grpc/session/v2beta"
 )
 
 var (

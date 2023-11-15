@@ -4,8 +4,8 @@ import (
 	stdout "go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing/otel"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing/otel"
 )
 
 type Config struct {

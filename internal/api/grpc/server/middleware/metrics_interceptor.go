@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 
-	_ "github.com/zitadel/zitadel/internal/statik"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+	_ "github.com/zitadel/zitadel/v2/internal/statik"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/metrics"
 )
 
 const (

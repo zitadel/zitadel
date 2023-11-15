@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/notification/channels"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels"
 )
 
 func logMessages(ctx context.Context, channel channels.NotificationChannel) channels.NotificationChannel {

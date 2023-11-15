@@ -5,11 +5,11 @@ import (
 
 	"github.com/zitadel/logging"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/iam/model"
-	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/org"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/iam/model"
+	"github.com/zitadel/zitadel/v2/internal/repository/instance"
+	"github.com/zitadel/zitadel/v2/internal/repository/org"
 )
 
 const (

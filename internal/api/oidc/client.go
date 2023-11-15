@@ -14,16 +14,16 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
-	"github.com/zitadel/zitadel/internal/actions"
-	"github.com/zitadel/zitadel/internal/actions/object"
-	"github.com/zitadel/zitadel/internal/api/authz"
-	api_http "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/v2/internal/actions"
+	"github.com/zitadel/zitadel/v2/internal/actions/object"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	api_http "github.com/zitadel/zitadel/v2/internal/api/http"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
 )
 
 const (

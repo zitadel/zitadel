@@ -3,7 +3,7 @@ package eventstore
 import (
 	"regexp"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 type Version string

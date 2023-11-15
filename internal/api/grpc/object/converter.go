@@ -5,9 +5,9 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
-	object_pb "github.com/zitadel/zitadel/pkg/grpc/object"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	object_pb "github.com/zitadel/zitadel/v2/pkg/grpc/object"
 )
 
 func DomainToChangeDetailsPb(objectDetail *domain.ObjectDetails) *object_pb.ObjectDetails {

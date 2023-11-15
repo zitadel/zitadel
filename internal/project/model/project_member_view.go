@@ -1,8 +1,8 @@
 package model
 
 import (
-	"github.com/zitadel/zitadel/internal/domain"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	caos_errors "github.com/zitadel/zitadel/v2/internal/errors"
 
 	"time"
 )

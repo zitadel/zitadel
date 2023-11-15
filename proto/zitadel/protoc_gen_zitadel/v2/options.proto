@@ -4,7 +4,7 @@ package zitadel.protoc_gen_zitadel.v2;
 
 import "google/protobuf/descriptor.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/protoc/v2;protoc";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/protoc;protoc";
 
 extend google.protobuf.MethodOptions {
   Options options = 50001;

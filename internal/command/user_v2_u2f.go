@@ -3,10 +3,10 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/repository/user"
 )
 
 func (c *Commands) RegisterUserU2F(ctx context.Context, userID, resourceOwner, rpID string) (*domain.WebAuthNRegistrationDetails, error) {

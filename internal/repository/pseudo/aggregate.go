@@ -1,6 +1,6 @@
 package pseudo
 
-import "github.com/zitadel/zitadel/internal/eventstore"
+import "github.com/zitadel/zitadel/v2/internal/eventstore"
 
 const (
 	AggregateType    = "pseudo"

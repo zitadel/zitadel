@@ -3,7 +3,7 @@ package domain
 import (
 	"time"
 
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
 )
 
 type OIDCSettings struct {

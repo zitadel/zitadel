@@ -7,11 +7,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
-	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/id"
+	id_mock "github.com/zitadel/zitadel/v2/internal/id/mock"
+	"github.com/zitadel/zitadel/v2/internal/repository/quota"
 )
 
 func TestQuotaReport_ReportQuotaUsage(t *testing.T) {

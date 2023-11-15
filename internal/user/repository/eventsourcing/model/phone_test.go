@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	es_models "github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
 )
 
 func TestPhoneChanges(t *testing.T) {

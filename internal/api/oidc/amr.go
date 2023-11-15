@@ -1,6 +1,6 @@
 package oidc
 
-import "github.com/zitadel/zitadel/internal/domain"
+import "github.com/zitadel/zitadel/v2/internal/domain"
 
 const (
 	// Password states that the users password has been verified

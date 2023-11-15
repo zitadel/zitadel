@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	http_utils "github.com/zitadel/zitadel/v2/internal/api/http"
 )
 
 func RobotsTagHandler(next http.Handler) http.Handler {

@@ -3,8 +3,8 @@ package preparation
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
 )
 
 // Validation of the input values of the command and if correct returns

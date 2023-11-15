@@ -11,7 +11,7 @@ compile: core_build console_build compile_pipeline
 
 .PHONY: compile_pipeline
 compile_pipeline: console_move
-	CGO_ENABLED=0 go build -o zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/cmd/build.commit=$(COMMIT_SHA)' -X 'github.com/zitadel/zitadel/cmd/build.date=$(now)' -X 'github.com/zitadel/zitadel/cmd/build.version=$(VERSION)' "
+	CGO_ENABLED=0 go build -o zitadel -v -ldflags="-s -w -X 'github.com/zitadel/zitadel/v2/cmd/build.commit=$(COMMIT_SHA)' -X 'github.com/zitadel/zitadel/v2/cmd/build.date=$(now)' -X 'github.com/zitadel/zitadel/v2/cmd/build.version=$(VERSION)' "
 	chmod +x zitadel
 
 .PHONY: core_dependencies
@@ -55,7 +55,7 @@ core_grpc_dependencies:
 core_api: core_api_generator core_grpc_dependencies
 	buf generate
 	mkdir -p pkg/grpc
-	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/
+	cp -r .artifacts/grpc/github.com/zitadel/zitadel/v2/pkg/grpc/* pkg/grpc/
 	mkdir -p openapi/v2/zitadel
 	cp -r .artifacts/grpc/zitadel/ openapi/v2/zitadel
 

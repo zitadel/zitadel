@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"testing"
 
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/project/model"
-	es_model "github.com/zitadel/zitadel/internal/project/repository/eventsourcing/model"
-	"github.com/zitadel/zitadel/internal/repository/project"
+	es_models "github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/v2/internal/project/model"
+	es_model "github.com/zitadel/zitadel/v2/internal/project/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/v2/internal/repository/project"
 )
 
 func mockAppData(app *es_model.Application) []byte {

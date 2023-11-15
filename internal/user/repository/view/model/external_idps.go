@@ -6,9 +6,9 @@ import (
 
 	"github.com/zitadel/logging"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	user_repo "github.com/zitadel/zitadel/internal/repository/user"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	user_repo "github.com/zitadel/zitadel/v2/internal/repository/user"
 )
 
 const (

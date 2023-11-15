@@ -13,9 +13,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/integration"
-	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/v2/internal/integration"
+	org "github.com/zitadel/zitadel/v2/pkg/grpc/org/v2beta"
+	user "github.com/zitadel/zitadel/v2/pkg/grpc/user/v2beta"
 )
 
 var (

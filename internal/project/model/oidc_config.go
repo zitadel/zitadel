@@ -7,11 +7,11 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	es_models "github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/v2/internal/id"
 )
 
 type OIDCConfig struct {
@@ -108,7 +108,7 @@ func (c *OIDCConfig) IsValid() bool {
 	return true
 }
 
-//ClientID random_number@projectname (eg. 495894098234@zitadel)
+// ClientID random_number@projectname (eg. 495894098234@zitadel)
 func (c *OIDCConfig) GenerateNewClientID(idGenerator id.Generator, project *Project) error {
 	rndID, err := idGenerator.Next()
 	if err != nil {

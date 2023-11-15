@@ -9,8 +9,8 @@ import (
 	"github.com/jackc/pgconn"
 	"github.com/zitadel/logging"
 
-	errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	errs "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/handler"
 )
 
 type Table struct {

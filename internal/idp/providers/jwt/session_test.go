@@ -16,8 +16,8 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/domain"
 )
 
 func TestSession_FetchUser(t *testing.T) {

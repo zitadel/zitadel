@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 type humanWebAuthNTokens struct {

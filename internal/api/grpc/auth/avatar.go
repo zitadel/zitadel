@@ -3,9 +3,9 @@ package auth
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	auth_pb "github.com/zitadel/zitadel/pkg/grpc/auth"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	auth_pb "github.com/zitadel/zitadel/v2/pkg/grpc/auth"
 )
 
 func (s *Server) RemoveMyAvatar(ctx context.Context, req *auth_pb.RemoveMyAvatarRequest) (*auth_pb.RemoveMyAvatarResponse, error) {

@@ -8,28 +8,28 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/repository/session"
+	"github.com/zitadel/zitadel/v2/internal/repository/session"
 
-	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/v2/internal/notification/messages"
 
 	"github.com/golang/mock/gomock"
 	statik_fs "github.com/rakyll/statik/fs"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
-	es_repo_mock "github.com/zitadel/zitadel/internal/eventstore/repository/mock"
-	channel_mock "github.com/zitadel/zitadel/internal/notification/channels/mock"
-	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
-	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
-	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
-	"github.com/zitadel/zitadel/internal/notification/handlers/mock"
-	"github.com/zitadel/zitadel/internal/notification/senders"
-	"github.com/zitadel/zitadel/internal/notification/types"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/repository"
+	es_repo_mock "github.com/zitadel/zitadel/v2/internal/eventstore/repository/mock"
+	channel_mock "github.com/zitadel/zitadel/v2/internal/notification/channels/mock"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/smtp"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/twilio"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/webhook"
+	"github.com/zitadel/zitadel/v2/internal/notification/handlers/mock"
+	"github.com/zitadel/zitadel/v2/internal/notification/senders"
+	"github.com/zitadel/zitadel/v2/internal/notification/types"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/repository/user"
 )
 
 const (

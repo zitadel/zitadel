@@ -3,12 +3,12 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	org_repo "github.com/zitadel/zitadel/internal/repository/org"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	org_repo "github.com/zitadel/zitadel/v2/internal/repository/org"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
 )
 
 func (c *Commands) ImportIDPConfig(ctx context.Context, config *domain.IDPConfig, idpConfigID, resourceOwner string) (*domain.IDPConfig, error) {

@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
 )
 
 func TestNewFilter(t *testing.T) {

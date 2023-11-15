@@ -6,17 +6,17 @@ import (
 
 	"github.com/zitadel/saml/pkg/provider"
 
-	http_utils "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/api/http/middleware"
-	"github.com/zitadel/zitadel/internal/api/ui/login"
-	"github.com/zitadel/zitadel/internal/auth/repository"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+	http_utils "github.com/zitadel/zitadel/v2/internal/api/http"
+	"github.com/zitadel/zitadel/v2/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/v2/internal/api/ui/login"
+	"github.com/zitadel/zitadel/v2/internal/auth/repository"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/metrics"
 )
 
 const (

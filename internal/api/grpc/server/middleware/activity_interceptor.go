@@ -7,7 +7,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/zitadel/zitadel/internal/activity"
+	"github.com/zitadel/zitadel/v2/internal/activity"
 )
 
 func ActivityInterceptor() grpc.UnaryServerInterceptor {

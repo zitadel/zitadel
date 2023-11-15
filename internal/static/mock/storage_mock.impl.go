@@ -8,8 +8,8 @@ import (
 
 	"github.com/golang/mock/gomock"
 
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/static"
+	caos_errors "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/static"
 )
 
 func NewStorage(t *testing.T) *MockStorage {

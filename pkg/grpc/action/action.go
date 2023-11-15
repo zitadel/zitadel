@@ -1,6 +1,6 @@
 package action
 
-import "github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
+import "github.com/zitadel/zitadel/v2/internal/api/grpc/server/middleware"
 
 func (f *Flow) Localizers() []middleware.Localizer {
 	if f == nil {

@@ -8,10 +8,10 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/domain"
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	errs "github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 var (

@@ -11,8 +11,8 @@ import (
 	"github.com/jackc/pgconn"
 	"github.com/zitadel/logging"
 
-	errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
+	errs "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
 )
 
 var (

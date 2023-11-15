@@ -6,7 +6,7 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/v2/internal/logstore"
 )
 
 func NewStdoutEmitter[T logstore.LogRecord[T]]() logstore.LogEmitter[T] {

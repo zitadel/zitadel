@@ -4,8 +4,8 @@ import (
 	"encoding/base64"
 	"strings"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	caos_errors "github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 func NewRefreshToken(userID, tokenID string, algorithm crypto.EncryptionAlgorithm) (string, error) {

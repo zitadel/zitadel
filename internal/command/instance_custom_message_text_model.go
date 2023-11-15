@@ -3,11 +3,11 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/repository/instance"
 )
 
 type InstanceCustomMessageTextWriteModel struct {

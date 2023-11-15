@@ -5,13 +5,13 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
-	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
-	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
-	"github.com/zitadel/zitadel/internal/notification/handlers"
-	"github.com/zitadel/zitadel/internal/notification/senders"
-	"github.com/zitadel/zitadel/internal/notification/types"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/smtp"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/twilio"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/webhook"
+	"github.com/zitadel/zitadel/v2/internal/notification/handlers"
+	"github.com/zitadel/zitadel/v2/internal/notification/senders"
+	"github.com/zitadel/zitadel/v2/internal/notification/types"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/metrics"
 )
 
 var _ types.ChannelChains = (*channels)(nil)

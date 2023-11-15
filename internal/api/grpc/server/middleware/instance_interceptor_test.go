@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
 )
 
 func Test_hostNameFromContext(t *testing.T) {

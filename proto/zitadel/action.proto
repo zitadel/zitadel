@@ -8,7 +8,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.action.v1;
 
-option go_package ="github.com/zitadel/zitadel/pkg/grpc/action";
+option go_package ="github.com/zitadel/zitadel/v2/pkg/grpc/action";
 
 message Action {
     string id = 1 [

@@ -13,10 +13,10 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/client/rs"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 
-	http_util "github.com/zitadel/zitadel/internal/api/http"
-	oidc_internal "github.com/zitadel/zitadel/internal/api/oidc"
-	"github.com/zitadel/zitadel/pkg/grpc/app"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
+	http_util "github.com/zitadel/zitadel/v2/internal/api/http"
+	oidc_internal "github.com/zitadel/zitadel/v2/internal/api/oidc"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/app"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/management"
 )
 
 func (s *Tester) CreateOIDCNativeClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string) (*management.AddOIDCAppResponse, error) {

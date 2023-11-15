@@ -3,7 +3,7 @@ package bigcache
 import (
 	"time"
 
-	"github.com/zitadel/zitadel/internal/cache"
+	"github.com/zitadel/zitadel/v2/internal/cache"
 )
 
 type Config struct {

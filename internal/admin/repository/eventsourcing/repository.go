@@ -3,10 +3,10 @@ package eventsourcing
 import (
 	"context"
 
-	admin_handler "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/handler"
-	admin_view "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/view"
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/static"
+	admin_handler "github.com/zitadel/zitadel/v2/internal/admin/repository/eventsourcing/handler"
+	admin_view "github.com/zitadel/zitadel/v2/internal/admin/repository/eventsourcing/view"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/static"
 )
 
 type Config struct {

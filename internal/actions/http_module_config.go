@@ -5,7 +5,7 @@ import (
 	"reflect"
 
 	"github.com/mitchellh/mapstructure"
-	z_errs "github.com/zitadel/zitadel/internal/errors"
+	z_errs "github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 func SetHTTPConfig(config *HTTPConfig) {

@@ -3,10 +3,10 @@ package admin
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/grpc/settings"
-	"github.com/zitadel/zitadel/internal/domain"
-	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/settings"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	admin_pb "github.com/zitadel/zitadel/v2/pkg/grpc/admin"
 )
 
 func (s *Server) GetFileSystemNotificationProvider(ctx context.Context, req *admin_pb.GetFileSystemNotificationProviderRequest) (*admin_pb.GetFileSystemNotificationProviderResponse, error) {

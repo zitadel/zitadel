@@ -9,7 +9,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"sigs.k8s.io/yaml"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 type ValidatableConfiguration interface {

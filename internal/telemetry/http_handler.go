@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/metrics"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )

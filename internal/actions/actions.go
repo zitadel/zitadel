@@ -8,8 +8,8 @@ import (
 	"github.com/dop251/goja_nodejs/require"
 	"github.com/sirupsen/logrus"
 
-	z_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/query"
+	z_errs "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/query"
 )
 
 type Config struct {

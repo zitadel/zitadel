@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/view"
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/v2/internal/admin/repository/eventsourcing/view"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	handler2 "github.com/zitadel/zitadel/v2/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/v2/internal/static"
 )
 
 type Config struct {

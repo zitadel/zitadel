@@ -4,10 +4,10 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/query"
-	eventpb "github.com/zitadel/zitadel/pkg/grpc/event"
-	"github.com/zitadel/zitadel/pkg/grpc/message"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	eventpb "github.com/zitadel/zitadel/v2/pkg/grpc/event"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/message"
 )
 
 func EventsToPb(events []*query.Event) (response []*eventpb.Event, err error) {

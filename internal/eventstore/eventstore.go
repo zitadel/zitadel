@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
 )
 
 // Eventstore abstracts all functions needed to store valid events

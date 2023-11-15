@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 type action interface {

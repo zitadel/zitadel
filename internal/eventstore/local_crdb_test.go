@@ -11,12 +11,12 @@ import (
 	"github.com/cockroachdb/cockroach-go/v2/testserver"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/cmd/initialise"
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/database/cockroach"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	es_sql "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
-	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/v2/cmd/initialise"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/database/cockroach"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	es_sql "github.com/zitadel/zitadel/v2/internal/eventstore/repository/sql"
+	new_es "github.com/zitadel/zitadel/v2/internal/eventstore/v3"
 )
 
 var (

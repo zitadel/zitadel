@@ -6,7 +6,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.change.v1;
 
-option go_package ="github.com/zitadel/zitadel/pkg/grpc/change";
+option go_package ="github.com/zitadel/zitadel/v2/pkg/grpc/change";
 
 message Change {
     google.protobuf.Timestamp change_date = 1 [

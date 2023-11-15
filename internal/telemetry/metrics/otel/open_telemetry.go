@@ -11,9 +11,9 @@ import (
 	"go.opentelemetry.io/otel/metric"
 	sdk_metric "go.opentelemetry.io/otel/sdk/metric"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
-	otel_resource "github.com/zitadel/zitadel/internal/telemetry/otel"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/metrics"
+	otel_resource "github.com/zitadel/zitadel/v2/internal/telemetry/otel"
 )
 
 type Metrics struct {

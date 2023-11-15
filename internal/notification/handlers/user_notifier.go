@@ -5,17 +5,17 @@ import (
 	"strings"
 	"time"
 
-	http_util "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/api/ui/login"
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/notification/types"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/repository/session"
-	"github.com/zitadel/zitadel/internal/repository/user"
+	http_util "github.com/zitadel/zitadel/v2/internal/api/http"
+	"github.com/zitadel/zitadel/v2/internal/api/ui/login"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/v2/internal/notification/types"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/repository/session"
+	"github.com/zitadel/zitadel/v2/internal/repository/user"
 )
 
 const (

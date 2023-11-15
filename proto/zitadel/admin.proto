@@ -27,7 +27,7 @@ import "validate/validate.proto";
 
 package zitadel.admin.v1;
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/admin";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/admin";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {

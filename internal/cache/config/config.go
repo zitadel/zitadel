@@ -3,10 +3,10 @@ package config
 import (
 	"encoding/json"
 
-	"github.com/zitadel/zitadel/internal/cache"
-	"github.com/zitadel/zitadel/internal/cache/bigcache"
-	"github.com/zitadel/zitadel/internal/cache/fastcache"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/cache"
+	"github.com/zitadel/zitadel/v2/internal/cache/bigcache"
+	"github.com/zitadel/zitadel/v2/internal/cache/fastcache"
+	"github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 type CacheConfig struct {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/rs/cors"
 
-	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	http_utils "github.com/zitadel/zitadel/v2/internal/api/http"
 )
 
 var (

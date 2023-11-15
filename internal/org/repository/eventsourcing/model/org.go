@@ -1,12 +1,12 @@
 package model
 
 import (
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	iam_es_model "github.com/zitadel/zitadel/internal/iam/repository/eventsourcing/model"
-	org_model "github.com/zitadel/zitadel/internal/org/model"
-	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	es_models "github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	iam_es_model "github.com/zitadel/zitadel/v2/internal/iam/repository/eventsourcing/model"
+	org_model "github.com/zitadel/zitadel/v2/internal/org/model"
+	"github.com/zitadel/zitadel/v2/internal/repository/org"
 )
 
 type Org struct {

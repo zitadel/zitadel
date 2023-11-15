@@ -1,6 +1,6 @@
 package channels
 
-import "github.com/zitadel/zitadel/internal/eventstore"
+import "github.com/zitadel/zitadel/v2/internal/eventstore"
 
 type Message interface {
 	GetTriggeringEvent() eventstore.Event

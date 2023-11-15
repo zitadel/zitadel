@@ -6,7 +6,7 @@ import (
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/i18n"
+	"github.com/zitadel/zitadel/v2/internal/i18n"
 )
 
 func (q *Queries) Languages(ctx context.Context) ([]language.Tag, error) {

@@ -3,11 +3,11 @@ package handlers
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
-	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/twilio"
+	"github.com/zitadel/zitadel/v2/internal/query"
 )
 
 // GetTwilioConfig reads the iam Twilio provider config

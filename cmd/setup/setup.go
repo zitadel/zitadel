@@ -9,15 +9,15 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/cmd/build"
-	"github.com/zitadel/zitadel/cmd/key"
-	"github.com/zitadel/zitadel/cmd/tls"
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
-	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
-	"github.com/zitadel/zitadel/internal/migration"
-	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/v2/cmd/build"
+	"github.com/zitadel/zitadel/v2/cmd/key"
+	"github.com/zitadel/zitadel/v2/cmd/tls"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	old_es "github.com/zitadel/zitadel/v2/internal/eventstore/repository/sql"
+	new_es "github.com/zitadel/zitadel/v2/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/v2/internal/migration"
+	"github.com/zitadel/zitadel/v2/internal/query/projection"
 )
 
 var (

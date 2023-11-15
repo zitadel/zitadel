@@ -3,18 +3,18 @@ package eventsourcing
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/feature"
-	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/eventstore"
-	auth_handler "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/handler"
-	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
-	"github.com/zitadel/zitadel/internal/auth_request/repository/cache"
-	"github.com/zitadel/zitadel/internal/command"
-	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/database"
-	eventstore2 "github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/v2/feature"
+	"github.com/zitadel/zitadel/v2/internal/auth/repository/eventsourcing/eventstore"
+	auth_handler "github.com/zitadel/zitadel/v2/internal/auth/repository/eventsourcing/handler"
+	auth_view "github.com/zitadel/zitadel/v2/internal/auth/repository/eventsourcing/view"
+	"github.com/zitadel/zitadel/v2/internal/auth_request/repository/cache"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	sd "github.com/zitadel/zitadel/v2/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	eventstore2 "github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/id"
+	"github.com/zitadel/zitadel/v2/internal/query"
 )
 
 type Config struct {

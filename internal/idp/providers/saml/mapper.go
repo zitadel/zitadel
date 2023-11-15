@@ -4,8 +4,8 @@ import (
 	"github.com/crewjam/saml"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/idp"
 )
 
 var _ idp.User = (*UserMapper)(nil)

@@ -3,13 +3,13 @@ package admin
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	org_grpc "github.com/zitadel/zitadel/internal/api/grpc/org"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
-	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	org_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/org"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	admin_pb "github.com/zitadel/zitadel/v2/pkg/grpc/admin"
 )
 
 func (s *Server) IsOrgUnique(ctx context.Context, req *admin_pb.IsOrgUniqueRequest) (*admin_pb.IsOrgUniqueResponse, error) {

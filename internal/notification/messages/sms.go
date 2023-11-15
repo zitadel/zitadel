@@ -1,8 +1,8 @@
 package messages
 
 import (
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/notification/channels"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels"
 )
 
 var _ channels.Message = (*SMS)(nil)

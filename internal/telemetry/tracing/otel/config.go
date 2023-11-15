@@ -7,8 +7,8 @@ import (
 	otlpgrpc "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
 )
 
 type Config struct {

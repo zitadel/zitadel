@@ -11,7 +11,7 @@ import (
 
 	"github.com/muhlemmer/gu"
 
-	errs "github.com/zitadel/zitadel/internal/errors"
+	errs "github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 var (

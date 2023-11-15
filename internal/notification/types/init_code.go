@@ -3,10 +3,10 @@ package types
 import (
 	"context"
 
-	http_utils "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/api/ui/login"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
+	http_utils "github.com/zitadel/zitadel/v2/internal/api/http"
+	"github.com/zitadel/zitadel/v2/internal/api/ui/login"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/query"
 )
 
 func (notify Notify) SendUserInitCode(ctx context.Context, user *query.NotifyUser, code string) error {

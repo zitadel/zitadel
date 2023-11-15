@@ -7,7 +7,7 @@ import "google/protobuf/duration.proto";
 
 package zitadel.idp.v1;
 
-option go_package ="github.com/zitadel/zitadel/pkg/grpc/idp";
+option go_package ="github.com/zitadel/zitadel/v2/pkg/grpc/idp";
 
 message IDP {
     string id = 1 [

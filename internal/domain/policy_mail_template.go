@@ -1,6 +1,6 @@
 package domain
 
-import "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+import "github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
 
 type MailTemplate struct {
 	models.ObjectRoot

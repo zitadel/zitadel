@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 func equalStringArray(a, b []string) bool {

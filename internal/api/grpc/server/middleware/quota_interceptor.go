@@ -6,11 +6,11 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/logstore"
-	"github.com/zitadel/zitadel/internal/logstore/record"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/logstore"
+	"github.com/zitadel/zitadel/v2/internal/logstore/record"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
 )
 
 func QuotaExhaustedInterceptor(svc *logstore.Service[*record.AccessLog], ignoreService ...string) grpc.UnaryServerInterceptor {

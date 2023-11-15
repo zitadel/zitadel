@@ -14,15 +14,15 @@ import (
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
-	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/grpc/server"
-	http_util "github.com/zitadel/zitadel/internal/api/http"
-	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
-	"github.com/zitadel/zitadel/internal/api/ui/login"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	internal_authz "github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/server"
+	http_util "github.com/zitadel/zitadel/v2/internal/api/http"
+	http_mw "github.com/zitadel/zitadel/v2/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/v2/internal/api/ui/login"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/metrics"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
 )
 
 type API struct {

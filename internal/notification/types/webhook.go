@@ -3,9 +3,9 @@ package types
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
-	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/webhook"
+	"github.com/zitadel/zitadel/v2/internal/notification/messages"
 )
 
 func handleWebhook(

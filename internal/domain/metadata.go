@@ -3,8 +3,8 @@ package domain
 import (
 	"time"
 
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	caos_errors "github.com/zitadel/zitadel/v2/internal/errors"
+	es_models "github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
 )
 
 type Metadata struct {

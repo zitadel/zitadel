@@ -11,13 +11,13 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/cmd/admin"
-	"github.com/zitadel/zitadel/cmd/build"
-	"github.com/zitadel/zitadel/cmd/initialise"
-	"github.com/zitadel/zitadel/cmd/key"
-	"github.com/zitadel/zitadel/cmd/ready"
-	"github.com/zitadel/zitadel/cmd/setup"
-	"github.com/zitadel/zitadel/cmd/start"
+	"github.com/zitadel/zitadel/v2/cmd/admin"
+	"github.com/zitadel/zitadel/v2/cmd/build"
+	"github.com/zitadel/zitadel/v2/cmd/initialise"
+	"github.com/zitadel/zitadel/v2/cmd/key"
+	"github.com/zitadel/zitadel/v2/cmd/ready"
+	"github.com/zitadel/zitadel/v2/cmd/setup"
+	"github.com/zitadel/zitadel/v2/cmd/start"
 )
 
 var (

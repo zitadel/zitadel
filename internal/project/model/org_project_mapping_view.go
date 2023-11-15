@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/domain"
 
 	"time"
 )

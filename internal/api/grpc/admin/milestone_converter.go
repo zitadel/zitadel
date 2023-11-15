@@ -1,12 +1,12 @@
 package admin
 
 import (
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/repository/milestone"
-	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
-	milestone_pb "github.com/zitadel/zitadel/pkg/grpc/milestone"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/repository/milestone"
+	admin_pb "github.com/zitadel/zitadel/v2/pkg/grpc/admin"
+	milestone_pb "github.com/zitadel/zitadel/v2/pkg/grpc/milestone"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

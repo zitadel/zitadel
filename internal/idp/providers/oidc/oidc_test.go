@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 
-	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/v2/internal/idp"
 )
 
 func TestProvider_BeginAuth(t *testing.T) {

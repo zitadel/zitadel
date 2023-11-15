@@ -1,11 +1,11 @@
 package user
 
 import (
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/query"
-	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	user_pb "github.com/zitadel/zitadel/v2/pkg/grpc/user"
 )
 
 func UsersToPb(users []*query.User, assetPrefix string) []*user_pb.User {

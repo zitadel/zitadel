@@ -12,9 +12,9 @@ import (
 
 	"github.com/jackc/pgconn"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/database/mock"
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/database/mock"
+	errs "github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 func TestHandler_lockState(t *testing.T) {

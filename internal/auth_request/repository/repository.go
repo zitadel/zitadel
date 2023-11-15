@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/domain"
 )
 
 type AuthRequestCache interface {

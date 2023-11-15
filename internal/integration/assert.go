@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	object "github.com/zitadel/zitadel/v2/pkg/grpc/object/v2beta"
 )
 
 type DetailsMsg interface {

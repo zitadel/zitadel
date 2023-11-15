@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
 )
 
 func TestCRDB_Push_OneAggregate(t *testing.T) {

@@ -1,8 +1,8 @@
 package org
 
 import (
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/deviceauth"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/repository/deviceauth"
 )
 
 func RegisterEventMappers(es *eventstore.Eventstore) {

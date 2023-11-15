@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/api/grpc/member"
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/member"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	admin_pb "github.com/zitadel/zitadel/v2/pkg/grpc/admin"
 )
 
 func (s *Server) ListIAMMemberRoles(ctx context.Context, req *admin_pb.ListIAMMemberRolesRequest) (*admin_pb.ListIAMMemberRolesResponse, error) {

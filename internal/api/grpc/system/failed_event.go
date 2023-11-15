@@ -3,8 +3,8 @@ package system
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/query"
-	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	system_pb "github.com/zitadel/zitadel/v2/pkg/grpc/system"
 )
 
 func (s *Server) ListFailedEvents(ctx context.Context, _ *system_pb.ListFailedEventsRequest) (*system_pb.ListFailedEventsResponse, error) {

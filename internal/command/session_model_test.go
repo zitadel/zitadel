@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/domain"
 )
 
 func TestSessionWriteModel_AuthMethodTypes(t *testing.T) {

@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/domain"
 )
 
 func orgWriteModelToOrg(wm *OrgWriteModel) *domain.Org {
@@ -46,10 +46,10 @@ func orgDomainWriteModelToOrgDomain(wm *OrgDomainWriteModel) *domain.OrgDomain {
 
 func orgWriteModelToPrivacyPolicy(wm *OrgPrivacyPolicyWriteModel) *domain.PrivacyPolicy {
 	return &domain.PrivacyPolicy{
-		ObjectRoot:  writeModelToObjectRoot(wm.PrivacyPolicyWriteModel.WriteModel),
-		TOSLink:     wm.TOSLink,
-		PrivacyLink: wm.PrivacyLink,
-		HelpLink:    wm.HelpLink,
+		ObjectRoot:   writeModelToObjectRoot(wm.PrivacyPolicyWriteModel.WriteModel),
+		TOSLink:      wm.TOSLink,
+		PrivacyLink:  wm.PrivacyLink,
+		HelpLink:     wm.HelpLink,
 		SupportEmail: wm.SupportEmail,
 	}
 }

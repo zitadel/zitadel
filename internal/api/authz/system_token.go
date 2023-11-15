@@ -11,8 +11,8 @@ import (
 	"github.com/go-jose/go-jose/v3"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	zitadel_errors "github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 var _ SystemTokenVerifier = (*SystemTokenVerifierFromConfig)(nil)

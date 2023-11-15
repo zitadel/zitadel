@@ -1,6 +1,6 @@
 package session
 
-import "github.com/zitadel/zitadel/internal/eventstore"
+import "github.com/zitadel/zitadel/v2/internal/eventstore"
 
 func RegisterEventMappers(es *eventstore.Eventstore) {
 	es.RegisterFilterEventMapper(AggregateType, AddedType, AddedEventMapper).

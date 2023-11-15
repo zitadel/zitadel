@@ -3,13 +3,13 @@ package eventsourcing
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/authz/repository"
-	authz_es "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/eventstore"
-	authz_view "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/view"
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/authz/repository"
+	authz_es "github.com/zitadel/zitadel/v2/internal/authz/repository/eventsourcing/eventstore"
+	authz_view "github.com/zitadel/zitadel/v2/internal/authz/repository/eventsourcing/view"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/query"
 )
 
 type EsRepository struct {

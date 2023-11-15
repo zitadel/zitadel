@@ -3,10 +3,10 @@ package model
 import (
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/project/model"
-	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	es_models "github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/v2/internal/project/model"
+	"github.com/zitadel/zitadel/v2/internal/repository/project"
 )
 
 type Project struct {

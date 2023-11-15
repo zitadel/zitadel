@@ -7,7 +7,7 @@ import (
 	"encoding/base64"
 	"io"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 var _ EncryptionAlgorithm = (*AESCrypto)(nil)

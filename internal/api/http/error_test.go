@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	caos_errors "github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 func TestZitadelErrorToHTTPStatusCode(t *testing.T) {

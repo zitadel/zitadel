@@ -3,8 +3,8 @@
 package {{.GoPackageName}}
 
 import (
-	"github.com/zitadel/zitadel/internal/api/authz"
-	{{if .AuthContext}}"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"{{end}}
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	{{if .AuthContext}}"github.com/zitadel/zitadel/v2/internal/api/grpc/server/middleware"{{end}}
 )
 
 var {{.ServiceName}}_AuthMethods = authz.MethodMapping {

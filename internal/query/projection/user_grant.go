@@ -3,18 +3,18 @@ package projection
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/org"
-	"github.com/zitadel/zitadel/internal/repository/project"
-	"github.com/zitadel/zitadel/internal/repository/user"
-	"github.com/zitadel/zitadel/internal/repository/usergrant"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	old_handler "github.com/zitadel/zitadel/v2/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/v2/internal/repository/instance"
+	"github.com/zitadel/zitadel/v2/internal/repository/org"
+	"github.com/zitadel/zitadel/v2/internal/repository/project"
+	"github.com/zitadel/zitadel/v2/internal/repository/user"
+	"github.com/zitadel/zitadel/v2/internal/repository/usergrant"
 )
 
 const (

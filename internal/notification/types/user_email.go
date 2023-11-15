@@ -4,10 +4,10 @@ import (
 	"context"
 	"html"
 
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/notification/messages"
-	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/notification/messages"
+	"github.com/zitadel/zitadel/v2/internal/query"
 )
 
 func generateEmail(

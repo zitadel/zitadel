@@ -10,11 +10,11 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/pkg/errors"
 
-	"github.com/zitadel/zitadel/internal/api/call"
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/query/projection"
-	"github.com/zitadel/zitadel/internal/repository/quota"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/v2/internal/api/call"
+	zitadel_errors "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/query/projection"
+	"github.com/zitadel/zitadel/v2/internal/repository/quota"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
 )
 
 var (

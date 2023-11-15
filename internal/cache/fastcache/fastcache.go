@@ -5,7 +5,7 @@ import (
 	"encoding/gob"
 	"reflect"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/errors"
 
 	"github.com/VictoriaMetrics/fastcache"
 )

@@ -18,18 +18,18 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	action_grpc "github.com/zitadel/zitadel/internal/api/grpc/action"
-	"github.com/zitadel/zitadel/internal/api/grpc/authn"
-	"github.com/zitadel/zitadel/internal/api/grpc/management"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
-	management_pb "github.com/zitadel/zitadel/pkg/grpc/management"
-	"github.com/zitadel/zitadel/pkg/grpc/policy"
-	v1_pb "github.com/zitadel/zitadel/pkg/grpc/v1"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	action_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/action"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/authn"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/management"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
+	admin_pb "github.com/zitadel/zitadel/v2/pkg/grpc/admin"
+	management_pb "github.com/zitadel/zitadel/v2/pkg/grpc/management"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/policy"
+	v1_pb "github.com/zitadel/zitadel/v2/pkg/grpc/v1"
 )
 
 type importResponse struct {

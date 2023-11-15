@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/service"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/service"
+	"github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 // testEvent implements the Event interface

@@ -3,11 +3,11 @@ package auth
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
-	"github.com/zitadel/zitadel/internal/query"
-	auth_pb "github.com/zitadel/zitadel/pkg/grpc/auth"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	user_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/user"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	auth_pb "github.com/zitadel/zitadel/v2/pkg/grpc/auth"
 )
 
 func (s *Server) ListMyZitadelPermissions(ctx context.Context, _ *auth_pb.ListMyZitadelPermissionsRequest) (*auth_pb.ListMyZitadelPermissionsResponse, error) {

@@ -3,10 +3,10 @@ package admin
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
-	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	policy_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/policy"
+	admin_pb "github.com/zitadel/zitadel/v2/pkg/grpc/admin"
 )
 
 func (s *Server) AddNotificationPolicy(ctx context.Context, req *admin_pb.AddNotificationPolicyRequest) (*admin_pb.AddNotificationPolicyResponse, error) {

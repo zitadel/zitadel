@@ -6,9 +6,9 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/errors"
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	user_repo "github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	es_models "github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	user_repo "github.com/zitadel/zitadel/v2/internal/repository/user"
 )
 
 type Machine struct {

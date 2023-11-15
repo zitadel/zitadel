@@ -9,9 +9,9 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/notification/channels"
-	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels"
+	"github.com/zitadel/zitadel/v2/internal/notification/messages"
 )
 
 func InitChannel(ctx context.Context, cfg Config) (channels.NotificationChannel, error) {

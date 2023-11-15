@@ -3,8 +3,8 @@ package handlers
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/repository/milestone"
-	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/v2/internal/repository/milestone"
+	"github.com/zitadel/zitadel/v2/internal/repository/quota"
 )
 
 type Commands interface {

@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	caos_errors "github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 func TestContains(t *testing.T) {

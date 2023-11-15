@@ -3,15 +3,15 @@ package model
 import (
 	"time"
 
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/domain"
 )
 
 type PrivacyPolicyView struct {
-	AggregateID string
-	TOSLink     string
-	PrivacyLink string
+	AggregateID  string
+	TOSLink      string
+	PrivacyLink  string
 	SupportEmail string
-	Default     bool
+	Default      bool
 
 	CreationDate time.Time
 	ChangeDate   time.Time

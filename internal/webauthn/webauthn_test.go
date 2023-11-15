@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 func TestConfig_serverFromContext(t *testing.T) {

@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	http_util "github.com/zitadel/zitadel/internal/api/http"
+	http_util "github.com/zitadel/zitadel/v2/internal/api/http"
 
-	"github.com/zitadel/zitadel/internal/api/assets"
-	"github.com/zitadel/zitadel/internal/i18n"
-	"github.com/zitadel/zitadel/internal/notification/templates"
-	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/api/assets"
+	"github.com/zitadel/zitadel/v2/internal/i18n"
+	"github.com/zitadel/zitadel/v2/internal/notification/templates"
+	"github.com/zitadel/zitadel/v2/internal/query"
 )
 
 func GetTemplateData(ctx context.Context, translator *i18n.Translator, translateArgs map[string]interface{}, href, msgType, lang string, policy *query.LabelPolicy) templates.TemplateData {

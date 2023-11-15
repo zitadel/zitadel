@@ -10,8 +10,8 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 
-	"github.com/zitadel/zitadel/internal/database"
-	z_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	z_errs "github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 const (

@@ -7,7 +7,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/repository"
 )
 
 var _ gomock.Matcher = (*filterMatcher)(nil)

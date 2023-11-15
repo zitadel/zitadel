@@ -5,9 +5,9 @@ import (
 
 	"github.com/jinzhu/gorm"
 
-	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/api/call"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	"github.com/zitadel/zitadel/v2/internal/query"
 )
 
 type View struct {

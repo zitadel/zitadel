@@ -3,11 +3,11 @@ package auth
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/api/grpc/user"
-	"github.com/zitadel/zitadel/internal/domain"
-	auth_pb "github.com/zitadel/zitadel/pkg/grpc/auth"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/user"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	auth_pb "github.com/zitadel/zitadel/v2/pkg/grpc/auth"
 )
 
 func (s *Server) GetMyEmail(ctx context.Context, _ *auth_pb.GetMyEmailRequest) (*auth_pb.GetMyEmailResponse, error) {

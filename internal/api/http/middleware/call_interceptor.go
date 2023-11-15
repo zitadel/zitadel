@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/v2/internal/api/call"
 )
 
 func CallDurationHandler(next http.Handler) http.Handler {

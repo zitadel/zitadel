@@ -3,8 +3,8 @@ package handlers
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
 )
 
 const NotifyUserID = "NOTIFICATION" //TODO: system?

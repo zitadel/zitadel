@@ -4,11 +4,11 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/pkg/grpc/object"
-	policy_pb "github.com/zitadel/zitadel/pkg/grpc/policy"
+	idp_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/idp"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/object"
+	policy_pb "github.com/zitadel/zitadel/v2/pkg/grpc/policy"
 )
 
 func ModelLoginPolicyToPb(policy *query.LoginPolicy) *policy_pb.LoginPolicy {

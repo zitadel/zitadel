@@ -3,11 +3,11 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
 
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/repository/idpconfig"
-	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/repository/idpconfig"
+	"github.com/zitadel/zitadel/v2/internal/repository/org"
 )
 
 type OrgIDPConfigWriteModel struct {

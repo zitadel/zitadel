@@ -1,10 +1,10 @@
 package metadata
 
 import (
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/query"
-	meta_pb "github.com/zitadel/zitadel/pkg/grpc/metadata"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	meta_pb "github.com/zitadel/zitadel/v2/pkg/grpc/metadata"
 )
 
 func UserMetadataListToPb(dataList []*query.UserMetadata) []*meta_pb.Metadata {

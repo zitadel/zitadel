@@ -7,9 +7,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zitadel/zitadel/internal/command"
-	z_errors "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/form"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	z_errors "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/form"
 )
 
 func Test_redirectToSuccessURL(t *testing.T) {

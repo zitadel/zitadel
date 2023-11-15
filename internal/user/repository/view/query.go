@@ -1,9 +1,9 @@
 package view
 
 import (
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/repository/user"
 )
 
 func UserByIDQuery(id, instanceID string, sequence uint64, eventTypes []eventstore.EventType) (*eventstore.SearchQueryBuilder, error) {

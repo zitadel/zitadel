@@ -6,12 +6,12 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/database"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	org_model "github.com/zitadel/zitadel/internal/org/model"
-	"github.com/zitadel/zitadel/internal/repository/user"
-	es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	org_model "github.com/zitadel/zitadel/v2/internal/org/model"
+	"github.com/zitadel/zitadel/v2/internal/repository/user"
+	es_model "github.com/zitadel/zitadel/v2/internal/user/repository/eventsourcing/model"
 )
 
 const (

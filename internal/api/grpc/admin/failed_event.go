@@ -3,9 +3,9 @@ package admin
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/query"
-	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	admin_pb "github.com/zitadel/zitadel/v2/pkg/grpc/admin"
 )
 
 func (s *Server) ListFailedEvents(ctx context.Context, _ *admin_pb.ListFailedEventsRequest) (*admin_pb.ListFailedEventsResponse, error) {

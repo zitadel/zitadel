@@ -13,9 +13,9 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/client/rs"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 
-	"github.com/zitadel/zitadel/pkg/grpc/authn"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/authn"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/management"
+	oidc_pb "github.com/zitadel/zitadel/v2/pkg/grpc/oidc/v2beta"
 )
 
 func TestOPStorage_SetUserinfoFromToken(t *testing.T) {

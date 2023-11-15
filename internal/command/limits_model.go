@@ -3,8 +3,8 @@ package command
 import (
 	"time"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/limits"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/repository/limits"
 )
 
 type limitsWriteModel struct {

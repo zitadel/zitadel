@@ -6,7 +6,7 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta;oidc";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/oidc/v2beta;oidc";
 
 message AuthRequest{
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {

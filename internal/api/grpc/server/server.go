@@ -8,14 +8,14 @@ import (
 	"google.golang.org/grpc/credentials"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
-	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
-	"github.com/zitadel/zitadel/internal/logstore"
-	"github.com/zitadel/zitadel/internal/logstore/record"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/metrics"
-	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	grpc_api "github.com/zitadel/zitadel/v2/internal/api/grpc"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/server/middleware"
+	"github.com/zitadel/zitadel/v2/internal/logstore"
+	"github.com/zitadel/zitadel/v2/internal/logstore/record"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/metrics"
+	system_pb "github.com/zitadel/zitadel/v2/pkg/grpc/system"
 )
 
 type Server interface {

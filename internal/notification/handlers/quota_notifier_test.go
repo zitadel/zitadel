@@ -14,10 +14,10 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/repository/quota"
-	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	quota_pb "github.com/zitadel/zitadel/pkg/grpc/quota"
-	"github.com/zitadel/zitadel/pkg/grpc/system"
+	"github.com/zitadel/zitadel/v2/internal/repository/quota"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/admin"
+	quota_pb "github.com/zitadel/zitadel/v2/pkg/grpc/quota"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/system"
 )
 
 func TestServer_QuotaNotification_Limit(t *testing.T) {

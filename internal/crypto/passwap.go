@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/passwap/scrypt"
 	"github.com/zitadel/passwap/verifier"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 type PasswordHasher struct {

@@ -13,7 +13,7 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/pluginpb"
 
-	protoc_gen_zitadel "github.com/zitadel/zitadel/pkg/grpc/protoc/v2"
+	protoc_gen_zitadel "github.com/zitadel/zitadel/v2/pkg/grpc/protoc/v2"
 )
 
 var (

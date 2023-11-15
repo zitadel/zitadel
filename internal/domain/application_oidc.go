@@ -4,9 +4,9 @@ import (
 	"strings"
 	"time"
 
-	http_util "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	http_util "github.com/zitadel/zitadel/v2/internal/api/http"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
 )
 
 const (

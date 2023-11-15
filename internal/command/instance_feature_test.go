@@ -6,14 +6,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	"github.com/zitadel/zitadel/internal/id/mock"
-	"github.com/zitadel/zitadel/internal/repository/feature"
-	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/id"
+	"github.com/zitadel/zitadel/v2/internal/id/mock"
+	"github.com/zitadel/zitadel/v2/internal/repository/feature"
+	"github.com/zitadel/zitadel/v2/internal/repository/instance"
 )
 
 func TestCommands_SetBooleanInstanceFeature(t *testing.T) {

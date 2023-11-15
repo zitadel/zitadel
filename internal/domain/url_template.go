@@ -4,7 +4,7 @@ import (
 	"io"
 	"text/template"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 func renderURLTemplate(w io.Writer, tmpl string, data any) error {

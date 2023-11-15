@@ -8,7 +8,7 @@ import "validate/validate.proto";
 
 package zitadel.policy.v1;
 
-option go_package ="github.com/zitadel/zitadel/pkg/grpc/policy";
+option go_package ="github.com/zitadel/zitadel/v2/pkg/grpc/policy";
 
 //deprecated: please use DomainPolicy instead
 message OrgIAMPolicy {

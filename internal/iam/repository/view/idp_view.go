@@ -3,11 +3,11 @@ package view
 import (
 	"github.com/jinzhu/gorm"
 
-	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	iam_model "github.com/zitadel/zitadel/internal/iam/model"
-	"github.com/zitadel/zitadel/internal/iam/repository/view/model"
-	"github.com/zitadel/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
+	iam_model "github.com/zitadel/zitadel/v2/internal/iam/model"
+	"github.com/zitadel/zitadel/v2/internal/iam/repository/view/model"
+	"github.com/zitadel/zitadel/v2/internal/view/repository"
 )
 
 func IDPByID(db *gorm.DB, table, idpID, instanceID string) (*model.IDPConfigView, error) {

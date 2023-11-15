@@ -3,11 +3,11 @@ package org
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
-	"github.com/zitadel/zitadel/internal/api/grpc/user/v2"
-	"github.com/zitadel/zitadel/internal/command"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object/v2"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/user/v2"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
+	org "github.com/zitadel/zitadel/v2/pkg/grpc/org/v2beta"
 )
 
 func (s *Server) AddOrganization(ctx context.Context, request *org.AddOrganizationRequest) (*org.AddOrganizationResponse, error) {

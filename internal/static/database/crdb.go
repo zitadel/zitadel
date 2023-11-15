@@ -10,8 +10,8 @@ import (
 
 	"github.com/Masterminds/squirrel"
 
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/static"
+	caos_errors "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/static"
 )
 
 var _ static.Storage = (*crdbStorage)(nil)

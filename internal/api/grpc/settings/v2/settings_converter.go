@@ -3,9 +3,9 @@ package settings
 import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
-	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	settings "github.com/zitadel/zitadel/v2/pkg/grpc/settings/v2beta"
 )
 
 func loginSettingsToPb(current *query.LoginPolicy) *settings.LoginSettings {

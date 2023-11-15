@@ -6,9 +6,9 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/id"
 )
 
 type oAuthApplication interface {
@@ -17,7 +17,7 @@ type oAuthApplication interface {
 	requiresClientSecret() bool
 }
 
-//ClientID random_number@projectname (eg. 495894098234@zitadel)
+// ClientID random_number@projectname (eg. 495894098234@zitadel)
 func SetNewClientID(a oAuthApplication, idGenerator id.Generator, project *Project) error {
 	clientID, err := NewClientID(idGenerator, project.Name)
 	if err != nil {

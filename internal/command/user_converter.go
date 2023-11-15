@@ -3,9 +3,9 @@ package command
 import (
 	"encoding/base64"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/repository/user"
 )
 
 func writeModelToHuman(wm *HumanWriteModel) *domain.Human {

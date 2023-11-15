@@ -1,9 +1,9 @@
 package model
 
 import (
-	"github.com/zitadel/zitadel/internal/domain"
-	proj_model "github.com/zitadel/zitadel/internal/project/model"
-	"github.com/zitadel/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	proj_model "github.com/zitadel/zitadel/v2/internal/project/model"
+	"github.com/zitadel/zitadel/v2/internal/view/repository"
 )
 
 type OrgProjectMappingSearchRequest proj_model.OrgProjectMappingViewSearchRequest

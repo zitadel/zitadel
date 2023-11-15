@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/notification/channels"
-	"github.com/zitadel/zitadel/internal/notification/channels/fs"
-	"github.com/zitadel/zitadel/internal/notification/channels/instrumenting"
-	"github.com/zitadel/zitadel/internal/notification/channels/log"
-	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/fs"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/instrumenting"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/log"
+	"github.com/zitadel/zitadel/v2/internal/notification/channels/smtp"
 )
 
 const smtpSpanName = "smtp.NotificationChannel"

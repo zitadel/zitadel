@@ -3,8 +3,8 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/command/preparation"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/command/preparation"
+	"github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 func domainPolicyWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) (*PolicyDomainWriteModel, error) {

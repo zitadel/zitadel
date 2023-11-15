@@ -3,13 +3,13 @@ package management
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	action_grpc "github.com/zitadel/zitadel/internal/api/grpc/action"
-	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
-	action_pb "github.com/zitadel/zitadel/pkg/grpc/action"
-	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	action_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/action"
+	obj_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	action_pb "github.com/zitadel/zitadel/v2/pkg/grpc/action"
+	mgmt_pb "github.com/zitadel/zitadel/v2/pkg/grpc/management"
 )
 
 func (s *Server) ListFlowTypes(ctx context.Context, _ *mgmt_pb.ListFlowTypesRequest) (*mgmt_pb.ListFlowTypesResponse, error) {

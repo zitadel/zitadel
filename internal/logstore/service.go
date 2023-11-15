@@ -5,7 +5,7 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/v2/internal/repository/quota"
 )
 
 type UsageStorer[T LogRecord[T]] interface {

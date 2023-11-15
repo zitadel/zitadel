@@ -6,16 +6,16 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/api/grpc/authn"
-	instance_grpc "github.com/zitadel/zitadel/internal/api/grpc/instance"
-	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
-	instance_pb "github.com/zitadel/zitadel/pkg/grpc/instance"
-	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/authn"
+	instance_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/instance"
+	member_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/member"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	z_oidc "github.com/zitadel/zitadel/v2/internal/api/oidc"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	instance_pb "github.com/zitadel/zitadel/v2/pkg/grpc/instance"
+	system_pb "github.com/zitadel/zitadel/v2/pkg/grpc/system"
 )
 
 func CreateInstancePbToSetupInstance(req *system_pb.CreateInstanceRequest, defaultInstance command.InstanceSetup, externalDomain string) *command.InstanceSetup {

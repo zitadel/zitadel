@@ -1,10 +1,10 @@
 package text
 
 import (
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
-	text_pb "github.com/zitadel/zitadel/pkg/grpc/text"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	text_pb "github.com/zitadel/zitadel/v2/pkg/grpc/text"
 )
 
 func ModelCustomMessageTextToPb(msg *query.MessageText) *text_pb.MessageCustomText {

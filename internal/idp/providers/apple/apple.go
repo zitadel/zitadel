@@ -9,8 +9,8 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/crypto"
 	openid "github.com/zitadel/oidc/v3/pkg/oidc"
 
-	"github.com/zitadel/zitadel/internal/idp"
-	"github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	"github.com/zitadel/zitadel/v2/internal/idp"
+	"github.com/zitadel/zitadel/v2/internal/idp/providers/oidc"
 )
 
 const (

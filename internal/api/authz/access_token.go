@@ -3,7 +3,7 @@ package authz
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
 )
 
 const (

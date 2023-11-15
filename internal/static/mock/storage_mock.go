@@ -10,7 +10,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	static "github.com/zitadel/zitadel/internal/static"
+	static "github.com/zitadel/zitadel/v2/internal/static"
 )
 
 // MockStorage is a mock of Storage interface.

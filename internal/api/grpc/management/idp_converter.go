@@ -5,17 +5,17 @@ import (
 
 	"github.com/crewjam/saml"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
-	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	iam_model "github.com/zitadel/zitadel/internal/iam/model"
-	"github.com/zitadel/zitadel/internal/query"
-	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
-	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	idp_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/idp"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/v2/internal/command"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	iam_model "github.com/zitadel/zitadel/v2/internal/iam/model"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	idp_pb "github.com/zitadel/zitadel/v2/pkg/grpc/idp"
+	mgmt_pb "github.com/zitadel/zitadel/v2/pkg/grpc/management"
 )
 
 func AddOIDCIDPRequestToDomain(req *mgmt_pb.AddOrgOIDCIDPRequest) *domain.IDPConfig {

@@ -5,7 +5,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.v1;
 
-option go_package ="github.com/zitadel/zitadel/pkg/grpc/object";
+option go_package ="github.com/zitadel/zitadel/v2/pkg/grpc/object";
 
 message ObjectDetails {
     //sequence represents the order of events. It's always counting

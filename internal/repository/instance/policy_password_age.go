@@ -3,8 +3,8 @@ package instance
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/repository/policy"
 )
 
 var (

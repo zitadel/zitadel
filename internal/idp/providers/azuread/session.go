@@ -6,7 +6,7 @@ import (
 	httphelper "github.com/zitadel/oidc/v3/pkg/http"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 
-	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
+	"github.com/zitadel/zitadel/v2/internal/idp/providers/oauth"
 )
 
 // Session extends the [oauth.Session] to extend it with the [idp.SessionSupportsMigration] functionality

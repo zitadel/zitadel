@@ -13,10 +13,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	"github.com/zitadel/zitadel/pkg/grpc/auth"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
-	"github.com/zitadel/zitadel/pkg/grpc/system"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/auth"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/management"
+	"github.com/zitadel/zitadel/v2/pkg/grpc/system"
 )
 
 func TestServer_Limits_AuditLogRetention(t *testing.T) {

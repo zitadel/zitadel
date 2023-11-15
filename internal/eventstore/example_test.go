@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	query_repo "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
-	v3 "github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	query_repo "github.com/zitadel/zitadel/v2/internal/eventstore/repository/sql"
+	v3 "github.com/zitadel/zitadel/v2/internal/eventstore/v3"
 )
 
 // ------------------------------------------------------------

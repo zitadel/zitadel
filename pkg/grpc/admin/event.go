@@ -3,11 +3,11 @@ package admin
 import (
 	"context"
 
-	event_grpc "github.com/zitadel/zitadel/internal/api/grpc/event"
-	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	event_pb "github.com/zitadel/zitadel/pkg/grpc/event"
+	event_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/event"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc/server/middleware"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
+	event_pb "github.com/zitadel/zitadel/v2/pkg/grpc/event"
 )
 
 func EventTypesToPb(eventTypes []string) *ListEventTypesResponse {

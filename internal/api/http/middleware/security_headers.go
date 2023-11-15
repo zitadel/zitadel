@@ -6,8 +6,8 @@ import (
 	"encoding/base64"
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	http_utils "github.com/zitadel/zitadel/v2/internal/api/http"
 )
 
 type securityKey int

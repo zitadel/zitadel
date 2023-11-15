@@ -1,14 +1,14 @@
 package view
 
 import (
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/view/repository"
 
 	"github.com/jinzhu/gorm"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	usr_model "github.com/zitadel/zitadel/internal/user/model"
-	"github.com/zitadel/zitadel/internal/user/repository/view/model"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
+	usr_model "github.com/zitadel/zitadel/v2/internal/user/model"
+	"github.com/zitadel/zitadel/v2/internal/user/repository/view/model"
 )
 
 func UserByID(db *gorm.DB, table, userID, instanceID string) (*model.UserView, error) {

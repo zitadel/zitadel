@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/query"
-	usr_model "github.com/zitadel/zitadel/internal/user/model"
-	"github.com/zitadel/zitadel/internal/user/repository/view"
-	"github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	usr_model "github.com/zitadel/zitadel/v2/internal/user/model"
+	"github.com/zitadel/zitadel/v2/internal/user/repository/view"
+	"github.com/zitadel/zitadel/v2/internal/user/repository/view/model"
 )
 
 const (

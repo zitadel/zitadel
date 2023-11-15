@@ -3,10 +3,10 @@ package eventstore
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
-	usr_model "github.com/zitadel/zitadel/internal/user/model"
-	"github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/v2/internal/api/authz"
+	"github.com/zitadel/zitadel/v2/internal/auth/repository/eventsourcing/view"
+	usr_model "github.com/zitadel/zitadel/v2/internal/user/model"
+	"github.com/zitadel/zitadel/v2/internal/user/repository/view/model"
 )
 
 type UserSessionRepo struct {

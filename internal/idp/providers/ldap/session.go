@@ -12,8 +12,8 @@ import (
 	"github.com/go-ldap/ldap/v3"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/idp"
 )
 
 var ErrNoSingleUser = errors.New("user does not exist or too many entries returned")

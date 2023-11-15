@@ -6,16 +6,16 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/database"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	iam_es_model "github.com/zitadel/zitadel/internal/iam/repository/eventsourcing/model"
-	org_es_model "github.com/zitadel/zitadel/internal/org/repository/eventsourcing/model"
-	proj_es_model "github.com/zitadel/zitadel/internal/project/repository/eventsourcing/model"
-	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/org"
-	"github.com/zitadel/zitadel/internal/repository/project"
-	"github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/v2/internal/database"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore/v1/models"
+	iam_es_model "github.com/zitadel/zitadel/v2/internal/iam/repository/eventsourcing/model"
+	org_es_model "github.com/zitadel/zitadel/v2/internal/org/repository/eventsourcing/model"
+	proj_es_model "github.com/zitadel/zitadel/v2/internal/project/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/v2/internal/repository/instance"
+	"github.com/zitadel/zitadel/v2/internal/repository/org"
+	"github.com/zitadel/zitadel/v2/internal/repository/project"
+	"github.com/zitadel/zitadel/v2/internal/user/model"
 )
 
 const (

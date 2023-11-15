@@ -5,9 +5,9 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/zitadel/zitadel/internal/crypto"
-	z_db "github.com/zitadel/zitadel/internal/database"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/crypto"
+	z_db "github.com/zitadel/zitadel/v2/internal/database"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
 )
 
 type database struct {

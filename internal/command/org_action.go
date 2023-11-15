@@ -4,11 +4,11 @@ import (
 	"context"
 	"sort"
 
-	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/action"
-	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/eventstore"
+	"github.com/zitadel/zitadel/v2/internal/repository/action"
+	"github.com/zitadel/zitadel/v2/internal/repository/org"
 )
 
 func (c *Commands) AddActionWithID(ctx context.Context, addAction *domain.Action, resourceOwner, actionID string) (_ string, _ *domain.ObjectDetails, err error) {

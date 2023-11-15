@@ -8,8 +8,8 @@ import (
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/i18n"
+	caos_errs "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/i18n"
 )
 
 type localizers interface {

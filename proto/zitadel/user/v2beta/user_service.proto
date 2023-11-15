@@ -17,7 +17,7 @@ import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2beta;user";
+option go_package = "github.com/zitadel/zitadel/v2/pkg/grpc/user/v2beta;user";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {

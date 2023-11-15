@@ -3,7 +3,7 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/repository/milestone"
+	"github.com/zitadel/zitadel/v2/internal/repository/milestone"
 )
 
 // MilestonePushed writes a new milestone.PushedEvent with a new milestone.Aggregate to the eventstore

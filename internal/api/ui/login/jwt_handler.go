@@ -11,11 +11,11 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/oauth2"
 
-	http_util "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
-	"github.com/zitadel/zitadel/internal/query"
+	http_util "github.com/zitadel/zitadel/v2/internal/api/http"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	"github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/idp/providers/jwt"
+	"github.com/zitadel/zitadel/v2/internal/query"
 )
 
 type jwtRequest struct {

@@ -4,13 +4,13 @@ import (
 	"github.com/crewjam/saml"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/domain"
-	iam_model "github.com/zitadel/zitadel/internal/iam/model"
-	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/repository/idp"
-	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
+	obj_grpc "github.com/zitadel/zitadel/v2/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/v2/internal/domain"
+	iam_model "github.com/zitadel/zitadel/v2/internal/iam/model"
+	"github.com/zitadel/zitadel/v2/internal/idp/providers/azuread"
+	"github.com/zitadel/zitadel/v2/internal/query"
+	"github.com/zitadel/zitadel/v2/internal/repository/idp"
+	idp_pb "github.com/zitadel/zitadel/v2/pkg/grpc/idp"
 )
 
 func IDPViewsToPb(idps []*query.IDP) []*idp_pb.IDP {

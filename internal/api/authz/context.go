@@ -7,10 +7,10 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/zitadel/zitadel/internal/api/grpc"
-	http_util "github.com/zitadel/zitadel/internal/api/http"
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/v2/internal/api/grpc"
+	http_util "github.com/zitadel/zitadel/v2/internal/api/http"
+	zitadel_errors "github.com/zitadel/zitadel/v2/internal/errors"
+	"github.com/zitadel/zitadel/v2/internal/telemetry/tracing"
 )
 
 type key int
