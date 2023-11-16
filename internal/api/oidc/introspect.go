@@ -25,7 +25,7 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 	}
 	if s.features.TriggerIntrospectionProjections {
 		// Execute all triggers in one concurrent sweep.
-		ctx = query.TriggerIntrospectionProjections(ctx)
+		query.TriggerIntrospectionProjections(ctx)
 	}
 
 	ctx, cancel := context.WithCancel(ctx)
@@ -78,8 +78,8 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 	defer func() {
 		if err != nil {
 			s.getLogger(ctx).ErrorContext(ctx, "oidc introspection", "err", err)
+			resp, err = op.NewResponse(new(oidc.IntrospectionResponse)), nil
 		}
-		resp, err = op.NewResponse(new(oidc.IntrospectionResponse)), nil
 	}()
 
 	if err != nil {

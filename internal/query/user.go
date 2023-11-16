@@ -706,8 +706,8 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 	)
 }
 
-func triggerUserProjections(ctx context.Context) context.Context {
-	return triggerBatch(ctx, projection.UserProjection, projection.LoginNameProjection)
+func triggerUserProjections(ctx context.Context) {
+	triggerBatch(ctx, projection.UserProjection, projection.LoginNameProjection)
 }
 
 func prepareLoginNamesQuery() (string, []interface{}, error) {

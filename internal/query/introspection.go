@@ -18,8 +18,8 @@ var introspectionTriggerHandlers = append(oidcUserInfoTriggerHandlers,
 	projection.AuthNKeyProjection,
 )
 
-func TriggerIntrospectionProjections(ctx context.Context) context.Context {
-	return triggerBatch(ctx, introspectionTriggerHandlers...)
+func TriggerIntrospectionProjections(ctx context.Context) {
+	triggerBatch(ctx, introspectionTriggerHandlers...)
 }
 
 type IntrospectionClient struct {

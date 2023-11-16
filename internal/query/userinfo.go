@@ -22,8 +22,8 @@ var oidcUserInfoTriggerHandlers = []*handler.Handler{
 	projection.ProjectProjection,
 }
 
-func TriggerOIDCUserInfoProjections(ctx context.Context) context.Context {
-	return triggerBatch(ctx, oidcUserInfoTriggerHandlers...)
+func TriggerOIDCUserInfoProjections(ctx context.Context) {
+	triggerBatch(ctx, oidcUserInfoTriggerHandlers...)
 }
 
 //go:embed embed/userinfo_by_id.sql
