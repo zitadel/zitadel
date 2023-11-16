@@ -93,7 +93,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 					},
 					Machine: nil,
 				},
-				Org: &userInfoOrg{
+				Org: &UserInfoOrg{
 					Name:          "demo",
 					PrimaryDomain: "demo.localhost",
 				},
@@ -128,7 +128,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 					},
 					Machine: nil,
 				},
-				Org: &userInfoOrg{
+				Org: &UserInfoOrg{
 					Name:          "demo",
 					PrimaryDomain: "demo.localhost",
 				},
@@ -185,7 +185,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 					},
 					Machine: nil,
 				},
-				Org: &userInfoOrg{
+				Org: &UserInfoOrg{
 					Name:          "demo",
 					PrimaryDomain: "demo.localhost",
 				},
@@ -270,7 +270,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 						Description: "My test service user",
 					},
 				},
-				Org: &userInfoOrg{
+				Org: &UserInfoOrg{
 					Name:          "demo",
 					PrimaryDomain: "demo.localhost",
 				},

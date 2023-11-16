@@ -25,13 +25,23 @@ func (s *Server) userInfo(ctx context.Context, userID, projectID string, scope, 
 		return nil, err
 	}
 
-	userInfo := userInfoToOIDC(projectID, qu, scope, requestedRoles, s.assetAPIPrefix(ctx))
+	userInfo := userInfoToOIDC(projectID, qu, scope, roleAudience, requestedRoles, s.assetAPIPrefix(ctx))
 	return userInfo, s.userinfoFlows(ctx, qu, userInfo)
 }
 
+// prepareRoles scans the requested scopes, appends to roleAudiendce and returns the requestedRoles.
+//
+// When [ScopeProjectsRoles] is present and roleAudience was empty,
+// project IDs with the [domain.ProjectIDScope] prefix are added to the roleAudience.
+//
+// Scopes with [ScopeProjectRolePrefix] are added to requestedRoles.
+//
+// If the resulting requestedRoles or roleAudience are not not empty,
+// the current projectID will always be parts or roleAudience.
+// Else nil, nil is returned.
 func prepareRoles(ctx context.Context, projectID string, scope, roleAudience []string) (ra, requestedRoles []string) {
 	// if all roles are requested take the audience for those from the scopes
-	if slices.Contains(scope, ScopeProjectsRoles) {
+	if slices.Contains(scope, ScopeProjectsRoles) && len(roleAudience) == 0 {
 		roleAudience = domain.AddAudScopeToAudience(ctx, roleAudience, scope)
 	}
 	requestedRoles = make([]string, 0, len(scope))
@@ -44,14 +54,13 @@ func prepareRoles(ctx context.Context, projectID string, scope, roleAudience []s
 		return nil, nil
 	}
 
-	// ensure the projectID of the requesting is part of the roleAudience
-	if !slices.Contains(roleAudience, projectID) {
+	if projectID != "" && !slices.Contains(roleAudience, projectID) {
 		roleAudience = append(roleAudience, projectID)
 	}
 	return roleAudience, requestedRoles
 }
 
-func userInfoToOIDC(projectID string, user *query.OIDCUserInfo, scope, requestedRoles []string, assetPrefix string) *oidc.UserInfo {
+func userInfoToOIDC(projectID string, user *query.OIDCUserInfo, scope, roleAudience, requestedRoles []string, assetPrefix string) *oidc.UserInfo {
 	out := new(oidc.UserInfo)
 	for _, s := range scope {
 		switch s {
@@ -70,16 +79,20 @@ func userInfoToOIDC(projectID string, user *query.OIDCUserInfo, scope, requested
 		case ScopeResourceOwner:
 			setUserInfoOrgClaims(user, out)
 		default:
-			if strings.HasPrefix(s, domain.OrgDomainPrimaryScope) {
-				out.AppendClaims(domain.OrgDomainPrimaryClaim, strings.TrimPrefix(s, domain.OrgDomainPrimaryScope))
+			if claim, ok := strings.CutPrefix(s, domain.OrgDomainPrimaryScope); ok {
+				out.AppendClaims(domain.OrgDomainPrimaryClaim, claim)
 			}
-			if strings.HasPrefix(s, domain.OrgIDScope) {
-				out.AppendClaims(domain.OrgIDClaim, strings.TrimPrefix(s, domain.OrgIDScope))
+			if claim, ok := strings.CutPrefix(s, domain.OrgIDScope); ok {
+				out.AppendClaims(domain.OrgIDClaim, claim)
 				setUserInfoOrgClaims(user, out)
 			}
 		}
 	}
-	setUserInfoRoleClaims(out, newProjectRoles(projectID, user.UserGrants, requestedRoles))
+
+	// prevent returning obtained grants if none where requested
+	if (projectID != "" && len(requestedRoles) > 0) || len(roleAudience) > 0 {
+		setUserInfoRoleClaims(out, newProjectRoles(projectID, user.UserGrants, requestedRoles))
+	}
 	return out
 }
 
@@ -114,10 +127,7 @@ func userInfoProfileToOidc(user *query.User, assetPrefix string) oidc.UserInfoPr
 			PreferredUsername: user.PreferredLoginName,
 		}
 	}
-	return oidc.UserInfoProfile{
-		UpdatedAt:         oidc.FromTime(user.ChangeDate),
-		PreferredUsername: user.PreferredLoginName,
-	}
+	return oidc.UserInfoProfile{}
 }
 
 func userInfoPhoneToOIDC(user *query.User) oidc.UserInfoPhone {

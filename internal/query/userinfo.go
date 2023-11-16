@@ -58,11 +58,11 @@ func (q *Queries) GetOIDCUserInfo(ctx context.Context, userID string, roleAudien
 type OIDCUserInfo struct {
 	User       *User          `json:"user,omitempty"`
 	Metadata   []UserMetadata `json:"metadata,omitempty"`
-	Org        *userInfoOrg   `json:"org,omitempty"`
+	Org        *UserInfoOrg   `json:"org,omitempty"`
 	UserGrants []UserGrant    `json:"user_grants,omitempty"`
 }
 
-type userInfoOrg struct {
+type UserInfoOrg struct {
 	ID            string `json:"id,omitempty"`
 	Name          string `json:"name,omitempty"`
 	PrimaryDomain string `json:"primary_domain,omitempty"`
