@@ -168,7 +168,7 @@ require (
 	github.com/jackc/pgproto3/v2 v2.3.2 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jonboulle/clockwork v0.4.0 // indirect
+	github.com/jonboulle/clockwork v0.4.0
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kevinburke/go-types v0.0.0-20210723172823-2deba1f80ba7 // indirect
 	github.com/kevinburke/rest v0.0.0-20231107185522-a9c371f90234 // indirect
