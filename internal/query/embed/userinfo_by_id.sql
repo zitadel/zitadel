@@ -2,10 +2,12 @@
 -- prepare q (text, text, text[]) as
 
 with usr as (
-	select id, creation_date, change_date, sequence, state, resource_owner, username
+	select u.id, u.creation_date, u.change_date, u.sequence, u.state, u.resource_owner, u.username, n.login_name as preferred_login_name
 	from projections.users9 u
-	where id = $1
-	and instance_id = $2
+	left join projections.login_names2 n on u.id = n.user_id and u.instance_id = n.instance_id
+	where u.id = $1
+	and u.instance_id = $2
+	and n.is_primary = true
 ),
 human as (
 	select $1 as user_id, row_to_json(r) as human from (
@@ -69,6 +71,7 @@ grants as (
 		left join orgs o on o.id = g.resource_owner
 		left join projections.projects3 p on p.id = g.project_id
 		left join usr u on u.id = g.user_id
+		where p.instance_id = $2
 	) r
 )
 -- build the final result JSON

@@ -7,6 +7,7 @@
     "state": 1,
     "resource_owner": "231848297847848962",
     "username": "tests",
+    "preferred_login_name": "tests@demo.localhost",
     "human": null,
     "machine": {
       "name": "tests",
