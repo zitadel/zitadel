@@ -16,7 +16,7 @@ Supported features are those that are guaranteed to work as intended and are ful
 If you encounter any issues with a supported feature, please contact us by creating a [bug report](https://github.com/zitadel/zitadel/issues/new/choose).
 We will review the issues according to our [product management process](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#product-management).
 
-In case you are eligible to [support services](/docs/legal/support-services) get in touch via one of our support channels and we will provide prompt response to the issues you may experience and make our best effort to assist you to find a resolution.
+In case you are eligible to [support services](/docs/legal/service-description/support-services) get in touch via one of our support channels and we will provide prompt response to the issues you may experience and make our best effort to assist you to find a resolution.
 
 :::info Security Issues
 Please report any security issues immediately to the indicated address in our [security.txt](https://zitadel.com/.well-known/security.txt)
@@ -24,7 +24,7 @@ Please report any security issues immediately to the indicated address in our [s
 
 ### Enterprise supported
 
-Enterprise supported features are those where we provide support only to users eligible for enterprise [support services](/docs/legal/support-services).
+Enterprise supported features are those where we provide support only to users eligible for enterprise [support services](/docs/legal/service-description/support-services).
 These features should be functional for eligible users, but may have some limitations for a broader use.
 
 If you encounter issues with an enterprise supported feature and you are eligible for enterprise support services, we will provide a prompt response to the issues you may experience and make our best effort to assist you to find a resolution.
