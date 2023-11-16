@@ -7,11 +7,13 @@ import (
 	"time"
 
 	"github.com/go-jose/go-jose/v3"
+	"github.com/jonboulle/clockwork"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
@@ -28,6 +30,7 @@ type keySetCache struct {
 	mtx          sync.RWMutex
 	instanceKeys map[string]map[string]query.PublicKey
 	queryKey     func(ctx context.Context, keyID string, current time.Time) (query.PublicKey, error)
+	clock        clockwork.Clock
 }
 
 // newKeySet initializes a keySetCache and starts a purging Go routine,
@@ -37,32 +40,26 @@ func newKeySet(background context.Context, purgeInterval time.Duration, queryKey
 	k := &keySetCache{
 		instanceKeys: make(map[string]map[string]query.PublicKey),
 		queryKey:     queryKey,
+		clock:        clockwork.FromContext(background), // defaults to real clock
 	}
-	go k.purgeOnInterval(background, purgeInterval)
+	go k.purgeOnInterval(background, k.clock.NewTicker(purgeInterval))
 	return k
 }
 
-func (k *keySetCache) purgeOnInterval(background context.Context, purgeInterval time.Duration) {
-	timer := time.NewTimer(purgeInterval)
-	defer func() {
-		if !timer.Stop() {
-			<-timer.C // make sure the channel is emptied
-		}
-	}()
-
+func (k *keySetCache) purgeOnInterval(background context.Context, ticker clockwork.Ticker) {
+	defer ticker.Stop()
 	for {
 		select {
 		case <-background.Done():
 			return
-		case <-timer.C:
-			timer.Reset(purgeInterval)
+		case <-ticker.Chan():
 		}
 
 		// do the actual purging
 		k.mtx.Lock()
 		for instanceID, keys := range k.instanceKeys {
 			for keyID, key := range keys {
-				if key.Expiry().Before(time.Now()) {
+				if key.Expiry().Before(k.clock.Now()) {
 					delete(keys, keyID)
 				}
 			}
@@ -72,7 +69,6 @@ func (k *keySetCache) purgeOnInterval(background context.Context, purgeInterval 
 		}
 		k.mtx.Unlock()
 	}
-
 }
 
 func (k *keySetCache) setKey(instanceID, keyID string, key query.PublicKey) {
@@ -87,7 +83,7 @@ func (k *keySetCache) setKey(instanceID, keyID string, key query.PublicKey) {
 	k.instanceKeys[instanceID] = map[string]query.PublicKey{keyID: key}
 }
 
-func (k *keySetCache) getKey(ctx context.Context, keyID string, current time.Time) (_ *jose.JSONWebKey, err error) {
+func (k *keySetCache) getKey(ctx context.Context, keyID string) (_ *jose.JSONWebKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -98,13 +94,13 @@ func (k *keySetCache) getKey(ctx context.Context, keyID string, current time.Tim
 	k.mtx.RUnlock()
 
 	if ok {
-		if key.Expiry().After(current) {
+		if key.Expiry().After(k.clock.Now()) {
 			return jsonWebkey(key), nil
 		}
 		return nil, errors.ThrowInvalidArgument(nil, "OIDC-Zoh9E", "Errors.Key.ExpireBeforeNow")
 	}
 
-	key, err = k.queryKey(ctx, keyID, current)
+	key, err = k.queryKey(ctx, keyID, k.clock.Now())
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +116,7 @@ func (k *keySetCache) VerifySignature(ctx context.Context, jws *jose.JSONWebSign
 	if len(jws.Signatures) != 1 {
 		return nil, errors.ThrowInvalidArgument(nil, "OIDC-Gid9s", "Errors.Token.Invalid")
 	}
-	key, err := k.getKey(ctx, jws.Signatures[0].Header.KeyID, time.Now())
+	key, err := k.getKey(ctx, jws.Signatures[0].Header.KeyID)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +145,7 @@ func (k keySetMap) getKey(keyID string) (*jose.JSONWebKey, error) {
 	return &jose.JSONWebKey{
 		Key:   pubKey,
 		KeyID: keyID,
-		Use:   "sig",
+		Use:   domain.KeyUsageSigning.String(),
 	}, nil
 }
 
