@@ -131,7 +131,7 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 }
 
 func (l *Login) publicOrgRegistrationIsDisallowed(ctx context.Context) (bool, error) {
-	restrictions, err := l.query.GetInstanceRestrictions(ctx, authz.GetInstance(ctx).InstanceID())
+	restrictions, err := l.query.GetInstanceRestrictions(ctx)
 	return restrictions.DisallowPublicOrgRegistration, err
 }
 
