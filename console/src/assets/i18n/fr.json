@@ -2096,6 +2096,8 @@
       "UPLOAD": "Télécharger le fichier XML",
       "METADATA": "Métadonnées",
       "METADATAFROMFILE": "Métadonnées du fichier",
+      "CERTIFICATE": "Certificat SAML",
+      "DOWNLOADCERT": "Télécharger le certificat SAML",
       "CREATEMETADATA": "Créer des métadonnées",
       "ENTITYID": "Entity ID",
       "ACSURL": "ACS endpoint URL"

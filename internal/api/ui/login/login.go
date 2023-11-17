@@ -130,11 +130,16 @@ func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecu
 				handler.ServeHTTP(w, r)
 				return
 			}
+			sameSiteMode := csrf.SameSiteLaxMode
+			if len(authz.GetInstance(r.Context()).SecurityPolicyAllowedOrigins()) > 0 {
+				sameSiteMode = csrf.SameSiteNoneMode
+			}
 			csrf.Protect(csrfCookieKey,
 				csrf.Secure(externalSecure),
 				csrf.CookieName(http_utils.SetCookiePrefix(cookieName, "", path, externalSecure)),
 				csrf.Path(path),
 				csrf.ErrorHandler(errorHandler),
+				csrf.SameSite(sameSiteMode),
 			)(handler).ServeHTTP(w, r)
 		})
 	}

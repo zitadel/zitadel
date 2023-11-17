@@ -2096,6 +2096,8 @@
       "UPLOAD": "Prześlij plik XML",
       "METADATA": "Metadane",
       "METADATAFROMFILE": "Metadane z pliku",
+      "CERTIFICATE": "Certyfikat SAML-a",
+      "DOWNLOADCERT": "Pobierz certyfikat SAML",
       "CREATEMETADATA": "Utwórz metadane",
       "ENTITYID": "Entity ID",
       "ACSURL": "ACS endpoint URL"
