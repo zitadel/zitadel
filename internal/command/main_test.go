@@ -243,6 +243,17 @@ func newMockPermissionCheckNotAllowed() domain.PermissionCheck {
 	}
 }
 
+func newMockTokenVerifierValid() func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+	return func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+		return nil
+	}
+}
+func newMockTokenVerifierInvalid() func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+	return func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
+		return errors.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid")
+	}
+}
+
 type plainHasher struct {
 	x string // arbitrary info that triggers update when different from encoding
 }
