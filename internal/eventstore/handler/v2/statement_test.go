@@ -358,49 +358,7 @@ func TestNewUpsertStatement(t *testing.T) {
 			},
 		},
 		{
-			name: "correct UPDATE single col",
-			args: args{
-				table: "my_table",
-				event: &testEvent{
-					aggregateType:    "agg",
-					sequence:         1,
-					previousSequence: 0,
-				},
-				conflictCols: []Column{
-					NewCol("col1", nil),
-				},
-				values: []Column{
-					{
-						Name:  "col1",
-						Value: "val",
-					},
-					{
-						Name:  "col2",
-						Value: "val",
-					},
-				},
-			},
-			want: want{
-				table:            "my_table",
-				aggregateType:    "agg",
-				sequence:         1,
-				previousSequence: 1,
-				executer: &wantExecuter{
-					params: []params{
-						{
-							query: "INSERT INTO my_table (col1, col2) VALUES ($1, $2) ON CONFLICT (col1) DO UPDATE SET col2 = EXCLUDED.col2",
-							args:  []interface{}{"val", "val"},
-						},
-					},
-					shouldExecute: true,
-				},
-				isErr: func(err error) bool {
-					return err == nil
-				},
-			},
-		},
-		{
-			name: "correct single *onlySetValueOnInsert",
+			name: "correct *onlySetValueOnInsert",
 			args: args{
 				table: "my_table",
 				event: &testEvent{
@@ -417,14 +375,13 @@ func TestNewUpsertStatement(t *testing.T) {
 						Value: "val1",
 					},
 					{
-						Name: "col2",
-						Value: &onlySetValueOnInsert{
-							Value: "val2",
-						},
+						Name:  "col2",
+						Value: "val2",
 					},
 					{
 						Name: "col3",
 						Value: &onlySetValueOnInsert{
+							Table: "some.table",
 							Value: "val3",
 						},
 					},
@@ -438,8 +395,8 @@ func TestNewUpsertStatement(t *testing.T) {
 				executer: &wantExecuter{
 					params: []params{
 						{
-							query: "INSERT INTO my_table (col1, col2) VALUES ($1, $2) ON CONFLICT (col1) DO UPDATE SET col2 = col2",
-							args:  []interface{}{"val1", "val2"},
+							query: "INSERT INTO my_table (col1, col2, col3) VALUES ($1, $2, $3) ON CONFLICT (col1) DO UPDATE SET (col2, col3) = (EXCLUDED.col2, some.table.col3)",
+							args:  []interface{}{"val1", "val2", "val3"},
 						},
 					},
 					shouldExecute: true,
@@ -469,6 +426,7 @@ func TestNewUpsertStatement(t *testing.T) {
 					{
 						Name: "col2",
 						Value: &onlySetValueOnInsert{
+							Table: "some.table",
 							Value: "val2",
 						},
 					},
@@ -482,7 +440,7 @@ func TestNewUpsertStatement(t *testing.T) {
 				executer: &wantExecuter{
 					params: []params{
 						{
-							query: "INSERT INTO my_table (col1, col2) VALUES ($1, $2) ON CONFLICT (col1) DO UPDATE SET col2 = col2",
+							query: "INSERT INTO my_table (col1, col2) VALUES ($1, $2) ON CONFLICT (col1) DO UPDATE SET col2 = some.table.col2",
 							args:  []interface{}{"val1", "val2"},
 						},
 					},

@@ -34,7 +34,7 @@ func TestRestrictionsProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.restrictions (instance_id, resource_owner, creation_date, change_date, sequence, aggregate_id, audit_log_retention) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, resource_owner) DO UPDATE SET (creation_date, change_date, sequence, aggregate_id, audit_log_retention) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.aggregate_id, EXCLUDED.audit_log_retention)",
+							expectedStmt: "INSERT INTO projections.restrictions (instance_id, resource_owner, creation_date, change_date, sequence, aggregate_id, disallow_public_org_registration) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, resource_owner) DO UPDATE SET (creation_date, change_date, sequence, aggregate_id, disallow_public_org_registration) = (projections.restrictions.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.aggregate_id, EXCLUDED.disallow_public_org_registration)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"ro-id",
@@ -55,7 +55,7 @@ func TestRestrictionsProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					restrictions.SetEventType,
 					restrictions.AggregateType,
-					[]byte(`{ "disallowPublicOrgRegistrations": true }`),
+					[]byte(`{}`),
 				), restrictions.SetEventMapper),
 			},
 			reduce: (&restrictionsProjection{}).reduceRestrictionsSet,
@@ -65,7 +65,7 @@ func TestRestrictionsProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.restrictions (instance_id, resource_owner, creation_date, change_date, sequence, aggregate_id, audit_log_retention) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, resource_owner) DO UPDATE SET (creation_date, change_date, sequence, aggregate_id, audit_log_retention) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.aggregate_id, EXCLUDED.audit_log_retention)",
+							expectedStmt: "INSERT INTO projections.restrictions (instance_id, resource_owner, creation_date, change_date, sequence, aggregate_id) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (instance_id, resource_owner) DO UPDATE SET (creation_date, change_date, sequence, aggregate_id) = (projections.restrictions.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.aggregate_id)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"ro-id",
@@ -73,7 +73,6 @@ func TestRestrictionsProjection_reduces(t *testing.T) {
 								anyArg{},
 								uint64(15),
 								"agg-id",
-								true,
 							},
 						},
 					},
