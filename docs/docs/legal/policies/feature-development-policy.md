@@ -3,6 +3,8 @@ title: Feature Development Policy
 custom_edit_url: null
 ---
 
+Last updated on September 25, 2023
+
 This policy clarifies how we handle requests for feature prioritization and development. This policy is applicable to situations where a user wants to prioritize certain features or development for our products and services.
 
 ## Why to do we have this policy?
@@ -49,9 +51,3 @@ We will send you an invoice and expect payment within the given deadline.
 Completion means that the agreed scope is available according to the agreed acceptance criteria.
 You had 14 days to verify the acceptance criteria and report any issues.
 A feature is  considered complete, if the outstanding issues are being solved, or a timeline for resolution of the issues has been mutually agreed, or if we haven't got any response within the last 14 days.
-
-## Entry into force
-
-This policy is valid from September 25, 2023.
-
-Last revised September 25, 2023

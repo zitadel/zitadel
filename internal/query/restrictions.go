@@ -60,14 +60,15 @@ type Restrictions struct {
 	DisallowPublicOrgRegistration bool
 }
 
-func (q *Queries) Restrictions(ctx context.Context, resourceOwner string) (restrictions Restrictions, err error) {
+func (q *Queries) GetInstanceRestrictions(ctx context.Context) (restrictions Restrictions, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	stmt, scan := prepareRestrictionsQuery(ctx, q.client)
+	instanceID := authz.GetInstance(ctx).InstanceID()
 	query, args, err := stmt.Where(sq.Eq{
-		RestrictionsColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
-		RestrictionsColumnResourceOwner.identifier(): resourceOwner,
+		RestrictionsColumnInstanceID.identifier():    instanceID,
+		RestrictionsColumnResourceOwner.identifier(): instanceID,
 	}).ToSql()
 	if err != nil {
 		return restrictions, zitade_errors.ThrowInternal(err, "QUERY-XnLMQ", "Errors.Query.SQLStatment")

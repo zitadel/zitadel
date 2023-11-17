@@ -56,8 +56,7 @@ func TestSetRestrictions(t *testing.T) {
 					id_mock.NewIDGeneratorExpectIDs(t, "restrictions1")
 			},
 			args: args{
-				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
-				resourceOwner: "instance1",
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setRestrictions: &SetRestrictions{
 					DisallowPublicOrgRegistration: gu.Ptr(true),
 				},
@@ -102,8 +101,7 @@ func TestSetRestrictions(t *testing.T) {
 					nil
 			},
 			args: args{
-				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
-				resourceOwner: "instance1",
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setRestrictions: &SetRestrictions{
 					DisallowPublicOrgRegistration: gu.Ptr(false),
 				},
@@ -135,8 +133,7 @@ func TestSetRestrictions(t *testing.T) {
 					nil
 			},
 			args: args{
-				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
-				resourceOwner: "instance1",
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setRestrictions: &SetRestrictions{
 					DisallowPublicOrgRegistration: gu.Ptr(true),
 				},
@@ -167,7 +164,6 @@ func TestSetRestrictions(t *testing.T) {
 			},
 			args: args{
 				ctx:             authz.WithInstanceID(context.Background(), "instance1"),
-				resourceOwner:   "instance1",
 				setRestrictions: &SetRestrictions{},
 			},
 			res: res{
@@ -179,7 +175,7 @@ func TestSetRestrictions(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := new(Commands)
 			r.eventstore, r.idGenerator = tt.fields(t)
-			got, err := r.SetRestrictions(tt.args.ctx, tt.args.resourceOwner, tt.args.setRestrictions)
+			got, err := r.SetInstanceRestrictions(tt.args.ctx, tt.args.setRestrictions)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

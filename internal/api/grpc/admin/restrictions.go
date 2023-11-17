@@ -3,18 +3,13 @@ package admin
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 func (s *Server) SetRestrictions(ctx context.Context, req *admin.SetRestrictionsRequest) (*admin.SetRestrictionsResponse, error) {
-	details, err := s.command.SetRestrictions(
-		ctx,
-		authz.GetInstance(ctx).InstanceID(),
-		&command.SetRestrictions{DisallowPublicOrgRegistration: req.DisallowPublicOrgRegistration},
-	)
+	details, err := s.command.SetInstanceRestrictions(ctx, &command.SetRestrictions{DisallowPublicOrgRegistration: req.DisallowPublicOrgRegistration})
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +19,7 @@ func (s *Server) SetRestrictions(ctx context.Context, req *admin.SetRestrictions
 }
 
 func (s *Server) GetRestrictions(ctx context.Context, _ *admin.GetRestrictionsRequest) (*admin.GetRestrictionsResponse, error) {
-	restrictions, err := s.query.Restrictions(ctx, authz.GetInstance(ctx).InstanceID())
+	restrictions, err := s.query.GetInstanceRestrictions(ctx)
 	if err != nil {
 		return nil, err
 	}
