@@ -179,7 +179,7 @@ func TestSetRestrictions(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := new(Commands)
 			r.eventstore, r.idGenerator = tt.fields(t)
-			got, err := r.SetRestrictions(tt.args.ctx, tt.args.resourceOwner, tt.args.setRestrictions)
+			got, err := r.SetInstanceRestrictions(tt.args.ctx, tt.args.resourceOwner, tt.args.setRestrictions)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

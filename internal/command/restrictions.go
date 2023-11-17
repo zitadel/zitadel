@@ -16,13 +16,12 @@ type SetRestrictions struct {
 }
 
 // SetRestrictions creates new restrictions or updates existing restrictions.
-func (c *Commands) SetRestrictions(
+func (c *Commands) SetInstanceRestrictions(
 	ctx context.Context,
-	resourceOwner string,
 	setRestrictions *SetRestrictions,
 ) (*domain.ObjectDetails, error) {
 	instanceId := authz.GetInstance(ctx).InstanceID()
-	wm, err := c.getRestrictionsWriteModel(ctx, instanceId, resourceOwner)
+	wm, err := c.getRestrictionsWriteModel(ctx, instanceId, instanceId)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +32,7 @@ func (c *Commands) SetRestrictions(
 			return nil, err
 		}
 	}
-	setCmd, err := c.SetRestrictionsCommand(restrictions.NewAggregate(aggregateId, instanceId, resourceOwner), wm, setRestrictions)()
+	setCmd, err := c.SetRestrictionsCommand(restrictions.NewAggregate(aggregateId, instanceId, instanceId), wm, setRestrictions)()
 	if err != nil {
 		return nil, err
 	}
