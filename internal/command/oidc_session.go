@@ -153,7 +153,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, authRequestID st
 	if err = authRequestWriteModel.CheckAuthenticated(); err != nil {
 		return nil, err
 	}
-	sessionWriteModel := NewSessionWriteModel(authRequestWriteModel.SessionID, authz.GetCtxData(ctx).OrgID)
+	sessionWriteModel := NewSessionWriteModel(authRequestWriteModel.SessionID, authz.GetInstance(ctx).InstanceID())
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
 	if err != nil {
 		return nil, err
