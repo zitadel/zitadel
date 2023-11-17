@@ -4,22 +4,30 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	"sync"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-var introspectionTriggerHandlers = append(oidcUserInfoTriggerHandlers,
-	projection.AppProjection,
-	projection.OIDCSettingsProjection,
-	projection.AuthNKeyProjection,
-)
+// introspectionTriggerHandlers slice can only be created after zitadel
+// is fully initialized, otherwise the handlers are nil.
+// OnceValue takes care of creating the slice on the first request
+// and than will always return the same slice on subsequent requests.
+var introspectionTriggerHandlers = sync.OnceValue(func() []*handler.Handler {
+	return append(oidcUserInfoTriggerHandlers(),
+		projection.AppProjection,
+		projection.OIDCSettingsProjection,
+		projection.AuthNKeyProjection,
+	)
+})
 
 func TriggerIntrospectionProjections(ctx context.Context) {
-	triggerBatch(ctx, introspectionTriggerHandlers...)
+	triggerBatch(ctx, introspectionTriggerHandlers()...)
 }
 
 type IntrospectionClient struct {

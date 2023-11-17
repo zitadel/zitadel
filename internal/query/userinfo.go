@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	_ "embed"
 	"encoding/json"
+	"sync"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
@@ -14,16 +15,22 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-var oidcUserInfoTriggerHandlers = []*handler.Handler{
-	projection.UserProjection,
-	projection.UserMetadataProjection,
-	projection.UserGrantProjection,
-	projection.OrgProjection,
-	projection.ProjectProjection,
-}
+// oidcUserInfoTriggerHandlers slice can only be created after zitadel
+// is fully initialized, otherwise the handlers are nil.
+// OnceValue takes care of creating the slice on the first request
+// and than will always return the same slice on subsequent requests.
+var oidcUserInfoTriggerHandlers = sync.OnceValue(func() []*handler.Handler {
+	return []*handler.Handler{
+		projection.UserProjection,
+		projection.UserMetadataProjection,
+		projection.UserGrantProjection,
+		projection.OrgProjection,
+		projection.ProjectProjection,
+	}
+})
 
 func TriggerOIDCUserInfoProjections(ctx context.Context) {
-	triggerBatch(ctx, oidcUserInfoTriggerHandlers...)
+	triggerBatch(ctx, oidcUserInfoTriggerHandlers()...)
 }
 
 //go:embed embed/userinfo_by_id.sql
