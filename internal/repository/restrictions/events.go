@@ -2,6 +2,7 @@ package restrictions
 
 import (
 	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 

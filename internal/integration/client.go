@@ -74,7 +74,7 @@ func (t *Tester) UseIsolatedInstance(iamOwnerCtx, systemCtx context.Context) (pr
 	if err != nil {
 		panic(err)
 	}
-	//nolint:typecheck
+	
 	t.createClientConn(iamOwnerCtx, fmt.Sprintf("%s:%d", primaryDomain, t.Config.Port))
 	instanceId = instance.GetInstanceId()
 	t.Users.Set(instanceId, IAMOwner, &User{

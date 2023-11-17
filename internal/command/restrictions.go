@@ -38,6 +38,9 @@ func (c *Commands) SetRestrictions(
 		return nil, err
 	}
 	cmds, err := setCmd(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
 	if len(cmds) > 0 {
 		events, err := c.eventstore.Push(ctx, cmds...)
 		if err != nil {
