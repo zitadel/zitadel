@@ -152,6 +152,7 @@ func TestCommands_CreateSession(t *testing.T) {
 		checks    []SessionCommand
 		metadata  map[string][]byte
 		userAgent *domain.UserAgent
+		lifetime  time.Duration
 	}
 	type res struct {
 		want *SessionChanged
@@ -193,6 +194,33 @@ func TestCommands_CreateSession(t *testing.T) {
 			},
 		},
 		{
+			"negative lifetime",
+			fields{
+				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
+				tokenCreator: func(sessionID string) (string, string, error) {
+					return "tokenID",
+						"token",
+						nil
+				},
+			},
+			args{
+				ctx: authz.NewMockContext("instance1", "", ""),
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				lifetime: -10 * time.Minute,
+			},
+			[]expect{
+				expectFilter(),
+			},
+			res{
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.PositiveLifetime"),
+			},
+		},
+		{
 			"empty session",
 			fields{
 				idGenerator: mock.NewIDGeneratorExpectIDs(t, "sessionID"),
@@ -203,19 +231,20 @@ func TestCommands_CreateSession(t *testing.T) {
 				},
 			},
 			args{
-				ctx: authz.NewMockContext("", "org1", ""),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				userAgent: &domain.UserAgent{
 					FingerprintID: gu.Ptr("fp1"),
 					IP:            net.ParseIP("1.2.3.4"),
 					Description:   gu.Ptr("firefox"),
 					Header:        http.Header{"foo": []string{"bar"}},
 				},
+				lifetime: 10 * time.Minute,
 			},
 			[]expect{
 				expectFilter(),
 				expectPush(
 					session.NewAddedEvent(context.Background(),
-						&session.NewAggregate("sessionID", "org1").Aggregate,
+						&session.NewAggregate("sessionID", "instance1").Aggregate,
 						&domain.UserAgent{
 							FingerprintID: gu.Ptr("fp1"),
 							IP:            net.ParseIP("1.2.3.4"),
@@ -223,14 +252,15 @@ func TestCommands_CreateSession(t *testing.T) {
 							Header:        http.Header{"foo": []string{"bar"}},
 						},
 					),
-					session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+					session.NewLifetimeSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate, 10*time.Minute),
+					session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 						"tokenID",
 					),
 				),
 			},
 			res{
 				want: &SessionChanged{
-					ObjectDetails: &domain.ObjectDetails{ResourceOwner: "org1"},
+					ObjectDetails: &domain.ObjectDetails{ResourceOwner: "instance1"},
 					ID:            "sessionID",
 					NewToken:      "token",
 				},
@@ -245,7 +275,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				idGenerator:         tt.fields.idGenerator,
 				sessionTokenCreator: tt.fields.tokenCreator,
 			}
-			got, err := c.CreateSession(tt.args.ctx, tt.args.checks, tt.args.metadata, tt.args.userAgent)
+			got, err := c.CreateSession(tt.args.ctx, tt.args.checks, tt.args.metadata, tt.args.userAgent, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})
@@ -263,6 +293,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 		sessionToken string
 		checks       []SessionCommand
 		metadata     map[string][]byte
+		lifetime     time.Duration
 	}
 	type res struct {
 		want *SessionChanged
@@ -295,7 +326,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(context.Background(),
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -304,13 +335,11 @@ func TestCommands_UpdateSession(t *testing.T) {
 								},
 							)),
 						eventFromEventPusher(
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 								"tokenID")),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return caos_errs.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid")
-				},
+				tokenVerifier: newMockTokenVerifierInvalid(),
 			},
 			args{
 				ctx:          context.Background(),
@@ -328,7 +357,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(context.Background(),
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -337,7 +366,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 								},
 							)),
 						eventFromEventPusher(
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 								"tokenID")),
 					),
 				),
@@ -353,7 +382,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 			res{
 				want: &SessionChanged{
 					ObjectDetails: &domain.ObjectDetails{
-						ResourceOwner: "org1",
+						ResourceOwner: "instance1",
 					},
 					ID:       "sessionID",
 					NewToken: "",
@@ -368,7 +397,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 				eventstore:           tt.fields.eventstore,
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 			}
-			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.sessionToken, tt.args.checks, tt.args.metadata)
+			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.sessionToken, tt.args.checks, tt.args.metadata, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})
@@ -397,6 +426,7 @@ func TestCommands_updateSession(t *testing.T) {
 		ctx      context.Context
 		checks   *SessionCommands
 		metadata map[string][]byte
+		lifetime time.Duration
 	}
 	type res struct {
 		want *SessionChanged
@@ -420,7 +450,7 @@ func TestCommands_updateSession(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMAND-SAjeh", "Errors.Session.Terminated"),
+				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Hewfq", "Errors.Session.Terminated"),
 			},
 		},
 		{
@@ -431,7 +461,7 @@ func TestCommands_updateSession(t *testing.T) {
 			args{
 				ctx: context.Background(),
 				checks: &SessionCommands{
-					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						func(ctx context.Context, cmd *SessionCommands) error {
 							return caos_errs.ThrowInternal(nil, "id", "check failed")
@@ -449,19 +479,86 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t),
 			},
 			args{
-				ctx: context.Background(),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
-					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands:   []SessionCommand{},
 				},
 			},
 			res{
 				want: &SessionChanged{
 					ObjectDetails: &domain.ObjectDetails{
-						ResourceOwner: "org1",
+						ResourceOwner: "instance1",
 					},
 					ID:       "sessionID",
 					NewToken: "",
+				},
+			},
+		},
+		{
+			"negative lifetime",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.NewMockContext("instance1", "", ""),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
+					sessionCommands:   []SessionCommand{},
+					eventstore:        eventstoreExpect(t),
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				lifetime: -10 * time.Minute,
+			},
+			res{
+				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.PositiveLifetime"),
+			},
+		},
+		{
+			"lifetime set",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectPush(
+						session.NewLifetimeSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+							10*time.Minute,
+						),
+						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+							"tokenID",
+						),
+					),
+				),
+			},
+			args{
+				ctx: authz.NewMockContext("instance1", "", ""),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
+					sessionCommands:   []SessionCommand{},
+					eventstore:        eventstoreExpect(t),
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				lifetime: 10 * time.Minute,
+			},
+			res{
+				want: &SessionChanged{
+					ObjectDetails: &domain.ObjectDetails{
+						ResourceOwner: "instance1",
+					},
+					ID:       "sessionID",
+					NewToken: "token",
 				},
 			},
 		},
@@ -470,27 +567,27 @@ func TestCommands_updateSession(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-							"userID", testNow,
+						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+							"userID", "org1", testNow,
 						),
-						session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow,
 						),
-						session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							map[string][]byte{"key": []byte("value")},
 						),
-						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							"tokenID",
 						),
 					),
 				),
 			},
 			args{
-				ctx: context.Background(),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
-					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID"),
+						CheckUser("userID", "org1"),
 						CheckPassword("password"),
 					},
 					eventstore: eventstoreExpect(t,
@@ -522,7 +619,7 @@ func TestCommands_updateSession(t *testing.T) {
 			res{
 				want: &SessionChanged{
 					ObjectDetails: &domain.ObjectDetails{
-						ResourceOwner: "org1",
+						ResourceOwner: "instance1",
 					},
 					ID:       "sessionID",
 					NewToken: "token",
@@ -535,11 +632,11 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t),
 			},
 			args{
-				ctx: context.Background(),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
-					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID"),
+						CheckUser("userID", "org1"),
 						CheckIntent("intent", "aW50ZW50"),
 					},
 					eventstore: eventstoreExpect(t,
@@ -574,11 +671,11 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t),
 			},
 			args{
-				ctx: context.Background(),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
-					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID"),
+						CheckUser("userID", "org1"),
 						CheckIntent("intent", "aW50ZW50"),
 					},
 					eventstore: eventstoreExpect(t,
@@ -623,11 +720,11 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t),
 			},
 			args{
-				ctx: context.Background(),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
-					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID"),
+						CheckUser("userID", "org1"),
 						CheckIntent("intent2", "aW50ZW50"),
 					},
 					eventstore: eventstoreExpect(t),
@@ -654,23 +751,23 @@ func TestCommands_updateSession(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
-							"userID", testNow),
-						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+							"userID", "org1", testNow),
+						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow),
-						session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							map[string][]byte{"key": []byte("value")}),
-						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							"tokenID"),
 					),
 				),
 			},
 			args{
-				ctx: context.Background(),
+				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
-					sessionWriteModel: NewSessionWriteModel("sessionID", "org1"),
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID"),
+						CheckUser("userID", "org1"),
 						CheckIntent("intent", "aW50ZW50"),
 					},
 					eventstore: eventstoreExpect(t,
@@ -708,7 +805,7 @@ func TestCommands_updateSession(t *testing.T) {
 			res{
 				want: &SessionChanged{
 					ObjectDetails: &domain.ObjectDetails{
-						ResourceOwner: "org1",
+						ResourceOwner: "instance1",
 					},
 					ID:       "sessionID",
 					NewToken: "token",
@@ -721,7 +818,7 @@ func TestCommands_updateSession(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := c.updateSession(tt.args.ctx, tt.args.checks, tt.args.metadata)
+			got, err := c.updateSession(tt.args.ctx, tt.args.checks, tt.args.metadata, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})
@@ -729,13 +826,13 @@ func TestCommands_updateSession(t *testing.T) {
 }
 
 func TestCheckTOTP(t *testing.T) {
-	ctx := authz.NewMockContext("", "org1", "user1")
+	ctx := authz.NewMockContext("instance1", "org1", "user1")
 
 	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	key, secret, err := domain.NewTOTPKey("example.com", "user1", cryptoAlg)
 	require.NoError(t, err)
 
-	sessAgg := &session.NewAggregate("session1", "org1").Aggregate
+	sessAgg := &session.NewAggregate("session1", "instance1").Aggregate
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 
 	code, err := totp.GenerateCode(key.Secret(), testNow)
@@ -862,8 +959,9 @@ func TestCheckTOTP(t *testing.T) {
 
 func TestCommands_TerminateSession(t *testing.T) {
 	type fields struct {
-		eventstore    *eventstore.Eventstore
-		tokenVerifier func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		tokenVerifier   func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx          context.Context
@@ -883,7 +981,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 		{
 			"eventstore failed",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilterError(caos_errs.ThrowInternal(nil, "id", "filter failed")),
 				),
 			},
@@ -897,11 +995,11 @@ func TestCommands_TerminateSession(t *testing.T) {
 		{
 			"invalid session token",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(context.Background(),
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -910,13 +1008,11 @@ func TestCommands_TerminateSession(t *testing.T) {
 								},
 							)),
 						eventFromEventPusher(
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 								"tokenID")),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return caos_errs.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid")
-				},
+				tokenVerifier: newMockTokenVerifierInvalid(),
 			},
 			args{
 				ctx:          context.Background(),
@@ -928,13 +1024,13 @@ func TestCommands_TerminateSession(t *testing.T) {
 			},
 		},
 		{
-			"not active",
+			"missing permission",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(context.Background(),
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -943,10 +1039,41 @@ func TestCommands_TerminateSession(t *testing.T) {
 								},
 							)),
 						eventFromEventPusher(
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"tokenID")),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args{
+				ctx:          context.Background(),
+				sessionID:    "sessionID",
+				sessionToken: "",
+			},
+			res{
+				err: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			},
+		},
+		{
+			"not active",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							)),
+						eventFromEventPusher(
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 								"tokenID")),
 						eventFromEventPusher(
-							session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate)),
+							session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate)),
 					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
@@ -960,18 +1087,18 @@ func TestCommands_TerminateSession(t *testing.T) {
 			},
 			res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance1",
 				},
 			},
 		},
 		{
 			"push failed",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(context.Background(),
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -980,13 +1107,13 @@ func TestCommands_TerminateSession(t *testing.T) {
 								},
 							)),
 						eventFromEventPusher(
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 								"tokenID"),
 						),
 					),
 					expectPushFailed(
 						caos_errs.ThrowInternal(nil, "id", "pushed failed"),
-						session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate),
+						session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate),
 					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
@@ -1003,13 +1130,13 @@ func TestCommands_TerminateSession(t *testing.T) {
 			},
 		},
 		{
-			"terminate",
+			"terminate with token",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(context.Background(),
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -1018,12 +1145,12 @@ func TestCommands_TerminateSession(t *testing.T) {
 								},
 							)),
 						eventFromEventPusher(
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 								"tokenID"),
 						),
 					),
 					expectPush(
-						session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "org1").Aggregate),
+						session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate),
 					),
 				),
 				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
@@ -1037,7 +1164,90 @@ func TestCommands_TerminateSession(t *testing.T) {
 			},
 			res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance1",
+				},
+			},
+		},
+		{
+			"terminate own session",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							),
+						),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"user1", "org1", testNow),
+						),
+						eventFromEventPusher(
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"tokenID"),
+						),
+					),
+					expectPush(
+						session.NewTerminateEvent(authz.NewMockContext("instance1", "org1", "user1"), &session.NewAggregate("sessionID", "instance1").Aggregate),
+					),
+				),
+			},
+			args{
+				ctx:          authz.NewMockContext("instance1", "org1", "user1"),
+				sessionID:    "sessionID",
+				sessionToken: "",
+			},
+			res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "instance1",
+				},
+			},
+		},
+		{
+			"terminate with permission",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							),
+						),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"userID", "org1", testNow),
+						),
+						eventFromEventPusher(
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"tokenID"),
+						),
+					),
+					expectPush(
+						session.NewTerminateEvent(authz.NewMockContext("instance1", "org1", "admin1"), &session.NewAggregate("sessionID", "instance1").Aggregate),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx:          authz.NewMockContext("instance1", "org1", "admin1"),
+				sessionID:    "sessionID",
+				sessionToken: "",
+			},
+			res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "instance1",
 				},
 			},
 		},
@@ -1045,8 +1255,9 @@ func TestCommands_TerminateSession(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:           tt.fields.eventstore,
+				eventstore:           tt.fields.eventstore(t),
 				sessionTokenVerifier: tt.fields.tokenVerifier,
+				checkPermission:      tt.fields.checkPermission,
 			}
 			got, err := c.TerminateSession(tt.args.ctx, tt.args.sessionID, tt.args.sessionToken)
 			require.ErrorIs(t, err, tt.res.err)

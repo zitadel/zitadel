@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/session"
 )
@@ -38,6 +39,7 @@ type SessionWriteModel struct {
 
 	TokenID              string
 	UserID               string
+	UserResourceOwner    string
 	UserCheckedAt        time.Time
 	PasswordCheckedAt    time.Time
 	IntentCheckedAt      time.Time
@@ -48,6 +50,7 @@ type SessionWriteModel struct {
 	WebAuthNUserVerified bool
 	Metadata             map[string][]byte
 	State                domain.SessionState
+	Expiration           time.Time
 
 	WebAuthNChallenge     *WebAuthNChallengeModel
 	OTPSMSCodeChallenge   *OTPCode
@@ -56,14 +59,14 @@ type SessionWriteModel struct {
 	aggregate *eventstore.Aggregate
 }
 
-func NewSessionWriteModel(sessionID string, resourceOwner string) *SessionWriteModel {
+func NewSessionWriteModel(sessionID string, instanceID string) *SessionWriteModel {
 	return &SessionWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   sessionID,
-			ResourceOwner: resourceOwner,
+			ResourceOwner: instanceID,
 		},
 		Metadata:  make(map[string][]byte),
-		aggregate: &session.NewAggregate(sessionID, resourceOwner).Aggregate,
+		aggregate: &session.NewAggregate(sessionID, instanceID).Aggregate,
 	}
 }
 
@@ -94,6 +97,8 @@ func (wm *SessionWriteModel) Reduce() error {
 			wm.reduceOTPEmailChecked(e)
 		case *session.TokenSetEvent:
 			wm.reduceTokenSet(e)
+		case *session.LifetimeSetEvent:
+			wm.reduceLifetimeSet(e)
 		case *session.TerminateEvent:
 			wm.reduceTerminate()
 		}
@@ -120,6 +125,7 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 			session.OTPEmailCheckedType,
 			session.TokenSetType,
 			session.MetadataSetType,
+			session.LifetimeSetType,
 			session.TerminateType,
 		).
 		Builder()
@@ -136,6 +142,7 @@ func (wm *SessionWriteModel) reduceAdded(e *session.AddedEvent) {
 
 func (wm *SessionWriteModel) reduceUserChecked(e *session.UserCheckedEvent) {
 	wm.UserID = e.UserID
+	wm.UserResourceOwner = e.UserResourceOwner
 	wm.UserCheckedAt = e.CheckedAt
 }
 
@@ -196,6 +203,10 @@ func (wm *SessionWriteModel) reduceTokenSet(e *session.TokenSetEvent) {
 	wm.TokenID = e.TokenID
 }
 
+func (wm *SessionWriteModel) reduceLifetimeSet(e *session.LifetimeSetEvent) {
+	wm.Expiration = e.CreationDate().Add(e.Lifetime)
+}
+
 func (wm *SessionWriteModel) reduceTerminate() {
 	wm.State = domain.SessionStateTerminated
 }
@@ -244,4 +255,24 @@ func (wm *SessionWriteModel) AuthMethodTypes() []domain.UserAuthMethodType {
 		types = append(types, domain.UserAuthMethodTypeOTPEmail)
 	}
 	return types
+}
+
+// CheckNotInvalidated checks that the session was not invalidated either manually ([session.TerminateType])
+// or automatically (expired).
+func (wm *SessionWriteModel) CheckNotInvalidated() error {
+	if wm.State == domain.SessionStateTerminated {
+		return errors.ThrowPreconditionFailed(nil, "COMMAND-Hewfq", "Errors.Session.Terminated")
+	}
+	if !wm.Expiration.IsZero() && wm.Expiration.Before(time.Now()) {
+		return errors.ThrowPreconditionFailed(nil, "COMMAND-Hkl3d", "Errors.Session.Expired")
+	}
+	return nil
+}
+
+// CheckIsActive checks that the session was not invalidated ([CheckNotInvalidated]) and actually already exists.
+func (wm *SessionWriteModel) CheckIsActive() error {
+	if wm.State == domain.SessionStateUnspecified {
+		return errors.ThrowPreconditionFailed(nil, "COMMAND-Flk38", "Errors.Session.NotExisting")
+	}
+	return wm.CheckNotInvalidated()
 }

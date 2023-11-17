@@ -8,10 +8,6 @@
   $button-disabled-text-color: map-get($foreground, disabled-button);
   $divider-color: map-get($foreground, dividers);
 
-  .title {
-    margin-bottom: 1rem;
-  }
-
   .metadata-option {
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
@@ -291,4 +287,15 @@
   display: flex;
   justify-content: flex-end;
   margin-top: 1rem;
+}
+
+.link a {
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  font-family: inherit;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }

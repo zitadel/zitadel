@@ -1061,7 +1061,9 @@
       "zh": "简体中文",
       "bg": "Български",
       "pt": "Portuguese",
-      "mk": "Македонски"
+      "mk": "Македонски",
+      "cs": "Čeština",
+      "ru": "Русский"
     },
     "SMTP": {
       "TITLE": "Configurações SMTP",
@@ -1272,7 +1274,9 @@
         "zh": "简体中文",
         "bg": "Български",
         "pt": "Portuguese",
-        "mk": "Македонски"
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificação de email concluída",
@@ -2087,6 +2091,8 @@
       "UPLOAD": "Prześlij plik XML",
       "METADATA": "Metadados",
       "METADATAFROMFILE": "Metadados do Arquivo",
+      "CERTIFICATE": "Certificado SAML",
+      "DOWNLOADCERT": "Baixar certificado SAML",
       "CREATEMETADATA": "Criar metadados",
       "ENTITYID": "Entity ID",
       "ACSURL": "ACS endpoint URL"
@@ -2154,7 +2160,9 @@
     "zh": "简体中文",
     "bg": "Български",
     "pt": "Portuguese",
-    "mk": "Македонски"
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский"
   },
   "MEMBER": {
     "ADD": "Adicionar um Gerente",

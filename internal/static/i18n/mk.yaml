@@ -51,6 +51,7 @@ Errors:
   Notification:
     NoDomain: Не е пронајден домен за пораката
   User:
+    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: Корисникот не е пронајден
     AlreadyExists: Корисникот веќе постои
     NotFoundOnOrg: Корисникот не е пронајден во избраната организација
@@ -317,7 +318,7 @@ Errors:
       NotActive: Овластувањето за проектот не е активно
       NotInactive: Овластувањето за проектот не е неактивно
   IAM:
-    NotFound: Инстанцата не е пронајдена
+    NotFound: Инстанцата не е пронајдена. Проверете https://zitadel.com/docs/self-hosting/manage/custom-domain
     Member:
       RolesNotChanged: Улогите не се променети
     MemberInvalid: Членот е невалиден
@@ -424,6 +425,7 @@ Errors:
     AuditRetention: Историјата е надвор од задржувањето на аудитот
   Token:
     NotFound: Токенот не е пронајден
+    Invalid: Токенот е невалиден
   UserSession:
     NotFound: Корисничката сесија не е пронајдена
   Key:
@@ -490,6 +492,8 @@ Errors:
   Session:
     NotExisting: Сесијата не постои
     Terminated: Сесијата е веќе завршена
+    Expired: Сесијата истече
+    PositiveLifetime: Времетраењето на сесијата не смее да биде помало од 0
     Token:
       Invalid: Токенот за сесија е невалиден
     WebAuthN:

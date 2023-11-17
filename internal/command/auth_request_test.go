@@ -164,9 +164,8 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient")
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		tokenVerifier   func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
-		checkPermission domain.PermissionCheck
+		eventstore    *eventstore.Eventstore
+		tokenVerifier func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
 	}
 	type args struct {
 		ctx              context.Context
@@ -192,10 +191,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
-				checkPermission: newMockPermissionCheckNotAllowed(),
+				tokenVerifier: newMockTokenVerifierValid(),
 			},
 			args{
 				ctx:       mockCtx,
@@ -235,10 +231,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 						),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
-				checkPermission: newMockPermissionCheckAllowed(),
+				tokenVerifier: newMockTokenVerifierValid(),
 			},
 			args{
 				ctx:       mockCtx,
@@ -274,10 +267,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 						),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
-				checkPermission: newMockPermissionCheckAllowed(),
+				tokenVerifier: newMockTokenVerifierValid(),
 			},
 			args{
 				ctx:              authz.NewMockContext("instanceID", "orgID", "wrongLoginClient"),
@@ -316,10 +306,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					),
 					expectFilter(),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
-				checkPermission: newMockPermissionCheckNotAllowed(),
+				tokenVerifier: newMockTokenVerifierValid(),
 			},
 			args{
 				ctx:       mockCtx,
@@ -327,11 +314,11 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 				sessionID: "sessionID",
 			},
 			res{
-				wantErr: caos_errs.ThrowNotFound(nil, "COMMAND-x0099887", "Errors.Session.NotExisting"),
+				wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Flk38", "Errors.Session.NotExisting"),
 			},
 		},
 		{
-			"missing permission",
+			"session expired",
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(
@@ -357,7 +344,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(mockCtx,
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -365,20 +352,29 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 									Header:        http.Header{"foo": []string{"bar"}},
 								},
 							)),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"userID", "org1", testNow.Add(-5*time.Minute)),
+						),
+						eventFromEventPusher(
+							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								testNow.Add(-5*time.Minute)),
+						),
+						eventFromEventPusher(
+							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								2*time.Minute),
+						),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
-				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
-				ctx:       mockCtx,
-				id:        "V2_id",
-				sessionID: "sessionID",
+				ctx:          mockCtx,
+				id:           "V2_id",
+				sessionID:    "sessionID",
+				sessionToken: "token",
 			},
 			res{
-				wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+				wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Hkl3d", "Errors.Session.Expired"),
 			},
 		},
 		{
@@ -408,7 +404,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(mockCtx,
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -418,9 +414,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 							)),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return caos_errs.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid")
-				},
+				tokenVerifier: newMockTokenVerifierInvalid(),
 			},
 			args{
 				ctx:          mockCtx,
@@ -459,7 +453,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(mockCtx,
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -468,12 +462,16 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								},
 							)),
 						eventFromEventPusher(
-							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
-								"userID", testNow),
+							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"userID", "org1", testNow),
 						),
 						eventFromEventPusher(
-							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
 								testNow),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								2*time.Minute),
 						),
 					),
 					expectPush(
@@ -485,10 +483,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 						),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
-				checkPermission: newMockPermissionCheckAllowed(),
+				tokenVerifier: newMockTokenVerifierValid(),
 			},
 			args{
 				ctx:          mockCtx,
@@ -543,7 +538,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(mockCtx,
-								&session.NewAggregate("sessionID", "org1").Aggregate,
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
 								&domain.UserAgent{
 									FingerprintID: gu.Ptr("fp1"),
 									IP:            net.ParseIP("1.2.3.4"),
@@ -552,12 +547,16 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								},
 							)),
 						eventFromEventPusher(
-							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
-								"userID", testNow),
+							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								"userID", "org1", testNow),
 						),
 						eventFromEventPusher(
-							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "org1").Aggregate,
+							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
 								testNow),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							session.NewLifetimeSetEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
+								2*time.Minute),
 						),
 					),
 					expectPush(
@@ -569,10 +568,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 						),
 					),
 				),
-				tokenVerifier: func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-					return nil
-				},
-				checkPermission: newMockPermissionCheckAllowed(),
+				tokenVerifier: newMockTokenVerifierValid(),
 			},
 			args{
 				ctx:              authz.NewMockContext("instanceID", "orgID", "loginClient"),
@@ -607,7 +603,6 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			c := &Commands{
 				eventstore:           tt.fields.eventstore,
 				sessionTokenVerifier: tt.fields.tokenVerifier,
-				checkPermission:      tt.fields.checkPermission,
 			}
 			details, got, err := c.LinkSessionToAuthRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLoginClient)
 			require.ErrorIs(t, err, tt.res.wantErr)

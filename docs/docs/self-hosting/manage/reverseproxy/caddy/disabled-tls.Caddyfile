@@ -1,0 +1,3 @@
+http://127.0.0.1.sslip.io {
+	reverse_proxy h2c://zitadel-disabled-tls:8080
+}

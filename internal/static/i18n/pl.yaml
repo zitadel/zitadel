@@ -51,6 +51,7 @@ Errors:
   Notification:
     NoDomain: Nie znaleziono domeny dla wiadomości
   User:
+    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: Nie znaleziono użytkownika
     AlreadyExists: Użytkownik już istnieje
     NotFoundOnOrg: Użytkownik nie został znaleziony w wybranej organizacji
@@ -317,7 +318,7 @@ Errors:
       NotActive: Grant projektu jest nieaktywny
       NotInactive: Grant projektu nie jest nieaktywny
   IAM:
-    NotFound: Instancja nie znaleziona
+    NotFound: Instancja nie znaleziona. Sprawdź https://zitadel.com/docs/self-hosting/manage/custom-domain
     Member:
       RolesNotChanged: Role nie zmienione
     MemberInvalid: Członek jest nieprawidłowy
@@ -424,6 +425,7 @@ Errors:
     AuditRetention: Historia jest poza zasięgiem retencji dziennika audytu
   Token:
     NotFound: Token nie znaleziony
+    Invalid: Token jest nieprawidłowy
   UserSession:
     NotFound: Sesja użytkownika nie znaleziona
   Key:
@@ -490,6 +492,8 @@ Errors:
   Session:
     NotExisting: Sesja nie istnieje
     Terminated: Sesja już zakończona
+    Expired: Sesja wygasła
+    PositiveLifetime: Czas życia sesji nie może być krótszy niż 0
     Token:
       Invalid: Token sesji jest nieprawidłowy
     WebAuthN:

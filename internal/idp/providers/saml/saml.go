@@ -162,7 +162,7 @@ func (p *Provider) GetSP() (*samlsp.Middleware, error) {
 	return sp, nil
 }
 
-func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (idp.Session, error) {
+func (p *Provider) BeginAuth(ctx context.Context, state string, _ ...idp.Parameter) (idp.Session, error) {
 	m, err := p.GetSP()
 	if err != nil {
 		return nil, err

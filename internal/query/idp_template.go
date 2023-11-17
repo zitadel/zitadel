@@ -704,8 +704,10 @@ func (q *Queries) IDPTemplateByID(ctx context.Context, shouldTriggerBulk bool, i
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerIDPTemplateProjection")
 		ctx, err = projection.IDPTemplateProjection.Trigger(ctx, handler.WithAwaitRunning())
 		logging.OnError(err).Debug("unable to trigger")
+		traceSpan.EndWithError(err)
 	}
 
 	eq := sq.Eq{

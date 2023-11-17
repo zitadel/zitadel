@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	SessionsProjectionTable = "projections.sessions6"
+	SessionsProjectionTable = "projections.sessions8"
 
 	SessionColumnID                     = "id"
 	SessionColumnCreationDate           = "creation_date"
@@ -25,6 +25,7 @@ const (
 	SessionColumnInstanceID             = "instance_id"
 	SessionColumnCreator                = "creator"
 	SessionColumnUserID                 = "user_id"
+	SessionColumnUserResourceOwner      = "user_resource_owner"
 	SessionColumnUserCheckedAt          = "user_checked_at"
 	SessionColumnPasswordCheckedAt      = "password_checked_at"
 	SessionColumnIntentCheckedAt        = "intent_checked_at"
@@ -39,6 +40,7 @@ const (
 	SessionColumnUserAgentIP            = "user_agent_ip"
 	SessionColumnUserAgentDescription   = "user_agent_description"
 	SessionColumnUserAgentHeader        = "user_agent_header"
+	SessionColumnExpiration             = "expiration"
 )
 
 type sessionProjection struct{}
@@ -63,6 +65,7 @@ func (*sessionProjection) Init() *old_handler.Check {
 			handler.NewColumn(SessionColumnInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(SessionColumnCreator, handler.ColumnTypeText),
 			handler.NewColumn(SessionColumnUserID, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(SessionColumnUserResourceOwner, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SessionColumnUserCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnPasswordCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnIntentCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
@@ -77,6 +80,7 @@ func (*sessionProjection) Init() *old_handler.Check {
 			handler.NewColumn(SessionColumnUserAgentIP, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SessionColumnUserAgentDescription, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SessionColumnUserAgentHeader, handler.ColumnTypeJSONB, handler.Nullable()),
+			handler.NewColumn(SessionColumnExpiration, handler.ColumnTypeTimestamp, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(SessionColumnInstanceID, SessionColumnID),
 			handler.WithIndex(handler.NewIndex(
@@ -131,6 +135,10 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  session.MetadataSetType,
 					Reduce: p.reduceMetadataSet,
+				},
+				{
+					Event:  session.LifetimeSetType,
+					Reduce: p.reduceLifetimeSet,
 				},
 				{
 					Event:  session.TerminateType,
@@ -207,6 +215,7 @@ func (p *sessionProjection) reduceUserChecked(event eventstore.Event) (*handler.
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
 			handler.NewCol(SessionColumnUserID, e.UserID),
+			handler.NewCol(SessionColumnUserResourceOwner, e.UserResourceOwner),
 			handler.NewCol(SessionColumnUserCheckedAt, e.CheckedAt),
 		},
 		[]handler.Condition{
@@ -376,6 +385,26 @@ func (p *sessionProjection) reduceMetadataSet(event eventstore.Event) (*handler.
 	), nil
 }
 
+func (p *sessionProjection) reduceLifetimeSet(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*session.LifetimeSetEvent](event)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
+			handler.NewCol(SessionColumnSequence, e.Sequence()),
+			handler.NewCol(SessionColumnExpiration, e.CreationDate().Add(e.Lifetime)),
+		},
+		[]handler.Condition{
+			handler.NewCond(SessionColumnID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
 func (p *sessionProjection) reduceSessionTerminated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*session.TerminateEvent)
 	if !ok {
@@ -404,6 +433,7 @@ func (p *sessionProjection) reducePasswordChanged(event eventstore.Event) (*hand
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnUserID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewLessThanCond(SessionColumnPasswordCheckedAt, e.CreationDate()),
 		},
 	), nil

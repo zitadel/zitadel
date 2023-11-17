@@ -23,7 +23,8 @@ jobs:
     outputs:
       cache_key: ${{ steps.cache.outputs.cache-primary-key }}
       cache_path: ${{ env.cache_path }}
-    runs-on: ubuntu-latest
+    runs-on: 
+      group:  zitadel-public
     steps:
         - 
           uses: actions/checkout@v3
