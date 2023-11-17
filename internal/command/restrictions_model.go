@@ -7,7 +7,7 @@ import (
 
 type restrictionsWriteModel struct {
 	eventstore.WriteModel
-	disallowPublicOrgRegistrations *bool
+	disallowPublicOrgRegistrations bool
 }
 
 // newRestrictionsWriteModel aggregateId is filled by reducing unit matching events
@@ -37,7 +37,7 @@ func (wm *restrictionsWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *restrictions.SetEvent:
 			if e.DisallowPublicOrgRegistrations != nil {
-				wm.disallowPublicOrgRegistrations = e.DisallowPublicOrgRegistrations
+				wm.disallowPublicOrgRegistrations = *e.DisallowPublicOrgRegistrations
 			}
 		}
 	}
@@ -51,8 +51,8 @@ func (wm *restrictionsWriteModel) NewChanges(setRestrictions *SetRestrictions) (
 		return nil
 	}
 	changes = make([]restrictions.RestrictionsChange, 0, 1)
-	if setRestrictions.DisallowPublicOrgRegistration != nil && (wm.disallowPublicOrgRegistrations == nil || *wm.disallowPublicOrgRegistrations != *setRestrictions.DisallowPublicOrgRegistration) {
-		changes = append(changes, restrictions.ChangePublicOrgRegistrations(setRestrictions.DisallowPublicOrgRegistration))
+	if setRestrictions.DisallowPublicOrgRegistration != nil && (wm.disallowPublicOrgRegistrations != *setRestrictions.DisallowPublicOrgRegistration) {
+		changes = append(changes, restrictions.ChangePublicOrgRegistrations(*setRestrictions.DisallowPublicOrgRegistration))
 	}
 	return changes
 }

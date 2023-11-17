@@ -84,7 +84,7 @@ func (p *restrictionsProjection) reduceRestrictionsSet(event eventstore.Event) (
 	updateCols := []handler.Column{
 		handler.NewCol(RestrictionsColumnInstanceID, e.Aggregate().InstanceID),
 		handler.NewCol(RestrictionsColumnResourceOwner, e.Aggregate().ResourceOwner),
-		handler.NewCol(RestrictionsColumnCreationDate, e.CreationDate()),
+		handler.NewCol(RestrictionsColumnCreationDate, handler.OnlySetValueOnInsert(RestrictionsProjectionTable, e.CreationDate())),
 		handler.NewCol(RestrictionsColumnChangeDate, e.CreationDate()),
 		handler.NewCol(RestrictionsColumnSequence, e.Sequence()),
 		handler.NewCol(RestrictionsColumnAggregateID, e.Aggregate().ID),
@@ -92,16 +92,5 @@ func (p *restrictionsProjection) reduceRestrictionsSet(event eventstore.Event) (
 	if e.DisallowPublicOrgRegistrations != nil {
 		updateCols = append(updateCols, handler.NewCol(RestrictionsColumnDisallowPublicOrgRegistration, *e.DisallowPublicOrgRegistrations))
 	}
-	return handler.NewMultiStatement(
-		e,
-		handler.AddUpsertStatement(conflictCols, updateCols),
-		// Cleanup there are no restrictions anymore.
-		handler.AddDeleteStatement(
-			[]handler.Condition{
-				handler.NewCond(RestrictionsColumnInstanceID, e.Aggregate().InstanceID),
-				handler.NewCond(RestrictionsColumnResourceOwner, e.Aggregate().ResourceOwner),
-				handler.NewCond(RestrictionsColumnDisallowPublicOrgRegistration, false),
-			},
-		),
-	), nil
+	return handler.NewUpsertStatement(e, conflictCols, updateCols), nil
 }

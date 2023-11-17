@@ -1,6 +1,7 @@
 package restrictions
 
 import (
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -42,9 +43,9 @@ func NewSetEvent(
 
 type RestrictionsChange func(*SetEvent)
 
-func ChangePublicOrgRegistrations(disallow *bool) RestrictionsChange {
+func ChangePublicOrgRegistrations(disallow bool) RestrictionsChange {
 	return func(e *SetEvent) {
-		e.DisallowPublicOrgRegistrations = disallow
+		e.DisallowPublicOrgRegistrations = gu.Ptr(disallow)
 	}
 }
 

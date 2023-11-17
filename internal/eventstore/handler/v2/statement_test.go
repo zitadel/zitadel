@@ -399,6 +399,100 @@ func TestNewUpsertStatement(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "correct single *onlySetValueOnInsert",
+			args: args{
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				conflictCols: []Column{
+					NewCol("col1", nil),
+				},
+				values: []Column{
+					{
+						Name:  "col1",
+						Value: "val1",
+					},
+					{
+						Name: "col2",
+						Value: &onlySetValueOnInsert{
+							Value: "val2",
+						},
+					},
+					{
+						Name: "col3",
+						Value: &onlySetValueOnInsert{
+							Value: "val3",
+						},
+					},
+				},
+			},
+			want: want{
+				table:            "my_table",
+				aggregateType:    "agg",
+				sequence:         1,
+				previousSequence: 1,
+				executer: &wantExecuter{
+					params: []params{
+						{
+							query: "INSERT INTO my_table (col1, col2) VALUES ($1, $2) ON CONFLICT (col1) DO UPDATE SET col2 = col2",
+							args:  []interface{}{"val1", "val2"},
+						},
+					},
+					shouldExecute: true,
+				},
+				isErr: func(err error) bool {
+					return err == nil
+				},
+			},
+		},
+		{
+			name: "correct all *onlySetValueOnInsert",
+			args: args{
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				conflictCols: []Column{
+					NewCol("col1", nil),
+				},
+				values: []Column{
+					{
+						Name:  "col1",
+						Value: "val1",
+					},
+					{
+						Name: "col2",
+						Value: &onlySetValueOnInsert{
+							Value: "val2",
+						},
+					},
+				},
+			},
+			want: want{
+				table:            "my_table",
+				aggregateType:    "agg",
+				sequence:         1,
+				previousSequence: 1,
+				executer: &wantExecuter{
+					params: []params{
+						{
+							query: "INSERT INTO my_table (col1, col2) VALUES ($1, $2) ON CONFLICT (col1) DO UPDATE SET col2 = col2",
+							args:  []interface{}{"val1", "val2"},
+						},
+					},
+					shouldExecute: true,
+				},
+				isErr: func(err error) bool {
+					return err == nil
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
