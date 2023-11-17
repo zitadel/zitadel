@@ -43,6 +43,9 @@ func TestServer_Restrictions_DisallowPublicOrgRegistration(t *testing.T) {
 func awaitAllowed(t *testing.T, ctx context.Context, client *http.Client, parsedURL *url.URL) string {
 	csrfToken := awaitGetResponse(t, ctx, client, parsedURL, http.StatusOK)
 	awaitPostFormResponse(t, ctx, client, parsedURL, http.StatusOK, csrfToken)
+	restrictions, err := Tester.Client.Admin.GetRestrictions(ctx, &admin.GetRestrictionsRequest{})
+	require.NoError(t, err)
+	require.False(t, restrictions.DisallowPublicOrgRegistration)
 	return csrfToken
 }
 
@@ -50,6 +53,9 @@ func awaitAllowed(t *testing.T, ctx context.Context, client *http.Client, parsed
 func awaitDisallowed(t *testing.T, ctx context.Context, client *http.Client, parsedURL *url.URL, reuseOldCSRFToken string) {
 	awaitGetResponse(t, ctx, client, parsedURL, http.StatusNotFound)
 	awaitPostFormResponse(t, ctx, client, parsedURL, http.StatusConflict, reuseOldCSRFToken)
+	restrictions, err := Tester.Client.Admin.GetRestrictions(ctx, &admin.GetRestrictionsRequest{})
+	require.NoError(t, err)
+	require.True(t, restrictions.DisallowPublicOrgRegistration)
 }
 
 // awaitGetResponse cuts the CSRF token from the response body if it exists
