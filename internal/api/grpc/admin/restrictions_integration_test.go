@@ -5,6 +5,7 @@ package admin_test
 import (
 	"bytes"
 	"context"
+	"github.com/muhlemmer/gu"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
@@ -17,7 +18,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
-func TestServer_Limits_DisallowPublicOrgRegistration(t *testing.T) {
+func TestServer_Restrictions_DisallowPublicOrgRegistration(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 	domain, _, iamOwnerCtx := Tester.UseIsolatedInstance(ctx, SystemCTX)
@@ -30,10 +31,10 @@ func TestServer_Limits_DisallowPublicOrgRegistration(t *testing.T) {
 	browserSession := &http.Client{Jar: jar}
 	// Default should be allowed
 	csrfToken := awaitAllowed(t, iamOwnerCtx, browserSession, regOrgUrl)
-	_, err = Tester.Client.Admin.SetInstanceLimits(iamOwnerCtx, &admin.SetInstanceLimitsRequest{DisallowPublicOrgRegistration: true})
+	_, err = Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{DisallowPublicOrgRegistration: gu.Ptr(true)})
 	require.NoError(t, err)
 	awaitDisallowed(t, iamOwnerCtx, browserSession, regOrgUrl, csrfToken)
-	_, err = Tester.Client.Admin.ResetInstanceLimits(iamOwnerCtx, &admin.ResetInstanceLimitsRequest{})
+	_, err = Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{DisallowPublicOrgRegistration: gu.Ptr(false)})
 	require.NoError(t, err)
 	awaitAllowed(t, iamOwnerCtx, browserSession, regOrgUrl)
 }
