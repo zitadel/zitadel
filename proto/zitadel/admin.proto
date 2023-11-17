@@ -3839,7 +3839,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: ["Feature Restrictions"];
             summary: "Get the current feature restrictions for the instance";
-            description: "Zero values mean that the feature is not restricted. If restrictions were never set, the instances features are not restricted and zero values are returned for all the features.";
+            description: "Undefined values mean that the feature is not restricted. If restrictions were never set, the instances features are not restricted, all properties are undefined and the details object is empty.";
             responses: {
                 key: "200";
                 value: {

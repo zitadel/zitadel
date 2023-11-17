@@ -3,14 +3,14 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/errors"
+	zitade_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -51,6 +51,7 @@ var (
 )
 
 type Restrictions struct {
+	AggregateID   string
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
@@ -69,12 +70,16 @@ func (q *Queries) Restrictions(ctx context.Context, resourceOwner string) (restr
 		RestrictionsColumnResourceOwner.identifier(): resourceOwner,
 	}).ToSql()
 	if err != nil {
-		return restrictions, errors.ThrowInternal(err, "QUERY-XnLMQ", "Errors.Query.SQLStatment")
+		return restrictions, zitade_errors.ThrowInternal(err, "QUERY-XnLMQ", "Errors.Query.SQLStatment")
 	}
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
 		restrictions, err = scan(row)
 		return err
 	}, query, args...)
+	if errors.Is(err, sql.ErrNoRows) {
+		// not found is not an error
+		err = nil
+	}
 	return restrictions, err
 }
 
@@ -90,17 +95,13 @@ func prepareRestrictionsQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			From(restrictionsTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (restrictions Restrictions, err error) {
-			err = row.Scan(
+			return restrictions, row.Scan(
+				&restrictions.AggregateID,
 				&restrictions.CreationDate,
 				&restrictions.ChangeDate,
 				&restrictions.ResourceOwner,
 				&restrictions.Sequence,
 				&restrictions.DisallowPublicOrgRegistration,
 			)
-			// ErrNoRows means that there are no restrictions set yet, so we return the struct with the zero values
-			if err != nil && !errs.Is(err, sql.ErrNoRows) {
-				return restrictions, errors.ThrowInternal(err, "QUERY-tjo1r", "Errors.Internal")
-			}
-			return restrictions, nil
 		}
 }
