@@ -19,14 +19,17 @@ join
     AND u.instance_id = $2
     AND u.instance_id = d.instance_id
     AND u.resource_owner = d.resource_owner
-join
-  projections.login_names2_policies p
-  on
-    u.instance_id = p.instance_id
-    AND (
-      (p.is_default = TRUE AND p.instance_id = $2)
-      OR (p.instance_id = $2 AND p.resource_owner = u.resource_owner)
-    )
+  join lateral (
+    SELECT * FROM projections.login_names2_policies p
+    where
+      u.instance_id = p.instance_id
+      AND (
+        (p.is_default = TRUE AND p.instance_id = $2)
+        OR (p.instance_id = $2 AND p.resource_owner = u.resource_owner)
+      )
+      ORDER BY is_default
+      LIMIT 1
+  ) p on true
 )
 SELECT 
   u.id

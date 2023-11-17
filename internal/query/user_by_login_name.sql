@@ -20,18 +20,21 @@ with login_names as (
       AND u.instance_id = $4
       AND u.instance_id = d.instance_id
       AND u.resource_owner = d.resource_owner
-  join
-    projections.login_names2_policies p
-    on
+  join lateral (
+    SELECT * FROM projections.login_names2_policies p
+    where
       u.instance_id = p.instance_id
       AND (
-        (p.is_default is TRUE AND p.instance_id = $4)
+        (p.is_default = TRUE AND p.instance_id = $4)
         OR (p.instance_id = $4 AND p.resource_owner = u.resource_owner)
       )
       AND (
-          (p.must_be_domain is true and u.user_name = $1 and d.name = $2)
-          or (p.must_be_domain is false and u.user_name = $3)
+        (p.must_be_domain is true and u.user_name = $1 and d.name = $2)
+        or (p.must_be_domain is false and u.user_name = $3)
       )
+      ORDER BY is_default
+      LIMIT 1
+  ) p on true
 )
 SELECT 
   u.id
