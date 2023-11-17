@@ -3,7 +3,6 @@ package query
 import (
 	"context"
 	"fmt"
-	"github.com/zitadel/zitadel/internal/repository/restrictions"
 	"net/http"
 	"regexp"
 	"sync"
@@ -30,6 +29,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/repository/restrictions"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"

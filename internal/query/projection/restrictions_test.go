@@ -1,11 +1,12 @@
 package projection
 
 import (
+	"testing"
+
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/restrictions"
-	"testing"
 )
 
 func TestRestrictionsProjection_reduces(t *testing.T) {

@@ -3,7 +3,7 @@ title: Feature Restrictions
 ---
 
 New self-hosted and [ZITADEL Cloud instances](https://zitadel.com/signin) are unrestricted by default.
-Self-hosters can change this default using the DefaultInstance.Restriction configuration section.
+Self-hosters can change this default using the DefaultInstance.Restrictions configuration section.
 Users with the role IAM_OWNER can change the restrictions of their instance using the [Feature Restrictions Admin API](/category/apis/resources/admin/feature-restrictions).
 Currently, the following restrictions are available:
 

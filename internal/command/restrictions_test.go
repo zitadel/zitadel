@@ -2,9 +2,10 @@ package command
 
 import (
 	"context"
+	"testing"
+
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
-	"testing"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"

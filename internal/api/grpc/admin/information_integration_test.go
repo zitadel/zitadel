@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
