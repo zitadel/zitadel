@@ -3796,66 +3796,54 @@ service AdminService {
         };
     }
 
-    // Sets instance level IAM limits
-    rpc SetInstanceLimits(SetInstanceLimitsRequest) returns (SetInstanceLimitsResponse) {
+    // Sets restrictions
+    rpc SetRestrictions(SetRestrictionsRequest) returns (SetRestrictionsResponse) {
         option (google.api.http) = {
-            put: "/limits"
+            put: "/restrictions"
             body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "iam.limits.write";
+            permission: "iam.restrictions.write";
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: ["Limits"];
+            tags: ["Feature Restrictions"];
+            summary: "Restrict the instances features";
+            description: "Undefined values don't change the current restriction. Zero values remove the current restriction.";
             responses: {
                 key: "200";
                 value: {
-                    description: "Instance limits set";
+                    description: "Restrictions set.";
                 };
             };
             responses: {
                 key: "400";
                 value: {
-                    description: "At least one limit must be specified";
-                    schema: {
-                        json_schema: {
-                            ref: "#/definitions/rpcStatus";
-                        };
-                    };
+                    description: "No restriction is defined or at least one defined restriction is unchanged.";
                 };
             };
         };
     }
 
-    // Resets instance level IAM limits
-    rpc ResetInstanceLimits(ResetInstanceLimitsRequest) returns (ResetInstanceLimitsResponse) {
+    // Gets restrictions
+    rpc GetRestrictions(GetRestrictionsRequest) returns (GetRestrictionsResponse) {
         option (google.api.http) = {
-            delete: "/limits"
+            get: "/restrictions"
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "iam.limits.delete";
+            permission: "iam.restrictions.read";
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-            tags: ["Limits"];
+            tags: ["Feature Restrictions"];
+            summary: "Get the current feature restrictions for the instance";
+            description: "Zero values mean that the feature is not restricted. If restrictions were never set, the instances features are not restricted and zero values are returned for all the features.";
             responses: {
                 key: "200";
                 value: {
-                    description: "Limits are reset to the system defaults";
-                };
-            };
-            responses: {
-                key: "404";
-                value: {
-                    description: "Limits are already set to the system defaults";
-                    schema: {
-                        json_schema: {
-                            ref: "#/definitions/rpcStatus";
-                        };
-                    };
+                    description: "The status 200 is also returned if no restrictions were ever set. In this case, all feature restrictions have zero values.";
                 };
             };
         };
@@ -8000,21 +7988,26 @@ message ListMilestonesResponse {
     repeated zitadel.milestone.v1.Milestone result = 2;
 }
 
-message SetInstanceLimitsRequest {
-    bool disallow_public_org_registration = 1 [
+message SetRestrictionsRequest {
+    optional bool disallow_public_org_registration = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "if disallowPublicOrgRegistration is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
         }
     ];
 }
 
-message SetInstanceLimitsResponse {
+message SetRestrictionsResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message ResetInstanceLimitsRequest {}
+message GetRestrictionsRequest {}
 
-message ResetInstanceLimitsResponse {
+message GetRestrictionsResponse {
     zitadel.v1.ObjectDetails details = 1;
+    bool disallow_public_org_registration = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "if disallowPublicOrgRegistration is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
+        }
+    ];
 }
 

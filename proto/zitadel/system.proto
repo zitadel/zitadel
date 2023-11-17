@@ -425,7 +425,7 @@ service SystemService {
     };
   }
 
-  // Sets instance level system limits
+  // Sets instance level limits
   rpc SetLimits(SetLimitsRequest) returns (SetLimitsResponse) {
     option (google.api.http) = {
       put: "/instances/{instance_id}/limits"
@@ -458,7 +458,7 @@ service SystemService {
     };
   }
 
-  // Resets instance level system limits
+  // Resets instance level limits
   rpc ResetLimits(ResetLimitsRequest) returns (ResetLimitsResponse) {
     option (google.api.http) = {
       delete: "/instances/{instance_id}/limits"
