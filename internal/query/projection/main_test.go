@@ -2,6 +2,7 @@ package projection
 
 import (
 	"database/sql"
+	"github.com/zitadel/zitadel/internal/repository/restrictions"
 	"testing"
 	"time"
 
@@ -38,6 +39,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	proj_repo.RegisterEventMappers(es)
 	quota_repo.RegisterEventMappers(es)
 	limits.RegisterEventMappers(es)
+	restrictions.RegisterEventMappers(es)
 	usergrant.RegisterEventMappers(es)
 	key_repo.RegisterEventMappers(es)
 	action_repo.RegisterEventMappers(es)

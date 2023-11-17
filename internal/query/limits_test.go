@@ -15,14 +15,13 @@ import (
 )
 
 var (
-	expectedLimitsQuery = regexp.QuoteMeta("SELECT projections.limits2.aggregate_id," +
-		" projections.limits2.creation_date," +
-		" projections.limits2.change_date," +
-		" projections.limits2.resource_owner," +
-		" projections.limits2.sequence," +
-		" projections.limits2.audit_log_retention," +
-		" projections.limits2.disallow_public_org_registration" +
-		" FROM projections.limits2" +
+	expectedLimitsQuery = regexp.QuoteMeta("SELECT projections.limits.aggregate_id," +
+		" projections.limits.creation_date," +
+		" projections.limits.change_date," +
+		" projections.limits.resource_owner," +
+		" projections.limits.sequence," +
+		" projections.limits.audit_log_retention" +
+		" FROM projections.limits" +
 		" AS OF SYSTEM TIME '-1 ms'",
 	)
 
@@ -33,7 +32,6 @@ var (
 		"resource_owner",
 		"sequence",
 		"audit_log_retention",
-		"disallow_public_org_registration",
 	}
 )
 
@@ -80,18 +78,16 @@ func Test_LimitsPrepare(t *testing.T) {
 						"instance1",
 						0,
 						intervalDriverValue(t, time.Hour),
-						true,
 					},
 				),
 			},
 			object: &Limits{
-				AggregateID:                   "limits1",
-				CreationDate:                  testNow,
-				ChangeDate:                    testNow,
-				ResourceOwner:                 "instance1",
-				Sequence:                      0,
-				AuditLogRetention:             gu.Ptr(time.Hour),
-				DisallowPublicOrgRegistration: gu.Ptr(true),
+				AggregateID:       "limits1",
+				CreationDate:      testNow,
+				ChangeDate:        testNow,
+				ResourceOwner:     "instance1",
+				Sequence:          0,
+				AuditLogRetention: gu.Ptr(time.Hour),
 			},
 		},
 		{

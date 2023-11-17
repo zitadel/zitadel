@@ -3820,7 +3820,7 @@ service AdminService {
             responses: {
                 key: "400";
                 value: {
-                    description: "No restriction is defined or at least one defined restriction is unchanged.";
+                    description: "No restriction is defined.";
                 };
             };
         };
@@ -7991,7 +7991,7 @@ message ListMilestonesResponse {
 message SetRestrictionsRequest {
     optional bool disallow_public_org_registration = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "if disallowPublicOrgRegistration is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
+            description: "defines if ZITADEL should expose the endpoint /ui/login/register/org. If it is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
         }
     ];
 }
@@ -8006,7 +8006,7 @@ message GetRestrictionsResponse {
     zitadel.v1.ObjectDetails details = 1;
     bool disallow_public_org_registration = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "if disallowPublicOrgRegistration is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
+            description: "defines if ZITADEL should expose the endpoint /ui/login/register/org. If it is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
         }
     ];
 }

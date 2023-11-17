@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"fmt"
+	"github.com/zitadel/zitadel/internal/repository/restrictions"
 	"net/http"
 	"regexp"
 	"sync"
@@ -102,6 +103,7 @@ func StartQueries(
 	oidcsession.RegisterEventMappers(repo.eventstore)
 	quota.RegisterEventMappers(repo.eventstore)
 	limits.RegisterEventMappers(repo.eventstore)
+	restrictions.RegisterEventMappers(repo.eventstore)
 
 	repo.idpConfigEncryption = idpConfigEncryption
 	repo.multifactors = domain.MultifactorConfigs{

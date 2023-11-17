@@ -49,10 +49,6 @@ var (
 		name:  projection.LimitsColumnAuditLogRetention,
 		table: limitSettingsTable,
 	}
-	LimitsColumnAllowPublicOrgRegistration = Column{
-		name:  projection.LimitsColumnDisallowPublicOrgRegistration,
-		table: limitSettingsTable,
-	}
 )
 
 type Limits struct {
@@ -62,8 +58,7 @@ type Limits struct {
 	ResourceOwner string
 	Sequence      uint64
 
-	AuditLogRetention             *time.Duration
-	DisallowPublicOrgRegistration *bool
+	AuditLogRetention *time.Duration
 }
 
 func (q *Queries) Limits(ctx context.Context, resourceOwner string) (limits *Limits, err error) {
@@ -94,15 +89,13 @@ func prepareLimitsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 			LimitsColumnResourceOwner.identifier(),
 			LimitsColumnSequence.identifier(),
 			LimitsColumnAuditLogRetention.identifier(),
-			LimitsColumnAllowPublicOrgRegistration.identifier(),
 		).
 			From(limitSettingsTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Limits, error) {
 			var (
-				limits               = new(Limits)
-				auditLogRetention    database.NullDuration
-				disallowPublicOrgReg sql.NullBool
+				limits            = new(Limits)
+				auditLogRetention database.NullDuration
 			)
 			err := row.Scan(
 				&limits.AggregateID,
@@ -111,7 +104,6 @@ func prepareLimitsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 				&limits.ResourceOwner,
 				&limits.Sequence,
 				&auditLogRetention,
-				&disallowPublicOrgReg,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
@@ -121,9 +113,6 @@ func prepareLimitsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 			}
 			if auditLogRetention.Valid {
 				limits.AuditLogRetention = &auditLogRetention.Duration
-			}
-			if disallowPublicOrgReg.Valid {
-				limits.DisallowPublicOrgRegistration = &disallowPublicOrgReg.Bool
 			}
 			return limits, nil
 		}

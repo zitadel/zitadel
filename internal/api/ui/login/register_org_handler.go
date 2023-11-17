@@ -131,17 +131,8 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 }
 
 func (l *Login) publicOrgRegistrationIsDisallowed(ctx context.Context) (bool, error) {
-	limits, err := l.query.Limits(ctx, authz.GetInstance(ctx).InstanceID())
-	if caos_errs.IsNotFound(err) {
-		return false, nil
-	}
-	if err != nil {
-		return false, err
-	}
-	if limits.DisallowPublicOrgRegistration != nil {
-		return *limits.DisallowPublicOrgRegistration, nil
-	}
-	return false, nil
+	restrictions, err := l.query.Restrictions(ctx, authz.GetInstance(ctx).InstanceID())
+	return restrictions.DisallowPublicOrgRegistration, err
 }
 
 func (d registerOrgFormData) toUserDomain() *domain.Human {

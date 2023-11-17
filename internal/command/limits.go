@@ -13,8 +13,7 @@ import (
 )
 
 type SetLimits struct {
-	AuditLogRetention             *time.Duration `json:"auditLogRetention,omitempty"`
-	DisallowPublicOrgRegistration *bool          `json:"disallowPublicOrgRegistration,omitempty"`
+	AuditLogRetention *time.Duration
 }
 
 // SetLimits creates new limits or updates existing limits.
@@ -35,9 +34,6 @@ func (c *Commands) SetLimits(
 			return nil, err
 		}
 	}
-	if err != nil {
-		return nil, err
-	}
 	createCmds, err := c.SetLimitsCommand(limits.NewAggregate(aggregateId, instanceId, resourceOwner), wm, setLimits)()
 	if err != nil {
 		return nil, err
@@ -56,7 +52,7 @@ func (c *Commands) SetLimits(
 	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
 
-func (c *Commands) ResetLimits(ctx context.Context, resourceOwner string, onlyReset ...limits.ResetProperty) (*domain.ObjectDetails, error) {
+func (c *Commands) ResetLimits(ctx context.Context, resourceOwner string) (*domain.ObjectDetails, error) {
 	instanceId := authz.GetInstance(ctx).InstanceID()
 	wm, err := c.getLimitsWriteModel(ctx, instanceId, resourceOwner)
 	if err != nil {
@@ -66,7 +62,7 @@ func (c *Commands) ResetLimits(ctx context.Context, resourceOwner string, onlyRe
 		return nil, errors.ThrowNotFound(nil, "COMMAND-9JToT", "Errors.Limits.NotFound")
 	}
 	aggregate := limits.NewAggregate(wm.AggregateID, instanceId, resourceOwner)
-	events := []eventstore.Command{limits.NewResetEvent(ctx, &aggregate.Aggregate, onlyReset...)}
+	events := []eventstore.Command{limits.NewResetEvent(ctx, &aggregate.Aggregate)}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
@@ -85,9 +81,7 @@ func (c *Commands) getLimitsWriteModel(ctx context.Context, instanceId, resource
 
 func (c *Commands) SetLimitsCommand(a *limits.Aggregate, wm *limitsWriteModel, setLimits *SetLimits) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		if setLimits == nil ||
-			setLimits.AuditLogRetention == nil &&
-				setLimits.DisallowPublicOrgRegistration == nil {
+		if setLimits == nil || setLimits.AuditLogRetention == nil {
 			return nil, errors.ThrowInvalidArgument(nil, "COMMAND-4M9vs", "Errors.Limits.NoneSpecified")
 		}
 		return func(ctx context.Context, _ preparation.FilterToQueryReducer) ([]eventstore.Command, error) {

@@ -21,42 +21,7 @@ func TestLimitsProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "reduceLimitsSet all properties",
-			args: args{
-				event: getEvent(testEvent(
-					limits.SetEventType,
-					limits.AggregateType,
-					[]byte(`{
-							"auditLogRetention": 300000000000,
-							"disallowPublicOrgRegistration": true
-					}`),
-				), limits.SetEventMapper),
-			},
-			reduce: (&limitsProjection{}).reduceLimitsSet,
-			want: wantReduce{
-				aggregateType: eventstore.AggregateType("limits"),
-				sequence:      15,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "INSERT INTO projections.limits2 (instance_id, resource_owner, creation_date, change_date, sequence, aggregate_id, audit_log_retention, disallow_public_org_registration) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (instance_id, resource_owner) DO UPDATE SET (creation_date, change_date, sequence, aggregate_id, audit_log_retention, disallow_public_org_registration) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.aggregate_id, EXCLUDED.audit_log_retention, EXCLUDED.disallow_public_org_registration)",
-							expectedArgs: []interface{}{
-								"instance-id",
-								"ro-id",
-								anyArg{},
-								anyArg{},
-								uint64(15),
-								"agg-id",
-								time.Minute * 5,
-								true,
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "reduceLimitsSet one property",
+			name: "reduceLimitsSet",
 			args: args{
 				event: getEvent(testEvent(
 					limits.SetEventType,
@@ -73,7 +38,7 @@ func TestLimitsProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.limits2 (instance_id, resource_owner, creation_date, change_date, sequence, aggregate_id, audit_log_retention) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, resource_owner) DO UPDATE SET (creation_date, change_date, sequence, aggregate_id, audit_log_retention) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.aggregate_id, EXCLUDED.audit_log_retention)",
+							expectedStmt: "INSERT INTO projections.limits (instance_id, resource_owner, creation_date, change_date, sequence, aggregate_id, audit_log_retention) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, resource_owner) DO UPDATE SET (creation_date, change_date, sequence, aggregate_id, audit_log_retention) = (EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.aggregate_id, EXCLUDED.audit_log_retention)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"ro-id",
@@ -88,8 +53,9 @@ func TestLimitsProjection_reduces(t *testing.T) {
 				},
 			},
 		},
+
 		{
-			name: "reduceLimitsReset all",
+			name: "reduceLimitsReset",
 			args: args{
 				event: getEvent(testEvent(
 					limits.ResetEventType,
@@ -104,35 +70,8 @@ func TestLimitsProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.limits2 WHERE (instance_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.limits WHERE (instance_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
-								"instance-id",
-								"ro-id",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "reduceLimitsReset single property",
-			args: args{
-				event: getEvent(testEvent(
-					limits.ResetEventType,
-					limits.AggregateType,
-					[]byte(`{ "properties": [1] }`),
-				), limits.ResetEventMapper),
-			},
-			reduce: (&limitsProjection{}).reduceLimitsReset,
-			want: wantReduce{
-				aggregateType: eventstore.AggregateType("limits"),
-				sequence:      15,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE projections.limits2 SET audit_log_retention = $1 WHERE (instance_id = $2) AND (resource_owner = $3)",
-							expectedArgs: []interface{}{
-								nil,
 								"instance-id",
 								"ro-id",
 							},

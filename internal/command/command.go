@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	"github.com/zitadel/zitadel/internal/repository/restrictions"
 	"math/big"
 	"net/http"
 	"strconv"
@@ -152,6 +153,7 @@ func StartCommands(
 	action.RegisterEventMappers(repo.eventstore)
 	quota.RegisterEventMappers(repo.eventstore)
 	limits.RegisterEventMappers(repo.eventstore)
+	restrictions.RegisterEventMappers(repo.eventstore)
 	session.RegisterEventMappers(repo.eventstore)
 	idpintent.RegisterEventMappers(repo.eventstore)
 	authrequest.RegisterEventMappers(repo.eventstore)

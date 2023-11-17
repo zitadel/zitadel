@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"database/sql"
+	"github.com/zitadel/zitadel/internal/repository/restrictions"
 	"strings"
 	"testing"
 	"time"
@@ -60,6 +61,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	oidcsession.RegisterEventMappers(es)
 	quota_repo.RegisterEventMappers(es)
 	limits.RegisterEventMappers(es)
+	restrictions.RegisterEventMappers(es)
 	feature.RegisterEventMappers(es)
 	return es
 }

@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -13,7 +11,7 @@ import (
 )
 
 const (
-	LimitsProjectionTable = "projections.limits2"
+	LimitsProjectionTable = "projections.limits"
 
 	LimitsColumnAggregateID   = "aggregate_id"
 	LimitsColumnCreationDate  = "creation_date"
@@ -22,8 +20,7 @@ const (
 	LimitsColumnInstanceID    = "instance_id"
 	LimitsColumnSequence      = "sequence"
 
-	LimitsColumnAuditLogRetention             = "audit_log_retention"
-	LimitsColumnDisallowPublicOrgRegistration = "disallow_public_org_registration"
+	LimitsColumnAuditLogRetention = "audit_log_retention"
 )
 
 type limitsProjection struct{}
@@ -46,7 +43,6 @@ func (*limitsProjection) Init() *old_handler.Check {
 			handler.NewColumn(LimitsColumnInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(LimitsColumnSequence, handler.ColumnTypeInt64),
 			handler.NewColumn(LimitsColumnAuditLogRetention, handler.ColumnTypeInterval, handler.Nullable()),
-			handler.NewColumn(LimitsColumnDisallowPublicOrgRegistration, handler.ColumnTypeBool, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(LimitsColumnInstanceID, LimitsColumnResourceOwner),
 		),
@@ -100,9 +96,6 @@ func (p *limitsProjection) reduceLimitsSet(event eventstore.Event) (*handler.Sta
 	if e.AuditLogRetention != nil {
 		updateCols = append(updateCols, handler.NewCol(LimitsColumnAuditLogRetention, *e.AuditLogRetention))
 	}
-	if e.DisallowPublicOrgRegistration != nil {
-		updateCols = append(updateCols, handler.NewCol(LimitsColumnDisallowPublicOrgRegistration, *e.DisallowPublicOrgRegistration))
-	}
 	return handler.NewUpsertStatement(e, conflictCols, updateCols), nil
 }
 
@@ -111,26 +104,11 @@ func (p *limitsProjection) reduceLimitsReset(event eventstore.Event) (*handler.S
 	if err != nil {
 		return nil, err
 	}
-	cond := []handler.Condition{
-		handler.NewCond(LimitsColumnInstanceID, e.Aggregate().InstanceID),
-		handler.NewCond(LimitsColumnResourceOwner, e.Aggregate().ResourceOwner),
-	}
-	if e.OnlyReset == nil {
-		return handler.NewDeleteStatement(e, cond), nil
-	}
-	var resetPropertyColumns []handler.Column
-	for _, property := range e.OnlyReset {
-		switch property {
-		case limits.ResetAuditLogRetention:
-			resetPropertyColumns = append(resetPropertyColumns, handler.NewCol(LimitsColumnAuditLogRetention, nil))
-		case limits.ResetAllowPublicOrgRegistration:
-			resetPropertyColumns = append(resetPropertyColumns, handler.NewCol(LimitsColumnDisallowPublicOrgRegistration, nil))
-		case limits.ResetUnknownProperty:
-			logging.Warn("unknown property type in reset limits event", "type", property)
-		}
-	}
-	if len(resetPropertyColumns) == 0 {
-		return handler.NewNoOpStatement(e), nil
-	}
-	return handler.NewUpdateStatement(e, resetPropertyColumns, cond), nil
+	return handler.NewDeleteStatement(
+		e,
+		[]handler.Condition{
+			handler.NewCond(LimitsColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCond(LimitsColumnResourceOwner, e.Aggregate().ResourceOwner),
+		},
+	), nil
 }

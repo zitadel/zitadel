@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/repository/limits"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
@@ -23,7 +22,7 @@ func (s *Server) SetLimits(ctx context.Context, req *system.SetLimitsRequest) (*
 }
 
 func (s *Server) ResetLimits(ctx context.Context, req *system.ResetLimitsRequest) (*system.ResetLimitsResponse, error) {
-	details, err := s.command.ResetLimits(ctx, req.GetInstanceId(), limits.ResetAuditLogRetention)
+	details, err := s.command.ResetLimits(ctx, req.GetInstanceId())
 	if err != nil {
 		return nil, err
 	}
