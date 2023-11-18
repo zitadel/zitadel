@@ -205,7 +205,6 @@ export class SMTPProviderComponent {
       req.setTls(this.tls?.value ?? false);
       req.setUser(this.user?.value ?? '');
       req.setPassword(this.password?.value ?? '');
-      req.setIsActive(false);
       req.setProviderType(this.providerDefaultSetting.type);
       return this.service.addSMTPConfig(req);
     }

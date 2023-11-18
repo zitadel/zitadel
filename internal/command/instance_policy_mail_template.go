@@ -13,7 +13,7 @@ import (
 
 func (c *Commands) AddDefaultMailTemplate(ctx context.Context, policy *domain.MailTemplate) (*domain.MailTemplate, error) {
 	addedPolicy := NewInstanceMailTemplateWriteModel(ctx)
-	instanceAgg := InstanceAggregateFromWriteModel(&addedPolicy.MailTemplateWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &addedPolicy.MailTemplateWriteModel.WriteModel)
 	event, err := c.addDefaultMailTemplate(ctx, instanceAgg, addedPolicy, policy)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func (c *Commands) changeDefaultMailTemplate(ctx context.Context, policy *domain
 		return nil, nil, caos_errs.ThrowNotFound(nil, "INSTANCE-2N8fs", "Errors.IAM.MailTemplate.NotFound")
 	}
 
-	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.MailTemplateWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingPolicy.MailTemplateWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.Template)
 	if !hasChanged {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-3nfsG", "Errors.IAM.MailTemplate.NotChanged")

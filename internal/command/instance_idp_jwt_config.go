@@ -21,7 +21,7 @@ func (c *Commands) ChangeDefaultIDPJWTConfig(ctx context.Context, config *domain
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-2m00d", "Errors.IAM.IDPConfig.AlreadyExists")
 	}
 
-	instanceAgg := InstanceAggregateFromWriteModel(&existingConfig.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingConfig.WriteModel)
 	changedEvent, hasChanged, err := existingConfig.NewChangedEvent(
 		ctx,
 		instanceAgg,

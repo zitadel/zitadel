@@ -34,7 +34,7 @@ func (c *Commands) ChangeDefaultLockoutPolicy(ctx context.Context, policy *domai
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-0oPew", "Errors.IAM.LockoutPolicy.NotFound")
 	}
 
-	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LockoutPolicyWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingPolicy.LockoutPolicyWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.MaxPasswordAttempts, policy.ShowLockOutFailures)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-0psjF", "Errors.IAM.LockoutPolicy.NotChanged")

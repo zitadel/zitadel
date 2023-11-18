@@ -40,7 +40,7 @@ func (c *Commands) RemoveCustomInstanceLoginTexts(ctx context.Context, lang lang
 	if customText.State == domain.PolicyStateUnspecified || customText.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-fru44", "Errors.CustomText.NotFound")
 	}
-	iamAgg := InstanceAggregateFromWriteModel(&customText.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(ctx, &customText.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewCustomTextTemplateRemovedEvent(ctx, iamAgg, domain.LoginCustomText, lang))
 	if err != nil {
 		return nil, err

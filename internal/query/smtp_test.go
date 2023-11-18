@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	errs "github.com/zitadel/zitadel/internal/errors"
 )
 
@@ -25,7 +26,8 @@ var (
 		` projections.smtp_configs2.host,` +
 		` projections.smtp_configs2.username,` +
 		` projections.smtp_configs2.password,` +
-		` projections.smtp_configs2.is_active,` +
+		` projections.smtp_configs2.id,` +
+		` projections.smtp_configs2.state,` +
 		` projections.smtp_configs2.provider_type` +
 		` FROM projections.smtp_configs2` +
 		` AS OF SYSTEM TIME '-1 ms'`
@@ -42,7 +44,8 @@ var (
 		"smtp_host",
 		"smtp_user",
 		"smtp_password",
-		"is_active",
+		"id",
+		"state",
 		"provider_type",
 	}
 )
@@ -96,7 +99,8 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 						"host",
 						"user",
 						&crypto.CryptoValue{},
-						false,
+						"2232323",
+						domain.SMTPConfigStateActive,
 						1,
 					},
 				),
@@ -114,6 +118,8 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 				Host:           "host",
 				User:           "user",
 				Password:       &crypto.CryptoValue{},
+				ID:             "2232323",
+				State:          domain.SMTPConfigStateActive,
 				ProviderType:   1,
 			},
 		},

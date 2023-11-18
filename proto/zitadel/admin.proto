@@ -4070,8 +4070,7 @@ message AddSMTPConfigRequest {
             max_length: 200;
         }
     ];
-    bool is_active = 8;
-    SMTPProviderType provider_type = 9;
+    SMTPProviderType provider_type = 8;
 }
 
 message AddSMTPConfigResponse {
@@ -4127,9 +4126,8 @@ message UpdateSMTPConfigRequest {
             example: "\"this-is-my-password\"";
         }
     ];
-    bool is_active = 8;
-    SMTPProviderType provider_type = 9;
-    string id = 10 [(validate.rules).string = {min_len: 1, max_len: 100}];
+    SMTPProviderType provider_type = 8;
+    string id = 9 [(validate.rules).string = {min_len: 1, max_len: 100}];
 }
 
 message UpdateSMTPConfigResponse {

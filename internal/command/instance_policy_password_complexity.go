@@ -38,7 +38,7 @@ func (c *Commands) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, po
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-0oPew", "Errors.IAM.PasswordComplexityPolicy.NotFound")
 	}
 
-	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.PasswordComplexityPolicyWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingPolicy.PasswordComplexityPolicyWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-9jlsf", "Errors.IAM.PasswordComplexityPolicy.NotChanged")

@@ -54,7 +54,7 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config 
 		return "", nil, err
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(ctx, &smtpConfigWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigAddedEvent(
 		ctx,
 		iamAgg,
@@ -68,10 +68,10 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config 
 		smtpPassword,
 		config.SMTP.ProviderType,
 	))
-
 	if err != nil {
 		return "", nil, err
 	}
+
 	err = AppendAndReduce(smtpConfigWriteModel, pushedEvents...)
 	if err != nil {
 		return "", nil, err
@@ -81,12 +81,12 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config 
 
 func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id string, config *smtp.Config) (*domain.ObjectDetails, error) {
 	if id == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "SMS-e9jwf", "Errors.IDMissing")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "SMTP-x8vo9", "Errors.IDMissing")
 	}
 
 	from := strings.TrimSpace(config.From)
 	if from == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "INST-ASv2d", "Errors.Invalid.Argument")
+		return nil, errors.ThrowInvalidArgument(nil, "INST-HSv2d", "Errors.Invalid.Argument")
 	}
 	fromSplitted := strings.Split(from, "@")
 	senderDomain := fromSplitted[len(fromSplitted)-1]
@@ -120,7 +120,7 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id s
 		return nil, err
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(ctx, &smtpConfigWriteModel.WriteModel)
 
 	changedEvent, hasChanged, err := smtpConfigWriteModel.NewChangedEvent(
 		ctx,
@@ -135,7 +135,9 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id s
 		smtpPassword,
 		config.SMTP.ProviderType,
 	)
-
+	if err != nil {
+		return nil, err
+	}
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-lh3op", "Errors.NoChangesFound")
 	}
@@ -186,30 +188,12 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, instanceID, id 
 }
 
 func (c *Commands) ActivateSMTPConfig(ctx context.Context, instanceID, id, activatedId string) (*domain.ObjectDetails, error) {
-	var pushedEvents []eventstore.Event
-
 	if id == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "SMTP-nm56k", "Errors.IDMissing")
 	}
 
 	if len(activatedId) > 0 {
-		smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, activatedId, "")
-		if err != nil {
-			return nil, err
-		}
-
-		if !smtpConfigWriteModel.State.Exists() {
-			return nil, caos_errs.ThrowNotFound(nil, "COMMAND-jg8ir", "Errors.SMTPConfig.NotFound")
-		}
-
-		if smtpConfigWriteModel.State == domain.SMTPConfigStateInactive {
-			return nil, caos_errs.ThrowNotFound(nil, "COMMAND-eh6kd", "Errors.SMTPConfig.AlreadyDeactivated")
-		}
-		iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
-		pushedEvents, err = c.eventstore.Push(ctx, instance.NewSMTPConfigDeactivatedEvent(
-			ctx,
-			iamAgg,
-			activatedId))
+		_, err := c.DeactivateSMTPConfig(ctx, instanceID, activatedId)
 		if err != nil {
 			return nil, err
 		}
@@ -228,8 +212,8 @@ func (c *Commands) ActivateSMTPConfig(ctx context.Context, instanceID, id, activ
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-ed3lr", "Errors.SMTPConfig.AlreadyActive")
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
-	pushedEvents, err = c.eventstore.Push(ctx, instance.NewSMTPConfigActivatedEvent(
+	iamAgg := InstanceAggregateFromWriteModel(ctx, &smtpConfigWriteModel.WriteModel)
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigActivatedEvent(
 		ctx,
 		iamAgg,
 		id))
@@ -258,7 +242,7 @@ func (c *Commands) DeactivateSMTPConfig(ctx context.Context, instanceID, id stri
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-km8g3", "Errors.SMTPConfig.AlreadyDeactivated")
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(ctx, &smtpConfigWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigDeactivatedEvent(
 		ctx,
 		iamAgg,
@@ -286,7 +270,7 @@ func (c *Commands) RemoveSMTPConfig(ctx context.Context, instanceID, id string) 
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-kg8rt", "Errors.SMTPConfig.NotFound")
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(ctx, &smtpConfigWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigRemovedEvent(
 		ctx,
 		iamAgg,
@@ -301,7 +285,7 @@ func (c *Commands) RemoveSMTPConfig(ctx context.Context, instanceID, id string) 
 	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
 }
 
-func checkSenderAddress(writeModel *InstanceSMTPConfigWriteModel) error {
+func checkSenderAddress(writeModel *IAMSMTPConfigWriteModel) error {
 	if !writeModel.smtpSenderAddressMatchesInstanceDomain {
 		return nil
 	}
@@ -311,7 +295,7 @@ func checkSenderAddress(writeModel *InstanceSMTPConfigWriteModel) error {
 	return nil
 }
 
-func (c *Commands) getSMTPConfig(ctx context.Context, instanceID, id, domain string) (_ *InstanceSMTPConfigWriteModel, err error) {
+func (c *Commands) getSMTPConfig(ctx context.Context, instanceID, id, domain string) (_ *IAMSMTPConfigWriteModel, err error) {
 	writeModel := NewIAMSMTPConfigWriteModel(instanceID, id, domain)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
@@ -381,7 +365,7 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, reply
 }
 
 // TODO: SetUpInstance still uses this and would be removed as soon as deprecated PrepareCommands is removed
-func getSMTPConfigWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, id, domain string) (_ *InstanceSMTPConfigWriteModel, err error) {
+func getSMTPConfigWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, id, domain string) (_ *IAMSMTPConfigWriteModel, err error) {
 	writeModel := NewIAMSMTPConfigWriteModel(authz.GetInstance(ctx).InstanceID(), id, domain)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {

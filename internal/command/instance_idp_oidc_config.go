@@ -21,7 +21,7 @@ func (c *Commands) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *domai
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-67J9d", "Errors.IAM.IDPConfig.AlreadyExists")
 	}
 
-	instanceAgg := InstanceAggregateFromWriteModel(&existingConfig.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingConfig.WriteModel)
 	changedEvent, hasChanged, err := existingConfig.NewChangedEvent(
 		ctx,
 		instanceAgg,

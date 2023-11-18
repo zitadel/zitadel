@@ -103,7 +103,7 @@ func (c *Commands) RemoveInstanceMessageTexts(ctx context.Context, messageTextTy
 	if customText.State == domain.PolicyStateUnspecified || customText.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-fju90", "Errors.CustomMessageText.NotFound")
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(&customText.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &customText.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewCustomTextTemplateRemovedEvent(ctx, instanceAgg, messageTextType, lang))
 	if err != nil {
 		return nil, err

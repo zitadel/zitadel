@@ -56,7 +56,7 @@ func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-0K9dq", "Errors.IAM.LabelPolicy.NotFound")
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingPolicy.LabelPolicyWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(
 		ctx,
 		instanceAgg,
@@ -113,7 +113,7 @@ func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context, upload *AssetU
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "INSTANCE-3m20c", "Errors.Assets.Object.PutFailed")
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyLogoAddedEvent(ctx, instanceAgg, asset.Name))
 	if err != nil {
 		return nil, err
@@ -139,7 +139,7 @@ func (c *Commands) RemoveLogoDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	if err != nil {
 		return nil, err
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyLogoRemovedEvent(ctx, instanceAgg, existingPolicy.LogoKey))
 	if err != nil {
 		return nil, err
@@ -164,7 +164,7 @@ func (c *Commands) AddIconDefaultLabelPolicy(ctx context.Context, upload *AssetU
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "INSTANCE-yxE4f", "Errors.Assets.Object.PutFailed")
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyIconAddedEvent(ctx, instanceAgg, asset.Name))
 	if err != nil {
 		return nil, err
@@ -189,7 +189,7 @@ func (c *Commands) RemoveIconDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	if err != nil {
 		return nil, err
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyIconRemovedEvent(ctx, instanceAgg, existingPolicy.IconKey))
 	if err != nil {
 		return nil, err
@@ -214,7 +214,7 @@ func (c *Commands) AddLogoDarkDefaultLabelPolicy(ctx context.Context, upload *As
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "INSTANCE-4fMs9", "Errors.Assets.Object.PutFailed")
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyLogoDarkAddedEvent(ctx, instanceAgg, asset.Name))
 	if err != nil {
 		return nil, err
@@ -239,7 +239,7 @@ func (c *Commands) RemoveLogoDarkDefaultLabelPolicy(ctx context.Context) (*domai
 	if err != nil {
 		return nil, err
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyLogoDarkRemovedEvent(ctx, instanceAgg, existingPolicy.LogoDarkKey))
 	if err != nil {
 		return nil, err
@@ -264,7 +264,7 @@ func (c *Commands) AddIconDarkDefaultLabelPolicy(ctx context.Context, upload *As
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "INSTANCE-1cxM3", "Errors.Assets.Object.PutFailed")
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyIconDarkAddedEvent(ctx, instanceAgg, asset.Name))
 	if err != nil {
 		return nil, err
@@ -289,7 +289,7 @@ func (c *Commands) RemoveIconDarkDefaultLabelPolicy(ctx context.Context) (*domai
 	if err != nil {
 		return nil, err
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyIconDarkRemovedEvent(ctx, instanceAgg, existingPolicy.IconDarkKey))
 	if err != nil {
 		return nil, err
@@ -314,7 +314,7 @@ func (c *Commands) AddFontDefaultLabelPolicy(ctx context.Context, upload *AssetU
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(nil, "INSTANCE-1N8fs", "Errors.Assets.Object.PutFailed")
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyFontAddedEvent(ctx, instanceAgg, asset.Name))
 	if err != nil {
 		return nil, err
@@ -339,7 +339,7 @@ func (c *Commands) RemoveFontDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	if err != nil {
 		return nil, err
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLabelPolicyFontRemovedEvent(ctx, instanceAgg, existingPolicy.FontKey))
 	if err != nil {
 		return nil, err

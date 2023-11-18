@@ -1,7 +1,6 @@
 package smtp
 
 type Config struct {
-	ConfigID       string
 	SMTP           SMTP
 	Tls            bool
 	From           string
@@ -13,7 +12,6 @@ type SMTP struct {
 	Host         string
 	User         string
 	Password     string
-	IsActive     bool
 	ProviderType uint32
 }
 

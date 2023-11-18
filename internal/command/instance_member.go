@@ -104,7 +104,7 @@ func (c *Commands) ChangeInstanceMember(ctx context.Context, member *domain.Memb
 	if reflect.DeepEqual(existingMember.Roles, member.Roles) {
 		return nil, errors.ThrowPreconditionFailed(nil, "INSTANCE-LiaZi", "Errors.IAM.Member.RolesNotChanged")
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingMember.MemberWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewMemberChangedEvent(ctx, instanceAgg, member.UserID, member.Roles...))
 	if err != nil {
 		return nil, err
@@ -130,7 +130,7 @@ func (c *Commands) RemoveInstanceMember(ctx context.Context, userID string) (*do
 		return &domain.ObjectDetails{}, nil
 	}
 
-	instanceAgg := InstanceAggregateFromWriteModel(&memberWriteModel.MemberWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &memberWriteModel.MemberWriteModel.WriteModel)
 	removeEvent := c.removeInstanceMember(ctx, instanceAgg, userID, false)
 	pushedEvents, err := c.eventstore.Push(ctx, removeEvent)
 	if err != nil {

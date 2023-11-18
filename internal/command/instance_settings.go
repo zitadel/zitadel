@@ -79,7 +79,7 @@ func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, generatorTyp
 	if err != nil {
 		return nil, err
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(&generatorWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &generatorWriteModel.WriteModel)
 	if generatorWriteModel.State == domain.SecretGeneratorStateUnspecified || generatorWriteModel.State == domain.SecretGeneratorStateRemoved {
 		err = c.pushAppendAndReduce(ctx, generatorWriteModel,
 			instance.NewSecretGeneratorAddedEvent(
@@ -134,7 +134,7 @@ func (c *Commands) RemoveSecretGeneratorConfig(ctx context.Context, generatorTyp
 	if generatorWriteModel.State == domain.SecretGeneratorStateUnspecified || generatorWriteModel.State == domain.SecretGeneratorStateRemoved {
 		return nil, errors.ThrowNotFound(nil, "COMMAND-b8les", "Errors.SecretGenerator.NotFound")
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(&generatorWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &generatorWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSecretGeneratorRemovedEvent(ctx, instanceAgg, generatorType))
 	if err != nil {
 		return nil, err

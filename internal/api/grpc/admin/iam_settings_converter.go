@@ -141,7 +141,6 @@ func AddSMTPToConfig(req *admin_pb.AddSMTPConfigRequest) *smtp.Config {
 			User:         req.User,
 			Password:     req.Password,
 			ProviderType: uint32(req.ProviderType),
-			IsActive:     req.IsActive,
 		},
 	}
 }
@@ -157,7 +156,6 @@ func UpdateSMTPToConfig(req *admin_pb.UpdateSMTPConfigRequest) *smtp.Config {
 			User:         req.User,
 			Password:     req.Password,
 			ProviderType: uint32(req.ProviderType),
-			IsActive:     req.IsActive,
 		},
 	}
 }

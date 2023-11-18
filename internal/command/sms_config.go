@@ -28,7 +28,7 @@ func (c *Commands) AddSMSConfigTwilio(ctx context.Context, instanceID string, co
 		}
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(ctx, &smsConfigWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigTwilioAddedEvent(
 		ctx,
 		iamAgg,
@@ -57,7 +57,7 @@ func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, instanceID, id str
 	if !smsConfigWriteModel.State.Exists() || smsConfigWriteModel.Twilio == nil {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2m9fw", "Errors.SMSConfig.NotFound")
 	}
-	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(ctx, &smsConfigWriteModel.WriteModel)
 
 	changedEvent, hasChanged, err := smsConfigWriteModel.NewChangedEvent(
 		ctx,
@@ -90,7 +90,7 @@ func (c *Commands) ChangeSMSConfigTwilioToken(ctx context.Context, instanceID, i
 	if !smsConfigWriteModel.State.Exists() || smsConfigWriteModel.Twilio == nil {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-fj9wf", "Errors.SMSConfig.NotFound")
 	}
-	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(ctx, &smsConfigWriteModel.WriteModel)
 	newtoken, err := crypto.Encrypt([]byte(token), c.smsEncryption)
 	if err != nil {
 		return nil, err
@@ -125,7 +125,7 @@ func (c *Commands) ActivateSMSConfig(ctx context.Context, instanceID, id string)
 	if smsConfigWriteModel.State == domain.SMSConfigStateActive {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-sn9we", "Errors.SMSConfig.AlreadyActive")
 	}
-	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(ctx, &smsConfigWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigTwilioActivatedEvent(
 		ctx,
 		iamAgg,
@@ -155,7 +155,7 @@ func (c *Commands) DeactivateSMSConfig(ctx context.Context, instanceID, id strin
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-dm9e3", "Errors.SMSConfig.AlreadyDeactivated")
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(ctx, &smsConfigWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigDeactivatedEvent(
 		ctx,
 		iamAgg,
@@ -182,7 +182,7 @@ func (c *Commands) RemoveSMSConfig(ctx context.Context, instanceID, id string) (
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-sn9we", "Errors.SMSConfig.NotFound")
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(ctx, &smsConfigWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigRemovedEvent(
 		ctx,
 		iamAgg,

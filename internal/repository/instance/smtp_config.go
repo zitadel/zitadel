@@ -198,8 +198,8 @@ func SMTPConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, err
 
 type SMTPConfigPasswordChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
-
-	Password *crypto.CryptoValue `json:"password,omitempty"`
+	ID                   string              `json:"id,omitempty"`
+	Password             *crypto.CryptoValue `json:"password,omitempty"`
 }
 
 func NewSMTPConfigPasswordChangedEvent(
