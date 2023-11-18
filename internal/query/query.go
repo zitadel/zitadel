@@ -67,12 +67,8 @@ func StartQueries(
 	permissionCheck func(q *Queries) domain.PermissionCheck,
 	defaultAuditLogRetention time.Duration,
 	systemAPIUsers map[string]*internal_authz.SystemAPIUser,
+	statikLoginFS http.FileSystem,
 ) (repo *Queries, err error) {
-	statikLoginFS, err := fs.NewWithNamespace("login")
-	if err != nil {
-		return nil, fmt.Errorf("unable to start login statik dir")
-	}
-
 	statikNotificationFS, err := fs.NewWithNamespace("notification")
 	if err != nil {
 		return nil, fmt.Errorf("unable to start notification statik dir")

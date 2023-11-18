@@ -2,6 +2,7 @@ package settings
 
 import (
 	"context"
+	"github.com/zitadel/zitadel/internal/i18n"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -116,13 +117,9 @@ func (s *Server) GetActiveIdentityProviders(ctx context.Context, req *settings.G
 }
 
 func (s *Server) GetGeneralSettings(ctx context.Context, _ *settings.GetGeneralSettingsRequest) (*settings.GetGeneralSettingsResponse, error) {
-	langs, err := s.query.Languages(ctx)
-	if err != nil {
-		return nil, err
-	}
 	instance := authz.GetInstance(ctx)
 	return &settings.GetGeneralSettingsResponse{
-		SupportedLanguages: domain.LanguagesToStrings(langs),
+		SupportedLanguages: domain.LanguagesToStrings(i18n.SupportedLanguages()),
 		DefaultOrgId:       instance.DefaultOrganisationID(),
 		DefaultLanguage:    instance.DefaultLanguage().String(),
 	}, nil

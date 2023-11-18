@@ -25,7 +25,10 @@ func GenericMapSlice[T any, U any](from []T, mapTo func(T) U) []U {
 
 // LanguagesDiffer returns true if the languages differ.
 func LanguagesDiffer(left, right []language.Tag) bool {
-	if len(left) != len(right) {
+	if left == nil && right == nil {
+		return false
+	}
+	if left == nil || right == nil || len(left) != len(right) {
 		return true
 	}
 	return len(FilterOutLanguages(left, right)) > 0 || len(FilterOutLanguages(right, left)) > 0
@@ -33,7 +36,7 @@ func LanguagesDiffer(left, right []language.Tag) bool {
 
 // FilterOutLanguages returns a new slice of languages without the languages to exclude.
 func FilterOutLanguages(originalLanguages, excludeLanguages []language.Tag) []language.Tag {
-	var filteredLanguages []language.Tag
+	filteredLanguages := make([]language.Tag, 0, len(originalLanguages))
 	for _, lang := range originalLanguages {
 		var found bool
 		for _, excludeLang := range excludeLanguages {

@@ -38,8 +38,15 @@ func (wm *restrictionsWriteModel) Query() *eventstore.SearchQueryBuilder {
 func (wm *restrictionsWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		wm.ChangeDate = event.CreatedAt()
-		if e, ok := event.(*restrictions.SetEvent); ok && e.PublicOrgRegistrationIsNotAlloweds != nil {
+		e, ok := event.(*restrictions.SetEvent)
+		if !ok {
+			continue
+		}
+		if e.PublicOrgRegistrationIsNotAlloweds != nil {
 			wm.disallowPublicOrgRegistration = *e.PublicOrgRegistrationIsNotAlloweds
+		}
+		if e.AllowedLanguages != nil {
+			wm.allowedLanguages = *e.AllowedLanguages
 		}
 	}
 	return wm.WriteModel.Reduce()

@@ -3,6 +3,7 @@ package i18n
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -17,12 +18,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/errors"
+	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 )
 
-const (
-	i18nPath = "/i18n"
-)
+const i18nPath = "/i18n"
+
+var supportedLanguages []language.Tag
 
 type Translator struct {
 	bundle             *i18n.Bundle
@@ -60,16 +61,16 @@ func newBundle(dir http.FileSystem, defaultLanguage language.Tag) (*i18n.Bundle,
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
 	i18nDir, err := dir.Open(i18nPath)
 	if err != nil {
-		return nil, errors.ThrowNotFound(err, "I18N-MnXRie", "path not found")
+		return nil, zitadel_errors.ThrowNotFound(err, "I18N-MnXRie", "path not found")
 	}
 	defer i18nDir.Close()
 	files, err := i18nDir.Readdir(0)
 	if err != nil {
-		return nil, errors.ThrowNotFound(err, "I18N-Gew23", "cannot read dir")
+		return nil, zitadel_errors.ThrowNotFound(err, "I18N-Gew23", "cannot read dir")
 	}
 	for _, file := range files {
 		if err := addFileFromFileSystemToBundle(dir, bundle, file); err != nil {
-			return nil, errors.ThrowNotFoundf(err, "I18N-ZS2AW", "cannot append file %s to Bundle", file.Name())
+			return nil, zitadel_errors.ThrowNotFoundf(err, "I18N-ZS2AW", "cannot append file %s to Bundle", file.Name())
 		}
 	}
 	return bundle, nil
@@ -89,24 +90,41 @@ func addFileFromFileSystemToBundle(dir http.FileSystem, bundle *i18n.Bundle, fil
 	return err
 }
 
-func SupportedLanguages(dir http.FileSystem) ([]language.Tag, error) {
-	i18nDir, err := dir.Open("/i18n")
-	if err != nil {
-		return nil, errors.ThrowNotFound(err, "I18N-Dbt42", "cannot open dir")
+func MustLoadSupportedLanguages(dir http.FileSystem) {
+	var err error
+	defer func() {
+		if err != nil {
+			panic("failed to load supported languages: " + err.Error())
+		}
+	}()
+	if supportedLanguages != nil {
+		return
 	}
-	defer i18nDir.Close()
+	i18nDir, err := dir.Open(i18nPath)
+	if err != nil {
+		return
+	}
+	defer func() {
+		err = errors.Join(err, i18nDir.Close())
+	}()
 	files, err := i18nDir.Readdir(0)
 	if err != nil {
-		return nil, errors.ThrowNotFound(err, "I18N-Gh4zk", "cannot read dir")
+		return
 	}
-	languages := make([]language.Tag, 0, len(files))
+	supportedLanguages = make([]language.Tag, 0, len(files))
 	for _, file := range files {
 		lang := language.Make(strings.TrimSuffix(file.Name(), ".yaml"))
 		if lang != language.Und {
-			languages = append(languages, lang)
+			supportedLanguages = append(supportedLanguages, lang)
 		}
 	}
-	return languages, nil
+}
+
+func SupportedLanguages() []language.Tag {
+	if supportedLanguages == nil {
+		panic("supported languages not loaded")
+	}
+	return supportedLanguages
 }
 
 func (t *Translator) SupportedLanguages() []language.Tag {

@@ -106,15 +106,17 @@ func prepareRestrictionsQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (restrictions Restrictions, err error) {
 			allowedLanguages := database.TextArray[string](make([]string, 0))
+			publicOrgRegistrationIsAllowed := sql.NullBool{}
 			err = row.Scan(
 				&restrictions.AggregateID,
 				&restrictions.CreationDate,
 				&restrictions.ChangeDate,
 				&restrictions.ResourceOwner,
 				&restrictions.Sequence,
-				&restrictions.PublicOrgRegistrationIsNotAllowed,
+				&publicOrgRegistrationIsAllowed,
 				&allowedLanguages,
 			)
+			restrictions.PublicOrgRegistrationIsNotAllowed = publicOrgRegistrationIsAllowed.Bool
 			restrictions.AllowedLanguages = domain.StringsToLanguages(allowedLanguages)
 			return restrictions, err
 		}

@@ -4,6 +4,8 @@ import (
 	"context"
 	"embed"
 	_ "embed"
+	"github.com/zitadel/zitadel/internal/api/ui/login/static/loginfs"
+	"github.com/zitadel/zitadel/internal/i18n"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -63,6 +65,8 @@ func Flags(cmd *cobra.Command) {
 func Setup(config *Config, steps *Steps, masterKey string) {
 	ctx := context.Background()
 	logging.Info("setup started")
+
+	i18n.MustLoadSupportedLanguages(loginfs.MustLoad())
 
 	zitadelDBClient, err := database.Connect(config.Database, false, false)
 	logging.OnError(err).Fatal("unable to connect to database")
