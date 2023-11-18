@@ -290,12 +290,12 @@ message CreateSessionResponse{
   string session_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"id of the session\"";
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      example: "\"222430354126975533\"";
     }
   ];
   string session_token = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"token of the session, which is required for further updates of the session or the request other resources\"";
+      description: "\"The current token of the session, which is required for further updates of the session or the request other resources.\"";
     }
   ];
   Challenges challenges = 4;
@@ -308,7 +308,7 @@ message SetSessionRequest{
       min_length: 1;
       max_length: 200;
       description: "\"id of the session to update\"";
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      example: "\"222430354126975533\"";
     }
   ];
   string session_token = 2 [
@@ -316,7 +316,7 @@ message SetSessionRequest{
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      description: "\"token of the session, previously returned on the create / update request\"";
+      description: "\"The current token of the session, previously returned on the create / update request.\"";
     }
   ];
   Checks checks = 3[
@@ -342,7 +342,7 @@ message SetSessionResponse{
   zitadel.object.v2beta.Details details = 1;
   string session_token = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"token of the session, which is required for further updates of the session or the request other resources\"";
+      description: "\"The current token of the session, which is required for further updates of the session or to request other resources.\"";
     }
   ];
   Challenges challenges = 3;
@@ -355,12 +355,12 @@ message DeleteSessionRequest{
       min_length: 1;
       max_length: 200;
       description: "\"id of the session to terminate\"";
-      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      example: "\"222430354126975533\"";
     }
   ];
   optional string session_token = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"token of the session, previously returned on the create / update request\"";
+      description: "\"The current token of the session, previously returned on the create / update request. The token is required unless the authenticated user terminates the own session or is granted the `session.delete` permission.\"";
     }
   ];
 }

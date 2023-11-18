@@ -4,7 +4,7 @@ sidebar_label: Support
 ---
 
 :::note
-We describe our [support services](/docs/legal/support-services) and information required in more detail in our legal section. Beware that not all features may be supported by your subscription and consult the [support states](/docs/support/software-release-cycles-support#support-states).
+We describe our [support services](/docs/legal/service-description/support-services) and information required in more detail in our legal section. Beware that not all features may be supported by your subscription and consult the [support states](/docs/support/software-release-cycles-support#support-states).
 :::
 In the header you can find a button for the support.
 

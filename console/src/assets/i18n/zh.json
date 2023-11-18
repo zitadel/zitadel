@@ -2095,6 +2095,8 @@
       "UPLOAD": "上传 XML 文件",
       "METADATA": "元数据",
       "METADATAFROMFILE": "文件中的元数据",
+      "CERTIFICATE": "SAML证书",
+      "DOWNLOADCERT": "下载 SAML 证书",
       "CREATEMETADATA": "创建元数据",
       "ENTITYID": "Entity ID",
       "ACSURL": "ACS endpoint URL"

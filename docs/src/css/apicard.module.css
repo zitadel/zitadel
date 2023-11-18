@@ -2,9 +2,7 @@
   text-decoration: none;
 }
 
-.apicard h3,
-h4,
-h5 {
+.apicard.h3, .apicard.h4, .apicard.h5 {
   margin: 0.5rem 0 0 0;
 }
 
