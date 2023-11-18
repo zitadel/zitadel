@@ -7,7 +7,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
-	"github.com/zitadel/zitadel/internal/api/grpc/text"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
@@ -122,7 +122,7 @@ func (s *Server) GetGeneralSettings(ctx context.Context, _ *settings.GetGeneralS
 	}
 	instance := authz.GetInstance(ctx)
 	return &settings.GetGeneralSettingsResponse{
-		SupportedLanguages: text.LanguageTagsToStrings(langs),
+		SupportedLanguages: domain.LanguagesToStrings(langs),
 		DefaultOrgId:       instance.DefaultOrganisationID(),
 		DefaultLanguage:    instance.DefaultLanguage().String(),
 	}, nil

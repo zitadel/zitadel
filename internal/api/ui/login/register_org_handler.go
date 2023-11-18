@@ -132,7 +132,7 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 
 func (l *Login) publicOrgRegistrationIsDisallowed(ctx context.Context) (bool, error) {
 	restrictions, err := l.query.GetInstanceRestrictions(ctx)
-	return restrictions.DisallowPublicOrgRegistration, err
+	return restrictions.PublicOrgRegistrationIsNotAllowed, err
 }
 
 func (d registerOrgFormData) toUserDomain() *domain.Human {

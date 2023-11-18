@@ -2,12 +2,12 @@ package admin
 
 import (
 	"context"
+	"github.com/zitadel/zitadel/internal/domain"
 
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/api/grpc/text"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
@@ -17,7 +17,7 @@ func (s *Server) GetSupportedLanguages(ctx context.Context, req *admin_pb.GetSup
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.GetSupportedLanguagesResponse{Languages: text.LanguageTagsToStrings(langs)}, nil
+	return &admin_pb.GetSupportedLanguagesResponse{Languages: domain.LanguagesToStrings(langs)}, nil
 }
 
 func (s *Server) SetDefaultLanguage(ctx context.Context, req *admin_pb.SetDefaultLanguageRequest) (*admin_pb.SetDefaultLanguageResponse, error) {

@@ -177,7 +177,7 @@ func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
 	return err
 }
 
-func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, string, *MachineKey, *domain.ObjectDetails, error) {
+func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, supportedLanguages []language.Tag) (string, string, *MachineKey, *domain.ObjectDetails, error) {
 	instanceID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", "", nil, nil, err
@@ -463,7 +463,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	}
 
 	if setup.Restrictions != nil {
-		validations = append(validations, c.SetRestrictionsCommand(restrictionsAgg, &restrictionsWriteModel{}, setup.Restrictions))
+		validations = append(validations, c.SetRestrictionsCommand(restrictionsAgg, &restrictionsWriteModel{}, setup.Restrictions, supportedLanguages))
 	}
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)

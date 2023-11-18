@@ -18,7 +18,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
-func TestServer_Restrictions_DisallowPublicOrgRegistration(t *testing.T) {
+func TestServer_Restrictions_PublicOrgRegistrationIsNotAllowed(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 	domain, _, iamOwnerCtx := Tester.UseIsolatedInstance(ctx, SystemCTX)
@@ -31,10 +31,10 @@ func TestServer_Restrictions_DisallowPublicOrgRegistration(t *testing.T) {
 	browserSession := &http.Client{Jar: jar}
 	// Default should be allowed
 	csrfToken := awaitAllowed(t, iamOwnerCtx, browserSession, regOrgUrl)
-	_, err = Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{DisallowPublicOrgRegistration: gu.Ptr(true)})
+	_, err = Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{PublicOrgRegistrationIsNotAllowed: gu.Ptr(true)})
 	require.NoError(t, err)
 	awaitDisallowed(t, iamOwnerCtx, browserSession, regOrgUrl, csrfToken)
-	_, err = Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{DisallowPublicOrgRegistration: gu.Ptr(false)})
+	_, err = Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{PublicOrgRegistrationIsNotAllowed: gu.Ptr(false)})
 	require.NoError(t, err)
 	awaitAllowed(t, iamOwnerCtx, browserSession, regOrgUrl)
 }
@@ -45,7 +45,7 @@ func awaitAllowed(t *testing.T, ctx context.Context, client *http.Client, parsed
 	awaitPostFormResponse(t, ctx, client, parsedURL, http.StatusOK, csrfToken)
 	restrictions, err := Tester.Client.Admin.GetRestrictions(ctx, &admin.GetRestrictionsRequest{})
 	require.NoError(t, err)
-	require.False(t, restrictions.DisallowPublicOrgRegistration)
+	require.False(t, restrictions.PublicOrgRegistrationIsNotAllowed)
 	return csrfToken
 }
 
@@ -55,7 +55,7 @@ func awaitDisallowed(t *testing.T, ctx context.Context, client *http.Client, par
 	awaitPostFormResponse(t, ctx, client, parsedURL, http.StatusConflict, reuseOldCSRFToken)
 	restrictions, err := Tester.Client.Admin.GetRestrictions(ctx, &admin.GetRestrictionsRequest{})
 	require.NoError(t, err)
-	require.True(t, restrictions.DisallowPublicOrgRegistration)
+	require.True(t, restrictions.PublicOrgRegistrationIsNotAllowed)
 }
 
 // awaitGetResponse cuts the CSRF token from the response body if it exists

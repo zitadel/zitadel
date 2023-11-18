@@ -25,7 +25,7 @@ func TestRestrictionsProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					restrictions.SetEventType,
 					restrictions.AggregateType,
-					[]byte(`{ "disallowPublicOrgRegistrations": true }`),
+					[]byte(`{ "PublicOrgRegistrationIsNotAlloweds": true }`),
 				), restrictions.SetEventMapper),
 			},
 			reduce: (&restrictionsProjection{}).reduceRestrictionsSet,

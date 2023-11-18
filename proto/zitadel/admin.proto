@@ -3843,7 +3843,7 @@ service AdminService {
             responses: {
                 key: "200";
                 value: {
-                    description: "The status 200 is also returned if no restrictions were ever set. In this case, all feature restrictions have zero values.";
+                    description: "The status 200 is also returned if no restrictions were ever set. In this case, all feature restrictions are undefined.";
                 };
             };
         };
@@ -7989,9 +7989,23 @@ message ListMilestonesResponse {
 }
 
 message SetRestrictionsRequest {
-    optional bool disallow_public_org_registration = 1 [
+    optional bool public_org_registration_is_not_allowed = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if ZITADEL should expose the endpoint /ui/login/register/org. If it is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
+        }
+    ];
+    optional SelectLanguages allowed_languages = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "restricts the allowed languages. If allowed_languages is undefined, the allowed languages are not changed.";
+        }
+    ];
+}
+
+// We have to wrap the languages list into a message so we can serialize empty lists.
+message SelectLanguages {
+    repeated string list = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which languages to select. An empty list means all languages are selected.";
         }
     ];
 }
@@ -8004,9 +8018,14 @@ message GetRestrictionsRequest {}
 
 message GetRestrictionsResponse {
     zitadel.v1.ObjectDetails details = 1;
-    bool disallow_public_org_registration = 2 [
+    bool public_org_registration_is_not_allowed = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if ZITADEL should expose the endpoint /ui/login/register/org. If it is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
+        }
+    ];
+    repeated string allowed_languages = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines the allowed languages. If allowed_languages has one or more entries, only these languages are allowed. If it has no entries, all supported languages are allowed";
         }
     ];
 }

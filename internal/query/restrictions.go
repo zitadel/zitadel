@@ -4,9 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
@@ -44,8 +47,12 @@ var (
 		name:  projection.RestrictionsColumnSequence,
 		table: restrictionsTable,
 	}
-	RestrictionsColumnDisallowPublicOrgRegistrations = Column{
-		name:  projection.RestrictionsColumnDisallowPublicOrgRegistration,
+	RestrictionsColumnPublicOrgRegistrationIsNotAlloweds = Column{
+		name:  projection.RestrictionsColumnPublicOrgRegistrationIsNotAllowed,
+		table: restrictionsTable,
+	}
+	RestrictionsColumnAllowedLanguages = Column{
+		name:  projection.RestrictionsColumnAllowedLanguages,
 		table: restrictionsTable,
 	}
 )
@@ -57,7 +64,8 @@ type Restrictions struct {
 	ResourceOwner string
 	Sequence      uint64
 
-	DisallowPublicOrgRegistration bool
+	PublicOrgRegistrationIsNotAllowed bool
+	AllowedLanguages                  []language.Tag
 }
 
 func (q *Queries) GetInstanceRestrictions(ctx context.Context) (restrictions Restrictions, err error) {
@@ -91,18 +99,23 @@ func prepareRestrictionsQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			RestrictionsColumnChangeDate.identifier(),
 			RestrictionsColumnResourceOwner.identifier(),
 			RestrictionsColumnSequence.identifier(),
-			RestrictionsColumnDisallowPublicOrgRegistrations.identifier(),
+			RestrictionsColumnPublicOrgRegistrationIsNotAlloweds.identifier(),
+			RestrictionsColumnAllowedLanguages.identifier(),
 		).
 			From(restrictionsTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (restrictions Restrictions, err error) {
-			return restrictions, row.Scan(
+			allowedLanguages := database.TextArray[string](make([]string, 0))
+			err = row.Scan(
 				&restrictions.AggregateID,
 				&restrictions.CreationDate,
 				&restrictions.ChangeDate,
 				&restrictions.ResourceOwner,
 				&restrictions.Sequence,
-				&restrictions.DisallowPublicOrgRegistration,
+				&restrictions.PublicOrgRegistrationIsNotAllowed,
+				&allowedLanguages,
 			)
+			restrictions.AllowedLanguages = domain.StringsToLanguages(allowedLanguages)
+			return restrictions, err
 		}
 }

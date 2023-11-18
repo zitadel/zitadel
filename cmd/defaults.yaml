@@ -819,9 +819,9 @@ DefaultInstance:
     # If this value is set, it overwrites the system default unless it is not reset via the admin API.
     AuditLogRetention: # ZITADEL_DEFAULTINSTANCE_LIMITS_AUDITLOGRETENTION
   Restrictions:
-    # DisallowPublicOrgRegistration defines if ZITADEL should expose the endpoint /ui/login/register/org
+    # PublicOrgRegistrationIsNotAllowed defines if ZITADEL should expose the endpoint /ui/login/register/org
     # If it is true, the endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.
-    DisallowPublicOrgRegistration: # ZITADEL_DEFAULTINSTANCE_RESTRICTIONS_DISALLOWPUBLICORGREGISTRATION
+    PublicOrgRegistrationIsNotAllowed: # ZITADEL_DEFAULTINSTANCE_RESTRICTIONS_DISALLOWPUBLICORGREGISTRATION
   Quotas:
     # Items take a slice of quota configurations, whereas, for each unit type and instance, one or zero quotas may exist.
     # The following unit types are supported
