@@ -47,6 +47,7 @@ Errors:
   SMTPConfig:
     NotFound: Konfiguracja SMTP nie znaleziona
     AlreadyExists: Konfiguracja SMTP już istnieje
+    AlreadyDeactivated: Konfiguracja SMTP jest już dezaktywowana
     SenderAdressNotCustomDomain: Adres nadawcy musi być skonfigurowany jako domena niestandardowa na instancji.
   Notification:
     NoDomain: Nie znaleziono domeny dla wiadomości
@@ -1057,6 +1058,9 @@ EventTypes:
       config:
         added: Dodano konfigurację SMTP
         changed: Zmieniono konfigurację SMTP
+        activated: Konfiguracja SMTP została aktywowana
+        deactivated: Konfiguracja SMTP dezaktywowana
+        removed: Konfiguracja SMTP została usunięta
         password:
           changed: Zmieniono sekret konfiguracji SMTP
     sms:
@@ -1202,6 +1206,8 @@ EventTypes:
       config:
         added: Konfiguracja SMTP dodana
         changed: Konfiguracja SMTP zmieniona
+        activated: Konfiguracja SMTP została aktywowana
+        deactivated: Konfiguracja SMTP dezaktywowana
         password:
           changed: Hasło konfiguracji SMTP zmienione
         removed: Konfiguracja SMTP usunięta

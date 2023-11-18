@@ -47,6 +47,7 @@ Errors:
   SMTPConfig:
     NotFound: SMTP構成が見つかりません
     AlreadyExists: すでに存在するSMTP構成です
+    AlreadyDeactivated: SMTP設定はすでに無効化されています
     SenderAdressNotCustomDomain: 送信者アドレスは、インスタンスのカスタムドメインとして構成する必要があります。
   Notification:
     NoDomain: メッセージのドメインが見つかりません
@@ -1046,6 +1047,9 @@ EventTypes:
       config:
         added: SMTP構成の追加
         changed: SMTP構成の変更
+        activated: SMTP設定が有効化されました
+        deactivated: SMTP設定が無効化されました
+        removed: SMTP設定が削除されました
         password:
           changed: SMTP構成シークレットの変更
     sms:
@@ -1191,6 +1195,8 @@ EventTypes:
       config:
         added: SMTP構成の追加
         changed: SMTP構成の変更
+        activated: SMTP設定が有効化されました
+        deactivated: SMTP設定が無効化されました
         password:
           changed: SMTP構成パスワードの変更
         removed: SMTP構成の削除

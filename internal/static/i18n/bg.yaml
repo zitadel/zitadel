@@ -47,6 +47,7 @@ Errors:
   SMTPConfig:
     NotFound: SMTP конфигурацията не е намерена
     AlreadyExists: SMTP конфигурация вече съществува
+    AlreadyDeactivated: SMTP конфигурацията вече е деактивирана
     SenderAdressNotCustomDomain: >-
       Адресът на изпращача трябва да бъде конфигуриран като персонализиран
       домейн в екземпляра.
@@ -1080,6 +1081,9 @@ EventTypes:
       config:
         added: Добавена е SMTP конфигурация
         changed: SMTP конфигурацията е променена
+        activated: SMTP конфигурацията е активирана
+        deactivated: SMTP конфигурацията е деактивирана
+        removed: Премахната SMTP конфигурация
         password:
           changed: Тайната на конфигурацията на SMTP е променена
     sms:
@@ -1234,6 +1238,8 @@ EventTypes:
       config:
         added: Добавена е SMTP конфигурация
         changed: SMTP конфигурацията е променена
+        activated: SMTP конфигурацията е активирана
+        deactivated: SMTP конфигурацията е деактивирана
         password:
           changed: Паролата на SMTP конфигурацията е променена
         removed: Премахната SMTP конфигурация

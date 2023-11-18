@@ -47,6 +47,7 @@ Errors:
   SMTPConfig:
     NotFound: Configuration SMTP non trouvée
     AlreadyExists: La configuration SMTP existe déjà
+    AlreadyDeactivated: Configuration SMTP déjà désactivée
     SenderAdressNotCustomDomain: L'adresse de l'expéditeur doit être configurée comme un domaine personnalisé sur l'instance.
   Notification:
     NoDomain: Aucun domaine trouvé pour le message
@@ -752,6 +753,12 @@ EventTypes:
       set: Ensemble de métadonnées de l'utilisateur
       removed: Métadonnées de l'utilisateur supprimées
       removed.all: Suppression de toutes les métadonnées utilisateur
+    domain:
+      claimed: Domaine revendiqué
+      claimed.sent: Notification de domaine revendiqué envoyée
+    pat:
+      added: Personal Access Token added
+      removed: Personal Access Token removed
   org:
     added: Organisation ajoutée
     changed: Organisation modifiée
@@ -798,6 +805,10 @@ EventTypes:
         config:
           added: Configuration IDP SAML ajoutée
           changed: Modification de la configuration IDP SAML
+      jwt:
+        config:
+          added: Configuration JWT IDP ajoutée
+          changed: La configuration du fournisseur d'identité JWT a été modifiée
     customtext:
       set: Jeu de texte personnalisé
       removed: Texte personnalisé supprimé
@@ -811,6 +822,8 @@ EventTypes:
         idpprovider:
           added: Fournisseur d'Idp ajouté à la politique de connexion
           removed: Idp Provider supprimé de la politique de connexion
+          cascade:
+            removed: Cascade de fournisseurs d'identité supprimée de la stratégie de connexion
         secondfactor:
           added: Second factor ajouté à la politique de connexion
           removed: Second facteur supprimé de la politique de connexion
@@ -856,6 +869,14 @@ EventTypes:
         added: Politique de confidentialité et CGU ajoutés
         changed: Politique de confidentialité et CGU modifiées
         removed: Politique de confidentialité et conditions d'utilisation supprimées
+      domain:
+        added: Politique de domaine ajoutée
+        changed: Politique de domaine modifiée
+        removed: Politique de domaine supprimée
+      lockout:
+        added: Politique de verrouillage ajoutée
+        changed: La politique de verrouillage a été modifiée
+        removed: Politique de verrouillage supprimée
       notification:
         added: Politique de notification ajoutée
         changed: Politique de notification modifiée
@@ -866,6 +887,20 @@ EventTypes:
         cascade:
           removed: Cascade d'actions supprimée
         removed: Actions supprimées
+      cleared: Flux effacé
+    mail:
+      template:
+        added: Modèle de courrier électronique ajouté
+        changed: Modèle d'e-mail modifié
+        removed: Modèle d'e-mail supprimé
+      text:
+        added: Texte de l'e-mail ajouté
+        changed: Le texte de l'e-mail a été modifié
+        removed: Texte de l'e-mail supprimé
+    metadata:
+      removed: Metadata removed
+      removed.all: All metadata removed
+      set: Metadata set
   project:
     added: Projet ajouté
     changed: Projet modifié
@@ -965,6 +1000,10 @@ EventTypes:
       saml:
         config:
           added: Ajout de la configuration SAML IDP
+          changed: La configuration SAML IDP a été modifiée
+      jwt:
+        config:
+          added: Configuration JWT du fournisseur d'identité ajoutée
           changed: Modification de la configuration de SAML IDP
     customtext:
       set: Le texte a été mis en place
@@ -1014,6 +1053,9 @@ EventTypes:
       config:
         added: Ajout de la configuration SMTP
         changed: Modification de la configuration SMTP
+        activated: Configuration SMTP activée
+        deactivated: Configuration SMTP désactivée
+        removed: Configuration SMTP supprimée
         password:
           changed: Modification du secret de la configuration SMTP
     sms:
@@ -1028,13 +1070,142 @@ EventTypes:
           deactivated: Fournisseur de SMS Twilio désactivé
   key_pair:
     added: Paire de clés ajoutée
+    certificate:
+      added: Certificat ajouté
   action:
     added: Action ajoutée
     changed: Action modifiée
     deactivated: Action désactivée
     reactivated: Action réactivée
     removed: Action supprimée
+instance:
+  added: Instance ajoutée
+  changed: Instance modifiée
+  customtext:
+    removed: Texte personnalisé supprimé
+    set: Ensemble de texte personnalisé
+    template:
+      removed: Modèle de texte personnalisé supprimé
+  default:
+    language:
+      set: Langue par défaut définie
+    org:
+      set: Ensemble d'organisation par défaut
+  domain:
+    added: Domaine ajouté
+    primary:
+      set: Ensemble de domaines principal
+    removed: Domaine supprimé
+  iam:
+    console:
+      set: Ensemble d'applications Console ZITADEL
+    project:
+      set: ZITADEL project set
+  mail:
+    template:
+      added: Modèle de courrier électronique ajouté
+      changed: Modèle d'e-mail modifié
+    text:
+      added: Texte de l'e-mail ajouté
+      changed: Le texte de l'e-mail a été modifié
+  member:
+    added: Membre de l'instance ajouté
+    changed: Membre de l'instance modifié
+    removed: Membre de l'instance supprimé
+    cascade:
+      removed: Cascade de membres de l'instance supprimée
+  notification:
+    provider:
+      debug:
+        fileadded: Fournisseur de notification de débogage de fichiers ajouté
+        filechanged: Le fournisseur de notification de débogage de fichier a été modifié
+        fileremoved: Fournisseur de notification de débogage de fichier supprimé
+        logadded: Fournisseur de notification de débogage de journal ajouté
+        logchanged: Le fournisseur de notification de débogage du journal a été modifié
+        logremoved: Fournisseur de notification de débogage du journal supprimé
+  oidc:
+    settings:
+      added: Paramètres OIDC ajoutés
+      changed: Paramètres OIDC modifiés
+  policy:
+    domain:
+      added: Politique de domaine ajoutée
+      changed: Politique de domaine modifiée
+    label:
+      activated: Politique d'étiquetage activée
+      added: Politique d'étiquetage ajoutée
+      assets:
+        removed: L'élément de la stratégie d'étiquette a été supprimé
+      changed: Politique d'étiquetage modifiée
+      font:
+        added: Police ajoutée à la stratégie d'étiquette
+        removed: Police supprimée de la stratégie relative aux étiquettes
+      icon:
+        added: Icône ajoutée à la politique d'étiquetage
+        removed: Icône supprimée des règles relatives aux étiquettes
+        dark:
+          added: Icône ajoutée à la politique d'étiquette sombre
+          removed: Icône supprimée de la politique relative aux étiquettes sombres
+      logo:
+        added: Logo ajouté à la politique d'étiquetage
+        removed: Logo supprimé de la politique relative aux étiquettes
+        dark:
+          added: Logo ajouté à la politique relative aux étiquettes sombres
+          removed: Logo supprimé de la politique relative aux étiquettes sombres
+    lockout:
+      added: Politique de verrouillage ajoutée
+      changed: La politique de verrouillage a été modifiée
+    login:
+      added: Politique de connexion ajoutée
+      changed: Politique de connexion modifiée
+      idpprovider:
+        added: Fournisseur d'identité ajouté à la politique de connexion
+        cascade:
+          removed: Cascade de fournisseurs d'identité supprimée de la stratégie de connexion
+        removed: Fournisseur d'identité supprimé de la stratégie de connexion
+      multifactor:
+        added: Multifactor ajouté à la politique de connexion
+        removed: Multifactor supprimé de la politique de connexion
+      secondfactor:
+        added: Deuxième facteur ajouté à la politique de connexion
+        removed: Deuxième facteur supprimé de la politique de connexion
+    password:
+      age:
+        added: Politique d'âge du mot de passe ajoutée
+        changed: La politique relative à l'âge du mot de passe a été modifiée
+      complexity:
+        added: Politique de complexité des mots de passe ajoutée
+        changed: Politique de complexité des mots de passe supprimée
+    privacy:
+      added: Politique de confidentialité ajoutée
+      changed: Politique de confidentialité modifiée
+    security:
+      set: Ensemble de règles de sécurité
 
+  removed: Instance removed
+  secret:
+    generator:
+      added: Générateur de secrets ajouté
+      changed: Le générateur de secrets a changé
+      removed: Générateur de secrets supprimé
+  sms:
+    configtwilio:
+      activated: Configuration SMS Twilio activée
+      added: Configuration SMS Twilio ajoutée
+      changed: La configuration des SMS Twilio a été modifiée
+      deactivated: Configuration SMS Twilio désactivée
+      removed: Configuration SMS Twilio supprimée
+      token:
+        changed: Jeton de configuration SMS Twilio modifié
+  smtp:
+    config:
+      added: Configuration SMTP ajoutée
+      changed: Configuration SMTP modifiée
+      activated: Configuration SMTP activée
+      deactivated: Configuration SMTP désactivée
+      password:
+        changed: Mot de passe de configuration SMTP modifié
+      removed: Configuration SMTP supprimée
 Application:
   OIDC:
     UnsupportedVersion: Votre version de l'OIDC n'est pas prise en charge

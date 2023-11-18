@@ -47,6 +47,7 @@ Errors:
   SMTPConfig:
     NotFound: SMTP конфигурацијата не е пронајдена
     AlreadyExists: SMTP конфигурацијата веќе постои
+    AlreadyDeactivated: SMTP конфигурацијата е веќе деактивирана
     SenderAdressNotCustomDomain: Адресата на испраќачот мора да биде конфигурирана како прилагоден домен на инстанцата.
   Notification:
     NoDomain: Не е пронајден домен за пораката
@@ -1057,6 +1058,9 @@ EventTypes:
       config:
         added: Додадена SMTP конфигурација
         changed: Променета SMTP конфигурација
+        activated: SMTP конфигурацијата е активирана
+        deactivated: SMTP конфигурацијата е деактивирана
+        removed: SMTP конфигурацијата е отстранета
         password:
           changed: Променена тајна на SMTP конфигурација
     sms:
@@ -1201,6 +1205,8 @@ EventTypes:
       config:
         added: Додадена SMTP конфигурација
         changed: Променета SMTP конфигурација
+        activated: SMTP конфигурацијата е активирана
+        deactivated: SMTP конфигурацијата е деактивирана
         password:
           changed: Променета лозинка на SMTP конфигурацијата
         removed: Отстранета SMTP конфигурација

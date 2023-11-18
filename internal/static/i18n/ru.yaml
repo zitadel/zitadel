@@ -44,6 +44,7 @@ Errors:
   SMTPConfig:
     NotFound: Конфигурация SMTP не найдена
     AlreadyExists: Конфигурация SMTP уже существует
+    AlreadyDeactivated: Конфигурация SMTP уже деактивирована
     SenderAdressNotCustomDomain: Адрес отправителя должен быть настроен как личный домен на экземпляре.
   Notification:
     NoDomain: Домен для сообщения не найден
@@ -1035,6 +1036,9 @@ EventTypes:
       config:
         added: Добавлена конфигурация SMTP
         changed: Изменена конфигурация SMTP
+        activated: Конфигурация SMTP активирована
+        deactivated: Конфигурация SMTP деактивирована
+        removed: Конфигурация SMTP удалена.
         password:
           changed: Изменен секрет конфигурации SMTP
     sms:
@@ -1180,6 +1184,8 @@ EventTypes:
       config:
         added: Добавлена конфигурация SMTP
         changed: Изменена конфигурация SMTP
+        activated: Конфигурация SMTP активирована
+        deactivated: Конфигурация SMTP деактивирована
         password:
           changed: Изменен пароль конфигурации SMTP
         removed: Удалена конфигурация SMTP

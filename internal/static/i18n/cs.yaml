@@ -47,6 +47,7 @@ Errors:
   SMTPConfig:
     NotFound: Konfigurace SMTP nebyla nalezena
     AlreadyExists: Konfigurace SMTP již existuje
+    AlreadyDeactivated: Konfigurace SMTP je již deaktivována
     SenderAdressNotCustomDomain: Adresa odesílatele musí být nakonfigurována jako vlastní doména na instanci.
   Notification:
     NoDomain: Pro zprávu nebyla nalezena žádná doména
@@ -1054,6 +1055,9 @@ EventTypes:
       config:
         added: Konfigurace SMTP přidána
         changed: Konfigurace SMTP změněna
+        activated: Konfigurace SMTP aktivována
+        deactivated: Konfigurace SMTP deaktivována
+        removed: Konfigurace SMTP odstraněna
         password:
           changed: Tajemství konfigurace SMTP změněno
     sms:
@@ -1199,6 +1203,8 @@ EventTypes:
       config:
         added: Konfigurace SMTP přidána
         changed: Konfigurace SMTP změněna
+        activated: Konfigurace SMTP aktivována
+        deactivated: Konfigurace SMTP deaktivována
         password:
           changed: Heslo konfigurace SMTP změněno
         removed: Konfigurace SMTP odstraněna
