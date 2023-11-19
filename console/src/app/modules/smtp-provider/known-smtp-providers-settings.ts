@@ -149,7 +149,7 @@ export const GenericDefaultSettings: ProviderDefaultSettings = {
 
 export const SMTPKnownProviders = [
   AmazonSESDefaultSettings,
-  GoogleDefaultSettings,
+  // GoogleDefaultSettings,
   MailgunDefaultSettings,
   MailjetDefaultSettings,
   PostmarkDefaultSettings,

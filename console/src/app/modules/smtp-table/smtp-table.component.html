@@ -26,6 +26,7 @@
             matTooltip="{{ 'SMTP.LIST.ACTIVATED' | translate }}"
             *ngIf="isActive(config.state)"
             class="smtp-available las la-check-circle"
+            data-e2e="active-provider"
           ></i>
         </td>
       </ng-container>
@@ -92,6 +93,7 @@
               [disabled]="(['iam.write'] | hasRole | async) === false"
               mat-icon-button
               matTooltip="{{ 'SMTP.LIST.ACTIVATE' | translate }}"
+              data-e2e="activate-provider-button"
               (click)="activateSMTPConfig(config.id); $event.stopPropagation()"
             >
               <i class="las la-check-circle"></i>
@@ -103,6 +105,7 @@
               [disabled]="(['iam.write'] | hasRole | async) === false"
               mat-icon-button
               matTooltip="{{ 'SMTP.LIST.DEACTIVATE' | translate }}"
+              data-e2e="deactivate-provider-button"
               (click)="deactivateSMTPConfig(config.id); $event.stopPropagation()"
             >
               <i class="las la-times-circle"></i>
@@ -114,6 +117,7 @@
               mat-icon-button
               color="warn"
               matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+              data-e2e="delete-provider-button"
               (click)="deleteSMTPConfig(config.id, config.senderName); $event.stopPropagation()"
             >
               <i class="las la-trash"></i>
