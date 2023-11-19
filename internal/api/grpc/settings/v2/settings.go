@@ -2,13 +2,13 @@ package settings
 
 import (
 	"context"
-	"github.com/zitadel/zitadel/internal/i18n"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"

@@ -33,6 +33,8 @@ Errors:
     NoneSpecified: 制限が指定されていません
   Restrictions:
     NoneSpecified: 制限が指定されていません
+    LanguagesNotSupported: サポートされていない言語です
+    DefaultLanguageMustBeAllowed: デフォルト言語は許可されている必要があります
   Language:
     NotParsed: 言語のパースに失敗しました
   OIDCSettings:

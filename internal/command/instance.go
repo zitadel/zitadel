@@ -463,7 +463,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	}
 
 	if setup.Restrictions != nil {
-		validations = append(validations, c.SetRestrictionsCommand(restrictionsAgg, &restrictionsWriteModel{}, setup.Restrictions))
+		validations = append(validations, c.SetRestrictionsCommand(restrictionsAgg, &restrictionsWriteModel{}, setup.Restrictions, setup.DefaultLanguage))
 	}
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)

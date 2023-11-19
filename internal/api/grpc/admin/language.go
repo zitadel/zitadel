@@ -2,14 +2,14 @@ package admin
 
 import (
 	"context"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/i18n"
 
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/domain"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/i18n"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 

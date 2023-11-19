@@ -33,6 +33,8 @@ Errors:
     NoneSpecified: Nebyly určeny žádné limity
   Restrictions:
     NoneSpecified: Nebyla určena žádná omezení
+    LanguagesNotSupported: Jazyky nejsou podporovány
+    DefaultLanguageMustBeAllowed: Výchozí jazyk musí být povolen
   Language:
     NotParsed: Jazyk nelze určit
   OIDCSettings:

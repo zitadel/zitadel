@@ -33,6 +33,8 @@ Errors:
     NoneSpecified: 未指定限制
   Restrictions:
     NoneSpecified: 未指定限制
+    LanguagesNotSupported: 语言不支持
+    DefaultLanguageMustBeAllowed: 默认语言必须被允许
   Language:
     NotParsed: 无法解析语言
   OIDCSettings:

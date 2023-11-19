@@ -33,6 +33,8 @@ Errors:
     NoneSpecified: Не се наведени лимити
   Restrictions:
     NoneSpecified: Не се наведени ограничувања
+    LanguagesNotSupported: Јазиците не се поддржани
+    DefaultLanguageMustBeAllowed: Стандардниот јазик мора да биде дозволен
   Language:
     NotParsed: Јазикот не може да се парсира
   OIDCSettings:

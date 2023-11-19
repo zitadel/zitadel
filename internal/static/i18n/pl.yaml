@@ -33,6 +33,8 @@ Errors:
     NoneSpecified: Nie określono limitów
   Restrictions:
     NoneSpecified: Nie określono ograniczeń
+    LanguagesNotSupported: Języki nie są obsługiwane
+    DefaultLanguageMustBeAllowed: Domyślny język musi być dozwolony
   Language:
     NotParsed: Nie można przeanalizować języka
   OIDCSettings:

@@ -2,8 +2,10 @@ package admin
 
 import (
 	"errors"
-	"github.com/zitadel/zitadel/pkg/grpc/admin"
+
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 func selectLanguagesToCommand(languages *admin.SelectLanguages) (tags []language.Tag, err error) {

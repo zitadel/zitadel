@@ -3,9 +3,10 @@ package oidc
 import (
 	"context"
 	"fmt"
-	"github.com/zitadel/zitadel/internal/i18n"
 	"net/http"
 	"time"
+
+	"golang.org/x/exp/slog"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
@@ -20,9 +21,9 @@ import (
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
-	"golang.org/x/exp/slog"
 )
 
 type Config struct {

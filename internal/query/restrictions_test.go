@@ -5,10 +5,12 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	"github.com/zitadel/zitadel/internal/database"
-	"golang.org/x/text/language"
 	"regexp"
 	"testing"
+
+	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 var (

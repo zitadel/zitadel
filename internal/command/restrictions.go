@@ -2,9 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
-	"github.com/zitadel/zitadel/internal/i18n"
-
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -12,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/repository/restrictions"
 )
 
@@ -24,6 +22,7 @@ type SetRestrictions struct {
 func (c *Commands) SetInstanceRestrictions(
 	ctx context.Context,
 	setRestrictions *SetRestrictions,
+	defaultLanguage language.Tag,
 ) (*domain.ObjectDetails, error) {
 	instanceId := authz.GetInstance(ctx).InstanceID()
 	wm, err := c.getRestrictionsWriteModel(ctx, instanceId, instanceId)
@@ -37,7 +36,7 @@ func (c *Commands) SetInstanceRestrictions(
 			return nil, err
 		}
 	}
-	setCmd, err := c.SetRestrictionsCommand(restrictions.NewAggregate(aggregateId, instanceId, instanceId), wm, setRestrictions)()
+	setCmd, err := c.SetRestrictionsCommand(restrictions.NewAggregate(aggregateId, instanceId, instanceId), wm, setRestrictions, defaultLanguage)()
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +62,7 @@ func (c *Commands) getRestrictionsWriteModel(ctx context.Context, instanceId, re
 	return wm, c.eventstore.FilterToQueryReducer(ctx, wm)
 }
 
-func (c *Commands) SetRestrictionsCommand(a *restrictions.Aggregate, wm *restrictionsWriteModel, setRestrictions *SetRestrictions) preparation.Validation {
+func (c *Commands) SetRestrictionsCommand(a *restrictions.Aggregate, wm *restrictionsWriteModel, setRestrictions *SetRestrictions, defaultLanguage language.Tag) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if setRestrictions == nil ||
 			setRestrictions.PublicOrgRegistrationIsNotAllowed == nil &&
@@ -73,7 +72,10 @@ func (c *Commands) SetRestrictionsCommand(a *restrictions.Aggregate, wm *restric
 		if setRestrictions.AllowedLanguages != nil {
 			unsupported := domain.FilterOutLanguages(setRestrictions.AllowedLanguages, i18n.SupportedLanguages())
 			if len(unsupported) > 0 {
-				return nil, errors.ThrowInvalidArgument(fmt.Errorf("%s", domain.LanguagesToStrings(unsupported)), "COMMAND-2M9fs", "Errors.Restrictions.LanguagesNotSupported")
+				return nil, errors.ThrowInvalidArgumentf(nil, "COMMAND-2M9fs", "Errors.Restrictions.LanguagesNotSupported: %s", domain.LanguagesToStrings(unsupported))
+			}
+			if len(setRestrictions.AllowedLanguages) > 0 && len(domain.FilterOutLanguages([]language.Tag{defaultLanguage}, setRestrictions.AllowedLanguages)) == 1 {
+				return nil, errors.ThrowInvalidArgumentf(nil, "COMMAND-2M9fs", "Errors.Restrictions.DefaultLanguageMustBeAllowed: %s", defaultLanguage.String())
 			}
 		}
 		return func(ctx context.Context, _ preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
