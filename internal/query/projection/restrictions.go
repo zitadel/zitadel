@@ -21,7 +21,7 @@ const (
 	RestrictionsColumnInstanceID    = "instance_id"
 	RestrictionsColumnSequence      = "sequence"
 
-	RestrictionsColumnPublicOrgRegistrationIsNotAllowed = "disallow_public_org_registration"
+	RestrictionsColumnPublicOrgRegistrationIsNotAllowed = "public_org_registration_is_not_allowed"
 	RestrictionsColumnAllowedLanguages                  = "allowed_languages"
 )
 
@@ -92,8 +92,8 @@ func (p *restrictionsProjection) reduceRestrictionsSet(event eventstore.Event) (
 		handler.NewCol(RestrictionsColumnSequence, e.Sequence()),
 		handler.NewCol(RestrictionsColumnAggregateID, e.Aggregate().ID),
 	}
-	if e.PublicOrgRegistrationIsNotAlloweds != nil {
-		updateCols = append(updateCols, handler.NewCol(RestrictionsColumnPublicOrgRegistrationIsNotAllowed, *e.PublicOrgRegistrationIsNotAlloweds))
+	if e.PublicOrgRegistrationIsNotAllowed != nil {
+		updateCols = append(updateCols, handler.NewCol(RestrictionsColumnPublicOrgRegistrationIsNotAllowed, *e.PublicOrgRegistrationIsNotAllowed))
 	}
 	if e.AllowedLanguages != nil {
 		updateCols = append(updateCols, handler.NewCol(RestrictionsColumnAllowedLanguages, domain.LanguagesToStrings(*e.AllowedLanguages)))

@@ -14,9 +14,9 @@ const (
 
 // SetEvent describes that restrictions are added or modified and contains only changed properties
 type SetEvent struct {
-	*eventstore.BaseEvent              `json:"-"`
-	PublicOrgRegistrationIsNotAlloweds *bool           `json:"disallowPublicOrgRegistrations,omitempty"`
-	AllowedLanguages                   *[]language.Tag `json:"allowedLanguages,omitempty"`
+	*eventstore.BaseEvent             `json:"-"`
+	PublicOrgRegistrationIsNotAllowed *bool           `json:"publicOrgRegistrationIsNotAllowed,omitempty"`
+	AllowedLanguages                  *[]language.Tag `json:"allowedLanguages,omitempty"`
 }
 
 func (e *SetEvent) Payload() any {
@@ -48,7 +48,7 @@ type RestrictionsChange func(*SetEvent)
 
 func ChangePublicOrgRegistrations(disallow bool) RestrictionsChange {
 	return func(e *SetEvent) {
-		e.PublicOrgRegistrationIsNotAlloweds = gu.Ptr(disallow)
+		e.PublicOrgRegistrationIsNotAllowed = gu.Ptr(disallow)
 	}
 }
 
