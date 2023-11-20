@@ -68,10 +68,10 @@ LEFT JOIN
     u.id = h.user_id
     AND u.instance_id = h.instance_id
 LEFT JOIN
-  projections.users8_notifications m
+  projections.users8_notifications n
   ON
-    u.id = m.user_id
-    AND u.instance_id = m.instance_id
+    u.id = n.user_id
+    AND u.instance_id = n.instance_id
 WHERE 
   u.id = $1
   AND u.instance_id = $2

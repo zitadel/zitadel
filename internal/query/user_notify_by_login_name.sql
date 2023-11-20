@@ -16,7 +16,7 @@ WITH login_names AS (
   JOIN 
     projections.login_names2_domains d
     ON 
-      (u.user_name = $1 OR u.user_name = $3)
+      (u.user_name ILIKE $1 OR u.user_name ILIKE $3)
       AND u.instance_id = $4
       AND u.instance_id = d.instance_id
       AND u.resource_owner = d.resource_owner
@@ -29,8 +29,8 @@ WITH login_names AS (
         OR (p.instance_id = $4 AND p.resource_owner = u.resource_owner)
       )
       AND (
-        (p.must_be_domain IS TRUE AND u.user_name = $1 AND d.name = $2)
-        or (p.must_be_domain IS FALSE AND u.user_name = $3)
+        (p.must_be_domain IS TRUE AND u.user_name ILIKE $1 AND d.name ILIKE $2)
+        or (p.must_be_domain IS FALSE AND u.user_name ILIKE $3)
       )
       ORDER BY is_default
       LIMIT 1
@@ -78,10 +78,10 @@ LEFT JOIN
     u.id = h.user_id
     AND u.instance_id = h.instance_id
 LEFT JOIN
-  projections.users8_notifications m
+  projections.users8_notifications n
   ON
-    u.id = m.user_id
-    AND u.instance_id = m.instance_id
+    u.id = n.user_id
+    AND u.instance_id = n.instance_id
 WHERE 
   u.instance_id = $4
 LIMIT 1
