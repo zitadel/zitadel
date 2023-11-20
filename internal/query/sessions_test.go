@@ -32,7 +32,6 @@ var (
 		` projections.sessions8.user_checked_at,` +
 		` projections.login_names3.login_name,` +
 		` projections.users8_humans.display_name,` +
-		` projections.users8.resource_owner,` +
 		` projections.sessions8.password_checked_at,` +
 		` projections.sessions8.intent_checked_at,` +
 		` projections.sessions8.webauthn_checked_at,` +
