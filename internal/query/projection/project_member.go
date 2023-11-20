@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	ProjectMemberProjectionTable = "projections.project_members3"
+	ProjectMemberProjectionTable = "projections.project_members4"
 	ProjectMemberProjectIDCol    = "project_id"
 )
 
@@ -39,18 +39,14 @@ func (*projectMemberProjection) Init() *old_handler.Check {
 			),
 			handler.NewPrimaryKey(MemberInstanceID, ProjectMemberProjectIDCol, MemberUserIDCol),
 			handler.WithIndex(handler.NewIndex("user_id", []string{MemberUserIDCol})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{MemberOwnerRemoved})),
-			handler.WithIndex(handler.NewIndex("user_owner_removed", []string{MemberUserOwnerRemoved})),
 			handler.WithIndex(
 				handler.NewIndex("pm_instance", []string{MemberInstanceID},
 					handler.WithInclude(
 						MemberCreationDate,
 						MemberChangeDate,
-						MemberUserOwnerRemoved,
 						MemberRolesCol,
 						MemberSequence,
 						MemberResourceOwner,
-						MemberOwnerRemoved,
 					),
 				),
 			),

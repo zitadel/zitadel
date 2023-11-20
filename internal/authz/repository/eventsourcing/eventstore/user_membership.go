@@ -41,7 +41,7 @@ func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context, orgID
 	}
 	memberships, err := repo.Queries.Memberships(ctx, &query.MembershipSearchQuery{
 		Queries: []query.SearchQuery{userIDQuery, query.Or(orgIDsQuery, grantedIDQuery)},
-	}, false, shouldTriggerBulk)
+	}, shouldTriggerBulk)
 	if err != nil {
 		return nil, err
 	}

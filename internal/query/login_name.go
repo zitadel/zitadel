@@ -23,22 +23,4 @@ var (
 		name:  projection.LoginNameInstanceIDCol,
 		table: loginNameTable,
 	}
-	LoginNameOwnerRemovedDomainCol = Column{
-		name:  projection.LoginNameOwnerRemovedDomainCol,
-		table: loginNameTable,
-	}
-	LoginNameOwnerRemovedUserCol = Column{
-		name:  projection.LoginNameOwnerRemovedUserCol,
-		table: loginNameTable,
-	}
-	LoginNameOwnerRemovedPolicyCol = Column{
-		name:  projection.LoginNameOwnerRemovedPolicyCol,
-		table: loginNameTable,
-	}
 )
-
-func addLoginNameWithoutOwnerRemoved(eq map[string]interface{}) {
-	eq[LoginNameOwnerRemovedDomainCol.identifier()] = false
-	eq[LoginNameOwnerRemovedUserCol.identifier()] = false
-	eq[LoginNameOwnerRemovedPolicyCol.identifier()] = false
-}

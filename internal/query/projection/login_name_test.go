@@ -40,7 +40,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names2_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.login_names3_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"human-added",
@@ -71,7 +71,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names2_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.login_names3_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"human-registered",
@@ -102,7 +102,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names2_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.login_names3_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"machine-added",
@@ -131,7 +131,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.login_names2_users WHERE (id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.login_names3_users WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -160,7 +160,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_names2_users SET user_name = $1 WHERE (id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.login_names3_users SET user_name = $1 WHERE (id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"changed",
 								"agg-id",
@@ -190,7 +190,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_names2_users SET user_name = $1 WHERE (id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.login_names3_users SET user_name = $1 WHERE (id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"claimed",
 								"agg-id",
@@ -220,7 +220,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names2_policies (must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.login_names3_policies (must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								true,
 								false,
@@ -251,7 +251,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_names2_policies SET must_be_domain = $1 WHERE (resource_owner = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.login_names3_policies SET must_be_domain = $1 WHERE (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								false,
 								"ro-id",
@@ -298,7 +298,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.login_names2_policies WHERE (resource_owner = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.login_names3_policies WHERE (resource_owner = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"ro-id",
 								"instance-id",
@@ -327,7 +327,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names2_domains (name, resource_owner, instance_id) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.login_names3_domains (name, resource_owner, instance_id) VALUES ($1, $2, $3)",
 							expectedArgs: []interface{}{
 								"verified",
 								"ro-id",
@@ -357,7 +357,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.login_names2_domains WHERE (name = $1) AND (resource_owner = $2) AND (instance_id = $3)",
+							expectedStmt: "DELETE FROM projections.login_names3_domains WHERE (name = $1) AND (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"remove",
 								"ro-id",
@@ -387,7 +387,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_names2_domains SET is_primary = $1 WHERE (resource_owner = $2) AND (is_primary = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.login_names3_domains SET is_primary = $1 WHERE (resource_owner = $2) AND (is_primary = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								false,
 								"ro-id",
@@ -396,7 +396,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.login_names2_domains SET is_primary = $1 WHERE (name = $2) AND (resource_owner = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.login_names3_domains SET is_primary = $1 WHERE (name = $2) AND (resource_owner = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								true,
 								"primary",
@@ -427,7 +427,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names2_policies (must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.login_names3_policies (must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								true,
 								true,
@@ -458,7 +458,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.login_names2_policies SET must_be_domain = $1 WHERE (resource_owner = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.login_names3_policies SET must_be_domain = $1 WHERE (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								false,
 								"ro-id",
@@ -505,19 +505,19 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.login_names2_domains WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.login_names3_domains WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
 						},
 						{
-							expectedStmt: "DELETE FROM projections.login_names2_policies WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.login_names3_policies WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
 						},
 						{
-							expectedStmt: "DELETE FROM projections.login_names2_users WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.login_names3_users WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -543,21 +543,21 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.login_names2_domains WHERE (instance_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.login_names3_domains WHERE (instance_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"agg-id",
 							},
 						},
 						{
-							expectedStmt: "DELETE FROM projections.login_names2_policies WHERE (instance_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.login_names3_policies WHERE (instance_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"agg-id",
 							},
 						},
 						{
-							expectedStmt: "DELETE FROM projections.login_names2_users WHERE (instance_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.login_names3_users WHERE (instance_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"agg-id",

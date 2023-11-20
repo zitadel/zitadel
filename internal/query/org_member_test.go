@@ -20,7 +20,7 @@ var (
 		", members.resource_owner" +
 		", members.user_id" +
 		", members.roles" +
-		", projections.login_names2.login_name" +
+		", projections.login_names3.login_name" +
 		", projections.users8_humans.email" +
 		", projections.users8_humans.first_name" +
 		", projections.users8_humans.last_name" +
@@ -29,7 +29,7 @@ var (
 		", projections.users8_humans.avatar_key" +
 		", projections.users8.type" +
 		", COUNT(*) OVER () " +
-		"FROM projections.org_members3 AS members " +
+		"FROM projections.org_members4 AS members " +
 		"LEFT JOIN projections.users8_humans " +
 		"ON members.user_id = projections.users8_humans.user_id " +
 		"AND members.instance_id = projections.users8_humans.instance_id " +
@@ -39,11 +39,11 @@ var (
 		"LEFT JOIN projections.users8 " +
 		"ON members.user_id = projections.users8.id " +
 		"AND members.instance_id = projections.users8.instance_id " +
-		"LEFT JOIN projections.login_names2 " +
-		"ON members.user_id = projections.login_names2.user_id " +
-		"AND members.instance_id = projections.login_names2.instance_id " +
+		"LEFT JOIN projections.login_names3 " +
+		"ON members.user_id = projections.login_names3.user_id " +
+		"AND members.instance_id = projections.login_names3.instance_id " +
 		"AS OF SYSTEM TIME '-1 ms' " +
-		"WHERE projections.login_names2.is_primary = $1")
+		"WHERE projections.login_names3.is_primary = $1")
 	orgMembersColumns = []string{
 		"creation_date",
 		"change_date",
