@@ -21,25 +21,31 @@ func (v *View) UserByID(userID, instanceID string) (*model.UserView, error) {
 }
 
 func (v *View) UserByLoginName(ctx context.Context, loginName, instanceID string) (*model.UserView, error) {
-	loginNameQuery, err := query.NewUserLoginNamesSearchQuery(loginName)
+	queriedUser, err := v.query.GetNotifyUserByLoginName(ctx, true, loginName, false)
 	if err != nil {
 		return nil, err
 	}
 
-	return v.userByID(ctx, instanceID, loginNameQuery)
+	//nolint: contextcheck // no lint was added because refactor would change too much code
+	return view.UserByID(v.Db, userTable, queriedUser.ID, instanceID)
 }
 
 func (v *View) UserByLoginNameAndResourceOwner(ctx context.Context, loginName, resourceOwner, instanceID string) (*model.UserView, error) {
-	loginNameQuery, err := query.NewUserLoginNamesSearchQuery(loginName)
-	if err != nil {
-		return nil, err
-	}
-	resourceOwnerQuery, err := query.NewUserResourceOwnerSearchQuery(resourceOwner, query.TextEquals)
+	queriedUser, err := v.query.GetNotifyUserByLoginName(ctx, true, loginName, false)
 	if err != nil {
 		return nil, err
 	}
 
-	return v.userByID(ctx, instanceID, loginNameQuery, resourceOwnerQuery)
+	//nolint: contextcheck // no lint was added because refactor would change too much code
+	user, err := view.UserByID(v.Db, userTable, queriedUser.ID, instanceID)
+	if err != nil {
+		return nil, err
+	}
+	if user.ResourceOwner != resourceOwner {
+		return nil, errors.ThrowNotFound(nil, "VIEW-qScmi", "Errors.User.NotFound")
+	}
+
+	return user, nil
 }
 
 func (v *View) UserByEmail(ctx context.Context, email, instanceID string) (*model.UserView, error) {
