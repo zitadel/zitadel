@@ -143,7 +143,7 @@ module.exports = {
             },
             {
               label: "Privacy Policy",
-              href: "/legal/privacy-policy",
+              href: "/legal/policies/privacy-policy",
             },
           ],
         },
