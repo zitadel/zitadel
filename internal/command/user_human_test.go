@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	zitadel_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
@@ -33,11 +33,12 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		newCode            cryptoCodeFunc
 	}
 	type args struct {
-		ctx             context.Context
-		orgID           string
-		human           *AddHuman
-		secretGenerator crypto.Generator
-		allowInitMail   bool
+		ctx              context.Context
+		orgID            string
+		human            *AddHuman
+		secretGenerator  crypto.Generator
+		allowInitMail    bool
+		allowedLanguages []language.Tag
 	}
 	type res struct {
 		want          *domain.ObjectDetails
@@ -74,7 +75,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal"))
+					return errors.Is(err, zitadel_errs.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal"))
 				},
 			},
 		},
@@ -94,7 +95,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty"))
+					return errors.Is(err, zitadel_errs.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty"))
 				},
 			},
 		},
@@ -126,12 +127,13 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting"))
+					return errors.Is(err, zitadel_errs.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting"))
 				},
 			},
 		},
 		{
 			name: "domain policy not found, precondition error",
+
 			fields: fields{
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				eventstore: expectEventstore(
@@ -156,7 +158,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInternal(nil, "USER-Ggk9n", "Errors.Internal"))
+					return errors.Is(err, zitadel_errs.ThrowInternal(nil, "USER-Ggk9n", "Errors.Internal"))
 				},
 			},
 		},
@@ -198,8 +200,36 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInternal(nil, "USER-uQ96e", "Errors.Internal"))
+					return errors.Is(err, zitadel_errs.ThrowInternal(nil, "USER-uQ96e", "Errors.Internal"))
 				},
+			},
+		},
+		{
+			name: "preferred language not allowed, precondition error",
+			fields: fields{
+				userPasswordHasher: mockPasswordHasher("x"),
+				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				eventstore:         expectEventstore(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &AddHuman{
+					Username:  "username",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Password:  "pass",
+					Email: Email{
+						Address:  "email@test.ch",
+						Verified: true,
+					},
+					PreferredLanguage: language.Spanish,
+				},
+				allowInitMail:    true,
+				allowedLanguages: []language.Tag{language.English},
+			},
+			res: res{
+				err: zitadel_errs.IsPreconditionFailed,
 			},
 		},
 		{
@@ -721,7 +751,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername"))
+					return errors.Is(err, zitadel_errs.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername"))
 				},
 			},
 		},
@@ -1108,7 +1138,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        tt.fields.idGenerator,
 				newCode:            tt.fields.newCode,
 			}
-			err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail)
+			err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail, tt.args.allowedLanguages)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -1140,6 +1170,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		links                []*domain.UserIDPLink
 		secretGenerator      crypto.Generator
 		passwordlessInitCode crypto.Generator
+		allowedLanguages     []language.Tag
 	}
 	type res struct {
 		wantHuman *domain.Human
@@ -1174,7 +1205,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zitadel_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1201,7 +1232,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zitadel_errs.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1238,7 +1269,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zitadel_errs.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1276,15 +1307,45 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				human: &domain.Human{
 					Username: "username",
 					Profile: &domain.Profile{
-						FirstName: "firstname",
+						FirstName:         "firstname",
+						PreferredLanguage: language.English,
 					},
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zitadel_errs.IsErrorInvalidArgument,
 			},
-		},
-		{
+		}, {
+			name: "preferred language not allowed, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Password: &domain.Password{
+						SecretString:   "password",
+						ChangeRequired: true,
+					},
+					Email: &domain.Email{
+						EmailAddress:    "email@test.ch",
+						IsEmailVerified: true,
+					},
+					Profile: &domain.Profile{
+						PreferredLanguage: language.Spanish,
+					},
+				},
+				allowedLanguages: []language.Tag{language.English},
+			},
+			res: res{
+				err: zitadel_errs.IsPreconditionFailed,
+			},
+		}, {
 			name: "add human (with password and initial code), ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -2120,7 +2181,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zitadel_errs.IsPreconditionFailed,
 			},
 		},
 	}
@@ -2131,7 +2192,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				idGenerator:        tt.fields.idGenerator,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
-			gotHuman, gotCode, err := r.ImportHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.passwordless, tt.args.links, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator)
+			gotHuman, gotCode, err := r.ImportHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.passwordless, tt.args.links, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.allowedLanguages)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -2153,12 +2214,13 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 		userPasswordHasher *crypto.PasswordHasher
 	}
 	type args struct {
-		ctx             context.Context
-		orgID           string
-		human           *domain.Human
-		link            *domain.UserIDPLink
-		orgMemberRoles  []string
-		secretGenerator crypto.Generator
+		ctx              context.Context
+		orgID            string
+		human            *domain.Human
+		link             *domain.UserIDPLink
+		orgMemberRoles   []string
+		secretGenerator  crypto.Generator
+		allowedLanguages []language.Tag
 	}
 	type res struct {
 		want *domain.Human
@@ -2192,7 +2254,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zitadel_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -2222,7 +2284,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zitadel_errs.IsPreconditionFailed,
 			},
 		},
 		{
@@ -2262,7 +2324,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zitadel_errs.IsPreconditionFailed,
 			},
 		},
 		{
@@ -2310,7 +2372,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zitadel_errs.IsPreconditionFailed,
 			},
 		},
 		{
@@ -2380,7 +2442,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zitadel_errs.IsPreconditionFailed,
 			},
 		},
 		{
@@ -2450,7 +2512,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zitadel_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -2528,8 +2590,9 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						SecretString: "password",
 					},
 					Profile: &domain.Profile{
-						FirstName: "firstname",
-						LastName:  "lastname",
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						PreferredLanguage: language.English,
 					},
 					Email: &domain.Email{
 						EmailAddress: "email@test.ch",
@@ -2537,7 +2600,37 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zitadel_errs.IsErrorInvalidArgument,
+			},
+		}, {
+			name: "preferred language not allowed, precondition error",
+			fields: fields{
+				userPasswordHasher: mockPasswordHasher("x"),
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Password: &domain.Password{
+						SecretString: "password",
+					},
+					Email: &domain.Email{
+						EmailAddress:    "email@test.ch",
+						IsEmailVerified: true,
+					},
+					Profile: &domain.Profile{
+						PreferredLanguage: language.Spanish,
+					},
+				},
+				allowedLanguages: []language.Tag{language.English},
+			},
+			res: res{
+				err: zitadel_errs.IsPreconditionFailed,
 			},
 		},
 		{
@@ -3405,7 +3498,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				idGenerator:        tt.fields.idGenerator,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
-			got, err := r.RegisterHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.link, tt.args.orgMemberRoles, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator)
+			got, err := r.RegisterHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.link, tt.args.orgMemberRoles, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.allowedLanguages)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -3453,7 +3546,7 @@ func TestCommandSide_HumanMFASkip(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zitadel_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -3470,7 +3563,7 @@ func TestCommandSide_HumanMFASkip(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zitadel_errs.IsNotFound,
 			},
 		},
 		{
@@ -3563,7 +3656,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 				userIDs: []string{"user1"},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zitadel_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -3579,7 +3672,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 				userIDs: []string{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zitadel_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -3763,12 +3856,13 @@ func TestAddHumanCommand(t *testing.T) {
 		idGenerator id.Generator
 	}
 	type args struct {
-		human         *AddHuman
-		orgID         string
-		hasher        *crypto.PasswordHasher
-		filter        preparation.FilterToQueryReducer
-		codeAlg       crypto.EncryptionAlgorithm
-		allowInitMail bool
+		human            *AddHuman
+		orgID            string
+		hasher           *crypto.PasswordHasher
+		filter           preparation.FilterToQueryReducer
+		codeAlg          crypto.EncryptionAlgorithm
+		allowInitMail    bool
+		allowedLanguages []language.Tag
 	}
 	agg := user.NewAggregate("id", "ro")
 	tests := []struct {
@@ -3788,7 +3882,7 @@ func TestAddHumanCommand(t *testing.T) {
 				orgID: "ro",
 			},
 			want: Want{
-				ValidationErr: caos_errs.ThrowInvalidArgument(nil, "EMAIL-599BI", "Errors.User.Email.Invalid"),
+				ValidationErr: zitadel_errs.ThrowInvalidArgument(nil, "EMAIL-599BI", "Errors.User.Email.Invalid"),
 			},
 		},
 		{
@@ -3804,7 +3898,7 @@ func TestAddHumanCommand(t *testing.T) {
 				orgID: "ro",
 			},
 			want: Want{
-				ValidationErr: caos_errs.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.User.Profile.FirstNameEmpty"),
+				ValidationErr: zitadel_errs.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.User.Profile.FirstNameEmpty"),
 			},
 		},
 		{
@@ -3819,7 +3913,7 @@ func TestAddHumanCommand(t *testing.T) {
 				orgID: "ro",
 			},
 			want: Want{
-				ValidationErr: caos_errs.ThrowInvalidArgument(nil, "USER-4hB7d", "Errors.User.Profile.LastNameEmpty"),
+				ValidationErr: zitadel_errs.ThrowInvalidArgument(nil, "USER-4hB7d", "Errors.User.Profile.LastNameEmpty"),
 			},
 		},
 		{
@@ -3837,7 +3931,7 @@ func TestAddHumanCommand(t *testing.T) {
 				hasher: mockPasswordHasher("x"),
 			},
 			want: Want{
-				ValidationErr: caos_errs.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.User.Password.NotSupported"),
+				ValidationErr: zitadel_errs.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.User.Password.NotSupported"),
 			},
 		},
 		{
@@ -3888,7 +3982,7 @@ func TestAddHumanCommand(t *testing.T) {
 					Filter(),
 			},
 			want: Want{
-				CreateErr: caos_errs.ThrowInvalidArgument(nil, "COMMA-HuJf6", "Errors.User.PasswordComplexityPolicy.MinLength"),
+				CreateErr: zitadel_errs.ThrowInvalidArgument(nil, "COMMA-HuJf6", "Errors.User.PasswordComplexityPolicy.MinLength"),
 			},
 		},
 		{
@@ -4041,7 +4135,7 @@ func TestAddHumanCommand(t *testing.T) {
 			c := &Commands{
 				idGenerator: tt.fields.idGenerator,
 			}
-			AssertValidation(t, context.Background(), c.AddHumanCommand(tt.args.human, tt.args.orgID, tt.args.hasher, tt.args.codeAlg, tt.args.allowInitMail), tt.args.filter, tt.want)
+			AssertValidation(t, context.Background(), c.AddHumanCommand(tt.args.human, tt.args.orgID, tt.args.hasher, tt.args.codeAlg, tt.args.allowInitMail, tt.args.allowedLanguages), tt.args.filter, tt.want)
 		})
 	}
 }

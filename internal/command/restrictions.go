@@ -69,11 +69,11 @@ func (c *Commands) SetRestrictionsCommand(a *restrictions.Aggregate, wm *restric
 			return nil, errors.ThrowInvalidArgument(nil, "COMMAND-oASwj", "Errors.Restrictions.NoneSpecified")
 		}
 		if setRestrictions.AllowedLanguages != nil {
-			unsupported := domain.UnsupportedLanguages(setRestrictions.AllowedLanguages...)
+			unsupported := domain.UnsupportedLanguages(false, setRestrictions.AllowedLanguages...)
 			if len(unsupported) > 0 {
 				return nil, errors.ThrowInvalidArgumentf(nil, "COMMAND-2M9fs", "Errors.Language.NotSupported: %s", domain.LanguagesToStrings(unsupported))
 			}
-			if !domain.LanguageIsAllowed(setRestrictions.AllowedLanguages, defaultLanguage) {
+			if !domain.LanguageIsAllowed(false, setRestrictions.AllowedLanguages, defaultLanguage) {
 				return nil, errors.ThrowInvalidArgumentf(nil, "COMMAND-2M9fs", "Errors.Restrictions.DefaultLanguageMustBeAllowed: %s", defaultLanguage.String())
 			}
 		}
@@ -96,7 +96,7 @@ func (c *Commands) SetRestrictionsCommand(a *restrictions.Aggregate, wm *restric
 					return nil, err
 				}
 				for _, profile := range profiles {
-					if !domain.LanguageIsAllowed(setRestrictions.AllowedLanguages, profile.PreferredLanguage) {
+					if !domain.LanguageIsAllowed(true, setRestrictions.AllowedLanguages, profile.PreferredLanguage) {
 						changeProfile, profileChanged, profileChangedErr := profile.NewChangedEvent(
 							ctx,
 							UserAggregateFromWriteModel(&profile.WriteModel),

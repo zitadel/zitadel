@@ -659,10 +659,10 @@ func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLangu
 		if defaultLanguage == language.Und {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-yG7LO", "Errors.Invalid.Argument")
 		}
-		if len(domain.UnsupportedLanguages(defaultLanguage)) == 1 {
+		if len(domain.UnsupportedLanguages(false, defaultLanguage)) == 1 {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-7s16J", "Errors.Language.NotSupported")
 		}
-		if !domain.LanguageIsAllowed(allowedLanguages, defaultLanguage) {
+		if !domain.LanguageIsAllowed(false, allowedLanguages, defaultLanguage) {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-paD10", "Errors.Language.NotAllowed")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {

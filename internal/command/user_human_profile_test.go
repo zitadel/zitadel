@@ -8,7 +8,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	zitadel_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -19,9 +19,10 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx           context.Context
-		address       *domain.Profile
-		resourceOwner string
+		ctx              context.Context
+		address          *domain.Profile
+		resourceOwner    string
+		allowedLanguages []language.Tag
 	}
 	type res struct {
 		want *domain.Profile
@@ -36,8 +37,7 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 		{
 			name: "user not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: eventstoreExpect(t,
 					expectFilter(),
 				),
 			},
@@ -57,7 +57,7 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zitadel_errs.IsPreconditionFailed,
 			},
 		},
 		{
@@ -99,7 +99,55 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zitadel_errs.IsPreconditionFailed,
+			},
+		}, {
+			name: "unsupported language, invalid argument error",
+			fields: fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args: args{
+				ctx: context.Background(),
+				address: &domain.Profile{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "user1",
+					},
+					FirstName:         "firstname2",
+					LastName:          "lastname2",
+					NickName:          "nickname2",
+					DisplayName:       "displayname2",
+					PreferredLanguage: language.French,
+					Gender:            domain.GenderMale,
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zitadel_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "disallowed language, precondition failed error",
+			fields: fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args: args{
+				ctx: context.Background(),
+				address: &domain.Profile{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "user1",
+					},
+					FirstName:         "firstname2",
+					LastName:          "lastname2",
+					NickName:          "nickname2",
+					DisplayName:       "displayname2",
+					PreferredLanguage: language.German,
+					Gender:            domain.GenderMale,
+				},
+				resourceOwner:    "org1",
+				allowedLanguages: []language.Tag{language.English},
+			},
+			res: res{
+				err: zitadel_errs.IsPreconditionFailed,
 			},
 		},
 		{
@@ -172,7 +220,7 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeHumanProfile(tt.args.ctx, tt.args.address)
+			got, err := r.ChangeHumanProfile(tt.args.ctx, tt.args.address, tt.args.allowedLanguages, true)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

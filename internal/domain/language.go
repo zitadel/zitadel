@@ -53,16 +53,22 @@ func FilterOutLanguages(originalLanguages, excludeLanguages []language.Tag) []la
 	return filteredLanguages
 }
 
-func LanguageIsAllowed(allowedLanguages []language.Tag, lang language.Tag) bool {
+func LanguageIsAllowed(allowUndefined bool, allowedLanguages []language.Tag, lang language.Tag) bool {
 	if len(allowedLanguages) == 0 {
+		return true
+	}
+	if allowUndefined && lang.IsRoot() {
 		return true
 	}
 	return languageIsContained(allowedLanguages, lang)
 }
 
-func UnsupportedLanguages(lang ...language.Tag) []language.Tag {
+func UnsupportedLanguages(allowUndefined bool, lang ...language.Tag) []language.Tag {
 	unsupported := make([]language.Tag, 0)
 	for _, l := range lang {
+		if allowUndefined && l.IsRoot() {
+			continue
+		}
 		if !languageIsContained(i18n.SupportedLanguages(), l) {
 			unsupported = append(unsupported, l)
 		}

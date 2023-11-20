@@ -745,7 +745,11 @@ func (l *Login) updateExternalUserProfile(ctx context.Context, user *query.User,
 		externalUser.PreferredLanguage == user.Human.PreferredLanguage {
 		return nil
 	}
-	_, err := l.command.ChangeHumanProfile(setContext(ctx, user.ResourceOwner), &domain.Profile{
+	restrictions, err := l.query.GetInstanceRestrictions(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = l.command.ChangeHumanProfile(setContext(ctx, user.ResourceOwner), &domain.Profile{
 		ObjectRoot:        models.ObjectRoot{AggregateID: user.ID},
 		FirstName:         externalUser.FirstName,
 		LastName:          externalUser.LastName,
@@ -753,7 +757,7 @@ func (l *Login) updateExternalUserProfile(ctx context.Context, user *query.User,
 		DisplayName:       externalUser.DisplayName,
 		PreferredLanguage: externalUser.PreferredLanguage,
 		Gender:            user.Human.Gender,
-	})
+	}, restrictions.AllowedLanguages, true)
 	return err
 }
 

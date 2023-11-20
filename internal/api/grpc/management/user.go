@@ -425,7 +425,11 @@ func (s *Server) GetHumanProfile(ctx context.Context, req *mgmt_pb.GetHumanProfi
 }
 
 func (s *Server) UpdateHumanProfile(ctx context.Context, req *mgmt_pb.UpdateHumanProfileRequest) (*mgmt_pb.UpdateHumanProfileResponse, error) {
-	profile, err := s.command.ChangeHumanProfile(ctx, UpdateHumanProfileRequestToDomain(req, authz.GetCtxData(ctx).OrgID))
+	restrictions, err := s.query.GetInstanceRestrictions(ctx)
+	if err != nil {
+		return nil, err
+	}
+	profile, err := s.command.ChangeHumanProfile(ctx, UpdateHumanProfileRequestToDomain(req, authz.GetCtxData(ctx).OrgID), restrictions.AllowedLanguages, true)
 	if err != nil {
 		return nil, err
 	}

@@ -26,7 +26,11 @@ func (s *Server) GetMyProfile(ctx context.Context, req *auth_pb.GetMyProfileRequ
 }
 
 func (s *Server) UpdateMyProfile(ctx context.Context, req *auth_pb.UpdateMyProfileRequest) (*auth_pb.UpdateMyProfileResponse, error) {
-	profile, err := s.command.ChangeHumanProfile(ctx, UpdateProfileToDomain(ctx, req))
+	restrictions, err := s.query.GetInstanceRestrictions(ctx)
+	if err != nil {
+		return nil, err
+	}
+	profile, err := s.command.ChangeHumanProfile(ctx, UpdateProfileToDomain(ctx, req), restrictions.AllowedLanguages, true)
 	if err != nil {
 		return nil, err
 	}

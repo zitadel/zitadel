@@ -120,7 +120,7 @@ func MustLoadSupportedLanguages(dir http.FileSystem) {
 	}
 }
 
-func LoadMockedSupportedLanguages(languages []language.Tag) {
+func LoadMockedSupportedLanguages(languages ...language.Tag) {
 	supportedLanguages = languages
 }
 
