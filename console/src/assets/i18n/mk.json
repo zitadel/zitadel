@@ -1030,7 +1030,7 @@
       "NOTIFICATIONS_DESC": "Подесувања за SMTP и SMS",
       "MESSAGETEXTS": "Текстови на пораки",
       "IDP": "Identity Providers",
-      "VERIFIED_DAMAINS": "Потврдени домени",
+      "VERIFIED_DOMAINS": "Потврдени домени",
       "DOMAIN": "Подесувања за домен",
       "LOGINTEXTS": "Текстови на интерфејс за најава",
       "BRANDING": "Брендирање",
