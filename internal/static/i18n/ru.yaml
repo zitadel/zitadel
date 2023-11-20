@@ -33,10 +33,11 @@ Errors:
     NoneSpecified: Не указаны лимиты
   Restrictions:
     NoneSpecified: Не указаны ограничения
-    LanguagesNotSupported: Языки не поддерживаются
     DefaultLanguageMustBeAllowed: Язык по умолчанию должен быть разрешен
   Language:
     NotParsed: Не удалось разобрать язык
+    NotSupported: Язык не поддерживается
+    NotAllowed: Язык не разрешен
   OIDCSettings:
     NotFound: Конфигурация OIDC не найдена
     AlreadyExists: Конфигурация OIDC уже существует

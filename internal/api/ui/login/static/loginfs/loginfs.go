@@ -14,7 +14,7 @@ func MustLoad() http.FileSystem {
 	}
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	if err != nil {
-		panic(fmt.Errorf("unable to start login statik dir"))
+		panic(fmt.Errorf("unable to start login statik dir: %w", err))
 	}
 	loadedloginFS = statikLoginFS
 	return loadedloginFS

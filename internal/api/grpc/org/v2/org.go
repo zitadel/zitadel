@@ -15,7 +15,11 @@ func (s *Server) AddOrganization(ctx context.Context, request *org.AddOrganizati
 	if err != nil {
 		return nil, err
 	}
-	createdOrg, err := s.command.SetUpOrg(ctx, orgSetup, false)
+	restrictions, err := s.query.GetInstanceRestrictions(ctx)
+	if err != nil {
+		return nil, err
+	}
+	createdOrg, err := s.command.SetUpOrg(ctx, orgSetup, false, restrictions.AllowedLanguages)
 	if err != nil {
 		return nil, err
 	}

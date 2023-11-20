@@ -75,7 +75,10 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 		return nil, err
 	}
 	human := setUpOrgHumanToCommand(req.User.(*admin_pb.SetUpOrgRequest_Human_).Human) //TODO: handle machine
-
+	restrictions, err := s.query.GetInstanceRestrictions(ctx)
+	if err != nil {
+		return nil, err
+	}
 	createdOrg, err := s.command.SetUpOrg(ctx, &command.OrgSetup{
 		Name:         req.Org.Name,
 		CustomDomain: req.Org.Domain,
@@ -85,7 +88,7 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 				Roles: req.Roles,
 			},
 		},
-	}, true, userIDs...)
+	}, true, restrictions.AllowedLanguages, userIDs...)
 	if err != nil {
 		return nil, err
 	}

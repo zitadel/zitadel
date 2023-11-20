@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/repository/restrictions"
 )
 
@@ -70,19 +69,21 @@ func (c *Commands) SetRestrictionsCommand(a *restrictions.Aggregate, wm *restric
 			return nil, errors.ThrowInvalidArgument(nil, "COMMAND-oASwj", "Errors.Restrictions.NoneSpecified")
 		}
 		if setRestrictions.AllowedLanguages != nil {
-			unsupported := domain.FilterOutLanguages(setRestrictions.AllowedLanguages, i18n.SupportedLanguages())
+			unsupported := domain.UnsupportedLanguages(setRestrictions.AllowedLanguages...)
 			if len(unsupported) > 0 {
-				return nil, errors.ThrowInvalidArgumentf(nil, "COMMAND-2M9fs", "Errors.Restrictions.LanguagesNotSupported: %s", domain.LanguagesToStrings(unsupported))
+				return nil, errors.ThrowInvalidArgumentf(nil, "COMMAND-2M9fs", "Errors.Language.NotSupported: %s", domain.LanguagesToStrings(unsupported))
 			}
-			if len(setRestrictions.AllowedLanguages) > 0 && len(domain.FilterOutLanguages([]language.Tag{defaultLanguage}, setRestrictions.AllowedLanguages)) == 1 {
+			if !domain.LanguageIsAllowed(setRestrictions.AllowedLanguages, defaultLanguage) {
 				return nil, errors.ThrowInvalidArgumentf(nil, "COMMAND-2M9fs", "Errors.Restrictions.DefaultLanguageMustBeAllowed: %s", defaultLanguage.String())
 			}
 		}
 		return func(ctx context.Context, _ preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			changes := wm.NewChanges(setRestrictions)
+			changes := wm.NewChanges(setRestrictions, defaultLanguage)
 			if len(changes) == 0 {
 				return nil, nil
 			}
+
+			c.instanceProfilesWriteModel(ctx, a.ID, a.ResourceOwner)
 			return []eventstore.Command{restrictions.NewSetEvent(
 				eventstore.NewBaseEventForPush(
 					ctx,

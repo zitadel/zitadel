@@ -33,10 +33,11 @@ Errors:
     NoneSpecified: Aucune limite spécifiée
   Restrictions:
     NoneSpecified: Aucune restriction spécifiée
-    LanguagesNotSupported: Les langues ne sont pas prises en charge
     DefaultLanguageMustBeAllowed: La langue par défaut doit être autorisée
   Language:
     NotParsed: Impossible d'analyser la langue
+    NotSupported: Langue non prise en charge
+    NotAllowed: Langue non autorisée
   OIDCSettings:
     NotFound: Configuration OIDC non trouvée
     AlreadyExists: La configuration OIDC existe déjà

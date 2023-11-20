@@ -28,8 +28,11 @@ func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest
 		return nil, err
 	}
 	orgID := authz.GetCtxData(ctx).OrgID
-	err = s.command.AddHuman(ctx, orgID, human, false)
+	restrictions, err := s.query.GetInstanceRestrictions(ctx)
 	if err != nil {
+		return nil, err
+	}
+	if err = s.command.AddHuman(ctx, orgID, human, false, restrictions.AllowedLanguages); err != nil {
 		return nil, err
 	}
 	return &user.AddHumanUserResponse{

@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"golang.org/x/text/language"
 	"testing"
 
 	"github.com/muhlemmer/gu"
@@ -22,6 +23,7 @@ func TestSetRestrictions(t *testing.T) {
 		ctx             context.Context
 		resourceOwner   string
 		setRestrictions *SetRestrictions
+		defaultLanguage language.Tag
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -175,7 +177,7 @@ func TestSetRestrictions(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := new(Commands)
 			r.eventstore, r.idGenerator = tt.fields(t)
-			got, err := r.SetInstanceRestrictions(tt.args.ctx, tt.args.setRestrictions)
+			got, err := r.SetInstanceRestrictions(tt.args.ctx, tt.args.setRestrictions, tt.args.defaultLanguage)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

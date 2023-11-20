@@ -120,6 +120,10 @@ func MustLoadSupportedLanguages(dir http.FileSystem) {
 	}
 }
 
+func LoadMockedSupportedLanguages(languages []language.Tag) {
+	supportedLanguages = languages
+}
+
 func SupportedLanguages() []language.Tag {
 	if supportedLanguages == nil {
 		panic("supported languages not loaded")

@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"github.com/zitadel/zitadel/internal/i18n"
 	"golang.org/x/text/language"
 )
 
@@ -50,4 +51,30 @@ func FilterOutLanguages(originalLanguages, excludeLanguages []language.Tag) []la
 		}
 	}
 	return filteredLanguages
+}
+
+func LanguageIsAllowed(allowedLanguages []language.Tag, lang language.Tag) bool {
+	if len(allowedLanguages) == 0 {
+		return true
+	}
+	return languageIsContained(allowedLanguages, lang)
+}
+
+func UnsupportedLanguages(lang ...language.Tag) []language.Tag {
+	unsupported := make([]language.Tag, 0)
+	for _, l := range lang {
+		if !languageIsContained(i18n.SupportedLanguages(), l) {
+			unsupported = append(unsupported, l)
+		}
+	}
+	return unsupported
+}
+
+func languageIsContained(languages []language.Tag, search language.Tag) bool {
+	for _, lang := range languages {
+		if lang == search {
+			return true
+		}
+	}
+	return false
 }

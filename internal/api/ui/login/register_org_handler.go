@@ -1,7 +1,6 @@
 package login
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -39,8 +38,12 @@ type registerOrgData struct {
 }
 
 func (l *Login) handleRegisterOrg(w http.ResponseWriter, r *http.Request) {
-	disallowed, err := l.publicOrgRegistrationIsDisallowed(r.Context())
-	if disallowed || err != nil {
+	restrictions, err := l.query.GetInstanceRestrictions(r.Context())
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+	if restrictions.PublicOrgRegistrationIsNotAllowed {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -54,8 +57,12 @@ func (l *Login) handleRegisterOrg(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
-	disallowed, err := l.publicOrgRegistrationIsDisallowed(r.Context())
-	if disallowed || err != nil {
+	restrictions, err := l.query.GetInstanceRestrictions(r.Context())
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+	if restrictions.PublicOrgRegistrationIsNotAllowed {
 		w.WriteHeader(http.StatusConflict)
 		return
 	}
@@ -77,7 +84,7 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
 	}
-	_, err = l.command.SetUpOrg(ctx, data.toCommandOrg(), true, userIDs...)
+	_, err = l.command.SetUpOrg(ctx, data.toCommandOrg(), true, restrictions.AllowedLanguages, userIDs...)
 	if err != nil {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
@@ -128,11 +135,6 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 		l.customTexts(r.Context(), translator, "")
 	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegisterOrg], data, nil)
-}
-
-func (l *Login) publicOrgRegistrationIsDisallowed(ctx context.Context) (bool, error) {
-	restrictions, err := l.query.GetInstanceRestrictions(ctx)
-	return restrictions.PublicOrgRegistrationIsNotAllowed, err
 }
 
 func (d registerOrgFormData) toUserDomain() *domain.Human {

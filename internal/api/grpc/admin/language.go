@@ -22,7 +22,12 @@ func (s *Server) SetDefaultLanguage(ctx context.Context, req *admin_pb.SetDefaul
 	if err != nil {
 		return nil, caos_errors.ThrowInvalidArgument(err, "API-39nnf", "Errors.Language.Parse")
 	}
-	details, err := s.command.SetDefaultLanguage(ctx, lang)
+	restrictions, err := s.query.GetInstanceRestrictions(ctx)
+	if err != nil {
+		return nil, err
+	}
+	details, err := s.command.
+		SetDefaultLanguage(ctx, lang, restrictions.AllowedLanguages)
 	if err != nil {
 		return nil, err
 	}

@@ -1267,6 +1267,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 		ctx              context.Context
 		setupOrg         *OrgSetup
 		allowInitialMail bool
+		allowedLanguages []language.Tag
 		userIDs          []string
 	}
 	type res struct {
@@ -1679,7 +1680,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 					},
 				},
 			}
-			got, err := r.SetUpOrg(tt.args.ctx, tt.args.setupOrg, tt.args.allowInitialMail, tt.args.userIDs...)
+			got, err := r.SetUpOrg(tt.args.ctx, tt.args.setupOrg, tt.args.allowInitialMail, tt.args.allowedLanguages, tt.args.userIDs...)
 			assert.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.createdOrg, got)
 		})

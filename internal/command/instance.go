@@ -177,7 +177,7 @@ func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
 	return err
 }
 
-func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, string, *MachineKey, *domain.ObjectDetails, error) {
+func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, allowedLanguages []language.Tag) (string, string, *MachineKey, *domain.ObjectDetails, error) {
 	instanceID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", "", nil, nil, err
@@ -356,7 +356,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	} else if setup.Org.Human != nil {
 		setup.Org.Human.ID = userID
 		validations = append(validations,
-			c.AddHumanCommand(setup.Org.Human, orgID, c.userPasswordHasher, c.userEncryption, true),
+			c.AddHumanCommand(setup.Org.Human, orgID, c.userPasswordHasher, c.userEncryption, true, allowedLanguages),
 		)
 	}
 
@@ -502,9 +502,9 @@ func (c *Commands) UpdateInstance(ctx context.Context, name string) (*domain.Obj
 	return pushedEventsToObjectDetails(events), nil
 }
 
-func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) (*domain.ObjectDetails, error) {
+func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage language.Tag, allowedLanguages []language.Tag) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareSetDefaultLanguage(instanceAgg, defaultLanguage)
+	validation := c.prepareSetDefaultLanguage(instanceAgg, defaultLanguage, allowedLanguages)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -654,10 +654,16 @@ func (c *Commands) prepareUpdateInstance(a *instance.Aggregate, name string) pre
 	}
 }
 
-func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLanguage language.Tag) preparation.Validation {
+func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLanguage language.Tag, allowedLanguages []language.Tag) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if defaultLanguage == language.Und {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-28nlD", "Errors.Invalid.Argument")
+			return nil, errors.ThrowInvalidArgument(nil, "INST-yG7LO", "Errors.Invalid.Argument")
+		}
+		if len(domain.UnsupportedLanguages(defaultLanguage)) == 1 {
+			return nil, errors.ThrowInvalidArgument(nil, "INST-7s16J", "Errors.Language.NotSupported")
+		}
+		if !domain.LanguageIsAllowed(allowedLanguages, defaultLanguage) {
+			return nil, errors.ThrowInvalidArgument(nil, "INST-paD10", "Errors.Language.NotAllowed")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel, err := getInstanceWriteModel(ctx, filter)
