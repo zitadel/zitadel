@@ -31,7 +31,7 @@ func (s *Server) getUserByID(ctx context.Context, id string) (*query.User, error
 	if err != nil {
 		return nil, err
 	}
-	user, err := s.query.GetUserByID(ctx, true, id, false, owner)
+	user, err := s.query.GetUserByID(ctx, true, id, owner)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (s *Server) GetUserByLoginNameGlobal(ctx context.Context, req *mgmt_pb.GetU
 	if err != nil {
 		return nil, err
 	}
-	user, err := s.query.GetUser(ctx, true, false, loginName)
+	user, err := s.query.GetUser(ctx, true, loginName)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUsers(ctx, queries, false)
+	res, err := s.query.SearchUsers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
@@ -384,7 +384,7 @@ func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*
 	}
 	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
 		Queries: []query.SearchQuery{membershipsUserQuery},
-	}, true, false)
+	}, false)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -923,7 +923,7 @@ func (s *Server) ListUserMemberships(ctx context.Context, req *mgmt_pb.ListUserM
 	if err != nil {
 		return nil, err
 	}
-	response, err := s.query.Memberships(ctx, request, false, false)
+	response, err := s.query.Memberships(ctx, request, false)
 	if err != nil {
 		return nil, err
 	}

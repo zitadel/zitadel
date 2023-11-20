@@ -133,7 +133,7 @@ func (p *Storage) AuthRequestByID(ctx context.Context, id string) (_ models.Auth
 func (p *Storage) SetUserinfoWithUserID(ctx context.Context, applicationID string, userinfo models.AttributeSetter, userID string, attributes []int) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	user, err := p.query.GetUserByID(ctx, true, userID, false)
+	user, err := p.query.GetUserByID(ctx, true, userID)
 	if err != nil {
 		return err
 	}
@@ -163,7 +163,7 @@ func (p *Storage) SetUserinfoWithLoginName(ctx context.Context, userinfo models.
 	if err != nil {
 		return err
 	}
-	user, err := p.query.GetUser(ctx, true, false, loginNameSQ)
+	user, err := p.query.GetUser(ctx, true, loginNameSQ)
 	if err != nil {
 		return err
 	}
@@ -216,7 +216,7 @@ func setUserinfo(user *query.User, userinfo models.AttributeSetter, attributes [
 
 func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, userGrants *query.UserGrants) (map[string]*customAttribute, error) {
 	customAttributes := make(map[string]*customAttribute, 0)
-	queriedActions, err := p.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomizeSAMLResponse, domain.TriggerTypePreSAMLResponseCreation, user.ResourceOwner, false)
+	queriedActions, err := p.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomizeSAMLResponse, domain.TriggerTypePreSAMLResponseCreation, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}

@@ -4,7 +4,7 @@
 with usr as (
 	select u.id, u.creation_date, u.change_date, u.sequence, u.state, u.resource_owner, u.username, n.login_name as preferred_login_name
 	from projections.users9 u
-	left join projections.login_names2 n on u.id = n.user_id and u.instance_id = n.instance_id
+	left join projections.login_names3 n on u.id = n.user_id and u.instance_id = n.instance_id
 	where u.id = $1
 	and u.instance_id = $2
 	and n.is_primary = true
@@ -69,7 +69,7 @@ grants as (
 			p.name as project_name, u.resource_owner as user_resource_owner
 		from user_grants g
 		left join orgs o on o.id = g.resource_owner
-		left join projections.projects3 p on p.id = g.project_id
+		left join projections.projects4 p on p.id = g.project_id
 		left join usr u on u.id = g.user_id
 		where p.instance_id = $2
 	) r

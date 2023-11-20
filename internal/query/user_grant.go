@@ -232,7 +232,6 @@ func addUserGrantWithoutOwnerRemoved(eq map[string]interface{}) {
 	eq[UserGrantUserOwnerRemoved.identifier()] = false
 	eq[UserGrantProjectOwnerRemoved.identifier()] = false
 	eq[UserGrantGrantGrantedOrgRemoved.identifier()] = false
-	addLoginNameWithoutOwnerRemoved(eq)
 }
 
 func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwnerRemoved bool, queries ...SearchQuery) (grant *UserGrant, err error) {

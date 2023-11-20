@@ -85,7 +85,7 @@ func (v *View) UserByPhoneAndResourceOwner(ctx context.Context, phone, resourceO
 }
 
 func (v *View) userByID(ctx context.Context, instanceID string, queries ...query.SearchQuery) (*model.UserView, error) {
-	queriedUser, err := v.query.GetNotifyUser(ctx, true, false, queries...)
+	queriedUser, err := v.query.GetNotifyUser(ctx, true, queries...)
 	if err != nil {
 		return nil, err
 	}

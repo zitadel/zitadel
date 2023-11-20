@@ -168,14 +168,11 @@ var (
 		table: userTable,
 	}
 
-	userLoginNamesTable                 = loginNameTable.setAlias("login_names")
-	userLoginNamesUserIDCol             = LoginNameUserIDCol.setTable(userLoginNamesTable)
-	userLoginNamesNameCol               = LoginNameNameCol.setTable(userLoginNamesTable)
-	userLoginNamesInstanceIDCol         = LoginNameInstanceIDCol.setTable(userLoginNamesTable)
-	userLoginNamesOwnerRemovedUserCol   = LoginNameOwnerRemovedUserCol.setTable(userLoginNamesTable)
-	userLoginNamesOwnerRemovedPolicyCol = LoginNameOwnerRemovedPolicyCol.setTable(userLoginNamesTable)
-	userLoginNamesOwnerRemovedDomainCol = LoginNameOwnerRemovedDomainCol.setTable(userLoginNamesTable)
-	userLoginNamesListCol               = Column{
+	userLoginNamesTable         = loginNameTable.setAlias("login_names")
+	userLoginNamesUserIDCol     = LoginNameUserIDCol.setTable(userLoginNamesTable)
+	userLoginNamesNameCol       = LoginNameNameCol.setTable(userLoginNamesTable)
+	userLoginNamesInstanceIDCol = LoginNameInstanceIDCol.setTable(userLoginNamesTable)
+	userLoginNamesListCol       = Column{
 		name:  "loginnames",
 		table: userLoginNamesTable,
 	}
@@ -183,14 +180,11 @@ var (
 		name:  "loginnames_lower",
 		table: userLoginNamesTable,
 	}
-	userPreferredLoginNameTable                 = loginNameTable.setAlias("preferred_login_name")
-	userPreferredLoginNameUserIDCol             = LoginNameUserIDCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameCol                   = LoginNameNameCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameIsPrimaryCol          = LoginNameIsPrimaryCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameInstanceIDCol         = LoginNameInstanceIDCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameOwnerRemovedUserCol   = LoginNameOwnerRemovedUserCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameOwnerRemovedPolicyCol = LoginNameOwnerRemovedPolicyCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameOwnerRemovedDomainCol = LoginNameOwnerRemovedDomainCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameTable         = loginNameTable.setAlias("preferred_login_name")
+	userPreferredLoginNameUserIDCol     = LoginNameUserIDCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameCol           = LoginNameNameCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameIsPrimaryCol  = LoginNameIsPrimaryCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameInstanceIDCol = LoginNameInstanceIDCol.setTable(userPreferredLoginNameTable)
 )
 
 var (
@@ -319,16 +313,7 @@ var (
 	}
 )
 
-func addUserWithoutOwnerRemoved(eq map[string]interface{}) {
-	eq[userLoginNamesOwnerRemovedUserCol.identifier()] = false
-	eq[userLoginNamesOwnerRemovedPolicyCol.identifier()] = false
-	eq[userLoginNamesOwnerRemovedDomainCol.identifier()] = false
-	eq[userPreferredLoginNameOwnerRemovedUserCol.identifier()] = false
-	eq[userPreferredLoginNameOwnerRemovedPolicyCol.identifier()] = false
-	eq[userPreferredLoginNameOwnerRemovedDomainCol.identifier()] = false
-}
-
-func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, withOwnerRemoved bool, queries ...SearchQuery) (user *User, err error) {
+func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, queries ...SearchQuery) (user *User, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -344,9 +329,6 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	if !withOwnerRemoved {
-		addUserWithoutOwnerRemoved(eq)
-	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-FBg21", "Errors.Query.SQLStatment")
@@ -359,7 +341,7 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	return user, err
 }
 
-func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwnerRemoved bool, queries ...SearchQuery) (user *User, err error) {
+func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, queries ...SearchQuery) (user *User, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -373,9 +355,6 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwner
 	}
 	eq := sq.Eq{
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		addUserWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -461,7 +440,7 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, queries ...S
 	return phone, err
 }
 
-func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string, withOwnerRemoved bool, queries ...SearchQuery) (user *NotifyUser, err error) {
+func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string, queries ...SearchQuery) (user *NotifyUser, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -477,9 +456,6 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	if !withOwnerRemoved {
-		addUserWithoutOwnerRemoved(eq)
-	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Err3g", "Errors.Query.SQLStatment")
@@ -492,7 +468,7 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 	return user, err
 }
 
-func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withOwnerRemoved bool, queries ...SearchQuery) (user *NotifyUser, err error) {
+func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, queries ...SearchQuery) (user *NotifyUser, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -507,9 +483,6 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 	eq := sq.Eq{
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	if !withOwnerRemoved {
-		addUserWithoutOwnerRemoved(eq)
-	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Err3g", "Errors.Query.SQLStatment")
@@ -522,15 +495,12 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 	return user, err
 }
 
-func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, withOwnerRemoved bool) (users *Users, err error) {
+func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries) (users *Users, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareUsersQuery(ctx, q.client)
 	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		addUserWithoutOwnerRemoved(eq)
-	}
 	stmt, args, err := queries.toQuery(query).Where(eq).
 		ToSql()
 	if err != nil {
@@ -716,16 +686,10 @@ func prepareLoginNamesQuery() (string, []interface{}, error) {
 		"ARRAY_AGG("+userLoginNamesNameCol.identifier()+")::TEXT[] AS "+userLoginNamesListCol.name,
 		"ARRAY_AGG(LOWER("+userLoginNamesNameCol.identifier()+"))::TEXT[] AS "+userLoginNamesLowerListCol.name,
 		userLoginNamesInstanceIDCol.identifier(),
-		userLoginNamesOwnerRemovedUserCol.identifier(),
-		userLoginNamesOwnerRemovedPolicyCol.identifier(),
-		userLoginNamesOwnerRemovedDomainCol.identifier(),
 	).From(userLoginNamesTable.identifier()).
 		GroupBy(
 			userLoginNamesUserIDCol.identifier(),
 			userLoginNamesInstanceIDCol.identifier(),
-			userLoginNamesOwnerRemovedUserCol.identifier(),
-			userLoginNamesOwnerRemovedPolicyCol.identifier(),
-			userLoginNamesOwnerRemovedDomainCol.identifier(),
 		).ToSql()
 }
 
@@ -734,9 +698,6 @@ func preparePreferredLoginNamesQuery() (string, []interface{}, error) {
 		userPreferredLoginNameUserIDCol.identifier(),
 		userPreferredLoginNameCol.identifier(),
 		userPreferredLoginNameInstanceIDCol.identifier(),
-		userPreferredLoginNameOwnerRemovedUserCol.identifier(),
-		userPreferredLoginNameOwnerRemovedPolicyCol.identifier(),
-		userPreferredLoginNameOwnerRemovedDomainCol.identifier(),
 	).From(userPreferredLoginNameTable.identifier()).
 		Where(sq.Eq{
 			userPreferredLoginNameIsPrimaryCol.identifier(): true,

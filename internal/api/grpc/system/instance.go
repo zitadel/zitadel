@@ -98,7 +98,7 @@ func (s *Server) ListIAMMembers(ctx context.Context, req *system_pb.ListIAMMembe
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.IAMMembers(ctx, queries, false)
+	res, err := s.query.IAMMembers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
