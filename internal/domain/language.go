@@ -1,8 +1,9 @@
 package domain
 
 import (
-	"github.com/zitadel/zitadel/internal/i18n"
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/i18n"
 )
 
 func StringsToLanguages(langs []string) []language.Tag {

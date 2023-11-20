@@ -4,8 +4,6 @@ import (
 	"context"
 	"embed"
 	_ "embed"
-	"github.com/zitadel/zitadel/internal/api/ui/login/static/loginfs"
-	"github.com/zitadel/zitadel/internal/i18n"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

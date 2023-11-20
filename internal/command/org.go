@@ -2,8 +2,9 @@ package command
 
 import (
 	"context"
-	"golang.org/x/text/language"
 	"strings"
+
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"

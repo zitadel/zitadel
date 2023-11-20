@@ -1,9 +1,11 @@
 package command
 
 import (
-	"github.com/zitadel/zitadel/internal/i18n"
-	"golang.org/x/text/language"
 	"testing"
+
+	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/i18n"
 )
 
 func TestMain(m *testing.M) {

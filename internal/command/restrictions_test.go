@@ -2,11 +2,11 @@ package command
 
 import (
 	"context"
-	"golang.org/x/text/language"
 	"testing"
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
