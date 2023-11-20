@@ -37,7 +37,7 @@
     "cors": "^2.8.5",
     "file-saver": "^2.0.5",
     "flag-icons": "^6.7.0",
-    "google-proto-files": "^3.0.3",
+    "google-proto-files": "^4.0.0",
     "google-protobuf": "^3.21.2",
     "grpc-web": "^1.4.1",
     "i18n-iso-countries": "^7.6.0",
