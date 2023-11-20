@@ -12,9 +12,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/notification/messages"
 
-	"github.com/golang/mock/gomock"
 	statik_fs "github.com/rakyll/statik/fs"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
