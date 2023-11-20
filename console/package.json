@@ -29,7 +29,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.4.2",
     "@fortawesome/free-brands-svg-icons": "^6.4.2",
     "@grpc/grpc-js": "^1.9.3",
-    "@ngx-translate/core": "^14.0.0",
+    "@ngx-translate/core": "^15.0.0",
     "angular-oauth2-oidc": "^15.0.1",
     "angularx-qrcode": "^16.0.0",
     "buffer": "^6.0.3",
