@@ -154,11 +154,20 @@ func init() {
 // triggerBatch calls Trigger on every handler in a seperate Go routine.
 // The returned context is the context returned by the Trigger that finishes last.
 func triggerBatch(ctx context.Context, handlers ...*handler.Handler) {
+	var wg sync.WaitGroup
+	wg.Add(len(handlers))
+
 	for _, h := range handlers {
-		name := h.ProjectionName()
-		_, traceSpan := tracing.NewNamedSpan(ctx, fmt.Sprintf("Trigger%s", name))
-		_, err := h.Trigger(ctx, handler.WithAwaitRunning())
-		logging.OnError(err).WithField("projection", name).Debug("trigger failed")
-		traceSpan.EndWithError(err)
+		go func(ctx context.Context, h *handler.Handler) {
+			name := h.ProjectionName()
+			_, traceSpan := tracing.NewNamedSpan(ctx, fmt.Sprintf("Trigger%s", name))
+			_, err := h.Trigger(ctx, handler.WithAwaitRunning())
+			logging.OnError(err).WithField("projection", name).Debug("trigger failed")
+			traceSpan.EndWithError(err)
+
+			wg.Done()
+		}(ctx, h)
 	}
+
+	wg.Wait()
 }
