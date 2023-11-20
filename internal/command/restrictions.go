@@ -78,20 +78,45 @@ func (c *Commands) SetRestrictionsCommand(a *restrictions.Aggregate, wm *restric
 			}
 		}
 		return func(ctx context.Context, _ preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			changes := wm.NewChanges(setRestrictions, defaultLanguage)
+			changes, languagesChanged := wm.NewChanges(setRestrictions)
 			if len(changes) == 0 {
 				return nil, nil
 			}
-
-			c.instanceProfilesWriteModel(ctx, a.ID, a.ResourceOwner)
-			return []eventstore.Command{restrictions.NewSetEvent(
+			commands := []eventstore.Command{restrictions.NewSetEvent(
 				eventstore.NewBaseEventForPush(
 					ctx,
 					&a.Aggregate,
 					restrictions.SetEventType,
 				),
 				changes...,
-			)}, nil
+			)}
+			if languagesChanged {
+				profiles, err := c.allProfileWriteModels(ctx)
+				if err != nil {
+					return nil, err
+				}
+				for _, profile := range profiles {
+					if !domain.LanguageIsAllowed(setRestrictions.AllowedLanguages, profile.PreferredLanguage) {
+						changeProfile, profileChanged, profileChangedErr := profile.NewChangedEvent(
+							ctx,
+							UserAggregateFromWriteModel(&profile.WriteModel),
+							profile.FirstName,
+							profile.LastName,
+							profile.NickName,
+							profile.DisplayName,
+							defaultLanguage,
+							profile.Gender,
+						)
+						if profileChangedErr != nil {
+							return nil, profileChangedErr
+						}
+						if profileChanged {
+							commands = append(commands, changeProfile)
+						}
+					}
+				}
+			}
+			return commands, nil
 		}, nil
 	}
 }

@@ -79,19 +79,7 @@ func (wm *HumanProfileWriteModel) Reduce() error {
 }
 
 func (wm *HumanProfileWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		ResourceOwner(wm.ResourceOwner).
-		AddQuery().
-		AggregateTypes(user.AggregateType).
-		AggregateIDs(wm.AggregateID).
-		EventTypes(user.HumanAddedType,
-			user.HumanRegisteredType,
-			user.HumanProfileChangedType,
-			user.UserRemovedType,
-			user.UserV1AddedType,
-			user.UserV1RegisteredType,
-			user.UserV1ProfileChangedType).
-		Builder()
+	return humanProfileWriteModelQuery(wm.ResourceOwner, wm.AggregateID)
 }
 
 func (wm *HumanProfileWriteModel) NewChangedEvent(
@@ -133,4 +121,26 @@ func (wm *HumanProfileWriteModel) NewChangedEvent(
 		return nil, false, err
 	}
 	return changeEvent, true, nil
+}
+
+func humanProfileWriteModelQuery(resourceOwner, userID string) *eventstore.SearchQueryBuilder {
+	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent)
+	if resourceOwner != "" {
+		builder.ResourceOwner(resourceOwner)
+	}
+	query := builder.
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		EventTypes(user.HumanAddedType,
+			user.HumanRegisteredType,
+			user.HumanProfileChangedType,
+			user.UserRemovedType,
+			user.UserV1AddedType,
+			user.UserV1RegisteredType,
+			user.UserV1ProfileChangedType)
+
+	if userID != "" {
+		query.AggregateIDs(userID)
+	}
+	return query.Builder()
 }

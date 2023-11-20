@@ -77,7 +77,7 @@ type AddLink struct {
 	IDPExternalID string
 }
 
-func (h *AddHuman) Validate(hasher *crypto.PasswordHasher) (err error) {
+func (h *AddHuman) Validate(hasher *crypto.PasswordHasher, allowedLanguages []language.Tag) (err error) {
 	if err := h.Email.Validate(); err != nil {
 		return err
 	}
@@ -90,6 +90,12 @@ func (h *AddHuman) Validate(hasher *crypto.PasswordHasher) (err error) {
 	}
 	if h.LastName = strings.TrimSpace(h.LastName); h.LastName == "" {
 		return errors.ThrowInvalidArgument(nil, "USER-4hB7d", "Errors.User.Profile.LastNameEmpty")
+	}
+	if len(domain.UnsupportedLanguages(h.PreferredLanguage)) > 0 {
+		return errors.ThrowInvalidArgument(nil, "USER-gL4Pj", "Errors.Language.NotSupported")
+	}
+	if !domain.LanguageIsAllowed(allowedLanguages, h.PreferredLanguage) {
+		return errors.ThrowInvalidArgument(nil, "USER-AJfus", "Errors.Language.NotAllowed")
 	}
 	h.ensureDisplayName()
 
@@ -127,7 +133,7 @@ func (m *AddMetadataEntry) Valid() error {
 	return nil
 }
 
-func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *AddHuman, allowInitMail bool) (err error) {
+func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *AddHuman, allowInitMail bool, allowedLanguages []language.Tag) (err error) {
 	if resourceOwner == "" {
 		return errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
 	}
@@ -138,6 +144,7 @@ func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *Ad
 			c.userPasswordHasher,
 			c.userEncryption,
 			allowInitMail,
+			allowedLanguages,
 		))
 	if err != nil {
 		return err
@@ -163,9 +170,9 @@ type humanCreationCommand interface {
 }
 
 //nolint:gocognit
-func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *crypto.PasswordHasher, codeAlg crypto.EncryptionAlgorithm, allowInitMail bool) preparation.Validation {
+func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *crypto.PasswordHasher, codeAlg crypto.EncryptionAlgorithm, allowInitMail bool, allowedLanguages []language.Tag) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
-		if err := human.Validate(hasher); err != nil {
+		if err := human.Validate(hasher, allowedLanguages); err != nil {
 			return nil, err
 		}
 
