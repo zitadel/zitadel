@@ -28,6 +28,7 @@ var (
 		` projections.sessions8.resource_owner,` +
 		` projections.sessions8.creator,` +
 		` projections.sessions8.user_id,` +
+		` projections.sessions8.user_resource_owner,` +
 		` projections.sessions8.user_checked_at,` +
 		` projections.login_names3.login_name,` +
 		` projections.users8_humans.display_name,` +
@@ -59,6 +60,7 @@ var (
 		` projections.sessions8.resource_owner,` +
 		` projections.sessions8.creator,` +
 		` projections.sessions8.user_id,` +
+		` projections.sessions8.user_resource_owner,` +
 		` projections.sessions8.user_checked_at,` +
 		` projections.login_names3.login_name,` +
 		` projections.users8_humans.display_name,` +
