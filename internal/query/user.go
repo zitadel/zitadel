@@ -184,11 +184,11 @@ var (
 	userLoginNamesOwnerRemovedPolicyCol = LoginNameOwnerRemovedPolicyCol.setTable(userLoginNamesTable)
 	userLoginNamesOwnerRemovedDomainCol = LoginNameOwnerRemovedDomainCol.setTable(userLoginNamesTable)
 	userLoginNamesListCol               = Column{
-		name:  "login_names",
+		name:  "loginnames",
 		table: userLoginNamesTable,
 	}
 	userLoginNamesLowerListCol = Column{
-		name:  "login_names_lower",
+		name:  "loginnames_lower",
 		table: userLoginNamesTable,
 	}
 	userPreferredLoginNameTable                 = loginNameTable.setAlias("preferred_login_name")
