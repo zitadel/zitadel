@@ -9,9 +9,8 @@ import (
 	"time"
 
 	"github.com/rakyll/statik/fs"
-	"golang.org/x/text/language"
-
 	"github.com/zitadel/logging"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"

@@ -59,7 +59,7 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		}
 		cancel()
 
-		// we only care for the first error that occured,
+		// we only care for the first error that occurred,
 		// as the next error is most probably a context error.
 		if err == nil {
 			err = resErr
@@ -86,7 +86,7 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		return nil, err
 	}
 
-	// TODO: can we get rid of this seperate query?
+	// TODO: can we get rid of this separate query?
 	if token.isPAT {
 		if err = s.assertClientScopesForPAT(ctx, token.accessToken, client.clientID, client.projectID); err != nil {
 			return nil, err

@@ -23,7 +23,7 @@ import (
 )
 
 // keySetCache implements oidc.KeySet for Access Token verification.
-// Public Keys are cached in a 2-dimentional map of Instance ID and Key ID.
+// Public Keys are cached in a 2-dimensional map of Instance ID and Key ID.
 // When a key is not present the queryKey function is called to obtain the key
 // from the database.
 type keySetCache struct {

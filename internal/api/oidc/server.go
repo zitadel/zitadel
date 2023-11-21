@@ -4,11 +4,10 @@ import (
 	"context"
 	"net/http"
 
-	"golang.org/x/exp/slog"
-
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
+	"golang.org/x/exp/slog"
 
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"
