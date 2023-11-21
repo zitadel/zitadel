@@ -36,7 +36,7 @@ WITH login_names AS (
     ON 
       u.instance_id = d.instance_id
       AND u.resource_owner = d.resource_owner
-      AND d.name ILIKE $2
+      AND CASE WHEN p.must_be_domain THEN d.name ILIKE $2 ELSE TRUE END
 )
 SELECT 
   u.id
