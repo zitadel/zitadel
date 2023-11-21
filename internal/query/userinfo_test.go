@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	_ "embed"
+	"encoding/json"
 	"regexp"
 	"testing"
 	"time"
@@ -26,6 +27,21 @@ var (
 	testdataUserInfoHumanGrants string
 	//go:embed testdata/userinfo_machine.json
 	testdataUserInfoMachine string
+
+	// timeLocation does a single parse of the testdata and extracts a time.Location,
+	// so that it may be used during test assertion.
+	// Because depending on the environment json.Unmarshal parses
+	// the 00:00 timezones differently.
+	// On my local system is parses to an empty timezone with 0 offset,
+	// but in github action is pares into UTC.
+	timeLocation = func() *time.Location {
+		referenceInfo := new(OIDCUserInfo)
+		err := json.Unmarshal([]byte(testdataUserInfoHumanNoMD), referenceInfo)
+		if err != nil {
+			panic(err)
+		}
+		return referenceInfo.User.CreationDate.Location()
+	}()
 )
 
 func TestQueries_GetOIDCUserInfo(t *testing.T) {
@@ -74,8 +90,8 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			want: &OIDCUserInfo{
 				User: &User{
 					ID:                 "231965491734773762",
-					CreationDate:       time.Date(2023, time.September, 15, 6, 10, 7, 434142000, time.FixedZone("", 0)),
-					ChangeDate:         time.Date(2023, time.November, 14, 13, 27, 2, 72318000, time.FixedZone("", 0)),
+					CreationDate:       time.Date(2023, time.September, 15, 6, 10, 7, 434142000, timeLocation),
+					ChangeDate:         time.Date(2023, time.November, 14, 13, 27, 2, 72318000, timeLocation),
 					Sequence:           1148,
 					State:              1,
 					ResourceOwner:      "231848297847848962",
@@ -110,8 +126,8 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			want: &OIDCUserInfo{
 				User: &User{
 					ID:                 "231965491734773762",
-					CreationDate:       time.Date(2023, time.September, 15, 6, 10, 7, 434142000, time.FixedZone("", 0)),
-					ChangeDate:         time.Date(2023, time.November, 14, 13, 27, 2, 72318000, time.FixedZone("", 0)),
+					CreationDate:       time.Date(2023, time.September, 15, 6, 10, 7, 434142000, timeLocation),
+					ChangeDate:         time.Date(2023, time.November, 14, 13, 27, 2, 72318000, timeLocation),
 					Sequence:           1148,
 					State:              1,
 					ResourceOwner:      "231848297847848962",
@@ -136,16 +152,16 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 				},
 				Metadata: []UserMetadata{
 					{
-						CreationDate:  time.Date(2023, time.November, 14, 13, 26, 3, 553702000, time.FixedZone("", 0)),
-						ChangeDate:    time.Date(2023, time.November, 14, 13, 26, 3, 553702000, time.FixedZone("", 0)),
+						CreationDate:  time.Date(2023, time.November, 14, 13, 26, 3, 553702000, timeLocation),
+						ChangeDate:    time.Date(2023, time.November, 14, 13, 26, 3, 553702000, timeLocation),
 						Sequence:      1147,
 						ResourceOwner: "231848297847848962",
 						Key:           "bar",
 						Value:         []byte("foo"),
 					},
 					{
-						CreationDate:  time.Date(2023, time.November, 14, 13, 25, 57, 171368000, time.FixedZone("", 0)),
-						ChangeDate:    time.Date(2023, time.November, 14, 13, 25, 57, 171368000, time.FixedZone("", 0)),
+						CreationDate:  time.Date(2023, time.November, 14, 13, 25, 57, 171368000, timeLocation),
+						ChangeDate:    time.Date(2023, time.November, 14, 13, 25, 57, 171368000, timeLocation),
 						Sequence:      1146,
 						ResourceOwner: "231848297847848962",
 						Key:           "foo",
@@ -168,8 +184,8 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			want: &OIDCUserInfo{
 				User: &User{
 					ID:                 "231965491734773762",
-					CreationDate:       time.Date(2023, time.September, 15, 6, 10, 7, 434142000, time.FixedZone("", 0)),
-					ChangeDate:         time.Date(2023, time.November, 14, 13, 27, 2, 72318000, time.FixedZone("", 0)),
+					CreationDate:       time.Date(2023, time.September, 15, 6, 10, 7, 434142000, timeLocation),
+					ChangeDate:         time.Date(2023, time.November, 14, 13, 27, 2, 72318000, timeLocation),
 					Sequence:           1148,
 					State:              1,
 					ResourceOwner:      "231848297847848962",
@@ -194,16 +210,16 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 				},
 				Metadata: []UserMetadata{
 					{
-						CreationDate:  time.Date(2023, time.November, 14, 13, 26, 3, 553702000, time.FixedZone("", 0)),
-						ChangeDate:    time.Date(2023, time.November, 14, 13, 26, 3, 553702000, time.FixedZone("", 0)),
+						CreationDate:  time.Date(2023, time.November, 14, 13, 26, 3, 553702000, timeLocation),
+						ChangeDate:    time.Date(2023, time.November, 14, 13, 26, 3, 553702000, timeLocation),
 						Sequence:      1147,
 						ResourceOwner: "231848297847848962",
 						Key:           "bar",
 						Value:         []byte("foo"),
 					},
 					{
-						CreationDate:  time.Date(2023, time.November, 14, 13, 25, 57, 171368000, time.FixedZone("", 0)),
-						ChangeDate:    time.Date(2023, time.November, 14, 13, 25, 57, 171368000, time.FixedZone("", 0)),
+						CreationDate:  time.Date(2023, time.November, 14, 13, 25, 57, 171368000, timeLocation),
+						ChangeDate:    time.Date(2023, time.November, 14, 13, 25, 57, 171368000, timeLocation),
 						Sequence:      1146,
 						ResourceOwner: "231848297847848962",
 						Key:           "foo",
@@ -215,8 +231,8 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 						ID:           "240749256523120642",
 						GrantID:      "",
 						State:        1,
-						CreationDate: time.Date(2023, time.November, 14, 20, 28, 59, 168208000, time.FixedZone("", 0)),
-						ChangeDate:   time.Date(2023, time.November, 14, 20, 50, 58, 822391000, time.FixedZone("", 0)),
+						CreationDate: time.Date(2023, time.November, 14, 20, 28, 59, 168208000, timeLocation),
+						ChangeDate:   time.Date(2023, time.November, 14, 20, 50, 58, 822391000, timeLocation),
 						Sequence:     2,
 						UserID:       "231965491734773762",
 						Roles: []string{
@@ -234,8 +250,8 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 						ID:           "240762315572510722",
 						GrantID:      "",
 						State:        1,
-						CreationDate: time.Date(2023, time.November, 14, 22, 38, 42, 967317000, time.FixedZone("", 0)),
-						ChangeDate:   time.Date(2023, time.November, 14, 22, 38, 42, 967317000, time.FixedZone("", 0)),
+						CreationDate: time.Date(2023, time.November, 14, 22, 38, 42, 967317000, timeLocation),
+						ChangeDate:   time.Date(2023, time.November, 14, 22, 38, 42, 967317000, timeLocation),
 						Sequence:     1,
 						UserID:       "231965491734773762",
 						Roles: []string{
@@ -261,8 +277,8 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			want: &OIDCUserInfo{
 				User: &User{
 					ID:                 "240707570677841922",
-					CreationDate:       time.Date(2023, time.November, 14, 13, 34, 52, 473732000, time.FixedZone("", 0)),
-					ChangeDate:         time.Date(2023, time.November, 14, 13, 35, 2, 861342000, time.FixedZone("", 0)),
+					CreationDate:       time.Date(2023, time.November, 14, 13, 34, 52, 473732000, timeLocation),
+					ChangeDate:         time.Date(2023, time.November, 14, 13, 35, 2, 861342000, timeLocation),
 					Sequence:           2,
 					State:              1,
 					ResourceOwner:      "231848297847848962",
@@ -280,16 +296,16 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 				},
 				Metadata: []UserMetadata{
 					{
-						CreationDate:  time.Date(2023, time.November, 14, 13, 35, 30, 126849000, time.FixedZone("", 0)),
-						ChangeDate:    time.Date(2023, time.November, 14, 13, 35, 30, 126849000, time.FixedZone("", 0)),
+						CreationDate:  time.Date(2023, time.November, 14, 13, 35, 30, 126849000, timeLocation),
+						ChangeDate:    time.Date(2023, time.November, 14, 13, 35, 30, 126849000, timeLocation),
 						Sequence:      3,
 						ResourceOwner: "231848297847848962",
 						Key:           "first",
 						Value:         []byte("Hello World!"),
 					},
 					{
-						CreationDate:  time.Date(2023, time.November, 14, 13, 35, 44, 28343000, time.FixedZone("", 0)),
-						ChangeDate:    time.Date(2023, time.November, 14, 13, 35, 44, 28343000, time.FixedZone("", 0)),
+						CreationDate:  time.Date(2023, time.November, 14, 13, 35, 44, 28343000, timeLocation),
+						ChangeDate:    time.Date(2023, time.November, 14, 13, 35, 44, 28343000, timeLocation),
 						Sequence:      4,
 						ResourceOwner: "231848297847848962",
 						Key:           "second",
