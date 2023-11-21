@@ -272,7 +272,7 @@ type mockApp struct {
 	app *query.App
 }
 
-func (m *mockApp) AppByOIDCClientID(ctx context.Context, id string, _ bool) (*query.App, error) {
+func (m *mockApp) AppByOIDCClientID(ctx context.Context, id string) (*query.App, error) {
 	if m.app != nil {
 		return m.app, nil
 	}

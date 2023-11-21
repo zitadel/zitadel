@@ -171,7 +171,7 @@ func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMeth
 	if domain.HasMFA(authMethods) {
 		return nil
 	}
-	availableAuthMethods, forceMFA, forceMFALocalOnly, err := repo.Query.ListUserAuthMethodTypesRequired(setCallerCtx(ctx, userID), userID, false)
+	availableAuthMethods, forceMFA, forceMFALocalOnly, err := repo.Query.ListUserAuthMethodTypesRequired(setCallerCtx(ctx, userID), userID)
 	if err != nil {
 		return err
 	}

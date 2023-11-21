@@ -86,10 +86,10 @@ func (mr *MockQueriesMockRecorder) GetDefaultLanguage(arg0 any) *gomock.Call {
 }
 
 // GetNotifyUserByID mocks base method.
-func (m *MockQueries) GetNotifyUserByID(arg0 context.Context, arg1 bool, arg2 string, arg3 bool, arg4 ...query.SearchQuery) (*query.NotifyUser, error) {
+func (m *MockQueries) GetNotifyUserByID(arg0 context.Context, arg1 bool, arg2 string, arg3 ...query.SearchQuery) (*query.NotifyUser, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1, arg2, arg3}
-	for _, a := range arg4 {
+	varargs := []any{arg0, arg1, arg2}
+	for _, a := range arg3 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetNotifyUserByID", varargs...)
@@ -99,9 +99,9 @@ func (m *MockQueries) GetNotifyUserByID(arg0 context.Context, arg1 bool, arg2 st
 }
 
 // GetNotifyUserByID indicates an expected call of GetNotifyUserByID.
-func (mr *MockQueriesMockRecorder) GetNotifyUserByID(arg0, arg1, arg2, arg3 any, arg4 ...any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) GetNotifyUserByID(arg0, arg1, arg2 any, arg3 ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1, arg2, arg3}, arg4...)
+	varargs := append([]any{arg0, arg1, arg2}, arg3...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNotifyUserByID", reflect.TypeOf((*MockQueries)(nil).GetNotifyUserByID), varargs...)
 }
 

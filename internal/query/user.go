@@ -5,11 +5,9 @@ import (
 	"database/sql"
 	errs "errors"
 	"strings"
-	"sync"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -17,7 +15,6 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -28,32 +25,32 @@ type Users struct {
 }
 
 type User struct {
-	ID                 string
-	CreationDate       time.Time
-	ChangeDate         time.Time
-	ResourceOwner      string
-	Sequence           uint64
-	State              domain.UserState
-	Type               domain.UserType
-	Username           string
-	LoginNames         database.TextArray[string]
-	PreferredLoginName string
-	Human              *Human
-	Machine            *Machine
+	ID                 string                     `json:"id,omitempty"`
+	CreationDate       time.Time                  `json:"creation_date,omitempty"`
+	ChangeDate         time.Time                  `json:"change_date,omitempty"`
+	ResourceOwner      string                     `json:"resource_owner,omitempty"`
+	Sequence           uint64                     `json:"sequence,omitempty"`
+	State              domain.UserState           `json:"state,omitempty"`
+	Type               domain.UserType            `json:"type,omitempty"`
+	Username           string                     `json:"username,omitempty"`
+	LoginNames         database.TextArray[string] `json:"login_names,omitempty"`
+	PreferredLoginName string                     `json:"preferred_login_name,omitempty"`
+	Human              *Human                     `json:"human,omitempty"`
+	Machine            *Machine                   `json:"machine,omitempty"`
 }
 
 type Human struct {
-	FirstName         string
-	LastName          string
-	NickName          string
-	DisplayName       string
-	AvatarKey         string
-	PreferredLanguage language.Tag
-	Gender            domain.Gender
-	Email             domain.EmailAddress
-	IsEmailVerified   bool
-	Phone             domain.PhoneNumber
-	IsPhoneVerified   bool
+	FirstName         string              `json:"first_name,omitempty"`
+	LastName          string              `json:"last_name,omitempty"`
+	NickName          string              `json:"nick_name,omitempty"`
+	DisplayName       string              `json:"display_name,omitempty"`
+	AvatarKey         string              `json:"avatar_key,omitempty"`
+	PreferredLanguage language.Tag        `json:"preferred_language,omitempty"`
+	Gender            domain.Gender       `json:"gender,omitempty"`
+	Email             domain.EmailAddress `json:"email,omitempty"`
+	IsEmailVerified   bool                `json:"is_email_verified,omitempty"`
+	Phone             domain.PhoneNumber  `json:"phone,omitempty"`
+	IsPhoneVerified   bool                `json:"is_phone_verified,omitempty"`
 }
 
 type Profile struct {
@@ -92,10 +89,10 @@ type Phone struct {
 }
 
 type Machine struct {
-	Name            string
-	Description     string
-	HasSecret       bool
-	AccessTokenType domain.OIDCTokenType
+	Name            string               `json:"name,omitempty"`
+	Description     string               `json:"description,omitempty"`
+	HasSecret       bool                 `json:"has_secret,omitempty"`
+	AccessTokenType domain.OIDCTokenType `json:"access_token_type,omitempty"`
 }
 
 type NotifyUser struct {
@@ -168,10 +165,6 @@ var (
 	}
 	UserTypeCol = Column{
 		name:  projection.UserTypeCol,
-		table: userTable,
-	}
-	UserOwnerRemovedCol = Column{
-		name:  projection.UserOwnerRemovedCol,
 		table: userTable,
 	}
 
@@ -320,11 +313,7 @@ var (
 	}
 )
 
-func addUserWithoutOwnerRemoved(eq map[string]interface{}) {
-	eq[UserOwnerRemovedCol.identifier()] = false
-}
-
-func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, withOwnerRemoved bool, queries ...SearchQuery) (user *User, err error) {
+func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string, queries ...SearchQuery) (user *User, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -339,9 +328,6 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		addUserWithoutOwnerRemoved(eq)
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -355,7 +341,7 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	return user, err
 }
 
-func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwnerRemoved bool, queries ...SearchQuery) (user *User, err error) {
+func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, queries ...SearchQuery) (user *User, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -370,9 +356,6 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwner
 	eq := sq.Eq{
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	if !withOwnerRemoved {
-		addUserWithoutOwnerRemoved(eq)
-	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dnhr2", "Errors.Query.SQLStatment")
@@ -385,7 +368,7 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, withOwner
 	return user, err
 }
 
-func (q *Queries) GetHumanProfile(ctx context.Context, userID string, withOwnerRemoved bool, queries ...SearchQuery) (profile *Profile, err error) {
+func (q *Queries) GetHumanProfile(ctx context.Context, userID string, queries ...SearchQuery) (profile *Profile, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -396,9 +379,6 @@ func (q *Queries) GetHumanProfile(ctx context.Context, userID string, withOwnerR
 	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -412,7 +392,7 @@ func (q *Queries) GetHumanProfile(ctx context.Context, userID string, withOwnerR
 	return profile, err
 }
 
-func (q *Queries) GetHumanEmail(ctx context.Context, userID string, withOwnerRemoved bool, queries ...SearchQuery) (email *Email, err error) {
+func (q *Queries) GetHumanEmail(ctx context.Context, userID string, queries ...SearchQuery) (email *Email, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -423,9 +403,6 @@ func (q *Queries) GetHumanEmail(ctx context.Context, userID string, withOwnerRem
 	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -439,7 +416,7 @@ func (q *Queries) GetHumanEmail(ctx context.Context, userID string, withOwnerRem
 	return email, err
 }
 
-func (q *Queries) GetHumanPhone(ctx context.Context, userID string, withOwnerRemoved bool, queries ...SearchQuery) (phone *Phone, err error) {
+func (q *Queries) GetHumanPhone(ctx context.Context, userID string, queries ...SearchQuery) (phone *Phone, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -450,9 +427,6 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, withOwnerRem
 	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -466,7 +440,7 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, withOwnerRem
 	return phone, err
 }
 
-func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string, withOwnerRemoved bool, queries ...SearchQuery) (user *NotifyUser, err error) {
+func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string, queries ...SearchQuery) (user *NotifyUser, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -482,9 +456,6 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	if !withOwnerRemoved {
-		addUserWithoutOwnerRemoved(eq)
-	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Err3g", "Errors.Query.SQLStatment")
@@ -497,7 +468,7 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 	return user, err
 }
 
-func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withOwnerRemoved bool, queries ...SearchQuery) (user *NotifyUser, err error) {
+func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, queries ...SearchQuery) (user *NotifyUser, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -512,9 +483,6 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 	eq := sq.Eq{
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	if !withOwnerRemoved {
-		addUserWithoutOwnerRemoved(eq)
-	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Err3g", "Errors.Query.SQLStatment")
@@ -527,15 +495,12 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, withO
 	return user, err
 }
 
-func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, withOwnerRemoved bool) (users *Users, err error) {
+func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries) (users *Users, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareUsersQuery(ctx, q.client)
 	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		addUserWithoutOwnerRemoved(eq)
-	}
 	stmt, args, err := queries.toQuery(query).Where(eq).
 		ToSql()
 	if err != nil {
@@ -554,7 +519,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, w
 	return users, err
 }
 
-func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwner string, withOwnerRemoved bool) (isUnique bool, err error) {
+func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwner string) (isUnique bool, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -585,9 +550,6 @@ func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwn
 		query = q.toQuery(query)
 	}
 	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
-	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return false, errors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatment")
@@ -715,23 +677,7 @@ func NewUserLoginNameExistsQuery(value string, comparison TextComparison) (Searc
 }
 
 func triggerUserProjections(ctx context.Context) {
-	wg := sync.WaitGroup{}
-	wg.Add(2)
-	func() {
-		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerUserProjection")
-		_, err := projection.UserProjection.Trigger(ctx, handler.WithAwaitRunning())
-		logging.OnError(err).Debug("trigger failed")
-		traceSpan.EndWithError(err)
-		wg.Done()
-	}()
-	func() {
-		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerLoginNameProjection")
-		_, err := projection.LoginNameProjection.Trigger(ctx, handler.WithAwaitRunning())
-		traceSpan.EndWithError(err)
-		logging.OnError(err).Debug("trigger failed")
-		wg.Done()
-	}()
-	wg.Wait()
+	triggerBatch(ctx, projection.UserProjection, projection.LoginNameProjection)
 }
 
 func prepareLoginNamesQuery() (string, []interface{}, error) {

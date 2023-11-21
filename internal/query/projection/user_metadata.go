@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	UserMetadataProjectionTable = "projections.user_metadata4"
+	UserMetadataProjectionTable = "projections.user_metadata5"
 
 	UserMetadataColumnUserID        = "user_id"
 	UserMetadataColumnCreationDate  = "creation_date"
@@ -23,7 +23,6 @@ const (
 	UserMetadataColumnInstanceID    = "instance_id"
 	UserMetadataColumnKey           = "key"
 	UserMetadataColumnValue         = "value"
-	UserMetadataColumnOwnerRemoved  = "owner_removed"
 )
 
 type userMetadataProjection struct{}
@@ -47,11 +46,9 @@ func (*userMetadataProjection) Init() *old_handler.Check {
 			handler.NewColumn(UserMetadataColumnInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(UserMetadataColumnKey, handler.ColumnTypeText),
 			handler.NewColumn(UserMetadataColumnValue, handler.ColumnTypeBytes, handler.Nullable()),
-			handler.NewColumn(UserMetadataColumnOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(UserMetadataColumnInstanceID, UserMetadataColumnUserID, UserMetadataColumnKey),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{UserGrantResourceOwner})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{UserMetadataColumnOwnerRemoved})),
 		),
 	)
 }
