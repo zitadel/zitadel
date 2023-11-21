@@ -2,13 +2,13 @@ package command
 
 import (
 	"context"
+	"github.com/zitadel/zitadel/internal/errors"
 
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/restrictions"
 )
@@ -16,6 +16,23 @@ import (
 type SetRestrictions struct {
 	PublicOrgRegistrationIsNotAllowed *bool
 	AllowedLanguages                  []language.Tag
+}
+
+func (s *SetRestrictions) Validate(defaultLanguage language.Tag) error {
+	if s == nil ||
+		s.PublicOrgRegistrationIsNotAllowed == nil &&
+			s.AllowedLanguages == nil {
+		return errors.ThrowInvalidArgument(nil, "COMMAND-oASwj", "Errors.Restrictions.NoneSpecified")
+	}
+	if s.AllowedLanguages != nil {
+		if err := domain.LanguagesAreSupported(s.AllowedLanguages...); err != nil {
+			return err
+		}
+		if err := domain.LanguageIsAllowed(false, s.AllowedLanguages, defaultLanguage); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // SetRestrictions creates new restrictions or updates existing restrictions.
@@ -64,18 +81,8 @@ func (c *Commands) getRestrictionsWriteModel(ctx context.Context, instanceId, re
 
 func (c *Commands) SetRestrictionsCommand(a *restrictions.Aggregate, wm *restrictionsWriteModel, setRestrictions *SetRestrictions, defaultLanguage language.Tag) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		if setRestrictions == nil ||
-			setRestrictions.PublicOrgRegistrationIsNotAllowed == nil &&
-				setRestrictions.AllowedLanguages == nil {
-			return nil, errors.ThrowInvalidArgument(nil, "COMMAND-oASwj", "Errors.Restrictions.NoneSpecified")
-		}
-		if setRestrictions.AllowedLanguages != nil {
-			if err := domain.LanguagesAreSupported(setRestrictions.AllowedLanguages...); err != nil {
-				return nil, err
-			}
-			if err := domain.LanguageIsAllowed(false, setRestrictions.AllowedLanguages, defaultLanguage); err != nil {
-				return nil, err
-			}
+		if err := setRestrictions.Validate(defaultLanguage); err != nil {
+			return nil, err
 		}
 		return func(ctx context.Context, _ preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			changes, languagesChanged := wm.NewChanges(setRestrictions)

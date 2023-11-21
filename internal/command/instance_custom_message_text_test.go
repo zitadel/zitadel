@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	zitadel_errs "github.com/zitadel/zitadel/internal/errors"
