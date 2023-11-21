@@ -151,7 +151,7 @@ func init() {
 	)
 }
 
-// triggerBatch calls Trigger on every handler in a seperate Go routine.
+// triggerBatch calls Trigger on every handler in a separate Go routine.
 // The returned context is the context returned by the Trigger that finishes last.
 func triggerBatch(ctx context.Context, handlers ...*handler.Handler) {
 	var wg sync.WaitGroup

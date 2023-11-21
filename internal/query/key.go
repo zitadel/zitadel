@@ -382,6 +382,7 @@ func (wm *PublicKeyReadModel) Reduce() error {
 			wm.Key = e.PublicKey.Key
 			wm.Expiry = e.PublicKey.Expiry
 			wm.Usage = e.Usage
+		default:
 		}
 	}
 	return wm.ReadModel.Reduce()
