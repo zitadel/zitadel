@@ -14,7 +14,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
@@ -70,7 +69,7 @@ func StartQueries(
 	sessionTokenVerifier func(ctx context.Context, sessionToken string, sessionID string, tokenID string) (err error),
 	permissionCheck func(q *Queries) domain.PermissionCheck,
 	defaultAuditLogRetention time.Duration,
-	systemAPIUsers map[string]*internal_authz.SystemAPIUser,
+	systemAPIUsers map[string]*authz.SystemAPIUser,
 ) (repo *Queries, err error) {
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	if err != nil {
