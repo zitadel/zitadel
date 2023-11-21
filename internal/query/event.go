@@ -120,7 +120,7 @@ func (q *Queries) convertEvent(ctx context.Context, event eventstore.Event, user
 }
 
 func (q *Queries) editorUserByID(ctx context.Context, userID string) *EventEditor {
-	user, err := q.GetUserByID(ctx, false, userID, false)
+	user, err := q.GetUserByID(ctx, false, userID)
 	if err != nil {
 		return &EventEditor{ID: userID}
 	}

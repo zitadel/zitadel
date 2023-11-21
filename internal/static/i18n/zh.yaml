@@ -429,6 +429,7 @@ Errors:
   UserSession:
     NotFound: 用户会话不存在
   Key:
+    NotFound: 找不到钥匙
     ExpireBeforeNow: 过期日期是过去的无效日期
   Login:
     LoginPolicy:

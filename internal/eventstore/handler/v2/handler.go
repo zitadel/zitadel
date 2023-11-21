@@ -456,3 +456,8 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 
 	return builder
 }
+
+// ProjectionName returns the name of the unlying projection.
+func (h *Handler) ProjectionName() string {
+	return h.projection.Name()
+}

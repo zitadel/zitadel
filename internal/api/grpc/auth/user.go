@@ -19,7 +19,7 @@ import (
 )
 
 func (s *Server) GetMyUser(ctx context.Context, _ *auth_pb.GetMyUserRequest) (*auth_pb.GetMyUserResponse, error) {
-	user, err := s.query.GetUserByID(ctx, true, authz.GetCtxData(ctx).UserID, false)
+	user, err := s.query.GetUserByID(ctx, true, authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
 	}
