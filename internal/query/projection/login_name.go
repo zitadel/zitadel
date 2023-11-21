@@ -194,6 +194,9 @@ func (*loginNameProjection) Init() *old_handler.Check {
 			},
 			handler.NewPrimaryKey(LoginNameUserInstanceIDCol, LoginNameUserIDCol),
 			loginNameUserSuffix,
+			handler.WithIndex(handler.NewIndex("instance_user_name", []string{LoginNameUserInstanceIDCol, LoginNameUserUserNameCol},
+				handler.WithInclude(LoginNameUserResourceOwnerCol),
+			)),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{LoginNameUserResourceOwnerCol})),
 			handler.WithIndex(handler.NewIndex("owner_removed", []string{LoginNameUserOwnerRemovedCol})),
 			handler.WithIndex(
