@@ -21,7 +21,6 @@ import (
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
-	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
@@ -119,6 +118,7 @@ func NewServer(
 	server := &Server{
 		LegacyServer:        op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
 		signingKeyAlgorithm: config.SigningKeyAlgorithm,
+		queries:             query,
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	server.Handler = op.RegisterLegacyServer(server, op.WithHTTPMiddleware(
@@ -157,7 +157,6 @@ func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []
 		AuthMethodPrivateKeyJWT:  config.AuthMethodPrivateKeyJWT,
 		GrantTypeRefreshToken:    config.GrantTypeRefreshToken,
 		RequestObjectSupported:   config.RequestObjectSupported,
-		SupportedUILocales:       i18n.SupportedLanguages(),
 		DeviceAuthorization:      config.DeviceAuth.toOPConfig(),
 	}
 	if cryptoLength := len(cryptoKey); cryptoLength != 32 {
