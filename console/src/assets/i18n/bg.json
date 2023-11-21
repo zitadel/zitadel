@@ -1056,7 +1056,7 @@
       "mk": "Македонски",
       "cs": "Čeština",
       "ru": "Русский",
-	  "nl": "Nederlands"
+      "nl": "Nederlands"
     },
     "SMTP": {
       "TITLE": "SMTP настройки",
@@ -1270,7 +1270,7 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-		"nl": "Nederlands"
+        "nl": "Nederlands"
       },
       "KEYS": {
         "emailVerificationDoneText": "Проверката на имейл е извършена",
@@ -2160,7 +2160,7 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-	"nl": "Nederlands"
+    "nl": "Nederlands"
   },
   "MEMBER": {
     "ADD": "Добавяне на мениджър",

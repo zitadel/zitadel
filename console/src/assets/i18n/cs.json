@@ -1063,7 +1063,7 @@
       "mk": "Македонски",
       "cs": "Čeština",
       "ru": "Русский",
-	  "nl": "Nederlands"
+      "nl": "Nederlands"
     },
     "SMTP": {
       "TITLE": "Nastavení SMTP",
@@ -1277,7 +1277,7 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-		"nl": "Nederlands"
+        "nl": "Nederlands"
       },
       "KEYS": {
         "emailVerificationDoneText": "Ověření e-mailu dokončeno",
@@ -2178,7 +2178,7 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-	"nl": "Nederlands"
+    "nl": "Nederlands"
   },
   "MEMBER": {
     "ADD": "Přidat manažera",
