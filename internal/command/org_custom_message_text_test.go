@@ -35,9 +35,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 		{
 			name: "no resource owner, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: eventstoreExpect(t),
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -89,9 +87,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 		{
 			name: "undefined language, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: eventstoreExpect(t),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -105,9 +101,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 		{
 			name: "unsupported language, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: eventstoreExpect(t),
 			},
 			args: args{
 				ctx:           context.Background(),

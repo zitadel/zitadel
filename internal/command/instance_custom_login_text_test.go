@@ -2,8 +2,9 @@ package command
 
 import (
 	"context"
-	"golang.org/x/text/language"
 	"testing"
+
+	"golang.org/x/text/language"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -55,9 +56,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 		{
 			name: "undefined language, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: eventstoreExpect(t),
 			},
 			args: args{
 				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
@@ -70,9 +69,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 		{
 			name: "unsupported language, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: eventstoreExpect(t),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),

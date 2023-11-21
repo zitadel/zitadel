@@ -2,11 +2,12 @@ package command
 
 import (
 	"context"
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"golang.org/x/text/language"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -33,7 +34,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "no resourceowner in args, invalid argument error",
+			name: "no resourceowner, invalid argument error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -74,9 +75,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 		{
 			name: "undefined language, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: eventstoreExpect(t),
 			},
 			args: args{
 				ctx:           authz.WithInstanceID(context.Background(), "org1"),
@@ -90,9 +89,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 		{
 			name: "unsupported language, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: eventstoreExpect(t),
 			},
 			args: args{
 				ctx:           authz.WithInstanceID(context.Background(), "org1"),
