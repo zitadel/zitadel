@@ -7755,7 +7755,7 @@ message ImportHumanUserRequest {
         string value = 1 [
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 example: "\"$2y$12$hXUrnqdq1RIIYZ2HPytIIe5lXdIvbhqrTvdPsSF7o.jFh817Z6lwm\"";
-                description: "Encoded hash of a password in Modular Crypt Format: https://passlib.readthedocs.io/en/stable/modular_crypt_format.html"
+                description: "Encoded hash of a password in Modular Crypt Format: https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
             }
         ];
         reserved 2; // was algortithm, which is actually obtained from the encoded hash
