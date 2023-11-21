@@ -431,6 +431,7 @@ Errors:
   UserSession:
     NotFound: Benutzer Sitzung konnte nicht gefunden werden
   Key:
+    NotFound: Schlüssel nicht gefunden
     ExpireBeforeNow: Das Ablaufdatum liegt in der Vergangenheit
   Login:
     LoginPolicy:

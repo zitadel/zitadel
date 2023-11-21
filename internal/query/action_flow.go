@@ -52,10 +52,6 @@ var (
 		name:  projection.FlowActionIDCol,
 		table: flowsTriggersTable,
 	}
-	FlowsTriggersOwnerRemovedCol = Column{
-		name:  projection.FlowOwnerRemovedCol,
-		table: flowsTriggersTable,
-	}
 )
 
 type Flow struct {
@@ -67,7 +63,7 @@ type Flow struct {
 	TriggerActions map[domain.TriggerType][]*Action
 }
 
-func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID string, withOwnerRemoved bool) (flow *Flow, err error) {
+func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID string) (flow *Flow, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -76,9 +72,6 @@ func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID s
 		FlowsTriggersColumnFlowType.identifier():      flowType,
 		FlowsTriggersColumnResourceOwner.identifier(): orgID,
 		FlowsTriggersColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		eq[FlowsTriggersOwnerRemovedCol.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -92,7 +85,7 @@ func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID s
 	return flow, err
 }
 
-func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flowType domain.FlowType, triggerType domain.TriggerType, orgID string, withOwnerRemoved bool) (actions []*Action, err error) {
+func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flowType domain.FlowType, triggerType domain.TriggerType, orgID string) (actions []*Action, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -103,9 +96,6 @@ func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flow
 		FlowsTriggersColumnResourceOwner.identifier(): orgID,
 		FlowsTriggersColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
 		ActionColumnState.identifier():                domain.ActionStateActive,
-	}
-	if !withOwnerRemoved {
-		eq[FlowsTriggersOwnerRemovedCol.identifier()] = false
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
@@ -119,7 +109,7 @@ func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flow
 	return actions, err
 }
 
-func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string, withOwnerRemoved bool) (types []domain.FlowType, err error) {
+func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string) (types []domain.FlowType, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -127,9 +117,6 @@ func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string, w
 	eq := sq.Eq{
 		FlowsTriggersColumnActionID.identifier():   actionID,
 		FlowsTriggersColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		eq[FlowsTriggersOwnerRemovedCol.identifier()] = false
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {

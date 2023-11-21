@@ -76,10 +76,6 @@ var (
 		name:  projection.AuthNKeyEnabledCol,
 		table: authNKeyTable,
 	}
-	AuthNKeyOwnerRemovedCol = Column{
-		name:  projection.AuthNKeyOwnerRemovedCol,
-		table: authNKeyTable,
-	}
 )
 
 type AuthNKeys struct {
@@ -139,9 +135,6 @@ func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 		AuthNKeyColumnEnabled.identifier():    true,
 		AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	if !withOwnerRemoved {
-		eq[AuthNKeyOwnerRemovedCol.identifier()] = false
-	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-SAf3f", "Errors.Query.InvalidRequest")
@@ -159,7 +152,7 @@ func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 	return authNKeys, err
 }
 
-func (q *Queries) SearchAuthNKeysData(ctx context.Context, queries *AuthNKeySearchQueries, withOwnerRemoved bool) (authNKeys *AuthNKeysData, err error) {
+func (q *Queries) SearchAuthNKeysData(ctx context.Context, queries *AuthNKeySearchQueries) (authNKeys *AuthNKeysData, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -168,9 +161,6 @@ func (q *Queries) SearchAuthNKeysData(ctx context.Context, queries *AuthNKeySear
 	eq := sq.Eq{
 		AuthNKeyColumnEnabled.identifier():    true,
 		AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		eq[AuthNKeyOwnerRemovedCol.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -188,7 +178,7 @@ func (q *Queries) SearchAuthNKeysData(ctx context.Context, queries *AuthNKeySear
 	return authNKeys, err
 }
 
-func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool, queries ...SearchQuery) (key *AuthNKey, err error) {
+func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, id string, queries ...SearchQuery) (key *AuthNKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -207,9 +197,6 @@ func (q *Queries) GetAuthNKeyByID(ctx context.Context, shouldTriggerBulk bool, i
 		AuthNKeyColumnID.identifier():         id,
 		AuthNKeyColumnEnabled.identifier():    true,
 		AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		eq[AuthNKeyOwnerRemovedCol.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -238,20 +225,6 @@ func (q *Queries) GetAuthNKeyPublicKeyByIDAndIdentifier(ctx context.Context, id 
 		sq.Gt{
 			AuthNKeyColumnExpiration.identifier(): time.Now(),
 		},
-	}
-	if !withOwnerRemoved {
-		eq = sq.And{
-			sq.Eq{
-				AuthNKeyColumnID.identifier():         id,
-				AuthNKeyColumnIdentifier.identifier(): identifier,
-				AuthNKeyColumnEnabled.identifier():    true,
-				AuthNKeyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-				AuthNKeyOwnerRemovedCol.identifier():  false,
-			},
-			sq.Gt{
-				AuthNKeyColumnExpiration.identifier(): time.Now(),
-			},
-		}
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {

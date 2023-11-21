@@ -26,8 +26,8 @@ var (
 			", members.id" +
 			", members.project_id" +
 			", members.grant_id" +
-			", projections.project_grants3.granted_org_id" +
-			", projections.projects3.name" +
+			", projections.project_grants4.granted_org_id" +
+			", projections.projects4.name" +
 			", projections.orgs1.name" +
 			", projections.instances.name" +
 			", COUNT(*) OVER ()" +
@@ -43,8 +43,7 @@ var (
 			", NULL::TEXT AS id" +
 			", NULL::TEXT AS project_id" +
 			", NULL::TEXT AS grant_id" +
-			" FROM projections.org_members3 AS members" +
-			" WHERE members.owner_removed = $1 AND members.user_owner_removed = $2" +
+			" FROM projections.org_members4 AS members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -57,8 +56,7 @@ var (
 			", members.id" +
 			", NULL::TEXT AS project_id" +
 			", NULL::TEXT AS grant_id" +
-			" FROM projections.instance_members3 AS members" +
-			" WHERE members.owner_removed = $3 AND members.user_owner_removed = $4" +
+			" FROM projections.instance_members4 AS members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -71,8 +69,7 @@ var (
 			", NULL::TEXT AS id" +
 			", members.project_id" +
 			", NULL::TEXT AS grant_id" +
-			" FROM projections.project_members3 AS members" +
-			" WHERE members.owner_removed = $5 AND members.user_owner_removed = $6" +
+			" FROM projections.project_members4 AS members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -85,12 +82,11 @@ var (
 			", NULL::TEXT AS id" +
 			", members.project_id" +
 			", members.grant_id" +
-			" FROM projections.project_grant_members3 AS members" +
-			" WHERE members.granted_org_removed = $7 AND members.owner_removed = $8 AND members.user_owner_removed = $9" +
+			" FROM projections.project_grant_members4 AS members" +
 			") AS members" +
-			" LEFT JOIN projections.projects3 ON members.project_id = projections.projects3.id AND members.instance_id = projections.projects3.instance_id" +
+			" LEFT JOIN projections.projects4 ON members.project_id = projections.projects4.id AND members.instance_id = projections.projects4.instance_id" +
 			" LEFT JOIN projections.orgs1 ON members.org_id = projections.orgs1.id AND members.instance_id = projections.orgs1.instance_id" +
-			" LEFT JOIN projections.project_grants3 ON members.grant_id = projections.project_grants3.grant_id AND members.instance_id = projections.project_grants3.instance_id" +
+			" LEFT JOIN projections.project_grants4 ON members.grant_id = projections.project_grants4.grant_id AND members.instance_id = projections.project_grants4.instance_id" +
 			" LEFT JOIN projections.instances ON members.instance_id = projections.instances.id" +
 			` AS OF SYSTEM TIME '-1 ms'`)
 	membershipCols = []string{
@@ -125,7 +121,7 @@ func Test_MembershipPrepares(t *testing.T) {
 	}{
 		{
 			name:    "prepareMembershipsQuery no result",
-			prepare: prepareMembershipWrapper(false),
+			prepare: prepareMembershipWrapper(),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -137,7 +133,7 @@ func Test_MembershipPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareMembershipsQuery one org member",
-			prepare: prepareMembershipWrapper(false),
+			prepare: prepareMembershipWrapper(),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -181,7 +177,7 @@ func Test_MembershipPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareMembershipsQuery one instance member",
-			prepare: prepareMembershipWrapper(false),
+			prepare: prepareMembershipWrapper(),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -225,7 +221,7 @@ func Test_MembershipPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareMembershipsQuery one project member",
-			prepare: prepareMembershipWrapper(false),
+			prepare: prepareMembershipWrapper(),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -269,7 +265,7 @@ func Test_MembershipPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareMembershipsQuery one project grant member",
-			prepare: prepareMembershipWrapper(false),
+			prepare: prepareMembershipWrapper(),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -318,7 +314,7 @@ func Test_MembershipPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareMembershipsQuery one for each member type",
-			prepare: prepareMembershipWrapper(false),
+			prepare: prepareMembershipWrapper(),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -442,7 +438,7 @@ func Test_MembershipPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareMembershipsQuery sql err",
-			prepare: prepareMembershipWrapper(false),
+			prepare: prepareMembershipWrapper(),
 			want: want{
 				sqlExpectations: mockQueryErr(
 					membershipsStmt,
@@ -465,9 +461,9 @@ func Test_MembershipPrepares(t *testing.T) {
 	}
 }
 
-func prepareMembershipWrapper(withOwnerRemoved bool) func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
+func prepareMembershipWrapper() func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
 	return func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
-		builder, _, fun := prepareMembershipsQuery(ctx, db, withOwnerRemoved, &MembershipSearchQuery{})
+		builder, _, fun := prepareMembershipsQuery(ctx, db, &MembershipSearchQuery{})
 		return builder, fun
 	}
 }
