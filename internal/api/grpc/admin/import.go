@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"golang.org/x/text/language"
 	"io/ioutil"
 	"strconv"
 	"time"
@@ -91,7 +92,10 @@ func (c *count) getProgress() string {
 func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest) (_ *admin_pb.ImportDataResponse, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-
+	restrictions, err := s.query.GetInstanceRestrictions(ctx)
+	if err != nil {
+		return nil, err
+	}
 	if req.GetDataOrgs() != nil || req.GetDataOrgsv1() != nil {
 		timeoutDuration, err := time.ParseDuration(req.Timeout)
 		if err != nil {
@@ -114,7 +118,7 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 				orgs = req.GetDataOrgs().GetOrgs()
 			}
 
-			ret, count, err := s.importData(ctx, orgs)
+			ret, count, err := s.importData(ctx, orgs, restrictions.AllowedLanguages)
 			ch <- importResponse{ret: ret, count: count, err: err}
 		}()
 
@@ -169,7 +173,7 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 					ch <- importResponse{nil, nil, err}
 					return
 				}
-				resp, count, err := s.importData(ctxTimeout, dataOrgs)
+				resp, count, err := s.importData(ctxTimeout, dataOrgs, restrictions.AllowedLanguages)
 				if err != nil {
 					ch <- importResponse{nil, count, err}
 					return
@@ -293,7 +297,7 @@ func getFileFromGCS(ctx context.Context, input *admin_pb.ImportDataRequest_GCSIn
 	return ioutil.ReadAll(reader)
 }
 
-func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*admin_pb.ImportDataResponse, *count, error) {
+func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg, allowedLanguages []language.Tag) (*admin_pb.ImportDataResponse, *count, error) {
 	errors := make([]*admin_pb.ImportDataError, 0)
 	success := &admin_pb.ImportDataSuccess{}
 	count := &count{}
@@ -538,7 +542,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 				logging.Debugf("import user: %s", user.GetUserId())
 				human, passwordless, links := management.ImportHumanUserRequestToDomain(user.User)
 				human.AggregateID = user.UserId
-				_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, links, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
+				_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, links, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, allowedLanguages)
 				if err != nil {
 					errors = append(errors, &admin_pb.ImportDataError{Type: "human_user", Id: user.GetUserId(), Message: err.Error()})
 					if isCtxTimeout(ctx) {

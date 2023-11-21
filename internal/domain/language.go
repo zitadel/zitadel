@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"github.com/zitadel/zitadel/internal/errors"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/i18n"
@@ -54,27 +55,40 @@ func FilterOutLanguages(originalLanguages, excludeLanguages []language.Tag) []la
 	return filteredLanguages
 }
 
-func LanguageIsAllowed(allowUndefined bool, allowedLanguages []language.Tag, lang language.Tag) bool {
-	if len(allowedLanguages) == 0 {
-		return true
+func LanguageIsAllowed(allowUndefined bool, allowedLanguages []language.Tag, lang language.Tag) error {
+	if err := LanguageIsDefined(lang); err != nil && !allowUndefined {
+		return err
 	}
-	if allowUndefined && lang.IsRoot() {
-		return true
+	if len(allowedLanguages) > 0 && !languageIsContained(allowedLanguages, lang) {
+		return errors.ThrowPreconditionFailed(nil, "LANG-2M9fs", "Errors.Language.NotAllowed")
 	}
-	return languageIsContained(allowedLanguages, lang)
+	return nil
 }
 
-func UnsupportedLanguages(allowUndefined bool, lang ...language.Tag) []language.Tag {
+func LanguagesAreSupported(lang ...language.Tag) error {
 	unsupported := make([]language.Tag, 0)
 	for _, l := range lang {
-		if allowUndefined && l.IsRoot() {
+		if l.IsRoot() {
 			continue
 		}
 		if !languageIsContained(i18n.SupportedLanguages(), l) {
 			unsupported = append(unsupported, l)
 		}
 	}
-	return unsupported
+	if len(unsupported) == 0 {
+		return nil
+	}
+	if len(unsupported) == 1 {
+		return errors.ThrowInvalidArgument(nil, "LANG-lg4DP", "Errors.Language.NotSupported")
+	}
+	return errors.ThrowInvalidArgumentf(nil, "LANG-XHiK5", "Errors.Languages.NotSupported: %s", LanguagesToStrings(unsupported))
+}
+
+func LanguageIsDefined(lang language.Tag) error {
+	if lang.IsRoot() {
+		return errors.ThrowInvalidArgument(nil, "LANG-3M9f2", "Errors.Language.Undefined")
+	}
+	return nil
 }
 
 func languageIsContained(languages []language.Tag, search language.Tag) bool {

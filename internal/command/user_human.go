@@ -91,12 +91,12 @@ func (h *AddHuman) Validate(hasher *crypto.PasswordHasher, allowedLanguages []la
 	if h.LastName = strings.TrimSpace(h.LastName); h.LastName == "" {
 		return errors.ThrowInvalidArgument(nil, "USER-4hB7d", "Errors.User.Profile.LastNameEmpty")
 	}
-	// TODO: Am I right that this is a legacy profile and an undefined preferred language should not be supported?
-	if len(domain.UnsupportedLanguages(false, h.PreferredLanguage)) > 0 {
-		return errors.ThrowPreconditionFailedf(nil, "USER-gL4Pj", "Errors.Language.NotSupported")
+	if err = domain.LanguagesAreSupported(h.PreferredLanguage); err != nil {
+		return err
 	}
-	if !domain.LanguageIsAllowed(false, allowedLanguages, h.PreferredLanguage) {
-		return errors.ThrowPreconditionFailedf(nil, "USER-AJfus", "Errors.Language.NotAllowed")
+	// TODO: Am I right that this is a legacy profile and an undefined preferred language should not be supported?
+	if err = domain.LanguageIsAllowed(false, allowedLanguages, h.PreferredLanguage); err != nil {
+		return err
 	}
 	h.ensureDisplayName()
 
@@ -525,7 +525,7 @@ func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.
 	if orgID == "" {
 		return nil, nil, nil, "", errors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.Org.Empty")
 	}
-	if err := human.Normalize(allowedLanguages, true /*TODO: or don't allow undefined languages? couldn't find out by tests or comments */); err != nil {
+	if err := human.Normalize(allowedLanguages, true); err != nil {
 		return nil, nil, nil, "", err
 	}
 	events, humanWriteModel, err = c.createHuman(ctx, orgID, human, links, false, passwordless, domainPolicy, pwPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, allowedLanguages)

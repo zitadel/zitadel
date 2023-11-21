@@ -12,10 +12,12 @@ import (
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/tls"
+	"github.com/zitadel/zitadel/internal/api/ui/login/static/loginfs"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/migration"
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
@@ -64,7 +66,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	ctx := context.Background()
 	logging.Info("setup started")
 
-	i18n.MustLoadSupportedLanguages(loginfs.MustLoad())
+	i18n.MustLoadSupportedLanguagesFromDir(loginfs.MustLoad())
 
 	zitadelDBClient, err := database.Connect(config.Database, false, false)
 	logging.OnError(err).Fatal("unable to connect to database")

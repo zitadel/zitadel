@@ -70,12 +70,11 @@ func (c *Commands) SetRestrictionsCommand(a *restrictions.Aggregate, wm *restric
 			return nil, errors.ThrowInvalidArgument(nil, "COMMAND-oASwj", "Errors.Restrictions.NoneSpecified")
 		}
 		if setRestrictions.AllowedLanguages != nil {
-			unsupported := domain.UnsupportedLanguages(false, setRestrictions.AllowedLanguages...)
-			if len(unsupported) > 0 {
-				return nil, errors.ThrowInvalidArgumentf(nil, "COMMAND-2M9fs", "Errors.Language.NotSupported: %s", domain.LanguagesToStrings(unsupported))
+			if err := domain.LanguagesAreSupported(setRestrictions.AllowedLanguages...); err != nil {
+				return nil, err
 			}
-			if !domain.LanguageIsAllowed(false, setRestrictions.AllowedLanguages, defaultLanguage) {
-				return nil, errors.ThrowInvalidArgumentf(nil, "COMMAND-2M9fs", "Errors.Restrictions.DefaultLanguageMustBeAllowed: %s", defaultLanguage.String())
+			if err := domain.LanguageIsAllowed(false, setRestrictions.AllowedLanguages, defaultLanguage); err != nil {
+				return nil, err
 			}
 		}
 		return func(ctx context.Context, _ preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -97,7 +96,7 @@ func (c *Commands) SetRestrictionsCommand(a *restrictions.Aggregate, wm *restric
 					return nil, err
 				}
 				for _, profile := range profiles {
-					if !domain.LanguageIsAllowed(true, setRestrictions.AllowedLanguages, profile.PreferredLanguage) {
+					if notAllowedErr := domain.LanguageIsAllowed(true, setRestrictions.AllowedLanguages, profile.PreferredLanguage); notAllowedErr != nil {
 						changeProfile, profileChanged, profileChangedErr := profile.NewChangedEvent(
 							ctx,
 							UserAggregateFromWriteModel(&profile.WriteModel),

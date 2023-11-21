@@ -12,6 +12,8 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
+// SetDefaultMessageText only validates if the language is supported, not if it is allowed.
+// This enables setting texts before allowing a language
 func (c *Commands) SetDefaultMessageText(ctx context.Context, instanceID string, messageText *domain.CustomMessageText) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(instanceID)
 	events, existingMessageText, err := c.setDefaultMessageText(ctx, &instanceAgg.Aggregate, messageText)
@@ -30,8 +32,8 @@ func (c *Commands) SetDefaultMessageText(ctx context.Context, instanceID string,
 }
 
 func (c *Commands) setDefaultMessageText(ctx context.Context, instanceAgg *eventstore.Aggregate, msg *domain.CustomMessageText) ([]eventstore.Command, *InstanceCustomMessageTextWriteModel, error) {
-	if !msg.IsValid() {
-		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-kd9fs", "Errors.CustomMessageText.Invalid")
+	if err := msg.IsValid(); err != nil {
+		return nil, nil, err
 	}
 
 	existingMessageText, err := c.defaultCustomMessageTextWriteModelByID(ctx, msg.MessageTextType, msg.Language)
@@ -129,8 +131,8 @@ func prepareSetInstanceCustomMessageTexts(
 	msg *domain.CustomMessageText,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		if !msg.IsValid() {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-kd9fs", "Errors.CustomMessageText.Invalid")
+		if err := msg.IsValid(); err != nil {
+			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			existing, err := existingInstanceCustomMessageText(ctx, filter, msg.MessageTextType, msg.Language)

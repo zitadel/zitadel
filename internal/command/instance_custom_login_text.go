@@ -12,6 +12,8 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
+// SetCustomInstanceLoginText only validates if the language is supported, not if it is allowed.
+// This enables setting texts before allowing a language
 func (c *Commands) SetCustomInstanceLoginText(ctx context.Context, loginText *domain.CustomLoginText) (*domain.ObjectDetails, error) {
 	iamAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	events, existingMailText, err := c.setCustomInstanceLoginText(ctx, &iamAgg.Aggregate, loginText)
@@ -53,8 +55,8 @@ func (c *Commands) RemoveCustomInstanceLoginTexts(ctx context.Context, lang lang
 }
 
 func (c *Commands) setCustomInstanceLoginText(ctx context.Context, instanceAgg *eventstore.Aggregate, text *domain.CustomLoginText) ([]eventstore.Command, *InstanceCustomLoginTextReadModel, error) {
-	if !text.IsValid() {
-		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "Instance-kd9fs", "Errors.CustomText.Invalid")
+	if err := text.IsValid(); err != nil {
+		return nil, nil, err
 	}
 	existingLoginText, err := c.defaultLoginTextWriteModelByID(ctx, text.Language)
 	if err != nil {

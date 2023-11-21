@@ -2,14 +2,13 @@ package command
 
 import (
 	"context"
+	"golang.org/x/text/language"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/text/language"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	zitadel_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
@@ -34,19 +33,72 @@ func TestCommandSide_SetDefaultMessageText(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "invalid custom text, error",
+			name: "empty message type, error",
+			fields: fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				config: &domain.CustomMessageText{
+					Language: AllowedLanguage,
+				},
+			},
+			res: res{
+				err: zitadel_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "empty custom message text, success",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectPush(),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				config: &domain.CustomMessageText{
+					MessageTextType: "Some type", // TODO: check the type!
+					Language:        AllowedLanguage,
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "undefined language, error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				instanceID: "INSTANCE",
-				config:     &domain.CustomMessageText{},
+				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
+				config: &domain.CustomMessageText{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zitadel_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "unsupported language, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				config: &domain.CustomMessageText{
+					Language: UnsupportedLanguage,
+				},
+			},
+			res: res{
+				err: zitadel_errs.IsErrorInvalidArgument,
 			},
 		},
 		{

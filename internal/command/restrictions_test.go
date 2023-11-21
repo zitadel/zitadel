@@ -172,6 +172,64 @@ func TestSetRestrictions(t *testing.T) {
 				err: zitadel_errs.IsErrorInvalidArgument,
 			},
 		},
+		{
+			name: "unsupported language restricted",
+			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+				return eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							restrictions.NewSetEvent(
+								eventstore.NewBaseEventForPush(
+									context.Background(),
+									&restrictions.NewAggregate("restrictions1", "instance1", "instance1").Aggregate,
+									restrictions.SetEventType,
+								),
+								restrictions.ChangeAllowedLanguages(SupportedLanguages),
+							),
+						),
+					),
+				), nil
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				setRestrictions: &SetRestrictions{
+					AllowedLanguages: []language.Tag{AllowedLanguage, UnsupportedLanguage},
+				},
+				defaultLanguage: AllowedLanguage,
+			},
+			res: res{
+				err: zitadel_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "default language not allowed",
+			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+				return eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							restrictions.NewSetEvent(
+								eventstore.NewBaseEventForPush(
+									context.Background(),
+									&restrictions.NewAggregate("restrictions1", "instance1", "instance1").Aggregate,
+									restrictions.SetEventType,
+								),
+								restrictions.ChangeAllowedLanguages(OnlyAllowedLanguages),
+							),
+						),
+					),
+				), nil
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				setRestrictions: &SetRestrictions{
+					AllowedLanguages: []language.Tag{DisallowedLanguage},
+				},
+				defaultLanguage: AllowedLanguage,
+			},
+			res: res{
+				err: zitadel_errs.IsPreconditionFailed,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

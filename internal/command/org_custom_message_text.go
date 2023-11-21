@@ -11,6 +11,8 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
+// SetOrgMessageText only validates if the language is supported, not if it is allowed.
+// This enables setting texts before allowing a language
 func (c *Commands) SetOrgMessageText(ctx context.Context, resourceOwner string, messageText *domain.CustomMessageText) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-2biiR", "Errors.ResourceOwnerMissing")
@@ -32,10 +34,9 @@ func (c *Commands) SetOrgMessageText(ctx context.Context, resourceOwner string, 
 }
 
 func (c *Commands) setOrgMessageText(ctx context.Context, orgAgg *eventstore.Aggregate, message *domain.CustomMessageText) ([]eventstore.Command, *OrgCustomMessageTextReadModel, error) {
-	if !message.IsValid() {
-		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "ORG-2jfsf", "Errors.CustomText.Invalid")
+	if err := message.IsValid(); err != nil {
+		return nil, nil, err
 	}
-
 	existingMessageText, err := c.orgCustomMessageTextWriteModelByID(ctx, orgAgg.ID, message.MessageTextType, message.Language)
 	if err != nil {
 		return nil, nil, err

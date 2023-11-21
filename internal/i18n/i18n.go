@@ -90,7 +90,7 @@ func addFileFromFileSystemToBundle(dir http.FileSystem, bundle *i18n.Bundle, fil
 	return err
 }
 
-func MustLoadSupportedLanguages(dir http.FileSystem) {
+func MustLoadSupportedLanguagesFromDir(dir http.FileSystem) {
 	var err error
 	defer func() {
 		if err != nil {
@@ -120,7 +120,7 @@ func MustLoadSupportedLanguages(dir http.FileSystem) {
 	}
 }
 
-func LoadMockedSupportedLanguages(languages ...language.Tag) {
+func SupportLanguages(languages ...language.Tag) {
 	supportedLanguages = languages
 }
 

@@ -125,7 +125,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	ctx := context.Background()
 
 	statikLoginFS := loginfs.MustLoad()
-	i18n.MustLoadSupportedLanguages(statikLoginFS)
+	i18n.MustLoadSupportedLanguagesFromDir(statikLoginFS)
 
 	zitadelDBClient, err := database.Connect(config.Database, false, false)
 	if err != nil {

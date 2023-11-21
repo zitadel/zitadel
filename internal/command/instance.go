@@ -659,11 +659,11 @@ func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLangu
 		if defaultLanguage == language.Und {
 			return nil, errors.ThrowInvalidArgument(nil, "INST-yG7LO", "Errors.Invalid.Argument")
 		}
-		if len(domain.UnsupportedLanguages(false, defaultLanguage)) == 1 {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-7s16J", "Errors.Language.NotSupported")
+		if err := domain.LanguagesAreSupported(defaultLanguage); err != nil {
+			return nil, err
 		}
-		if !domain.LanguageIsAllowed(false, allowedLanguages, defaultLanguage) {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-paD10", "Errors.Language.NotAllowed")
+		if err := domain.LanguageIsAllowed(false, allowedLanguages, defaultLanguage); err != nil {
+			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel, err := getInstanceWriteModel(ctx, filter)

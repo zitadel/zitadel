@@ -11,6 +11,8 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
+// SetOrgLoginText only validates if the language is supported, not if it is allowed.
+// This enables setting texts before allowing a language
 func (c *Commands) SetOrgLoginText(ctx context.Context, resourceOwner string, loginText *domain.CustomLoginText) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-m29rF", "Errors.ResourceOwnerMissing")
@@ -32,10 +34,9 @@ func (c *Commands) SetOrgLoginText(ctx context.Context, resourceOwner string, lo
 }
 
 func (c *Commands) setOrgLoginText(ctx context.Context, orgAgg *eventstore.Aggregate, loginText *domain.CustomLoginText) ([]eventstore.Command, *OrgCustomLoginTextReadModel, error) {
-	if !loginText.IsValid() {
-		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "ORG-PPo2w", "Errors.CustomText.Invalid")
+	if err := loginText.IsValid(); err != nil {
+		return nil, nil, err
 	}
-
 	existingLoginText, err := c.orgCustomLoginTextWriteModelByID(ctx, orgAgg.ID, loginText.Language)
 	if err != nil {
 		return nil, nil, err

@@ -30,11 +30,11 @@ func (p *Profile) Validate(allowedLanguages []language.Tag, allowUndefinedLangua
 	if p.LastName == "" {
 		return errors.ThrowInvalidArgument(nil, "PROFILE-DSUkN", "Errors.User.Profile.LastNameEmpty")
 	}
-	if len(UnsupportedLanguages(allowUndefinedLanguage, p.PreferredLanguage)) == 1 {
-		return errors.ThrowInvalidArgument(nil, "PROFILE-NzQ5q", "Errors.Languages.NotSupported")
+	if err := LanguagesAreSupported(p.PreferredLanguage); err != nil {
+		return err
 	}
-	if !LanguageIsAllowed(allowUndefinedLanguage, allowedLanguages, p.PreferredLanguage) {
-		return errors.ThrowPreconditionFailedf(nil, "USER-hB5rv", "Errors.Language.NotAllowed")
+	if err := LanguageIsAllowed(allowUndefinedLanguage, allowedLanguages, p.PreferredLanguage); err != nil {
+		return err
 	}
 	return nil
 }

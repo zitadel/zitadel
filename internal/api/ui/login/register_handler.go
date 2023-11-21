@@ -96,8 +96,12 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-
-	user, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, nil, nil, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
+	restrictions, err := l.query.GetInstanceRestrictions(r.Context())
+	if err != nil {
+		l.renderError(w, r, authRequest, err)
+		return
+	}
+	user, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, nil, nil, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, restrictions.AllowedLanguages)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
