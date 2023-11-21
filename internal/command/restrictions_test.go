@@ -20,7 +20,6 @@ func TestSetRestrictions(t *testing.T) {
 	type fields func(*testing.T) (*eventstore.Eventstore, id.Generator)
 	type args struct {
 		ctx             context.Context
-		resourceOwner   string
 		setRestrictions *SetRestrictions
 	}
 	type res struct {

@@ -348,7 +348,6 @@ func NewTester(ctx context.Context) *Tester {
 	host := tester.Host()
 	tester.createClientConn(ctx, host)
 	tester.createLoginClient(ctx)
-	
 	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, http_util.BuildOrigin(host, tester.Config.ExternalSecure))
 	tester.createMachineUserOrgOwner(ctx)
 	tester.createMachineUserInstanceOwner(ctx)
