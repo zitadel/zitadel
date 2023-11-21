@@ -1,35 +1,39 @@
-WITH login_names AS (SELECT 
-  u.id user_id
-  , u.instance_id
-  , u.resource_owner
-  , u.user_name
-  , d.name domain_name
-  , d.is_primary
-  , p.must_be_domain
-  , CASE WHEN p.must_be_domain 
-      THEN concat(u.user_name, '@', d.name)
-      ELSE u.user_name
+WITH login_names AS (
+  SELECT 
+    u.id user_id
+    , u.instance_id
+    , u.resource_owner
+    , u.user_name
+    , d.name domain_name
+    , d.is_primary
+    , p.must_be_domain
+    , CASE WHEN p.must_be_domain 
+        THEN concat(u.user_name, '@', d.name)
+        ELSE u.user_name
     END login_name
-FROM 
-  projections.login_names2_users u
-JOIN 
-  projections.login_names2_domains d
-  ON 
-    u.id = $1
-    AND u.instance_id = $2
-    AND u.instance_id = d.instance_id
-    AND u.resource_owner = d.resource_owner
+  FROM 
+    projections.login_names2_users u
   JOIN lateral (
-    SELECT * FROM projections.login_names2_policies p
+    SELECT 
+      p.must_be_domain 
+    FROM 
+      projections.login_names2_policies p
     WHERE
       u.instance_id = p.instance_id
       AND (
         (p.is_default IS TRUE AND p.instance_id = $2)
         OR (p.instance_id = $2 AND p.resource_owner = u.resource_owner)
       )
-      ORDER BY is_default
-      LIMIT 1
-  ) p ON true
+      AND 
+        u.id = $1
+    ORDER BY is_default
+    LIMIT 1
+  ) p ON TRUE
+  JOIN 
+    projections.login_names2_domains d
+    ON 
+      u.instance_id = d.instance_id
+      AND u.resource_owner = d.resource_owner
 )
 SELECT 
   u.id

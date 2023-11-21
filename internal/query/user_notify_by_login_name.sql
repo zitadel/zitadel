@@ -13,15 +13,11 @@ WITH login_names AS (
       END login_name
   FROM 
     projections.login_names2_users u
-  JOIN 
-    projections.login_names2_domains d
-    ON 
-      (u.user_name ILIKE $1 OR u.user_name ILIKE $3)
-      AND u.instance_id = $4
-      AND u.instance_id = d.instance_id
-      AND u.resource_owner = d.resource_owner
   JOIN lateral (
-    SELECT * FROM projections.login_names2_policies p
+    SELECT 
+      p.must_be_domain 
+    FROM 
+      projections.login_names2_policies p
     WHERE
       u.instance_id = p.instance_id
       AND (
@@ -29,12 +25,18 @@ WITH login_names AS (
         OR (p.instance_id = $4 AND p.resource_owner = u.resource_owner)
       )
       AND (
-        (p.must_be_domain IS TRUE AND u.user_name ILIKE $1 AND d.name ILIKE $2)
-        or (p.must_be_domain IS FALSE AND u.user_name ILIKE $3)
+        (p.must_be_domain IS TRUE AND u.user_name ILIKE $1)
+        OR (p.must_be_domain IS FALSE AND u.user_name ILIKE $3)
       )
-      ORDER BY is_default
-      LIMIT 1
-  ) p ON true
+    ORDER BY is_default
+    LIMIT 1
+  ) p ON TRUE
+  JOIN 
+    projections.login_names2_domains d
+    ON 
+      u.instance_id = d.instance_id
+      AND u.resource_owner = d.resource_owner
+      AND d.name ILIKE $2
 )
 SELECT 
   u.id
