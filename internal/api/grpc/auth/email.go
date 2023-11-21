@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Server) GetMyEmail(ctx context.Context, _ *auth_pb.GetMyEmailRequest) (*auth_pb.GetMyEmailResponse, error) {
-	email, err := s.query.GetHumanEmail(ctx, authz.GetCtxData(ctx).UserID, false)
+	email, err := s.query.GetHumanEmail(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
 	}

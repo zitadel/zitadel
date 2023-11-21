@@ -101,7 +101,7 @@ func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authRe
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 		return
 	}
-	user, err := l.query.GetUser(setContext(r.Context(), userOrg), false, false, loginName)
+	user, err := l.query.GetUser(setContext(r.Context(), userOrg), false, loginName)
 	if err != nil {
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 		return
@@ -144,7 +144,7 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 		}
 	}
 	if authReq == nil {
-		user, err := l.query.GetUserByID(r.Context(), false, userID, false)
+		user, err := l.query.GetUserByID(r.Context(), false, userID)
 		if err == nil {
 			l.customTexts(r.Context(), translator, user.ResourceOwner)
 		}

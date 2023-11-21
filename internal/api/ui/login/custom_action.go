@@ -347,7 +347,7 @@ func (l *Login) runPostCreationActions(
 			actions.SetFields("v1",
 				actions.SetFields("getUser", func(c *actions.FieldConfig) interface{} {
 					return func(call goja.FunctionCall) goja.Value {
-						user, err := l.query.GetUserByID(actionCtx, true, userID, false)
+						user, err := l.query.GetUserByID(actionCtx, true, userID)
 						if err != nil {
 							panic(err)
 						}

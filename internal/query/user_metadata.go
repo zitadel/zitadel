@@ -24,12 +24,12 @@ type UserMetadataList struct {
 }
 
 type UserMetadata struct {
-	CreationDate  time.Time
-	ChangeDate    time.Time
-	ResourceOwner string
-	Sequence      uint64
-	Key           string
-	Value         []byte
+	CreationDate  time.Time `json:"creation_date,omitempty"`
+	ChangeDate    time.Time `json:"change_date,omitempty"`
+	ResourceOwner string    `json:"resource_owner,omitempty"`
+	Sequence      uint64    `json:"sequence,omitempty"`
+	Key           string    `json:"key,omitempty"`
+	Value         []byte    `json:"value,omitempty"`
 }
 
 type UserMetadataSearchQueries struct {
@@ -74,10 +74,6 @@ var (
 		name:  projection.UserMetadataColumnValue,
 		table: userMetadataTable,
 	}
-	UserMetadataOwnerRemovedCol = Column{
-		name:  projection.UserMetadataColumnOwnerRemoved,
-		table: userMetadataTable,
-	}
 )
 
 func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bool, userID, key string, withOwnerRemoved bool, queries ...SearchQuery) (metadata *UserMetadata, err error) {
@@ -99,9 +95,6 @@ func (q *Queries) GetUserMetadataByKey(ctx context.Context, shouldTriggerBulk bo
 		UserMetadataUserIDCol.identifier():     userID,
 		UserMetadataKeyCol.identifier():        key,
 		UserMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		eq[UserMetadataOwnerRemovedCol.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -130,9 +123,6 @@ func (q *Queries) SearchUserMetadata(ctx context.Context, shouldTriggerBulk bool
 	eq := sq.Eq{
 		UserMetadataUserIDCol.identifier():     userID,
 		UserMetadataInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		eq[UserMetadataOwnerRemovedCol.identifier()] = false
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
