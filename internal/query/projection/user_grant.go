@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	UserGrantProjectionTable = "projections.user_grants3"
+	UserGrantProjectionTable = "projections.user_grants4"
 
 	UserGrantID                   = "id"
 	UserGrantCreationDate         = "creation_date"
@@ -29,15 +29,11 @@ const (
 	UserGrantInstanceID           = "instance_id"
 	UserGrantUserID               = "user_id"
 	UserGrantResourceOwnerUser    = "resource_owner_user"
-	UserGrantUserOwnerRemoved     = "user_owner_removed"
 	UserGrantProjectID            = "project_id"
 	UserGrantResourceOwnerProject = "resource_owner_project"
-	UserGrantProjectOwnerRemoved  = "project_owner_removed"
 	UserGrantGrantID              = "grant_id"
 	UserGrantGrantedOrg           = "granted_org"
-	UserGrantGrantedOrgRemoved    = "granted_org_removed"
 	UserGrantRoles                = "roles"
-	UserGrantOwnerRemoved         = "owner_removed"
 )
 
 type userGrantProjection struct {
@@ -64,23 +60,16 @@ func (*userGrantProjection) Init() *old_handler.Check {
 			handler.NewColumn(UserGrantInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(UserGrantUserID, handler.ColumnTypeText),
 			handler.NewColumn(UserGrantResourceOwnerUser, handler.ColumnTypeText),
-			handler.NewColumn(UserGrantUserOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(UserGrantProjectID, handler.ColumnTypeText),
 			handler.NewColumn(UserGrantResourceOwnerProject, handler.ColumnTypeText),
-			handler.NewColumn(UserGrantProjectOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(UserGrantGrantID, handler.ColumnTypeText),
 			handler.NewColumn(UserGrantGrantedOrg, handler.ColumnTypeText),
-			handler.NewColumn(UserGrantGrantedOrgRemoved, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(UserGrantRoles, handler.ColumnTypeTextArray, handler.Nullable()),
-			handler.NewColumn(UserGrantOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(UserGrantInstanceID, UserGrantID),
 			handler.WithIndex(handler.NewIndex("user_id", []string{UserGrantUserID})),
+			handler.WithIndex(handler.NewIndex("project_id", []string{UserGrantProjectID})),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{UserGrantResourceOwner})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{UserGrantOwnerRemoved})),
-			handler.WithIndex(handler.NewIndex("user_owner_removed", []string{UserGrantUserOwnerRemoved})),
-			handler.WithIndex(handler.NewIndex("project_owner_removed", []string{UserGrantProjectOwnerRemoved})),
-			handler.WithIndex(handler.NewIndex("granted_org_removed", []string{UserGrantGrantedOrgRemoved})),
 		),
 	)
 }
@@ -92,6 +81,10 @@ func (p *userGrantProjection) Reducers() []handler.AggregateReducer {
 			EventReducers: []handler.EventReducer{
 				{
 					Event:  usergrant.UserGrantAddedType,
+					Reduce: p.reduceAdded,
+				},
+				{
+					Event:  usergrant.UserGrantAddedV2Type,
 					Reduce: p.reduceAdded,
 				},
 				{
@@ -216,6 +209,32 @@ func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 			handler.NewCol(UserGrantResourceOwnerProject, projectOwner),
 			handler.NewCol(UserGrantGrantID, e.ProjectGrantID),
 			handler.NewCol(UserGrantGrantedOrg, grantOwner),
+			handler.NewCol(UserGrantRoles, database.TextArray[string](e.RoleKeys)),
+			handler.NewCol(UserGrantState, domain.UserGrantStateActive),
+		},
+	), nil
+}
+
+func (p *userGrantProjection) reduceAddedV2(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*usergrant.UserGrantAddedV2Event)
+	if !ok {
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-MQHVB2", "reduce.wrong.event.type %s", usergrant.UserGrantAddedType)
+	}
+	return handler.NewCreateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(UserGrantID, e.Aggregate().ID),
+			handler.NewCol(UserGrantResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(UserGrantInstanceID, e.Aggregate().InstanceID),
+			handler.NewCol(UserGrantCreationDate, e.CreatedAt()),
+			handler.NewCol(UserGrantChangeDate, e.CreatedAt()),
+			handler.NewCol(UserGrantSequence, e.Sequence()),
+			handler.NewCol(UserGrantUserID, e.UserID),
+			handler.NewCol(UserGrantResourceOwnerUser, e.UserResourceOwner),
+			handler.NewCol(UserGrantProjectID, e.ProjectID),
+			handler.NewCol(UserGrantResourceOwnerProject, e.ProjectResourceOwner),
+			handler.NewCol(UserGrantGrantID, e.ProjectGrantID),
+			handler.NewCol(UserGrantGrantedOrg, e.GrantedOrg),
 			handler.NewCol(UserGrantRoles, database.TextArray[string](e.RoleKeys)),
 			handler.NewCol(UserGrantState, domain.UserGrantStateActive),
 		},

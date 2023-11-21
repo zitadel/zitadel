@@ -86,14 +86,17 @@ func UserGrantAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Agg
 type UserGrantPreConditionReadModel struct {
 	eventstore.WriteModel
 
-	UserID             string
-	ProjectID          string
-	ProjectGrantID     string
-	ResourceOwner      string
-	UserExists         bool
-	ProjectExists      bool
-	ProjectGrantExists bool
-	ExistingRoleKeys   []string
+	UserID               string
+	ProjectID            string
+	ProjectGrantID       string
+	ResourceOwner        string
+	UserExists           bool
+	UserResourceOwner    string
+	ProjectExists        bool
+	ProjectResourceOwner string
+	ProjectGrantExists   bool
+	GrantedOrg           string
+	ExistingRoleKeys     []string
 }
 
 func NewUserGrantPreConditionReadModel(userID, projectID, projectGrantID, resourceOwner string) *UserGrantPreConditionReadModel {
@@ -110,22 +113,29 @@ func (wm *UserGrantPreConditionReadModel) Reduce() error {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
 			wm.UserExists = true
+			wm.UserResourceOwner = e.Aggregate().ResourceOwner
 		case *user.HumanRegisteredEvent:
 			wm.UserExists = true
+			wm.UserResourceOwner = e.Aggregate().ResourceOwner
 		case *user.MachineAddedEvent:
 			wm.UserExists = true
+			wm.UserResourceOwner = e.Aggregate().ResourceOwner
 		case *user.UserRemovedEvent:
 			wm.UserExists = false
+			wm.UserResourceOwner = ""
 		case *project.ProjectAddedEvent:
 			if wm.ProjectGrantID == "" && wm.ResourceOwner == e.Aggregate().ResourceOwner {
 				wm.ProjectExists = true
+				wm.ProjectResourceOwner = e.Aggregate().ResourceOwner
 			}
 		case *project.ProjectRemovedEvent:
 			wm.ProjectExists = false
+			wm.ProjectResourceOwner = ""
 		case *project.GrantAddedEvent:
 			if wm.ProjectGrantID == e.GrantID && wm.ResourceOwner == e.GrantedOrgID {
 				wm.ProjectGrantExists = true
 				wm.ExistingRoleKeys = e.RoleKeys
+				wm.GrantedOrg = e.GrantedOrgID
 			}
 		case *project.GrantChangedEvent:
 			if wm.ProjectGrantID == e.GrantID {
@@ -134,6 +144,7 @@ func (wm *UserGrantPreConditionReadModel) Reduce() error {
 		case *project.GrantRemovedEvent:
 			if wm.ProjectGrantID == e.GrantID {
 				wm.ProjectGrantExists = false
+				wm.GrantedOrg = ""
 				wm.ExistingRoleKeys = []string{}
 			}
 		case *project.RoleAddedEvent:
