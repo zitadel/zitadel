@@ -99,7 +99,7 @@ func (p *Project) appendRemovedEvent() error {
 
 func (p *Project) appendOIDCConfig(event eventstore.Event) error {
 	appEvent := new(oidcApp)
-	if err := event.Unmarshal(p); err != nil {
+	if err := event.Unmarshal(appEvent); err != nil {
 		return err
 	}
 	p.OIDCApplications = append(p.OIDCApplications, appEvent)

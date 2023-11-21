@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	OrgMemberProjectionTable = "projections.org_members3"
+	OrgMemberProjectionTable = "projections.org_members4"
 	OrgMemberOrgIDCol        = "org_id"
 )
 
@@ -35,18 +35,14 @@ func (*orgMemberProjection) Init() *old_handler.Check {
 			append(memberColumns, handler.NewColumn(OrgMemberOrgIDCol, handler.ColumnTypeText)),
 			handler.NewPrimaryKey(MemberInstanceID, OrgMemberOrgIDCol, MemberUserIDCol),
 			handler.WithIndex(handler.NewIndex("user_id", []string{MemberUserIDCol})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{MemberOwnerRemoved})),
-			handler.WithIndex(handler.NewIndex("user_owner_removed", []string{MemberUserOwnerRemoved})),
 			handler.WithIndex(
 				handler.NewIndex("om_instance", []string{MemberInstanceID},
 					handler.WithInclude(
 						MemberCreationDate,
 						MemberChangeDate,
-						MemberUserOwnerRemoved,
 						MemberRolesCol,
 						MemberSequence,
 						MemberResourceOwner,
-						MemberOwnerRemoved,
 					),
 				),
 			),
