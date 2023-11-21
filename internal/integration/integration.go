@@ -214,7 +214,7 @@ func (s *Tester) createMachineUser(ctx context.Context, username string, userTyp
 
 	usernameQuery, err := query.NewUserUsernameSearchQuery(username, query.TextEquals)
 	logging.OnError(err).Fatal("user query")
-	user, err := s.Queries.GetUser(ctx, true, true, usernameQuery)
+	user, err := s.Queries.GetUser(ctx, true, usernameQuery)
 	if errors.Is(err, sql.ErrNoRows) {
 		_, err = s.Commands.AddMachine(ctx, &command.Machine{
 			ObjectRoot: models.ObjectRoot{
@@ -226,7 +226,7 @@ func (s *Tester) createMachineUser(ctx context.Context, username string, userTyp
 			AccessTokenType: domain.OIDCTokenTypeJWT,
 		})
 		logging.WithFields("username", username).OnError(err).Fatal("add machine user")
-		user, err = s.Queries.GetUser(ctx, true, true, usernameQuery)
+		user, err = s.Queries.GetUser(ctx, true, usernameQuery)
 	}
 	logging.WithFields("username", username).OnError(err).Fatal("get user")
 

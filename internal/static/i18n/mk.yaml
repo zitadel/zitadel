@@ -434,6 +434,7 @@ Errors:
   UserSession:
     NotFound: Корисничката сесија не е пронајдена
   Key:
+    NotFound: Клучот не е пронајден
     ExpireBeforeNow: Датумот на истекување е во минатото
   Login:
     LoginPolicy:

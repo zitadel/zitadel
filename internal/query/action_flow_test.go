@@ -26,15 +26,15 @@ var (
 		` projections.actions3.script,` +
 		` projections.actions3.allowed_to_fail,` +
 		` projections.actions3.timeout,` +
-		` projections.flow_triggers2.trigger_type,` +
-		` projections.flow_triggers2.trigger_sequence,` +
-		` projections.flow_triggers2.flow_type,` +
-		` projections.flow_triggers2.change_date,` +
-		` projections.flow_triggers2.sequence,` +
-		` projections.flow_triggers2.resource_owner` +
-		` FROM projections.flow_triggers2` +
-		` LEFT JOIN projections.actions3 ON projections.flow_triggers2.action_id = projections.actions3.id AND projections.flow_triggers2.instance_id = projections.actions3.instance_id`
-		// ` AS OF SYSTEM TIME '-1 ms'`
+		` projections.flow_triggers3.trigger_type,` +
+		` projections.flow_triggers3.trigger_sequence,` +
+		` projections.flow_triggers3.flow_type,` +
+		` projections.flow_triggers3.change_date,` +
+		` projections.flow_triggers3.sequence,` +
+		` projections.flow_triggers3.resource_owner` +
+		` FROM projections.flow_triggers3` +
+		` LEFT JOIN projections.actions3 ON projections.flow_triggers3.action_id = projections.actions3.id AND projections.flow_triggers3.instance_id = projections.actions3.instance_id`
+	// ` AS OF SYSTEM TIME '-1 ms'`
 	prepareFlowCols = []string{
 		"id",
 		"creation_date",
@@ -65,9 +65,9 @@ var (
 		` projections.actions3.script,` +
 		` projections.actions3.allowed_to_fail,` +
 		` projections.actions3.timeout` +
-		` FROM projections.flow_triggers2` +
-		` LEFT JOIN projections.actions3 ON projections.flow_triggers2.action_id = projections.actions3.id AND projections.flow_triggers2.instance_id = projections.actions3.instance_id`
-		// ` AS OF SYSTEM TIME '-1 ms'`
+		` FROM projections.flow_triggers3` +
+		` LEFT JOIN projections.actions3 ON projections.flow_triggers3.action_id = projections.actions3.id AND projections.flow_triggers3.instance_id = projections.actions3.instance_id`
+	// ` AS OF SYSTEM TIME '-1 ms'`
 
 	prepareTriggerActionCols = []string{
 		"id",
@@ -82,9 +82,9 @@ var (
 		"timeout",
 	}
 
-	prepareFlowTypeStmt = `SELECT projections.flow_triggers2.flow_type` +
-		` FROM projections.flow_triggers2`
-		// ` AS OF SYSTEM TIME '-1 ms'`
+	prepareFlowTypeStmt = `SELECT projections.flow_triggers3.flow_type` +
+		` FROM projections.flow_triggers3`
+	// ` AS OF SYSTEM TIME '-1 ms'`
 
 	prepareFlowTypeCols = []string{
 		"flow_type",

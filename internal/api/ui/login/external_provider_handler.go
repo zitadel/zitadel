@@ -677,7 +677,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 
 // updateExternalUser will update the existing user (email, phone, profile) with data provided by the IDP
 func (l *Login) updateExternalUser(ctx context.Context, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) error {
-	user, err := l.query.GetUserByID(ctx, true, authReq.UserID, false)
+	user, err := l.query.GetUserByID(ctx, true, authReq.UserID)
 	if err != nil {
 		return err
 	}

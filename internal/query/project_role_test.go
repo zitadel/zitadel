@@ -10,16 +10,16 @@ import (
 )
 
 var (
-	prepareProjectRolesStmt = `SELECT projections.project_roles3.project_id,` +
-		` projections.project_roles3.creation_date,` +
-		` projections.project_roles3.change_date,` +
-		` projections.project_roles3.resource_owner,` +
-		` projections.project_roles3.sequence,` +
-		` projections.project_roles3.role_key,` +
-		` projections.project_roles3.display_name,` +
-		` projections.project_roles3.group_name,` +
+	prepareProjectRolesStmt = `SELECT projections.project_roles4.project_id,` +
+		` projections.project_roles4.creation_date,` +
+		` projections.project_roles4.change_date,` +
+		` projections.project_roles4.resource_owner,` +
+		` projections.project_roles4.sequence,` +
+		` projections.project_roles4.role_key,` +
+		` projections.project_roles4.display_name,` +
+		` projections.project_roles4.group_name,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.project_roles3` +
+		` FROM projections.project_roles4` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	prepareProjectRolesCols = []string{
 		"project_id",

@@ -434,6 +434,7 @@ Errors:
   UserSession:
     NotFound: UserSession non trouvé
   Key:
+    NotFound: Clé introuvable
     ExpireBeforeNow: La date d'expiration est dans le passé
   Login:
     LoginPolicy:

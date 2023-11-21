@@ -446,6 +446,7 @@ Errors:
   UserSession:
     NotFound: UserSession не е намерена
   Key:
+    NotFound: Ключът не е намерен
     ExpireBeforeNow: Срокът на годност е в миналото
   Login:
     LoginPolicy:

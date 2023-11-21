@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	UserTable        = "projections.users8"
+	UserTable        = "projections.users9"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
 	UserNotifyTable  = UserTable + "_" + UserNotifySuffix
@@ -29,7 +29,6 @@ const (
 	UserInstanceIDCol    = "instance_id"
 	UserUsernameCol      = "username"
 	UserTypeCol          = "type"
-	UserOwnerRemovedCol  = "owner_removed"
 
 	UserHumanSuffix        = "humans"
 	HumanUserIDCol         = "user_id"
@@ -94,12 +93,10 @@ func (*userProjection) Init() *old_handler.Check {
 			handler.NewColumn(UserInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(UserUsernameCol, handler.ColumnTypeText),
 			handler.NewColumn(UserTypeCol, handler.ColumnTypeEnum),
-			handler.NewColumn(UserOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(UserInstanceIDCol, UserIDCol),
 			handler.WithIndex(handler.NewIndex("username", []string{UserUsernameCol})),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{UserResourceOwnerCol})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{UserOwnerRemovedCol})),
 		),
 		handler.NewSuffixedTable([]*handler.InitColumn{
 			handler.NewColumn(HumanUserIDCol, handler.ColumnTypeText),
