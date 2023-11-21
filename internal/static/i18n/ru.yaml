@@ -423,6 +423,7 @@ Errors:
   UserSession:
     NotFound: UserSession не найден
   Key:
+    NotFound: Ключ не найден
     ExpireBeforeNow: Срок годности в прошлом
   Login:
     LoginPolicy:

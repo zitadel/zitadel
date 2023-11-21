@@ -15,11 +15,10 @@ import (
 )
 
 const (
-	ProjectGrantMemberProjectionTable   = "projections.project_grant_members3"
-	ProjectGrantMemberProjectIDCol      = "project_id"
-	ProjectGrantMemberGrantIDCol        = "grant_id"
-	ProjectGrantMemberGrantedOrg        = "granted_org"
-	ProjectGrantMemberGrantedOrgRemoved = "granted_org_removed"
+	ProjectGrantMemberProjectionTable = "projections.project_grant_members4"
+	ProjectGrantMemberProjectIDCol    = "project_id"
+	ProjectGrantMemberGrantIDCol      = "grant_id"
+	ProjectGrantMemberGrantedOrg      = "granted_org"
 )
 
 type projectGrantMemberProjection struct {
@@ -41,24 +40,17 @@ func (*projectGrantMemberProjection) Init() *old_handler.Check {
 				handler.NewColumn(ProjectGrantMemberProjectIDCol, handler.ColumnTypeText),
 				handler.NewColumn(ProjectGrantMemberGrantIDCol, handler.ColumnTypeText),
 				handler.NewColumn(ProjectGrantMemberGrantedOrg, handler.ColumnTypeText),
-				handler.NewColumn(ProjectGrantMemberGrantedOrgRemoved, handler.ColumnTypeBool, handler.Default(false)),
 			),
 			handler.NewPrimaryKey(MemberInstanceID, ProjectGrantMemberProjectIDCol, ProjectGrantMemberGrantIDCol, MemberUserIDCol),
 			handler.WithIndex(handler.NewIndex("user_id", []string{MemberUserIDCol})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{MemberOwnerRemoved})),
-			handler.WithIndex(handler.NewIndex("user_owner_removed", []string{MemberUserOwnerRemoved})),
-			handler.WithIndex(handler.NewIndex("granted_org_removed", []string{ProjectGrantMemberGrantedOrgRemoved})),
 			handler.WithIndex(
 				handler.NewIndex("pgm_instance", []string{MemberInstanceID},
 					handler.WithInclude(
 						MemberCreationDate,
 						MemberChangeDate,
-						MemberUserOwnerRemoved,
 						MemberRolesCol,
 						MemberSequence,
 						MemberResourceOwner,
-						MemberOwnerRemoved,
-						ProjectGrantMemberGrantedOrgRemoved,
 					),
 				),
 			),
@@ -147,7 +139,6 @@ func (p *projectGrantMemberProjection) reduceAdded(event eventstore.Event) (*han
 		withMemberCol(ProjectGrantMemberProjectIDCol, e.Aggregate().ID),
 		withMemberCol(ProjectGrantMemberGrantIDCol, e.GrantID),
 		withMemberCol(ProjectGrantMemberGrantedOrg, grantedOrg),
-		withMemberCol(ProjectGrantMemberGrantedOrgRemoved, false),
 	)
 }
 

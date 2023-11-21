@@ -360,7 +360,7 @@ func (s *Server) checkIntentToken(token string, intentID string) error {
 }
 
 func (s *Server) ListAuthenticationMethodTypes(ctx context.Context, req *user.ListAuthenticationMethodTypesRequest) (*user.ListAuthenticationMethodTypesResponse, error) {
-	authMethods, err := s.query.ListActiveUserAuthMethodTypes(ctx, req.GetUserId(), false)
+	authMethods, err := s.query.ListActiveUserAuthMethodTypes(ctx, req.GetUserId())
 	if err != nil {
 		return nil, err
 	}

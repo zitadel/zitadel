@@ -20,30 +20,30 @@ var (
 		", members.resource_owner" +
 		", members.user_id" +
 		", members.roles" +
-		", projections.login_names2.login_name" +
-		", projections.users8_humans.email" +
-		", projections.users8_humans.first_name" +
-		", projections.users8_humans.last_name" +
-		", projections.users8_humans.display_name" +
-		", projections.users8_machines.name" +
-		", projections.users8_humans.avatar_key" +
-		", projections.users8.type" +
+		", projections.login_names3.login_name" +
+		", projections.users9_humans.email" +
+		", projections.users9_humans.first_name" +
+		", projections.users9_humans.last_name" +
+		", projections.users9_humans.display_name" +
+		", projections.users9_machines.name" +
+		", projections.users9_humans.avatar_key" +
+		", projections.users9.type" +
 		", COUNT(*) OVER () " +
-		"FROM projections.org_members3 AS members " +
-		"LEFT JOIN projections.users8_humans " +
-		"ON members.user_id = projections.users8_humans.user_id " +
-		"AND members.instance_id = projections.users8_humans.instance_id " +
-		"LEFT JOIN projections.users8_machines " +
-		"ON members.user_id = projections.users8_machines.user_id " +
-		"AND members.instance_id = projections.users8_machines.instance_id " +
-		"LEFT JOIN projections.users8 " +
-		"ON members.user_id = projections.users8.id " +
-		"AND members.instance_id = projections.users8.instance_id " +
-		"LEFT JOIN projections.login_names2 " +
-		"ON members.user_id = projections.login_names2.user_id " +
-		"AND members.instance_id = projections.login_names2.instance_id " +
+		"FROM projections.org_members4 AS members " +
+		"LEFT JOIN projections.users9_humans " +
+		"ON members.user_id = projections.users9_humans.user_id " +
+		"AND members.instance_id = projections.users9_humans.instance_id " +
+		"LEFT JOIN projections.users9_machines " +
+		"ON members.user_id = projections.users9_machines.user_id " +
+		"AND members.instance_id = projections.users9_machines.instance_id " +
+		"LEFT JOIN projections.users9 " +
+		"ON members.user_id = projections.users9.id " +
+		"AND members.instance_id = projections.users9.instance_id " +
+		"LEFT JOIN projections.login_names3 " +
+		"ON members.user_id = projections.login_names3.user_id " +
+		"AND members.instance_id = projections.login_names3.instance_id " +
 		"AS OF SYSTEM TIME '-1 ms' " +
-		"WHERE projections.login_names2.is_primary = $1")
+		"WHERE projections.login_names3.is_primary = $1")
 	orgMembersColumns = []string{
 		"creation_date",
 		"change_date",

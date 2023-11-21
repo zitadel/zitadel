@@ -420,6 +420,7 @@ Errors:
   UserSession:
     NotFound: ユーザーが見つかりません
   Key:
+    NotFound: キーが見つかりません
     ExpireBeforeNow: 有効期限が過去です
   Login:
     LoginPolicy:

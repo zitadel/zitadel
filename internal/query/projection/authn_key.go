@@ -30,7 +30,6 @@ const (
 	AuthNKeyPublicKeyCol     = "public_key"
 	AuthNKeyTypeCol          = "type"
 	AuthNKeyEnabledCol       = "enabled"
-	AuthNKeyOwnerRemovedCol  = "owner_removed"
 )
 
 type authNKeyProjection struct{}
@@ -59,12 +58,10 @@ func (*authNKeyProjection) Init() *old_handler.Check {
 			handler.NewColumn(AuthNKeyPublicKeyCol, handler.ColumnTypeBytes),
 			handler.NewColumn(AuthNKeyEnabledCol, handler.ColumnTypeBool, handler.Default(true)),
 			handler.NewColumn(AuthNKeyTypeCol, handler.ColumnTypeEnum, handler.Default(0)),
-			handler.NewColumn(AuthNKeyOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(AuthNKeyInstanceIDCol, AuthNKeyIDCol),
 			handler.WithIndex(handler.NewIndex("enabled", []string{AuthNKeyEnabledCol})),
 			handler.WithIndex(handler.NewIndex("identifier", []string{AuthNKeyIdentifierCol})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{AuthNKeyOwnerRemovedCol})),
 		),
 	)
 }

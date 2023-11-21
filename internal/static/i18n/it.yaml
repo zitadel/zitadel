@@ -432,6 +432,7 @@ Errors:
   UserSession:
     NotFound: Sessione non trovata
   Key:
+    NotFound: Chiave non trovata
     ExpireBeforeNow: La data di scadenza è passata
   Login:
     LoginPolicy:

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	ProjectProjectionTable = "projections.projects3"
+	ProjectProjectionTable = "projections.projects4"
 
 	ProjectColumnID                     = "id"
 	ProjectColumnCreationDate           = "creation_date"
@@ -28,7 +28,6 @@ const (
 	ProjectColumnProjectRoleCheck       = "project_role_check"
 	ProjectColumnHasProjectCheck        = "has_project_check"
 	ProjectColumnPrivateLabelingSetting = "private_labeling_setting"
-	ProjectColumnOwnerRemoved           = "owner_removed"
 )
 
 type projectProjection struct{}
@@ -56,11 +55,9 @@ func (*projectProjection) Init() *old_handler.Check {
 			handler.NewColumn(ProjectColumnProjectRoleCheck, handler.ColumnTypeBool),
 			handler.NewColumn(ProjectColumnHasProjectCheck, handler.ColumnTypeBool),
 			handler.NewColumn(ProjectColumnPrivateLabelingSetting, handler.ColumnTypeEnum),
-			handler.NewColumn(ProjectColumnOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(ProjectColumnInstanceID, ProjectColumnID),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{ProjectColumnResourceOwner})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{ProjectColumnOwnerRemoved})),
 		),
 	)
 }

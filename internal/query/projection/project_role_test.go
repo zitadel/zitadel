@@ -38,7 +38,7 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_roles3 WHERE (project_id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.project_roles4 WHERE (project_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -65,7 +65,7 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_roles3 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.project_roles4 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -91,7 +91,7 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_roles3 WHERE (role_key = $1) AND (project_id = $2) AND (instance_id = $3)",
+							expectedStmt: "DELETE FROM projections.project_roles4 WHERE (role_key = $1) AND (project_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"key",
 								"agg-id",
@@ -119,7 +119,7 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.project_roles3 SET (change_date, sequence, display_name, group_name) = ($1, $2, $3, $4) WHERE (role_key = $5) AND (project_id = $6) AND (instance_id = $7)",
+							expectedStmt: "UPDATE projections.project_roles4 SET (change_date, sequence, display_name, group_name) = ($1, $2, $3, $4) WHERE (role_key = $5) AND (project_id = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -168,7 +168,7 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.project_roles3 (role_key, project_id, creation_date, change_date, resource_owner, instance_id, sequence, display_name, group_name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.project_roles4 (role_key, project_id, creation_date, change_date, resource_owner, instance_id, sequence, display_name, group_name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"key",
 								"agg-id",
@@ -202,7 +202,7 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.project_roles3 WHERE (instance_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.project_roles4 WHERE (instance_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"agg-id",

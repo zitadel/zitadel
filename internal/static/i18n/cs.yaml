@@ -430,6 +430,7 @@ Errors:
   UserSession:
     NotFound: UserSession nenalezena
   Key:
+    NotFound: Klíč nenalezen
     ExpireBeforeNow: Datum expirace je v minulosti
   Login:
     LoginPolicy:
