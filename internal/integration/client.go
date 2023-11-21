@@ -59,7 +59,7 @@ func newClient(cc *grpc.ClientConn) Client {
 }
 
 func (t *Tester) UseIsolatedInstance(iamOwnerCtx, systemCtx context.Context) (primaryDomain, instanceId string, authenticatedIamOwnerCtx context.Context) {
-	primaryDomain = randString(5) + ".integration.localhost"
+	primaryDomain = RandString(5) + ".integration.localhost"
 	instance, err := t.Client.System.CreateInstance(systemCtx, &system.CreateInstanceRequest{
 		InstanceName: "testinstance",
 		CustomDomain: primaryDomain,
