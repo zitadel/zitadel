@@ -84,10 +84,6 @@ func (p *userGrantProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  usergrant.UserGrantAddedV2Type,
-					Reduce: p.reduceAdded,
-				},
-				{
 					Event:  usergrant.UserGrantChangedType,
 					Reduce: p.reduceChanged,
 				},
@@ -175,23 +171,9 @@ func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 	}
 
 	ctx := setUserGrantContext(e.Aggregate())
-	userOwner, err := getResourceOwnerOfUser(ctx, p.es, e.Aggregate().InstanceID, e.UserID)
+	userOwner, projectOwner, grantOwner, err := getResourceOwners(ctx, p.es, e.Aggregate().InstanceID, e.UserID, e.ProjectID, e.ProjectGrantID)
 	if err != nil {
 		return nil, err
-	}
-
-	projectOwner := ""
-	grantOwner := ""
-	if e.ProjectGrantID != "" {
-		grantOwner, err = getGrantedOrgOfGrantedProject(ctx, p.es, e.Aggregate().InstanceID, e.ProjectID, e.ProjectGrantID)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		projectOwner, err = getResourceOwnerOfProject(ctx, p.es, e.Aggregate().InstanceID, e.ProjectID)
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	return handler.NewCreateStatement(
@@ -209,32 +191,6 @@ func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 			handler.NewCol(UserGrantResourceOwnerProject, projectOwner),
 			handler.NewCol(UserGrantGrantID, e.ProjectGrantID),
 			handler.NewCol(UserGrantGrantedOrg, grantOwner),
-			handler.NewCol(UserGrantRoles, database.TextArray[string](e.RoleKeys)),
-			handler.NewCol(UserGrantState, domain.UserGrantStateActive),
-		},
-	), nil
-}
-
-func (p *userGrantProjection) reduceAddedV2(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*usergrant.UserGrantAddedV2Event)
-	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-MQHVB2", "reduce.wrong.event.type %s", usergrant.UserGrantAddedType)
-	}
-	return handler.NewCreateStatement(
-		e,
-		[]handler.Column{
-			handler.NewCol(UserGrantID, e.Aggregate().ID),
-			handler.NewCol(UserGrantResourceOwner, e.Aggregate().ResourceOwner),
-			handler.NewCol(UserGrantInstanceID, e.Aggregate().InstanceID),
-			handler.NewCol(UserGrantCreationDate, e.CreatedAt()),
-			handler.NewCol(UserGrantChangeDate, e.CreatedAt()),
-			handler.NewCol(UserGrantSequence, e.Sequence()),
-			handler.NewCol(UserGrantUserID, e.UserID),
-			handler.NewCol(UserGrantResourceOwnerUser, e.UserResourceOwner),
-			handler.NewCol(UserGrantProjectID, e.ProjectID),
-			handler.NewCol(UserGrantResourceOwnerProject, e.ProjectResourceOwner),
-			handler.NewCol(UserGrantGrantID, e.ProjectGrantID),
-			handler.NewCol(UserGrantGrantedOrg, e.GrantedOrg),
 			handler.NewCol(UserGrantRoles, database.TextArray[string](e.RoleKeys)),
 			handler.NewCol(UserGrantState, domain.UserGrantStateActive),
 		},
@@ -444,74 +400,53 @@ func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 	), nil
 }
 
-func getResourceOwnerOfUser(ctx context.Context, es handler.EventStore, instanceID, aggID string) (string, error) {
-	events, err := es.Filter(
-		ctx,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-			AwaitOpenTransactions().
-			InstanceID(instanceID).
-			AddQuery().
-			AggregateTypes(user.AggregateType).
-			AggregateIDs(aggID).
-			EventTypes(user.HumanRegisteredType, user.HumanAddedType, user.MachineAddedEventType).
-			Builder(),
-	)
-	if err != nil {
-		return "", err
-	}
-	if len(events) != 1 {
-		return "", errors.ThrowNotFound(nil, "PROJ-0I92sp", "Errors.User.NotFound")
-	}
-	return events[0].Aggregate().ResourceOwner, nil
-}
+func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, userID, projectID, grantID string) (string, string, string, error) {
+	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
+		InstanceID(instanceID).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(userID).
+		EventTypes(user.HumanRegisteredType, user.HumanAddedType, user.MachineAddedEventType)
 
-func getResourceOwnerOfProject(ctx context.Context, es handler.EventStore, instanceID, aggID string) (string, error) {
-	events, err := es.Filter(
-		ctx,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-			AwaitOpenTransactions().
-			InstanceID(instanceID).
-			AddQuery().
-			AggregateTypes(project.AggregateType).
-			AggregateIDs(aggID).
-			EventTypes(project.ProjectAddedType).
-			Builder(),
-	)
-	if err != nil {
-		return "", err
-	}
-	if len(events) != 1 {
-		return "", errors.ThrowNotFound(nil, "PROJ-0I91sp", "Errors.Project.NotFound")
-	}
-	return events[0].Aggregate().ResourceOwner, nil
-}
-
-func getGrantedOrgOfGrantedProject(ctx context.Context, es handler.EventStore, instanceID, projectID, grantID string) (string, error) {
-	events, err := es.Filter(
-		ctx,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-			AwaitOpenTransactions().
-			InstanceID(instanceID).
-			AddQuery().
+	// if it's a project grant then we only need the resourceowner for the projectgrant, else the project
+	if grantID != "" {
+		builder = builder.Or().
 			AggregateTypes(project.AggregateType).
 			AggregateIDs(projectID).
 			EventTypes(project.GrantAddedType).
 			EventData(map[string]interface{}{
 				"grantId": grantID,
-			}).
-			Builder(),
+			})
+	} else if projectID != "" {
+		builder = builder.Or().
+			AggregateTypes(project.AggregateType).
+			AggregateIDs(projectID).
+			EventTypes(project.ProjectAddedType)
+	}
+
+	events, err := es.Filter(
+		ctx,
+		builder.Builder(),
 	)
 	if err != nil {
-		return "", err
+		return "", "", "", err
 	}
-	if len(events) != 1 {
-		return "", errors.ThrowNotFound(nil, "PROJ-MoaSpw", "Errors.Grant.NotFound")
+	if len(events) != 2 {
+		return "", "", "", errors.ThrowNotFound(nil, "PROJ-0I91sp", "Errors.NotFound")
 	}
-	grantAddedEvent, ok := events[0].(*project.GrantAddedEvent)
-	if !ok {
-		return "", errors.ThrowNotFound(nil, "PROJ-P0s2o0", "Errors.Grant.NotFound")
+	var userRO, projectRO, grantedOrg string
+	for _, event := range events {
+		switch e := event.(type) {
+		case *project.GrantAddedEvent:
+			grantedOrg = e.GrantedOrgID
+		case *project.ProjectAddedEvent:
+			projectRO = e.Aggregate().ResourceOwner
+		case *user.HumanRegisteredEvent, *user.HumanAddedEvent, *user.MachineAddedEvent:
+			userRO = e.Aggregate().ResourceOwner
+		}
 	}
-	return grantAddedEvent.GrantedOrgID, nil
+	return userRO, projectRO, grantedOrg, nil
 }
 
 func setUserGrantContext(aggregate *eventstore.Aggregate) context.Context {

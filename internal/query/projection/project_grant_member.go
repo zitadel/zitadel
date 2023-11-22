@@ -125,11 +125,7 @@ func (p *projectGrantMemberProjection) reduceAdded(event eventstore.Event) (*han
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-0EBQf", "reduce.wrong.event.type %s", project.GrantMemberAddedType)
 	}
 	ctx := setMemberContext(e.Aggregate())
-	userOwner, err := getResourceOwnerOfUser(ctx, p.es, e.Aggregate().InstanceID, e.UserID)
-	if err != nil {
-		return nil, err
-	}
-	grantedOrg, err := getGrantedOrgOfGrantedProject(ctx, p.es, e.Aggregate().InstanceID, e.Aggregate().ID, e.GrantID)
+	userOwner, _, grantedOrg, err := getResourceOwners(ctx, p.es, e.Aggregate().InstanceID, e.UserID, e.Aggregate().ID, e.GrantID)
 	if err != nil {
 		return nil, err
 	}
@@ -229,4 +225,53 @@ func (p *projectGrantMemberProjection) reduceProjectGrantRemoved(event eventstor
 		withMemberCond(ProjectGrantMemberGrantIDCol, e.GrantID),
 		withMemberCond(ProjectGrantMemberProjectIDCol, e.Aggregate().ID),
 	)
+}
+
+func getResourceOwnerOfUserAndGrantedProject(ctx context.Context, es handler.EventStore, instanceID, aggID string) (string, error) {
+	events, err := es.Filter(
+		ctx,
+		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+			AwaitOpenTransactions().
+			InstanceID(instanceID).
+			AddQuery().
+			AggregateTypes(user.AggregateType).
+			AggregateIDs(aggID).
+			EventTypes(user.HumanRegisteredType, user.HumanAddedType, user.MachineAddedEventType).
+			Builder(),
+	)
+	if err != nil {
+		return "", err
+	}
+	if len(events) != 1 {
+		return "", errors.ThrowNotFound(nil, "PROJ-0I92sp", "Errors.User.NotFound")
+	}
+	return events[0].Aggregate().ResourceOwner, nil
+}
+
+func getGrantedOrgOfGrantedProject(ctx context.Context, es handler.EventStore, instanceID, projectID, grantID string) (string, error) {
+	events, err := es.Filter(
+		ctx,
+		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+			AwaitOpenTransactions().
+			InstanceID(instanceID).
+			AddQuery().
+			AggregateTypes(project.AggregateType).
+			AggregateIDs(projectID).
+			EventTypes(project.GrantAddedType).
+			EventData(map[string]interface{}{
+				"grantId": grantID,
+			}).
+			Builder(),
+	)
+	if err != nil {
+		return "", err
+	}
+	if len(events) != 1 {
+		return "", errors.ThrowNotFound(nil, "PROJ-MoaSpw", "Errors.Grant.NotFound")
+	}
+	grantAddedEvent, ok := events[0].(*project.GrantAddedEvent)
+	if !ok {
+		return "", errors.ThrowNotFound(nil, "PROJ-P0s2o0", "Errors.Grant.NotFound")
+	}
+	return grantAddedEvent.GrantedOrgID, nil
 }

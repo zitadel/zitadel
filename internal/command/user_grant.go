@@ -44,15 +44,12 @@ func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant
 
 	addedUserGrant := NewUserGrantWriteModel(userGrant.AggregateID, resourceOwner)
 	userGrantAgg := UserGrantAggregateFromWriteModel(&addedUserGrant.WriteModel)
-	command = usergrant.NewUserGrantAddedV2Event(
+	command = usergrant.NewUserGrantAddedEvent(
 		ctx,
 		userGrantAgg,
 		userGrant.UserID,
-		userGrant.UserResourceOwner,
 		userGrant.ProjectID,
-		userGrant.ProjectResourceOwner,
 		userGrant.ProjectGrantID,
-		userGrant.GrantedOrg,
 		userGrant.RoleKeys,
 	)
 	return command, addedUserGrant, nil
@@ -306,8 +303,5 @@ func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *do
 	if usergrant.HasInvalidRoles(preConditions.ExistingRoleKeys) {
 		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-mm9F4", "Errors.Project.Role.NotFound")
 	}
-	usergrant.UserResourceOwner = preConditions.UserResourceOwner
-	usergrant.ProjectResourceOwner = preConditions.ProjectResourceOwner
-	usergrant.GrantedOrg = preConditions.GrantedOrg
 	return nil
 }

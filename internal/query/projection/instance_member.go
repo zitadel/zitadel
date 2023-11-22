@@ -151,3 +151,24 @@ func (p *instanceMemberProjection) reduceUserOwnerRemoved(event eventstore.Event
 	}
 	return reduceMemberUserOwnerRemoved(e)
 }
+
+func getResourceOwnerOfUser(ctx context.Context, es handler.EventStore, instanceID, aggID string) (string, error) {
+	events, err := es.Filter(
+		ctx,
+		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+			AwaitOpenTransactions().
+			InstanceID(instanceID).
+			AddQuery().
+			AggregateTypes(user.AggregateType).
+			AggregateIDs(aggID).
+			EventTypes(user.HumanRegisteredType, user.HumanAddedType, user.MachineAddedEventType).
+			Builder(),
+	)
+	if err != nil {
+		return "", err
+	}
+	if len(events) != 1 {
+		return "", errors.ThrowNotFound(nil, "PROJ-0I92sp", "Errors.User.NotFound")
+	}
+	return events[0].Aggregate().ResourceOwner, nil
+}

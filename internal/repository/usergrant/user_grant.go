@@ -85,65 +85,6 @@ func UserGrantAddedEventMapper(event eventstore.Event) (eventstore.Event, error)
 	return e, nil
 }
 
-type UserGrantAddedV2Event struct {
-	eventstore.BaseEvent `json:"-"`
-
-	UserID               string   `json:"userId,omitempty"`
-	UserResourceOwner    string   `json:"userResourceOwner,omitempty"`
-	ProjectID            string   `json:"projectId,omitempty"`
-	ProjectResourceOwner string   `json:"projectResourceOwner,omitempty"`
-	ProjectGrantID       string   `json:"grantId,omitempty"`
-	GrantedOrg           string   `json:"grantedOrg,omitempty"`
-	RoleKeys             []string `json:"roleKeys,omitempty"`
-}
-
-func (e *UserGrantAddedV2Event) Payload() interface{} {
-	return e
-}
-
-func (e *UserGrantAddedV2Event) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.UserID, e.ProjectID, e.ProjectGrantID)}
-}
-
-func NewUserGrantAddedV2Event(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-	userID,
-	userResourceOwner,
-	projectID,
-	projectResourceOwner,
-	projectGrantID,
-	grantedOrg string,
-	roleKeys []string) *UserGrantAddedV2Event {
-	return &UserGrantAddedV2Event{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			UserGrantAddedType,
-		),
-		UserID:               userID,
-		UserResourceOwner:    userResourceOwner,
-		ProjectID:            projectID,
-		ProjectResourceOwner: projectResourceOwner,
-		ProjectGrantID:       projectGrantID,
-		GrantedOrg:           grantedOrg,
-		RoleKeys:             roleKeys,
-	}
-}
-
-func UserGrantAddedV2EventMapper(event eventstore.Event) (eventstore.Event, error) {
-	e := &UserGrantAddedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := event.Unmarshal(e)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "UGRANT-0p9ol2", "unable to unmarshal user grant")
-	}
-
-	return e, nil
-}
-
 type UserGrantChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	RoleKeys             []string `json:"roleKeys"`
