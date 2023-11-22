@@ -58,8 +58,31 @@ ZITADEL does handle many different passwords and secrets. These include:
   - Client Secrets
 
 :::info
-ZITADEL uses `bcrypt` by default to store all Passwords and Client Secrets in an non reversible way to further reduce the risk of a Secrets Storage breach.
+ZITADEL hashes all Passwords and Client Secrets in an non reversible way to further reduce the risk of a Secrets Storage breach.
 :::
+
+Passwords and secrets are always hashed with a random salt and stored as an encoded string that contains the Algorithm, its Parameters, Salt and Hash.
+The storage encoding used by ZITADEL is Modular Crypt Format and a full reference can be found in our [Passwap library](https://github.com/zitadel/passwap#encoding).
+
+The following hash algorithms are supported for user passwords:
+
+- argon2i / id[^1]
+- bcrypt (Default)
+- md5[^2]
+- scrypt
+- pbkdf2
+
+[^1]: argon2 algorithms are currently disabled on ZITADEL Cloud due to its steep memory requirements.
+[^2]: md5 is insecure and can only be used to import and verify users, not hash new passwords.
+
+:::info
+ZITADEL updates stored hashes when the configured algorithm or its parameters are updated,
+the first time verification succeeds.
+This allows to increase cost along with growing computing power.
+ZITADEL allows to import user passwords from systems that use any of the above hashing algorithms.
+:::
+
+Client Secrets always use bcrypt.
 
 ### Encrypted Secrets
 
