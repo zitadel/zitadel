@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	FlowTriggerTable             = "projections.flow_triggers2"
+	FlowTriggerTable             = "projections.flow_triggers3"
 	FlowTypeCol                  = "flow_type"
 	FlowChangeDateCol            = "change_date"
 	FlowSequenceCol              = "sequence"
@@ -21,7 +21,6 @@ const (
 	FlowInstanceIDCol            = "instance_id"
 	FlowActionTriggerSequenceCol = "trigger_sequence"
 	FlowActionIDCol              = "action_id"
-	FlowOwnerRemovedCol          = "owner_removed"
 )
 
 type flowProjection struct{}
@@ -45,10 +44,8 @@ func (*flowProjection) Init() *old_handler.Check {
 			handler.NewColumn(FlowInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(FlowActionTriggerSequenceCol, handler.ColumnTypeInt64),
 			handler.NewColumn(FlowActionIDCol, handler.ColumnTypeText),
-			handler.NewColumn(FlowOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(FlowInstanceIDCol, FlowTypeCol, FlowTriggerTypeCol, FlowResourceOwnerCol, FlowActionIDCol),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{FlowOwnerRemovedCol})),
 		),
 	)
 }

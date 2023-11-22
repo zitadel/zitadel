@@ -219,7 +219,7 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 			}
 			applicationIDs := make([]string, 0, len(project.Applications))
 			for _, app := range project.Applications {
-				if app.OIDCConfig != nil {
+				if app.OIDCConfig != nil && app.OIDCConfig.ClientID != "" {
 					applicationIDs = append(applicationIDs, app.OIDCConfig.ClientID)
 				}
 			}

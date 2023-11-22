@@ -3795,6 +3795,59 @@ service AdminService {
             description: "Returns a list of reached instance usage milestones."
         };
     }
+
+    // Sets restrictions
+    rpc SetRestrictions(SetRestrictionsRequest) returns (SetRestrictionsResponse) {
+        option (google.api.http) = {
+            put: "/restrictions"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.restrictions.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Feature Restrictions"];
+            summary: "Restrict the instances features";
+            description: "Undefined values don't change the current restriction. Zero values remove the current restriction.";
+            responses: {
+                key: "200";
+                value: {
+                    description: "Restrictions set.";
+                };
+            };
+            responses: {
+                key: "400";
+                value: {
+                    description: "No restriction is defined.";
+                };
+            };
+        };
+    }
+
+    // Gets restrictions
+    rpc GetRestrictions(GetRestrictionsRequest) returns (GetRestrictionsResponse) {
+        option (google.api.http) = {
+            get: "/restrictions"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.restrictions.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: ["Feature Restrictions"];
+            summary: "Get the current feature restrictions for the instance";
+            description: "Undefined values mean that the feature is not restricted. If restrictions were never set, the instances features are not restricted, all properties are undefined and the details object is empty.";
+            responses: {
+                key: "200";
+                value: {
+                    description: "The status 200 is also returned if no restrictions were ever set. In this case, all feature restrictions have zero values.";
+                };
+            };
+        };
+    }
 }
 
 
@@ -7934,3 +7987,27 @@ message ListMilestonesResponse {
     zitadel.v1.ListDetails details = 1;
     repeated zitadel.milestone.v1.Milestone result = 2;
 }
+
+message SetRestrictionsRequest {
+    optional bool disallow_public_org_registration = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if ZITADEL should expose the endpoint /ui/login/register/org. If it is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
+        }
+    ];
+}
+
+message SetRestrictionsResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetRestrictionsRequest {}
+
+message GetRestrictionsResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    bool disallow_public_org_registration = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines if ZITADEL should expose the endpoint /ui/login/register/org. If it is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
+        }
+    ];
+}
+

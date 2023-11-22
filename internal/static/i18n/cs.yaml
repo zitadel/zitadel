@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limity nebyly nalezeny
     NoneSpecified: Nebyly určeny žádné limity
+  Restrictions:
+    NoneSpecified: Nebyla určena žádná omezení
   Language:
     NotParsed: Jazyk nelze určit
   OIDCSettings:
@@ -428,6 +430,7 @@ Errors:
   UserSession:
     NotFound: UserSession nenalezena
   Key:
+    NotFound: Klíč nenalezen
     ExpireBeforeNow: Datum expirace je v minulosti
   Login:
     LoginPolicy:
