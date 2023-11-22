@@ -151,7 +151,7 @@ func (p *Storage) SetUserinfoWithUserID(ctx context.Context, applicationID strin
 	setUserinfo(user, userinfo, attributes, customAttributes)
 
 	// trigger activity log for authentication for user
-	activity.Trigger(ctx, user.ResourceOwner, user.ID, activity.SAMLResponse)
+	activity.TriggerHTTP(ctx, user.ResourceOwner, user.ID, activity.SAMLResponse)
 	return nil
 }
 
