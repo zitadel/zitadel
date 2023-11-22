@@ -2,7 +2,6 @@ package admin
 
 import (
 	"context"
-
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -15,6 +14,18 @@ import (
 
 func (s *Server) GetSupportedLanguages(ctx context.Context, req *admin_pb.GetSupportedLanguagesRequest) (*admin_pb.GetSupportedLanguagesResponse, error) {
 	return &admin_pb.GetSupportedLanguagesResponse{Languages: domain.LanguagesToStrings(i18n.SupportedLanguages())}, nil
+}
+
+func (s *Server) GetAllowedLanguages(ctx context.Context, _ *admin_pb.GetAllowedLanguagesRequest) (*admin_pb.GetAllowedLanguagesResponse, error) {
+	restrictions, err := s.query.GetInstanceRestrictions(ctx)
+	if err != nil {
+		return nil, err
+	}
+	allowed := restrictions.AllowedLanguages
+	if len(allowed) == 0 {
+		allowed = i18n.SupportedLanguages()
+	}
+	return &admin_pb.GetAllowedLanguagesResponse{Languages: domain.LanguagesToStrings(allowed)}, nil
 }
 
 func (s *Server) SetDefaultLanguage(ctx context.Context, req *admin_pb.SetDefaultLanguageRequest) (*admin_pb.SetDefaultLanguageResponse, error) {

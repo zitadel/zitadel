@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/text"
 	"github.com/zitadel/zitadel/pkg/grpc/user"
@@ -127,12 +128,17 @@ func setAndAwaitAllowedLanguages(ctx context.Context, t *testing.T, selectLangua
 
 func assertIfLanguageIsUsable(ctx context.Context, t *testing.T, domain string, supportedLanguagesStr []string, allowedLanguage, disallowedLanguage language.Tag, existingUserID string, usable bool) {
 	var (
-		usableStr   = "usable"
-		checkAPIErr = require.NoError
+		usableStr               = "usable"
+		checkAPIErr             = require.NoError
+		allowListMustContain    = supportedLanguagesStr
+		allowListMustNotContain []string
 	)
+
 	if !usable {
 		usableStr = "unusable"
 		checkAPIErr = require.Error
+		allowListMustContain = []string{allowedLanguage.String()}
+		allowListMustNotContain = []string{disallowedLanguage.String()}
 	}
 
 	t.Run("the disallowed language is "+usableStr, func(tt *testing.T) {
@@ -153,13 +159,18 @@ func assertIfLanguageIsUsable(ctx context.Context, t *testing.T, domain string, 
 			checkAPIErr(ttt, err)
 		})
 		tt.Run("as ui locale according to the oidc discovery endpoint", func(ttt *testing.T) {
-			containsUILocales := supportedLanguagesStr
-			var notContainsUILocales []string
-			if !usable {
-				containsUILocales = []string{allowedLanguage.String()}
-				notContainsUILocales = []string{disallowedLanguage.String()}
-			}
-			checkDiscoveryEndpoint(ttt, domain, containsUILocales, notContainsUILocales)
+			checkDiscoveryEndpoint(ttt, domain, allowListMustContain, allowListMustNotContain)
+		})
+		tt.Run("for consumers of the GetAllowedLanguages endpoints", func(ttt *testing.T) {
+			adminAllowed, err := Tester.Client.Admin.GetAllowedLanguages(ctx, &admin.GetAllowedLanguagesRequest{})
+			require.NoError(ttt, err)
+			assertAllowList(adminAllowed.Languages, allowListMustContain, allowListMustNotContain)
+			mgmtAllowed, err := Tester.Client.Mgmt.GetAllowedLanguages(ctx, &management.GetAllowedLanguagesRequest{})
+			require.NoError(ttt, err)
+			assertAllowList(mgmtAllowed.Languages, allowListMustContain, allowListMustNotContain)
+			authAllowed, err := Tester.Client.Auth.GetAllowedLanguages(ctx, &auth.GetAllowedLanguagesRequest{})
+			require.NoError(ttt, err)
+			assertAllowList(authAllowed.Languages, allowListMustContain, allowListMustNotContain)
 		})
 	})
 }
@@ -204,11 +215,15 @@ func checkDiscoveryEndpoint(t *testing.T, domain string, containsUILocales, notC
 		UILocalesSupported []string `json:"ui_locales_supported"`
 	}{}
 	require.NoError(t, json.Unmarshal(body, &doc))
-	if containsUILocales != nil {
-		assert.Condition(NoopAssertionT, contains(doc.UILocalesSupported, containsUILocales))
+	assertAllowList(doc.UILocalesSupported, containsUILocales, notContainsUILocales)
+}
+
+func assertAllowList(allowList, mustContain, mustNotContain []string) {
+	if mustContain != nil {
+		assert.Condition(NoopAssertionT, contains(allowList, mustContain))
 	}
-	if notContainsUILocales != nil {
-		assert.Condition(NoopAssertionT, not(contains(doc.UILocalesSupported, notContainsUILocales)))
+	if mustNotContain != nil {
+		assert.Condition(NoopAssertionT, not(contains(allowList, mustNotContain)))
 	}
 }
 

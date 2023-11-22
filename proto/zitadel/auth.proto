@@ -146,7 +146,22 @@ service AuthService {
             description: "The supported/default languages of the system will be returned by the language abbreviation."
             tags: "General";
         };
+    }
 
+    rpc GetAllowedLanguages(GetAllowedLanguagesRequest) returns (GetAllowedLanguagesResponse) {
+        option (google.api.http) = {
+            get: "/languages/allowed";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Allowed Languages";
+            description: "If the languages are restricted, only those are returned. Else, all supported languages are returned."
+            tags: "Restrictions";
+        };
     }
 
     rpc GetMyUser(GetMyUserRequest) returns (GetMyUserResponse) {
@@ -996,8 +1011,18 @@ message HealthzResponse {}
 //This is an empty request
 message GetSupportedLanguagesRequest {}
 
-//This is an empty response
 message GetSupportedLanguagesResponse {
+    repeated string languages = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"en\", \"de\", \"it\"]"
+        }
+    ];
+}
+
+//This is an empty request
+message GetAllowedLanguagesRequest {}
+
+message GetAllowedLanguagesResponse {
     repeated string languages = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"en\", \"de\", \"it\"]"
