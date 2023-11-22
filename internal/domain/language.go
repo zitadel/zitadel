@@ -38,7 +38,11 @@ func LanguagesDiffer(left, right []language.Tag) bool {
 }
 
 func LanguageIsAllowed(allowUndefined bool, allowedLanguages []language.Tag, lang language.Tag) error {
-	if err := LanguageIsDefined(lang); err != nil && !allowUndefined {
+	err := LanguageIsDefined(lang)
+	if err != nil && allowUndefined {
+		return nil
+	}
+	if err != nil {
 		return err
 	}
 	if len(allowedLanguages) > 0 && !languageIsContained(allowedLanguages, lang) {

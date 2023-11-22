@@ -433,7 +433,7 @@ func (s *Server) UpdateHumanProfile(ctx context.Context, req *mgmt_pb.UpdateHuma
 	if err != nil {
 		return nil, err
 	}
-	profile, err := s.command.ChangeHumanProfile(ctx, UpdateHumanProfileRequestToDomain(req, authz.GetCtxData(ctx).OrgID), restrictions.AllowedLanguages, true)
+	profile, err := s.command.ChangeHumanProfile(ctx, UpdateHumanProfileRequestToDomain(req, authz.GetCtxData(ctx).OrgID), restrictions.AllowedLanguages)
 	if err != nil {
 		return nil, err
 	}

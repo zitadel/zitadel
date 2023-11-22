@@ -1351,69 +1351,6 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			},
 		},
 		{
-			name: "human preferred language undefined, error",
-			fields: fields{
-				eventstore:  expectEventstore(),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID", "userID"),
-			},
-			args: args{
-				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
-				setupOrg: &OrgSetup{
-					Name: "Org",
-					Admins: []*OrgSetupAdmin{
-						{
-							Human: &AddHuman{
-								Username:  "username",
-								FirstName: "firstname",
-								LastName:  "lastname",
-								Email: Email{
-									Address:  "email@test.ch",
-									Verified: true,
-								},
-							},
-						},
-					},
-				},
-				allowInitialMail: true,
-				allowedLanguages: SupportedLanguages,
-			},
-			res: res{
-				err: errors.ThrowInvalidArgumentf(nil, "LANG-3M9f2", "Errors.Language.Undefined"),
-			},
-		},
-		{
-			name: "human preferred language not supported, error",
-			fields: fields{
-				eventstore:  expectEventstore(),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID", "userID"),
-			},
-			args: args{
-				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
-				setupOrg: &OrgSetup{
-					Name: "Org",
-					Admins: []*OrgSetupAdmin{
-						{
-							Human: &AddHuman{
-								Username:  "username",
-								FirstName: "firstname",
-								LastName:  "lastname",
-								Email: Email{
-									Address:  "email@test.ch",
-									Verified: true,
-								},
-								PreferredLanguage: UnsupportedLanguage,
-							},
-						},
-					},
-				},
-				allowInitialMail: true,
-				allowedLanguages: SupportedLanguages,
-			},
-			res: res{
-				err: errors.ThrowInvalidArgument(nil, "LANG-lg4DP", "Errors.Language.NotSupported"),
-			},
-		},
-		{
 			name: "human preferred language not allowed, error",
 			fields: fields{
 				eventstore:  expectEventstore(),

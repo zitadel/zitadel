@@ -220,7 +220,7 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeHumanProfile(tt.args.ctx, tt.args.address, tt.args.allowedLanguages, true)
+			got, err := r.ChangeHumanProfile(tt.args.ctx, tt.args.address, tt.args.allowedLanguages)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

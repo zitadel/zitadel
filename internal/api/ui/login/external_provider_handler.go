@@ -757,7 +757,7 @@ func (l *Login) updateExternalUserProfile(ctx context.Context, user *query.User,
 		DisplayName:       externalUser.DisplayName,
 		PreferredLanguage: externalUser.PreferredLanguage,
 		Gender:            user.Human.Gender,
-	}, restrictions.AllowedLanguages, true)
+	}, restrictions.AllowedLanguages)
 	return err
 }
 

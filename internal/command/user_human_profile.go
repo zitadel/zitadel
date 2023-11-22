@@ -9,12 +9,12 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) ChangeHumanProfile(ctx context.Context, profile *domain.Profile, allowedLanguages []language.Tag, allowUndefinedLanguage bool) (*domain.Profile, error) {
+func (c *Commands) ChangeHumanProfile(ctx context.Context, profile *domain.Profile, allowedLanguages []language.Tag) (*domain.Profile, error) {
 	if profile.AggregateID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-AwbEB", "Errors.User.Profile.IDMissing")
 	}
 	// True?
-	if err := profile.Validate(allowedLanguages, allowUndefinedLanguage); err != nil {
+	if err := profile.Validate(allowedLanguages); err != nil {
 		return nil, err
 	}
 	existingProfile, err := c.profileWriteModelByID(ctx, profile.AggregateID, profile.ResourceOwner)

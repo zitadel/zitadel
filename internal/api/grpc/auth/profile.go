@@ -30,7 +30,7 @@ func (s *Server) UpdateMyProfile(ctx context.Context, req *auth_pb.UpdateMyProfi
 	if err != nil {
 		return nil, err
 	}
-	profile, err := s.command.ChangeHumanProfile(ctx, UpdateProfileToDomain(ctx, req), restrictions.AllowedLanguages, true)
+	profile, err := s.command.ChangeHumanProfile(ctx, UpdateProfileToDomain(ctx, req), restrictions.AllowedLanguages)
 	if err != nil {
 		return nil, err
 	}

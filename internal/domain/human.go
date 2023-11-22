@@ -59,11 +59,11 @@ func (f Gender) Specified() bool {
 	return f > GenderUnspecified && f < genderCount
 }
 
-func (u *Human) Normalize(allowedLanguages []language.Tag, allowUndefinedLanguage bool) error {
+func (u *Human) Normalize(allowedLanguages []language.Tag) error {
 	if u.Username == "" {
 		return errors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.User.Username.Empty")
 	}
-	if err := u.Profile.Validate(allowedLanguages, allowUndefinedLanguage); err != nil {
+	if err := u.Profile.Validate(allowedLanguages); err != nil {
 		return err
 	}
 	if err := u.Email.Validate(); err != nil {
