@@ -415,6 +415,8 @@ import {
   SendPasswordlessRegistrationRequest,
   SendPasswordlessRegistrationResponse,
   SetCustomDomainClaimedMessageTextRequest,
+  GetAllowedLanguagesRequest,
+  GetAllowedLanguagesResponse,
   SetCustomDomainClaimedMessageTextResponse,
   SetCustomInitMessageTextRequest,
   SetCustomInitMessageTextResponse,
@@ -554,6 +556,11 @@ export class ManagementService {
   public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
     const req = new GetSupportedLanguagesRequest();
     return this.grpcService.mgmt.getSupportedLanguages(req, null).then((resp) => resp.toObject());
+  }
+
+  public getAllowedLanguages(): Promise<GetAllowedLanguagesResponse.AsObject> {
+    const req = new GetAllowedLanguagesRequest();
+    return this.grpcService.mgmt.getAllowedLanguages(req, null).then((resp) => resp.toObject());
   }
 
   public getDefaultLoginTexts(req: GetDefaultLoginTextsRequest): Promise<GetDefaultLoginTextsResponse.AsObject> {

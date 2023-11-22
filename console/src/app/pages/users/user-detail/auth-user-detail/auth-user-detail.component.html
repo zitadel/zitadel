@@ -30,7 +30,7 @@
             [showEditImage]="true"
             [preferredLoginName]="user.preferredLoginName"
             [genders]="genders"
-            [languages]="languages"
+            [languages]="(languages$ | async) || []"
             [username]="user.userName"
             [user]="user.human"
             [disabled]="false"

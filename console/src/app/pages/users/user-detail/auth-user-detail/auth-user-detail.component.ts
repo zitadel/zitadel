@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
-import { Subscription, take } from 'rxjs';
+import {from, Observable, Subscription, take} from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { InfoDialogComponent } from 'src/app/modules/info-dialog/info-dialog.component';
@@ -24,8 +24,8 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
-import { supportedLanguages } from 'src/app/utils/language';
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
+import {map} from "rxjs/operators";
 
 @Component({
   selector: 'cnsl-auth-user-detail',
@@ -35,7 +35,7 @@ import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.c
 export class AuthUserDetailComponent implements OnDestroy {
   public user?: User.AsObject;
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages: string[] = supportedLanguages;
+  public languages$: Observable<string[]>;
 
   private subscription: Subscription = new Subscription();
 
@@ -86,6 +86,10 @@ export class AuthUserDetailComponent implements OnDestroy {
         this.currentSetting = id;
       }
     });
+    this.languages$ = from(this.userService.getAllowedLanguages()).pipe(
+      take(1),
+      map(({ languagesList }) => languagesList ),
+    );
 
     const mediaq: string = '(max-width: 500px)';
     const small = this.mediaMatcher.matchMedia(mediaq).matches;
@@ -98,10 +102,6 @@ export class AuthUserDetailComponent implements OnDestroy {
 
     this.loading = true;
     this.refreshUser();
-
-    this.userService.getSupportedLanguages().then((lang) => {
-      this.languages = lang.languagesList;
-    });
 
     this.userService.getMyLoginPolicy().then((policy) => {
       if (policy.policy) {

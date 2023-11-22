@@ -106,6 +106,7 @@ import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/ge
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageLocation, StorageService } from './storage.service';
 import { ThemeService } from './theme.service';
+import {GetAllowedLanguagesRequest, GetAllowedLanguagesResponse} from "../proto/generated/zitadel/management_pb";
 
 @Injectable({
   providedIn: 'root',
@@ -497,6 +498,11 @@ export class GrpcAuthService {
   public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
     const req = new GetSupportedLanguagesRequest();
     return this.grpcService.auth.getSupportedLanguages(req, null).then((resp) => resp.toObject());
+  }
+
+  public getAllowedLanguages(): Promise<GetAllowedLanguagesResponse.AsObject> {
+    const req = new GetAllowedLanguagesRequest();
+    return this.grpcService.auth.getAllowedLanguages(req, null).then((resp) => resp.toObject());
   }
 
   public getMyLoginPolicy(): Promise<GetMyLoginPolicyResponse.AsObject> {

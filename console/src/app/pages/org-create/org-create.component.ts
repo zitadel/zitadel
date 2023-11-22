@@ -20,7 +20,8 @@ import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { supportedLanguages } from 'src/app/utils/language';
+import {Observable} from "rxjs";
+import {LanguagesService} from "../../services/languages.service";
 
 @Component({
   selector: 'cnsl-org-create',
@@ -46,7 +47,7 @@ export class OrgCreateComponent {
   public pwdForm?: UntypedFormGroup;
 
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
-  public languages: string[] = supportedLanguages;
+  public languages$: Observable<string[]>;
 
   public policy?: PasswordComplexityPolicy.AsObject;
   public usePassword: boolean = false;
@@ -60,6 +61,7 @@ export class OrgCreateComponent {
     private _location: Location,
     private fb: UntypedFormBuilder,
     private mgmtService: ManagementService,
+    private languagesSvc: LanguagesService,
     breadcrumbService: BreadcrumbService,
   ) {
     const instanceBread = new Breadcrumb({
@@ -71,9 +73,7 @@ export class OrgCreateComponent {
     breadcrumbService.setBreadcrumb([instanceBread]);
     this.initForm();
 
-    this.adminService.getSupportedLanguages().then((supportedResp) => {
-      this.languages = supportedResp.languagesList;
-    });
+    this.languages$ = this.languagesSvc.allowedLanguages(this.mgmtService);
   }
 
   public createSteps: number = 2;
