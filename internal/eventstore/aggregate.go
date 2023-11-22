@@ -55,6 +55,7 @@ func AggregateFromWriteModel(
 	version Version,
 ) *Aggregate {
 	return NewAggregate(
+		// TODO: the linter complains if this function is called without passing a context
 		context.Background(),
 		wm.AggregateID,
 		typ,
