@@ -318,6 +318,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, allo
 	setupLimits(c, &validations, limitsAgg, setup.Limits)
 	setupRestrictions(c, &validations, restrictionsAgg, setup.Restrictions, setup.DefaultLanguage)
 
+	//nolint:staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
 	if err != nil {
 		return "", "", nil, nil, err

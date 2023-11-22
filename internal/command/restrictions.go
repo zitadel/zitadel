@@ -119,6 +119,7 @@ func (c *Commands) resetPreferredLanguageOnAllHumans(ctx context.Context, setRes
 		if notAllowedErr := domain.LanguageIsAllowed(true, setRestrictions.AllowedLanguages, profile.PreferredLanguage); notAllowedErr != nil {
 			changeProfile, profileChanged, profileChangedErr := profile.NewChangedEvent(
 				ctx,
+				//nolint:contextcheck
 				UserAggregateFromWriteModel(&profile.WriteModel),
 				profile.FirstName,
 				profile.LastName,
