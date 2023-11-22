@@ -1,4 +1,4 @@
-import {from, Observable, share, take} from "rxjs";
+import {from, Observable, share, switchMap, take} from "rxjs";
 import {map} from "rxjs/operators";
 import {Injectable} from "@angular/core";
 
@@ -19,19 +19,27 @@ export class LanguagesService {
   private supportedLanguages$!: Observable<string[]>;
 
   public allowedLanguages(svc: LanguagesProvider): Observable<string[]> {
-    return this.toSharedObservable(svc.getAllowedLanguages());
+    return this.toObservable(svc.getAllowedLanguages());
+  }
+  // By accepting an observable, we can reuse the results of that API call.
+  public notAllowedLanguages(svc: LanguagesProvider, allowedLanguages: Observable<string[]>): Observable<string[]> {
+    return allowedLanguages.pipe(
+      switchMap((allowed) =>
+        // this.supportedLanguages always returns the same observable, so we don't have to worry about API calls.
+        this.supportedLanguages(svc).pipe(
+          // cut the allowed languages from the supported list
+          map((supported) => supported.filter((s) => !allowed.includes(s))),
+        ),
+      ),
+    );
   }
   public supportedLanguages(svc: LanguagesProvider): Observable<string[]> {
     if (!this.supportedLanguages$) {
-      this.supportedLanguages$ = this.toSharedObservable(svc.getSupportedLanguages());
+      this.supportedLanguages$ = this.toObservable(svc.getSupportedLanguages());
     }
     return this.supportedLanguages$;
   }
-  private toSharedObservable(resp: Promise<languagesResponse>): Observable<Array<string>> {
-    return from(resp).pipe(
-      take(1),
-      map(({ languagesList }) => languagesList ),
-      share(),
-    );
+  private toObservable(resp: Promise<languagesResponse>): Observable<Array<string>> {
+    return from(resp).pipe(map(({ languagesList }) => languagesList ));
   }
 }

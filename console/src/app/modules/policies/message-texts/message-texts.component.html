@@ -1,5 +1,8 @@
 <h2>{{ 'POLICY.MESSAGE_TEXTS.TITLE' | translate }}</h2>
 <p class="cnsl-secondary-text">{{ 'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate }}</p>
+<cnsl-info-section class="locked" *ngIf="languageNotAllowed$ | async" [type]="InfoSectionType.WARN">
+  {{ 'POLICY.LOGIN_TEXTS.ACTIVE_LANGUAGE_NOT_ALLOWED' | translate }}</cnsl-info-section
+>
 
 <div *ngIf="loading" class="spinner-wr">
   <mat-spinner diameter="30" color="primary"></mat-spinner>
@@ -14,20 +17,31 @@
       </mat-option>
     </mat-select>
   </cnsl-form-field>
-
   <cnsl-form-field class="language">
-    <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.LOCALE' | translate }}</cnsl-label>
-    <mat-select [(ngModel)]="locale" name="locale" (selectionChange)="changeLocale($event)">
-      <mat-option *ngFor="let loc of LOCALES" [value]="loc">
+    <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.LANGUAGE' | translate }}</cnsl-label>
+    <mat-select formControlName="language" name="language">
+      <mat-option *ngFor="let lang of (allowedLanguages$ | async)" [value]="lang">
         <div class="centerline">
-          <span
-            >{{ loc }}
-            <span class="lighter cnsl-secondary-text"
-              >|&nbsp;{{ 'POLICY.LOGIN_TEXTS.LOCALES.' + loc | translate }}</span
-            ></span
-          >
+            <span
+            >{{ lang }}
+              <span class="lighter cnsl-secondary-text"
+              >|&nbsp;{{ 'POLICY.LOGIN_TEXTS.LANGUAGES.' + lang | translate }}</span
+              ></span
+            >
         </div>
       </mat-option>
+      <mat-optgroup [label]="'POLICY.LOGIN_TEXTS.LANGUAGES_NOT_ALLOWED' | translate" *ngIf="languagesAreRestricted$ | async">
+        <mat-option *ngFor="let lang of (notAllowedLanguages$ | async)" [value]="lang">
+          <div class="centerline">
+            <span
+            >{{ lang }}
+              <span class="lighter cnsl-secondary-text"
+              >|&nbsp;{{ 'POLICY.LOGIN_TEXTS.LANGUAGES.' + lang | translate }}</span
+              ></span
+            >
+          </div>
+        </mat-option>
+      </mat-optgroup>
     </mat-select>
   </cnsl-form-field>
 </div>
