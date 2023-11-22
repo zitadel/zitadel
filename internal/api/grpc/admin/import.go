@@ -589,7 +589,7 @@ func importProjects(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDa
 	return nil
 }
 
-func importOIDCApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) error {
+func importOIDCApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts, appSecretGenerator crypto.Generator) error {
 	if org.OidcApps == nil {
 		return nil
 	}
@@ -610,7 +610,7 @@ func importOIDCApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDa
 	return nil
 }
 
-func importAPIApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) error {
+func importAPIApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts, appSecretGenerator crypto.Generator) error {
 	if org.ApiApps == nil {
 		return nil
 	}
@@ -747,10 +747,10 @@ func importResources(ctx context.Context, s *Server, errors *[]*admin_pb.ImportD
 	if err := importProjects(ctx, s, errors, successOrg, org, count); err != nil {
 		return err
 	}
-	if err := importOIDCApps(ctx, s, errors, successOrg, org, count); err != nil {
+	if err := importOIDCApps(ctx, s, errors, successOrg, org, count, appSecretGenerator); err != nil {
 		return err
 	}
-	if err := importAPIApps(ctx, s, errors, successOrg, org, count); err != nil {
+	if err := importAPIApps(ctx, s, errors, successOrg, org, count, appSecretGenerator); err != nil {
 		return err
 	}
 	if err := importAppKeys(ctx, s, errors, successOrg, org, count); err != nil {
