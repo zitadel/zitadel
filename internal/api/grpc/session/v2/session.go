@@ -354,7 +354,7 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 		}
 
 		// trigger activity log for session for user
-		activity.Trigger(ctx, user.ResourceOwner, user.ID, activity.SessionAPI)
+		activity.TriggerHTTP(ctx, user.ResourceOwner, user.ID, activity.SessionAPI)
 		sessionChecks = append(sessionChecks, command.CheckUser(user.ID, user.ResourceOwner))
 	}
 	if password := checks.GetPassword(); password != nil {

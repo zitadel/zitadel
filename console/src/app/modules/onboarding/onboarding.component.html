@@ -24,53 +24,71 @@
   >
     <ng-container *ngFor="let action of actions | async">
       <a
+        *ngIf="!action[1].externalLink"
         [routerLink]="action[1].link"
         [queryParams]="{ id: action[1].fragment }"
         class="action-card card"
         [ngClass]="{ done: action[1].reached !== undefined }"
       >
-        <div class="state-circle">
-          <mat-icon
-            *ngIf="action[1]?.reached !== undefined"
-            matTooltip="{{ action[1].reached | milestone }}"
-            class="success-icon"
-            >check_circle</mat-icon
-          >
-        </div>
-
-        <div class="action-content">
-          <div class="action-content-row">
-            <div
-              class="icon-wrapper"
-              [ngStyle]="{
-                background: (themeService.isDarkTheme | async) ? action[1].darkcolor + 50 : action[1].lightcolor + 50
-              }"
-            >
-              <div
-                class="inner"
-                [ngStyle]="{
-                  background: (themeService.isDarkTheme | async) ? action[1].darkcolor : action[1].lightcolor,
-                  color: (themeService.isDarkTheme | async) ? action[1].lightcolor : action[1].darkcolor
-                }"
-              >
-                <i class="{{ action[1].iconClasses }}"></i>
-              </div>
-            </div>
-            <div class="text-block">
-              <span class="name">{{ 'ONBOARDING.MILESTONES.' + action[0] + '.title' | translate }}</span>
-              <span class="cnsl-secondary-text description">{{
-                'ONBOARDING.MILESTONES.' + action[0] + '.description' | translate
-              }}</span>
-            </div>
-          </div>
-
-          <span class="fill-space"></span>
-          <div class="action-row">
-            <span>{{ 'ONBOARDING.MILESTONES.' + action[0] + '.action' | translate }}</span>
-            <mat-icon class="icon">keyboard_arrow_right</mat-icon>
-          </div>
-        </div>
+        <ng-template
+          [ngTemplateOutlet]="onboardingContent"
+          [ngTemplateOutletContext]="{ title: action[0], action: action[1] }"
+        >
+        </ng-template>
+      </a>
+      <a
+        *ngIf="action[1].externalLink"
+        [href]="action[1].link"
+        class="action-card card"
+        [ngClass]="{ done: action[1].reached !== undefined }"
+      >
+        <ng-template
+          [ngTemplateOutlet]="onboardingContent"
+          [ngTemplateOutletContext]="{ title: action[0], action: action[1] }"
+        >
+        </ng-template>
       </a>
     </ng-container>
   </div>
 </div>
+
+<ng-template #onboardingContent let-action="action" let-title="title">
+  <div class="state-circle">
+    <mat-icon *ngIf="action?.reached !== undefined" matTooltip="{{ action.reached | milestone }}" class="success-icon"
+      >check_circle</mat-icon
+    >
+  </div>
+
+  <div class="action-content">
+    <div class="action-content-row">
+      <div
+        class="icon-wrapper"
+        [ngStyle]="{
+          background: (themeService.isDarkTheme | async) ? action.darkcolor + 50 : action.lightcolor + 50
+        }"
+      >
+        <div
+          class="inner"
+          [ngStyle]="{
+            background: (themeService.isDarkTheme | async) ? action.darkcolor : action.lightcolor,
+            color: (themeService.isDarkTheme | async) ? action.lightcolor : action.darkcolor
+          }"
+        >
+          <i class="{{ action.iconClasses }}"></i>
+        </div>
+      </div>
+      <div class="text-block">
+        <span class="name">{{ 'ONBOARDING.MILESTONES.' + title + '.title' | translate }}</span>
+        <span class="cnsl-secondary-text description">{{
+          'ONBOARDING.MILESTONES.' + title + '.description' | translate
+        }}</span>
+      </div>
+    </div>
+
+    <span class="fill-space"></span>
+    <div class="action-row">
+      <span>{{ 'ONBOARDING.MILESTONES.' + title + '.action' | translate }}</span>
+      <mat-icon class="icon">keyboard_arrow_right</mat-icon>
+    </div>
+  </div>
+</ng-template>
