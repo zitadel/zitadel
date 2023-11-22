@@ -1029,7 +1029,7 @@
       "NOTIFICATIONS_DESC": "SMTPおよびSMS設定",
       "MESSAGETEXTS": "メッセージテキスト",
       "IDP": "IDプロバイダー",
-      "VERIFIED_DAMAINS": "検証済みドメイン",
+      "VERIFIED_DOMAINS": "検証済みドメイン",
       "DOMAIN": "ドメイン設定",
       "LOGINTEXTS": "ログイン画面のテキスト",
       "BRANDING": "ブランディング",

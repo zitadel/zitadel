@@ -1028,7 +1028,7 @@
       "NOTIFICATIONS_DESC": "Impostazioni SMTP e SMS",
       "MESSAGETEXTS": "Testi di notifica",
       "IDP": "Fornitori di identità",
-      "VERIFIED_DAMAINS": "Domini verificati",
+      "VERIFIED_DOMAINS": "Domini verificati",
       "DOMAIN": "Impostazioni del dominio",
       "LOGINTEXTS": "Testi dell'interfaccia login",
       "BRANDING": "Branding",
