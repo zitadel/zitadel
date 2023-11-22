@@ -32,6 +32,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 	proj_repo "github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/repository/restrictions"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	usr_grant_repo "github.com/zitadel/zitadel/internal/repository/usergrant"
@@ -152,6 +153,7 @@ func StartCommands(
 	action.RegisterEventMappers(repo.eventstore)
 	quota.RegisterEventMappers(repo.eventstore)
 	limits.RegisterEventMappers(repo.eventstore)
+	restrictions.RegisterEventMappers(repo.eventstore)
 	session.RegisterEventMappers(repo.eventstore)
 	idpintent.RegisterEventMappers(repo.eventstore)
 	authrequest.RegisterEventMappers(repo.eventstore)

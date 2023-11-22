@@ -21,6 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/repository/restrictions"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -115,10 +116,9 @@ type InstanceSetup struct {
 	Quotas *struct {
 		Items []*SetQuota
 	}
-	Features map[domain.Feature]any
-	Limits   *struct {
-		AuditLogRetention *time.Duration
-	}
+	Features     map[domain.Feature]any
+	Limits       *SetLimits
+	Restrictions *SetRestrictions
 }
 
 type SecretGenerators struct {
@@ -135,12 +135,13 @@ type SecretGenerators struct {
 }
 
 type ZitadelConfig struct {
-	projectID    string
-	mgmtAppID    string
-	adminAppID   string
-	authAppID    string
-	consoleAppID string
-	limitsID     string
+	projectID      string
+	mgmtAppID      string
+	adminAppID     string
+	authAppID      string
+	consoleAppID   string
+	limitsID       string
+	restrictionsID string
 }
 
 func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
@@ -169,6 +170,10 @@ func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
 		return err
 	}
 	s.zitadel.limitsID, err = idGenerator.Next()
+	if err != nil {
+		return err
+	}
+	s.zitadel.restrictionsID, err = idGenerator.Next()
 	return err
 }
 
@@ -200,6 +205,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	userAgg := user.NewAggregate(userID, orgID)
 	projectAgg := project.NewAggregate(setup.zitadel.projectID, orgID)
 	limitsAgg := limits.NewAggregate(setup.zitadel.limitsID, instanceID, instanceID)
+	restrictionsAgg := restrictions.NewAggregate(setup.zitadel.restrictionsID, instanceID, instanceID)
 
 	validations := []preparation.Validation{
 		prepareAddInstance(instanceAgg, setup.InstanceName, setup.DefaultLanguage),
@@ -453,9 +459,11 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	}
 
 	if setup.Limits != nil {
-		validations = append(validations, c.SetLimitsCommand(limitsAgg, &limitsWriteModel{}, &SetLimits{
-			AuditLogRetention: setup.Limits.AuditLogRetention,
-		}))
+		validations = append(validations, c.SetLimitsCommand(limitsAgg, &limitsWriteModel{}, setup.Limits))
+	}
+
+	if setup.Restrictions != nil {
+		validations = append(validations, c.SetRestrictionsCommand(restrictionsAgg, &restrictionsWriteModel{}, setup.Restrictions))
 	}
 
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)

@@ -13,7 +13,7 @@ import (
 )
 
 type SetLimits struct {
-	AuditLogRetention *time.Duration `json:"AuditLogRetention,omitempty"`
+	AuditLogRetention *time.Duration
 }
 
 // SetLimits creates new limits or updates existing limits.
@@ -34,14 +34,14 @@ func (c *Commands) SetLimits(
 			return nil, err
 		}
 	}
-	if err != nil {
-		return nil, err
-	}
 	createCmds, err := c.SetLimitsCommand(limits.NewAggregate(aggregateId, instanceId, resourceOwner), wm, setLimits)()
 	if err != nil {
 		return nil, err
 	}
 	cmds, err := createCmds(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
 	if len(cmds) > 0 {
 		events, err := c.eventstore.Push(ctx, cmds...)
 		if err != nil {
