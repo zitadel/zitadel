@@ -65,6 +65,7 @@ export class AuthUserDetailComponent implements OnDestroy {
   ];
   public currentSetting: string | undefined = this.settingsList[0].id;
   public loginPolicy?: LoginPolicy.AsObject;
+  private savedLanguage?: string;
 
   constructor(
     public translate: TranslateService,
@@ -81,6 +82,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     activatedRoute.queryParams.pipe(take(1)).subscribe((params: Params) => {
       const { id } = params;
       if (id) {
+        this.cleanupTranslation();
         this.currentSetting = id;
       }
     });
@@ -109,6 +111,7 @@ export class AuthUserDetailComponent implements OnDestroy {
   }
 
   private changeSelection(small: boolean): void {
+    this.cleanupTranslation();
     if (small) {
       this.currentSetting = undefined;
     } else {
@@ -138,6 +141,7 @@ export class AuthUserDetailComponent implements OnDestroy {
             }),
           ]);
         }
+        this.savedLanguage = resp.user?.human?.profile?.preferredLanguage
         this.loading = false;
       })
       .catch((error) => {
@@ -147,7 +151,20 @@ export class AuthUserDetailComponent implements OnDestroy {
   }
 
   public ngOnDestroy(): void {
+    this.cleanupTranslation();
     this.subscription.unsubscribe();
+  }
+
+  public settingChanged(): void {
+    this.cleanupTranslation();
+  }
+
+  private cleanupTranslation(): void {
+    if (this?.savedLanguage){
+      this.translate.use(this?.savedLanguage);
+    } else {
+      this.translate.use(this.translate.defaultLang)
+    }
   }
 
   public changeUsername(): void {
@@ -193,6 +210,7 @@ export class AuthUserDetailComponent implements OnDestroy {
         )
         .then(() => {
           this.toast.showInfo('USER.TOAST.SAVED', true);
+          this.savedLanguage = this.user?.human?.profile?.preferredLanguage
           this.refreshChanges$.emit();
         })
         .catch((error) => {
