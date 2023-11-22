@@ -24,7 +24,7 @@ func (mig *UniqueConstraintToLower) Execute(ctx context.Context) error {
 		return err
 	}
 	count, err := res.RowsAffected()
-	logging.Infof("updated %d unique_constraints", count)
+	logging.WithFields("count", count).Info("unique constraints updated")
 	return err
 }
 
