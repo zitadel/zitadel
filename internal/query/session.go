@@ -130,6 +130,10 @@ var (
 		name:  projection.SessionColumnUserID,
 		table: sessionsTable,
 	}
+	SessionColumnUserResourceOwner = Column{
+		name:  projection.SessionColumnUserResourceOwner,
+		table: sessionsTable,
+	}
 	SessionColumnUserCheckedAt = Column{
 		name:  projection.SessionColumnUserCheckedAt,
 		table: sessionsTable,
@@ -239,7 +243,8 @@ func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQue
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
 			SessionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		}).ToSql()
+		}).
+		ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-sn9Jf", "Errors.Query.InvalidRequest")
 	}
@@ -268,6 +273,14 @@ func NewSessionCreatorSearchQuery(creator string) (SearchQuery, error) {
 	return NewTextQuery(SessionColumnCreator, creator, TextEquals)
 }
 
+func NewUserIDSearchQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(SessionColumnUserID, id, TextEquals)
+}
+
+func NewCreationDateQuery(datetime time.Time, compare TimestampComparison) (SearchQuery, error) {
+	return NewTimestampQuery(SessionColumnCreationDate, datetime, compare)
+}
+
 func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Session, string, error)) {
 	return sq.Select(
 			SessionColumnID.identifier(),
@@ -278,10 +291,10 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			SessionColumnResourceOwner.identifier(),
 			SessionColumnCreator.identifier(),
 			SessionColumnUserID.identifier(),
+			SessionColumnUserResourceOwner.identifier(),
 			SessionColumnUserCheckedAt.identifier(),
 			LoginNameNameCol.identifier(),
 			HumanDisplayNameCol.identifier(),
-			UserResourceOwnerCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
 			SessionColumnIntentCheckedAt.identifier(),
 			SessionColumnWebAuthNCheckedAt.identifier(),
@@ -305,10 +318,10 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 
 			var (
 				userID              sql.NullString
+				userResourceOwner   sql.NullString
 				userCheckedAt       sql.NullTime
 				loginName           sql.NullString
 				displayName         sql.NullString
-				userResourceOwner   sql.NullString
 				passwordCheckedAt   sql.NullTime
 				intentCheckedAt     sql.NullTime
 				webAuthNCheckedAt   sql.NullTime
@@ -332,10 +345,10 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&session.ResourceOwner,
 				&session.Creator,
 				&userID,
+				&userResourceOwner,
 				&userCheckedAt,
 				&loginName,
 				&displayName,
-				&userResourceOwner,
 				&passwordCheckedAt,
 				&intentCheckedAt,
 				&webAuthNCheckedAt,
@@ -360,10 +373,10 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			}
 
 			session.UserFactor.UserID = userID.String
+			session.UserFactor.ResourceOwner = userResourceOwner.String
 			session.UserFactor.UserCheckedAt = userCheckedAt.Time
 			session.UserFactor.LoginName = loginName.String
 			session.UserFactor.DisplayName = displayName.String
-			session.UserFactor.ResourceOwner = userResourceOwner.String
 			session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
 			session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
 			session.WebAuthNFactor.WebAuthNCheckedAt = webAuthNCheckedAt.Time
@@ -391,10 +404,10 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			SessionColumnResourceOwner.identifier(),
 			SessionColumnCreator.identifier(),
 			SessionColumnUserID.identifier(),
+			SessionColumnUserResourceOwner.identifier(),
 			SessionColumnUserCheckedAt.identifier(),
 			LoginNameNameCol.identifier(),
 			HumanDisplayNameCol.identifier(),
-			UserResourceOwnerCol.identifier(),
 			SessionColumnPasswordCheckedAt.identifier(),
 			SessionColumnIntentCheckedAt.identifier(),
 			SessionColumnWebAuthNCheckedAt.identifier(),
@@ -417,10 +430,10 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 
 				var (
 					userID              sql.NullString
+					userResourceOwner   sql.NullString
 					userCheckedAt       sql.NullTime
 					loginName           sql.NullString
 					displayName         sql.NullString
-					userResourceOwner   sql.NullString
 					passwordCheckedAt   sql.NullTime
 					intentCheckedAt     sql.NullTime
 					webAuthNCheckedAt   sql.NullTime
@@ -441,10 +454,10 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					&session.ResourceOwner,
 					&session.Creator,
 					&userID,
+					&userResourceOwner,
 					&userCheckedAt,
 					&loginName,
 					&displayName,
-					&userResourceOwner,
 					&passwordCheckedAt,
 					&intentCheckedAt,
 					&webAuthNCheckedAt,
@@ -461,10 +474,10 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 					return nil, errors.ThrowInternal(err, "QUERY-SAfeg", "Errors.Internal")
 				}
 				session.UserFactor.UserID = userID.String
+				session.UserFactor.ResourceOwner = userResourceOwner.String
 				session.UserFactor.UserCheckedAt = userCheckedAt.Time
 				session.UserFactor.LoginName = loginName.String
 				session.UserFactor.DisplayName = displayName.String
-				session.UserFactor.ResourceOwner = userResourceOwner.String
 				session.PasswordFactor.PasswordCheckedAt = passwordCheckedAt.Time
 				session.IntentFactor.IntentCheckedAt = intentCheckedAt.Time
 				session.WebAuthNFactor.WebAuthNCheckedAt = webAuthNCheckedAt.Time

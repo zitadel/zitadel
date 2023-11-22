@@ -39,7 +39,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.projects3 WHERE (id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.projects4 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -66,7 +66,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.projects3 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.projects4 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -92,7 +92,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.projects3 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.projects4 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -122,7 +122,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.projects3 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.projects4 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -152,7 +152,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.projects3 SET (change_date, sequence, name, project_role_assertion, project_role_check, has_project_check, private_labeling_setting) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
+							expectedStmt: "UPDATE projections.projects4 SET (change_date, sequence, name, project_role_assertion, project_role_check, has_project_check, private_labeling_setting) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -203,7 +203,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.projects3 (id, creation_date, change_date, resource_owner, instance_id, sequence, name, project_role_assertion, project_role_check, has_project_check, private_labeling_setting, state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+							expectedStmt: "INSERT INTO projections.projects4 (id, creation_date, change_date, resource_owner, instance_id, sequence, name, project_role_assertion, project_role_check, has_project_check, private_labeling_setting, state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -240,7 +240,7 @@ func TestProjectProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.projects3 WHERE (instance_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.projects4 WHERE (instance_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"agg-id",

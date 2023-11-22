@@ -1060,7 +1060,9 @@
       "zh": "简体中文",
       "bg": "Български",
       "pt": "Portuguese",
-      "mk": "Македонски"
+      "mk": "Македонски",
+      "cs": "Čeština",
+      "ru": "Русский"
     },
     "SMTP": {
       "TITLE": "SMTP設定",
@@ -1266,7 +1268,9 @@
         "zh": "简体中文",
         "bg": "Български",
         "pt": "Portuguese",
-        "mk": "Македонски"
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -2083,6 +2087,8 @@
       "UPLOAD": "XMLファイルをアップロードする",
       "METADATA": "メタデータ",
       "METADATAFROMFILE": "ファイルからのメタデータ",
+      "CERTIFICATE": "SAML証明書",
+      "DOWNLOADCERT": "SAML証明書をダウンロードする",
       "CREATEMETADATA": "メタデータの作成",
       "ENTITYID": "Entity ID",
       "ACSURL": "ACS endpoint URL"
@@ -2150,7 +2156,9 @@
     "zh": "简体中文",
     "bg": "Български",
     "pt": "Portuguese",
-    "mk": "Македонски"
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

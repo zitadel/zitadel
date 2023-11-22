@@ -17,19 +17,16 @@ import (
 )
 
 const (
-	LoginNameTableAlias            = "login_names2"
+	LoginNameTableAlias            = "login_names3"
 	LoginNameProjectionTable       = "projections." + LoginNameTableAlias
 	LoginNameUserProjectionTable   = LoginNameProjectionTable + "_" + loginNameUserSuffix
 	LoginNamePolicyProjectionTable = LoginNameProjectionTable + "_" + loginNamePolicySuffix
 	LoginNameDomainProjectionTable = LoginNameProjectionTable + "_" + loginNameDomainSuffix
 
-	LoginNameCol                   = "login_name"
-	LoginNameUserCol               = "user_id"
-	LoginNameIsPrimaryCol          = "is_primary"
-	LoginNameInstanceIDCol         = "instance_id"
-	LoginNameOwnerRemovedUserCol   = "user_owner_removed"
-	LoginNameOwnerRemovedPolicyCol = "policy_owner_removed"
-	LoginNameOwnerRemovedDomainCol = "domain_owner_removed"
+	LoginNameCol           = "login_name"
+	LoginNameUserCol       = "user_id"
+	LoginNameIsPrimaryCol  = "is_primary"
+	LoginNameInstanceIDCol = "instance_id"
 
 	usersAlias         = "users"
 	policyCustomAlias  = "policy_custom"
@@ -43,21 +40,18 @@ const (
 	LoginNameUserUserNameCol      = "user_name"
 	LoginNameUserResourceOwnerCol = "resource_owner"
 	LoginNameUserInstanceIDCol    = "instance_id"
-	LoginNameUserOwnerRemovedCol  = "owner_removed"
 
 	loginNameDomainSuffix           = "domains"
 	LoginNameDomainNameCol          = "name"
 	LoginNameDomainIsPrimaryCol     = "is_primary"
 	LoginNameDomainResourceOwnerCol = "resource_owner"
 	LoginNameDomainInstanceIDCol    = "instance_id"
-	LoginNameDomainOwnerRemovedCol  = "owner_removed"
 
 	loginNamePolicySuffix             = "policies"
 	LoginNamePoliciesMustBeDomainCol  = "must_be_domain"
 	LoginNamePoliciesIsDefaultCol     = "is_default"
 	LoginNamePoliciesResourceOwnerCol = "resource_owner"
 	LoginNamePoliciesInstanceIDCol    = "instance_id"
-	LoginNamePoliciesOwnerRemovedCol  = "owner_removed"
 )
 
 var (
@@ -73,10 +67,6 @@ var (
 			coalesce(col(policyCustomAlias, LoginNamePoliciesMustBeDomainCol), col(policyDefaultAlias, LoginNamePoliciesMustBeDomainCol)),
 			LoginNamePoliciesMustBeDomainCol,
 		),
-		alias(col(usersAlias, LoginNameUserOwnerRemovedCol),
-			LoginNameOwnerRemovedUserCol),
-		alias(coalesce(col(policyCustomAlias, LoginNamePoliciesOwnerRemovedCol), "false"),
-			LoginNameOwnerRemovedPolicyCol),
 	).From(alias(LoginNameUserProjectionTable, usersAlias)).
 		LeftJoin(
 			leftJoin(LoginNamePolicyProjectionTable, policyCustomAlias,
@@ -101,10 +91,6 @@ var (
 		alias(col(domainsAlias, LoginNameDomainNameCol),
 			domainAlias),
 		col(domainsAlias, LoginNameDomainIsPrimaryCol),
-		col(policyUsersAlias, LoginNameOwnerRemovedUserCol),
-		col(policyUsersAlias, LoginNameOwnerRemovedPolicyCol),
-		alias(coalesce(col(domainsAlias, LoginNameDomainOwnerRemovedCol), "false"),
-			LoginNameOwnerRemovedDomainCol),
 	).FromSelect(policyUsers, policyUsersAlias).
 		LeftJoin(
 			leftJoin(LoginNameDomainProjectionTable, domainsAlias,
@@ -125,9 +111,6 @@ var (
 		alias(coalesce(LoginNameDomainIsPrimaryCol, "true"),
 			LoginNameIsPrimaryCol),
 		LoginNameInstanceIDCol,
-		LoginNameOwnerRemovedUserCol,
-		LoginNameOwnerRemovedPolicyCol,
-		LoginNameOwnerRemovedDomainCol,
 	).FromSelect(loginNamesTable, LoginNameTableAlias).MustSql()
 )
 
@@ -190,17 +173,14 @@ func (*loginNameProjection) Init() *old_handler.Check {
 				handler.NewColumn(LoginNameUserUserNameCol, handler.ColumnTypeText),
 				handler.NewColumn(LoginNameUserResourceOwnerCol, handler.ColumnTypeText),
 				handler.NewColumn(LoginNameUserInstanceIDCol, handler.ColumnTypeText),
-				handler.NewColumn(LoginNameUserOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
 			},
 			handler.NewPrimaryKey(LoginNameUserInstanceIDCol, LoginNameUserIDCol),
 			loginNameUserSuffix,
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{LoginNameUserResourceOwnerCol})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{LoginNameUserOwnerRemovedCol})),
 			handler.WithIndex(
 				handler.NewIndex("lnu_instance_ro_id", []string{LoginNameUserInstanceIDCol, LoginNameUserResourceOwnerCol, LoginNameUserIDCol},
 					handler.WithInclude(
 						LoginNameUserUserNameCol,
-						LoginNameUserOwnerRemovedCol,
 					),
 				),
 			),
@@ -211,11 +191,9 @@ func (*loginNameProjection) Init() *old_handler.Check {
 				handler.NewColumn(LoginNameDomainIsPrimaryCol, handler.ColumnTypeBool, handler.Default(false)),
 				handler.NewColumn(LoginNameDomainResourceOwnerCol, handler.ColumnTypeText),
 				handler.NewColumn(LoginNameDomainInstanceIDCol, handler.ColumnTypeText),
-				handler.NewColumn(LoginNameDomainOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
 			},
 			handler.NewPrimaryKey(LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol, LoginNameDomainNameCol),
 			loginNameDomainSuffix,
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{LoginNameDomainOwnerRemovedCol})),
 		),
 		handler.NewSuffixedTable(
 			[]*handler.InitColumn{
@@ -223,12 +201,10 @@ func (*loginNameProjection) Init() *old_handler.Check {
 				handler.NewColumn(LoginNamePoliciesIsDefaultCol, handler.ColumnTypeBool),
 				handler.NewColumn(LoginNamePoliciesResourceOwnerCol, handler.ColumnTypeText),
 				handler.NewColumn(LoginNamePoliciesInstanceIDCol, handler.ColumnTypeText),
-				handler.NewColumn(LoginNamePoliciesOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
 			},
 			handler.NewPrimaryKey(LoginNamePoliciesInstanceIDCol, LoginNamePoliciesResourceOwnerCol),
 			loginNamePolicySuffix,
 			handler.WithIndex(handler.NewIndex("is_default", []string{LoginNamePoliciesResourceOwnerCol, LoginNamePoliciesIsDefaultCol})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{LoginNamePoliciesOwnerRemovedCol})),
 		),
 	)
 }

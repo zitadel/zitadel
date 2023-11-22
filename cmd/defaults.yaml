@@ -39,16 +39,15 @@ Telemetry:
 
 # Port ZITADEL will listen on
 Port: 8080 # ZITADEL_PORT
-# Port ZITADEL is exposed on, it can differ from port e.g. if you proxy the traffic
-# !!! Changing this after the initial setup breaks your system !!!
+# ExternalPort is the port on which end users access ZITADEL.
+# It can differ from Port e.g. if a reverse proxy forwards the traffic to ZITADEL
+# Read more about external access: https://zitadel.com/docs/self-hosting/manage/custom-domain
 ExternalPort: 8080 # ZITADEL_EXTERNALPORT
-# Domain/hostname ZITADEL is exposed externally
-# !!! Changing this after the initial setup breaks your system !!!
+# ExternalPort is the domain on which end users access ZITADEL.
+# Read more about external access: https://zitadel.com/docs/self-hosting/manage/custom-domain
 ExternalDomain: localhost # ZITADEL_EXTERNALDOMAIN
-# specifies if ZITADEL is exposed externally through TLS
-# this must be set to true even if TLS is not enabled on ZITADEL itself
-# but TLS traffic is terminated on a reverse proxy
-# !!! Changing this after the initial setup breaks your system !!!
+# ExternalSecure specifies if ZITADEL is exposed externally using HTTPS or HTTP.
+# Read more about external access: https://zitadel.com/docs/self-hosting/manage/custom-domain
 ExternalSecure: true # ZITADEL_EXTERNALSECURE
 TLS:
   # If enabled, ZITADEL will serve all traffic over TLS (HTTPS and gRPC)
@@ -315,6 +314,11 @@ OIDC:
       Path: /oauth/v2/device_authorization # ZITADEL_OIDC_CUSTOMENDPOINTS_DEVICEAUTH_PATH
   DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
   DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
+  Features:
+    # Wheter projection triggers are used in the new Introspection implementation.
+    TriggerIntrospectionProjections: false
+    # Allows fallback to the Legacy Introspection implementation
+    LegacyIntrospection: false
 
 SAML:
   ProviderConfig:
@@ -954,6 +958,7 @@ InternalAuthZ:
         - "project.grant.member.delete"
         - "events.read"
         - "milestones.read"
+        - "session.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -1031,6 +1036,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "session.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1054,6 +1060,7 @@ InternalAuthZ:
         - "project.grant.write"
         - "project.grant.delete"
         - "project.grant.member.read"
+        - "session.delete"
     - Role: "ORG_OWNER"
       Permissions:
         - "org.read"
@@ -1103,6 +1110,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "session.delete"
     - Role: "ORG_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1117,6 +1125,7 @@ InternalAuthZ:
         - "policy.read"
         - "project.read"
         - "project.role.read"
+        - "session.delete"
     - Role: "ORG_OWNER_VIEWER"
       Permissions:
         - "org.read"

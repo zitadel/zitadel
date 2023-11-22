@@ -29,7 +29,7 @@ type smsInitFormData struct {
 // It will also add a successful OTP SMS check to the auth request.
 // If there's no verified phone number, the potential last phone number will be used to render the registration page
 func (l *Login) handleRegisterOTPSMS(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
-	user, err := l.query.GetNotifyUserByID(r.Context(), true, authReq.UserID, false)
+	user, err := l.query.GetNotifyUserByID(r.Context(), true, authReq.UserID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
