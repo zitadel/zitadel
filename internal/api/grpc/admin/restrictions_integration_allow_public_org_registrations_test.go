@@ -20,7 +20,6 @@ import (
 )
 
 func TestServer_Restrictions_PublicOrgRegistrationIsNotAllowed(t *testing.T) {
-	t.Parallel()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 	domain, _, iamOwnerCtx := Tester.UseIsolatedInstance(ctx, SystemCTX)

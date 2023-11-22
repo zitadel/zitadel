@@ -62,7 +62,7 @@ func TestImport_and_Get(t *testing.T) {
 				Profile: &management.ImportHumanUserRequest_Profile{
 					FirstName:         firstName,
 					LastName:          lastName,
-					PreferredLanguage: language.Afrikaans.String(),
+					PreferredLanguage: language.Japanese.String(),
 					Gender:            user.Gender_GENDER_DIVERSE,
 				},
 				Email: &management.ImportHumanUserRequest_Email{
@@ -81,4 +81,22 @@ func TestImport_and_Get(t *testing.T) {
 			require.NoError(t, err) // catch and fail on any other error
 		})
 	}
+}
+
+func TestImport_UnsupportedPreferredLanguage(t *testing.T) {
+	random := integration.RandString(5)
+	_, err := Client.ImportHumanUser(CTX, &management.ImportHumanUserRequest{
+		UserName: random,
+		Profile: &management.ImportHumanUserRequest_Profile{
+			FirstName:         random,
+			LastName:          random,
+			PreferredLanguage: language.Afrikaans.String(),
+			Gender:            user.Gender_GENDER_DIVERSE,
+		},
+		Email: &management.ImportHumanUserRequest_Email{
+			Email:           random + "@zitadel.com",
+			IsEmailVerified: true,
+		},
+	})
+	require.Error(t, err)
 }
