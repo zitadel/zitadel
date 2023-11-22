@@ -1,0 +1,1255 @@
+Errors:
+  Internal: Er is een interne fout opgetreden
+  NoChangesFound: Geen veranderingen gevonden
+  OriginNotAllowed: Deze "Origin" is niet toegestaan
+  IDMissing: ID ontbreekt
+  ResourceOwnerMissing: Resource Eigenaar Organisatie ontbreekt
+  RemoveFailed: Kon niet worden verwijderd
+  ProjectionName:
+    Invalid: Ongeldige projectienaam
+  Assets:
+    EmptyKey: Asset sleutel is leeg
+    Store:
+      NotInitialized: Asset opslag niet geïnitialiseerd
+      NotConfigured: Asset opslag niet geconfigureerd
+    Bucket:
+      Internal: Interne fout bij het aanmaken van de bucket
+      AlreadyExists: Bucket bestaat al
+      CreateFailed: Bucket is niet aangemaakt
+      ListFailed: Buckets konden niet worden gelezen
+      RemoveFailed: Bucket is niet verwijderd
+      SetPublicFailed: Kon bucket niet instellen op openbaar
+    Object:
+      PutFailed: Object is niet aangemaakt
+      GetFailed: Object kon niet worden gelezen
+      NotFound: Object kon niet worden gevonden
+      PresignedTokenFailed: Ondertekende token kon niet worden aangemaakt
+      ListFailed: Objectlijst kon niet worden gelezen
+      RemoveFailed: Object kon niet worden verwijderd
+  Limit:
+    ExceedsDefault: Limiet overschrijdt standaardlimiet
+  Limits:
+    NotFound: Limieten niet gevonden
+    NoneSpecified: Geen limieten gespecificeerd
+  Restrictions:
+    NoneSpecified: Geen beperkingen gespecificeerd
+  Language:
+    NotParsed: Kon taal niet parsen
+  OIDCSettings:
+    NotFound: OIDC-configuratie niet gevonden
+    AlreadyExists: OIDC-configuratie bestaat al
+  SecretGenerator:
+    AlreadyExists: Geheime generator bestaat al
+    TypeMissing: Type geheime generator ontbreekt
+    NotFound: Geheime generator niet gevonden
+  SMSConfig:
+    NotFound: SMS-configuratie niet gevonden
+    AlreadyActive: SMS-configuratie al actief
+    AlreadyDeactivated: SMS-configuratie al gedeactiveerd
+  SMTPConfig:
+    NotFound: SMTP-configuratie niet gevonden
+    AlreadyExists: SMTP-configuratie bestaat al
+    SenderAdressNotCustomDomain: Het afzenderadres moet worden geconfigureerd als aangepaste domein op de instantie.
+  Notification:
+    NoDomain: Geen domein gevonden voor bericht
+  User:
+    TooManyNestingLevels: Te veel query nesting niveaus (Max 20).
+    NotFound: Gebruiker kon niet worden gevonden
+    AlreadyExists: Gebruiker bestaat al
+    NotFoundOnOrg: Gebruiker kon niet worden gevonden op gekozen organisatie
+    NotAllowedOrg: Gebruiker is geen lid van de vereiste organisatie
+    UserIDMissing: UserID is leeg
+    UserIDWrong: "Verzoekgebruiker niet gelijk aan geverifieerde gebruiker"
+    DomainPolicyNil: Organisatiebeleid is leeg
+    EmailAsUsernameNotAllowed: Email is niet toegestaan als gebruikersnaam
+    Invalid: Gebruikersdata is ongeldig
+    DomainNotAllowedAsUsername: Domein is al gereserveerd en kan niet worden gebruikt
+    AlreadyInactive: Gebruiker is al inactief
+    NotInactive: Gebruiker is niet inactief
+    CantDeactivateInitial: Gebruiker met staat initial kan alleen worden verwijderd, niet gedeactiveerd
+    ShouldBeActiveOrInitial: Gebruiker is niet actief of initial
+    AlreadyInitialised: Gebruiker is al geïnitialiseerd
+    NotInitialised: Gebruiker is nog niet geïnitialiseerd
+    NotLocked: Gebruiker is niet vergrendeld
+    NoChanges: Geen veranderingen gevonden
+    InitCodeNotFound: Initialisatiecode niet gevonden
+    UsernameNotChanged: Gebruikersnaam niet veranderd
+    InvalidURLTemplate: URL-sjabloon is ongeldig
+    Profile:
+      NotFound: Profiel niet gevonden
+      NotChanged: Profiel niet veranderd
+      Empty: Profiel is leeg
+      FirstNameEmpty: Voornaam in profiel is leeg
+      LastNameEmpty: Achternaam in profiel is leeg
+      IDMissing: Profiel ID ontbreekt
+    Email:
+      NotFound: Email niet gevonden
+      Invalid: Email is ongeldig
+      AlreadyVerified: Email is al geverifieerd
+      NotChanged: Email niet veranderd
+      Empty: Email is leeg
+      IDMissing: Email ID ontbreekt
+    Phone:
+      NotFound: Telefoon niet gevonden
+      Invalid: Telefoon is ongeldig
+      AlreadyVerified: Telefoon is al geverifieerd
+      Empty: Telefoon is leeg
+      NotChanged: Telefoon niet veranderd
+    Address:
+      NotFound: Adres niet gevonden
+      NotChanged: Adres niet veranderd
+    Machine:
+      Key:
+        NotFound: Machine sleutel niet gevonden
+        AlreadyExisting: Machine sleutel al bestaand
+      Secret:
+        NotExisting: Geheim bestaat niet
+        Invalid: Geheim is ongeldig
+        CouldNotGenerate: Geheim kon niet worden gegenereerd
+    PAT:
+      NotFound: Persoonlijk toegangstoken niet gevonden
+    NotHuman: De gebruiker moet persoonlijk zijn
+    NotMachine: De gebruiker moet technisch zijn
+    WrongType: Niet toegestaan voor dit gebruikerstype
+    NotAllowedToLink: Gebruiker mag niet koppelen met externe inlogprovider
+    Username:
+      AlreadyExists: Gebruikersnaam al ingenomen
+      Reserved: Gebruikersnaam al ingenomen
+      Empty: Gebruikersnaam is leeg
+    Code:
+      Empty: Code is leeg
+      NotFound: Code niet gevonden
+      Expired: Code is verlopen
+      GeneratorAlgNotSupported: Generator algoritme wordt niet ondersteund
+    Password:
+      NotFound: Wachtwoord niet gevonden
+      Empty: Wachtwoord is leeg
+      Invalid: Wachtwoord is ongeldig
+      NotSet: Gebruiker heeft geen wachtwoord ingesteld
+      NotChanged: Nieuw wachtwoord kan niet hetzelfde zijn als uw huidige wachtwoord
+      NotSupported: Wachtwoord hash codering wordt niet ondersteund
+    PasswordComplexityPolicy:
+      NotFound: Wachtwoordbeleid niet gevonden
+      MinLength: Wachtwoord is te kort
+      MinLengthNotAllowed: Opgegeven minimale lengte is niet toegestaan
+      HasLower: Wachtwoord moet een kleine letter bevatten
+      HasUpper: Wachtwoord moet een hoofdletter bevatten
+      HasNumber: Wachtwoord moet een nummer bevatten
+      HasSymbol: Wachtwoord moet een symbool bevatten
+    ExternalIDP:
+      Invalid: Externe IDP ongeldig
+      IDPConfigNotExisting: IDP provider ongeldig voor deze organisatie
+      NotAllowed: Externe IDP niet toegestaan op deze organisatie
+      MinimumExternalIDPNeeded: Er moet minstens één IDP worden toegevoegd
+      AlreadyExists: Externe IDP al ingenomen
+      NotFound: Externe IDP niet gevonden
+      LoginFailed: Inloggen bij externe IDP mislukt
+    MFA:
+      OTP:
+        AlreadyReady: Multifactor OTP (OneTimePassword) is al ingesteld
+        NotExisting: Multifactor OTP (OneTimePassword) bestaat niet
+        NotReady: Multifactor OTP (OneTimePassword) is niet klaar
+        InvalidCode: Ongeldige code
+      U2F:
+        NotExisting: U2F bestaat niet
+      Passwordless:
+        NotExisting: Wachtwoordloos bestaat niet
+    WebAuthN:
+      NotFound: WebAuthN Token kon niet worden gevonden
+      BeginRegisterFailed: WebAuthN begin registratie mislukt
+      MarshalError: Fout bij het ordenen van data
+      ErrorOnParseCredential: Fout bij het parseren van inloggegevens
+      CreateCredentialFailed: Fout bij het aanmaken van inloggegevens
+      BeginLoginFailed: WebAuthN begin login mislukt
+      ValidateLoginFailed: Fout bij het valideren van login inloggegevens
+      CloneWarning: Inloggegevens kunnen worden gekloond
+    RefreshToken:
+      Invalid: Refresh Token is ongeldig
+      NotFound: Refresh Token niet gevonden
+  Instance:
+    NotFound: Instantie niet gevonden
+    AlreadyExists: Instantie bestaat al
+    NotChanged: Instantie is niet veranderd
+  Org:
+    AlreadyExists: Organisatienaam is al in gebruik
+    Invalid: Organisatie is ongeldig
+    AlreadyDeactivated: Organisatie is al gedeactiveerd
+    AlreadyActive: Organisatie is al actief
+    Empty: Organisatie is leeg
+    NotFound: Organisatie niet gevonden
+    NotChanged: Organisatie is niet veranderd
+    DefaultOrgNotDeletable: Standaard organisatie kan niet worden verwijderd
+    ZitadelOrgNotDeletable: Organisatie met ZITADEL-project kan niet worden verwijderd
+    InvalidDomain: Ongeldig domein
+    DomainMissing: Domein ontbreekt
+    DomainNotOnOrg: Domein bestaat niet op organisatie
+    DomainNotVerified: Domein is niet geverifieerd
+    DomainAlreadyVerified: Domein is al geverifieerd
+    DomainVerificationTypeInvalid: Domeinverificatietype is ongeldig
+    DomainVerificationMissing: Domeinverificatie nog niet gestart
+    DomainVerificationFailed: Domeinverificatie mislukt
+    DomainVerificationTXTNotFound: Het _zitadel-challenge TXT-record is niet gevonden voor uw domein. Controleer of u het aan uw DNS-server heeft toegevoegd of wacht tot het nieuwe record is gepropageerd
+    DomainVerificationTXTNoMatch: Het _zitadel-challenge TXT-record is gevonden voor uw domein, maar het bevat niet de juiste token-tekst. Controleer of u het juiste token aan uw DNS-server heeft toegevoegd of wacht tot het nieuwe record is gepropageerd
+    DomainVerificationHTTPNotFound: Het bestand met de uitdaging is niet gevonden op de verwachte URL. Controleer of u het bestand op de juiste plaats heeft geüpload met leesrechten
+    DomainVerificationHTTPNoMatch: Het bestand met de uitdaging is gevonden op de verwachte URL, maar het bevat niet de juiste token-tekst. Controleer de inhoud
+    DomainVerificationTimeout: Er was een time-out bij het opvragen van de DNS-server
+    PrimaryDomainNotDeletable: Primair domein mag niet worden verwijderd
+    DomainNotFound: Domein niet gevonden
+    MemberIDMissing: Lid ID ontbreekt
+    MemberNotFound: Organisatielid niet gevonden
+    InvalidMember: Organisatielid is ongeldig
+    UserIDMissing: Gebruiker ID ontbreekt
+    PolicyAlreadyExists: Beleid bestaat al
+    PolicyNotExisting: Beleid bestaat niet
+    IdpInvalid: IDP-configuratie is ongeldig
+    IdpNotExisting: IDP-configuratie bestaat niet
+    OIDCConfigInvalid: OIDC IDP-configuratie is ongeldig
+    IdpIsNotOIDC: IDP-configuratie is niet van het type oidc
+    Domain:
+      AlreadyExists: Domein bestaat al
+      InvalidCharacter: Alleen alfanumerieke tekens, . en - zijn toegestaan voor een domein
+      EmptyString: Ongeldige niet-numerieke en alfabetische tekens zijn vervangen door lege spaties en het resulterende domein is een lege string
+    IDP:
+      InvalidSearchQuery: Ongeldige zoekopdracht
+      ClientIDMissing: ClientID ontbreekt
+      TeamIDMissing: TeamID ontbreekt
+      KeyIDMissing: KeyID ontbreekt
+      PrivateKeyMissing: Privésleutel ontbreekt
+    LoginPolicy:
+      NotFound: Login Beleid niet gevonden
+      Invalid: Login Beleid is ongeldig
+      RedirectURIInvalid: Standaard Redirect URI is ongeldig
+      NotExisting: Login Beleid bestaat niet
+      AlreadyExists: Login Beleid bestaat al
+      IdpProviderAlreadyExisting: Identiteitsprovider bestaat al
+      IdpProviderNotExisting: Identiteitsprovider bestaat niet
+      RegistrationNotAllowed: Registratie is niet toegestaan
+      UsernamePasswordNotAllowed: Inloggen met gebruikersnaam / wachtwoord is niet toegestaan
+      MFA:
+        AlreadyExists: Multifactor bestaat al
+        NotExisting: Multifactor bestaat niet
+        Unspecified: Multifactor ongeldig
+    MailTemplate:
+      NotFound: Standaard Mail Sjabloon niet gevonden
+      NotChanged: Standaard Mail Sjabloon is niet veranderd
+      AlreadyExists: Standaard Mail Sjabloon bestaat al
+      Invalid: Standaard Mail Sjabloon is ongeldig
+    CustomMessageText:
+      NotFound: Standaard Bericht Tekst niet gevonden
+      NotChanged: Standaard Bericht Tekst is niet veranderd
+      AlreadyExists: Standaard Bericht Tekst bestaat al
+      Invalid: Standaard Bericht Tekst is ongeldig
+    PasswordComplexityPolicy:
+      NotFound: Standaard Wachtwoord Complexiteit Beleid niet gevonden
+      Empty: Standaard Wachtwoord Complexiteit Beleid is leeg
+      NotExisting: Standaard Wachtwoord Complexiteit Beleid bestaat niet
+      AlreadyExists: Standaard Wachtwoord Complexiteit Beleid bestaat al
+    PasswordLockoutPolicy:
+      NotFound: Standaard Wachtwoord Lockout Beleid niet gevonden
+      Empty: Standaard Wachtwoord Lockout Beleid is leeg
+      NotExisting: Standaard Wachtwoord Lockout Beleid bestaat niet
+      AlreadyExists: Standaard Wachtwoord Lockout Beleid bestaat al
+    PasswordAgePolicy:
+      NotFound: Standaard Wachtwoord Leeftijd Beleid niet gevonden
+      Empty: Standaard Wachtwoord Leeftijd Beleid is leeg
+      NotExisting: Standaard Wachtwoord Leeftijd Beleid bestaat niet
+      AlreadyExists: Standaard Wachtwoord Leeftijd Beleid bestaat al
+    OrgIAMPolicy:
+      Empty: Org IAM Beleid is leeg
+      NotExisting: Org IAM Beleid bestaat niet
+      AlreadyExists: Org IAM Beleid bestaat al
+    NotificationPolicy:
+      NotFound: Standaard Notificatie Beleid niet gevonden
+      NotChanged: Standaard Notificatie Beleid is niet veranderd
+      AlreadyExists: Standaard Notificatie Beleid bestaat al
+    LabelPolicy:
+      NotFound: Privé Label Beleid niet gevonden
+      NotChanged: Privé Label Beleid is niet veranderd
+  Project:
+    ProjectIDMissing: Project ID ontbreekt
+    AlreadyExists: Project bestaat al op organisatie
+    OrgNotExisting: Organisatie bestaat niet
+    UserNotExisting: Gebruiker bestaat niet
+    CouldNotGenerateClientSecret: Kon client geheim niet genereren
+    Invalid: Project is ongeldig
+    NotActive: Project is niet actief
+    NotInactive: Project is niet gedeactiveerd
+    NotFound: Project niet gevonden
+    UserIDMissing: Gebruiker ID ontbreekt
+    Member:
+      NotFound: Projectlid niet gevonden
+      Invalid: Projectlid is ongeldig
+      AlreadyExists: Projectlid bestaat al
+      NotExisting: Projectlid bestaat niet
+    MinimumOneRoleNeeded: Er moet minstens één rol worden toegevoegd
+    Role:
+      AlreadyExists: Rol bestaat al
+      Invalid: Rol is ongeldig
+      NotExisting: Rol bestaat niet
+    IDMissing: ID ontbreekt
+    App:
+      AlreadyExists: Applicatie bestaat al
+      NotFound: Applicatie niet gevonden
+      Invalid: Applicatie is ongeldig
+      NotExisting: Applicatie bestaat niet
+      NotActive: Applicatie is niet actief
+      NotInactive: Applicatie is niet gedeactiveerd
+      OIDCConfigInvalid: OIDC configuratie is ongeldig
+      APIConfigInvalid: API configuratie is ongeldig
+      SAMLConfigInvalid: SAML configuratie is ongeldig
+      IsNotOIDC: Applicatie is niet van het type OIDC
+      IsNotAPI: Applicatie is niet van het type API
+      IsNotSAML: Applicatie is niet van het type SAML
+      SAMLMetadataMissing: SAML metadata ontbreekt
+      SAMLMetadataFormat: Fout formaat SAML Metadata
+      SAMLEntityIDAlreadyExisting: SAML EntityID bestaat al
+      OIDCAuthMethodNoSecret: Gekozen OIDC Auth Methode vereist geen geheim
+      APIAuthMethodNoSecret: Gekozen API Auth Methode vereist geen geheim
+      AuthMethodNoPrivateKeyJWT: Gekozen Auth Methode vereist geen sleutel
+      ClientSecretInvalid: Client Geheim is ongeldig
+      Key:
+        AlreadyExisting: Applicatie sleutel bestaat al
+        NotFound: Applicatie sleutel niet gevonden
+    RequiredFieldsMissing: Enkele vereiste velden ontbreken
+    Grant:
+      AlreadyExists: Projecttoekenning bestaat al
+      NotFound: Toekenning niet gevonden
+      Invalid: Projecttoekenning is ongeldig
+      NotExisting: Projecttoekenning bestaat niet
+      HasNotExistingRole: Een rol bestaat niet op project
+      NotActive: Projecttoekenning is niet actief
+      NotInactive: Projecttoekenning is niet gedeactiveerd
+  IAM:
+    NotFound: Instantie niet gevonden. Bekijk https://zitadel.com/docs/self-hosting/manage/custom-domain
+    Member:
+      RolesNotChanged: Rollen zijn niet veranderd
+    MemberInvalid: Lid is ongeldig
+    MemberAlreadyExisting: Lid bestaat al
+    MemberNotExisting: Lid bestaat niet
+    IDMissing: ID ontbreekt
+    IAMProjectIDMissing: IAM project id ontbreekt
+    IamProjectAlreadySet: IAM project id is al ingesteld
+    IdpInvalid: IDP-configuratie is ongeldig
+    IdpNotExisting: IDP-configuratie bestaat niet
+    OIDCConfigInvalid: OIDC IDP-configuratie is ongeldig
+    IdpIsNotOIDC: IDP-configuratie is niet van het type oidc
+    LoginPolicyInvalid: Login Beleid is ongeldig
+    LoginPolicyNotExisting: Login Beleid bestaat niet
+    IdpProviderInvalid: Identiteitsprovider is ongeldig
+    LoginPolicy:
+      NotFound: Standaard Login Beleid niet gevonden
+      NotChanged: Standaard Login Beleid is niet veranderd
+      NotExisting: Standaard Login Beleid bestaat niet
+      AlreadyExists: Standaard Login Beleid bestaat al
+      RedirectURIInvalid: Standaard Redirect URI is ongeldig
+      MFA:
+        AlreadyExists: Multifactor bestaat al
+        NotExisting: Multifactor bestaat niet
+        Unspecified: Multifactor ongeldig
+      IDP:
+        AlreadyExists: Identiteitsprovider bestaat al
+        NotExisting: Identiteitsprovider bestaat niet
+        Invalid: Identiteitsprovider is ongeldig
+      IDPConfig:
+        AlreadyExists: Identiteitsprovider Configuratie bestaat al
+        NotInactive: Identiteitsprovider Configuratie is niet inactief
+        NotActive: Identiteitsprovider Configuratie is niet actief
+    LabelPolicy:
+      NotFound: Standaard Privé Label Beleid niet gevonden
+      NotChanged: Standaard Privé Label Beleid is niet veranderd
+    MailTemplate:
+      NotFound: Standaard Mail Sjabloon niet gevonden
+      NotChanged: Standaard Mail Sjabloon is niet veranderd
+      AlreadyExists: Standaard Mail Sjabloon bestaat al
+      Invalid: Standaard Mail Sjabloon is ongeldig
+    CustomMessageText:
+      NotFound: Standaard Bericht Tekst niet gevonden
+      NotChanged: Standaard Bericht Tekst is niet veranderd
+      AlreadyExists: Standaard Bericht Tekst bestaat al
+      Invalid: Standaard Bericht Tekst is ongeldig
+    PasswordComplexityPolicy:
+      NotFound: Standaard Wachtwoord Complexiteit Beleid niet gevonden
+      NotExisting: Standaard Wachtwoord Complexiteit Beleid bestaat niet
+      AlreadyExists: Standaard Wachtwoord Complexiteit Beleid bestaat al
+      Empty: Standaard Wachtwoord Complexiteit Beleid is leeg
+      NotChanged: Standaard Wachtwoord Complexiteit Beleid is niet veranderd
+    PasswordAgePolicy:
+      NotFound: Standaard Wachtwoord Leeftijd Beleid niet gevonden
+      NotExisting: Standaard Wachtwoord Leeftijd Beleid bestaat niet
+      AlreadyExists: Standaard Wachtwoord Leeftijd Beleid bestaat al
+      Empty: Standaard Wachtwoord Leeftijd Beleid is leeg
+      NotChanged: Standaard Wachtwoord Leeftijd Beleid is niet veranderd
+    PasswordLockoutPolicy:
+      NotFound: Standaard Wachtwoord Lockout Beleid niet gevonden
+      NotExisting: Standaard Wachtwoord Lockout Beleid bestaat niet
+      AlreadyExists: Standaard Wachtwoord Lockout Beleid bestaat al
+      Empty: Standaard Wachtwoord Lockout Beleid is leeg
+      NotChanged: Standaard Wachtwoord Lockout Beleid is niet veranderd
+    DomainPolicy:
+      NotFound: Org IAM Beleid niet gevonden
+      Empty: Org IAM Beleid is leeg
+      NotExisting: Org IAM Beleid bestaat niet
+      AlreadyExists: Org IAM Beleid bestaat al
+      NotChanged: Org IAM Beleid is niet veranderd
+    NotificationPolicy:
+      NotFound: Standaard Notificatie Beleid niet gevonden
+      NotChanged: Standaard Notificatie Beleid is niet veranderd
+      AlreadyExists: Standaard Notificatie Beleid bestaat al
+  Policy:
+    AlreadyExists: Beleid bestaat al
+    Label:
+      Invalid:
+        PrimaryColor: Primaire kleur is geen geldige Hex kleur waarde
+        BackgroundColor: Achtergrondkleur is geen geldige Hex kleur waarde
+        WarnColor: Waarschuwingskleur is geen geldige Hex kleur waarde
+        FontColor: Tekstkleur is geen geldige Hex kleur waarde
+        PrimaryColorDark: Primaire kleur (donkere modus) is geen geldige Hex kleur waarde
+        BackgroundColorDark: Achtergrondkleur (donkere modus) is geen geldige Hex kleur waarde
+        WarnColorDark: Waarschuwingskleur (donkere modus) is geen geldige Hex kleur waarde
+        FontColorDark: Tekstkleur (donkere modus) is geen geldige Hex kleur waarde
+  UserGrant:
+    AlreadyExists: Gebruikerstoekenning bestaat al
+    NotFound: Gebruikerstoekenning niet gevonden
+    Invalid: Gebruikerstoekenning is ongeldig
+    NotChanged: Gebruikerstoekenning is niet veranderd
+    IDMissing: ID ontbreekt
+    NotActive: Gebruikerstoekenning is niet actief
+    NotInactive: Gebruikerstoekenning is niet gedeactiveerd
+    NoPermissionForProject: Gebruiker heeft geen rechten op dit project
+    RoleKeyNotFound: Rol niet gevonden
+  Member:
+    AlreadyExists: Lid bestaat al
+  IDPConfig:
+    AlreadyExists: IDP-configuratie met deze naam bestaat al
+    NotExisting: Identiteitsprovider-configuratie bestaat niet
+  Changes:
+    NotFound: Geen geschiedenis gevonden
+    AuditRetention: Geschiedenis is buiten de bewaartermijn van het auditlogboek
+  Token:
+    NotFound: Token niet gevonden
+    Invalid: Token is ongeldig
+  UserSession:
+    NotFound: Gebruikerssessie niet gevonden
+  Key:
+    NotFound: Sleutel niet gevonden
+    ExpireBeforeNow: De vervaldatum ligt in het verleden
+  Login:
+    LoginPolicy:
+      MFA:
+        ForceAndNotConfigured: Multifactor is vereist, maar er zijn geen mogelijke providers geconfigureerd. Neem contact op met uw systeembeheerder.
+  Step:
+    Started:
+      AlreadyExists: Stap gestart bestaat al
+    Done:
+      AlreadyExists: Stap voltooid bestaat al
+  CustomText:
+    AlreadyExists: Aangepaste tekst bestaat al
+    Invalid: Aangepaste tekst is ongeldig
+    NotFound: Aangepaste tekst niet gevonden
+  TranslationFile:
+    ReadError: Fout bij het lezen van vertaalbestand
+    MergeError: Vertaalbestand kon niet worden samengevoegd met aangepaste vertalingen
+    NotFound: Vertaalbestand bestaat niet
+  Metadata:
+    NotFound: Metadata niet gevonden
+    NoData: Metadata lijst is leeg
+    Invalid: Metadata is ongeldig
+    KeyNotExisting: Een of meer sleutels bestaan niet
+  Action:
+    Invalid: Actie is ongeldig
+    NotFound: Actie niet gevonden
+    NotActive: Actie is niet actief
+    NotInactive: Actie is niet inactief
+    MaxAllowed: Geen extra actieve acties toegestaan
+  Flow:
+    FlowTypeMissing: FlowType ontbreekt
+    Empty: Flow is al leeg
+    WrongTriggerType: TriggerType is ongeldig
+    NoChanges: Geen veranderingen
+    ActionIDsNotExist: ActieIDs bestaan niet
+  Query:
+    CloseRows: SQL Statement kon niet worden voltooid
+    SQLStatement: SQL Statement kon niet worden gemaakt
+    InvalidRequest: Verzoek is ongeldig
+  Quota:
+    AlreadyExists: Quota bestaat al voor deze eenheid
+    NotFound: Quota niet gevonden voor deze eenheid
+    Invalid:
+      CallURL: Quota oproep URL is ongeldig
+      Percent: Quota percentage is lager dan 1
+      Unimplemented: Quota's zijn niet geïmplementeerd voor deze eenheid
+      Amount: Quota hoeveelheid is lager dan 1
+      ResetInterval: Quota reset interval is korter dan een minuut
+      Noop: Een onbeperkte quota zonder meldingen heeft geen effect
+    Access:
+      Exhausted: De quota voor geauthenticeerde verzoeken is opgebruikt
+    Execution:
+      Exhausted: De quota voor uitvoeringseconden is opgebruikt
+  LogStore:
+    Access:
+      StorageFailed: Opslaan toegangslogboek naar database mislukt
+      ScanFailed: Opvragen gebruik voor geauthenticeerde verzoeken mislukt
+    Execution:
+      StorageFailed: Opslaan actie uitvoeringslog naar database mislukt
+      ScanFailed: Opvragen gebruik voor actie uitvoeringsseconden mislukt
+  Session:
+    NotExisting: Sessie bestaat niet
+    Terminated: Sessie al beëindigd
+    Expired: Sessie is verlopen
+    PositiveLifetime: Sessie levensduur mag niet minder dan 0 zijn
+    Token:
+      Invalid: Sessie Token is ongeldig
+    WebAuthN:
+      NoChallenge: Sessie zonder WebAuthN uitdaging
+  Intent:
+    IDPMissing: IDP ID ontbreekt in het verzoek
+    IDPInvalid: IDP ongeldig voor het verzoek
+    ResponseInvalid: IDP respons is ongeldig
+    SuccessURLMissing: Success URL ontbreekt in het verzoek
+    FailureURLMissing: Failure URL ontbreekt in het verzoek
+    StateMissing: Staat parameter ontbreekt in het verzoek
+    NotStarted: Intentie is niet gestart of was al beëindigd
+    NotSucceeded: Intentie is niet geslaagd
+    TokenCreationFailed: Token aanmaken mislukt
+    InvalidToken: Intentie Token is ongeldig
+    OtherUser: Intentie bedoeld voor een andere gebruiker
+  AuthRequest:
+    AlreadyExists: Auth Verzoek bestaat al
+    NotExisting: Auth Verzoek bestaat niet
+    WrongLoginClient: Auth Verzoek aangemaakt door andere login client
+  OIDCSession:
+    RefreshTokenInvalid: Refresh Token is ongeldig
+    Token:
+      Invalid: Token is ongeldig
+      Expired: Token is verlopen
+    InvalidClient: Token is niet uitgegeven voor deze client
+  Feature:
+    NotExisting: Functie bestaat niet
+    TypeNotSupported: Functie type wordt niet ondersteund
+    InvalidValue: Ongeldige waarde voor deze functie
+
+AggregateTypes:
+  action: Actie
+  instance: Instantie
+  key_pair: Sleutelpaar
+  org: Organisatie
+  project: Project
+  user: Gebruiker
+  usergrant: Gebruikerstoekenning
+  quota: Quota
+  feature: Functie
+
+EventTypes:
+  user:
+    added: Gebruiker toegevoegd
+    selfregistered: Gebruiker heeft zichzelf geregistreerd
+    initialization:
+      code:
+        added: Initialisatiecode gegenereerd
+        sent: Initialisatiecode verzonden
+      check:
+        succeeded: Initialisatiecontrole geslaagd
+        failed: Initialisatiecontrole mislukt
+    token:
+      added: Toegangstoken aangemaakt
+      removed: Toegangstoken verwijderd
+    username:
+      reserved: Gebruikersnaam gereserveerd
+      released: Gebruikersnaam vrijgegeven
+      changed: Gebruikersnaam gewijzigd
+    email:
+      reserved: E-mailadres gereserveerd
+      released: E-mailadres vrijgegeven
+      changed: E-mailadres gewijzigd
+      verified: E-mailadres geverifieerd
+      verification:
+        failed: E-mailadres verificatie mislukt
+      code:
+        added: E-mailadres verificatiecode gegenereerd
+        sent: E-mailadres verificatiecode verzonden
+    machine:
+      added: Technische gebruiker toegevoegd
+      changed: Technische gebruiker gewijzigd
+      key:
+        added: Sleutel toegevoegd
+        removed: Sleutel verwijderd
+      secret:
+        set: Geheim ingesteld
+        removed: Geheim verwijderd
+        check:
+          succeeded: Geheimcontrole geslaagd
+          failed: Geheimcontrole mislukt
+    human:
+      added: Persoon toegevoegd
+      selfregistered: Persoon heeft zichzelf geregistreerd
+      avatar:
+        added: Avatar toegevoegd
+        removed: Avatar verwijderd
+      initialization:
+        code:
+          added: Initialisatiecode gegenereerd
+          sent: Initialisatiecode verzonden
+        check:
+          succeeded: Initialisatiecontrole geslaagd
+          failed: Initialisatiecontrole mislukt
+      username:
+        reserved: Gebruikersnaam gereserveerd
+        released: Gebruikersnaam vrijgegeven
+      email:
+        changed: E-mailadres gewijzigd
+        verified: E-mailadres geverifieerd
+        verification:
+          failed: E-mailadres verificatie mislukt
+        code:
+          added: E-mailadres verificatiecode gegenereerd
+          sent: E-mailadres verificatiecode verzonden
+      password:
+        changed: Wachtwoord gewijzigd
+        code:
+          added: Wachtwoordcode gegenereerd
+          sent: Wachtwoordcode verzonden
+        check:
+          succeeded: Wachtwoordcontrole geslaagd
+          failed: Wachtwoordcontrole mislukt
+        change:
+          sent: Wachtwoordwijziging verzonden
+        hash:
+          updated: Wachtwoordhash bijgewerkt
+      externallogin:
+        check:
+          succeeded: Externe login geslaagd
+      externalidp:
+        added: Externe IDP toegevoegd
+        removed: Externe IDP verwijderd
+        cascade:
+          removed: Externe IDP cascade verwijderd
+        id:
+          migrated: Externe UserID van IDP was gemigreerd
+      phone:
+        changed: Telefoonnummer gewijzigd
+        verified: Telefoonnummer geverifieerd
+        verification:
+          failed: Telefoonnummer verificatie mislukt
+        code:
+          added: Telefoonnummercode gegenereerd
+          sent: Telefoonnummercode verzonden
+        removed: Telefoonnummer verwijderd
+      profile:
+        changed: Gebruikersprofiel gewijzigd
+      address:
+        changed: Gebruikersadres gewijzigd
+      mfa:
+        otp:
+          added: Multifactor OTP toegevoegd
+          verified: Multifactor OTP geverifieerd
+          removed: Multifactor OTP verwijderd
+          check:
+            succeeded: Multifactor OTP controle geslaagd
+            failed: Multifactor OTP controle mislukt
+          sms:
+            added: Multifactor OTP SMS toegevoegd
+            removed: Multifactor OTP SMS verwijderd
+            code:
+              added: Multifactor OTP SMS code toegevoegd
+              sent: Multifactor OTP SMS code verzonden
+            check:
+              succeeded: Multifactor OTP SMS controle geslaagd
+              failed: Multifactor OTP SMS controle mislukt
+          email:
+            added: Multifactor OTP Email toegevoegd
+            removed: Multifactor OTP Email verwijderd
+            code:
+              added: Multifactor OTP Email code toegevoegd
+              sent: Multifactor OTP Email code verzonden
+            check:
+              succeeded: Multifactor OTP Email controle geslaagd
+              failed: Multifactor OTP Email controle mislukt
+        u2f:
+          token:
+            added: Multifactor U2F Token toegevoegd
+            verified: Multifactor U2F Token geverifieerd
+            removed: Multifactor U2F Token verwijderd
+            begin:
+              login: Multifactor U2F controle gestart
+            check:
+              succeeded: Multifactor U2F controle geslaagd
+              failed: Multifactor U2F controle mislukt
+            signcount:
+              changed: Controlesom van de Multifactor U2F Token is gewijzigd
+        init:
+          skipped: Multifactor initialisatie overgeslagen
+      passwordless:
+        token:
+          added: Token voor wachtwoordloze login toegevoegd
+          verified: Token voor wachtwoordloze login geverifieerd
+          removed: Token voor wachtwoordloze login verwijderd
+          begin:
+            login: Wachtwoordloze login controle gestart
+          check:
+            succeeded: Wachtwoordloze login controle geslaagd
+            failed: Wachtwoordloze login controle mislukt
+          signcount:
+            changed: Controlesom van de wachtwoordloze login Token is gewijzigd
+        initialization:
+          code:
+            added: Wachtwoordloze initialisatiecode toegevoegd
+            sent: Wachtwoordloze initialisatiecode verzonden
+            requested: Wachtwoordloze initialisatiecode aangevraagd
+            check:
+              succeeded: Wachtwoordloze initialisatiecode succesvol gecontroleerd
+              failed: Wachtwoordloze initialisatiecode controle mislukt
+      signed:
+        out: Gebruiker uitgelogd
+      refresh:
+        token:
+          added: Ververs Token aangemaakt
+          renewed: Ververs Token vernieuwd
+          removed: Ververs Token verwijderd
+    locked: Gebruiker vergrendeld
+    unlocked: Gebruiker ontgrendeld
+    deactivated: Gebruiker gedeactiveerd
+    reactivated: Gebruiker gereactiveerd
+    removed: Gebruiker verwijderd
+    password:
+      changed: Wachtwoord gewijzigd
+      code:
+        added: Wachtwoordcode gegenereerd
+        sent: Wachtwoordcode verzonden
+      check:
+        succeeded: Wachtwoordcontrole geslaagd
+        failed: Wachtwoordcontrole mislukt
+    phone:
+      changed: Telefoonnummer gewijzigd
+      verified: Telefoonnummer geverifieerd
+      verification:
+        failed: Telefoonnummer verificatie mislukt
+      code:
+        added: Telefoonnummercode gegenereerd
+        sent: Telefoonnummercode verzonden
+      removed: Telefoonnummer verwijderd
+    profile:
+      changed: Gebruikersprofiel gewijzigd
+    address:
+      changed: Gebruikersadres gewijzigd
+    mfa:
+      otp:
+        added: Multifactor OTP toegevoegd
+        verified: Multifactor OTP geverifieerd
+        removed: Multifactor OTP verwijderd
+        check:
+          succeeded: Multifactor OTP controle geslaagd
+          failed: Multifactor OTP controle mislukt
+        init:
+          skipped: Multifactor OTP initialisatie overgeslagen
+      init:
+        skipped: Multifactor initialisatie overgeslagen
+    signed:
+      out: Gebruiker uitgelogd
+    grant:
+      added: Autorisatie toegevoegd
+      changed: Autorisatie gewijzigd
+      removed: Autorisatie verwijderd
+      deactivated: Autorisatie gedeactiveerd
+      reactivated: Autorisatie gereactiveerd
+      reserved: Autorisatie gereserveerd
+      released: Autorisatie vrijgegeven
+      cascade:
+        removed: Autorisatie cascade verwijderd
+        changed: Autorisatie gewijzigd
+    metadata:
+      set: Gebruikersmetadata ingesteld
+      removed: Gebruikersmetadata verwijderd
+      removed.all: Alle gebruikersmetadata verwijderd
+    domain:
+      claimed: Domein geclaimd
+      claimed.sent: Domein claim melding verzonden
+    pat:
+      added: Persoonlijke ToegangsToken toegevoegd
+      removed: Persoonlijke ToegangsToken verwijderd
+  org:
+    added: Organisatie toegevoegd
+    changed: Organisatie gewijzigd
+    deactivated: Organisatie gedeactiveerd
+    reactivated: Organisatie gereactiveerd
+    removed: Organisatie verwijderd
+    domain:
+      added: Domein toegevoegd
+      verification:
+        added: Domein verificatie toegevoegd
+        failed: Domein verificatie mislukt
+      verified: Domein geverifieerd
+      removed: Domein verwijderd
+      primary:
+        set: Primair domein ingesteld
+      reserved: Domein gereserveerd
+      released: Domein vrijgegeven
+    name:
+      reserved: Organisatienaam gereserveerd
+      released: Organisatienaam vrijgegeven
+    member:
+      added: Organisatielid toegevoegd
+      changed: Organisatielid gewijzigd
+      removed: Organisatielid verwijderd
+      cascade:
+        removed: Organisatielid cascade verwijderd
+    iam:
+      policy:
+        added: Systeembeleid toegevoegd
+        changed: Systeembeleid gewijzigd
+        removed: Systeembeleid verwijderd
+    idp:
+      config:
+        added: IDP-configuratie toegevoegd
+        changed: IDP-configuratie gewijzigd
+        removed: IDP-configuratie verwijderd
+        deactivated: IDP-configuratie gedeactiveerd
+        reactivated: IDP-configuratie gereactiveerd
+      oidc:
+        config:
+          added: OIDC IDP-configuratie toegevoegd
+          changed: OIDC IDP-configuratie gewijzigd
+      saml:
+        config:
+          added: SAML IDP-configuratie toegevoegd
+          changed: SAML IDP-configuratie gewijzigd
+      jwt:
+        config:
+          added: JWT IDP-configuratie toegevoegd
+          changed: JWT IDP-configuratie gewijzigd
+    customtext:
+      set: Aangepaste tekst ingesteld
+      removed: Aangepaste tekst verwijderd
+      template:
+        removed: Aangepaste tekst sjabloon verwijderd
+    policy:
+      login:
+        added: Login Beleid toegevoegd
+        changed: Login Beleid gewijzigd
+        removed: Login Beleid verwijderd
+        idpprovider:
+          added: Identiteitsprovider toegevoegd aan Login Beleid
+          removed: Identiteitsprovider verwijderd van Login Beleid
+          cascade:
+            removed: Identiteitsprovider cascade verwijderd van Login Beleid
+        secondfactor:
+          added: Tweede factor toegevoegd aan Login Beleid
+          removed: Tweede factor verwijderd van Login Beleid
+        multifactor:
+          added: Meerdere factoren toegevoegd aan Login Beleid
+          removed: Meerdere factoren verwijderd van Login Beleid
+      password:
+        complexity:
+          added: Wachtwoord complexiteit beleid toegevoegd
+          changed: Wachtwoord complexiteit beleid gewijzigd
+          removed: Wachtwoord complexiteit beleid verwijderd
+        age:
+          added: Wachtwoord leeftijd beleid toegevoegd
+          changed: Wachtwoord leeftijd beleid gewijzigd
+          removed: Wachtwoord leeftijd beleid verwijderd
+        lockout:
+          added: Wachtwoord lockout beleid toegevoegd
+          changed: Wachtwoord lockout beleid gewijzigd
+          removed: Wachtwoord lockout beleid verwijderd
+      label:
+        added: Label Beleid toegevoegd
+        changed: Label Beleid gewijzigd
+        activated: Label Beleid geactiveerd
+        removed: Label Beleid verwijderd
+        logo:
+          added: Logo toegevoegd aan Label Beleid
+          removed: Logo verwijderd van Label Beleid
+          dark:
+            added: Logo (donkere modus) toegevoegd aan Label Beleid
+            removed: Logo (donkere modus) verwijderd van Label Beleid
+        icon:
+          added: Icoon toegevoegd aan Label Beleid
+          removed: Icoon verwijderd van Label Beleid
+          dark:
+            added: Icoon (donkere modus) toegevoegd aan Label Beleid
+            removed: Icoon (donkere modus) verwijderd van Label Beleid
+        font:
+          added: Lettertype toegevoegd aan Label Beleid
+          removed: Lettertype verwijderd van Label Beleid
+        assets:
+          removed: Assets verwijderd van Label Beleid
+      privacy:
+        added: Privacy beleid en Algemene Voorwaarden toegevoegd
+        changed: Privacy beleid en Algemene Voorwaarden gewijzigd
+        removed: Privacy beleid en Algemene Voorwaarden verwijderd
+      domain:
+        added: Domein beleid toegevoegd
+        changed: Domein beleid gewijzigd
+        removed: Domein beleid verwijderd
+      lockout:
+        added: Lockout beleid toegevoegd
+        changed: Lockout beleid gewijzigd
+        removed: Lockout beleid verwijderd
+      notification:
+        added: Notificatie beleid toegevoegd
+        changed: Notificatie beleid gewijzigd
+        removed: Notificatie beleid verwijderd
+    flow:
+      trigger_actions:
+        set: Actie ingesteld
+        cascade:
+          removed: Acties cascade verwijderd
+        removed: Acties verwijderd
+      cleared: Flow gewist
+    mail:
+      template:
+        added: E-mail sjabloon toegevoegd
+        changed: E-mail sjabloon gewijzigd
+        removed: E-mail sjabloon verwijderd
+      text:
+        added: E-mail tekst toegevoegd
+        changed: E-mail tekst gewijzigd
+        removed: E-mail tekst verwijderd
+    metadata:
+      removed: Metadata verwijderd
+      removed.all: Alle metadata verwijderd
+      set: Metadata ingesteld
+  project:
+    added: Project toegevoegd
+    changed: Project gewijzigd
+    deactivated: Project gedeactiveerd
+    reactivated: Project gereactiveerd
+    removed: Project verwijderd
+    member:
+      added: Projectlid toegevoegd
+      changed: Projectlid gewijzigd
+      removed: Projectlid verwijderd
+      cascade:
+        removed: Projectlid cascade verwijderd
+    role:
+      added: Projectrol toegevoegd
+      changed: Projectrol gewijzigd
+      removed: Projectrol verwijderd
+    grant:
+      added: Beheertoegang toegevoegd
+      changed: Beheertoegang gewijzigd
+      removed: Beheertoegang verwijderd
+      deactivated: Beheertoegang gedeactiveerd
+      reactivated: Beheertoegang gereactiveerd
+      cascade:
+        changed: Beheertoegang gewijzigd
+      member:
+        added: Beheertoegangslid toegevoegd
+        changed: Beheertoegangslid gewijzigd
+        removed: Beheertoegangslid verwijderd
+        cascade:
+          removed: Beheertoegangslid cascade verwijderd
+    application:
+      added: Applicatie toegevoegd
+      changed: Applicatie gewijzigd
+      removed: Applicatie verwijderd
+      deactivated: Applicatie gedeactiveerd
+      reactivated: Applicatie gereactiveerd
+      oidc:
+        secret:
+          check:
+            succeeded: OIDC Client Secret controle geslaagd
+            failed: OIDC Client Secret controle mislukt
+        key:
+          added: Applicatiesleutel toegevoegd
+          removed: Applicatiesleutel verwijderd
+      config:
+        saml:
+          added: SAML Configuratie toegevoegd
+          changed: SAML Configuratie gewijzigd
+        oidc:
+          added: OIDC Configuratie toegevoegd
+          changed: OIDC Configuratie gewijzigd
+          secret:
+            changed: OIDC geheim gewijzigd
+        api:
+          added: API Configuratie toegevoegd
+          changed: API Configuratie gewijzigd
+          secret:
+            changed: API geheim gewijzigd
+  policy:
+    password:
+      complexity:
+        added: Wachtwoord complexiteit beleid toegevoegd
+        changed: Wachtwoord complexiteit beleid gewijzigd
+      age:
+        added: Wachtwoord leeftijd beleid toegevoegd
+        changed: Wachtwoord leeftijd beleid gewijzigd
+      lockout:
+        added: Wachtwoord lockout beleid toegevoegd
+        changed: Wachtwoord lockout beleid gewijzigd
+  iam:
+    setup:
+      started: ZITADEL setup gestart
+      done: ZITADEL setup voltooid
+    global:
+      org:
+        set: Globale organisatie ingesteld
+    project:
+      iam:
+        set: ZITADEL project ingesteld
+    member:
+      added: ZITADEL lid toegevoegd
+      changed: ZITADEL lid gewijzigd
+      removed: ZITADEL lid verwijderd
+      cascade:
+        removed: ZITADEL lid cascade verwijderd
+    idp:
+      config:
+        added: IDP-configuratie toegevoegd
+        changed: IDP-configuratie gewijzigd
+        removed: IDP-configuratie verwijderd
+        deactivated: IDP-configuratie gedeactiveerd
+        reactivated: IDP-configuratie geactiveerd
+      oidc:
+        config:
+          added: OIDC IDP-configuratie toegevoegd
+          changed: OIDC IDP-configuratie gewijzigd
+      saml:
+        config:
+          added: SAML IDP-configuratie toegevoegd
+          changed: SAML IDP-configuratie gewijzigd
+      jwt:
+        config:
+          added: JWT-configuratie aan identiteitsprovider toegevoegd
+          changed: JWT-configuratie van identiteitsprovider verwijderd
+    customtext:
+      set: Tekst ingesteld
+      removed: Tekst verwijderd
+    policy:
+      login:
+        added: Standaard Login Beleid toegevoegd
+        changed: Standaard Login Beleid gewijzigd
+        idpprovider:
+          added: Identiteitsprovider toegevoegd aan Standaard Login Beleid
+          removed: Identiteitsprovider verwijderd van Standaard Login Beleid
+      label:
+        added: Label Beleid toegevoegd
+        changed: Label Beleid gewijzigd
+        activated: Label Beleid geactiveerd
+        logo:
+          added: Logo toegevoegd aan Label Beleid
+          removed: Logo verwijderd van Label Beleid
+          dark:
+            added: Logo (donkere modus) toegevoegd aan Label Beleid
+            removed: Logo (donkere modus) verwijderd van Label Beleid
+        icon:
+          added: Icoon toegevoegd aan Label Beleid
+          removed: Icoon verwijderd van Label Beleid
+          dark:
+            added: Icoon (donkere modus) toegevoegd aan Label Beleid
+            removed: Icoon (donkere modus) verwijderd van Label Beleid
+        font:
+          added: Lettertype toegevoegd aan Label Beleid
+          removed: Lettertype verwijderd van Label Beleid
+        assets:
+          removed: Assets verwijderd van Label Beleid
+    default:
+      language:
+        set: Standaard taal ingesteld
+    oidc:
+      settings:
+        added: OIDC-configuratie toegevoegd
+        changed: OIDC-configuratie gewijzigd
+        removed: OIDC-configuratie verwijderd
+    secret:
+      generator:
+        added: Geheim generator toegevoegd
+        changed: Geheim generator gewijzigd
+        removed: Geheim generator verwijderd
+    smtp:
+      config:
+        added: SMTP-configuratie toegevoegd
+        changed: SMTP-configuratie gewijzigd
+        password:
+          changed: SMTP-configuratie geheim gewijzigd
+    sms:
+      config:
+        twilio:
+          added: Twilio SMS-provider toegevoegd
+          changed: Twilio SMS-provider gewijzigd
+          token:
+            changed: Twilio SMS-provider token gewijzigd
+          removed: Twilio SMS-provider verwijderd
+          activated: Twilio SMS-provider geactiveerd
+          deactivated: Twilio SMS-provider gedeactiveerd
+  key_pair:
+    added: Sleutelpaar toegevoegd
+    certificate:
+      added: Certificaat toegevoegd
+  action:
+    added: Actie toegevoegd
+    changed: Actie gewijzigd
+    deactivated: Actie gedeactiveerd
+    reactivated: Actie geactiveerd
+    removed: Actie verwijderd
+  instance:
+    added: Instantie toegevoegd
+    changed: Instantie gewijzigd
+    customtext:
+      removed: Aangepaste tekst verwijderd
+      set: Aangepaste tekst ingesteld
+      template:
+        removed: Sjabloon van aangepaste tekst verwijderd
+    default:
+      language:
+        set: Standaard taal ingesteld
+      org:
+        set: Standaard organisatie ingesteld
+    domain:
+      added: Domein toegevoegd
+      primary:
+        set: Primair domein ingesteld
+      removed: Domein verwijderd
+    iam:
+      console:
+        set: ZITADEL Console applicatie ingesteld
+      project:
+        set: ZITADEL project ingesteld
+    mail:
+      template:
+        added: E-Mail sjabloon toegevoegd
+        changed: E-Mail sjabloon gewijzigd
+      text:
+        added: E-Mail tekst toegevoegd
+        changed: E-Mail tekst gewijzigd
+    member:
+      added: Instantie lid toegevoegd
+      changed: Instantie lid gewijzigd
+      removed: Instantie lid verwijderd
+      cascade:
+        removed: Instantie lid cascade verwijderd
+    notification:
+      provider:
+        debug:
+          fileadded: Bestand debug meldingenprovider toegevoegd
+          filechanged: Bestand debug meldingenprovider gewijzigd
+          fileremoved: Bestand debug meldingenprovider verwijderd
+          logadded: Log debug meldingenprovider toegevoegd
+          logchanged: Log debug meldingenprovider gewijzigd
+          logremoved: Log debug meldingenprovider verwijderd
+    oidc:
+      settings:
+        added: OIDC instellingen toegevoegd
+        changed: OIDC instellingen gewijzigd
+    policy:
+      domain:
+        added: Domein beleid toegevoegd
+        changed: Domein beleid gewijzigd
+      label:
+        activated: Label beleid geactiveerd
+        added: Label beleid toegevoegd
+        assets:
+          removed: Asset van label beleid verwijderd
+        changed: Label beleid gewijzigd
+        font:
+          added: Lettertype toegevoegd aan label beleid
+          removed: Lettertype verwijderd van label beleid
+        icon:
+          added: Icoon toegevoegd aan label beleid
+          removed: Icoon verwijderd van label beleid
+          dark:
+            added: Icoon toegevoegd aan donker label beleid
+            removed: Icoon verwijderd van donker label beleid
+        logo:
+          added: Logo toegevoegd aan label beleid
+          removed: Logo verwijderd van label beleid
+          dark:
+            added: Logo toegevoegd aan donker label beleid
+            removed: Logo verwijderd van donker label beleid
+      lockout:
+        added: Lockout beleid toegevoegd
+        changed: Lockout beleid gewijzigd
+      login:
+        added: Login beleid toegevoegd
+        changed: Login beleid gewijzigd
+        idpprovider:
+          added: Identiteitsprovider toegevoegd aan login beleid
+          cascade:
+            removed: Identiteitsprovider cascade verwijderd van login beleid
+          removed: Identiteitsprovider verwijderd van login beleid
+        multifactor:
+          added: Multifactor toegevoegd aan login beleid
+          removed: Multifactor verwijderd van login beleid
+        secondfactor:
+          added: Tweede factor toegevoegd aan login beleid
+          removed: Tweede factor verwijderd van login beleid
+      password:
+        age:
+          added: Wachtwoord leeftijd beleid toegevoegd
+          changed: Wachtwoord leeftijd beleid gewijzigd
+        complexity:
+          added: Wachtwoord complexiteit beleid toegevoegd
+          changed: Wachtwoord complexiteit beleid gewijzigd
+      privacy:
+        added: Privacy beleid toegevoegd
+        changed: Privacy beleid gewijzigd
+      security:
+        set: Beveiligingsbeleid ingesteld
+
+    removed: Instantie verwijderd
+    secret:
+      generator:
+        added: Geheim generator toegevoegd
+        changed: Geheim generator gewijzigd
+        removed: Geheim generator verwijderd
+    sms:
+      configtwilio:
+        activated: Twilio SMS-configuratie geactiveerd
+        added: Twilio SMS-configuratie toegevoegd
+        changed: Twilio SMS-configuratie gewijzigd
+        deactivated: Twilio SMS-configuratie gedeactiveerd
+        removed: Twilio SMS-configuratie verwijderd
+        token:
+          changed: Token van Twilio SMS-configuratie gewijzigd
+    smtp:
+      config:
+        added: SMTP-configuratie toegevoegd
+        changed: SMTP-configuratie gewijzigd
+        password:
+          changed: Wachtwoord van SMTP-configuratie gewijzigd
+        removed: SMTP-configuratie verwijderd
+
+Application:
+  OIDC:
+    UnsupportedVersion: Uw OIDC-versie wordt niet ondersteund
+    V1:
+      NotCompliant: Uw configuratie is niet conform en wijkt af van de OIDC 1.0-standaard.
+      NoRedirectUris: Er moet ten minste één omleidings-URI geregistreerd zijn.
+      NotAllCombinationsAreAllowed: Configuratie is conform, maar niet alle mogelijke combinaties zijn toegestaan.
+      Code:
+        RedirectUris:
+          HttpOnlyForWeb: Grant type code staat alleen http omleidings-URI's toe voor apptype web.
+          CustomOnlyForNative: Grant type code staat alleen aangepaste omleidings-URI's toe voor apptype native (bijv. appname:// )
+      Implicit:
+        RedirectUris:
+          CustomNotAllowed: Grant type impliciet staat geen aangepaste omleidings-URI's toe
+          HttpNotAllowed: Grant type impliciet staat geen http omleidings-URI's toe
+          HttpLocalhostOnlyForNative: Http://localhost omleidings-URI is alleen toegestaan voor native applicaties.
+      Native:
+        AuthMethodType:
+          NotNone: Native applicaties moeten authmethodtype none hebben.
+        RedirectUris:
+          MustBeHttpLocalhost: Omleidings-URI's moeten beginnen met uw eigen protocol, http://127.0.0.1, http://[::1] of http://localhost.
+      UserAgent:
+        AuthMethodType:
+          NotNone: User agent-app moet authmethodtype none hebben.
+      GrantType:
+        Refresh:
+          NoAuthCode: Refresh Token is alleen toegestaan in combinatie met Authorization Code.
+
+Action:
+  Flow:
+    Type:
+      Unspecified: Niet gespecificeerd
+      ExternalAuthentication: Externe Authenticatie
+      CustomiseToken: Token Aanvullen
+      InternalAuthentication: Interne Authenticatie
+      CustomizeSAMLResponse: SAMLResponse Aanvullen
+  TriggerType:
+    Unspecified: Niet gespecificeerd
+    PostAuthentication: Na Authenticatie
+    PreCreation: Voor Creatie
+    PostCreation: Na Creatie
+    PreUserinfoCreation: Voor Userinfo creatie
+    PreAccessTokenCreation: Voor het aanmaken van een toegangstoken
+    PreSAMLResponseCreation: Voor SAMLResponse creatie
