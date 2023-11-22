@@ -1055,7 +1055,8 @@
       "pt": "Portuguese",
       "mk": "Македонски",
       "cs": "Čeština",
-      "ru": "Русский"
+      "ru": "Русский",
+      "nl": "Nederlands"
     },
     "SMTP": {
       "TITLE": "SMTP настройки",
@@ -1268,7 +1269,8 @@
         "pt": "Portuguese",
         "mk": "Македонски",
         "cs": "Čeština",
-        "ru": "Русский"
+        "ru": "Русский",
+        "nl": "Nederlands"
       },
       "KEYS": {
         "emailVerificationDoneText": "Проверката на имейл е извършена",
@@ -2157,7 +2159,8 @@
     "pt": "португалски",
     "mk": "Македонски",
     "cs": "Čeština",
-    "ru": "Русский"
+    "ru": "Русский",
+    "nl": "Nederlands"
   },
   "MEMBER": {
     "ADD": "Добавяне на мениджър",

@@ -1028,7 +1028,7 @@
       "NOTIFICATIONS_DESC": "Impostazioni SMTP e SMS",
       "MESSAGETEXTS": "Testi di notifica",
       "IDP": "Fornitori di identità",
-      "VERIFIED_DAMAINS": "Domini verificati",
+      "VERIFIED_DOMAINS": "Domini verificati",
       "DOMAIN": "Impostazioni del dominio",
       "LOGINTEXTS": "Testi dell'interfaccia login",
       "BRANDING": "Branding",
@@ -1061,7 +1061,8 @@
       "pt": "Portuguese",
       "mk": "Македонски",
       "cs": "Čeština",
-      "ru": "Русский"
+      "ru": "Русский",
+      "nl": "Nederlands"
     },
     "SMTP": {
       "TITLE": "Impostazioni SMTP",
@@ -1274,7 +1275,8 @@
         "pt": "Portuguese",
         "mk": "Македонски",
         "cs": "Čeština",
-        "ru": "Русский"
+        "ru": "Русский",
+        "nl": "Nederlands"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -2167,7 +2169,8 @@
     "pt": "Portuguese",
     "mk": "Македонски",
     "cs": "Čeština",
-    "ru": "Русский"
+    "ru": "Русский",
+    "nl": "Nederlands"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

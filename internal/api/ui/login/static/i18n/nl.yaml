@@ -1,0 +1,490 @@
+Login:
+  Title: Welkom terug!
+  Description: Voer uw inloggegevens in.
+  TitleLinking: Inloggen voor gebruikerskoppeling
+  DescriptionLinking: Voer uw inloggegevens in om uw externe gebruiker te koppelen.
+  LoginNameLabel: Inlognaam
+  UsernamePlaceHolder: gebruikersnaam
+  LoginnamePlaceHolder: gebruikersnaam@domein
+  ExternalUserDescription: Inloggen met een externe gebruiker.
+  MustBeMemberOfOrg: De gebruiker moet lid zijn van de {{.OrgName}} organisatie.
+  RegisterButtonText: Registreren
+  NextButtonText: Volgende
+
+LDAP:
+  Title: Inloggen
+  Description: Voer uw inloggegevens in.
+  LoginNameLabel: Inlognaam
+  PasswordLabel: Wachtwoord
+  NextButtonText: Volgende
+
+SelectAccount:
+  Title: Selecteer Account
+  Description: Gebruik uw account
+  TitleLinking: Selecteer account voor gebruikerskoppeling
+  DescriptionLinking: Selecteer uw account om te koppelen met uw externe gebruiker.
+  OtherUser: Andere gebruiker
+  SessionState0: actief
+  SessionState1: Uitgelogd
+  MustBeMemberOfOrg: De gebruiker moet lid zijn van de {{.OrgName}} organisatie.
+
+Password:
+  Title: Wachtwoord
+  Description: Voer uw inloggegevens in.
+  PasswordLabel: Wachtwoord
+  MinLength: Minimum lengte
+  HasUppercase: Hoofdletter
+  HasLowercase: Kleine letter
+  HasNumber: Nummer
+  HasSymbol: Symbool
+  Confirmation: Bevestiging komt overeen
+  ResetLinkText: Reset Wachtwoord
+  BackButtonText: Terug
+  NextButtonText: Volgende
+
+UsernameChange:
+  Title: Verander Gebruikersnaam
+  Description: Stel uw nieuwe gebruikersnaam in
+  UsernameLabel: Gebruikersnaam
+  CancelButtonText: Annuleren
+  NextButtonText: Volgende
+
+UsernameChangeDone:
+  Title: Gebruikersnaam Veranderd
+  Description: Uw gebruikersnaam is succesvol veranderd.
+  NextButtonText: Volgende
+
+InitPassword:
+  Title: Stel Wachtwoord in
+  Description: U heeft een code ontvangen, die u in het onderstaande formulier moet invoeren, om uw nieuwe wachtwoord in te stellen.
+  CodeLabel: Code
+  NewPasswordLabel: Nieuw Wachtwoord
+  NewPasswordConfirmLabel: Bevestig Wachtwoord
+  ResendButtonText: Verstuur Code Opnieuw
+  NextButtonText: Volgende
+
+InitPasswordDone:
+  Title: Wachtwoord Ingesteld
+  Description: Wachtwoord succesvol ingesteld
+  NextButtonText: Volgende
+  CancelButtonText: Annuleren
+
+InitUser:
+  Title: Activeer Gebruiker
+  Description: Verifieer uw e-mail met de onderstaande code en stel uw wachtwoord in.
+  CodeLabel: Code
+  NewPasswordLabel: Nieuw Wachtwoord
+  NewPasswordConfirm: Bevestig Wachtwoord
+  NextButtonText: Volgende
+  ResendButtonText: Verstuur Code Opnieuw
+
+InitUserDone:
+  Title: Gebruiker Geactiveerd
+  Description: E-mail geverifieerd en Wachtwoord succesvol ingesteld
+  NextButtonText: Volgende
+  CancelButtonText: Annuleren
+
+InitMFAPrompt:
+  Title: 2-Factor Setup
+  Description: 2-factor authenticatie geeft u extra beveiliging voor uw gebruikersaccount. Hierdoor bent u de enige die toegang heeft tot uw account.
+  Provider0: Authenticator App (bijv. Google/Microsoft Authenticator, Authy)
+  Provider1: Apparaat afhankelijk (bijv. FaceID, Windows Hello, Vingerafdruk)
+  Provider3: OTP SMS
+  Provider4: OTP Email
+  NextButtonText: Volgende
+  SkipButtonText: Overslaan
+
+InitMFAOTP:
+  Title: 2-Factor Verificatie
+  Description: Maak uw 2-factor aan. Download een authenticator app als u er nog geen heeft.
+  OTPDescription: Scan de code met uw authenticator app (bijv. Google/Microsoft Authenticator, Authy) of kopieer het geheim en voer de gegenereerde code hieronder in.
+  SecretLabel: Geheim
+  CodeLabel: Code
+  NextButtonText: Volgende
+  CancelButtonText: Annuleren
+
+InitMFAOTPSMS:
+  Title: 2-Factor Verificatie
+  DescriptionPhone: Maak uw 2-factor aan. Voer uw telefoonnummer in om te verifiëren.
+  DescriptionCode: Maak uw 2-factor aan. Voer de ontvangen code in om uw telefoonnummer te verifiëren.
+  PhoneLabel: Telefoon
+  CodeLabel: Code
+  EditButtonText: Bewerken
+  ResendButtonText: Verstuur Code Opnieuw
+  NextButtonText: Volgende
+
+InitMFAU2F:
+  Title: Voeg Beveiligingssleutel Toe
+  Description: Een beveiligingssleutel is een verificatiemethode die kan worden ingebouwd in uw telefoon, gebruik maakt van Bluetooth, of direct in de USB-poort van uw computer wordt gestoken.
+  TokenNameLabel: Naam van de beveiligingssleutel / apparaat
+  NotSupported: WebAuthN wordt niet ondersteund door uw browser. Zorg ervoor dat het up-to-date is of gebruik een andere (bijv. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Voeg beveiligingssleutel toe
+  ErrorRetry: Probeer opnieuw, maak een nieuwe uitdaging of kies een andere methode.
+
+InitMFADone:
+  Title: 2-factor Geverifieerd
+  Description: Geweldig! U heeft zojuist uw 2-factor succesvol ingesteld en uw account veel veiliger gemaakt. De Factor moet bij elke login worden ingevoerd.
+  NextButtonText: Volgende
+  CancelButtonText: Annuleren
+
+MFAProvider:
+  Provider0: Authenticator App (bijv. Google/Microsoft Authenticator, Authy)
+  Provider1: Apparaat afhankelijk (bijv. FaceID, Windows Hello, Vingerafdruk)
+  Provider3: OTP SMS
+  Provider4: OTP Email
+  ChooseOther: of kies een andere optie
+
+VerifyMFAOTP:
+  Title: Verifieer 2-Factor
+  Description: Verifieer uw tweede factor
+  CodeLabel: Code
+  NextButtonText: Volgende
+
+VerifyOTP:
+  Title: Verifieer 2-Factor
+  Description: Verifieer uw tweede factor
+  CodeLabel: Code
+  ResendButtonText: Verstuur Code Opnieuw
+  NextButtonText: Volgende
+
+VerifyMFAU2F:
+  Title: 2-Factor Verificatie
+  Description: Verifieer uw 2-Factor met het geregistreerde apparaat (bijv. FaceID, Windows Hello, Vingerafdruk)
+  NotSupported: WebAuthN wordt niet ondersteund door uw browser. Zorg ervoor dat het up-to-date is of gebruik een andere (bijv. Chrome, Safari, Firefox)
+  ErrorRetry: Probeer opnieuw, maak een nieuwe aanvraag of kies een andere methode.
+  ValidateTokenButtonText: Verifieer 2-Factor
+
+Passwordless:
+  Title: Wachtwoordloze Login
+  Description: Log in met authenticatiemethoden die door uw apparaat worden verstrekt, zoals FaceID, Windows Hello of Vingerafdruk.
+  NotSupported: WebAuthN wordt niet ondersteund door uw browser. Zorg ervoor dat het up-to-date is of gebruik een andere (bijv. Chrome, Safari, Firefox)
+  ErrorRetry: Probeer opnieuw, maak een nieuwe uitdaging of kies een andere methode.
+  LoginWithPwButtonText: Inloggen met wachtwoord
+  ValidateTokenButtonText: Inloggen met wachtwoordloos
+
+PasswordlessPrompt:
+  Title: Wachtwoordloze Setup
+  Description: Wilt u wachtwoordloze login instellen? (Authenticatiemethoden van uw apparaat zoals FaceID, Windows Hello of Vingerafdruk)
+  DescriptionInit: U moet wachtwoordloze login instellen. Gebruik de link die u heeft gekregen om uw apparaat te registreren.
+  PasswordlessButtonText: Ga wachtwoordloos
+  NextButtonText: Volgende
+  SkipButtonText: Overslaan
+
+PasswordlessRegistration:
+  Title: Wachtwoordloze Setup
+  Description: Voeg uw authenticatie toe door een naam te geven (bijv. MyMobilePhone, MacBook, etc.) en vervolgens op de knop 'Registreer wachtwoordloos' hieronder te klikken.
+  TokenNameLabel: Naam van het apparaat
+  NotSupported: WebAuthN wordt niet ondersteund door uw browser. Zorg ervoor dat het up-to-date is of gebruik een andere (bijv. Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Registreer wachtwoordloos
+  ErrorRetry: Probeer opnieuw, maak een nieuwe uitdaging of kies een andere methode.
+
+PasswordlessRegistrationDone:
+  Title: Wachtwoordloze Setup
+  Description: Apparaat voor wachtwoordloos succesvol toegevoegd.
+  DescriptionClose: U kunt dit venster nu sluiten.
+  NextButtonText: Volgende
+  CancelButtonText: Annuleren
+
+PasswordChange:
+  Title: Verander Wachtwoord
+  Description: Verander uw wachtwoord. Voer uw oude en nieuwe wachtwoord in.
+  OldPasswordLabel: Oud Wachtwoord
+  NewPasswordLabel: Nieuw Wachtwoord
+  NewPasswordConfirmLabel: Bevestig Wachtwoord
+  CancelButtonText: Annuleren
+  NextButtonText: Volgende
+  Footer: Footer
+
+PasswordChangeDone:
+  Title: Verander Wachtwoord
+  Description: Uw wachtwoord is succesvol veranderd.
+  NextButtonText: Volgende
+
+PasswordResetDone:
+  Title: Wachtwoord Reset Link Verstuurd
+  Description: Controleer uw e-mail om uw wachtwoord te resetten.
+  NextButtonText: Volgende
+
+EmailVerification:
+  Title: E-Mail Verificatie
+  Description: We hebben u een e-mail gestuurd om uw adres te verifiëren. Voer de code in het onderstaande formulier in.
+  CodeLabel: Code
+  NextButtonText: Volgende
+  ResendButtonText: Verstuur Code Opnieuw
+
+EmailVerificationDone:
+  Title: E-Mail Verificatie
+  Description: Uw e-mailadres is met succes geverifieerd.
+  NextButtonText: Volgende
+  CancelButtonText: Annuleren
+  LoginButtonText: Inloggen
+
+RegisterOption:
+  Title: Registratie Opties
+  Description: Kies hoe u wilt registreren
+  RegisterUsernamePasswordButtonText: Met gebruikersnaam en wachtwoord
+  ExternalLoginDescription: of registreer met een externe gebruiker
+  LoginButtonText: Inloggen
+
+RegistrationUser:
+  Title: Registratie
+  Description: Voer uw gebruikersgegevens in. Uw e-mailadres wordt gebruikt als uw inlognaam.
+  DescriptionOrgRegister: Voer uw gebruikersgegevens in.
+  EmailLabel: E-Mail
+  UsernameLabel: Gebruikersnaam
+  FirstnameLabel: Voornaam
+  LastnameLabel: Achternaam
+  LanguageLabel: Taal
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  GenderLabel: Geslacht
+  Female: Vrouw
+  Male: Man
+  Diverse: divers / X
+  PasswordLabel: Wachtwoord
+  PasswordConfirmLabel: Bevestig wachtwoord
+  TosAndPrivacyLabel: Algemene voorwaarden
+  TosConfirm: Ik accepteer de
+  TosLinkText: AV
+  PrivacyConfirm: Ik accepteer het
+  PrivacyLinkText: privacybeleid
+  ExternalLogin: of registreer met een externe gebruiker
+  BackButtonText: Inloggen
+  NextButtonText: Volgende
+
+ExternalRegistrationUserOverview:
+  Title: Externe Gebruiker Registratie
+  Description: We hebben uw gebruikersgegevens van de geselecteerde provider overgenomen. U kunt ze nu wijzigen of aanvullen.
+  EmailLabel: E-Mail
+  UsernameLabel: Gebruikersnaam
+  FirstnameLabel: Voornaam
+  LastnameLabel: Achternaam
+  NicknameLabel: Bijnaam
+  PhoneLabel: Telefoonnummer
+  LanguageLabel: Taal
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Nederlands: Nederlands
+  TosAndPrivacyLabel: Algemene voorwaarden
+  TosConfirm: Ik accepteer de
+  TosLinkText: AV
+  PrivacyConfirm: Ik accepteer het
+  PrivacyLinkText: privacybeleid
+  ExternalLogin: of registreer met een externe gebruiker
+  BackButtonText: Terug
+  NextButtonText: Opslaan
+
+RegistrationOrg:
+  Title: Organisatie Registratie
+  Description: Voer uw organisatienaam en gebruikersgegevens in.
+  OrgNameLabel: Organisatienaam
+  EmailLabel: E-Mail
+  UsernameLabel: Gebruikersnaam
+  FirstnameLabel: Voornaam
+  LastnameLabel: Achternaam
+  PasswordLabel: Wachtwoord
+  PasswordConfirmLabel: Bevestig wachtwoord
+  TosAndPrivacyLabel: Algemene voorwaarden
+  TosConfirm: Ik accepteer de
+  TosLinkText: AV
+  PrivacyConfirm: Ik accepteer het
+  PrivacyLinkText: privacybeleid
+  SaveButtonText: Creëer organisatie
+
+LoginSuccess:
+  Title: Inloggen Succesvol
+  AutoRedirectDescription: U wordt automatisch teruggeleid naar uw toepassing. Zo niet, klik dan op de onderstaande knop. U mag het venster daarna sluiten.
+  RedirectedDescription: U mag dit venster nu sluiten.
+  NextButtonText: Volgende
+
+LogoutDone:
+  Title: Uitgelogd
+  Description: U heeft succesvol uitgelogd.
+  LoginButtonText: Inloggen
+
+LinkingUsersDone:
+  Title: Koppeling Gebruiker
+  Description: Gebruiker gekoppeld.
+  CancelButtonText: Annuleren
+  NextButtonText: Volgende
+
+ExternalNotFound:
+  Title: Externe Gebruiker Niet Gevonden
+  Description: Externe gebruiker niet gevonden. Wilt u uw gebruiker koppelen of automatisch een nieuwe registreren.
+  LinkButtonText: Koppelen
+  AutoRegisterButtonText: Registreren
+  TosAndPrivacyLabel: Algemene voorwaarden
+  TosConfirm: Ik accepteer de
+  TosLinkText: AV
+  PrivacyConfirm: Ik accepteer het
+  PrivacyLinkText: privacybeleid
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+DeviceAuth:
+  Title: Apparaat Autorisatie
+  UserCode:
+    Label: Gebruikerscode
+    Description: Voer de gebruikerscode in die op het apparaat wordt weergegeven.
+    ButtonNext: Volgende
+  Action:
+    Description: Verleen apparaattoegang.
+    GrantDevice: u staat op het punt om apparaat
+    AccessToScopes: toegang te verlenen tot de volgende scopes
+    Button:
+      Allow: Toestaan
+      Deny: Weigeren
+  Done:
+    Description: Klaar.
+    Approved: Apparaat autorisatie goedgekeurd. U kunt nu teruggaan naar het apparaat.
+    Denied: Apparaat autorisatie geweigerd. U kunt nu teruggaan naar het apparaat.
+
+Footer:
+  PoweredBy: Mogelijk gemaakt door
+  Tos: AV
+  PrivacyPolicy: Privacybeleid
+  Help: Help
+  SupportEmail: Ondersteuning E-mail
+
+SignIn: Inloggen met {{.Provider}}
+
+Errors:
+  Internal: Er is een interne fout opgetreden
+  AuthRequest:
+    NotFound: Kon authrequest niet vinden
+    UserAgentNotCorresponding: User Agent komt niet overeen
+    UserAgentNotFound: User Agent ID niet gevonden
+    TokenNotFound: Token niet gevonden
+    RequestTypeNotSupported: Request type wordt niet ondersteund
+    MissingParameters: Verplichte parameters ontbreken
+  User:
+    NotFound: Gebruiker kon niet worden gevonden
+    AlreadyExists: Gebruiker bestaat al
+    Inactive: Gebruiker is inactief
+    NotFoundOnOrg: Gebruiker kon niet worden gevonden op gekozen organisatie
+    NotAllowedOrg: Gebruiker is geen lid van de vereiste organisatie
+    NotMatchingUserID: Gebruiker en gebruiker in authrequest komen niet overeen
+    UserIDMissing: UserID is leeg
+    Invalid: Ongeldige gebruikersgegevens
+    DomainNotAllowedAsUsername: Domein is al gereserveerd en kan niet worden gebruikt
+    NotAllowedToLink: Gebruiker mag niet koppelen met externe inlogprovider
+    Profile:
+      NotFound: Profiel niet gevonden
+      NotChanged: Profiel niet veranderd
+      Empty: Profiel is leeg
+      FirstNameEmpty: Voornaam in profiel is leeg
+      LastNameEmpty: Achternaam in profiel is leeg
+      IDMissing: Profiel ID ontbreekt
+    Email:
+      NotFound: E-mail niet gevonden
+      Invalid: E-mail is ongeldig
+      AlreadyVerified: E-mail is al geverifieerd
+      NotChanged: E-mail niet veranderd
+      Empty: E-mail is leeg
+      IDMissing: E-mail ID ontbreekt
+    Phone:
+      NotFound: Telefoon niet gevonden
+      Invalid: Telefoon is ongeldig
+      AlreadyVerified: Telefoon is al geverifieerd
+      Empty: Telefoon is leeg
+      NotChanged: Telefoon niet veranderd
+    Address:
+      NotFound: Adres niet gevonden
+      NotChanged: Adres niet veranderd
+    Username:
+      AlreadyExists: Gebruikersnaam is al ingenomen
+      Reserved: Gebruikersnaam is al ingenomen
+      Empty: Gebruikersnaam is leeg
+    Password:
+      ConfirmationWrong: Wachtwoordbevestiging is onjuist
+      Empty: Wachtwoord is leeg
+      Invalid: Wachtwoord is ongeldig
+      InvalidAndLocked: Wachtwoord is ongeldig en gebruiker is vergrendeld, neem contact op met uw beheerder.
+      NotChanged: Nieuw wachtwoord kan niet hetzelfde zijn als uw huidige wachtwoord
+    UsernameOrPassword:
+      Invalid: Gebruikersnaam of wachtwoord is ongeldig
+    PasswordComplexityPolicy:
+      NotFound: Wachtwoordbeleid niet gevonden
+      MinLength: Wachtwoord is te kort
+      HasLower: Wachtwoord moet een kleine letter bevatten
+      HasUpper: Wachtwoord moet een hoofdletter bevatten
+      HasNumber: Wachtwoord moet een nummer bevatten
+      HasSymbol: Wachtwoord moet een symbool bevatten
+    Code:
+      Expired: Code is verlopen
+      Invalid: Code is ongeldig
+      Empty: Code is leeg
+      CryptoCodeNil: Crypto code is nil
+      NotFound: Kon code niet vinden
+      GeneratorAlgNotSupported: Generator algoritme wordt niet ondersteund
+    EmailVerify:
+      UserIDEmpty: UserID is leeg
+    ExternalData:
+      CouldNotRead: Externe gegevens konden niet correct worden gelezen
+    MFA:
+      NoProviders: Geen beschikbare multifactor providers
+      OTP:
+        AlreadyReady: Multifactor OTP (OneTimePassword) is al ingesteld
+        NotExisting: Multifactor OTP (OneTimePassword) bestaat niet
+        InvalidCode: Ongeldige code
+        NotReady: Multifactor OTP (OneTimePassword) is niet klaar
+    Locked: Gebruiker is vergrendeld
+    SomethingWentWrong: Er is iets misgegaan
+    NotActive: Gebruiker is niet actief
+    ExternalIDP:
+      IDPTypeNotImplemented: IDP Type is niet geïmplementeerd
+      NotAllowed: Externe Inlog Provider niet toegestaan
+      IDPConfigIDEmpty: Identity Provider ID is leeg
+      ExternalUserIDEmpty: Externe Gebruiker ID is leeg
+      UserDisplayNameEmpty: Gebruiker Weergavenaam is leeg
+      NoExternalUserData: Geen externe Gebruiker Data ontvangen
+      CreationNotAllowed: Creatie van een nieuwe gebruiker is niet toegestaan op deze Provider
+      LinkingNotAllowed: Koppeling van een gebruiker is niet toegestaan op deze Provider
+    GrantRequired: Inloggen niet mogelijk. De gebruiker moet minimaal één grant hebben op de applicatie. Neem contact op met uw beheerder.
+    ProjectRequired: Inloggen niet mogelijk. De organisatie van de gebruiker moet toegekend zijn aan het project. Neem contact op met uw beheerder.
+  IdentityProvider:
+    InvalidConfig: Identity Provider configuratie is ongeldig
+  IAM:
+    LockoutPolicy:
+      NotExisting: Lockout Beleid bestaat niet
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registratie is niet toegestaan
+  DeviceAuth:
+    NotExisting: Gebruikerscode bestaat niet
+
+optional: (optioneel)
