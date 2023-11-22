@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
+	"go.uber.org/mock/gomock"
 
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/static"

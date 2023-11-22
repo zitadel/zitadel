@@ -33,6 +33,7 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventst
 
 	for _, command := range commands {
 		for _, constraint := range command.UniqueConstraints() {
+			constraint.UniqueField = strings.ToLower(constraint.UniqueField)
 			switch constraint.Action {
 			case eventstore.UniqueConstraintAdd:
 				addPlaceholders = append(addPlaceholders, fmt.Sprintf("($%d, $%d, $%d)", len(addArgs)+1, len(addArgs)+2, len(addArgs)+3))

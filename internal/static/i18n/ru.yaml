@@ -28,6 +28,11 @@ Errors:
       RemoveFailed: Объект не удалось удалить
   Limit:
     ExceedsDefault: Лимит превышает лимит по умолчанию
+  Limits:
+    NotFound: Лимиты не найдены
+    NoneSpecified: Не указаны лимиты
+  Restrictions:
+    NoneSpecified: Не указаны ограничения
   Language:
     NotParsed: Не удалось разобрать язык
   OIDCSettings:
