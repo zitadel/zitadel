@@ -38,6 +38,7 @@ Errors:
     NotParsed: Езикът не можа да бъде анализиран синтактично
     NotSupported: Езикът не се поддържа
     NotAllowed: Езикът не е разрешен
+    Undefined: Езикът е неопределен
   OIDCSettings:
     NotFound: Конфигурацията на OIDC не е намерена
     AlreadyExists: OIDC конфигурацията вече съществува

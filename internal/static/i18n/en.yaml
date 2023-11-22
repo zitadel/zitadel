@@ -38,6 +38,7 @@ Errors:
     NotParsed: Could not parse language
     NotSupported: Language is not supported
     NotAllowed: Language is not allowed
+    Undefined: Language is undefined
   OIDCSettings:
     NotFound: OIDC Configuration not found
     AlreadyExists: OIDC configuration already exists

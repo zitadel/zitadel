@@ -34,25 +34,7 @@ func LanguagesDiffer(left, right []language.Tag) bool {
 	if left == nil || right == nil || len(left) != len(right) {
 		return true
 	}
-	return len(FilterOutLanguages(left, right)) > 0 || len(FilterOutLanguages(right, left)) > 0
-}
-
-// FilterOutLanguages returns a new slice of languages without the languages to exclude.
-func FilterOutLanguages(originalLanguages, excludeLanguages []language.Tag) []language.Tag {
-	filteredLanguages := make([]language.Tag, 0, len(originalLanguages))
-	for _, lang := range originalLanguages {
-		var found bool
-		for _, excludeLang := range excludeLanguages {
-			if lang == excludeLang {
-				found = true
-				break
-			}
-		}
-		if !found {
-			filteredLanguages = append(filteredLanguages, lang)
-		}
-	}
-	return filteredLanguages
+	return !languagesAreContained(left, right)
 }
 
 func LanguageIsAllowed(allowUndefined bool, allowedLanguages []language.Tag, lang language.Tag) error {
@@ -89,6 +71,15 @@ func LanguageIsDefined(lang language.Tag) error {
 		return errors.ThrowInvalidArgument(nil, "LANG-3M9f2", "Errors.Language.Undefined")
 	}
 	return nil
+}
+
+func languagesAreContained(languages, search []language.Tag) bool {
+	for _, s := range search {
+		if !languageIsContained(languages, s) {
+			return false
+		}
+	}
+	return true
 }
 
 func languageIsContained(languages []language.Tag, search language.Tag) bool {

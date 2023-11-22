@@ -38,6 +38,7 @@ Errors:
     NotParsed: 言語のパースに失敗しました
     NotSupported: 言語はサポートされていません
     NotAllowed: 言語は許可されていません
+    Undefined: 言語は未定義です
   OIDCSettings:
     NotFound: OIDC構成が見つかりません
     AlreadyExists: すでに存在するOIDC構成です

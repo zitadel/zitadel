@@ -38,6 +38,7 @@ Errors:
     NotParsed: No pude analizar el idioma
     NotSupported: El idioma no está soportado
     NotAllowed: El idioma no está permitido
+    Undefined: El idioma no está definido
   OIDCSettings:
     NotFound: Configuración OIDC no encontrada
     AlreadyExists: La configuración OIDC ya existe
