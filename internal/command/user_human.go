@@ -528,7 +528,7 @@ func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.
 	if err := human.Normalize(allowedLanguages, true); err != nil {
 		return nil, nil, nil, "", err
 	}
-	events, humanWriteModel, err = c.createHuman(ctx, orgID, human, links, false, passwordless, domainPolicy, pwPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, allowedLanguages)
+	events, humanWriteModel, err = c.createHuman(ctx, orgID, human, links, false, passwordless, domainPolicy, pwPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		return nil, nil, nil, "", err
 	}
@@ -566,10 +566,10 @@ func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domai
 	if link != nil {
 		links = append(links, link)
 	}
-	return c.createHuman(ctx, orgID, human, links, true, false, domainPolicy, pwPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, allowedLanguages)
+	return c.createHuman(ctx, orgID, human, links, true, false, domainPolicy, pwPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
 }
 
-func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.Human, links []*domain.UserIDPLink, selfregister, passwordless bool, domainPolicy *domain.DomainPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator crypto.Generator, allowedLanguages []language.Tag) (events []eventstore.Command, addedHuman *HumanWriteModel, err error) {
+func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.Human, links []*domain.UserIDPLink, selfregister, passwordless bool, domainPolicy *domain.DomainPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator crypto.Generator) (events []eventstore.Command, addedHuman *HumanWriteModel, err error) {
 	if err := human.CheckDomainPolicy(domainPolicy); err != nil {
 		return nil, nil, err
 	}

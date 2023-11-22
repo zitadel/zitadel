@@ -2,13 +2,14 @@ package command
 
 import (
 	"context"
+	"errors"
 
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/restrictions"
 )
@@ -22,7 +23,7 @@ func (s *SetRestrictions) Validate(defaultLanguage language.Tag) error {
 	if s == nil ||
 		s.PublicOrgRegistrationIsNotAllowed == nil &&
 			s.AllowedLanguages == nil {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-oASwj", "Errors.Restrictions.NoneSpecified")
+		return zitadel_errors.ThrowInvalidArgument(nil, "COMMAND-oASwj", "Errors.Restrictions.NoneSpecified")
 	}
 	if s.AllowedLanguages != nil {
 		if err := domain.LanguagesAreSupported(s.AllowedLanguages...); err != nil {
@@ -98,32 +99,41 @@ func (c *Commands) SetRestrictionsCommand(a *restrictions.Aggregate, wm *restric
 				changes...,
 			)}
 			if languagesChanged {
-				profiles, err := c.allProfileWriteModels(ctx)
+				resetCommands, err := c.resetPreferredLanguageOnAllHumans(ctx, setRestrictions, defaultLanguage)
 				if err != nil {
 					return nil, err
 				}
-				for _, profile := range profiles {
-					if notAllowedErr := domain.LanguageIsAllowed(true, setRestrictions.AllowedLanguages, profile.PreferredLanguage); notAllowedErr != nil {
-						changeProfile, profileChanged, profileChangedErr := profile.NewChangedEvent(
-							ctx,
-							UserAggregateFromWriteModel(&profile.WriteModel),
-							profile.FirstName,
-							profile.LastName,
-							profile.NickName,
-							profile.DisplayName,
-							defaultLanguage,
-							profile.Gender,
-						)
-						if profileChangedErr != nil {
-							return nil, profileChangedErr
-						}
-						if profileChanged {
-							commands = append(commands, changeProfile)
-						}
-					}
-				}
+				commands = append(commands, resetCommands...)
 			}
 			return commands, nil
 		}, nil
 	}
+}
+
+func (c *Commands) resetPreferredLanguageOnAllHumans(ctx context.Context, setRestrictions *SetRestrictions, defaultLanguage language.Tag) (commands []eventstore.Command, err error) {
+	profiles, err := c.allProfileWriteModels(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for _, profile := range profiles {
+		if notAllowedErr := domain.LanguageIsAllowed(true, setRestrictions.AllowedLanguages, profile.PreferredLanguage); notAllowedErr != nil {
+			changeProfile, profileChanged, profileChangedErr := profile.NewChangedEvent(
+				ctx,
+				UserAggregateFromWriteModel(&profile.WriteModel),
+				profile.FirstName,
+				profile.LastName,
+				profile.NickName,
+				profile.DisplayName,
+				defaultLanguage,
+				profile.Gender,
+			)
+			if profileChangedErr != nil {
+				err = errors.Join(err, profileChangedErr)
+			}
+			if profileChanged {
+				commands = append(commands, changeProfile)
+			}
+		}
+	}
+	return commands, err
 }
