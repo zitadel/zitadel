@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limieten niet gevonden
     NoneSpecified: Geen limieten gespecificeerd
+  Restrictions:
+    NoneSpecified: Geen beperkingen gespecificeerd
   Language:
     NotParsed: Kon taal niet parsen
   OIDCSettings:
@@ -429,6 +431,7 @@ Errors:
   UserSession:
     NotFound: Gebruikerssessie niet gevonden
   Key:
+    NotFound: Sleutel niet gevonden
     ExpireBeforeNow: De vervaldatum ligt in het verleden
   Login:
     LoginPolicy:
