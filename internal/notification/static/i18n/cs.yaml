@@ -1,0 +1,61 @@
+InitCode:
+  Title: Inicializace uživatele
+  PreHeader: Inicializace uživatele
+  Subject: Inicializace uživatele
+  Greeting: Dobrý den, {{.DisplayName}},
+  Text: Tento uživatel byl vytvořen. Pro přihlášení použijte uživatelské jméno {{.PreferredLoginName}}. Prosím klikněte na tlačítko níže k dokončení procesu inicializace. (Kód {{.Code}}) Pokud jste o tento email nepožádali, prosím ignorujte ho.
+  ButtonText: Dokončit inicializaci
+PasswordReset:
+  Title: Reset hesla
+  PreHeader: Reset hesla
+  Subject: Reset hesla
+  Greeting: Dobrý den, {{.DisplayName}},
+  Text: Přijali jsme žádost o reset hesla. Pro reset hesla prosím použijte tlačítko níže. (Kód {{.Code}}) Pokud jste o tento email nepožádali, prosím ignorujte ho.
+  ButtonText: Reset hesla
+VerifyEmail:
+  Title: Ověření emailu
+  PreHeader: Ověření emailu
+  Subject: Ověření emailu
+  Greeting: Dobrý den, {{.DisplayName}},
+  Text: Byl přidán nový email. Pro ověření vašeho emailu prosím použijte tlačítko níže. (Kód {{.Code}}) Pokud jste nepřidávali nový email, prosím ignorujte tento email.
+  ButtonText: Ověřit email
+VerifyPhone:
+  Title: Ověření telefonu
+  PreHeader: Ověření telefonu
+  Subject: Ověření telefonu
+  Greeting: Dobrý den, {{.DisplayName}},
+  Text: Bylo přidáno nové telefonní číslo. Prosím použijte následující kód k jeho ověření {{.Code}}
+  ButtonText: Ověřit telefon
+VerifyEmailOTP:
+  Title: Ověření jednorázového hesla
+  PreHeader: Ověření jednorázového hesla
+  Subject: Ověření jednorázového hesla
+  Greeting: Dobrý den, {{.DisplayName}},
+  Text: Prosím použijte jednorázové heslo {{.OTP}} k ověření během následujících pěti minut nebo klikněte na tlačítko "Ověřit".
+  ButtonText: Ověřit
+VerifySMSOTP:
+  Text: >-
+    {{.OTP}} je vaše jednorázové heslo pro {{ .Domain }}. Použijte jej během následujících {{.Expiry}}.
+    
+    @{{.Domain}} #{{.OTP}}
+DomainClaimed:
+  Title: Doména byla přiřazena
+  PreHeader: Změna emailu / uživatelského jména
+  Subject: Doména byla přiřazena
+  Greeting: Dobrý den, {{.DisplayName}},
+  Text: Doména {{.Domain}} byla přiřazena organizaci. Váš současný uživatel {{.Username}} není součástí této organizace. Proto budete muset změnit svůj email při přihlášení. Pro toto přihlášení jsme vytvořili dočasné uživatelské jméno ({{.TempUsername}}).
+  ButtonText: Přihlásit se
+PasswordlessRegistration:
+  Title: Přidat přihlášení bez hesla
+  PreHeader: Přidat přihlášení bez hesla
+  Subject: Přidat přihlášení bez hesla
+  Greeting: Dobrý den, {{.DisplayName}},
+  Text: Přijali jsme žádost o přidání tokenu pro přihlášení bez hesla. Pro přidání vašeho tokenu nebo zařízení pro přihlášení bez hesla prosím použijte tlačítko níže.
+  ButtonText: Přidat přihlášení bez hesla
+PasswordChange:
+  Title: Heslo uživatele bylo změněno
+  PreHeader: Změna hesla
+  Subject: Heslo uživatele bylo změněno
+  Greeting: Dobrý den, {{.DisplayName}},
+  Text: Heslo vašeho uživatele bylo změněno. Pokud tato změna nebyla provedena Vámi pak doporučujeme okamžitě resetovat/změnit vaše heslo.
+  ButtonText: Přihlásit se

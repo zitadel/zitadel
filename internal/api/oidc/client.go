@@ -43,7 +43,7 @@ const (
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	client, err := o.query.AppByOIDCClientID(ctx, id, false)
+	client, err := o.query.AppByOIDCClientID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-mPxqP", "Errors.Internal")
 	}
-	projectRoles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
+	projectRoles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 }
 
 func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string, scopes []string) ([]string, error) {
-	user, err := o.query.GetUserByID(ctx, true, subject, false)
+	user, err := o.query.GetUserByID(ctx, true, subject)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 		UserID: oidcCtx,
 		OrgID:  oidcCtx,
 	})
-	app, err := o.query.AppByClientID(ctx, id, false)
+	app, err := o.query.AppByClientID(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -149,7 +149,7 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo *oidc.Us
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	if applicationID != "" {
-		app, err := o.query.AppByOIDCClientID(ctx, applicationID, false)
+		app, err := o.query.AppByOIDCClientID(ctx, applicationID)
 		if err != nil {
 			return err
 		}
@@ -184,7 +184,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 		if err != nil {
 			return err
 		}
-		projectID, err := o.query.ProjectIDFromClientID(ctx, clientID, false)
+		projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
 		if err != nil {
 			return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 		}
@@ -198,7 +198,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
-	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID, false)
+	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 	}
@@ -219,7 +219,7 @@ func (o *OPStorage) ClientCredentialsTokenRequest(ctx context.Context, clientID 
 	if err != nil {
 		return nil, err
 	}
-	user, err := o.query.GetUser(ctx, false, false, loginname)
+	user, err := o.query.GetUser(ctx, false, loginname)
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +240,7 @@ func (o *OPStorage) ClientCredentials(ctx context.Context, clientID, clientSecre
 	if err != nil {
 		return nil, err
 	}
-	user, err := o.query.GetUser(ctx, false, false, loginname)
+	user, err := o.query.GetUser(ctx, false, loginname)
 	if err != nil {
 		return nil, err
 	}
@@ -259,7 +259,7 @@ func (o *OPStorage) isOriginAllowed(ctx context.Context, clientID, origin string
 	if origin == "" {
 		return nil
 	}
-	app, err := o.query.AppByOIDCClientID(ctx, clientID, false)
+	app, err := o.query.AppByOIDCClientID(ctx, clientID)
 	if err != nil {
 		return err
 	}
@@ -331,7 +331,7 @@ func (o *OPStorage) checkOrgScopes(ctx context.Context, user *query.User, scopes
 func (o *OPStorage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, userID, applicationID string, scopes []string, roleAudience []string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	user, err := o.query.GetUserByID(ctx, true, userID, false)
+	user, err := o.query.GetUserByID(ctx, true, userID)
 	if err != nil {
 		return err
 	}
@@ -458,7 +458,7 @@ func (o *OPStorage) setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projec
 }
 
 func (o *OPStorage) userinfoFlows(ctx context.Context, user *query.User, userGrants *query.UserGrants, userInfo *oidc.UserInfo) error {
-	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, user.ResourceOwner, false)
+	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, user.ResourceOwner)
 	if err != nil {
 		return err
 	}
@@ -645,11 +645,11 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 }
 
 func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userGrants *query.UserGrants, claims map[string]interface{}) (map[string]interface{}, error) {
-	user, err := o.query.GetUserByID(ctx, true, userID, false)
+	user, err := o.query.GetUserByID(ctx, true, userID)
 	if err != nil {
 		return nil, err
 	}
-	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreAccessTokenCreation, user.ResourceOwner, false)
+	queriedActions, err := o.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreAccessTokenCreation, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -764,7 +764,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	if (applicationID == "" || len(requestedRoles) == 0) && len(roleAudience) == 0 {
 		return nil, nil, nil
 	}
-	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID, false)
+	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID)
 	// applicationID might contain a username (e.g. client credentials) -> ignore the not found
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, nil, err
@@ -795,7 +795,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	if len(requestedRoles) > 0 {
 		for _, requestedRole := range requestedRoles {
 			for _, grant := range grants.UserGrants {
-				checkGrantedRoles(roles, grant, requestedRole, grant.ProjectID == projectID)
+				checkGrantedRoles(roles, *grant, requestedRole, grant.ProjectID == projectID)
 			}
 		}
 		return grants, roles, nil
@@ -823,7 +823,7 @@ func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[
 }
 
 func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) (map[string]string, error) {
-	user, err := o.query.GetUserByID(ctx, true, userID, false)
+	user, err := o.query.GetUserByID(ctx, true, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -838,7 +838,7 @@ func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) 
 	}, nil
 }
 
-func checkGrantedRoles(roles *projectsRoles, grant *query.UserGrant, requestedRole string, isRequested bool) {
+func checkGrantedRoles(roles *projectsRoles, grant query.UserGrant, requestedRole string, isRequested bool) {
 	for _, grantedRole := range grant.Roles {
 		if requestedRole == grantedRole {
 			roles.Add(grant.ProjectID, grantedRole, grant.ResourceOwner, grant.OrgPrimaryDomain, isRequested)
@@ -852,6 +852,26 @@ type projectsRoles struct {
 	projects map[string]projectRoles
 
 	requestProjectID string
+}
+
+func newProjectRoles(projectID string, grants []query.UserGrant, requestedRoles []string) *projectsRoles {
+	roles := new(projectsRoles)
+	// if specific roles where requested, check if they are granted and append them in the roles list
+	if len(requestedRoles) > 0 {
+		for _, requestedRole := range requestedRoles {
+			for _, grant := range grants {
+				checkGrantedRoles(roles, grant, requestedRole, grant.ProjectID == projectID)
+			}
+		}
+		return roles
+	}
+	// no specific roles were requested, so convert any grants into roles
+	for _, grant := range grants {
+		for _, role := range grant.Roles {
+			roles.Add(grant.ProjectID, role, grant.ResourceOwner, grant.OrgPrimaryDomain, grant.ProjectID == projectID)
+		}
+	}
+	return roles
 }
 
 func (p *projectsRoles) Add(projectID, roleKey, orgID, domain string, isRequested bool) {

@@ -1059,7 +1059,9 @@
       "zh": "简体中文",
       "bg": "Български",
       "pt": "Portuguese",
-      "mk": "Македонски"
+      "mk": "Македонски",
+      "cs": "Čeština",
+      "ru": "Русский"
     },
     "SMTP": {
       "TITLE": "Paramètres SMTP",
@@ -1270,7 +1272,9 @@
         "zh": "简体中文",
         "bg": "Български",
         "pt": "Portuguese",
-        "mk": "Македонски"
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'email effectuée",
@@ -2092,6 +2096,8 @@
       "UPLOAD": "Télécharger le fichier XML",
       "METADATA": "Métadonnées",
       "METADATAFROMFILE": "Métadonnées du fichier",
+      "CERTIFICATE": "Certificat SAML",
+      "DOWNLOADCERT": "Télécharger le certificat SAML",
       "CREATEMETADATA": "Créer des métadonnées",
       "ENTITYID": "Entity ID",
       "ACSURL": "ACS endpoint URL"
@@ -2159,7 +2165,9 @@
     "zh": "简体中文",
     "bg": "Български",
     "pt": "Portuguese",
-    "mk": "Македонски"
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский"
   },
   "MEMBER": {
     "ADD": "Ajouter un manager",

@@ -16,7 +16,7 @@ import (
 )
 
 func (s *Server) GetAppByID(ctx context.Context, req *mgmt_pb.GetAppByIDRequest) (*mgmt_pb.GetAppByIDResponse, error) {
-	app, err := s.query.AppByProjectAndAppID(ctx, true, req.ProjectId, req.AppId, false)
+	app, err := s.query.AppByProjectAndAppID(ctx, true, req.ProjectId, req.AppId)
 	if err != nil {
 		return nil, err
 	}
@@ -259,7 +259,7 @@ func (s *Server) GetAppKey(ctx context.Context, req *mgmt_pb.GetAppKeyRequest) (
 	if err != nil {
 		return nil, err
 	}
-	key, err := s.query.GetAuthNKeyByID(ctx, true, req.KeyId, false, resourceOwner, aggregateID, objectID)
+	key, err := s.query.GetAuthNKeyByID(ctx, true, req.KeyId, resourceOwner, aggregateID, objectID)
 	if err != nil {
 		return nil, err
 	}

@@ -141,7 +141,7 @@ func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMe
 	return userAuthMethods, err
 }
 
-func (q *Queries) ListActiveUserAuthMethodTypes(ctx context.Context, userID string, withOwnerRemoved bool) (userAuthMethodTypes *AuthMethodTypes, err error) {
+func (q *Queries) ListActiveUserAuthMethodTypes(ctx context.Context, userID string) (userAuthMethodTypes *AuthMethodTypes, err error) {
 	ctxData := authz.GetCtxData(ctx)
 	if ctxData.UserID != userID {
 		if err := q.checkPermission(ctx, domain.PermissionUserRead, ctxData.OrgID, userID); err != nil {
@@ -155,9 +155,6 @@ func (q *Queries) ListActiveUserAuthMethodTypes(ctx context.Context, userID stri
 	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
@@ -175,7 +172,7 @@ func (q *Queries) ListActiveUserAuthMethodTypes(ctx context.Context, userID stri
 	return userAuthMethodTypes, err
 }
 
-func (q *Queries) ListUserAuthMethodTypesRequired(ctx context.Context, userID string, withOwnerRemoved bool) (userAuthMethodTypes []domain.UserAuthMethodType, forceMFA, forceMFALocalOnly bool, err error) {
+func (q *Queries) ListUserAuthMethodTypesRequired(ctx context.Context, userID string) (userAuthMethodTypes []domain.UserAuthMethodType, forceMFA, forceMFALocalOnly bool, err error) {
 	ctxData := authz.GetCtxData(ctx)
 	if ctxData.UserID != userID {
 		if err := q.checkPermission(ctx, domain.PermissionUserRead, ctxData.OrgID, userID); err != nil {
@@ -189,9 +186,6 @@ func (q *Queries) ListUserAuthMethodTypesRequired(ctx context.Context, userID st
 	eq := sq.Eq{
 		UserIDCol.identifier():         userID,
 		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		eq[UserOwnerRemovedCol.identifier()] = false
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {

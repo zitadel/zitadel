@@ -15,115 +15,115 @@ import (
 )
 
 var (
-	expectedAppQuery = regexp.QuoteMeta(`SELECT projections.apps5.id,` +
-		` projections.apps5.name,` +
-		` projections.apps5.project_id,` +
-		` projections.apps5.creation_date,` +
-		` projections.apps5.change_date,` +
-		` projections.apps5.resource_owner,` +
-		` projections.apps5.state,` +
-		` projections.apps5.sequence,` +
+	expectedAppQuery = regexp.QuoteMeta(`SELECT projections.apps6.id,` +
+		` projections.apps6.name,` +
+		` projections.apps6.project_id,` +
+		` projections.apps6.creation_date,` +
+		` projections.apps6.change_date,` +
+		` projections.apps6.resource_owner,` +
+		` projections.apps6.state,` +
+		` projections.apps6.sequence,` +
 		// api config
-		` projections.apps5_api_configs.app_id,` +
-		` projections.apps5_api_configs.client_id,` +
-		` projections.apps5_api_configs.auth_method,` +
+		` projections.apps6_api_configs.app_id,` +
+		` projections.apps6_api_configs.client_id,` +
+		` projections.apps6_api_configs.auth_method,` +
 		// oidc config
-		` projections.apps5_oidc_configs.app_id,` +
-		` projections.apps5_oidc_configs.version,` +
-		` projections.apps5_oidc_configs.client_id,` +
-		` projections.apps5_oidc_configs.redirect_uris,` +
-		` projections.apps5_oidc_configs.response_types,` +
-		` projections.apps5_oidc_configs.grant_types,` +
-		` projections.apps5_oidc_configs.application_type,` +
-		` projections.apps5_oidc_configs.auth_method_type,` +
-		` projections.apps5_oidc_configs.post_logout_redirect_uris,` +
-		` projections.apps5_oidc_configs.is_dev_mode,` +
-		` projections.apps5_oidc_configs.access_token_type,` +
-		` projections.apps5_oidc_configs.access_token_role_assertion,` +
-		` projections.apps5_oidc_configs.id_token_role_assertion,` +
-		` projections.apps5_oidc_configs.id_token_userinfo_assertion,` +
-		` projections.apps5_oidc_configs.clock_skew,` +
-		` projections.apps5_oidc_configs.additional_origins,` +
-		` projections.apps5_oidc_configs.skip_native_app_success_page,` +
+		` projections.apps6_oidc_configs.app_id,` +
+		` projections.apps6_oidc_configs.version,` +
+		` projections.apps6_oidc_configs.client_id,` +
+		` projections.apps6_oidc_configs.redirect_uris,` +
+		` projections.apps6_oidc_configs.response_types,` +
+		` projections.apps6_oidc_configs.grant_types,` +
+		` projections.apps6_oidc_configs.application_type,` +
+		` projections.apps6_oidc_configs.auth_method_type,` +
+		` projections.apps6_oidc_configs.post_logout_redirect_uris,` +
+		` projections.apps6_oidc_configs.is_dev_mode,` +
+		` projections.apps6_oidc_configs.access_token_type,` +
+		` projections.apps6_oidc_configs.access_token_role_assertion,` +
+		` projections.apps6_oidc_configs.id_token_role_assertion,` +
+		` projections.apps6_oidc_configs.id_token_userinfo_assertion,` +
+		` projections.apps6_oidc_configs.clock_skew,` +
+		` projections.apps6_oidc_configs.additional_origins,` +
+		` projections.apps6_oidc_configs.skip_native_app_success_page,` +
 		//saml config
-		` projections.apps5_saml_configs.app_id,` +
-		` projections.apps5_saml_configs.entity_id,` +
-		` projections.apps5_saml_configs.metadata,` +
-		` projections.apps5_saml_configs.metadata_url` +
-		` FROM projections.apps5` +
-		` LEFT JOIN projections.apps5_api_configs ON projections.apps5.id = projections.apps5_api_configs.app_id AND projections.apps5.instance_id = projections.apps5_api_configs.instance_id` +
-		` LEFT JOIN projections.apps5_oidc_configs ON projections.apps5.id = projections.apps5_oidc_configs.app_id AND projections.apps5.instance_id = projections.apps5_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps5_saml_configs ON projections.apps5.id = projections.apps5_saml_configs.app_id AND projections.apps5.instance_id = projections.apps5_saml_configs.instance_id` +
+		` projections.apps6_saml_configs.app_id,` +
+		` projections.apps6_saml_configs.entity_id,` +
+		` projections.apps6_saml_configs.metadata,` +
+		` projections.apps6_saml_configs.metadata_url` +
+		` FROM projections.apps6` +
+		` LEFT JOIN projections.apps6_api_configs ON projections.apps6.id = projections.apps6_api_configs.app_id AND projections.apps6.instance_id = projections.apps6_api_configs.instance_id` +
+		` LEFT JOIN projections.apps6_oidc_configs ON projections.apps6.id = projections.apps6_oidc_configs.app_id AND projections.apps6.instance_id = projections.apps6_oidc_configs.instance_id` +
+		` LEFT JOIN projections.apps6_saml_configs ON projections.apps6.id = projections.apps6_saml_configs.app_id AND projections.apps6.instance_id = projections.apps6_saml_configs.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
-	expectedAppsQuery = regexp.QuoteMeta(`SELECT projections.apps5.id,` +
-		` projections.apps5.name,` +
-		` projections.apps5.project_id,` +
-		` projections.apps5.creation_date,` +
-		` projections.apps5.change_date,` +
-		` projections.apps5.resource_owner,` +
-		` projections.apps5.state,` +
-		` projections.apps5.sequence,` +
+	expectedAppsQuery = regexp.QuoteMeta(`SELECT projections.apps6.id,` +
+		` projections.apps6.name,` +
+		` projections.apps6.project_id,` +
+		` projections.apps6.creation_date,` +
+		` projections.apps6.change_date,` +
+		` projections.apps6.resource_owner,` +
+		` projections.apps6.state,` +
+		` projections.apps6.sequence,` +
 		// api config
-		` projections.apps5_api_configs.app_id,` +
-		` projections.apps5_api_configs.client_id,` +
-		` projections.apps5_api_configs.auth_method,` +
+		` projections.apps6_api_configs.app_id,` +
+		` projections.apps6_api_configs.client_id,` +
+		` projections.apps6_api_configs.auth_method,` +
 		// oidc config
-		` projections.apps5_oidc_configs.app_id,` +
-		` projections.apps5_oidc_configs.version,` +
-		` projections.apps5_oidc_configs.client_id,` +
-		` projections.apps5_oidc_configs.redirect_uris,` +
-		` projections.apps5_oidc_configs.response_types,` +
-		` projections.apps5_oidc_configs.grant_types,` +
-		` projections.apps5_oidc_configs.application_type,` +
-		` projections.apps5_oidc_configs.auth_method_type,` +
-		` projections.apps5_oidc_configs.post_logout_redirect_uris,` +
-		` projections.apps5_oidc_configs.is_dev_mode,` +
-		` projections.apps5_oidc_configs.access_token_type,` +
-		` projections.apps5_oidc_configs.access_token_role_assertion,` +
-		` projections.apps5_oidc_configs.id_token_role_assertion,` +
-		` projections.apps5_oidc_configs.id_token_userinfo_assertion,` +
-		` projections.apps5_oidc_configs.clock_skew,` +
-		` projections.apps5_oidc_configs.additional_origins,` +
-		` projections.apps5_oidc_configs.skip_native_app_success_page,` +
+		` projections.apps6_oidc_configs.app_id,` +
+		` projections.apps6_oidc_configs.version,` +
+		` projections.apps6_oidc_configs.client_id,` +
+		` projections.apps6_oidc_configs.redirect_uris,` +
+		` projections.apps6_oidc_configs.response_types,` +
+		` projections.apps6_oidc_configs.grant_types,` +
+		` projections.apps6_oidc_configs.application_type,` +
+		` projections.apps6_oidc_configs.auth_method_type,` +
+		` projections.apps6_oidc_configs.post_logout_redirect_uris,` +
+		` projections.apps6_oidc_configs.is_dev_mode,` +
+		` projections.apps6_oidc_configs.access_token_type,` +
+		` projections.apps6_oidc_configs.access_token_role_assertion,` +
+		` projections.apps6_oidc_configs.id_token_role_assertion,` +
+		` projections.apps6_oidc_configs.id_token_userinfo_assertion,` +
+		` projections.apps6_oidc_configs.clock_skew,` +
+		` projections.apps6_oidc_configs.additional_origins,` +
+		` projections.apps6_oidc_configs.skip_native_app_success_page,` +
 		//saml config
-		` projections.apps5_saml_configs.app_id,` +
-		` projections.apps5_saml_configs.entity_id,` +
-		` projections.apps5_saml_configs.metadata,` +
-		` projections.apps5_saml_configs.metadata_url,` +
+		` projections.apps6_saml_configs.app_id,` +
+		` projections.apps6_saml_configs.entity_id,` +
+		` projections.apps6_saml_configs.metadata,` +
+		` projections.apps6_saml_configs.metadata_url,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.apps5` +
-		` LEFT JOIN projections.apps5_api_configs ON projections.apps5.id = projections.apps5_api_configs.app_id AND projections.apps5.instance_id = projections.apps5_api_configs.instance_id` +
-		` LEFT JOIN projections.apps5_oidc_configs ON projections.apps5.id = projections.apps5_oidc_configs.app_id AND projections.apps5.instance_id = projections.apps5_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps5_saml_configs ON projections.apps5.id = projections.apps5_saml_configs.app_id AND projections.apps5.instance_id = projections.apps5_saml_configs.instance_id` +
+		` FROM projections.apps6` +
+		` LEFT JOIN projections.apps6_api_configs ON projections.apps6.id = projections.apps6_api_configs.app_id AND projections.apps6.instance_id = projections.apps6_api_configs.instance_id` +
+		` LEFT JOIN projections.apps6_oidc_configs ON projections.apps6.id = projections.apps6_oidc_configs.app_id AND projections.apps6.instance_id = projections.apps6_oidc_configs.instance_id` +
+		` LEFT JOIN projections.apps6_saml_configs ON projections.apps6.id = projections.apps6_saml_configs.app_id AND projections.apps6.instance_id = projections.apps6_saml_configs.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
-	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT projections.apps5_api_configs.client_id,` +
-		` projections.apps5_oidc_configs.client_id` +
-		` FROM projections.apps5` +
-		` LEFT JOIN projections.apps5_api_configs ON projections.apps5.id = projections.apps5_api_configs.app_id AND projections.apps5.instance_id = projections.apps5_api_configs.instance_id` +
-		` LEFT JOIN projections.apps5_oidc_configs ON projections.apps5.id = projections.apps5_oidc_configs.app_id AND projections.apps5.instance_id = projections.apps5_oidc_configs.instance_id` +
+	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT projections.apps6_api_configs.client_id,` +
+		` projections.apps6_oidc_configs.client_id` +
+		` FROM projections.apps6` +
+		` LEFT JOIN projections.apps6_api_configs ON projections.apps6.id = projections.apps6_api_configs.app_id AND projections.apps6.instance_id = projections.apps6_api_configs.instance_id` +
+		` LEFT JOIN projections.apps6_oidc_configs ON projections.apps6.id = projections.apps6_oidc_configs.app_id AND projections.apps6.instance_id = projections.apps6_oidc_configs.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
-	expectedProjectIDByAppQuery = regexp.QuoteMeta(`SELECT projections.apps5.project_id` +
-		` FROM projections.apps5` +
-		` LEFT JOIN projections.apps5_api_configs ON projections.apps5.id = projections.apps5_api_configs.app_id AND projections.apps5.instance_id = projections.apps5_api_configs.instance_id` +
-		` LEFT JOIN projections.apps5_oidc_configs ON projections.apps5.id = projections.apps5_oidc_configs.app_id AND projections.apps5.instance_id = projections.apps5_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps5_saml_configs ON projections.apps5.id = projections.apps5_saml_configs.app_id AND projections.apps5.instance_id = projections.apps5_saml_configs.instance_id` +
+	expectedProjectIDByAppQuery = regexp.QuoteMeta(`SELECT projections.apps6.project_id` +
+		` FROM projections.apps6` +
+		` LEFT JOIN projections.apps6_api_configs ON projections.apps6.id = projections.apps6_api_configs.app_id AND projections.apps6.instance_id = projections.apps6_api_configs.instance_id` +
+		` LEFT JOIN projections.apps6_oidc_configs ON projections.apps6.id = projections.apps6_oidc_configs.app_id AND projections.apps6.instance_id = projections.apps6_oidc_configs.instance_id` +
+		` LEFT JOIN projections.apps6_saml_configs ON projections.apps6.id = projections.apps6_saml_configs.app_id AND projections.apps6.instance_id = projections.apps6_saml_configs.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
-	expectedProjectByAppQuery = regexp.QuoteMeta(`SELECT projections.projects3.id,` +
-		` projections.projects3.creation_date,` +
-		` projections.projects3.change_date,` +
-		` projections.projects3.resource_owner,` +
-		` projections.projects3.state,` +
-		` projections.projects3.sequence,` +
-		` projections.projects3.name,` +
-		` projections.projects3.project_role_assertion,` +
-		` projections.projects3.project_role_check,` +
-		` projections.projects3.has_project_check,` +
-		` projections.projects3.private_labeling_setting` +
-		` FROM projections.projects3` +
-		` JOIN projections.apps5 ON projections.projects3.id = projections.apps5.project_id AND projections.projects3.instance_id = projections.apps5.instance_id` +
-		` LEFT JOIN projections.apps5_api_configs ON projections.apps5.id = projections.apps5_api_configs.app_id AND projections.apps5.instance_id = projections.apps5_api_configs.instance_id` +
-		` LEFT JOIN projections.apps5_oidc_configs ON projections.apps5.id = projections.apps5_oidc_configs.app_id AND projections.apps5.instance_id = projections.apps5_oidc_configs.instance_id` +
-		` LEFT JOIN projections.apps5_saml_configs ON projections.apps5.id = projections.apps5_saml_configs.app_id AND projections.apps5.instance_id = projections.apps5_saml_configs.instance_id` +
+	expectedProjectByAppQuery = regexp.QuoteMeta(`SELECT projections.projects4.id,` +
+		` projections.projects4.creation_date,` +
+		` projections.projects4.change_date,` +
+		` projections.projects4.resource_owner,` +
+		` projections.projects4.state,` +
+		` projections.projects4.sequence,` +
+		` projections.projects4.name,` +
+		` projections.projects4.project_role_assertion,` +
+		` projections.projects4.project_role_check,` +
+		` projections.projects4.has_project_check,` +
+		` projections.projects4.private_labeling_setting` +
+		` FROM projections.projects4` +
+		` JOIN projections.apps6 ON projections.projects4.id = projections.apps6.project_id AND projections.projects4.instance_id = projections.apps6.instance_id` +
+		` LEFT JOIN projections.apps6_api_configs ON projections.apps6.id = projections.apps6_api_configs.app_id AND projections.apps6.instance_id = projections.apps6_api_configs.instance_id` +
+		` LEFT JOIN projections.apps6_oidc_configs ON projections.apps6.id = projections.apps6_oidc_configs.app_id AND projections.apps6.instance_id = projections.apps6_oidc_configs.instance_id` +
+		` LEFT JOIN projections.apps6_saml_configs ON projections.apps6.id = projections.apps6_saml_configs.app_id AND projections.apps6.instance_id = projections.apps6_saml_configs.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
 
 	appCols = database.TextArray[string]{

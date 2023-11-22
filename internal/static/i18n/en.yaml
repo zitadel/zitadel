@@ -51,6 +51,7 @@ Errors:
   Notification:
     NoDomain: No Domain found for message
   User:
+    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: User could not be found
     AlreadyExists: User already exists
     NotFoundOnOrg: User could not be found on chosen organization
@@ -317,7 +318,7 @@ Errors:
       NotActive: Project grant is not active
       NotInactive: Project grant is not inactive
   IAM:
-    NotFound: Instance not found
+    NotFound: Instance not found. Check out https://zitadel.com/docs/self-hosting/manage/custom-domain
     Member:
       RolesNotChanged: Roles have not been changed
     MemberInvalid: Member is invalid
@@ -428,6 +429,7 @@ Errors:
   UserSession:
     NotFound: UserSession not found
   Key:
+    NotFound: Key not found
     ExpireBeforeNow: The expiration date is in the past
   Login:
     LoginPolicy:
