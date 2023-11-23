@@ -70,6 +70,7 @@ var (
 	MilestoneProjection                 *handler.Handler
 	QuotaProjection                     *quotaProjection
 	LimitsProjection                    *handler.Handler
+	RestrictionsProjection              *handler.Handler
 )
 
 type projection interface {
@@ -143,6 +144,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	MilestoneProjection = newMilestoneProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["milestones"]), systemUsers)
 	QuotaProjection = newQuotaProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["quotas"]))
 	LimitsProjection = newLimitsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["limits"]))
+	RestrictionsProjection = newRestrictionsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["restrictions"]))
 	newProjectionsList()
 	return nil
 }
@@ -247,5 +249,6 @@ func newProjectionsList() {
 		MilestoneProjection,
 		QuotaProjection.handler,
 		LimitsProjection,
+		RestrictionsProjection,
 	}
 }

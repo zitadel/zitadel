@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limite não encontrado
     NoneSpecified: Nenhum limite especificado
+  Restrictions:
+    NoneSpecified: Nenhuma restrição especificada
   Language:
     NotParsed: Não foi possível analisar o idioma
   OIDCSettings:
@@ -427,6 +429,7 @@ Errors:
   UserSession:
     NotFound: Sessão do usuário não encontrada
   Key:
+    NotFound: Chave não encontrada
     ExpireBeforeNow: A data de expiração está no passado
   Login:
     LoginPolicy:

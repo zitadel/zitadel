@@ -44,7 +44,7 @@ func (t TriggerMethod) String() string {
 	}
 }
 
-func Trigger(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
+func TriggerHTTP(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
 	ai := info.ActivityInfoFromContext(ctx)
 	triggerLog(
 		authz.GetInstance(ctx).InstanceID(),
@@ -55,11 +55,30 @@ func Trigger(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
 		ai.Method,
 		ai.Path,
 		ai.RequestMethod,
+		"",
 		authz.GetCtxData(ctx).SystemMemberships != nil,
 	)
 }
 
-func TriggerWithContext(ctx context.Context, trigger TriggerMethod) {
+func TriggerGRPC(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
+	ai := info.ActivityInfoFromContext(ctx)
+	// GRPC call the method is contained in the HTTP request path
+	method := ai.Path
+	triggerLog(
+		authz.GetInstance(ctx).InstanceID(),
+		orgID,
+		userID,
+		http_utils.ComposedOrigin(ctx),
+		trigger,
+		method,
+		"",
+		ai.RequestMethod,
+		ai.GRPCStatus.String(),
+		authz.GetCtxData(ctx).SystemMemberships != nil,
+	)
+}
+
+func TriggerGRPCWithContext(ctx context.Context, trigger TriggerMethod) {
 	ai := info.ActivityInfoFromContext(ctx)
 	// GRPC call the method is contained in the HTTP request path
 	method := ai.Path
@@ -72,11 +91,12 @@ func TriggerWithContext(ctx context.Context, trigger TriggerMethod) {
 		method,
 		"",
 		ai.RequestMethod,
+		ai.GRPCStatus.String(),
 		authz.GetCtxData(ctx).SystemMemberships != nil,
 	)
 }
 
-func triggerLog(instanceID, orgID, userID, domain string, trigger TriggerMethod, method, path, requestMethod string, isSystemUser bool) {
+func triggerLog(instanceID, orgID, userID, domain string, trigger TriggerMethod, method, path, requestMethod, status string, isSystemUser bool) {
 	logging.WithFields(
 		"instance", instanceID,
 		"org", orgID,
@@ -85,6 +105,7 @@ func triggerLog(instanceID, orgID, userID, domain string, trigger TriggerMethod,
 		"trigger", trigger.String(),
 		"method", method,
 		"path", path,
+		"grpcStatus", status,
 		"requestMethod", requestMethod,
 		"isSystemUser", isSystemUser,
 	).Info(Activity)

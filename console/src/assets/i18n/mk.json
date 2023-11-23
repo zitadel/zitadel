@@ -1030,7 +1030,7 @@
       "NOTIFICATIONS_DESC": "Подесувања за SMTP и SMS",
       "MESSAGETEXTS": "Текстови на пораки",
       "IDP": "Identity Providers",
-      "VERIFIED_DAMAINS": "Потврдени домени",
+      "VERIFIED_DOMAINS": "Потврдени домени",
       "DOMAIN": "Подесувања за домен",
       "LOGINTEXTS": "Текстови на интерфејс за најава",
       "BRANDING": "Брендирање",
@@ -1063,7 +1063,8 @@
       "pt": "Portuguese",
       "mk": "Македонски",
       "cs": "Čeština",
-      "ru": "Русский"
+      "ru": "Русский",
+      "nl": "Nederlands"
     },
     "SMTP": {
       "TITLE": "SMTP подесувања",
@@ -1276,7 +1277,8 @@
         "pt": "Portuguese",
         "mk": "Македонски",
         "cs": "Čeština",
-        "ru": "Русский"
+        "ru": "Русский",
+        "nl": "Nederlands"
       },
       "KEYS": {
         "emailVerificationDoneText": "Е-поштата е верифицирана",
@@ -2164,7 +2166,8 @@
     "pt": "Portuguese",
     "mk": "Македонски",
     "cs": "Čeština",
-    "ru": "Русский"
+    "ru": "Русский",
+    "nl": "Nederlands"
   },
   "MEMBER": {
     "ADD": "Додај Менаџер",

@@ -12,7 +12,7 @@ import (
 
 func (o *OPStorage) JWTProfileTokenType(ctx context.Context, request op.TokenRequest) (op.AccessTokenType, error) {
 	mapJWTProfileScopesToAudience(ctx, request)
-	user, err := o.query.GetUserByID(ctx, false, request.GetSubject(), false)
+	user, err := o.query.GetUserByID(ctx, false, request.GetSubject())
 	if err != nil {
 		return 0, err
 	}

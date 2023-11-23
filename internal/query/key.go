@@ -13,7 +13,9 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -348,4 +350,89 @@ func preparePrivateKeysQuery(ctx context.Context, db prepareDatabase) (sq.Select
 				},
 			}, nil
 		}
+}
+
+type PublicKeyReadModel struct {
+	eventstore.ReadModel
+
+	Algorithm string
+	Key       *crypto.CryptoValue
+	Expiry    time.Time
+	Usage     domain.KeyUsage
+}
+
+func NewPublicKeyReadModel(keyID, resourceOwner string) *PublicKeyReadModel {
+	return &PublicKeyReadModel{
+		ReadModel: eventstore.ReadModel{
+			AggregateID:   keyID,
+			ResourceOwner: resourceOwner,
+		},
+	}
+}
+
+func (wm *PublicKeyReadModel) AppendEvents(events ...eventstore.Event) {
+	wm.ReadModel.AppendEvents(events...)
+}
+
+func (wm *PublicKeyReadModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *keypair.AddedEvent:
+			wm.Algorithm = e.Algorithm
+			wm.Key = e.PublicKey.Key
+			wm.Expiry = e.PublicKey.Expiry
+			wm.Usage = e.Usage
+		default:
+		}
+	}
+	return wm.ReadModel.Reduce()
+}
+
+func (wm *PublicKeyReadModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(keypair.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(keypair.AddedEventType).
+		Builder()
+}
+
+func (q *Queries) GetActivePublicKeyByID(ctx context.Context, keyID string, current time.Time) (_ PublicKey, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	model := NewPublicKeyReadModel(keyID, authz.GetInstance(ctx).InstanceID())
+	if err := q.eventstore.FilterToQueryReducer(ctx, model); err != nil {
+		return nil, err
+	}
+	if model.Algorithm == "" || model.Key == nil {
+		return nil, errors.ThrowNotFound(err, "QUERY-Ahf7x", "Errors.Key.NotFound")
+	}
+	if model.Expiry.Before(current) {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-ciF4k", "Errors.Key.ExpireBeforeNow")
+	}
+	keyValue, err := crypto.Decrypt(model.Key, q.keyEncryptionAlgorithm)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-Ie4oh", "Errors.Internal")
+	}
+	publicKey, err := crypto.BytesToPublicKey(keyValue)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-Kai2Z", "Errors.Internal")
+	}
+
+	return &rsaPublicKey{
+		key: key{
+			id:            model.AggregateID,
+			creationDate:  model.CreationDate,
+			changeDate:    model.ChangeDate,
+			sequence:      model.ProcessedSequence,
+			resourceOwner: model.ResourceOwner,
+			algorithm:     model.Algorithm,
+			use:           model.Usage,
+		},
+		expiry:    model.Expiry,
+		publicKey: publicKey,
+	}, nil
 }

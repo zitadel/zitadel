@@ -39,7 +39,7 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 }
 
 func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.AuthRequest, hintUserID, loginClient string) (op.AuthRequest, error) {
-	project, err := o.query.ProjectByClientID(ctx, req.ClientID, false)
+	project, err := o.query.ProjectByClientID(ctx, req.ClientID)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (o *OPStorage) audienceFromProjectID(ctx context.Context, projectID string)
 	if err != nil {
 		return nil, err
 	}
-	appIDs, err := o.query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
+	appIDs, err := o.query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
@@ -198,7 +198,7 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 		userOrgID = authReq.UserOrgID
 	case *AuthRequestV2:
 		// trigger activity log for authentication for user
-		activity.Trigger(ctx, "", authReq.CurrentAuthRequest.UserID, activity.OIDCAccessToken)
+		activity.TriggerHTTP(ctx, "", authReq.CurrentAuthRequest.UserID, activity.OIDCAccessToken)
 		return o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.GetID())
 	}
 
@@ -213,7 +213,7 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 	}
 
 	// trigger activity log for authentication for user
-	activity.Trigger(ctx, userOrgID, req.GetSubject(), activity.OIDCAccessToken)
+	activity.TriggerHTTP(ctx, userOrgID, req.GetSubject(), activity.OIDCAccessToken)
 	return resp.TokenID, resp.Expiration, nil
 }
 
@@ -225,11 +225,11 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 	switch tokenReq := req.(type) {
 	case *AuthRequestV2:
 		// trigger activity log for authentication for user
-		activity.Trigger(ctx, "", tokenReq.GetSubject(), activity.OIDCRefreshToken)
+		activity.TriggerHTTP(ctx, "", tokenReq.GetSubject(), activity.OIDCRefreshToken)
 		return o.command.AddOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.GetID())
 	case *RefreshTokenRequestV2:
 		// trigger activity log for authentication for user
-		activity.Trigger(ctx, "", tokenReq.GetSubject(), activity.OIDCRefreshToken)
+		activity.TriggerHTTP(ctx, "", tokenReq.GetSubject(), activity.OIDCRefreshToken)
 		return o.command.ExchangeOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.OIDCSessionWriteModel.AggregateID, refreshToken, tokenReq.RequestedScopes)
 	}
 
@@ -258,7 +258,7 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 	}
 
 	// trigger activity log for authentication for user
-	activity.Trigger(ctx, userOrgID, req.GetSubject(), activity.OIDCRefreshToken)
+	activity.TriggerHTTP(ctx, userOrgID, req.GetSubject(), activity.OIDCRefreshToken)
 	return resp.TokenID, token, resp.Expiration, nil
 }
 
@@ -288,7 +288,7 @@ func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken
 			return nil, err
 		}
 		// trigger activity log for authentication for user
-		activity.Trigger(ctx, "", oidcSession.UserID, activity.OIDCRefreshToken)
+		activity.TriggerHTTP(ctx, "", oidcSession.UserID, activity.OIDCRefreshToken)
 		return &RefreshTokenRequestV2{OIDCSessionWriteModel: oidcSession}, nil
 	}
 
@@ -298,7 +298,7 @@ func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken
 	}
 
 	// trigger activity log for use of refresh token for user
-	activity.Trigger(ctx, tokenView.ResourceOwner, tokenView.UserID, activity.OIDCRefreshToken)
+	activity.TriggerHTTP(ctx, tokenView.ResourceOwner, tokenView.UserID, activity.OIDCRefreshToken)
 	return RefreshTokenRequestFromBusiness(tokenView), nil
 }
 
@@ -432,11 +432,11 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 			return scopes, nil
 		}
 	}
-	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, clientID, false)
+	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, clientID)
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
 	}
-	project, err := o.query.ProjectByID(ctx, false, projectID, false)
+	project, err := o.query.ProjectByID(ctx, false, projectID)
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-w4wIn", "Errors.Internal")
 	}
@@ -447,7 +447,7 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
-	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
+	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
@@ -470,7 +470,7 @@ func (o *OPStorage) assertProjectRoleScopesByProject(ctx context.Context, projec
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
-	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
+	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
@@ -486,7 +486,7 @@ func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.T
 	if err != nil {
 		return errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
-	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
+	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return err
 	}

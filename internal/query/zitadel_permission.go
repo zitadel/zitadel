@@ -26,7 +26,7 @@ func (q *Queries) MyZitadelPermissions(ctx context.Context, orgID, userID string
 	}
 	memberships, err := q.Memberships(ctx, &MembershipSearchQuery{
 		Queries: []SearchQuery{userIDQuery, Or(orgIDsQuery, grantedOrgIDQuery)},
-	}, false, false)
+	}, false)
 	if err != nil {
 		return nil, err
 	}

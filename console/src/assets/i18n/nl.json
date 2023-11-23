@@ -1,0 +1,2266 @@
+{
+  "APP_NAME": "ZITADEL",
+  "PAGINATOR": {
+    "PREVIOUS": "Vorige",
+    "NEXT": "Volgende",
+    "COUNT": "Totaal resultaten",
+    "MORE": "Meer"
+  },
+  "FOOTER": {
+    "LINKS": {
+      "CONTACT": "Contact",
+      "TOS": "Algemene voorwaarden",
+      "PP": "Privacybeleid"
+    },
+    "THEME": {
+      "DARK": "Donker",
+      "LIGHT": "Licht"
+    }
+  },
+  "HOME": {
+    "WELCOME": "Begin met ZITADEL",
+    "DISCLAIMER": "ZITADEL behandelt uw gegevens vertrouwelijk en veilig.",
+    "DISCLAIMERLINK": "Meer informatie",
+    "DOCUMENTATION": {
+      "TITLE": "Documentatie",
+      "DESCRIPTION": "Begin snel met ZITADEL."
+    },
+    "GETSTARTED": {
+      "TITLE": "Begin met ZITADEL",
+      "DESCRIPTION": "Begin snel met ZITADEL."
+    },
+    "QUICKSTARTS": {
+      "LABEL": "Eerste stappen",
+      "TITLE": "Quickstarts",
+      "DESCRIPTION": "Begin snel met ZITADEL."
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "Snelkoppelingen",
+      "SETTINGS": "Beschikbare snelkoppelingen",
+      "PROJECTS": "Projecten",
+      "REORDER": "Houd en sleep de tegel om hem te verplaatsen",
+      "ADD": "Houd en sleep een tegel om toe te voegen"
+    }
+  },
+  "ONBOARDING": {
+    "DESCRIPTION": "Uw onboardingproces",
+    "MOREDESCRIPTION": "meer snelkoppelingen",
+    "COMPLETED": "voltooid",
+    "DISMISS": "Nee bedankt, ik ben een professional.",
+    "CARD": {
+      "TITLE": "Zorg dat uw ZITADEL draait",
+      "DESCRIPTION": "Deze checklist helpt om uw instantie in te stellen en begeleidt u door de meest essentiële stappen"
+    },
+    "MILESTONES": {
+      "instance.policy.label.added": {
+        "title": "Stel uw merk in",
+        "description": "Definieer de kleuring en vorm van uw login en upload uw logo en iconen.",
+        "action": "Branding instellen"
+      },
+      "instance.smtp.config.added": {
+        "title": "Stel uw SMTP-instellingen in",
+        "description": "Stel uw eigen mailserverinstellingen in.",
+        "action": "SMTP instellen"
+      },
+      "PROJECT_CREATED": {
+        "title": "Maak een project aan",
+        "description": "Voeg een project toe en definieer de rollen en machtigingen.",
+        "action": "Project aanmaken"
+      },
+      "APPLICATION_CREATED": {
+        "title": "Registreer uw app",
+        "description": "Registreer uw web-, native-, api- of saml-applicatie en stel een authenticatiestroom in.",
+        "action": "App registreren"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Log in op uw app",
+        "description": "Integreer uw applicatie met ZITADEL voor authenticatie en test het door in te loggen met uw beheerdersgebruiker.",
+        "action": "Log in"
+      },
+      "user.human.added": {
+        "title": "Gebruikers toevoegen",
+        "description": "Voeg uw applicatiegebruikers toe",
+        "action": "Gebruiker toevoegen"
+      },
+      "user.grant.added": {
+        "title": "Gebruikers toekennen",
+        "description": "Sta gebruikers toe om toegang te krijgen tot uw applicatie en stel hun rol in.",
+        "action": "Gebruiker toekennen"
+      }
+    }
+  },
+  "MENU": {
+    "INSTANCE": "Instantie",
+    "DASHBOARD": "Home",
+    "PERSONAL_INFO": "Persoonlijke informatie",
+    "DOCUMENTATION": "Documentatie",
+    "INSTANCEOVERVIEW": "Instantie",
+    "ORGS": "Organisaties",
+    "VIEWS": "Weergaves",
+    "EVENTS": "Evenementen",
+    "FAILEDEVENTS": "Mislukte evenementen",
+    "ORGANIZATION": "Organisatie",
+    "PROJECT": "Projecten",
+    "PROJECTOVERVIEW": "Overzicht",
+    "PROJECTGRANTS": "Subsidies",
+    "ROLES": "Rollen",
+    "GRANTEDPROJECT": "Verleende projecten",
+    "HUMANUSERS": "Gebruikers",
+    "MACHINEUSERS": "Servicegebruikers",
+    "LOGOUT": "Alle gebruikers uitloggen",
+    "NEWORG": "Nieuwe organisatie",
+    "IAMADMIN": "U bent een IAM-beheerder. Let op: u heeft uitgebreide rechten.",
+    "SHOWORGS": "Toon alle organisaties",
+    "GRANTS": "Machtigingen",
+    "ACTIONS": "Acties",
+    "PRIVACY": "Privacy",
+    "TOS": "Algemene voorwaarden",
+    "OPENSHORTCUTSTOOLTIP": "Typ ? om toetsenbordsnelkoppelingen te tonen",
+    "SETTINGS": "Instellingen",
+    "CUSTOMERPORTAL": "Klantenportaal"
+  },
+  "ACTIONS": {
+    "ACTIONS": "Acties",
+    "FILTER": "Filter",
+    "RENAME": "Hernoemen",
+    "SET": "Instellen",
+    "COPY": "Kopieer naar klembord",
+    "COPIED": "Gekopieerd naar klembord.",
+    "RESET": "Resetten",
+    "RESETDEFAULT": "Resetten naar standaard",
+    "RESETTO": "Resetten naar: ",
+    "RESETCURRENT": "Resetten naar huidig",
+    "SHOW": "Tonen",
+    "HIDE": "Verbergen",
+    "SAVE": "Opslaan",
+    "SAVENOW": "Nu opslaan",
+    "NEW": "Nieuw",
+    "ADD": "Toevoegen",
+    "CREATE": "Aanmaken",
+    "CONTINUE": "Doorgaan",
+    "BACK": "Terug",
+    "CLOSE": "Sluiten",
+    "CLEAR": "Leegmaken",
+    "CANCEL": "Annuleren",
+    "INFO": "Info",
+    "OK": "OK",
+    "SELECT": "Selecteren",
+    "VIEW": "Tonen",
+    "SELECTIONDELETE": "Selectie verwijderen",
+    "DELETE": "Verwijderen",
+    "REMOVE": "Verwijderen",
+    "VERIFY": "Verifiëren",
+    "FINISH": "Voltooien",
+    "FINISHED": "Sluiten",
+    "CHANGE": "Wijzigen",
+    "REACTIVATE": "Heractiveren",
+    "ACTIVATE": "Activeren",
+    "DEACTIVATE": "Deactiveren",
+    "REFRESH": "Vernieuwen",
+    "LOGIN": "Inloggen",
+    "EDIT": "Bewerken",
+    "PIN": "Vastmaken / Losmaken",
+    "CONFIGURE": "Configureren",
+    "SEND": "Verzenden",
+    "NEWVALUE": "Nieuwe waarde",
+    "RESTORE": "Herstellen",
+    "CONTINUEWITHOUTSAVE": "Doorgaan zonder op te slaan",
+    "OF": "van",
+    "PREVIOUS": "Vorige",
+    "NEXT": "Volgende",
+    "MORE": "meer",
+    "STEP": "Stap",
+    "SETUP": "Instellen",
+    "UNSAVEDCHANGES": "Niet-opgeslagen wijzigingen",
+    "UNSAVED": {
+      "DIALOG": {
+        "DESCRIPTION": "Weet u zeker dat u deze nieuwe actie wilt verwijderen? Uw actie gaat verloren",
+        "CANCEL": "Annuleren",
+        "DISCARD": "Verwijderen"
+      }
+    },
+    "TABLE": {
+      "SHOWUSER": "Toon gebruiker {{value}}"
+    }
+  },
+  "MEMBERROLES": {
+    "IAM_OWNER": "Heeft controle over de hele instantie, inclusief alle organisaties",
+    "IAM_OWNER_VIEWER": "Heeft toestemming om de hele instantie te bekijken, inclusief alle organisaties",
+    "IAM_ORG_MANAGER": "Heeft toestemming om organisaties aan te maken en te beheren",
+    "IAM_USER_MANAGER": "Heeft toestemming om gebruikers aan te maken en te beheren",
+    "ORG_OWNER": "Heeft toestemming over de hele organisatie",
+    "ORG_USER_MANAGER": "Heeft toestemming om gebruikers van de organisatie aan te maken en te beheren",
+    "ORG_OWNER_VIEWER": "Heeft toestemming om de hele organisatie te bekijken",
+    "ORG_USER_PERMISSION_EDITOR": "Heeft toestemming om gebruikerstoegang te beheren",
+    "ORG_PROJECT_PERMISSION_EDITOR": "Heeft toestemming om projecttoegang te beheren",
+    "ORG_PROJECT_CREATOR": "Heeft toestemming om zijn eigen projecten en onderliggende instellingen aan te maken",
+    "PROJECT_OWNER": "Heeft toestemming over het hele project",
+    "PROJECT_OWNER_VIEWER": "Heeft toestemming om het hele project te bekijken",
+    "PROJECT_OWNER_GLOBAL": "Heeft toestemming over het hele project",
+    "PROJECT_OWNER_VIEWER_GLOBAL": "Heeft toestemming om het hele project te bekijken",
+    "PROJECT_GRANT_OWNER": "Heeft toestemming om de projectsubsidie te beheren",
+    "PROJECT_GRANT_OWNER_VIEWER": "Heeft toestemming om de projectsubsidie te bekijken"
+  },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "Alle organisatie-instellingen en tabellen in console zijn gebaseerd op een geselecteerde organisatie. Klik op deze knop om van organisatie te wisselen of een nieuwe aan te maken."
+    },
+    "INSTANCE": {
+      "TEXT": "Klik hier om naar de instantie-instellingen te gaan. Merk op dat u alleen toegang heeft tot deze knop als u uitgebreide machtigingen heeft."
+    },
+    "PROFILE": {
+      "TEXT": "Hier kunt u schakelen tussen uw gebruikersaccounts en uw sessies en profiel beheren."
+    },
+    "NAV": {
+      "TEXT": "Deze navigatie verandert op basis van uw geselecteerde organisatie hierboven of uw instantie"
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "De organisatiecontext is veranderd."
+    },
+    "SWITCHEDTOINSTANCE": {
+      "TEXT": "De weergave is zojuist naar instantie veranderd!"
+    }
+  },
+  "FILTER": {
+    "TITLE": "Filter",
+    "STATE": "Status",
+    "DISPLAYNAME": "Weergavenaam van de gebruiker",
+    "EMAIL": "E-mail",
+    "USERNAME": "Gebruikersnaam",
+    "ORGNAME": "Organisatienaam",
+    "PROJECTNAME": "Projectnaam",
+    "RESOURCEOWNER": "Eigenaar van de bron",
+    "METHODS": {
+      "5": "bevat",
+      "7": "eindigt met",
+      "1": "gelijk aan"
+    }
+  },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Toetsenbordsnelkoppelingen",
+    "UNDERORGCONTEXT": "Binnen organisatiepagina's",
+    "SIDEWIDE": "Snelkoppelingen voor de hele site",
+    "SHORTCUTS": {
+      "HOME": "<strong>G</strong>a naar <strong>H</strong>ome",
+      "INSTANCE": "<strong>G</strong>a naar <strong>I</strong>nstantie",
+      "ORG": "<strong>G</strong>a naar <strong>O</strong>rganisatie",
+      "ORGSETTINGS": "<strong>G</strong>a naar Organisatie <strong>S</strong>instellingen",
+      "ORGSWITCHER": "Verander Organisatie",
+      "ME": "Ga naar eigen profiel",
+      "PROJECTS": "<strong>G</strong>a naar <strong>P</strong>rojecten",
+      "USERS": "<strong>G</strong>a naar <strong>U</strong>sers",
+      "USERGRANTS": "<strong>G</strong>a naar <strong>A</strong>uthorizations",
+      "ACTIONS": "<strong>G</strong>a naar Acties en <strong>F</strong>lows",
+      "DOMAINS": "<strong>G</strong>a naar <strong>D</strong>omeinen"
+    }
+  },
+  "RESOURCEID": "Resource ID",
+  "NAME": "Naam",
+  "VERSION": "Versie",
+  "TABLE": {
+    "NOROWS": "Geen data"
+  },
+  "ERRORS": {
+    "REQUIRED": "Vul dit veld in.",
+    "ATLEASTONE": "Geef ten minste één waarde.",
+    "TOKENINVALID": {
+      "TITLE": "Uw autorisatietoken is verlopen.",
+      "DESCRIPTION": "Klik op de knop hieronder om opnieuw in te loggen."
+    },
+    "EXHAUSTED": {
+      "TITLE": "Uw quotum voor geauthenticeerde aanvragen is opgebruikt.",
+      "DESCRIPTION": "Verwijder of verhoog het quotumlimiet voor deze ZITADEL-instantie."
+    },
+    "INVALID_FORMAT": "De opmaak is ongeldig.",
+    "NOTANEMAIL": "De opgegeven waarde is geen e-mailadres.",
+    "MINLENGTH": "Moet minimaal {{requiredLength}} tekens lang zijn.",
+    "UPPERCASEMISSING": "Moet een hoofdletter bevatten.",
+    "LOWERCASEMISSING": "Moet een kleine letter bevatten.",
+    "SYMBOLERROR": "Moet een symbool of leesteken bevatten.",
+    "NUMBERERROR": "Moet een cijfer bevatten.",
+    "PWNOTEQUAL": "De opgegeven wachtwoorden komen niet overeen.",
+    "PHONE": "Het telefoonnummer moet beginnen met +."
+  },
+  "USER": {
+    "SETTINGS": {
+      "TITLE": "Instellingen",
+      "GENERAL": "Algemeen",
+      "IDP": "Identiteitsproviders",
+      "SECURITY": "Wachtwoord en beveiliging",
+      "KEYS": "Sleutels",
+      "PAT": "Persoonlijke toegangstokens",
+      "USERGRANTS": "Machtigingen",
+      "MEMBERSHIPS": "Lidmaatschappen",
+      "METADATA": "Metadata"
+    },
+    "TITLE": "Persoonlijke informatie",
+    "DESCRIPTION": "Beheer uw informatie en beveiligingsinstellingen.",
+    "PAGES": {
+      "LIST": "Gebruikers",
+      "TITLE": "Gebruiker",
+      "DESCRIPTION": "Maak nieuwe gebruikers aan in uw organisatie en beheer bestaande.",
+      "LISTMACHINE": "Servicegebruikers",
+      "DESCRIPTIONMACHINE": "Maak en beheer Servicegebruikers van uw organisatie",
+      "DETAIL": "Detail",
+      "CREATE": "Aanmaken",
+      "MY": "Mijn informatie",
+      "LOGINNAMES": "Inlognamen",
+      "LOGINMETHODS": "Inlogmethoden",
+      "LOGINNAMESDESC": "Dit zijn uw inlognamen:",
+      "NOUSER": "Geen gekoppelde gebruiker.",
+      "REACTIVATE": "Reactiveren",
+      "DEACTIVATE": "Deactiveren",
+      "FILTER": "Filter",
+      "STATE": "Status",
+      "DELETE": "Gebruiker verwijderen",
+      "UNLOCK": "Gebruiker ontgrendelen",
+      "GENERATESECRET": "Client Secret genereren",
+      "REMOVESECRET": "Client Secret verwijderen",
+      "LOCKEDDESCRIPTION": "Deze gebruiker is vergrendeld omdat het maximale aantal inlogpogingen is overschreden en moet worden ontgrendeld om opnieuw te worden gebruikt.",
+      "DELETEACCOUNT": "Account verwijderen",
+      "DELETEACCOUNT_DESC": "Als u deze actie uitvoert, wordt u uitgelogd en heeft u geen toegang meer tot uw account. Deze actie is niet omkeerbaar, dus ga voorzichtig verder.",
+      "DELETEACCOUNT_BTN": "Account verwijderen",
+      "DELETEACCOUNT_SUCCESS": "Account succesvol verwijderd!"
+    },
+    "DETAILS": {
+      "DATECREATED": "Gemaakt",
+      "DATECHANGED": "Veranderd"
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Gebruiker verwijderen",
+      "DELETE_SELF_TITLE": "Account verwijderen",
+      "DELETE_DESCRIPTION": "U staat op het punt om een gebruiker permanent te verwijderen. Weet u het zeker?",
+      "DELETE_SELF_DESCRIPTION": "U staat op het punt om uw persoonlijke account permanent te verwijderen. Hierdoor wordt u uitgelogd en wordt uw gebruiker verwijderd. Deze actie kan niet ongedaan worden gemaakt!",
+      "DELETE_AUTH_DESCRIPTION": "U staat op het punt om uw persoonlijke account permanent te verwijderen. Weet u het zeker?",
+      "TYPEUSERNAME": "Typ '{{value}}', om te bevestigen en de gebruiker te verwijderen.",
+      "USERNAME": "Loginnaam",
+      "DELETE_BTN": "Permanent verwijderen"
+    },
+    "SENDEMAILDIALOG": {
+      "TITLE": "Stuur Email Notificatie",
+      "DESCRIPTION": "Klik op de knop hieronder om een notificatie naar het huidige e-mailadres te sturen of wijzig het e-mailadres in het veld.",
+      "NEWEMAIL": "Nieuw e-mailadres"
+    },
+    "SECRETDIALOG": {
+      "CLIENTSECRET": "Client Secret",
+      "CLIENTSECRET_DESCRIPTION": "Bewaar uw client secret op een veilige plaats, omdat deze zal verdwijnen zodra het dialoogvenster wordt gesloten."
+    },
+    "TABLE": {
+      "DEACTIVATE": "Deactiveren",
+      "ACTIVATE": "Activeren",
+      "CHANGEDATE": "Laatst gewijzigd",
+      "CREATIONDATE": "Aangemaakt op",
+      "TYPES": {
+        "HUMAN": "Gebruikers",
+        "MACHINE": "Servicegebruikers"
+      },
+      "FILTER": {
+        "0": "Filter op weergavenaam",
+        "1": "Filter op gebruikersnaam",
+        "2": "Filter op weergavenaam",
+        "3": "Filter op gebruikersnaam",
+        "4": "Filter op e-mail",
+        "5": "Filter op weergavenaam",
+        "10": "Filter op organisatienaam",
+        "12": "Filter op projectnaam"
+      },
+      "EMPTY": "Geen gegevens"
+    },
+    "PASSWORDLESS": {
+      "SEND": "Stuur registratielink",
+      "TABLETYPE": "Type",
+      "TABLESTATE": "Status",
+      "NAME": "Naam",
+      "EMPTY": "Geen apparaat ingesteld",
+      "TITLE": "Wachtwoordloze authenticatie",
+      "DESCRIPTION": "Voeg op WebAuthn gebaseerde authenticatiemethoden toe om zonder wachtwoord in te loggen op ZITADEL.",
+      "MANAGE_DESCRIPTION": "Beheer de tweede factor-methoden van uw gebruikers.",
+      "U2F": "Voeg methode toe",
+      "U2F_DIALOG_TITLE": "Verifieer authenticator",
+      "U2F_DIALOG_DESCRIPTION": "Voer een naam in voor uw gebruikte wachtwoordloze login",
+      "U2F_SUCCESS": "Wachtwoordloze auth succesvol aangemaakt!",
+      "U2F_ERROR": "Er is een fout opgetreden tijdens de installatie!",
+      "U2F_NAME": "Authenticator Naam",
+      "TYPE": {
+        "0": "Geen MFA gedefinieerd",
+        "1": "Eenmalig wachtwoord (OTP)",
+        "2": "Vingerafdruk, beveiligingssleutels, gezichtsherkenning en andere"
+      },
+      "STATE": {
+        "0": "Geen status",
+        "1": "Niet klaar",
+        "2": "Klaar",
+        "3": "Verwijderd"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Verwijder wachtwoordloze authenticatiemethode",
+        "DELETE_DESCRIPTION": "U staat op het punt om een wachtwoordloze authenticatiemethode te verwijderen. Weet u het zeker?",
+        "ADD_TITLE": "Wachtwoordloze Authenticatie",
+        "ADD_DESCRIPTION": "Selecteer een van de beschikbare opties voor het creëren van een wachtwoordloze authenticatiemethode.",
+        "SEND_DESCRIPTION": "Stuur uzelf een registratielink naar uw e-mailadres.",
+        "SEND": "Stuur registratielink",
+        "SENT": "De e-mail is succesvol verzonden. Controleer uw mailbox om verder te gaan met de installatie.",
+        "QRCODE_DESCRIPTION": "Genereer QR-code voor het scannen met een ander apparaat.",
+        "QRCODE": "Genereer QR-code",
+        "QRCODE_SCAN": "Scan deze QR-code om verder te gaan met de installatie op uw apparaat.",
+        "NEW_DESCRIPTION": "Gebruik dit apparaat om Passwordless in te stellen.",
+        "NEW": "Nieuw toevoegen"
+      }
+    },
+    "MFA": {
+      "TABLETYPE": "Type",
+      "TABLESTATE": "Status",
+      "NAME": "Naam",
+      "EMPTY": "Geen extra factoren",
+      "TITLE": "Multifactor Authenticatie",
+      "DESCRIPTION": "Voeg een tweede factor toe om optimale beveiliging voor uw account te garanderen.",
+      "MANAGE_DESCRIPTION": "Beheer de tweede factor-methoden van uw gebruikers.",
+      "ADD": "Factor toevoegen",
+      "OTP": "Authenticator App voor TOTP (Time-based One-Time Password)",
+      "OTP_DIALOG_TITLE": "Voeg OTP toe",
+      "OTP_DIALOG_DESCRIPTION": "Scan de QR-code met een authenticator-app en voer de code hieronder in om de OTP-methode te verifiëren en te activeren.",
+      "U2F": "Vingerafdruk, beveiligingssleutels, gezichtsherkenning en andere",
+      "U2F_DIALOG_TITLE": "Verifieer factor",
+      "U2F_DIALOG_DESCRIPTION": "Voer een naam in voor uw gebruikte universele multifactor.",
+      "U2F_SUCCESS": "Factor succesvol toegevoegd!",
+      "U2F_ERROR": "Er is een fout opgetreden tijdens de installatie!",
+      "U2F_NAME": "Authenticator Naam",
+      "OTPSMS": "OTP (Eenmalig wachtwoord) met SMS",
+      "OTPEMAIL": "OTP (Eenmalig wachtwoord) met Email",
+      "SETUPOTPSMSDESCRIPTION": "Wilt u dit telefoonnummer instellen als OTP (One-Time password) tweede factor?",
+      "OTPSMSSUCCESS": "OTP factor succesvol ingesteld.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Uw telefoon moet worden geverifieerd om deze methode te kunnen gebruiken.",
+      "OTPEMAILSUCCESS": "OTP factor succesvol ingesteld.",
+      "TYPE": {
+        "0": "Geen MFA gedefinieerd",
+        "1": "Eenmalig wachtwoord (OTP)",
+        "2": "Vingerafdruk, beveiligingssleutels, gezichtsherkenning en andere"
+      },
+      "STATE": {
+        "0": "Geen status",
+        "1": "Niet klaar",
+        "2": "Klaar",
+        "3": "Verwijderd"
+      },
+      "DIALOG": {
+        "MFA_DELETE_TITLE": "Verwijder tweede factor",
+        "MFA_DELETE_DESCRIPTION": "U staat op het punt om een tweede factor te verwijderen. Weet u het zeker?",
+        "ADD_MFA_TITLE": "Voeg tweede factor toe",
+        "ADD_MFA_DESCRIPTION": "Selecteer een van de volgende opties."
+      }
+    },
+    "EXTERNALIDP": {
+      "TITLE": "Externe Identiteitsproviders",
+      "DESC": "",
+      "IDPCONFIGID": "IDP Config ID",
+      "IDPNAME": "IDP Naam",
+      "USERDISPLAYNAME": "Externe Naam",
+      "EXTERNALUSERID": "Externe Gebruiker ID",
+      "EMPTY": "Geen externe IDP gevonden",
+      "DIALOG": {
+        "DELETE_TITLE": "Verwijder IDP",
+        "DELETE_DESCRIPTION": "U staat op het punt om een Identiteitsprovider van een gebruiker te verwijderen. Weet u het zeker?"
+      }
+    },
+    "CREATE": {
+      "TITLE": "Maak een nieuwe gebruiker aan",
+      "DESCRIPTION": "Gelieve de nodige informatie te verstrekken.",
+      "NAMEANDEMAILSECTION": "Naam en e-mail",
+      "GENDERLANGSECTION": "Geslacht en taal",
+      "PHONESECTION": "Telefoonnummers",
+      "PASSWORDSECTION": "Initieel wachtwoord",
+      "ADDRESSANDPHONESECTION": "Telefoonnummer",
+      "INITMAILDESCRIPTION": "Als beide opties geselecteerd zijn, wordt er geen e-mail voor initialisatie verzonden. Als slechts een van de opties is geselecteerd, wordt een e-mail gestuurd om de gegevens te verstrekken / te verifiëren."
+    },
+    "CODEDIALOG": {
+      "TITLE": "Verifieer telefoonnummer",
+      "DESCRIPTION": "Voer de code in die u per sms heeft ontvangen om uw telefoonnummer te verifiëren.",
+      "CODE": "Code"
+    },
+    "DATA": {
+      "STATE": "Status",
+      "STATE0": "Onbekend",
+      "STATE1": "Actief",
+      "STATE2": "Inactief",
+      "STATE3": "Verwijderd",
+      "STATE4": "Vergrendeld",
+      "STATE5": "Opgeschort",
+      "STATE6": "Initieel"
+    },
+    "PROFILE": {
+      "TITLE": "Profiel",
+      "EMAIL": "E-mail",
+      "PHONE": "Telefoonnummer",
+      "PHONE_HINT": "Gebruik het + symbool gevolgd door de landcode, of selecteer het land uit de dropdown en voer ten slotte het telefoonnummer in",
+      "USERNAME": "Gebruikersnaam",
+      "CHANGEUSERNAME": "wijzigen",
+      "CHANGEUSERNAME_TITLE": "Gebruikersnaam wijzigen",
+      "CHANGEUSERNAME_DESC": "Voer de nieuwe naam in het onderstaande veld in.",
+      "FIRSTNAME": "Voornaam",
+      "LASTNAME": "Achternaam",
+      "NICKNAME": "Bijnaam",
+      "DISPLAYNAME": "Weergavenaam",
+      "PREFERREDLOGINNAME": "Voorkeurs inlognaam",
+      "PREFERRED_LANGUAGE": "Taal",
+      "GENDER": "Geslacht",
+      "PASSWORD": "Wachtwoord",
+      "AVATAR": {
+        "UPLOADTITLE": "Upload uw profielfoto",
+        "UPLOADBTN": "Bestand kiezen",
+        "UPLOAD": "Uploaden",
+        "CURRENT": "Huidige foto",
+        "PREVIEW": "Voorbeeld",
+        "DELETESUCCESS": "Succesvol verwijderd!",
+        "CROPPERERROR": "Er is een fout opgetreden bij het uploaden van uw bestand. Probeer een ander formaat en grootte indien nodig."
+      },
+      "COUNTRY": "Land"
+    },
+    "MACHINE": {
+      "TITLE": "Details Servicegebruiker",
+      "USERNAME": "Gebruikersnaam",
+      "NAME": "Naam",
+      "DESCRIPTION": "Beschrijving",
+      "KEYSTITLE": "Sleutels",
+      "KEYSDESC": "Definieer uw sleutels en voeg een optionele vervaldatum toe.",
+      "TOKENSTITLE": "Persoonlijke toegangstokens",
+      "TOKENSDESC": "Persoonlijke toegangstokens functioneren als gewone OAuth-toegangstokens.",
+      "ID": "Sleutel ID",
+      "TYPE": "Type",
+      "EXPIRATIONDATE": "Vervaldatum",
+      "CHOOSEDATEAFTER": "Voer een geldige vervaldatum in na",
+      "CHOOSEEXPIRY": "Selecteer een vervaldatum",
+      "CREATIONDATE": "Aanmaakdatum",
+      "KEYDETAILS": "Sleuteldetails",
+      "ACCESSTOKENTYPE": "Toegangstoken Type",
+      "ACCESSTOKENTYPES": {
+        "0": "Bearer",
+        "1": "JWT"
+      },
+      "ADD": {
+        "TITLE": "Sleutel toevoegen",
+        "DESCRIPTION": "Selecteer uw sleuteltype en kies een optionele vervaldatum."
+      },
+      "ADDED": {
+        "TITLE": "De sleutel is aangemaakt",
+        "DESCRIPTION": "Download de sleutel want deze zal niet zichtbaar zijn na het sluiten van dit dialoogvenster!"
+      },
+      "KEYTYPES": {
+        "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Sleutel verwijderen",
+          "DESCRIPTION": "Wilt u de geselecteerde sleutel verwijderen? Dit kan niet ongedaan worden gemaakt."
+        }
+      }
+    },
+    "PASSWORD": {
+      "TITLE": "Wachtwoord",
+      "LABEL": "Een veilig wachtwoord helpt het account te beschermen",
+      "DESCRIPTION": "Voer het nieuwe wachtwoord in volgens het onderstaande beleid.",
+      "OLD": "Huidig wachtwoord",
+      "NEW": "Nieuw wachtwoord",
+      "CONFIRM": "Bevestig nieuw wachtwoord",
+      "NEWINITIAL": "Wachtwoord",
+      "CONFIRMINITIAL": "Bevestig wachtwoord",
+      "RESET": "Huidig wachtwoord resetten",
+      "SET": "Stel nieuw wachtwoord in",
+      "RESENDNOTIFICATION": "Stuur wachtwoord reset link",
+      "REQUIRED": "Sommige verplichte velden ontbreken.",
+      "MINLENGTHERROR": "Moet minstens {{value}} tekens lang zijn."
+    },
+    "ID": "ID",
+    "EMAIL": "E-mail",
+    "PHONE": "Telefoonnummer",
+    "PHONEEMPTY": "Geen telefoonnummer gedefinieerd",
+    "PHONEVERIFIED": "Telefoonnummer geverifieerd.",
+    "EMAILVERIFIED": "E-mail geverifieerd",
+    "NOTVERIFIED": "niet geverifieerd",
+    "PREFERRED_LOGINNAME": "Voorkeurs inlognaam",
+    "ISINITIAL": "Gebruiker is nog niet actief.",
+    "LOGINMETHODS": {
+      "TITLE": "Contactinformatie",
+      "DESCRIPTION": "De verstrekte informatie wordt gebruikt om belangrijke informatie te sturen, zoals wachtwoord reset e-mails naar u.",
+      "EMAIL": {
+        "TITLE": "E-mail",
+        "VALID": "gevalideerd",
+        "ISVERIFIED": "E-mail geverifieerd",
+        "ISVERIFIEDDESC": "Als de e-mail is aangegeven als geverifieerd, zal er geen e-mailverificatieverzoek worden gedaan.",
+        "RESEND": "Verzend verificatie e-mail opnieuw",
+        "EDITTITLE": "Verander e-mail",
+        "EDITDESC": "Voer de nieuwe e-mail in het onderstaande veld in."
+      },
+      "PHONE": {
+        "TITLE": "Telefoon",
+        "VALID": "gevalideerd",
+        "RESEND": "Verzend verificatie sms opnieuw",
+        "EDITTITLE": "Verander nummer",
+        "EDITVALUE": "Telefoonnummer",
+        "EDITDESC": "Voer het nieuwe telefoonnummer in het onderstaande veld in.",
+        "DELETETITLE": "Verwijder telefoonnummer",
+        "DELETEDESC": "Weet u zeker dat u het telefoonnummer wilt verwijderen",
+        "OTPSMSREMOVALWARNING": "Dit account gebruikt dit telefoonnummer als tweede factor. U zult het niet kunnen gebruiken nadat u verder gaat."
+      },
+      "RESENDCODE": "Verzend code opnieuw",
+      "ENTERCODE": "Verifieer",
+      "ENTERCODE_DESC": "Verifieer code"
+    },
+    "GRANTS": {
+      "TITLE": "Gebruikerstoegang",
+      "DESCRIPTION": "Verleen deze gebruiker toegang tot bepaalde projecten",
+      "CREATE": {
+        "TITLE": "Creëer gebruikerstoegang",
+        "DESCRIPTION": "Zoek naar de organisatie, het project en de bijbehorende projectrollen."
+      },
+      "PROJECTNAME": "Projectnaam",
+      "PROJECT-OWNED": "Project",
+      "PROJECT-GRANTED": "Verleend project",
+      "FILTER": {
+        "0": "filter voor gebruiker",
+        "1": "filter voor domein",
+        "2": "filter voor projectnaam",
+        "3": "filter voor rolnaam"
+      }
+    },
+    "STATE": {
+      "0": "Onbekend",
+      "1": "Actief",
+      "2": "Inactief",
+      "3": "Verwijderd",
+      "4": "Vergrendeld",
+      "5": "Opgeschort",
+      "6": "Initieel"
+    },
+    "SEARCH": {
+      "ADDITIONAL": "Loginnaam (huidige organisatie)",
+      "ADDITIONAL-EXTERNAL": "Loginnaam (externe organisatie)"
+    },
+    "TARGET": {
+      "SELF": "Als u een gebruiker van een andere organisatie wilt verlenen",
+      "EXTERNAL": "Om een gebruiker van uw organisatie te verlenen",
+      "CLICKHERE": "klik hier"
+    },
+    "SIGNEDOUT": "U bent uitgelogd. Klik op de knop \"Inloggen\" om opnieuw in te loggen.",
+    "SIGNEDOUT_BTN": "Inloggen",
+    "EDITACCOUNT": "Account bewerken",
+    "ADDACCOUNT": "Inloggen met een ander account",
+    "RESENDINITIALEMAIL": "Stuur activatie mail opnieuw",
+    "RESENDEMAILNOTIFICATION": "Stuur e-mail notificatie opnieuw",
+    "TOAST": {
+      "CREATED": "Gebruiker succesvol aangemaakt.",
+      "SAVED": "Profiel succesvol opgeslagen.",
+      "USERNAMECHANGED": "Gebruikersnaam gewijzigd.",
+      "EMAILSAVED": "E-mail succesvol opgeslagen.",
+      "INITEMAILSENT": "Initialisatie mail verzonden.",
+      "PHONESAVED": "Telefoon succesvol opgeslagen.",
+      "PHONEREMOVED": "Telefoon is verwijderd.",
+      "PHONEVERIFIED": "Telefoon succesvol geverifieerd.",
+      "PHONEVERIFICATIONSENT": "Telefoon verificatiecode verzonden.",
+      "EMAILVERIFICATIONSENT": "E-mail verificatiecode verzonden.",
+      "OTPREMOVED": "OTP verwijderd.",
+      "U2FREMOVED": "Factor verwijderd.",
+      "PASSWORDLESSREMOVED": "Wachtwoordloos verwijderd.",
+      "INITIALPASSWORDSET": "Initieel wachtwoord ingesteld.",
+      "PASSWORDNOTIFICATIONSENT": "Wachtwoord wijzigingsnotificatie verzonden.",
+      "PASSWORDCHANGED": "Wachtwoord succesvol gewijzigd.",
+      "REACTIVATED": "Gebruiker geheractiveerd.",
+      "DEACTIVATED": "Gebruiker gedeactiveerd.",
+      "SELECTEDREACTIVATED": "Geselecteerde gebruikers geheractiveerd.",
+      "SELECTEDDEACTIVATED": "Geselecteerde gebruikers gedeactiveerd.",
+      "SELECTEDKEYSDELETED": "Geselecteerde sleutels verwijderd.",
+      "KEYADDED": "Sleutel toegevoegd!",
+      "MACHINEADDED": "Servicegebruiker aangemaakt!",
+      "DELETED": "Gebruiker succesvol verwijderd!",
+      "UNLOCKED": "Gebruiker succesvol ontgrendeld!",
+      "PASSWORDLESSREGISTRATIONSENT": "Registratielink succesvol verzonden.",
+      "SECRETGENERATED": "Secret succesvol gegenereerd!",
+      "SECRETREMOVED": "Secret succesvol verwijderd!"
+    },
+    "MEMBERSHIPS": {
+      "TITLE": "ZITADEL Beheerdersrollen",
+      "DESCRIPTION": "Dit zijn alle lidmaatschapstoewijzingen van de gebruiker. U kunt ze ook wijzigen op de detailpagina's van organisaties, projecten of IAM.",
+      "ORGCONTEXT": "U ziet alle organisaties en projecten die gerelateerd zijn aan de momenteel geselecteerde organisatie.",
+      "USERCONTEXT": "U ziet alle organisaties en projecten waarvoor u gemachtigd bent. Inclusief andere organisaties.",
+      "CREATIONDATE": "Aanmaakdatum",
+      "CHANGEDATE": "Laatst gewijzigd",
+      "DISPLAYNAME": "Weergavenaam",
+      "REMOVE": "Verwijderen",
+      "TYPE": "Type",
+      "ORGID": "Organisatie ID",
+      "UPDATED": "Het lidmaatschap is bijgewerkt.",
+      "NOPERMISSIONTOEDIT": "U mist de benodigde rechten om rollen te bewerken!",
+      "TYPES": {
+        "UNKNOWN": "Onbekend",
+        "ORG": "Organisatie",
+        "PROJECT": "Project",
+        "GRANTEDPROJECT": "Verleend project"
+      }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "Token",
+      "ADD": {
+        "TITLE": "Genereer nieuw Persoonlijk Toegangstoken",
+        "DESCRIPTION": "Bepaal een aangepaste vervaldatum voor het token.",
+        "CHOOSEEXPIRY": "Selecteer een vervaldatum",
+        "CHOOSEDATEAFTER": "Voer een geldige vervaldatum in na"
+      },
+      "ADDED": {
+        "TITLE": "Persoonlijk Toegangstoken",
+        "DESCRIPTION": "Zorg ervoor dat u uw persoonlijk toegangstoken kopieert. U zult het niet nogmaals kunnen zien!"
+      },
+      "DELETE": {
+        "TITLE": "Verwijder Token",
+        "DESCRIPTION": "U staat op het punt het persoonlijke toegangstoken te verwijderen. Weet u het zeker?"
+      },
+      "DELETED": "Token succesvol verwijderd."
+    }
+  },
+  "METADATA": {
+    "TITLE": "Metadata",
+    "KEY": "Sleutel",
+    "VALUE": "Waarde",
+    "ADD": "Nieuwe Invoer",
+    "SAVE": "Opslaan",
+    "EMPTY": "Geen metadata",
+    "SETSUCCESS": "Element succesvol opgeslagen",
+    "REMOVESUCCESS": "Element succesvol verwijderd"
+  },
+  "FLOWS": {
+    "TITLE": "Acties en Flows",
+    "DESCRIPTION": "Definieer scripts om uit te voeren bij een bepaalde gebeurtenis.",
+    "ACTIONSTITLE": "Acties",
+    "ACTIONSDESCRIPTION": "Dit zijn uw scripts die u kunt uitvoeren in de flows.",
+    "FLOWSTITLE": "Flows",
+    "FLOWSDESCRIPTION": "Flows van een bepaald type voeren acties uit op het moment van een trigger.",
+    "ID": "ID",
+    "NAME": "Naam",
+    "STATE": "Status",
+    "STATES": {
+      "0": "geen status",
+      "1": "inactief",
+      "2": "actief"
+    },
+    "ADDTRIGGER": "Voeg trigger toe",
+    "FLOWCHANGED": "De flow is succesvol gewijzigd",
+    "FLOWCLEARED": "De flow is succesvol gereset",
+    "TIMEOUT": "Time-out",
+    "TIMEOUTINSEC": "Time-out in seconden",
+    "ALLOWEDTOFAIL": "Mislukken toegestaan",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Waarschuwing",
+      "DESCRIPTION": "Als u deze instelling uitschakelt, kan dit ertoe leiden dat gebruikers in uw organisatie zich niet kunnen aanmelden. Bovendien kunt u de console niet meer bereiken om de actie uit te schakelen. Wij raden aan om eerst scripts te testen in een ontwikkelomgeving of een ontwikkelorganisatie."
+    },
+    "SCRIPT": "Script",
+    "FLOWTYPE": "Flowtype",
+    "TRIGGERTYPE": "Triggertype",
+    "ACTIONS": "Acties",
+    "ACTIONSMAX": "Op basis van uw Tier beschikt u over een beperkt aantal acties ({{value}}). Zorg ervoor dat u de acties die u niet nodig heeft, deactiveert of overweeg uw tier te upgraden.",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "Maak een actie aan"
+      },
+      "UPDATE": {
+        "TITLE": "Update actie"
+      },
+      "DELETEACTION": {
+        "TITLE": "Actie verwijderen?",
+        "DESCRIPTION": "U staat op het punt een actie te verwijderen. Dit kan niet ongedaan worden gemaakt. Weet u het zeker?",
+        "DELETE_SUCCESS": "Actie succesvol verwijderd."
+      },
+      "CLEAR": {
+        "TITLE": "Flow wissen?",
+        "DESCRIPTION": "U staat op het punt de flow te resetten met zijn triggers en acties. Deze wijziging kan niet worden hersteld. Weet u het zeker?"
+      },
+      "REMOVEACTIONSLIST": {
+        "TITLE": "Geselecteerde acties verwijderen?",
+        "DESCRIPTION": "Weet u zeker dat u de geselecteerde acties uit de flow wilt verwijderen?"
+      }
+    },
+    "TOAST": {
+      "ACTIONSSET": "Acties ingesteld",
+      "ACTIONREACTIVATED": "Acties succesvol geheractiveerd",
+      "ACTIONDEACTIVATED": "Acties succesvol gedeactiveerd"
+    }
+  },
+  "IAM": {
+    "TITLE": "Instantie",
+    "DESCRIPTION": "Beheer uw instantie-instellingen en organisaties",
+    "POLICIES": {
+      "TITLE": "Systeembeleid en toegangsinstellingen",
+      "DESCRIPTION": "Beheer uw wereldwijde beleid en beheer toegangsinstellingen."
+    },
+    "EVENTSTORE": {
+      "TITLE": "IAM Opslagbeheer",
+      "DESCRIPTION": "Beheer uw ZITADEL-weergaven en mislukte evenementen."
+    },
+    "MEMBER": {
+      "TITLE": "Beheerders",
+      "DESCRIPTION": "Deze beheerders mogen wijzigingen aanbrengen in uw instantie."
+    },
+    "PAGES": {
+      "STATE": "Status",
+      "DOMAINLIST": "Aangepaste domeinen"
+    },
+    "STATE": {
+      "0": "Niet gespecifieerd",
+      "1": "Aanmaken",
+      "2": "Lopend",
+      "3": "Stoppen",
+      "4": "Gestopt"
+    },
+    "VIEWS": {
+      "TITLE": "Weergaven",
+      "DESCRIPTION": "Dit paneel toont uw ZITADEL-weergaven.",
+      "VIEWNAME": "Naam",
+      "DATABASE": "Database",
+      "SEQUENCE": "Reeks",
+      "EVENTTIMESTAMP": "Tijdstempel",
+      "LASTSPOOL": "Succesvolle spoel",
+      "ACTIONS": "Acties",
+      "CLEAR": "Leegmaken",
+      "CLEARED": "Weergave is succesvol leeggemaakt!",
+      "DIALOG": {
+        "VIEW_CLEAR_TITLE": "Weergave leegmaken",
+        "VIEW_CLEAR_DESCRIPTION": "U staat op het punt om een weergave leeg te maken. Het leegmaken van een weergave creëert een proces waarbij gegevens mogelijk niet beschikbaar zijn voor eindgebruikers. Weet u het zeker?"
+      }
+    },
+    "FAILEDEVENTS": {
+      "TITLE": "Mislukte Evenementen",
+      "DESCRIPTION": "Deze kaart toont uw mislukte evenementen.",
+      "VIEWNAME": "Naam",
+      "DATABASE": "Database",
+      "FAILEDSEQUENCE": "Mislukte Reeks",
+      "FAILURECOUNT": "Aantal Mislukkingen",
+      "LASTFAILED": "Laatst mislukt op",
+      "ERRORMESSAGE": "Foutmelding",
+      "ACTIONS": "Acties",
+      "DELETE": "Verwijderen",
+      "DELETESUCCESS": "Mislukte evenementen verwijderd."
+    },
+    "EVENTS": {
+      "TITLE": "Evenementen",
+      "DESCRIPTION": "Deze weergave toont alle voorgekomen evenementen.",
+      "EDITOR": "Editor",
+      "EDITORID": "Editor ID",
+      "AGGREGATE": "Aggregaat",
+      "AGGREGATEID": "Aggregaat ID",
+      "AGGREGATETYPE": "Aggregaat Type",
+      "RESOURCEOWNER": "Resource Eigenaar",
+      "SEQUENCE": "Reeks",
+      "CREATIONDATE": "Aangemaakt Op",
+      "TYPE": "Type",
+      "PAYLOAD": "Payload",
+      "FILTERS": {
+        "BTN": "Filter",
+        "USER": {
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filter op Editor"
+        },
+        "AGGREGATE": {
+          "TYPELABEL": "Aggregaat Type",
+          "IDLABEL": "ID",
+          "CHECKBOX": "Filter op Aggregaat"
+        },
+        "TYPE": {
+          "TYPELABEL": "Type",
+          "CHECKBOX": "Filter op Type"
+        },
+        "RESOURCEOWNER": {
+          "LABEL": "ID",
+          "CHECKBOX": "Filter op Resource Eigenaar"
+        },
+        "SEQUENCE": {
+          "LABEL": "Reeks",
+          "CHECKBOX": "Filter op Reeks",
+          "SORT": "Sortering",
+          "ASC": "Oplopend",
+          "DESC": "Aflopend"
+        },
+        "CREATIONDATE": {
+          "LABEL": "Aanmaakdatum",
+          "CHECKBOX": "Filter op Aanmaakdatum"
+        },
+        "OTHER": "ander",
+        "OTHERS": "anderen"
+      },
+      "DIALOG": {
+        "TITLE": "Evenement Detail"
+      }
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Beheerder verwijderd.",
+      "MEMBERSADDED": "Beheerders toegevoegd.",
+      "MEMBERADDED": "Beheerder toegevoegd.",
+      "MEMBERCHANGED": "Beheerder gewijzigd.",
+      "ROLEREMOVED": "Rol verwijderd.",
+      "ROLECHANGED": "Rol gewijzigd.",
+      "REACTIVATED": "Geheractiveerd",
+      "DEACTIVATED": "Gedeactiveerd"
+    }
+  },
+  "ORG": {
+    "PAGES": {
+      "NAME": "Naam",
+      "ID": "ID",
+      "CREATIONDATE": "Aanmaakdatum",
+      "DATECHANGED": "Gewijzigd",
+      "FILTER": "Filter",
+      "FILTERPLACEHOLDER": "Filter voor de naam",
+      "LIST": "Organisaties",
+      "LISTDESCRIPTION": "Kies een organisatie.",
+      "ACTIVE": "Actief",
+      "CREATE": "Maak Organisatie aan",
+      "DEACTIVATE": "Deactiveer Organisatie",
+      "REACTIVATE": "Heractiveer Organisatie",
+      "NOPERMISSION": "U heeft geen toestemming om toegang te krijgen tot organisatie-instellingen.",
+      "USERSELFACCOUNT": "Gebruik uw persoonlijke account als organisatie-eigenaar",
+      "ORGDETAIL_TITLE": "Voer de naam en het domein van uw nieuwe organisatie in.",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Voer de naam van uw nieuwe organisatie in.",
+      "ORGDETAILUSER_TITLE": "Configureer Organisatie Eigenaar",
+      "DELETE": "Verwijder organisatie",
+      "DEFAULTLABEL": "Standaard",
+      "SETASDEFAULT": "Stel in als standaardorganisatie",
+      "DEFAULTORGSET": "Standaardorganisatie succesvol gewijzigd",
+      "RENAME": {
+        "ACTION": "Hernoemen",
+        "TITLE": "Hernoem Organisatie",
+        "DESCRIPTION": "Voer de nieuwe naam voor uw organisatie in",
+        "BTN": "Hernoemen"
+      },
+      "ORGDOMAIN": {
+        "TITLE": "Verificatie van Organisatie Domein Eigendom",
+        "VERIFICATION": "Om het eigendom van uw domein te verifiëren, moet u een verificatiebestand downloaden en uploaden op de hieronder vermelde URL, of een TXT Record DNS-invoer plaatsen voor de verstrekte URL. Om te voltooien, klik op de knop om te verifiëren.",
+        "VERIFICATION_SKIP": "Je kunt de verificatie nu overslaan en doorgaan met het aanmaken van je organisatie, maar om je organisatie te kunnen gebruiken, moet deze stap worden voltooid!",
+        "VERIFICATION_VALIDATION_DESC": "De tokens worden regelmatig gecontroleerd om te zorgen dat u nog steeds eigenaar bent van het domein.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Vraag nieuw token aan",
+        "VERIFICATION_NEWTOKEN_DESC": "Als u een nieuw token wilt aanvragen, selecteer dan uw voorkeursmethode. Als u een bestaand token wilt valideren, klik dan op de knop hierboven.",
+        "VERIFICATION_VALIDATION_ONGOING": "Er is al een verificatietoken aangevraagd. Klik op de knop om een verificatiecontrole te activeren.",
+        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Type van het token:",
+        "VERIFICATION_SUCCESSFUL": "Domein succesvol geverifieerd!",
+        "REQUESTNEWTOKEN": "Vraag nieuw token aan",
+        "TYPES": {
+          "1": "HTTP",
+          "2": "DNS"
+        }
+      },
+      "DOWNLOAD_FILE": "Download bestand",
+      "SELECTORGTOOLTIP": "Selecteer deze organisatie.",
+      "PRIMARYDOMAIN": "Primaire Domein",
+      "STATE": "Status",
+      "USEPASSWORD": "Stel Initieel Wachtwoord in",
+      "USEPASSWORDDESC": "De gebruiker hoeft het wachtwoord niet in te stellen tijdens de initialisatie."
+    },
+    "LIST": {
+      "TITLE": "Organisaties",
+      "DESCRIPTION": "Dit zijn de organisaties op uw instantie"
+    },
+    "DOMAINS": {
+      "NEW": "Domein toevoegen",
+      "TITLE": "Geverifieerde domeinen",
+      "DESCRIPTION": "Configureer uw organisatiedomeinen. Dit domein kan worden gebruikt voor domeinontdekking en gebruikersnaamsuffixering.",
+      "SETPRIMARY": "Stel in als Primair",
+      "DELETE": {
+        "TITLE": "Verwijder Domein",
+        "DESCRIPTION": "U staat op het punt een van uw domeinen te verwijderen."
+      },
+      "ADD": {
+        "TITLE": "Domein toevoegen",
+        "DESCRIPTION": "U staat op het punt een domein toe te voegen voor uw organisatie. Na een succesvol proces kan het domein worden gebruikt voor domeinontdekking en als achtervoegsel voor uw gebruikers."
+      }
+    },
+    "STATE": {
+      "0": "Niet gedefinieerd",
+      "1": "Actief",
+      "2": "Gedeactiveerd"
+    },
+    "MEMBER": {
+      "TITLE": "Organisatie Beheerders",
+      "DESCRIPTION": "Definieer de gebruikers die de voorkeuren van uw organisaties kunnen wijzigen."
+    },
+    "TOAST": {
+      "UPDATED": "Organisatie succesvol bijgewerkt.",
+      "DEACTIVATED": "Organisatie gedeactiveerd.",
+      "REACTIVATED": "Organisatie heractiveerd.",
+      "DOMAINADDED": "Domein toegevoegd.",
+      "DOMAINREMOVED": "Domein verwijderd.",
+      "MEMBERADDED": "Beheerder toegevoegd.",
+      "MEMBERREMOVED": "Beheerder verwijderd.",
+      "MEMBERCHANGED": "Beheerder gewijzigd.",
+      "SETPRIMARY": "Primaire domein ingesteld.",
+      "DELETED": "Organisatie succesvol verwijderd",
+      "ORG_WAS_DELETED": "Organisatie is verwijderd."
+    },
+    "DIALOG": {
+      "DEACTIVATE": {
+        "TITLE": "Deactiveer organisatie",
+        "DESCRIPTION": "U staat op het punt uw organisatie te deactiveren. Gebruikers kunnen daarna niet meer inloggen. Weet u zeker dat u wilt doorgaan?"
+      },
+      "REACTIVATE": {
+        "TITLE": "Heractiveer organisatie",
+        "DESCRIPTION": "U staat op het punt uw organisatie te heractiveren. Gebruikers kunnen weer inloggen. Weet u zeker dat u wilt doorgaan?"
+      },
+      "DELETE": {
+        "TITLE": "Verwijder organisatie",
+        "DESCRIPTION": "U staat op het punt uw organisatie te verwijderen. Dit start een proces waarbij alle gegevens gerelateerd aan de organisatie worden verwijderd. U kunt deze actie voorlopig niet terugdraaien.",
+        "TYPENAME": "Typ '{{value}}', om uw organisatie te verwijderen.",
+        "ORGNAME": "Naam",
+        "BTN": "Verwijderen"
+      }
+    }
+  },
+  "SETTINGS": {
+    "INSTANCE": {
+      "TITLE": "Instantie Instellingen",
+      "DESCRIPTION": "Deze instellingen zijn van toepassing op al uw organisaties, tenzij ze zijn overschreven."
+    },
+    "ORG": {
+      "TITLE": "Organisatie Instellingen",
+      "DESCRIPTION": "Deze instellingen breiden uw instantie instellingen uit en overschrijven deze."
+    },
+    "LIST": {
+      "GENERAL": "Algemeen",
+      "LOGIN": "Login Gedrag en Beveiliging",
+      "LOCKOUT": "Lockout",
+      "COMPLEXITY": "Wachtwoord complexiteit",
+      "NOTIFICATIONS": "Notificaties",
+      "SMTP_PROVIDER": "SMTP Provider",
+      "SMS_PROVIDER": "SMS/Telefoon Provider",
+      "NOTIFICATIONS_DESC": "SMTP en SMS Instellingen",
+      "MESSAGETEXTS": "Bericht Teksten",
+      "IDP": "Identiteitsproviders",
+      "VERIFIED_DOMAINS": "Geverifieerde domeinen",
+      "DOMAIN": "Domein instellingen",
+      "LOGINTEXTS": "Login Interface Teksten",
+      "BRANDING": "Branding",
+      "PRIVACYPOLICY": "Privacybeleid",
+      "OIDC": "OIDC Token levensduur en vervaldatum",
+      "SECRETS": "Secret Generator",
+      "SECURITY": "Beveiligingsinstellingen"
+    },
+    "GROUPS": {
+      "NOTIFICATIONS": "Notificaties",
+      "LOGIN": "Login en Toegang",
+      "DOMAIN": "Domein",
+      "TEXTS": "Teksten en Talen",
+      "APPEARANCE": "Verschijning",
+      "OTHER": "Andere"
+    }
+  },
+  "SETTING": {
+    "DEFAULTLANGUAGE": "Standaard Taal",
+    "LANGUAGE": {
+      "de": "Deutsch",
+      "en": "Engels",
+      "es": "Español",
+      "fr": "Français",
+      "it": "Italiano",
+      "ja": "日本語",
+      "pl": "Polski",
+      "zh": "简体中文",
+      "bg": "Български",
+      "pt": "Portugees",
+      "mk": "Македонски",
+      "cs": "Čeština",
+      "ru": "Русский",
+      "nl": "Nederlands"
+    },
+    "SMTP": {
+      "TITLE": "SMTP Instellingen",
+      "SENDERADDRESS": "Afzender Email Adres",
+      "SENDERNAME": "Afzender Naam",
+      "REPLYTOADDRESS": "Antwoord-naar Adres",
+      "HOSTANDPORT": "Host En Poort",
+      "USER": "Gebruiker",
+      "PASSWORD": "Wachtwoord",
+      "SETPASSWORD": "Stel SMTP Wachtwoord in",
+      "PASSWORDSET": "SMTP Wachtwoord is succesvol ingesteld.",
+      "TLS": "Transport Layer Security (TLS)",
+      "SAVED": "Succesvol opgeslagen!",
+      "REQUIREDWARN": "Om notificaties te kunnen versturen vanaf uw domein, moet u uw SMTP-gegevens invoeren."
+    },
+    "SMS": {
+      "TITLE": "SMS Instellingen",
+      "PROVIDERS": "Providers",
+      "PROVIDER": "SMS Provider",
+      "ADDPROVIDER": "Voeg SMS Provider toe",
+      "ADDPROVIDERDESCRIPTION": "Kies een van de beschikbare providers en voer de benodigde gegevens in.",
+      "REMOVEPROVIDER": "Verwijder Provider",
+      "REMOVEPROVIDER_DESC": "U staat op het punt een providerconfiguratie te verwijderen. Wilt u doorgaan?",
+      "SMSPROVIDERSTATE": {
+        "0": "Niet gespecifieerd",
+        "1": "Actief",
+        "2": "Inactief"
+      },
+      "ACTIVATED": "Provider geactiveerd.",
+      "DEACTIVATED": "Provider gedeactiveerd.",
+      "TWILIO": {
+        "SID": "Sid",
+        "TOKEN": "Token",
+        "SENDERNUMBER": "Verzender Nummer",
+        "ADDED": "Twilio succesvol toegevoegd.",
+        "UPDATED": "Twilio succesvol bijgewerkt.",
+        "REMOVED": "Twilio verwijderd",
+        "CHANGETOKEN": "Verander Token",
+        "SETTOKEN": "Stel Token in",
+        "TOKENSET": "Token succesvol ingesteld."
+      }
+    },
+    "OIDC": {
+      "TITLE": "OIDC Instellingen",
+      "ACCESSTOKENLIFETIME": "Toegangstoken Levensduur",
+      "IDTOKENLIFETIME": "ID Token Levensduur",
+      "REFRESHTOKENEXPIRATION": "Vernieuw Token Vervaldatum",
+      "REFRESHTOKENIDLEEXPIRATION": "Vernieuw Token Inactieve Vervaldatum",
+      "INHOURS": "uren",
+      "INDAYS": "Dagen"
+    },
+    "SECRETS": {
+      "TITLE": "Secret Generator",
+      "TYPES": "Secret Types",
+      "TYPE": {
+        "1": "Initialisatie Mail",
+        "2": "E-mail verificatie",
+        "3": "Telefoon verificatie",
+        "4": "Wachtwoord Reset",
+        "5": "Wachtwoordloos Initialisatie",
+        "6": "App Secret",
+        "7": "Eenmalig Wachtwoord (OTP) - SMS",
+        "8": "Eenmalig Wachtwoord (OTP) - Email"
+      },
+      "ADDGENERATOR": "Definieer Secret Generator",
+      "GENERATORTYPE": "Type",
+      "EXPIRY": "Vervaldatum (in uren)",
+      "INCLUDEDIGITS": "Inclusief Nummers",
+      "INCLUDESYMBOLS": "Inclusief Symbolen",
+      "INCLUDELOWERLETTERS": "Inclusief Kleinletters",
+      "INCLUDEUPPERLETTERS": "Inclusief Hoofdletters",
+      "LENGTH": "Lengte",
+      "UPDATED": "Instellingen bijgewerkt."
+    },
+    "SECURITY": {
+      "DESCRIPTION": "Deze instelling stelt de CSP in om framing van een reeks toegestane domeinen toe te staan. Let op: door het gebruik van iFrames toe te staan, loopt u het risico om clickjacking toe te staan.",
+      "IFRAMEENABLED": "Sta iFrame toe",
+      "ALLOWEDORIGINS": "Toegestane URLs"
+    },
+    "DIALOG": {
+      "RESET": {
+        "DEFAULTTITLE": "Reset Instelling",
+        "DEFAULTDESCRIPTION": "U staat op het punt om uw instellingen te resetten naar de standaard configuratie van uw instantie. Weet u zeker dat u wilt doorgaan?",
+        "LOGINPOLICY_DESCRIPTION": "Waarschuwing: Als u doorgaat, worden de instellingen voor identiteitsproviders ook gereset naar de instantie-instelling."
+      }
+    }
+  },
+  "POLICY": {
+    "TITLE": "Bekijk Instellingen",
+    "DESCRIPTION": "Vooringestelde instellingen die uw beveiliging versterken.",
+    "APPLIEDTO": "Toegepast op",
+    "PWD_COMPLEXITY": {
+      "TITLE": "Wachtwoord Complexiteit",
+      "DESCRIPTION": "Zorgt ervoor dat alle ingestelde wachtwoorden overeenkomen met een specifiek patroon",
+      "SYMBOLANDNUMBERERROR": "Moet bestaan uit een cijfer en een symbool/leesteken.",
+      "SYMBOLERROR": "Moet een symbool/leesteken bevatten.",
+      "NUMBERERROR": "Moet een cijfer bevatten.",
+      "PATTERNERROR": "Het wachtwoord voldoet niet aan het vereiste patroon."
+    },
+    "NOTIFICATION": {
+      "TITLE": "Notificatie",
+      "DESCRIPTION": "Bepaalt bij welke wijzigingen notificaties worden verzonden.",
+      "PASSWORDCHANGE": "Wachtwoord wijziging"
+    },
+    "PRIVATELABELING": {
+      "TITLE": "Branding",
+      "DESCRIPTION": "Geef de login uw gepersonaliseerde stijl en wijzig zijn gedrag.",
+      "PREVIEW_DESCRIPTION": "Wijzigingen aan het beleid worden automatisch toegepast op de voorbeeldomgeving.",
+      "BTN": "Selecteer Bestand",
+      "ACTIVATEPREVIEW": "Pas configuratie toe",
+      "DARK": "Donkere Modus",
+      "LIGHT": "Lichte Modus",
+      "CHANGEVIEW": "Verander Weergave",
+      "ACTIVATED": "Beleid wijzigingen zijn nu LIVE",
+      "THEME": "Thema",
+      "COLORS": "Kleuren",
+      "FONT": "Lettertype",
+      "ADVANCEDBEHAVIOR": "Geavanceerd Gedrag",
+      "DROP": "Sleep afbeelding hier of",
+      "RELEASE": "Laat los",
+      "DROPFONT": "Sleep lettertype bestand hier",
+      "RELEASEFONT": "Laat los",
+      "USEOFLOGO": "Uw Logo zal worden gebruikt in de Login evenals e-mails, terwijl het pictogram wordt gebruikt voor kleinere UI-elementen zoals in de organisatieschakelaar in de console",
+      "MAXSIZE": "De maximale grootte is beperkt tot 524kB",
+      "EMAILNOSVG": "Het SVG bestandsformaat wordt niet ondersteund in e-mails. Daarom moet u uw logo uploaden in PNG of een ander ondersteund formaat.",
+      "MAXSIZEEXCEEDED": "Maximale grootte van 524kB overschreden.",
+      "NOSVGSUPPORTED": "SVG's worden niet ondersteund!",
+      "FONTINLOGINONLY": "Het lettertype wordt momenteel alleen weergegeven in de login interface.",
+      "BACKGROUNDCOLOR": "Achtergrondkleur",
+      "PRIMARYCOLOR": "Primaire kleur",
+      "WARNCOLOR": "Waarschuwingskleur",
+      "FONTCOLOR": "Lettertype kleur",
+      "VIEWS": {
+        "PREVIEW": "Voorbeeld",
+        "CURRENT": "Huidige Configuratie"
+      },
+      "PREVIEW": {
+        "TITLE": "Login",
+        "SECOND": "login met uw ZITADEL-Account.",
+        "ERROR": "Gebruiker kon niet worden gevonden!",
+        "PRIMARYBUTTON": "volgende",
+        "SECONDARYBUTTON": "registreer"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Automatische Modus",
+        "THEME_MODE_LIGHT": "Alleen Lichte Modus",
+        "THEME_MODE_DARK": "Alleen Donkere Modus"
+      }
+    },
+    "PWD_AGE": {
+      "TITLE": "Wachtwoord Veroudering",
+      "DESCRIPTION": "U kunt een beleid instellen voor de veroudering van wachtwoorden. Dit beleid geeft een waarschuwing nadat de specifieke verouderingstijd is verstreken."
+    },
+    "PWD_LOCKOUT": {
+      "TITLE": "Lockout Beleid",
+      "DESCRIPTION": "Stel een maximum aantal wachtwoordpogingen in, waarna accounts worden geblokkeerd."
+    },
+    "DOMAIN_POLICY": {
+      "TITLE": "Domein Instellingen"
+    },
+    "PRIVATELABELING_POLICY": {
+      "TITLE": "Branding",
+      "BTN": "Selecteer Bestand",
+      "DESCRIPTION": "Pas het uiterlijk van de Login aan",
+      "ACTIVATEPREVIEW": "Activeer Configuratie"
+    },
+    "LOGIN_POLICY": {
+      "TITLE": "Login Instellingen",
+      "DESCRIPTION": "Definieer hoe Gebruikers kunnen worden geauthenticeerd en configureer Identiteitsproviders",
+      "DESCRIPTIONCREATEADMIN": "Gebruikers kunnen kiezen uit de beschikbare identiteitsproviders hieronder.",
+      "DESCRIPTIONCREATEMGMT": "Gebruikers kunnen kiezen uit de beschikbare identiteitsproviders hieronder. Opmerking: U kunt systeem ingestelde providers gebruiken evenals providers die alleen voor uw organisatie zijn ingesteld.",
+      "ADVANCED": "Geavanceerd",
+      "LIFETIMEDURATIONS": "Login Levensduur",
+      "SAVED": "Succesvol opgeslagen!"
+    },
+    "PRIVACY_POLICY": {
+      "TITLE": "Privacybeleid en TOS",
+      "DESCRIPTION": "Stel uw Privacybeleid en Algemene Voorwaarden Links in",
+      "TOSLINK": "Link naar Algemene Voorwaarden",
+      "POLICYLINK": "Link naar Privacybeleid",
+      "HELPLINK": "Link naar Help",
+      "SUPPORTEMAIL": "Ondersteuning Email",
+      "SAVED": "Succesvol opgeslagen!",
+      "RESET_TITLE": "Herstel Standaard Waarden",
+      "RESET_DESCRIPTION": "U staat op het punt de standaard Links voor TOS en Privacybeleid te herstellen. Weet u zeker dat u wilt doorgaan?"
+    },
+    "LOGIN_TEXTS": {
+      "TITLE": "Login Interface Teksten",
+      "DESCRIPTION": "Definieer uw teksten voor de login interfaces. Als teksten leeg zijn, wordt de standaardwaarde getoond als de placeholder gebruikt.",
+      "DESCRIPTION_SHORT": "Definieer uw teksten voor de login interfaces.",
+      "NEWERVERSIONEXISTS": "Nieuwere versie bestaat",
+      "CURRENTDATE": "Huidige configuratie",
+      "CHANGEDATE": "Nieuwere Versie van",
+      "KEYNAME": "Login Scherm / Interface",
+      "RESET_TITLE": "Herstel Standaard Waarden",
+      "RESET_DESCRIPTION": "U staat op het punt om alle standaardwaarden te herstellen. Alle wijzigingen die u heeft gemaakt zullen permanent worden verwijderd. Weet u zeker dat u wilt doorgaan?",
+      "UNSAVED_TITLE": "Doorgaan zonder opslaan?",
+      "UNSAAVED_DESCRIPTION": "U heeft wijzigingen gemaakt zonder op te slaan. Wilt u nu opslaan?",
+      "LOCALE": "Locale Code",
+      "LOCALES": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      },
+      "KEYS": {
+        "emailVerificationDoneText": "E-mail verificatie voltooid",
+        "emailVerificationText": "E-mail verificatie",
+        "externalUserNotFoundText": "Externe gebruiker niet gevonden",
+        "footerText": "Voettekst",
+        "initMfaDoneText": "MFA initialisatie voltooid",
+        "initMfaOtpText": "Initialiseer MFA",
+        "initMfaPromptText": "Initialiseer MFA Prompt",
+        "initMfaU2fText": "Initialiseer Universele Tweede Factor",
+        "initPasswordDoneText": "Wachtwoord initialisatie voltooid",
+        "initPasswordText": "Initialiseer wachtwoord",
+        "initializeDoneText": "Gebruiker initialisatie voltooid",
+        "initializeUserText": "Initialiseer gebruiker",
+        "linkingUserDoneText": "Gebruiker koppeling voltooid",
+        "loginText": "Login",
+        "logoutText": "Uitloggen",
+        "mfaProvidersText": "MFA Providers",
+        "passwordChangeDoneText": "Wachtwoord wijziging voltooid",
+        "passwordChangeText": "Wachtwoord wijziging",
+        "passwordResetDoneText": "Wachtwoord reset voltooid",
+        "passwordText": "Wachtwoord",
+        "registrationOptionText": "Registratie Opties",
+        "registrationOrgText": "Registreer Org",
+        "registrationUserText": "Registreer Gebruiker",
+        "selectAccountText": "Selecteer Account",
+        "successLoginText": "Login met succes",
+        "usernameChangeDoneText": "Gebruikersnaam wijziging voltooid",
+        "usernameChangeText": "Gebruikersnaam wijziging",
+        "verifyMfaOtpText": "Verifieer OTP",
+        "verifyMfaU2fText": "Verifieer Universele Tweede Factor",
+        "passwordlessPromptText": "Wachtwoordloos Prompt",
+        "passwordlessRegistrationDoneText": "Wachtwoordloze Registratie Voltooid",
+        "passwordlessRegistrationText": "Wachtwoordloze Registratie",
+        "passwordlessText": "Wachtwoordloos",
+        "externalRegistrationUserOverviewText": "Externe Registratie Gebruiker Overzicht"
+      }
+    },
+    "MESSAGE_TEXTS": {
+      "TITLE": "Bericht Teksten",
+      "DESCRIPTION": "Definieer uw teksten voor uw notificatie mails.",
+      "TYPE": "Notificatie",
+      "TYPES": {
+        "INIT": "Initialisatie",
+        "VE": "Verifieer Email",
+        "VP": "Verifieer Telefoon",
+        "VSO": "Verifieer SMS OTP",
+        "VEO": "Verifieer Email OTP",
+        "PR": "Wachtwoord Reset",
+        "DC": "Domein Claim",
+        "PL": "Wachtwoordloos",
+        "PC": "Wachtwoord Verandering"
+      },
+      "CHIPS": {
+        "firstname": "Voornaam",
+        "lastname": "Achternaam",
+        "code": "Code",
+        "preferredLoginName": "Voorkeurs Inlognaam",
+        "displayName": "Weergavenaam",
+        "nickName": "Bijnaam",
+        "loginnames": "Inlognamen",
+        "domain": "Domein",
+        "lastEmail": "Laatste email",
+        "lastPhone": "Laatste telefoon",
+        "verifiedEmail": "Geverifieerde email",
+        "verifiedPhone": "Geverifieerde telefoon",
+        "changedate": "Wijzigingsdatum",
+        "username": "Gebruikersnaam",
+        "tempUsername": "Tijdelijke gebruikersnaam",
+        "otp": "Eenmalig wachtwoord",
+        "verifyUrl": "Verifieer Eenmalig-wachtwoord URL"
+      },
+      "TOAST": {
+        "UPDATED": "Aangepaste Teksten opgeslagen."
+      }
+    },
+    "DEFAULTLABEL": "De huidige instellingen komen overeen met de standaard van uw Instantie.",
+    "BTN_INSTALL": "Setup",
+    "BTN_EDIT": "Wijzigen",
+    "DATA": {
+      "DESCRIPTION": "Beschrijving",
+      "MINLENGTH": "minimum lengte",
+      "HASNUMBER": "heeft nummer",
+      "HASSYMBOL": "heeft symbool",
+      "HASLOWERCASE": "heeft kleine letters",
+      "HASUPPERCASE": "heeft hoofdletters",
+      "SHOWLOCKOUTFAILURES": "toon lockout mislukkingen",
+      "MAXATTEMPTS": "Maximum pogingen voor wachtwoord",
+      "EXPIREWARNDAYS": "Vervaldatum Waarschuwing na dag",
+      "MAXAGEDAYS": "Maximale Leeftijd in dagen",
+      "USERLOGINMUSTBEDOMAIN": "Voeg organisatie domein toe als achtervoegsel aan inlognamen",
+      "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Als u deze instelling inschakelt, worden alle inlognamen voorzien van een achtervoegsel met het domein van de organisatie. Als deze instelling is uitgeschakeld, moet u ervoor zorgen dat gebruikersnamen uniek zijn over alle organisaties.",
+      "VALIDATEORGDOMAINS": "Verificatie van organisatiedomeinen vereist (DNS of HTTP-uitdaging)",
+      "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Afzender Adres komt overeen met Instantie Domein",
+      "ALLOWUSERNAMEPASSWORD": "Gebruikersnaam Wachtwoord toegestaan",
+      "ALLOWEXTERNALIDP": "Externe IDP toegestaan",
+      "ALLOWREGISTER": "Registratie toegestaan",
+      "ALLOWUSERNAMEPASSWORD_DESC": "De conventionele login met gebruikersnaam en wachtwoord is toegestaan.",
+      "ALLOWEXTERNALIDP_DESC": "De login is toegestaan voor de onderliggende identiteitsproviders",
+      "ALLOWREGISTER_DESC": "Als de optie is geselecteerd, verschijnt er een extra stap voor het registreren van een gebruiker in het login proces.",
+      "FORCEMFA": "Forceer MFA",
+      "FORCEMFA_DESC": "Als de optie is geselecteerd, moeten gebruikers een tweede factor configureren voor login.",
+      "FORCEMFALOCALONLY": "Forceer MFA voor lokaal geauthenticeerde gebruikers",
+      "FORCEMFALOCALONLY_DESC": "Als de optie is geselecteerd, moeten lokaal geauthenticeerde gebruikers een tweede factor configureren voor login.",
+      "HIDEPASSWORDRESET": "Verberg Wachtwoord reset",
+      "HIDEPASSWORDRESET_DESC": "Als de optie is geselecteerd, kan de gebruiker zijn wachtwoord niet resetten in het login proces.",
+      "HIDELOGINNAMESUFFIX": "Verberg Inlognaam achtervoegsel",
+      "HIDELOGINNAMESUFFIX_DESC": "Verbergt het inlognaam achtervoegsel in de login interface",
+      "IGNOREUNKNOWNUSERNAMES": "Negeer onbekende gebruikersnamen",
+      "IGNOREUNKNOWNUSERNAMES_DESC": "Als de optie is geselecteerd, zal het wachtwoordscherm worden weergegeven in het login proces, zelfs als de gebruiker niet is gevonden. De fout bij de wachtwoordcontrole zal niet onthullen of de gebruikersnaam of het wachtwoord verkeerd was.",
+      "ALLOWDOMAINDISCOVERY": "Domein ontdekking toegestaan",
+      "ALLOWDOMAINDISCOVERY_DESC": "Als de optie is geselecteerd, zal het achtervoegsel (@domein.com) van een onbekende gebruikersnaam invoer op het login scherm worden gematcht tegen de organisatie domeinen en zal bij succes doorverwijzen naar de registratie van die organisatie.",
+      "DISABLELOGINWITHEMAIL": "Deactiveer login met e-mailadres",
+      "DISABLELOGINWITHPHONE": "Deactiveer login met telefoonnummer",
+      "DEFAULTREDIRECTURI": "Standaard Doorverwijs URI",
+      "DEFAULTREDIRECTURI_DESC": "Definieert waar de gebruiker naar wordt doorverwezen als de login is gestart zonder een app context (bijv. vanuit mail)",
+      "ERRORMSGPOPUP": "Toon Fout in Dialoog",
+      "DISABLEWATERMARK": "Verberg Watermerk",
+      "DISABLEWATERMARK_DESC": "Verberg Powered by ZITADEL watermerk in de login interface",
+      "PASSWORDCHECKLIFETIME": "Wachtwoord Controle Levensduur",
+      "EXTERNALLOGINCHECKLIFETIME": "Externe Login Controle Levensduur",
+      "MFAINITSKIPLIFETIME": "Multifactor Init Levensduur",
+      "SECONDFACTORCHECKLIFETIME": "Tweede Factor Controle Levensduur",
+      "MULTIFACTORCHECKLIFETIME": "Multifactor Controle Levensduur",
+      "INHOURS": "uren"
+    },
+    "RESET": "Reset naar Instantie standaard",
+    "CREATECUSTOM": "Maak Aangepast Beleid",
+    "TOAST": {
+      "SET": "Beleid succesvol ingesteld!",
+      "RESETSUCCESS": "Beleid succesvol gereset!",
+      "UPLOADSUCCESS": "Succesvol geüpload!",
+      "DELETESUCCESS": "Succesvol verwijderd!",
+      "UPLOADFAILED": "Upload mislukt!"
+    }
+  },
+  "ORG_DETAIL": {
+    "TITLE": "Organisatie",
+    "DESCRIPTION": "Hier kunt u de configuratie van uw organisatie bewerken en de leden beheren.",
+    "DETAIL": {
+      "TITLE": "Detail",
+      "NAME": "Naam",
+      "DOMAIN": "Domein",
+      "STATE": {
+        "0": "Niet gedefinieerd",
+        "1": "Actief",
+        "2": "Inactief"
+      }
+    },
+    "MEMBER": {
+      "TITLE": "Leden",
+      "USERNAME": "Gebruikersnaam",
+      "DISPLAYNAME": "Weergavenaam",
+      "LOGINNAME": "Login Naam",
+      "EMAIL": "E-mail",
+      "ROLES": "Rollen",
+      "ADD": "Lid toevoegen",
+      "ADDDESCRIPTION": "Voer de namen van de gebruikers in die moeten worden toegevoegd."
+    },
+    "TABLE": {
+      "TOTAL": "Totaal aantal",
+      "SELECTION": "Geselecteerde elementen",
+      "DEACTIVATE": "Deactiveer gebruiker",
+      "ACTIVATE": "Activeer gebruiker",
+      "DELETE": "Verwijder gebruiker",
+      "CLEAR": "Selectie wissen"
+    }
+  },
+  "PROJECT": {
+    "PAGES": {
+      "TITLE": "Project",
+      "DESCRIPTION": "Hier kunt u toepassingen definiëren, rollen beheren en andere organisaties toestaan uw project te gebruiken.",
+      "DELETE": "Verwijder Project",
+      "LIST": "Projecten",
+      "LISTDESCRIPTION": "Als u geen project kunt vinden, neem dan contact op met een projecteigenaar of iemand met de bijbehorende rechten om toegang te krijgen tot het project.",
+      "DETAIL": "Detail",
+      "CREATE": "Maak Project",
+      "CREATE_DESC": "Voer de naam van uw project in.",
+      "ROLE": "Rol",
+      "NOITEMS": "Geen projecten",
+      "ZITADELPROJECT": "Dit behoort tot het ZITADEL-project. Pas op: Als u wijzigingen aanbrengt, werkt ZITADEL mogelijk niet zoals bedoeld.",
+      "TYPE": {
+        "OWNED": "Eigen Projecten",
+        "GRANTED": "Verleende Projecten",
+        "OWNED_SINGULAR": "Eigen Project",
+        "GRANTED_SINGULAR": "Verleend Project"
+      },
+      "PRIVATELABEL": {
+        "TITLE": "Branding Instelling",
+        "0": {
+          "TITLE": "Niet gespecificeerd",
+          "DESC": "Zodra de gebruiker is geïdentificeerd, wordt de branding van de organisatie van de geïdentificeerde gebruiker getoond, voordat de systeemstandaard wordt getoond."
+        },
+        "1": {
+          "TITLE": "Gebruik projectinstelling",
+          "DESC": "De branding van de organisatie die eigenaar is van het project wordt getoond"
+        },
+        "2": {
+          "TITLE": "Gebruik instelling van gebruikersorganisatie",
+          "DESC": "De branding van de organisatie van het project wordt getoond, maar zodra de gebruiker is geïdentificeerd, wordt de instelling van de organisatie van de geïdentificeerde gebruiker getoond."
+        },
+        "DIALOG": {
+          "TITLE": "Branding instelling",
+          "DESCRIPTION": "Selecteer het gedrag van de login, bij gebruik van het project."
+        }
+      },
+      "PINNED": "Vastgezet",
+      "ALL": "Alles",
+      "CREATEDON": "Gemaakt op",
+      "LASTMODIFIED": "Laatst gewijzigd op",
+      "ADDNEW": "Maak nieuw project",
+      "DIALOG": {
+        "REACTIVATE": {
+          "TITLE": "Heractiveer Project",
+          "DESCRIPTION": "Weet u zeker dat u uw project opnieuw wilt activeren?"
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deactiveer Project",
+          "DESCRIPTION": "Weet u zeker dat u uw project wilt deactiveren?"
+        },
+        "DELETE": {
+          "TITLE": "Verwijder Project",
+          "DESCRIPTION": "Weet u zeker dat u uw project wilt verwijderen?",
+          "TYPENAME": "Typ de naam van het project om het permanent te verwijderen."
+        }
+      }
+    },
+    "SETTINGS": {
+      "TITLE": "Instellingen",
+      "DESCRIPTION": ""
+    },
+    "STATE": {
+      "TITLE": "Status",
+      "0": "Niet gedefinieerd",
+      "1": "Actief",
+      "2": "Inactief"
+    },
+    "TYPE": {
+      "TITLE": "Type",
+      "0": "Onbekend type",
+      "1": "Eigen",
+      "2": "Verleend"
+    },
+    "NAME": "Naam",
+    "NAMEDIALOG": {
+      "TITLE": "Hernoem Project",
+      "DESCRIPTION": "Voer de nieuwe naam in voor uw project",
+      "NAME": "Nieuwe naam"
+    },
+    "MEMBER": {
+      "TITLE": "Managers",
+      "TITLEDESC": "Managers kunnen wijzigingen aanbrengen in dit project op basis van hun rol.",
+      "DESCRIPTION": "Deze managers kunnen mogelijk uw project bewerken.",
+      "USERNAME": "Gebruikersnaam",
+      "DISPLAYNAME": "Weergavenaam",
+      "LOGINNAME": "Loginnaam",
+      "EMAIL": "E-mail",
+      "ROLES": "Rollen",
+      "USERID": "Gebruiker ID"
+    },
+    "GRANT": {
+      "EMPTY": "Geen verleende organisatie.",
+      "TITLE": "Projectverleningen",
+      "DESCRIPTION": "Sta een andere organisatie toe om uw project te gebruiken.",
+      "EDITTITLE": "Bewerk rollen",
+      "CREATE": {
+        "TITLE": "Creëer Organisatieverlening",
+        "SEL_USERS": "Selecteer de gebruikers aan wie u toegang wilt verlenen",
+        "SEL_PROJECT": "Zoek een project",
+        "SEL_ROLES": "Selecteer de rollen die u wilt toevoegen aan de verlening",
+        "SEL_USER": "Selecteer gebruikers",
+        "SEL_ORG": "Zoek een organisatie",
+        "SEL_ORG_DESC": "Zoek de organisatie om te verlenen.",
+        "ORG_DESCRIPTION": "U staat op het punt om een gebruiker toe te kennen voor de organisatie {{naam}}.",
+        "ORG_DESCRIPTION_DESC": "Schakel de context in de kop hierboven om een gebruiker toe te kennen voor een andere organisatie.",
+        "SEL_ORG_FORMFIELD": "Organisatie",
+        "FOR_ORG": "De verlening wordt gecreëerd voor:"
+      },
+      "DETAIL": {
+        "TITLE": "Projectverlening",
+        "DESC": "U kunt selecteren welke rollen kunnen worden gebruikt door de gespecificeerde organisatie, en managers kiezen",
+        "MEMBERTITLE": "Managers",
+        "MEMBERDESC": "Dit zijn de managers van de verleende organisatie. Voeg hier gebruikers toe die toegang moeten krijgen om de gegevens van het project te bewerken.",
+        "PROJECTNAME": "Projectnaam",
+        "GRANTEDORG": "Verleende Organisatie",
+        "RESOURCEOWNER": "Resource Eigenaar"
+      },
+      "STATE": "Status",
+      "STATES": {
+        "1": "Actief",
+        "2": "Inactief"
+      },
+      "ALL": "Alles",
+      "SHOWDETAIL": "Toon details",
+      "USER": "Gebruiker",
+      "MEMBERS": "Managers",
+      "ORG": "Organisatie",
+      "PROJECTNAME": "Projectnaam",
+      "GRANTEDORG": "Verleende Organisatie",
+      "GRANTEDORGDOMAIN": "Domein",
+      "RESOURCEOWNER": "Resource Eigenaar",
+      "GRANTEDORGNAME": "Organisatienaam",
+      "GRANTID": "Verlening ID",
+      "CREATIONDATE": "Aanmaakdatum",
+      "CHANGEDATE": "Laatst gewijzigd",
+      "DATES": "Data",
+      "ROLENAMESLIST": "Rollen",
+      "NOROLES": "Geen rollen",
+      "TYPE": "Type",
+      "TOAST": {
+        "PROJECTGRANTUSERGRANTADDED": "Projectverlening gecreëerd.",
+        "PROJECTGRANTADDED": "Projectverlening gecreëerd.",
+        "PROJECTGRANTCHANGED": "Projectverlening gewijzigd.",
+        "PROJECTGRANTMEMBERADDED": "Verlening Manager toegevoegd.",
+        "PROJECTGRANTMEMBERCHANGED": "Verlening Manager gewijzigd.",
+        "PROJECTGRANTMEMBERREMOVED": "Verlening Manager verwijderd.",
+        "PROJECTGRANTUPDATED": "Projectverlening bijgewerkt"
+      },
+      "DIALOG": {
+        "DELETE_TITLE": "Verwijder projectverlening",
+        "DELETE_DESCRIPTION": "U staat op het punt om een projectverlening te verwijderen. Weet u het zeker?"
+      },
+      "ROLES": "Project Rollen"
+    },
+    "APP": {
+      "TITLE": "Toepassingen",
+      "NAME": "Naam",
+      "NAMEREQUIRED": "Een naam is vereist."
+    },
+    "ROLE": {
+      "EMPTY": "Er is nog geen rol gecreëerd.",
+      "ADDNEWLINE": "Voeg extra rol toe",
+      "KEY": "Sleutel",
+      "TITLE": "Rollen",
+      "DESCRIPTION": "Definieer enkele rollen die kunnen worden gebruikt om projectverleningen te creëren.",
+      "NAME": "Naam",
+      "DISPLAY_NAME": "Weergavenaam",
+      "GROUP": "Groep",
+      "ACTIONS": "Acties",
+      "ADDTITLE": "Creëer Rol",
+      "ADDDESCRIPTION": "Voer de gegevens in voor de nieuwe rol.",
+      "EDITTITLE": "Bewerk Rol",
+      "EDITDESCRIPTION": "Voer de nieuwe gegevens in voor de rol.",
+      "DELETE": "Verwijder Rol",
+      "CREATIONDATE": "Gecreëerd",
+      "CHANGEDATE": "Laatst gewijzigd",
+      "SELECTGROUPTOOLTIP": "Selecteer alle rollen van de groep {{groep}}.",
+      "OPTIONS": "Opties",
+      "ASSERTION": "Bevestig Rollen bij Authenticatie",
+      "ASSERTION_DESCRIPTION": "Rol informatie wordt verzonden vanaf de Userinfo eindpunt en afhankelijk van uw applicatie instellingen in tokens en andere typen.",
+      "CHECK": "Controleer autorisatie bij Authenticatie",
+      "CHECK_DESCRIPTION": "Als dit is ingesteld, mogen gebruikers alleen authenticeren als een rol is toegewezen aan hun account.",
+      "DIALOG": {
+        "DELETE_TITLE": "Verwijder rol",
+        "DELETE_DESCRIPTION": "U staat op het punt om een projectrol te verwijderen. Weet u het zeker?"
+      }
+    },
+    "HAS_PROJECT": "Controleer op Project bij Authenticatie",
+    "HAS_PROJECT_DESCRIPTION": "Het wordt gecontroleerd of de organisatie van de gebruiker dit project heeft. Zo niet, kan de gebruiker niet worden geauthenticeerd.",
+    "TABLE": {
+      "TOTAL": "Totaal aantal:",
+      "SELECTION": "Geselecteerde Elementen",
+      "DEACTIVATE": "Deactiveer Project",
+      "ACTIVATE": "Activeer Project",
+      "DELETE": "Verwijder Project",
+      "ORGNAME": "Organisatienaam",
+      "ORGDOMAIN": "Organisatie Domein",
+      "STATE": "Status",
+      "TYPE": "Type",
+      "CREATIONDATE": "Aangemaakt op",
+      "CHANGEDATE": "Laatst gewijzigd",
+      "RESOURCEOWNER": "Eigenaar",
+      "SHOWTABLE": "Toon tabel",
+      "SHOWGRID": "Toon rooster",
+      "EMPTY": "Geen project gevonden"
+    },
+    "TOAST": {
+      "MEMBERREMOVED": "Manager verwijderd.",
+      "MEMBERSADDED": "Managers toegevoegd.",
+      "MEMBERADDED": "Manager toegevoegd.",
+      "MEMBERCHANGED": "Manager gewijzigd.",
+      "ROLESCREATED": "Rollen gecreëerd.",
+      "ROLEREMOVED": "Rol verwijderd.",
+      "ROLECHANGED": "Rol gewijzigd.",
+      "REACTIVATED": "Heractiveerd.",
+      "DEACTIVATED": "Gedeactiveerd.",
+      "CREATED": "Project gecreëerd.",
+      "UPDATED": "Project gewijzigd.",
+      "GRANTUPDATED": "Verlening gewijzigd.",
+      "DELETED": "Project verwijderd."
+    }
+  },
+  "ROLES": {
+    "DIALOG": {
+      "DELETE_TITLE": "Verwijder rol",
+      "DELETE_DESCRIPTION": "U staat op het punt om een rol te verwijderen. Weet u het zeker?"
+    }
+  },
+  "NEXTSTEPS": {
+    "TITLE": "Volgende stappen"
+  },
+  "IDP": {
+    "LIST": {
+      "TITLE": "Identiteitsproviders",
+      "DESCRIPTION": "Beheer uw identiteitsprovider configuratie, die vervolgens kan worden geactiveerd in uw Login-instellingen.",
+      "ACTIVETITLE": "Actieve identiteitsproviders"
+    },
+    "CREATE": {
+      "TITLE": "Voeg provider toe",
+      "DESCRIPTION": "Selecteer een of meer van de volgende providers.",
+      "STEPPERTITLE": "Creëer Provider",
+      "OIDC": {
+        "TITLE": "OIDC Provider",
+        "DESCRIPTION": "Voer de vereiste gegevens in voor uw OIDC provider."
+      },
+      "OAUTH": {
+        "TITLE": "OAuth Provider",
+        "DESCRIPTION": "Voer de vereiste gegevens in voor uw OAuth provider."
+      },
+      "JWT": {
+        "TITLE": "JWT Provider",
+        "DESCRIPTION": "Voer de vereiste gegevens in voor uw JWT provider."
+      },
+      "GOOGLE": {
+        "TITLE": "Google Provider",
+        "DESCRIPTION": "Voer de inloggegevens in voor uw Google Identity Provider"
+      },
+      "GITLAB": {
+        "TITLE": "Gitlab Provider",
+        "DESCRIPTION": "Voer de inloggegevens in voor uw Gitlab Identity Provider"
+      },
+      "GITLABSELFHOSTED": {
+        "TITLE": "Gitlab Self Hosted Provider",
+        "DESCRIPTION": "Voer de inloggegevens in voor uw Gitlab Self Hosted Identity Provider"
+      },
+      "GITHUBES": {
+        "TITLE": "GitHub Enterprise Server Provider",
+        "DESCRIPTION": "Voer de inloggegevens in voor uw GitHub Enterprise Server Identity Provider"
+      },
+      "GITHUB": {
+        "TITLE": "Github Provider",
+        "DESCRIPTION": "Voer de inloggegevens in voor uw Github Identity Provider"
+      },
+      "AZUREAD": {
+        "TITLE": "Microsoft Provider",
+        "DESCRIPTION": "Voer de inloggegevens in voor uw Microsoft Identity Provider"
+      },
+      "LDAP": {
+        "TITLE": "Active Directory / LDAP",
+        "DESCRIPTION": "Voer de inloggegevens in voor uw LDAP Provider"
+      },
+      "APPLE": {
+        "TITLE": "Log in met Apple",
+        "DESCRIPTION": "Voer de inloggegevens in voor uw Apple Provider"
+      },
+      "SAML": {
+        "TITLE": "Log in met Saml SP",
+        "DESCRIPTION": "Voer de inloggegevens in voor uw SAML Provider"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Identiteitsprovider",
+      "DESCRIPTION": "Update uw provider configuratie",
+      "DATECREATED": "Gecreëerd",
+      "DATECHANGED": "Gewijzigd"
+    },
+    "OPTIONS": {
+      "ISAUTOCREATION": "Automatische creatie",
+      "ISAUTOCREATION_DESC": "Als geselecteerd, wordt een account aangemaakt als het nog niet bestaat.",
+      "ISAUTOUPDATE": "Automatische update",
+      "ISAUTOUPDATE_DESC": "Als geselecteerd, worden accounts bijgewerkt bij opnieuw authenticeren.",
+      "ISCREATIONALLOWED": "Account creatie toegestaan",
+      "ISCREATIONALLOWED_DESC": "Bepaalt of accounts kunnen worden aangemaakt.",
+      "ISLINKINGALLOWED": "Account koppeling toegestaan",
+      "ISLINKINGALLOWED_DESC": "Bepaalt of een identiteit kan worden gekoppeld aan een bestaand account."
+    },
+    "OWNERTYPES": {
+      "0": "onbekend",
+      "1": "Instantie",
+      "2": "Organisatie"
+    },
+    "STATES": {
+      "1": "actief",
+      "2": "inactief"
+    },
+    "AZUREADTENANTTYPES": {
+      "3": "Tenant ID",
+      "0": "Algemeen",
+      "1": "Organisaties",
+      "2": "Consumenten"
+    },
+    "AZUREADTENANTTYPE": "Tenant Type",
+    "AZUREADTENANTID": "Tenant ID",
+    "EMAILVERIFIED": "E-mail geverifieerd",
+    "NAMEHINT": "Als opgegeven zal dit worden getoond in de login interface.",
+    "OPTIONAL": "optioneel",
+    "LDAPATTRIBUTES": "LDAP Attributen",
+    "UPDATEBINDPASSWORD": "update Bind Wachtwoord",
+    "UPDATECLIENTSECRET": "update client geheim",
+    "ADD": "Voeg Identiteitsprovider toe",
+    "TYPE": "Type",
+    "OWNER": "Eigenaar",
+    "ID": "ID",
+    "NAME": "Naam",
+    "AUTHORIZATIONENDPOINT": "Autorisatie Eindpunt",
+    "TOKENENDPOINT": "Token Eindpunt",
+    "USERENDPOINT": "Gebruiker Eindpunt",
+    "IDATTRIBUTE": "ID Attribuut",
+    "AVAILABILITY": "Beschikbaarheid",
+    "AVAILABLE": "beschikbaar",
+    "AVAILABLEBUTINACTIVE": "beschikbaar maar inactief",
+    "SETAVAILABLE": "instellen als beschikbaar",
+    "SETUNAVAILABLE": "instellen als niet beschikbaar",
+    "CONFIG": "Configuratie",
+    "STATE": "Status",
+    "ISSUER": "Uitgever",
+    "SCOPESLIST": "Scopes Lijst",
+    "CLIENTID": "Client ID",
+    "CLIENTSECRET": "Client Geheim",
+    "LDAPCONNECTION": "Verbinding",
+    "LDAPUSERBINDING": "Gebruiker binding",
+    "BASEDN": "BaseDn",
+    "BINDDN": "BindDn",
+    "BINDPASSWORD": "Bind Wachtwoord",
+    "SERVERS": "Servers",
+    "STARTTLS": "Start TLS",
+    "TIMEOUT": "Timeout in seconden",
+    "USERBASE": "Gebruikersbasis",
+    "USERFILTERS": "Gebruikersfilters",
+    "USEROBJECTCLASSES": "Gebruiker Object Klassen",
+    "REQUIRED": "verplicht",
+    "LDAPIDATTRIBUTE": "ID attribuut",
+    "AVATARURLATTRIBUTE": "Avatar Url attribuut",
+    "DISPLAYNAMEATTRIBUTE": "Weergavenaam attribuut",
+    "EMAILATTRIBUTEATTRIBUTE": "E-mail attribuut",
+    "EMAILVERIFIEDATTRIBUTE": "E-mail geverifieerd attribuut",
+    "FIRSTNAMEATTRIBUTE": "Voornaam attribuut",
+    "LASTNAMEATTRIBUTE": "Achternaam attribuut",
+    "NICKNAMEATTRIBUTE": "Bijnaam attribuut",
+    "PHONEATTRIBUTE": "Telefoon attribuut",
+    "PHONEVERIFIEDATTRIBUTE": "Telefoon geverifieerd attribuut",
+    "PREFERREDLANGUAGEATTRIBUTE": "Voorkeurstaal attribuut",
+    "PREFERREDUSERNAMEATTRIBUTE": "Voorkeursgebruikersnaam attribuut",
+    "PROFILEATTRIBUTE": "Profiel attribuut",
+    "IDPDISPLAYNAMEMAPPING": "IDP Weergavenaam Mapping",
+    "USERNAMEMAPPING": "Gebruikersnaam Mapping",
+    "DATES": "Data",
+    "CREATIONDATE": "Aangemaakt Op",
+    "CHANGEDATE": "Laatst gewijzigd",
+    "DEACTIVATE": "Deactiveer",
+    "ACTIVATE": "Activeer",
+    "DELETE": "Verwijder",
+    "DELETE_TITLE": "Verwijder IDP",
+    "DELETE_DESCRIPTION": "U staat op het punt om een identiteitsprovider te verwijderen. De resulterende wijzigingen zijn onomkeerbaar. Weet u zeker dat u dit wilt doen?",
+    "REMOVE_WARN_TITLE": "Verwijder IDP",
+    "REMOVE_WARN_DESCRIPTION": "U staat op het punt om een identiteitsprovider te verwijderen. Dit zal de selectie van de beschikbare IDP voor uw gebruikers verwijderen en reeds geregistreerde gebruikers zullen niet opnieuw kunnen inloggen. Weet u zeker dat u wilt doorgaan?",
+    "DELETE_SELECTION_TITLE": "Verwijder IDP",
+    "DELETE_SELECTION_DESCRIPTION": "U staat op het punt om een identiteitsprovider te verwijderen. De resulterende wijzigingen zijn onomkeerbaar. Weet u zeker dat u dit wilt doen?",
+    "EMPTY": "Geen IDP beschikbaar",
+    "OIDC": {
+      "GENERAL": "Algemene Informatie",
+      "TITLE": "OIDC Configuratie",
+      "DESCRIPTION": "Voer de gegevens in voor de OIDC Identity Provider."
+    },
+    "JWT": {
+      "TITLE": "JWT Configuratie",
+      "DESCRIPTION": "Voer de gegevens in voor JWT Identity Provider.",
+      "HEADERNAME": "Header Naam",
+      "JWTENDPOINT": "JWT Eindpunt",
+      "JWTKEYSENDPOINT": "JWT Sleutels Eindpunt"
+    },
+    "APPLE": {
+      "TEAMID": "Team ID",
+      "KEYID": "Sleutel ID",
+      "PRIVATEKEY": "Privé Sleutel",
+      "UPDATEPRIVATEKEY": "Update Privé Sleutel",
+      "UPLOADPRIVATEKEY": "Upload Privé Sleutel",
+      "KEYMAXSIZEEXCEEDED": "Maximale grootte van 5kB overschreden."
+    },
+    "SAML": {
+      "METADATAXML": "Metadata Xml",
+      "METADATAURL": "Metadata URL",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "Ondertekend Verzoek"
+    },
+    "TOAST": {
+      "SAVED": "Succesvol opgeslagen.",
+      "REACTIVATED": "Idp heractiveerd.",
+      "DEACTIVATED": "Idp gedeactiveerd.",
+      "SELECTEDREACTIVATED": "Geselecteerde Idps heractiveerd.",
+      "SELECTEDDEACTIVATED": "Geselecteerde Idps gedeactiveerd.",
+      "SELECTEDKEYSDELETED": "Geselecteerde Idps verwijderd.",
+      "DELETED": "Idp succesvol verwijderd!",
+      "ADDED": "Succesvol toegevoegd.",
+      "REMOVED": "Succesvol verwijderd."
+    },
+    "ISIDTOKENMAPPING": "Kaart van de ID token",
+    "ISIDTOKENMAPPING_DESC": "Als geselecteerd, wordt provider informatie in kaart gebracht van de ID token, niet van de userinfo eindpunt."
+  },
+  "MFA": {
+    "LIST": {
+      "MULTIFACTORTITLE": "Wachtwoordloos",
+      "MULTIFACTORDESCRIPTION": "Definieer uw multifactor voor uw wachtwoordloze authenticatie hier.",
+      "SECONDFACTORTITLE": "Multifactor Authenticatie",
+      "SECONDFACTORDESCRIPTION": "Definieer verdere mogelijke factoren waarmee u uw wachtwoordauthenticatie kunt beveiligen."
+    },
+    "CREATE": {
+      "TITLE": "Nieuwe Factor",
+      "DESCRIPTION": "Selecteer uw nieuwe Factortype."
+    },
+    "DELETE": {
+      "TITLE": "Verwijder Factor",
+      "DESCRIPTION": "U staat op het punt om een Factor uit Login-instellingen te verwijderen. Weet u het zeker?"
+    },
+    "TOAST": {
+      "ADDED": "Succesvol toegevoegd.",
+      "SAVED": "Succesvol opgeslagen.",
+      "DELETED": "Succesvol verwijderd"
+    },
+    "TYPE": "Type",
+    "MULTIFACTORTYPES": {
+      "0": "Onbekend",
+      "1": "Vingerafdruk, Beveiligingssleutels, Face ID en andere"
+    },
+    "SECONDFACTORTYPES": {
+      "0": "Onbekend",
+      "1": "Eenmalig wachtwoord door Authenticator App (TOTP)",
+      "2": "Vingerafdruk, Beveiligingssleutels, Face ID en andere",
+      "3": "Eenmalig wachtwoord per e-mail (Email OTP)",
+      "4": "Eenmalig wachtwoord per SMS (SMS OTP)"
+    }
+  },
+  "LOGINPOLICY": {
+    "CREATE": {
+      "TITLE": "Login Instellingen",
+      "DESCRIPTION": "Definieer hoe uw gebruikers kunnen worden geauthenticeerd op uw organisatie."
+    },
+    "IDPS": "Identiteitsproviders",
+    "ADDIDP": {
+      "TITLE": "Voeg Identiteitsprovider toe",
+      "DESCRIPTION": "U kunt vooraf gedefinieerde of zelfgemaakte providers selecteren voor authenticatie.",
+      "SELECTIDPS": "Identiteitsproviders"
+    },
+    "PASSWORDLESS": "Wachtwoordloze Login",
+    "PASSWORDLESSTYPE": {
+      "0": "Niet toegestaan",
+      "1": "Toegestaan"
+    }
+  },
+  "APP": {
+    "LIST": "Toepassingen",
+    "COMPLIANCE": "OIDC Conformiteit",
+    "URLS": "URL's",
+    "CONFIGURATION": "Configuratie",
+    "TOKEN": "Token-instellingen",
+    "PAGES": {
+      "TITLE": "Toepassing",
+      "ID": "ID",
+      "DESCRIPTION": "Hier kunt u uw toepassingsgegevens en de configuratie bewerken.",
+      "CREATE": "Creëer toepassing",
+      "CREATE_SELECT_PROJECT": "Selecteer eerst uw project",
+      "CREATE_NEW_PROJECT": "of creëer een nieuwe <a href='{{url}}' title='Maak project'>hier</a>.",
+      "CREATE_DESC_TITLE": "Voer uw toepassingsdetails stap voor stap in",
+      "CREATE_DESC_SUB": "Er wordt automatisch een aanbevolen configuratie gegenereerd.",
+      "STATE": "Status",
+      "DATECREATED": "Gecreëerd",
+      "DATECHANGED": "Gewijzigd",
+      "URLS": "URL's",
+      "DELETE": "Verwijder App",
+      "DETAIL": {
+        "TITLE": "Detail",
+        "STATE": {
+          "0": "Niet gedefinieerd",
+          "1": "Actief",
+          "2": "Inactief"
+        }
+      },
+      "DIALOG": {
+        "CONFIG": {
+          "TITLE": "Wijzig OIDC-configuratie"
+        },
+        "DELETE": {
+          "TITLE": "Verwijder App",
+          "DESCRIPTION": "Weet u zeker dat u deze toepassing wilt verwijderen?"
+        }
+      },
+      "NEXTSTEPS": {
+        "TITLE": "Volgende stappen",
+        "0": {
+          "TITLE": "Voeg rollen toe",
+          "DESC": "Voer uw projectrollen in"
+        },
+        "1": {
+          "TITLE": "Voeg gebruikers toe",
+          "DESC": "Voeg nieuwe gebruikers van uw organisatie toe"
+        },
+        "2": {
+          "TITLE": "Hulp & Ondersteuning",
+          "DESC": "Lees onze documentatie over het creëren van toepassingen of neem contact op met onze ondersteuning"
+        }
+      }
+    },
+    "NAMEDIALOG": {
+      "TITLE": "Hernoem App",
+      "DESCRIPTION": "Voer de nieuwe naam in voor uw app",
+      "NAME": "Nieuwe naam"
+    },
+    "NAME": "Naam",
+    "TYPE": "Toepassingstype",
+    "AUTHMETHOD": "Authenticatiemethode",
+    "AUTHMETHODSECTION": "Authenticatiemethode",
+    "GRANT": "Grant Types",
+    "ADDITIONALORIGINS": "Extra Origins",
+    "ADDITIONALORIGINSDESC": "Als u extra Origins aan uw app wilt toevoegen die niet als redirect worden gebruikt, kunt u dat hier doen.",
+    "ORIGINS": "Origins",
+    "NOTANORIGIN": "De ingevoerde waarde is geen origin",
+    "PROSWITCH": "Ik ben een professional. Sla deze wizard over.",
+    "NAMEANDTYPESECTION": "Naam en Type",
+    "TITLEFIRST": "Naam van de toepassing",
+    "TYPETITLE": "Type toepassing",
+    "OIDC": {
+      "WELLKNOWN": "Verdere links kunnen worden opgehaald van het <a href='{{url}}' title='Ontdekkings-eindpunt' target='_blank'>ontdekkings-eindpunt</a>.",
+      "INFO": {
+        "ISSUER": "Uitgever",
+        "CLIENTID": "Client ID"
+      },
+      "CURRENT": "Huidige Config",
+      "TOKENSECTIONTITLE": "AuthToken Opties",
+      "REDIRECTSECTIONTITLE": "Redirect Instellingen",
+      "REDIRECTTITLE": "Specificeer de URI's waar de login naar zal redirecten.",
+      "POSTREDIRECTTITLE": "Dit is de redirect URI na uitloggen.",
+      "REDIRECTDESCRIPTIONWEB": "Redirect URI's moeten beginnen met https://. http:// is alleen geldig met ingeschakelde ontwikkelingsmodus.",
+      "REDIRECTDESCRIPTIONNATIVE": "Redirect URI's moeten beginnen met uw eigen protocol, http://127.0.0.1, http://[::1] of http://localhost.",
+      "REDIRECTNOTVALID": "Deze redirect URI is niet geldig.",
+      "COMMAORENTERSEPERATION": "scheiden met ↵",
+      "TYPEREQUIRED": "Het type is vereist.",
+      "TITLE": "OIDC Configuratie",
+      "CLIENTID": "Client ID",
+      "CLIENTSECRET": "Client Geheim",
+      "CLIENTSECRET_NOSECRET": "Met uw gekozen authenticatiestroom is geen geheim vereist en is daarom niet beschikbaar.",
+      "CLIENTSECRET_DESCRIPTION": "Bewaar uw client geheim op een veilige plaats aangezien het zal verdwijnen zodra het dialoogvenster wordt gesloten.",
+      "REGENERATESECRET": "Regenereer Client Geheim",
+      "DEVMODE": "Ontwikkelingsmodus",
+      "DEVMODE_ENABLED": "Ingeschakeld",
+      "DEVMODE_DISABLED": "Uitgeschakeld",
+      "DEVMODEDESC": "Let op: Met ingeschakelde ontwikkelingsmodus worden redirect URI's niet gevalideerd.",
+      "SKIPNATIVEAPPSUCCESSPAGE": "Sla Login Succes Pagina over",
+      "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Sla de succespagina na een login voor deze native app over.",
+      "REDIRECT": "Redirect URI's",
+      "REDIRECTSECTION": "Redirect URI's",
+      "POSTLOGOUTREDIRECT": "Post Logout URI's",
+      "RESPONSESECTION": "Response Types",
+      "GRANTSECTION": "Grant Types",
+      "GRANTTITLE": "Selecteer uw grant types. Opmerking: Implicit is alleen beschikbaar voor browser-gebaseerde toepassingen.",
+      "APPTYPE": {
+        "0": "Web",
+        "1": "User Agent",
+        "2": "Native"
+      },
+      "RESPONSETYPE": "Response Types",
+      "RESPONSE": {
+        "0": "Code",
+        "1": "ID Token",
+        "2": "Token-ID Token"
+      },
+      "REFRESHTOKEN": "Refresh Token",
+      "GRANTTYPE": "Grant Types",
+      "GRANT": {
+        "0": "Authorization Code",
+        "1": "Implicit",
+        "2": "Refresh Token",
+        "3": "Device Code"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Post",
+        "2": "None",
+        "3": "Private Key JWT"
+      },
+      "TOKENTYPE": "Auth Token Type",
+      "TOKENTYPE0": "Bearer Token",
+      "TOKENTYPE1": "JWT",
+      "UNSECUREREDIRECT": "Ik hoop zeker dat u weet wat u doet.",
+      "OVERVIEWSECTION": "Overzicht",
+      "OVERVIEWTITLE": "U bent nu klaar. Bekijk uw configuratie.",
+      "ACCESSTOKENROLEASSERTION": "Voeg gebruikersrollen toe aan de toegangstoken",
+      "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Indien geselecteerd, worden de aangevraagde rollen van de geauthenticeerde gebruiker toegevoegd aan de toegangstoken.",
+      "IDTOKENROLEASSERTION": "Gebruikersrollen in ID Token",
+      "IDTOKENROLEASSERTION_DESCRIPTION": "Indien geselecteerd, worden de aangevraagde rollen van de geauthenticeerde gebruiker toegevoegd aan het ID-token.",
+      "IDTOKENUSERINFOASSERTION": "Gebruikersinformatie in ID Token",
+      "IDTOKENUSERINFOASSERTION_DESCRIPTION": "Hiermee kunnen clients profiel-, e-mail-, telefoon- en adresclaims van ID-token ophalen.",
+      "CLOCKSKEW": "Hiermee kunnen clients de klok skew van OP en client verwerken. De duur (0-5s) wordt toegevoegd aan exp claim en afgetrokken van iats, auth_time en nbf.",
+      "RECOMMENDED": "aanbevolen",
+      "NOTRECOMMENDED": "niet aanbevolen",
+      "SELECTION": {
+        "APPTYPE": {
+          "WEB": {
+            "TITLE": "Web",
+            "DESCRIPTION": "Reguliere Webtoepassingen zoals .net, PHP, Node.js, Java, enz."
+          },
+          "NATIVE": {
+            "TITLE": "Native",
+            "DESCRIPTION": "Mobiele Apps, Desktop, Slimme Apparaten, etc."
+          },
+          "USERAGENT": {
+            "TITLE": "User Agent",
+            "DESCRIPTION": "Single Page Applications (SPA) en over het algemeen alle JS-frameworks die in browsers worden uitgevoerd"
+          }
+        }
+      }
+    },
+    "API": {
+      "INFO": {
+        "CLIENTID": "Client ID"
+      },
+      "REGENERATESECRET": "Regenereer Client Geheim",
+      "SELECTION": {
+        "TITLE": "API",
+        "DESCRIPTION": "API's in het algemeen"
+      },
+      "AUTHMETHOD": {
+        "0": "Basic",
+        "1": "Private Key JWT"
+      }
+    },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "SAML Toepassingen"
+      },
+      "CONFIGSECTION": "SAML Configuratie",
+      "CHOOSEMETADATASOURCE": "Geef uw SAML-configuratie op met behulp van een van de volgende opties:",
+      "METADATAOPT1": "Optie 1. Specificeer de url waar het metadata-bestand zich bevindt",
+      "METADATAOPT2": "Optie 2. Upload een bestand met uw metadata XML",
+      "METADATAOPT3": "Optie 3. Creëer een minimaal metadata-bestand on the fly door ENTITYID en ACS URL te verstrekken",
+      "UPLOAD": "Upload XML-bestand",
+      "METADATA": "Metadata",
+      "METADATAFROMFILE": "Metadata van bestand",
+      "CERTIFICATE": "SAML-certificaat",
+      "DOWNLOADCERT": "Download SAML-certificaat",
+      "CREATEMETADATA": "Creëer metadata",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS eindpunt URL"
+    },
+    "AUTHMETHODS": {
+      "CODE": {
+        "TITLE": "Code",
+        "DESCRIPTION": "Wissel de autorisatiecode in voor de tokens"
+      },
+      "PKCE": {
+        "TITLE": "PKCE",
+        "DESCRIPTION": "Gebruik een willekeurige hash in plaats van een statisch client-geheim voor meer veiligheid"
+      },
+      "POST": {
+        "TITLE": "POST",
+        "DESCRIPTION": "Stuur client_id en client_secret als onderdeel van het formulier"
+      },
+      "PK_JWT": {
+        "TITLE": "Private Key JWT",
+        "DESCRIPTION": "Gebruik een privésleutel om uw toepassing te autoriseren"
+      },
+      "BASIC": {
+        "TITLE": "Basic",
+        "DESCRIPTION": "Authenticatie met Gebruikersnaam en Wachtwoord"
+      },
+      "IMPLICIT": {
+        "TITLE": "Implicit",
+        "DESCRIPTION": "Krijg de tokens direct van het autorisatie-eindpunt"
+      },
+      "DEVICECODE": {
+        "TITLE": "Device Code",
+        "DESCRIPTION": "Autoriseer het apparaat op een computer of smartphone."
+      },
+      "CUSTOM": {
+        "TITLE": "Aangepast",
+        "DESCRIPTION": "Uw instelling komt niet overeen met een andere optie."
+      }
+    },
+    "TOAST": {
+      "REACTIVATED": "Toepassing heractiveerd.",
+      "DEACTIVATED": "Toepassing gedeactiveerd.",
+      "OIDCUPDATED": "App bijgewerkt.",
+      "APIUPDATED": "App bijgewerkt",
+      "UPDATED": "App bijgewerkt.",
+      "CREATED": "App gecreëerd.",
+      "CLIENTSECRETREGENERATED": "client geheim gegenereerd.",
+      "DELETED": "App verwijderd.",
+      "CONFIGCHANGED": "Wijzigingen gedetecteerd!"
+    }
+  },
+  "GENDERS": {
+    "0": "Onbekend",
+    "1": "Vrouw",
+    "2": "Man",
+    "3": "Anders"
+  },
+  "LANGUAGES": {
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "it": "Italiano",
+    "ja": "日本語",
+    "pl": "Polski",
+    "zh": "简体中文",
+    "bg": "Български",
+    "pt": "Portuguese",
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский",
+    "nl": "Nederlands"
+  },
+  "MEMBER": {
+    "ADD": "Voeg een Manager toe",
+    "CREATIONTYPE": "Creatietype",
+    "CREATIONTYPES": {
+      "3": "IAM",
+      "2": "Organisatie",
+      "0": "Eigendom Project",
+      "1": "Verleend Project",
+      "4": "Project"
+    },
+    "EDITROLE": "Bewerk rollen",
+    "EDITFOR": "Bewerk de rollen voor de gebruiker: {{value}}",
+    "DIALOG": {
+      "DELETE_TITLE": "Verwijder Manager",
+      "DELETE_DESCRIPTION": "U staat op het punt om een manager te verwijderen. Weet u het zeker?"
+    }
+  },
+  "ROLESLABEL": "Rollen",
+  "GRANTS": {
+    "TITLE": "Autorisaties",
+    "DESC": "Dit zijn alle autorisaties op uw organisatie.",
+    "DELETE": "Verwijder Autorisatie",
+    "EMPTY": "Geen autorisatie gevonden",
+    "ADD": "Creëer Autorisatie",
+    "ADD_BTN": "Nieuw",
+    "PROJECT": {
+      "TITLE": "Autorisatie",
+      "DESCRIPTION": "Definieer autorisaties voor het gespecificeerde project. Let op, u kunt alleen entries van projecten en gebruikers zien waarvoor u de rechten heeft."
+    },
+    "USER": {
+      "TITLE": "Autorisatie",
+      "DESCRIPTION": "Definieer autorisaties voor de gespecificeerde gebruiker. Let op, u kunt alleen entries van projecten en gebruikers zien waarvoor u de rechten heeft."
+    },
+    "CREATE": {
+      "TITLE": "Creëer autorisatie",
+      "DESCRIPTION": "Zoek naar de organisatie, het project en de bijbehorende rollen."
+    },
+    "EDIT": {
+      "TITLE": "Wijzig autorisatie"
+    },
+    "DETAIL": {
+      "TITLE": "Autorisatie Detail",
+      "DESCRIPTION": "Hier kunt u alle details van de autorisatie zien."
+    },
+    "TOAST": {
+      "UPDATED": "Autorisatie bijgewerkt.",
+      "REMOVED": "Autorisatie verwijderd",
+      "BULKREMOVED": "Autorisaties verwijderd."
+    },
+    "DIALOG": {
+      "DELETE_TITLE": "Verwijder autorisatie",
+      "DELETE_DESCRIPTION": "U staat op het punt om een autorisatie te verwijderen. Wilt u doorgaan?",
+      "BULK_DELETE_TITLE": "Verwijder autorisaties",
+      "BULK_DELETE_DESCRIPTION": "U staat op het punt om meerdere autorisaties te verwijderen. Wilt u doorgaan?"
+    }
+  },
+  "CHANGES": {
+    "LISTTITLE": "Laatste Wijzigingen",
+    "BOTTOM": "U heeft het einde van de lijst bereikt.",
+    "LOADMORE": "Laad meer",
+    "ORG": {
+      "TITLE": "Activiteit",
+      "DESCRIPTION": "Hier kunt u de laatste gebeurtenissen zien die een organisatieverandering hebben gegenereerd."
+    },
+    "PROJECT": {
+      "TITLE": "Activiteit",
+      "DESCRIPTION": "Hier kunt u de laatste gebeurtenissen zien die een projectverandering hebben gegenereerd."
+    },
+    "USER": {
+      "TITLE": "Activiteit",
+      "DESCRIPTION": "Hier kunt u de laatste gebeurtenissen zien die een gebruikersverandering hebben gegenereerd."
+    }
+  }
+}

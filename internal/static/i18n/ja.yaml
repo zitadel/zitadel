@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: 制限が見つかりません
     NoneSpecified: 制限が指定されていません
+  Restrictions:
+    NoneSpecified: 制限が指定されていません
   Language:
     NotParsed: 言語のパースに失敗しました
   OIDCSettings:
@@ -418,6 +420,7 @@ Errors:
   UserSession:
     NotFound: ユーザーが見つかりません
   Key:
+    NotFound: キーが見つかりません
     ExpireBeforeNow: 有効期限が過去です
   Login:
     LoginPolicy:

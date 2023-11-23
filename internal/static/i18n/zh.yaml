@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: 未找到限制
     NoneSpecified: 未指定限制
+  Restrictions:
+    NoneSpecified: 未指定限制
   Language:
     NotParsed: 无法解析语言
   OIDCSettings:
@@ -429,6 +431,7 @@ Errors:
   UserSession:
     NotFound: 用户会话不存在
   Key:
+    NotFound: 找不到钥匙
     ExpireBeforeNow: 过期日期是过去的无效日期
   Login:
     LoginPolicy:

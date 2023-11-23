@@ -55,7 +55,7 @@ type Storage struct {
 }
 
 func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error) {
-	app, err := p.query.AppBySAMLEntityID(ctx, entityID, false)
+	app, err := p.query.AppBySAMLEntityID(ctx, entityID)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*servicep
 }
 
 func (p *Storage) GetEntityIDByAppID(ctx context.Context, appID string) (string, error) {
-	app, err := p.query.AppByID(ctx, appID, false)
+	app, err := p.query.AppByID(ctx, appID)
 	if err != nil {
 		return "", err
 	}
@@ -133,7 +133,7 @@ func (p *Storage) AuthRequestByID(ctx context.Context, id string) (_ models.Auth
 func (p *Storage) SetUserinfoWithUserID(ctx context.Context, applicationID string, userinfo models.AttributeSetter, userID string, attributes []int) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	user, err := p.query.GetUserByID(ctx, true, userID, false)
+	user, err := p.query.GetUserByID(ctx, true, userID)
 	if err != nil {
 		return err
 	}
@@ -151,7 +151,7 @@ func (p *Storage) SetUserinfoWithUserID(ctx context.Context, applicationID strin
 	setUserinfo(user, userinfo, attributes, customAttributes)
 
 	// trigger activity log for authentication for user
-	activity.Trigger(ctx, user.ResourceOwner, user.ID, activity.SAMLResponse)
+	activity.TriggerHTTP(ctx, user.ResourceOwner, user.ID, activity.SAMLResponse)
 	return nil
 }
 
@@ -163,7 +163,7 @@ func (p *Storage) SetUserinfoWithLoginName(ctx context.Context, userinfo models.
 	if err != nil {
 		return err
 	}
-	user, err := p.query.GetUser(ctx, true, false, loginNameSQ)
+	user, err := p.query.GetUser(ctx, true, loginNameSQ)
 	if err != nil {
 		return err
 	}
@@ -216,7 +216,7 @@ func setUserinfo(user *query.User, userinfo models.AttributeSetter, attributes [
 
 func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, userGrants *query.UserGrants) (map[string]*customAttribute, error) {
 	customAttributes := make(map[string]*customAttribute, 0)
-	queriedActions, err := p.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomizeSAMLResponse, domain.TriggerTypePreSAMLResponseCreation, user.ResourceOwner, false)
+	queriedActions, err := p.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomizeSAMLResponse, domain.TriggerTypePreSAMLResponseCreation, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -314,7 +314,7 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 }
 
 func (p *Storage) getGrants(ctx context.Context, userID, applicationID string) (*query.UserGrants, error) {
-	projectID, err := p.query.ProjectIDFromClientID(ctx, applicationID, false)
+	projectID, err := p.query.ProjectIDFromClientID(ctx, applicationID)
 	if err != nil {
 		return nil, err
 	}
