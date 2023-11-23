@@ -1018,7 +1018,7 @@
       "DESCRIPTION": "Diese Einstellungen erweitern bzw. überschreiben die Einstellungen Ihrer Instanz."
     },
     "LIST": {
-      "GENERAL": "Allgemein",
+      "LANGUAGES": "Sprachen",
       "LOGIN": "Loginverhalten und Sicherheit",
       "LOCKOUT": "Sperrmechanismen",
       "COMPLEXITY": "Passwordkomplexität",

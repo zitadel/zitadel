@@ -1019,7 +1019,7 @@
       "DESCRIPTION": "Estas configuraciones amplían y sobrescriben tus configuraciones de instancia."
     },
     "LIST": {
-      "GENERAL": "General",
+      "LANGUAGES": "Idiomas",
       "LOGIN": "Comportamiento del inicio de sesión y de la seguridad",
       "LOCKOUT": "Bloqueo",
       "COMPLEXITY": "Complejidad de contraseña",

@@ -1019,7 +1019,7 @@
       "DESCRIPTION": "Deze instellingen breiden uw instantie instellingen uit en overschrijven deze."
     },
     "LIST": {
-      "GENERAL": "Algemeen",
+      "LANGUAGES": "Talen",
       "LOGIN": "Login Gedrag en Beveiliging",
       "LOCKOUT": "Lockout",
       "COMPLEXITY": "Wachtwoord complexiteit",

@@ -1018,7 +1018,7 @@
       "DESCRIPTION": "Ces paramètres étendent et remplacent les paramètres de votre instance."
     },
     "LIST": {
-      "GENERAL": "Général",
+      "LANGUAGES": "Langues",
       "LOGIN": "Comportement de connexion et sécurité",
       "LOCKOUT": "Verrouillage",
       "COMPLEXITY": "Complexité du mot de passe",

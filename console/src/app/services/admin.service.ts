@@ -127,7 +127,7 @@ import {
   GetPrivacyPolicyRequest,
   GetPrivacyPolicyResponse,
   GetProviderByIDRequest,
-  GetProviderByIDResponse,
+  GetProviderByIDResponse, GetRestrictionsResponse,
   GetSecretGeneratorRequest,
   GetSecretGeneratorResponse,
   GetSecurityPolicyRequest,
@@ -217,7 +217,7 @@ import {
   SetDefaultVerifyPhoneMessageTextRequest,
   SetDefaultVerifyPhoneMessageTextResponse,
   SetDefaultVerifySMSOTPMessageTextRequest,
-  SetDefaultVerifySMSOTPMessageTextResponse,
+  SetDefaultVerifySMSOTPMessageTextResponse, SetRestrictionsRequest, SetRestrictionsResponse,
   SetSecurityPolicyRequest,
   SetSecurityPolicyResponse,
   SetUpOrgRequest,
@@ -829,6 +829,18 @@ export class AdminService {
 
     return this.grpcService.admin.setDefaultLanguage(req, null).then((resp) => resp.toObject());
   }
+
+  /* restrictions */
+
+  public getRestrictions(): Promise<GetRestrictionsResponse.AsObject> {
+    const req = new GetDefaultLanguageRequest();
+    return this.grpcService.admin.getRestrictions(req, null).then((resp) => resp.toObject());
+  }
+
+  public setRestrictions(req: SetRestrictionsRequest): Promise<SetRestrictionsResponse.AsObject> {
+    return this.grpcService.admin.setRestrictions(req, null).then((resp) => resp.toObject());
+  }
+
 
   /* notification policy */
 

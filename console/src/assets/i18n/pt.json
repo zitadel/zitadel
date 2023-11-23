@@ -1020,7 +1020,7 @@
       "DESCRIPTION": "Essas configurações estendem e sobrescrevem as configurações da sua instância."
     },
     "LIST": {
-      "GENERAL": "Geral",
+      "LANGUAGES": "Idiomas",
       "LOGIN": "Comportamento de Login e Segurança",
       "LOCKOUT": "Bloqueio",
       "COMPLEXITY": "Complexidade de Senha",

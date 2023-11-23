@@ -1,0 +1,50 @@
+<h2>{{ 'SETTING.LANGUAGES.TITLE' | translate }}</h2>
+
+<div class="spinner-wr">
+  <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
+</div>
+
+<div>
+    <form *ngIf="form" [formGroup]="form" class="form-content">
+        <cnsl-form-field class="default-language" label="Default Language" required="true">
+          <cnsl-label>{{ 'SETTING.LANGUAGES.DEFAULT' | translate }}</cnsl-label>
+          <mat-select
+              name="default"
+              [disabled]="(['iam.policy.write'] | hasRole | async) === false"
+          >
+            <mat-option *ngFor="let lang of defaultLanguageOptions" [value]="lang">
+              {{ lang }} - {{ 'SETTING.LANGUAGE.' + lang | translate }}
+            </mat-option>
+          </mat-select>
+        </cnsl-form-field>
+        <div class="languages-container" cdkDropList id="allowed" [cdkDropListConnectedTo]="['notallowed']" style="display: inline-block">
+          <cnsl-label>{{ 'SETTING.LANGUAGES.ALLOWED' | translate }}</cnsl-label>
+          <div class="languages-list">
+            <mat-action-list class="language-box" *ngFor="let lang of allowed$ | async" [attr.name]="lang" cdkDrag>
+              <button mat-list-item color="primary">{{ lang }} - {{ 'SETTING.LANGUAGE.' + lang | translate }}</button>
+            </mat-action-list>
+          </div>
+        </div>
+        <div class="languages-container" cdkDropList id="notallowed" [cdkDropListConnectedTo]="['allowed']" style="display: inline-block">
+          <cnsl-label>{{ 'SETTING.LANGUAGES.NOT_ALLOWED' | translate }}</cnsl-label>
+          <div class="languages-list">
+          <mat-action-list class="language-box" *ngFor="let lang of notAllowed$ | async" [attr.name]="lang" cdkDrag>
+            <button mat-list-item>{{ lang }} - {{ 'SETTING.LANGUAGE.' + lang | translate }}</button>
+          </mat-action-list>
+          </div>
+        </div>
+  </form>
+</div>
+
+<div class="general-btn-container">
+  <button
+    class="save-button"
+    (click)="savePolicy()"
+    color="primary"
+    type="submit"
+    mat-raised-button
+    [disabled]="(['iam.policy.write'] | hasRole | async) === false"
+  >
+    {{ 'ACTIONS.SAVE' | translate }}
+  </button>
+</div>

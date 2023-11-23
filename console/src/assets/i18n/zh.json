@@ -1018,7 +1018,7 @@
       "DESCRIPTION": "这些设置将扩展或覆盖您的实例设置。"
     },
     "LIST": {
-      "GENERAL": "通用",
+      "LANGUAGES": "语言",
       "LOGIN": "登录行为和安全",
       "LOCKOUT": "安全锁策略",
       "COMPLEXITY": "密码复杂性",

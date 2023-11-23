@@ -83,3 +83,10 @@ function i18nErr(err: ValidationErrors | null | undefined, i18nKey: string, para
     };
   }
 }
+
+
+export function i18nValidator(i18Key: string, validator: (c: AbstractControl) => ValidationErrors | null, params?: any): ValidatorFn {
+  return (c: AbstractControl): ValidationErrors | null => {
+    return i18nErr(validator(c), i18Key);
+  };
+}

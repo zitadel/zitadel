@@ -1018,7 +1018,7 @@
       "DESCRIPTION": "Te ustawienia rozszerzają i nadpisują ustawienia instancji."
     },
     "LIST": {
-      "GENERAL": "Ogólne",
+      "LANGUAGES": "Języki",
       "LOGIN": "Zachowanie logowania i bezpieczeństwo",
       "LOCKOUT": "Blokada",
       "COMPLEXITY": "Złożoność hasła",

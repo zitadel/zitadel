@@ -1,0 +1,46 @@
+.languages-container {
+  width: 400px;
+  max-width: 100%;
+  margin: 0 25px 25px 0;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.languages-list {
+  border: solid 1px #ccc;
+  min-height: 60px;
+  border-radius: 4px;
+  overflow: hidden;
+  display: block;
+}
+
+.language-box {
+  padding: 20px 10px;
+  border-bottom: solid 1px #ccc;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  cursor: move;
+  font-size: 14px;
+}
+
+.spinner-wr {
+  margin: 0.5rem 0;
+}
+
+.default-language {
+  max-width: 400px;
+  display: block;
+}
+
+.general-btn-container {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 1rem;
+
+  .save-button {
+    display: block;
+  }
+}

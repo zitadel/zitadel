@@ -1019,7 +1019,7 @@
       "DESCRIPTION": "Tato nastavení rozšiřují a přepisují nastavení vaší instance."
     },
     "LIST": {
-      "GENERAL": "Obecné",
+      "LANGUAGES": "Jazyky",
       "LOGIN": "Chování při přihlášení a bezpečnost",
       "LOCKOUT": "Blokování",
       "COMPLEXITY": "Složitost hesla",

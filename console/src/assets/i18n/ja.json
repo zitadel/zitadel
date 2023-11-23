@@ -1019,7 +1019,7 @@
       "DESCRIPTION": "これらの設定は、インスタンス設定を拡張・上書きします。"
     },
     "LIST": {
-      "GENERAL": "全般",
+      "LANGUAGES": "一般設定",
       "LOGIN": "ログイン動作とセキュリティ",
       "LOCKOUT": "ロックアウト",
       "COMPLEXITY": "パスワードの複雑さ",

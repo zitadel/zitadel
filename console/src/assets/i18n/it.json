@@ -1018,7 +1018,7 @@
       "DESCRIPTION": "Queste impostazioni si applicheranno alla organizzazione corrente."
     },
     "LIST": {
-      "GENERAL": "Generale",
+      "LANGUAGES": "Lingue",
       "LOGIN": "Comportamento login e sicurezza",
       "LOCKOUT": "Meccanismi di bloccaggio",
       "COMPLEXITY": "Complessità della password",
