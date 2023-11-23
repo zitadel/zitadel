@@ -155,7 +155,7 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 			return err
 		}
 
-		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
+		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
 		if err != nil {
 			return err
 		}
@@ -212,7 +212,7 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 			return err
 		}
 
-		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
+		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
 		if err != nil {
 			return err
 		}
@@ -268,7 +268,7 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 			return err
 		}
 
-		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
+		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
 		if err != nil {
 			return err
 		}
@@ -361,7 +361,7 @@ func (u *userNotifier) reduceOTPSMS(
 		return nil, err
 	}
 
-	notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, userID, false)
+	notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -479,7 +479,7 @@ func (u *userNotifier) reduceOTPEmail(
 		return nil, err
 	}
 
-	notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, userID, false)
+	notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -532,7 +532,7 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 			return err
 		}
 
-		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
+		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
 		if err != nil {
 			return err
 		}
@@ -586,7 +586,7 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 			return err
 		}
 
-		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
+		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
 		if err != nil {
 			return err
 		}
@@ -646,7 +646,7 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 			return err
 		}
 
-		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
+		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
 		if err != nil {
 			return err
 		}
@@ -696,7 +696,7 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 			return err
 		}
 
-		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID, false)
+		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
 		if err != nil {
 			return err
 		}

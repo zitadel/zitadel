@@ -1054,7 +1054,8 @@
       "bg": "Български",
       "pt": "Portuguese",
       "mk": "Македонски",
-      "ru": "Русский"
+      "ru": "Русский",
+      "nl": "Nederlands"
     },
     "SMTP": {
       "TITLE": "Настройки SMTP",
@@ -1260,7 +1261,8 @@
         "bg": "Български",
         "pt": "Portuguese",
         "mk": "Македонски",
-        "ru": "Русский"
+        "ru": "Русский",
+        "nl": "Nederlands"
       },
       "KEYS": {
         "emailVerificationDoneText": "Проверка электронной почты завершена",
@@ -2084,7 +2086,12 @@
       "OR": "или",
       "XML": "Загрузить XML-метаданные",
       "METADATA": "Метаданные",
-      "METADATAFROMFILE": "Метаданные из файла"
+      "METADATAFROMFILE": "Метаданные из файла",
+      "CERTIFICATE": "SAML-сертификат",
+      "DOWNLOADCERT": "Скачать сертификат SAML",
+      "CREATEMETADATA": "Создать метаданные",
+      "ENTITYID": "Идентификатор объекта",
+      "ACSURL": "URL-адрес конечной точки ACS"
     },
     "AUTHMETHODS": {
       "CODE": {
@@ -2150,7 +2157,8 @@
     "bg": "Български",
     "pt": "Portuguese",
     "mk": "Македонски",
-    "ru": "Русский"
+    "ru": "Русский",
+    "nl": "Nederlands"
   },
   "MEMBER": {
     "ADD": "Добавить менеджера",

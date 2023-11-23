@@ -1,6 +1,7 @@
 package login
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -38,6 +39,11 @@ type registerOrgData struct {
 }
 
 func (l *Login) handleRegisterOrg(w http.ResponseWriter, r *http.Request) {
+	disallowed, err := l.publicOrgRegistrationIsDisallowed(r.Context())
+	if disallowed || err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 	data := new(registerOrgFormData)
 	authRequest, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
@@ -48,6 +54,11 @@ func (l *Login) handleRegisterOrg(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
+	disallowed, err := l.publicOrgRegistrationIsDisallowed(r.Context())
+	if disallowed || err != nil {
+		w.WriteHeader(http.StatusConflict)
+		return
+	}
 	data := new(registerOrgFormData)
 	authRequest, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
@@ -117,6 +128,11 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 		l.customTexts(r.Context(), translator, "")
 	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegisterOrg], data, nil)
+}
+
+func (l *Login) publicOrgRegistrationIsDisallowed(ctx context.Context) (bool, error) {
+	restrictions, err := l.query.GetInstanceRestrictions(ctx)
+	return restrictions.DisallowPublicOrgRegistration, err
 }
 
 func (d registerOrgFormData) toUserDomain() *domain.Human {

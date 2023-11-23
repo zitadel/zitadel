@@ -1,33 +1,42 @@
 ---
-title: Service Level
+title: Service level description for ZITADEL Cloud
+sidebar_label: Service Level
 custom_edit_url: null
 --- 
 
-## Introduction
+Last updated on November 15, 2023
 
-This annex of the [Framework Agreement](terms-of-service) describes the service levels offered by us for our Services (ZITADEL Cloud).
-
-Last revised: June 14, 2022
+This annex of the [Framework Agreement](../terms-of-service) describes the service levels offered by us for our Services (ZITADEL Cloud).
 
 ## Definitions
 
-**Monthly Uptime Percentage** means total number of minutes in a month, minus the number of minutes of Downtime suffered from all Downtime Periods in a month, divided by the total number of minutes in a month.
+### Monthly Uptime Percentage
 
-**Downtime Period** means a period of one or more consecutive minutes of Downtime. Partial minutes or intermittent Downtime for a period of less than one minute will not count towards any Downtime Period.
+Monthly Uptime Percentage means total number of minutes in a month, minus the number of minutes of Downtime suffered from all Downtime Periods in a month, divided by the total number of minutes in a month.
 
-**Downtime** means any period of time in which Core Services are not Available within the Region of the customer’s organization. Downtime excludes any time in which ZITADEL Cloud is not Available because of
+### Downtime Period
+
+Downtime Period means a period of one or more consecutive minutes of Downtime. Partial minutes or intermittent Downtime for a period of less than one minute will not count towards any Downtime Period.
+
+### Downtime
+
+Downtime means any period of time in which Core Services are not Available within the Region of the customer’s organization. Downtime excludes any time in which ZITADEL Cloud is not Available because of
 
 - [Announced maintenance work](/docs/support/software-release-cycles-support#maintenance)
 - Emergency maintenance
 - Force majeure events.
 
-**Available** means that Core Services of ZITADEL Cloud respond to Customer Requests in such a way that results in a Successful Minute. The Availability of Core Services will be monitored from CAOS’ facilities from black-box monitoring jobs.
+### Available
 
-**Successful Minute** means a minute in which ZITADEL cloud is not repeatedly returning Failed Customer Requests and includes minutes in which no Customer Request were made.
+Available means that Core Services of ZITADEL Cloud respond to Customer Requests in such a way that results in a Successful Minute. The Availability of Core Services will be monitored from CAOS’ facilities from black-box monitoring jobs.
 
-**Customer Requests** means a HTTP request made by a Customer or a Customers’ users to Core Services within the Customer’s organization’s region.
+### Customer Requests
 
-**Successful Minute** means a minute in which ZITADEL Cloud is not repeatedly returning Failed Customer Requests and includes minutes in which no Customer Requests were made.
+Customer Requests means a HTTP request made by a Customer or a Customers’ users to Core Services within the Customer’s organization’s region.
+
+### Successful Minute
+
+Successful Minute means a minute in which ZITADEL Cloud is not repeatedly returning Failed Customer Requests and includes minutes in which no Customer Requests were made.
 
 Failed Customer Request means Customer Requests that
 
@@ -39,13 +48,17 @@ This excludes specifically:
 - Failed Customer Requests due to malformed requests, client-side application errors outside of ZITADEL Cloud’s control
 - Customer Requests that do not reach ZITADEL Cloud Core Services
 
-**Core Services** means the following ZITADEL Cloud Services and API’s:
+### Core Services
 
-- **Authentication API** Endpoints
+Core Services means the following ZITADEL Cloud Services and API’s:
+
+- **Authentication API** Endpoints including the session endpoints
 - **OpenID Connect 1.0 / OAuth 2.0 API** Endpoints
 - **SAML 2.0** Endpoints
 - **Login Service** means the graphical user interface of ZITADEL Cloud for users to Login, Self-Register, and conduct a Password Reset.
 - **Identity Brokering Service** means the component of ZITADEL Cloud that handles federated authentication of users with third-party identity provider, excluding any failure or misconfiguration by the third-party
+
+### Financial Credit
 
 **Financial Credit** means the percent of the monthly subscription fee applicable to the month in which the guaranteed service level was not met, according to the actual achieved monthly uptime percentage, as shown in the following table
 

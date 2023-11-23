@@ -4,6 +4,8 @@ sidebar_label: Account Lockout Policy
 custom_edit_url: null
 ---
 
+Last updated on May 31, 2023
+
 This policy is an annex to the [Terms of Service](../terms-of-service) that clarifies your obligations and our procedure handling requests where you can't get access to your ZITADEL Cloud services and data. This policy is applicable to situations where we, ZITADEL, need to restore your access for a otherwise available service and not in cases where the services are unavailable.
 
 ## Why to do we have this policy?
@@ -55,9 +57,3 @@ Please visit the [support page in the customer portal](https://zitadel.cloud/adm
 
 Please allow us time to validate your request.
 Our support will get back to you to request additional information for verification.
-
-## Entry into force
-
-This policy is valid from May 31, 2023.
-
-Last revised May 31, 2023

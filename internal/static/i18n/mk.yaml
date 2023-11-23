@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Лимитот не е пронајден
     NoneSpecified: Не се наведени лимити
+  Restrictions:
+    NoneSpecified: Не се наведени ограничувања
   Language:
     NotParsed: Јазикот не може да се парсира
   OIDCSettings:
@@ -429,6 +431,7 @@ Errors:
   UserSession:
     NotFound: Корисничката сесија не е пронајдена
   Key:
+    NotFound: Клучот не е пронајден
     ExpireBeforeNow: Датумот на истекување е во минатото
   Login:
     LoginPolicy:

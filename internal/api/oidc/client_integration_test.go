@@ -48,7 +48,7 @@ func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
 	assertUserinfo(t, userinfo)
 }
 
-func TestOPStorage_SetIntrospectionFromToken(t *testing.T) {
+func TestServer_Introspect(t *testing.T) {
 	project, err := Tester.CreateProject(CTX)
 	require.NoError(t, err)
 	app, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId())

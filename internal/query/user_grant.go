@@ -22,32 +22,32 @@ import (
 
 type UserGrant struct {
 	// ID represents the aggregate id (id of the user grant)
-	ID           string
-	CreationDate time.Time
-	ChangeDate   time.Time
-	Sequence     uint64
-	Roles        database.TextArray[string]
+	ID           string                     `json:"id,omitempty"`
+	CreationDate time.Time                  `json:"creation_date,omitempty"`
+	ChangeDate   time.Time                  `json:"change_date,omitempty"`
+	Sequence     uint64                     `json:"sequence,omitempty"`
+	Roles        database.TextArray[string] `json:"roles,omitempty"`
 	// GrantID represents the project grant id
-	GrantID string
-	State   domain.UserGrantState
+	GrantID string                `json:"grant_id,omitempty"`
+	State   domain.UserGrantState `json:"state,omitempty"`
 
-	UserID             string
-	Username           string
-	UserType           domain.UserType
-	UserResourceOwner  string
-	FirstName          string
-	LastName           string
-	Email              string
-	DisplayName        string
-	AvatarURL          string
-	PreferredLoginName string
+	UserID             string          `json:"user_id,omitempty"`
+	Username           string          `json:"username,omitempty"`
+	UserType           domain.UserType `json:"user_type,omitempty"`
+	UserResourceOwner  string          `json:"user_resource_owner,omitempty"`
+	FirstName          string          `json:"first_name,omitempty"`
+	LastName           string          `json:"last_name,omitempty"`
+	Email              string          `json:"email,omitempty"`
+	DisplayName        string          `json:"display_name,omitempty"`
+	AvatarURL          string          `json:"avatar_url,omitempty"`
+	PreferredLoginName string          `json:"preferred_login_name,omitempty"`
 
-	ResourceOwner    string
-	OrgName          string
-	OrgPrimaryDomain string
+	ResourceOwner    string `json:"resource_owner,omitempty"`
+	OrgName          string `json:"org_name,omitempty"`
+	OrgPrimaryDomain string `json:"org_primary_domain,omitempty"`
 
-	ProjectID   string
-	ProjectName string
+	ProjectID   string `json:"project_id,omitempty"`
+	ProjectName string `json:"project_name,omitempty"`
 }
 
 type UserGrants struct {
@@ -232,7 +232,6 @@ func addUserGrantWithoutOwnerRemoved(eq map[string]interface{}) {
 	eq[UserGrantUserOwnerRemoved.identifier()] = false
 	eq[UserGrantProjectOwnerRemoved.identifier()] = false
 	eq[UserGrantGrantGrantedOrgRemoved.identifier()] = false
-	addLoginNameWithoutOwnerRemoved(eq)
 }
 
 func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwnerRemoved bool, queries ...SearchQuery) (grant *UserGrant, err error) {

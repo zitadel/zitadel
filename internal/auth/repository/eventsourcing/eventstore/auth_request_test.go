@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	cache "github.com/zitadel/zitadel/internal/auth_request/repository"
@@ -238,7 +238,7 @@ type mockUserGrants struct {
 	userGrants int
 }
 
-func (m *mockUserGrants) ProjectByClientID(ctx context.Context, s string, _ bool) (*query.Project, error) {
+func (m *mockUserGrants) ProjectByClientID(ctx context.Context, s string) (*query.Project, error) {
 	return &query.Project{ProjectRoleCheck: m.roleCheck}, nil
 }
 
@@ -256,11 +256,11 @@ type mockProject struct {
 	resourceOwner string
 }
 
-func (m *mockProject) ProjectByClientID(ctx context.Context, s string, _ bool) (*query.Project, error) {
+func (m *mockProject) ProjectByClientID(ctx context.Context, s string) (*query.Project, error) {
 	return &query.Project{ResourceOwner: m.resourceOwner, HasProjectCheck: m.projectCheck}, nil
 }
 
-func (m *mockProject) SearchProjectGrants(ctx context.Context, queries *query.ProjectGrantSearchQueries, _ bool) (*query.ProjectGrants, error) {
+func (m *mockProject) SearchProjectGrants(ctx context.Context, queries *query.ProjectGrantSearchQueries) (*query.ProjectGrants, error) {
 	if m.hasProject {
 		mockProjectGrant := new(query.ProjectGrant)
 		return &query.ProjectGrants{ProjectGrants: []*query.ProjectGrant{mockProjectGrant}}, nil
@@ -272,7 +272,7 @@ type mockApp struct {
 	app *query.App
 }
 
-func (m *mockApp) AppByOIDCClientID(ctx context.Context, id string, _ bool) (*query.App, error) {
+func (m *mockApp) AppByOIDCClientID(ctx context.Context, id string) (*query.App, error) {
 	if m.app != nil {
 		return m.app, nil
 	}

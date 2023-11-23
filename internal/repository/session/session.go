@@ -75,8 +75,9 @@ func AddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 type UserCheckedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID    string    `json:"userID"`
-	CheckedAt time.Time `json:"checkedAt"`
+	UserID            string    `json:"userID"`
+	UserResourceOwner string    `json:"userResourceOwner"`
+	CheckedAt         time.Time `json:"checkedAt"`
 }
 
 func (e *UserCheckedEvent) Payload() interface{} {
@@ -90,7 +91,8 @@ func (e *UserCheckedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 func NewUserCheckedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	userID string,
+	userID,
+	userResourceOwner string,
 	checkedAt time.Time,
 ) *UserCheckedEvent {
 	return &UserCheckedEvent{
@@ -99,8 +101,9 @@ func NewUserCheckedEvent(
 			aggregate,
 			UserCheckedType,
 		),
-		UserID:    userID,
-		CheckedAt: checkedAt,
+		UserID:            userID,
+		UserResourceOwner: userResourceOwner,
+		CheckedAt:         checkedAt,
 	}
 }
 
