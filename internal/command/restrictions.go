@@ -15,12 +15,12 @@ import (
 )
 
 type SetRestrictions struct {
-	PublicOrgRegistrationIsNotAllowed *bool
-	AllowedLanguages                  []language.Tag
+	DisallowPublicOrgRegistration *bool
+	AllowedLanguages              []language.Tag
 }
 
 func (s *SetRestrictions) Validate(defaultLanguage language.Tag) error {
-	if s == nil || (s.PublicOrgRegistrationIsNotAllowed == nil && s.AllowedLanguages == nil) {
+	if s == nil || (s.DisallowPublicOrgRegistration == nil && s.AllowedLanguages == nil) {
 		return zitadel_errors.ThrowInvalidArgument(nil, "COMMAND-oASwj", "Errors.Restrictions.NoneSpecified")
 	}
 	if s.AllowedLanguages != nil {

@@ -21,8 +21,8 @@ const (
 	RestrictionsColumnInstanceID    = "instance_id"
 	RestrictionsColumnSequence      = "sequence"
 
-	RestrictionsColumnPublicOrgRegistrationIsNotAllowed = "public_org_registration_is_not_allowed"
-	RestrictionsColumnAllowedLanguages                  = "allowed_languages"
+	RestrictionsColumnDisallowPublicOrgRegistration = "disallow_public_org_registration"
+	RestrictionsColumnAllowedLanguages              = "allowed_languages"
 )
 
 type restrictionsProjection struct{}
@@ -44,7 +44,7 @@ func (*restrictionsProjection) Init() *old_handler.Check {
 			handler.NewColumn(RestrictionsColumnResourceOwner, handler.ColumnTypeText),
 			handler.NewColumn(RestrictionsColumnInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(RestrictionsColumnSequence, handler.ColumnTypeInt64),
-			handler.NewColumn(RestrictionsColumnPublicOrgRegistrationIsNotAllowed, handler.ColumnTypeBool, handler.Nullable()),
+			handler.NewColumn(RestrictionsColumnDisallowPublicOrgRegistration, handler.ColumnTypeBool, handler.Nullable()),
 			handler.NewColumn(RestrictionsColumnAllowedLanguages, handler.ColumnTypeTextArray, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(RestrictionsColumnInstanceID, RestrictionsColumnResourceOwner),
@@ -93,7 +93,7 @@ func (p *restrictionsProjection) reduceRestrictionsSet(event eventstore.Event) (
 		handler.NewCol(RestrictionsColumnAggregateID, e.Aggregate().ID),
 	}
 	if e.PublicOrgRegistrationIsNotAllowed != nil {
-		updateCols = append(updateCols, handler.NewCol(RestrictionsColumnPublicOrgRegistrationIsNotAllowed, *e.PublicOrgRegistrationIsNotAllowed))
+		updateCols = append(updateCols, handler.NewCol(RestrictionsColumnDisallowPublicOrgRegistration, *e.PublicOrgRegistrationIsNotAllowed))
 	}
 	if e.AllowedLanguages != nil {
 		updateCols = append(updateCols, handler.NewCol(RestrictionsColumnAllowedLanguages, domain.LanguagesToStrings(*e.AllowedLanguages)))

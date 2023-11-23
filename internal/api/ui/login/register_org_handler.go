@@ -43,7 +43,7 @@ func (l *Login) handleRegisterOrg(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, nil, err)
 		return
 	}
-	if restrictions.PublicOrgRegistrationIsNotAllowed {
+	if restrictions.DisallowPublicOrgRegistration {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -62,7 +62,7 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, nil, err)
 		return
 	}
-	if restrictions.PublicOrgRegistrationIsNotAllowed {
+	if restrictions.DisallowPublicOrgRegistration {
 		w.WriteHeader(http.StatusConflict)
 		return
 	}

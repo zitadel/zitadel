@@ -7989,7 +7989,7 @@ message ListMilestonesResponse {
 }
 
 message SetRestrictionsRequest {
-    optional bool public_org_registration_is_not_allowed = 1 [
+    optional bool disallow_public_org_registration = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if ZITADEL should expose the endpoint /ui/login/register/org. If it is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
         }
@@ -8018,7 +8018,7 @@ message GetRestrictionsRequest {}
 
 message GetRestrictionsResponse {
     zitadel.v1.ObjectDetails details = 1;
-    bool public_org_registration_is_not_allowed = 2 [
+    bool disallow_public_org_registration = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if ZITADEL should expose the endpoint /ui/login/register/org. If it is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
         }

@@ -59,8 +59,8 @@ func (wm *restrictionsWriteModel) NewChanges(setRestrictions *SetRestrictions) (
 		return nil, false
 	}
 	changes = make([]restrictions.RestrictionsChange, 0, 1)
-	if setRestrictions.PublicOrgRegistrationIsNotAllowed != nil && (wm.publicOrgRegistrationIsNotAllowed != *setRestrictions.PublicOrgRegistrationIsNotAllowed) {
-		changes = append(changes, restrictions.ChangePublicOrgRegistrations(*setRestrictions.PublicOrgRegistrationIsNotAllowed))
+	if setRestrictions.DisallowPublicOrgRegistration != nil && (wm.publicOrgRegistrationIsNotAllowed != *setRestrictions.DisallowPublicOrgRegistration) {
+		changes = append(changes, restrictions.ChangePublicOrgRegistrations(*setRestrictions.DisallowPublicOrgRegistration))
 	}
 	if setRestrictions.AllowedLanguages != nil && domain.LanguagesDiffer(wm.allowedLanguages, setRestrictions.AllowedLanguages) {
 		changes = append(changes, restrictions.ChangeAllowedLanguages(setRestrictions.AllowedLanguages))
