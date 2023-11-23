@@ -257,7 +257,7 @@ func (h *Handler) Trigger(ctx context.Context, opts ...triggerOpt) (_ context.Co
 // lockInstances tries to lock the instance.
 // If the instance is already locked from another process no cancel function is returned
 // the instance can be skipped then
-// If the instance is locked, an unlock deferable function is returned
+// If the instance is locked, an unlock deferrable function is returned
 func (h *Handler) lockInstance(ctx context.Context, config *triggerConfig) func() {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 
@@ -353,10 +353,27 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return nil, false, err
 	}
 	eventAmount := len(events)
+
+	if len(events) == 0 {
+		err = h.setState(tx, currentState)
+		h.log().OnError(err).Debug("unable to update last updated")
+		return nil, false, nil
+	}
+
+	for _, event := range events {
+		if event.Position() == currentState.position {
+			currentState.offset++
+			continue
+		}
+		currentState.offset = 0
+		currentState.position = event.Position()
+	}
+
 	events = skipPreviouslyReduced(events, currentState)
 
 	if len(events) == 0 {
-		h.updateLastUpdated(ctx, tx, currentState)
+		err = h.setState(tx, currentState)
+		h.log().OnError(err).Debug("unable to update last updated")
 		return nil, false, nil
 	}
 
@@ -367,7 +384,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 
 	additionalIteration = eventAmount == int(h.bulkLimit)
 	if len(statements) < len(events) {
-		// retry imediatly if statements failed
+		// retry immediately if statements failed
 		additionalIteration = true
 	}
 
@@ -442,7 +459,11 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		InstanceID(currentState.instanceID)
 
 	if currentState.position > 0 {
+		// decrease position by 10 because builder.PositionAfter filters for position > and we need position >=
 		builder = builder.PositionAfter(math.Float64frombits(math.Float64bits(currentState.position) - 10))
+		if currentState.offset > 0 {
+			builder = builder.Offset(currentState.offset)
+		}
 	}
 
 	for aggregateType, eventTypes := range h.eventTypes {
@@ -457,7 +478,7 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 	return builder
 }
 
-// ProjectionName returns the name of the unlying projection.
+// ProjectionName returns the name of the underlying projection.
 func (h *Handler) ProjectionName() string {
 	return h.projection.Name()
 }
