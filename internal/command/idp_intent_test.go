@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"github.com/crewjam/saml"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"go.uber.org/mock/gomock"
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 

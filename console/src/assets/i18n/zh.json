@@ -1030,7 +1030,7 @@
       "NOTIFICATIONS_DESC": "SMTP 和 SMS 设置",
       "MESSAGETEXTS": "消息文本",
       "IDP": "身份提供者",
-      "VERIFIED_DAMAINS": "已验证的域名",
+      "VERIFIED_DOMAINS": "已验证的域名",
       "DOMAIN": "域名设置",
       "LOGINTEXTS": "登录界面文本",
       "BRANDING": "品牌标识",
@@ -1063,7 +1063,8 @@
       "pt": "Portuguese",
       "mk": "Македонски",
       "cs": "Čeština",
-      "ru": "Русский"
+      "ru": "Русский",
+      "nl": "Nederlands"
     },
     "SMTP": {
       "TITLE": "SMTP 设置",
@@ -1275,7 +1276,8 @@
         "pt": "Portuguese",
         "mk": "Македонски",
         "cs": "Čeština",
-        "ru": "Русский"
+        "ru": "Русский",
+        "nl": "Nederlands"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -2168,7 +2170,8 @@
     "pt": "Portuguese",
     "mk": "Македонски",
     "cs": "Čeština",
-    "ru": "Русский"
+    "ru": "Русский",
+    "nl": "Nederlands"
   },
   "MEMBER": {
     "ADD": "添加管理者",
