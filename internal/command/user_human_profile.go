@@ -13,7 +13,6 @@ func (c *Commands) ChangeHumanProfile(ctx context.Context, profile *domain.Profi
 	if profile.AggregateID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-AwbEB", "Errors.User.Profile.IDMissing")
 	}
-	// True?
 	if err := profile.Validate(allowedLanguages); err != nil {
 		return nil, err
 	}
