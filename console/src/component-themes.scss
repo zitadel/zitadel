@@ -65,6 +65,7 @@
 @import 'src/app/modules/policies/login-policy/factor-table/factor-table.component.scss';
 @import 'src/app/modules/info-overlay/info-overlay.component.scss';
 @import 'src/app/modules/create-layout/create-layout.component.scss';
+@import 'src/app/modules/domains/domain-verification/domain-verification.component.scss';
 @import './styles/codemirror.scss';
 
 @mixin component-themes($theme) {
@@ -136,4 +137,5 @@
   @include codemirror-theme($theme);
   @include contact-theme($theme);
   @include app-create-theme($theme);
+  @include domain-verification-theme($theme);
 }

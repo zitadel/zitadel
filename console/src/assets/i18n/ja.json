@@ -929,20 +929,22 @@
         "BTN": "名前の変更"
       },
       "ORGDOMAIN": {
-        "TITLE": "組織ドメインの所有権の認証",
-        "VERIFICATION": "ドメインの所有権を確認するには、検証ファイルをダウンロードし、下記の提供されたURLにアップロードするか、提供されたURLのTXTレコードのDNSエントリーを配置する必要があります。完了するには、検証するボタンをクリックしてください。",
-        "VERIFICATION_SKIP": "認証をスキップしたまま組織を作成することはできますが、組織を使用するにはこのステップを完了する必要があります。",
-        "VERIFICATION_VALIDATION_DESC": "ユーザーがドメインの所有者であることを確認するために、トークンは定期的にチェックされます。",
+        "TITLE": "{{value}} の所有権を確認します",
+        "VERIFICATION": "ドメインを手動で検証する 2 つの方法が提供されています。",
+        "VERIFICATION_HTML": "- HTTP。 Web サイト上で一時検証ファイルをホストする",
+        "VERIFICATION_DNS": "-DNS。 TXT レコードの DNS エントリを作成する",
+        "VERIFICATION_DNS_DESC": "{{ value }} を管理しており、DNS レコードにアクセスできる場合は、次の値を使用して新しい TXT レコードを作成できます。",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "TXT レコードの値には次のコードを使用します。",
+        "VERIFICATION_HTTP_DESC": "Web サイトのホスティングにアクセスできる場合は、検証ファイルをダウンロードし、指定された URL にアップロードするだけです。",
+        "VERIFICATION_HTTP_URL_LABEL": "予想される URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "検証ファイル:",
+        "VERIFICATION_SKIP": "現時点では検証をスキップして組織の作成を続行できますが、ドメインを使用するにはこの手順を完了する必要があります。",
+        "VERIFICATION_VALIDATION_DESC": "ZITADEL はドメインの所有権を随時再確認するため、確認コードは削除しないでください。",
         "VERIFICATION_NEWTOKEN_TITLE": "新しいトークンをリクエストする",
-        "VERIFICATION_NEWTOKEN_DESC": "新しいトークンをリクエストする場合は、方法を選択します。永続的なトークンを認証する場合は、上のボタンをクリックします。",
-        "VERIFICATION_VALIDATION_ONGOING": "認証トークンはすでにリクエストされています。ボタンをクリックして、認証チェックをトリガーする。",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "トークンのタイプ：",
-        "VERIFICATION_SUCCESSFUL": "ドメインは正常に認証されました！",
-        "REQUESTNEWTOKEN": "新しいトークンをリクエストする",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "VERIFICATION_VALIDATION_ONGOING": "ドメインを確認するために {{ value }} 方法が選択されました。ボタンをクリックして検証チェックをトリガーするか、検証プロセスをリセットします。",
+        "VERIFICATION_SUCCESSFUL": "ドメインが正常に認証されました。",
+        "RESETMETHOD": "リセット確認方法"
       },
       "DOWNLOAD_FILE": "ファイルをダウンロード",
       "SELECTORGTOOLTIP": "この組織を選択",

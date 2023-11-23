@@ -929,20 +929,22 @@
         "BTN": "Renomear"
       },
       "ORGDOMAIN": {
-        "TITLE": "Verificação de Propriedade do Domínio da Organização",
-        "VERIFICATION": "Para verificar a propriedade do seu domínio, você precisa baixar um arquivo de verificação e enviá-lo para a URL fornecida abaixo, ou criar um registro DNS TXT para a URL fornecida. Para concluir, clique no botão para verificar.",
-        "VERIFICATION_SKIP": "Você pode pular a verificação por enquanto e continuar a criar sua organização, mas para usar sua organização, esta etapa deve ser concluída!",
-        "VERIFICATION_VALIDATION_DESC": "Os tokens são verificados regularmente para garantir que você ainda seja o proprietário do domínio.",
-        "VERIFICATION_NEWTOKEN_TITLE": "Solicitar Novo Token",
-        "VERIFICATION_NEWTOKEN_DESC": "Se você deseja solicitar um novo token, selecione seu método preferido. Se você deseja validar um token persistente, clique no botão acima.",
-        "VERIFICATION_VALIDATION_ONGOING": "Um token de verificação já foi solicitado. Clique no botão para iniciar uma verificação.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Tipo do token:",
+        "TITLE": "Verifique a propriedade de {{value}}",
+        "VERIFICATION": "Oferecemos dois métodos para validar manualmente o seu domínio:",
+        "VERIFICATION_HTML": "-HTTP. Hospede um arquivo de verificação temporário em seu site",
+        "VERIFICATION_DNS": "-DNS. Crie uma entrada DNS de registro TXT",
+        "VERIFICATION_DNS_DESC": "Se você gerencia {{ value }} e tem acesso aos seus registros DNS, poderá criar um novo registro TXT com os seguintes valores:",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Use este código para o valor do registro TXT:",
+        "VERIFICATION_HTTP_DESC": "Se você tiver acesso à hospedagem do seu site, basta baixar o arquivo de verificação e carregá-lo no URL fornecido",
+        "VERIFICATION_HTTP_URL_LABEL": "URL esperado:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Arquivo de verificação:",
+        "VERIFICATION_SKIP": "Você pode pular a verificação por enquanto e continuar a criar sua organização, mas para usar seu domínio esta etapa precisa ser concluída!",
+        "VERIFICATION_VALIDATION_DESC": "Não exclua o código de verificação, pois a ZITADEL verificará novamente a propriedade do seu domínio de tempos em tempos.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Solicitar novo token",
+        "VERIFICATION_VALIDATION_ONGOING": "O método {{ value }} foi selecionado para verificar seu domínio. Clique no botão para acionar uma verificação ou redefinir o processo de verificação.",
         "VERIFICATION_SUCCESSFUL": "Domínio verificado com sucesso!",
-        "REQUESTNEWTOKEN": "Solicitar novo token",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "RESETMETHOD": "Redefinir método de verificação"
       },
       "DOWNLOAD_FILE": "Baixar Arquivo",
       "SELECTORGTOOLTIP": "Selecionar esta organização.",
