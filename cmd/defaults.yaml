@@ -824,9 +824,9 @@ DefaultInstance:
     # If this value is set, it overwrites the system default unless it is not reset via the admin API.
     AuditLogRetention: # ZITADEL_DEFAULTINSTANCE_LIMITS_AUDITLOGRETENTION
   Restrictions:
-    # PublicOrgRegistrationIsNotAllowed defines if ZITADEL should expose the endpoint /ui/login/register/org
+    # DisallowPublicOrgRegistration defines if ZITADEL should expose the endpoint /ui/login/register/org
     # If it is true, the endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.
-    PublicOrgRegistrationIsNotAllowed: # ZITADEL_DEFAULTINSTANCE_RESTRICTIONS_PUBLICORGREGISTRATIONISNOTALLOWED
+    DisallowPublicOrgRegistration: # ZITADEL_DEFAULTINSTANCE_RESTRICTIONS_DISALLOWPUBLICORGREGISTRATION
     # AllowedLanguages restricts the languages that can be used.
     # If the list is empty, all supported languages are allowed.
     AllowedLanguages: # ZITADEL_DEFAULTINSTANCE_RESTRICTIONS_ALLOWEDLANGUAGES

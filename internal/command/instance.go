@@ -181,7 +181,7 @@ func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
 	return err
 }
 
-func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, allowedLanguages []language.Tag) (string, string, *MachineKey, *domain.ObjectDetails, error) {
+func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, string, *MachineKey, *domain.ObjectDetails, error) {
 	instanceID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", "", nil, nil, err
@@ -301,6 +301,10 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, allo
 		AddOrgCommand(ctx, orgAgg, setup.Org.Name),
 		c.prepareSetDefaultOrg(instanceAgg, orgAgg.ID),
 	)
+	var allowedLanguages []language.Tag
+	if setup.Restrictions != nil {
+		allowedLanguages = setup.Restrictions.AllowedLanguages
+	}
 	pat, machineKey, err := setupAdmin(c, &validations, setup.Org.Machine, setup.Org.Human, orgID, userID, userAgg, allowedLanguages)
 	if err != nil {
 		return "", "", nil, nil, err

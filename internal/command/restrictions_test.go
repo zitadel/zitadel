@@ -59,7 +59,7 @@ func TestSetRestrictions(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setRestrictions: &SetRestrictions{
-					PublicOrgRegistrationIsNotAllowed: gu.Ptr(true),
+					DisallowPublicOrgRegistration: gu.Ptr(true),
 				},
 			},
 			res: res{
@@ -104,7 +104,7 @@ func TestSetRestrictions(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setRestrictions: &SetRestrictions{
-					PublicOrgRegistrationIsNotAllowed: gu.Ptr(false),
+					DisallowPublicOrgRegistration: gu.Ptr(false),
 				},
 			},
 			res: res{
@@ -136,7 +136,7 @@ func TestSetRestrictions(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setRestrictions: &SetRestrictions{
-					PublicOrgRegistrationIsNotAllowed: gu.Ptr(true),
+					DisallowPublicOrgRegistration: gu.Ptr(true),
 				},
 			},
 			res: res{

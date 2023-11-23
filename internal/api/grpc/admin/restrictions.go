@@ -15,8 +15,8 @@ func (s *Server) SetRestrictions(ctx context.Context, req *admin.SetRestrictions
 		return nil, err
 	}
 	details, err := s.command.SetInstanceRestrictions(ctx, &command.SetRestrictions{
-		PublicOrgRegistrationIsNotAllowed: req.PublicOrgRegistrationIsNotAllowed,
-		AllowedLanguages:                  lang,
+		DisallowPublicOrgRegistration: req.DisallowPublicOrgRegistration,
+		AllowedLanguages:              lang,
 	}, s.query.GetDefaultLanguage(ctx))
 	if err != nil {
 		return nil, err
@@ -32,8 +32,8 @@ func (s *Server) GetRestrictions(ctx context.Context, _ *admin.GetRestrictionsRe
 		return nil, err
 	}
 	return &admin.GetRestrictionsResponse{
-		Details:                           object.ToViewDetailsPb(restrictions.Sequence, restrictions.CreationDate, restrictions.ChangeDate, restrictions.ResourceOwner),
-		PublicOrgRegistrationIsNotAllowed: restrictions.PublicOrgRegistrationIsNotAllowed,
-		AllowedLanguages:                  domain.LanguagesToStrings(restrictions.AllowedLanguages),
+		Details:                       object.ToViewDetailsPb(restrictions.Sequence, restrictions.CreationDate, restrictions.ChangeDate, restrictions.ResourceOwner),
+		DisallowPublicOrgRegistration: restrictions.DisallowPublicOrgRegistration,
+		AllowedLanguages:              domain.LanguagesToStrings(restrictions.AllowedLanguages),
 	}, nil
 }

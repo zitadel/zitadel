@@ -47,8 +47,8 @@ var (
 		name:  projection.RestrictionsColumnSequence,
 		table: restrictionsTable,
 	}
-	RestrictionsColumnPublicOrgRegistrationIsNotAlloweds = Column{
-		name:  projection.RestrictionsColumnPublicOrgRegistrationIsNotAllowed,
+	RestrictionsColumnDisallowPublicOrgRegistration = Column{
+		name:  projection.RestrictionsColumnDisallowPublicOrgRegistration,
 		table: restrictionsTable,
 	}
 	RestrictionsColumnAllowedLanguages = Column{
@@ -64,8 +64,8 @@ type Restrictions struct {
 	ResourceOwner string
 	Sequence      uint64
 
-	PublicOrgRegistrationIsNotAllowed bool
-	AllowedLanguages                  []language.Tag
+	DisallowPublicOrgRegistration bool
+	AllowedLanguages              []language.Tag
 }
 
 func (q *Queries) GetInstanceRestrictions(ctx context.Context) (restrictions Restrictions, err error) {
@@ -99,24 +99,24 @@ func prepareRestrictionsQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			RestrictionsColumnChangeDate.identifier(),
 			RestrictionsColumnResourceOwner.identifier(),
 			RestrictionsColumnSequence.identifier(),
-			RestrictionsColumnPublicOrgRegistrationIsNotAlloweds.identifier(),
+			RestrictionsColumnDisallowPublicOrgRegistration.identifier(),
 			RestrictionsColumnAllowedLanguages.identifier(),
 		).
 			From(restrictionsTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (restrictions Restrictions, err error) {
 			allowedLanguages := database.TextArray[string](make([]string, 0))
-			publicOrgRegistrationIsAllowed := sql.NullBool{}
+			disallowPublicOrgRegistration := sql.NullBool{}
 			err = row.Scan(
 				&restrictions.AggregateID,
 				&restrictions.CreationDate,
 				&restrictions.ChangeDate,
 				&restrictions.ResourceOwner,
 				&restrictions.Sequence,
-				&publicOrgRegistrationIsAllowed,
+				&disallowPublicOrgRegistration,
 				&allowedLanguages,
 			)
-			restrictions.PublicOrgRegistrationIsNotAllowed = publicOrgRegistrationIsAllowed.Bool
+			restrictions.DisallowPublicOrgRegistration = disallowPublicOrgRegistration.Bool
 			restrictions.AllowedLanguages = domain.StringsToLanguages(allowedLanguages)
 			return restrictions, err
 		}

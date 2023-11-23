@@ -39,6 +39,7 @@ Errors:
     NotSupported: Jazyk není podporován
     NotAllowed: Jazyk není povolen
     Undefined: Jazyk není definován
+    Duplicate: Jazyky mají duplikáty
   OIDCSettings:
     NotFound: Konfigurace OIDC nebyla nalezena
     AlreadyExists: Konfigurace OIDC již existuje

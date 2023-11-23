@@ -33,14 +33,16 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventst
 
 	for _, command := range commands {
 		for _, constraint := range command.UniqueConstraints() {
-			constraint.UniqueField = strings.ToLower(constraint.UniqueField)
 			switch constraint.Action {
 			case eventstore.UniqueConstraintAdd:
+				constraint.UniqueField = strings.ToLower(constraint.UniqueField)
 				addPlaceholders = append(addPlaceholders, fmt.Sprintf("($%d, $%d, $%d)", len(addArgs)+1, len(addArgs)+2, len(addArgs)+3))
 				addArgs = append(addArgs, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)
 				addConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintRemove:
-				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d AND unique_type = $%d AND unique_field = $%d)", len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
+				// the query is so complex because we accidentally stored unique constraint case sensitive
+				// the query checks first if there is a case sensitive match and afterwards if there is a case insensitive match
+				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%[1]d AND unique_type = $%[2]d AND unique_field = (SELECT unique_field from (SELECT instance_id, unique_type, unique_field FROM eventstore.unique_constraints WHERE instance_id = $%[1]d AND unique_type = $%[2]d AND unique_field = $%[3]d UNION ALL SELECT instance_id, unique_type, unique_field FROM eventstore.unique_constraints WHERE instance_id = $%[1]d AND unique_type = $%[2]d AND unique_field = LOWER($%[3]d)) LIMIT 1))", len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
 				deleteArgs = append(deleteArgs, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)
 				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintInstanceRemove:

@@ -123,11 +123,7 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 		}
 	}
 
-	var allowedLanguages []language.Tag
-	if mig.instanceSetup.Restrictions != nil {
-		allowedLanguages = mig.instanceSetup.Restrictions.AllowedLanguages
-	}
-	_, token, key, _, err := cmd.SetUpInstance(ctx, &mig.instanceSetup, allowedLanguages)
+	_, token, key, _, err := cmd.SetUpInstance(ctx, &mig.instanceSetup)
 	if err != nil {
 		return err
 	}
