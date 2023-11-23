@@ -14,6 +14,8 @@
       "nick_name": "muhlemmer",
       "display_name": "Tim Mohlmann",
       "avatar_key": null,
+      "preferred_language": "en",
+      "gender": 2,
       "email": "tim+tesmail@zitadel.com",
       "is_email_verified": true,
       "phone": "+40123456789",
@@ -22,6 +24,7 @@
     "machine": null
   },
   "org": {
+    "id": "231848297847848962",
     "name": "demo",
     "primary_domain": "demo.localhost"
   },
