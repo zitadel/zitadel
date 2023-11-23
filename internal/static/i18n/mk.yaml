@@ -39,6 +39,7 @@ Errors:
     NotSupported: Јазикот не е поддржан
     NotAllowed: Јазикот не е дозволен
     Undefined: Јазикот е недефиниран
+    Duplicate: Јазиците имаат дупликати
   OIDCSettings:
     NotFound: OIDC конфигурацијата не е пронајдена
     AlreadyExists: OIDC конфигурацијата веќе постои

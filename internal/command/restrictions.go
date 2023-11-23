@@ -26,6 +26,9 @@ func (s *SetRestrictions) Validate(defaultLanguage language.Tag) error {
 		return zitadel_errors.ThrowInvalidArgument(nil, "COMMAND-oASwj", "Errors.Restrictions.NoneSpecified")
 	}
 	if s.AllowedLanguages != nil {
+		if err := domain.LanguagesHaveDuplicates(s.AllowedLanguages); err != nil {
+			return err
+		}
 		if err := domain.LanguagesAreSupported(s.AllowedLanguages...); err != nil {
 			return err
 		}

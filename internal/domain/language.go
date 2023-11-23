@@ -77,6 +77,26 @@ func LanguageIsDefined(lang language.Tag) error {
 	return nil
 }
 
+// LanguagesHaveDuplicates returns an error if the passed slices contains duplicates.
+// The error lists the duplicates.
+func LanguagesHaveDuplicates(langs []language.Tag) error {
+	unique := make(map[language.Tag]struct{})
+	duplicates := make([]language.Tag, 0)
+	for _, lang := range langs {
+		if _, ok := unique[lang]; ok {
+			duplicates = append(duplicates, lang)
+		}
+		unique[lang] = struct{}{}
+	}
+	if len(duplicates) == 0 {
+		return nil
+	}
+	if len(duplicates) > 1 {
+		return errors.ThrowInvalidArgument(nil, "LANG-3M9f2", "Errors.Language.Duplicate")
+	}
+	return errors.ThrowInvalidArgumentf(nil, "LANG-XHiK5", "Errors.Languages.Duplicate: %s", LanguagesToStrings(duplicates))
+}
+
 func languagesAreContained(languages, search []language.Tag) bool {
 	for _, s := range search {
 		if !languageIsContained(languages, s) {
