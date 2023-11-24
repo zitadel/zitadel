@@ -85,8 +85,8 @@ function i18nErr(err: ValidationErrors | null | undefined, i18nKey: string, para
 }
 
 
-export function i18nValidator(i18Key: string, validator: (c: AbstractControl) => ValidationErrors | null, params?: any): ValidatorFn {
+export function i18nValidator(i18Key: string, validator: (c: AbstractControl) => boolean, params?: any): ValidatorFn {
   return (c: AbstractControl): ValidationErrors | null => {
-    return i18nErr(validator(c), i18Key);
+    return validator(c) ? null : i18nErr({ invalid: true }, i18Key, params);
   };
 }

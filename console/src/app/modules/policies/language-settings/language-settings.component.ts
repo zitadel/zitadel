@@ -1,28 +1,36 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import { SetDefaultLanguageResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
-import {AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
+import {AbstractControl, FormControl, UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
 import {LanguagesService} from "../../../services/languages.service";
-import {forkJoin, from, Observable} from "rxjs";
+import {AsyncSubject, forkJoin, from, Observable, Subject} from "rxjs";
 import {GrpcAuthService} from "../../../services/grpc-auth.service";
 import {i18nValidator} from "../../form-field/validators/validators";
+
+interface RemoteState {
+  defaultLang: string,
+  allowed: string[]
+}
+
+interface LocalState extends RemoteState {
+  notAllowed: string[]
+}
 
 @Component({
   selector: 'cnsl-language-settings',
   templateUrl: './language-settings.component.html',
   styleUrls: ['./language-settings.component.scss'],
 })
-export class LanguageSettingsComponent implements OnInit {
+export class LanguageSettingsComponent {
 
   public form!: UntypedFormGroup;
+  public formLoaded$ = new AsyncSubject<boolean>();
 
   public canWriteRestrictions$: Observable<boolean> = this.authService.isAllowed(["iam.restrictions.write"]);
   public canWriteDefaultLanguage$: Observable<boolean> = this.authService.isAllowed(["iam.write"]);
 
-  public allowed$: Observable<string[]>;
-  public notAllowed$: Observable<string[]>;
-  private remoteState: { defaultLang: string, allowed: string[] } | null = null;
+  private remoteState: RemoteState | null = null;
 
   public loading: boolean = false;
   constructor(
@@ -31,53 +39,65 @@ export class LanguageSettingsComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private languagesSvc: LanguagesService,
     private authService: GrpcAuthService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.form = this.fb.group({
       defaultLang: ['', [i18nValidator(
         "SETTING.LANGUAGES.DEFAULT_MUST_BE_ALLOWED",
-        (control: AbstractControl) => control.parent?.get('allowed')?.value.contains(control.value))
-      ]],
+        (control: AbstractControl) => {
+          const alloweds = (this.form?.getRawValue() as LocalState)?.allowed
+          return alloweds && alloweds.find(allowed => allowed == control.value) !== undefined
+        }
+      )]],
       allowed: [[''], []],
+      notAllowed: [[''], []],
     });
-    const allowed$ = this.languagesSvc.allowedLanguages(this.service);
+    const allowed$ = this.languagesSvc.allowedLanguages(this.service)
     const notAllowed$: Observable<string[]> = this.languagesSvc.notAllowedLanguages(this.service, allowed$);
     const defaultLang$ = from(this.service.getDefaultLanguage());
-    forkJoin([allowed$, notAllowed$, defaultLang$]).subscribe(([allowed, notAllowed, { language: defaultLang }]) => {
-      this.remoteState = { defaultLang, allowed, };
-      this.form.setValue(this.remoteState);
-    }).unsubscribe();
+    const sub = forkJoin([allowed$, notAllowed$, defaultLang$]).subscribe({
+      next: ([allowed, notAllowed, {language: defaultLang}]) => {
+        this.remoteState = {defaultLang, allowed,};
+        this.form.setValue(<LocalState>{notAllowed, ...this.remoteState});
+        this.formLoaded$.next(true);
+        this.formLoaded$.complete();
+        console.log("da")
+        this.formLoaded$.asObservable().subscribe((x) => {console.log("hier", x)})
+        this.formLoaded$.subscribe((x) => {console.log("hier", x)})
+        this.formLoaded$.subscribe((x) => {console.log("hier", x)})
+        this.formLoaded$.subscribe((x) => {console.log("hier", x)})
+        this.formLoaded$.subscribe((x) => {console.log("hier", x)})
+        this.cdr.detectChanges()
+      },
+      error: this.toast.showError,
+      complete: () => {
+        sub.unsubscribe()
+      },
+    })
   }
 
   private discardChanges(): void {
     this.form.reset()
   }
 
+  get selectedAllowedLanguages() { return this.form.get('allowed')?.value as string[] }
+
   public save(): void {
-    const newValue = this.form.getRawValue();
-    if (newValue.defaultLang !== this.remoteState?.defaultLang) {
-      this.service.setDefaultLanguage(newValue.defaultLang).then(() => {
-        this.toast.showInfo("POLICY.LANGUAGE.SAVED", true);
-        this.fetchData();
+    const newState: RemoteState = this.form.getRawValue();
+    if (newState.defaultLang !== this.remoteState?.defaultLang) {
+      this.service.setDefaultLanguage(newState.defaultLang).then(() => {
+        this.toast.showInfo("SETTING.LANGUAGE.SAVED", true);
       }).catch(error => {
         this.toast.showError(error);
       });
     }
-
-    const prom = this.updateData();
-    this.loading = true;
-    if (prom) {
-      prom
-        .then(() => {
-          this.toast.showInfo('POLICY.LOGIN_POLICY.SAVED', true);
-          this.loading = false;
-          setTimeout(() => {
-            this.fetchData();
-          }, 2000);
-        })
-        .catch((error) => {
-          this.loading = false;
-          this.toast.showError(error);
-        });
+    if (newState.allowed.length != this.remoteState?.allowed.length ||
+      newState.allowed.every((item, i) => this.remoteState?.allowed[i] === item)) {
+      this.service.setDefaultLanguage(newState.defaultLang).then(() => {
+        this.toast.showInfo("SETTING.LANGUAGES.SAVED", true);
+      }).catch(error => {
+        this.toast.showError(error);
+      });
     }
   }
 }
