@@ -45,6 +45,7 @@ type Config struct {
 	DeviceAuth                        *DeviceAuthorizationConfig
 	DefaultLoginURLV2                 string
 	DefaultLogoutURLV2                string
+	Features                          Features
 }
 
 type EndpointConfig struct {
@@ -61,6 +62,11 @@ type EndpointConfig struct {
 type Endpoint struct {
 	Path string
 	URL  string
+}
+
+type Features struct {
+	TriggerIntrospectionProjections bool
+	LegacyIntrospection             bool
 }
 
 type OPStorage struct {
@@ -120,7 +126,15 @@ func NewServer(
 
 	server := &Server{
 		LegacyServer:        op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
+		features:            config.Features,
+		repo:                repo,
+		query:               query,
+		command:             command,
+		keySet:              newKeySet(context.TODO(), time.Hour, query.GetActivePublicKeyByID),
+		fallbackLogger:      fallbackLogger,
+		hashAlg:             crypto.NewBCrypt(10), // as we are only verifying in oidc, the cost is already part of the hash string and the config here is irrelevant.
 		signingKeyAlgorithm: config.SigningKeyAlgorithm,
+		assetAPIPrefix:      assets.AssetAPI(externalSecure),
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	server.Handler = op.RegisterLegacyServer(server, op.WithHTTPMiddleware(

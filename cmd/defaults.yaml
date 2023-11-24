@@ -325,6 +325,11 @@ OIDC:
       Path: /oauth/v2/device_authorization # ZITADEL_OIDC_CUSTOMENDPOINTS_DEVICEAUTH_PATH
   DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
   DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
+  Features:
+    # Wheter projection triggers are used in the new Introspection implementation.
+    TriggerIntrospectionProjections: false
+    # Allows fallback to the Legacy Introspection implementation
+    LegacyIntrospection: false
 
 SAML:
   ProviderConfig:
@@ -829,6 +834,10 @@ DefaultInstance:
     # A value of "0s" means that all events are available.
     # If this value is set, it overwrites the system default unless it is not reset via the admin API.
     AuditLogRetention: # ZITADEL_DEFAULTINSTANCE_LIMITS_AUDITLOGRETENTION
+  Restrictions:
+    # DisallowPublicOrgRegistration defines if ZITADEL should expose the endpoint /ui/login/register/org
+    # If it is true, the endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.
+    DisallowPublicOrgRegistration: # ZITADEL_DEFAULTINSTANCE_RESTRICTIONS_DISALLOWPUBLICORGREGISTRATION
   Quotas:
     # Items take a slice of quota configurations, whereas, for each unit type and instance, one or zero quotas may exist.
     # The following unit types are supported
@@ -913,6 +922,8 @@ InternalAuthZ:
         - "iam.flow.write"
         - "iam.flow.delete"
         - "iam.feature.write"
+        - "iam.restrictions.read"
+        - "iam.restrictions.write"
         - "org.read"
         - "org.global.read"
         - "org.create"
@@ -973,6 +984,7 @@ InternalAuthZ:
         - "iam.idp.read"
         - "iam.action.read"
         - "iam.flow.read"
+        - "iam.restrictions.read"
         - "org.read"
         - "org.member.read"
         - "org.idp.read"

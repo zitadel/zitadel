@@ -7,6 +7,7 @@ import (
 	"time"
 
 	crewjam_saml "github.com/crewjam/saml"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -59,7 +60,7 @@ func newClient(cc *grpc.ClientConn) Client {
 }
 
 func (t *Tester) UseIsolatedInstance(iamOwnerCtx, systemCtx context.Context) (primaryDomain, instanceId string, authenticatedIamOwnerCtx context.Context) {
-	primaryDomain = randString(5) + ".integration"
+	primaryDomain = randString(5) + ".integration.localhost"
 	instance, err := t.Client.System.CreateInstance(systemCtx, &system.CreateInstanceRequest{
 		InstanceName: "testinstance",
 		CustomDomain: primaryDomain,
@@ -74,7 +75,7 @@ func (t *Tester) UseIsolatedInstance(iamOwnerCtx, systemCtx context.Context) (pr
 	if err != nil {
 		panic(err)
 	}
-	t.createClientConn(iamOwnerCtx, grpc.WithAuthority(primaryDomain))
+	t.createClientConn(iamOwnerCtx, fmt.Sprintf("%s:%d", primaryDomain, t.Config.Port))
 	instanceId = instance.GetInstanceId()
 	t.Users.Set(instanceId, IAMOwner, &User{
 		Token: instance.GetPat(),
@@ -90,8 +91,10 @@ func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse
 			},
 		},
 		Profile: &user.SetHumanProfile{
-			GivenName:  "Mickey",
-			FamilyName: "Mouse",
+			GivenName:         "Mickey",
+			FamilyName:        "Mouse",
+			PreferredLanguage: gu.Ptr("nl"),
+			Gender:            gu.Ptr(user.Gender_GENDER_MALE),
 		},
 		Email: &user.SetHumanEmail{
 			Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
