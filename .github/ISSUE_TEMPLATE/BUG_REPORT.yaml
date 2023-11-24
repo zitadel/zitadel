@@ -43,7 +43,7 @@ body:
     - PostgreSQL
     - Other (describe below!)
 - type: input
-  id: Database version
+  id: database-version
   attributes:
     label: Database Version
     description: Which version of the selected database are you using? (self-hosters only)
