@@ -7,6 +7,9 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/sirupsen/logrus"
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
@@ -107,6 +110,7 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 		return CtxData{}, err
 	}
 	if err != nil {
+		logging.WithError(err).WithFields(logrus.Fields{"org_id": orgID, "org_domain": orgDomain}).Warn("authz: verify access token")
 		var sysTokenErr error
 		sysMemberships, userID, sysTokenErr = t.VerifySystemToken(ctx, tokenWOBearer, orgID)
 		if sysTokenErr != nil || sysMemberships == nil {
