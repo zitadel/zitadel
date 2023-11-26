@@ -319,7 +319,11 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 
 	var statements []*Statement
 	statements, additionalIteration, err = h.generateStatements(ctx, tx, currentState)
-	if err != nil || len(statements) == 0 {
+	if err != nil {
+		return additionalIteration, err
+	}
+	if len(statements) == 0 {
+		err = h.setState(tx, currentState)
 		return additionalIteration, err
 	}
 
@@ -329,6 +333,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	}
 
 	currentState.position = statements[lastProcessedIndex].Position
+	currentState.offset = statements[lastProcessedIndex].offset
 	currentState.aggregateID = statements[lastProcessedIndex].AggregateID
 	currentState.aggregateType = statements[lastProcessedIndex].AggregateType
 	currentState.sequence = statements[lastProcessedIndex].Sequence
@@ -354,33 +359,22 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	}
 	eventAmount := len(events)
 
-	if len(events) == 0 {
-		err = h.setState(tx, currentState)
-		h.log().OnError(err).Debug("unable to update last updated")
-		return nil, false, nil
-	}
-
-	for _, event := range events {
-		if event.Position() == currentState.position {
-			currentState.offset++
-			continue
-		}
-		currentState.offset = 0
-		currentState.position = event.Position()
-	}
-
-	events = skipPreviouslyReduced(events, currentState)
-
-	if len(events) == 0 {
-		err = h.setState(tx, currentState)
-		h.log().OnError(err).Debug("unable to update last updated")
-		return nil, false, nil
+	if h.projection.Name() == "projections.login_names3" {
+		h.log()
 	}
 
 	statements, err := h.eventsToStatements(tx, events, currentState)
-	if len(statements) == 0 {
+	if err != nil || len(statements) == 0 {
 		return nil, false, err
 	}
+
+	idx := skipPreviouslyReduced(statements, currentState)
+	if idx+1 == len(statements) {
+		currentState.position = statements[len(statements)-1].Position
+		currentState.offset = statements[len(statements)-1].offset
+		return nil, false, err
+	}
+	statements = statements[idx+1:]
 
 	additionalIteration = eventAmount == int(h.bulkLimit)
 	if len(statements) < len(events) {
@@ -391,16 +385,16 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	return statements, additionalIteration, nil
 }
 
-func skipPreviouslyReduced(events []eventstore.Event, currentState *state) []eventstore.Event {
-	for i, event := range events {
-		if event.Position() == currentState.position &&
-			event.Aggregate().ID == currentState.aggregateID &&
-			event.Aggregate().Type == currentState.aggregateType &&
-			event.Sequence() == currentState.sequence {
-			return events[i+1:]
+func skipPreviouslyReduced(statements []*Statement, currentState *state) int {
+	for i, statement := range statements {
+		if statement.Position == currentState.position &&
+			statement.AggregateID == currentState.aggregateID &&
+			statement.AggregateType == currentState.aggregateType &&
+			statement.Sequence == currentState.sequence {
+			return i
 		}
 	}
-	return events
+	return -1
 }
 
 func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, currentState *state, statements []*Statement) (lastProcessedIndex int, err error) {
@@ -439,7 +433,7 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, currentState
 	if err = statement.Execute(tx, h.projection.Name()); err != nil {
 		h.log().WithError(err).Error("statement execution failed")
 
-		shouldContinue = h.handleFailedStmt(tx, currentState, failureFromStatement(statement, err))
+		shouldContinue = h.handleFailedStmt(tx, failureFromStatement(statement, err))
 		if shouldContinue {
 			return nil
 		}

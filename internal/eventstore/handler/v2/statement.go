@@ -17,15 +17,26 @@ import (
 
 func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, currentState *state) (statements []*Statement, err error) {
 	statements = make([]*Statement, 0, len(events))
+
+	previousPosition := currentState.position
+	offset := currentState.offset
 	for _, event := range events {
 		statement, err := h.reduce(event)
 		if err != nil {
 			h.logEvent(event).WithError(err).Error("reduce failed")
-			if shouldContinue := h.handleFailedStmt(tx, currentState, failureFromEvent(event, err)); shouldContinue {
+			if shouldContinue := h.handleFailedStmt(tx, failureFromEvent(event, err)); shouldContinue {
 				continue
 			}
 			return statements, err
 		}
+		if previousPosition == event.Position() {
+			offset++
+		} else {
+			offset = 0
+		}
+		statement.offset = offset
+		statement.Position = event.Position()
+		previousPosition = event.Position()
 		statements = append(statements, statement)
 	}
 	return statements, nil
@@ -53,6 +64,8 @@ type Statement struct {
 	Position      float64
 	CreationDate  time.Time
 	InstanceID    string
+
+	offset uint16
 
 	Execute Exec
 }
