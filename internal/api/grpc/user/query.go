@@ -46,6 +46,8 @@ func UserQueryToQuery(query *user_pb.SearchQuery, level uint8) (query.SearchQuer
 		return ResourceOwnerQueryToQuery(q.ResourceOwner)
 	case *user_pb.SearchQuery_InUserIdsQuery:
 		return InUserIdsQueryToQuery(q.InUserIdsQuery)
+	case *user_pb.SearchQuery_InUserEmailsQuery:
+		return InUserEmailsQueryToQuery(q.InUserEmailsQuery)
 	case *user_pb.SearchQuery_OrQuery:
 		return OrQueryToQuery(q.OrQuery, level)
 	case *user_pb.SearchQuery_AndQuery:
@@ -100,6 +102,11 @@ func ResourceOwnerQueryToQuery(q *user_pb.ResourceOwnerQuery) (query.SearchQuery
 func InUserIdsQueryToQuery(q *user_pb.InUserIDQuery) (query.SearchQuery, error) {
 	return query.NewUserInUserIdsSearchQuery(q.UserIds)
 }
+
+func InUserEmailsQueryToQuery(q *user_pb.InUserEmailsQuery) (query.SearchQuery, error) {
+	return query.NewUserInUserEmailsSearchQuery(q.UserEmails)
+}
+
 func OrQueryToQuery(q *user_pb.OrQuery, level uint8) (query.SearchQuery, error) {
 	mappedQueries, err := UserQueriesToQuery(q.Queries, level+1)
 	if err != nil {
