@@ -46,7 +46,8 @@ func (t TriggerMethod) String() string {
 	}
 }
 
-func TriggerHTTP(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
+// Trigger is used to log a specific events for a user (e.g. session or oidc token creation)
+func Trigger(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
 	ai := info.ActivityInfoFromContext(ctx)
 	triggerLog(
 		authz.GetInstance(ctx).InstanceID(),
@@ -63,37 +64,16 @@ func TriggerHTTP(ctx context.Context, orgID, userID string, trigger TriggerMetho
 	)
 }
 
-func TriggerGRPC(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
-	ai := info.ActivityInfoFromContext(ctx)
-	// GRPC call the method is contained in the HTTP request path
-	method := ai.Path
-	triggerLog(
-		authz.GetInstance(ctx).InstanceID(),
-		orgID,
-		userID,
-		http_utils.ComposedOrigin(ctx),
-		trigger,
-		method,
-		"",
-		ai.RequestMethod,
-		strconv.Itoa(int(ai.GRPCStatus)),
-		strconv.Itoa(runtime.HTTPStatusFromCode(ai.GRPCStatus)),
-		authz.GetCtxData(ctx).SystemMemberships != nil,
-	)
-}
-
 func TriggerGRPCWithContext(ctx context.Context, trigger TriggerMethod) {
 	ai := info.ActivityInfoFromContext(ctx)
-	// GRPC call the method is contained in the HTTP request path
-	method := ai.Path
 	triggerLog(
 		authz.GetInstance(ctx).InstanceID(),
 		authz.GetCtxData(ctx).OrgID,
 		authz.GetCtxData(ctx).UserID,
 		http_utils.ComposedOrigin(ctx),
 		trigger,
-		method,
-		"",
+		ai.Method,
+		ai.Path,
 		ai.RequestMethod,
 		strconv.Itoa(int(ai.GRPCStatus)),
 		strconv.Itoa(runtime.HTTPStatusFromCode(ai.GRPCStatus)),

@@ -96,7 +96,10 @@ func CreateGatewayWithPrefix(
 	runtimeMux := runtime.NewServeMux(serveMuxOptions...)
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(grpcCredentials(tlsConfig)),
-		grpc.WithUnaryInterceptor(client_middleware.DefaultTracingClient()),
+		grpc.WithChainUnaryInterceptor(
+			client_middleware.DefaultTracingClient(),
+			client_middleware.UnaryActivityClientInterceptor(),
+		),
 	}
 	connection, err := dial(ctx, port, opts)
 	if err != nil {
@@ -120,7 +123,10 @@ func CreateGateway(
 		port,
 		[]grpc.DialOption{
 			grpc.WithTransportCredentials(grpcCredentials(tlsConfig)),
-			grpc.WithUnaryInterceptor(client_middleware.DefaultTracingClient()),
+			grpc.WithChainUnaryInterceptor(
+				client_middleware.DefaultTracingClient(),
+				client_middleware.UnaryActivityClientInterceptor(),
+			),
 		})
 	if err != nil {
 		return nil, err
@@ -176,6 +182,7 @@ func addInterceptors(
 	handler = http_mw.CORSInterceptor(handler)
 	handler = http_mw.RobotsTagHandler(handler)
 	handler = http_mw.DefaultTelemetryHandler(handler)
+	handler = http_mw.ActivityHandler(handler)
 	// For some non-obvious reason, the exhaustedCookieInterceptor sends the SetCookie header
 	// only if it follows the http_mw.DefaultTelemetryHandler
 	handler = exhaustedCookieInterceptor(handler, accessInterceptor, queries)
