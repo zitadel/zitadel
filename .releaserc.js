@@ -2,7 +2,7 @@ module.exports = {
   branches: [
     { name: "next" },
     { name: "next-rc", prerelease: "rc" },
-    { name: "activity-status", prerelease: "alpha" },
+    { name: "activity-status", prerelease: "beta" },
   ],
   plugins: [
     "@semantic-release/commit-analyzer",
