@@ -385,3 +385,27 @@ func (s *Tester) CreatePasswordSession(t *testing.T, ctx context.Context, userID
 	return createResp.GetSessionId(), createResp.GetSessionToken(),
 		createResp.GetDetails().GetChangeDate().AsTime(), createResp.GetDetails().GetChangeDate().AsTime()
 }
+
+func (s *Tester) CreateProjectUserGrant(t *testing.T, ctx context.Context, projectID, userID string) string {
+	resp, err := s.Client.Mgmt.AddUserGrant(ctx, &mgmt.AddUserGrantRequest{
+		UserId:    userID,
+		ProjectId: projectID,
+	})
+	require.NoError(t, err)
+	return resp.GetUserGrantId()
+}
+
+func (s *Tester) CreateOrgMembership(t *testing.T, ctx context.Context, userID string) {
+	_, err := s.Client.Mgmt.AddOrgMember(ctx, &mgmt.AddOrgMemberRequest{
+		UserId: userID,
+	})
+	require.NoError(t, err)
+}
+
+func (s *Tester) CreateProjectMembership(t *testing.T, ctx context.Context, projectID, userID string) {
+	_, err := s.Client.Mgmt.AddProjectMember(ctx, &mgmt.AddProjectMemberRequest{
+		ProjectId: projectID,
+		UserId:    userID,
+	})
+	require.NoError(t, err)
+}

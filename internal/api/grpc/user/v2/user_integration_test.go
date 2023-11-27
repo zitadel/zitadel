@@ -542,6 +542,152 @@ func TestServer_AddHumanUser(t *testing.T) {
 	}
 }
 
+func TestServer_RemoveUser(t *testing.T) {
+	projectResp, err := Tester.CreateProject(CTX)
+	require.NoError(t, err)
+	type args struct {
+		ctx          context.Context
+		req          *user.AddHumanUserRequest
+		dependencies []func(ctx context.Context, userID string)
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *user.RemoveUserResponse
+		wantErr bool
+	}{
+		{
+			name: "remove, not existing",
+			args: args{
+				CTX,
+				nil,
+				nil,
+			},
+			wantErr: true,
+		},
+		{
+			name: "remove, ok",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
+							OrgId: Tester.Organisation.ID,
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_HashedPassword{
+						HashedPassword: &user.HashedPassword{
+							Hash: "$2y$12$hXUrnqdq1RIIYZ2HPytIIe5lXdIvbhqrTvdPsSF7o.jFh817Z6lwm",
+						},
+					},
+				},
+				nil,
+			},
+			want: &user.RemoveUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+		{
+			name: "remove all dependencies, ok",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
+							OrgId: Tester.Organisation.ID,
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_HashedPassword{
+						HashedPassword: &user.HashedPassword{
+							Hash: "$2y$12$hXUrnqdq1RIIYZ2HPytIIe5lXdIvbhqrTvdPsSF7o.jFh817Z6lwm",
+						},
+					},
+				},
+				[]func(context.Context, string){
+					func(ctx context.Context, userID string) {
+						Tester.CreateProjectUserGrant(t, ctx, projectResp.GetId(), userID)
+					},
+					func(ctx context.Context, userID string) {
+						Tester.CreateProjectMembership(t, ctx, projectResp.GetId(), userID)
+					},
+					func(ctx context.Context, userID string) {
+						Tester.CreateOrgMembership(t, ctx, userID)
+					},
+				},
+			},
+			want: &user.RemoveUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+	}
+	for i, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			userAdd := &user.AddHumanUserResponse{
+				UserId: fmt.Sprint(time.Now().UnixNano() + int64(i)),
+			}
+			var err error
+			if tt.args.req != nil {
+				userID := userAdd.UserId
+				tt.args.req.UserId = &userID
+				if email := tt.args.req.GetEmail(); email != nil {
+					email.Email = fmt.Sprintf("%s@me.now", userID)
+				}
+
+				userAdd, err = Client.AddHumanUser(tt.args.ctx, tt.args.req)
+				require.NoError(t, err)
+
+				for _, f := range tt.args.dependencies {
+					f(tt.args.ctx, userAdd.GetUserId())
+				}
+			}
+
+			got, err := Client.RemoveUser(tt.args.ctx, &user.RemoveUserRequest{UserId: userAdd.UserId})
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			integration.AssertDetails(t, tt.want, got)
+		})
+	}
+}
+
 func TestServer_AddIDPLink(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t)
 	type args struct {

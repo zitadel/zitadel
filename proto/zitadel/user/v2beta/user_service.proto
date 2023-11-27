@@ -238,6 +238,36 @@ service UserService {
     };
   }
 
+  rpc RemoveUser(RemoveUserRequest) returns (RemoveUserResponse) {
+    option (google.api.http) = {
+      delete: "/v2beta/users/{user_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "user.delete"
+        org_field: "organization"
+      }
+      http_response: {
+        success_code: 201
+      }
+    };
+
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Delete user";
+      description: "The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found"
+      tags: "Users";
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+
   rpc RegisterPasskey (RegisterPasskeyRequest) returns (RegisterPasskeyResponse) {
     option (google.api.http) = {
       post: "/v2beta/users/{user_id}/passkeys"
@@ -802,6 +832,38 @@ message VerifyPhoneRequest{
 
 message VerifyPhoneResponse{
   zitadel.object.v2beta.Details details = 1;
+}
+
+message RemoveUserRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+    }];
+}
+
+message RemoveUserResponse {
+  zitadel.object.v2beta.Details details = 1;
+}
+
+message GetUserByIDRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+      description: "User ID of the user you like to get."
+    }
+  ];
+}
+
+message GetUserByIDResponse {
+  zitadel.user.v1.User user = 1;
 }
 
 message RegisterPasskeyRequest{

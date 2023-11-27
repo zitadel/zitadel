@@ -129,6 +129,92 @@ func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_
 	}, nil
 }
 
+func (s *Server) RemoveUser(ctx context.Context, req *user.RemoveUserRequest) (_ *user.RemoveUserResponse, err error) {
+	memberships, grants, err := s.removeUserDependencies(ctx, req.GetUserId())
+	if err != nil {
+		return nil, err
+	}
+	details, err := s.command.RemoveUser(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, memberships, grants...)
+	if err != nil {
+		return nil, err
+	}
+	return &user.RemoveUserResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, error) {
+	userGrantUserQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
+	if err != nil {
+		return nil, nil, err
+	}
+	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
+		Queries: []query.SearchQuery{userGrantUserQuery},
+	}, true, true)
+	if err != nil {
+		return nil, nil, err
+	}
+	membershipsUserQuery, err := query.NewMembershipUserIDQuery(userID)
+	if err != nil {
+		return nil, nil, err
+	}
+	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
+		Queries: []query.SearchQuery{membershipsUserQuery},
+	}, false)
+	if err != nil {
+		return nil, nil, err
+	}
+	return cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants), nil
+}
+
+func cascadingMemberships(memberships []*query.Membership) []*command.CascadingMembership {
+	cascades := make([]*command.CascadingMembership, len(memberships))
+	for i, membership := range memberships {
+		cascades[i] = &command.CascadingMembership{
+			UserID:        membership.UserID,
+			ResourceOwner: membership.ResourceOwner,
+			IAM:           cascadingIAMMembership(membership.IAM),
+			Org:           cascadingOrgMembership(membership.Org),
+			Project:       cascadingProjectMembership(membership.Project),
+			ProjectGrant:  cascadingProjectGrantMembership(membership.ProjectGrant),
+		}
+	}
+	return cascades
+}
+
+func cascadingIAMMembership(membership *query.IAMMembership) *command.CascadingIAMMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingIAMMembership{IAMID: membership.IAMID}
+}
+func cascadingOrgMembership(membership *query.OrgMembership) *command.CascadingOrgMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingOrgMembership{OrgID: membership.OrgID}
+}
+func cascadingProjectMembership(membership *query.ProjectMembership) *command.CascadingProjectMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingProjectMembership{ProjectID: membership.ProjectID}
+}
+func cascadingProjectGrantMembership(membership *query.ProjectGrantMembership) *command.CascadingProjectGrantMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingProjectGrantMembership{ProjectID: membership.ProjectID, GrantID: membership.GrantID}
+}
+
+func userGrantsToIDs(userGrants []*query.UserGrant) []string {
+	converted := make([]string, len(userGrants))
+	for i, grant := range userGrants {
+		converted[i] = grant.ID
+	}
+	return converted
+}
+
 func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *user.StartIdentityProviderIntentRequest) (_ *user.StartIdentityProviderIntentResponse, err error) {
 	switch t := req.GetContent().(type) {
 	case *user.StartIdentityProviderIntentRequest_Urls:
