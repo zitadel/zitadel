@@ -31,14 +31,14 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	clientChan := make(chan *instrospectionClientResult)
-	go s.instrospectionClientAuth(ctx, r.Data.ClientCredentials, clientChan)
+	clientChan := make(chan *introspectionClientResult)
+	go s.introspectionClientAuth(ctx, r.Data.ClientCredentials, clientChan)
 
 	tokenChan := make(chan *introspectionTokenResult)
 	go s.introspectionToken(ctx, r.Data.Token, tokenChan)
 
 	var (
-		client *instrospectionClientResult
+		client *introspectionClientResult
 		token  *introspectionTokenResult
 	)
 
@@ -116,13 +116,13 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 	return op.NewResponse(introspectionResp), nil
 }
 
-type instrospectionClientResult struct {
+type introspectionClientResult struct {
 	clientID  string
 	projectID string
 	err       error
 }
 
-func (s *Server) instrospectionClientAuth(ctx context.Context, cc *op.ClientCredentials, rc chan<- *instrospectionClientResult) {
+func (s *Server) introspectionClientAuth(ctx context.Context, cc *op.ClientCredentials, rc chan<- *introspectionClientResult) {
 	ctx, span := tracing.NewSpan(ctx)
 
 	clientID, projectID, err := func() (string, string, error) {
@@ -147,7 +147,7 @@ func (s *Server) instrospectionClientAuth(ctx context.Context, cc *op.ClientCred
 
 	span.EndWithError(err)
 
-	rc <- &instrospectionClientResult{
+	rc <- &introspectionClientResult{
 		clientID:  clientID,
 		projectID: projectID,
 		err:       err,
