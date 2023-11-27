@@ -46,19 +46,20 @@ func (t TriggerMethod) String() string {
 	}
 }
 
-func TriggerHTTP(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
+func TriggerHTTP(ctx context.Context, statusCode int) {
 	ai := info.ActivityInfoFromContext(ctx)
+	si := getStorageInfo(ctx)
 	triggerLog(
 		authz.GetInstance(ctx).InstanceID(),
-		orgID,
-		userID,
+		si.ResourceOwner,
+		si.UserID,
 		http_utils.ComposedOrigin(ctx),
-		trigger,
+		si.Trigger,
 		ai.Method,
 		ai.Path,
 		ai.RequestMethod,
 		"",
-		"",
+		statusCode,
 		authz.GetCtxData(ctx).SystemMemberships != nil,
 	)
 }
@@ -77,7 +78,7 @@ func TriggerGRPC(ctx context.Context, orgID, userID string, trigger TriggerMetho
 		"",
 		ai.RequestMethod,
 		strconv.Itoa(int(ai.GRPCStatus)),
-		strconv.Itoa(runtime.HTTPStatusFromCode(ai.GRPCStatus)),
+		runtime.HTTPStatusFromCode(ai.GRPCStatus),
 		authz.GetCtxData(ctx).SystemMemberships != nil,
 	)
 }
@@ -96,12 +97,12 @@ func TriggerGRPCWithContext(ctx context.Context, trigger TriggerMethod) {
 		"",
 		ai.RequestMethod,
 		strconv.Itoa(int(ai.GRPCStatus)),
-		strconv.Itoa(runtime.HTTPStatusFromCode(ai.GRPCStatus)),
+		runtime.HTTPStatusFromCode(ai.GRPCStatus),
 		authz.GetCtxData(ctx).SystemMemberships != nil,
 	)
 }
 
-func triggerLog(instanceID, orgID, userID, domain string, trigger TriggerMethod, method, path, requestMethod, grpcStatus, httpStatus string, isSystemUser bool) {
+func triggerLog(instanceID, orgID, userID, domain string, trigger TriggerMethod, method, path, requestMethod, grpcStatus string, httpStatus int, isSystemUser bool) {
 	logging.WithFields(
 		"instance", instanceID,
 		"org", orgID,
