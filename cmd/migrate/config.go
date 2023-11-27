@@ -15,7 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 )
 
-type Config struct {
+type EventsConfig struct {
 	Source      database.Config
 	Destination database.Config
 
@@ -29,7 +29,31 @@ var (
 	configPaths   []string
 )
 
-func MustNewConfig(v *viper.Viper) *Config {
+func mustNewEventsConfig(v *viper.Viper) *EventsConfig {
+	config := new(EventsConfig)
+	mustNewConfig(v, config)
+
+	err := config.Log.SetLogger()
+	logging.OnError(err).Fatal("unable to set logger")
+
+	id.Configure(config.Machine)
+
+	return config
+}
+
+func mustNewProjectionsConfig(v *viper.Viper) *ProjectionsConfig {
+	config := new(ProjectionsConfig)
+	mustNewConfig(v, config)
+
+	err := config.Log.SetLogger()
+	logging.OnError(err).Fatal("unable to set logger")
+
+	id.Configure(config.Machine)
+
+	return config
+}
+
+func mustNewConfig(v *viper.Viper, config any) {
 	v.AutomaticEnv()
 	v.SetEnvPrefix("ZITADEL")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
@@ -43,7 +67,6 @@ func MustNewConfig(v *viper.Viper) *Config {
 		logging.WithFields("file", file).OnError(err).Warn("unable to read config file")
 	}
 
-	config := new(Config)
 	err = v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 			hook.Base64ToBytesHookFunc(),
@@ -55,11 +78,4 @@ func MustNewConfig(v *viper.Viper) *Config {
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")
-
-	err = config.Log.SetLogger()
-	logging.OnError(err).Fatal("unable to set logger")
-
-	id.Configure(config.Machine)
-
-	return config
 }
