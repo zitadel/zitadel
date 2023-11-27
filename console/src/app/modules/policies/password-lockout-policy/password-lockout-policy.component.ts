@@ -91,15 +91,27 @@ export class PasswordLockoutPolicyComponent implements OnInit {
     }
   }
 
-  public incrementMaxAttempts(): void {
+  public incrementPasswordMaxAttempts(): void {
     if (this.lockoutData?.maxPasswordAttempts !== undefined) {
       this.lockoutData.maxPasswordAttempts++;
     }
   }
 
-  public decrementMaxAttempts(): void {
+  public decrementPasswordMaxAttempts(): void {
     if (this.lockoutData?.maxPasswordAttempts && this.lockoutData?.maxPasswordAttempts > 0) {
       this.lockoutData.maxPasswordAttempts--;
+    }
+  }
+
+  public incrementOTPMaxAttempts(): void {
+    if (this.lockoutData?.maxOtpAttempts !== undefined) {
+      this.lockoutData.maxOtpAttempts++;
+    }
+  }
+
+  public decrementOTPMaxAttempts(): void {
+    if (this.lockoutData?.maxOtpAttempts && this.lockoutData?.maxOtpAttempts > 0) {
+      this.lockoutData.maxOtpAttempts--;
     }
   }
 
@@ -108,7 +120,7 @@ export class PasswordLockoutPolicyComponent implements OnInit {
     if (this.lockoutData) {
       if (this.service instanceof AdminService) {
         promise = this.service
-          .updateLockoutPolicy(this.lockoutData.maxPasswordAttempts)
+          .updateLockoutPolicy(this.lockoutData.maxPasswordAttempts, this.lockoutData.maxOtpAttempts)
           .then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
             this.fetchData();

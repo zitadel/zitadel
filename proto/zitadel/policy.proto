@@ -337,6 +337,12 @@ message LockoutPolicy {
             example: "\"10\""
         }
     ];
+    uint64 max_otp_attempts = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Maximum attempts for a single OTP type (TOTP, SMS, Email) before the account gets locked. Attempts are reset as soon as the OTP is entered correctly. If set to 0 the account will never be locked."
+            example: "\"10\""
+        }
+    ];
     bool is_default = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if the organization's admin changed the policy"

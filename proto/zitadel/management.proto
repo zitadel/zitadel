@@ -10412,6 +10412,11 @@ message AddCustomLockoutPolicyRequest {
             description: "When the user has reached the maximum password attempts the account will be locked, If this is set to 0 the lockout will not trigger."
         }
     ];
+    uint32 max_otp_attempts = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "When the user has reached the maximum OTP attempts the account will be locked, If this is set to 0 the lockout will not trigger."
+        }
+    ];
 }
 
 message AddCustomLockoutPolicyResponse {
@@ -10422,6 +10427,11 @@ message UpdateCustomLockoutPolicyRequest {
     uint32 max_password_attempts = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "When the user has reached the maximum password attempts the account will be locked, If this is set to 0 the lockout will not trigger."
+        }
+    ];
+    uint32 max_otp_attempts = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "When the user has reached the maximum OTP attempts the account will be locked, If this is set to 0 the lockout will not trigger."
         }
     ];
 }
