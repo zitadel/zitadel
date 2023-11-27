@@ -11,9 +11,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 )
 
@@ -99,19 +101,22 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 					Username:           "tim+tesmail@zitadel.com",
 					PreferredLoginName: "tim+tesmail@zitadel.com@demo.localhost",
 					Human: &Human{
-						FirstName:       "Tim",
-						LastName:        "Mohlmann",
-						NickName:        "muhlemmer",
-						DisplayName:     "Tim Mohlmann",
-						AvatarKey:       "",
-						Email:           "tim+tesmail@zitadel.com",
-						IsEmailVerified: true,
-						Phone:           "+40123456789",
-						IsPhoneVerified: false,
+						FirstName:         "Tim",
+						LastName:          "Mohlmann",
+						NickName:          "muhlemmer",
+						DisplayName:       "Tim Mohlmann",
+						AvatarKey:         "",
+						PreferredLanguage: language.English,
+						Gender:            domain.GenderMale,
+						Email:             "tim+tesmail@zitadel.com",
+						IsEmailVerified:   true,
+						Phone:             "+40123456789",
+						IsPhoneVerified:   false,
 					},
 					Machine: nil,
 				},
 				Org: &UserInfoOrg{
+					ID:            "231848297847848962",
 					Name:          "demo",
 					PrimaryDomain: "demo.localhost",
 				},
@@ -135,19 +140,22 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 					Username:           "tim+tesmail@zitadel.com",
 					PreferredLoginName: "tim+tesmail@zitadel.com@demo.localhost",
 					Human: &Human{
-						FirstName:       "Tim",
-						LastName:        "Mohlmann",
-						NickName:        "muhlemmer",
-						DisplayName:     "Tim Mohlmann",
-						AvatarKey:       "",
-						Email:           "tim+tesmail@zitadel.com",
-						IsEmailVerified: true,
-						Phone:           "+40123456789",
-						IsPhoneVerified: false,
+						FirstName:         "Tim",
+						LastName:          "Mohlmann",
+						NickName:          "muhlemmer",
+						DisplayName:       "Tim Mohlmann",
+						AvatarKey:         "",
+						PreferredLanguage: language.English,
+						Gender:            domain.GenderMale,
+						Email:             "tim+tesmail@zitadel.com",
+						IsEmailVerified:   true,
+						Phone:             "+40123456789",
+						IsPhoneVerified:   false,
 					},
 					Machine: nil,
 				},
 				Org: &UserInfoOrg{
+					ID:            "231848297847848962",
 					Name:          "demo",
 					PrimaryDomain: "demo.localhost",
 				},
@@ -193,19 +201,22 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 					Username:           "tim+tesmail@zitadel.com",
 					PreferredLoginName: "tim+tesmail@zitadel.com@demo.localhost",
 					Human: &Human{
-						FirstName:       "Tim",
-						LastName:        "Mohlmann",
-						NickName:        "muhlemmer",
-						DisplayName:     "Tim Mohlmann",
-						AvatarKey:       "",
-						Email:           "tim+tesmail@zitadel.com",
-						IsEmailVerified: true,
-						Phone:           "+40123456789",
-						IsPhoneVerified: false,
+						FirstName:         "Tim",
+						LastName:          "Mohlmann",
+						NickName:          "muhlemmer",
+						DisplayName:       "Tim Mohlmann",
+						AvatarKey:         "",
+						PreferredLanguage: language.English,
+						Gender:            domain.GenderMale,
+						Email:             "tim+tesmail@zitadel.com",
+						IsEmailVerified:   true,
+						Phone:             "+40123456789",
+						IsPhoneVerified:   false,
 					},
 					Machine: nil,
 				},
 				Org: &UserInfoOrg{
+					ID:            "231848297847848962",
 					Name:          "demo",
 					PrimaryDomain: "demo.localhost",
 				},
@@ -292,6 +303,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 					},
 				},
 				Org: &UserInfoOrg{
+					ID:            "231848297847848962",
 					Name:          "demo",
 					PrimaryDomain: "demo.localhost",
 				},

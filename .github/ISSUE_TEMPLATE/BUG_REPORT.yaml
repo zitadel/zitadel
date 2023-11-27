@@ -1,12 +1,13 @@
 name: Bug Report
-description: "Create a bug report to help us improve ZITADEL. Click [here](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#product-management) to see how we process your issue."
+description: "Create a bug report to help us improve ZITADEL."
 title: "[Bug]: "
 labels: ["bug"]
 body:
 - type: markdown
   attributes:
     value: |
-      Thanks for taking the time to fill out this bug report!
+      Thanks for taking the time to fill out this bug report!  
+      Learn more in our [contribution guide](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#product-management) on how we will process your issue.
 - type: checkboxes
   id: preflight
   attributes:
@@ -32,6 +33,20 @@ body:
   attributes:
     label: Version
     description: Which version of ZITADEL are you using.
+- type: dropdown
+  id: database
+  attributes:
+    label: Database
+    description: What database are you using? (self-hosters only)
+    options:
+    - CockroachDB
+    - PostgreSQL
+    - Other (describe below!)
+- type: input
+  id: database-version
+  attributes:
+    label: Database Version
+    description: Which version of the selected database are you using? (self-hosters only)
 - type: textarea
   id: impact
   attributes:

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	crewjam_saml "github.com/crewjam/saml"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -90,8 +91,10 @@ func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse
 			},
 		},
 		Profile: &user.SetHumanProfile{
-			GivenName:  "Mickey",
-			FamilyName: "Mouse",
+			GivenName:         "Mickey",
+			FamilyName:        "Mouse",
+			PreferredLanguage: gu.Ptr("nl"),
+			Gender:            gu.Ptr(user.Gender_GENDER_MALE),
 		},
 		Email: &user.SetHumanEmail{
 			Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
