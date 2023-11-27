@@ -33,6 +33,20 @@ body:
   attributes:
     label: Version
     description: Which version of ZITADEL are you using.
+- type: dropdown
+  id: database
+  attributes:
+    label: Database
+    description: What database are you using? (self-hosters only)
+    options:
+    - CockroachDB
+    - PostgreSQL
+    - Other (describe below!)
+- type: input
+  id: database-version
+  attributes:
+    label: Database Version
+    description: Which version of the selected database are you using? (self-hosters only)
 - type: textarea
   id: impact
   attributes:
