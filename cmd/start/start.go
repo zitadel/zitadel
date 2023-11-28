@@ -215,6 +215,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
 	}
+	defer commands.Close(ctx) // wait for background jobs
 
 	clock := clockpkg.New()
 	actionsExecutionStdoutEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, &logstore.EmitterConfig{Enabled: config.LogStore.Execution.Stdout.Enabled}, stdout.NewStdoutEmitter[*record.ExecutionLog]())

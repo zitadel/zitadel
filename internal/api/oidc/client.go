@@ -235,22 +235,10 @@ func (o *OPStorage) ClientCredentialsTokenRequest(ctx context.Context, clientID 
 	}, nil
 }
 
-func (o *OPStorage) ClientCredentials(ctx context.Context, clientID, clientSecret string) (op.Client, error) {
-	loginname, err := query.NewUserLoginNamesSearchQuery(clientID)
-	if err != nil {
-		return nil, err
-	}
-	user, err := o.query.GetUser(ctx, false, loginname)
-	if err != nil {
-		return nil, err
-	}
-	if _, err := o.command.VerifyMachineSecret(ctx, user.ID, user.ResourceOwner, clientSecret); err != nil {
-		return nil, err
-	}
-	return &clientCredentialsClient{
-		id:        clientID,
-		tokenType: accessTokenTypeToOIDC(user.Machine.AccessTokenType),
-	}, nil
+// ClientCredentials method is kept to keep the storage interface implemented.
+// However, it should never be called as the VerifyClient method on the Server is overridden.
+func (o *OPStorage) ClientCredentials(context.Context, string, string) (op.Client, error) {
+	return nil, errors.ThrowInternal(nil, "OIDC-Su8So", "Errors.Internal")
 }
 
 // isOriginAllowed checks whether a call by the client to the endpoint is allowed from the provided origin
@@ -933,4 +921,19 @@ func userinfoClaims(userInfo *oidc.UserInfo) func(c *actions.FieldConfig) interf
 		}
 		return c.Runtime.ToValue(claims)
 	}
+}
+
+func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCredentials]) (_ op.Client, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if oidc.GrantType(r.Form.Get("grant_type")) == oidc.GrantTypeClientCredentials {
+		return s.clientCredentialsAuth(ctx, r.Data.ClientID, r.Data.ClientSecret)
+	}
+
+	/* step 2:
+	Single query for OIDC app, to retreive secrets and keys.
+	*/
+
+	return s.LegacyServer.VerifyClient(ctx, r)
 }

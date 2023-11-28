@@ -9,8 +9,10 @@ import (
 	"math/big"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
@@ -37,11 +39,14 @@ import (
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	usr_grant_repo "github.com/zitadel/zitadel/internal/repository/usergrant"
 	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	webauthn_helper "github.com/zitadel/zitadel/internal/webauthn"
 )
 
 type Commands struct {
 	httpClient *http.Client
+
+	jobs sync.WaitGroup
 
 	checkPermission    domain.PermissionCheck
 	newCode            cryptoCodeFunc
@@ -256,4 +261,61 @@ func samlCertificateAndKeyGenerator(keySize int) func(id string) ([]byte, []byte
 		certBlock := &pem.Block{Type: "CERTIFICATE", Bytes: derBytes}
 		return pem.EncodeToMemory(keyBlock), pem.EncodeToMemory(certBlock), nil
 	}
+}
+
+// Close blocks until all async jobs are finished,
+// the context expires or after eventstore.PushTimeout.
+func (c *Commands) Close(ctx context.Context) error {
+	if c.eventstore.PushTimeout != 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, c.eventstore.PushTimeout)
+		defer cancel()
+	}
+
+	done := make(chan struct{})
+	go func() {
+		c.jobs.Wait()
+		close(done)
+	}()
+	select {
+	case <-done:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
+
+// asyncPush attempts to push events to the eventstore in a separate Go routine.
+// This can be used to speed up request times when the outcome of the push is
+// not important for business logic but have a pure logging function.
+// For example this can be used for Secret Check Success and Failed events.
+// On push error, a log line describing the error will be emitted.
+func (c *Commands) asyncPush(ctx context.Context, cmds ...eventstore.Command) {
+	// Create a new context, as the request scoped context might get
+	// canceled before we where able to push.
+	// The eventstore has its own PushTimeout setting,
+	// so we don't need to have a context with timeout here.
+	localCtx, cancel := context.WithCancel(context.Background())
+	localCtx = authz.WithInstance(localCtx, authz.GetInstance(ctx))
+	localCtx = tracing.MigrateContexts(localCtx, ctx)
+
+	c.jobs.Add(1)
+	cancel = func() {
+		cancel()
+		c.jobs.Done()
+	}
+
+	go func() {
+		defer cancel()
+		localCtx, span := tracing.NewSpan(localCtx)
+
+		_, err := c.eventstore.Push(localCtx, cmds...)
+		if err != nil {
+			for _, cmd := range cmds {
+				logging.WithError(err).Errorf("could not push event %T", cmd)
+			}
+		}
+
+		span.EndWithError(err)
+	}()
 }

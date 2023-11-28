@@ -135,13 +135,6 @@ func (s *Server) DeviceAuthorization(ctx context.Context, r *op.ClientRequest[oi
 	return s.LegacyServer.DeviceAuthorization(ctx, r)
 }
 
-func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCredentials]) (_ op.Client, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.VerifyClient(ctx, r)
-}
-
 func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.AccessTokenRequest]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
