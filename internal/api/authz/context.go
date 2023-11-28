@@ -7,6 +7,8 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
@@ -107,6 +109,7 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 		return CtxData{}, err
 	}
 	if err != nil {
+		logging.WithFields("org_id", orgID, "org_domain", orgDomain).WithError(err).Warn("authz: verify access token")
 		var sysTokenErr error
 		sysMemberships, userID, sysTokenErr = t.VerifySystemToken(ctx, tokenWOBearer, orgID)
 		if sysTokenErr != nil || sysMemberships == nil {
@@ -130,7 +133,7 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 	if orgID == "" && orgDomain == "" {
 		orgID = resourceOwner
 	}
-	// System API calls dont't have a resource owner
+	// System API calls don't have a resource owner
 	if orgID != "" {
 		orgID, err = t.ExistsOrg(ctx, orgID, orgDomain)
 		if err != nil {
