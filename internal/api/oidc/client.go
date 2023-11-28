@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -22,7 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	errz "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -49,7 +48,7 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 		return nil, err
 	}
 	if client.State != domain.AppStateActive {
-		return nil, errz.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
+		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
 	}
 	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultLoginURLV2), nil
 }
@@ -118,7 +117,7 @@ func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo *oidc.Use
 
 	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
 	if err != nil {
-		return errz.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
+		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
 	if token.ApplicationID != "" {
 		if err = o.isOriginAllowed(ctx, token.ApplicationID, origin); err != nil {
@@ -139,7 +138,7 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo *oidc.Us
 		if app.OIDCConfig.AssertIDTokenRole {
 			scopes, err = o.assertProjectRoleScopes(ctx, applicationID, scopes)
 			if err != nil {
-				return errz.ThrowPreconditionFailed(err, "OIDC-Dfe2s", "Errors.Internal")
+				return errors.ThrowPreconditionFailed(err, "OIDC-Dfe2s", "Errors.Internal")
 			}
 		}
 	}
@@ -169,7 +168,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 		}
 		projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
 		if err != nil {
-			return errz.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
+			return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 		}
 		return o.introspect(ctx, introspection,
 			tokenID, token.UserID, token.ClientID, clientID, projectID,
@@ -179,16 +178,16 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 
 	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
 	if err != nil {
-		return errz.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
+		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
 	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
 	if err != nil {
-		return errz.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
+		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 	}
 	if token.IsPAT {
 		err = o.assertClientScopesForPAT(ctx, token, clientID, projectID)
 		if err != nil {
-			return errz.ThrowPreconditionFailed(err, "OIDC-AGefw", "Errors.Internal")
+			return errors.ThrowPreconditionFailed(err, "OIDC-AGefw", "Errors.Internal")
 		}
 	}
 	return o.introspect(ctx, introspection,
@@ -221,7 +220,7 @@ func (o *OPStorage) ClientCredentialsTokenRequest(ctx context.Context, clientID 
 // ClientCredentials method is kept to keep the storage interface implemented.
 // However, it should never be called as the VerifyClient method on the Server is overridden.
 func (o *OPStorage) ClientCredentials(context.Context, string, string) (op.Client, error) {
-	return nil, errz.ThrowInternal(nil, "OIDC-Su8So", "Errors.Internal")
+	return nil, errors.ThrowInternal(nil, "OIDC-Su8So", "Errors.Internal")
 }
 
 // isOriginAllowed checks whether a call by the client to the endpoint is allowed from the provided origin
@@ -237,7 +236,7 @@ func (o *OPStorage) isOriginAllowed(ctx context.Context, clientID, origin string
 	if api_http.IsOriginAllowed(app.OIDCConfig.AllowedOrigins, origin) {
 		return nil
 	}
-	return errz.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
+	return errors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
 }
 
 func (o *OPStorage) introspect(
@@ -270,7 +269,7 @@ func (o *OPStorage) introspect(
 			return nil
 		}
 	}
-	return errz.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
+	return errors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
 }
 
 func (o *OPStorage) checkOrgScopes(ctx context.Context, user *query.User, scopes []string) ([]string, error) {
@@ -737,7 +736,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	}
 	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID)
 	// applicationID might contain a username (e.g. client credentials) -> ignore the not found
-	if err != nil && !errz.IsNotFound(err) {
+	if err != nil && !errors.IsNotFound(err) {
 		return nil, nil, err
 	}
 	// ensure the projectID of the requesting is part of the roleAudience
@@ -934,34 +933,41 @@ func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCreden
 
 	switch client.AuthMethodType {
 	case domain.OIDCAuthMethodTypeBasic, domain.OIDCAuthMethodTypePost:
-		err = s.verifyClientSecret(client, r.Data.ClientSecret)
+		err = s.verifyClientSecret(ctx, client, r.Data.ClientSecret)
 	case domain.OIDCAuthMethodTypePrivateKeyJWT:
 		err = s.verifyClientAssertion(ctx, client, r.Data.ClientAssertion)
 	case domain.OIDCAuthMethodTypeNone:
+	}
+	if err != nil {
+		return nil, err
 	}
 
 	return ClientFromBusiness(client, s.defaultLoginURL, s.defaultLoginURLV2), nil
 }
 
-var (
-	errEmptyClientAssertion = errors.New("empty client assertion")
-	errEmptyClientSecret    = errors.New("empty client secret")
-)
+func (s *Server) verifyClientAssertion(ctx context.Context, client *query.OIDCClient, assertion string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 
-func (s *Server) verifyClientAssertion(ctx context.Context, client *query.OIDCClient, assertion string) error {
 	if assertion == "" {
-		return errEmptyClientAssertion
+		return oidc.ErrUnauthorizedClient().WithDescription("empty client assertion")
 	}
 	verifier := op.NewJWTProfileVerifierKeySet(keySetMap(client.PublicKeys), op.IssuerFromContext(ctx), time.Hour, client.ClockSkew)
 	if _, err := op.VerifyJWTAssertion(ctx, assertion, verifier); err != nil {
-		return err
+		return oidc.ErrUnauthorizedClient().WithParent(err).WithDescription("invalid assertion")
 	}
 	return nil
 }
 
-func (s *Server) verifyClientSecret(client *query.OIDCClient, secret string) error {
+func (s *Server) verifyClientSecret(ctx context.Context, client *query.OIDCClient, secret string) (err error) {
+	_, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if secret == "" {
-		return errEmptyClientSecret
+		return oidc.ErrUnauthorizedClient().WithDescription("empty client secret")
 	}
-	return crypto.CompareHash(client.ClientSecret, []byte(secret), s.hashAlg)
+	if err = crypto.CompareHash(client.ClientSecret, []byte(secret), s.hashAlg); err != nil {
+		return oidc.ErrUnauthorizedClient().WithParent(err).WithDescription("invalid secret")
+	}
+	return nil
 }
