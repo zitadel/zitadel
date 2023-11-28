@@ -26,6 +26,10 @@ type Server struct {
 	command *command.Commands
 	keySet  *keySetCache
 
+	defaultLoginURL    string
+	defaultLoginURLV2  string
+	defaultLogoutURLV2 string
+
 	fallbackLogger      *slog.Logger
 	hashAlg             crypto.HashAlgorithm
 	signingKeyAlgorithm string
