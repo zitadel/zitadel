@@ -14,6 +14,9 @@ import (
 
 const (
 	Activity = "activity"
+
+	PathKey          = "zitadel-activity-path"
+	RequestMethodKey = "zitadel-activity-request-method"
 )
 
 type TriggerMethod int

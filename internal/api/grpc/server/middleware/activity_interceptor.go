@@ -46,11 +46,11 @@ func activityInfoFromGateway(ctx context.Context) *ainfo.ActivityInfo {
 	if !ok {
 		return info
 	}
-	path := md.Get("zitadel-activity-path")
+	path := md.Get(activity.PathKey)
 	if len(path) != 1 {
 		return info
 	}
-	requestMethod := md.Get("zitadel-activity-request-method")
+	requestMethod := md.Get(activity.RequestMethodKey)
 	if len(requestMethod) != 1 {
 		return info
 	}
