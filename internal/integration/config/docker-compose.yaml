@@ -8,7 +8,7 @@ services:
   
   postgres:
     restart: 'always'
-    image: 'postgres:15'
+    image: 'postgres:latest'
     environment:
       - POSTGRES_USER=zitadel
       - PGUSER=zitadel
