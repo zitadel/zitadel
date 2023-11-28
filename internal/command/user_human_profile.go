@@ -2,18 +2,16 @@ package command
 
 import (
 	"context"
-	"golang.org/x/text/language"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) ChangeHumanProfile(ctx context.Context, profile *domain.Profile, allowedLanguages []language.Tag) (*domain.Profile, error) {
+func (c *Commands) ChangeHumanProfile(ctx context.Context, profile *domain.Profile) (*domain.Profile, error) {
 	if profile.AggregateID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-AwbEB", "Errors.User.Profile.IDMissing")
 	}
-	if err := profile.Validate(allowedLanguages); err != nil {
+	if err := profile.Validate(); err != nil {
 		return nil, err
 	}
 	existingProfile, err := c.profileWriteModelByID(ctx, profile.AggregateID, profile.ResourceOwner)

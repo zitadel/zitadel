@@ -344,10 +344,7 @@ type CustomLoginText struct {
 }
 
 func (m *CustomLoginText) IsValid() error {
-	if err := LanguageIsDefined(m.Language); err != nil {
-		return err
-	}
-	return LanguagesAreSupported(m.Language)
+	return LanguageIsDefined(m.Language)
 }
 
 type SelectAccountScreenText struct {

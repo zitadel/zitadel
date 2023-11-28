@@ -22,7 +22,6 @@ func TestSetRestrictions(t *testing.T) {
 	type args struct {
 		ctx             context.Context
 		setRestrictions *SetRestrictions
-		defaultLanguage language.Tag
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -194,7 +193,6 @@ func TestSetRestrictions(t *testing.T) {
 				setRestrictions: &SetRestrictions{
 					AllowedLanguages: []language.Tag{AllowedLanguage, UnsupportedLanguage},
 				},
-				defaultLanguage: AllowedLanguage,
 			},
 			res: res{
 				err: zitadel_errs.IsErrorInvalidArgument,
@@ -219,11 +217,10 @@ func TestSetRestrictions(t *testing.T) {
 				), nil
 			},
 			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				ctx: authz.WithInstance(context.Background(), &mockInstance{}),
 				setRestrictions: &SetRestrictions{
 					AllowedLanguages: []language.Tag{DisallowedLanguage},
 				},
-				defaultLanguage: AllowedLanguage,
 			},
 			res: res{
 				err: zitadel_errs.IsPreconditionFailed,
@@ -234,7 +231,7 @@ func TestSetRestrictions(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := new(Commands)
 			r.eventstore, r.idGenerator = tt.fields(t)
-			got, err := r.SetInstanceRestrictions(tt.args.ctx, tt.args.setRestrictions, tt.args.defaultLanguage)
+			got, err := r.SetInstanceRestrictions(tt.args.ctx, tt.args.setRestrictions)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

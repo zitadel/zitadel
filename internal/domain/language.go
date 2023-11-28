@@ -4,7 +4,6 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/i18n"
 )
 
 func StringsToLanguages(langs []string) []language.Tag {
@@ -51,13 +50,13 @@ func LanguageIsAllowed(allowUndefined bool, allowedLanguages []language.Tag, lan
 	return nil
 }
 
-func LanguagesAreSupported(lang ...language.Tag) error {
+func LanguagesAreSupported(supportedLanguages []language.Tag, lang ...language.Tag) error {
 	unsupported := make([]language.Tag, 0)
 	for _, l := range lang {
 		if l.IsRoot() {
 			continue
 		}
-		if !languageIsContained(i18n.SupportedLanguages(), l) {
+		if !languageIsContained(supportedLanguages, l) {
 			unsupported = append(unsupported, l)
 		}
 	}

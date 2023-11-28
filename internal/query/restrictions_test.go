@@ -19,7 +19,7 @@ var (
 		" projections.restrictions.change_date," +
 		" projections.restrictions.resource_owner," +
 		" projections.restrictions.sequence," +
-		" projections.restrictions.public_org_registration_is_not_allowed," +
+		" projections.restrictions.disallow_public_org_registration," +
 		" projections.restrictions.allowed_languages" +
 		" FROM projections.restrictions" +
 		" AS OF SYSTEM TIME '-1 ms'",
@@ -31,7 +31,7 @@ var (
 		"change_date",
 		"resource_owner",
 		"sequence",
-		"public_org_registration_is_not_allowed",
+		"disallow_public_org_registration",
 		"allowed_languages",
 	}
 )

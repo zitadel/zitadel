@@ -47,8 +47,8 @@ func (r *Renderer) RenderTemplate(w http.ResponseWriter, req *http.Request, tran
 	}
 }
 
-func (r *Renderer) NewTranslator(ctx context.Context) (*i18n.Translator, error) {
-	return i18n.NewTranslator(r.dir, authz.GetInstance(ctx).DefaultLanguage(), r.cookieName)
+func (r *Renderer) NewTranslator(ctx context.Context, allowedLanguages []language.Tag) (*i18n.Translator, error) {
+	return i18n.NewTranslator(r.dir, authz.GetInstance(ctx).DefaultLanguage(), allowedLanguages, r.cookieName)
 }
 
 func (r *Renderer) Localize(translator *i18n.Translator, id string, args map[string]interface{}) string {

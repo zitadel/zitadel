@@ -85,8 +85,8 @@ func (t *Tester) UseIsolatedInstance(iamOwnerCtx, systemCtx context.Context) (pr
 
 func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse {
 	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user.AddHumanUserRequest{
-		Organisation: &object.Organisation{
-			Org: &object.Organisation_OrgId{
+		Organization: &object.Organization{
+			Org: &object.Organization_OrgId{
 				OrgId: s.Organisation.ID,
 			},
 		},

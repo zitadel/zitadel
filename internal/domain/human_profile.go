@@ -20,7 +20,7 @@ type Profile struct {
 	LoginNames         []string
 }
 
-func (p *Profile) Validate(allowedLanguages []language.Tag) error {
+func (p *Profile) Validate() error {
 	if p == nil {
 		return errors.ThrowInvalidArgument(nil, "PROFILE-GPY3p", "Errors.User.Profile.Empty")
 	}
@@ -29,12 +29,6 @@ func (p *Profile) Validate(allowedLanguages []language.Tag) error {
 	}
 	if p.LastName == "" {
 		return errors.ThrowInvalidArgument(nil, "PROFILE-DSUkN", "Errors.User.Profile.LastNameEmpty")
-	}
-	if err := LanguagesAreSupported(p.PreferredLanguage); err != nil {
-		return err
-	}
-	if err := LanguageIsAllowed(true, allowedLanguages, p.PreferredLanguage); err != nil {
-		return err
 	}
 	return nil
 }

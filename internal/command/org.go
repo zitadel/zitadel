@@ -4,8 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"golang.org/x/text/language"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -64,10 +62,10 @@ type CreatedOrgAdmin struct {
 	MachineKey *MachineKey
 }
 
-func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID string, allowInitialMail bool, allowedLanguages []language.Tag, userIDs ...string) (_ *CreatedOrg, err error) {
+func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID string, allowInitialMail bool, userIDs ...string) (_ *CreatedOrg, err error) {
 	cmds := c.newOrgSetupCommands(ctx, orgID, o, userIDs)
 	for _, admin := range o.Admins {
-		if err = cmds.setupOrgAdmin(admin, allowInitialMail, allowedLanguages); err != nil {
+		if err = cmds.setupOrgAdmin(admin, allowInitialMail); err != nil {
 			return nil, err
 		}
 	}
@@ -91,7 +89,7 @@ func (c *Commands) newOrgSetupCommands(ctx context.Context, orgID string, orgSet
 	}
 }
 
-func (c *orgSetupCommands) setupOrgAdmin(admin *OrgSetupAdmin, allowInitialMail bool, allowedLanguages []language.Tag) error {
+func (c *orgSetupCommands) setupOrgAdmin(admin *OrgSetupAdmin, allowInitialMail bool) error {
 	if admin.ID != "" {
 		c.validations = append(c.validations, c.commands.AddOrgMemberCommand(c.aggregate, admin.ID, orgAdminRoles(admin.Roles)...))
 		return nil
@@ -102,7 +100,7 @@ func (c *orgSetupCommands) setupOrgAdmin(admin *OrgSetupAdmin, allowInitialMail 
 	}
 	if admin.Human != nil {
 		admin.Human.ID = userID
-		c.validations = append(c.validations, c.commands.AddHumanCommand(admin.Human, c.aggregate.ID, c.commands.userPasswordHasher, c.commands.userEncryption, allowInitialMail, allowedLanguages))
+		c.validations = append(c.validations, c.commands.AddHumanCommand(admin.Human, c.aggregate.ID, c.commands.userPasswordHasher, c.commands.userEncryption, allowInitialMail))
 	} else if admin.Machine != nil {
 		admin.Machine.Machine.AggregateID = userID
 		if err = c.setupOrgAdminMachine(c.aggregate, admin.Machine); err != nil {
@@ -224,13 +222,13 @@ func (c *orgSetupCommands) createdMachineAdmin(admin *OrgSetupAdmin) *CreatedOrg
 	return createdAdmin
 }
 
-func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail bool, allowedLanguages []language.Tag, userIDs ...string) (*CreatedOrg, error) {
+func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail bool, userIDs ...string) (*CreatedOrg, error) {
 	orgID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
 
-	return c.setUpOrgWithIDs(ctx, o, orgID, allowInitialMail, allowedLanguages, userIDs...)
+	return c.setUpOrgWithIDs(ctx, o, orgID, allowInitialMail, userIDs...)
 }
 
 // AddOrgCommand defines the commands to create a new org,

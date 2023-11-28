@@ -56,10 +56,7 @@ func (m *CustomMessageText) IsValid() error {
 	if m.MessageTextType == "" {
 		return zitadel_errs.ThrowInvalidArgument(nil, "INSTANCE-kd9fs", "Errors.CustomMessageText.Invalid")
 	}
-	if err := LanguageIsDefined(m.Language); err != nil {
-		return err
-	}
-	return LanguagesAreSupported(m.Language)
+	return LanguageIsDefined(m.Language)
 }
 
 func IsMessageTextType(textType string) bool {
