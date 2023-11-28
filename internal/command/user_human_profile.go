@@ -53,15 +53,3 @@ func (c *Commands) profileWriteModelByID(ctx context.Context, userID, resourceOw
 	}
 	return writeModel, nil
 }
-
-func (c *Commands) allProfileWriteModels(ctx context.Context) (writeModels map[string]*HumanProfileWriteModel, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	wm := NewHumanProfileWriteModels()
-	err = c.eventstore.FilterToQueryReducer(ctx, wm)
-	if err != nil {
-		return nil, err
-	}
-	return wm.Profiles, nil
-}

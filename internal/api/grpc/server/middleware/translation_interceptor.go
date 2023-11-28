@@ -2,12 +2,12 @@ package middleware
 
 import (
 	"context"
-	"github.com/zitadel/zitadel/internal/i18n"
 
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/i18n"
 	_ "github.com/zitadel/zitadel/internal/statik"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )

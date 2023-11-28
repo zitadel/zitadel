@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"github.com/zitadel/zitadel/internal/i18n"
 	"time"
 
 	"golang.org/x/text/language"
@@ -14,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/feature"

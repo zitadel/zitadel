@@ -19,10 +19,9 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx              context.Context
-		address          *domain.Profile
-		resourceOwner    string
-		allowedLanguages []language.Tag
+		ctx           context.Context
+		address       *domain.Profile
+		resourceOwner string
 	}
 	type res struct {
 		want *domain.Profile
