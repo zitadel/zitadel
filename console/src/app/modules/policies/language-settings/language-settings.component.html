@@ -25,7 +25,7 @@
           cdkDrag
         >
           <mat-radio-button
-            [disabled]="(isRemotelyDisallowed$(lang) | async) || !(canWriteDefaultLanguage$ | async)"
+            [disabled]="(isRemotelyDisallowed$(lang) | async) || (canWriteDefaultLanguage$ | async) === false"
             mat-list-item
             color="primary"
             [checked]="(localState$ | async)!.defaultLang == lang"
