@@ -2,7 +2,7 @@ import { Component, Injector, Input, OnInit, Type } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
-import {firstValueFrom, forkJoin, from, Observable, of, take} from 'rxjs';
+import { firstValueFrom, forkJoin, from, Observable, of, take } from 'rxjs';
 import {
   GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
   UpdateLoginPolicyRequest,
@@ -24,7 +24,7 @@ import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { LoginMethodComponentType } from './factor-table/factor-table.component';
-import {catchError, map} from "rxjs/operators";
+import { catchError, map } from 'rxjs/operators';
 
 @Component({
   selector: 'cnsl-login-policy',
@@ -64,53 +64,52 @@ export class LoginPolicyComponent implements OnInit {
 
   public fetchData(): void {
     const data$ = forkJoin([
-      this.serviceType === PolicyComponentServiceType.ADMIN ?
-        from((this.service as AdminService).getRestrictions()).pipe(
-          map(({disallowPublicOrgRegistration}) => disallowPublicOrgRegistration)
-        ) : of(true),
-        from(this.getData())
-    ])
+      this.serviceType === PolicyComponentServiceType.ADMIN
+        ? from((this.service as AdminService).getRestrictions()).pipe(
+            map(({ disallowPublicOrgRegistration }) => disallowPublicOrgRegistration),
+          )
+        : of(true),
+      from(this.getData()),
+    ]);
 
     const sub = data$.subscribe({
       next: ([disallowPublicOrgRegistration, resp]) => {
         this.allowOrgRegistration = !disallowPublicOrgRegistration;
         if (!resp.policy) {
-          return
+          return;
         }
-          this.loginData = resp.policy;
-          this.loading = false;
+        this.loginData = resp.policy;
+        this.loading = false;
 
-          this.passwordCheckLifetime?.setValue(
-            this.loginData.passwordCheckLifetime?.seconds ? this.loginData.passwordCheckLifetime?.seconds / 60 / 60 : 0,
-          );
+        this.passwordCheckLifetime?.setValue(
+          this.loginData.passwordCheckLifetime?.seconds ? this.loginData.passwordCheckLifetime?.seconds / 60 / 60 : 0,
+        );
 
-          this.externalLoginCheckLifetime?.setValue(
-            this.loginData.externalLoginCheckLifetime?.seconds
-              ? this.loginData.externalLoginCheckLifetime?.seconds / 60 / 60
-              : 0,
-          );
+        this.externalLoginCheckLifetime?.setValue(
+          this.loginData.externalLoginCheckLifetime?.seconds
+            ? this.loginData.externalLoginCheckLifetime?.seconds / 60 / 60
+            : 0,
+        );
 
-          this.mfaInitSkipLifetime?.setValue(
-            this.loginData.mfaInitSkipLifetime?.seconds ? this.loginData.mfaInitSkipLifetime?.seconds / 60 / 60 : 0,
-          );
+        this.mfaInitSkipLifetime?.setValue(
+          this.loginData.mfaInitSkipLifetime?.seconds ? this.loginData.mfaInitSkipLifetime?.seconds / 60 / 60 : 0,
+        );
 
-          this.secondFactorCheckLifetime?.setValue(
-            this.loginData.secondFactorCheckLifetime?.seconds
-              ? this.loginData.secondFactorCheckLifetime?.seconds / 60 / 60
-              : 0,
-          );
+        this.secondFactorCheckLifetime?.setValue(
+          this.loginData.secondFactorCheckLifetime?.seconds
+            ? this.loginData.secondFactorCheckLifetime?.seconds / 60 / 60
+            : 0,
+        );
 
-          this.multiFactorCheckLifetime?.setValue(
-            this.loginData.multiFactorCheckLifetime?.seconds
-              ? this.loginData.multiFactorCheckLifetime?.seconds / 60 / 60
-              : 0,
-          );
+        this.multiFactorCheckLifetime?.setValue(
+          this.loginData.multiFactorCheckLifetime?.seconds ? this.loginData.multiFactorCheckLifetime?.seconds / 60 / 60 : 0,
+        );
       },
       error: this.toast.showError,
       complete: () => {
         sub.unsubscribe();
-      }
-    })
+      },
+    });
   }
 
   public ngOnInit(): void {
@@ -196,7 +195,7 @@ export class LoginPolicyComponent implements OnInit {
             mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 
             calls.push(from((this.service as ManagementService).addCustomLoginPolicy(mgmtreq)));
-            break
+            break;
           } else {
             const mgmtreq = new UpdateCustomLoginPolicyRequest();
             mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
@@ -229,7 +228,7 @@ export class LoginPolicyComponent implements OnInit {
             mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 
             calls.push(from((this.service as ManagementService).updateCustomLoginPolicy(mgmtreq)));
-            break
+            break;
           }
         case PolicyComponentServiceType.ADMIN:
           const adminreq = new UpdateLoginPolicyRequest();
@@ -261,19 +260,21 @@ export class LoginPolicyComponent implements OnInit {
           adminreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
           adminreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 
-          calls.push(from((this.service as AdminService).setRestrictions(!this.allowOrgRegistration)))
+          calls.push(from((this.service as AdminService).setRestrictions(!this.allowOrgRegistration)));
           calls.push(from((this.service as AdminService).updateLoginPolicy(adminreq)));
-          break
+          break;
       }
     } else {
       calls.push(from(Promise.reject()));
     }
-    return firstValueFrom(forkJoin(calls).pipe(
-      catchError((error, caught) => {
-        // We just ignore the policy not changed error!
-        return (error as {message: string}).message.includes('INSTANCE-5M9vdd') ? of(true) : caught
-      })
-    ))
+    return firstValueFrom(
+      forkJoin(calls).pipe(
+        catchError((error, caught) => {
+          // We just ignore the policy not changed error!
+          return (error as { message: string }).message.includes('INSTANCE-5M9vdd') ? of(true) : caught;
+        }),
+      ),
+    );
   }
 
   public savePolicy(): void {

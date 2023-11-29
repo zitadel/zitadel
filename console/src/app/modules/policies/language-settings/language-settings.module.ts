@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
@@ -10,10 +10,10 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { CardModule } from '../../card/card.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
 import { LanguageSettingsComponent } from './language-settings.component';
-import { MatListModule} from "@angular/material/list";
-import { MatFormFieldModule} from "@angular/material/form-field";
-import { DragDropModule} from "@angular/cdk/drag-drop";
-import {MatRadioModule}  from "@angular/material/radio";
+import { MatListModule } from '@angular/material/list';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { MatRadioModule } from '@angular/material/radio';
 
 @NgModule({
   declarations: [LanguageSettingsComponent],

@@ -57,7 +57,7 @@ export class ToastService {
     } else {
       this.showMessage(error as string, '', false);
     }
-  }
+  };
 
   private showMessage(message: string, action: string, success: boolean): Observable<void> {
     const ref = this.snackBar.open(message, action, {

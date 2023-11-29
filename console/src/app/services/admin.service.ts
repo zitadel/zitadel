@@ -127,7 +127,8 @@ import {
   GetPrivacyPolicyRequest,
   GetPrivacyPolicyResponse,
   GetProviderByIDRequest,
-  GetProviderByIDResponse, GetRestrictionsResponse,
+  GetProviderByIDResponse,
+  GetRestrictionsResponse,
   GetSecretGeneratorRequest,
   GetSecretGeneratorResponse,
   GetSecurityPolicyRequest,
@@ -193,7 +194,8 @@ import {
   ResetCustomDomainPolicyToDefaultRequest,
   ResetCustomDomainPolicyToDefaultResponse,
   ResetCustomLoginTextsToDefaultRequest,
-  ResetCustomLoginTextsToDefaultResponse, SelectLanguages,
+  ResetCustomLoginTextsToDefaultResponse,
+  SelectLanguages,
   SetCustomLoginTextsRequest,
   SetCustomLoginTextsResponse,
   SetDefaultDomainClaimedMessageTextRequest,
@@ -217,7 +219,9 @@ import {
   SetDefaultVerifyPhoneMessageTextRequest,
   SetDefaultVerifyPhoneMessageTextResponse,
   SetDefaultVerifySMSOTPMessageTextRequest,
-  SetDefaultVerifySMSOTPMessageTextResponse, SetRestrictionsRequest, SetRestrictionsResponse,
+  SetDefaultVerifySMSOTPMessageTextResponse,
+  SetRestrictionsRequest,
+  SetRestrictionsResponse,
   SetSecurityPolicyRequest,
   SetSecurityPolicyResponse,
   SetUpOrgRequest,
@@ -837,19 +841,21 @@ export class AdminService {
     return this.grpcService.admin.getRestrictions(req, null).then((resp) => resp.toObject());
   }
 
-  public setRestrictions(disallowPublicOrgRegistration?: boolean, allowedLanguages?: string[]): Promise<SetRestrictionsResponse.AsObject> {
+  public setRestrictions(
+    disallowPublicOrgRegistration?: boolean,
+    allowedLanguages?: string[],
+  ): Promise<SetRestrictionsResponse.AsObject> {
     const req = new SetRestrictionsRequest();
     if (disallowPublicOrgRegistration !== undefined) {
       req.setDisallowPublicOrgRegistration(disallowPublicOrgRegistration);
     }
     if (allowedLanguages !== undefined) {
       const langs = new SelectLanguages();
-      langs.setListList(allowedLanguages)
+      langs.setListList(allowedLanguages);
       req.setAllowedLanguages(langs);
     }
     return this.grpcService.admin.setRestrictions(req, null).then((resp) => resp.toObject());
   }
-
 
   /* notification policy */
 
