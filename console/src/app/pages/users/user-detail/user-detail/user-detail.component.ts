@@ -25,8 +25,8 @@ import { formatPhone } from 'src/app/utils/formatPhone';
 import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
 import { MachineSecretDialogComponent } from './machine-secret-dialog/machine-secret-dialog.component';
-import {Observable} from "rxjs";
-import {LanguagesService} from "../../../../services/languages.service";
+import { Observable } from 'rxjs';
+import { LanguagesService } from '../../../../services/languages.service';
 
 const GENERAL: SidenavSetting = { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' };
 const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' };
@@ -102,7 +102,7 @@ export class UserDetailComponent implements OnInit {
     this.mediaMatcher.matchMedia(mediaq).onchange = (small) => {
       this.changeSelection(small.matches);
     };
-    this.languages$ = this.languagesSvc.allowedLanguages(this.mgmtUserService)
+    this.languages$ = this.languagesSvc.allowedLanguages(this.mgmtUserService);
   }
 
   private changeSelection(small: boolean): void {

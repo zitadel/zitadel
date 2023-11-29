@@ -106,7 +106,7 @@ import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/ge
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageLocation, StorageService } from './storage.service';
 import { ThemeService } from './theme.service';
-import {GetAllowedLanguagesRequest, GetAllowedLanguagesResponse} from "../proto/generated/zitadel/management_pb";
+import { GetAllowedLanguagesRequest, GetAllowedLanguagesResponse } from '../proto/generated/zitadel/management_pb';
 
 @Injectable({
   providedIn: 'root',

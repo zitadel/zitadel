@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
-import {from, Observable, Subscription, take} from 'rxjs';
+import { from, Observable, Subscription, take } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
 import { InfoDialogComponent } from 'src/app/modules/info-dialog/info-dialog.component';
@@ -25,7 +25,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
-import {map} from "rxjs/operators";
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'cnsl-auth-user-detail',
@@ -86,9 +86,9 @@ export class AuthUserDetailComponent implements OnDestroy {
         this.currentSetting = id;
       }
     });
-    this.languages$ = from(this.userService.getAllowedLanguages()).pipe(
+    this.languages$ = from(this.userService.getSupportedLanguages()).pipe(
       take(1),
-      map(({ languagesList }) => languagesList ),
+      map(({ languagesList }) => languagesList),
     );
 
     const mediaq: string = '(max-width: 500px)';
@@ -141,7 +141,7 @@ export class AuthUserDetailComponent implements OnDestroy {
             }),
           ]);
         }
-        this.savedLanguage = resp.user?.human?.profile?.preferredLanguage
+        this.savedLanguage = resp.user?.human?.profile?.preferredLanguage;
         this.loading = false;
       })
       .catch((error) => {
@@ -160,10 +160,10 @@ export class AuthUserDetailComponent implements OnDestroy {
   }
 
   private cleanupTranslation(): void {
-    if (this?.savedLanguage){
+    if (this?.savedLanguage) {
       this.translate.use(this?.savedLanguage);
     } else {
-      this.translate.use(this.translate.defaultLang)
+      this.translate.use(this.translate.defaultLang);
     }
   }
 
@@ -210,7 +210,7 @@ export class AuthUserDetailComponent implements OnDestroy {
         )
         .then(() => {
           this.toast.showInfo('USER.TOAST.SAVED', true);
-          this.savedLanguage = this.user?.human?.profile?.preferredLanguage
+          this.savedLanguage = this.user?.human?.profile?.preferredLanguage;
           this.refreshChanges$.emit();
         })
         .catch((error) => {

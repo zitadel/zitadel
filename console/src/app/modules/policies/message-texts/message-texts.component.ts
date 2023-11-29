@@ -1,7 +1,7 @@
 import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSelectChange } from '@angular/material/select';
-import {BehaviorSubject, from, Observable, of, Subscription, switchMap} from 'rxjs';
+import { BehaviorSubject, from, Observable, of, Subscription, switchMap } from 'rxjs';
 import {
   GetDefaultDomainClaimedMessageTextRequest as AdminGetDefaultDomainClaimedMessageTextRequest,
   GetDefaultInitMessageTextRequest as AdminGetDefaultInitMessageTextRequest,
@@ -60,8 +60,8 @@ import { ToastService } from 'src/app/services/toast.service';
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
-import {map} from "rxjs/operators";
-import {LanguagesService} from "../../../services/languages.service";
+import { map } from 'rxjs/operators';
+import { LanguagesService } from '../../../services/languages.service';
 
 enum MESSAGETYPES {
   INIT = 'INIT',
@@ -572,10 +572,8 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
         break;
     }
     this.allowedLanguages$ = this.languagesSvc.allowedLanguages(this.service);
-    this.languageNotAllowed$ = this.allowedLanguages$.pipe(
-        map((allowed) => !allowed.includes(this.language))
-    );
-    this.notAllowedLanguages$ = this.languagesSvc.notAllowedLanguages(this.service, this.allowedLanguages$)
+    this.languageNotAllowed$ = this.allowedLanguages$.pipe(map((allowed) => !allowed.includes(this.language)));
+    this.notAllowedLanguages$ = this.languagesSvc.notAllowedLanguages(this.service, this.allowedLanguages$);
     this.languagesAreRestricted$ = this.notAllowedLanguages$.pipe(map((notAllowed) => notAllowed.length > 0));
 
     this.loadData(this.currentType);

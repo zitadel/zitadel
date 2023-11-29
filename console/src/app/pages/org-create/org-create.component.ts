@@ -20,8 +20,8 @@ import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-import {Observable} from "rxjs";
-import {LanguagesService} from "../../services/languages.service";
+import { Observable } from 'rxjs';
+import { LanguagesService } from '../../services/languages.service';
 
 @Component({
   selector: 'cnsl-org-create',
@@ -73,7 +73,7 @@ export class OrgCreateComponent {
     breadcrumbService.setBreadcrumb([instanceBread]);
     this.initForm();
 
-    this.languages$ = this.languagesSvc.allowedLanguages(this.mgmtService);
+    this.languages$ = this.languagesSvc.supportedLanguages(this.mgmtService);
   }
 
   public createSteps: number = 2;

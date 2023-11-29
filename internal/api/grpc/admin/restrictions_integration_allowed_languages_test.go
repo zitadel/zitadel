@@ -5,20 +5,23 @@ package admin_test
 import (
 	"context"
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
-	"github.com/zitadel/zitadel/pkg/grpc/text"
-	"github.com/zitadel/zitadel/pkg/grpc/user"
-	"golang.org/x/text/language"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"io"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/pkg/grpc/auth"
+	"github.com/zitadel/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/pkg/grpc/text"
+	"github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
 func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
@@ -60,6 +63,17 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 	})
 	t.Run("restricting allowed languages works", func(tt *testing.T) {
 		setAndAwaitAllowedLanguages(iamOwnerCtx, tt, []string{defaultAndAllowedLanguage.String()})
+	})
+	t.Run("all GetAllowedLanguages methods return only the allowed languages", func(tt *testing.T) {
+		adminLangs, err := Tester.Client.Admin.GetAllowedLanguages(iamOwnerCtx, &admin.GetAllowedLanguagesRequest{})
+		require.NoError(tt, err)
+		assertAllowList(adminLangs.GetLanguages(), []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
+		mgmtLangs, err := Tester.Client.Mgmt.GetAllowedLanguages(iamOwnerCtx, &management.GetAllowedLanguagesRequest{})
+		require.NoError(tt, err)
+		assertAllowList(mgmtLangs.GetLanguages(), []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
+		authLangs, err := Tester.Client.Auth.GetAllowedLanguages(iamOwnerCtx, &auth.GetAllowedLanguagesRequest{})
+		require.NoError(tt, err)
+		assertAllowList(authLangs.GetLanguages(), []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
 	})
 	t.Run("setting the default language to a disallowed language fails", func(tt *testing.T) {
 		_, err := Tester.Client.Admin.SetDefaultLanguage(iamOwnerCtx, &admin.SetDefaultLanguageRequest{Language: disallowedLanguage.String()})
@@ -155,6 +169,7 @@ func setAndAwaitAllowedLanguages(ctx context.Context, t *testing.T, selectLangua
 			assert.Equal(NoopAssertionT, expectLanguages, restrictions.GetAllowedLanguages())
 	})
 }
+
 func setAndAwaitDefaultLanguage(ctx context.Context, t *testing.T, lang language.Tag) {
 	_, err := Tester.Client.Admin.SetDefaultLanguage(ctx, &admin.SetDefaultLanguageRequest{Language: lang.String()})
 	require.NoError(t, err)
