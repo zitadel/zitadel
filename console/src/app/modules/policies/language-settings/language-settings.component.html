@@ -18,13 +18,13 @@
           <cnsl-label>{{ 'SETTING.LANGUAGES.ALLOWED' | translate }}</cnsl-label>
           <div class="languages-list">
               <mat-action-list
-                [disabled]="(['iam.restrictions.write'] | hasRole | async) === false"
+                [disabled]="(canWriteRestrictions$ | async) === false"
                 *ngFor="let lang of (localState$ | async)!.allowed"
                 name="allowed"
                 class="language-box"
                 [cdkDragData]="lang"
                 cdkDrag>
-                <mat-radio-button mat-list-item color="primary" [checked]="(localState$ | async)!.defaultLang == lang" (change)="setLocalDefaultLang(lang)">
+                <mat-radio-button [disabled]="(isRemotelyDisallowed$(lang) | async) || !(canWriteDefaultLanguage$ | async)" mat-list-item color="primary" [checked]="(localState$ | async)!.defaultLang == lang" (change)="setLocalDefaultLang(lang)">
                   {{ lang }} - {{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }}{{ lang == (localState$ | async)!.defaultLang ? ' (' + ( 'SETTING.LANGUAGES.DEFAULT' | translate ) + ')' : '' | translate }}
                 </mat-radio-button>
               </mat-action-list>
@@ -46,7 +46,7 @@
                  name="notAllowed"
                  class="language-box"
                  cdkDrag>
-                 <button mat-list-item color="primary">{{ lang }} - {{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }}</button>
+                 <mat-radio-button [disabled]="true" mat-list-item color="primary">{{ lang }} - {{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }}</mat-radio-button>
                </mat-action-list>
              </div>
            </div>
@@ -54,6 +54,18 @@
    </div>
 
    <div class="general-btn-container">
+     <button
+       class="reset-button"
+       [disabled]="(canWriteRestrictions$ | async) === false"
+       (click)="discard()"
+       color="message-text-warn"
+       type="submit"
+       mat-stroked-button
+     >
+       <div class="cnsl-action-button">
+         <i class="las la-history"></i><span>{{ 'ACTIONS.UNSAVED.DIALOG.DISCARD' | translate }}</span>
+       </div>
+     </button>
      <button
        class="save-button"
        (click)="save()"

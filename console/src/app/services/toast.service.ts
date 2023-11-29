@@ -36,7 +36,7 @@ export class ToastService {
     }
   }
 
-  public showError(error: any | string, isGrpc: boolean = true, i18nKey: boolean = false): void {
+  public showError = (error: any | string, isGrpc: boolean = true, i18nKey: boolean = false) => {
     if (isGrpc) {
       const { message, code, metadata } = error;
       if (code !== 16) {

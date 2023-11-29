@@ -2,7 +2,7 @@ import { Component, Injector, Input, OnInit, Type } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
-import { take } from 'rxjs';
+import {firstValueFrom, forkJoin, from, Observable, of, take} from 'rxjs';
 import {
   GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
   UpdateLoginPolicyRequest,
@@ -24,6 +24,7 @@ import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { LoginMethodComponentType } from './factor-table/factor-table.component';
+import {catchError, map} from "rxjs/operators";
 
 @Component({
   selector: 'cnsl-login-policy',
@@ -37,6 +38,7 @@ export class LoginPolicyComponent implements OnInit {
     PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
   ];
   public loginData?: LoginPolicy.AsObject;
+  public allowOrgRegistration: boolean = false;
 
   public service!: ManagementService | AdminService;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
@@ -61,9 +63,20 @@ export class LoginPolicyComponent implements OnInit {
   ) {}
 
   public fetchData(): void {
-    this.getData()
-      .then((resp) => {
-        if (resp.policy) {
+    const data$ = forkJoin([
+      this.serviceType === PolicyComponentServiceType.ADMIN ?
+        from((this.service as AdminService).getRestrictions()).pipe(
+          map(({disallowPublicOrgRegistration}) => disallowPublicOrgRegistration)
+        ) : of(true),
+        from(this.getData())
+    ])
+
+    const sub = data$.subscribe({
+      next: ([disallowPublicOrgRegistration, resp]) => {
+        this.allowOrgRegistration = !disallowPublicOrgRegistration;
+        if (!resp.policy) {
+          return
+        }
           this.loginData = resp.policy;
           this.loading = false;
 
@@ -92,11 +105,12 @@ export class LoginPolicyComponent implements OnInit {
               ? this.loginData.multiFactorCheckLifetime?.seconds / 60 / 60
               : 0,
           );
-        }
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+      },
+      error: this.toast.showError,
+      complete: () => {
+        sub.unsubscribe();
+      }
+    })
   }
 
   public ngOnInit(): void {
@@ -142,7 +156,9 @@ export class LoginPolicyComponent implements OnInit {
     }
   }
 
-  private async updateData(): Promise<UpdateLoginPolicyResponse.AsObject> {
+  private async updateData(): Promise<any> {
+    const calls: Observable<any>[] = [];
+
     if (this.loginData) {
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
@@ -179,7 +195,8 @@ export class LoginPolicyComponent implements OnInit {
             mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
             mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 
-            return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
+            calls.push(from((this.service as ManagementService).addCustomLoginPolicy(mgmtreq)));
+            break
           } else {
             const mgmtreq = new UpdateCustomLoginPolicyRequest();
             mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
@@ -211,7 +228,8 @@ export class LoginPolicyComponent implements OnInit {
             mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
             mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 
-            return (this.service as ManagementService).updateCustomLoginPolicy(mgmtreq);
+            calls.push(from((this.service as ManagementService).updateCustomLoginPolicy(mgmtreq)));
+            break
           }
         case PolicyComponentServiceType.ADMIN:
           const adminreq = new UpdateLoginPolicyRequest();
@@ -243,11 +261,19 @@ export class LoginPolicyComponent implements OnInit {
           adminreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
           adminreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 
-          return (this.service as AdminService).updateLoginPolicy(adminreq);
+          calls.push(from((this.service as AdminService).setRestrictions(!this.allowOrgRegistration)))
+          calls.push(from((this.service as AdminService).updateLoginPolicy(adminreq)));
+          break
       }
     } else {
-      return Promise.reject();
+      calls.push(from(Promise.reject()));
     }
+    return firstValueFrom(forkJoin(calls).pipe(
+      catchError((error, caught) => {
+        // We just ignore the policy not changed error!
+        return (error as {message: string}).message.includes('INSTANCE-5M9vdd') ? of(true) : caught
+      })
+    ))
   }
 
   public savePolicy(): void {
