@@ -119,7 +119,7 @@ func NewUpsertStatement(event eventstore.Event, conflictCols []Column, values []
 		config.err = ErrNoValues
 	}
 
-	updateCols, updateVals := getUpdateCols(cols, conflictTarget)
+	updateCols, updateVals := getUpdateCols(values, conflictTarget)
 	if len(updateCols) == 0 || len(updateVals) == 0 {
 		config.err = ErrNoValues
 	}
@@ -141,17 +141,38 @@ func NewUpsertStatement(event eventstore.Event, conflictCols []Column, values []
 	return NewStatement(event, exec(config, q, opts))
 }
 
-func getUpdateCols(cols, conflictTarget []string) (updateCols, updateVals []string) {
+var _ ValueContainer = (*onlySetValueOnInsert)(nil)
+
+type onlySetValueOnInsert struct {
+	Table string
+	Value interface{}
+}
+
+func (c *onlySetValueOnInsert) GetValue() interface{} {
+	return c.Value
+}
+
+func OnlySetValueOnInsert(table string, value interface{}) *onlySetValueOnInsert {
+	return &onlySetValueOnInsert{
+		Table: table,
+		Value: value,
+	}
+}
+
+func getUpdateCols(cols []Column, conflictTarget []string) (updateCols, updateVals []string) {
 	updateCols = make([]string, len(cols))
 	updateVals = make([]string, len(cols))
 
-	copy(updateCols, cols)
-
-	for i := len(updateCols) - 1; i >= 0; i-- {
-		updateVals[i] = "EXCLUDED." + updateCols[i]
-
+	for i := len(cols) - 1; i >= 0; i-- {
+		col := cols[i]
+		table := "EXCLUDED"
+		if onlyOnInsert, ok := col.Value.(*onlySetValueOnInsert); ok {
+			table = onlyOnInsert.Table
+		}
+		updateCols[i] = col.Name
+		updateVals[i] = table + "." + col.Name
 		for _, conflict := range conflictTarget {
-			if conflict == updateCols[i] {
+			if conflict == col.Name {
 				copy(updateCols[i:], updateCols[i+1:])
 				updateCols[len(updateCols)-1] = ""
 				updateCols = updateCols[:len(updateCols)-1]
@@ -383,6 +404,10 @@ func NewCopyStatement(event eventstore.Event, conflictCols, from, to []Column, n
 	return NewStatement(event, exec(config, q, opts))
 }
 
+type ValueContainer interface {
+	GetValue() interface{}
+}
+
 func columnsToQuery(cols []Column) (names []string, parameters []string, values []interface{}) {
 	names = make([]string, len(cols))
 	values = make([]interface{}, len(cols))
@@ -390,10 +415,13 @@ func columnsToQuery(cols []Column) (names []string, parameters []string, values 
 	var parameterIndex int
 	for i, col := range cols {
 		names[i] = col.Name
-		if c, ok := col.Value.(Column); ok {
+		switch c := col.Value.(type) {
+		case Column:
 			parameters[i] = c.Name
 			continue
-		} else {
+		case ValueContainer:
+			values[parameterIndex] = c.GetValue()
+		default:
 			values[parameterIndex] = col.Value
 		}
 		parameters[i] = "$" + strconv.Itoa(parameterIndex+1)

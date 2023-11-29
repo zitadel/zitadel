@@ -1028,7 +1028,7 @@
       "NOTIFICATIONS_DESC": "Impostazioni SMTP e SMS",
       "MESSAGETEXTS": "Testi di notifica",
       "IDP": "Fornitori di identità",
-      "VERIFIED_DAMAINS": "Domini verificati",
+      "VERIFIED_DOMAINS": "Domini verificati",
       "DOMAIN": "Impostazioni del dominio",
       "LOGINTEXTS": "Testi dell'interfaccia login",
       "BRANDING": "Branding",
@@ -1061,7 +1061,8 @@
       "pt": "Portuguese",
       "mk": "Македонски",
       "cs": "Čeština",
-      "ru": "Русский"
+      "ru": "Русский",
+      "nl": "Nederlands"
     },
     "SMTP": {
       "TITLE": "Impostazioni SMTP",
@@ -1274,7 +1275,8 @@
         "pt": "Portuguese",
         "mk": "Македонски",
         "cs": "Čeština",
-        "ru": "Русский"
+        "ru": "Русский",
+        "nl": "Nederlands"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -2096,6 +2098,8 @@
       "UPLOAD": "Carica il file XML",
       "METADATA": "Metadata",
       "METADATAFROMFILE": "Metadati dal file",
+      "CERTIFICATE": "Certificato SAML",
+      "DOWNLOADCERT": "Scarica il certificato SAML",
       "CREATEMETADATA": "Crea metadati",
       "ENTITYID": "Entity ID",
       "ACSURL": "ACS endpoint URL"
@@ -2165,7 +2169,8 @@
     "pt": "Portuguese",
     "mk": "Македонски",
     "cs": "Čeština",
-    "ru": "Русский"
+    "ru": "Русский",
+    "nl": "Nederlands"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

@@ -12,7 +12,7 @@ We require that you keep vulnerabilities confidential until we are able to addre
 The scope of this policy applies to all security issues that concern our Product in form of Software in our [open source repositories](https://github.com/zitadel).
 
 Out of scope are all websites and services operated by ZITADEL (CAOS Ltd.).
-Please refer to the separate [vulnerability disclosure policy](https://zitadel.com/docs/legal/vulnerability-disclosure-policy).
+Please refer to the separate [vulnerability disclosure policy](https://zitadel.com/docs/legal/policies/vulnerability-disclosure-policy).
 
 ### Supported Versions
 

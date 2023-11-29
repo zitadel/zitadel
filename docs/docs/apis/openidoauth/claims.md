@@ -9,26 +9,26 @@ Please check below the matrix for an overview where which scope is asserted.
 | Claims                                            | Userinfo       | Introspection  | ID Token                                    | Access Token                         |
 |:--------------------------------------------------|:---------------|----------------|---------------------------------------------|--------------------------------------|
 | acr                                               | No             | No             | Yes                                         | No                                   |
-| address                                           | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| address                                           | When requested | When requested | When requested and response_type `id_token` | No                                   |
 | amr                                               | No             | No             | Yes                                         | No                                   |
 | aud                                               | No             | Yes            | Yes                                         | When JWT                             |
 | auth_time                                         | No             | No             | Yes                                         | No                                   |
 | azp (client_id when Introspect)                   | No             | Yes            | Yes                                         | When JWT                             |
-| email                                             | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| email_verified                                    | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| email                                             | When requested | When requested | When requested and response_type `id_token` | No                                   |
+| email_verified                                    | When requested | When requested | When requested and response_type `id_token` | No                                   |
 | exp                                               | No             | Yes            | Yes                                         | When JWT                             |
-| family_name                                       | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| gender                                            | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| given_name                                        | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| family_name                                       | When requested | When requested | When requested and response_type `id_token` | No                                   |
+| gender                                            | When requested | When requested | When requested and response_type `id_token` | No                                   |
+| given_name                                        | When requested | When requested | When requested and response_type `id_token` | No                                   |
 | iat                                               | No             | Yes            | Yes                                         | When JWT                             |
 | iss                                               | No             | Yes            | Yes                                         | When JWT                             |
 | jti                                               | No             | Yes            | No                                          | When JWT                             |
-| locale                                            | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| name                                              | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| locale                                            | When requested | When requested | When requested and response_type `id_token` | No                                   |
+| name                                              | When requested | When requested | When requested and response_type `id_token` | No                                   |
 | nbf                                               | No             | Yes            | Yes                                         | When JWT                             |
 | nonce                                             | No             | No             | Yes                                         | No                                   |
-| phone                                             | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| phone_verified                                    | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| phone                                             | When requested | When requested | When requested and response_type `id_token` | No                                   |
+| phone_verified                                    | When requested | When requested | When requested and response_type `id_token` | No                                   |
 | preferred_username (username when Introspect)     | When requested | When requested | Yes                                         | No                                   |
 | sub                                               | Yes            | Yes            | Yes                                         | When JWT                             |
 | urn:zitadel:iam:org:domain:primary:{domainname}   | When requested | When requested | When requested                              | When JWT and requested               |

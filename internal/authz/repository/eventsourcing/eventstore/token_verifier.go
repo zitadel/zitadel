@@ -171,7 +171,7 @@ func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMeth
 	if domain.HasMFA(authMethods) {
 		return nil
 	}
-	availableAuthMethods, forceMFA, forceMFALocalOnly, err := repo.Query.ListUserAuthMethodTypesRequired(setCallerCtx(ctx, userID), userID, false)
+	availableAuthMethods, forceMFA, forceMFALocalOnly, err := repo.Query.ListUserAuthMethodTypesRequired(setCallerCtx(ctx, userID), userID)
 	if err != nil {
 		return err
 	}
@@ -263,9 +263,11 @@ func (repo *TokenVerifierRepo) getTokenIDAndSubject(ctx context.Context, accessT
 	// let's try opaque first:
 	tokenIDSubject, err := repo.decryptAccessToken(accessToken)
 	if err != nil {
+		logging.WithError(err).Warn("token verifier repo: decrypt access token")
 		// if decryption did not work, it might be a JWT
 		accessTokenClaims, err := op.VerifyAccessToken[*oidc.AccessTokenClaims](ctx, accessToken, repo.jwtTokenVerifier(ctx))
 		if err != nil {
+			logging.WithError(err).Warn("token verifier repo: verify JWT access token")
 			return "", "", false
 		}
 		return accessTokenClaims.JWTID, accessTokenClaims.Subject, true

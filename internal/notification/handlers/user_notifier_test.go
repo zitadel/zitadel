@@ -12,9 +12,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/notification/messages"
 
-	"github.com/golang/mock/gomock"
 	statik_fs "github.com/rakyll/statik/fs"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -1373,7 +1373,7 @@ func expectTemplateQueries(queries *mock.MockQueries, template string) {
 		},
 	}, nil)
 	queries.EXPECT().MailTemplateByOrg(gomock.Any(), gomock.Any(), gomock.Any()).Return(&query.MailTemplate{Template: []byte(template)}, nil)
-	queries.EXPECT().GetNotifyUserByID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(&query.NotifyUser{
+	queries.EXPECT().GetNotifyUserByID(gomock.Any(), gomock.Any(), gomock.Any()).Return(&query.NotifyUser{
 		ID:                 userID,
 		ResourceOwner:      orgID,
 		LastEmail:          lastEmail,

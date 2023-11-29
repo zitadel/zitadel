@@ -1061,7 +1061,8 @@
       "pt": "Portuguese",
       "mk": "Македонски",
       "cs": "Čeština",
-      "ru": "Русский"
+      "ru": "Русский",
+      "nl": "Nederlands"
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -1274,7 +1275,8 @@
         "pt": "Portuguese",
         "mk": "Македонски",
         "cs": "Čeština",
-        "ru": "Русский"
+        "ru": "Русский",
+        "nl": "Nederlands"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -2095,6 +2097,8 @@
       "UPLOAD": "XML-Datei hochladen",
       "METADATA": "Metadaten",
       "METADATAFROMFILE": "Metadata aus Datei",
+      "CERTIFICATE": "SAML-Zertifikat",
+      "DOWNLOADCERT": "Laden Sie das SAML-Zertifikat herunter",
       "CREATEMETADATA": "Create metadata",
       "ENTITYID": "Entity ID",
       "ACSURL": "ACS endpoint URL"
@@ -2164,7 +2168,8 @@
     "pt": "Portuguese",
     "mk": "Македонски",
     "cs": "Čeština",
-    "ru": "Русский"
+    "ru": "Русский",
+    "nl": "Nederlands"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

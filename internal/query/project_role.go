@@ -58,10 +58,6 @@ var (
 		name:  projection.ProjectRoleColumnGroupName,
 		table: projectRolesTable,
 	}
-	ProjectRoleColumnOwnerRemoved = Column{
-		name:  projection.ProjectRoleColumnOwnerRemoved,
-		table: projectRolesTable,
-	}
 )
 
 type ProjectRoles struct {
@@ -86,7 +82,7 @@ type ProjectRoleSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool, queries *ProjectRoleSearchQueries, withOwnerRemoved bool) (roles *ProjectRoles, err error) {
+func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool, queries *ProjectRoleSearchQueries) (roles *ProjectRoles, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -98,9 +94,6 @@ func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool
 	}
 
 	eq := sq.Eq{ProjectRoleColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		eq[ProjectRoleColumnOwnerRemoved.identifier()] = false
-	}
 
 	query, scan := prepareProjectRolesQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
@@ -119,11 +112,11 @@ func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool
 	return roles, err
 }
 
-func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grantedOrg string, queries *ProjectRoleSearchQueries, withOwnerRemoved bool) (roles *ProjectRoles, err error) {
+func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grantedOrg string, queries *ProjectRoleSearchQueries) (roles *ProjectRoles, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	grant, err := q.ProjectGrantByIDAndGrantedOrg(ctx, grantID, grantedOrg, withOwnerRemoved)
+	grant, err := q.ProjectGrantByIDAndGrantedOrg(ctx, grantID, grantedOrg)
 	if err != nil {
 		return nil, err
 	}
@@ -133,9 +126,6 @@ func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grante
 	}
 
 	eq := sq.Eq{ProjectRoleColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		eq[ProjectRoleColumnOwnerRemoved.identifier()] = false
-	}
 
 	query, scan := prepareProjectRolesQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()

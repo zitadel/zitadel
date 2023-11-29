@@ -86,6 +86,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         adminServiceUrl: `${env.api}/admin/v1`,
         mgmtServiceUrl: `${env.api}/management/v1`,
         authServiceUrl: `${env.api}/auth/v1`,
+        samlCertificateURL: `${env.issuer}/saml/v2/certificate`,
+        samlSSO: `${env.issuer}/saml/v2/SSO`,
+        samlSLO: `${env.issuer}/saml/v2/SLO`,
       };
     }),
   );
@@ -351,7 +354,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                   this.authMethods = this.authMethods.filter((element) => element !== CUSTOM_METHOD);
                 }
               } else if (this.app.samlConfig) {
-                this.settingsList = [{ id: 'configuration', i18nKey: 'APP.CONFIGURATION' }];
+                this.settingsList = [
+                  { id: 'configuration', i18nKey: 'APP.CONFIGURATION' },
+                  { id: 'urls', i18nKey: 'APP.URLS' },
+                ];
               }
 
               if (allowed) {

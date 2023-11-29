@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limits not found
     NoneSpecified: No limits specified
+  Restrictions:
+    NoneSpecified: No restrictions specified
   Language:
     NotParsed: Could not parse language
   OIDCSettings:
@@ -429,6 +431,7 @@ Errors:
   UserSession:
     NotFound: UserSession not found
   Key:
+    NotFound: Key not found
     ExpireBeforeNow: The expiration date is in the past
   Login:
     LoginPolicy:

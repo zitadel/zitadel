@@ -240,6 +240,7 @@ RegistrationUser:
   Macedonian: Македонски
   Czech: Čeština
   Russian: Русский
+  Dutch: Nederlands
   GenderLabel: 性別
   Female: 女性
   Male: 男性
@@ -278,6 +279,7 @@ ExternalRegistrationUserOverview:
   Macedonian: Македонски
   Czech: Čeština
   Russian: Русский
+  Dutch: Nederlands
   TosAndPrivacyLabel: 利用規約
   TosConfirm: 私は利用規約を承諾します。
   TosLinkText: TOS
@@ -344,6 +346,7 @@ ExternalNotFound:
   Macedonian: Македонски
   Czech: Čeština
   Russian: Русский
+  Dutch: Nederlands
 
 DeviceAuth:
   Title: デバイス認証

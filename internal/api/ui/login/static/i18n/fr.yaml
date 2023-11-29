@@ -248,6 +248,7 @@ RegistrationUser:
   Macedonian: Македонски
   Czech: Čeština
   Russian: Русский
+  Dutch: Nederlands
   GenderLabel: Genre
   Female: Femme
   Male: Homme
@@ -286,6 +287,7 @@ ExternalRegistrationUserOverview:
   Macedonian: Македонски
   Czech: Čeština
   Russian: Русский
+  Dutch: Nederlands
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
@@ -352,6 +354,7 @@ ExternalNotFound:
   Macedonian: Македонски
   Czech: Čeština
   Russian: Русский
+  Dutch: Nederlands
 
 DeviceAuth:
   Title: Autorisation de l'appareil

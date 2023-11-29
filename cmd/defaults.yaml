@@ -10,9 +10,20 @@ Metrics:
 
 Tracing:
   # Choose one in "otel", "google", "log" and "none"
+  # Depending on the type there are different configuration options
+  # for type 'otel' is used for standard [open telemetry](https://opentelemetry.io)
+  # Fraction: 1.0
+  # Endpoint: 'otel.collector.endpoint'
+  # 
+  # type 'log' or '' disables tracing
+  # 
+  # for type 'google'
+  # ProjectID: ''
+  # Fraction: 1.0
   Type: none # ZITADEL_TRACING_TYPE
   Fraction: 1.0 # ZITADEL_TRACING_FRACTION
-  MetricPrefix: zitadel # ZITADEL_TRACING_METRICPREFIX
+  # The endpoint of the otel collector endpoint
+  Endpoint: '' #ZITADEL_TRACING_ENDPOINT
 
 Telemetry:
   # As long as Enabled is true, ZITADEL tries to send usage data to the configured Telemetry.Endpoints.
@@ -314,6 +325,11 @@ OIDC:
       Path: /oauth/v2/device_authorization # ZITADEL_OIDC_CUSTOMENDPOINTS_DEVICEAUTH_PATH
   DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
   DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
+  Features:
+    # Wheter projection triggers are used in the new Introspection implementation.
+    TriggerIntrospectionProjections: false
+    # Allows fallback to the Legacy Introspection implementation
+    LegacyIntrospection: false
 
 SAML:
   ProviderConfig:
@@ -818,6 +834,10 @@ DefaultInstance:
     # A value of "0s" means that all events are available.
     # If this value is set, it overwrites the system default unless it is not reset via the admin API.
     AuditLogRetention: # ZITADEL_DEFAULTINSTANCE_LIMITS_AUDITLOGRETENTION
+  Restrictions:
+    # DisallowPublicOrgRegistration defines if ZITADEL should expose the endpoint /ui/login/register/org
+    # If it is true, the endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.
+    DisallowPublicOrgRegistration: # ZITADEL_DEFAULTINSTANCE_RESTRICTIONS_DISALLOWPUBLICORGREGISTRATION
   Quotas:
     # Items take a slice of quota configurations, whereas, for each unit type and instance, one or zero quotas may exist.
     # The following unit types are supported
@@ -902,6 +922,8 @@ InternalAuthZ:
         - "iam.flow.write"
         - "iam.flow.delete"
         - "iam.feature.write"
+        - "iam.restrictions.read"
+        - "iam.restrictions.write"
         - "org.read"
         - "org.global.read"
         - "org.create"
@@ -953,6 +975,7 @@ InternalAuthZ:
         - "project.grant.member.delete"
         - "events.read"
         - "milestones.read"
+        - "session.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -961,6 +984,7 @@ InternalAuthZ:
         - "iam.idp.read"
         - "iam.action.read"
         - "iam.flow.read"
+        - "iam.restrictions.read"
         - "org.read"
         - "org.member.read"
         - "org.idp.read"
@@ -1030,6 +1054,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "session.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1053,6 +1078,7 @@ InternalAuthZ:
         - "project.grant.write"
         - "project.grant.delete"
         - "project.grant.member.read"
+        - "session.delete"
     - Role: "ORG_OWNER"
       Permissions:
         - "org.read"
@@ -1102,6 +1128,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "session.delete"
     - Role: "ORG_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1116,6 +1143,7 @@ InternalAuthZ:
         - "policy.read"
         - "project.read"
         - "project.role.read"
+        - "session.delete"
     - Role: "ORG_OWNER_VIEWER"
       Permissions:
         - "org.read"
