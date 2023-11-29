@@ -78,7 +78,7 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 	t.Run("the login ui is rendered in the default language", func(tt *testing.T) {
 		checkLoginUILanguage(tt, domain, disallowedLanguage, defaultAndAllowedLanguage, "Allgemeine Geschäftsbedingungen und Datenschutz")
 	})
-	t.Run("preferred languages and message texts are not restricted by the supported languages", func(tt *testing.T) {
+	t.Run("preferred languages are not restricted by the supported languages", func(tt *testing.T) {
 		var importedUser *management.ImportHumanUserResponse
 		tt.Run("import user", func(ttt *testing.T) {
 			var err error
@@ -97,32 +97,32 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 			})
 			require.NoError(ttt, err)
 		})
-		tt.Run("setting a message text for a disallowed language still works, so they can be set before a language is allowed", func(ttt *testing.T) {
-			_, err := Tester.Client.Admin.SetCustomLoginText(iamOwnerCtx, &admin.SetCustomLoginTextsRequest{
-				Language: unsupportedLanguage1.String(),
-				EmailVerificationText: &text.EmailVerificationScreenText{
-					Description: "hodor",
-				},
-			})
-			assert.NoError(ttt, err)
-			_, err = Tester.Client.Mgmt.SetCustomLoginText(iamOwnerCtx, &management.SetCustomLoginTextsRequest{
-				Language: unsupportedLanguage1.String(),
-				EmailVerificationText: &text.EmailVerificationScreenText{
-					Description: "hodor",
-				},
-			})
-			assert.NoError(ttt, err)
-			_, err = Tester.Client.Mgmt.SetCustomInitMessageText(iamOwnerCtx, &management.SetCustomInitMessageTextRequest{
-				Language: unsupportedLanguage1.String(),
-				Text:     "hodor",
-			})
-			assert.NoError(ttt, err)
-			_, err = Tester.Client.Admin.SetDefaultInitMessageText(iamOwnerCtx, &admin.SetDefaultInitMessageTextRequest{
-				Language: unsupportedLanguage1.String(),
-				Text:     "hodor",
-			})
-			assert.NoError(ttt, err)
+	})
+	t.Run("custom texts are only restricted by the supported languages", func(tt *testing.T) {
+		_, err := Tester.Client.Admin.SetCustomLoginText(iamOwnerCtx, &admin.SetCustomLoginTextsRequest{
+			Language: disallowedLanguage.String(),
+			EmailVerificationText: &text.EmailVerificationScreenText{
+				Description: "hodor",
+			},
 		})
+		assert.NoError(tt, err)
+		_, err = Tester.Client.Mgmt.SetCustomLoginText(iamOwnerCtx, &management.SetCustomLoginTextsRequest{
+			Language: disallowedLanguage.String(),
+			EmailVerificationText: &text.EmailVerificationScreenText{
+				Description: "hodor",
+			},
+		})
+		assert.NoError(tt, err)
+		_, err = Tester.Client.Mgmt.SetCustomInitMessageText(iamOwnerCtx, &management.SetCustomInitMessageTextRequest{
+			Language: disallowedLanguage.String(),
+			Text:     "hodor",
+		})
+		assert.NoError(tt, err)
+		_, err = Tester.Client.Admin.SetDefaultInitMessageText(iamOwnerCtx, &admin.SetDefaultInitMessageTextRequest{
+			Language: disallowedLanguage.String(),
+			Text:     "hodor",
+		})
+		assert.NoError(tt, err)
 	})
 	t.Run("allowing all languages works", func(tt *testing.T) {
 		tt.Run("restricting allowed languages works", func(ttt *testing.T) {
