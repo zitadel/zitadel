@@ -49,7 +49,6 @@ require (
 	github.com/muhlemmer/gu v0.3.1
 	github.com/muhlemmer/httpforwarded v0.1.0
 	github.com/nicksnyder/go-i18n/v2 v2.2.2
-	github.com/pkg/errors v0.9.1
 	github.com/pquerna/otp v1.4.0
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.10.1
@@ -107,6 +106,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sagikazarmark/locafero v0.3.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect

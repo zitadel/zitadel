@@ -44,7 +44,7 @@ func (q *Queries) GetOIDCUserInfo(ctx context.Context, userID string, roleAudien
 		userID, authz.GetInstance(ctx).InstanceID(), database.TextArray[string](roleAudience),
 	)
 	if errors.Is(err, sql.ErrNoRows) {
-		zerrors.ThrowNotFound(err, "QUERY-Eey2a", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(err, "QUERY-Eey2a", "Errors.User.NotFound")
 	}
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-Oath6", "Errors.Internal")

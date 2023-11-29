@@ -5,7 +5,8 @@ import (
 	"net"
 	"net/smtp"
 
-	"github.com/pkg/errors"
+	"errors"
+
 	"github.com/zitadel/logging"
 
 	caos_errs "github.com/zitadel/zitadel/internal/errors"

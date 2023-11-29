@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"

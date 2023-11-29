@@ -4,9 +4,9 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	"errors"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
