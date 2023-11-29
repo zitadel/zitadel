@@ -220,11 +220,7 @@ func (s *Server) BulkRemoveUserMetadata(ctx context.Context, req *mgmt_pb.BulkRe
 
 func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequest) (*mgmt_pb.AddHumanUserResponse, error) {
 	human := AddHumanUserRequestToAddHuman(req)
-	restrictions, err := s.query.GetInstanceRestrictions(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if err = s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, human, true, restrictions.AllowedLanguages); err != nil {
+	if err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, human, true); err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddHumanUserResponse{
@@ -281,11 +277,7 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 	if err != nil {
 		return nil, err
 	}
-	restrictions, err := s.query.GetInstanceRestrictions(ctx)
-	if err != nil {
-		return nil, err
-	}
-	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless, links, initCodeGenerator, phoneCodeGenerator, emailCodeGenerator, passwordlessInitCode, restrictions.AllowedLanguages)
+	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless, links, initCodeGenerator, phoneCodeGenerator, emailCodeGenerator, passwordlessInitCode)
 	if err != nil {
 		return nil, err
 	}
@@ -429,11 +421,7 @@ func (s *Server) GetHumanProfile(ctx context.Context, req *mgmt_pb.GetHumanProfi
 }
 
 func (s *Server) UpdateHumanProfile(ctx context.Context, req *mgmt_pb.UpdateHumanProfileRequest) (*mgmt_pb.UpdateHumanProfileResponse, error) {
-	restrictions, err := s.query.GetInstanceRestrictions(ctx)
-	if err != nil {
-		return nil, err
-	}
-	profile, err := s.command.ChangeHumanProfile(ctx, UpdateHumanProfileRequestToDomain(req, authz.GetCtxData(ctx).OrgID), restrictions.AllowedLanguages)
+	profile, err := s.command.ChangeHumanProfile(ctx, UpdateHumanProfileRequestToDomain(req, authz.GetCtxData(ctx).OrgID))
 	if err != nil {
 		return nil, err
 	}

@@ -212,7 +212,7 @@ func (m *mockInstance) ConsoleApplicationID() string {
 }
 
 func (m *mockInstance) DefaultLanguage() language.Tag {
-	return language.English
+	return AllowedLanguage
 }
 
 func (m *mockInstance) DefaultOrganisationID() string {

@@ -343,11 +343,11 @@ type CustomLoginText struct {
 	Footer                           FooterText
 }
 
-func (m *CustomLoginText) IsValid() error {
+func (m *CustomLoginText) IsValid(supportedLanguages []language.Tag) error {
 	if err := LanguageIsDefined(m.Language); err != nil {
 		return err
 	}
-	return LanguagesAreSupported(m.Language)
+	return LanguagesAreSupported(supportedLanguages, m.Language)
 }
 
 type SelectAccountScreenText struct {

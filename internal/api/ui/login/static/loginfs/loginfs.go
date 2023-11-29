@@ -2,8 +2,9 @@ package loginfs
 
 import (
 	"fmt"
-	"github.com/rakyll/statik/fs"
 	"net/http"
+
+	"github.com/rakyll/statik/fs"
 )
 
 var loadedloginFS http.FileSystem

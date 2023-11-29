@@ -33,12 +33,11 @@ func TestCommandSide_AddHuman(t *testing.T) {
 		newCode            cryptoCodeFunc
 	}
 	type args struct {
-		ctx              context.Context
-		orgID            string
-		human            *AddHuman
-		secretGenerator  crypto.Generator
-		allowInitMail    bool
-		allowedLanguages []language.Tag
+		ctx             context.Context
+		orgID           string
+		human           *AddHuman
+		secretGenerator crypto.Generator
+		allowInitMail   bool
 	}
 	type res struct {
 		want          *domain.ObjectDetails
@@ -202,61 +201,6 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				err: func(err error) bool {
 					return errors.Is(err, zitadel_errs.ThrowInternal(nil, "USER-uQ96e", "Errors.Internal"))
 				},
-			},
-		},
-		{
-			name: "preferred language not supported, invalid argument error",
-			fields: fields{
-				userPasswordHasher: mockPasswordHasher("x"),
-				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				eventstore:         expectEventstore(),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				human: &AddHuman{
-					Username:  "username",
-					FirstName: "firstname",
-					LastName:  "lastname",
-					Password:  "pass",
-					Email: Email{
-						Address:  "email@test.ch",
-						Verified: true,
-					},
-					PreferredLanguage: UnsupportedLanguage,
-				},
-				allowInitMail:    true,
-				allowedLanguages: SupportedLanguages,
-			},
-			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
-			},
-		}, {
-			name: "preferred language not allowed, precondition error",
-			fields: fields{
-				userPasswordHasher: mockPasswordHasher("x"),
-				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				eventstore:         expectEventstore(),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				human: &AddHuman{
-					Username:  "username",
-					FirstName: "firstname",
-					LastName:  "lastname",
-					Password:  "pass",
-					Email: Email{
-						Address:  "email@test.ch",
-						Verified: true,
-					},
-					PreferredLanguage: DisallowedLanguage,
-				},
-				allowInitMail:    true,
-				allowedLanguages: OnlyAllowedLanguages,
-			},
-			res: res{
-				err: zitadel_errs.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1232,7 +1176,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        tt.fields.idGenerator,
 				newCode:            tt.fields.newCode,
 			}
-			err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail, tt.args.allowedLanguages)
+			err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -1264,7 +1208,6 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		links                []*domain.UserIDPLink
 		secretGenerator      crypto.Generator
 		passwordlessInitCode crypto.Generator
-		allowedLanguages     []language.Tag
 	}
 	type res struct {
 		wantHuman *domain.Human
@@ -1418,114 +1361,6 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			},
 			res: res{
 				err: zitadel_errs.IsErrorInvalidArgument,
-			},
-		}, {
-			name: "preferred language not supported, invalid argument error",
-			given: func(t *testing.T) (fields, args) {
-				return fields{
-						eventstore: eventstoreExpect(t,
-							expectFilter(
-								eventFromEventPusher(
-									org.NewDomainPolicyAddedEvent(context.Background(),
-										&user.NewAggregate("user1", "org1").Aggregate,
-										true,
-										true,
-										true,
-									),
-								),
-							),
-							expectFilter(
-								eventFromEventPusher(
-									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-										&user.NewAggregate("user1", "org1").Aggregate,
-										1,
-										false,
-										false,
-										false,
-										false,
-									),
-								),
-							),
-						),
-					},
-					args{
-						ctx:   context.Background(),
-						orgID: "org1",
-						human: &domain.Human{
-							Username: "username",
-							Password: &domain.Password{
-								SecretString:   "password",
-								ChangeRequired: true,
-							},
-							Email: &domain.Email{
-								EmailAddress:    "email@test.ch",
-								IsEmailVerified: true,
-							},
-							Profile: &domain.Profile{
-								FirstName:         "firstname",
-								LastName:          "lastname",
-								PreferredLanguage: UnsupportedLanguage,
-							},
-						},
-						allowedLanguages: OnlyAllowedLanguages,
-					}
-			},
-			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
-			},
-		}, {
-			name: "preferred language not allowed, precondition error",
-			given: func(t *testing.T) (fields, args) {
-				return fields{
-						eventstore: eventstoreExpect(t,
-							expectFilter(
-								eventFromEventPusher(
-									org.NewDomainPolicyAddedEvent(context.Background(),
-										&user.NewAggregate("user1", "org1").Aggregate,
-										true,
-										true,
-										true,
-									),
-								),
-							),
-							expectFilter(
-								eventFromEventPusher(
-									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-										&user.NewAggregate("user1", "org1").Aggregate,
-										1,
-										false,
-										false,
-										false,
-										false,
-									),
-								),
-							),
-						),
-					},
-					args{
-						ctx:   context.Background(),
-						orgID: "org1",
-						human: &domain.Human{
-							Username: "username",
-							Password: &domain.Password{
-								SecretString:   "password",
-								ChangeRequired: true,
-							},
-							Email: &domain.Email{
-								EmailAddress:    "email@test.ch",
-								IsEmailVerified: true,
-							},
-							Profile: &domain.Profile{
-								FirstName:         "firstname",
-								LastName:          "lastname",
-								PreferredLanguage: DisallowedLanguage,
-							},
-						},
-						allowedLanguages: OnlyAllowedLanguages,
-					}
-			},
-			res: res{
-				err: zitadel_errs.IsPreconditionFailed,
 			},
 		}, {
 			name: "add human (with password and initial code), ok",
@@ -2390,7 +2225,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 				idGenerator:        f.idGenerator,
 				userPasswordHasher: f.userPasswordHasher,
 			}
-			gotHuman, gotCode, err := r.ImportHuman(a.ctx, a.orgID, a.human, a.passwordless, a.links, a.secretGenerator, a.secretGenerator, a.secretGenerator, a.secretGenerator, a.allowedLanguages)
+			gotHuman, gotCode, err := r.ImportHuman(a.ctx, a.orgID, a.human, a.passwordless, a.links, a.secretGenerator, a.secretGenerator, a.secretGenerator, a.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -2412,13 +2247,12 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 		userPasswordHasher *crypto.PasswordHasher
 	}
 	type args struct {
-		ctx              context.Context
-		orgID            string
-		human            *domain.Human
-		link             *domain.UserIDPLink
-		orgMemberRoles   []string
-		secretGenerator  crypto.Generator
-		allowedLanguages []language.Tag
+		ctx             context.Context
+		orgID           string
+		human           *domain.Human
+		link            *domain.UserIDPLink
+		orgMemberRoles  []string
+		secretGenerator crypto.Generator
 	}
 	type res struct {
 		want *domain.Human
@@ -2798,36 +2632,6 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 			},
 			res: res{
 				err: zitadel_errs.IsErrorInvalidArgument,
-			},
-		}, {
-			name: "preferred language not allowed, precondition error",
-			fields: fields{
-				userPasswordHasher: mockPasswordHasher("x"),
-				eventstore: eventstoreExpect(t,
-					expectFilter(),
-					expectFilter(),
-				),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "org1",
-				human: &domain.Human{
-					Username: "username",
-					Password: &domain.Password{
-						SecretString: "password",
-					},
-					Email: &domain.Email{
-						EmailAddress:    "email@test.ch",
-						IsEmailVerified: true,
-					},
-					Profile: &domain.Profile{
-						PreferredLanguage: DisallowedLanguage,
-					},
-				},
-				allowedLanguages: OnlyAllowedLanguages,
-			},
-			res: res{
-				err: zitadel_errs.IsPreconditionFailed,
 			},
 		},
 		{
@@ -3702,7 +3506,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				idGenerator:        tt.fields.idGenerator,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
-			got, err := r.RegisterHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.link, tt.args.orgMemberRoles, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.allowedLanguages)
+			got, err := r.RegisterHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.link, tt.args.orgMemberRoles, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -4060,13 +3864,12 @@ func TestAddHumanCommand(t *testing.T) {
 		idGenerator id.Generator
 	}
 	type args struct {
-		human            *AddHuman
-		orgID            string
-		hasher           *crypto.PasswordHasher
-		filter           preparation.FilterToQueryReducer
-		codeAlg          crypto.EncryptionAlgorithm
-		allowInitMail    bool
-		allowedLanguages []language.Tag
+		human         *AddHuman
+		orgID         string
+		hasher        *crypto.PasswordHasher
+		filter        preparation.FilterToQueryReducer
+		codeAlg       crypto.EncryptionAlgorithm
+		allowInitMail bool
 	}
 	agg := user.NewAggregate("id", "ro")
 	tests := []struct {
@@ -4340,7 +4143,7 @@ func TestAddHumanCommand(t *testing.T) {
 			c := &Commands{
 				idGenerator: tt.fields.idGenerator,
 			}
-			AssertValidation(t, context.Background(), c.AddHumanCommand(tt.args.human, tt.args.orgID, tt.args.hasher, tt.args.codeAlg, tt.args.allowInitMail, tt.args.allowedLanguages), tt.args.filter, tt.want)
+			AssertValidation(t, context.Background(), c.AddHumanCommand(tt.args.human, tt.args.orgID, tt.args.hasher, tt.args.codeAlg, tt.args.allowInitMail), tt.args.filter, tt.want)
 		})
 	}
 }

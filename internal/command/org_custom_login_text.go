@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
@@ -34,7 +35,7 @@ func (c *Commands) SetOrgLoginText(ctx context.Context, resourceOwner string, lo
 }
 
 func (c *Commands) setOrgLoginText(ctx context.Context, orgAgg *eventstore.Aggregate, loginText *domain.CustomLoginText) ([]eventstore.Command, *OrgCustomLoginTextReadModel, error) {
-	if err := loginText.IsValid(); err != nil {
+	if err := loginText.IsValid(i18n.SupportedLanguages()); err != nil {
 		return nil, nil, err
 	}
 	existingLoginText, err := c.orgCustomLoginTextWriteModelByID(ctx, orgAgg.ID, loginText.Language)

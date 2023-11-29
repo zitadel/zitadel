@@ -13,7 +13,6 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/zitadel/logging"
-	"golang.org/x/text/language"
 	"google.golang.org/api/option"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -92,10 +91,6 @@ func (c *counts) getProgress() string {
 func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest) (_ *admin_pb.ImportDataResponse, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	restrictions, err := s.query.GetInstanceRestrictions(ctx)
-	if err != nil {
-		return nil, err
-	}
 	if req.GetDataOrgs() != nil || req.GetDataOrgsv1() != nil {
 		timeoutDuration, err := time.ParseDuration(req.Timeout)
 		if err != nil {
@@ -118,7 +113,7 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 				orgs = req.GetDataOrgs().GetOrgs()
 			}
 
-			ret, count, err := s.importData(ctx, orgs, restrictions.AllowedLanguages)
+			ret, count, err := s.importData(ctx, orgs)
 			ch <- importResponse{ret: ret, count: count, err: err}
 		}()
 
@@ -173,7 +168,7 @@ func (s *Server) ImportData(ctx context.Context, req *admin_pb.ImportDataRequest
 					ch <- importResponse{nil, nil, err}
 					return
 				}
-				resp, count, err := s.importData(ctxTimeout, dataOrgs, restrictions.AllowedLanguages)
+				resp, count, err := s.importData(ctxTimeout, dataOrgs)
 				if err != nil {
 					ch <- importResponse{nil, count, err}
 					return
@@ -297,7 +292,7 @@ func getFileFromGCS(ctx context.Context, input *admin_pb.ImportDataRequest_GCSIn
 	return ioutil.ReadAll(reader)
 }
 
-func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, ctxData authz.CtxData, org *admin_pb.DataOrg, success *admin_pb.ImportDataSuccess, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, appSecretGenerator crypto.Generator, allowedLanguages []language.Tag) error {
+func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, ctxData authz.CtxData, org *admin_pb.DataOrg, success *admin_pb.ImportDataSuccess, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, appSecretGenerator crypto.Generator) error {
 	_, err := s.command.AddOrgWithID(ctx, org.GetOrg().GetName(), ctxData.UserID, ctxData.ResourceOwner, org.GetOrgId(), []string{})
 	if err != nil {
 		*errors = append(*errors, &admin_pb.ImportDataError{Type: "org", Id: org.GetOrgId(), Message: err.Error()})
@@ -330,7 +325,7 @@ func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "domain_policy", Id: org.GetOrgId(), Message: err.Error()})
 		}
 	}
-	return importResources(ctx, s, errors, successOrg, org, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, appSecretGenerator, allowedLanguages)
+	return importResources(ctx, s, errors, successOrg, org, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, appSecretGenerator)
 }
 
 func importLabelPolicy(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, org *admin_pb.DataOrg) error {
@@ -435,7 +430,7 @@ func importPrivacyPolicy(ctx context.Context, s *Server, errors *[]*admin_pb.Imp
 	}
 }
 
-func importHumanUsers(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode crypto.Generator, allowedLanguages []language.Tag) error {
+func importHumanUsers(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode crypto.Generator) error {
 	if org.HumanUsers == nil {
 		return nil
 	}
@@ -443,7 +438,7 @@ func importHumanUsers(ctx context.Context, s *Server, errors *[]*admin_pb.Import
 		logging.Debugf("import user: %s", user.GetUserId())
 		human, passwordless, links := management.ImportHumanUserRequestToDomain(user.User)
 		human.AggregateID = user.UserId
-		_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, links, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, allowedLanguages)
+		_, _, err := s.command.ImportHuman(ctx, org.GetOrgId(), human, passwordless, links, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "human_user", Id: user.GetUserId(), Message: err.Error()})
 			if isCtxTimeout(ctx) {
@@ -705,7 +700,7 @@ func importProjectRoles(ctx context.Context, s *Server, errors *[]*admin_pb.Impo
 	return nil
 }
 
-func importResources(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, appSecretGenerator crypto.Generator, allowedLanguages []language.Tag) error {
+func importResources(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, appSecretGenerator crypto.Generator) error {
 	if err := importOrgDomains(ctx, s, errors, successOrg, org); err != nil {
 		return err
 	}
@@ -729,7 +724,7 @@ func importResources(ctx context.Context, s *Server, errors *[]*admin_pb.ImportD
 	importVerifyPhoneMessageTexts(ctx, s, errors, org)
 	importDomainClaimedMessageTexts(ctx, s, errors, org)
 	importPasswordlessRegistrationMessageTexts(ctx, s, errors, org)
-	if err := importHumanUsers(ctx, s, errors, successOrg, org, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, allowedLanguages); err != nil {
+	if err := importHumanUsers(ctx, s, errors, successOrg, org, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode); err != nil {
 		return err
 	}
 	if err := importMachineUsers(ctx, s, errors, successOrg, org, count); err != nil {
@@ -1023,7 +1018,7 @@ func findOldOrg(success *admin_pb.ImportDataSuccess, orgId string) *admin_pb.Imp
 	return nil
 }
 
-func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg, allowedLanguages []language.Tag) (*admin_pb.ImportDataResponse, *counts, error) {
+func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*admin_pb.ImportDataResponse, *counts, error) {
 	errors := make([]*admin_pb.ImportDataError, 0)
 	success := &admin_pb.ImportDataSuccess{}
 	count := &counts{}
@@ -1069,7 +1064,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg, allow
 		count.appKeysCount += len(org.GetAppKeys())
 	}
 	for _, org := range orgs {
-		if err = importOrg1(ctx, s, &errors, ctxData, org, success, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, appSecretGenerator, allowedLanguages); err != nil {
+		if err = importOrg1(ctx, s, &errors, ctxData, org, success, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, appSecretGenerator); err != nil {
 			return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
 		}
 	}

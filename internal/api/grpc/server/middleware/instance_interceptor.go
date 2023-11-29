@@ -24,7 +24,7 @@ const (
 )
 
 func InstanceInterceptor(verifier authz.InstanceVerifier, headerName string, explicitInstanceIdServices ...string) grpc.UnaryServerInterceptor {
-	translator, err := newZitadelTranslator(language.English)
+	translator, err := newZitadelTranslator(language.English, i18n.SupportedLanguages())
 	logging.OnError(err).Panic("unable to get translator")
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		return setInstance(ctx, req, info, handler, verifier, headerName, translator, explicitInstanceIdServices...)

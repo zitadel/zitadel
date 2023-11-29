@@ -19,10 +19,9 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx              context.Context
-		address          *domain.Profile
-		resourceOwner    string
-		allowedLanguages []language.Tag
+		ctx           context.Context
+		address       *domain.Profile
+		resourceOwner string
 	}
 	type res struct {
 		want *domain.Profile
@@ -101,54 +100,6 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 			res: res{
 				err: zitadel_errs.IsPreconditionFailed,
 			},
-		}, {
-			name: "unsupported language, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(t),
-			},
-			args: args{
-				ctx: context.Background(),
-				address: &domain.Profile{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "user1",
-					},
-					FirstName:         "firstname2",
-					LastName:          "lastname2",
-					NickName:          "nickname2",
-					DisplayName:       "displayname2",
-					PreferredLanguage: UnsupportedLanguage,
-					Gender:            domain.GenderMale,
-				},
-				resourceOwner: "org1",
-			},
-			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
-			name: "disallowed language, precondition failed error",
-			fields: fields{
-				eventstore: eventstoreExpect(t),
-			},
-			args: args{
-				ctx: context.Background(),
-				address: &domain.Profile{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "user1",
-					},
-					FirstName:         "firstname2",
-					LastName:          "lastname2",
-					NickName:          "nickname2",
-					DisplayName:       "displayname2",
-					PreferredLanguage: DisallowedLanguage,
-					Gender:            domain.GenderMale,
-				},
-				resourceOwner:    "org1",
-				allowedLanguages: OnlyAllowedLanguages,
-			},
-			res: res{
-				err: zitadel_errs.IsPreconditionFailed,
-			},
 		},
 		{
 			name: "profile changed, ok",
@@ -220,7 +171,7 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeHumanProfile(tt.args.ctx, tt.args.address, tt.args.allowedLanguages)
+			got, err := r.ChangeHumanProfile(tt.args.ctx, tt.args.address)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

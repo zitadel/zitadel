@@ -2,9 +2,10 @@ package command
 
 import (
 	"context"
-	"golang.org/x/text/language"
 	"testing"
 	"time"
+
+	"golang.org/x/text/language"
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"

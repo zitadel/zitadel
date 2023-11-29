@@ -17,7 +17,7 @@ func (s *Server) SetRestrictions(ctx context.Context, req *admin.SetRestrictions
 	details, err := s.command.SetInstanceRestrictions(ctx, &command.SetRestrictions{
 		DisallowPublicOrgRegistration: req.DisallowPublicOrgRegistration,
 		AllowedLanguages:              lang,
-	}, s.query.GetDefaultLanguage(ctx))
+	})
 	if err != nil {
 		return nil, err
 	}
