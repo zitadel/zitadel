@@ -1047,22 +1047,28 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "默认语言",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "语言设置",
+      "DEFAULT": "默认语言",
+      "ALLOWED": "允许的语言",
+      "NOT_ALLOWED": "不允许的语言",
+      "SAVED": "语言已保存",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "SMTP 设置",
@@ -1261,7 +1267,6 @@
       "UNSAVED_TITLE": "继续但不保存？",
       "UNSAVED_DESCRIPTION": "您在未保存的情况下进行了更改。您现在要保存吗？",
       "ACTIVE_LANGUAGE_NOT_ALLOWED": "您选择了不允许的语言。您可以继续修改文本。但是，如果您希望您的用户实际上能够使用此语言，请更改您的实例限制。",
-      "LANGUAGES_NOT_ALLOWED": "不允许：",
       "LANGUAGE": "语言",
       "LANGUAGES": {
         "de": "Deutsch",
@@ -1374,7 +1379,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP 发件人地址与实例域名匹配",
       "ALLOWUSERNAMEPASSWORD": "允许用户名密码",
       "ALLOWEXTERNALIDP": "允许外部身份提供者",
-      "ALLOWREGISTER": "允许注册",
+      "ALLOWREGISTERUSERS": "允许注册用户",
+      "ALLOWREGISTERORGS": "允许注册组织",
       "ALLOWUSERNAMEPASSWORD_DESC": "允许使用用户名和密码进行登录。",
       "ALLOWEXTERNALIDP_DESC": "允许外部身份提供者进行登录",
       "ALLOWREGISTER_DESC": "如果选择了该选项，登录中会出现一个用于注册用户的附加步骤。",

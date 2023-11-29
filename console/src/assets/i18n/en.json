@@ -1053,7 +1053,7 @@
       "DEFAULT": "Default Language",
       "ALLOWED": "Allowed Languages",
       "NOT_ALLOWED": "Not Allowed Languages",
-      "NO_CHANGES": "No changes",
+      "SAVED": "Languages saved",
       "OPTIONS": {
         "de": "Deutsch",
         "en": "English",
@@ -1269,7 +1269,6 @@
       "UNSAVED_TITLE": "Continue without saving?",
       "UNSAVED_DESCRIPTION": "You have made changes without saving. Do you want to save now?",
       "ACTIVE_LANGUAGE_NOT_ALLOWED": "You selected a language that is not allowed. You can go on modifying the texts. But if you want your users to actually be able to use this language, change your instances restrictions.",
-      "LANGUAGES_NOT_ALLOWED": "Not allowed:",
       "LANGUAGE": "Language",
       "LANGUAGES": {
         "de": "Deutsch",
@@ -1382,7 +1381,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
       "ALLOWUSERNAMEPASSWORD": "Username Password allowed",
       "ALLOWEXTERNALIDP": "External IDP allowed",
-      "ALLOWREGISTER": "Register allowed",
+      "ALLOWREGISTERUSERS": "Register users allowed",
+      "ALLOWREGISTERORGS": "Register organizations allowed",
       "ALLOWUSERNAMEPASSWORD_DESC": "The conventional login with user name and password is allowed.",
       "ALLOWEXTERNALIDP_DESC": "The login is allowed for the underlying identity providers",
       "ALLOWREGISTER_DESC": "If the option is selected, an additional step for registering a user appears in the login.",

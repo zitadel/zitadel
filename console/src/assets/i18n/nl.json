@@ -1048,22 +1048,28 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Standaard Taal",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "Engels",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portugees",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Taalinstellingen",
+      "DEFAULT": "Standaardtaal",
+      "ALLOWED": "Toegestane Talen",
+      "NOT_ALLOWED": "Niet Toegestane Talen",
+      "SAVED": "Talen opgeslagen",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "Engels",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portugees",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "SMTP Instellingen",
@@ -1263,7 +1269,6 @@
       "UNSAVED_TITLE": "Doorgaan zonder opslaan?",
       "UNSAVED_DESCRIPTION": "U heeft wijzigingen gemaakt zonder op te slaan. Wilt u nu opslaan?",
       "ACTIVE_LANGUAGE_NOT_ALLOWED": "U heeft een taal geselecteerd die niet is toegestaan. U kunt doorgaan met het wijzigen van de teksten. Maar als u wilt dat uw gebruikers deze taal daadwerkelijk kunnen gebruiken, wijzig dan de beperkingen van uw instantie.",
-      "LANGUAGES_NOT_ALLOWED": "Niet toegestaan:",
       "LANGUAGE": "Taal",
       "LANGUAGES": {
         "de": "Deutsch",
@@ -1376,7 +1381,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Afzender Adres komt overeen met Instantie Domein",
       "ALLOWUSERNAMEPASSWORD": "Gebruikersnaam Wachtwoord toegestaan",
       "ALLOWEXTERNALIDP": "Externe IDP toegestaan",
-      "ALLOWREGISTER": "Registratie toegestaan",
+      "ALLOWREGISTERUSERS": "Gebruikersregistratie toegestaan",
+      "ALLOWREGISTERORGS": "Organisatieregistratie toegestaan",
       "ALLOWUSERNAMEPASSWORD_DESC": "De conventionele login met gebruikersnaam en wachtwoord is toegestaan.",
       "ALLOWEXTERNALIDP_DESC": "De login is toegestaan voor de onderliggende identiteitsproviders",
       "ALLOWREGISTER_DESC": "Als de optie is geselecteerd, verschijnt er een extra stap voor het registreren van een gebruiker in het login proces.",

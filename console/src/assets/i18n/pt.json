@@ -1049,22 +1049,28 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Idioma padrão",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Configurações de Idioma",
+      "DEFAULT": "Idioma Padrão",
+      "ALLOWED": "Idiomas Permitidos",
+      "NOT_ALLOWED": "Idiomas Não Permitidos",
+      "SAVED": "Idiomas salvos",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "Configurações SMTP",
@@ -1264,7 +1270,6 @@
       "UNSAVED_TITLE": "Continuar sem salvar?",
       "UNSAVED_DESCRIPTION": "Você fez alterações sem salvar. Deseja salvar agora?",
       "ACTIVE_LANGUAGE_NOT_ALLOWED": "Você selecionou um idioma que não é permitido. Você pode continuar modificando os textos. Mas se deseja que seus usuários realmente possam usar este idioma, altere as restrições de suas instâncias.",
-      "LANGUAGES_NOT_ALLOWED": "Não permitido:",
       "LANGUAGE": "Idioma",
       "LANGUAGES": {
         "de": "Deutsch",
@@ -1377,7 +1382,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "O endereço do remetente do SMTP corresponde ao domínio da Instância",
       "ALLOWUSERNAMEPASSWORD": "Permitir usuário e senha",
       "ALLOWEXTERNALIDP": "Permitir provedor de ID externo",
-      "ALLOWREGISTER": "Permitir registro",
+      "ALLOWREGISTERUSERS": "Permitir registro de usuários",
+      "ALLOWREGISTERORGS": "Permitir registro de organizações",
       "ALLOWUSERNAMEPASSWORD_DESC": "O login convencional com nome de usuário e senha é permitido.",
       "ALLOWEXTERNALIDP_DESC": "O login é permitido para os provedores de identidade subjacentes",
       "ALLOWREGISTER_DESC": "Se a opção estiver selecionada, uma etapa adicional para registrar um usuário aparecerá no login.",

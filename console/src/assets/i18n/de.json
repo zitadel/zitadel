@@ -1047,22 +1047,28 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Standardsprache",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Spracheinstellungen",
+      "DEFAULT": "Standardsprache",
+      "ALLOWED": "Erlaubte Sprachen",
+      "NOT_ALLOWED": "Nicht erlaubte Sprachen",
+      "SAVED": "Sprachen gespeichert",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -1262,7 +1268,6 @@
       "UNSAVED_TITLE": "Ohne speichern fortfahren?",
       "UNSAVED_DESCRIPTION": "Sie haben Änderungen vorgenommen ohne zu speichern. Möchten Sie jetzt speichern?",
       "ACTIVE_LANGUAGE_NOT_ALLOWED": "Sie haben eine Sprache ausgewählt, die nicht erlaubt ist. Sie können weiterhin die Texte ändern. Wenn Sie jedoch möchten, dass Ihre Benutzer diese Sprache tatsächlich verwenden können, ändern Sie die Einschränkungen Ihrer Instanz.",
-      "LANGUAGES_NOT_ALLOWED": "Nicht erlaubt:",
       "LANGUAGE": "Sprache",
       "LANGUAGES": {
         "de": "Deutsch",
@@ -1375,7 +1380,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Adresse entspricht Instanzdomain",
       "ALLOWUSERNAMEPASSWORD": "Benutzername Passwort erlaubt",
       "ALLOWEXTERNALIDP": "Externer IDP erlaubt",
-      "ALLOWREGISTER": "Registrieren erlaubt",
+      "ALLOWREGISTERUSERS": "Benutzerregistrierung erlaubt",
+      "ALLOWREGISTERORGS": "Organisationsregistrierung erlaubt",
       "ALLOWUSERNAMEPASSWORD_DESC": "Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
       "ALLOWEXTERNALIDP_DESC": "Der Login wird für die darunter liegenden Identitätsanbieter erlaubt.",
       "ALLOWREGISTER_DESC": "Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",

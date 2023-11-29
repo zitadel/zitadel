@@ -1048,22 +1048,28 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Výchozí jazyk",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Nastavení jazyka",
+      "DEFAULT": "Výchozí jazyk",
+      "ALLOWED": "Povolené jazyky",
+      "NOT_ALLOWED": "Nepovolené jazyky",
+      "SAVED": "Jazyky uloženy",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "Nastavení SMTP",
@@ -1263,7 +1269,6 @@
       "UNSAVED_TITLE": "Pokračovat bez uložení?",
       "UNSAVED_DESCRIPTION": "Provedli jste změny bez uložení. Chcete je nyní uložit?",
       "ACTIVE_LANGUAGE_NOT_ALLOWED": "Vybrali jste jazyk, který není povolen. Můžete pokračovat v úpravách textů. Ale pokud chcete, aby vaši uživatelé mohli tento jazyk skutečně používat, změňte omezení vašich instancí.",
-      "LANGUAGES_NOT_ALLOWED": "Nepovolené jazyky:",
       "LANGUAGE": "Jazyk",
       "LANGUAGES": {
         "de": "Deutsch",
@@ -1377,6 +1382,8 @@
       "ALLOWUSERNAMEPASSWORD": "Povoleno uživatelské jméno a heslo",
       "ALLOWEXTERNALIDP": "Povoleno externí IDP",
       "ALLOWREGISTER": "Registrace povolena",
+      "ALLOWREGISTERUSERS": "Registrace uživatelů povolena",
+      "ALLOWREGISTERORGS": "Registrace organizací povolena",
       "ALLOWUSERNAMEPASSWORD_DESC": "Je povoleno klasické přihlášení s uživatelským jménem a heslem.",
       "ALLOWEXTERNALIDP_DESC": "Přihlášení je povoleno pro níže uvedené poskytovatele identity.",
       "ALLOWREGISTER_DESC": "Pokud je možnost vybrána, objeví se při přihlášení další krok pro registraci uživatele.",

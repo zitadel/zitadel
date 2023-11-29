@@ -1048,22 +1048,28 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "デフォルトの言語",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "言語設定",
+      "DEFAULT": "デフォルト言語",
+      "ALLOWED": "許可された言語",
+      "NOT_ALLOWED": "許可されていない言語",
+      "SAVED": "言語が保存されました",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "SMTP設定",
@@ -1258,7 +1264,6 @@
       "UNSAVED_TITLE": "保存せずに続行しますか？",
       "UNSAVED_DESCRIPTION": "あなたは保存せずに変更を加えました。今すぐ保存しますか？",
       "ACTIVE_LANGUAGE_NOT_ALLOWED": "許可されていない言語を選択しました。テキストを変更し続けることはできますが、実際にこの言語を使用できるようにするには、インスタンスの制限を変更してください。",
-      "LANGUAGES_NOT_ALLOWED": "許可されていない言語：",
       "LANGUAGE": "言語",
       "LANGUAGES": {
         "de": "Deutsch",
@@ -1371,7 +1376,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP送信者アドレスはインスタンスドメインに一致しています",
       "ALLOWUSERNAMEPASSWORD": "ユーザー名とパスワードを許可",
       "ALLOWEXTERNALIDP": "外部IDPを許可",
-      "ALLOWREGISTER": "登録を許可",
+      "ALLOWREGISTERUSERS": "ユーザーの登録を許可",
+      "ALLOWREGISTERORGS": "組織の登録を許可",
       "ALLOWUSERNAMEPASSWORD_DESC": "ユーザー名とパスワードを使用した従来のログインを許可します。",
       "ALLOWEXTERNALIDP_DESC": "基礎となるIDプロバイダーにログインを許可します。",
       "ALLOWREGISTER_DESC": "このオプションが選択されている場合、ユーザーを登録するための追加のステップがログインに表示されます。",
