@@ -19,6 +19,7 @@ func TranslationHandler() func(ctx context.Context, req interface{}, info *grpc.
 		defer func() { span.EndWithError(err) }()
 
 		if loc, ok := resp.(localizers); ok && resp != nil {
+			// This translator is only used for texts that are not customizable, so we translate to all supported languages.
 			translator, translatorError := newZitadelTranslator(authz.GetInstance(ctx).DefaultLanguage(), i18n.SupportedLanguages())
 			if translatorError != nil {
 				logging.New().WithError(translatorError).Error("could not load translator")
@@ -27,6 +28,7 @@ func TranslationHandler() func(ctx context.Context, req interface{}, info *grpc.
 			translateFields(ctx, loc, translator)
 		}
 		if err != nil {
+			// This translator is only used for texts that are not customizable, so we translate to all supported languages.
 			translator, translatorError := newZitadelTranslator(authz.GetInstance(ctx).DefaultLanguage(), i18n.SupportedLanguages())
 			if translatorError != nil {
 				logging.New().WithError(translatorError).Error("could not load translator")
