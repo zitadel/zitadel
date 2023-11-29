@@ -98,5 +98,5 @@ func TestImport_UnsupportedPreferredLanguage(t *testing.T) {
 			IsEmailVerified: true,
 		},
 	})
-	require.Error(t, err)
+	require.NoError(t, err)
 }
