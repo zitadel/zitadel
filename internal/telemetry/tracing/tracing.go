@@ -79,9 +79,3 @@ func NewSpanHTTP(r *http.Request) (*http.Request, *Span) {
 func TraceIDFromCtx(ctx context.Context) string {
 	return api_trace.SpanFromContext(ctx).SpanContext().TraceID().String()
 }
-
-// MigrateContext takes a span from a context and sets it to a context.
-// The resulting context is returned.
-func MigrateContexts(to, from context.Context) context.Context {
-	return api_trace.ContextWithSpanContext(to, api_trace.SpanFromContext(from).SpanContext())
-}
