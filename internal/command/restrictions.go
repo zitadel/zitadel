@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -23,6 +24,9 @@ func (s *SetRestrictions) Validate(defaultLanguage language.Tag) error {
 	}
 	if s.AllowedLanguages != nil {
 		if err := domain.LanguagesHaveDuplicates(s.AllowedLanguages); err != nil {
+			return err
+		}
+		if err := domain.LanguagesAreSupported(i18n.SupportedLanguages(), s.AllowedLanguages...); err != nil {
 			return err
 		}
 		if err := domain.LanguageIsAllowed(false, s.AllowedLanguages, defaultLanguage); err != nil {

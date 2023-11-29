@@ -59,7 +59,7 @@ func (m *CustomMessageText) IsValid(supportedLanguages []language.Tag) error {
 	if err := LanguageIsDefined(m.Language); err != nil {
 		return err
 	}
-	return LanguagesAreSupported(supportedLanguages)
+	return LanguagesAreSupported(supportedLanguages, m.Language)
 }
 
 func IsMessageTextType(textType string) bool {

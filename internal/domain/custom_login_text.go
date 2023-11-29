@@ -347,7 +347,7 @@ func (m *CustomLoginText) IsValid(supportedLanguages []language.Tag) error {
 	if err := LanguageIsDefined(m.Language); err != nil {
 		return err
 	}
-	return LanguagesAreSupported(supportedLanguages)
+	return LanguagesAreSupported(supportedLanguages, m.Language)
 }
 
 type SelectAccountScreenText struct {
