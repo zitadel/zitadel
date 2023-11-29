@@ -1,6 +1,6 @@
-import {from, Observable, share, switchMap, take} from "rxjs";
-import {map} from "rxjs/operators";
-import {Injectable} from "@angular/core";
+import { from, Observable, share, switchMap, take } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { Injectable } from '@angular/core';
 
 interface LanguagesProvider {
   getAllowedLanguages(): Promise<languagesResponse>;
@@ -8,14 +8,13 @@ interface LanguagesProvider {
 }
 
 interface languagesResponse {
-  languagesList: Array<string>
+  languagesList: Array<string>;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class LanguagesService {
-
   private supportedLanguages$!: Observable<string[]>;
 
   public allowedLanguages(svc: LanguagesProvider): Observable<string[]> {
@@ -40,6 +39,6 @@ export class LanguagesService {
     return this.supportedLanguages$;
   }
   private toObservable(resp: Promise<languagesResponse>): Observable<Array<string>> {
-    return from(resp).pipe(map(({ languagesList }) => languagesList ));
+    return from(resp).pipe(map(({ languagesList }) => languagesList));
   }
 }

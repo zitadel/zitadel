@@ -2,7 +2,7 @@ import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/co
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import {BehaviorSubject, from, interval, Observable, of, Subject, Subscription, switchMap} from 'rxjs';
+import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription, switchMap } from 'rxjs';
 import { map, pairwise, startWith, takeUntil } from 'rxjs/operators';
 import {
   GetCustomLoginTextsRequest as AdminGetCustomLoginTextsRequest,
@@ -23,7 +23,7 @@ import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { mapRequestValues } from './helper';
-import {LanguagesService} from "../../../services/languages.service";
+import { LanguagesService } from '../../../services/languages.service';
 
 const MIN_INTERVAL_SECONDS = 10; // if the difference of a newer version to the current exceeds this time, a refresh button is shown.
 
@@ -174,13 +174,11 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     }
 
     this.allowedLanguages$ = this.languagesSvc.allowedLanguages(this.service);
-    this.languageNotAllowed$ = (this.languageControl.valueChanges).pipe(
+    this.languageNotAllowed$ = this.languageControl.valueChanges.pipe(
       // By always using the same observable this.allowedLanguages$, we only call the API once.
-      switchMap((language) => this.allowedLanguages$.pipe(
-          map((allowed) => !allowed.includes(language))
-      )),
+      switchMap((language) => this.allowedLanguages$.pipe(map((allowed) => !allowed.includes(language)))),
     );
-    this.notAllowedLanguages$ = this.languagesSvc.notAllowedLanguages(this.service, this.allowedLanguages$)
+    this.notAllowedLanguages$ = this.languagesSvc.notAllowedLanguages(this.service, this.allowedLanguages$);
     this.languagesAreRestricted$ = this.notAllowedLanguages$.pipe(map((notAllowed) => notAllowed.length > 0));
 
     this.loadData();
@@ -411,7 +409,6 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
   }
 
   public get language(): string {
-    return this.languageControl?.value
+    return this.languageControl?.value;
   }
-
 }

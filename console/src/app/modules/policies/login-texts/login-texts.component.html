@@ -28,7 +28,6 @@
   </button>
 </div>
 <form *ngIf="form" class="top-actions" [formGroup]="form">
-
   <cnsl-form-field class="keys">
     <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.KEYNAME' | translate }}</cnsl-label>
     <mat-select formControlName="currentSubMap" name="currentSubMap">
@@ -41,23 +40,23 @@
   <cnsl-form-field class="language">
     <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.LANGUAGE' | translate }}</cnsl-label>
     <mat-select formControlName="language" name="language">
-      <mat-option *ngFor="let lang of (allowedLanguages$ | async)" [value]="lang">
+      <mat-option *ngFor="let lang of allowedLanguages$ | async" [value]="lang">
         <div class="centerline">
-            <span
+          <span
             >{{ lang }}
-              <span class="lighter cnsl-secondary-text"
+            <span class="lighter cnsl-secondary-text"
               >|&nbsp;{{ 'POLICY.LOGIN_TEXTS.LANGUAGES.' + lang | translate }}</span
-              ></span
-            >
+            ></span
+          >
         </div>
       </mat-option>
       <mat-optgroup [label]="'POLICY.LOGIN_TEXTS.LANGUAGES_NOT_ALLOWED' | translate" *ngIf="languagesAreRestricted$ | async">
-        <mat-option *ngFor="let lang of (notAllowedLanguages$ | async)" [value]="lang">
+        <mat-option *ngFor="let lang of notAllowedLanguages$ | async" [value]="lang">
           <div class="centerline">
             <span
-            >{{ lang }}
+              >{{ lang }}
               <span class="lighter cnsl-secondary-text"
-              >|&nbsp;{{ 'POLICY.LOGIN_TEXTS.LANGUAGES.' + lang | translate }}</span
+                >|&nbsp;{{ 'POLICY.LOGIN_TEXTS.LANGUAGES.' + lang | translate }}</span
               ></span
             >
           </div>
