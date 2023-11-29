@@ -13,6 +13,7 @@ import { LanguageSettingsComponent } from './language-settings.component';
 import { MatListModule} from "@angular/material/list";
 import { MatFormFieldModule} from "@angular/material/form-field";
 import { DragDropModule} from "@angular/cdk/drag-drop";
+import {MatRadioModule}  from "@angular/material/radio";
 
 @NgModule({
   declarations: [LanguageSettingsComponent],
@@ -31,6 +32,7 @@ import { DragDropModule} from "@angular/cdk/drag-drop";
     TranslateModule,
     MatListModule,
     DragDropModule,
+    MatRadioModule,
   ],
   exports: [LanguageSettingsComponent],
 })

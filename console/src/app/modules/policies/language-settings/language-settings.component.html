@@ -6,19 +6,6 @@
 
 <div>
     <form class="form-content">
-        <cnsl-form-field class="default-language" label="Default Language" required="true">
-          <cnsl-label>{{ 'SETTING.LANGUAGES.DEFAULT' | translate }}</cnsl-label>
-          <mat-select
-              name="defaultLang"
-              [disabled]="(['iam.write'] | hasRole | async) === false"
-              [value]="(localState$ | async)!.defaultLang"
-              (value)="setLocalDefaultLang"
-              >
-            <mat-option *ngFor="let lang of (localState$ | async)!.allowed" [value]="lang">
-              {{ lang }} - {{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }}
-            </mat-option>
-          </mat-select>
-        </cnsl-form-field>
         <div
           class="languages-container"
           cdkDropList
@@ -30,17 +17,17 @@
         >
           <cnsl-label>{{ 'SETTING.LANGUAGES.ALLOWED' | translate }}</cnsl-label>
           <div class="languages-list">
-            <mat-action-list
-              [disabled]="(['iam.restrictions.write'] | hasRole | async) === false"
-              *ngFor="let lang of (localState$ | async)!.allowed"
-              name="allowed"
-              class="language-box"
-              [cdkDragData]="lang"
-              cdkDrag>
-              <button mat-list-item color="primary">
-                {{ lang }} - {{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }}{{ lang == (localState$ | async)!.defaultLang ? ' (' + ( 'SETTING.LANGUAGES.DEFAULT' | translate ) + ')' : '' | translate }}
-              </button>
-            </mat-action-list>
+              <mat-action-list
+                [disabled]="(['iam.restrictions.write'] | hasRole | async) === false"
+                *ngFor="let lang of (localState$ | async)!.allowed"
+                name="allowed"
+                class="language-box"
+                [cdkDragData]="lang"
+                cdkDrag>
+                <mat-radio-button mat-list-item color="primary" [checked]="(localState$ | async)!.defaultLang == lang" (change)="setLocalDefaultLang(lang)">
+                  {{ lang }} - {{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }}{{ lang == (localState$ | async)!.defaultLang ? ' (' + ( 'SETTING.LANGUAGES.DEFAULT' | translate ) + ')' : '' | translate }}
+                </mat-radio-button>
+              </mat-action-list>
           </div>
         </div>
            <div

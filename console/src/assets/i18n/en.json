@@ -1048,14 +1048,12 @@
     }
   },
   "SETTING": {
-    "RESTRICTIONS": {
-      "TITLE": "Restrictions"
-    },
     "LANGUAGES": {
       "TITLE": "Language Settings",
       "DEFAULT": "Default Language",
       "ALLOWED": "Allowed Languages",
       "NOT_ALLOWED": "Not Allowed Languages",
+      "NO_CHANGES": "No changes",
       "OPTIONS": {
         "de": "Deutsch",
         "en": "English",

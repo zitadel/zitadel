@@ -4,7 +4,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 import {AbstractControl, FormControl, UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
 import {LanguagesService} from "../../../services/languages.service";
-import {AsyncSubject, BehaviorSubject, forkJoin, from, Observable, Subject} from "rxjs";
+import {AsyncSubject, BehaviorSubject, concat, forkJoin, from, Observable, Subject} from "rxjs";
 import {GrpcAuthService} from "../../../services/grpc-auth.service";
 import {i18nValidator} from "../../form-field/validators/validators";
 import {CdkDrag, CdkDragDrop, moveItemInArray, transferArrayItem} from "@angular/cdk/drag-drop";
@@ -69,7 +69,7 @@ export class LanguageSettingsComponent {
     }
   }
 
-  setLocalDefaultLang(lang: string): void {
+  setLocalDefaultLang(lang: any): void {
     this.localState$.next({...this.localState$.value, defaultLang: lang});
   }
 
@@ -80,28 +80,36 @@ export class LanguageSettingsComponent {
   public save(): void {
     const newState = this.localState$.value;
     const remoteState = this.remoteState$.value
-    if (newState.defaultLang !== remoteState.defaultLang) {
-      this.service.setDefaultLanguage(newState.defaultLang).then(() => {
-        this.remoteState$.next({
-          ...this.remoteState$.value,
-          defaultLang: newState.defaultLang,
-        });
-        this.toast.showInfo("SETTING.LANGUAGE.SAVED", true);
-      }).catch(error => {
-        this.toast.showError(error);
-      });
+    const defaultLangChanged = newState.defaultLang !== remoteState.defaultLang
+    const allowedLangsChanged = newState.allowed.length != remoteState.allowed.length ||
+      !newState.allowed.every((item, i) => remoteState.allowed[i] === item)
+    if (!defaultLangChanged && !allowedLangsChanged) {
+      this.toast.showInfo("SETTING.LANGUAGES.NO_CHANGES", true);
+      return
     }
-    if (newState.allowed.length != remoteState.allowed.length ||
-      !newState.allowed.every((item, i) => remoteState.allowed[i] === item)) {
-      this.service.setRestrictions(undefined, newState.allowed).then(() => {
+    let saveCalls = []
+    if (defaultLangChanged && allowedLangsChanged) {
+      // Temporarily enable all languages to avoid conflicts
+      saveCalls.push(this.service.setRestrictions(undefined, []))
+    }
+    if (defaultLangChanged) {
+      saveCalls.push(from(this.service.setDefaultLanguage(newState.defaultLang)))
+    }
+    if (allowedLangsChanged) {
+      saveCalls.push(from(this.service.setRestrictions(undefined, newState.allowed)))
+    }
+    const sub = concat(...saveCalls).subscribe({
+      next: () => {
         this.remoteState$.next({
-          ...this.remoteState$.value,
+          defaultLang: newState.defaultLang,
           allowed: [...newState.allowed],
         });
         this.toast.showInfo("SETTING.LANGUAGES.SAVED", true);
-      }).catch(error => {
-        this.toast.showError(error);
-      });
-    }
+      },
+      error: this.toast.showError,
+      complete: () => {
+        sub.unsubscribe()
+      },
+    })
   }
 }
