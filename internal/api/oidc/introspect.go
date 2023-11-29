@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	errz "github.com/zitadel/zitadel/internal/errors"
+	zerrors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -192,5 +192,5 @@ func validateIntrospectionAudience(audience []string, clientID, projectID string
 		return nil
 	}
 
-	return errz.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
+	return zerrors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
 }

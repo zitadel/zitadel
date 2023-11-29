@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	errz "github.com/zitadel/zitadel/internal/errors"
+	zerrors "github.com/zitadel/zitadel/internal/errors"
 )
 
 var (
@@ -49,12 +49,12 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 		{
 			name:    "no rows",
 			mock:    mockQueryErr(expQuery, sql.ErrNoRows, "instanceID", "clientID", true),
-			wantErr: errz.ThrowNotFound(sql.ErrNoRows, "QUERY-wu6Ee", "Errors.App.NotFound"),
+			wantErr: zerrors.ThrowNotFound(sql.ErrNoRows, "QUERY-wu6Ee", "Errors.App.NotFound"),
 		},
 		{
 			name:    "internal error",
 			mock:    mockQueryErr(expQuery, sql.ErrConnDone, "instanceID", "clientID", true),
-			wantErr: errz.ThrowInternal(sql.ErrConnDone, "QUERY-ieR7R", "Errors.Internal"),
+			wantErr: zerrors.ThrowInternal(sql.ErrConnDone, "QUERY-ieR7R", "Errors.Internal"),
 		},
 		{
 			name: "jwt client",

@@ -13,7 +13,7 @@ import (
 	_ "github.com/zitadel/zitadel/internal/database/cockroach"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	_ "github.com/zitadel/zitadel/internal/database/postgres"
-	errz "github.com/zitadel/zitadel/internal/errors"
+	zerrors "github.com/zitadel/zitadel/internal/errors"
 )
 
 type Config struct {
@@ -100,11 +100,11 @@ func QueryJSONObject[T any](ctx context.Context, db *DB, query string, args ...a
 		return nil, err
 	}
 	if err != nil {
-		return nil, errz.ThrowInternal(err, "DATAB-Oath6", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "DATAB-Oath6", "Errors.Internal")
 	}
 	obj := new(T)
 	if err = json.Unmarshal(data, obj); err != nil {
-		return nil, errz.ThrowInternal(err, "DATAB-Vohs6", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "DATAB-Vohs6", "Errors.Internal")
 	}
 	return obj, nil
 }
@@ -126,7 +126,7 @@ func Connect(config Config, useAdmin, isEventPusher bool) (*DB, error) {
 	}
 
 	if err := client.Ping(); err != nil {
-		return nil, errz.ThrowPreconditionFailed(err, "DATAB-0pIWD", "Errors.Database.Connection.Failed")
+		return nil, zerrors.ThrowPreconditionFailed(err, "DATAB-0pIWD", "Errors.Database.Connection.Failed")
 	}
 
 	return &DB{

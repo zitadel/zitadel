@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	errz "github.com/zitadel/zitadel/internal/errors"
+	zerrors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
@@ -52,10 +52,10 @@ func (q *Queries) GetOIDCClientByID(ctx context.Context, clientID string, getKey
 		authz.GetInstance(ctx).InstanceID(), clientID, getKeys,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, errz.ThrowNotFound(err, "QUERY-wu6Ee", "Errors.App.NotFound")
+		return nil, zerrors.ThrowNotFound(err, "QUERY-wu6Ee", "Errors.App.NotFound")
 	}
 	if err != nil {
-		return nil, errz.ThrowInternal(err, "QUERY-ieR7R", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-ieR7R", "Errors.Internal")
 	}
 	return client, err
 }

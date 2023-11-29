@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/database/mock"
-	errz "github.com/zitadel/zitadel/internal/errors"
+	zerrors "github.com/zitadel/zitadel/internal/errors"
 )
 
 func TestQueryJSONObject(t *testing.T) {
@@ -33,7 +33,7 @@ func TestQueryJSONObject(t *testing.T) {
 			mock: func(t *testing.T) *mock.SQLMock {
 				return mock.NewSQLMock(t, mock.ExpectBegin(sql.ErrConnDone))
 			},
-			wantErr: errz.ThrowInternal(sql.ErrConnDone, "DATAB-Oath6", "Errors.Internal"),
+			wantErr: zerrors.ThrowInternal(sql.ErrConnDone, "DATAB-Oath6", "Errors.Internal"),
 		},
 		{
 			name: "no rows",
@@ -60,7 +60,7 @@ func TestQueryJSONObject(t *testing.T) {
 					mock.ExpectCommit(nil),
 				)
 			},
-			wantErr: errz.ThrowInternal(nil, "DATAB-Vohs6", "Errors.Internal"),
+			wantErr: zerrors.ThrowInternal(nil, "DATAB-Vohs6", "Errors.Internal"),
 		},
 		{
 			name: "success",

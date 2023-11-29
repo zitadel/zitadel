@@ -9,7 +9,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
-	errz "github.com/zitadel/zitadel/internal/errors"
+	zerrors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -44,13 +44,13 @@ func (q *Queries) GetOIDCUserInfo(ctx context.Context, userID string, roleAudien
 		userID, authz.GetInstance(ctx).InstanceID(), database.TextArray[string](roleAudience),
 	)
 	if errors.Is(err, sql.ErrNoRows) {
-		errz.ThrowNotFound(err, "QUERY-Eey2a", "Errors.User.NotFound")
+		zerrors.ThrowNotFound(err, "QUERY-Eey2a", "Errors.User.NotFound")
 	}
 	if err != nil {
-		return nil, errz.ThrowInternal(err, "QUERY-Oath6", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Oath6", "Errors.Internal")
 	}
 	if userInfo.User == nil {
-		return nil, errz.ThrowNotFound(nil, "QUERY-ahs4S", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "QUERY-ahs4S", "Errors.User.NotFound")
 	}
 
 	return userInfo, nil
