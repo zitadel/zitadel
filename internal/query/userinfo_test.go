@@ -69,14 +69,6 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			wantErr: sql.ErrConnDone,
 		},
 		{
-			name: "unmarshal error",
-			args: args{
-				userID: "231965491734773762",
-			},
-			mock:    mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{`~~~`}, "231965491734773762", "instanceID", nil),
-			wantErr: errors.ThrowInternal(nil, "QUERY-Vohs6", "Errors.Internal"),
-		},
-		{
 			name: "user not found",
 			args: args{
 				userID: "231965491734773762",

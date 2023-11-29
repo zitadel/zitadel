@@ -16,6 +16,7 @@ import (
 )
 
 type OIDCClient struct {
+	InstanceID               string                     `json:"instance_id,omitempty"`
 	AppID                    string                     `json:"app_id,omitempty"`
 	State                    domain.AppState            `json:"state,omitempty"`
 	ClientID                 string                     `json:"client_id,omitempty"`
@@ -34,6 +35,7 @@ type OIDCClient struct {
 	ClockSkew                time.Duration              `json:"clock_skew,omitempty"`
 	AdditionalOrigins        []string                   `json:"additional_origins,omitempty"`
 	PublicKeys               map[string][]byte          `json:"public_keys,omitempty"`
+	ProjectID                string                     `json:"project_id,omitempty"`
 	ProjectRoleKeys          []string                   `json:"project_role_keys,omitempty"`
 	AccessTokenLifetime      time.Duration              `json:"access_token_lifetime,omitempty"`
 	IDTokenLifetime          time.Duration              `json:"id_token_lifetime,omitempty"`
