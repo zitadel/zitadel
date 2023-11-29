@@ -2,10 +2,9 @@ package smtp
 
 import (
 	"crypto/tls"
+	"errors"
 	"net"
 	"net/smtp"
-
-	"errors"
 
 	"github.com/zitadel/logging"
 
