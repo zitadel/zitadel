@@ -86,7 +86,7 @@ export class AuthUserDetailComponent implements OnDestroy {
         this.currentSetting = id;
       }
     });
-    this.languages$ = from(this.userService.getAllowedLanguages()).pipe(
+    this.languages$ = from(this.userService.getSupportedLanguages()).pipe(
       take(1),
       map(({ languagesList }) => languagesList ),
     );

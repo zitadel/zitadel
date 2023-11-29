@@ -70,7 +70,7 @@ export class UserCreateComponent implements OnInit, OnDestroy {
         routerLink: ['/org'],
       }),
     ]);
-    this.languages$ = this.languagesSvc.allowedLanguages(this.mgmtService);
+    this.languages$ = this.languagesSvc.supportedLanguages(this.mgmtService);
     this.loading = true;
     this.loadOrg();
     this.mgmtService

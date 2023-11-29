@@ -73,7 +73,7 @@ export class OrgCreateComponent {
     breadcrumbService.setBreadcrumb([instanceBread]);
     this.initForm();
 
-    this.languages$ = this.languagesSvc.allowedLanguages(this.mgmtService);
+    this.languages$ = this.languagesSvc.supportedLanguages(this.mgmtService);
   }
 
   public createSteps: number = 2;
