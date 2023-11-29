@@ -25,6 +25,24 @@ func domainPolicyWriteModel(ctx context.Context, filter preparation.FilterToQuer
 	return nil, errors.ThrowInternal(nil, "USER-Ggk9n", "Errors.Internal")
 }
 
+func (c *Commands) domainPolicyWriteModel(ctx context.Context, orgID string) (*PolicyDomainWriteModel, error) {
+	wm, err := c.orgDomainPolicyWriteModel(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if wm != nil && wm.State.Exists() {
+		return &wm.PolicyDomainWriteModel, err
+	}
+	instanceWriteModel, err := c.instanceDomainPolicyWriteModel(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if instanceWriteModel != nil && instanceWriteModel.State.Exists() {
+		return &instanceWriteModel.PolicyDomainWriteModel, err
+	}
+	return nil, errors.ThrowInternal(nil, "USER-Ggk9n", "Errors.Internal")
+}
+
 func orgDomainPolicy(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) (*OrgDomainPolicyWriteModel, error) {
 	policy := NewOrgDomainPolicyWriteModel(orgID)
 	events, err := filter(ctx, policy.Query())

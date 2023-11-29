@@ -28,7 +28,7 @@ func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest
 		return nil, err
 	}
 	orgID := authz.GetCtxData(ctx).OrgID
-	err = s.command.AddHuman(ctx, orgID, human, false)
+	err = s.command.AddUserHuman(ctx, orgID, human, false)
 	if err != nil {
 		return nil, err
 	}

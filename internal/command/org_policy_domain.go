@@ -60,7 +60,7 @@ func (c *Commands) RemoveOrgDomainPolicy(ctx context.Context, orgID string) (*do
 }
 
 func (c *Commands) getOrgDomainPolicy(ctx context.Context, orgID string) (*domain.DomainPolicy, error) {
-	policy, err := c.orgDomainPolicyWriteModelByID(ctx, orgID)
+	policy, err := c.orgDomainPolicyWriteModel(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (c *Commands) getOrgDomainPolicy(ctx context.Context, orgID string) (*domai
 	return c.getDefaultDomainPolicy(ctx)
 }
 
-func (c *Commands) orgDomainPolicyWriteModelByID(ctx context.Context, orgID string) (policy *OrgDomainPolicyWriteModel, err error) {
+func (c *Commands) orgDomainPolicyWriteModel(ctx context.Context, orgID string) (policy *OrgDomainPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

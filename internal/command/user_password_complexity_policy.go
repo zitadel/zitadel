@@ -20,6 +20,18 @@ func passwordComplexityPolicyWriteModel(ctx context.Context, filter preparation.
 	return nil, errors.ThrowInternal(nil, "USER-uQ96e", "Errors.Internal")
 }
 
+func (c *Commands) passwordComplexityPolicyWriteModel(ctx context.Context) (*PasswordComplexityPolicyWriteModel, error) {
+	wm, err := c.orgPasswordComplexityPolicyWriteModelByID(ctx, authz.GetCtxData(ctx).OrgID)
+	if err != nil || wm != nil && wm.State.Exists() {
+		return &wm.PasswordComplexityPolicyWriteModel, err
+	}
+	defaultWm, err := c.defaultPasswordComplexityPolicyWriteModelByID(ctx)
+	if err != nil || defaultWm != nil && defaultWm.State.Exists() {
+		return &defaultWm.PasswordComplexityPolicyWriteModel, err
+	}
+	return nil, errors.ThrowInternal(nil, "USER-uQ96e", "Errors.Internal")
+}
+
 func customPasswordComplexityPolicy(ctx context.Context, filter preparation.FilterToQueryReducer) (*PasswordComplexityPolicyWriteModel, error) {
 	policy := NewOrgPasswordComplexityPolicyWriteModel(authz.GetCtxData(ctx).OrgID)
 	events, err := filter(ctx, policy.Query())

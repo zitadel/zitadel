@@ -180,7 +180,7 @@ func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *crypto
 				return nil, err
 			}
 
-			if err = userValidateDomain(ctx, a, human.Username, domainPolicy.UserLoginMustBeDomain, filter); err != nil {
+			if err = c.userValidateDomain(ctx, a.ResourceOwner, human.Username, domainPolicy.UserLoginMustBeDomain); err != nil {
 				return nil, err
 			}
 
@@ -219,7 +219,7 @@ func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *crypto
 				createCmd.AddPhoneData(human.Phone.Number)
 			}
 
-			if err := addHumanCommandPassword(ctx, filter, createCmd, human, hasher); err != nil {
+			if err := c.addHumanCommandPassword(ctx, createCmd, human, hasher); err != nil {
 				return nil, err
 			}
 
@@ -310,6 +310,7 @@ func (c *Commands) addHumanCommandPhone(ctx context.Context, filter preparation.
 	return append(cmds, user.NewHumanPhoneCodeAddedEventV2(ctx, &a.Aggregate, phoneCode.Crypted, phoneCode.Expiry, human.Phone.ReturnCode)), nil
 }
 
+// TODO remove
 func (c *Commands) addHumanCommandCheckID(ctx context.Context, filter preparation.FilterToQueryReducer, human *AddHuman, orgID string) (err error) {
 	if human.ID == "" {
 		human.ID, err = c.idGenerator.Next()
@@ -327,9 +328,9 @@ func (c *Commands) addHumanCommandCheckID(ctx context.Context, filter preparatio
 	return nil
 }
 
-func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQueryReducer, createCmd humanCreationCommand, human *AddHuman, hasher *crypto.PasswordHasher) (err error) {
+func (c *Commands) addHumanCommandPassword(ctx context.Context, createCmd humanCreationCommand, human *AddHuman, hasher *crypto.PasswordHasher) (err error) {
 	if human.Password != "" {
-		if err = humanValidatePassword(ctx, filter, human.Password); err != nil {
+		if err = c.humanValidatePassword(ctx, human.Password); err != nil {
 			return err
 		}
 
@@ -347,7 +348,7 @@ func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQue
 	return nil
 }
 
-func userValidateDomain(ctx context.Context, a *user.Aggregate, username string, mustBeDomain bool, filter preparation.FilterToQueryReducer) error {
+func (c *Commands) userValidateDomain(ctx context.Context, resourceOwner string, username string, mustBeDomain bool) error {
 	if mustBeDomain {
 		return nil
 	}
@@ -357,25 +358,20 @@ func userValidateDomain(ctx context.Context, a *user.Aggregate, username string,
 		return nil
 	}
 
-	domainCheck := NewOrgDomainVerifiedWriteModel(username[index+1:])
-	events, err := filter(ctx, domainCheck.Query())
+	domainCheck, err := c.orgDomainVerifiedWriteModel(ctx, username[index+1:])
 	if err != nil {
 		return err
 	}
-	domainCheck.AppendEvents(events...)
-	if err = domainCheck.Reduce(); err != nil {
-		return err
-	}
 
-	if domainCheck.Verified && domainCheck.ResourceOwner != a.ResourceOwner {
+	if domainCheck.Verified && domainCheck.ResourceOwner != resourceOwner {
 		return errors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
 	}
 
 	return nil
 }
 
-func humanValidatePassword(ctx context.Context, filter preparation.FilterToQueryReducer, password string) error {
-	passwordComplexity, err := passwordComplexityPolicyWriteModel(ctx, filter)
+func (c *Commands) humanValidatePassword(ctx context.Context, password string) error {
+	passwordComplexity, err := c.passwordComplexityPolicyWriteModel(ctx)
 	if err != nil {
 		return err
 	}
