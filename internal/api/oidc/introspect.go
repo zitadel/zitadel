@@ -157,15 +157,11 @@ func (s *Server) introspectionClientAuth(ctx context.Context, cc *op.ClientCrede
 // clientFromCredentials parses the client ID early,
 // and makes a single query for the client for either auth methods.
 func (s *Server) clientFromCredentials(ctx context.Context, cc *op.ClientCredentials) (client *query.IntrospectionClient, err error) {
-	if cc.ClientAssertion != "" {
-		claims := new(oidc.JWTTokenRequest)
-		if _, err := oidc.ParseToken(cc.ClientAssertion, claims); err != nil {
-			return nil, oidc.ErrUnauthorizedClient().WithParent(err)
-		}
-		client, err = s.query.GetIntrospectionClientByID(ctx, claims.Issuer, true)
-	} else {
-		client, err = s.query.GetIntrospectionClientByID(ctx, cc.ClientID, false)
+	clientID, assertion, err := clientIDFromCredentials(cc)
+	if err != nil {
+		return nil, err
 	}
+	client, err = s.query.GetIntrospectionClientByID(ctx, clientID, assertion)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, oidc.ErrUnauthorizedClient().WithParent(err)
 	}

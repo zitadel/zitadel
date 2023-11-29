@@ -48,17 +48,17 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 	}{
 		{
 			name:    "no rows",
-			mock:    mockQueryErr(expQuery, sql.ErrNoRows, "instanceID", "clientID"),
+			mock:    mockQueryErr(expQuery, sql.ErrNoRows, "instanceID", "clientID", true),
 			wantErr: errz.ThrowNotFound(sql.ErrNoRows, "QUERY-wu6Ee", "Errors.App.NotFound"),
 		},
 		{
 			name:    "internal error",
-			mock:    mockQueryErr(expQuery, sql.ErrConnDone, "instanceID", "clientID"),
+			mock:    mockQueryErr(expQuery, sql.ErrConnDone, "instanceID", "clientID", true),
 			wantErr: errz.ThrowInternal(sql.ErrConnDone, "QUERY-ieR7R", "Errors.Internal"),
 		},
 		{
 			name: "jwt client",
-			mock: mockQuery(expQuery, cols, []driver.Value{testdataOidcClientJWT}, "instanceID", "clientID"),
+			mock: mockQuery(expQuery, cols, []driver.Value{testdataOidcClientJWT}, "instanceID", "clientID", true),
 			want: &OIDCClient{
 				InstanceID:               "230690539048009730",
 				AppID:                    "236647088211886082",
@@ -87,7 +87,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 		},
 		{
 			name: "public client",
-			mock: mockQuery(expQuery, cols, []driver.Value{testdataOidcClientPublic}, "instanceID", "clientID"),
+			mock: mockQuery(expQuery, cols, []driver.Value{testdataOidcClientPublic}, "instanceID", "clientID", true),
 			want: &OIDCClient{
 				InstanceID:               "230690539048009730",
 				AppID:                    "236646457053020162",
@@ -116,7 +116,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 		},
 		{
 			name: "secret client",
-			mock: mockQuery(expQuery, cols, []driver.Value{testdataOidcClientSecret}, "instanceID", "clientID"),
+			mock: mockQuery(expQuery, cols, []driver.Value{testdataOidcClientSecret}, "instanceID", "clientID", true),
 			want: &OIDCClient{
 				InstanceID: "230690539048009730",
 				AppID:      "236646858984783874",
@@ -158,7 +158,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 					},
 				}
 				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
-				got, err := q.GetOIDCClientByID(ctx, "clientID")
+				got, err := q.GetOIDCClientByID(ctx, "clientID", true)
 				require.ErrorIs(t, err, tt.wantErr)
 				assert.Equal(t, tt.want, got)
 			})

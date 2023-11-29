@@ -43,7 +43,7 @@ const (
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	client, err := o.query.GetOIDCClientByID(ctx, id)
+	client, err := o.query.GetOIDCClientByID(ctx, id, false)
 	if err != nil {
 		return nil, err
 	}
@@ -913,17 +913,11 @@ func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCreden
 		return s.clientCredentialsAuth(ctx, r.Data.ClientID, r.Data.ClientSecret)
 	}
 
-	clientID := r.Data.ClientID
-	// early parse so we get a client ID
-	if r.Data.ClientAssertion != "" {
-		claims := new(oidc.JWTTokenRequest)
-		if _, err := oidc.ParseToken(r.Data.ClientAssertion, claims); err != nil {
-			return nil, oidc.ErrUnauthorizedClient().WithParent(err)
-		}
-		clientID = claims.Issuer
+	clientID, assertion, err := clientIDFromCredentials(r.Data)
+	if err != nil {
+		return nil, err
 	}
-
-	client, err := s.query.GetOIDCClientByID(ctx, clientID)
+	client, err := s.query.GetOIDCClientByID(ctx, clientID, assertion)
 	if err != nil {
 		return nil, err
 	}

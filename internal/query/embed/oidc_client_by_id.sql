@@ -14,7 +14,7 @@ with client as (
 ),
 roles as (
 	select p.project_id, json_agg(p.role_key) as project_role_keys
-	from projections.project_roles3 p
+	from projections.project_roles4 p
 	join client c on c.project_id = p.project_id
 		and p.instance_id = c.instance_id
 	group by p.project_id

@@ -222,3 +222,14 @@ func removeScopeWithPrefix(scopes []string, scopePrefix ...string) []string {
 	}
 	return newScopeList
 }
+
+func clientIDFromCredentials(cc *op.ClientCredentials) (clientID string, assertion bool, err error) {
+	if cc.ClientAssertion != "" {
+		claims := new(oidc.JWTTokenRequest)
+		if _, err := oidc.ParseToken(cc.ClientAssertion, claims); err != nil {
+			return "", false, oidc.ErrUnauthorizedClient().WithParent(err)
+		}
+		return claims.Issuer, true, nil
+	}
+	return cc.ClientID, false, nil
+}

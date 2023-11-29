@@ -44,12 +44,12 @@ type OIDCClient struct {
 //go:embed embed/oidc_client_by_id.sql
 var oidcClientQuery string
 
-func (q *Queries) GetOIDCClientByID(ctx context.Context, clientID string) (client *OIDCClient, err error) {
+func (q *Queries) GetOIDCClientByID(ctx context.Context, clientID string, getKeys bool) (client *OIDCClient, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	client, err = database.QueryJSONObject[OIDCClient](ctx, q.client, oidcClientQuery,
-		authz.GetInstance(ctx).InstanceID(), clientID,
+		authz.GetInstance(ctx).InstanceID(), clientID, getKeys,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, errz.ThrowNotFound(err, "QUERY-wu6Ee", "Errors.App.NotFound")
