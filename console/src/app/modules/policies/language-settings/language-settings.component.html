@@ -5,36 +5,64 @@
 </div>
 
 <div>
-    <form *ngIf="formLoaded$ | async" [formGroup]="form" class="form-content">
+    <form class="form-content">
         <cnsl-form-field class="default-language" label="Default Language" required="true">
           <cnsl-label>{{ 'SETTING.LANGUAGES.DEFAULT' | translate }}</cnsl-label>
           <mat-select
               name="defaultLang"
               [disabled]="(['iam.write'] | hasRole | async) === false"
-          >
-            <mat-option *ngFor="let lang of selectedAllowedLanguages" [value]="lang">
-              {{ lang }} - {{ 'SETTING.LANGUAGE.' + lang | translate }}
+              [value]="(localState$ | async)!.defaultLang"
+              (value)="setLocalDefaultLang"
+              >
+            <mat-option *ngFor="let lang of (localState$ | async)!.allowed" [value]="lang">
+              {{ lang }} - {{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }}
             </mat-option>
           </mat-select>
         </cnsl-form-field>
-        <div class="languages-container" cdkDropList id="allowed" [cdkDropListConnectedTo]="['notallowed']">
+        <div
+          class="languages-container"
+          cdkDropList
+          id="allowed"
+          [cdkDropListConnectedTo]="['notallowed']"
+          (cdkDropListDropped)="drop($event)"
+          [cdkDropListData]="(localState$ | async)!.allowed"
+
+        >
           <cnsl-label>{{ 'SETTING.LANGUAGES.ALLOWED' | translate }}</cnsl-label>
           <div class="languages-list">
-            <mat-action-list name="notAllowed" class="language-box" cdkDrag>
-<!--              <button *ngFor="lang of allowed" mat-list-item color="primary">{{ lang }} - {{ 'SETTING.LANGUAGE.' + lang | translate }}</button>-->
+            <mat-action-list
+              [disabled]="(['iam.restrictions.write'] | hasRole | async) === false"
+              *ngFor="let lang of (localState$ | async)!.allowed"
+              name="allowed"
+              class="language-box"
+              [cdkDragData]="lang"
+              cdkDrag>
+              <button mat-list-item color="primary">
+                {{ lang }} - {{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }}{{ lang == (localState$ | async)!.defaultLang ? ' (' + ( 'SETTING.LANGUAGES.DEFAULT' | translate ) + ')' : '' | translate }}
+              </button>
             </mat-action-list>
           </div>
         </div>
-      <!--
-           <div class="languages-container" cdkDropList id="notallowed" [cdkDropListConnectedTo]="['allowed']" style="display: inline-block">
+           <div
+             class="languages-container"
+             cdkDropList
+             id="notallowed"
+             [cdkDropListConnectedTo]="['allowed']"
+             [cdkDropListEnterPredicate]="defaultLangPredicate"
+             (cdkDropListDropped)="drop($event)"
+             [cdkDropListData]="(localState$ | async)!.notAllowed"
+             style="display: inline-block">
              <cnsl-label>{{ 'SETTING.LANGUAGES.NOT_ALLOWED' | translate }}</cnsl-label>
              <div class="languages-list">
-             <mat-action-list class="language-box" *ngFor="let lang of notAllowed$ | async" [attr.name]="lang" cdkDrag>
-               <button mat-list-item>{{ lang }} - {{ 'SETTING.LANGUAGE.' + lang | translate }}</button>
-             </mat-action-list>
+               <mat-action-list
+                 *ngFor="let lang of (localState$ | async)!.notAllowed"
+                 name="notAllowed"
+                 class="language-box"
+                 cdkDrag>
+                 <button mat-list-item color="primary">{{ lang }} - {{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }}</button>
+               </mat-action-list>
              </div>
            </div>
--->
      </form>
    </div>
 

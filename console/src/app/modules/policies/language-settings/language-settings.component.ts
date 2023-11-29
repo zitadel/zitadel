@@ -1,12 +1,13 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import { SetDefaultLanguageResponse } from 'src/app/proto/generated/zitadel/admin_pb';
+import {SetDefaultLanguageResponse, SetRestrictionsRequest} from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 import {AbstractControl, FormControl, UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
 import {LanguagesService} from "../../../services/languages.service";
-import {AsyncSubject, forkJoin, from, Observable, Subject} from "rxjs";
+import {AsyncSubject, BehaviorSubject, forkJoin, from, Observable, Subject} from "rxjs";
 import {GrpcAuthService} from "../../../services/grpc-auth.service";
 import {i18nValidator} from "../../form-field/validators/validators";
+import {CdkDrag, CdkDragDrop, moveItemInArray, transferArrayItem} from "@angular/cdk/drag-drop";
 
 interface RemoteState {
   defaultLang: string,
@@ -24,13 +25,11 @@ interface LocalState extends RemoteState {
 })
 export class LanguageSettingsComponent {
 
-  public form!: UntypedFormGroup;
-  public formLoaded$ = new AsyncSubject<boolean>();
-
   public canWriteRestrictions$: Observable<boolean> = this.authService.isAllowed(["iam.restrictions.write"]);
   public canWriteDefaultLanguage$: Observable<boolean> = this.authService.isAllowed(["iam.write"]);
 
-  private remoteState: RemoteState | null = null;
+  public localState$ = new BehaviorSubject<LocalState>({allowed: [], notAllowed: [], defaultLang: ""});
+  public remoteState$ = new BehaviorSubject<RemoteState>({allowed: [], defaultLang: ""});
 
   public loading: boolean = false;
   constructor(
@@ -41,32 +40,13 @@ export class LanguageSettingsComponent {
     private authService: GrpcAuthService,
     private cdr: ChangeDetectorRef,
   ) {
-    this.form = this.fb.group({
-      defaultLang: ['', [i18nValidator(
-        "SETTING.LANGUAGES.DEFAULT_MUST_BE_ALLOWED",
-        (control: AbstractControl) => {
-          const alloweds = (this.form?.getRawValue() as LocalState)?.allowed
-          return alloweds && alloweds.find(allowed => allowed == control.value) !== undefined
-        }
-      )]],
-      allowed: [[''], []],
-      notAllowed: [[''], []],
-    });
-    const allowed$ = this.languagesSvc.allowedLanguages(this.service)
-    const notAllowed$: Observable<string[]> = this.languagesSvc.notAllowedLanguages(this.service, allowed$);
+    const allowedInit$ = this.languagesSvc.allowedLanguages(this.service)
+    const notAllowedInit$ = this.languagesSvc.notAllowedLanguages(this.service, allowedInit$);
     const defaultLang$ = from(this.service.getDefaultLanguage());
-    const sub = forkJoin([allowed$, notAllowed$, defaultLang$]).subscribe({
+    const sub = forkJoin([allowedInit$, notAllowedInit$, defaultLang$]).subscribe({
       next: ([allowed, notAllowed, {language: defaultLang}]) => {
-        this.remoteState = {defaultLang, allowed,};
-        this.form.setValue(<LocalState>{notAllowed, ...this.remoteState});
-        this.formLoaded$.next(true);
-        this.formLoaded$.complete();
-        console.log("da")
-        this.formLoaded$.asObservable().subscribe((x) => {console.log("hier", x)})
-        this.formLoaded$.subscribe((x) => {console.log("hier", x)})
-        this.formLoaded$.subscribe((x) => {console.log("hier", x)})
-        this.formLoaded$.subscribe((x) => {console.log("hier", x)})
-        this.formLoaded$.subscribe((x) => {console.log("hier", x)})
+        this.remoteState$.next({defaultLang, allowed});
+        this.localState$.next({notAllowed, ...{allowed: [...allowed], defaultLang}});
         this.cdr.detectChanges()
       },
       error: this.toast.showError,
@@ -76,24 +56,48 @@ export class LanguageSettingsComponent {
     })
   }
 
-  private discardChanges(): void {
-    this.form.reset()
+  drop(event: CdkDragDrop<string[]>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    } else {
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex,
+      );
+    }
   }
 
-  get selectedAllowedLanguages() { return this.form.get('allowed')?.value as string[] }
+  setLocalDefaultLang(lang: string): void {
+    this.localState$.next({...this.localState$.value, defaultLang: lang});
+  }
+
+  defaultLangPredicate = (lang: CdkDrag<string>) => {
+    return !!lang?.data && lang.data !== this.localState$.value.defaultLang;
+  }
 
   public save(): void {
-    const newState: RemoteState = this.form.getRawValue();
-    if (newState.defaultLang !== this.remoteState?.defaultLang) {
+    const newState = this.localState$.value;
+    const remoteState = this.remoteState$.value
+    if (newState.defaultLang !== remoteState.defaultLang) {
       this.service.setDefaultLanguage(newState.defaultLang).then(() => {
+        this.remoteState$.next({
+          ...this.remoteState$.value,
+          defaultLang: newState.defaultLang,
+        });
         this.toast.showInfo("SETTING.LANGUAGE.SAVED", true);
       }).catch(error => {
         this.toast.showError(error);
       });
     }
-    if (newState.allowed.length != this.remoteState?.allowed.length ||
-      newState.allowed.every((item, i) => this.remoteState?.allowed[i] === item)) {
-      this.service.setDefaultLanguage(newState.defaultLang).then(() => {
+    if (newState.allowed.length != remoteState.allowed.length ||
+      !newState.allowed.every((item, i) => remoteState.allowed[i] === item)) {
+      this.service.setRestrictions(undefined, newState.allowed).then(() => {
+        this.remoteState$.next({
+          ...this.remoteState$.value,
+          allowed: [...newState.allowed],
+        });
         this.toast.showInfo("SETTING.LANGUAGES.SAVED", true);
       }).catch(error => {
         this.toast.showError(error);
