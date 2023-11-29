@@ -2,7 +2,9 @@ package activity
 
 import (
 	"context"
+	"strconv"
 
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -12,6 +14,9 @@ import (
 
 const (
 	Activity = "activity"
+
+	PathKey          = "zitadel-activity-path"
+	RequestMethodKey = "zitadel-activity-request-method"
 )
 
 type TriggerMethod int
@@ -44,7 +49,8 @@ func (t TriggerMethod) String() string {
 	}
 }
 
-func TriggerHTTP(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
+// Trigger is used to log a specific events for a user (e.g. session or oidc token creation)
+func Trigger(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
 	ai := info.ActivityInfoFromContext(ctx)
 	triggerLog(
 		authz.GetInstance(ctx).InstanceID(),
@@ -56,47 +62,29 @@ func TriggerHTTP(ctx context.Context, orgID, userID string, trigger TriggerMetho
 		ai.Path,
 		ai.RequestMethod,
 		"",
-		authz.GetCtxData(ctx).SystemMemberships != nil,
-	)
-}
-
-func TriggerGRPC(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
-	ai := info.ActivityInfoFromContext(ctx)
-	// GRPC call the method is contained in the HTTP request path
-	method := ai.Path
-	triggerLog(
-		authz.GetInstance(ctx).InstanceID(),
-		orgID,
-		userID,
-		http_utils.ComposedOrigin(ctx),
-		trigger,
-		method,
 		"",
-		ai.RequestMethod,
-		ai.GRPCStatus.String(),
 		authz.GetCtxData(ctx).SystemMemberships != nil,
 	)
 }
 
 func TriggerGRPCWithContext(ctx context.Context, trigger TriggerMethod) {
 	ai := info.ActivityInfoFromContext(ctx)
-	// GRPC call the method is contained in the HTTP request path
-	method := ai.Path
 	triggerLog(
 		authz.GetInstance(ctx).InstanceID(),
 		authz.GetCtxData(ctx).OrgID,
 		authz.GetCtxData(ctx).UserID,
 		http_utils.ComposedOrigin(ctx),
 		trigger,
-		method,
-		"",
+		ai.Method,
+		ai.Path,
 		ai.RequestMethod,
-		ai.GRPCStatus.String(),
+		strconv.Itoa(int(ai.GRPCStatus)),
+		strconv.Itoa(runtime.HTTPStatusFromCode(ai.GRPCStatus)),
 		authz.GetCtxData(ctx).SystemMemberships != nil,
 	)
 }
 
-func triggerLog(instanceID, orgID, userID, domain string, trigger TriggerMethod, method, path, requestMethod, status string, isSystemUser bool) {
+func triggerLog(instanceID, orgID, userID, domain string, trigger TriggerMethod, method, path, requestMethod, grpcStatus, httpStatus string, isSystemUser bool) {
 	logging.WithFields(
 		"instance", instanceID,
 		"org", orgID,
@@ -105,7 +93,8 @@ func triggerLog(instanceID, orgID, userID, domain string, trigger TriggerMethod,
 		"trigger", trigger.String(),
 		"method", method,
 		"path", path,
-		"grpcStatus", status,
+		"grpcStatus", grpcStatus,
+		"httpStatus", httpStatus,
 		"requestMethod", requestMethod,
 		"isSystemUser", isSystemUser,
 	).Info(Activity)
