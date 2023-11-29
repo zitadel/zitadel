@@ -549,7 +549,7 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 
 	translator := l.getTranslator(r.Context(), authReq)
 	data := externalNotFoundOptionData{
-		baseData: l.getBaseData(r, authReq, "ExternalNotFound.Title", "ExternalNotFound.Description", errID, errMessage),
+		baseData: l.getBaseData(r, authReq, translator, "ExternalNotFound.Title", "ExternalNotFound.Description", errID, errMessage),
 		externalNotFoundOptionFormData: externalNotFoundOptionFormData{
 			externalRegisterFormData: externalRegisterFormData{
 				Email:     human.EmailAddress,
@@ -745,11 +745,7 @@ func (l *Login) updateExternalUserProfile(ctx context.Context, user *query.User,
 		externalUser.PreferredLanguage == user.Human.PreferredLanguage {
 		return nil
 	}
-	restrictions, err := l.query.GetInstanceRestrictions(ctx)
-	if err != nil {
-		return err
-	}
-	_, err = l.command.ChangeHumanProfile(setContext(ctx, user.ResourceOwner), &domain.Profile{
+	_, err := l.command.ChangeHumanProfile(setContext(ctx, user.ResourceOwner), &domain.Profile{
 		ObjectRoot:        models.ObjectRoot{AggregateID: user.ID},
 		FirstName:         externalUser.FirstName,
 		LastName:          externalUser.LastName,
@@ -757,7 +753,7 @@ func (l *Login) updateExternalUserProfile(ctx context.Context, user *query.User,
 		DisplayName:       externalUser.DisplayName,
 		PreferredLanguage: externalUser.PreferredLanguage,
 		Gender:            user.Human.Gender,
-	}, restrictions.AllowedLanguages)
+	})
 	return err
 }
 

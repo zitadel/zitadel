@@ -4,7 +4,6 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/i18n"
 )
 
 func StringsToLanguages(langs []string) []language.Tag {
@@ -51,13 +50,13 @@ func LanguageIsAllowed(allowUndefined bool, allowedLanguages []language.Tag, lan
 	return nil
 }
 
-func LanguagesAreSupported(lang ...language.Tag) error {
+func LanguagesAreSupported(supportedLanguages []language.Tag, lang ...language.Tag) error {
 	unsupported := make([]language.Tag, 0)
 	for _, l := range lang {
 		if l.IsRoot() {
 			continue
 		}
-		if !languageIsContained(i18n.SupportedLanguages(), l) {
+		if !languageIsContained(supportedLanguages, l) {
 			unsupported = append(unsupported, l)
 		}
 	}
@@ -75,6 +74,26 @@ func LanguageIsDefined(lang language.Tag) error {
 		return errors.ThrowInvalidArgument(nil, "LANG-3M9f2", "Errors.Language.Undefined")
 	}
 	return nil
+}
+
+// LanguagesHaveDuplicates returns an error if the passed slices contains duplicates.
+// The error lists the duplicates.
+func LanguagesHaveDuplicates(langs []language.Tag) error {
+	unique := make(map[language.Tag]struct{})
+	duplicates := make([]language.Tag, 0)
+	for _, lang := range langs {
+		if _, ok := unique[lang]; ok {
+			duplicates = append(duplicates, lang)
+		}
+		unique[lang] = struct{}{}
+	}
+	if len(duplicates) == 0 {
+		return nil
+	}
+	if len(duplicates) > 1 {
+		return errors.ThrowInvalidArgument(nil, "LANG-3M9f2", "Errors.Language.Duplicate")
+	}
+	return errors.ThrowInvalidArgumentf(nil, "LANG-XHiK5", "Errors.Languages.Duplicate: %s", LanguagesToStrings(duplicates))
 }
 
 func languagesAreContained(languages, search []language.Tag) bool {

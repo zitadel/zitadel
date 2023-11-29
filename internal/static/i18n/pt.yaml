@@ -39,6 +39,7 @@ Errors:
     NotSupported: Idioma não suportado
     NotAllowed: Idioma não permitido
     Undefined: Idioma indefinido
+    Duplicate: Idiomas têm duplicatas
   OIDCSettings:
     NotFound: Configuração OIDC não encontrada
     AlreadyExists: Configuração OIDC já existe

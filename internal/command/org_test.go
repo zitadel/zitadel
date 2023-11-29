@@ -1267,7 +1267,6 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 		ctx              context.Context
 		setupOrg         *OrgSetup
 		allowInitialMail bool
-		allowedLanguages []language.Tag
 		userIDs          []string
 	}
 	type res struct {
@@ -1348,38 +1347,6 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 			},
 			res: res{
 				err: errors.ThrowInvalidArgument(nil, "V2-zzad3", "Errors.Invalid.Argument"),
-			},
-		},
-		{
-			name: "human preferred language not allowed, error",
-			fields: fields{
-				eventstore:  expectEventstore(),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID", "userID"),
-			},
-			args: args{
-				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
-				setupOrg: &OrgSetup{
-					Name: "Org",
-					Admins: []*OrgSetupAdmin{
-						{
-							Human: &AddHuman{
-								Username:  "username",
-								FirstName: "firstname",
-								LastName:  "lastname",
-								Email: Email{
-									Address:  "email@test.ch",
-									Verified: true,
-								},
-								PreferredLanguage: DisallowedLanguage,
-							},
-						},
-					},
-				},
-				allowInitialMail: true,
-				allowedLanguages: OnlyAllowedLanguages,
-			},
-			res: res{
-				err: errors.ThrowPreconditionFailedf(nil, "LANG-2M9fs", "Errors.Language.NotAllowed"),
 			},
 		},
 		{
@@ -1712,7 +1679,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 					},
 				},
 			}
-			got, err := r.SetUpOrg(tt.args.ctx, tt.args.setupOrg, tt.args.allowInitialMail, tt.args.allowedLanguages, tt.args.userIDs...)
+			got, err := r.SetUpOrg(tt.args.ctx, tt.args.setupOrg, tt.args.allowInitialMail, tt.args.userIDs...)
 			assert.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.createdOrg, got)
 		})

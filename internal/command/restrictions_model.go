@@ -54,17 +54,16 @@ func (wm *restrictionsWriteModel) Reduce() error {
 
 // NewChanges returns all changes that need to be applied to the aggregate.
 // nil properties in setRestrictions are ignored
-func (wm *restrictionsWriteModel) NewChanges(setRestrictions *SetRestrictions) (changes []restrictions.RestrictionsChange, languagesChanged bool) {
+func (wm *restrictionsWriteModel) NewChanges(setRestrictions *SetRestrictions) (changes []restrictions.RestrictionsChange) {
 	if setRestrictions == nil {
-		return nil, false
+		return nil
 	}
 	changes = make([]restrictions.RestrictionsChange, 0, 1)
-	if setRestrictions.PublicOrgRegistrationIsNotAllowed != nil && (wm.publicOrgRegistrationIsNotAllowed != *setRestrictions.PublicOrgRegistrationIsNotAllowed) {
-		changes = append(changes, restrictions.ChangePublicOrgRegistrations(*setRestrictions.PublicOrgRegistrationIsNotAllowed))
+	if setRestrictions.DisallowPublicOrgRegistration != nil && (wm.publicOrgRegistrationIsNotAllowed != *setRestrictions.DisallowPublicOrgRegistration) {
+		changes = append(changes, restrictions.ChangePublicOrgRegistrations(*setRestrictions.DisallowPublicOrgRegistration))
 	}
 	if setRestrictions.AllowedLanguages != nil && domain.LanguagesDiffer(wm.allowedLanguages, setRestrictions.AllowedLanguages) {
 		changes = append(changes, restrictions.ChangeAllowedLanguages(setRestrictions.AllowedLanguages))
-		languagesChanged = true
 	}
-	return changes, languagesChanged
+	return changes
 }

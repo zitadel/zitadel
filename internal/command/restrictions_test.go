@@ -20,9 +20,7 @@ import (
 func TestSetRestrictions(t *testing.T) {
 	type fields func(*testing.T) (*eventstore.Eventstore, id.Generator)
 	type args struct {
-		ctx             context.Context
 		setRestrictions *SetRestrictions
-		defaultLanguage language.Tag
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -42,11 +40,11 @@ func TestSetRestrictions(t *testing.T) {
 						expectFilter(),
 						expectPush(
 							eventFromEventPusherWithInstanceID(
-								"instance1",
+								"INSTANCE",
 								restrictions.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&restrictions.NewAggregate("restrictions1", "instance1", "instance1").Aggregate,
+										&restrictions.NewAggregate("restrictions1", "INSTANCE", "INSTANCE").Aggregate,
 										restrictions.SetEventType,
 									),
 									restrictions.ChangePublicOrgRegistrations(true),
@@ -57,14 +55,13 @@ func TestSetRestrictions(t *testing.T) {
 					id_mock.NewIDGeneratorExpectIDs(t, "restrictions1")
 			},
 			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setRestrictions: &SetRestrictions{
-					PublicOrgRegistrationIsNotAllowed: gu.Ptr(true),
+					DisallowPublicOrgRegistration: gu.Ptr(true),
 				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "instance1",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -78,7 +75,7 @@ func TestSetRestrictions(t *testing.T) {
 								restrictions.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&restrictions.NewAggregate("restrictions1", "instance1", "instance1").Aggregate,
+										&restrictions.NewAggregate("restrictions1", "INSTANCE", "INSTANCE").Aggregate,
 										restrictions.SetEventType,
 									),
 									restrictions.ChangePublicOrgRegistrations(true),
@@ -87,11 +84,11 @@ func TestSetRestrictions(t *testing.T) {
 						),
 						expectPush(
 							eventFromEventPusherWithInstanceID(
-								"instance1",
+								"INSTANCE",
 								restrictions.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&restrictions.NewAggregate("restrictions1", "instance1", "instance1").Aggregate,
+										&restrictions.NewAggregate("restrictions1", "INSTANCE", "INSTANCE").Aggregate,
 										restrictions.SetEventType,
 									),
 									restrictions.ChangePublicOrgRegistrations(false),
@@ -102,14 +99,13 @@ func TestSetRestrictions(t *testing.T) {
 					nil
 			},
 			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setRestrictions: &SetRestrictions{
-					PublicOrgRegistrationIsNotAllowed: gu.Ptr(false),
+					DisallowPublicOrgRegistration: gu.Ptr(false),
 				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "instance1",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -123,7 +119,7 @@ func TestSetRestrictions(t *testing.T) {
 								restrictions.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&restrictions.NewAggregate("restrictions1", "instance1", "instance1").Aggregate,
+										&restrictions.NewAggregate("restrictions1", "INSTANCE", "INSTANCE").Aggregate,
 										restrictions.SetEventType,
 									),
 									restrictions.ChangePublicOrgRegistrations(true),
@@ -134,14 +130,13 @@ func TestSetRestrictions(t *testing.T) {
 					nil
 			},
 			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setRestrictions: &SetRestrictions{
-					PublicOrgRegistrationIsNotAllowed: gu.Ptr(true),
+					DisallowPublicOrgRegistration: gu.Ptr(true),
 				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "instance1",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -154,7 +149,7 @@ func TestSetRestrictions(t *testing.T) {
 							restrictions.NewSetEvent(
 								eventstore.NewBaseEventForPush(
 									context.Background(),
-									&restrictions.NewAggregate("restrictions1", "instance1", "instance1").Aggregate,
+									&restrictions.NewAggregate("restrictions1", "INSTANCE", "INSTANCE").Aggregate,
 									restrictions.SetEventType,
 								),
 								restrictions.ChangePublicOrgRegistrations(true),
@@ -164,7 +159,6 @@ func TestSetRestrictions(t *testing.T) {
 				), nil
 			},
 			args: args{
-				ctx:             authz.WithInstanceID(context.Background(), "instance1"),
 				setRestrictions: &SetRestrictions{},
 			},
 			res: res{
@@ -180,7 +174,7 @@ func TestSetRestrictions(t *testing.T) {
 							restrictions.NewSetEvent(
 								eventstore.NewBaseEventForPush(
 									context.Background(),
-									&restrictions.NewAggregate("restrictions1", "instance1", "instance1").Aggregate,
+									&restrictions.NewAggregate("restrictions1", "INSTANCE", "INSTANCE").Aggregate,
 									restrictions.SetEventType,
 								),
 								restrictions.ChangeAllowedLanguages(SupportedLanguages),
@@ -190,11 +184,9 @@ func TestSetRestrictions(t *testing.T) {
 				), nil
 			},
 			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setRestrictions: &SetRestrictions{
 					AllowedLanguages: []language.Tag{AllowedLanguage, UnsupportedLanguage},
 				},
-				defaultLanguage: AllowedLanguage,
 			},
 			res: res{
 				err: zitadel_errs.IsErrorInvalidArgument,
@@ -209,7 +201,7 @@ func TestSetRestrictions(t *testing.T) {
 							restrictions.NewSetEvent(
 								eventstore.NewBaseEventForPush(
 									context.Background(),
-									&restrictions.NewAggregate("restrictions1", "instance1", "instance1").Aggregate,
+									&restrictions.NewAggregate("restrictions1", "INSTANCE", "INSTANCE").Aggregate,
 									restrictions.SetEventType,
 								),
 								restrictions.ChangeAllowedLanguages(OnlyAllowedLanguages),
@@ -219,11 +211,9 @@ func TestSetRestrictions(t *testing.T) {
 				), nil
 			},
 			args: args{
-				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setRestrictions: &SetRestrictions{
 					AllowedLanguages: []language.Tag{DisallowedLanguage},
 				},
-				defaultLanguage: AllowedLanguage,
 			},
 			res: res{
 				err: zitadel_errs.IsPreconditionFailed,
@@ -234,7 +224,7 @@ func TestSetRestrictions(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := new(Commands)
 			r.eventstore, r.idGenerator = tt.fields(t)
-			got, err := r.SetInstanceRestrictions(tt.args.ctx, tt.args.setRestrictions, tt.args.defaultLanguage)
+			got, err := r.SetInstanceRestrictions(authz.WithInstance(context.Background(), &mockInstance{}), tt.args.setRestrictions)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

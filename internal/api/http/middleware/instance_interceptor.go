@@ -98,8 +98,7 @@ func HostFromRequest(r *http.Request, headerName string) (string, error) {
 func newZitadelTranslator() *i18n.Translator {
 	dir, err := fs.NewWithNamespace("zitadel")
 	logging.WithFields("namespace", "zitadel").OnError(err).Panic("unable to get namespace")
-
-	translator, err := i18n.NewTranslator(dir, language.English, "")
+	translator, err := i18n.NewTranslator(dir, language.English, i18n.SupportedLanguages(), "")
 	logging.OnError(err).Panic("unable to get translator")
 	return translator
 }

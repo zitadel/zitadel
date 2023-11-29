@@ -1366,6 +1366,9 @@ func (c *channels) Webhook(context.Context, webhook.Config) (*senders.Chain, err
 }
 
 func expectTemplateQueries(queries *mock.MockQueries, template string) {
+	queries.EXPECT().GetInstanceRestrictions(gomock.Any()).Return(query.Restrictions{
+		AllowedLanguages: []language.Tag{language.English},
+	}, nil)
 	queries.EXPECT().ActiveLabelPolicyByOrg(gomock.Any(), gomock.Any(), gomock.Any()).Return(&query.LabelPolicy{
 		ID: policyID,
 		Light: query.Theme{

@@ -35,12 +35,12 @@ func TestServer_Restrictions_PublicOrgRegistrationIsNotAllowed(t *testing.T) {
 		csrfToken = awaitPubOrgRegAllowed(t, iamOwnerCtx, browserSession, regOrgUrl)
 	})
 	t.Run("disallowing public org registration disables the endpoints", func(*testing.T) {
-		_, err = Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{PublicOrgRegistrationIsNotAllowed: gu.Ptr(true)})
+		_, err = Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{DisallowPublicOrgRegistration: gu.Ptr(true)})
 		require.NoError(t, err)
 		awaitPubOrgRegDisallowed(t, iamOwnerCtx, browserSession, regOrgUrl, csrfToken)
 	})
 	t.Run("allowing public org registration again re-enables the endpoints", func(*testing.T) {
-		_, err = Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{PublicOrgRegistrationIsNotAllowed: gu.Ptr(false)})
+		_, err = Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{DisallowPublicOrgRegistration: gu.Ptr(false)})
 		require.NoError(t, err)
 		awaitPubOrgRegAllowed(t, iamOwnerCtx, browserSession, regOrgUrl)
 	})
@@ -52,7 +52,7 @@ func awaitPubOrgRegAllowed(t *testing.T, ctx context.Context, client *http.Clien
 	awaitPostFormResponse(t, ctx, client, parsedURL, http.StatusOK, csrfToken)
 	restrictions, err := Tester.Client.Admin.GetRestrictions(ctx, &admin.GetRestrictionsRequest{})
 	require.NoError(t, err)
-	require.False(t, restrictions.PublicOrgRegistrationIsNotAllowed)
+	require.False(t, restrictions.DisallowPublicOrgRegistration)
 	return csrfToken
 }
 
@@ -62,7 +62,7 @@ func awaitPubOrgRegDisallowed(t *testing.T, ctx context.Context, client *http.Cl
 	awaitPostFormResponse(t, ctx, client, parsedURL, http.StatusConflict, reuseOldCSRFToken)
 	restrictions, err := Tester.Client.Admin.GetRestrictions(ctx, &admin.GetRestrictionsRequest{})
 	require.NoError(t, err)
-	require.True(t, restrictions.PublicOrgRegistrationIsNotAllowed)
+	require.True(t, restrictions.DisallowPublicOrgRegistration)
 }
 
 // awaitGetSSRGetResponse cuts the CSRF token from the response body if it exists

@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/repository/org"
 )
 
@@ -34,7 +35,7 @@ func (c *Commands) SetOrgMessageText(ctx context.Context, resourceOwner string, 
 }
 
 func (c *Commands) setOrgMessageText(ctx context.Context, orgAgg *eventstore.Aggregate, message *domain.CustomMessageText) ([]eventstore.Command, *OrgCustomMessageTextReadModel, error) {
-	if err := message.IsValid(); err != nil {
+	if err := message.IsValid(i18n.SupportedLanguages()); err != nil {
 		return nil, nil, err
 	}
 	existingMessageText, err := c.orgCustomMessageTextWriteModelByID(ctx, orgAgg.ID, message.MessageTextType, message.Language)

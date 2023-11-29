@@ -43,7 +43,7 @@ func (l *Login) handleRegisterOrg(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, nil, err)
 		return
 	}
-	if restrictions.PublicOrgRegistrationIsNotAllowed {
+	if restrictions.DisallowPublicOrgRegistration {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -62,7 +62,7 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, nil, err)
 		return
 	}
-	if restrictions.PublicOrgRegistrationIsNotAllowed {
+	if restrictions.DisallowPublicOrgRegistration {
 		w.WriteHeader(http.StatusConflict)
 		return
 	}
@@ -84,7 +84,7 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
 	}
-	_, err = l.command.SetUpOrg(ctx, data.toCommandOrg(), true, restrictions.AllowedLanguages, userIDs...)
+	_, err = l.command.SetUpOrg(ctx, data.toCommandOrg(), true, userIDs...)
 	if err != nil {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
@@ -106,7 +106,7 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 	}
 	translator := l.getTranslator(r.Context(), authRequest)
 	data := registerOrgData{
-		baseData:            l.getBaseData(r, authRequest, "RegistrationOrg.Title", "RegistrationOrg.Description", errID, errMessage),
+		baseData:            l.getBaseData(r, authRequest, translator, "RegistrationOrg.Title", "RegistrationOrg.Description", errID, errMessage),
 		registerOrgFormData: *formData,
 	}
 	pwPolicy := l.getPasswordComplexityPolicy(r, "0")

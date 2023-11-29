@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/BurntSushi/toml"
@@ -18,6 +19,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/domain"
 	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 )
 
@@ -30,6 +32,7 @@ type Translator struct {
 	cookieName         string
 	cookieHandler      *http_util.CookieHandler
 	preferredLanguages []string
+	allowedLanguages   []language.Tag
 }
 
 type TranslatorConfig struct {
@@ -42,10 +45,14 @@ type Message struct {
 	Text string
 }
 
-func NewTranslator(dir http.FileSystem, defaultLanguage language.Tag, cookieName string) (*Translator, error) {
+func NewTranslator(dir http.FileSystem, defaultLanguage language.Tag, allowedLanguages []language.Tag, cookieName string) (*Translator, error) {
 	t := new(Translator)
 	var err error
-	t.bundle, err = newBundle(dir, defaultLanguage)
+	t.allowedLanguages = allowedLanguages
+	if len(t.allowedLanguages) == 0 {
+		t.allowedLanguages = SupportedLanguages()
+	}
+	t.bundle, err = newBundle(dir, defaultLanguage, t.allowedLanguages)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +61,7 @@ func NewTranslator(dir http.FileSystem, defaultLanguage language.Tag, cookieName
 	return t, nil
 }
 
-func newBundle(dir http.FileSystem, defaultLanguage language.Tag) (*i18n.Bundle, error) {
+func newBundle(dir http.FileSystem, defaultLanguage language.Tag, allowedLanguages []language.Tag) (*i18n.Bundle, error) {
 	bundle := i18n.NewBundle(defaultLanguage)
 	bundle.RegisterUnmarshalFunc("yaml", func(data []byte, v interface{}) error { return yaml.Unmarshal(data, v) })
 	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
@@ -69,6 +76,10 @@ func newBundle(dir http.FileSystem, defaultLanguage language.Tag) (*i18n.Bundle,
 		return nil, zitadel_errors.ThrowNotFound(err, "I18N-Gew23", "cannot read dir")
 	}
 	for _, file := range files {
+		fileLang, _ := strings.CutSuffix(file.Name(), filepath.Ext(file.Name()))
+		if err = domain.LanguageIsAllowed(false, allowedLanguages, language.Make(fileLang)); err != nil {
+			continue
+		}
 		if err := addFileFromFileSystemToBundle(dir, bundle, file); err != nil {
 			return nil, zitadel_errors.ThrowNotFoundf(err, "I18N-ZS2AW", "cannot append file %s to Bundle", file.Name())
 		}
@@ -132,7 +143,7 @@ func SupportedLanguages() []language.Tag {
 }
 
 func (t *Translator) SupportedLanguages() []language.Tag {
-	return t.bundle.LanguageTags()
+	return t.allowedLanguages
 }
 
 func (t *Translator) AddMessages(tag language.Tag, messages ...Message) error {
@@ -166,7 +177,7 @@ func (t *Translator) LocalizeWithoutArgs(id string, langs ...string) string {
 }
 
 func (t *Translator) Lang(r *http.Request) language.Tag {
-	matcher := language.NewMatcher(t.bundle.LanguageTags())
+	matcher := language.NewMatcher(t.allowedLanguages)
 	tag, _ := language.MatchStrings(matcher, t.langsFromRequest(r)...)
 	return tag
 }

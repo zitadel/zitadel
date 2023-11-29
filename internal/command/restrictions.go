@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"errors"
 
 	"golang.org/x/text/language"
 
@@ -11,26 +10,28 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/repository/restrictions"
 )
 
 type SetRestrictions struct {
-	PublicOrgRegistrationIsNotAllowed *bool
-	AllowedLanguages                  []language.Tag
+	DisallowPublicOrgRegistration *bool
+	AllowedLanguages              []language.Tag
 }
 
 func (s *SetRestrictions) Validate(defaultLanguage language.Tag) error {
-	if s == nil ||
-		s.PublicOrgRegistrationIsNotAllowed == nil &&
-			s.AllowedLanguages == nil {
+	if s == nil || (s.DisallowPublicOrgRegistration == nil && s.AllowedLanguages == nil) {
 		return zitadel_errors.ThrowInvalidArgument(nil, "COMMAND-oASwj", "Errors.Restrictions.NoneSpecified")
 	}
 	if s.AllowedLanguages != nil {
-		if err := domain.LanguagesAreSupported(s.AllowedLanguages...); err != nil {
+		if err := domain.LanguagesHaveDuplicates(s.AllowedLanguages); err != nil {
+			return err
+		}
+		if err := domain.LanguagesAreSupported(i18n.SupportedLanguages(), s.AllowedLanguages...); err != nil {
 			return err
 		}
 		if err := domain.LanguageIsAllowed(false, s.AllowedLanguages, defaultLanguage); err != nil {
-			return err
+			return zitadel_errors.ThrowPreconditionFailedf(err, "COMMAND-L0m2u", "Errors.Restrictions.DefaultLanguageMustBeAllowed")
 		}
 	}
 	return nil
@@ -40,7 +41,6 @@ func (s *SetRestrictions) Validate(defaultLanguage language.Tag) error {
 func (c *Commands) SetInstanceRestrictions(
 	ctx context.Context,
 	setRestrictions *SetRestrictions,
-	defaultLanguage language.Tag,
 ) (*domain.ObjectDetails, error) {
 	instanceId := authz.GetInstance(ctx).InstanceID()
 	wm, err := c.getRestrictionsWriteModel(ctx, instanceId, instanceId)
@@ -54,7 +54,7 @@ func (c *Commands) SetInstanceRestrictions(
 			return nil, err
 		}
 	}
-	setCmd, err := c.SetRestrictionsCommand(restrictions.NewAggregate(aggregateId, instanceId, instanceId), wm, setRestrictions, defaultLanguage)()
+	setCmd, err := c.SetRestrictionsCommand(restrictions.NewAggregate(aggregateId, instanceId, instanceId), wm, setRestrictions)()
 	if err != nil {
 		return nil, err
 	}
@@ -80,61 +80,24 @@ func (c *Commands) getRestrictionsWriteModel(ctx context.Context, instanceId, re
 	return wm, c.eventstore.FilterToQueryReducer(ctx, wm)
 }
 
-func (c *Commands) SetRestrictionsCommand(a *restrictions.Aggregate, wm *restrictionsWriteModel, setRestrictions *SetRestrictions, defaultLanguage language.Tag) preparation.Validation {
+func (c *Commands) SetRestrictionsCommand(a *restrictions.Aggregate, wm *restrictionsWriteModel, setRestrictions *SetRestrictions) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		if err := setRestrictions.Validate(defaultLanguage); err != nil {
-			return nil, err
-		}
 		return func(ctx context.Context, _ preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			changes, languagesChanged := wm.NewChanges(setRestrictions)
+			if err := setRestrictions.Validate(authz.GetInstance(ctx).DefaultLanguage()); err != nil {
+				return nil, err
+			}
+			changes := wm.NewChanges(setRestrictions)
 			if len(changes) == 0 {
 				return nil, nil
 			}
-			commands := []eventstore.Command{restrictions.NewSetEvent(
+			return []eventstore.Command{restrictions.NewSetEvent(
 				eventstore.NewBaseEventForPush(
 					ctx,
 					&a.Aggregate,
 					restrictions.SetEventType,
 				),
 				changes...,
-			)}
-			if languagesChanged {
-				resetCommands, err := c.resetPreferredLanguageOnAllHumans(ctx, setRestrictions, defaultLanguage)
-				if err != nil {
-					return nil, err
-				}
-				commands = append(commands, resetCommands...)
-			}
-			return commands, nil
+			)}, nil
 		}, nil
 	}
-}
-
-func (c *Commands) resetPreferredLanguageOnAllHumans(ctx context.Context, setRestrictions *SetRestrictions, defaultLanguage language.Tag) (commands []eventstore.Command, err error) {
-	profiles, err := c.allProfileWriteModels(ctx)
-	if err != nil {
-		return nil, err
-	}
-	for _, profile := range profiles {
-		if notAllowedErr := domain.LanguageIsAllowed(true, setRestrictions.AllowedLanguages, profile.PreferredLanguage); notAllowedErr != nil {
-			changeProfile, profileChanged, profileChangedErr := profile.NewChangedEvent(
-				ctx,
-				//nolint:contextcheck
-				UserAggregateFromWriteModel(&profile.WriteModel),
-				profile.FirstName,
-				profile.LastName,
-				profile.NickName,
-				profile.DisplayName,
-				defaultLanguage,
-				profile.Gender,
-			)
-			if profileChangedErr != nil {
-				err = errors.Join(err, profileChangedErr)
-			}
-			if profileChanged {
-				commands = append(commands, changeProfile)
-			}
-		}
-	}
-	return commands, err
 }

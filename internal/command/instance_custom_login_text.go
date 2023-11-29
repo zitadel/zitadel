@@ -2,13 +2,13 @@ package command
 
 import (
 	"context"
-
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
@@ -55,7 +55,7 @@ func (c *Commands) RemoveCustomInstanceLoginTexts(ctx context.Context, lang lang
 }
 
 func (c *Commands) setCustomInstanceLoginText(ctx context.Context, instanceAgg *eventstore.Aggregate, text *domain.CustomLoginText) ([]eventstore.Command, *InstanceCustomLoginTextReadModel, error) {
-	if err := text.IsValid(); err != nil {
+	if err := text.IsValid(i18n.SupportedLanguages()); err != nil {
 		return nil, nil, err
 	}
 	existingLoginText, err := c.defaultLoginTextWriteModelByID(ctx, text.Language)

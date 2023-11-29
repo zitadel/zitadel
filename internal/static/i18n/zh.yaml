@@ -39,6 +39,7 @@ Errors:
     NotSupported: 语言不支持
     NotAllowed: 语言不被允许
     Undefined: 语言未定义
+    Duplicate: 语言有重复
   OIDCSettings:
     NotFound: OIDC 配置未找到
     AlreadyExists: OIDC 配置已存在

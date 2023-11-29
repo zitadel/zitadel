@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/feature"
@@ -181,7 +182,7 @@ func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
 	return err
 }
 
-func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, allowedLanguages []language.Tag) (string, string, *MachineKey, *domain.ObjectDetails, error) {
+func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, string, *MachineKey, *domain.ObjectDetails, error) {
 	instanceID, err := c.idGenerator.Next()
 	if err != nil {
 		return "", "", nil, nil, err
@@ -301,7 +302,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, allo
 		AddOrgCommand(ctx, orgAgg, setup.Org.Name),
 		c.prepareSetDefaultOrg(instanceAgg, orgAgg.ID),
 	)
-	pat, machineKey, err := setupAdmin(c, &validations, setup.Org.Machine, setup.Org.Human, orgID, userID, userAgg, allowedLanguages)
+	pat, machineKey, err := setupAdmin(c, &validations, setup.Org.Machine, setup.Org.Human, orgID, userID, userAgg)
 	if err != nil {
 		return "", "", nil, nil, err
 	}
@@ -316,7 +317,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup, allo
 		return "", "", nil, nil, err
 	}
 	setupLimits(c, &validations, limitsAgg, setup.Limits)
-	setupRestrictions(c, &validations, restrictionsAgg, setup.Restrictions, setup.DefaultLanguage)
+	setupRestrictions(c, &validations, restrictionsAgg, setup.Restrictions)
 
 	//nolint:staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
@@ -347,9 +348,9 @@ func setupLimits(commands *Commands, validations *[]preparation.Validation, limi
 	}
 }
 
-func setupRestrictions(commands *Commands, validations *[]preparation.Validation, restrictionsAgg *restrictions.Aggregate, setRestrictions *SetRestrictions, defaultLanguage language.Tag) {
+func setupRestrictions(commands *Commands, validations *[]preparation.Validation, restrictionsAgg *restrictions.Aggregate, setRestrictions *SetRestrictions) {
 	if setRestrictions != nil {
-		*validations = append(*validations, commands.SetRestrictionsCommand(restrictionsAgg, &restrictionsWriteModel{}, setRestrictions, defaultLanguage))
+		*validations = append(*validations, commands.SetRestrictionsCommand(restrictionsAgg, &restrictionsWriteModel{}, setRestrictions))
 	}
 }
 
@@ -503,7 +504,7 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 	)
 }
 
-func setupAdmin(commands *Commands, validations *[]preparation.Validation, machine *AddMachine, human *AddHuman, orgID, userID string, userAgg *user.Aggregate, allowedLanguages []language.Tag) (pat *PersonalAccessToken, machineKey *MachineKey, err error) {
+func setupAdmin(commands *Commands, validations *[]preparation.Validation, machine *AddMachine, human *AddHuman, orgID, userID string, userAgg *user.Aggregate) (pat *PersonalAccessToken, machineKey *MachineKey, err error) {
 	// only a human or a machine user should be created as owner
 	if machine != nil && machine.Machine != nil && !machine.Machine.IsZero() {
 		*validations = append(*validations,
@@ -528,7 +529,7 @@ func setupAdmin(commands *Commands, validations *[]preparation.Validation, machi
 	} else if human != nil {
 		human.ID = userID
 		*validations = append(*validations,
-			commands.AddHumanCommand(human, orgID, commands.userPasswordHasher, commands.userEncryption, true, allowedLanguages),
+			commands.AddHumanCommand(human, orgID, commands.userPasswordHasher, commands.userEncryption, true),
 		)
 	}
 	return pat, machineKey, nil
@@ -554,9 +555,9 @@ func (c *Commands) UpdateInstance(ctx context.Context, name string) (*domain.Obj
 	return pushedEventsToObjectDetails(events), nil
 }
 
-func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage language.Tag, allowedLanguages []language.Tag) (*domain.ObjectDetails, error) {
+func (c *Commands) SetDefaultLanguage(ctx context.Context, defaultLanguage language.Tag) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	validation := c.prepareSetDefaultLanguage(instanceAgg, defaultLanguage, allowedLanguages)
+	validation := c.prepareSetDefaultLanguage(instanceAgg, defaultLanguage)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validation)
 	if err != nil {
 		return nil, err
@@ -706,24 +707,29 @@ func (c *Commands) prepareUpdateInstance(a *instance.Aggregate, name string) pre
 	}
 }
 
-func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLanguage language.Tag, allowedLanguages []language.Tag) preparation.Validation {
+func (c *Commands) prepareSetDefaultLanguage(a *instance.Aggregate, defaultLanguage language.Tag) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		if defaultLanguage == language.Und {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-yG7LO", "Errors.Invalid.Argument")
-		}
-		if err := domain.LanguagesAreSupported(defaultLanguage); err != nil {
+		if err := domain.LanguageIsDefined(defaultLanguage); err != nil {
 			return nil, err
 		}
-		if err := domain.LanguageIsAllowed(false, allowedLanguages, defaultLanguage); err != nil {
+		if err := domain.LanguagesAreSupported(i18n.SupportedLanguages(), defaultLanguage); err != nil {
 			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel, err := getInstanceWriteModel(ctx, filter)
+			if writeModel.DefaultLanguage == defaultLanguage {
+				return nil, errors.ThrowPreconditionFailed(nil, "INST-DS3rq", "Errors.Instance.NotChanged")
+			}
+			instanceID := authz.GetInstance(ctx).InstanceID()
+			restrictionsWM, err := c.getRestrictionsWriteModel(ctx, instanceID, instanceID)
 			if err != nil {
 				return nil, err
 			}
-			if writeModel.DefaultLanguage == defaultLanguage {
-				return nil, errors.ThrowPreconditionFailed(nil, "INST-DS3rq", "Errors.Instance.NotChanged")
+			if err := domain.LanguageIsAllowed(false, restrictionsWM.allowedLanguages, defaultLanguage); err != nil {
+				return nil, err
+			}
+			if err != nil {
+				return nil, err
 			}
 			return []eventstore.Command{instance.NewDefaultLanguageSetEvent(ctx, &a.Aggregate, defaultLanguage)}, nil
 		}, nil

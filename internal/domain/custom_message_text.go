@@ -52,14 +52,14 @@ type CustomMessageText struct {
 	FooterText      string
 }
 
-func (m *CustomMessageText) IsValid() error {
+func (m *CustomMessageText) IsValid(supportedLanguages []language.Tag) error {
 	if m.MessageTextType == "" {
 		return zitadel_errs.ThrowInvalidArgument(nil, "INSTANCE-kd9fs", "Errors.CustomMessageText.Invalid")
 	}
 	if err := LanguageIsDefined(m.Language); err != nil {
 		return err
 	}
-	return LanguagesAreSupported(m.Language)
+	return LanguagesAreSupported(supportedLanguages, m.Language)
 }
 
 func IsMessageTextType(textType string) bool {

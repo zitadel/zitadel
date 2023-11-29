@@ -25,6 +25,7 @@ type Queries interface {
 	SMSProviderConfig(ctx context.Context, queries ...query.SearchQuery) (*query.SMSConfig, error)
 	SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (*query.SMTPConfig, error)
 	GetDefaultLanguage(ctx context.Context) language.Tag
+	GetInstanceRestrictions(ctx context.Context) (restrictions query.Restrictions, err error)
 }
 
 type NotificationQueries struct {
