@@ -3,8 +3,10 @@ package command
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -317,4 +319,36 @@ func TestCommandSide_RemoveMachineSecret(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCommands_MachineSecretCheckSucceeded(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	agg := user.NewAggregate("userID", "orgID")
+	cmd := user.NewMachineSecretCheckSucceededEvent(ctx, &agg.Aggregate)
+
+	c := &Commands{
+		eventstore: eventstoreExpect(t,
+			expectPushSlow(time.Second/100, cmd),
+		),
+	}
+	c.MachineSecretCheckSucceeded(ctx, "userID", "orgID")
+	require.NoError(t, c.Close(ctx))
+}
+
+func TestCommands_MachineSecretCheckFailed(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	agg := user.NewAggregate("userID", "orgID")
+	cmd := user.NewMachineSecretCheckFailedEvent(ctx, &agg.Aggregate)
+
+	c := &Commands{
+		eventstore: eventstoreExpect(t,
+			expectPushSlow(time.Second/100, cmd),
+		),
+	}
+	c.MachineSecretCheckFailed(ctx, "userID", "orgID")
+	require.NoError(t, c.Close(ctx))
 }

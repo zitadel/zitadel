@@ -95,7 +95,13 @@ func eventPusherToEvents(eventsPushes ...eventstore.Command) []*repository.Event
 
 func expectPush(commands ...eventstore.Command) expect {
 	return func(m *mock.MockRepository) {
-		m.ExpectPush(commands)
+		m.ExpectPush(commands, 0)
+	}
+}
+
+func expectPushSlow(sleep time.Duration, commands ...eventstore.Command) expect {
+	return func(m *mock.MockRepository) {
+		m.ExpectPush(commands, sleep)
 	}
 }
 

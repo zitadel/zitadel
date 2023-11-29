@@ -295,24 +295,18 @@ func (c *Commands) asyncPush(ctx context.Context, cmds ...eventstore.Command) {
 	// canceled before we where able to push.
 	// The eventstore has its own PushTimeout setting,
 	// so we don't need to have a context with timeout here.
-	localCtx, cancel := context.WithCancel(context.Background())
-	localCtx = authz.WithInstance(localCtx, authz.GetInstance(ctx))
-	localCtx = tracing.MigrateContexts(localCtx, ctx)
+	ctx = context.WithoutCancel(ctx)
 
 	c.jobs.Add(1)
-	cancel = func() {
-		cancel()
-		c.jobs.Done()
-	}
 
 	go func() {
-		defer cancel()
-		localCtx, span := tracing.NewSpan(localCtx)
+		defer c.jobs.Done()
+		localCtx, span := tracing.NewSpan(ctx)
 
 		_, err := c.eventstore.Push(localCtx, cmds...)
 		if err != nil {
 			for _, cmd := range cmds {
-				logging.WithError(err).Errorf("could not push event %T", cmd)
+				logging.WithError(err).Errorf("could not push event %q", cmd.Type())
 			}
 		}
 
