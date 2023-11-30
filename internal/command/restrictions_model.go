@@ -10,8 +10,8 @@ import (
 
 type restrictionsWriteModel struct {
 	eventstore.WriteModel
-	publicOrgRegistrationIsNotAllowed bool
-	allowedLanguages                  []language.Tag
+	disallowPublicOrgRegistration bool
+	allowedLanguages              []language.Tag
 }
 
 // newRestrictionsWriteModel aggregateId is filled by reducing unit matching events
@@ -43,7 +43,7 @@ func (wm *restrictionsWriteModel) Reduce() error {
 			continue
 		}
 		if e.DisallowPublicOrgRegistration != nil {
-			wm.publicOrgRegistrationIsNotAllowed = *e.DisallowPublicOrgRegistration
+			wm.disallowPublicOrgRegistration = *e.DisallowPublicOrgRegistration
 		}
 		if e.AllowedLanguages != nil {
 			wm.allowedLanguages = *e.AllowedLanguages
@@ -59,7 +59,7 @@ func (wm *restrictionsWriteModel) NewChanges(setRestrictions *SetRestrictions) (
 		return nil
 	}
 	changes = make([]restrictions.RestrictionsChange, 0, 1)
-	if setRestrictions.DisallowPublicOrgRegistration != nil && (wm.publicOrgRegistrationIsNotAllowed != *setRestrictions.DisallowPublicOrgRegistration) {
+	if setRestrictions.DisallowPublicOrgRegistration != nil && (wm.disallowPublicOrgRegistration != *setRestrictions.DisallowPublicOrgRegistration) {
 		changes = append(changes, restrictions.ChangeDisallowPublicOrgRegistration(*setRestrictions.DisallowPublicOrgRegistration))
 	}
 	if setRestrictions.AllowedLanguages != nil && domain.LanguagesDiffer(wm.allowedLanguages, setRestrictions.AllowedLanguages) {

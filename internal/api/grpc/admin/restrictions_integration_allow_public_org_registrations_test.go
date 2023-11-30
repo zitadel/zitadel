@@ -19,7 +19,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
-func TestServer_Restrictions_PublicOrgRegistrationIsNotAllowed(t *testing.T) {
+func TestServer_Restrictions_DisallowPublicOrgRegistration(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 	domain, _, iamOwnerCtx := Tester.UseIsolatedInstance(ctx, SystemCTX)
