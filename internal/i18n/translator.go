@@ -2,13 +2,15 @@ package i18n
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/zitadel/logging"
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
-	"golang.org/x/text/language"
-	"net/http"
 )
 
 type Translator struct {

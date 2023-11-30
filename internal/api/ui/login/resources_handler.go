@@ -1,13 +1,13 @@
 package login
 
 import (
-	"github.com/zitadel/zitadel/internal/i18n"
 	"net/http"
 
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/assets"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/i18n"
 )
 
 type dynamicResourceData struct {

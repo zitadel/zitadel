@@ -2,8 +2,9 @@ package i18n
 
 import (
 	"errors"
-	"golang.org/x/text/language"
 	"strings"
+
+	"golang.org/x/text/language"
 )
 
 var supportedLanguages []language.Tag

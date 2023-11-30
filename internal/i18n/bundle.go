@@ -2,7 +2,7 @@ package i18n
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -51,7 +51,7 @@ func addFileFromFileSystemToBundle(dir http.FileSystem, bundle *i18n.Bundle, fil
 		return err
 	}
 	defer f.Close()
-	content, err := ioutil.ReadAll(f)
+	content, err := io.ReadAll(f)
 	if err != nil {
 		return err
 	}

@@ -1,9 +1,10 @@
 package i18n
 
 import (
+	"net/http"
+
 	"github.com/rakyll/statik/fs"
 	"github.com/zitadel/logging"
-	"net/http"
 )
 
 var zitadelFS, loginFS, notificationFS http.FileSystem
@@ -12,12 +13,17 @@ type Namespace string
 
 const (
 	ZITADEL      Namespace = "zitadel"
-	LOGIN                  = "login"
-	NOTIFICATION           = "notification"
+	LOGIN        Namespace = "login"
+	NOTIFICATION Namespace = "notification"
 )
 
 func LoadFilesystem(ns Namespace) http.FileSystem {
 	var err error
+	defer func() {
+		if err != nil {
+			logging.WithFields("namespace", ns).OnError(err).Panic("unable to get namespace")
+		}
+	}()
 	switch ns {
 	case ZITADEL:
 		if zitadelFS != nil {
@@ -37,9 +43,6 @@ func LoadFilesystem(ns Namespace) http.FileSystem {
 		}
 		notificationFS, err = fs.NewWithNamespace(string(ns))
 		return notificationFS
-	}
-	if err != nil {
-		logging.WithFields("namespace", ns).OnError(err).Panic("unable to get namespace")
 	}
 	return nil
 }
