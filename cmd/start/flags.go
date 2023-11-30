@@ -20,9 +20,9 @@ var (
 )
 
 func init() {
-	startFlagSet.Uint16(portFlag, viper.GetUint16(portFlag), "port to run ZITADEL on")
-	startFlagSet.String(externalDomainFlag, viper.GetString(externalDomainFlag), "domain ZITADEL will be exposed on")
-	startFlagSet.String(externalPortFlag, viper.GetString(externalPortFlag), "port ZITADEL will be exposed on")
+	startFlagSet.Uint16(portFlag, 0, "port to run ZITADEL on")
+	startFlagSet.String(externalDomainFlag, "", "domain ZITADEL will be exposed on")
+	startFlagSet.String(externalPortFlag, "", "port ZITADEL will be exposed on")
 }
 
 func startFlags(cmd *cobra.Command) {
