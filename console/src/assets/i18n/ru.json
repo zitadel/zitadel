@@ -874,7 +874,8 @@
           "DESC": "По убыванию"
         },
         "CREATIONDATE": {
-          "LABEL": "Дата создания",
+          "LABEL_FROM": "От",
+          "LABEL_UNTIL": "К",
           "CHECKBOX": "Фильтровать по дате создания"
         },
         "OTHER": "другой",

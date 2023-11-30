@@ -876,8 +876,9 @@
           "DESC": "Descending"
         },
         "CREATIONDATE": {
-          "LABEL": "Creation Date",
-          "CHECKBOX": "Filter by Creation Date"
+          "LABEL_FROM": "Da",
+          "LABEL_UNTIL": "A",
+          "CHECKBOX": "Filter per data di creazione"
         },
         "OTHER": "altro",
         "OTHERS": "altri"

@@ -878,7 +878,8 @@
           "DESC": "Descendente"
         },
         "CREATIONDATE": {
-          "LABEL": "Fecha de creación",
+          "LABEL_FROM": "Desde",
+          "LABEL_UNTIL": "Hasta",
           "CHECKBOX": "Filtrar por fecha de creación"
         },
         "OTHER": "otro",

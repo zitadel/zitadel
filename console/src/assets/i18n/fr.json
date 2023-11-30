@@ -877,7 +877,8 @@
           "DESC": "Descendant"
         },
         "CREATIONDATE": {
-          "LABEL": "Date de création",
+          "LABEL_FROM": "De",
+          "LABEL_UNTIL": "À",
           "CHECKBOX": "Filtrer par date de création"
         },
         "OTHER": "autre",

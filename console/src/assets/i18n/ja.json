@@ -878,7 +878,8 @@
           "DESC": "降順"
         },
         "CREATIONDATE": {
-          "LABEL": "作成日",
+          "LABEL_FROM": "作成日から",
+          "LABEL_UNTIL": "作成日まで",
           "CHECKBOX": "作成日で絞り込み"
         },
         "OTHER": "その他",

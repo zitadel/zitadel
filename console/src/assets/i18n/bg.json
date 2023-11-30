@@ -871,7 +871,8 @@
           "DESC": "Спускане"
         },
         "CREATIONDATE": {
-          "LABEL": "Дата на създаване",
+          "LABEL_FROM": "От",
+          "LABEL_UNTIL": "До",
           "CHECKBOX": "Филтриране по дата на създаване"
         },
         "OTHER": "друго",

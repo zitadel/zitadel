@@ -878,7 +878,8 @@
           "DESC": "Sestupně"
         },
         "CREATIONDATE": {
-          "LABEL": "Datum vytvoření",
+          "LABEL_FROM": "Od",
+          "LABEL_UNTIL": "Do",
           "CHECKBOX": "Filtrovat podle Datumu vytvoření"
         },
         "OTHER": "jiný",

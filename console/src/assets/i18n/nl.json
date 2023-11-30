@@ -878,7 +878,8 @@
           "DESC": "Aflopend"
         },
         "CREATIONDATE": {
-          "LABEL": "Aanmaakdatum",
+          "LABEL_FROM": "Van",
+          "LABEL_UNTIL": "Tot",
           "CHECKBOX": "Filter op Aanmaakdatum"
         },
         "OTHER": "ander",

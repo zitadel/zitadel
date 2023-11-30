@@ -877,7 +877,8 @@
           "DESC": "Malejące"
         },
         "CREATIONDATE": {
-          "LABEL": "Data utworzenia",
+          "LABEL_FROM": "od",
+          "LABEL_UNTIL": "do",
           "CHECKBOX": "Filtruj według daty utworzenia"
         },
         "OTHER": "inne",

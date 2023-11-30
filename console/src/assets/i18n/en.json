@@ -878,7 +878,8 @@
           "DESC": "Descending"
         },
         "CREATIONDATE": {
-          "LABEL": "Creation Date",
+          "LABEL_FROM": "From",
+          "LABEL_UNTIL": "Until",
           "CHECKBOX": "Filter by Creation Date"
         },
         "OTHER": "other",

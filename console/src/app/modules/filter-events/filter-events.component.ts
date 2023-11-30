@@ -54,7 +54,9 @@ export class FilterEventsComponent implements OnInit {
     sequence: new FormControl(''),
     isAsc: new FormControl<boolean>(false),
     creationDateFilterSet: new FormControl(false),
-    creationDate: new FormControl<Date>(new Date()),
+    // creationDateFrom is 15 minutes in the past by default
+    creationDateFrom: new FormControl<Date>(new Date(new Date().getTime() - 15 * 60_000)),
+    creationDateUntil: new FormControl<Date>(new Date()),
     userFilterSet: new FormControl(false),
     editorUserId: new FormControl(''),
     aggregateFilterSet: new FormControl(false),
@@ -86,11 +88,18 @@ export class FilterEventsComponent implements OnInit {
               this.aggregateFilterSet?.setValue(true);
             }
             if (filters.creationDate) {
-              const milliseconds = filters.creationDate;
-              const date = new Date(milliseconds);
-              const ts = dateToTs(date);
-              this.request.setCreationDate(ts);
-              this.creationDate?.setValue(date);
+              const millisecondsFrom = filters.creationDateFrom;
+              const dateFrom = new Date(millisecondsFrom);
+              const tsFrom = dateToTs(dateFrom);
+              this.creationDateFrom?.setValue(dateFrom);
+              this.request.setCreationDate(tsFrom);
+
+              const millisecondsUntil = filters.creationDateUntil;
+              const dateUntil = new Date(millisecondsUntil);
+              const tsUntil = dateToTs(dateUntil);
+              this.creationDateUntil?.setValue(dateUntil);
+              this.request.setCreationDate(tsUntil);
+
               this.creationDateFilterSet?.setValue(true);
             }
             if (filters.aggregateTypesList && filters.aggregateTypesList.length) {
@@ -252,11 +261,15 @@ export class FilterEventsComponent implements OnInit {
       constructRequest.setAsc(formValues.isAsc);
       filterObject.isAsc = formValues.isAsc;
     }
-    if (formValues.creationDateFilterSet && formValues.creationDate) {
-      const date = new Date(formValues.creationDate);
-      const ts = dateToTs(date);
-      constructRequest.setCreationDate(ts);
-      filterObject.creationDate = date.getTime();
+    if (formValues.creationDateFilterSet) {
+      const dateFrom = new Date(formValues.creationDateFrom);
+      const tsFrom = dateToTs(dateFrom);
+      constructRequest.setCreationDate(tsFrom);
+      filterObject.creationDateFrom = dateFrom.getTime();
+      const dateUntil = new Date(formValues.creationDateUntil);
+      const tsUntil = dateToTs(dateUntil);
+      constructRequest.setCreationDate(tsUntil);
+      filterObject.creationDateUntil = dateUntil.getTime();
     }
 
     this.requestChanged.emit(constructRequest);
@@ -304,8 +317,12 @@ export class FilterEventsComponent implements OnInit {
     return this.form.get('sequenceFilterSet');
   }
 
-  public get creationDate(): AbstractControl | null {
-    return this.form.get('creationDate');
+  public get creationDateFrom(): AbstractControl | null {
+    return this.form.get('creationDateFrom');
+  }
+
+  public get creationDateUntil(): AbstractControl | null {
+    return this.form.get('creationDateUntil');
   }
 
   public get creationDateFilterSet(): AbstractControl | null {
@@ -341,7 +358,7 @@ export class FilterEventsComponent implements OnInit {
     if (this.userFilterSet?.value && this.editorUserId?.value) {
       ++count;
     }
-    if (this.creationDateFilterSet?.value && this.creationDate?.value) {
+    if (this.creationDateFilterSet?.value) {
       ++count;
     }
     if (this.aggregateFilterSet?.value && this.aggregateId?.value) {

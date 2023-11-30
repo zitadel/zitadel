@@ -877,7 +877,8 @@
           "DESC": "下降"
         },
         "CREATIONDATE": {
-          "LABEL": "创建日期",
+          "LABEL_FROM": "从",
+          "LABEL_UNTIL": "至",
           "CHECKBOX": "按创建日期过滤"
         },
         "OTHER": "其他",

@@ -877,7 +877,8 @@
           "DESC": "absteigend"
         },
         "CREATIONDATE": {
-          "LABEL": "Erstelldatum",
+          "LABEL_FROM": "Von",
+          "LABEL_UNTIL": "Bis",
           "CHECKBOX": "Nach Erstelldatum filtern"
         },
         "OTHER": "weiterer",

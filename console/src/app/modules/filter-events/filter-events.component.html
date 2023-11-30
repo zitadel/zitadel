@@ -180,18 +180,18 @@
             </mat-checkbox>
           </div>
           <div class="filter-events-sub" *ngIf="creationDateFilterSet?.value">
-            <cnsl-form-field class="filter-input-value">
-              <cnsl-label>{{ 'IAM.EVENTS.FILTERS.CREATIONDATE.LABEL' | translate }}</cnsl-label>
-              <input
-                cnslInput
-                id="creationDate"
-                name="creationDate"
-                [matDatepicker]="picker"
-                formControlName="creationDate"
+              <cnsl-label>{{ 'IAM.EVENTS.FILTERS.CREATIONDATE.LABEL_FROM' | translate }}</cnsl-label>
+              <cnsl-datetime-local-input
+                type="datetime-local"
+                name="creationDateFrom"
+                formControlName="creationDateFrom"
               />
-              <mat-datepicker-toggle style="top: 0" cnslSuffix [for]="picker"></mat-datepicker-toggle>
-              <mat-datepicker #picker></mat-datepicker>
-            </cnsl-form-field>
+              <cnsl-label>{{ 'IAM.EVENTS.FILTERS.CREATIONDATE.LABEL_UNTIL' | translate }}</cnsl-label>
+              <cnsl-datetime-local-input
+                type="datetime-local"
+                name="creationDateUntil"
+                formControlName="creationDateUntil"
+              />
           </div>
         </div>
       </form>
