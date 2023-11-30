@@ -90,7 +90,7 @@ func TestImport_UnparsablePreferredLanguage(t *testing.T) {
 		Profile: &management.ImportHumanUserRequest_Profile{
 			FirstName:         random,
 			LastName:          random,
-			PreferredLanguage: "a very invalid language tag",
+			PreferredLanguage: "not valid",
 			Gender:            user.Gender_GENDER_DIVERSE,
 		},
 		Email: &management.ImportHumanUserRequest_Email{
