@@ -367,7 +367,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 
 	additionalIteration = eventAmount == int(h.bulkLimit)
 	if len(statements) < len(events) {
-		// retry imediatly if statements failed
+		// retry immediately if statements failed
 		additionalIteration = true
 	}
 
