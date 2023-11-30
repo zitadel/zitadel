@@ -42,8 +42,8 @@ func (wm *restrictionsWriteModel) Reduce() error {
 		if !ok {
 			continue
 		}
-		if e.PublicOrgRegistrationIsNotAllowed != nil {
-			wm.publicOrgRegistrationIsNotAllowed = *e.PublicOrgRegistrationIsNotAllowed
+		if e.DisallowPublicOrgRegistration != nil {
+			wm.publicOrgRegistrationIsNotAllowed = *e.DisallowPublicOrgRegistration
 		}
 		if e.AllowedLanguages != nil {
 			wm.allowedLanguages = *e.AllowedLanguages
@@ -60,7 +60,7 @@ func (wm *restrictionsWriteModel) NewChanges(setRestrictions *SetRestrictions) (
 	}
 	changes = make([]restrictions.RestrictionsChange, 0, 1)
 	if setRestrictions.DisallowPublicOrgRegistration != nil && (wm.publicOrgRegistrationIsNotAllowed != *setRestrictions.DisallowPublicOrgRegistration) {
-		changes = append(changes, restrictions.ChangePublicOrgRegistrations(*setRestrictions.DisallowPublicOrgRegistration))
+		changes = append(changes, restrictions.ChangeDisallowPublicOrgRegistration(*setRestrictions.DisallowPublicOrgRegistration))
 	}
 	if setRestrictions.AllowedLanguages != nil && domain.LanguagesDiffer(wm.allowedLanguages, setRestrictions.AllowedLanguages) {
 		changes = append(changes, restrictions.ChangeAllowedLanguages(setRestrictions.AllowedLanguages))
