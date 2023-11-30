@@ -97,9 +97,9 @@ func GenericEventMapper[T any, PT BaseEventSetter[T]](event Event) (Event, error
 	return e, nil
 }
 
-func isEventTypes(event Event, types ...EventType) bool {
+func isEventTypes(command Command, types ...EventType) bool {
 	for _, typ := range types {
-		if event.Type() == typ {
+		if command.Type() == typ {
 			return true
 		}
 	}
