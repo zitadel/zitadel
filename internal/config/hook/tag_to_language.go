@@ -1,11 +1,12 @@
 package hook
 
 import (
-	"github.com/zitadel/zitadel/internal/domain"
 	"reflect"
 
 	"github.com/mitchellh/mapstructure"
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 func TagToLanguageHookFunc() mapstructure.DecodeHookFuncType {

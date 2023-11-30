@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+
 	"golang.org/x/text/language"
 
 	z_errors "github.com/zitadel/zitadel/internal/errors"
