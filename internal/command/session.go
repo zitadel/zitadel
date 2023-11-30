@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -226,6 +227,8 @@ func (s *SessionCommands) OTPEmailChecked(ctx context.Context, checkedAt time.Ti
 }
 
 func (s *SessionCommands) SetToken(ctx context.Context, tokenID string) {
+	// trigger activity log for session for user
+	activity.Trigger(ctx, s.sessionWriteModel.UserResourceOwner, s.sessionWriteModel.UserID, activity.SessionAPI)
 	s.eventCommands = append(s.eventCommands, session.NewTokenSetEvent(ctx, s.sessionWriteModel.aggregate, tokenID))
 }
 
