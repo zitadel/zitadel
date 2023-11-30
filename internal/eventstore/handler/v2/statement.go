@@ -29,10 +29,10 @@ func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, curr
 			}
 			return statements, err
 		}
-		if previousPosition == event.Position() {
-			offset++
-		} else {
-			offset = 0
+		offset++
+		if previousPosition != event.Position() {
+			// offset is 1 because we want to skip this event
+			offset = 1
 		}
 		statement.offset = offset
 		statement.Position = event.Position()

@@ -359,10 +359,6 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	}
 	eventAmount := len(events)
 
-	if h.projection.Name() == "projections.login_names3" {
-		h.log()
-	}
-
 	statements, err := h.eventsToStatements(tx, events, currentState)
 	if err != nil || len(statements) == 0 {
 		return nil, false, err
@@ -372,7 +368,12 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	if idx+1 == len(statements) {
 		currentState.position = statements[len(statements)-1].Position
 		currentState.offset = statements[len(statements)-1].offset
-		return nil, false, err
+		currentState.aggregateID = statements[len(statements)-1].AggregateID
+		currentState.aggregateType = statements[len(statements)-1].AggregateType
+		currentState.sequence = statements[len(statements)-1].Sequence
+		currentState.eventTimestamp = statements[len(statements)-1].CreationDate
+
+		return nil, false, nil
 	}
 	statements = statements[idx+1:]
 
