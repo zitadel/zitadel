@@ -1,6 +1,7 @@
 package login
 
 import (
+	"github.com/zitadel/zitadel/internal/i18n"
 	"net/http"
 
 	"github.com/zitadel/logging"
@@ -15,8 +16,8 @@ type dynamicResourceData struct {
 	FileName      string `schema:"filename"`
 }
 
-func (l *Login) handleResources(staticDir http.FileSystem) http.Handler {
-	return http.FileServer(staticDir)
+func (l *Login) handleResources() http.Handler {
+	return http.FileServer(i18n.LoadFilesystem(i18n.LOGIN))
 }
 
 func (l *Login) handleDynamicResources(w http.ResponseWriter, r *http.Request) {

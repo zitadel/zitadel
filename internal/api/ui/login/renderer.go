@@ -39,7 +39,7 @@ type LanguageData struct {
 	Lang string
 }
 
-func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage static.Storage, cookieName string) *Renderer {
+func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName string) *Renderer {
 	r := &Renderer{
 		pathPrefix:    pathPrefix,
 		staticStorage: staticStorage,
@@ -238,7 +238,6 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 	}
 	var err error
 	r.Renderer, err = renderer.NewRenderer(
-		staticDir,
 		tmplMapping, funcs,
 		cookieName,
 	)

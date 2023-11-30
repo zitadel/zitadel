@@ -203,7 +203,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				},
 			},
 		},
-		{
+		{ // TODO: test not parsable, test unsupported
 			name: "add human with undefined preferred language, ok",
 			fields: fields{
 				eventstore: expectEventstore(

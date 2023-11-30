@@ -2,15 +2,12 @@ package login
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
-	"github.com/rakyll/statik/fs"
-
 	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
@@ -93,17 +90,12 @@ func CreateLogin(config Config,
 		userCodeAlg:         userCodeAlg,
 		featureCheck:        featureCheck,
 	}
-	statikFS, err := fs.NewWithNamespace("login")
-	if err != nil {
-		return nil, fmt.Errorf("unable to create filesystem: %w", err)
-	}
-
 	csrfInterceptor := createCSRFInterceptor(config.CSRFCookieName, csrfCookieKey, externalSecure, login.csrfErrorHandler())
 	cacheInterceptor := createCacheInterceptor(config.Cache.MaxAge, config.Cache.SharedMaxAge, assetCache)
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
 
-	login.router = CreateRouter(login, statikFS, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), oidcInstanceHandler, samlInstanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor, accessHandler)
-	login.renderer = CreateRenderer(HandlerPrefix, statikFS, staticStorage, config.LanguageCookieName)
+	login.router = CreateRouter(login, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), oidcInstanceHandler, samlInstanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor, accessHandler)
+	login.renderer = CreateRenderer(HandlerPrefix, staticStorage, config.LanguageCookieName)
 	login.parser = form.NewParser()
 	return login, nil
 }

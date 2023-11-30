@@ -2,30 +2,14 @@ package i18n
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"path/filepath"
-	"strings"
-
-	"github.com/BurntSushi/toml"
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/zitadel/logging"
-	"golang.org/x/text/language"
-	"sigs.k8s.io/yaml"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/domain"
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
+	"golang.org/x/text/language"
+	"net/http"
 )
-
-const i18nPath = "/i18n"
-
-var supportedLanguages []language.Tag
 
 type Translator struct {
 	bundle             *i18n.Bundle
@@ -45,101 +29,33 @@ type Message struct {
 	Text string
 }
 
-func NewTranslator(dir http.FileSystem, defaultLanguage language.Tag, allowedLanguages []language.Tag, cookieName string) (*Translator, error) {
+// NewZitadelTranslator translates to all supported languages, as the ZITADEL texts are not customizable.
+func NewZitadelTranslator(defaultLanguage language.Tag) (*Translator, error) {
+	return newTranslator(ZITADEL, defaultLanguage, SupportedLanguages(), "")
+}
+
+func NewNotificationTranslator(defaultLanguage language.Tag, allowedLanguages []language.Tag) (*Translator, error) {
+	return newTranslator(NOTIFICATION, defaultLanguage, allowedLanguages, "")
+}
+
+func NewLoginTranslator(defaultLanguage language.Tag, allowedLanguages []language.Tag, cookieName string) (*Translator, error) {
+	return newTranslator(LOGIN, defaultLanguage, allowedLanguages, cookieName)
+}
+
+func newTranslator(ns Namespace, defaultLanguage language.Tag, allowedLanguages []language.Tag, cookieName string) (*Translator, error) {
 	t := new(Translator)
 	var err error
 	t.allowedLanguages = allowedLanguages
 	if len(t.allowedLanguages) == 0 {
 		t.allowedLanguages = SupportedLanguages()
 	}
-	t.bundle, err = newBundle(dir, defaultLanguage, t.allowedLanguages)
+	t.bundle, err = newBundle(LoadFilesystem(ns), defaultLanguage, t.allowedLanguages)
 	if err != nil {
 		return nil, err
 	}
 	t.cookieHandler = http_util.NewCookieHandler()
 	t.cookieName = cookieName
 	return t, nil
-}
-
-func newBundle(dir http.FileSystem, defaultLanguage language.Tag, allowedLanguages []language.Tag) (*i18n.Bundle, error) {
-	bundle := i18n.NewBundle(defaultLanguage)
-	bundle.RegisterUnmarshalFunc("yaml", func(data []byte, v interface{}) error { return yaml.Unmarshal(data, v) })
-	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
-	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
-	i18nDir, err := dir.Open(i18nPath)
-	if err != nil {
-		return nil, zitadel_errors.ThrowNotFound(err, "I18N-MnXRie", "path not found")
-	}
-	defer i18nDir.Close()
-	files, err := i18nDir.Readdir(0)
-	if err != nil {
-		return nil, zitadel_errors.ThrowNotFound(err, "I18N-Gew23", "cannot read dir")
-	}
-	for _, file := range files {
-		fileLang, _ := strings.CutSuffix(file.Name(), filepath.Ext(file.Name()))
-		if err = domain.LanguageIsAllowed(false, allowedLanguages, language.Make(fileLang)); err != nil {
-			continue
-		}
-		if err := addFileFromFileSystemToBundle(dir, bundle, file); err != nil {
-			return nil, zitadel_errors.ThrowNotFoundf(err, "I18N-ZS2AW", "cannot append file %s to Bundle", file.Name())
-		}
-	}
-	return bundle, nil
-}
-
-func addFileFromFileSystemToBundle(dir http.FileSystem, bundle *i18n.Bundle, file os.FileInfo) error {
-	f, err := dir.Open("/i18n/" + file.Name())
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	content, err := ioutil.ReadAll(f)
-	if err != nil {
-		return err
-	}
-	_, err = bundle.ParseMessageFileBytes(content, file.Name())
-	return err
-}
-
-func MustLoadSupportedLanguagesFromDir(dir http.FileSystem) {
-	var err error
-	defer func() {
-		if err != nil {
-			panic("failed to load supported languages: " + err.Error())
-		}
-	}()
-	if supportedLanguages != nil {
-		return
-	}
-	i18nDir, err := dir.Open(i18nPath)
-	if err != nil {
-		return
-	}
-	defer func() {
-		err = errors.Join(err, i18nDir.Close())
-	}()
-	files, err := i18nDir.Readdir(0)
-	if err != nil {
-		return
-	}
-	supportedLanguages = make([]language.Tag, 0, len(files))
-	for _, file := range files {
-		lang := language.Make(strings.TrimSuffix(file.Name(), ".yaml"))
-		if lang != language.Und {
-			supportedLanguages = append(supportedLanguages, lang)
-		}
-	}
-}
-
-func SupportLanguages(languages ...language.Tag) {
-	supportedLanguages = languages
-}
-
-func SupportedLanguages() []language.Tag {
-	if supportedLanguages == nil {
-		panic("supported languages not loaded")
-	}
-	return supportedLanguages
 }
 
 func (t *Translator) SupportedLanguages() []language.Tag {

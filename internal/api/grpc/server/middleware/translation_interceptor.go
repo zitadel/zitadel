@@ -19,23 +19,27 @@ func TranslationHandler() func(ctx context.Context, req interface{}, info *grpc.
 		defer func() { span.EndWithError(err) }()
 
 		if loc, ok := resp.(localizers); ok && resp != nil {
-			// This translator is only used for texts that are not customizable, so we translate to all supported languages.
-			translator, translatorError := newZitadelTranslator(authz.GetInstance(ctx).DefaultLanguage(), i18n.SupportedLanguages())
+			translator, translatorError := getTranslator(ctx)
 			if translatorError != nil {
-				logging.New().WithError(translatorError).Error("could not load translator")
 				return resp, err
 			}
 			translateFields(ctx, loc, translator)
 		}
 		if err != nil {
-			// This translator is only used for texts that are not customizable, so we translate to all supported languages.
-			translator, translatorError := newZitadelTranslator(authz.GetInstance(ctx).DefaultLanguage(), i18n.SupportedLanguages())
+			translator, translatorError := getTranslator(ctx)
 			if translatorError != nil {
-				logging.New().WithError(translatorError).Error("could not load translator")
 				return resp, err
 			}
 			err = translateError(ctx, err, translator)
 		}
 		return resp, err
 	}
+}
+
+func getTranslator(ctx context.Context) (*i18n.Translator, error) {
+	translator, err := i18n.NewZitadelTranslator(authz.GetInstance(ctx).DefaultLanguage())
+	if err != nil {
+		logging.New().WithError(err).Error("could not load translator")
+	}
+	return translator, err
 }
