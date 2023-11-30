@@ -203,7 +203,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				},
 			},
 		},
-		{ // TODO: test not parsable, test unsupported
+		{
 			name: "add human with undefined preferred language, ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -257,6 +257,74 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					Email: Email{
 						Address: "email@test.ch",
 					},
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					Sequence:      0,
+					EventDate:     time.Time{},
+					ResourceOwner: "org1",
+				},
+				wantID: "user1",
+			},
+		},
+		{
+			name: "add human with unsupported preferred language, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanAddedEvent(context.Background(),
+							&userAgg.Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"",
+							"firstname lastname",
+							UnsupportedLanguage,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
+						),
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&userAgg.Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("userinit"),
+							},
+							time.Hour*1,
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				newCode:     mockCode("userinit", time.Hour),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &AddHuman{
+					Username:  "username",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address: "email@test.ch",
+					},
+					PreferredLanguage: UnsupportedLanguage,
 				},
 				secretGenerator: GetMockSecretGenerator(t),
 				allowInitMail:   true,
@@ -1930,6 +1998,177 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			},
 		},
 		{
+			name: "add human (with undefined preferred language), ok",
+			given: func(t *testing.T) (fields, args) {
+				return fields{
+						eventstore: eventstoreExpect(
+							t,
+							expectFilter(
+								eventFromEventPusher(
+									org.NewDomainPolicyAddedEvent(context.Background(),
+										&user.NewAggregate("user1", "org1").Aggregate,
+										true,
+										true,
+										true,
+									),
+								),
+							),
+							expectFilter(
+								eventFromEventPusher(
+									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+										&user.NewAggregate("user1", "org1").Aggregate,
+										1,
+										false,
+										false,
+										false,
+										false,
+									),
+								),
+							),
+							expectPush(
+								newAddHumanEvent("$plain$x$password", false, true, "", language.Und),
+								user.NewHumanInitialCodeAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("a"),
+									},
+									time.Hour*1,
+								),
+							),
+						),
+						idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+						userPasswordHasher: mockPasswordHasher("x"),
+					},
+					args{
+						ctx:   context.Background(),
+						orgID: "org1",
+						human: &domain.Human{
+							Username: "username",
+							Profile: &domain.Profile{
+								FirstName: "firstname",
+								LastName:  "lastname",
+							},
+							Password: &domain.Password{
+								SecretString:   "password",
+								ChangeRequired: false,
+							},
+							Email: &domain.Email{
+								EmailAddress: "email@test.ch",
+							},
+						},
+						secretGenerator: GetMockSecretGenerator(t),
+					}
+			},
+			res: res{
+				wantHuman: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						DisplayName:       "firstname lastname",
+						PreferredLanguage: language.Und,
+					},
+					Email: &domain.Email{
+						EmailAddress: "email@test.ch",
+					},
+					State: domain.UserStateInitial,
+				},
+			},
+		},
+		{
+			name: "add human (with unsupported preferred language), ok",
+			given: func(t *testing.T) (fields, args) {
+				return fields{
+						eventstore: eventstoreExpect(
+							t,
+							expectFilter(
+								eventFromEventPusher(
+									org.NewDomainPolicyAddedEvent(context.Background(),
+										&user.NewAggregate("user1", "org1").Aggregate,
+										true,
+										true,
+										true,
+									),
+								),
+							),
+							expectFilter(
+								eventFromEventPusher(
+									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+										&user.NewAggregate("user1", "org1").Aggregate,
+										1,
+										false,
+										false,
+										false,
+										false,
+									),
+								),
+							),
+							expectPush(
+								newAddHumanEvent("$plain$x$password", false, true, "", UnsupportedLanguage),
+								user.NewHumanInitialCodeAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("a"),
+									},
+									time.Hour*1,
+								),
+							),
+						),
+						idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+						userPasswordHasher: mockPasswordHasher("x"),
+					},
+					args{
+						ctx:   context.Background(),
+						orgID: "org1",
+						human: &domain.Human{
+							Username: "username",
+							Profile: &domain.Profile{
+								FirstName:         "firstname",
+								LastName:          "lastname",
+								PreferredLanguage: UnsupportedLanguage,
+							},
+							Password: &domain.Password{
+								SecretString:   "password",
+								ChangeRequired: false,
+							},
+							Email: &domain.Email{
+								EmailAddress: "email@test.ch",
+							},
+						},
+						secretGenerator: GetMockSecretGenerator(t),
+					}
+			},
+			res: res{
+				wantHuman: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						DisplayName:       "firstname lastname",
+						PreferredLanguage: UnsupportedLanguage,
+					},
+					Email: &domain.Email{
+						EmailAddress: "email@test.ch",
+					},
+					State: domain.UserStateInitial,
+				},
+			},
+		},
+		{
 			name: "add human (with idp), ok",
 			given: func(t *testing.T) (fields, args) {
 				return fields{
@@ -3329,6 +3568,218 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 			},
 		},
 		{
+			name: "add human (with unsupported preferred language), ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								false,
+								true,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
+					expectPush(
+						newRegisterHumanEvent("username", "$plain$x$password", false, true, "", UnsupportedLanguage),
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+						),
+					),
+				),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						PreferredLanguage: UnsupportedLanguage,
+					},
+					Email: &domain.Email{
+						EmailAddress: "email@test.ch",
+					},
+					Password: &domain.Password{
+						SecretString: "password",
+					},
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+			},
+			res: res{
+				want: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						DisplayName:       "firstname lastname",
+						PreferredLanguage: UnsupportedLanguage,
+					},
+					Email: &domain.Email{
+						EmailAddress: "email@test.ch",
+					},
+					State: domain.UserStateInitial,
+				},
+			},
+		},
+		{
+			name: "add human (with undefined preferred language), ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								false,
+								true,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+								"",
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
+							),
+						),
+					),
+					expectPush(
+						newRegisterHumanEvent("username", "$plain$x$password", false, true, "", language.Und),
+						user.NewHumanInitialCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+						),
+					),
+				),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName: "firstname",
+						LastName:  "lastname",
+					},
+					Email: &domain.Email{
+						EmailAddress: "email@test.ch",
+					},
+					Password: &domain.Password{
+						SecretString: "password",
+					},
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+			},
+			res: res{
+				want: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:   "firstname",
+						LastName:    "lastname",
+						DisplayName: "firstname lastname",
+					},
+					Email: &domain.Email{
+						EmailAddress: "email@test.ch",
+					},
+					State: domain.UserStateInitial,
+				},
+			},
+		},
+		{
 			name: "add with idp link, email verified, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -4054,6 +4505,149 @@ func TestAddHumanCommand(t *testing.T) {
 							"",
 							"gigi giraffe",
 							AllowedLanguage,
+							0,
+							"support@zitadel.com",
+							true,
+						)
+						event.AddPasswordData("$plain$x$password", false)
+						return event
+					}(),
+					user.NewHumanEmailVerifiedEvent(context.Background(), &agg.Aggregate),
+				},
+			},
+		},
+		{
+			name: "undefined preferred language, ok",
+			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id"),
+			},
+			args: args{
+				human: &AddHuman{
+					Email:     Email{Address: "support@zitadel.com", Verified: true},
+					FirstName: "gigi",
+					LastName:  "giraffe",
+					Password:  "password",
+					Username:  "username",
+				},
+				orgID:   "ro",
+				hasher:  mockPasswordHasher("x"),
+				codeAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				filter: NewMultiFilter().Append(
+					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{}, nil
+					}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return []eventstore.Event{
+								org.NewDomainPolicyAddedEvent(
+									ctx,
+									&org.NewAggregate("id").Aggregate,
+									true,
+									true,
+									true,
+								),
+							}, nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return []eventstore.Event{
+								org.NewPasswordComplexityPolicyAddedEvent(
+									ctx,
+									&org.NewAggregate("id").Aggregate,
+									2,
+									false,
+									false,
+									false,
+									false,
+								),
+							}, nil
+						}).
+					Filter(),
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					func() *user.HumanAddedEvent {
+						event := user.NewHumanAddedEvent(
+							context.Background(),
+							&agg.Aggregate,
+							"username",
+							"gigi",
+							"giraffe",
+							"",
+							"gigi giraffe",
+							language.Und,
+							0,
+							"support@zitadel.com",
+							true,
+						)
+						event.AddPasswordData("$plain$x$password", false)
+						return event
+					}(),
+					user.NewHumanEmailVerifiedEvent(context.Background(), &agg.Aggregate),
+				},
+			},
+		},
+		{
+			name: "unsupported preferred language, ok",
+			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id"),
+			},
+			args: args{
+				human: &AddHuman{
+					Email:             Email{Address: "support@zitadel.com", Verified: true},
+					FirstName:         "gigi",
+					LastName:          "giraffe",
+					Password:          "password",
+					Username:          "username",
+					PreferredLanguage: UnsupportedLanguage,
+				},
+				orgID:   "ro",
+				hasher:  mockPasswordHasher("x"),
+				codeAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				filter: NewMultiFilter().Append(
+					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{}, nil
+					}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return []eventstore.Event{
+								org.NewDomainPolicyAddedEvent(
+									ctx,
+									&org.NewAggregate("id").Aggregate,
+									true,
+									true,
+									true,
+								),
+							}, nil
+						}).
+					Append(
+						func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+							return []eventstore.Event{
+								org.NewPasswordComplexityPolicyAddedEvent(
+									ctx,
+									&org.NewAggregate("id").Aggregate,
+									2,
+									false,
+									false,
+									false,
+									false,
+								),
+							}, nil
+						}).
+					Filter(),
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					func() *user.HumanAddedEvent {
+						event := user.NewHumanAddedEvent(
+							context.Background(),
+							&agg.Aggregate,
+							"username",
+							"gigi",
+							"giraffe",
+							"",
+							"gigi giraffe",
+							UnsupportedLanguage,
 							0,
 							"support@zitadel.com",
 							true,

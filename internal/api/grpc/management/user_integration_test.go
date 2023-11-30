@@ -55,7 +55,7 @@ func TestImport_and_Get(t *testing.T) {
 			// create unique names.
 			lastName := strconv.FormatInt(time.Now().Unix(), 10)
 			userName := strings.Join([]string{firstName, lastName}, "_")
-			email := strings.Join([]string{userName, "zitadel.com"}, "@")
+			email := strings.Join([]string{userName, "example.com"}, "@")
 
 			res, err := Client.ImportHumanUser(CTX, &management.ImportHumanUserRequest{
 				UserName: userName,
@@ -83,18 +83,18 @@ func TestImport_and_Get(t *testing.T) {
 	}
 }
 
-func TestImport_UnsupportedPreferredLanguage(t *testing.T) {
+func TestImport_UnparsablePreferredLanguage(t *testing.T) {
 	random := integration.RandString(5)
 	_, err := Client.ImportHumanUser(CTX, &management.ImportHumanUserRequest{
 		UserName: random,
 		Profile: &management.ImportHumanUserRequest_Profile{
 			FirstName:         random,
 			LastName:          random,
-			PreferredLanguage: language.Afrikaans.String(),
+			PreferredLanguage: "a very invalid language tag",
 			Gender:            user.Gender_GENDER_DIVERSE,
 		},
 		Email: &management.ImportHumanUserRequest_Email{
-			Email:           random + "@zitadel.com",
+			Email:           random + "@example.com",
 			IsEmailVerified: true,
 		},
 	})

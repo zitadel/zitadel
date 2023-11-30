@@ -1,6 +1,7 @@
 package hook
 
 import (
+	"github.com/zitadel/zitadel/internal/domain"
 	"reflect"
 
 	"github.com/mitchellh/mapstructure"
@@ -21,6 +22,7 @@ func TagToLanguageHookFunc() mapstructure.DecodeHookFuncType {
 			return data, nil
 		}
 
-		return language.Parse(data.(string))
+		lang, err := domain.ParseLanguage(data.(string))
+		return lang[0], err
 	}
 }
