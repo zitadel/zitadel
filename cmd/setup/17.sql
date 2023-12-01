@@ -1,0 +1,1 @@
+ALTER TABLE projections.current_states ADD filter_offset INTEGER;
