@@ -99,10 +99,11 @@ func LanguagesHaveDuplicates(langs []language.Tag) error {
 }
 
 func ParseLanguage(lang ...string) (tags []language.Tag, err error) {
-	for _, l := range lang {
-		t, parseErr := language.Parse(l)
+	tags = make([]language.Tag, len(lang))
+	for i := range lang {
+		var parseErr error
+		tags[i], parseErr = language.Parse(lang[i])
 		err = errors.Join(err, parseErr)
-		tags = append(tags, t)
 	}
 	if err != nil {
 		err = z_errors.ThrowInvalidArgument(err, "LANG-jc8Sq", "Errors.Language.NotParsed")
