@@ -89,6 +89,11 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		query += " LIMIT ?"
 	}
 
+	if q.Offset > 0 {
+		values = append(values, q.Offset)
+		query += " OFFSET ?"
+	}
+
 	query = criteria.placeholder(query)
 
 	var contextQuerier interface {
