@@ -238,6 +238,35 @@ service UserService {
     };
   }
 
+  rpc UpdateHumanUser(UpdateHumanUserRequest) returns (UpdateHumanUserResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/users/{user_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "user.write"
+        org_field: "organization"
+      }
+      http_response: {
+        success_code: 201
+      }
+    };
+
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Delete user";
+      description: "The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found"
+      tags: "Users";
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
   rpc RemoveUser(RemoveUserRequest) returns (RemoveUserResponse) {
     option (google.api.http) = {
       delete: "/v2beta/users/{user_id}"
@@ -267,6 +296,33 @@ service UserService {
     };
   }
 
+  rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
+    option (google.api.http) = {
+      get: "/v2beta/users/{user_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "user.read"
+        org_field: "organization"
+      }
+      http_response: {
+        success_code: 201
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "User by ID";
+      description: "Returns the full user object (human or machine) including the profile, email, etc."
+      tags: "Users";
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
 
   rpc RegisterPasskey (RegisterPasskeyRequest) returns (RegisterPasskeyResponse) {
     option (google.api.http) = {
@@ -863,7 +919,37 @@ message GetUserByIDRequest {
 }
 
 message GetUserByIDResponse {
-  zitadel.user.v1.User user = 1;
+  zitadel.object.v2beta.Details details = 1;
+  HumanUser user = 2;
+}
+
+message UpdateHumanUserRequest{
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  optional string username = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"minnie-mouse\"";
+    }
+  ];
+  zitadel.object.v2beta.Organization organization = 3;
+  optional SetHumanProfile profile = 4;
+  optional SetHumanEmail email = 5;
+  optional SetHumanPhone phone = 6;
+}
+
+message UpdateHumanUserResponse {
+  zitadel.object.v2beta.Details details = 1;
+  optional string email_code = 2;
+  optional string phone_code = 3;
 }
 
 message RegisterPasskeyRequest{

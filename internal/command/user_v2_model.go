@@ -32,10 +32,17 @@ type UserHumanWriteModel struct {
 	InitCodeCreationDate time.Time
 	InitCodeExpiry       time.Duration
 
-	EmailWriteModel bool
-	Email           domain.EmailAddress
-	IsEmailVerified bool
+	PasswordWriteModel       bool
+	PasswordEncodedHash      string
+	PasswordChangeRequired   bool
+	PasswordCode             *crypto.CryptoValue
+	PasswordCodeCreationDate time.Time
+	PasswordCodeExpiry       time.Duration
+	PasswordCheckFailedCount uint64
 
+	EmailWriteModel       bool
+	Email                 domain.EmailAddress
+	IsEmailVerified       bool
 	EmailCode             *crypto.CryptoValue
 	EmailCodeCreationDate time.Time
 	EmailCodeExpiry       time.Duration
@@ -60,12 +67,17 @@ func NewUserHumanAllWriteModel(userID, resourceOwner string) *UserHumanWriteMode
 		StateWriteModel:  true,
 	}
 }
-func NewUserHumanWriteModel(userID, resourceOwner string) *UserHumanWriteModel {
+
+func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM bool) *UserHumanWriteModel {
 	return &UserHumanWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
+		ProfileWriteModel:  profileWM,
+		EmailWriteModel:    emailWM,
+		PhoneWriteModel:    phoneWM,
+		PasswordWriteModel: passwordWM,
 	}
 }
 
@@ -144,6 +156,7 @@ func (wm *UserHumanWriteModel) Reduce() error {
 				wm.UserState = domain.UserStateLocked
 			}
 		case *user.UserUnlockedEvent:
+			wm.PasswordCheckFailedCount = 0
 			if wm.UserState != domain.UserStateDeleted {
 				wm.UserState = domain.UserStateActive
 			}
@@ -157,6 +170,22 @@ func (wm *UserHumanWriteModel) Reduce() error {
 			}
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
+
+		case *user.HumanPasswordHashUpdatedEvent:
+			wm.PasswordEncodedHash = e.EncodedHash
+		case *user.HumanPasswordCheckFailedEvent:
+			wm.PasswordCheckFailedCount += 1
+		case *user.HumanPasswordCheckSucceededEvent:
+			wm.PasswordCheckFailedCount = 0
+		case *user.HumanPasswordChangedEvent:
+			wm.PasswordEncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
+			wm.PasswordChangeRequired = e.ChangeRequired
+			wm.PasswordCode = nil
+			wm.PasswordCheckFailedCount = 0
+		case *user.HumanPasswordCodeAddedEvent:
+			wm.PasswordCode = e.Code
+			wm.PasswordCodeCreationDate = e.CreationDate()
+			wm.PasswordCodeExpiry = e.Expiry
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -217,6 +246,21 @@ func (wm *UserHumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanAvatarRemovedType,
 		)
 	}
+	if wm.PasswordWriteModel {
+		eventTypes = append(eventTypes,
+			user.HumanPasswordChangedType,
+			user.HumanPasswordCodeAddedType,
+			user.HumanPasswordCheckFailedType,
+			user.HumanPasswordCheckSucceededType,
+			user.HumanPasswordHashUpdatedType,
+			user.UserV1PasswordChangedType,
+			user.UserV1PasswordCodeAddedType,
+			user.UserV1PasswordCheckFailedType,
+			user.UserV1PasswordCheckSucceededType,
+
+			user.HumanEmailVerifiedType,
+		)
+	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
@@ -242,6 +286,8 @@ func (wm *UserHumanWriteModel) reduceHumanAddedEvent(e *user.HumanAddedEvent) {
 	wm.Email = e.EmailAddress
 	wm.Phone = e.PhoneNumber
 	wm.UserState = domain.UserStateActive
+	wm.PasswordEncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
+	wm.PasswordChangeRequired = e.ChangeRequired
 }
 
 func (wm *UserHumanWriteModel) reduceHumanRegisteredEvent(e *user.HumanRegisteredEvent) {
@@ -255,6 +301,8 @@ func (wm *UserHumanWriteModel) reduceHumanRegisteredEvent(e *user.HumanRegistere
 	wm.Email = e.EmailAddress
 	wm.Phone = e.PhoneNumber
 	wm.UserState = domain.UserStateActive
+	wm.PasswordEncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
+	wm.PasswordChangeRequired = e.ChangeRequired
 }
 
 func (wm *UserHumanWriteModel) reduceHumanProfileChangedEvent(e *user.HumanProfileChangedEvent) {
@@ -298,17 +346,80 @@ func (wm *UserHumanWriteModel) reduceHumanPhoneRemovedEvent() {
 	wm.IsPhoneVerified = false
 }
 
-func (wm *HumanEmailWriteModel) NewEmailChangedEvent(
+func (wm *UserHumanWriteModel) NewEmailAddressChangedEvent(
 	ctx context.Context,
-	aggregate *eventstore.Aggregate,
 	email domain.EmailAddress,
-) (*user.HumanEmailChangedEvent, bool) {
+) *user.HumanEmailChangedEvent {
 	if wm.Email == email {
-		return nil, false
+		return nil
 	}
-	return user.NewHumanEmailChangedEvent(ctx, aggregate, email), true
+	return user.NewHumanEmailChangedEvent(ctx, &wm.Aggregate().Aggregate, email)
+}
+
+func (wm *UserHumanWriteModel) NewEmailIsVerifiedEvent(
+	ctx context.Context,
+	isVerified bool,
+) *user.HumanEmailVerifiedEvent {
+	if wm.IsEmailVerified == isVerified || !wm.IsEmailVerified {
+		return nil
+	}
+	return user.NewHumanEmailVerifiedEvent(ctx, &wm.Aggregate().Aggregate)
+}
+
+func (wm *UserHumanWriteModel) NewPhoneNumberChangedEvent(
+	ctx context.Context,
+	phone domain.PhoneNumber,
+) *user.HumanPhoneChangedEvent {
+	if wm.Phone == phone {
+		return nil
+	}
+	return user.NewHumanPhoneChangedEvent(ctx, &wm.Aggregate().Aggregate, phone)
+}
+
+func (wm *UserHumanWriteModel) NewPhoneIsVerifiedEvent(
+	ctx context.Context,
+	isVerified bool,
+) *user.HumanPhoneVerifiedEvent {
+	if wm.IsPhoneVerified == isVerified || !wm.IsPhoneVerified {
+		return nil
+	}
+	return user.NewHumanPhoneVerifiedEvent(ctx, &wm.Aggregate().Aggregate)
 }
 
 func (wm *UserHumanWriteModel) Aggregate() *user.Aggregate {
 	return user.NewAggregate(wm.AggregateID, wm.ResourceOwner)
+}
+
+func (wm *UserHumanWriteModel) NewProfileChangedEvent(
+	ctx context.Context,
+	firstName,
+	lastName,
+	nickName,
+	displayName *string,
+	preferredLanguage *language.Tag,
+	gender *domain.Gender,
+) (*user.HumanProfileChangedEvent, error) {
+	changes := make([]user.ProfileChanges, 0)
+	if firstName != nil && wm.FirstName != *firstName {
+		changes = append(changes, user.ChangeFirstName(*firstName))
+	}
+	if lastName != nil && wm.LastName != *lastName {
+		changes = append(changes, user.ChangeLastName(*lastName))
+	}
+	if nickName != nil && wm.NickName != *nickName {
+		changes = append(changes, user.ChangeNickName(*nickName))
+	}
+	if displayName != nil && wm.DisplayName != *displayName {
+		changes = append(changes, user.ChangeDisplayName(*displayName))
+	}
+	if preferredLanguage != nil && wm.PreferredLanguage != *preferredLanguage {
+		changes = append(changes, user.ChangePreferredLanguage(*preferredLanguage))
+	}
+	if gender != nil && wm.Gender != *gender {
+		changes = append(changes, user.ChangeGender(*gender))
+	}
+	if len(changes) == 0 {
+		return nil, nil
+	}
+	return user.NewHumanProfileChangedEvent(ctx, &wm.Aggregate().Aggregate, changes)
 }

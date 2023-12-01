@@ -24,6 +24,16 @@ message SetHumanPhone {
     }
 }
 
+message HumanPhone {
+    string phone = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 200;
+            example: "\"+41791234567\"";
+        }
+    ];
+    bool is_verified = 2;
+}
+
 message SendPhoneVerificationCode {}
 
 message ReturnPhoneVerificationCode {}
