@@ -261,20 +261,32 @@ func (h *Handler) Trigger(ctx context.Context, opts ...triggerOpt) (_ context.Co
 func (h *Handler) lockInstance(ctx context.Context, config *triggerConfig) func() {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 
-	// Check that the instance has a mutex to lock
-	instanceMu, _ := h.triggeredInstancesSync.LoadOrStore(instanceID, new(sync.Mutex))
-	unlock := func() {
-		instanceMu.(*sync.Mutex).Unlock()
-	}
-	if !instanceMu.(*sync.Mutex).TryLock() {
-		instanceMu.(*sync.Mutex).Lock()
-		if config.awaitRunning {
-			return unlock
+	// Check that the instance has a lock
+	instanceLock, _ := h.triggeredInstancesSync.LoadOrStore(instanceID, make(chan bool, 1))
+
+	// in case we don't want to wait for a running trigger / lock (e.g. spooler),
+	// we can directly return if we cannot lock
+	if !config.awaitRunning {
+		select {
+		case instanceLock.(chan bool) <- true:
+			return func() {
+				<-instanceLock.(chan bool)
+			}
+		default:
+			return nil
 		}
-		defer unlock()
+	}
+
+	// in case we want to wait for a running trigger / lock (e.g. query),
+	// we try to lock as long as the context is not cancelled
+	select {
+	case instanceLock.(chan bool) <- true:
+		return func() {
+			<-instanceLock.(chan bool)
+		}
+	case <-ctx.Done():
 		return nil
 	}
-	return unlock
 }
 
 func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (additionalIteration bool, err error) {
