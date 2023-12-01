@@ -55,6 +55,12 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 		require.True(tt, ok)
 		require.Equal(tt, codes.FailedPrecondition, expectStatus.Code())
 	})
+	t.Run("not defining any restrictions throws an error", func(tt *testing.T) {
+		_, err := Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{})
+		expectStatus, ok := status.FromError(err)
+		require.True(tt, ok)
+		require.Equal(tt, codes.InvalidArgument, expectStatus.Code())
+	})
 	t.Run("setting the default language works", func(tt *testing.T) {
 		setAndAwaitDefaultLanguage(iamOwnerCtx, tt, defaultAndAllowedLanguage)
 	})
