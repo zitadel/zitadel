@@ -21,7 +21,7 @@ func Test_verifyGrant(t *testing.T) {
 			name: "doesn't exists, create fails",
 			args: args{
 				db: prepareDB(t,
-					expectExec("GRANT ALL ON DATABASE zitadel TO zitadel-user", sql.ErrTxDone),
+					expectExec("GRANT ALL ON DATABASE \"zitadel\" TO \"zitadel-user\"", sql.ErrTxDone),
 				),
 				database: "zitadel",
 				username: "zitadel-user",
@@ -32,7 +32,7 @@ func Test_verifyGrant(t *testing.T) {
 			name: "correct",
 			args: args{
 				db: prepareDB(t,
-					expectExec("GRANT ALL ON DATABASE zitadel TO zitadel-user", nil),
+					expectExec("GRANT ALL ON DATABASE \"zitadel\" TO \"zitadel-user\"", nil),
 				),
 				database: "zitadel",
 				username: "zitadel-user",
@@ -43,7 +43,7 @@ func Test_verifyGrant(t *testing.T) {
 			name: "already exists",
 			args: args{
 				db: prepareDB(t,
-					expectExec("GRANT ALL ON DATABASE zitadel TO zitadel-user", nil),
+					expectExec("GRANT ALL ON DATABASE \"zitadel\" TO \"zitadel-user\"", nil),
 				),
 				database: "zitadel",
 				username: "zitadel-user",
