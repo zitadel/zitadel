@@ -227,7 +227,7 @@ func clientIDFromCredentials(cc *op.ClientCredentials) (clientID string, asserti
 	if cc.ClientAssertion != "" {
 		claims := new(oidc.JWTTokenRequest)
 		if _, err := oidc.ParseToken(cc.ClientAssertion, claims); err != nil {
-			return "", false, oidc.ErrUnauthorizedClient().WithParent(err)
+			return "", false, oidc.ErrInvalidClient().WithParent(err)
 		}
 		return claims.Issuer, true, nil
 	}

@@ -39,8 +39,11 @@ func (s *Server) clientCredentialsAuth(ctx context.Context, clientID, clientSecr
 		return nil, err
 	}
 	user, err := s.query.GetUser(ctx, false, searchQuery)
+	if errors.IsNotFound(err) {
+		return nil, oidc.ErrInvalidClient().WithParent(err).WithDescription("client not found")
+	}
 	if err != nil {
-		return nil, err
+		return nil, err // defaults to server error
 	}
 	if user.Machine == nil || user.Machine.Secret == nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-pieP8", "Errors.User.Machine.Secret.NotExisting")

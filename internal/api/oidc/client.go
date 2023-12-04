@@ -918,8 +918,11 @@ func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCreden
 		return nil, err
 	}
 	client, err := s.query.GetOIDCClientByID(ctx, clientID, assertion)
+	if errors.IsNotFound(err) {
+		return nil, oidc.ErrInvalidClient().WithParent(err).WithDescription("client not found")
+	}
 	if err != nil {
-		return nil, err
+		return nil, err // defaults to server error
 	}
 	if client.State != domain.AppStateActive {
 		return nil, oidc.ErrInvalidClient().WithDescription("client is not active")
@@ -944,11 +947,11 @@ func (s *Server) verifyClientAssertion(ctx context.Context, client *query.OIDCCl
 	defer func() { span.EndWithError(err) }()
 
 	if assertion == "" {
-		return oidc.ErrUnauthorizedClient().WithDescription("empty client assertion")
+		return oidc.ErrInvalidClient().WithDescription("empty client assertion")
 	}
 	verifier := op.NewJWTProfileVerifierKeySet(keySetMap(client.PublicKeys), op.IssuerFromContext(ctx), time.Hour, client.ClockSkew)
 	if _, err := op.VerifyJWTAssertion(ctx, assertion, verifier); err != nil {
-		return oidc.ErrUnauthorizedClient().WithParent(err).WithDescription("invalid assertion")
+		return oidc.ErrInvalidClient().WithParent(err).WithDescription("invalid assertion")
 	}
 	return nil
 }
@@ -958,10 +961,10 @@ func (s *Server) verifyClientSecret(ctx context.Context, client *query.OIDCClien
 	defer func() { span.EndWithError(err) }()
 
 	if secret == "" {
-		return oidc.ErrUnauthorizedClient().WithDescription("empty client secret")
+		return oidc.ErrInvalidClient().WithDescription("empty client secret")
 	}
 	if err = crypto.CompareHash(client.ClientSecret, []byte(secret), s.hashAlg); err != nil {
-		return oidc.ErrUnauthorizedClient().WithParent(err).WithDescription("invalid secret")
+		return oidc.ErrInvalidClient().WithParent(err).WithDescription("invalid secret")
 	}
 	return nil
 }

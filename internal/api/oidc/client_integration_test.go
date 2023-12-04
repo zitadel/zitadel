@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client"
@@ -22,6 +23,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/authn"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
 func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
@@ -317,4 +319,74 @@ func createInvalidKeyData(t testing.TB, client *management.AddOIDCAppResponse) [
 	data, err := key.Detail()
 	require.NoError(t, err)
 	return data
+}
+
+func TestServer_CreateAccessToken_ClientCredentials(t *testing.T) {
+	clientID, clientSecret, err := Tester.CreateOIDCCredentialsClient(CTX)
+	require.NoError(t, err)
+
+	type clientDetails struct {
+		clientID     string
+		clientSecret string
+		keyData      []byte
+	}
+	tests := []struct {
+		name         string
+		clientID     string
+		clientSecret string
+		wantErr      bool
+	}{
+		{
+			name:         "missing client ID error",
+			clientID:     "",
+			clientSecret: clientSecret,
+			wantErr:      true,
+		},
+		{
+			name:         "client not found error",
+			clientID:     "foo",
+			clientSecret: clientSecret,
+			wantErr:      true,
+		},
+		{
+			name: "machine user without secret error",
+			clientID: func() string {
+				name := gofakeit.Username()
+				_, err := Tester.Client.Mgmt.AddMachineUser(CTX, &management.AddMachineUserRequest{
+					Name:            name,
+					UserName:        name,
+					AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
+				})
+				require.NoError(t, err)
+				return name
+			}(),
+			clientSecret: clientSecret,
+			wantErr:      true,
+		},
+		{
+			name:         "wrong secret error",
+			clientID:     clientID,
+			clientSecret: "bar",
+			wantErr:      true,
+		},
+		{
+			name:         "success",
+			clientID:     clientID,
+			clientSecret: clientSecret,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			provider, err := rp.NewRelyingPartyOIDC(CTX, Tester.OIDCIssuer(), tt.clientID, tt.clientSecret, redirectURI, []string{oidc.ScopeOpenID})
+			require.NoError(t, err)
+			tokens, err := rp.ClientCredentials(CTX, provider, nil)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.NotNil(t, tokens)
+			assert.NotEmpty(t, tokens.AccessToken)
+		})
+	}
 }

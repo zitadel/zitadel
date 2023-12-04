@@ -13,6 +13,7 @@ require (
 	github.com/allegro/bigcache v1.2.1
 	github.com/benbjohnson/clock v1.3.5
 	github.com/boombuler/barcode v1.0.1
+	github.com/brianvoe/gofakeit/v6 v6.25.0
 	github.com/cockroachdb/cockroach-go/v2 v2.3.5
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/crewjam/saml v0.4.14
@@ -59,7 +60,7 @@ require (
 	github.com/superseriousbusiness/exifremove v0.0.0-20210330092427-6acd27eac203
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/zitadel/logging v0.5.0
-	github.com/zitadel/oidc/v3 v3.4.0
+	github.com/zitadel/oidc/v3 v3.4.1-0.20231204173057-172aef535097
 	github.com/zitadel/passwap v0.4.0
 	github.com/zitadel/saml v0.1.2
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.46.0
@@ -73,10 +74,10 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.20.0
 	go.opentelemetry.io/otel/trace v1.21.0
 	go.uber.org/mock v0.3.0
-	golang.org/x/crypto v0.15.0
+	golang.org/x/crypto v0.16.0
 	golang.org/x/exp v0.0.0-20231108232855-2478ac86f678
-	golang.org/x/net v0.18.0
-	golang.org/x/oauth2 v0.14.0
+	golang.org/x/net v0.19.0
+	golang.org/x/oauth2 v0.15.0
 	golang.org/x/sync v0.5.0
 	golang.org/x/text v0.14.0
 	google.golang.org/api v0.150.0
@@ -201,7 +202,7 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.20.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
-	golang.org/x/sys v0.14.0
+	golang.org/x/sys v0.15.0
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
