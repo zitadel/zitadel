@@ -170,18 +170,14 @@
         </div>
 
         <div class="filter-events-section">
-            <mat-radio-group
-              aria-label="Select an option"
-              class="filter-events-sub"
-              formControlName="creationDateFilterType"
-            >
-              <mat-radio-button [value]="CreationDateFilterType.FROM">
-                {{ 'IAM.EVENTS.FILTERS.CREATIONDATE.RADIO_FROM' | translate }}
-              </mat-radio-button>
-              <mat-radio-button [value]="CreationDateFilterType.RANGE">
-                {{ 'IAM.EVENTS.FILTERS.CREATIONDATE.RADIO_RANGE' | translate }}
-              </mat-radio-button>
-            </mat-radio-group>
+          <mat-radio-group aria-label="Select an option" class="filter-events-sub" formControlName="creationDateFilterType">
+            <mat-radio-button [value]="CreationDateFilterType.FROM">
+              {{ 'IAM.EVENTS.FILTERS.CREATIONDATE.RADIO_FROM' | translate }}
+            </mat-radio-button>
+            <mat-radio-button [value]="CreationDateFilterType.RANGE">
+              {{ 'IAM.EVENTS.FILTERS.CREATIONDATE.RADIO_RANGE' | translate }}
+            </mat-radio-button>
+          </mat-radio-group>
           <div class="filter-events-sub">
             <ng-container *ngIf="creationDateFilterType!.value == CreationDateFilterType.FROM">
               <mat-form-field class="datetime-input">
@@ -198,7 +194,8 @@
             <ng-container *ngIf="creationDateFilterType!.value == CreationDateFilterType.RANGE">
               <div class="datetime-range">
                 <mat-form-field class="datetime-input">
-                  <cnsl-label>{{ 'IAM.EVENTS.FILTERS.CREATIONDATE.LABEL_SINCE' | translate }}
+                  <cnsl-label
+                    >{{ 'IAM.EVENTS.FILTERS.CREATIONDATE.LABEL_SINCE' | translate }}
                     <input
                       matInput
                       type="datetime-local"
@@ -208,20 +205,21 @@
                     />
                   </cnsl-label>
                 </mat-form-field>
-              <mat-form-field class="datetime-input">
-                <cnsl-label>{{ 'IAM.EVENTS.FILTERS.CREATIONDATE.LABEL_UNTIL' | translate }}
-                <input
-                  matInput
-                  type="datetime-local"
-                  name="creationDateUntil"
-                  [value]="creationDateUntil!.value | date: 'yyyy-MM-ddTHH:mm:ss'"
-                  (value)="creationDateUntil = $event.target"
-                />
-                </cnsl-label>
-              </mat-form-field>
+                <mat-form-field class="datetime-input">
+                  <cnsl-label
+                    >{{ 'IAM.EVENTS.FILTERS.CREATIONDATE.LABEL_UNTIL' | translate }}
+                    <input
+                      matInput
+                      type="datetime-local"
+                      name="creationDateUntil"
+                      [value]="creationDateUntil!.value | date: 'yyyy-MM-ddTHH:mm:ss'"
+                      (value)="creationDateUntil = $event.target"
+                    />
+                  </cnsl-label>
+                </mat-form-field>
               </div>
             </ng-container>
-        </div>
+          </div>
         </div>
       </form>
     </div>

@@ -37,7 +37,7 @@ function dateToTs(date: Date): Timestamp {
 })
 export class FilterEventsComponent implements OnInit {
   // Make enum available in template
-  public CreationDateFilterType = CreationDateFilterType
+  public CreationDateFilterType = CreationDateFilterType;
 
   public showFilter: boolean = false;
   public ActionKeysType: any = ActionKeysType;
@@ -424,8 +424,8 @@ export class FilterEventsComponent implements OnInit {
 
   private setDate(ctrl: AbstractControl<Date>, event: EventTarget | null): void {
     if (!(event instanceof HTMLInputElement)) {
-      throw new Error("wrong target");
+      throw new Error('wrong target');
     }
-    ctrl.setValue(new Date(event.value || ""));
+    ctrl.setValue(new Date(event.value || ''));
   }
 }
