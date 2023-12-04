@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/app"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
@@ -52,9 +53,9 @@ func TestMain(m *testing.M) {
 func TestServer_GetAuthRequest(t *testing.T) {
 	project, err := Tester.CreateProject(CTX)
 	require.NoError(t, err)
-	client, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
+	client, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE)
 	require.NoError(t, err)
-	authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
+	authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), "", Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
 	require.NoError(t, err)
 	now := time.Now()
 
@@ -96,7 +97,7 @@ func TestServer_GetAuthRequest(t *testing.T) {
 func TestServer_CreateCallback(t *testing.T) {
 	project, err := Tester.CreateProject(CTX)
 	require.NoError(t, err)
-	client, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
+	client, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE)
 	require.NoError(t, err)
 	sessionResp, err := Tester.Client.SessionV2.CreateSession(CTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
@@ -134,7 +135,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			name: "session not found",
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
+					authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), "", Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -151,7 +152,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			name: "session token invalid",
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
+					authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), "", Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -168,7 +169,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			name: "fail callback",
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
+					authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), "", Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
 					require.NoError(t, err)
 					return authRequestID
 				}(),
@@ -192,7 +193,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			name: "code callback",
 			req: &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: func() string {
-					authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
+					authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, client.GetClientId(), "", Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID, redirectURI)
 					require.NoError(t, err)
 					return authRequestID
 				}(),

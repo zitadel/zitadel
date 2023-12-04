@@ -15,13 +15,14 @@ import (
 	"golang.org/x/text/language"
 
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/pkg/grpc/app"
 	"github.com/zitadel/zitadel/pkg/grpc/authn"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 )
 
 func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
-	clientID := createClient(t)
+	clientID, _ := createClient(t, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -37,13 +38,13 @@ func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, "", code)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
 
 	// test actual userinfo
-	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
+	provider, err := Tester.CreateRelyingParty(CTX, clientID, "", redirectURI)
 	require.NoError(t, err)
 	userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
 	require.NoError(t, err)
@@ -53,7 +54,7 @@ func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
 func TestServer_Introspect(t *testing.T) {
 	project, err := Tester.CreateProject(CTX)
 	require.NoError(t, err)
-	app, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
+	app, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE)
 	require.NoError(t, err)
 	api, err := Tester.CreateAPIClient(CTX, project.GetId())
 	require.NoError(t, err)
@@ -68,7 +69,7 @@ func TestServer_Introspect(t *testing.T) {
 	require.NoError(t, err)
 
 	scope := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess, oidc_api.ScopeResourceOwner}
-	authRequestID := createAuthRequest(t, app.GetClientId(), redirectURI, scope...)
+	authRequestID := createAuthRequest(t, app.GetClientId(), "", redirectURI, scope...)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
@@ -83,7 +84,7 @@ func TestServer_Introspect(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, app.GetClientId(), code)
+	tokens, err := exchangeTokens(t, app.GetClientId(), "", code)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
