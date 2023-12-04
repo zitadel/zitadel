@@ -1,4 +1,6 @@
 FirstInstance:
+  # If set to true zitadel is setup without initial data
+  Skip: false
   # The machine key from the section FirstInstance.Org.Machine.MachineKey is written to the MachineKeyPath.
   MachineKeyPath: # ZITADEL_FIRSTINSTANCE_MACHINEKEYPATH
   # The personal access token from the section FirstInstance.Org.Machine.Pat is written to the PatPath.

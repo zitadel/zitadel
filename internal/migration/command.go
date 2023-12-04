@@ -46,6 +46,18 @@ func setupStartedCmd(ctx context.Context, migration Migration) eventstore.Comman
 	}
 }
 
+func setupSkippedCmd(ctx context.Context, migration Migration) eventstore.Command {
+	ctx = authz.SetCtxData(service.WithService(ctx, "system"), authz.CtxData{UserID: "system", OrgID: "SYSTEM", ResourceOwner: "SYSTEM"})
+	return &SetupStep{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			eventstore.NewAggregate(ctx, aggregateID, aggregateType, "v1"),
+			skippedType),
+		migration: migration,
+		Name:      migration.String(),
+	}
+}
+
 func setupDoneCmd(ctx context.Context, migration Migration, err error) eventstore.Command {
 	ctx = authz.SetCtxData(service.WithService(ctx, "system"), authz.CtxData{UserID: "system", OrgID: "SYSTEM", ResourceOwner: "SYSTEM"})
 	typ := doneType

@@ -28,3 +28,7 @@ func (mig *ProjectionTable) Execute(ctx context.Context) error {
 func (mig *ProjectionTable) String() string {
 	return "01_tables"
 }
+
+func (mig *ProjectionTable) ShouldSkip() bool {
+	return false
+}

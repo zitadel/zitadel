@@ -41,3 +41,7 @@ func (mig *LogstoreTables) Execute(ctx context.Context) error {
 func (mig *LogstoreTables) String() string {
 	return "07_logstore"
 }
+
+func (mig *LogstoreTables) ShouldSkip() bool {
+	return false
+}

@@ -34,3 +34,7 @@ func (mig *AssetTable) Execute(ctx context.Context) error {
 func (mig *AssetTable) String() string {
 	return "02_assets"
 }
+
+func (mig *AssetTable) ShouldSkip() bool {
+	return false
+}

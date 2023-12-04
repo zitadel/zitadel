@@ -29,3 +29,7 @@ func (mig *AuthTokenIndexes) Execute(ctx context.Context) error {
 func (mig *AuthTokenIndexes) String() string {
 	return "08_auth_token_indexes"
 }
+
+func (mig *AuthTokenIndexes) ShouldSkip() bool {
+	return false
+}

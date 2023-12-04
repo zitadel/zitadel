@@ -24,3 +24,7 @@ func (mig *FixQuotaConstraints) Execute(ctx context.Context) error {
 func (mig *FixQuotaConstraints) String() string {
 	return "13_fix_quota_constraints"
 }
+
+func (mig *FixQuotaConstraints) ShouldSkip() bool {
+	return false
+}

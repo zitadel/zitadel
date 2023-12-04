@@ -86,3 +86,7 @@ func (mig *CorrectCreationDate) Execute(ctx context.Context) (err error) {
 func (mig *CorrectCreationDate) String() string {
 	return "10_correct_creation_date"
 }
+
+func (mig *CorrectCreationDate) ShouldSkip() bool {
+	return false
+}

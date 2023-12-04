@@ -89,10 +89,10 @@ func events(ctx context.Context, config *EventsConfig, instanceID string) {
 		}
 		_ = tx.Commit(ctx)
 		pos <- position
-		// Do pgx specific stuff with conn
+
 		tag, err := conn.PgConn().CopyFrom(ctx, r, "COPY eventstore.events2 FROM stdin")
 		eventCount = tag.RowsAffected()
-		// conn.CopyFrom(...)
+
 		return err
 	})
 	logging.OnError(err).Fatal("unable to copy events to destination")

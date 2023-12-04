@@ -26,6 +26,8 @@ type FirstInstance struct {
 	PatPath         string
 	Features        map[domain.Feature]any
 
+	Skip bool
+
 	instanceSetup     command.InstanceSetup
 	userEncryptionKey *crypto.KeyConfig
 	smtpEncryptionKey *crypto.KeyConfig
@@ -165,6 +167,10 @@ func outputStdoutOrPath(path string, content string) (err error) {
 
 func (mig *FirstInstance) String() string {
 	return "03_default_instance"
+}
+
+func (mig *FirstInstance) ShouldSkip() bool {
+	return mig.Skip
 }
 
 func verifyKey(key *crypto.KeyConfig, storage crypto.KeyStorage) (err error) {

@@ -63,6 +63,10 @@ func (mig *NewEventsTable) String() string {
 	return "14_events_push"
 }
 
+func (mig *NewEventsTable) ShouldSkip() bool {
+	return false
+}
+
 func (mig *NewEventsTable) ContinueOnErr(err error) bool {
 	pgErr := new(pgconn.PgError)
 	if errors.As(err, &pgErr) {
