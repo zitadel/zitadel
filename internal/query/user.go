@@ -348,12 +348,12 @@ func (q *Queries) GetUserByLoginName(ctx context.Context, shouldTriggered bool, 
 		triggerUserProjections(ctx)
 	}
 
-	loginNameSplit := strings.Split(loginName, "@")
-	var domain string
-	if len(loginNameSplit) > 1 {
-		domain = loginNameSplit[len(loginNameSplit)-1]
+	domainIndex := strings.LastIndex(loginName, "@")
+	var domainSuffix string
+	if domainIndex > 0 {
+		domainSuffix = loginName[:domainIndex]
 	}
-	username := strings.Join(loginNameSplit[:len(loginNameSplit)-1], "@")
+	username := loginName[domainIndex:]
 
 	err = q.client.QueryRowContext(ctx,
 		func(row *sql.Row) error {
@@ -362,7 +362,7 @@ func (q *Queries) GetUserByLoginName(ctx context.Context, shouldTriggered bool, 
 		},
 		userByLoginNameQuery,
 		username,
-		domain,
+		domainSuffix,
 		loginName,
 		authz.GetInstance(ctx).InstanceID(),
 	)
@@ -494,7 +494,7 @@ func (q *Queries) GetNotifyUserByID(ctx context.Context, shouldTriggered bool, u
 //go:embed user_notify_by_login_name.sql
 var notifyUserByLoginNameQuery string
 
-func (q *Queries) GetNotifyUserByLoginName(ctx context.Context, shouldTriggered bool, loginName string, withOwnerRemoved bool) (user *NotifyUser, err error) {
+func (q *Queries) GetNotifyUserByLoginName(ctx context.Context, shouldTriggered bool, loginName string) (user *NotifyUser, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -502,12 +502,12 @@ func (q *Queries) GetNotifyUserByLoginName(ctx context.Context, shouldTriggered 
 		triggerUserProjections(ctx)
 	}
 
-	loginNameSplit := strings.Split(loginName, "@")
-	var domain string
-	if len(loginNameSplit) > 1 {
-		domain = loginNameSplit[len(loginNameSplit)-1]
+	domainIndex := strings.LastIndex(loginName, "@")
+	var domainSuffix string
+	if domainIndex > 0 {
+		domainSuffix = loginName[:domainIndex]
 	}
-	username := strings.Join(loginNameSplit[:len(loginNameSplit)-1], "@")
+	username := loginName[domainIndex:]
 
 	err = q.client.QueryRowContext(ctx,
 		func(row *sql.Row) error {
@@ -516,7 +516,7 @@ func (q *Queries) GetNotifyUserByLoginName(ctx context.Context, shouldTriggered 
 		},
 		notifyUserByLoginNameQuery,
 		username,
-		domain,
+		domainSuffix,
 		loginName,
 		authz.GetInstance(ctx).InstanceID(),
 	)

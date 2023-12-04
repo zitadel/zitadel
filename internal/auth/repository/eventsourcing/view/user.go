@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
@@ -21,7 +22,7 @@ func (v *View) UserByID(userID, instanceID string) (*model.UserView, error) {
 }
 
 func (v *View) UserByLoginName(ctx context.Context, loginName, instanceID string) (*model.UserView, error) {
-	queriedUser, err := v.query.GetNotifyUserByLoginName(ctx, true, loginName, false)
+	queriedUser, err := v.query.GetNotifyUserByLoginName(ctx, true, loginName)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +32,7 @@ func (v *View) UserByLoginName(ctx context.Context, loginName, instanceID string
 }
 
 func (v *View) UserByLoginNameAndResourceOwner(ctx context.Context, loginName, resourceOwner, instanceID string) (*model.UserView, error) {
-	queriedUser, err := v.query.GetNotifyUserByLoginName(ctx, true, loginName, false)
+	queriedUser, err := v.query.GetNotifyUserByLoginName(ctx, true, loginName)
 	if err != nil {
 		return nil, err
 	}
