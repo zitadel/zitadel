@@ -11,12 +11,12 @@ WITH login_names AS (SELECT
       ELSE u.user_name
     END login_name
   FROM 
-    projections.login_names2_users u
+    projections.login_names3_users u
   JOIN lateral (
     SELECT 
       p.must_be_domain 
     FROM 
-      projections.login_names2_policies p
+      projections.login_names3_policies p
     WHERE
       u.instance_id = p.instance_id
       AND (
@@ -29,7 +29,7 @@ WITH login_names AS (SELECT
     LIMIT 1
   ) p ON TRUE
   JOIN 
-    projections.login_names2_domains d
+    projections.login_names3_domains d
     ON 
       u.instance_id = d.instance_id
       AND u.resource_owner = d.resource_owner
@@ -63,14 +63,14 @@ SELECT
   , m.has_secret
   , m.access_token_type
   , count(*) OVER ()
-FROM projections.users8 u
+FROM projections.users9 u
 LEFT JOIN
-  projections.users8_humans h
+  projections.users9_humans h
   ON
     u.id = h.user_id
     AND u.instance_id = h.instance_id
 LEFT JOIN
-  projections.users8_machines m
+  projections.users9_machines m
   ON
     u.id = m.user_id
     AND u.instance_id = m.instance_id

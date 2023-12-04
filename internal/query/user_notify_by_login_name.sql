@@ -1,16 +1,16 @@
 WITH found_users AS (
   SELECT 
-    u.id user_id
+    u.id id
     , u.instance_id
     , u.resource_owner
     , u.user_name
   FROM 
-    projections.login_names2_users u
+    projections.login_names3_users u
   JOIN lateral (
     SELECT 
       p.must_be_domain 
     FROM 
-      projections.login_names2_policies p
+      projections.login_names3_policies p
     WHERE
       u.instance_id = p.instance_id
       AND (
@@ -25,7 +25,7 @@ WITH found_users AS (
     LIMIT 1
   ) p ON TRUE
   JOIN 
-    projections.login_names2_domains d
+    projections.login_names3_domains d
     ON 
       u.instance_id = d.instance_id
       AND u.resource_owner = d.resource_owner
@@ -49,7 +49,7 @@ login_names AS (SELECT
     SELECT 
       p.must_be_domain 
     FROM 
-      projections.login_names2_policies p
+      projections.login_names3_policies p
     WHERE
       u.instance_id = p.instance_id
       AND (
@@ -60,7 +60,7 @@ login_names AS (SELECT
     LIMIT 1
   ) p ON TRUE
   JOIN 
-    projections.login_names2_domains d
+    projections.login_names3_domains d
     ON 
       u.instance_id = d.instance_id
       AND u.resource_owner = d.resource_owner
@@ -93,17 +93,17 @@ SELECT
   , count(*) OVER ()
 FROM login_names ln
 JOIN
-  projections.users8 u
+  projections.users9 u
   ON
     ln.user_id = u.id
     AND ln.instance_id = u.instance_id
 LEFT JOIN
-  projections.users8_humans h
+  projections.users9_humans h
   ON
     u.id = h.user_id
     AND u.instance_id = h.instance_id
 LEFT JOIN
-  projections.users8_notifications n
+  projections.users9_notifications n
   ON
     u.id = n.user_id
     AND u.instance_id = n.instance_id

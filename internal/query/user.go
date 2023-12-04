@@ -507,7 +507,7 @@ func (q *Queries) GetNotifyUserByLoginName(ctx context.Context, shouldTriggered 
 	if len(loginNameSplit) > 1 {
 		domain = loginNameSplit[len(loginNameSplit)-1]
 	}
-	username := strings.TrimSuffix(loginName, domain)
+	username := strings.Join(loginNameSplit[:len(loginNameSplit)-1], "@")
 
 	err = q.client.QueryRowContext(ctx,
 		func(row *sql.Row) error {
