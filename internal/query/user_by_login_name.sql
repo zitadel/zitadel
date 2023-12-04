@@ -1,5 +1,5 @@
 WITH found_users AS (
-  SELECT 
+  SELECT DISTINCT
     u.id id
     , u.instance_id
     , u.resource_owner
@@ -32,29 +32,29 @@ WITH found_users AS (
       AND CASE WHEN p.must_be_domain THEN d.name ILIKE $2 ELSE TRUE END
 ),
 login_names AS (SELECT 
-  u.id user_id
-  , u.instance_id
-  , u.resource_owner
-  , u.user_name
+  fu.id user_id
+  , fu.instance_id
+  , fu.resource_owner
+  , fu.user_name
   , d.name domain_name
   , d.is_primary
   , p.must_be_domain
   , CASE WHEN p.must_be_domain 
-      THEN concat(u.user_name, '@', d.name)
-      ELSE u.user_name
+      THEN concat(fu.user_name, '@', d.name)
+      ELSE fu.user_name
     END login_name
   FROM 
-    found_users u
+    found_users fu
   JOIN lateral (
     SELECT 
       p.must_be_domain 
     FROM 
       projections.login_names3_policies p
     WHERE
-      u.instance_id = p.instance_id
+      fu.instance_id = p.instance_id
       AND (
         (p.is_default IS TRUE AND p.instance_id = $4)
-        OR (p.instance_id = $4 AND p.resource_owner = u.resource_owner)
+        OR (p.instance_id = $4 AND p.resource_owner = fu.resource_owner)
       )
     ORDER BY is_default
     LIMIT 1
@@ -62,8 +62,8 @@ login_names AS (SELECT
   JOIN 
     projections.login_names3_domains d
     ON 
-      u.instance_id = d.instance_id
-      AND u.resource_owner = d.resource_owner
+      fu.instance_id = d.instance_id
+      AND fu.resource_owner = d.resource_owner
 )
 SELECT 
   u.id
@@ -74,8 +74,8 @@ SELECT
   , u.state
   , u.type
   , u.username
-  , (SELECT array_agg(ln.login_name)::TEXT[] login_names FROM login_names ln GROUP BY ln.user_id, ln.instance_id) login_names
-  , (SELECT ln.login_name login_names_lower FROM login_names ln WHERE ln.is_primary IS TRUE) preferred_login_name
+  , (SELECT array_agg(ln.login_name)::TEXT[] login_names FROM login_names ln WHERE fu.id = ln.user_id GROUP BY ln.user_id, ln.instance_id) login_names
+  , (SELECT ln.login_name login_names_lower FROM login_names ln WHERE fu.id = ln.user_id AND ln.is_primary IS TRUE) preferred_login_name
   , h.user_id
   , h.first_name
   , h.last_name
@@ -94,23 +94,22 @@ SELECT
   , m.has_secret
   , m.access_token_type
   , count(*) OVER ()
-FROM login_names ln
+FROM found_users fu
 JOIN
   projections.users9 u
   ON
-    ln.user_id = u.id
-    AND ln.instance_id = u.instance_id
+    fu.id = u.id
+    AND fu.instance_id = u.instance_id
 LEFT JOIN
   projections.users9_humans h
   ON
-    ln.user_id = h.user_id
-    AND ln.instance_id = h.instance_id
+    fu.id = h.user_id
+    AND fu.instance_id = h.instance_id
 LEFT JOIN
   projections.users9_machines m
   ON
-    ln.user_id = m.user_id
-    AND ln.instance_id = m.instance_id
+    fu.id = m.user_id
+    AND fu.instance_id = m.instance_id
 WHERE 
   u.instance_id = $4
-LIMIT 1
 ;

@@ -351,9 +351,9 @@ func (q *Queries) GetUserByLoginName(ctx context.Context, shouldTriggered bool, 
 	domainIndex := strings.LastIndex(loginName, "@")
 	var domainSuffix string
 	if domainIndex > 0 {
-		domainSuffix = loginName[:domainIndex]
+		domainSuffix = loginName[domainIndex+1:]
 	}
-	username := loginName[domainIndex:]
+	username := loginName[:domainIndex]
 
 	err = q.client.QueryRowContext(ctx,
 		func(row *sql.Row) error {
@@ -505,9 +505,9 @@ func (q *Queries) GetNotifyUserByLoginName(ctx context.Context, shouldTriggered 
 	domainIndex := strings.LastIndex(loginName, "@")
 	var domainSuffix string
 	if domainIndex > 0 {
-		domainSuffix = loginName[:domainIndex]
+		domainSuffix = loginName[domainIndex+1:]
 	}
-	username := loginName[domainIndex:]
+	username := loginName[:domainIndex]
 
 	err = q.client.QueryRowContext(ctx,
 		func(row *sql.Row) error {
