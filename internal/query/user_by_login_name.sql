@@ -1,6 +1,6 @@
 WITH found_users AS (
   SELECT DISTINCT
-    u.id id
+    u.id
     , u.instance_id
     , u.resource_owner
     , u.user_name
