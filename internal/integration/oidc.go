@@ -12,22 +12,24 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/client/rs"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	oidc_internal "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/pkg/grpc/app"
+	"github.com/zitadel/zitadel/pkg/grpc/authn"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func (s *Tester) CreateOIDCNativeClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string) (*management.AddOIDCAppResponse, error) {
+func (s *Tester) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, appType app.OIDCAppType, authMethod app.OIDCAuthMethodType) (*management.AddOIDCAppResponse, error) {
 	return s.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
 		ProjectId:                projectID,
 		Name:                     fmt.Sprintf("app-%d", time.Now().UnixNano()),
 		RedirectUris:             []string{redirectURI},
 		ResponseTypes:            []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
 		GrantTypes:               []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN},
-		AppType:                  app.OIDCAppType_OIDC_APP_TYPE_NATIVE,
-		AuthMethodType:           app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE,
+		AppType:                  appType,
+		AuthMethodType:           authMethod,
 		PostLogoutRedirectUris:   []string{logoutRedirectURI},
 		Version:                  app.OIDCVersion_OIDC_VERSION_1_0,
 		DevMode:                  false,
@@ -39,6 +41,46 @@ func (s *Tester) CreateOIDCNativeClient(ctx context.Context, redirectURI, logout
 		AdditionalOrigins:        nil,
 		SkipNativeAppSuccessPage: false,
 	})
+}
+
+func (s *Tester) CreateOIDCNativeClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string) (*management.AddOIDCAppResponse, error) {
+	return s.CreateOIDCClient(ctx, redirectURI, logoutRedirectURI, projectID, app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE)
+}
+
+func (s *Tester) CreateOIDCWebClientBasic(ctx context.Context, redirectURI, logoutRedirectURI, projectID string) (*management.AddOIDCAppResponse, error) {
+	return s.CreateOIDCClient(ctx, redirectURI, logoutRedirectURI, projectID, app.OIDCAppType_OIDC_APP_TYPE_WEB, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC)
+}
+
+func (s *Tester) CreateOIDCWebClientJWT(ctx context.Context, redirectURI, logoutRedirectURI, projectID string) (client *management.AddOIDCAppResponse, keyData []byte, err error) {
+	client, err = s.CreateOIDCClient(ctx, redirectURI, logoutRedirectURI, projectID, app.OIDCAppType_OIDC_APP_TYPE_WEB, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT)
+	if err != nil {
+		return nil, nil, err
+	}
+	key, err := s.Client.Mgmt.AddAppKey(ctx, &management.AddAppKeyRequest{
+		ProjectId:      projectID,
+		AppId:          client.GetAppId(),
+		Type:           authn.KeyType_KEY_TYPE_JSON,
+		ExpirationDate: timestamppb.New(time.Now().Add(time.Hour)),
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+	return client, key.GetKeyDetails(), nil
+}
+
+func (s *Tester) CreateOIDCInactivateClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string) (*management.AddOIDCAppResponse, error) {
+	client, err := s.CreateOIDCNativeClient(ctx, redirectURI, logoutRedirectURI, projectID)
+	if err != nil {
+		return nil, err
+	}
+	_, err = s.Client.Mgmt.DeactivateApp(ctx, &management.DeactivateAppRequest{
+		ProjectId: projectID,
+		AppId:     client.GetAppId(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return client, err
 }
 
 func (s *Tester) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI string) (*management.AddOIDCAppResponse, error) {
@@ -83,14 +125,14 @@ func (s *Tester) CreateAPIClient(ctx context.Context, projectID string) (*manage
 	})
 }
 
+const CodeVerifier = "codeVerifier"
+
 func (s *Tester) CreateOIDCAuthRequest(ctx context.Context, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
 	provider, err := s.CreateRelyingParty(ctx, clientID, redirectURI, scope...)
 	if err != nil {
 		return "", err
 	}
-
-	codeVerifier := "codeVerifier"
-	codeChallenge := oidc.NewSHACodeChallenge(codeVerifier)
+	codeChallenge := oidc.NewSHACodeChallenge(CodeVerifier)
 	authURL := rp.AuthURL("state", provider, rp.WithCodeChallenge(codeChallenge))
 
 	req, err := GetRequest(authURL, map[string]string{oidc_internal.LoginClientHeader: loginClient})
