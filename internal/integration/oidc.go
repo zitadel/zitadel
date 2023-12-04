@@ -19,7 +19,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
-func (s *Tester) CreateOIDCNativeClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, authMethod app.OIDCAuthMethodType) (*management.AddOIDCAppResponse, error) {
+func (s *Tester) CreateOIDCNativeClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string) (*management.AddOIDCAppResponse, error) {
 	return s.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
 		ProjectId:                projectID,
 		Name:                     fmt.Sprintf("app-%d", time.Now().UnixNano()),
@@ -27,7 +27,7 @@ func (s *Tester) CreateOIDCNativeClient(ctx context.Context, redirectURI, logout
 		ResponseTypes:            []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
 		GrantTypes:               []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN},
 		AppType:                  app.OIDCAppType_OIDC_APP_TYPE_NATIVE,
-		AuthMethodType:           authMethod,
+		AuthMethodType:           app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE,
 		PostLogoutRedirectUris:   []string{logoutRedirectURI},
 		Version:                  app.OIDCVersion_OIDC_VERSION_1_0,
 		DevMode:                  false,
@@ -83,8 +83,8 @@ func (s *Tester) CreateAPIClient(ctx context.Context, projectID string) (*manage
 	})
 }
 
-func (s *Tester) CreateOIDCAuthRequest(ctx context.Context, clientID, clientSecret, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
-	provider, err := s.CreateRelyingParty(ctx, clientID, clientSecret, redirectURI, scope...)
+func (s *Tester) CreateOIDCAuthRequest(ctx context.Context, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
+	provider, err := s.CreateRelyingParty(ctx, clientID, redirectURI, scope...)
 	if err != nil {
 		return "", err
 	}
@@ -111,7 +111,7 @@ func (s *Tester) CreateOIDCAuthRequest(ctx context.Context, clientID, clientSecr
 }
 
 func (s *Tester) CreateOIDCAuthRequestImplicit(ctx context.Context, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
-	provider, err := s.CreateRelyingParty(ctx, clientID, "", redirectURI, scope...)
+	provider, err := s.CreateRelyingParty(ctx, clientID, redirectURI, scope...)
 	if err != nil {
 		return "", err
 	}
@@ -146,12 +146,12 @@ func (s *Tester) OIDCIssuer() string {
 	return http_util.BuildHTTP(s.Config.ExternalDomain, s.Config.Port, s.Config.ExternalSecure)
 }
 
-func (s *Tester) CreateRelyingParty(ctx context.Context, clientID, clientSecret, redirectURI string, scope ...string) (rp.RelyingParty, error) {
+func (s *Tester) CreateRelyingParty(ctx context.Context, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
 	if len(scope) == 0 {
 		scope = []string{oidc.ScopeOpenID}
 	}
 	loginClient := &http.Client{Transport: &loginRoundTripper{http.DefaultTransport}}
-	return rp.NewRelyingPartyOIDC(ctx, s.OIDCIssuer(), clientID, clientSecret, redirectURI, scope, rp.WithHTTPClient(loginClient))
+	return rp.NewRelyingPartyOIDC(ctx, s.OIDCIssuer(), clientID, "", redirectURI, scope, rp.WithHTTPClient(loginClient))
 }
 
 type loginRoundTripper struct {
