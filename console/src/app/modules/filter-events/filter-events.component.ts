@@ -23,10 +23,10 @@ enum CreationDateFilterType {
 function dateToTs(date: Date): Timestamp {
   const ts = new Timestamp();
   const milliseconds = date.getTime();
-  const seconds = Math.abs(milliseconds / 1000);
+  const seconds = milliseconds / 1000;
   const nanos = (milliseconds - seconds * 1000) * 1000 * 1000;
-  ts.setSeconds(seconds);
-  ts.setNanos(nanos);
+  ts.setSeconds(Math.round(seconds));
+  ts.setNanos(Math.round(nanos));
   return ts;
 }
 
@@ -80,7 +80,9 @@ export class FilterEventsComponent implements OnInit {
     private toast: ToastService,
     private route: ActivatedRoute,
     private router: Router,
-  ) {}
+  ) {
+    this.requestChanged.subscribe(console.log)
+  }
 
   public ngOnInit(): void {
     this.loadAvailableTypes().then(() => {

@@ -878,9 +878,10 @@
           "DESC": "Descending"
         },
         "CREATIONDATE": {
-          "LABEL_FROM": "From",
-          "LABEL_UNTIL": "Until",
-          "CHECKBOX": "Filter by Creation Date"
+          "RADIO_FROM": "From",
+          "RADIO_RANGE": "Range",
+          "LABEL_SINCE": "Since",
+          "LABEL_UNTIL": "Until"
         },
         "OTHER": "other",
         "OTHERS": "others"

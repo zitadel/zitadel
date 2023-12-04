@@ -189,6 +189,7 @@ export class EventsComponent implements OnDestroy {
     if (this.sortAsc !== isAsc) {
       this.sort.sort({ id: 'sequence', start: isAsc ? 'asc' : 'desc', disableClear: true });
     }
+    console.log("events.component.ts", req.toObject(), req.getRange()?.getSince());
     this.loadEvents(req, true);
   }
 
