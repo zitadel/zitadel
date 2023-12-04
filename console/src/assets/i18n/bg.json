@@ -871,16 +871,10 @@
           "DESC": "Спускане"
         },
         "CREATIONDATE": {
-          "RADIO_FROM": "From",
-          "RADIO_RANGE": "Range",
-          "LABEL_SINCE": "Since",
-          "LABEL_UNTIL": "Until"
-        },
-
-        "CREATIONDATE": {
-          "LABEL_FROM": "От",
-          "LABEL_UNTIL": "До",
-          "CHECKBOX": "Филтриране по дата на създаване"
+          "RADIO_FROM": "От",
+          "RADIO_RANGE": "Обхват",
+          "LABEL_SINCE": "От",
+          "LABEL_UNTIL": "До"
         },
         "OTHER": "друго",
         "OTHERS": "други"

@@ -878,9 +878,10 @@
           "DESC": "Опаѓачки"
         },
         "CREATIONDATE": {
-          "LABEL_FROM": "Од",
-          "LABEL_UNTIL": "До",
-          "CHECKBOX": "Филтер според датумот на креирање"
+          "RADIO_FROM": "Од",
+          "RADIO_RANGE": "Ранг",
+          "LABEL_SINCE": "Од",
+          "LABEL_UNTIL": "До"
         },
         "OTHER": "друго",
         "OTHERS": "други"

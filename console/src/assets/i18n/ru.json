@@ -874,9 +874,10 @@
           "DESC": "По убыванию"
         },
         "CREATIONDATE": {
-          "LABEL_FROM": "От",
-          "LABEL_UNTIL": "К",
-          "CHECKBOX": "Фильтровать по дате создания"
+          "RADIO_FROM": "От",
+          "RADIO_RANGE": "Диапазон",
+          "LABEL_SINCE": "С",
+          "LABEL_UNTIL": "К"
         },
         "OTHER": "другой",
         "OTHERS": "другие"

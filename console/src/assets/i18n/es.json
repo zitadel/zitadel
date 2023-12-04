@@ -878,9 +878,10 @@
           "DESC": "Descendente"
         },
         "CREATIONDATE": {
-          "LABEL_FROM": "Desde",
-          "LABEL_UNTIL": "Hasta",
-          "CHECKBOX": "Filtrar por fecha de creación"
+          "RADIO_FROM": "Desde",
+          "RADIO_RANGE": "Rango",
+          "LABEL_SINCE": "Desde",
+          "LABEL_UNTIL": "Hasta"
         },
         "OTHER": "otro",
         "OTHERS": "otros"

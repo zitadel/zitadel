@@ -878,9 +878,10 @@
           "DESC": "Aflopend"
         },
         "CREATIONDATE": {
-          "LABEL_FROM": "Van",
-          "LABEL_UNTIL": "Tot",
-          "CHECKBOX": "Filter op Aanmaakdatum"
+          "RADIO_FROM": "Van",
+          "RADIO_RANGE": "Reeks",
+          "LABEL_SINCE": "Sinds",
+          "LABEL_UNTIL": "Tot"
         },
         "OTHER": "ander",
         "OTHERS": "anderen"

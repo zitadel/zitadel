@@ -877,9 +877,10 @@
           "DESC": "Malejące"
         },
         "CREATIONDATE": {
-          "LABEL_FROM": "od",
-          "LABEL_UNTIL": "do",
-          "CHECKBOX": "Filtruj według daty utworzenia"
+          "RADIO_FROM": "Od",
+          "RADIO_RANGE": "Zakres",
+          "LABEL_SINCE": "Od",
+          "LABEL_UNTIL": "Do"
         },
         "OTHER": "inne",
         "OTHERS": "inni"

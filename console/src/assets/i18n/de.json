@@ -877,9 +877,10 @@
           "DESC": "absteigend"
         },
         "CREATIONDATE": {
-          "LABEL_FROM": "Von",
-          "LABEL_UNTIL": "Bis",
-          "CHECKBOX": "Nach Erstelldatum filtern"
+          "RADIO_FROM": "Von",
+          "RADIO_RANGE": "Zeitraum",
+          "LABEL_SINCE": "Seit",
+          "LABEL_UNTIL": "Bis"
         },
         "OTHER": "weiterer",
         "OTHERS": "weitere"

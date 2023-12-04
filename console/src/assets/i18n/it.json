@@ -876,9 +876,10 @@
           "DESC": "Descending"
         },
         "CREATIONDATE": {
-          "LABEL_FROM": "Da",
-          "LABEL_UNTIL": "A",
-          "CHECKBOX": "Filter per data di creazione"
+          "RADIO_FROM": "Da",
+          "RADIO_RANGE": "Intervallo",
+          "LABEL_SINCE": "Da",
+          "LABEL_UNTIL": "A"
         },
         "OTHER": "altro",
         "OTHERS": "altri"
