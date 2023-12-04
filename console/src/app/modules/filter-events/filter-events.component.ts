@@ -80,9 +80,7 @@ export class FilterEventsComponent implements OnInit {
     private toast: ToastService,
     private route: ActivatedRoute,
     private router: Router,
-  ) {
-    this.requestChanged.subscribe(console.log)
-  }
+  ) {}
 
   public ngOnInit(): void {
     this.loadAvailableTypes().then(() => {
