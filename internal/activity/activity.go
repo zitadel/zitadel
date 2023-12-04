@@ -2,7 +2,9 @@ package activity
 
 import (
 	"context"
+	"strconv"
 
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -12,6 +14,9 @@ import (
 
 const (
 	Activity = "activity"
+
+	PathKey          = "zitadel-activity-path"
+	RequestMethodKey = "zitadel-activity-request-method"
 )
 
 type TriggerMethod int
@@ -44,6 +49,7 @@ func (t TriggerMethod) String() string {
 	}
 }
 
+// Trigger is used to log a specific events for a user (e.g. session or oidc token creation)
 func Trigger(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
 	ai := info.ActivityInfoFromContext(ctx)
 	triggerLog(
@@ -55,28 +61,30 @@ func Trigger(ctx context.Context, orgID, userID string, trigger TriggerMethod) {
 		ai.Method,
 		ai.Path,
 		ai.RequestMethod,
+		"",
+		"",
 		authz.GetCtxData(ctx).SystemMemberships != nil,
 	)
 }
 
-func TriggerWithContext(ctx context.Context, trigger TriggerMethod) {
+func TriggerGRPCWithContext(ctx context.Context, trigger TriggerMethod) {
 	ai := info.ActivityInfoFromContext(ctx)
-	// GRPC call the method is contained in the HTTP request path
-	method := ai.Path
 	triggerLog(
 		authz.GetInstance(ctx).InstanceID(),
 		authz.GetCtxData(ctx).OrgID,
 		authz.GetCtxData(ctx).UserID,
 		http_utils.ComposedOrigin(ctx),
 		trigger,
-		method,
-		"",
+		ai.Method,
+		ai.Path,
 		ai.RequestMethod,
+		strconv.Itoa(int(ai.GRPCStatus)),
+		strconv.Itoa(runtime.HTTPStatusFromCode(ai.GRPCStatus)),
 		authz.GetCtxData(ctx).SystemMemberships != nil,
 	)
 }
 
-func triggerLog(instanceID, orgID, userID, domain string, trigger TriggerMethod, method, path, requestMethod string, isSystemUser bool) {
+func triggerLog(instanceID, orgID, userID, domain string, trigger TriggerMethod, method, path, requestMethod, grpcStatus, httpStatus string, isSystemUser bool) {
 	logging.WithFields(
 		"instance", instanceID,
 		"org", orgID,
@@ -85,6 +93,8 @@ func triggerLog(instanceID, orgID, userID, domain string, trigger TriggerMethod,
 		"trigger", trigger.String(),
 		"method", method,
 		"path", path,
+		"grpcStatus", grpcStatus,
+		"httpStatus", httpStatus,
 		"requestMethod", requestMethod,
 		"isSystemUser", isSystemUser,
 	).Info(Activity)

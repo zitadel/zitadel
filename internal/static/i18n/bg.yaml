@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Лимитът не е намерен
     NoneSpecified: Не са посочени лимити
+  Restrictions:
+    NoneSpecified: Не са посочени ограничения
   Language:
     NotParsed: Езикът не можа да бъде анализиран синтактично
   OIDCSettings:
@@ -441,6 +443,7 @@ Errors:
   UserSession:
     NotFound: UserSession не е намерена
   Key:
+    NotFound: Ключът не е намерен
     ExpireBeforeNow: Срокът на годност е в миналото
   Login:
     LoginPolicy:

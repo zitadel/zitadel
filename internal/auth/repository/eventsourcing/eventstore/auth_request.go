@@ -103,17 +103,17 @@ type orgViewProvider interface {
 }
 
 type userGrantProvider interface {
-	ProjectByClientID(context.Context, string, bool) (*query.Project, error)
+	ProjectByClientID(context.Context, string) (*query.Project, error)
 	UserGrantsByProjectAndUserID(context.Context, string, string) ([]*query.UserGrant, error)
 }
 
 type projectProvider interface {
-	ProjectByClientID(context.Context, string, bool) (*query.Project, error)
-	SearchProjectGrants(ctx context.Context, queries *query.ProjectGrantSearchQueries, withOwnerRemoved bool) (projects *query.ProjectGrants, err error)
+	ProjectByClientID(context.Context, string) (*query.Project, error)
+	SearchProjectGrants(ctx context.Context, queries *query.ProjectGrantSearchQueries) (projects *query.ProjectGrants, err error)
 }
 
 type applicationProvider interface {
-	AppByOIDCClientID(context.Context, string, bool) (*query.App, error)
+	AppByOIDCClientID(context.Context, string) (*query.App, error)
 }
 
 type customTextProvider interface {
@@ -132,7 +132,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 		return nil, err
 	}
 	request.ID = reqID
-	project, err := repo.ProjectProvider.ProjectByClientID(ctx, request.ApplicationID, false)
+	project, err := repo.ProjectProvider.ProjectByClientID(ctx, request.ApplicationID)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	if err != nil {
 		return nil, err
 	}
-	appIDs, err := repo.Query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
+	appIDs, err := repo.Query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
@@ -1351,7 +1351,7 @@ func (repo *AuthRequestRepo) hasSucceededPage(ctx context.Context, request *doma
 	if _, ok := request.Request.(*domain.AuthRequestOIDC); !ok {
 		return false, nil
 	}
-	app, err := provider.AppByOIDCClientID(ctx, request.ApplicationID, false)
+	app, err := provider.AppByOIDCClientID(ctx, request.ApplicationID)
 	if err != nil {
 		return false, err
 	}
@@ -1617,7 +1617,7 @@ func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *u
 	var project *query.Project
 	switch request.Request.Type() {
 	case domain.AuthRequestTypeOIDC, domain.AuthRequestTypeSAML, domain.AuthRequestTypeDevice:
-		project, err = userGrantProvider.ProjectByClientID(ctx, request.ApplicationID, false)
+		project, err = userGrantProvider.ProjectByClientID(ctx, request.ApplicationID)
 		if err != nil {
 			return false, err
 		}
@@ -1638,7 +1638,7 @@ func projectRequired(ctx context.Context, request *domain.AuthRequest, projectPr
 	var project *query.Project
 	switch request.Request.Type() {
 	case domain.AuthRequestTypeOIDC, domain.AuthRequestTypeSAML, domain.AuthRequestTypeDevice:
-		project, err = projectProvider.ProjectByClientID(ctx, request.ApplicationID, false)
+		project, err = projectProvider.ProjectByClientID(ctx, request.ApplicationID)
 		if err != nil {
 			return false, err
 		}
@@ -1659,7 +1659,7 @@ func projectRequired(ctx context.Context, request *domain.AuthRequest, projectPr
 	if err != nil {
 		return false, err
 	}
-	grants, err := projectProvider.SearchProjectGrants(ctx, &query.ProjectGrantSearchQueries{Queries: []query.SearchQuery{projectID, grantedOrg}}, false)
+	grants, err := projectProvider.SearchProjectGrants(ctx, &query.ProjectGrantSearchQueries{Queries: []query.SearchQuery{projectID, grantedOrg}})
 	if err != nil {
 		return false, err
 	}

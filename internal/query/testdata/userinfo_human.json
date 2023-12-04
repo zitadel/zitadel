@@ -1,0 +1,50 @@
+{
+  "user": {
+    "id": "231965491734773762",
+    "creation_date": "2023-09-15T06:10:07.434142+00:00",
+    "change_date": "2023-11-14T13:27:02.072318+00:00",
+    "sequence": 1148,
+    "state": 1,
+    "resource_owner": "231848297847848962",
+    "username": "tim+tesmail@zitadel.com",
+    "preferred_login_name": "tim+tesmail@zitadel.com@demo.localhost",
+    "human": {
+      "first_name": "Tim",
+      "last_name": "Mohlmann",
+      "nick_name": "muhlemmer",
+      "display_name": "Tim Mohlmann",
+      "avatar_key": null,
+      "preferred_language": "en",
+      "gender": 2,
+      "email": "tim+tesmail@zitadel.com",
+      "is_email_verified": true,
+      "phone": "+40123456789",
+      "is_phone_verified": false
+    },
+    "machine": null
+  },
+  "org": {
+    "id": "231848297847848962",
+    "name": "demo",
+    "primary_domain": "demo.localhost"
+  },
+  "metadata": [
+    {
+      "creation_date": "2023-11-14T13:26:03.553702+00:00",
+      "change_date": "2023-11-14T13:26:03.553702+00:00",
+      "sequence": 1147,
+      "resource_owner": "231848297847848962",
+      "key": "bar",
+      "value": "Zm9v"
+    },
+    {
+      "creation_date": "2023-11-14T13:25:57.171368+00:00",
+      "change_date": "2023-11-14T13:25:57.171368+00:00",
+      "sequence": 1146,
+      "resource_owner": "231848297847848962",
+      "key": "foo",
+      "value": "YmFy"
+    }
+  ],
+  "user_grants": null
+}

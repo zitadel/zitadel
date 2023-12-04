@@ -1,9 +1,30 @@
 When your user is done using your application and clicks on the logout button, you have to send a request to the terminate session endpoint.
 [Terminate Session Documentation](https://zitadel.com/docs/apis/resources/session_service/session-service-delete-session)
 
-Send the session token in the body of the request.
+Sessions can be terminated by either:
+- the authenticated user
+- a manager, who is granted `session.delete` (e.g. ORG_OWNER) on the authenticated users organisation
+- providing the current session_token in the body.
 
-### Request
+Terminating a session means to delete it.
+If you try to read or update the session afterward, you will get an error that the Session does not exist or was terminated.
+
+
+### Request for authenticated users or managers
+
+Make sure that the provided token is from the authenticated user, resp. the manager:
+
+```bash
+curl --request DELETE \
+  --url https://$ZITADEL_DOMAIN/v2beta/sessions/218480890961985793 \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Bearer '"$TOKEN"''\
+  --header 'Content-Type: application/json'
+```
+
+### Request with session token
+
+Send the session token in the body of the request:
 
 ```bash
 curl --request DELETE \
@@ -15,6 +36,3 @@ curl --request DELETE \
   "sessionToken": "blGKerGQPKv8jN21p6E9GB1B-vl6_EyKlvTd5UALu8-aQmjucgZxHSXJx3XMFTwT9_Y3VnbOo3gC_Q"
 }'
 ```
-
-Terminating a session means to delete it.
-If you try to read the session afterwards, you will get an error “Session does not exist”.

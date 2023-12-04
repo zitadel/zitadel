@@ -4,16 +4,32 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
+	"golang.org/x/exp/slog"
 
+	"github.com/zitadel/zitadel/internal/auth/repository"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type Server struct {
 	http.Handler
 	*op.LegacyServer
+	features Features
+
+	repo    repository.Repository
+	query   *query.Queries
+	command *command.Commands
+	keySet  *keySetCache
+
+	fallbackLogger      *slog.Logger
+	hashAlg             crypto.HashAlgorithm
 	signingKeyAlgorithm string
+	assetAPIPrefix      func(ctx context.Context) string
 }
 
 func endpoints(endpointConfig *EndpointConfig) op.Endpoints {
@@ -57,6 +73,13 @@ func endpoints(endpointConfig *EndpointConfig) op.Endpoints {
 		endpoints.DeviceAuthorization = op.NewEndpointWithURL(endpointConfig.DeviceAuth.Path, endpointConfig.DeviceAuth.URL)
 	}
 	return endpoints
+}
+
+func (s *Server) getLogger(ctx context.Context) *slog.Logger {
+	if logger, ok := logging.FromContext(ctx); ok {
+		return logger
+	}
+	return s.fallbackLogger
 }
 
 func (s *Server) IssuerFromRequest(r *http.Request) string {
@@ -159,13 +182,6 @@ func (s *Server) DeviceToken(ctx context.Context, r *op.ClientRequest[oidc.Devic
 	defer func() { span.EndWithError(err) }()
 
 	return s.LegacyServer.DeviceToken(ctx, r)
-}
-
-func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionRequest]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.Introspect(ctx, r)
 }
 
 func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoRequest]) (_ *op.Response, err error) {

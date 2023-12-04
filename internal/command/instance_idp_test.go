@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	openid "github.com/zitadel/oidc/v3/pkg/oidc"
+	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"

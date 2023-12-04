@@ -248,6 +248,7 @@ RegistrationUser:
   Macedonian: Македонски
   Czech: Čeština
   Russian: Русский
+  Dutch: Nederlands
   GenderLabel: Род
   Female: Женский
   Male: Мужской
@@ -286,6 +287,7 @@ ExternalRegistrationUserOverview:
   Macedonian: Македонски
   Czech: Čeština
   Russian: Русский
+  Dutch: Nederlands
   TosAndPrivacyLabel: Правила и условия
   TosConfirm: Я принимаю
   TosLinkText: ТОТ
@@ -352,6 +354,8 @@ ExternalNotFound:
   Macedonian: Македонски
   Czech: Čeština
   Russian: Русский
+  Dutch: Nederlands
+  
 DeviceAuth:
   Title: Авторизация устройства
   UserCode:

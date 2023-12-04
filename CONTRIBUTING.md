@@ -220,7 +220,7 @@ In order to run the integrations tests for the gRPC API, PostgreSQL and Cockroac
 
 ```bash
 export INTEGRATION_DB_FLAVOR="cockroach" ZITADEL_MASTERKEY="MasterkeyNeedsToHave32Characters"
-docker compose -f internal/integration/config/docker-compose.yaml up --wait ${INTEGRATION_DB_FLAVOR}
+docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait ${INTEGRATION_DB_FLAVOR}
 make core_integration_test
 docker compose -f internal/integration/config/docker-compose.yaml down
 ```

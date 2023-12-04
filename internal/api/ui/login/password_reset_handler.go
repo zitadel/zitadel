@@ -17,7 +17,7 @@ func (l *Login) handlePasswordReset(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	user, err := l.query.GetUserByLoginName(setContext(r.Context(), authReq.UserOrgID), true, authReq.LoginName, false)
+	user, err := l.query.GetUserByLoginName(setContext(r.Context(), authReq.UserOrgID), true, authReq.LoginName)
 	if err != nil {
 		if authReq.LoginPolicy.IgnoreUnknownUsernames && errors.IsNotFound(err) {
 			err = nil

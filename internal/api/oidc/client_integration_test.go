@@ -12,7 +12,9 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/client/rs"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"golang.org/x/text/language"
 
+	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/pkg/grpc/authn"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
@@ -48,7 +50,7 @@ func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
 	assertUserinfo(t, userinfo)
 }
 
-func TestOPStorage_SetIntrospectionFromToken(t *testing.T) {
+func TestServer_Introspect(t *testing.T) {
 	project, err := Tester.CreateProject(CTX)
 	require.NoError(t, err)
 	app, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
@@ -65,7 +67,7 @@ func TestOPStorage_SetIntrospectionFromToken(t *testing.T) {
 	resourceServer, err := Tester.CreateResourceServer(CTX, keyResp.GetKeyDetails())
 	require.NoError(t, err)
 
-	scope := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess}
+	scope := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess, oidc_api.ScopeResourceOwner}
 	authRequestID := createAuthRequest(t, app.GetClientId(), redirectURI, scope...)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -129,7 +131,14 @@ func assertIntrospection(
 	assert.Equal(t, "Mickey", introspection.GivenName)
 	assert.Equal(t, "Mouse", introspection.FamilyName)
 	assert.Equal(t, "Mickey Mouse", introspection.Name)
+	assert.Equal(t, oidc.Gender("male"), introspection.Gender)
+	assert.Equal(t, oidc.NewLocale(language.Dutch), introspection.Locale)
 	assert.Equal(t, introspection.Username, introspection.Email)
 	assert.False(t, bool(introspection.EmailVerified))
 	assertOIDCTime(t, introspection.UpdatedAt, User.GetDetails().GetChangeDate().AsTime())
+
+	require.NotNil(t, introspection.Claims)
+	assert.Equal(t, User.Details.ResourceOwner, introspection.Claims[oidc_api.ClaimResourceOwner+"id"])
+	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwner+"name"])
+	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwner+"primary_domain"])
 }
