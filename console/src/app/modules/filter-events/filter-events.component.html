@@ -170,29 +170,56 @@
         </div>
 
         <div class="filter-events-section">
-          <div class="checkbox-wrapper">
-            <mat-checkbox
-              id="creationDateFilterSet"
-              name="creationDateFilterSet"
-              class="cb"
-              formControlName="creationDateFilterSet"
-              >{{ 'IAM.EVENTS.FILTERS.CREATIONDATE.CHECKBOX' | translate }}
-            </mat-checkbox>
+          <div>
+            <mat-radio-group
+              aria-label="Select an option"
+              class="filter-events-sub"
+              formControlName="creationDateFilterType"
+            >
+              <mat-radio-button [value]="CreationDateFilterType.FROM">
+                {{ 'IAM.EVENTS.FILTERS.CREATIONDATE.RADIO_FROM' | translate }}
+              </mat-radio-button>
+              <mat-radio-button [value]="CreationDateFilterType.RANGE">
+                {{ 'IAM.EVENTS.FILTERS.CREATIONDATE.RADIO_RANGE' | translate }}
+              </mat-radio-button>
+            </mat-radio-group>
           </div>
-          <div class="filter-events-sub" *ngIf="creationDateFilterSet?.value">
-              <cnsl-label>{{ 'IAM.EVENTS.FILTERS.CREATIONDATE.LABEL_FROM' | translate }}</cnsl-label>
-              <cnsl-datetime-local-input
-                type="datetime-local"
-                name="creationDateFrom"
-                formControlName="creationDateFrom"
-              />
-              <cnsl-label>{{ 'IAM.EVENTS.FILTERS.CREATIONDATE.LABEL_UNTIL' | translate }}</cnsl-label>
-              <cnsl-datetime-local-input
-                type="datetime-local"
-                name="creationDateUntil"
-                formControlName="creationDateUntil"
-              />
-          </div>
+          <div class="filter-events-sub">
+            <ng-container *ngIf="creationDateFilterType!.value == CreationDateFilterType.FROM">
+              <mat-form-field>
+                <cnsl-label>{{ 'IAM.EVENTS.FILTERS.CREATIONDATE.LABEL_FROM' | translate }}</cnsl-label>
+                <input
+                  matInput
+                  type="datetime-local"
+                  name="creationDateFrom"
+                  [value]="creationDateFrom!.value | date: 'yyyy-MM-ddTHH:mm:ss'"
+                  (change)="creationDateFrom = $event.target"
+                />
+              </mat-form-field>
+            </ng-container>
+            <ng-container *ngIf="creationDateFilterType!.value == CreationDateFilterType.RANGE">
+              <mat-form-field>
+                <cnsl-label>{{ 'IAM.EVENTS.FILTERS.CREATIONDATE.LABEL_SINCE' | translate }}</cnsl-label>
+                <input
+                  matInput
+                  type="datetime-local"
+                  name="creationDateSince"
+                  [value]="creationDateSince!.value | date: 'yyyy-MM-ddTHH:mm:ss'"
+                  (change)="creationDateSince = $event.target"
+                />
+              </mat-form-field>
+              <mat-form-field>
+                <cnsl-label>{{ 'IAM.EVENTS.FILTERS.CREATIONDATE.LABEL_UNTIL' | translate }}</cnsl-label>
+                <input
+                  matInput
+                  type="datetime-local"
+                  name="creationDateUntil"
+                  [value]="creationDateUntil!.value | date: 'yyyy-MM-ddTHH:mm:ss'"
+                  (value)="creationDateUntil = $event.target"
+                />
+              </mat-form-field>
+            </ng-container>
+        </div>
         </div>
       </form>
     </div>

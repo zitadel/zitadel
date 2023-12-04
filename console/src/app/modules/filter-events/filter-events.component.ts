@@ -15,6 +15,11 @@ export enum UserTarget {
   EXTERNAL = 'external',
 }
 
+enum CreationDateFilterType {
+  FROM = 'from',
+  RANGE = 'range',
+}
+
 function dateToTs(date: Date): Timestamp {
   const ts = new Timestamp();
   const milliseconds = date.getTime();
@@ -31,6 +36,9 @@ function dateToTs(date: Date): Timestamp {
   styleUrls: ['./filter-events.component.scss'],
 })
 export class FilterEventsComponent implements OnInit {
+  // Make enum available in template
+  public CreationDateFilterType = CreationDateFilterType
+
   public showFilter: boolean = false;
   public ActionKeysType: any = ActionKeysType;
 
@@ -53,9 +61,10 @@ export class FilterEventsComponent implements OnInit {
     sequenceFilterSet: new FormControl(false),
     sequence: new FormControl(''),
     isAsc: new FormControl<boolean>(false),
-    creationDateFilterSet: new FormControl(false),
-    // creationDateFrom is 15 minutes in the past by default
-    creationDateFrom: new FormControl<Date>(new Date(new Date().getTime() - 15 * 60_000)),
+    creationDateFilterType: new FormControl(CreationDateFilterType.FROM),
+    creationDateFrom: new FormControl<Date>(new Date()),
+    // creationDateSince is 15 minutes in the past by default
+    creationDateSince: new FormControl<Date>(new Date(new Date().getTime() - 15 * 60_000)),
     creationDateUntil: new FormControl<Date>(new Date()),
     userFilterSet: new FormControl(false),
     editorUserId: new FormControl(''),
@@ -80,27 +89,35 @@ export class FilterEventsComponent implements OnInit {
           const { filter } = params;
           if (filter) {
             const stringifiedFilters = filter as string;
-            const filters = JSON.parse(stringifiedFilters);
+            const filters = JSON.parse(decodeURIComponent(stringifiedFilters));
 
             if (filters.aggregateId) {
               this.request.setAggregateId(filters.aggregateId);
               this.aggregateId?.setValue(filters.aggregateId);
               this.aggregateFilterSet?.setValue(true);
             }
-            if (filters.creationDate) {
+            if (filters.creationDateFrom) {
               const millisecondsFrom = filters.creationDateFrom;
               const dateFrom = new Date(millisecondsFrom);
-              const tsFrom = dateToTs(dateFrom);
+              const ts = dateToTs(dateFrom);
               this.creationDateFrom?.setValue(dateFrom);
-              this.request.setCreationDate(tsFrom);
-
+              this.creationDateFilterType?.setValue(CreationDateFilterType.FROM);
+              this.request.setCreationDate(ts);
+            }
+            if (filters.creationDateSince || filters.creationDateUntil) {
+              const millisecondsFrom = filters.creationDateSince;
+              const dateSince = new Date(millisecondsFrom);
+              const tsSince = dateToTs(dateSince);
+              this.creationDateSince?.setValue(dateSince);
               const millisecondsUntil = filters.creationDateUntil;
               const dateUntil = new Date(millisecondsUntil);
               const tsUntil = dateToTs(dateUntil);
               this.creationDateUntil?.setValue(dateUntil);
-              this.request.setCreationDate(tsUntil);
-
-              this.creationDateFilterSet?.setValue(true);
+              const range = new ListEventsRequest.creation_date_range();
+              range.setSince(tsSince);
+              range.setUntil(tsUntil);
+              this.request.setRange(range);
+              this.creationDateFilterType?.setValue(CreationDateFilterType.RANGE);
             }
             if (filters.aggregateTypesList && filters.aggregateTypesList.length) {
               const values = this.aggregateTypes.filter((agg) => filters.aggregateTypesList.includes(agg.type));
@@ -261,15 +278,28 @@ export class FilterEventsComponent implements OnInit {
       constructRequest.setAsc(formValues.isAsc);
       filterObject.isAsc = formValues.isAsc;
     }
-    if (formValues.creationDateFilterSet) {
+    if (formValues.creationDateFilterType === CreationDateFilterType.FROM) {
       const dateFrom = new Date(formValues.creationDateFrom);
       const tsFrom = dateToTs(dateFrom);
-      constructRequest.setCreationDate(tsFrom);
+      constructRequest.setFrom(tsFrom);
+      constructRequest.clearRange();
       filterObject.creationDateFrom = dateFrom.getTime();
+      filterObject.creationDateSince = undefined;
+      filterObject.creationDateUntil = undefined;
+    }
+    if (formValues.creationDateFilterType === CreationDateFilterType.RANGE) {
+      const range = new ListEventsRequest.creation_date_range();
+      const dateSince = new Date(formValues.creationDateSince);
+      const tsSince = dateToTs(dateSince);
+      range.setSince(tsSince);
+      filterObject.creationDateSince = dateSince.getTime();
       const dateUntil = new Date(formValues.creationDateUntil);
       const tsUntil = dateToTs(dateUntil);
-      constructRequest.setCreationDate(tsUntil);
+      range.setUntil(tsUntil);
       filterObject.creationDateUntil = dateUntil.getTime();
+      constructRequest.setRange(range);
+      constructRequest.clearFrom();
+      filterObject.creationDateFrom = undefined;
     }
 
     this.requestChanged.emit(constructRequest);
@@ -278,7 +308,7 @@ export class FilterEventsComponent implements OnInit {
       this.router.navigate([], {
         relativeTo: this.route,
         queryParams: {
-          ['filter']: JSON.stringify(filterObject),
+          ['filter']: encodeURIComponent(JSON.stringify(filterObject)),
         },
         replaceUrl: true,
         queryParamsHandling: 'merge',
@@ -317,16 +347,32 @@ export class FilterEventsComponent implements OnInit {
     return this.form.get('sequenceFilterSet');
   }
 
+  public get creationDateFilterType(): AbstractControl | null {
+    return this.form.get('creationDateFilterType');
+  }
+
   public get creationDateFrom(): AbstractControl | null {
     return this.form.get('creationDateFrom');
+  }
+
+  public set creationDateFrom(event: EventTarget | null) {
+    this.setDate(this.creationDateFrom!, event);
+  }
+
+  public get creationDateSince(): AbstractControl | null {
+    return this.form.get('creationDateSince');
+  }
+
+  public set creationDateSince(event: EventTarget | null) {
+    this.setDate(this.creationDateSince!, event);
   }
 
   public get creationDateUntil(): AbstractControl | null {
     return this.form.get('creationDateUntil');
   }
 
-  public get creationDateFilterSet(): AbstractControl | null {
-    return this.form.get('creationDateFilterSet');
+  public set creationDateUntil(event: EventTarget | null) {
+    this.setDate(this.creationDateUntil!, event);
   }
 
   public get resourceOwnerFilterSet(): AbstractControl | null {
@@ -358,9 +404,6 @@ export class FilterEventsComponent implements OnInit {
     if (this.userFilterSet?.value && this.editorUserId?.value) {
       ++count;
     }
-    if (this.creationDateFilterSet?.value) {
-      ++count;
-    }
     if (this.aggregateFilterSet?.value && this.aggregateId?.value) {
       ++count;
     }
@@ -377,5 +420,12 @@ export class FilterEventsComponent implements OnInit {
       ++count;
     }
     return count;
+  }
+
+  private setDate(ctrl: AbstractControl<Date>, event: EventTarget | null): void {
+    if (!(event instanceof HTMLInputElement)) {
+      throw new Error("wrong target");
+    }
+    ctrl.setValue(new Date(event.value || ""));
   }
 }

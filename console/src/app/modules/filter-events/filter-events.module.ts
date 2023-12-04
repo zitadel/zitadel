@@ -12,7 +12,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { InputModule } from '../input/input.module';
 import { FilterEventsComponent } from './filter-events.component';
-import {DateTimeLocalInputModule} from "../input-datetime-local/input-datetime-local.module";
+import {MatInputModule} from "@angular/material/input";
+import {MatRadioModule} from "@angular/material/radio";
 
 @NgModule({
   declarations: [FilterEventsComponent],
@@ -29,7 +30,8 @@ import {DateTimeLocalInputModule} from "../input-datetime-local/input-datetime-l
     MatCheckboxModule,
     MatSelectModule,
     ActionKeysModule,
-    DateTimeLocalInputModule,
+    MatInputModule,
+    MatRadioModule,
   ],
   exports: [FilterEventsComponent],
 })
