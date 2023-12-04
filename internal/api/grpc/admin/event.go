@@ -2,7 +2,6 @@ package admin
 
 import (
 	"context"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
@@ -36,6 +35,18 @@ func (s *Server) ListAggregateTypes(ctx context.Context, in *admin_pb.ListAggreg
 }
 
 func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) (*eventstore.SearchQueryBuilder, error) {
+	fromField := req.GetCreationDate()
+	if req.GetFrom() != nil {
+		fromField = req.GetFrom()
+	}
+	sinceField := req.GetRange().GetSince()
+	if sinceField != nil {
+		fromField = nil
+	}
+	untilField := req.GetRange().GetUntil()
+	if untilField != nil {
+		fromField = nil
+	}
 	eventTypes := make([]eventstore.EventType, len(req.EventTypes))
 	for i, eventType := range req.EventTypes {
 		eventTypes[i] = eventstore.EventType(eventType)
@@ -72,10 +83,19 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 
 	if req.GetAsc() {
 		builder.OrderAsc()
-		builder.CreationDateAfter(req.CreationDate.AsTime())
+		if fromField != nil {
+			builder.CreationDateAfter(fromField.AsTime())
+		}
 	} else {
-		builder.CreationDateBefore(req.CreationDate.AsTime())
+		if fromField != nil {
+			builder.CreationDateBefore(fromField.AsTime())
+		}
 	}
-
+	if sinceField != nil {
+		builder.CreationDateAfter(sinceField.AsTime())
+	}
+	if untilField != nil {
+		builder.CreationDateBefore(untilField.AsTime())
+	}
 	return builder, nil
 }
