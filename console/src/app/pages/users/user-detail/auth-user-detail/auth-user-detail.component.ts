@@ -26,6 +26,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
 import { map } from 'rxjs/operators';
+import { LanguagesService } from '../../../../services/languages.service';
 
 @Component({
   selector: 'cnsl-auth-user-detail',
@@ -78,6 +79,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     private mediaMatcher: MediaMatcher,
     private _location: Location,
     activatedRoute: ActivatedRoute,
+    private languagesSvc: LanguagesService,
   ) {
     activatedRoute.queryParams.pipe(take(1)).subscribe((params: Params) => {
       const { id } = params;
@@ -86,10 +88,7 @@ export class AuthUserDetailComponent implements OnDestroy {
         this.currentSetting = id;
       }
     });
-    this.languages$ = from(this.userService.getSupportedLanguages()).pipe(
-      take(1),
-      map(({ languagesList }) => languagesList),
-    );
+    this.languages$ = this.languagesSvc.supportedLanguages();
 
     const mediaq: string = '(max-width: 500px)';
     const small = this.mediaMatcher.matchMedia(mediaq).matches;

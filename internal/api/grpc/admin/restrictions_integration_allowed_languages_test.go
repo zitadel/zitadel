@@ -18,7 +18,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/text"
 	"github.com/zitadel/zitadel/pkg/grpc/user"
@@ -70,21 +69,11 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 	t.Run("restricting allowed languages works", func(tt *testing.T) {
 		setAndAwaitAllowedLanguages(iamOwnerCtx, tt, []string{defaultAndAllowedLanguage.String()})
 	})
-	t.Run("all GetAllowedLanguages methods return only the allowed languages", func(tt *testing.T) {
+	t.Run("GetAllowedLanguage returns only the allowed languages", func(tt *testing.T) {
 		expectContains, expectNotContains := []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()}
 		adminResp, err := Tester.Client.Admin.GetAllowedLanguages(iamOwnerCtx, &admin.GetAllowedLanguagesRequest{})
 		require.NoError(t, err)
 		langs := adminResp.GetLanguages()
-		assert.Condition(t, contains(langs, expectContains))
-		assert.Condition(t, not(contains(langs, expectNotContains)))
-		mgmtResp, err := Tester.Client.Mgmt.GetAllowedLanguages(iamOwnerCtx, &management.GetAllowedLanguagesRequest{})
-		require.NoError(t, err)
-		langs = mgmtResp.GetLanguages()
-		assert.Condition(t, contains(langs, expectContains))
-		assert.Condition(t, not(contains(langs, expectNotContains)))
-		authResp, err := Tester.Client.Auth.GetAllowedLanguages(iamOwnerCtx, &auth.GetAllowedLanguagesRequest{})
-		require.NoError(t, err)
-		langs = authResp.GetLanguages()
 		assert.Condition(t, contains(langs, expectContains))
 		assert.Condition(t, not(contains(langs, expectNotContains)))
 	})

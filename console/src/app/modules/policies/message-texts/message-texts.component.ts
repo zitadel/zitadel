@@ -571,9 +571,9 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
         this.service = this.injector.get(AdminService as Type<AdminService>);
         break;
     }
-    this.allowedLanguages$ = this.languagesSvc.allowedLanguages(this.service);
+    this.allowedLanguages$ = this.languagesSvc.allowedLanguages();
     this.languageNotAllowed$ = this.allowedLanguages$.pipe(map((allowed) => !allowed.includes(this.language)));
-    this.notAllowedLanguages$ = this.languagesSvc.notAllowedLanguages(this.service, this.allowedLanguages$);
+    this.notAllowedLanguages$ = this.languagesSvc.notAllowedLanguages(this.allowedLanguages$);
     this.languagesAreRestricted$ = this.notAllowedLanguages$.pipe(map((notAllowed) => notAllowed.length > 0));
 
     this.loadData(this.currentType);
