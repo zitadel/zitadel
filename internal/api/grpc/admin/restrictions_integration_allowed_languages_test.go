@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/text"
 	"github.com/zitadel/zitadel/pkg/grpc/user"
@@ -55,6 +56,12 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 		require.True(tt, ok)
 		require.Equal(tt, codes.FailedPrecondition, expectStatus.Code())
 	})
+	t.Run("not defining any restrictions throws an error", func(tt *testing.T) {
+		_, err := Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{})
+		expectStatus, ok := status.FromError(err)
+		require.True(tt, ok)
+		require.Equal(tt, codes.InvalidArgument, expectStatus.Code())
+	})
 	t.Run("setting the default language works", func(tt *testing.T) {
 		setAndAwaitDefaultLanguage(iamOwnerCtx, tt, defaultAndAllowedLanguage)
 	})
@@ -62,15 +69,22 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 		setAndAwaitAllowedLanguages(iamOwnerCtx, tt, []string{defaultAndAllowedLanguage.String()})
 	})
 	t.Run("all GetAllowedLanguages methods return only the allowed languages", func(tt *testing.T) {
-		adminLangs, err := Tester.Client.Admin.GetAllowedLanguages(iamOwnerCtx, &admin.GetAllowedLanguagesRequest{})
-		require.NoError(tt, err)
-		assertAllowList(adminLangs.GetLanguages(), []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
-		mgmtLangs, err := Tester.Client.Mgmt.GetAllowedLanguages(iamOwnerCtx, &management.GetAllowedLanguagesRequest{})
-		require.NoError(tt, err)
-		assertAllowList(mgmtLangs.GetLanguages(), []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
-		authLangs, err := Tester.Client.Auth.GetAllowedLanguages(iamOwnerCtx, &auth.GetAllowedLanguagesRequest{})
-		require.NoError(tt, err)
-		assertAllowList(authLangs.GetLanguages(), []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
+		expectContains, expectNotContains := []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()}
+		adminResp, err := Tester.Client.Admin.GetAllowedLanguages(iamOwnerCtx, &admin.GetAllowedLanguagesRequest{})
+		require.NoError(t, err)
+		langs := adminResp.GetLanguages()
+		assert.Condition(t, contains(langs, expectContains))
+		assert.Condition(t, not(contains(langs, expectNotContains)))
+		mgmtResp, err := Tester.Client.Mgmt.GetAllowedLanguages(iamOwnerCtx, &management.GetAllowedLanguagesRequest{})
+		require.NoError(t, err)
+		langs = mgmtResp.GetLanguages()
+		assert.Condition(t, contains(langs, expectContains))
+		assert.Condition(t, not(contains(langs, expectNotContains)))
+		authResp, err := Tester.Client.Auth.GetAllowedLanguages(iamOwnerCtx, &auth.GetAllowedLanguagesRequest{})
+		require.NoError(t, err)
+		langs = authResp.GetLanguages()
+		assert.Condition(t, contains(langs, expectContains))
+		assert.Condition(t, not(contains(langs, expectNotContains)))
 	})
 	t.Run("setting the default language to a disallowed language fails", func(tt *testing.T) {
 		_, err := Tester.Client.Admin.SetDefaultLanguage(iamOwnerCtx, &admin.SetDefaultLanguageRequest{Language: disallowedLanguage.String()})
@@ -212,10 +226,10 @@ func checkDiscoveryEndpoint(t *testing.T, domain string, containsUILocales, notC
 	}{}
 	require.NoError(t, json.Unmarshal(body, &doc))
 	if containsUILocales != nil {
-		assert.Condition(NoopAssertionT, contains(doc.UILocalesSupported, containsUILocales))
+		assert.Condition(t, contains(doc.UILocalesSupported, containsUILocales))
 	}
 	if notContainsUILocales != nil {
-		assert.Condition(NoopAssertionT, not(contains(doc.UILocalesSupported, notContainsUILocales)))
+		assert.Condition(t, not(contains(doc.UILocalesSupported, notContainsUILocales)))
 	}
 }
 
@@ -232,6 +246,28 @@ func checkLoginUILanguage(t *testing.T, domain string, acceptLanguage language.T
 	}()
 	require.NoError(t, err)
 	assert.Containsf(t, string(body), containsText, "login ui language is in "+expectLang.String())
+}
+
+type allowedLanguagesService[U any, V getAllowedLanguagesResponse] interface {
+	GetAllowedLanguages(context.Context, U) (V, error)
+}
+
+type getAllowedLanguagesResponse interface {
+	GetLanguages() []string
+}
+
+func checkAllowedLanguages[T allowedLanguagesService[U, V], U any, V getAllowedLanguagesResponse](
+	t *testing.T,
+	svc T,
+	ctx context.Context,
+	req U,
+	containsLanguages, notContainsLanguages []string,
+) {
+	resp, err := svc.GetAllowedLanguages(ctx, req)
+	require.NoError(t, err)
+	langs := resp.GetLanguages()
+	assert.Condition(t, contains(langs, containsLanguages))
+	assert.Condition(t, not(contains(langs, notContainsLanguages)))
 }
 
 // We would love to use assert.Contains here, but it doesn't work with slices of strings

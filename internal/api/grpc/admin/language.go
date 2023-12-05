@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
-
 	"github.com/zitadel/zitadel/internal/i18n"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
