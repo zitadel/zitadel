@@ -173,12 +173,12 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
         break;
     }
 
-    this.allowedLanguages$ = this.languagesSvc.allowedLanguages(this.service);
+    this.allowedLanguages$ = this.languagesSvc.allowedLanguages();
     this.languageNotAllowed$ = this.languageControl.valueChanges.pipe(
       // By always using the same observable this.allowedLanguages$, we only call the API once.
       switchMap((language) => this.allowedLanguages$.pipe(map((allowed) => !allowed.includes(language)))),
     );
-    this.notAllowedLanguages$ = this.languagesSvc.notAllowedLanguages(this.service, this.allowedLanguages$);
+    this.notAllowedLanguages$ = this.languagesSvc.notAllowedLanguages(this.allowedLanguages$);
     this.languagesAreRestricted$ = this.notAllowedLanguages$.pipe(map((notAllowed) => notAllowed.length > 0));
 
     this.loadData();

@@ -92,8 +92,8 @@ func (p *restrictionsProjection) reduceRestrictionsSet(event eventstore.Event) (
 		handler.NewCol(RestrictionsColumnSequence, e.Sequence()),
 		handler.NewCol(RestrictionsColumnAggregateID, e.Aggregate().ID),
 	}
-	if e.PublicOrgRegistrationIsNotAllowed != nil {
-		updateCols = append(updateCols, handler.NewCol(RestrictionsColumnDisallowPublicOrgRegistration, *e.PublicOrgRegistrationIsNotAllowed))
+	if e.DisallowPublicOrgRegistration != nil {
+		updateCols = append(updateCols, handler.NewCol(RestrictionsColumnDisallowPublicOrgRegistration, *e.DisallowPublicOrgRegistration))
 	}
 	if e.AllowedLanguages != nil {
 		updateCols = append(updateCols, handler.NewCol(RestrictionsColumnAllowedLanguages, domain.LanguagesToStrings(*e.AllowedLanguages)))

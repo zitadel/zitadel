@@ -5,16 +5,22 @@ package user_test
 import (
 	"context"
 	"testing"
+	"time"
 
+	"github.com/pquerna/otp/totp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func TestServer_RegisterTOTP(t *testing.T) {
-	// userID := Tester.CreateHumanUser(CTX).GetUserId()
+	userID := Tester.CreateHumanUser(CTX).GetUserId()
+	Tester.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	ctx := Tester.WithAuthorizationToken(CTX, sessionToken)
 
 	type args struct {
 		ctx context.Context
@@ -29,7 +35,7 @@ func TestServer_RegisterTOTP(t *testing.T) {
 		{
 			name: "missing user id",
 			args: args{
-				ctx: CTX,
+				ctx: ctx,
 				req: &user.RegisterTOTPRequest{},
 			},
 			wantErr: true,
@@ -37,19 +43,17 @@ func TestServer_RegisterTOTP(t *testing.T) {
 		{
 			name: "user mismatch",
 			args: args{
-				ctx: CTX,
+				ctx: ctx,
 				req: &user.RegisterTOTPRequest{
 					UserId: "wrong",
 				},
 			},
 			wantErr: true,
 		},
-		/* TODO: after we are able to obtain a Bearer token for a human user
-		https://github.com/zitadel/zitadel/issues/6022
 		{
-			name: "human user",
+			name: "success",
 			args: args{
-				ctx: CTX,
+				ctx: ctx,
 				req: &user.RegisterTOTPRequest{
 					UserId: userID,
 				},
@@ -60,7 +64,6 @@ func TestServer_RegisterTOTP(t *testing.T) {
 				},
 			},
 		},
-		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -80,15 +83,16 @@ func TestServer_RegisterTOTP(t *testing.T) {
 
 func TestServer_VerifyTOTPRegistration(t *testing.T) {
 	userID := Tester.CreateHumanUser(CTX).GetUserId()
+	Tester.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	ctx := Tester.WithAuthorizationToken(CTX, sessionToken)
 
-	/* TODO: after we are able to obtain a Bearer token for a human user
-	reg, err := Client.RegisterTOTP(CTX, &user.RegisterTOTPRequest{
+	reg, err := Client.RegisterTOTP(ctx, &user.RegisterTOTPRequest{
 		UserId: userID,
 	})
 	require.NoError(t, err)
 	code, err := totp.GenerateCode(reg.Secret, time.Now())
 	require.NoError(t, err)
-	*/
 
 	type args struct {
 		ctx context.Context
@@ -103,7 +107,7 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 		{
 			name: "user mismatch",
 			args: args{
-				ctx: CTX,
+				ctx: ctx,
 				req: &user.VerifyTOTPRegistrationRequest{
 					UserId: "wrong",
 				},
@@ -113,7 +117,7 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 		{
 			name: "wrong code",
 			args: args{
-				ctx: CTX,
+				ctx: ctx,
 				req: &user.VerifyTOTPRegistrationRequest{
 					UserId: userID,
 					Code:   "123",
@@ -121,12 +125,10 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		/* TODO: after we are able to obtain a Bearer token for a human user
-		https://github.com/zitadel/zitadel/issues/6022
 		{
 			name: "success",
 			args: args{
-				ctx: CTX,
+				ctx: ctx,
 				req: &user.VerifyTOTPRegistrationRequest{
 					UserId: userID,
 					Code:   code,
@@ -138,7 +140,6 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 				},
 			},
 		},
-		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

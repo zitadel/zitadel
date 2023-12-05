@@ -19,10 +19,10 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
-func TestServer_Restrictions_PublicOrgRegistrationIsNotAllowed(t *testing.T) {
+func TestServer_Restrictions_DisallowPublicOrgRegistration(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
-	domain, _, iamOwnerCtx := Tester.UseIsolatedInstance(ctx, SystemCTX)
+	domain, _, iamOwnerCtx := Tester.UseIsolatedInstance(t, ctx, SystemCTX)
 	regOrgUrl, err := url.Parse("http://" + domain + ":8080/ui/login/register/org")
 	require.NoError(t, err)
 	// The CSRF cookie must be sent with every request.
@@ -68,7 +68,7 @@ func awaitPubOrgRegDisallowed(t *testing.T, ctx context.Context, client *http.Cl
 // awaitGetSSRGetResponse cuts the CSRF token from the response body if it exists
 func awaitGetSSRGetResponse(t *testing.T, ctx context.Context, client *http.Client, parsedURL *url.URL, expectCode int) string {
 	var csrfToken []byte
-	await(t, ctx, func() bool {
+	await(t, ctx, func(tt *assert.CollectT) {
 		resp, err := client.Get(parsedURL.String())
 		require.NoError(t, err)
 		body, err := io.ReadAll(resp.Body)
@@ -78,18 +78,18 @@ func awaitGetSSRGetResponse(t *testing.T, ctx context.Context, client *http.Clie
 		if hasCsrfToken {
 			csrfToken, _, _ = bytes.Cut(after, []byte(`">`))
 		}
-		return assert.Equal(NoopAssertionT, resp.StatusCode, expectCode)
+		assert.Equal(tt, resp.StatusCode, expectCode)
 	})
 	return string(csrfToken)
 }
 
 // awaitPostFormResponse needs a valid CSRF token to make it to the actual endpoint implementation and get the expected status code
 func awaitPostFormResponse(t *testing.T, ctx context.Context, client *http.Client, parsedURL *url.URL, expectCode int, csrfToken string) {
-	await(t, ctx, func() bool {
+	await(t, ctx, func(tt *assert.CollectT) {
 		resp, err := client.PostForm(parsedURL.String(), url.Values{
 			"gorilla.csrf.Token": {csrfToken},
 		})
 		require.NoError(t, err)
-		return assert.Equal(NoopAssertionT, resp.StatusCode, expectCode)
+		assert.Equal(tt, resp.StatusCode, expectCode)
 	})
 }

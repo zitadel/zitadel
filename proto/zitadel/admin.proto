@@ -230,7 +230,7 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "iam.read";
+            permission: "authenticated";
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
