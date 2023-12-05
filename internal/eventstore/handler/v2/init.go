@@ -314,7 +314,7 @@ func createTableStatement(table *Table, tableName string, suffix string) string 
 }
 
 func createViewStatement(viewName string, selectStmt string) string {
-	return fmt.Sprintf("CREATE VIEW IF NOT EXISTS %s AS %s",
+	return fmt.Sprintf("CREATE VIEW %s AS %s",
 		viewName,
 		selectStmt,
 	)
