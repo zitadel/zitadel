@@ -250,28 +250,6 @@ func checkLoginUILanguage(t *testing.T, domain string, acceptLanguage language.T
 	assert.Containsf(t, string(body), containsText, "login ui language is in "+expectLang.String())
 }
 
-type allowedLanguagesService[U any, V getAllowedLanguagesResponse] interface {
-	GetAllowedLanguages(context.Context, U) (V, error)
-}
-
-type getAllowedLanguagesResponse interface {
-	GetLanguages() []string
-}
-
-func checkAllowedLanguages[T allowedLanguagesService[U, V], U any, V getAllowedLanguagesResponse](
-	t *testing.T,
-	svc T,
-	ctx context.Context,
-	req U,
-	containsLanguages, notContainsLanguages []string,
-) {
-	resp, err := svc.GetAllowedLanguages(ctx, req)
-	require.NoError(t, err)
-	langs := resp.GetLanguages()
-	assert.Condition(t, contains(langs, containsLanguages))
-	assert.Condition(t, not(contains(langs, notContainsLanguages)))
-}
-
 // We would love to use assert.Contains here, but it doesn't work with slices of strings
 func contains(container []string, subset []string) assert.Comparison {
 	return func() bool {
