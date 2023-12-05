@@ -348,12 +348,14 @@ func (q *Queries) GetUserByLoginName(ctx context.Context, shouldTriggered bool, 
 		triggerUserProjections(ctx)
 	}
 
+	username := loginName
 	domainIndex := strings.LastIndex(loginName, "@")
 	var domainSuffix string
-	if domainIndex > 0 {
+	// split between the last @ (so ignore it if the loginname ends with it)
+	if domainIndex > 0 && domainIndex != len(loginName)-1 {
 		domainSuffix = loginName[domainIndex+1:]
+		username = loginName[:domainIndex]
 	}
-	username := loginName[:domainIndex]
 
 	err = q.client.QueryRowContext(ctx,
 		func(row *sql.Row) error {
@@ -502,12 +504,14 @@ func (q *Queries) GetNotifyUserByLoginName(ctx context.Context, shouldTriggered 
 		triggerUserProjections(ctx)
 	}
 
+	username := loginName
 	domainIndex := strings.LastIndex(loginName, "@")
 	var domainSuffix string
-	if domainIndex > 0 {
+	// split between the last @ (so ignore it if the loginname ends with it)
+	if domainIndex > 0 && domainIndex != len(loginName)-1 {
 		domainSuffix = loginName[domainIndex+1:]
+		username = loginName[:domainIndex]
 	}
-	username := loginName[:domainIndex]
 
 	err = q.client.QueryRowContext(ctx,
 		func(row *sql.Row) error {
