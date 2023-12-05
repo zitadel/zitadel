@@ -82,7 +82,7 @@ type Aggregate struct {
 // AggregateType is the object name
 type AggregateType string
 
-func isAggreagteTypes(a *Aggregate, types ...AggregateType) bool {
+func isAggregateTypes(a *Aggregate, types ...AggregateType) bool {
 	for _, typ := range types {
 		if a.Type == typ {
 			return true
