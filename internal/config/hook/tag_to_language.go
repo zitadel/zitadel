@@ -5,6 +5,8 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 func TagToLanguageHookFunc() mapstructure.DecodeHookFuncType {
@@ -21,6 +23,7 @@ func TagToLanguageHookFunc() mapstructure.DecodeHookFuncType {
 			return data, nil
 		}
 
-		return language.Parse(data.(string))
+		lang, err := domain.ParseLanguage(data.(string))
+		return lang[0], err
 	}
 }

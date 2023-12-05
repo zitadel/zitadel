@@ -3,15 +3,31 @@ package command
 import (
 	"context"
 	"io"
+	"os"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
+
+var (
+	SupportedLanguages   = []language.Tag{language.English, language.German}
+	OnlyAllowedLanguages = []language.Tag{language.English}
+	AllowedLanguage      = language.English
+	DisallowedLanguage   = language.German
+	UnsupportedLanguage  = language.Spanish
+)
+
+func TestMain(m *testing.M) {
+	i18n.SupportLanguages(SupportedLanguages...)
+	os.Exit(m.Run())
+}
 
 func TestCommands_asyncPush(t *testing.T) {
 	// make sure the test terminates on deadlock

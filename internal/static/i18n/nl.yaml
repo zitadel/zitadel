@@ -33,8 +33,13 @@ Errors:
     NoneSpecified: Geen limieten gespecificeerd
   Restrictions:
     NoneSpecified: Geen beperkingen gespecificeerd
+    DefaultLanguageMustBeAllowed: De standaardtaal moet worden toegestaan
   Language:
     NotParsed: Kon taal niet parsen
+    NotSupported: Taal wordt niet ondersteund
+    NotAllowed: Taal is niet toegestaan
+    Undefined: Taal is niet gedefinieerd
+    Duplicate: Talen hebben duplicaten
   OIDCSettings:
     NotFound: OIDC-configuratie niet gevonden
     AlreadyExists: OIDC-configuratie bestaat al

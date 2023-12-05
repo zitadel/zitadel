@@ -23,17 +23,13 @@ const (
 
 type Renderer struct {
 	Templates  map[string]*template.Template
-	dir        http.FileSystem
 	cookieName string
 }
 
-func NewRenderer(dir http.FileSystem, tmplMapping map[string]string, funcs map[string]interface{}, cookieName string) (*Renderer, error) {
+func NewRenderer(tmplMapping map[string]string, funcs map[string]interface{}, cookieName string) (*Renderer, error) {
 	var err error
-	r := &Renderer{
-		dir:        dir,
-		cookieName: cookieName,
-	}
-	err = r.loadTemplates(dir, nil, tmplMapping, funcs)
+	r := &Renderer{cookieName: cookieName}
+	err = r.loadTemplates(i18n.LoadFilesystem(i18n.LOGIN), nil, tmplMapping, funcs)
 	if err != nil {
 		return nil, err
 	}
@@ -47,8 +43,8 @@ func (r *Renderer) RenderTemplate(w http.ResponseWriter, req *http.Request, tran
 	}
 }
 
-func (r *Renderer) NewTranslator(ctx context.Context) (*i18n.Translator, error) {
-	return i18n.NewTranslator(r.dir, authz.GetInstance(ctx).DefaultLanguage(), r.cookieName)
+func (r *Renderer) NewTranslator(ctx context.Context, allowedLanguages []language.Tag) (*i18n.Translator, error) {
+	return i18n.NewLoginTranslator(authz.GetInstance(ctx).DefaultLanguage(), allowedLanguages, r.cookieName)
 }
 
 func (r *Renderer) Localize(translator *i18n.Translator, id string, args map[string]interface{}) string {
