@@ -251,20 +251,22 @@ func assertQuery(t *testing.T, i int, want, got *SearchQuery) {
 
 func TestSearchQuery_matches(t *testing.T) {
 	type args struct {
-		event Event
+		event Command
 	}
 	tests := []struct {
 		name  string
 		query *SearchQuery
-		event Event
+		event Command
 		want  bool
 	}{
 		{
 			name:  "wrong aggregate type",
 			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().AggregateTypes("searched"),
-			event: &BaseEvent{
-				Agg: &Aggregate{
-					Type: "found",
+			event: &matcherCommand{
+				BaseEvent{
+					Agg: &Aggregate{
+						Type: "found",
+					},
 				},
 			},
 			want: false,
@@ -272,9 +274,11 @@ func TestSearchQuery_matches(t *testing.T) {
 		{
 			name:  "wrong aggregate id",
 			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().AggregateIDs("1", "10", "100"),
-			event: &BaseEvent{
-				Agg: &Aggregate{
-					ID: "2",
+			event: &matcherCommand{
+				BaseEvent{
+					Agg: &Aggregate{
+						ID: "2",
+					},
 				},
 			},
 			want: false,
@@ -282,9 +286,11 @@ func TestSearchQuery_matches(t *testing.T) {
 		{
 			name:  "wrong event type",
 			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery().EventTypes("event.searched.type"),
-			event: &BaseEvent{
-				EventType: "event.actual.type",
-				Agg:       &Aggregate{},
+			event: &matcherCommand{
+				BaseEvent{
+					EventType: "event.actual.type",
+					Agg:       &Aggregate{},
+				},
 			},
 			want: false,
 		},
@@ -295,26 +301,30 @@ func TestSearchQuery_matches(t *testing.T) {
 				AggregateIDs("2").
 				AggregateTypes("actual").
 				EventTypes("event.actual.type"),
-			event: &BaseEvent{
-				Seq: 55,
-				Agg: &Aggregate{
-					ID:   "2",
-					Type: "actual",
+			event: &matcherCommand{
+				BaseEvent{
+					Seq: 55,
+					Agg: &Aggregate{
+						ID:   "2",
+						Type: "actual",
+					},
+					EventType: "event.actual.type",
 				},
-				EventType: "event.actual.type",
 			},
 			want: true,
 		},
 		{
 			name:  "matching empty query",
 			query: NewSearchQueryBuilder(ColumnsEvent).AddQuery(),
-			event: &BaseEvent{
-				Seq: 55,
-				Agg: &Aggregate{
-					ID:   "2",
-					Type: "actual",
+			event: &matcherCommand{
+				BaseEvent{
+					Seq: 55,
+					Agg: &Aggregate{
+						ID:   "2",
+						Type: "actual",
+					},
+					EventType: "event.actual.type",
 				},
-				EventType: "event.actual.type",
 			},
 			want: true,
 		},
@@ -334,76 +344,128 @@ func TestSearchQuery_matches(t *testing.T) {
 	}
 }
 
+type matcherCommand struct {
+	BaseEvent
+}
+
+func (matcherCommand) Payload() any { return nil }
+
+func (matcherCommand) UniqueConstraints() []*UniqueConstraint { return nil }
+
 func TestSearchQueryBuilder_Matches(t *testing.T) {
 	type args struct {
-		event       Event
-		existingLen int
+		commands []Command
 	}
 	tests := []struct {
-		name    string
-		builder *SearchQueryBuilder
-		args    args
-		want    bool
+		name      string
+		builder   *SearchQueryBuilder
+		args      args
+		wantedLen int
 	}{
 		{
-			name:    "sequence too high",
-			builder: NewSearchQueryBuilder(ColumnsEvent).SequenceGreater(60),
+			name: "sequence too high",
+			builder: NewSearchQueryBuilder(ColumnsEvent).
+				SequenceGreater(60),
 			args: args{
-				event: &BaseEvent{
-					Agg: &Aggregate{
-						InstanceID: "instance",
-					},
-					Seq: 60,
-				},
-			},
-			want: false,
-		},
-		{
-			name:    "limit exeeded",
-			builder: NewSearchQueryBuilder(ColumnsEvent).Limit(100),
-			args: args{
-				event:       &BaseEvent{},
-				existingLen: 100,
-			},
-			want: false,
-		},
-		{
-			name:    "wrong resource owner",
-			builder: NewSearchQueryBuilder(ColumnsEvent).ResourceOwner("query"),
-			args: args{
-				event: &BaseEvent{
-					Agg: &Aggregate{
-						ResourceOwner: "ro",
+				commands: []Command{
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								InstanceID: "instance",
+							},
+							Seq: 60,
+						},
 					},
 				},
-				existingLen: 0,
 			},
-			want: false,
+			wantedLen: 0,
 		},
 		{
-			name:    "wrong instance",
-			builder: NewSearchQueryBuilder(ColumnsEvent).InstanceID("instance"),
+			name: "limit exeeded",
+			builder: NewSearchQueryBuilder(ColumnsEvent).
+				Limit(2),
 			args: args{
-				event: &BaseEvent{
-					Agg: &Aggregate{
-						InstanceID: "different instance",
+				commands: []Command{
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								ResourceOwner: "ro",
+								InstanceID:    "instance",
+							},
+							Seq: 1001,
+						},
+					},
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								ResourceOwner: "ro",
+								InstanceID:    "instance",
+							},
+							Seq: 1001,
+						},
+					},
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								ResourceOwner: "ro",
+								InstanceID:    "instance",
+							},
+							Seq: 1001,
+						},
 					},
 				},
-				existingLen: 0,
 			},
-			want: false,
+			wantedLen: 2,
 		},
 		{
-			name:    "query failed",
-			builder: NewSearchQueryBuilder(ColumnsEvent).SequenceGreater(1000),
+			name: "wrong resource owner",
+			builder: NewSearchQueryBuilder(ColumnsEvent).
+				ResourceOwner("query"),
 			args: args{
-				event: &BaseEvent{
-					Seq: 999,
-					Agg: &Aggregate{},
+				commands: []Command{
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								ResourceOwner: "ro",
+							},
+						},
+					},
 				},
-				existingLen: 0,
 			},
-			want: false,
+			wantedLen: 0,
+		},
+		{
+			name: "wrong instance",
+			builder: NewSearchQueryBuilder(ColumnsEvent).
+				InstanceID("instance"),
+			args: args{
+				commands: []Command{
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								InstanceID: "different instance",
+							},
+						},
+					},
+				},
+			},
+			wantedLen: 0,
+		},
+		{
+			name: "query failed",
+			builder: NewSearchQueryBuilder(ColumnsEvent).
+				SequenceGreater(1000),
+			args: args{
+				commands: []Command{
+					&matcherCommand{
+						BaseEvent{
+							Seq: 999,
+							Agg: &Aggregate{},
+						},
+					},
+				},
+			},
+			wantedLen: 0,
 		},
 		{
 			name: "matching",
@@ -413,65 +475,242 @@ func TestSearchQueryBuilder_Matches(t *testing.T) {
 				InstanceID("instance").
 				SequenceGreater(1000),
 			args: args{
-				event: &BaseEvent{
-					Agg: &Aggregate{
-						ResourceOwner: "ro",
-						InstanceID:    "instance",
+				commands: []Command{
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								ResourceOwner: "ro",
+								InstanceID:    "instance",
+							},
+							Seq: 1001,
+						},
 					},
-					Seq: 1001,
 				},
-				existingLen: 999,
 			},
-			want: true,
+			wantedLen: 1,
 		},
 		{
-			name:    "matching builder resourceOwner and Instance",
-			builder: NewSearchQueryBuilder(ColumnsEvent),
+			name: "matching builder resourceOwner and Instance",
+			builder: NewSearchQueryBuilder(ColumnsEvent).
+				ResourceOwner("ro").
+				InstanceID("instance"),
 			args: args{
-				event: &BaseEvent{
-					Agg: &Aggregate{
-						ResourceOwner: "ro",
-						InstanceID:    "instance",
+				commands: []Command{
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								ResourceOwner: "ro",
+								InstanceID:    "instance",
+							},
+							Seq: 1001,
+						},
 					},
-					Seq: 1001,
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								ResourceOwner: "ro2",
+								InstanceID:    "instance2",
+							},
+							Seq: 1002,
+						},
+					},
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								ResourceOwner: "ro2",
+								InstanceID:    "instance",
+							},
+							Seq: 1003,
+						},
+					},
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								ResourceOwner: "ro",
+								InstanceID:    "instance2",
+							},
+							Seq: 1004,
+						},
+					},
 				},
-				existingLen: 999,
 			},
-			want: true,
+			wantedLen: 1,
 		},
 		{
-			name:    "matching builder resourceOwner only",
-			builder: NewSearchQueryBuilder(ColumnsEvent),
+			name: "matching builder resourceOwner only",
+			builder: NewSearchQueryBuilder(ColumnsEvent).
+				ResourceOwner("ro"),
 			args: args{
-				event: &BaseEvent{
-					Agg: &Aggregate{
-						ResourceOwner: "ro",
+				commands: []Command{
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								ResourceOwner: "ro",
+							},
+							Seq: 1001,
+						},
 					},
-					Seq: 1001,
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								ResourceOwner: "ro2",
+							},
+							Seq: 1001,
+						},
+					},
 				},
-				existingLen: 999,
 			},
-			want: true,
+			wantedLen: 1,
 		},
 		{
-			name:    "matching builder instanceID only",
-			builder: NewSearchQueryBuilder(ColumnsEvent),
+			name: "matching builder instanceID only",
+			builder: NewSearchQueryBuilder(ColumnsEvent).
+				InstanceID("instance"),
 			args: args{
-				event: &BaseEvent{
-					Agg: &Aggregate{
-						InstanceID: "instance",
+				commands: []Command{
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								InstanceID: "instance",
+							},
+							Seq: 1001,
+						},
 					},
-					Seq: 1001,
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								InstanceID: "instance2",
+							},
+							Seq: 1001,
+						},
+					},
 				},
-				existingLen: 999,
 			},
-			want: true,
+			wantedLen: 1,
+		},
+		{
+			name: "offset too high",
+			builder: NewSearchQueryBuilder(ColumnsEvent).
+				Offset(2),
+			args: args{
+				commands: []Command{
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								InstanceID: "instance",
+							},
+							Seq: 1001,
+						},
+					},
+				},
+			},
+			wantedLen: 0,
+		},
+		{
+			name: "offset",
+			builder: NewSearchQueryBuilder(ColumnsEvent).
+				Offset(1),
+			args: args{
+				commands: []Command{
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								InstanceID: "instance",
+							},
+							Seq: 1001,
+						},
+					},
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								InstanceID: "instance",
+							},
+							Seq: 1002,
+						},
+					},
+				},
+			},
+			wantedLen: 1,
+		},
+		{
+			name: "offset and limit",
+			builder: NewSearchQueryBuilder(ColumnsEvent).
+				Offset(1).
+				Limit(1),
+			args: args{
+				commands: []Command{
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								InstanceID: "instance",
+							},
+							Seq: 1001,
+						},
+					},
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								InstanceID: "instance",
+							},
+							Seq: 1002,
+						},
+					},
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								InstanceID: "instance",
+							},
+							Seq: 1002,
+						},
+					},
+				},
+			},
+			wantedLen: 1,
+		},
+		{
+			name: "sub query",
+			builder: NewSearchQueryBuilder(ColumnsEvent).
+				AddQuery().
+				AggregateTypes("test").
+				Builder(),
+			args: args{
+				commands: []Command{
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								InstanceID: "instance",
+								Type:       "test",
+							},
+							Seq: 1001,
+						},
+					},
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								InstanceID: "instance",
+								Type:       "test",
+							},
+							Seq: 1002,
+						},
+					},
+					&matcherCommand{
+						BaseEvent{
+							Agg: &Aggregate{
+								InstanceID: "instance",
+								Type:       "test2",
+							},
+							Seq: 1003,
+						},
+					},
+				},
+			},
+			wantedLen: 2,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.builder.Matches(tt.args.event, tt.args.existingLen); got != tt.want {
-				t.Errorf("SearchQueryBuilder.Matches() = %v, want %v", got, tt.want)
+			if got := tt.builder.Matches(tt.args.commands...); len(got) != tt.wantedLen {
+				t.Errorf("SearchQueryBuilder.Matches() = %v, wantted len %v", got, tt.wantedLen)
 			}
 		})
 	}

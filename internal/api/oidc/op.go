@@ -6,11 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/rakyll/statik/fs"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 	"golang.org/x/exp/slog"
-	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/assets"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
@@ -23,7 +21,6 @@ import (
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
-	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
@@ -145,6 +142,7 @@ func NewServer(
 		userAgentCookie,
 		http_utils.CopyHeadersToContext,
 		accessHandler.HandleIgnorePathPrefixes(ignoredQuotaLimitEndpoint(config.CustomEndpoints)),
+		middleware.ActivityHandler,
 	))
 
 	return server, nil
@@ -166,10 +164,6 @@ func ignoredQuotaLimitEndpoint(endpoints *EndpointConfig) []string {
 }
 
 func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []byte) (*op.Config, error) {
-	supportedLanguages, err := getSupportedLanguages()
-	if err != nil {
-		return nil, err
-	}
 	opConfig := &op.Config{
 		DefaultLogoutRedirectURI: defaultLogoutRedirectURI,
 		CodeMethodS256:           config.CodeMethodS256,
@@ -177,7 +171,6 @@ func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []
 		AuthMethodPrivateKeyJWT:  config.AuthMethodPrivateKeyJWT,
 		GrantTypeRefreshToken:    config.GrantTypeRefreshToken,
 		RequestObjectSupported:   config.RequestObjectSupported,
-		SupportedUILocales:       supportedLanguages,
 		DeviceAuthorization:      config.DeviceAuth.toOPConfig(),
 	}
 	if cryptoLength := len(cryptoKey); cryptoLength != 32 {
@@ -209,12 +202,4 @@ func newStorage(config Config, command *command.Commands, query *query.Queries, 
 
 func (o *OPStorage) Health(ctx context.Context) error {
 	return o.repo.Health(ctx)
-}
-
-func getSupportedLanguages() ([]language.Tag, error) {
-	statikLoginFS, err := fs.NewWithNamespace("login")
-	if err != nil {
-		return nil, err
-	}
-	return i18n.SupportedLanguages(statikLoginFS)
 }

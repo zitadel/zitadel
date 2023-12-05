@@ -838,6 +838,11 @@ DefaultInstance:
     # DisallowPublicOrgRegistration defines if ZITADEL should expose the endpoint /ui/login/register/org
     # If it is true, the endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.
     DisallowPublicOrgRegistration: # ZITADEL_DEFAULTINSTANCE_RESTRICTIONS_DISALLOWPUBLICORGREGISTRATION
+    # AllowedLanguages restricts the languages that can be used.
+    # If the list is empty, all supported languages are allowed.
+    AllowedLanguages: # ZITADEL_DEFAULTINSTANCE_RESTRICTIONS_ALLOWEDLANGUAGES
+    # - en
+    # - de
   Quotas:
     # Items take a slice of quota configurations, whereas, for each unit type and instance, one or zero quotas may exist.
     # The following unit types are supported

@@ -5,13 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 
-	"github.com/rakyll/statik/fs"
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
 	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -73,7 +74,7 @@ func setInstance(r *http.Request, verifier authz.InstanceVerifier, headerName st
 
 	host, err := HostFromRequest(r, headerName)
 	if err != nil {
-		return nil, err
+		return nil, caos_errors.ThrowNotFound(err, "INST-zWq7X", "Errors.Instance.NotFound")
 	}
 
 	instance, err := verifier.InstanceByHost(authCtx, host)
@@ -84,22 +85,41 @@ func setInstance(r *http.Request, verifier authz.InstanceVerifier, headerName st
 	return authz.WithInstance(ctx, instance), nil
 }
 
-func HostFromRequest(r *http.Request, headerName string) (string, error) {
-	host := r.Host
+func HostFromRequest(r *http.Request, headerName string) (host string, err error) {
 	if headerName != "host" {
-		host = r.Header.Get(headerName)
+		return hostFromSpecialHeader(r, headerName)
 	}
+	return hostFromOrigin(r.Context())
+}
+
+func hostFromSpecialHeader(r *http.Request, headerName string) (host string, err error) {
+	host = r.Header.Get(headerName)
 	if host == "" {
 		return "", fmt.Errorf("host header `%s` not found", headerName)
 	}
 	return host, nil
 }
 
-func newZitadelTranslator() *i18n.Translator {
-	dir, err := fs.NewWithNamespace("zitadel")
-	logging.WithFields("namespace", "zitadel").OnError(err).Panic("unable to get namespace")
+func hostFromOrigin(ctx context.Context) (host string, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("invalid origin: %w", err)
+		}
+	}()
+	origin := zitadel_http.ComposedOrigin(ctx)
+	u, err := url.Parse(origin)
+	if err != nil {
+		return "", err
+	}
+	host = u.Hostname()
+	if host == "" {
+		err = errors.New("empty host")
+	}
+	return host, err
+}
 
-	translator, err := i18n.NewTranslator(dir, language.English, "")
+func newZitadelTranslator() *i18n.Translator {
+	translator, err := i18n.NewZitadelTranslator(language.English)
 	logging.OnError(err).Panic("unable to get translator")
 	return translator
 }

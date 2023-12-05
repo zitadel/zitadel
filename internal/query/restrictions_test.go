@@ -7,6 +7,10 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
+
+	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 var (
@@ -15,7 +19,8 @@ var (
 		" projections.restrictions.change_date," +
 		" projections.restrictions.resource_owner," +
 		" projections.restrictions.sequence," +
-		" projections.restrictions.disallow_public_org_registration" +
+		" projections.restrictions.disallow_public_org_registration," +
+		" projections.restrictions.allowed_languages" +
 		" FROM projections.restrictions" +
 		" AS OF SYSTEM TIME '-1 ms'",
 	)
@@ -27,6 +32,7 @@ var (
 		"resource_owner",
 		"sequence",
 		"disallow_public_org_registration",
+		"allowed_languages",
 	}
 )
 
@@ -56,7 +62,9 @@ func Test_RestrictionsPrepare(t *testing.T) {
 					}
 					return nil, true
 				},
-				object: Restrictions{},
+				object: Restrictions{
+					AllowedLanguages: make([]language.Tag, 0),
+				},
 			},
 		},
 		{
@@ -73,6 +81,7 @@ func Test_RestrictionsPrepare(t *testing.T) {
 						"instance1",
 						0,
 						true,
+						database.TextArray[string]([]string{"en", "de", "ru"}),
 					},
 				),
 				object: Restrictions{
@@ -82,6 +91,7 @@ func Test_RestrictionsPrepare(t *testing.T) {
 					ResourceOwner:                 "instance1",
 					Sequence:                      0,
 					DisallowPublicOrgRegistration: true,
+					AllowedLanguages:              []language.Tag{language.Make("en"), language.Make("de"), language.Make("ru")},
 				},
 			},
 		},

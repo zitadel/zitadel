@@ -7,7 +7,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
-	"github.com/zitadel/zitadel/internal/api/grpc/text"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
@@ -116,13 +117,9 @@ func (s *Server) GetActiveIdentityProviders(ctx context.Context, req *settings.G
 }
 
 func (s *Server) GetGeneralSettings(ctx context.Context, _ *settings.GetGeneralSettingsRequest) (*settings.GetGeneralSettingsResponse, error) {
-	langs, err := s.query.Languages(ctx)
-	if err != nil {
-		return nil, err
-	}
 	instance := authz.GetInstance(ctx)
 	return &settings.GetGeneralSettingsResponse{
-		SupportedLanguages: text.LanguageTagsToStrings(langs),
+		SupportedLanguages: domain.LanguagesToStrings(i18n.SupportedLanguages()),
 		DefaultOrgId:       instance.DefaultOrganisationID(),
 		DefaultLanguage:    instance.DefaultLanguage().String(),
 	}, nil

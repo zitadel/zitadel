@@ -13,6 +13,7 @@ func (l *Login) handleLogoutDone(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) renderLogoutDone(w http.ResponseWriter, r *http.Request) {
-	data := l.getUserData(r, nil, "LogoutDone.Title", "LogoutDone.Description", "", "")
-	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), nil), l.renderer.Templates[tmplLogoutDone], data, nil)
+	translator := l.getTranslator(r.Context(), nil)
+	data := l.getUserData(r, nil, translator, "LogoutDone.Title", "LogoutDone.Description", "", "")
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplLogoutDone], data, nil)
 }

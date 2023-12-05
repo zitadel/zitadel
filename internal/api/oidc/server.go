@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -103,8 +104,15 @@ func (s *Server) Ready(ctx context.Context, r *op.Request[struct{}]) (_ *op.Resp
 func (s *Server) Discovery(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-
-	return op.NewResponse(s.createDiscoveryConfig(ctx)), nil
+	restrictions, err := s.query.GetInstanceRestrictions(ctx)
+	if err != nil {
+		return nil, err
+	}
+	allowedLanguages := restrictions.AllowedLanguages
+	if len(allowedLanguages) == 0 {
+		allowedLanguages = i18n.SupportedLanguages()
+	}
+	return op.NewResponse(s.createDiscoveryConfig(ctx, allowedLanguages)), nil
 }
 
 func (s *Server) Keys(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
@@ -205,7 +213,7 @@ func (s *Server) EndSession(ctx context.Context, r *op.Request[oidc.EndSessionRe
 	return s.LegacyServer.EndSession(ctx, r)
 }
 
-func (s *Server) createDiscoveryConfig(ctx context.Context) *oidc.DiscoveryConfiguration {
+func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales oidc.Locales) *oidc.DiscoveryConfiguration {
 	issuer := op.IssuerFromContext(ctx)
 	return &oidc.DiscoveryConfiguration{
 		Issuer:                                     issuer,
@@ -231,7 +239,7 @@ func (s *Server) createDiscoveryConfig(ctx context.Context) *oidc.DiscoveryConfi
 		RevocationEndpointAuthMethodsSupported:             op.AuthMethodsRevocationEndpoint(s.Provider()),
 		ClaimsSupported:                                    op.SupportedClaims(s.Provider()),
 		CodeChallengeMethodsSupported:                      op.CodeChallengeMethods(s.Provider()),
-		UILocalesSupported:                                 s.Provider().SupportedUILocales(),
+		UILocalesSupported:                                 supportedUILocales,
 		RequestParameterSupported:                          s.Provider().RequestObjectSupported(),
 	}
 }

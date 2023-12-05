@@ -7,6 +7,7 @@ INSERT INTO projections.current_states (
     , event_date
     , "position"
     , last_updated
+    , filter_offset
 ) VALUES (
     $1
     , $2
@@ -16,6 +17,7 @@ INSERT INTO projections.current_states (
     , $6
     , $7
     , now()
+    , $8
 ) ON CONFLICT (
     projection_name
     , instance_id
@@ -26,4 +28,5 @@ INSERT INTO projections.current_states (
     , event_date = $6
     , "position" = $7
     , last_updated = statement_timestamp()
+    , filter_offset = $8
 ;
