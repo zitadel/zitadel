@@ -5,21 +5,23 @@ package admin_test
 import (
 	"context"
 	"encoding/json"
+	"io"
+	"net/http"
+	"testing"
+	"time"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/text"
 	"github.com/zitadel/zitadel/pkg/grpc/user"
-	"golang.org/x/text/language"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"io"
-	"net/http"
-	"testing"
-	"time"
 )
 
 func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
