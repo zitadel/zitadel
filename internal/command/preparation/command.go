@@ -70,12 +70,9 @@ func transactionFilter(filter FilterToQueryReducer, commands []eventstore.Comman
 		if err != nil {
 			return nil, err
 		}
-		for _, command := range commands {
-			event := command.(eventstore.Event)
-			if !query.Matches(event, len(events)) {
-				continue
-			}
-			events = append(events, event)
+		matches := query.Matches(commands...)
+		for _, command := range matches {
+			events = append(events, command.(eventstore.Event))
 		}
 		return events, nil
 	}

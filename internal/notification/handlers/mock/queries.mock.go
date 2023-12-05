@@ -85,6 +85,21 @@ func (mr *MockQueriesMockRecorder) GetDefaultLanguage(arg0 any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultLanguage", reflect.TypeOf((*MockQueries)(nil).GetDefaultLanguage), arg0)
 }
 
+// GetInstanceRestrictions mocks base method.
+func (m *MockQueries) GetInstanceRestrictions(arg0 context.Context) (query.Restrictions, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetInstanceRestrictions", arg0)
+	ret0, _ := ret[0].(query.Restrictions)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetInstanceRestrictions indicates an expected call of GetInstanceRestrictions.
+func (mr *MockQueriesMockRecorder) GetInstanceRestrictions(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInstanceRestrictions", reflect.TypeOf((*MockQueries)(nil).GetInstanceRestrictions), arg0)
+}
+
 // GetNotifyUserByID mocks base method.
 func (m *MockQueries) GetNotifyUserByID(arg0 context.Context, arg1 bool, arg2 string, arg3 ...query.SearchQuery) (*query.NotifyUser, error) {
 	m.ctrl.T.Helper()

@@ -3,9 +3,6 @@ package notification
 import (
 	"context"
 
-	statik_fs "github.com/rakyll/statik/fs"
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -29,9 +26,7 @@ func Start(
 	fileSystemPath string,
 	userEncryption, smtpEncryption, smsEncryption crypto.EncryptionAlgorithm,
 ) {
-	statikFS, err := statik_fs.NewWithNamespace("notification")
-	logging.OnError(err).Panic("unable to start listener")
-	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption, statikFS)
+	q := handlers.NewNotificationQueries(queries, es, externalDomain, externalPort, externalSecure, fileSystemPath, userEncryption, smtpEncryption, smsEncryption)
 	c := newChannels(q)
 	handlers.NewUserNotifier(ctx, projection.ApplyCustomConfig(userHandlerCustomConfig), commands, q, c, otpEmailTmpl).Start(ctx)
 	handlers.NewQuotaNotifier(ctx, projection.ApplyCustomConfig(quotaHandlerCustomConfig), commands, q, c).Start(ctx)

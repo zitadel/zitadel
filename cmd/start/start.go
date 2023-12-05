@@ -62,6 +62,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
@@ -93,7 +94,6 @@ Requirements:
 			if err != nil {
 				return err
 			}
-
 			return startZitadel(config, masterKey, server)
 		},
 	}
@@ -122,6 +122,8 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	showBasicInformation(config)
 
 	ctx := context.Background()
+
+	i18n.MustLoadSupportedLanguagesFromDir()
 
 	zitadelDBClient, err := database.Connect(config.Database, false, false)
 	if err != nil {
