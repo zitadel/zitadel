@@ -66,7 +66,7 @@ func filterAuditLogRetention(ctx context.Context, auditLogRetention time.Duratio
 	if callTime.IsZero() {
 		callTime = time.Now()
 	}
-	oldestAllowed := callTime.Add(-auditLogRetention)
+	oldestAllowed := callTime.UTC().Add(-auditLogRetention)
 	// The audit log retention time should overwrite the creation date after query only if it is older
 	// For example API calls should still be able to restrict the creation date after to a more recent date
 	if builder.GetCreationDateAfter().Before(oldestAllowed) {
