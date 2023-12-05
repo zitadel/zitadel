@@ -4,6 +4,7 @@ SELECT
     , "sequence"
     , event_date
     , "position"
+    , filter_offset
 FROM 
     projections.current_states
 WHERE

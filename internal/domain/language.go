@@ -1,9 +1,11 @@
 package domain
 
 import (
+	"errors"
+
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	z_errors "github.com/zitadel/zitadel/internal/errors"
 )
 
 func StringsToLanguages(langs []string) []language.Tag {
@@ -45,7 +47,7 @@ func LanguageIsAllowed(allowUndefined bool, allowedLanguages []language.Tag, lan
 		return err
 	}
 	if len(allowedLanguages) > 0 && !languageIsContained(allowedLanguages, lang) {
-		return errors.ThrowPreconditionFailed(nil, "LANG-2M9fs", "Errors.Language.NotAllowed")
+		return z_errors.ThrowPreconditionFailed(nil, "LANG-2M9fs", "Errors.Language.NotAllowed")
 	}
 	return nil
 }
@@ -64,14 +66,14 @@ func LanguagesAreSupported(supportedLanguages []language.Tag, lang ...language.T
 		return nil
 	}
 	if len(unsupported) == 1 {
-		return errors.ThrowInvalidArgument(nil, "LANG-lg4DP", "Errors.Language.NotSupported")
+		return z_errors.ThrowInvalidArgument(nil, "LANG-lg4DP", "Errors.Language.NotSupported")
 	}
-	return errors.ThrowInvalidArgumentf(nil, "LANG-XHiK5", "Errors.Languages.NotSupported: %s", LanguagesToStrings(unsupported))
+	return z_errors.ThrowInvalidArgumentf(nil, "LANG-XHiK5", "Errors.Languages.NotSupported: %s", LanguagesToStrings(unsupported))
 }
 
 func LanguageIsDefined(lang language.Tag) error {
 	if lang.IsRoot() {
-		return errors.ThrowInvalidArgument(nil, "LANG-3M9f2", "Errors.Language.Undefined")
+		return z_errors.ThrowInvalidArgument(nil, "LANG-3M9f2", "Errors.Language.Undefined")
 	}
 	return nil
 }
@@ -91,9 +93,22 @@ func LanguagesHaveDuplicates(langs []language.Tag) error {
 		return nil
 	}
 	if len(duplicates) > 1 {
-		return errors.ThrowInvalidArgument(nil, "LANG-3M9f2", "Errors.Language.Duplicate")
+		return z_errors.ThrowInvalidArgument(nil, "LANG-3M9f2", "Errors.Language.Duplicate")
 	}
-	return errors.ThrowInvalidArgumentf(nil, "LANG-XHiK5", "Errors.Languages.Duplicate: %s", LanguagesToStrings(duplicates))
+	return z_errors.ThrowInvalidArgumentf(nil, "LANG-XHiK5", "Errors.Languages.Duplicate: %s", LanguagesToStrings(duplicates))
+}
+
+func ParseLanguage(lang ...string) (tags []language.Tag, err error) {
+	tags = make([]language.Tag, len(lang))
+	for i := range lang {
+		var parseErr error
+		tags[i], parseErr = language.Parse(lang[i])
+		err = errors.Join(err, parseErr)
+	}
+	if err != nil {
+		err = z_errors.ThrowInvalidArgument(err, "LANG-jc8Sq", "Errors.Language.NotParsed")
+	}
+	return tags, err
 }
 
 func languagesAreContained(languages, search []language.Tag) bool {

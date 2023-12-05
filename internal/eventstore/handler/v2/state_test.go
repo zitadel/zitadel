@@ -217,6 +217,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 							uint64(42),
 							mock.AnyType[time.Time]{},
 							float64(42),
+							uint16(0),
 						),
 						mock.WithExecRowsAffected(1),
 					),
@@ -388,7 +389,7 @@ func TestHandler_currentState(t *testing.T) {
 							"projection",
 						),
 						mock.WithQueryResult(
-							[]string{"aggregate_id", "aggregate_type", "event_sequence", "event_date", "position"},
+							[]string{"aggregate_id", "aggregate_type", "event_sequence", "event_date", "position", "offset"},
 							[][]driver.Value{
 								{
 									"aggregate id",
@@ -396,6 +397,7 @@ func TestHandler_currentState(t *testing.T) {
 									int64(42),
 									testTime,
 									float64(42),
+									uint16(10),
 								},
 							},
 						),
@@ -413,6 +415,7 @@ func TestHandler_currentState(t *testing.T) {
 					aggregateType:  "aggregate type",
 					aggregateID:    "aggregate id",
 					sequence:       42,
+					offset:         10,
 				},
 			},
 		},

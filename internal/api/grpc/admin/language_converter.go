@@ -1,10 +1,9 @@
 package admin
 
 import (
-	"errors"
-
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -16,11 +15,5 @@ func selectLanguagesToCommand(languages *admin.SelectLanguages) (tags []language
 	if allowedLanguages == nil {
 		return nil, nil
 	}
-	tags = make([]language.Tag, len(allowedLanguages))
-	for i, lang := range allowedLanguages {
-		var parseErr error
-		tags[i], parseErr = language.Parse(lang)
-		err = errors.Join(err, parseErr)
-	}
-	return tags, err
+	return domain.ParseLanguage(allowedLanguages...)
 }

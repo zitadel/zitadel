@@ -50,7 +50,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/saml"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
-	"github.com/zitadel/zitadel/internal/api/ui/login/static/loginfs"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/authz"
 	authz_repo "github.com/zitadel/zitadel/internal/authz/repository"
@@ -124,8 +123,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 
 	ctx := context.Background()
 
-	statikLoginFS := loginfs.MustLoad()
-	i18n.MustLoadSupportedLanguagesFromDir(statikLoginFS)
+	i18n.MustLoadSupportedLanguagesFromDir()
 
 	zitadelDBClient, err := database.Connect(config.Database, false, false)
 	if err != nil {
@@ -170,7 +168,6 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		},
 		config.AuditLogRetention,
 		config.SystemAPIUsers,
-		statikLoginFS,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)

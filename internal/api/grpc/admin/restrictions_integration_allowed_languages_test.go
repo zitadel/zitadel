@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/text"
 	"github.com/zitadel/zitadel/pkg/grpc/user"
@@ -212,15 +211,11 @@ func checkDiscoveryEndpoint(t *testing.T, domain string, containsUILocales, notC
 		UILocalesSupported []string `json:"ui_locales_supported"`
 	}{}
 	require.NoError(t, json.Unmarshal(body, &doc))
-	assertAllowList(doc.UILocalesSupported, containsUILocales, notContainsUILocales)
-}
-
-func assertAllowList(allowList, mustContain, mustNotContain []string) {
-	if mustContain != nil {
-		assert.Condition(NoopAssertionT, contains(allowList, mustContain))
+	if containsUILocales != nil {
+		assert.Condition(NoopAssertionT, contains(doc.UILocalesSupported, containsUILocales))
 	}
-	if mustNotContain != nil {
-		assert.Condition(NoopAssertionT, not(contains(allowList, mustNotContain)))
+	if notContainsUILocales != nil {
+		assert.Condition(NoopAssertionT, not(contains(doc.UILocalesSupported, notContainsUILocales)))
 	}
 }
 

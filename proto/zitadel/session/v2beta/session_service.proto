@@ -280,7 +280,8 @@ message CreateSessionRequest{
   optional google.protobuf.Duration lifetime = 5 [
     (validate.rules).duration = {gt: {seconds: 0}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"duration after which the session will be automatically invalidated\"";
+      description: "\"duration (in seconds) after which the session will be automatically invalidated\"";
+      example:"\"18000s\""
     }
   ];
 }
@@ -333,7 +334,8 @@ message SetSessionRequest{
   optional google.protobuf.Duration lifetime = 6 [
     (validate.rules).duration = {gt: {seconds: 0}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"duration after which the session will be automatically invalidated\"";
+      description: "\"duration (in seconds) after which the session will be automatically invalidated\"";
+      example:"\"18000s\""
     }
   ];
 }
