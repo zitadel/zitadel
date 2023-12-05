@@ -31,6 +31,7 @@ type UserHumanWriteModel struct {
 	InitCode             *crypto.CryptoValue
 	InitCodeCreationDate time.Time
 	InitCodeExpiry       time.Duration
+	InitCheckFailedCount uint64
 
 	PasswordWriteModel       bool
 	PasswordEncodedHash      string
@@ -46,10 +47,15 @@ type UserHumanWriteModel struct {
 	EmailCode             *crypto.CryptoValue
 	EmailCodeCreationDate time.Time
 	EmailCodeExpiry       time.Duration
+	EmailCheckFailedCount uint64
 
-	PhoneWriteModel bool
-	Phone           domain.PhoneNumber
-	IsPhoneVerified bool
+	PhoneWriteModel       bool
+	Phone                 domain.PhoneNumber
+	IsPhoneVerified       bool
+	PhoneCode             *crypto.CryptoValue
+	PhoneCodeCreationDate time.Time
+	PhoneCodeExpiry       time.Duration
+	PhoneCheckFailedCount uint64
 
 	StateWriteModel bool
 	UserState       domain.UserState
@@ -61,14 +67,15 @@ func NewUserHumanAllWriteModel(userID, resourceOwner string) *UserHumanWriteMode
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
-		AvatarWriteModel: true,
-		EmailWriteModel:  true,
-		PhoneWriteModel:  true,
-		StateWriteModel:  true,
+		AvatarWriteModel:   true,
+		EmailWriteModel:    true,
+		PhoneWriteModel:    true,
+		PasswordWriteModel: true,
+		StateWriteModel:    true,
 	}
 }
 
-func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM bool) *UserHumanWriteModel {
+func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM, stateWM, avatarWM bool) *UserHumanWriteModel {
 	return &UserHumanWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   userID,
@@ -78,36 +85,8 @@ func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, ph
 		EmailWriteModel:    emailWM,
 		PhoneWriteModel:    phoneWM,
 		PasswordWriteModel: passwordWM,
-	}
-}
-
-func NewUserHumanStateWriteModel(userID, resourceOwner string) *UserHumanWriteModel {
-	return &UserHumanWriteModel{
-		WriteModel: eventstore.WriteModel{
-			AggregateID:   userID,
-			ResourceOwner: resourceOwner,
-		},
-		StateWriteModel: true,
-	}
-}
-
-func NewUserHumanEmailWriteModel(userID, resourceOwner string) *UserHumanWriteModel {
-	return &UserHumanWriteModel{
-		WriteModel: eventstore.WriteModel{
-			AggregateID:   userID,
-			ResourceOwner: resourceOwner,
-		},
-		EmailWriteModel: true,
-	}
-}
-
-func NewUserHumanPhoneWriteModel(userID, resourceOwner string) *UserHumanWriteModel {
-	return &UserHumanWriteModel{
-		WriteModel: eventstore.WriteModel{
-			AggregateID:   userID,
-			ResourceOwner: resourceOwner,
-		},
-		PhoneWriteModel: true,
+		StateWriteModel:    stateWM,
+		AvatarWriteModel:   avatarWM,
 	}
 }
 
@@ -118,56 +97,67 @@ func (wm *UserHumanWriteModel) Reduce() error {
 			wm.reduceHumanAddedEvent(e)
 		case *user.HumanRegisteredEvent:
 			wm.reduceHumanRegisteredEvent(e)
+
 		case *user.HumanInitialCodeAddedEvent:
-			wm.InitCode = e.Code
-			wm.InitCodeCreationDate = e.CreationDate()
-			wm.InitCodeExpiry = e.Expiry
 			wm.UserState = domain.UserStateInitial
+			wm.SetInitCode(e.Code, e.Expiry, e.CreationDate())
 		case *user.HumanInitializedCheckSucceededEvent:
-			wm.InitCode = nil
 			wm.UserState = domain.UserStateActive
+			wm.EmptyInitCode()
+		case *user.HumanInitializedCheckFailedEvent:
+			wm.InitCheckFailedCount += 1
+
 		case *user.UsernameChangedEvent:
 			wm.UserName = e.UserName
 		case *user.HumanProfileChangedEvent:
 			wm.reduceHumanProfileChangedEvent(e)
+
 		case *user.HumanEmailChangedEvent:
 			wm.Email = e.EmailAddress
 			wm.IsEmailVerified = false
-			wm.EmailCode = nil
+			wm.EmptyEmailCode()
 		case *user.HumanEmailCodeAddedEvent:
-			wm.EmailCode = e.Code
-			wm.EmailCodeCreationDate = e.CreationDate()
-			wm.EmailCodeExpiry = e.Expiry
+			wm.IsEmailVerified = false
+			wm.SetEMailCode(e.Code, e.Expiry, e.CreationDate())
 		case *user.HumanEmailVerifiedEvent:
 			wm.IsEmailVerified = true
-			wm.EmailCode = nil
+			wm.EmptyEmailCode()
+		case *user.HumanEmailVerificationFailedEvent:
+			wm.EmailCheckFailedCount += 1
+
 		case *user.HumanPhoneChangedEvent:
-			wm.reduceHumanPhoneChangedEvent(e)
+			wm.IsPhoneVerified = false
+			wm.Phone = e.PhoneNumber
+			wm.EmptyPhoneCode()
+		case *user.HumanPhoneCodeAddedEvent:
+			wm.IsPhoneVerified = false
+			wm.SetPhoneCode(e.Code, e.Expiry, e.CreationDate())
 		case *user.HumanPhoneVerifiedEvent:
-			wm.reduceHumanPhoneVerifiedEvent()
+			wm.IsPhoneVerified = true
+			wm.EmptyPhoneCode()
+		case *user.HumanPhoneVerificationFailedEvent:
+			wm.PhoneCheckFailedCount += 1
 		case *user.HumanPhoneRemovedEvent:
-			wm.reduceHumanPhoneRemovedEvent()
+			wm.EmptyPhoneCode()
+			wm.Phone = ""
+			wm.IsPhoneVerified = false
+
 		case *user.HumanAvatarAddedEvent:
 			wm.Avatar = e.StoreKey
 		case *user.HumanAvatarRemovedEvent:
 			wm.Avatar = ""
+
 		case *user.UserLockedEvent:
-			if wm.UserState != domain.UserStateDeleted {
-				wm.UserState = domain.UserStateLocked
-			}
+			wm.UserState = domain.UserStateLocked
 		case *user.UserUnlockedEvent:
 			wm.PasswordCheckFailedCount = 0
-			if wm.UserState != domain.UserStateDeleted {
-				wm.UserState = domain.UserStateActive
-			}
+			wm.UserState = domain.UserStateActive
+
 		case *user.UserDeactivatedEvent:
-			if wm.UserState != domain.UserStateDeleted {
-				wm.UserState = domain.UserStateInactive
-			}
+			wm.UserState = domain.UserStateInactive
 		case *user.UserReactivatedEvent:
-			if wm.UserState != domain.UserStateDeleted {
-				wm.UserState = domain.UserStateActive
-			}
+			wm.UserState = domain.UserStateActive
+
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
 
@@ -180,15 +170,59 @@ func (wm *UserHumanWriteModel) Reduce() error {
 		case *user.HumanPasswordChangedEvent:
 			wm.PasswordEncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			wm.PasswordChangeRequired = e.ChangeRequired
-			wm.PasswordCode = nil
-			wm.PasswordCheckFailedCount = 0
+			wm.EmptyPasswordCode()
 		case *user.HumanPasswordCodeAddedEvent:
-			wm.PasswordCode = e.Code
-			wm.PasswordCodeCreationDate = e.CreationDate()
-			wm.PasswordCodeExpiry = e.Expiry
+			wm.SetPasswordCode(e.Code, e.Expiry, e.CreationDate())
 		}
 	}
 	return wm.WriteModel.Reduce()
+}
+
+func (wm *UserHumanWriteModel) EmptyInitCode() {
+	wm.InitCode = nil
+	wm.InitCodeExpiry = 0
+	wm.InitCodeCreationDate = time.Time{}
+	wm.InitCheckFailedCount = 0
+}
+func (wm *UserHumanWriteModel) SetInitCode(code *crypto.CryptoValue, expiry time.Duration, creationDate time.Time) {
+	wm.InitCode = code
+	wm.InitCodeExpiry = expiry
+	wm.InitCodeCreationDate = creationDate
+	wm.InitCheckFailedCount = 0
+}
+func (wm *UserHumanWriteModel) EmptyEmailCode() {
+	wm.EmailCode = nil
+	wm.EmailCodeExpiry = 0
+	wm.EmailCodeCreationDate = time.Time{}
+	wm.EmailCheckFailedCount = 0
+}
+func (wm *UserHumanWriteModel) SetEMailCode(code *crypto.CryptoValue, expiry time.Duration, creationDate time.Time) {
+	wm.EmailCode = code
+	wm.EmailCodeExpiry = expiry
+	wm.EmailCodeCreationDate = creationDate
+	wm.EmailCheckFailedCount = 0
+}
+func (wm *UserHumanWriteModel) EmptyPhoneCode() {
+	wm.PhoneCode = nil
+	wm.PhoneCodeExpiry = 0
+	wm.PhoneCodeCreationDate = time.Time{}
+	wm.PhoneCheckFailedCount = 0
+}
+func (wm *UserHumanWriteModel) SetPhoneCode(code *crypto.CryptoValue, expiry time.Duration, creationDate time.Time) {
+	wm.PhoneCode = code
+	wm.PhoneCodeExpiry = expiry
+	wm.PhoneCodeCreationDate = creationDate
+	wm.PhoneCheckFailedCount = 0
+}
+func (wm *UserHumanWriteModel) EmptyPasswordCode() {
+	wm.PasswordCode = nil
+	wm.PasswordCodeExpiry = 0
+	wm.PasswordCodeCreationDate = time.Time{}
+}
+func (wm *UserHumanWriteModel) SetPasswordCode(code *crypto.CryptoValue, expiry time.Duration, creationDate time.Time) {
+	wm.PasswordCode = code
+	wm.PasswordCodeExpiry = expiry
+	wm.PasswordCodeCreationDate = creationDate
 }
 
 func (wm *UserHumanWriteModel) Query() *eventstore.SearchQueryBuilder {
@@ -197,12 +231,16 @@ func (wm *UserHumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 		user.HumanAddedType,
 		user.UserV1RegisteredType,
 		user.HumanRegisteredType,
+
 		user.UserV1InitialCodeAddedType,
 		user.HumanInitialCodeAddedType,
+
 		user.UserV1InitializedCheckSucceededType,
 		user.HumanInitializedCheckSucceededType,
-		user.UserRemovedType,
+		user.HumanInitializedCheckFailedType,
+		user.UserV1InitializedCheckFailedType,
 
+		user.UserRemovedType,
 		user.UserUserNameChangedType,
 	}
 
@@ -212,16 +250,25 @@ func (wm *UserHumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanEmailChangedType,
 			user.UserV1EmailCodeAddedType,
 			user.HumanEmailCodeAddedType,
+
 			user.UserV1EmailVerifiedType,
 			user.HumanEmailVerifiedType,
+			user.HumanEmailVerificationFailedType,
+			user.UserV1EmailVerificationFailedType,
 		)
 	}
 	if wm.PhoneWriteModel {
 		eventTypes = append(eventTypes,
 			user.UserV1PhoneChangedType,
 			user.HumanPhoneChangedType,
+			user.UserV1PhoneCodeAddedType,
+			user.HumanPhoneCodeAddedType,
+
 			user.UserV1PhoneVerifiedType,
 			user.HumanPhoneVerifiedType,
+			user.HumanPhoneVerificationFailedType,
+			user.UserV1PhoneVerificationFailedType,
+
 			user.UserV1PhoneRemovedType,
 			user.HumanPhoneRemovedType,
 		)
@@ -248,17 +295,17 @@ func (wm *UserHumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 	}
 	if wm.PasswordWriteModel {
 		eventTypes = append(eventTypes,
-			user.HumanPasswordChangedType,
-			user.HumanPasswordCodeAddedType,
-			user.HumanPasswordCheckFailedType,
-			user.HumanPasswordCheckSucceededType,
 			user.HumanPasswordHashUpdatedType,
-			user.UserV1PasswordChangedType,
-			user.UserV1PasswordCodeAddedType,
-			user.UserV1PasswordCheckFailedType,
-			user.UserV1PasswordCheckSucceededType,
 
-			user.HumanEmailVerifiedType,
+			user.HumanPasswordChangedType,
+			user.UserV1PasswordChangedType,
+			user.HumanPasswordCodeAddedType,
+			user.UserV1PasswordCodeAddedType,
+
+			user.HumanPasswordCheckFailedType,
+			user.UserV1PasswordCheckFailedType,
+			user.HumanPasswordCheckSucceededType,
+			user.UserV1PasswordCheckSucceededType,
 		)
 	}
 
@@ -285,7 +332,7 @@ func (wm *UserHumanWriteModel) reduceHumanAddedEvent(e *user.HumanAddedEvent) {
 	wm.Gender = e.Gender
 	wm.Email = e.EmailAddress
 	wm.Phone = e.PhoneNumber
-	wm.UserState = domain.UserStateActive
+	wm.UserState = domain.UserStateInitial
 	wm.PasswordEncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 	wm.PasswordChangeRequired = e.ChangeRequired
 }
@@ -300,7 +347,7 @@ func (wm *UserHumanWriteModel) reduceHumanRegisteredEvent(e *user.HumanRegistere
 	wm.Gender = e.Gender
 	wm.Email = e.EmailAddress
 	wm.Phone = e.PhoneNumber
-	wm.UserState = domain.UserStateActive
+	wm.UserState = domain.UserStateInitial
 	wm.PasswordEncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 	wm.PasswordChangeRequired = e.ChangeRequired
 }
@@ -326,26 +373,6 @@ func (wm *UserHumanWriteModel) reduceHumanProfileChangedEvent(e *user.HumanProfi
 	}
 }
 
-func (wm *UserHumanWriteModel) reduceHumanEmailChangedEvent(e *user.HumanEmailChangedEvent) {
-	wm.Email = e.EmailAddress
-	wm.IsEmailVerified = false
-	wm.EmailCode = nil
-}
-
-func (wm *UserHumanWriteModel) reduceHumanPhoneChangedEvent(e *user.HumanPhoneChangedEvent) {
-	wm.Phone = e.PhoneNumber
-	wm.IsPhoneVerified = false
-}
-
-func (wm *UserHumanWriteModel) reduceHumanPhoneVerifiedEvent() {
-	wm.IsPhoneVerified = true
-}
-
-func (wm *UserHumanWriteModel) reduceHumanPhoneRemovedEvent() {
-	wm.Phone = ""
-	wm.IsPhoneVerified = false
-}
-
 func (wm *UserHumanWriteModel) NewEmailAddressChangedEvent(
 	ctx context.Context,
 	email domain.EmailAddress,
@@ -360,7 +387,7 @@ func (wm *UserHumanWriteModel) NewEmailIsVerifiedEvent(
 	ctx context.Context,
 	isVerified bool,
 ) *user.HumanEmailVerifiedEvent {
-	if wm.IsEmailVerified == isVerified || !wm.IsEmailVerified {
+	if !isVerified || wm.IsEmailVerified == isVerified {
 		return nil
 	}
 	return user.NewHumanEmailVerifiedEvent(ctx, &wm.Aggregate().Aggregate)
@@ -380,7 +407,7 @@ func (wm *UserHumanWriteModel) NewPhoneIsVerifiedEvent(
 	ctx context.Context,
 	isVerified bool,
 ) *user.HumanPhoneVerifiedEvent {
-	if wm.IsPhoneVerified == isVerified || !wm.IsPhoneVerified {
+	if !isVerified || wm.IsPhoneVerified == isVerified {
 		return nil
 	}
 	return user.NewHumanPhoneVerifiedEvent(ctx, &wm.Aggregate().Aggregate)

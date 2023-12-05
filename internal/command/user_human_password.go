@@ -235,12 +235,15 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 	if wm.UserState == domain.UserStateLocked {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JLK35", "Errors.User.Locked")
 	}
+	if wm.EncodedHash == "" {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3nJ4t", "Errors.User.Password.NotSet")
+	}
 
 	userAgg := UserAggregateFromWriteModel(&wm.WriteModel)
-	updated, err := c.verifyPassword(ctx, wm.EncodedHash, password)
-	if err != nil {
-		return err
-	}
+	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
+	updated, err := c.userPasswordHasher.Verify(wm.EncodedHash, password)
+	spanPasswordComparison.EndWithError(err)
+	err = convertPasswapErr(err)
 	commands := make([]eventstore.Command, 0, 2)
 
 	// recheck for additional events (failed password checks or locks)

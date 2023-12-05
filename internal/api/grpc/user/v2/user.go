@@ -28,7 +28,7 @@ func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest
 		return nil, err
 	}
 	orgID := authz.GetCtxData(ctx).OrgID
-	err = s.command.AddUserHuman(ctx, orgID, human, false)
+	err = s.command.AddUserHuman(ctx, orgID, human, false, s.userCodeAlg)
 	if err != nil {
 		return nil, err
 	}
@@ -112,6 +112,129 @@ func genderToDomain(gender user.Gender) domain.Gender {
 	default:
 		return domain.GenderUnspecified
 	}
+}
+
+func (s *Server) UpdateHumanUser(ctx context.Context, req *user.UpdateHumanUserRequest) (_ *user.UpdateHumanUserResponse, err error) {
+	human, err := UpdateUserRequestToChangeHuman(req)
+	if err != nil {
+		return nil, err
+	}
+	orgID := authz.GetCtxData(ctx).OrgID
+	err = s.command.ChangeUserHuman(ctx, orgID, human, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	return &user.UpdateHumanUserResponse{
+		Details:   object.DomainToDetailsPb(human.Details),
+		EmailCode: human.EmailCode,
+		PhoneCode: human.PhoneCode,
+	}, nil
+}
+
+func ifNotNilPtr[v, p any](value *v, conv func(v) p) *p {
+	var pNil *p
+	if value == nil {
+		return pNil
+	}
+	pVal := conv(*value)
+	return &pVal
+}
+
+func UpdateUserRequestToChangeHuman(req *user.UpdateHumanUserRequest) (*command.ChangeHuman, error) {
+	var profile *command.Profile
+	if req.Profile != nil {
+		var firstName *string
+		if req.Profile.GivenName != "" {
+			firstName = &req.Profile.GivenName
+		}
+		var lastName *string
+		if req.Profile.FamilyName != "" {
+			lastName = &req.Profile.FamilyName
+		}
+
+		profile = &command.Profile{
+			FirstName:         firstName,
+			LastName:          lastName,
+			NickName:          req.Profile.NickName,
+			DisplayName:       req.Profile.DisplayName,
+			PreferredLanguage: ifNotNilPtr(req.Profile.PreferredLanguage, language.Make),
+			Gender:            ifNotNilPtr(req.Profile.Gender, genderToDomain),
+		}
+	}
+	var email *command.Email
+	if req.Email != nil {
+		var returnCode bool
+		if req.Email.GetReturnCode() != nil {
+			returnCode = true
+		}
+		var urlTemplate string
+		if req.Email.GetSendCode() != nil && req.Email.GetSendCode().UrlTemplate != nil {
+			urlTemplate = *req.Email.GetSendCode().UrlTemplate
+			if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, req.GetUserId(), "code", "orgID"); err != nil {
+				return nil, err
+			}
+		}
+		email = &command.Email{
+			Address:     domain.EmailAddress(req.Email.Email),
+			Verified:    req.Email.GetIsVerified(),
+			ReturnCode:  returnCode,
+			URLTemplate: urlTemplate,
+		}
+	}
+
+	var phone *command.Phone
+	if req.Phone != nil {
+		var returnCode bool
+		if req.Email.GetReturnCode() != nil {
+			returnCode = true
+		}
+		phone = &command.Phone{
+			Number:     domain.PhoneNumber(req.GetPhone().GetPhone()),
+			Verified:   req.Phone.GetIsVerified(),
+			ReturnCode: returnCode,
+		}
+	}
+	var password *command.Password
+	if req.Password != nil {
+		var changeRequired bool
+		var passwordStr *string
+		if req.Password.GetPassword() != nil {
+			passwordStr = &req.Password.GetPassword().Password
+			changeRequired = req.Password.GetPassword().GetChangeRequired()
+		}
+		var hash *string
+		if req.Password.GetHashedPassword() != nil {
+			hash = &req.Password.GetHashedPassword().Hash
+			changeRequired = req.Password.GetHashedPassword().GetChangeRequired()
+		}
+		var code *string
+		if req.Password.GetVerificationCode() != "" {
+			codeT := req.Password.GetVerificationCode()
+			code = &codeT
+		}
+		var oldPassword *string
+		if req.Password.GetCurrentPassword() != "" {
+			oldPasswordT := req.Password.GetCurrentPassword()
+			oldPassword = &oldPasswordT
+		}
+
+		password = &command.Password{
+			PasswordCode:        code,
+			OldPassword:         oldPassword,
+			Password:            passwordStr,
+			EncodedPasswordHash: hash,
+			ChangeRequired:      changeRequired,
+		}
+	}
+
+	return &command.ChangeHuman{
+		ID:       req.GetUserId(),
+		Username: req.Username,
+		Profile:  profile,
+		Email:    email,
+		Phone:    phone,
+		Password: password,
+	}, nil
 }
 
 func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_ *user.AddIDPLinkResponse, err error) {

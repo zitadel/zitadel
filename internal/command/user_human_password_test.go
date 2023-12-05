@@ -673,18 +673,6 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 							false,
 							"")),
 				),
-				expectFilter(
-					eventFromEventPusher(
-						org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-							1,
-							false,
-							false,
-							false,
-							false,
-						),
-					),
-				),
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,

@@ -240,7 +240,7 @@ service UserService {
 
   rpc UpdateHumanUser(UpdateHumanUserRequest) returns (UpdateHumanUserResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}"
+      put: "/v2beta/users/{user_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -944,6 +944,7 @@ message UpdateHumanUserRequest{
   optional SetHumanProfile profile = 4;
   optional SetHumanEmail email = 5;
   optional SetHumanPhone phone = 6;
+  optional SetPassword password = 7;
 }
 
 message UpdateHumanUserResponse {

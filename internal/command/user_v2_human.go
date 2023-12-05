@@ -52,20 +52,20 @@ type Password struct {
 }
 
 func (h *ChangeHuman) Validate(hasher *crypto.PasswordHasher) (err error) {
-	if h.Email.Address != "" {
+	if h.Email != nil && h.Email.Address != "" {
 		if err := h.Email.Validate(); err != nil {
 			return err
 		}
 	}
 
-	if h.Phone.Number != "" {
+	if h.Phone != nil && h.Phone.Number != "" {
 		if h.Phone.Number, err = h.Phone.Number.Normalize(); err != nil {
 			return err
 		}
 	}
 
 	if h.Password != nil {
-		if h.Password.Validate(hasher); err != nil {
+		if err := h.Password.Validate(hasher); err != nil {
 			return err
 		}
 	}
@@ -81,14 +81,11 @@ func (p *Password) Validate(hasher *crypto.PasswordHasher) error {
 	if p.Password == nil {
 		return errors.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Empty")
 	}
-	if p.OldPassword == nil && p.PasswordCode == nil {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Empty")
-	}
 
 	return nil
 }
 
-func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human *AddHuman, allowInitMail bool) (err error) {
+func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human *AddHuman, allowInitMail bool, alg crypto.EncryptionAlgorithm) (err error) {
 	if resourceOwner == "" {
 		return errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
 	}
@@ -112,6 +109,8 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		human.Email.Address != "",
 		human.Phone.Number != "",
 		human.Password != "" || human.EncodedPasswordHash != "",
+		true,  // state is always necessary at creation
+		false, // avatar not updateable
 	)
 	if err != nil {
 		return err
@@ -164,20 +163,20 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		createCmd.AddPhoneData(human.Phone.Number)
 	}
 
-	if err := c.addHumanCommandPassword(ctx, createCmd, human, c.userPasswordHasher); err != nil {
+	filter := c.eventstore.Filter
+	if err := addHumanCommandPassword(ctx, filter, createCmd, human, c.userPasswordHasher); err != nil {
 		return err
 	}
 
 	cmds := make([]eventstore.Command, 0, 3)
 	cmds = append(cmds, createCmd)
-	filter := c.eventstore.Filter
 
-	cmds, err = c.addHumanCommandEmail(ctx, filter, cmds, existingHuman.Aggregate(), human, c.userEncryption, allowInitMail)
+	cmds, err = c.addHumanCommandEmail(ctx, filter, cmds, existingHuman.Aggregate(), human, alg, allowInitMail)
 	if err != nil {
 		return err
 	}
 
-	cmds, err = c.addHumanCommandPhone(ctx, filter, cmds, existingHuman.Aggregate(), human, c.userEncryption)
+	cmds, err = c.addHumanCommandPhone(ctx, filter, cmds, existingHuman.Aggregate(), human, alg)
 	if err != nil {
 		return err
 	}
@@ -198,6 +197,11 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		cmds = append(cmds, cmd)
 	}
 
+	if len(cmds) == 0 {
+		human.Details = writeModelToObjectDetails(&existingHuman.WriteModel)
+		return nil
+	}
+
 	err = c.pushAppendAndReduce(ctx, existingHuman, cmds...)
 	if err != nil {
 		return err
@@ -206,7 +210,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	return nil
 }
 
-func (c *Commands) ChangeUserHuman(ctx context.Context, resourceOwner string, human *ChangeHuman) error {
+func (c *Commands) ChangeUserHuman(ctx context.Context, resourceOwner string, human *ChangeHuman, alg crypto.EncryptionAlgorithm) (err error) {
 	if resourceOwner == "" {
 		return errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
 	}
@@ -222,37 +226,52 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, resourceOwner string, hu
 		human.Email != nil,
 		human.Phone != nil,
 		human.Password != nil,
+		true,  // state is always necessary at update
+		false, // avatar not updateable
 	)
 	if err != nil {
 		return err
 	}
-	if isUserStateExists(existingHuman.UserState) {
-		return errors.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting")
+	if !isUserStateExists(existingHuman.UserState) {
+		return errors.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.NotFound")
 	}
 
-	cmds := make([]eventstore.Command, 0, 4)
+	cmds := make([]eventstore.Command, 0)
 	if human.Username != nil {
-		if err := c.changeUsername(ctx, cmds, existingHuman, *human.Username); err != nil {
+		cmds, err = c.changeUsername(ctx, cmds, existingHuman, *human.Username)
+		if err != nil {
 			return err
 		}
 	}
 	if human.Profile != nil {
-		changeUserProfile(ctx, cmds, existingHuman, human.Profile)
+		cmds, err = changeUserProfile(ctx, cmds, existingHuman, human.Profile)
+		if err != nil {
+			return err
+		}
 	}
 	if human.Email != nil {
-		changeUserEmail(ctx, cmds, existingHuman, human.Email)
+		cmds, human.EmailCode, err = c.changeUserEmail(ctx, cmds, existingHuman, human.Email, alg)
+		if err != nil {
+			return err
+		}
 	}
 	if human.Phone != nil {
-		changeUserPhone(ctx, cmds, existingHuman, human.Phone)
+		cmds, human.PhoneCode, err = c.changeUserPhone(ctx, cmds, existingHuman, human.Phone, alg)
+		if err != nil {
+			return err
+		}
 	}
 	if human.Password != nil {
-		// password changes can only be handled if user is active
-		if existingHuman.UserState == domain.UserStateInitial {
-			return errors.ThrowPreconditionFailed(nil, "COMMAND-2M9sd", "Errors.User.NotInitialised")
+		cmds, err = c.changeUserPassword(ctx, cmds, existingHuman, human.Password, alg)
+		if err != nil {
+			return err
 		}
-		c.changeUserPassword(ctx, cmds, existingHuman, human.Password)
 	}
 
+	if len(cmds) == 0 {
+		human.Details = writeModelToObjectDetails(&existingHuman.WriteModel)
+		return nil
+	}
 	err = c.pushAppendAndReduce(ctx, existingHuman, cmds...)
 	if err != nil {
 		return err
@@ -261,7 +280,7 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, resourceOwner string, hu
 	return nil
 }
 
-func changeUserEmail(ctx context.Context, cmds []eventstore.Command, wm *UserHumanWriteModel, email *Email) {
+func (c *Commands) changeUserEmail(ctx context.Context, cmds []eventstore.Command, wm *UserHumanWriteModel, email *Email, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, code *string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.End() }()
 
@@ -277,11 +296,23 @@ func changeUserEmail(ctx context.Context, cmds []eventstore.Command, wm *UserHum
 			cmds = append(cmds, cmd)
 		}
 	} else {
-		//TODO email code generate
+		// if email not changed or empty, send no code
+		if email.Address == "" || email.Address == wm.Email {
+			return cmds, code, err
+		}
+		c, err := c.newEmailCode(ctx, c.eventstore.Filter, alg)
+		if err != nil {
+			return cmds, code, err
+		}
+		cmds = append(cmds, user.NewHumanEmailCodeAddedEventV2(ctx, &wm.Aggregate().Aggregate, c.Crypted, c.Expiry, email.URLTemplate, email.ReturnCode))
+		if email.ReturnCode {
+			code = &c.Plain
+		}
 	}
+	return cmds, code, nil
 }
 
-func changeUserPhone(ctx context.Context, cmds []eventstore.Command, wm *UserHumanWriteModel, phone *Phone) {
+func (c *Commands) changeUserPhone(ctx context.Context, cmds []eventstore.Command, wm *UserHumanWriteModel, phone *Phone, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, code *string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.End() }()
 
@@ -297,63 +328,68 @@ func changeUserPhone(ctx context.Context, cmds []eventstore.Command, wm *UserHum
 			cmds = append(cmds, cmd)
 		}
 	} else {
-		//TODO phone code generate
+		// if phone not changed or empty, send no code
+		if phone.Number == "" || phone.Number == wm.Phone {
+			return cmds, code, err
+		}
+		c, err := c.newPhoneCode(ctx, c.eventstore.Filter, alg)
+		if err != nil {
+			return cmds, code, err
+		}
+		cmds = append(cmds, user.NewHumanPhoneCodeAddedEventV2(ctx, &wm.Aggregate().Aggregate, c.Crypted, c.Expiry, phone.ReturnCode))
+		if phone.ReturnCode {
+			code = &c.Plain
+		}
 	}
+	return cmds, code, nil
 }
 
-func changeUserProfile(ctx context.Context, cmds []eventstore.Command, wm *UserHumanWriteModel, profile *Profile) error {
+func changeUserProfile(ctx context.Context, cmds []eventstore.Command, wm *UserHumanWriteModel, profile *Profile) ([]eventstore.Command, error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.End() }()
 
 	cmd, err := wm.NewProfileChangedEvent(ctx, profile.FirstName, profile.LastName, profile.NickName, profile.DisplayName, profile.PreferredLanguage, profile.Gender)
-	if err != nil {
-		return err
-	}
 	if cmd != nil {
-		cmds = append(cmds, cmd)
+		return append(cmds, cmd), err
 	}
-	return nil
+	return cmds, err
 }
 
-func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Command, wm *UserHumanWriteModel, password *Password) error {
+func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Command, wm *UserHumanWriteModel, password *Password, alg crypto.EncryptionAlgorithm) ([]eventstore.Command, error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.End() }()
 
 	// Either have a code to set the password
 	if password.PasswordCode != nil {
-		if err := crypto.VerifyCodeWithAlgorithm(wm.PasswordCodeCreationDate, wm.PasswordCodeExpiry, wm.PasswordCode, *password.PasswordCode, c.userEncryption); err != nil {
-			return err
+		if err := crypto.VerifyCodeWithAlgorithm(wm.PasswordCodeCreationDate, wm.PasswordCodeExpiry, wm.PasswordCode, *password.PasswordCode, alg); err != nil {
+			return cmds, err
 		}
 	}
 	// or have the old password to change it
 	if password.OldPassword != nil {
 		if _, err := c.verifyPassword(ctx, wm.PasswordEncodedHash, *password.OldPassword); err != nil {
-			return err
+			return cmds, err
 		}
 	}
 	// or if neither, have the permission to do so
 	if password.PasswordCode == nil && password.OldPassword == nil {
 		if err := c.checkPermission(ctx, domain.PermissionUserWrite, wm.ResourceOwner, wm.AggregateID); err != nil {
-			return err
+			return cmds, err
 		}
 	}
 
 	cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, *password.Password, password.ChangeRequired)
-	if err != nil {
-		return err
-	}
 	if cmd != nil {
-		cmds = append(cmds, cmd)
+		return append(cmds, cmd), err
 	}
-
-	return nil
+	return cmds, err
 }
 
-func (c *Commands) userHumanWriteModel(ctx context.Context, userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM bool) (writeModel *UserHumanWriteModel, err error) {
+func (c *Commands) userHumanWriteModel(ctx context.Context, userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM, stateWM, avatarWM bool) (writeModel *UserHumanWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewUserHumanWriteModel(userID, resourceOwner, profileWM, emailWM, phoneWM, passwordWM)
+	writeModel = NewUserHumanWriteModel(userID, resourceOwner, profileWM, emailWM, phoneWM, passwordWM, stateWM, avatarWM)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

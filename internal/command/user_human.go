@@ -219,7 +219,7 @@ func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *crypto
 				createCmd.AddPhoneData(human.Phone.Number)
 			}
 
-			if err := c.addHumanCommandPassword(ctx, createCmd, human, hasher); err != nil {
+			if err := addHumanCommandPassword(ctx, filter, createCmd, human, hasher); err != nil {
 				return nil, err
 			}
 
@@ -328,9 +328,9 @@ func (c *Commands) addHumanCommandCheckID(ctx context.Context, filter preparatio
 	return nil
 }
 
-func (c *Commands) addHumanCommandPassword(ctx context.Context, createCmd humanCreationCommand, human *AddHuman, hasher *crypto.PasswordHasher) (err error) {
+func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQueryReducer, createCmd humanCreationCommand, human *AddHuman, hasher *crypto.PasswordHasher) (err error) {
 	if human.Password != "" {
-		if err = c.humanValidatePassword(ctx, human.Password); err != nil {
+		if err = humanValidatePassword(ctx, filter, human.Password); err != nil {
 			return err
 		}
 
@@ -370,8 +370,8 @@ func (c *Commands) userValidateDomain(ctx context.Context, resourceOwner string,
 	return nil
 }
 
-func (c *Commands) humanValidatePassword(ctx context.Context, password string) error {
-	passwordComplexity, err := c.passwordComplexityPolicyWriteModel(ctx)
+func humanValidatePassword(ctx context.Context, filter preparation.FilterToQueryReducer, password string) error {
+	passwordComplexity, err := passwordComplexityPolicyWriteModel(ctx, filter)
 	if err != nil {
 		return err
 	}
