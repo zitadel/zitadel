@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	UserTable        = "projections.users9"
+	UserTable        = "projections.users10"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
 	UserNotifyTable  = UserTable + "_" + UserNotifySuffix
@@ -57,7 +57,7 @@ const (
 	MachineUserInstanceIDCol  = "instance_id"
 	MachineNameCol            = "name"
 	MachineDescriptionCol     = "description"
-	MachineHasSecretCol       = "has_secret"
+	MachineSecretCol          = "secret"
 	MachineAccessTokenTypeCol = "access_token_type"
 
 	// notify
@@ -122,7 +122,7 @@ func (*userProjection) Init() *old_handler.Check {
 			handler.NewColumn(MachineUserInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(MachineNameCol, handler.ColumnTypeText),
 			handler.NewColumn(MachineDescriptionCol, handler.ColumnTypeText, handler.Nullable()),
-			handler.NewColumn(MachineHasSecretCol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(MachineSecretCol, handler.ColumnTypeJSONB, handler.Nullable()),
 			handler.NewColumn(MachineAccessTokenTypeCol, handler.ColumnTypeEnum, handler.Default(0)),
 		},
 			handler.NewPrimaryKey(MachineUserInstanceIDCol, MachineUserIDCol),
@@ -936,7 +936,7 @@ func (p *userProjection) reduceMachineSecretSet(event eventstore.Event) (*handle
 		),
 		handler.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(MachineHasSecretCol, true),
+				handler.NewCol(MachineSecretCol, e.ClientSecret),
 			},
 			[]handler.Condition{
 				handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
@@ -967,7 +967,7 @@ func (p *userProjection) reduceMachineSecretRemoved(event eventstore.Event) (*ha
 		),
 		handler.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(MachineHasSecretCol, false),
+				handler.NewCol(MachineSecretCol, nil),
 			},
 			[]handler.Condition{
 				handler.NewCond(MachineUserIDCol, e.Aggregate().ID),

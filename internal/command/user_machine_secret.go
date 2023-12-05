@@ -3,8 +3,6 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/logging"
-
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -111,59 +109,12 @@ func prepareRemoveMachineSecret(a *user.Aggregate) preparation.Validation {
 	}
 }
 
-func (c *Commands) VerifyMachineSecret(ctx context.Context, userID string, resourceOwner string, secret string) (*domain.ObjectDetails, error) {
+func (c *Commands) MachineSecretCheckSucceeded(ctx context.Context, userID, resourceOwner string) {
 	agg := user.NewAggregate(userID, resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareVerifyMachineSecret(agg, secret, c.codeAlg))
-	if err != nil {
-		return nil, err
-	}
-
-	events, err := c.eventstore.Push(ctx, cmds...)
-	for _, cmd := range cmds {
-		if cmd.Type() == user.MachineSecretCheckFailedType {
-			logging.OnError(err).Error("could not push event MachineSecretCheckFailed")
-			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3kjh", "Errors.User.Machine.Secret.Invalid")
-		}
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	return &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreatedAt(),
-		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
-	}, nil
+	c.asyncPush(ctx, user.NewMachineSecretCheckSucceededEvent(ctx, &agg.Aggregate))
 }
 
-func prepareVerifyMachineSecret(a *user.Aggregate, secret string, algorithm crypto.HashAlgorithm) preparation.Validation {
-	return func() (_ preparation.CreateCommands, err error) {
-		if a.ResourceOwner == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-0qp2hus", "Errors.ResourceOwnerMissing")
-		}
-		if a.ID == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-bzosjs", "Errors.User.UserIDMissing")
-		}
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			writeModel, err := getMachineWriteModel(ctx, a.ID, a.ResourceOwner, filter)
-			if err != nil {
-				return nil, err
-			}
-			if !isUserStateExists(writeModel.UserState) {
-				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-569sh2o", "Errors.User.NotExisting")
-			}
-			if writeModel.ClientSecret == nil {
-				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-x8910n", "Errors.User.Machine.Secret.NotExisting")
-			}
-			err = crypto.CompareHash(writeModel.ClientSecret, []byte(secret), algorithm)
-			if err == nil {
-				return []eventstore.Command{
-					user.NewMachineSecretCheckSucceededEvent(ctx, &a.Aggregate),
-				}, nil
-			}
-			return []eventstore.Command{
-				user.NewMachineSecretCheckFailedEvent(ctx, &a.Aggregate),
-			}, nil
-		}, nil
-	}
+func (c *Commands) MachineSecretCheckFailed(ctx context.Context, userID, resourceOwner string) {
+	agg := user.NewAggregate(userID, resourceOwner)
+	c.asyncPush(ctx, user.NewMachineSecretCheckFailedEvent(ctx, &agg.Aggregate))
 }
