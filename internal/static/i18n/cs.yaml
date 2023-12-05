@@ -33,8 +33,13 @@ Errors:
     NoneSpecified: Nebyly určeny žádné limity
   Restrictions:
     NoneSpecified: Nebyla určena žádná omezení
+    DefaultLanguageMustBeAllowed: Výchozí jazyk musí být povolen
   Language:
     NotParsed: Jazyk nelze určit
+    NotSupported: Jazyk není podporován
+    NotAllowed: Jazyk není povolen
+    Undefined: Jazyk není definován
+    Duplicate: Jazyky mají duplikáty
   OIDCSettings:
     NotFound: Konfigurace OIDC nebyla nalezena
     AlreadyExists: Konfigurace OIDC již existuje

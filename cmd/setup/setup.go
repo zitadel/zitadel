@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/migration"
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
@@ -63,6 +64,8 @@ func Flags(cmd *cobra.Command) {
 func Setup(config *Config, steps *Steps, masterKey string) {
 	ctx := context.Background()
 	logging.Info("setup started")
+
+	i18n.MustLoadSupportedLanguagesFromDir()
 
 	zitadelDBClient, err := database.Connect(config.Database, false, false)
 	logging.OnError(err).Fatal("unable to connect to database")
