@@ -24,6 +24,10 @@ func TestServer_RegisterPasskey(t *testing.T) {
 	})
 	require.NoError(t, err)
 
+	// We also need a user session
+	Tester.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
+
 	type args struct {
 		ctx context.Context
 		req *user.RegisterPasskeyRequest
@@ -95,14 +99,12 @@ func TestServer_RegisterPasskey(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		/* TODO: after we are able to obtain a Bearer token for a human user
-		https://github.com/zitadel/zitadel/issues/6022
 		{
-			name: "human user",
+			name: "user setting its own passkey",
 			args: args{
-				ctx: CTX,
+				ctx: Tester.WithAuthorizationToken(CTX, sessionToken),
 				req: &user.RegisterPasskeyRequest{
-					UserId: humanUserID,
+					UserId: userID,
 				},
 			},
 			want: &user.RegisterPasskeyResponse{
@@ -111,7 +113,6 @@ func TestServer_RegisterPasskey(t *testing.T) {
 				},
 			},
 		},
-		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
