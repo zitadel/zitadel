@@ -1,4 +1,4 @@
-import { from, Observable, share, switchMap, take } from 'rxjs';
+import { combineLatest, forkJoin, from, merge, Observable, of, share, switchMap, take, zip } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { AdminService } from './admin.service';
@@ -11,32 +11,14 @@ interface languagesResponse {
   providedIn: 'root',
 })
 export class LanguagesService {
-  private supportedLanguages$!: Observable<string[]>;
-
+  public supportedLanguages$: Observable<string[]> = from(this.adminSvc.getSupportedLanguages()).pipe(
+    map((list) => list.languagesList),
+  );
+  public allowedLanguages$: Observable<string[]> = from(this.adminSvc.getAllowedLanguages()).pipe(
+    map((list) => list.languagesList),
+  );
+  public notAllowedLanguages$: Observable<string[]> = combineLatest([this.supportedLanguages$, this.allowedLanguages$]).pipe(
+    switchMap(([supported, allowed]) => [supported.filter((s) => !allowed.includes(s))]),
+  );
   constructor(private adminSvc: AdminService) {}
-
-  public allowedLanguages(): Observable<string[]> {
-    return this.toObservable(this.adminSvc.getAllowedLanguages());
-  }
-  // By accepting an observable, we can reuse the results of that API call.
-  public notAllowedLanguages(allowedLanguages: Observable<string[]>): Observable<string[]> {
-    return allowedLanguages.pipe(
-      switchMap((allowed) =>
-        // this.supportedLanguages always returns the same observable, so we don't have to worry about API calls.
-        this.supportedLanguages().pipe(
-          // cut the allowed languages from the supported list
-          map((supported) => supported.filter((s) => !allowed.includes(s))),
-        ),
-      ),
-    );
-  }
-  public supportedLanguages(): Observable<string[]> {
-    if (!this.supportedLanguages$) {
-      this.supportedLanguages$ = this.toObservable(this.adminSvc.getSupportedLanguages());
-    }
-    return this.supportedLanguages$;
-  }
-  private toObservable(resp: Promise<languagesResponse>): Observable<Array<string>> {
-    return from(resp).pipe(map(({ languagesList }) => languagesList));
-  }
 }

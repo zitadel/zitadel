@@ -88,7 +88,7 @@ export class AuthUserDetailComponent implements OnDestroy {
         this.currentSetting = id;
       }
     });
-    this.languages$ = this.languagesSvc.supportedLanguages();
+    this.languages$ = this.languagesSvc.supportedLanguages$;
 
     const mediaq: string = '(max-width: 500px)';
     const small = this.mediaMatcher.matchMedia(mediaq).matches;
