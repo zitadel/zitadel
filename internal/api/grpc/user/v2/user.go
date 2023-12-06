@@ -131,6 +131,50 @@ func (s *Server) UpdateHumanUser(ctx context.Context, req *user.UpdateHumanUserR
 	}, nil
 }
 
+func (s *Server) LockHumanUser(ctx context.Context, req *user.LockHumanUserRequest) (_ *user.LockHumanUserResponse, err error) {
+	orgID := authz.GetCtxData(ctx).OrgID
+	details, err := s.command.LockUserHuman(ctx, orgID, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &user.LockHumanUserResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UnlockHumanUser(ctx context.Context, req *user.UnlockHumanUserRequest) (_ *user.UnlockHumanUserResponse, err error) {
+	orgID := authz.GetCtxData(ctx).OrgID
+	details, err := s.command.UnlockUserHuman(ctx, orgID, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &user.UnlockHumanUserResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) DeactivateHumanUser(ctx context.Context, req *user.DeactivateHumanUserRequest) (_ *user.DeactivateHumanUserResponse, err error) {
+	orgID := authz.GetCtxData(ctx).OrgID
+	details, err := s.command.DeactivateAction(ctx, orgID, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &user.DeactivateHumanUserResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) ReactivateHumanUser(ctx context.Context, req *user.ReactivateHumanUserRequest) (_ *user.ReactivateHumanUserResponse, err error) {
+	orgID := authz.GetCtxData(ctx).OrgID
+	details, err := s.command.ReactivateUserHuman(ctx, orgID, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &user.ReactivateHumanUserResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
 func ifNotNilPtr[v, p any](value *v, conv func(v) p) *p {
 	var pNil *p
 	if value == nil {

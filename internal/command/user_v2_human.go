@@ -210,6 +210,109 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	return nil
 }
 
+func (c *Commands) LockUserHuman(ctx context.Context, resourceOwner string, userID string) (*domain.ObjectDetails, error) {
+	if resourceOwner == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
+	}
+	if userID == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
+	}
+
+	existingHuman, err := c.userHumanStateWriteModel(ctx, userID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if !isUserStateExists(existingHuman.UserState) {
+		return nil, errors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound")
+	}
+	if !hasUserState(existingHuman.UserState, domain.UserStateActive, domain.UserStateInitial) {
+		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-3NN8v", "Errors.User.ShouldBeActiveOrInitial")
+	}
+
+	if err := c.pushAppendAndReduce(ctx, existingHuman, user.NewUserLockedEvent(ctx, &existingHuman.Aggregate().Aggregate)); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
+}
+
+func (c *Commands) UnlockUserHuman(ctx context.Context, resourceOwner string, userID string) (*domain.ObjectDetails, error) {
+	if resourceOwner == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
+	}
+	if userID == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
+	}
+
+	existingHuman, err := c.userHumanStateWriteModel(ctx, userID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if !isUserStateExists(existingHuman.UserState) {
+		return nil, errors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound")
+	}
+	if !hasUserState(existingHuman.UserState, domain.UserStateLocked) {
+		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.NotLocked")
+	}
+
+	if err := c.pushAppendAndReduce(ctx, existingHuman, user.NewUserUnlockedEvent(ctx, &existingHuman.Aggregate().Aggregate)); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
+}
+
+func (c *Commands) DeactivateUserHuman(ctx context.Context, resourceOwner string, userID string) (*domain.ObjectDetails, error) {
+	if resourceOwner == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
+	}
+	if userID == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
+	}
+
+	existingHuman, err := c.userHumanStateWriteModel(ctx, userID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if !isUserStateExists(existingHuman.UserState) {
+		return nil, errors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound")
+	}
+	if isUserStateInitial(existingHuman.UserState) {
+		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-ke0fw", "Errors.User.CantDeactivateInitial")
+	}
+	if isUserStateInactive(existingHuman.UserState) {
+		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-5M0sf", "Errors.User.AlreadyInactive")
+	}
+
+	if err := c.pushAppendAndReduce(ctx, existingHuman, user.NewUserDeactivatedEvent(ctx, &existingHuman.Aggregate().Aggregate)); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
+}
+
+func (c *Commands) ReactivateUserHuman(ctx context.Context, resourceOwner string, userID string) (*domain.ObjectDetails, error) {
+	if resourceOwner == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
+	}
+	if userID == "" {
+		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
+	}
+
+	existingHuman, err := c.userHumanStateWriteModel(ctx, userID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if !isUserStateExists(existingHuman.UserState) {
+		return nil, errors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound")
+	}
+	if !isUserStateInactive(existingHuman.UserState) {
+		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-6M0sf", "Errors.User.NotInactive")
+	}
+
+	if err := c.pushAppendAndReduce(ctx, existingHuman, user.NewUserReactivatedEvent(ctx, &existingHuman.Aggregate().Aggregate)); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
+}
+
 func (c *Commands) ChangeUserHuman(ctx context.Context, resourceOwner string, human *ChangeHuman, alg crypto.EncryptionAlgorithm) (err error) {
 	if resourceOwner == "" {
 		return errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
@@ -233,7 +336,7 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, resourceOwner string, hu
 		return err
 	}
 	if !isUserStateExists(existingHuman.UserState) {
-		return errors.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.NotFound")
+		return errors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound")
 	}
 
 	cmds := make([]eventstore.Command, 0)
@@ -390,6 +493,18 @@ func (c *Commands) userHumanWriteModel(ctx context.Context, userID, resourceOwne
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewUserHumanWriteModel(userID, resourceOwner, profileWM, emailWM, phoneWM, passwordWM, stateWM, avatarWM)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	if err != nil {
+		return nil, err
+	}
+	return writeModel, nil
+}
+
+func (c *Commands) userHumanStateWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *UserHumanWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	writeModel = NewUserHumanStateWriteModel(userID, resourceOwner)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

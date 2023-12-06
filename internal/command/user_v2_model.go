@@ -61,18 +61,8 @@ type UserHumanWriteModel struct {
 	UserState       domain.UserState
 }
 
-func NewUserHumanAllWriteModel(userID, resourceOwner string) *UserHumanWriteModel {
-	return &UserHumanWriteModel{
-		WriteModel: eventstore.WriteModel{
-			AggregateID:   userID,
-			ResourceOwner: resourceOwner,
-		},
-		AvatarWriteModel:   true,
-		EmailWriteModel:    true,
-		PhoneWriteModel:    true,
-		PasswordWriteModel: true,
-		StateWriteModel:    true,
-	}
+func NewUserHumanStateWriteModel(userID, resourceOwner string) *UserHumanWriteModel {
+	return NewUserHumanWriteModel(userID, resourceOwner, false, false, false, false, true, false)
 }
 
 func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM, stateWM, avatarWM bool) *UserHumanWriteModel {
