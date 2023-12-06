@@ -18,7 +18,7 @@ export class LanguagesService {
     map((list) => list.languagesList),
   );
   public notAllowedLanguages$: Observable<string[]> = combineLatest([this.supportedLanguages$, this.allowedLanguages$]).pipe(
-    switchMap(([supported, allowed]) => [supported.filter((s) => !allowed.includes(s))]),
+    switchMap(([supported, allowed]) => [supported.filter((s) => !allowed.includes(s))]), // TODO return valid array
   );
   constructor(private adminSvc: AdminService) {}
 }
