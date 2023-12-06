@@ -322,7 +322,7 @@ func (wm *UserHumanWriteModel) reduceHumanAddedEvent(e *user.HumanAddedEvent) {
 	wm.Gender = e.Gender
 	wm.Email = e.EmailAddress
 	wm.Phone = e.PhoneNumber
-	wm.UserState = domain.UserStateInitial
+	wm.UserState = domain.UserStateActive
 	wm.PasswordEncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 	wm.PasswordChangeRequired = e.ChangeRequired
 }
@@ -337,7 +337,7 @@ func (wm *UserHumanWriteModel) reduceHumanRegisteredEvent(e *user.HumanRegistere
 	wm.Gender = e.Gender
 	wm.Email = e.EmailAddress
 	wm.Phone = e.PhoneNumber
-	wm.UserState = domain.UserStateInitial
+	wm.UserState = domain.UserStateActive
 	wm.PasswordEncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 	wm.PasswordChangeRequired = e.ChangeRequired
 }

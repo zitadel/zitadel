@@ -78,10 +78,12 @@ func (p *Password) Validate(hasher *crypto.PasswordHasher) error {
 			return errors.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.User.Password.NotSupported")
 		}
 	}
-	if p.Password == nil {
+	if p.Password == nil && p.EncodedPasswordHash == nil {
 		return errors.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Empty")
 	}
-
+	if p.Password != nil && p.EncodedPasswordHash != nil {
+		return errors.ThrowInvalidArgument(nil, "COMMAND-3M0fsss", "Errors.User.Password.NotSupported")
+	}
 	return nil
 }
 
@@ -481,11 +483,21 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 		}
 	}
 
-	cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, *password.Password, password.ChangeRequired)
-	if cmd != nil {
-		return append(cmds, cmd), err
+	if password.EncodedPasswordHash != nil {
+		cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, *password.EncodedPasswordHash, password.ChangeRequired, true)
+		if cmd != nil {
+			return append(cmds, cmd), err
+		}
+		return cmds, err
 	}
-	return cmds, err
+	if password.Password != nil {
+		cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, *password.Password, password.ChangeRequired, false)
+		if cmd != nil {
+			return append(cmds, cmd), err
+		}
+		return cmds, err
+	}
+	return cmds, nil
 }
 
 func (c *Commands) userHumanWriteModel(ctx context.Context, userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM, stateWM, avatarWM bool) (writeModel *UserHumanWriteModel, err error) {

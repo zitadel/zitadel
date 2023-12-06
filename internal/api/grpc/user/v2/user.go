@@ -155,7 +155,7 @@ func (s *Server) UnlockHumanUser(ctx context.Context, req *user.UnlockHumanUserR
 
 func (s *Server) DeactivateHumanUser(ctx context.Context, req *user.DeactivateHumanUserRequest) (_ *user.DeactivateHumanUserResponse, err error) {
 	orgID := authz.GetCtxData(ctx).OrgID
-	details, err := s.command.DeactivateAction(ctx, orgID, req.UserId)
+	details, err := s.command.DeactivateUserHuman(ctx, orgID, req.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -207,10 +207,6 @@ func UpdateUserRequestToChangeHuman(req *user.UpdateHumanUserRequest) (*command.
 	}
 	var email *command.Email
 	if req.Email != nil {
-		var returnCode bool
-		if req.Email.GetReturnCode() != nil {
-			returnCode = true
-		}
 		var urlTemplate string
 		if req.Email.GetSendCode() != nil && req.Email.GetSendCode().UrlTemplate != nil {
 			urlTemplate = *req.Email.GetSendCode().UrlTemplate
@@ -221,21 +217,17 @@ func UpdateUserRequestToChangeHuman(req *user.UpdateHumanUserRequest) (*command.
 		email = &command.Email{
 			Address:     domain.EmailAddress(req.Email.Email),
 			Verified:    req.Email.GetIsVerified(),
-			ReturnCode:  returnCode,
+			ReturnCode:  req.Email.GetReturnCode() != nil,
 			URLTemplate: urlTemplate,
 		}
 	}
 
 	var phone *command.Phone
 	if req.Phone != nil {
-		var returnCode bool
-		if req.Email.GetReturnCode() != nil {
-			returnCode = true
-		}
 		phone = &command.Phone{
 			Number:     domain.PhoneNumber(req.GetPhone().GetPhone()),
 			Verified:   req.Phone.GetIsVerified(),
-			ReturnCode: returnCode,
+			ReturnCode: req.Phone.GetReturnCode() != nil,
 		}
 	}
 	var password *command.Password
@@ -301,7 +293,8 @@ func (s *Server) RemoveUser(ctx context.Context, req *user.RemoveUserRequest) (_
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.RemoveUser(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, memberships, grants...)
+	orgID := authz.GetCtxData(ctx).OrgID
+	details, err := s.command.RemoveUser(ctx, req.UserId, orgID, memberships, grants...)
 	if err != nil {
 		return nil, err
 	}

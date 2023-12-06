@@ -18,6 +18,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
@@ -398,6 +399,7 @@ func (s *Tester) CreateProjectUserGrant(t *testing.T, ctx context.Context, proje
 func (s *Tester) CreateOrgMembership(t *testing.T, ctx context.Context, userID string) {
 	_, err := s.Client.Mgmt.AddOrgMember(ctx, &mgmt.AddOrgMemberRequest{
 		UserId: userID,
+		Roles:  []string{domain.RoleOrgOwner},
 	})
 	require.NoError(t, err)
 }
@@ -406,6 +408,7 @@ func (s *Tester) CreateProjectMembership(t *testing.T, ctx context.Context, proj
 	_, err := s.Client.Mgmt.AddProjectMember(ctx, &mgmt.AddProjectMemberRequest{
 		ProjectId: projectID,
 		UserId:    userID,
+		Roles:     []string{domain.RoleProjectOwner},
 	})
 	require.NoError(t, err)
 }

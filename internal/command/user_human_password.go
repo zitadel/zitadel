@@ -62,7 +62,7 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID,
 }
 
 func (c *Commands) setPassword(ctx context.Context, wm *HumanPasswordWriteModel, password string, changeRequired bool) (objectDetails *domain.ObjectDetails, err error) {
-	command, err := c.setPasswordCommand(ctx, UserAggregateFromWriteModel(&wm.WriteModel), wm.UserState, password, changeRequired)
+	command, err := c.setPasswordCommand(ctx, UserAggregateFromWriteModel(&wm.WriteModel), wm.UserState, password, changeRequired, false)
 	if err != nil {
 		return nil, err
 	}
@@ -73,17 +73,21 @@ func (c *Commands) setPassword(ctx context.Context, wm *HumanPasswordWriteModel,
 	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
 
-func (c *Commands) setPasswordCommand(ctx context.Context, agg *eventstore.Aggregate, userState domain.UserState, password string, changeRequired bool) (_ eventstore.Command, err error) {
+func (c *Commands) setPasswordCommand(ctx context.Context, agg *eventstore.Aggregate, userState domain.UserState, password string, changeRequired, encoded bool) (_ eventstore.Command, err error) {
 	if err = c.canUpdatePassword(ctx, password, agg.ResourceOwner, userState); err != nil {
 		return nil, err
 	}
-	ctx, span := tracing.NewNamedSpan(ctx, "passwap.Hash")
-	encoded, err := c.userPasswordHasher.Hash(password)
-	span.EndWithError(err)
-	if err = convertPasswapErr(err); err != nil {
-		return nil, err
+
+	if !encoded {
+		ctx, span := tracing.NewNamedSpan(ctx, "passwap.Hash")
+		encodedPassword, err := c.userPasswordHasher.Hash(password)
+		span.EndWithError(err)
+		if err = convertPasswapErr(err); err != nil {
+			return nil, err
+		}
+		return user.NewHumanPasswordChangedEvent(ctx, agg, encodedPassword, changeRequired, ""), nil
 	}
-	return user.NewHumanPasswordChangedEvent(ctx, agg, encoded, changeRequired, ""), nil
+	return user.NewHumanPasswordChangedEvent(ctx, agg, password, changeRequired, ""), nil
 }
 
 func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword string) (objectDetails *domain.ObjectDetails, err error) {

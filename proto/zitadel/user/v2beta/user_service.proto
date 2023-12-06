@@ -1015,6 +1015,7 @@ message RemoveUserRequest {
       max_length: 200;
       example: "\"69629012906488334\"";
     }];
+  zitadel.object.v2beta.Organization organization = 2;
 }
 
 message RemoveUserResponse {
