@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
-import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { FormControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription, switchMap } from 'rxjs';
@@ -111,11 +111,6 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
 
   public KeyNamesArray: string[] = KeyNamesArray;
 
-  public languageNotAllowed$!: Observable<boolean>;
-  public notAllowedLanguages$!: Observable<string[]>;
-  public allowedLanguages$!: Observable<string[]>;
-  public languagesAreRestricted$!: Observable<boolean>;
-
   private sub: Subscription = new Subscription();
 
   public updateRequest!: SetCustomLoginTextsRequest;
@@ -123,8 +118,8 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
   public destroy$: Subject<void> = new Subject();
   public InfoSectionType: any = InfoSectionType;
   public form: UntypedFormGroup = new UntypedFormGroup({
-    currentSubMap: new UntypedFormControl('emailVerificationDoneText'),
-    language: new UntypedFormControl('en'),
+    currentSubMap: new FormControl<string>('emailVerificationDoneText'),
+    language: new FormControl<string>('en'),
   });
 
   public isDefault: boolean = false;
@@ -141,7 +136,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     private injector: Injector,
     private dialog: MatDialog,
     private toast: ToastService,
-    private languagesSvc: LanguagesService,
+    public langSvc: LanguagesService,
   ) {
     this.form.valueChanges
       .pipe(startWith({ currentSubMap: 'emailVerificationDoneText', language: 'en' }), pairwise(), takeUntil(this.destroy$))
@@ -172,14 +167,6 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
         this.service = this.injector.get(AdminService as Type<AdminService>);
         break;
     }
-
-    this.allowedLanguages$ = this.languagesSvc.allowedLanguages();
-    this.languageNotAllowed$ = this.languageControl.valueChanges.pipe(
-      // By always using the same observable this.allowedLanguages$, we only call the API once.
-      switchMap((language) => this.allowedLanguages$.pipe(map((allowed) => !allowed.includes(language)))),
-    );
-    this.notAllowedLanguages$ = this.languagesSvc.notAllowedLanguages(this.allowedLanguages$);
-    this.languagesAreRestricted$ = this.notAllowedLanguages$.pipe(map((notAllowed) => notAllowed.length > 0));
 
     this.loadData();
 
@@ -400,15 +387,15 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     }
   }
 
-  private get languageControl() {
-    return this.form.get('language') as UntypedFormControl;
+  public get language(): string {
+    return this.form.get('language')?.value;
+  }
+
+  public set language(lang: string) {
+    this.form.get('language')?.setValue(lang);
   }
 
   public get currentSubMap(): string {
     return this.form.get('currentSubMap')?.value;
-  }
-
-  public get language(): string {
-    return this.languageControl?.value;
   }
 }

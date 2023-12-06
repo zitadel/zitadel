@@ -25,7 +25,6 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
-import { map } from 'rxjs/operators';
 import { LanguagesService } from '../../../../services/languages.service';
 
 @Component({
@@ -36,7 +35,6 @@ import { LanguagesService } from '../../../../services/languages.service';
 export class AuthUserDetailComponent implements OnDestroy {
   public user?: User.AsObject;
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages$: Observable<string[]>;
 
   private subscription: Subscription = new Subscription();
 
@@ -79,7 +77,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     private mediaMatcher: MediaMatcher,
     private _location: Location,
     activatedRoute: ActivatedRoute,
-    private languagesSvc: LanguagesService,
+    public langSvc: LanguagesService,
   ) {
     activatedRoute.queryParams.pipe(take(1)).subscribe((params: Params) => {
       const { id } = params;
@@ -88,7 +86,6 @@ export class AuthUserDetailComponent implements OnDestroy {
         this.currentSetting = id;
       }
     });
-    this.languages$ = this.languagesSvc.supportedLanguages();
 
     const mediaq: string = '(max-width: 500px)';
     const small = this.mediaMatcher.matchMedia(mediaq).matches;

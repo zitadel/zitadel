@@ -1,6 +1,6 @@
 <h2>{{ 'POLICY.MESSAGE_TEXTS.TITLE' | translate }}</h2>
 <p class="cnsl-secondary-text">{{ 'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate }}</p>
-<cnsl-info-section class="locked" *ngIf="languageNotAllowed$ | async" [type]="InfoSectionType.WARN">
+<cnsl-info-section class="locked" *ngIf="langSvc.isNotAllowed(language) | async" [type]="InfoSectionType.WARN">
   {{ 'POLICY.LOGIN_TEXTS.ACTIVE_LANGUAGE_NOT_ALLOWED' | translate }}</cnsl-info-section
 >
 
@@ -19,8 +19,8 @@
   </cnsl-form-field>
   <cnsl-form-field class="language">
     <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.LANGUAGE' | translate }}</cnsl-label>
-    <mat-select formControlName="language" name="language">
-      <mat-option *ngFor="let lang of allowedLanguages$ | async" [value]="lang">
+    <mat-select [(ngModel)]="language" name="language">
+      <mat-option *ngFor="let lang of langSvc.allowed$ | async" [value]="lang">
         <div class="centerline">
           <span
             >{{ lang }}
@@ -30,8 +30,8 @@
           >
         </div>
       </mat-option>
-      <mat-optgroup [label]="'POLICY.LOGIN_TEXTS.LANGUAGES_NOT_ALLOWED' | translate" *ngIf="languagesAreRestricted$ | async">
-        <mat-option *ngFor="let lang of notAllowedLanguages$ | async" [value]="lang">
+      <mat-optgroup [label]="'POLICY.LOGIN_TEXTS.LANGUAGES_NOT_ALLOWED' | translate" *ngIf="langSvc.restricted$ | async">
+        <mat-option *ngFor="let lang of langSvc.notAllowed$ | async" [value]="lang">
           <div class="centerline">
             <span
               >{{ lang }}

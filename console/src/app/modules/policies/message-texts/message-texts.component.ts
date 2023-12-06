@@ -540,11 +540,6 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
 
   public language: string = 'en';
 
-  public languageNotAllowed$!: Observable<boolean>;
-  public notAllowedLanguages$!: Observable<string[]>;
-  public allowedLanguages$!: Observable<string[]>;
-  public languagesAreRestricted$!: Observable<boolean>;
-
   private sub: Subscription = new Subscription();
   public canWrite$: Observable<boolean> = this.authService.isAllowed([
     this.serviceType === PolicyComponentServiceType.ADMIN
@@ -559,7 +554,7 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private injector: Injector,
     private dialog: MatDialog,
-    private languagesSvc: LanguagesService,
+    public langSvc: LanguagesService,
   ) {}
 
   ngOnInit(): void {
@@ -571,11 +566,6 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
         this.service = this.injector.get(AdminService as Type<AdminService>);
         break;
     }
-    this.allowedLanguages$ = this.languagesSvc.allowedLanguages();
-    this.languageNotAllowed$ = this.allowedLanguages$.pipe(map((allowed) => !allowed.includes(this.language)));
-    this.notAllowedLanguages$ = this.languagesSvc.notAllowedLanguages(this.allowedLanguages$);
-    this.languagesAreRestricted$ = this.notAllowedLanguages$.pipe(map((notAllowed) => notAllowed.length > 0));
-
     this.loadData(this.currentType);
   }
 
