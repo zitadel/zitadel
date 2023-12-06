@@ -1,7 +1,7 @@
 import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSelectChange } from '@angular/material/select';
-import { BehaviorSubject, from, Observable, of, Subscription, switchMap } from 'rxjs';
+import { BehaviorSubject, from, Observable, of, Subscription, switchMap, take, tap } from 'rxjs';
 import {
   GetDefaultDomainClaimedMessageTextRequest as AdminGetDefaultDomainClaimedMessageTextRequest,
   GetDefaultInitMessageTextRequest as AdminGetDefaultInitMessageTextRequest,
@@ -539,6 +539,12 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
   };
 
   public language: string = 'en';
+  public allowed$: Observable<string[]> = this.langSvc.allowed$.pipe(
+    take(1),
+    tap(([firstAllowed]) => {
+      this.language = firstAllowed;
+    }),
+  );
 
   private sub: Subscription = new Subscription();
   public canWrite$: Observable<boolean> = this.authService.isAllowed([
