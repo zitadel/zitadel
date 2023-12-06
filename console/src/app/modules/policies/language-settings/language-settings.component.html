@@ -55,6 +55,7 @@
         (cdkDropListDropped)="drop($event)"
         [cdkDropListData]="(localState$ | async)!.notAllowed"
         [cdkDropListEnterPredicate]="defaultLangPredicate"
+        cdkDropListSortingDisabled
       >
         <cnsl-label>{{ 'SETTING.LANGUAGES.NOT_ALLOWED' | translate }}</cnsl-label>
         <button
