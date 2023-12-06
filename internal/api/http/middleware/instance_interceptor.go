@@ -111,7 +111,7 @@ func hostFromOrigin(ctx context.Context) (host string, err error) {
 	if err != nil {
 		return "", err
 	}
-	host = u.Hostname()
+	host = u.Host
 	if host == "" {
 		err = errors.New("empty host")
 	}

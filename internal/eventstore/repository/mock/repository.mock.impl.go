@@ -75,10 +75,14 @@ func (m *MockRepository) ExpectInstanceIDsError(err error) *MockRepository {
 	return m
 }
 
-func (m *MockRepository) ExpectPush(expectedCommands []eventstore.Command) *MockRepository {
+// ExpectPush checks if the expectedCommands are send to the Push method.
+// The call will sleep at least the amount of passed duration.
+func (m *MockRepository) ExpectPush(expectedCommands []eventstore.Command, sleep time.Duration) *MockRepository {
 	m.MockPusher.EXPECT().Push(gomock.Any(), gomock.Any()).DoAndReturn(
 		func(ctx context.Context, commands ...eventstore.Command) ([]eventstore.Event, error) {
 			m.MockPusher.ctrl.T.Helper()
+
+			time.Sleep(sleep)
 
 			if len(expectedCommands) != len(commands) {
 				return nil, fmt.Errorf("unexpected amount of commands: want %d, got %d", len(expectedCommands), len(commands))

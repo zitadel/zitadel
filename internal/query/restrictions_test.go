@@ -14,14 +14,14 @@ import (
 )
 
 var (
-	expectedRestrictionsQuery = regexp.QuoteMeta("SELECT projections.restrictions.aggregate_id," +
-		" projections.restrictions.creation_date," +
-		" projections.restrictions.change_date," +
-		" projections.restrictions.resource_owner," +
-		" projections.restrictions.sequence," +
-		" projections.restrictions.disallow_public_org_registration," +
-		" projections.restrictions.allowed_languages" +
-		" FROM projections.restrictions" +
+	expectedRestrictionsQuery = regexp.QuoteMeta("SELECT projections.restrictions2.aggregate_id," +
+		" projections.restrictions2.creation_date," +
+		" projections.restrictions2.change_date," +
+		" projections.restrictions2.resource_owner," +
+		" projections.restrictions2.sequence," +
+		" projections.restrictions2.disallow_public_org_registration," +
+		" projections.restrictions2.allowed_languages" +
+		" FROM projections.restrictions2" +
 		" AS OF SYSTEM TIME '-1 ms'",
 	)
 
