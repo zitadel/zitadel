@@ -111,11 +111,6 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
 
   public KeyNamesArray: string[] = KeyNamesArray;
 
-  public languageNotAllowed$!: Observable<boolean>;
-  public notAllowedLanguages$!: Observable<string[]>;
-  public allowedLanguages$!: Observable<string[]>;
-  public languagesAreRestricted$!: Observable<boolean>;
-
   private sub: Subscription = new Subscription();
 
   public updateRequest!: SetCustomLoginTextsRequest;
@@ -141,7 +136,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     private injector: Injector,
     private dialog: MatDialog,
     private toast: ToastService,
-    private languagesSvc: LanguagesService,
+    public langSvc: LanguagesService,
   ) {
     this.form.valueChanges
       .pipe(startWith({ currentSubMap: 'emailVerificationDoneText', language: 'en' }), pairwise(), takeUntil(this.destroy$))
@@ -172,14 +167,6 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
         this.service = this.injector.get(AdminService as Type<AdminService>);
         break;
     }
-
-    this.allowedLanguages$ = this.languagesSvc.allowedLanguages();
-    this.languageNotAllowed$ = this.languageControl.valueChanges.pipe(
-      // By always using the same observable this.allowedLanguages$, we only call the API once.
-      switchMap((language) => this.allowedLanguages$.pipe(map((allowed) => !allowed.includes(language)))),
-    );
-    this.notAllowedLanguages$ = this.languagesSvc.notAllowedLanguages(this.allowedLanguages$);
-    this.languagesAreRestricted$ = this.notAllowedLanguages$.pipe(map((notAllowed) => notAllowed.length > 0));
 
     this.loadData();
 

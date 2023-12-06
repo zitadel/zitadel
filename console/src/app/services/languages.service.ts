@@ -1,42 +1,47 @@
-import { from, Observable, share, switchMap, take } from 'rxjs';
-import { map } from 'rxjs/operators';
+import {
+  forkJoin,
+  Observable, ReplaySubject,
+  Subscription,
+} from 'rxjs';
+import {map, withLatestFrom} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { AdminService } from './admin.service';
-
-interface languagesResponse {
-  languagesList: Array<string>;
-}
 
 @Injectable({
   providedIn: 'root',
 })
 export class LanguagesService {
-  private supportedLanguages$!: Observable<string[]>;
+  private supportedSubject$ = new ReplaySubject<string[]>(1);
+  public supported$: Observable<string[]> = this.supportedSubject$.asObservable();
+  private allowedSubject$ = new ReplaySubject<string[]>(1);
+  public allowed$: Observable<string[]> = this.allowedSubject$.asObservable()
+  public notAllowed$: Observable<string[]> = this.allowed$.pipe(
+    withLatestFrom(this.supported$),
+    map(([allowed, supported]) => {
+      return supported.filter((s) => !allowed.includes(s))
+    }),
+  );
+  public restricted$: Observable<boolean> = this.notAllowed$.pipe(map((notallowed) => {
+    return notallowed.length > 0
+  }),
+);
 
-  constructor(private adminSvc: AdminService) {}
+  constructor(private adminSvc: AdminService) {
+    const sub: Subscription = forkJoin([this.adminSvc.getSupportedLanguages(), this.adminSvc.getAllowedLanguages()]).subscribe({
+      next: ([{languagesList: supported}, {languagesList: allowed}]) => {
+        this.supportedSubject$.next(supported);
+        this.allowedSubject$.next(allowed);
+      },
+      complete: () => sub.unsubscribe(),
+    });
+  }
 
-  public allowedLanguages(): Observable<string[]> {
-    return this.toObservable(this.adminSvc.getAllowedLanguages());
+  // TODO: call this in https://github.com/zitadel/zitadel/pull/6965
+  public newAllowed(languages: string[]) {
+    this.allowedSubject$.next(languages);
   }
-  // By accepting an observable, we can reuse the results of that API call.
-  public notAllowedLanguages(allowedLanguages: Observable<string[]>): Observable<string[]> {
-    return allowedLanguages.pipe(
-      switchMap((allowed) =>
-        // this.supportedLanguages always returns the same observable, so we don't have to worry about API calls.
-        this.supportedLanguages().pipe(
-          // cut the allowed languages from the supported list
-          map((supported) => supported.filter((s) => !allowed.includes(s))),
-        ),
-      ),
-    );
-  }
-  public supportedLanguages(): Observable<string[]> {
-    if (!this.supportedLanguages$) {
-      this.supportedLanguages$ = this.toObservable(this.adminSvc.getSupportedLanguages());
-    }
-    return this.supportedLanguages$;
-  }
-  private toObservable(resp: Promise<languagesResponse>): Observable<Array<string>> {
-    return from(resp).pipe(map(({ languagesList }) => languagesList));
+
+  public isNotAllowed(language: string): Observable<boolean> {
+    return this.notAllowed$.pipe(map((notAllowed) => notAllowed.includes(language)));
   }
 }

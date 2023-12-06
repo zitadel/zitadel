@@ -35,7 +35,7 @@
             [showEditImage]="true"
             [preferredLoginName]="user.preferredLoginName"
             [genders]="genders"
-            [languages]="(languages$ | async) || []"
+            [languages]="(langSvc.supported$ | async) || []"
             [username]="user.userName"
             [user]="user.human"
             [disabled]="false"

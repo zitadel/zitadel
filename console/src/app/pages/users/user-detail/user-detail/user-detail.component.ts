@@ -46,7 +46,6 @@ export class UserDetailComponent implements OnInit {
   public user!: User.AsObject;
   public metadata: Metadata.AsObject[] = [];
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages$: Observable<string[]>;
 
   public ChangeType: any = ChangeType;
 
@@ -77,7 +76,7 @@ export class UserDetailComponent implements OnInit {
     private router: Router,
     activatedRoute: ActivatedRoute,
     private mediaMatcher: MediaMatcher,
-    private languagesSvc: LanguagesService,
+    public langSvc: LanguagesService,
     breadcrumbService: BreadcrumbService,
   ) {
     activatedRoute.queryParams.pipe(take(1)).subscribe((params: Params) => {
@@ -102,7 +101,6 @@ export class UserDetailComponent implements OnInit {
     this.mediaMatcher.matchMedia(mediaq).onchange = (small) => {
       this.changeSelection(small.matches);
     };
-    this.languages$ = this.languagesSvc.allowedLanguages();
   }
 
   private changeSelection(small: boolean): void {

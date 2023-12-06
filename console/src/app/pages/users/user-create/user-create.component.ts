@@ -34,7 +34,6 @@ import { LanguagesService } from '../../../services/languages.service';
 export class UserCreateComponent implements OnInit, OnDestroy {
   public user: AddHumanUserRequest.AsObject = new AddHumanUserRequest().toObject();
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
-  public languages$: Observable<string[]>;
   public selected: CountryPhoneCode | undefined = {
     countryCallingCode: '1',
     countryCode: 'US',
@@ -61,7 +60,7 @@ export class UserCreateComponent implements OnInit, OnDestroy {
     private changeDetRef: ChangeDetectorRef,
     private _location: Location,
     private countryCallingCodesService: CountryCallingCodesService,
-    private languagesSvc: LanguagesService,
+    public langSvc: LanguagesService,
     breadcrumbService: BreadcrumbService,
   ) {
     breadcrumbService.setBreadcrumb([
@@ -70,7 +69,6 @@ export class UserCreateComponent implements OnInit, OnDestroy {
         routerLink: ['/org'],
       }),
     ]);
-    this.languages$ = this.languagesSvc.supportedLanguages();
     this.loading = true;
     this.loadOrg();
     this.mgmtService
