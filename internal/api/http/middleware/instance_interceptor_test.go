@@ -221,7 +221,7 @@ func Test_setInstance(t *testing.T) {
 					r.Header.Set("host", "fromrequest")
 					return r.WithContext(zitadel_http.WithComposedOrigin(r.Context(), "https://fromorigin:9999"))
 				}(),
-				verifier:   &mockInstanceVerifier{"fromorigin"},
+				verifier:   &mockInstanceVerifier{"fromorigin:9999"},
 				headerName: "host",
 			},
 			res{
