@@ -1273,6 +1273,7 @@
       "UNSAVED_TITLE": "Pokračovat bez uložení?",
       "UNSAVED_DESCRIPTION": "Provedli jste změny bez uložení. Chcete je nyní uložit?",
       "ACTIVE_LANGUAGE_NOT_ALLOWED": "Vybrali jste jazyk, který není povolen. Můžete pokračovat v úpravách textů. Ale pokud chcete, aby vaši uživatelé mohli tento jazyk skutečně používat, změňte omezení vašich instancí.",
+      "LANGUAGES_NOT_ALLOWED": "Nepovolené jazyky:",
       "LANGUAGE": "Jazyk",
       "LANGUAGES": {
         "de": "Deutsch",

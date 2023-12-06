@@ -1268,6 +1268,7 @@
       "UNSAVED_TITLE": "保存せずに続行しますか？",
       "UNSAVED_DESCRIPTION": "あなたは保存せずに変更を加えました。今すぐ保存しますか？",
       "ACTIVE_LANGUAGE_NOT_ALLOWED": "許可されていない言語を選択しました。テキストを変更し続けることはできますが、実際にこの言語を使用できるようにするには、インスタンスの制限を変更してください。",
+      "LANGUAGES_NOT_ALLOWED": "許可されていない言語：",
       "LANGUAGE": "言語",
       "LANGUAGES": {
         "de": "Deutsch",

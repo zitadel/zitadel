@@ -1272,6 +1272,7 @@
       "UNSAVED_TITLE": "Kontynuuj bez zapisywania?",
       "UNSAVED_DESCRIPTION": "Wprowadziłeś zmiany bez zapisywania. Czy chcesz zapisać teraz?",
       "ACTIVE_LANGUAGE_NOT_ALLOWED": "Wybrałeś język, który nie jest dozwolony. Możesz kontynuować modyfikowanie tekstów. Ale jeśli chcesz, aby twoi użytkownicy mogli faktycznie używać tego języka, zmień ograniczenia swoich instancji.",
+      "LANGUAGES_NOT_ALLOWED": "Niedozwolone:",
       "LANGUAGE": "Język",
       "LANGUAGES": {
         "de": "Deutsch",

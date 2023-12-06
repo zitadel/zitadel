@@ -1272,6 +1272,7 @@
       "UNSAVED_TITLE": "Continuer sans sauvegarder ?",
       "UNSAVED_DESCRIPTION": "Vous avez apporté des modifications sans les sauvegarder. Voulez-vous les enregistrer maintenant ?",
       "ACTIVE_LANGUAGE_NOT_ALLOWED": "Vous avez sélectionné une langue qui n'est pas autorisée. Vous pouvez continuer à modifier les textes. Mais si vous voulez que vos utilisateurs puissent réellement utiliser cette langue, modifiez les restrictions de vos instances.",
+      "LANGUAGES_NOT_ALLOWED": "Non autorisé:",
       "LANGUAGE": "Langue",
       "LANGUAGES": {
         "de": "Deutsch",

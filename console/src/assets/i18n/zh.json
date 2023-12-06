@@ -1271,6 +1271,7 @@
       "UNSAVED_TITLE": "继续但不保存？",
       "UNSAVED_DESCRIPTION": "您在未保存的情况下进行了更改。您现在要保存吗？",
       "ACTIVE_LANGUAGE_NOT_ALLOWED": "您选择了不允许的语言。您可以继续修改文本。但是，如果您希望您的用户实际上能够使用此语言，请更改您的实例限制。",
+      "LANGUAGES_NOT_ALLOWED": "不允许：",
       "LANGUAGE": "语言",
       "LANGUAGES": {
         "de": "Deutsch",
