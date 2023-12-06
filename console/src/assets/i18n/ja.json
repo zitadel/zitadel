@@ -872,11 +872,11 @@
         },
         "SEQUENCE": {
           "LABEL": "シーケンス",
-          "CHECKBOX": "シーケンスで絞り込み",
-          "SORT": "ソート",
-          "ASC": "昇順",
-          "DESC": "降順"
+          "CHECKBOX": "シーケンスで絞り込み"
         },
+        "SORT": "ソート",
+        "ASC": "昇順",
+        "DESC": "降順",
         "CREATIONDATE": {
           "RADIO_FROM": "から",
           "RADIO_RANGE": "範囲",

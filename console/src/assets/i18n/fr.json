@@ -871,11 +871,11 @@
         },
         "SEQUENCE": {
           "LABEL": "séquence",
-          "CHECKBOX": "Filtrer par séquence",
-          "SORT": "Triage",
-          "ASC": "Ascendant",
-          "DESC": "Descendant"
+          "CHECKBOX": "Filtrer par séquence"
         },
+        "SORT": "Triage",
+        "ASC": "Ascendant",
+        "DESC": "Descendant",
         "CREATIONDATE": {
           "RADIO_FROM": "De",
           "RADIO_RANGE": "Gamme",

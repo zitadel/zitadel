@@ -871,11 +871,11 @@
         },
         "SEQUENCE": {
           "LABEL": "Sequenz",
-          "CHECKBOX": "Nach Sequenz filtern",
-          "SORT": "Sortierung",
-          "ASC": "aufsteigend",
-          "DESC": "absteigend"
+          "CHECKBOX": "Nach Sequenz filtern"
         },
+        "SORT": "Sortierung",
+        "ASC": "Aufsteigend",
+        "DESC": "Absteigend",
         "CREATIONDATE": {
           "RADIO_FROM": "Von",
           "RADIO_RANGE": "Zeitraum",

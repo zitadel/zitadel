@@ -871,11 +871,11 @@
         },
         "SEQUENCE": {
           "LABEL": "序列",
-          "CHECKBOX": "按顺序过滤",
-          "SORT": "分拣",
-          "ASC": "上升中",
-          "DESC": "下降"
+          "CHECKBOX": "按顺序过滤"
         },
+        "SORT": "分拣",
+        "ASC": "上升中",
+        "DESC": "下降",
         "CREATIONDATE": {
           "RADIO_FROM": "从",
           "RADIO_RANGE": "范围",

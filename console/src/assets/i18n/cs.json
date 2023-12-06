@@ -872,11 +872,11 @@
         },
         "SEQUENCE": {
           "LABEL": "Sekvence",
-          "CHECKBOX": "Filtrovat podle Sekvence",
-          "SORT": "Třídění",
-          "ASC": "Vzestupně",
-          "DESC": "Sestupně"
+          "CHECKBOX": "Filtrovat podle Sekvence"
         },
+        "SORT": "Třídění",
+        "ASC": "Vzestupně",
+        "DESC": "Sestupně",
         "CREATIONDATE": {
           "RADIO_FROM": "Od",
           "RADIO_RANGE": "Rozsah",

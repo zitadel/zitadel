@@ -872,11 +872,11 @@
         },
         "SEQUENCE": {
           "LABEL": "Sequência",
-          "CHECKBOX": "Filtrar por Sequência",
-          "SORT": "Ordenação",
-          "ASC": "Crescente",
-          "DESC": "Decrescente"
+          "CHECKBOX": "Filtrar por Sequência"
         },
+        "SORT": "Ordenação",
+        "ASC": "Crescente",
+        "DESC": "Decrescente",
         "CREATIONDATE": {
           "RADIO_FROM": "Desde",
           "RADIO_RANGE": "Intervalo",

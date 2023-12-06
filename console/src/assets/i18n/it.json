@@ -870,11 +870,11 @@
         },
         "SEQUENCE": {
           "LABEL": "Sequence",
-          "CHECKBOX": "Filter per sequenza",
-          "SORT": "",
-          "ASC": "Ascending",
-          "DESC": "Descending"
+          "CHECKBOX": "Filter per sequenza"
         },
+        "SORT": "Ordina per",
+        "ASC": "Ascendente",
+        "DESC": "Discendente",
         "CREATIONDATE": {
           "RADIO_FROM": "Da",
           "RADIO_RANGE": "Intervallo",
