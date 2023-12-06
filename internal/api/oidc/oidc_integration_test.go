@@ -31,9 +31,9 @@ var (
 )
 
 const (
-	redirectURI          = "oidcintegrationtest://callback"
+	redirectURI          = "https://callback"
 	redirectURIImplicit  = "http://localhost:9999/callback"
-	logoutRedirectURI    = "oidcintegrationtest://logged-out"
+	logoutRedirectURI    = "https://logged-out"
 	zitadelAudienceScope = domain.ProjectIDScope + domain.ProjectIDScopeZITADEL + domain.AudSuffix
 )
 
