@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	openid "github.com/zitadel/oidc/v3/pkg/oidc"
+	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -141,7 +141,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 								"lastname1",
 								"nickname1",
 								"displayname1",
-								language.German,
+								language.English,
 								domain.GenderMale,
 								"email1",
 								true,
@@ -185,7 +185,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 								"lastname1",
 								"nickname1",
 								"displayname1",
-								language.German,
+								language.English,
 								domain.GenderMale,
 								"email1",
 								true,
@@ -253,7 +253,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 								"lastname1",
 								"nickname1",
 								"displayname1",
-								language.German,
+								language.English,
 								domain.GenderMale,
 								"email1",
 								true,
@@ -321,7 +321,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 								"lastname1",
 								"nickname1",
 								"displayname1",
-								language.German,
+								language.English,
 								domain.GenderMale,
 								"email1",
 								true,
@@ -392,7 +392,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 								"lastname1",
 								"nickname1",
 								"displayname1",
-								language.German,
+								language.English,
 								domain.GenderMale,
 								"email1",
 								true,
@@ -1181,7 +1181,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 								"lastname1",
 								"nickname1",
 								"displayname1",
-								language.German,
+								language.English,
 								domain.GenderMale,
 								"email1",
 								false,

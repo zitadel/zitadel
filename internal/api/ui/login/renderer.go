@@ -39,7 +39,7 @@ type LanguageData struct {
 	Lang string
 }
 
-func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage static.Storage, cookieName string) *Renderer {
+func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName string) *Renderer {
 	r := &Renderer{
 		pathPrefix:    pathPrefix,
 		staticStorage: staticStorage,
@@ -238,7 +238,6 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 	}
 	var err error
 	r.Renderer, err = renderer.NewRenderer(
-		staticDir,
 		tmplMapping, funcs,
 		cookieName,
 	)
@@ -343,13 +342,14 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 
 		_, msg = l.getErrorMessage(r, err)
 	}
-	data := l.getBaseData(r, authReq, "Errors.Internal", "", "Internal", msg)
-	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplError], data, nil)
+	translator := l.getTranslator(r.Context(), authReq)
+	data := l.getBaseData(r, authReq, translator, "Errors.Internal", "", "Internal", msg)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplError], data, nil)
 }
 
-func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, titleI18nKey string, descriptionI18nKey string, errType, errMessage string) userData {
+func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, translator *i18n.Translator, titleI18nKey string, descriptionI18nKey string, errType, errMessage string) userData {
 	userData := userData{
-		baseData:    l.getBaseData(r, authReq, titleI18nKey, descriptionI18nKey, errType, errMessage),
+		baseData:    l.getBaseData(r, authReq, translator, titleI18nKey, descriptionI18nKey, errType, errMessage),
 		profileData: l.getProfileData(authReq),
 	}
 	if authReq != nil && authReq.LinkingUsers != nil {
@@ -358,9 +358,7 @@ func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, titleI
 	return userData
 }
 
-func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, titleI18nKey string, descriptionI18nKey string, errType, errMessage string) baseData {
-	translator := l.getTranslator(r.Context(), authReq)
-
+func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, translator *i18n.Translator, titleI18nKey string, descriptionI18nKey string, errType, errMessage string) baseData {
 	title := ""
 	if titleI18nKey != "" {
 		title = translator.LocalizeWithoutArgs(titleI18nKey)
@@ -418,7 +416,11 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, titleI
 }
 
 func (l *Login) getTranslator(ctx context.Context, authReq *domain.AuthRequest) *i18n.Translator {
-	translator, err := l.renderer.NewTranslator(ctx)
+	restrictions, err := l.query.GetInstanceRestrictions(ctx)
+	if err != nil {
+		logging.OnError(err).Warn("cannot load instance restrictions to retrieve allowed languages for creating the translator")
+	}
+	translator, err := l.renderer.NewTranslator(ctx, restrictions.AllowedLanguages)
 	logging.OnError(err).Warn("cannot load translator")
 	if authReq != nil {
 		l.addLoginTranslations(translator, authReq.DefaultTranslations)

@@ -3,12 +3,11 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"math"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/pkg/errors"
 
 	"github.com/zitadel/zitadel/internal/api/call"
 	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
@@ -166,7 +165,7 @@ func prepareQuotaNotificationsQuery(ctx context.Context, db prepareDatabase) (sq
 				var nextDueThreshold sql.NullInt16
 				err := rows.Scan(&cfg.ID, &cfg.CallURL, &cfg.Percent, &cfg.Repeat, &nextDueThreshold)
 				if err != nil {
-					if errs.Is(err, sql.ErrNoRows) {
+					if errors.Is(err, sql.ErrNoRows) {
 						return nil, zitadel_errors.ThrowNotFound(err, "QUERY-bbqWb", "Errors.QuotaNotification.NotExisting")
 					}
 					return nil, zitadel_errors.ThrowInternal(err, "QUERY-8copS", "Errors.Internal")

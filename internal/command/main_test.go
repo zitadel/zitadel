@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/zitadel/passwap"
 	"github.com/zitadel/passwap/verifier"
+	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -29,6 +29,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 	proj_repo "github.com/zitadel/zitadel/internal/repository/project"
 	quota_repo "github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/repository/restrictions"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
@@ -60,6 +61,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	oidcsession.RegisterEventMappers(es)
 	quota_repo.RegisterEventMappers(es)
 	limits.RegisterEventMappers(es)
+	restrictions.RegisterEventMappers(es)
 	feature.RegisterEventMappers(es)
 	return es
 }
@@ -93,7 +95,13 @@ func eventPusherToEvents(eventsPushes ...eventstore.Command) []*repository.Event
 
 func expectPush(commands ...eventstore.Command) expect {
 	return func(m *mock.MockRepository) {
-		m.ExpectPush(commands)
+		m.ExpectPush(commands, 0)
+	}
+}
+
+func expectPushSlow(sleep time.Duration, commands ...eventstore.Command) expect {
+	return func(m *mock.MockRepository) {
+		m.ExpectPush(commands, sleep)
 	}
 }
 
@@ -210,7 +218,7 @@ func (m *mockInstance) ConsoleApplicationID() string {
 }
 
 func (m *mockInstance) DefaultLanguage() language.Tag {
-	return language.English
+	return AllowedLanguage
 }
 
 func (m *mockInstance) DefaultOrganisationID() string {

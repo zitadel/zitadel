@@ -31,8 +31,15 @@ Errors:
   Limits:
     NotFound: Лимитот не е пронајден
     NoneSpecified: Не се наведени лимити
+  Restrictions:
+    NoneSpecified: Не се наведени ограничувања
+    DefaultLanguageMustBeAllowed: Стандардниот јазик мора да биде дозволен
   Language:
     NotParsed: Јазикот не може да се парсира
+    NotSupported: Јазикот не е поддржан
+    NotAllowed: Јазикот не е дозволен
+    Undefined: Јазикот е недефиниран
+    Duplicate: Јазиците имаат дупликати
   OIDCSettings:
     NotFound: OIDC конфигурацијата не е пронајдена
     AlreadyExists: OIDC конфигурацијата веќе постои
@@ -430,6 +437,7 @@ Errors:
   UserSession:
     NotFound: Корисничката сесија не е пронајдена
   Key:
+    NotFound: Клучот не е пронајден
     ExpireBeforeNow: Датумот на истекување е во минатото
   Login:
     LoginPolicy:

@@ -22,7 +22,7 @@ func (l *Login) getPasswordComplexityPolicy(r *http.Request, orgID string) *iam_
 }
 
 func (l *Login) getPasswordComplexityPolicyByUserID(r *http.Request, userID string) *iam_model.PasswordComplexityPolicyView {
-	user, err := l.query.GetUserByID(r.Context(), false, userID, false)
+	user, err := l.query.GetUserByID(r.Context(), false, userID)
 	if err != nil {
 		logging.WithFields("userID", userID).OnError(err).Error("could not load user for password complexity policy")
 		return nil

@@ -55,6 +55,7 @@ func AggregateFromWriteModel(
 	version Version,
 ) *Aggregate {
 	return NewAggregate(
+		// TODO: the linter complains if this function is called without passing a context
 		context.Background(),
 		wm.AggregateID,
 		typ,
@@ -81,7 +82,7 @@ type Aggregate struct {
 // AggregateType is the object name
 type AggregateType string
 
-func isAggreagteTypes(a *Aggregate, types ...AggregateType) bool {
+func isAggregateTypes(a *Aggregate, types ...AggregateType) bool {
 	for _, typ := range types {
 		if a.Type == typ {
 			return true

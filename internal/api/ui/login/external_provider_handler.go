@@ -549,7 +549,7 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 
 	translator := l.getTranslator(r.Context(), authReq)
 	data := externalNotFoundOptionData{
-		baseData: l.getBaseData(r, authReq, "ExternalNotFound.Title", "ExternalNotFound.Description", errID, errMessage),
+		baseData: l.getBaseData(r, authReq, translator, "ExternalNotFound.Title", "ExternalNotFound.Description", errID, errMessage),
 		externalNotFoundOptionFormData: externalNotFoundOptionFormData{
 			externalRegisterFormData: externalRegisterFormData{
 				Email:     human.EmailAddress,
@@ -677,7 +677,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 
 // updateExternalUser will update the existing user (email, phone, profile) with data provided by the IDP
 func (l *Login) updateExternalUser(ctx context.Context, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) error {
-	user, err := l.query.GetUserByID(ctx, true, authReq.UserID, false)
+	user, err := l.query.GetUserByID(ctx, true, authReq.UserID)
 	if err != nil {
 		return err
 	}

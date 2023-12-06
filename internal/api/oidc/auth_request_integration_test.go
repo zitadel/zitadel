@@ -17,6 +17,7 @@ import (
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/integration"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 )
@@ -500,8 +501,7 @@ func exchangeTokens(t testing.TB, clientID, code string) (*oidc.Tokens[*oidc.IDT
 	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
 
-	codeVerifier := "codeVerifier"
-	return rp.CodeExchange[*oidc.IDTokenClaims](context.Background(), code, provider, rp.WithCodeVerifier(codeVerifier))
+	return rp.CodeExchange[*oidc.IDTokenClaims](context.Background(), code, provider, rp.WithCodeVerifier(integration.CodeVerifier))
 }
 
 func refreshTokens(t testing.TB, clientID, refreshToken string) (*oidc.Tokens[*oidc.IDTokenClaims], error) {

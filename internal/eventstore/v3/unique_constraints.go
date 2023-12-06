@@ -18,6 +18,8 @@ import (
 var (
 	//go:embed unique_constraints_delete.sql
 	deleteConstraintStmt string
+	//go:embed unique_constraints_delete_placeholders.sql
+	deleteConstraintPlaceholdersStmt string
 	//go:embed unique_constraints_add.sql
 	addConstraintStmt string
 )
@@ -35,11 +37,12 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventst
 		for _, constraint := range command.UniqueConstraints() {
 			switch constraint.Action {
 			case eventstore.UniqueConstraintAdd:
+				constraint.UniqueField = strings.ToLower(constraint.UniqueField)
 				addPlaceholders = append(addPlaceholders, fmt.Sprintf("($%d, $%d, $%d)", len(addArgs)+1, len(addArgs)+2, len(addArgs)+3))
 				addArgs = append(addArgs, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)
 				addConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintRemove:
-				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d AND unique_type = $%d AND unique_field = $%d)", len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
+				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf(deleteConstraintPlaceholdersStmt, len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
 				deleteArgs = append(deleteArgs, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)
 				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintInstanceRemove:

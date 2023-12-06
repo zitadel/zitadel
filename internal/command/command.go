@@ -9,7 +9,10 @@ import (
 	"math/big"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
+
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	api_http "github.com/zitadel/zitadel/internal/api/http"
@@ -32,15 +35,19 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 	proj_repo "github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/repository/restrictions"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	usr_grant_repo "github.com/zitadel/zitadel/internal/repository/usergrant"
 	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	webauthn_helper "github.com/zitadel/zitadel/internal/webauthn"
 )
 
 type Commands struct {
 	httpClient *http.Client
+
+	jobs sync.WaitGroup
 
 	checkPermission    domain.PermissionCheck
 	newCode            cryptoCodeFunc
@@ -152,6 +159,7 @@ func StartCommands(
 	action.RegisterEventMappers(repo.eventstore)
 	quota.RegisterEventMappers(repo.eventstore)
 	limits.RegisterEventMappers(repo.eventstore)
+	restrictions.RegisterEventMappers(repo.eventstore)
 	session.RegisterEventMappers(repo.eventstore)
 	idpintent.RegisterEventMappers(repo.eventstore)
 	authrequest.RegisterEventMappers(repo.eventstore)
@@ -254,4 +262,55 @@ func samlCertificateAndKeyGenerator(keySize int) func(id string) ([]byte, []byte
 		certBlock := &pem.Block{Type: "CERTIFICATE", Bytes: derBytes}
 		return pem.EncodeToMemory(keyBlock), pem.EncodeToMemory(certBlock), nil
 	}
+}
+
+// Close blocks until all async jobs are finished,
+// the context expires or after eventstore.PushTimeout.
+func (c *Commands) Close(ctx context.Context) error {
+	if c.eventstore.PushTimeout != 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, c.eventstore.PushTimeout)
+		defer cancel()
+	}
+
+	done := make(chan struct{})
+	go func() {
+		c.jobs.Wait()
+		close(done)
+	}()
+	select {
+	case <-done:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
+
+// asyncPush attempts to push events to the eventstore in a separate Go routine.
+// This can be used to speed up request times when the outcome of the push is
+// not important for business logic but have a pure logging function.
+// For example this can be used for Secret Check Success and Failed events.
+// On push error, a log line describing the error will be emitted.
+func (c *Commands) asyncPush(ctx context.Context, cmds ...eventstore.Command) {
+	// Create a new context, as the request scoped context might get
+	// canceled before we where able to push.
+	// The eventstore has its own PushTimeout setting,
+	// so we don't need to have a context with timeout here.
+	ctx = context.WithoutCancel(ctx)
+
+	c.jobs.Add(1)
+
+	go func() {
+		defer c.jobs.Done()
+		localCtx, span := tracing.NewSpan(ctx)
+
+		_, err := c.eventstore.Push(localCtx, cmds...)
+		if err != nil {
+			for _, cmd := range cmds {
+				logging.WithError(err).Errorf("could not push event %q", cmd.Type())
+			}
+		}
+
+		span.EndWithError(err)
+	}()
 }

@@ -31,8 +31,15 @@ Errors:
   Limits:
     NotFound: 未找到限制
     NoneSpecified: 未指定限制
+  Restrictions:
+    NoneSpecified: 未指定限制
+    DefaultLanguageMustBeAllowed: 默认语言必须被允许
   Language:
     NotParsed: 无法解析语言
+    NotSupported: 语言不支持
+    NotAllowed: 语言不被允许
+    Undefined: 语言未定义
+    Duplicate: 语言有重复
   OIDCSettings:
     NotFound: OIDC 配置未找到
     AlreadyExists: OIDC 配置已存在
@@ -430,6 +437,7 @@ Errors:
   UserSession:
     NotFound: 用户会话不存在
   Key:
+    NotFound: 找不到钥匙
     ExpireBeforeNow: 过期日期是过去的无效日期
   Login:
     LoginPolicy:

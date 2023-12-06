@@ -27,19 +27,19 @@ var (
 		"private_labeling_setting",
 	}
 
-	prepareProjectsStmt = `SELECT projections.projects3.id,` +
-		` projections.projects3.creation_date,` +
-		` projections.projects3.change_date,` +
-		` projections.projects3.resource_owner,` +
-		` projections.projects3.state,` +
-		` projections.projects3.sequence,` +
-		` projections.projects3.name,` +
-		` projections.projects3.project_role_assertion,` +
-		` projections.projects3.project_role_check,` +
-		` projections.projects3.has_project_check,` +
-		` projections.projects3.private_labeling_setting,` +
+	prepareProjectsStmt = `SELECT projections.projects4.id,` +
+		` projections.projects4.creation_date,` +
+		` projections.projects4.change_date,` +
+		` projections.projects4.resource_owner,` +
+		` projections.projects4.state,` +
+		` projections.projects4.sequence,` +
+		` projections.projects4.name,` +
+		` projections.projects4.project_role_assertion,` +
+		` projections.projects4.project_role_check,` +
+		` projections.projects4.has_project_check,` +
+		` projections.projects4.private_labeling_setting,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.projects3` +
+		` FROM projections.projects4` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	prepareProjectsCols = []string{
 		"id",
@@ -56,18 +56,18 @@ var (
 		"count",
 	}
 
-	prepareProjectStmt = `SELECT projections.projects3.id,` +
-		` projections.projects3.creation_date,` +
-		` projections.projects3.change_date,` +
-		` projections.projects3.resource_owner,` +
-		` projections.projects3.state,` +
-		` projections.projects3.sequence,` +
-		` projections.projects3.name,` +
-		` projections.projects3.project_role_assertion,` +
-		` projections.projects3.project_role_check,` +
-		` projections.projects3.has_project_check,` +
-		` projections.projects3.private_labeling_setting` +
-		` FROM projections.projects3` +
+	prepareProjectStmt = `SELECT projections.projects4.id,` +
+		` projections.projects4.creation_date,` +
+		` projections.projects4.change_date,` +
+		` projections.projects4.resource_owner,` +
+		` projections.projects4.state,` +
+		` projections.projects4.sequence,` +
+		` projections.projects4.name,` +
+		` projections.projects4.project_role_assertion,` +
+		` projections.projects4.project_role_check,` +
+		` projections.projects4.has_project_check,` +
+		` projections.projects4.private_labeling_setting` +
+		` FROM projections.projects4` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	prepareProjectCols = []string{
 		"id",

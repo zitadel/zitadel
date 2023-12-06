@@ -1,18 +1,28 @@
 package query
 
 import (
+	"context"
 	"crypto/rsa"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"io"
 	"math/big"
 	"regexp"
 	"testing"
+	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	key_repo "github.com/zitadel/zitadel/internal/repository/keypair"
 )
 
 var (
@@ -246,4 +256,233 @@ func fromBase16(base16 string) *big.Int {
 		panic("bad number: " + base16)
 	}
 	return i
+}
+
+const pubKey = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs38btwb3c7r0tMaQpGvB
+mY+mPwMU/LpfuPoC0k2t4RsKp0fv40SMl50CRrHgk395wch8PMPYbl3+8TtYAJuy
+rFALIj3Ff1UcKIk0hOH5DDsfh7/q2wFuncTmS6bifYo8CfSq2vDGnM7nZnEvxY/M
+fSydZdcmIqlkUpfQmtzExw9+tSe5Dxq6gn5JtlGgLgZGt69r5iMMrTEGhhVAXzNu
+MZbmlCoBru+rC8ITlTX/0V1ZcsSbL8tYWhthyu9x6yjo1bH85wiVI4gs0MhU8f2a
++kjL/KGZbR14Ua2eo6tonBZLC5DHWM2TkYXgRCDPufjcgmzN0Lm91E4P8KvBcvly
+6QIDAQAB
+-----END PUBLIC KEY-----
+`
+
+func TestQueries_GetActivePublicKeyByID(t *testing.T) {
+	now := time.Now()
+	future := now.Add(time.Hour)
+
+	tests := []struct {
+		name       string
+		eventstore func(*testing.T) *eventstore.Eventstore
+		encryption func(*testing.T) *crypto.MockEncryptionAlgorithm
+		want       *rsaPublicKey
+		wantErr    error
+	}{
+		{
+			name: "filter error",
+			eventstore: expectEventstore(
+				expectFilterError(io.ErrClosedPipe),
+			),
+			wantErr: io.ErrClosedPipe,
+		},
+		{
+			name: "not found error",
+			eventstore: expectEventstore(
+				expectFilter(),
+			),
+			wantErr: errs.ThrowNotFound(nil, "QUERY-Ahf7x", "Errors.Key.NotFound"),
+		},
+		{
+			name: "expired error",
+			eventstore: expectEventstore(
+				expectFilter(
+					eventFromEventPusher(key_repo.NewAddedEvent(context.Background(),
+						&eventstore.Aggregate{
+							ID:            "keyID",
+							Type:          key_repo.AggregateType,
+							ResourceOwner: "instanceID",
+							InstanceID:    "instanceID",
+							Version:       key_repo.AggregateVersion,
+						},
+						domain.KeyUsageSigning, "alg",
+						&crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "alg",
+							KeyID:      "keyID",
+							Crypted:    []byte("private"),
+						},
+						&crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "alg",
+							KeyID:      "keyID",
+							Crypted:    []byte("public"),
+						},
+						now.Add(-time.Hour),
+						now.Add(-time.Hour),
+					)),
+				),
+			),
+			wantErr: errs.ThrowInvalidArgument(nil, "QUERY-ciF4k", "Errors.Key.ExpireBeforeNow"),
+		},
+		{
+			name: "decrypt error",
+			eventstore: expectEventstore(
+				expectFilter(
+					eventFromEventPusher(key_repo.NewAddedEvent(context.Background(),
+						&eventstore.Aggregate{
+							ID:            "keyID",
+							Type:          key_repo.AggregateType,
+							ResourceOwner: "instanceID",
+							InstanceID:    "instanceID",
+							Version:       key_repo.AggregateVersion,
+						},
+						domain.KeyUsageSigning, "alg",
+						&crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "alg",
+							KeyID:      "keyID",
+							Crypted:    []byte("private"),
+						},
+						&crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "alg",
+							KeyID:      "keyID",
+							Crypted:    []byte("public"),
+						},
+						future,
+						future,
+					)),
+				),
+			),
+			encryption: func(t *testing.T) *crypto.MockEncryptionAlgorithm {
+				encryption := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
+				expect := encryption.EXPECT()
+				expect.Algorithm().Return("alg")
+				expect.DecryptionKeyIDs().Return([]string{})
+				return encryption
+			},
+			wantErr: errs.ThrowInternal(nil, "QUERY-Ie4oh", "Errors.Internal"),
+		},
+		{
+			name: "parse error",
+			eventstore: expectEventstore(
+				expectFilter(
+					eventFromEventPusher(key_repo.NewAddedEvent(context.Background(),
+						&eventstore.Aggregate{
+							ID:            "keyID",
+							Type:          key_repo.AggregateType,
+							ResourceOwner: "instanceID",
+							InstanceID:    "instanceID",
+							Version:       key_repo.AggregateVersion,
+						},
+						domain.KeyUsageSigning, "alg",
+						&crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "alg",
+							KeyID:      "keyID",
+							Crypted:    []byte("private"),
+						},
+						&crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "alg",
+							KeyID:      "keyID",
+							Crypted:    []byte("public"),
+						},
+						future,
+						future,
+					)),
+				),
+			),
+			encryption: func(t *testing.T) *crypto.MockEncryptionAlgorithm {
+				encryption := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
+				expect := encryption.EXPECT()
+				expect.Algorithm().Return("alg")
+				expect.DecryptionKeyIDs().Return([]string{"keyID"})
+				expect.Decrypt([]byte("public"), "keyID").Return([]byte("foo"), nil)
+				return encryption
+			},
+			wantErr: errs.ThrowInternal(nil, "QUERY-Kai2Z", "Errors.Internal"),
+		},
+		{
+			name: "success",
+			eventstore: expectEventstore(
+				expectFilter(
+					eventFromEventPusher(key_repo.NewAddedEvent(context.Background(),
+						&eventstore.Aggregate{
+							ID:            "keyID",
+							Type:          key_repo.AggregateType,
+							ResourceOwner: "instanceID",
+							InstanceID:    "instanceID",
+							Version:       key_repo.AggregateVersion,
+						},
+						domain.KeyUsageSigning, "alg",
+						&crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "alg",
+							KeyID:      "keyID",
+							Crypted:    []byte("private"),
+						},
+						&crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "alg",
+							KeyID:      "keyID",
+							Crypted:    []byte("public"),
+						},
+						future,
+						future,
+					)),
+				),
+			),
+			encryption: func(t *testing.T) *crypto.MockEncryptionAlgorithm {
+				encryption := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
+				expect := encryption.EXPECT()
+				expect.Algorithm().Return("alg")
+				expect.DecryptionKeyIDs().Return([]string{"keyID"})
+				expect.Decrypt([]byte("public"), "keyID").Return([]byte(pubKey), nil)
+				return encryption
+			},
+			want: &rsaPublicKey{
+				key: key{
+					id:            "keyID",
+					resourceOwner: "instanceID",
+					algorithm:     "alg",
+					use:           domain.KeyUsageSigning,
+				},
+				expiry: future,
+				publicKey: func() *rsa.PublicKey {
+					publicKey, err := crypto.BytesToPublicKey([]byte(pubKey))
+					if err != nil {
+						panic(err)
+					}
+					return publicKey
+				}(),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			q := &Queries{
+				eventstore: tt.eventstore(t),
+			}
+			if tt.encryption != nil {
+				q.keyEncryptionAlgorithm = tt.encryption(t)
+			}
+			ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
+			key, err := q.GetActivePublicKeyByID(ctx, "keyID", now)
+			if tt.wantErr != nil {
+				require.ErrorIs(t, err, tt.wantErr)
+				return
+			}
+			require.NoError(t, err)
+			require.NotNil(t, key)
+
+			got := key.(*rsaPublicKey)
+			assert.WithinDuration(t, tt.want.expiry, got.expiry, time.Second)
+			tt.want.expiry = time.Time{}
+			got.expiry = time.Time{}
+			assert.Equal(t, tt.want, got)
+		})
+	}
 }

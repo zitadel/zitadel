@@ -46,7 +46,7 @@ func (l *Login) runPostExternalAuthenticationActions(
 	if resourceOwner == "" {
 		resourceOwner = authz.GetInstance(ctx).DefaultOrganisationID()
 	}
-	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner, false)
+	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner)
 	if err != nil {
 		return nil, false, err
 	}
@@ -168,7 +168,7 @@ func (l *Login) runPostInternalAuthenticationActions(
 		resourceOwner = authRequest.UserOrgID
 	}
 
-	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeInternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner, false)
+	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeInternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -226,7 +226,7 @@ func (l *Login) runPreCreationActions(
 ) (*domain.Human, []*domain.Metadata, error) {
 	ctx := httpRequest.Context()
 
-	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, flowType, domain.TriggerTypePreCreation, resourceOwner, false)
+	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, flowType, domain.TriggerTypePreCreation, resourceOwner)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -326,7 +326,7 @@ func (l *Login) runPostCreationActions(
 ) ([]*domain.UserGrant, error) {
 	ctx := httpRequest.Context()
 
-	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, flowType, domain.TriggerTypePostCreation, resourceOwner, false)
+	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, flowType, domain.TriggerTypePostCreation, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -347,7 +347,7 @@ func (l *Login) runPostCreationActions(
 			actions.SetFields("v1",
 				actions.SetFields("getUser", func(c *actions.FieldConfig) interface{} {
 					return func(call goja.FunctionCall) goja.Value {
-						user, err := l.query.GetUserByID(actionCtx, true, userID, false)
+						user, err := l.query.GetUserByID(actionCtx, true, userID)
 						if err != nil {
 							panic(err)
 						}

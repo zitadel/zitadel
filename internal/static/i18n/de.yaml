@@ -31,8 +31,15 @@ Errors:
   Limits:
     NotFound: Limits konnten nicht gefunden werden
     NoneSpecified: Keine Limits angegeben
+  Restrictions:
+    NoneSpecified: Keine Restriktionen angegeben
+    DefaultLanguageMustBeAllowed: Default Sprache muss erlaubt sein
   Language:
     NotParsed: Sprache konnte nicht gemapped werden
+    NotSupported: Sprache wird nicht unterstützt
+    NotAllowed: Sprache ist nicht erlaubt
+    Undefined: Sprache ist nicht definiert
+    Duplicate: Sprachen haben Duplikate
   OIDCSettings:
     NotFound: OIDC Konfiguration konnte nicht gefunden werden
     AlreadyExists: OIDC Konfiguration existiert bereits
@@ -430,6 +437,7 @@ Errors:
   UserSession:
     NotFound: Benutzer Sitzung konnte nicht gefunden werden
   Key:
+    NotFound: Schlüssel nicht gefunden
     ExpireBeforeNow: Das Ablaufdatum liegt in der Vergangenheit
   Login:
     LoginPolicy:

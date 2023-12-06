@@ -23,7 +23,7 @@ func (l *Login) handlePasswordReset(w http.ResponseWriter, r *http.Request) {
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 		return
 	}
-	user, err := l.query.GetUser(setContext(r.Context(), authReq.UserOrgID), true, false, loginName)
+	user, err := l.query.GetUser(setContext(r.Context(), authReq.UserOrgID), true, loginName)
 	if err != nil {
 		if authReq.LoginPolicy.IgnoreUnknownUsernames && errors.IsNotFound(err) {
 			err = nil
@@ -48,6 +48,7 @@ func (l *Login) renderPasswordResetDone(w http.ResponseWriter, r *http.Request, 
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	data := l.getUserData(r, authReq, "PasswordResetDone.Title", "PasswordResetDone.Description", errID, errMessage)
-	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplPasswordResetDone], data, nil)
+	translator := l.getTranslator(r.Context(), authReq)
+	data := l.getUserData(r, authReq, translator, "PasswordResetDone.Title", "PasswordResetDone.Description", errID, errMessage)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplPasswordResetDone], data, nil)
 }

@@ -28,8 +28,7 @@ func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest
 		return nil, err
 	}
 	orgID := authz.GetCtxData(ctx).OrgID
-	err = s.command.AddHuman(ctx, orgID, human, false)
-	if err != nil {
+	if err = s.command.AddHuman(ctx, orgID, human, false); err != nil {
 		return nil, err
 	}
 	return &user.AddHumanUserResponse{
@@ -360,7 +359,7 @@ func (s *Server) checkIntentToken(token string, intentID string) error {
 }
 
 func (s *Server) ListAuthenticationMethodTypes(ctx context.Context, req *user.ListAuthenticationMethodTypesRequest) (*user.ListAuthenticationMethodTypesResponse, error) {
-	authMethods, err := s.query.ListActiveUserAuthMethodTypes(ctx, req.GetUserId(), false)
+	authMethods, err := s.query.ListActiveUserAuthMethodTypes(ctx, req.GetUserId())
 	if err != nil {
 		return nil, err
 	}

@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Server) GetMyPhone(ctx context.Context, _ *auth_pb.GetMyPhoneRequest) (*auth_pb.GetMyPhoneResponse, error) {
-	phone, err := s.query.GetHumanPhone(ctx, authz.GetCtxData(ctx).UserID, false)
+	phone, err := s.query.GetHumanPhone(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
 	}

@@ -47,7 +47,7 @@ func failureFromStatement(statement *Statement, err error) *failure {
 	}
 }
 
-func (h *Handler) handleFailedStmt(tx *sql.Tx, currentState *state, f *failure) (shouldContinue bool) {
+func (h *Handler) handleFailedStmt(tx *sql.Tx, f *failure) (shouldContinue bool) {
 	failureCount, err := h.failureCount(tx, f)
 	if err != nil {
 		h.logFailure(f).WithError(err).Warn("unable to get failure count")

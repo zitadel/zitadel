@@ -11,7 +11,6 @@ import (
 
 	"github.com/muhlemmer/gu"
 
-	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
@@ -352,9 +351,6 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 		if err != nil {
 			return nil, err
 		}
-
-		// trigger activity log for session for user
-		activity.Trigger(ctx, user.ResourceOwner, user.ID, activity.SessionAPI)
 		sessionChecks = append(sessionChecks, command.CheckUser(user.ID, user.ResourceOwner))
 	}
 	if password := checks.GetPassword(); password != nil {
@@ -490,7 +486,7 @@ type userSearchByID struct {
 }
 
 func (u userSearchByID) search(ctx context.Context, q *query.Queries) (*query.User, error) {
-	return q.GetUserByID(ctx, true, u.id, false)
+	return q.GetUserByID(ctx, true, u.id)
 }
 
 type userSearchByLoginName struct {
@@ -498,5 +494,5 @@ type userSearchByLoginName struct {
 }
 
 func (u userSearchByLoginName) search(ctx context.Context, q *query.Queries) (*query.User, error) {
-	return q.GetUser(ctx, true, false, u.loginNameQuery)
+	return q.GetUser(ctx, true, u.loginNameQuery)
 }

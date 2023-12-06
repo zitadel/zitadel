@@ -85,7 +85,7 @@ jobs:
     - 
       uses: actions/setup-go@v4
       with:
-        go-version: ${{ github.event.inputs.go_version }}
+        go-version: ${{ inputs.go_version }}
     - 
       uses: actions/cache/restore@v3
       timeout-minutes: 1
