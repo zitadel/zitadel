@@ -1,5 +1,5 @@
 import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
-import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import {FormControl, UntypedFormControl, UntypedFormGroup} from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription, switchMap } from 'rxjs';
@@ -118,8 +118,8 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
   public destroy$: Subject<void> = new Subject();
   public InfoSectionType: any = InfoSectionType;
   public form: UntypedFormGroup = new UntypedFormGroup({
-    currentSubMap: new UntypedFormControl('emailVerificationDoneText'),
-    language: new UntypedFormControl('en'),
+    currentSubMap: new FormControl<string>('emailVerificationDoneText'),
+    language: new FormControl<string>('en'),
   });
 
   public isDefault: boolean = false;
@@ -387,15 +387,15 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     }
   }
 
-  private get languageControl() {
-    return this.form.get('language') as UntypedFormControl;
+  public get language(): string {
+    return this.form.get('language')?.value;
+  }
+
+  public set language(lang: string) {
+    this.form.get('language')?.setValue(lang);
   }
 
   public get currentSubMap(): string {
     return this.form.get('currentSubMap')?.value;
-  }
-
-  public get language(): string {
-    return this.languageControl?.value;
   }
 }
