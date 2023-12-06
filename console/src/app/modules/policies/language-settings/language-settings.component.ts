@@ -30,7 +30,7 @@ export class LanguageSettingsComponent {
   constructor(
     private service: AdminService,
     private toast: ToastService,
-    langSvc: LanguagesService,
+    private langSvc: LanguagesService,
     private authService: GrpcAuthService,
   ) {
     const sub = forkJoin([
@@ -83,6 +83,7 @@ export class LanguageSettingsComponent {
           allowed: [...allowed],
           notAllowed: [...notAllowed],
         });
+        this.langSvc.newAllowed(allowed);
         this.toast.showInfo('SETTING.LANGUAGES.ALLOWED_SAVED', true);
       },
       error: this.toast.showError,

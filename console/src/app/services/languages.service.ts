@@ -36,7 +36,6 @@ export class LanguagesService {
     });
   }
 
-  // TODO: call this in https://github.com/zitadel/zitadel/pull/6965
   public newAllowed(languages: string[]) {
     this.allowedSubject$.next(languages);
   }
