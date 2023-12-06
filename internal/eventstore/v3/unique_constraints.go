@@ -18,6 +18,8 @@ import (
 var (
 	//go:embed unique_constraints_delete.sql
 	deleteConstraintStmt string
+	//go:embed unique_constraints_delete_placeholders.sql
+	deleteConstraintPlaceholdersStmt string
 	//go:embed unique_constraints_add.sql
 	addConstraintStmt string
 )
@@ -40,9 +42,7 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventst
 				addArgs = append(addArgs, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)
 				addConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintRemove:
-				// the query is so complex because we accidentally stored unique constraint case sensitive
-				// the query checks first if there is a case sensitive match and afterwards if there is a case insensitive match
-				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%[1]d AND unique_type = $%[2]d AND unique_field = (SELECT unique_field from (SELECT instance_id, unique_type, unique_field FROM eventstore.unique_constraints WHERE instance_id = $%[1]d AND unique_type = $%[2]d AND unique_field = $%[3]d UNION ALL SELECT instance_id, unique_type, unique_field FROM eventstore.unique_constraints WHERE instance_id = $%[1]d AND unique_type = $%[2]d AND unique_field = LOWER($%[3]d)) LIMIT 1))", len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
+				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf(deleteConstraintPlaceholdersStmt, len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
 				deleteArgs = append(deleteArgs, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)
 				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintInstanceRemove:

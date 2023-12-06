@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -40,24 +41,62 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				config: &domain.CustomLoginText{},
+				ctx: authz.WithInstanceID(context.Background(), "org1"),
+				config: &domain.CustomLoginText{
+					Language: AllowedLanguage,
+				},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
 			},
 		},
 		{
-			name: "invalid custom login text, error",
+			name: "empty custom login text, success",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
+					expectPush(),
 				),
 			},
 			args: args{
-				ctx:           context.Background(),
+				ctx:           authz.WithInstanceID(context.Background(), "org1"),
+				resourceOwner: "org1",
+				config: &domain.CustomLoginText{
+					Language: AllowedLanguage,
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "undefined language, error",
+			fields: fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args: args{
+				ctx:           authz.WithInstanceID(context.Background(), "org1"),
 				resourceOwner: "org1",
 				config:        &domain.CustomLoginText{},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "unsupported language, error",
+			fields: fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args: args{
+				ctx:           authz.WithInstanceID(context.Background(), "org1"),
+				resourceOwner: "org1",
+				config: &domain.CustomLoginText{
+					Language: UnsupportedLanguage,
+				},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,

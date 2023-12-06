@@ -10,9 +10,20 @@ Metrics:
 
 Tracing:
   # Choose one in "otel", "google", "log" and "none"
+  # Depending on the type there are different configuration options
+  # for type 'otel' is used for standard [open telemetry](https://opentelemetry.io)
+  # Fraction: 1.0
+  # Endpoint: 'otel.collector.endpoint'
+  # 
+  # type 'log' or '' disables tracing
+  # 
+  # for type 'google'
+  # ProjectID: ''
+  # Fraction: 1.0
   Type: none # ZITADEL_TRACING_TYPE
   Fraction: 1.0 # ZITADEL_TRACING_FRACTION
-  MetricPrefix: zitadel # ZITADEL_TRACING_METRICPREFIX
+  # The endpoint of the otel collector endpoint
+  Endpoint: '' #ZITADEL_TRACING_ENDPOINT
 
 Telemetry:
   # As long as Enabled is true, ZITADEL tries to send usage data to the configured Telemetry.Endpoints.
@@ -827,6 +838,11 @@ DefaultInstance:
     # DisallowPublicOrgRegistration defines if ZITADEL should expose the endpoint /ui/login/register/org
     # If it is true, the endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.
     DisallowPublicOrgRegistration: # ZITADEL_DEFAULTINSTANCE_RESTRICTIONS_DISALLOWPUBLICORGREGISTRATION
+    # AllowedLanguages restricts the languages that can be used.
+    # If the list is empty, all supported languages are allowed.
+    AllowedLanguages: # ZITADEL_DEFAULTINSTANCE_RESTRICTIONS_ALLOWEDLANGUAGES
+    # - en
+    # - de
   Quotas:
     # Items take a slice of quota configurations, whereas, for each unit type and instance, one or zero quotas may exist.
     # The following unit types are supported

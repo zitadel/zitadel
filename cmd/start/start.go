@@ -62,6 +62,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
@@ -93,7 +94,6 @@ Requirements:
 			if err != nil {
 				return err
 			}
-
 			return startZitadel(config, masterKey, server)
 		},
 	}
@@ -122,6 +122,8 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	showBasicInformation(config)
 
 	ctx := context.Background()
+
+	i18n.MustLoadSupportedLanguagesFromDir()
 
 	zitadelDBClient, err := database.Connect(config.Database, false, false)
 	if err != nil {
@@ -215,6 +217,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
 	}
+	defer commands.Close(ctx) // wait for background jobs
 
 	clock := clockpkg.New()
 	actionsExecutionStdoutEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, &logstore.EmitterConfig{Enabled: config.LogStore.Execution.Stdout.Enabled}, stdout.NewStdoutEmitter[*record.ExecutionLog]())
@@ -319,8 +322,6 @@ func startAPIs(
 	oidcPrefixes := []string{"/.well-known/openid-configuration", "/oidc/v1", "/oauth/v2"}
 	// always set the origin in the context if available in the http headers, no matter for what protocol
 	router.Use(middleware.OriginHandler)
-	// adds used HTTPPathPattern and RequestMethod to context
-	router.Use(middleware.ActivityHandler)
 	systemTokenVerifier, err := internal_authz.StartSystemTokenVerifierFromConfig(http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
 	if err != nil {
 		return err

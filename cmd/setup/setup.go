@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/migration"
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
@@ -64,6 +65,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	ctx := context.Background()
 	logging.Info("setup started")
 
+	i18n.MustLoadSupportedLanguagesFromDir()
+
 	zitadelDBClient, err := database.Connect(config.Database, false, false)
 	logging.OnError(err).Fatal("unable to connect to database")
 	esPusherDBClient, err := database.Connect(config.Database, false, true)
@@ -101,6 +104,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s14NewEventsTable = &NewEventsTable{dbClient: esPusherDBClient}
 	steps.s15CurrentStates = &CurrentProjectionState{dbClient: zitadelDBClient}
 	steps.s16UniqueConstraintsLower = &UniqueConstraintToLower{dbClient: zitadelDBClient}
+	steps.s17AddOffsetToUniqueConstraints = &AddOffsetToCurrentStates{dbClient: zitadelDBClient}
 
 	err = projection.Create(ctx, zitadelDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -143,6 +147,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.WithFields("name", steps.s15CurrentStates.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s16UniqueConstraintsLower)
 	logging.WithFields("name", steps.s16UniqueConstraintsLower.String()).OnError(err).Fatal("migration failed")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s17AddOffsetToUniqueConstraints)
+	logging.WithFields("name", steps.s17AddOffsetToUniqueConstraints.String()).OnError(err).Fatal("migration failed")
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)

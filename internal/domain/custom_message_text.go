@@ -3,6 +3,7 @@ package domain
 import (
 	"golang.org/x/text/language"
 
+	zitadel_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
@@ -51,8 +52,14 @@ type CustomMessageText struct {
 	FooterText      string
 }
 
-func (m *CustomMessageText) IsValid() bool {
-	return m.MessageTextType != "" && m.Language != language.Und
+func (m *CustomMessageText) IsValid(supportedLanguages []language.Tag) error {
+	if m.MessageTextType == "" {
+		return zitadel_errs.ThrowInvalidArgument(nil, "INSTANCE-kd9fs", "Errors.CustomMessageText.Invalid")
+	}
+	if err := LanguageIsDefined(m.Language); err != nil {
+		return err
+	}
+	return LanguagesAreSupported(supportedLanguages, m.Language)
 }
 
 func IsMessageTextType(textType string) bool {
