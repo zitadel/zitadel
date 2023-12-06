@@ -181,7 +181,7 @@ export class EventsComponent implements OnDestroy {
     const isAsc: boolean = filterRequest.getAsc();
     req.setAsc(isAsc);
     if (this.sortAsc !== isAsc) {
-      this.sort.sort({ id: 'sequence', start: isAsc ? 'asc' : 'desc', disableClear: true });
+      this.sort.sort({ id: 'creationDate', start: isAsc ? 'asc' : 'desc', disableClear: true });
     }
     this.loadEvents(req, true);
   }

@@ -38,6 +38,8 @@ func (s *Server) ListAggregateTypes(ctx context.Context, in *admin_pb.ListAggreg
 
 func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) (*eventstore.SearchQueryBuilder, error) {
 	var fromTime, sinceTime, untilTime time.Time
+	// We ignore the deprecation warning here because we still need to support the deprecated field.
+	//nolint:staticcheck
 	if creationDatePb := req.GetCreationDate(); creationDatePb != nil {
 		fromTime = creationDatePb.AsTime()
 	}
