@@ -99,7 +99,7 @@
         type="submit"
         (click)="submit()"
         mat-raised-button
-        [disabled]="(['iam.write'] | hasRole | async) === false && (['iam.restrictions.write'] | hasRole | async) === false"
+        [disabled]="(canWriteRestrictions$ | async) === false"
       >
         {{ 'ACTIONS.SAVE' | translate }}
       </button>
