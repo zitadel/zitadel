@@ -53,7 +53,7 @@ If authorization is required, the token must not be expired and the API has to b
 For tests we will use a Personal Access Token.
 
 ```go reference
-https://github.com/zitadel/zitadel-go/blob/authorization/example/api/http/main.go
+https://github.com/zitadel/zitadel-go/blob/next/example/api/http/main.go
 ```
 
 You will need to provide some values for the program to run:
