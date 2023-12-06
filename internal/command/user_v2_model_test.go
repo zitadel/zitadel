@@ -42,7 +42,7 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newAddHumanEvent("$plain$x$password", true, true, ""),
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
 						),
 					),
 				),
@@ -82,7 +82,7 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 					),
 				),
@@ -110,7 +110,7 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 					InitCode:               nil,
 					InitCodeCreationDate:   time.Time{},
 					InitCodeExpiry:         0,
-					PreferredLanguage:      language.Und,
+					PreferredLanguage:      language.English,
 					UserState:              domain.UserStateActive,
 				},
 			},
@@ -121,7 +121,7 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanInitialCodeAddedEvent(context.Background(),
@@ -155,7 +155,7 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 					FirstName:              "firstname",
 					LastName:               "lastname",
 					DisplayName:            "firstname lastname",
-					PreferredLanguage:      language.Und,
+					PreferredLanguage:      language.English,
 					PasswordEncodedHash:    "$plain$x$password",
 					PasswordChangeRequired: true,
 					Email:                  "email@test.ch",
@@ -178,7 +178,7 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanInitialCodeAddedEvent(context.Background(),
@@ -217,7 +217,7 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 					FirstName:              "firstname",
 					LastName:               "lastname",
 					DisplayName:            "firstname lastname",
-					PreferredLanguage:      language.Und,
+					PreferredLanguage:      language.English,
 					PasswordEncodedHash:    "$plain$x$password",
 					PasswordChangeRequired: true,
 					Email:                  "email@test.ch",
@@ -232,7 +232,7 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanInitialCodeAddedEvent(context.Background(),
@@ -271,7 +271,7 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 					FirstName:              "firstname",
 					LastName:               "lastname",
 					DisplayName:            "firstname lastname",
-					PreferredLanguage:      language.Und,
+					PreferredLanguage:      language.English,
 					PasswordEncodedHash:    "$plain$x$password",
 					PasswordChangeRequired: true,
 					Email:                  "email@test.ch",
@@ -295,7 +295,7 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewUsernameChangedEvent(context.Background(),
@@ -325,7 +325,7 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 					FirstName:              "firstname",
 					LastName:               "lastname",
 					DisplayName:            "firstname lastname",
-					PreferredLanguage:      language.Und,
+					PreferredLanguage:      language.English,
 					PasswordEncodedHash:    "$plain$x$password",
 					PasswordChangeRequired: true,
 					Email:                  "email@test.ch",
@@ -340,7 +340,7 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newAddHumanEvent("$plain$x$password", true, true, ""),
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewUserRemovedEvent(context.Background(),
@@ -428,7 +428,7 @@ func TestCommandSide_userHumanWriteModel_profile(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							func() eventstore.Command {
@@ -528,7 +528,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newAddHumanEvent("$plain$x$password", true, true, ""),
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanEmailChangedEvent(context.Background(),
@@ -575,7 +575,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanEmailCodeAddedEventV2(context.Background(),
@@ -612,7 +612,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 					FirstName:              "firstname",
 					LastName:               "lastname",
 					DisplayName:            "firstname lastname",
-					PreferredLanguage:      language.Und,
+					PreferredLanguage:      language.English,
 					PasswordEncodedHash:    "$plain$x$password",
 					PasswordChangeRequired: true,
 					Email:                  "email@test.ch",
@@ -635,7 +635,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanEmailCodeAddedEventV2(context.Background(),
@@ -677,7 +677,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 					FirstName:              "firstname",
 					LastName:               "lastname",
 					DisplayName:            "firstname lastname",
-					PreferredLanguage:      language.Und,
+					PreferredLanguage:      language.English,
 					PasswordEncodedHash:    "$plain$x$password",
 					PasswordChangeRequired: true,
 					Email:                  "email@test.ch",
@@ -692,7 +692,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanEmailCodeAddedEventV2(context.Background(),
@@ -734,7 +734,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 					FirstName:              "firstname",
 					LastName:               "lastname",
 					DisplayName:            "firstname lastname",
-					PreferredLanguage:      language.Und,
+					PreferredLanguage:      language.English,
 					PasswordEncodedHash:    "$plain$x$password",
 					PasswordChangeRequired: true,
 					Email:                  "email@test.ch",
@@ -758,7 +758,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanEmailCodeAddedEventV2(context.Background(),
@@ -806,7 +806,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 					FirstName:              "firstname",
 					LastName:               "lastname",
 					DisplayName:            "firstname lastname",
-					PreferredLanguage:      language.Und,
+					PreferredLanguage:      language.English,
 					PasswordEncodedHash:    "$plain$x$password",
 					PasswordChangeRequired: true,
 					Email:                  "changed@test.com",
@@ -865,7 +865,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newAddHumanEvent("$plain$x$password", true, true, ""),
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanPhoneChangedEvent(context.Background(),
@@ -911,7 +911,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanPhoneChangedEvent(context.Background(),
@@ -953,7 +953,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 					FirstName:              "firstname",
 					LastName:               "lastname",
 					DisplayName:            "firstname lastname",
-					PreferredLanguage:      language.Und,
+					PreferredLanguage:      language.English,
 					PasswordEncodedHash:    "$plain$x$password",
 					PasswordChangeRequired: true,
 					Email:                  "email@test.ch",
@@ -978,7 +978,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanPhoneChangedEvent(context.Background(),
@@ -1025,7 +1025,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 					FirstName:              "firstname",
 					LastName:               "lastname",
 					DisplayName:            "firstname lastname",
-					PreferredLanguage:      language.Und,
+					PreferredLanguage:      language.English,
 					PasswordEncodedHash:    "$plain$x$password",
 					PasswordChangeRequired: true,
 					Email:                  "email@test.ch",
@@ -1042,7 +1042,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 
 						eventFromEventPusher(
@@ -1090,7 +1090,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 					FirstName:              "firstname",
 					LastName:               "lastname",
 					DisplayName:            "firstname lastname",
-					PreferredLanguage:      language.Und,
+					PreferredLanguage:      language.English,
 					PasswordEncodedHash:    "$plain$x$password",
 					PasswordChangeRequired: true,
 					Email:                  "email@test.ch",
@@ -1116,7 +1116,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanPhoneChangedEvent(context.Background(),
@@ -1169,7 +1169,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 					FirstName:              "firstname",
 					LastName:               "lastname",
 					DisplayName:            "firstname lastname",
-					PreferredLanguage:      language.Und,
+					PreferredLanguage:      language.English,
 					PasswordEncodedHash:    "$plain$x$password",
 					PasswordChangeRequired: true,
 					Email:                  "email@test.ch",
@@ -1230,7 +1230,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newAddHumanEvent("$plain$x$password", true, true, ""),
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanPasswordHashUpdatedEvent(context.Background(),
@@ -1274,7 +1274,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newAddHumanEvent("$plain$x$password", true, true, ""),
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanPasswordChangedEvent(context.Background(),
@@ -1320,7 +1320,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanPasswordCodeAddedEventV2(context.Background(),
@@ -1358,7 +1358,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 					FirstName:              "firstname",
 					LastName:               "lastname",
 					DisplayName:            "firstname lastname",
-					PreferredLanguage:      language.Und,
+					PreferredLanguage:      language.English,
 					PasswordEncodedHash:    "$plain$x$password",
 					PasswordChangeRequired: true,
 					Email:                  "email@test.ch",
@@ -1381,7 +1381,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanPasswordCodeAddedEventV2(context.Background(),
@@ -1427,7 +1427,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 					FirstName:              "firstname",
 					LastName:               "lastname",
 					DisplayName:            "firstname lastname",
-					PreferredLanguage:      language.Und,
+					PreferredLanguage:      language.English,
 					PasswordEncodedHash:    "hash",
 					PasswordChangeRequired: true,
 					Email:                  "email@test.ch",
@@ -1486,7 +1486,7 @@ func TestCommandSide_userHumanWriteModel_state(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newAddHumanEvent("$plain$x$password", true, true, ""),
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanPasswordCheckFailedEvent(context.Background(),
@@ -1548,7 +1548,7 @@ func TestCommandSide_userHumanWriteModel_state(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanPasswordCheckFailedEvent(context.Background(),
@@ -1599,7 +1599,7 @@ func TestCommandSide_userHumanWriteModel_state(t *testing.T) {
 					FirstName:                "firstname",
 					LastName:                 "lastname",
 					DisplayName:              "firstname lastname",
-					PreferredLanguage:        language.Und,
+					PreferredLanguage:        language.English,
 					PasswordEncodedHash:      "$plain$x$password",
 					PasswordChangeRequired:   true,
 					PasswordCheckFailedCount: 0,
@@ -1615,7 +1615,7 @@ func TestCommandSide_userHumanWriteModel_state(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewUserDeactivatedEvent(context.Background(),
@@ -1643,7 +1643,7 @@ func TestCommandSide_userHumanWriteModel_state(t *testing.T) {
 					FirstName:              "firstname",
 					LastName:               "lastname",
 					DisplayName:            "firstname lastname",
-					PreferredLanguage:      language.Und,
+					PreferredLanguage:      language.English,
 					PasswordEncodedHash:    "$plain$x$password",
 					PasswordChangeRequired: true,
 					Email:                  "email@test.ch",
@@ -1657,7 +1657,7 @@ func TestCommandSide_userHumanWriteModel_state(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newRegisterHumanEvent("username", "$plain$x$password", true, true, ""),
+							newRegisterHumanEvent("username", "$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewUserDeactivatedEvent(context.Background(),
@@ -1690,7 +1690,7 @@ func TestCommandSide_userHumanWriteModel_state(t *testing.T) {
 					FirstName:              "firstname",
 					LastName:               "lastname",
 					DisplayName:            "firstname lastname",
-					PreferredLanguage:      language.Und,
+					PreferredLanguage:      language.English,
 					PasswordEncodedHash:    "$plain$x$password",
 					PasswordChangeRequired: true,
 					Email:                  "email@test.ch",
@@ -1749,7 +1749,7 @@ func TestCommandSide_userHumanWriteModel_avatar(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newAddHumanEvent("$plain$x$password", true, true, ""),
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanAvatarAddedEvent(context.Background(),
@@ -1795,7 +1795,7 @@ func TestCommandSide_userHumanWriteModel_avatar(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							newAddHumanEvent("$plain$x$password", true, true, ""),
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
 						),
 						eventFromEventPusher(
 							user.NewHumanAvatarAddedEvent(context.Background(),
