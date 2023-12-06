@@ -99,11 +99,10 @@ func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Re
 	if webAuthNToken != nil {
 		credentialData = base64.RawURLEncoding.EncodeToString(webAuthNToken.CredentialCreationData)
 	}
-
 	translator := l.getTranslator(r.Context(), authReq)
 	data := &passwordlessRegistrationData{
 		webAuthNData{
-			userData:               l.getUserData(r, authReq, "PasswordlessRegistration.Title", "PasswordlessRegistration.Description", errID, errMessage),
+			userData:               l.getUserData(r, authReq, translator, "PasswordlessRegistration.Title", "PasswordlessRegistration.Description", errID, errMessage),
 			CredentialCreationData: credentialData,
 		},
 		code,
@@ -117,8 +116,6 @@ func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Re
 		policy, err := l.query.ActiveLabelPolicyByOrg(r.Context(), orgID, false)
 		logging.Log("HANDL-XjWKE").OnError(err).Error("unable to get active label policy")
 		data.LabelPolicy = labelPolicyToDomain(policy)
-
-		translator, err = l.renderer.NewTranslator(r.Context())
 		if err == nil {
 			texts, err := l.authRepo.GetLoginText(r.Context(), orgID)
 			logging.Log("LOGIN-HJK4t").OnError(err).Warn("could not get custom texts")
@@ -193,9 +190,8 @@ func (l *Login) renderPasswordlessRegistrationDone(w http.ResponseWriter, r *htt
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	translator := l.getTranslator(r.Context(), authReq)
-
 	data := passwordlessRegistrationDoneDate{
-		userData:       l.getUserData(r, authReq, "PasswordlessRegistrationDone.Title", "PasswordlessRegistrationDone.Description", errID, errMessage),
+		userData:       l.getUserData(r, authReq, translator, "PasswordlessRegistrationDone.Title", "PasswordlessRegistrationDone.Description", errID, errMessage),
 		HideNextButton: authReq == nil,
 	}
 	if authReq == nil {

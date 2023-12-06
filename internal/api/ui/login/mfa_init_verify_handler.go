@@ -71,7 +71,7 @@ func (l *Login) renderMFAInitVerify(w http.ResponseWriter, r *http.Request, auth
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	translator := l.getTranslator(r.Context(), authReq)
-	data.baseData = l.getBaseData(r, authReq, "InitMFAOTP.Title", "InitMFAOTP.Description", errID, errMessage)
+	data.baseData = l.getBaseData(r, authReq, translator, "InitMFAOTP.Title", "InitMFAOTP.Description", errID, errMessage)
 	data.profileData = l.getProfileData(authReq)
 	if data.MFAType == domain.MFATypeTOTP {
 		code, err := generateQrCode(data.totpData.Url)

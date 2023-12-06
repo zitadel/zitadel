@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"net/http"
 	"testing"
 	"time"
 
@@ -12,7 +11,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/notification/messages"
 
-	statik_fs "github.com/rakyll/statik/fs"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
@@ -202,15 +200,13 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 		},
 	}}
 	// TODO: Why don't we have an url template on user.HumanInitialCodeAddedEvent?
-	fs, err := statik_fs.NewWithNamespace("notification")
-	assert.NoError(t, err)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			stmt, err := newUserNotifier(t, ctrl, queries, fs, f, a, w).reduceInitCodeAdded(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reduceInitCodeAdded(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -423,15 +419,13 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 				}, w
 		},
 	}}
-	fs, err := statik_fs.NewWithNamespace("notification")
-	assert.NoError(t, err)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			stmt, err := newUserNotifier(t, ctrl, queries, fs, f, a, w).reduceEmailCodeAdded(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reduceEmailCodeAdded(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -644,15 +638,13 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 				}, w
 		},
 	}}
-	fs, err := statik_fs.NewWithNamespace("notification")
-	assert.NoError(t, err)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			stmt, err := newUserNotifier(t, ctrl, queries, fs, f, a, w).reducePasswordCodeAdded(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reducePasswordCodeAdded(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -737,15 +729,13 @@ func Test_userNotifier_reduceDomainClaimed(t *testing.T) {
 				}, w
 		},
 	}}
-	fs, err := statik_fs.NewWithNamespace("notification")
-	assert.NoError(t, err)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			stmt, err := newUserNotifier(t, ctrl, queries, fs, f, a, w).reduceDomainClaimed(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reduceDomainClaimed(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -963,15 +953,13 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 				}, w
 		},
 	}}
-	fs, err := statik_fs.NewWithNamespace("notification")
-	assert.NoError(t, err)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			stmt, err := newUserNotifier(t, ctrl, queries, fs, f, a, w).reducePasswordlessCodeRequested(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reducePasswordlessCodeRequested(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1062,15 +1050,13 @@ func Test_userNotifier_reducePasswordChanged(t *testing.T) {
 				}, w
 		},
 	}}
-	fs, err := statik_fs.NewWithNamespace("notification")
-	assert.NoError(t, err)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			stmt, err := newUserNotifier(t, ctrl, queries, fs, f, a, w).reducePasswordChanged(a.event)
+			stmt, err := newUserNotifier(t, ctrl, queries, f, a, w).reducePasswordChanged(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1287,15 +1273,13 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 				}, w
 		},
 	}}
-	fs, err := statik_fs.NewWithNamespace("notification")
-	assert.NoError(t, err)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			queries := mock.NewMockQueries(ctrl)
 			commands := mock.NewMockCommands(ctrl)
 			f, a, w := tt.test(ctrl, queries, commands)
-			_, err = newUserNotifier(t, ctrl, queries, fs, f, a, w).reduceSessionOTPEmailChallenged(a.event)
+			_, err := newUserNotifier(t, ctrl, queries, f, a, w).reduceSessionOTPEmailChallenged(a.event)
 			if w.err != nil {
 				w.err(t, err)
 			} else {
@@ -1320,7 +1304,7 @@ type want struct {
 	err     assert.ErrorAssertionFunc
 }
 
-func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, fs http.FileSystem, f fields, a args, w want) *userNotifier {
+func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQueries, f fields, a args, w want) *userNotifier {
 	queries.EXPECT().NotificationProviderByIDAndType(gomock.Any(), gomock.Any(), gomock.Any()).AnyTimes().Return(&query.DebugNotificationProvider{}, nil)
 	smtpAlg, _ := cryptoValue(t, ctrl, "smtppw")
 	channel := channel_mock.NewMockNotificationChannel(ctrl)
@@ -1340,7 +1324,6 @@ func newUserNotifier(t *testing.T, ctrl *gomock.Controller, queries *mock.MockQu
 			f.userDataCrypto,
 			smtpAlg,
 			f.SMSTokenCrypto,
-			fs,
 		),
 		otpEmailTmpl: defaultOTPEmailTemplate,
 		channels:     &channels{Chain: *senders.ChainChannels(channel)},
@@ -1366,6 +1349,9 @@ func (c *channels) Webhook(context.Context, webhook.Config) (*senders.Chain, err
 }
 
 func expectTemplateQueries(queries *mock.MockQueries, template string) {
+	queries.EXPECT().GetInstanceRestrictions(gomock.Any()).Return(query.Restrictions{
+		AllowedLanguages: []language.Tag{language.English},
+	}, nil)
 	queries.EXPECT().ActiveLabelPolicyByOrg(gomock.Any(), gomock.Any(), gomock.Any()).Return(&query.LabelPolicy{
 		ID: policyID,
 		Light: query.Theme{
