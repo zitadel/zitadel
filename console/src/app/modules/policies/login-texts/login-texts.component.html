@@ -27,7 +27,7 @@
     </div>
   </button>
 </div>
-<form *ngIf="form" class="top-actions" [formGroup]="form">
+<form *ngIf="allowed$ | async" class="top-actions" [formGroup]="form">
   <cnsl-form-field class="keys">
     <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.KEYNAME' | translate }}</cnsl-label>
     <mat-select formControlName="currentSubMap" name="currentSubMap">
@@ -40,7 +40,7 @@
   <cnsl-form-field class="language">
     <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.LANGUAGE' | translate }}</cnsl-label>
     <mat-select formControlName="language" name="language">
-      <mat-option *ngFor="let lang of langSvc.allowed$ | async" [value]="lang">
+      <mat-option *ngFor="let lang of allowed$ | async" [value]="lang">
         <div class="centerline">
           <span
             >{{ lang }}

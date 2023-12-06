@@ -2,7 +2,19 @@ import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/co
 import { FormControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription, switchMap } from 'rxjs';
+import {
+  BehaviorSubject,
+  from,
+  interval,
+  Observable,
+  of,
+  Subject,
+  Subscription,
+  switchMap,
+  take,
+  takeLast,
+  tap,
+} from 'rxjs';
 import { map, pairwise, startWith, takeUntil } from 'rxjs/operators';
 import {
   GetCustomLoginTextsRequest as AdminGetCustomLoginTextsRequest,
@@ -121,6 +133,12 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     currentSubMap: new FormControl<string>('emailVerificationDoneText'),
     language: new FormControl<string>('en'),
   });
+  public allowed$: Observable<string[]> = this.langSvc.allowed$.pipe(
+    take(1),
+    tap(([firstAllowed]) => {
+      this.form.get('language')?.setValue(firstAllowed);
+    }),
+  );
 
   public isDefault: boolean = false;
 
