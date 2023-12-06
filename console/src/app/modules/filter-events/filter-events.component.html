@@ -168,7 +168,7 @@
             </mat-radio-button>
           </mat-radio-group>
           <div class="filter-events-sub">
-            <ng-container *ngIf="creationDateFilterType!.value == CreationDateFilterType.FROM">
+            <ng-container *ngIf="creationDateFilterType!.value === CreationDateFilterType.FROM">
               <mat-form-field class="datetime-input">
                 <input
                   class="datetime"
@@ -180,7 +180,7 @@
                 />
               </mat-form-field>
             </ng-container>
-            <ng-container *ngIf="creationDateFilterType!.value == CreationDateFilterType.RANGE">
+            <ng-container *ngIf="creationDateFilterType!.value === CreationDateFilterType.RANGE">
               <div class="datetime-range">
                 <mat-form-field class="datetime-input">
                   <cnsl-label
