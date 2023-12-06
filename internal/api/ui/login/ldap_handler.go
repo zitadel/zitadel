@@ -35,8 +35,9 @@ func (l *Login) renderLDAPLogin(w http.ResponseWriter, r *http.Request, authReq 
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	temp := l.renderer.Templates[tmplLDAPLogin]
-	data := l.getUserData(r, authReq, "Login.Title", "Login.Description", errID, errMessage)
-	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), temp, data, nil)
+	translator := l.getTranslator(r.Context(), authReq)
+	data := l.getUserData(r, authReq, translator, "Login.Title", "Login.Description", errID, errMessage)
+	l.renderer.RenderTemplate(w, r, translator, temp, data, nil)
 }
 
 func (l *Login) handleLDAPCallback(w http.ResponseWriter, r *http.Request) {

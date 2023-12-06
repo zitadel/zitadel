@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"github.com/muhlemmer/gu"
+	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
@@ -29,19 +30,25 @@ func TestServer_Restrictions_DisallowPublicOrgRegistration(t *testing.T) {
 	jar, err := cookiejar.New(nil)
 	require.NoError(t, err)
 	browserSession := &http.Client{Jar: jar}
-	// Default should be allowed
-	csrfToken := awaitAllowed(t, iamOwnerCtx, browserSession, regOrgUrl)
-	_, err = Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{DisallowPublicOrgRegistration: gu.Ptr(true)})
-	require.NoError(t, err)
-	awaitDisallowed(t, iamOwnerCtx, browserSession, regOrgUrl, csrfToken)
-	_, err = Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{DisallowPublicOrgRegistration: gu.Ptr(false)})
-	require.NoError(t, err)
-	awaitAllowed(t, iamOwnerCtx, browserSession, regOrgUrl)
+	var csrfToken string
+	t.Run("public org registration is allowed by default", func(*testing.T) {
+		csrfToken = awaitPubOrgRegAllowed(t, iamOwnerCtx, browserSession, regOrgUrl)
+	})
+	t.Run("disallowing public org registration disables the endpoints", func(*testing.T) {
+		_, err = Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{DisallowPublicOrgRegistration: gu.Ptr(true)})
+		require.NoError(t, err)
+		awaitPubOrgRegDisallowed(t, iamOwnerCtx, browserSession, regOrgUrl, csrfToken)
+	})
+	t.Run("allowing public org registration again re-enables the endpoints", func(*testing.T) {
+		_, err = Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{DisallowPublicOrgRegistration: gu.Ptr(false)})
+		require.NoError(t, err)
+		awaitPubOrgRegAllowed(t, iamOwnerCtx, browserSession, regOrgUrl)
+	})
 }
 
-// awaitAllowed doesn't accept a CSRF token, as we expected it to always produce a new one
-func awaitAllowed(t *testing.T, ctx context.Context, client *http.Client, parsedURL *url.URL) string {
-	csrfToken := awaitGetResponse(t, ctx, client, parsedURL, http.StatusOK)
+// awaitPubOrgRegAllowed doesn't accept a CSRF token, as we expected it to always produce a new one
+func awaitPubOrgRegAllowed(t *testing.T, ctx context.Context, client *http.Client, parsedURL *url.URL) string {
+	csrfToken := awaitGetSSRGetResponse(t, ctx, client, parsedURL, http.StatusOK)
 	awaitPostFormResponse(t, ctx, client, parsedURL, http.StatusOK, csrfToken)
 	restrictions, err := Tester.Client.Admin.GetRestrictions(ctx, &admin.GetRestrictionsRequest{})
 	require.NoError(t, err)
@@ -49,17 +56,17 @@ func awaitAllowed(t *testing.T, ctx context.Context, client *http.Client, parsed
 	return csrfToken
 }
 
-// awaitDisallowed accepts an old CSRF token, as we don't expect to get a CSRF token from the GET request anymore
-func awaitDisallowed(t *testing.T, ctx context.Context, client *http.Client, parsedURL *url.URL, reuseOldCSRFToken string) {
-	awaitGetResponse(t, ctx, client, parsedURL, http.StatusNotFound)
+// awaitPubOrgRegDisallowed accepts an old CSRF token, as we don't expect to get a CSRF token from the GET request anymore
+func awaitPubOrgRegDisallowed(t *testing.T, ctx context.Context, client *http.Client, parsedURL *url.URL, reuseOldCSRFToken string) {
+	awaitGetSSRGetResponse(t, ctx, client, parsedURL, http.StatusNotFound)
 	awaitPostFormResponse(t, ctx, client, parsedURL, http.StatusConflict, reuseOldCSRFToken)
 	restrictions, err := Tester.Client.Admin.GetRestrictions(ctx, &admin.GetRestrictionsRequest{})
 	require.NoError(t, err)
 	require.True(t, restrictions.DisallowPublicOrgRegistration)
 }
 
-// awaitGetResponse cuts the CSRF token from the response body if it exists
-func awaitGetResponse(t *testing.T, ctx context.Context, client *http.Client, parsedURL *url.URL, expectCode int) string {
+// awaitGetSSRGetResponse cuts the CSRF token from the response body if it exists
+func awaitGetSSRGetResponse(t *testing.T, ctx context.Context, client *http.Client, parsedURL *url.URL, expectCode int) string {
 	var csrfToken []byte
 	await(t, ctx, func() bool {
 		resp, err := client.Get(parsedURL.String())
@@ -71,7 +78,7 @@ func awaitGetResponse(t *testing.T, ctx context.Context, client *http.Client, pa
 		if hasCsrfToken {
 			csrfToken, _, _ = bytes.Cut(after, []byte(`">`))
 		}
-		return resp.StatusCode == expectCode
+		return assert.Equal(NoopAssertionT, resp.StatusCode, expectCode)
 	})
 	return string(csrfToken)
 }
@@ -83,24 +90,6 @@ func awaitPostFormResponse(t *testing.T, ctx context.Context, client *http.Clien
 			"gorilla.csrf.Token": {csrfToken},
 		})
 		require.NoError(t, err)
-		return resp.StatusCode == expectCode
-
+		return assert.Equal(NoopAssertionT, resp.StatusCode, expectCode)
 	})
-}
-
-func await(t *testing.T, ctx context.Context, cb func() bool) {
-	deadline, ok := ctx.Deadline()
-	require.True(t, ok, "context must have deadline")
-	require.Eventuallyf(
-		t,
-		func() bool {
-			defer func() {
-				require.Nil(t, recover(), "panic in await callback")
-			}()
-			return cb()
-		},
-		time.Until(deadline),
-		100*time.Millisecond,
-		"awaiting successful callback failed",
-	)
 }

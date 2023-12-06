@@ -5,11 +5,19 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 func (s *Server) SetRestrictions(ctx context.Context, req *admin.SetRestrictionsRequest) (*admin.SetRestrictionsResponse, error) {
-	details, err := s.command.SetInstanceRestrictions(ctx, &command.SetRestrictions{DisallowPublicOrgRegistration: req.DisallowPublicOrgRegistration})
+	lang, err := selectLanguagesToCommand(req.GetAllowedLanguages())
+	if err != nil {
+		return nil, err
+	}
+	details, err := s.command.SetInstanceRestrictions(ctx, &command.SetRestrictions{
+		DisallowPublicOrgRegistration: req.DisallowPublicOrgRegistration,
+		AllowedLanguages:              lang,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -26,5 +34,6 @@ func (s *Server) GetRestrictions(ctx context.Context, _ *admin.GetRestrictionsRe
 	return &admin.GetRestrictionsResponse{
 		Details:                       object.ToViewDetailsPb(restrictions.Sequence, restrictions.CreationDate, restrictions.ChangeDate, restrictions.ResourceOwner),
 		DisallowPublicOrgRegistration: restrictions.DisallowPublicOrgRegistration,
+		AllowedLanguages:              domain.LanguagesToStrings(restrictions.AllowedLanguages),
 	}, nil
 }

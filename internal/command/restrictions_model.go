@@ -1,13 +1,17 @@
 package command
 
 import (
+	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/restrictions"
 )
 
 type restrictionsWriteModel struct {
 	eventstore.WriteModel
-	disallowPublicOrgRegistrations bool
+	disallowPublicOrgRegistration bool
+	allowedLanguages              []language.Tag
 }
 
 // newRestrictionsWriteModel aggregateId is filled by reducing unit matching events
@@ -34,8 +38,15 @@ func (wm *restrictionsWriteModel) Query() *eventstore.SearchQueryBuilder {
 func (wm *restrictionsWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		wm.ChangeDate = event.CreatedAt()
-		if e, ok := event.(*restrictions.SetEvent); ok && e.DisallowPublicOrgRegistrations != nil {
-			wm.disallowPublicOrgRegistrations = *e.DisallowPublicOrgRegistrations
+		e, ok := event.(*restrictions.SetEvent)
+		if !ok {
+			continue
+		}
+		if e.DisallowPublicOrgRegistration != nil {
+			wm.disallowPublicOrgRegistration = *e.DisallowPublicOrgRegistration
+		}
+		if e.AllowedLanguages != nil {
+			wm.allowedLanguages = *e.AllowedLanguages
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -48,8 +59,11 @@ func (wm *restrictionsWriteModel) NewChanges(setRestrictions *SetRestrictions) (
 		return nil
 	}
 	changes = make([]restrictions.RestrictionsChange, 0, 1)
-	if setRestrictions.DisallowPublicOrgRegistration != nil && (wm.disallowPublicOrgRegistrations != *setRestrictions.DisallowPublicOrgRegistration) {
-		changes = append(changes, restrictions.ChangePublicOrgRegistrations(*setRestrictions.DisallowPublicOrgRegistration))
+	if setRestrictions.DisallowPublicOrgRegistration != nil && (wm.disallowPublicOrgRegistration != *setRestrictions.DisallowPublicOrgRegistration) {
+		changes = append(changes, restrictions.ChangeDisallowPublicOrgRegistration(*setRestrictions.DisallowPublicOrgRegistration))
+	}
+	if setRestrictions.AllowedLanguages != nil && domain.LanguagesDiffer(wm.allowedLanguages, setRestrictions.AllowedLanguages) {
+		changes = append(changes, restrictions.ChangeAllowedLanguages(setRestrictions.AllowedLanguages))
 	}
 	return changes
 }

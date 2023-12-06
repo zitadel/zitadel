@@ -17,6 +17,7 @@ type SearchQuery struct {
 	AllowTimeTravel       bool
 	AwaitOpenTransactions bool
 	Limit                 uint64
+	Offset                uint16
 	Desc                  bool
 
 	InstanceID        *Filter
@@ -121,12 +122,12 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 	query := &SearchQuery{
 		Columns:               builder.GetColumns(),
 		Limit:                 builder.GetLimit(),
+		Offset:                builder.GetOffset(),
 		Desc:                  builder.GetDesc(),
 		Tx:                    builder.GetTx(),
 		AllowTimeTravel:       builder.GetAllowTimeTravel(),
 		AwaitOpenTransactions: builder.GetAwaitOpenTransactions(),
-		// Queries:               make([]*Filter, 0, 7),
-		SubQueries: make([][]*Filter, len(builder.GetQueries())),
+		SubQueries:            make([][]*Filter, len(builder.GetQueries())),
 	}
 
 	for _, f := range []func(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter{

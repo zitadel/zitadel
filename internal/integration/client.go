@@ -61,7 +61,7 @@ func newClient(cc *grpc.ClientConn) Client {
 }
 
 func (t *Tester) UseIsolatedInstance(iamOwnerCtx, systemCtx context.Context) (primaryDomain, instanceId string, authenticatedIamOwnerCtx context.Context) {
-	primaryDomain = randString(5) + ".integration.localhost"
+	primaryDomain = RandString(5) + ".integration.localhost"
 	instance, err := t.Client.System.CreateInstance(systemCtx, &system.CreateInstanceRequest{
 		InstanceName: "testinstance",
 		CustomDomain: primaryDomain,
@@ -86,8 +86,8 @@ func (t *Tester) UseIsolatedInstance(iamOwnerCtx, systemCtx context.Context) (pr
 
 func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse {
 	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user.AddHumanUserRequest{
-		Organisation: &object.Organisation{
-			Org: &object.Organisation_OrgId{
+		Organization: &object.Organization{
+			Org: &object.Organization_OrgId{
 				OrgId: s.Organisation.ID,
 			},
 		},

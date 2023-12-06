@@ -33,8 +33,13 @@ Errors:
     NoneSpecified: No limits specified
   Restrictions:
     NoneSpecified: No restrictions specified
+    DefaultLanguageMustBeAllowed: The default language must be allowed
   Language:
     NotParsed: Could not parse language
+    NotSupported: Language is not supported
+    NotAllowed: Language is not allowed
+    Undefined: Language is undefined
+    Duplicate: Languages have duplicates
   OIDCSettings:
     NotFound: OIDC Configuration not found
     AlreadyExists: OIDC configuration already exists

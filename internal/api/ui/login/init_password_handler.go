@@ -120,7 +120,7 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 	translator := l.getTranslator(r.Context(), authReq)
 
 	data := initPasswordData{
-		baseData:    l.getBaseData(r, authReq, "InitPassword.Title", "InitPassword.Description", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, translator, "InitPassword.Title", "InitPassword.Description", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		Code:        code,
@@ -151,8 +151,8 @@ func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authR
 }
 
 func (l *Login) renderInitPasswordDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
-	data := l.getUserData(r, authReq, "InitPasswordDone.Title", "InitPasswordDone.Description", "", "")
 	translator := l.getTranslator(r.Context(), authReq)
+	data := l.getUserData(r, authReq, translator, "InitPasswordDone.Title", "InitPasswordDone.Description", "", "")
 	if authReq == nil {
 		l.customTexts(r.Context(), translator, orgID)
 	}
