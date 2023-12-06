@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	RestrictionsProjectionTable = "projections.restrictions"
+	RestrictionsProjectionTable = "projections.restrictions2"
 
 	RestrictionsColumnAggregateID   = "aggregate_id"
 	RestrictionsColumnCreationDate  = "creation_date"
