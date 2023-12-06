@@ -1053,7 +1053,11 @@
       "DEFAULT": "Idioma predeterminado",
       "ALLOWED": "Idiomas permitidos",
       "NOT_ALLOWED": "Idiomas no permitidos",
-      "SAVED": "Idiomas guardados",
+      "ALLOW_ALL": "Permitir todos los idiomas",
+      "DISALLOW_ALL": "No permitir ningún idioma",
+      "SETASDEFAULT": "Establecer como idioma predeterminado",
+      "DEFAULT_SAVED": "Idioma predeterminado guardado",
+      "ALLOWED_SAVED": "Idiomas permitidos guardados",
       "OPTIONS": {
         "de": "Deutsch",
         "en": "English",

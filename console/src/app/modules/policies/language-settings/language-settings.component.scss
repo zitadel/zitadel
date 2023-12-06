@@ -1,53 +1,65 @@
 .languages-container {
-  width: 400px;
-  max-width: 100%;
-  margin: 0 25px 25px 0;
   display: inline-block;
+  max-width: 400px;
   vertical-align: top;
+  width: 350px;
+  max-width: 100%;
+
+  .spinner-wr {
+    margin: 0.5rem 0;
+  }
+
+  .default-language {
+    max-width: 400px;
+    display: block;
+  }
+
+  .general-btn-container {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 1rem;
+
+    .save-button {
+      display: block;
+    }
+  }
+
+  .example-custom-placeholder {
+    background: #ccc;
+    border: dotted 3px #999;
+    min-height: 60px;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
 }
 
 .languages-list {
-  border: solid 1px #ccc;
-  min-height: 60px;
-  border-radius: 4px;
   overflow: hidden;
   display: block;
 }
 
-.language-box {
-  padding: 20px 10px;
-  border-bottom: solid 1px #ccc;
+.languages-box {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  box-sizing: border-box;
-  cursor: move;
-  font-size: 14px;
-}
+  padding: 0.5rem 0.5rem;
+  min-height: 40px;
 
-.spinner-wr {
-  margin: 0.5rem 0;
-}
-
-.default-language {
-  max-width: 400px;
-  display: block;
-}
-
-.general-btn-container {
-  display: flex;
-  justify-content: flex-start;
-  margin-top: 1rem;
-
-  .save-button {
-    display: block;
+  &:last-child {
+    border: none;
   }
-}
 
-.example-custom-placeholder {
-  background: #ccc;
-  border: dotted 3px #999;
-  min-height: 60px;
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  [hoveractions] {
+    display: none;
+  }
+
+  &:hover {
+    [hoveractions] {
+      display: flex;
+    }
+  }
+
+  .defaultlanglabel {
+    margin-left: 0.5rem;
+  }
 }

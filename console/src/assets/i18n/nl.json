@@ -1053,7 +1053,11 @@
       "DEFAULT": "Standaardtaal",
       "ALLOWED": "Toegestane Talen",
       "NOT_ALLOWED": "Niet Toegestane Talen",
-      "SAVED": "Talen opgeslagen",
+      "ALLOW_ALL": "Sta alle talen toe",
+      "DISALLOW_ALL": "Sta geen talen toe",
+      "SETASDEFAULT": "Stel in als standaardtaal",
+      "DEFAULT_SAVED": "Standaardtaal opgeslagen",
+      "ALLOWED_SAVED": "Toegestane talen opgeslagen",
       "OPTIONS": {
         "de": "Deutsch",
         "en": "Engels",

@@ -1053,7 +1053,11 @@
       "DEFAULT": "デフォルト言語",
       "ALLOWED": "許可された言語",
       "NOT_ALLOWED": "許可されていない言語",
-      "SAVED": "言語が保存されました",
+      "ALLOW_ALL": "すべての言語を許可する",
+      "DISALLOW_ALL": "すべての言語を許可しない",
+      "SETASDEFAULT": "デフォルト言語として設定する",
+      "DEFAULT_SAVED": "デフォルト言語が保存されました",
+      "ALLOWED_SAVED": "許可された言語が保存されました",
       "OPTIONS": {
         "de": "Deutsch",
         "en": "English",

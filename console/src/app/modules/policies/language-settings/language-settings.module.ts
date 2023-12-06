@@ -14,6 +14,9 @@ import { MatListModule } from '@angular/material/list';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { TableActionsModule } from '../../table-actions/table-actions.module';
+import { MatMenuModule } from '@angular/material/menu';
 
 @NgModule({
   declarations: [LanguageSettingsComponent],
@@ -33,6 +36,9 @@ import { MatRadioModule } from '@angular/material/radio';
     MatListModule,
     DragDropModule,
     MatRadioModule,
+    MatTooltipModule,
+    MatMenuModule,
+    TableActionsModule,
   ],
   exports: [LanguageSettingsComponent],
 })

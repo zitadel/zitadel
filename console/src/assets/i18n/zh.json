@@ -1052,7 +1052,11 @@
       "DEFAULT": "默认语言",
       "ALLOWED": "允许的语言",
       "NOT_ALLOWED": "不允许的语言",
-      "SAVED": "语言已保存",
+      "ALLOW_ALL": "允许所有语言",
+      "DISALLOW_ALL": "禁止所有语言",
+      "SETASDEFAULT": "设置为默认语言",
+      "DEFAULT_SAVED": "默认语言已保存",
+      "ALLOWED_SAVED": "允许的语言已保存",
       "OPTIONS": {
         "de": "Deutsch",
         "en": "English",

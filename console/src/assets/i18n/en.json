@@ -1053,7 +1053,11 @@
       "DEFAULT": "Default Language",
       "ALLOWED": "Allowed Languages",
       "NOT_ALLOWED": "Not Allowed Languages",
-      "SAVED": "Languages saved",
+      "ALLOW_ALL": "Allow All Languages",
+      "DISALLOW_ALL": "Disallow All Languages",
+      "SETASDEFAULT": "Set as Default Language",
+      "DEFAULT_SAVED": "Default Language saved",
+      "ALLOWED_SAVED": "Allowed Languages saved",
       "OPTIONS": {
         "de": "Deutsch",
         "en": "English",

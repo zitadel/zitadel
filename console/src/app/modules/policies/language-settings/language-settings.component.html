@@ -6,89 +6,102 @@
 
 <div>
   <form class="form-content">
-    <div
-      class="languages-container"
-      cdkDropList
-      id="allowed"
-      [cdkDropListConnectedTo]="['notallowed']"
-      (cdkDropListDropped)="drop($event)"
-      [cdkDropListData]="(localState$ | async)!.allowed"
-    >
-      <cnsl-label>{{ 'SETTING.LANGUAGES.ALLOWED' | translate }}</cnsl-label>
-      <div class="languages-list">
-        <mat-action-list
-          [disabled]="(canWriteRestrictions$ | async) === false"
+    <div class="languages-container">
+      <div
+        class="languages-list"
+        cdkDropList
+        id="allowed"
+        [cdkDropListConnectedTo]="['notallowed']"
+        (cdkDropListDropped)="drop($event)"
+        [cdkDropListData]="(localState$ | async)!.allowed"
+      >
+        <cnsl-label>{{ 'SETTING.LANGUAGES.ALLOWED' | translate }}</cnsl-label>
+        <button class="reset-button" [disabled]="(canWriteRestrictions$ | async) === false" (click)="allowAll()" mat-button>
+          <div class="cnsl-action-button">
+            <i class="las la-object-group"></i><span>{{ 'SETTING.LANGUAGES.ALLOW_ALL' | translate }}</span>
+          </div>
+        </button>
+        <div
+          class="card languages-box"
           *ngFor="let lang of (localState$ | async)!.allowed"
-          name="allowed"
-          class="language-box"
           [cdkDragData]="lang"
           cdkDrag
+          [cdkDragDisabled]="(canWriteRestrictions$ | async) === false"
+          mat-list-item
         >
-          <mat-radio-button
-            [disabled]="(isRemotelyDisallowed$(lang) | async) || (canWriteDefaultLanguage$ | async) === false"
-            mat-list-item
-            color="primary"
-            [checked]="(localState$ | async)!.defaultLang == lang"
-            (change)="setLocalDefaultLang(lang)"
-          >
-            {{ lang }} - {{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate
-            }}{{
-              lang == (localState$ | async)!.defaultLang
-                ? ' (' + ('SETTING.LANGUAGES.DEFAULT' | translate) + ')'
-                : ('' | translate)
-            }}
-          </mat-radio-button>
-        </mat-action-list>
+          <span> {{ lang }} - {{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }} </span>
+          <span *ngIf="lang === (defaultLang$ | async)" class="state orgdefaultlabel">{{
+            'SETTING.LANGUAGES.DEFAULT' | translate
+          }}</span>
+          <cnsl-table-actions [hasActions]="lang != (defaultLang$ | async) && (isRemotelyAllowed$(lang) | async) === true">
+            <button
+              menuActions
+              mat-menu-item
+              (click)="setDefaultLang(lang)"
+              [disabled]="(canWriteDefaultLanguage$ | async) === false"
+            >
+              {{ 'SETTING.LANGUAGES.SETASDEFAULT' | translate }}
+            </button>
+          </cnsl-table-actions>
+        </div>
       </div>
     </div>
-    <div
-      class="languages-container"
-      cdkDropList
-      id="notallowed"
-      [cdkDropListConnectedTo]="['allowed']"
-      [cdkDropListEnterPredicate]="defaultLangPredicate"
-      (cdkDropListDropped)="drop($event)"
-      [cdkDropListData]="(localState$ | async)!.notAllowed"
-      style="display: inline-block"
-    >
-      <cnsl-label>{{ 'SETTING.LANGUAGES.NOT_ALLOWED' | translate }}</cnsl-label>
-      <div class="languages-list">
-        <mat-action-list
-          *ngFor="let lang of (localState$ | async)!.notAllowed"
-          name="notAllowed"
-          class="language-box"
-          cdkDrag
+    <div class="languages-container">
+      <div
+        class="languages-list"
+        cdkDropList
+        id="notallowed"
+        [cdkDropListConnectedTo]="['allowed']"
+        (cdkDropListDropped)="drop($event)"
+        [cdkDropListData]="(localState$ | async)!.notAllowed"
+        [cdkDropListEnterPredicate]="defaultLangPredicate"
+      >
+        <cnsl-label>{{ 'SETTING.LANGUAGES.NOT_ALLOWED' | translate }}</cnsl-label>
+        <button
+          class="reset-button"
+          [disabled]="(canWriteRestrictions$ | async) === false"
+          (click)="disallowAll()"
+          mat-button
         >
-          <mat-radio-button [disabled]="true" mat-list-item color="primary"
-            >{{ lang }} - {{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }}</mat-radio-button
-          >
-        </mat-action-list>
+          <div class="cnsl-action-button">
+            <i class="las la-object-group"></i><span>{{ 'SETTING.LANGUAGES.DISALLOW_ALL' | translate }}</span>
+          </div>
+        </button>
+        <div
+          class="card languages-box"
+          *ngFor="let lang of (localState$ | async)!.notAllowed"
+          [cdkDragData]="lang"
+          cdkDrag
+          [cdkDragDisabled]="(canWriteRestrictions$ | async) === false"
+          mat-list-item
+        >
+          <span> {{ lang }} - {{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }} </span>
+          <cnsl-table-actions />
+        </div>
       </div>
+    </div>
+    <div class="general-btn-container">
+      <button
+        class="reset-button"
+        [disabled]="(canWriteRestrictions$ | async) === false"
+        (click)="discard()"
+        color="message-text-warn"
+        mat-stroked-button
+      >
+        <div class="cnsl-action-button">
+          <i class="las la-history"></i><span>{{ 'ACTIONS.UNSAVED.DIALOG.DISCARD' | translate }}</span>
+        </div>
+      </button>
+      <button
+        class="save-button"
+        color="primary"
+        type="submit"
+        (click)="submit()"
+        mat-raised-button
+        [disabled]="(['iam.write'] | hasRole | async) === false && (['iam.restrictions.write'] | hasRole | async) === false"
+      >
+        {{ 'ACTIONS.SAVE' | translate }}
+      </button>
     </div>
   </form>
-</div>
-
-<div class="general-btn-container">
-  <button
-    class="reset-button"
-    [disabled]="(canWriteRestrictions$ | async) === false"
-    (click)="discard()"
-    color="message-text-warn"
-    type="submit"
-    mat-stroked-button
-  >
-    <div class="cnsl-action-button">
-      <i class="las la-history"></i><span>{{ 'ACTIONS.UNSAVED.DIALOG.DISCARD' | translate }}</span>
-    </div>
-  </button>
-  <button
-    class="save-button"
-    (click)="save()"
-    color="primary"
-    type="submit"
-    mat-raised-button
-    [disabled]="(['iam.write'] | hasRole | async) === false && (['iam.restrictions.write'] | hasRole | async) === false"
-  >
-    {{ 'ACTIONS.SAVE' | translate }}
-  </button>
 </div>

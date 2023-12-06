@@ -1052,7 +1052,11 @@
       "DEFAULT": "Langue par défaut",
       "ALLOWED": "Langues autorisées",
       "NOT_ALLOWED": "Langues non autorisées",
-      "SAVED": "Langues enregistrées",
+      "ALLOW_ALL": "Autoriser toutes les langues",
+      "DISALLOW_ALL": "Interdire toutes les langues",
+      "SETASDEFAULT": "Définir comme langue par défaut",
+      "DEFAULT_SAVED": "Langue par défaut enregistrée",
+      "ALLOWED_SAVED": "Langues autorisées enregistrées",
       "OPTIONS": {
         "de": "Deutsch",
         "en": "English",

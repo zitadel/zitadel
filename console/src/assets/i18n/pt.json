@@ -1054,7 +1054,11 @@
       "DEFAULT": "Idioma Padrão",
       "ALLOWED": "Idiomas Permitidos",
       "NOT_ALLOWED": "Idiomas Não Permitidos",
-      "SAVED": "Idiomas salvos",
+      "ALLOW_ALL": "Permitir Todos os Idiomas",
+      "DISALLOW_ALL": "Não Permitir Todos os Idiomas",
+      "SETASDEFAULT": "Definir como Idioma Padrão",
+      "DEFAULT_SAVED": "Idioma Padrão salvo",
+      "ALLOWED_SAVED": "Idiomas Permitidos salvos",
       "OPTIONS": {
         "de": "Deutsch",
         "en": "English",

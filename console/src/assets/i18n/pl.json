@@ -1052,7 +1052,11 @@
       "DEFAULT": "Domyślny język",
       "ALLOWED": "Dozwolone języki",
       "NOT_ALLOWED": "Niedozwolone języki",
-      "SAVED": "Języki zapisane",
+      "ALLOW_ALL": "Zezwól na wszystkie języki",
+      "DISALLOW_ALL": "Zabroń wszystkich języków",
+      "SETASDEFAULT": "Ustaw jako domyślny język",
+      "DEFAULT_SAVED": "Domyślny język zapisany",
+      "ALLOWED_SAVED": "Dozwolone języki zapisane",
       "OPTIONS": {
         "de": "Deutsch",
         "en": "English",

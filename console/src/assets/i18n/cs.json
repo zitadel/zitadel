@@ -1053,7 +1053,11 @@
       "DEFAULT": "Výchozí jazyk",
       "ALLOWED": "Povolené jazyky",
       "NOT_ALLOWED": "Nepovolené jazyky",
-      "SAVED": "Jazyky uloženy",
+      "ALLOW_ALL": "Povolit všechny jazyky",
+      "DISALLOW_ALL": "Zakázat všechny jazyky",
+      "SETASDEFAULT": "Nastavit jako výchozí",
+      "DEFAULT_SAVED": "Výchozí jazyk byl úspěšně nastaven.",
+      "ALLOWED_SAVED": "Povolené jazyky byly úspěšně nastaveny.",
       "OPTIONS": {
         "de": "Deutsch",
         "en": "English",
