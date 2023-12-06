@@ -117,7 +117,7 @@ func (c *Commands) verifyPassword(ctx context.Context, encodedHash, password str
 		return "", caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Fds3s", "Errors.User.Password.NotSet")
 	}
 
-	ctx, spanPasswap := tracing.NewNamedSpan(ctx, "passwap.Verify")
+	_, spanPasswap := tracing.NewNamedSpan(ctx, "passwap.Verify")
 	updated, err := c.userPasswordHasher.Verify(encodedHash, password)
 	spanPasswap.EndWithError(err)
 	return updated, convertPasswapErr(err)
