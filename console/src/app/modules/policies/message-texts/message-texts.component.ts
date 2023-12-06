@@ -60,7 +60,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { LanguagesService } from '../../../services/languages.service';
 
 enum MESSAGETYPES {
@@ -559,7 +559,7 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private injector: Injector,
     private dialog: MatDialog,
-    private languagesSvc: LanguagesService,
+    public languagesSvc: LanguagesService,
   ) {}
 
   ngOnInit(): void {
@@ -571,10 +571,9 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
         this.service = this.injector.get(AdminService as Type<AdminService>);
         break;
     }
-    this.allowedLanguages$ = this.languagesSvc.allowedLanguages();
-    this.languageNotAllowed$ = this.allowedLanguages$.pipe(map((allowed) => !allowed.includes(this.language)));
-    this.notAllowedLanguages$ = this.languagesSvc.notAllowedLanguages(this.allowedLanguages$);
-    this.languagesAreRestricted$ = this.notAllowedLanguages$.pipe(map((notAllowed) => notAllowed.length > 0));
+
+    this.languageNotAllowed$ = this.languagesSvc.allowedLanguages$.pipe(map((allowed) => !allowed.includes(this.language)));
+    this.languagesAreRestricted$ = this.languagesSvc.notAllowedLanguages$.pipe(map((notAllowed) => notAllowed.length > 0));
 
     this.loadData(this.currentType);
   }

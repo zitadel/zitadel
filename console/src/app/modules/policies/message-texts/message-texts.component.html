@@ -19,8 +19,8 @@
   </cnsl-form-field>
   <cnsl-form-field class="language">
     <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.LANGUAGE' | translate }}</cnsl-label>
-    <mat-select formControlName="language" name="language">
-      <mat-option *ngFor="let lang of allowedLanguages$ | async" [value]="lang">
+    <mat-select [(ngModel)]="language" name="language">
+      <mat-option *ngFor="let lang of languagesSvc.allowedLanguages$ | async" [value]="lang">
         <div class="centerline">
           <span
             >{{ lang }}
@@ -31,7 +31,7 @@
         </div>
       </mat-option>
       <mat-optgroup [label]="'POLICY.LOGIN_TEXTS.LANGUAGES_NOT_ALLOWED' | translate" *ngIf="languagesAreRestricted$ | async">
-        <mat-option *ngFor="let lang of notAllowedLanguages$ | async" [value]="lang">
+        <mat-option *ngFor="let lang of languagesSvc.notAllowedLanguages$ | async" [value]="lang">
           <div class="centerline">
             <span
               >{{ lang }}

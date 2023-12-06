@@ -102,7 +102,7 @@ export class UserDetailComponent implements OnInit {
     this.mediaMatcher.matchMedia(mediaq).onchange = (small) => {
       this.changeSelection(small.matches);
     };
-    this.languages$ = this.languagesSvc.allowedLanguages();
+    this.languages$ = this.languagesSvc.allowedLanguages$;
   }
 
   private changeSelection(small: boolean): void {
