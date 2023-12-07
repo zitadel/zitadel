@@ -309,6 +309,7 @@ export class UserTableComponent implements OnInit {
               setTimeout(() => {
                 this.refreshPage();
               }, 1000);
+              this.selection.clear();
               this.toast.showInfo('USER.TOAST.DELETED', true);
             })
             .catch((error) => {
