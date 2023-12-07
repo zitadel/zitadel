@@ -37,7 +37,7 @@
             [cdkDragDisabled]="(canWriteRestrictions$ | async) === false"
             mat-list-item
           >
-            <span class="index">{{ i }}</span>
+            <span class="index">{{ i + 1 }}</span>
             <span> {{ lang }} - {{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }} </span>
             <span *ngIf="lang === (defaultLang$ | async)" class="state orgdefaultlabel">{{
               'SETTING.LANGUAGES.DEFAULT' | translate
