@@ -543,6 +543,7 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
     take(1),
     tap(([firstAllowed]) => {
       this.language = firstAllowed;
+      this.loadData(this.currentType);
     }),
   );
 
@@ -572,7 +573,6 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
         this.service = this.injector.get(AdminService as Type<AdminService>);
         break;
     }
-    this.loadData(this.currentType);
   }
 
   public getDefaultValues(type: MESSAGETYPES, req: any): Promise<any> {
