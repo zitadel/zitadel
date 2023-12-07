@@ -46,7 +46,7 @@
 
             <button
               (click)="$event.stopPropagation()"
-              *ngIf="lang != (defaultLang$ | async) && (isRemotelyAllowed$(lang) | async) === true"
+              *ngIf="lang !== (defaultLang$ | async) && (isRemotelyAllowed$(lang) | async) === true"
               mat-icon-button
               class="more-button"
               [matMenuTriggerFor]="actions"
