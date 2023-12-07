@@ -29,18 +29,18 @@ keys as (
 	group by identifier
 ),
 settings as (
-	select instance_id, access_token_lifetime, id_token_lifetime
+	select instance_id, json_build_object('access_token_lifetime', access_token_lifetime, 'id_token_lifetime', id_token_lifetime) as settings
 	from projections.oidc_settings2
 	where aggregate_id = $1
 		and instance_id = $1
 )
 
 select row_to_json(r) as client from (
-	select c.*, r.project_role_keys, k.public_keys, s.access_token_lifetime, s.id_token_lifetime
+	select c.*, r.project_role_keys, k.public_keys, s.settings
 	from client c
 	left join roles r on r.project_id = c.project_id
 	left join keys k on k.client_id = c.client_id
-	join settings s on s.instance_id = s.instance_id
+	left join settings s on s.instance_id = s.instance_id
 ) r;
 
 --execute q('230690539048009730', '236647088211951618@tests', true);
