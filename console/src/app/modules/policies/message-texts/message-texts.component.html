@@ -20,7 +20,7 @@
     </cnsl-form-field>
     <cnsl-form-field class="language">
       <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.LANGUAGE' | translate }}</cnsl-label>
-      <mat-select [(ngModel)]="language" name="language">
+      <mat-select [(ngModel)]="language" (selectionChange)="changeLocale($event)" name="language">
         <mat-option *ngFor="let lang of langSvc.allowed$ | async" [value]="lang">
           <div class="centerline">
             <span
