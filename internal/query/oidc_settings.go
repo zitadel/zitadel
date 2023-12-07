@@ -69,10 +69,10 @@ type OIDCSettings struct {
 	ResourceOwner string
 	Sequence      uint64
 
-	AccessTokenLifetime        time.Duration
-	IdTokenLifetime            time.Duration
-	RefreshTokenIdleExpiration time.Duration
-	RefreshTokenExpiration     time.Duration
+	AccessTokenLifetime        time.Duration `json:"access_token_lifetime,omitempty"`
+	IdTokenLifetime            time.Duration `json:"id_token_lifetime,omitempty"`
+	RefreshTokenIdleExpiration time.Duration `json:"refresh_token_idle_expiration,omitempty"`
+	RefreshTokenExpiration     time.Duration `json:"refresh_token_expiration,omitempty"`
 }
 
 func (q *Queries) OIDCSettingsByAggID(ctx context.Context, aggregateID string) (settings *OIDCSettings, err error) {
