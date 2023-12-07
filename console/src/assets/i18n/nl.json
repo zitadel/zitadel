@@ -931,20 +931,22 @@
         "BTN": "Hernoemen"
       },
       "ORGDOMAIN": {
-        "TITLE": "Verificatie van Organisatie Domein Eigendom",
-        "VERIFICATION": "Om het eigendom van uw domein te verifiëren, moet u een verificatiebestand downloaden en uploaden op de hieronder vermelde URL, of een TXT Record DNS-invoer plaatsen voor de verstrekte URL. Om te voltooien, klik op de knop om te verifiëren.",
-        "VERIFICATION_SKIP": "Je kunt de verificatie nu overslaan en doorgaan met het aanmaken van je organisatie, maar om je organisatie te kunnen gebruiken, moet deze stap worden voltooid!",
-        "VERIFICATION_VALIDATION_DESC": "De tokens worden regelmatig gecontroleerd om te zorgen dat u nog steeds eigenaar bent van het domein.",
-        "VERIFICATION_NEWTOKEN_TITLE": "Vraag nieuw token aan",
-        "VERIFICATION_NEWTOKEN_DESC": "Als u een nieuw token wilt aanvragen, selecteer dan uw voorkeursmethode. Als u een bestaand token wilt valideren, klik dan op de knop hierboven.",
-        "VERIFICATION_VALIDATION_ONGOING": "Er is al een verificatietoken aangevraagd. Klik op de knop om een verificatiecontrole te activeren.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Type van het token:",
+        "TITLE": "Verifieer het eigendom van {{value}}",
+        "VERIFICATION": "Wij bieden u twee methoden aan om uw domein handmatig te valideren:",
+        "VERIFICATION_HTML": "-HTTP. Host een tijdelijk verificatiebestand op uw website",
+        "VERIFICATION_DNS": "- DNS. Maak een TXT Record DNS-vermelding",
+        "VERIFICATION_DNS_DESC": "Als u {{ value }} beheert en toegang heeft tot uw DNS-records, kunt u een nieuw TXT-record maken met de volgende waarden:",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Gebruik deze code voor de waarde van het TXT-record:",
+        "VERIFICATION_HTTP_DESC": "Als u toegang heeft tot de hosting van uw website, downloadt u eenvoudigweg het verificatiebestand en uploadt u dit naar de opgegeven URL",
+        "VERIFICATION_HTTP_URL_LABEL": "Verwachte URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Verificatiebestand:",
+        "VERIFICATION_SKIP": "U kunt de verificatie voorlopig overslaan en doorgaan met het aanmaken van uw organisatie, maar om uw domein te gebruiken moet deze stap worden voltooid!",
+        "VERIFICATION_VALIDATION_DESC": "Verwijder de verificatiecode niet, aangezien ZITADEL van tijd tot tijd het eigendom van uw domein opnieuw zal controleren.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Vraag een nieuw token aan",
+        "VERIFICATION_VALIDATION_ONGOING": "De methode {{ value }} is geselecteerd om uw domein te verifiëren. Klik op de knop om een ​​verificatiecontrole te activeren of het verificatieproces opnieuw in te stellen.",
         "VERIFICATION_SUCCESSFUL": "Domein succesvol geverifieerd!",
-        "REQUESTNEWTOKEN": "Vraag nieuw token aan",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "RESETMETHOD": "Verificatiemethode opnieuw instellen"
       },
       "DOWNLOAD_FILE": "Download bestand",
       "SELECTORGTOOLTIP": "Selecteer deze organisatie.",

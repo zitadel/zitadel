@@ -931,20 +931,22 @@
         "BTN": "Rename"
       },
       "ORGDOMAIN": {
-        "TITLE": "Organization Domain Ownership Verification",
-        "VERIFICATION": "To verify the ownership of your domain, you need to download a verification file and upload it at the provided URL listed below, or place a TXT Record DNS entry for the provided URL. To complete, click the button to verify.",
-        "VERIFICATION_SKIP": "You can skip verification for now and continue to create your organization, but in order to use your organization this step has to be completed!",
-        "VERIFICATION_VALIDATION_DESC": "The tokens are checked regularly to ensure you are still owner of the domain.",
+        "TITLE": "Verify {{value}} ownership",
+        "VERIFICATION": "We offer you two methods to manually validate your domain:",
+        "VERIFICATION_HTML": "- HTTP. Host a temporary verification file on your website",
+        "VERIFICATION_DNS": "- DNS. Create a TXT Record DNS entry",
+        "VERIFICATION_DNS_DESC": "If you manage {{ value }} and you have access to your DNS records, you can create a new TXT record with the following values:",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Use this code for the value of the TXT record:",
+        "VERIFICATION_HTTP_DESC": "If you have access to your website hosting, simply download the verification file and upload it at the provided URL",
+        "VERIFICATION_HTTP_URL_LABEL": "Expected URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Verification file:",
+        "VERIFICATION_SKIP": "You can skip verification for now and continue to create your organization, but in order to use your domain this step has to be completed!",
+        "VERIFICATION_VALIDATION_DESC": "Do not delete the verification code, as ZITADEL will re-check the ownership of your domain from time to time.",
         "VERIFICATION_NEWTOKEN_TITLE": "Request New Token",
-        "VERIFICATION_NEWTOKEN_DESC": "If you want to request a new token, select you preferred method. If you want to validate a persisting token, click the button above.",
-        "VERIFICATION_VALIDATION_ONGOING": "A verification token has already been requested. Click on the button to trigger a verification check.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Type of the token:",
+        "VERIFICATION_VALIDATION_ONGOING": "The {{ value }} method has been selected to verify your domain. Click on the button to trigger a verification check or reset the verification process.",
         "VERIFICATION_SUCCESSFUL": "Domain successfully verified!",
-        "REQUESTNEWTOKEN": "Request new token",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "RESETMETHOD": "Reset verification method"
       },
       "DOWNLOAD_FILE": "Download File",
       "SELECTORGTOOLTIP": "Select this organization.",

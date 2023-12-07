@@ -930,20 +930,22 @@
         "BTN": "Renommer"
       },
       "ORGDOMAIN": {
-        "TITLE": "Vérification de la propriété du domaine de l'organisation",
-        "VERIFICATION": "Pour vérifier la propriété de votre domaine, vous devez télécharger un fichier de vérification et le charger à l'URL indiquée ci-dessous, ou placer une entrée DNS TXT Record pour l'URL indiquée. Pour terminer, cliquez sur le bouton de vérification.",
-        "VERIFICATION_SKIP": "Vous pouvez ignorer la vérification pour l'instant et continuer à créer votre organisation, mais cette étape doit être terminée pour pouvoir utiliser votre organisation !",
-        "VERIFICATION_VALIDATION_DESC": "Les jetons sont vérifiés régulièrement pour s'assurer que vous êtes toujours propriétaire du domaine.",
+        "TITLE": "Vérifier la propriété de {{value}}",
+        "VERIFICATION": "Nous vous proposons deux méthodes pour valider manuellement votre domaine :",
+        "VERIFICATION_HTML": "-HTTP. Hébergez un fichier de vérification temporaire sur votre site Web",
+        "VERIFICATION_DNS": "-DNS. Créer une entrée DNS d'enregistrement TXT",
+        "VERIFICATION_DNS_DESC": "Si vous gérez {{ value }} et que vous avez accès à vos enregistrements DNS, vous pouvez créer un nouvel enregistrement TXT avec les valeurs suivantes :",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Utilisez ce code pour la valeur de l'enregistrement TXT :",
+        "VERIFICATION_HTTP_DESC": "Si vous avez accès à l'hébergement de votre site Web, téléchargez simplement le fichier de vérification et téléchargez-le à l'URL fournie.",
+        "VERIFICATION_HTTP_URL_LABEL": "URL attendue :",
+        "VERIFICATION_HTTP_FILE_LABEL": "Dossier de vérification :",
+        "VERIFICATION_SKIP": "Vous pouvez ignorer la vérification pour le moment et continuer à créer votre organisation, mais pour pouvoir utiliser votre domaine, cette étape doit être complétée !",
+        "VERIFICATION_VALIDATION_DESC": "Ne supprimez pas le code de vérification, car ZITADEL revérifiera de temps en temps la propriété de votre domaine.",
         "VERIFICATION_NEWTOKEN_TITLE": "Demander un nouveau jeton",
-        "VERIFICATION_NEWTOKEN_DESC": "Si vous voulez demander un nouveau jeton, sélectionnez votre méthode préférée. Si vous voulez valider un jeton persistant, cliquez sur le bouton ci-dessus.",
-        "VERIFICATION_VALIDATION_ONGOING": "Un jeton de vérification a déjà été demandé. Cliquez sur le bouton pour déclencher un contrôle de vérification.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Type de jeton",
-        "VERIFICATION_SUCCESSFUL": "Domaine vérifié avec succès !",
-        "REQUESTNEWTOKEN": "Demander un nouveau jeton",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "VERIFICATION_VALIDATION_ONGOING": "La méthode {{ value }} a été sélectionnée pour vérifier votre domaine. Cliquez sur le bouton pour déclencher une vérification ou réinitialiser le processus de vérification.",
+        "VERIFICATION_SUCCESSFUL": "Domaine vérifié avec succès !",
+        "RESETMETHOD": "Réinitialiser la méthode de vérification"
       },
       "DOWNLOAD_FILE": "Télécharger le fichier",
       "SELECTORGTOOLTIP": "Sélectionnez cette organisation.",

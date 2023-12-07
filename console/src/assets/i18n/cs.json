@@ -931,20 +931,22 @@
         "BTN": "Přejmenovat"
       },
       "ORGDOMAIN": {
-        "TITLE": "Ověření vlastnictví domény organizace",
-        "VERIFICATION": "Pro ověření vlastnictví vaší domény je potřeba stáhnout ověřovací soubor a nahrát jej na uvedené URL níže, nebo umístit záznam TXT Record DNS pro uvedené URL. Pro dokončení klikněte na tlačítko a proveďte ověření.",
-        "VERIFICATION_SKIP": "Ověření můžete nyní přeskočit a pokračovat ve vytváření vaší organizace, ale pro používání vaší organizace je třeba tento krok dokončit!",
-        "VERIFICATION_VALIDATION_DESC": "Tokeny jsou pravidelně kontrolovány, aby bylo zajištěno, že jste stále vlastníkem domény.",
-        "VERIFICATION_NEWTOKEN_TITLE": "Požádat o nový token",
-        "VERIFICATION_NEWTOKEN_DESC": "Pokud si přejete požádat o nový token, vyberte preferovanou metodu. Pokud chcete ověřit stávající token, klikněte na tlačítko výše.",
-        "VERIFICATION_VALIDATION_ONGOING": "Token pro ověření byl již požadován. Klikněte na tlačítko a spusťte ověřovací kontrolu.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Typ tokenu:",
+        "TITLE": "Ověřte vlastnictví {{value}}",
+        "VERIFICATION": "Nabízíme vám dva způsoby ručního ověření domény:",
+        "VERIFICATION_HTML": "- HTTP. Hostujte na svém webu dočasný ověřovací soubor",
+        "VERIFICATION_DNS": "- DNS. Vytvořte záznam DNS záznamu TXT",
+        "VERIFICATION_DNS_DESC": "Pokud spravujete {{ value }} a máte přístup ke svým záznamům DNS, můžete vytvořit nový záznam TXT s následujícími hodnotami:",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Pro hodnotu TXT záznamu použijte tento kód:",
+        "VERIFICATION_HTTP_DESC": "Pokud máte přístup k hostování svých webových stránek, jednoduše si stáhněte ověřovací soubor a nahrajte jej na uvedenou adresu URL",
+        "VERIFICATION_HTTP_URL_LABEL": "Očekávaná adresa URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Ověřovací soubor:",
+        "VERIFICATION_SKIP": "Ověření můžete zatím přeskočit a pokračovat ve vytváření organizace, ale abyste mohli používat svou doménu, musíte tento krok dokončit!",
+        "VERIFICATION_VALIDATION_DESC": "Nemažte ověřovací kód, protože ZITADEL čas od času znovu zkontroluje vlastnictví vaší domény.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Vyžádejte si nový token",
+        "VERIFICATION_VALIDATION_ONGOING": "Pro ověření vaší domény byla vybrána metoda {{ value }}. Kliknutím na tlačítko spustíte kontrolu ověření nebo resetujete proces ověření.",
         "VERIFICATION_SUCCESSFUL": "Doména byla úspěšně ověřena!",
-        "REQUESTNEWTOKEN": "Požadovat nový token",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "RESETMETHOD": "Resetovat metodu ověření"
       },
       "DOWNLOAD_FILE": "Stáhnout soubor",
       "SELECTORGTOOLTIP": "Vybrat tuto organizaci.",

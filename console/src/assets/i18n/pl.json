@@ -930,20 +930,22 @@
         "BTN": "Zmień nazwę"
       },
       "ORGDOMAIN": {
-        "TITLE": "Weryfikacja własności domeny organizacji",
-        "VERIFICATION": "Aby zweryfikować własność swojej domeny, musisz pobrać plik weryfikacyjny i przesłać go na podany poniżej adres URL lub dodać rekord TXT DNS dla podanego adresu URL. Aby zakończyć, kliknij przycisk weryfikuj.",
-        "VERIFICATION_SKIP": "Możesz teraz pominąć weryfikację i kontynuować tworzenie swojej organizacji, ale aby korzystać z organizacji, ta krok musi zostać ukończony!",
-        "VERIFICATION_VALIDATION_DESC": "Tokeny są regularnie sprawdzane, aby upewnić się, że nadal jesteś właścicielem domeny.",
-        "VERIFICATION_NEWTOKEN_TITLE": "Prośba o nowy token",
-        "VERIFICATION_NEWTOKEN_DESC": "Jeśli chcesz poprosić o nowy token, wybierz preferowany sposób. Jeśli chcesz zwalidować trwający token, kliknij powyższy przycisk.",
-        "VERIFICATION_VALIDATION_ONGOING": "Token weryfikacyjny został już zażądany. Kliknij przycisk, aby uruchomić sprawdzenie weryfikacyjne.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Typ tokenu:",
-        "VERIFICATION_SUCCESSFUL": "Domena zweryfikowana pomyślnie!",
-        "REQUESTNEWTOKEN": "Poproś o nowy token",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "TITLE": "Zweryfikuj własność {{value}}",
+        "VERIFICATION": "Oferujemy dwie metody ręcznej weryfikacji domeny:",
+        "VERIFICATION_HTML": "-HTTP. Umieść tymczasowy plik weryfikacyjny w swojej witrynie",
+        "VERIFICATION_DNS": "-DNS. Utwórz wpis DNS rekordu TXT",
+        "VERIFICATION_DNS_DESC": "Jeśli zarządzasz wartością {{ value }} i masz dostęp do swoich rekordów DNS, możesz utworzyć nowy rekord TXT z następującymi wartościami:",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Użyj tego kodu dla wartości rekordu TXT:",
+        "VERIFICATION_HTTP_DESC": "Jeśli masz dostęp do hostingu swojej witryny, po prostu pobierz plik weryfikacyjny i prześlij go pod podanym adresem URL",
+        "VERIFICATION_HTTP_URL_LABEL": "Oczekiwany adres URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Plik weryfikacyjny:",
+        "VERIFICATION_SKIP": "Możesz na razie pominąć weryfikację i kontynuować tworzenie organizacji, jednak aby móc korzystać z domeny, ten krok musi zostać ukończony!",
+        "VERIFICATION_VALIDATION_DESC": "Nie usuwaj kodu weryfikacyjnego, ponieważ ZITADEL będzie od czasu do czasu ponownie sprawdzał własność Twojej domeny.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Poproś o nowy token",
+        "VERIFICATION_VALIDATION_ONGOING": "Wybrano metodę {{ value }} do weryfikacji Twojej domeny. Kliknij przycisk, aby uruchomić kontrolę weryfikacyjną lub zresetować proces weryfikacji.",
+        "VERIFICATION_SUCCESSFUL": "Domena pomyślnie zweryfikowana!",
+        "RESETMETHOD": "Zresetuj metodę weryfikacji"
       },
       "DOWNLOAD_FILE": "Pobierz plik",
       "SELECTORGTOOLTIP": "Wybierz tę organizację.",
