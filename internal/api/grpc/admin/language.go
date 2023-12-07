@@ -2,7 +2,6 @@ package admin
 
 import (
 	"context"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -30,4 +29,16 @@ func (s *Server) SetDefaultLanguage(ctx context.Context, req *admin_pb.SetDefaul
 
 func (s *Server) GetDefaultLanguage(ctx context.Context, _ *admin_pb.GetDefaultLanguageRequest) (*admin_pb.GetDefaultLanguageResponse, error) {
 	return &admin_pb.GetDefaultLanguageResponse{Language: authz.GetInstance(ctx).DefaultLanguage().String()}, nil
+}
+
+func (s *Server) GetAllowedLanguages(ctx context.Context, _ *admin_pb.GetAllowedLanguagesRequest) (*admin_pb.GetAllowedLanguagesResponse, error) {
+	restrictions, err := s.query.GetInstanceRestrictions(ctx)
+	if err != nil {
+		return nil, err
+	}
+	allowed := restrictions.AllowedLanguages
+	if len(allowed) == 0 {
+		allowed = i18n.SupportedLanguages()
+	}
+	return &admin_pb.GetAllowedLanguagesResponse{Languages: domain.LanguagesToStrings(allowed)}, nil
 }

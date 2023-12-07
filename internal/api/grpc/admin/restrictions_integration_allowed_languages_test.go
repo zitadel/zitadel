@@ -5,20 +5,21 @@ package admin_test
 import (
 	"context"
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"github.com/zitadel/zitadel/internal/integration"
-	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	"github.com/zitadel/zitadel/pkg/grpc/management"
-	"github.com/zitadel/zitadel/pkg/grpc/text"
-	"github.com/zitadel/zitadel/pkg/grpc/user"
-	"golang.org/x/text/language"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"io"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/pkg/grpc/text"
+	"github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
 func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
@@ -29,11 +30,10 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 		defaultAndAllowedLanguage = language.German
 		supportedLanguagesStr     = []string{language.German.String(), language.English.String(), language.Japanese.String()}
 		disallowedLanguage        = language.Spanish
-		unsupportedLanguage1      = language.Afrikaans
-		unsupportedLanguage2      = language.Albanian
+		unsupportedLanguage       = language.Afrikaans
 	)
 
-	domain, _, iamOwnerCtx := Tester.UseIsolatedInstance(ctx, SystemCTX)
+	domain, _, iamOwnerCtx := Tester.UseIsolatedInstance(t, ctx, SystemCTX)
 	t.Run("assumed defaults are correct", func(tt *testing.T) {
 		tt.Run("languages are not restricted by default", func(ttt *testing.T) {
 			restrictions, err := Tester.Client.Admin.GetRestrictions(iamOwnerCtx, &admin.GetRestrictionsRequest{})
@@ -46,7 +46,7 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 			require.Equal(ttt, language.Make(defaultLang.Language), language.English)
 		})
 		tt.Run("the discovery endpoint returns all supported languages", func(ttt *testing.T) {
-			checkDiscoveryEndpoint(ttt, domain, supportedLanguagesStr, nil)
+			awaitDiscoveryEndpoint(ttt, domain, supportedLanguagesStr, nil)
 		})
 	})
 	t.Run("restricting the default language fails", func(tt *testing.T) {
@@ -67,6 +67,14 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 	t.Run("restricting allowed languages works", func(tt *testing.T) {
 		setAndAwaitAllowedLanguages(iamOwnerCtx, tt, []string{defaultAndAllowedLanguage.String()})
 	})
+	t.Run("GetAllowedLanguage returns only the allowed languages", func(tt *testing.T) {
+		expectContains, expectNotContains := []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()}
+		adminResp, err := Tester.Client.Admin.GetAllowedLanguages(iamOwnerCtx, &admin.GetAllowedLanguagesRequest{})
+		require.NoError(t, err)
+		langs := adminResp.GetLanguages()
+		assert.Condition(t, contains(langs, expectContains))
+		assert.Condition(t, not(contains(langs, expectNotContains)))
+	})
 	t.Run("setting the default language to a disallowed language fails", func(tt *testing.T) {
 		_, err := Tester.Client.Admin.SetDefaultLanguage(iamOwnerCtx, &admin.SetDefaultLanguageRequest{Language: disallowedLanguage.String()})
 		expectStatus, ok := status.FromError(err)
@@ -79,29 +87,31 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 		require.Condition(tt, contains(supported.GetLanguages(), supportedLanguagesStr))
 	})
 	t.Run("the disallowed language is not listed in the discovery endpoint", func(tt *testing.T) {
-		checkDiscoveryEndpoint(tt, domain, []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
+		awaitDiscoveryEndpoint(tt, domain, []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
 	})
 	t.Run("the login ui is rendered in the default language", func(tt *testing.T) {
-		checkLoginUILanguage(tt, domain, disallowedLanguage, defaultAndAllowedLanguage, "Allgemeine Geschäftsbedingungen und Datenschutz")
+		awaitLoginUILanguage(tt, domain, disallowedLanguage, defaultAndAllowedLanguage, "Allgemeine Geschäftsbedingungen und Datenschutz")
 	})
 	t.Run("preferred languages are not restricted by the supported languages", func(tt *testing.T) {
-		var importedUser *management.ImportHumanUserResponse
-		tt.Run("import user", func(ttt *testing.T) {
-			var err error
-			importedUser, err = importUser(iamOwnerCtx, unsupportedLanguage1)
-			require.NoError(ttt, err)
-		})
 		tt.Run("change user profile", func(ttt *testing.T) {
-			_, err := Tester.Client.Mgmt.UpdateHumanProfile(iamOwnerCtx, &management.UpdateHumanProfileRequest{
-				UserId:            importedUser.GetUserId(),
-				FirstName:         "hodor",
-				LastName:          "hodor",
-				NickName:          integration.RandString(5),
-				DisplayName:       "hodor",
-				PreferredLanguage: unsupportedLanguage2.String(),
-				Gender:            user.Gender_GENDER_MALE,
-			})
+			resp, err := Tester.Client.Mgmt.ListUsers(iamOwnerCtx, &management.ListUsersRequest{Queries: []*user.SearchQuery{{Query: &user.SearchQuery_UserNameQuery{UserNameQuery: &user.UserNameQuery{
+				UserName: "zitadel-admin@zitadel.localhost"}},
+			}}})
 			require.NoError(ttt, err)
+			require.Len(ttt, resp.GetResult(), 1)
+			humanAdmin := resp.GetResult()[0]
+			profile := humanAdmin.GetHuman().GetProfile()
+			require.NotEqual(ttt, unsupportedLanguage.String(), profile.GetPreferredLanguage())
+			_, updateErr := Tester.Client.Mgmt.UpdateHumanProfile(iamOwnerCtx, &management.UpdateHumanProfileRequest{
+				PreferredLanguage: unsupportedLanguage.String(),
+				UserId:            humanAdmin.GetId(),
+				FirstName:         profile.GetFirstName(),
+				LastName:          profile.GetLastName(),
+				NickName:          profile.GetNickName(),
+				DisplayName:       profile.GetDisplayName(),
+				Gender:            profile.GetGender(),
+			})
+			require.NoError(ttt, updateErr)
 		})
 	})
 	t.Run("custom texts are only restricted by the supported languages", func(tt *testing.T) {
@@ -137,11 +147,11 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 	})
 
 	t.Run("allowing the language makes it usable again", func(tt *testing.T) {
-		tt.Run("the disallowed language is listed in the discovery endpoint again", func(ttt *testing.T) {
-			checkDiscoveryEndpoint(ttt, domain, []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
+		tt.Run("the previously disallowed language is listed in the discovery endpoint again", func(ttt *testing.T) {
+			awaitDiscoveryEndpoint(ttt, domain, []string{disallowedLanguage.String()}, nil)
 		})
-		tt.Run("the login ui is rendered in the allowed language", func(ttt *testing.T) {
-			checkLoginUILanguage(ttt, domain, disallowedLanguage, disallowedLanguage, "Términos y condiciones")
+		tt.Run("the login ui is rendered in the previously disallowed language", func(ttt *testing.T) {
+			awaitLoginUILanguage(ttt, domain, disallowedLanguage, disallowedLanguage, "Términos y condiciones")
 		})
 	})
 }
@@ -151,14 +161,14 @@ func setAndAwaitAllowedLanguages(ctx context.Context, t *testing.T, selectLangua
 	require.NoError(t, err)
 	awaitCtx, awaitCancel := context.WithTimeout(ctx, 10*time.Second)
 	defer awaitCancel()
-	await(t, awaitCtx, func() bool {
+	await(t, awaitCtx, func(tt *assert.CollectT) {
 		restrictions, getErr := Tester.Client.Admin.GetRestrictions(awaitCtx, &admin.GetRestrictionsRequest{})
 		expectLanguages := selectLanguages
 		if len(selectLanguages) == 0 {
 			expectLanguages = nil
 		}
-		return assert.NoError(NoopAssertionT, getErr) &&
-			assert.Equal(NoopAssertionT, expectLanguages, restrictions.GetAllowedLanguages())
+		assert.NoError(tt, getErr)
+		assert.Equal(tt, expectLanguages, restrictions.GetAllowedLanguages())
 	})
 }
 
@@ -167,66 +177,57 @@ func setAndAwaitDefaultLanguage(ctx context.Context, t *testing.T, lang language
 	require.NoError(t, err)
 	awaitCtx, awaitCancel := context.WithTimeout(ctx, 10*time.Second)
 	defer awaitCancel()
-	await(t, awaitCtx, func() bool {
+	await(t, awaitCtx, func(tt *assert.CollectT) {
 		defaultLang, getErr := Tester.Client.Admin.GetDefaultLanguage(awaitCtx, &admin.GetDefaultLanguageRequest{})
-		return assert.NoError(NoopAssertionT, getErr) &&
-			assert.Equal(NoopAssertionT, lang.String(), defaultLang.GetLanguage())
+		assert.NoError(tt, getErr)
+		assert.Equal(tt, lang.String(), defaultLang.GetLanguage())
 	})
 }
 
-func importUser(ctx context.Context, preferredLanguage language.Tag) (*management.ImportHumanUserResponse, error) {
-	random := integration.RandString(5)
-	return Tester.Client.Mgmt.ImportHumanUser(ctx, &management.ImportHumanUserRequest{
-		UserName: "integration-test-user_" + random,
-		Profile: &management.ImportHumanUserRequest_Profile{
-			FirstName:         "hodor",
-			LastName:          "hodor",
-			NickName:          "hodor",
-			PreferredLanguage: preferredLanguage.String(),
-		},
-		Email: &management.ImportHumanUserRequest_Email{
-			Email:           random + "@hodor.hodor",
-			IsEmailVerified: true,
-		},
-		PasswordChangeRequired: false,
-		Password:               "Password1!",
+func awaitDiscoveryEndpoint(t *testing.T, domain string, containsUILocales, notContainsUILocales []string) {
+	awaitCtx, awaitCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer awaitCancel()
+	await(t, awaitCtx, func(tt *assert.CollectT) {
+		req, err := http.NewRequestWithContext(awaitCtx, http.MethodGet, "http://"+domain+":8080/.well-known/openid-configuration", nil)
+		require.NoError(tt, err)
+		resp, err := http.DefaultClient.Do(req)
+		require.NoError(tt, err)
+		require.Equal(tt, http.StatusOK, resp.StatusCode)
+		body, err := io.ReadAll(resp.Body)
+		defer func() {
+			require.NoError(tt, resp.Body.Close())
+		}()
+		require.NoError(tt, err)
+		doc := struct {
+			UILocalesSupported []string `json:"ui_locales_supported"`
+		}{}
+		require.NoError(tt, json.Unmarshal(body, &doc))
+		if containsUILocales != nil {
+			assert.Condition(tt, contains(doc.UILocalesSupported, containsUILocales))
+		}
+		if notContainsUILocales != nil {
+			assert.Condition(tt, not(contains(doc.UILocalesSupported, notContainsUILocales)))
+		}
 	})
 }
 
-func checkDiscoveryEndpoint(t *testing.T, domain string, containsUILocales, notContainsUILocales []string) {
-	resp, err := http.Get("http://" + domain + ":8080/.well-known/openid-configuration")
-	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, resp.StatusCode)
-	body, err := io.ReadAll(resp.Body)
-	defer func() {
-		require.NoError(t, resp.Body.Close())
-	}()
-	require.NoError(t, err)
-	doc := struct {
-		UILocalesSupported []string `json:"ui_locales_supported"`
-	}{}
-	require.NoError(t, json.Unmarshal(body, &doc))
-	if containsUILocales != nil {
-		assert.Condition(NoopAssertionT, contains(doc.UILocalesSupported, containsUILocales))
-	}
-	if notContainsUILocales != nil {
-		assert.Condition(NoopAssertionT, not(contains(doc.UILocalesSupported, notContainsUILocales)))
-	}
-}
-
-func checkLoginUILanguage(t *testing.T, domain string, acceptLanguage language.Tag, expectLang language.Tag, containsText string) {
-	req, err := http.NewRequest(http.MethodGet, "http://"+domain+":8080/ui/login/register", nil)
-	req.Header.Set("Accept-Language", acceptLanguage.String())
-	require.NoError(t, err)
-	resp, err := http.DefaultClient.Do(req)
-	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, resp.StatusCode)
-	body, err := io.ReadAll(resp.Body)
-	defer func() {
-		require.NoError(t, resp.Body.Close())
-	}()
-	require.NoError(t, err)
-	assert.Containsf(t, string(body), containsText, "login ui language is in "+expectLang.String())
+func awaitLoginUILanguage(t *testing.T, domain string, acceptLanguage language.Tag, expectLang language.Tag, containsText string) {
+	awaitCtx, awaitCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer awaitCancel()
+	await(t, awaitCtx, func(tt *assert.CollectT) {
+		req, err := http.NewRequestWithContext(awaitCtx, http.MethodGet, "http://"+domain+":8080/ui/login/register", nil)
+		req.Header.Set("Accept-Language", acceptLanguage.String())
+		require.NoError(t, err)
+		resp, err := http.DefaultClient.Do(req)
+		require.NoError(t, err)
+		require.Equal(t, http.StatusOK, resp.StatusCode)
+		body, err := io.ReadAll(resp.Body)
+		defer func() {
+			require.NoError(t, resp.Body.Close())
+		}()
+		require.NoError(t, err)
+		assert.Containsf(t, string(body), containsText, "login ui language is in "+expectLang.String())
+	})
 }
 
 // We would love to use assert.Contains here, but it doesn't work with slices of strings

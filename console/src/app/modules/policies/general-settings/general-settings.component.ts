@@ -26,7 +26,7 @@ export class GeneralSettingsComponent implements OnInit {
     this.service.getDefaultLanguage().then((langResp) => {
       this.defaultLanguage = langResp.language;
     });
-    this.service.getSupportedLanguages().then((supportedResp) => {
+    this.service.getAllowedLanguages().then((supportedResp) => {
       this.defaultLanguageOptions = supportedResp.languagesList;
     });
   }

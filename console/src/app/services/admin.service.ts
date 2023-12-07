@@ -54,6 +54,8 @@ import {
   DeactivateSMSProviderResponse,
   DeleteProviderRequest,
   DeleteProviderResponse,
+  GetAllowedLanguagesRequest,
+  GetAllowedLanguagesResponse,
   GetCustomDomainClaimedMessageTextRequest,
   GetCustomDomainClaimedMessageTextResponse,
   GetCustomDomainPolicyRequest,
@@ -431,6 +433,11 @@ export class AdminService {
   public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
     const req = new GetSupportedLanguagesRequest();
     return this.grpcService.admin.getSupportedLanguages(req, null).then((resp) => resp.toObject());
+  }
+
+  public getAllowedLanguages(): Promise<GetAllowedLanguagesResponse.AsObject> {
+    const req = new GetAllowedLanguagesRequest();
+    return this.grpcService.admin.getAllowedLanguages(req, null).then((resp) => resp.toObject());
   }
 
   public getDefaultLoginTexts(req: GetDefaultLoginTextsRequest): Promise<GetDefaultLoginTextsResponse.AsObject> {

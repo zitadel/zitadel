@@ -23,7 +23,7 @@ import (
 var callURL = "http://localhost:" + integration.PortQuotaServer
 
 func TestServer_QuotaNotification_Limit(t *testing.T) {
-	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(CTX, SystemCTX)
+	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
 	amount := 10
 	percent := 50
 	percentAmount := amount * percent / 100
@@ -67,7 +67,7 @@ func TestServer_QuotaNotification_Limit(t *testing.T) {
 }
 
 func TestServer_QuotaNotification_NoLimit(t *testing.T) {
-	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(CTX, SystemCTX)
+	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
 	amount := 10
 	percent := 50
 	percentAmount := amount * percent / 100
@@ -149,7 +149,7 @@ func awaitNotification(t *testing.T, bodies chan []byte, unit quota.Unit, percen
 }
 
 func TestServer_AddAndRemoveQuota(t *testing.T) {
-	_, instanceID, _ := Tester.UseIsolatedInstance(CTX, SystemCTX)
+	_, instanceID, _ := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
 
 	got, err := Tester.Client.System.SetQuota(SystemCTX, &system.SetQuotaRequest{
 		InstanceId:    instanceID,

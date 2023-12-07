@@ -20,6 +20,8 @@
   "state": 1,
   "project_role_keys": ["role1", "role2"],
   "public_keys": null,
-  "access_token_lifetime": 43200000000000,
-  "id_token_lifetime": 43200000000000
+  "settings": {
+    "access_token_lifetime": 43200000000000,
+    "id_token_lifetime": 43200000000000
+  }
 }
