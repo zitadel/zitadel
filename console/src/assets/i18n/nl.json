@@ -1263,9 +1263,11 @@
       "RESET_TITLE": "Herstel Standaard Waarden",
       "RESET_DESCRIPTION": "U staat op het punt om alle standaardwaarden te herstellen. Alle wijzigingen die u heeft gemaakt zullen permanent worden verwijderd. Weet u zeker dat u wilt doorgaan?",
       "UNSAVED_TITLE": "Doorgaan zonder opslaan?",
-      "UNSAAVED_DESCRIPTION": "U heeft wijzigingen gemaakt zonder op te slaan. Wilt u nu opslaan?",
-      "LOCALE": "Locale Code",
-      "LOCALES": {
+      "UNSAVED_DESCRIPTION": "U heeft wijzigingen gemaakt zonder op te slaan. Wilt u nu opslaan?",
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "U heeft een taal geselecteerd die niet is toegestaan. U kunt doorgaan met het wijzigen van de teksten. Maar als u wilt dat uw gebruikers deze taal daadwerkelijk kunnen gebruiken, wijzig dan de beperkingen van uw instantie.",
+      "LANGUAGES_NOT_ALLOWED": "Niet toegestaan:",
+      "LANGUAGE": "Taal",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
