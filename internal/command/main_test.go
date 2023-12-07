@@ -95,7 +95,13 @@ func eventPusherToEvents(eventsPushes ...eventstore.Command) []*repository.Event
 
 func expectPush(commands ...eventstore.Command) expect {
 	return func(m *mock.MockRepository) {
-		m.ExpectPush(commands)
+		m.ExpectPush(commands, 0)
+	}
+}
+
+func expectPushSlow(sleep time.Duration, commands ...eventstore.Command) expect {
+	return func(m *mock.MockRepository) {
+		m.ExpectPush(commands, sleep)
 	}
 }
 
@@ -212,7 +218,7 @@ func (m *mockInstance) ConsoleApplicationID() string {
 }
 
 func (m *mockInstance) DefaultLanguage() language.Tag {
-	return language.English
+	return AllowedLanguage
 }
 
 func (m *mockInstance) DefaultOrganisationID() string {

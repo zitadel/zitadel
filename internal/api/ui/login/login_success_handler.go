@@ -41,8 +41,9 @@ func (l *Login) renderSuccessAndCallback(w http.ResponseWriter, r *http.Request,
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
+	translator := l.getTranslator(r.Context(), authReq)
 	data := loginSuccessData{
-		userData: l.getUserData(r, authReq, "LoginSuccess.Title", "", errID, errMessage),
+		userData: l.getUserData(r, authReq, translator, "LoginSuccess.Title", "", errID, errMessage),
 	}
 	if authReq != nil {
 		data.RedirectURI, err = l.authRequestCallback(r.Context(), authReq)
@@ -51,7 +52,7 @@ func (l *Login) renderSuccessAndCallback(w http.ResponseWriter, r *http.Request,
 			return
 		}
 	}
-	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplLoginSuccess], data, nil)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplLoginSuccess], data, nil)
 }
 
 func (l *Login) redirectToCallback(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {

@@ -11,11 +11,16 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func TestServer_RegisterU2F(t *testing.T) {
 	userID := Tester.CreateHumanUser(CTX).GetUserId()
+
+	// We also need a user session
+	Tester.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
 
 	type args struct {
 		ctx context.Context
@@ -45,12 +50,10 @@ func TestServer_RegisterU2F(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		/* TODO: after we are able to obtain a Bearer token for a human user
-		https://github.com/zitadel/zitadel/issues/6022
 		{
-			name: "human user",
+			name: "user setting its own passkey",
 			args: args{
-				ctx: CTX,
+				ctx: Tester.WithAuthorizationToken(CTX, sessionToken),
 				req: &user.RegisterU2FRequest{
 					UserId: userID,
 				},
@@ -61,7 +64,6 @@ func TestServer_RegisterU2F(t *testing.T) {
 				},
 			},
 		},
-		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -85,8 +87,11 @@ func TestServer_RegisterU2F(t *testing.T) {
 
 func TestServer_VerifyU2FRegistration(t *testing.T) {
 	userID := Tester.CreateHumanUser(CTX).GetUserId()
-	/* TODO after we are able to obtain a Bearer token for a human user
-	pkr, err := Client.RegisterU2F(CTX, &user.RegisterU2FRequest{
+	Tester.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	ctx := Tester.WithAuthorizationToken(CTX, sessionToken)
+
+	pkr, err := Client.RegisterU2F(ctx, &user.RegisterU2FRequest{
 		UserId: userID,
 	})
 	require.NoError(t, err)
@@ -94,7 +99,6 @@ func TestServer_VerifyU2FRegistration(t *testing.T) {
 
 	attestationResponse, err := Tester.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
 	require.NoError(t, err)
-	*/
 
 	type args struct {
 		ctx context.Context
@@ -109,7 +113,7 @@ func TestServer_VerifyU2FRegistration(t *testing.T) {
 		{
 			name: "missing user id",
 			args: args{
-				ctx: CTX,
+				ctx: ctx,
 				req: &user.VerifyU2FRegistrationRequest{
 					U2FId:     "123",
 					TokenName: "nice name",
@@ -117,11 +121,10 @@ func TestServer_VerifyU2FRegistration(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		/* TODO after we are able to obtain a Bearer token for a human user
 		{
 			name: "success",
 			args: args{
-				ctx: CTX,
+				ctx: ctx,
 				req: &user.VerifyU2FRegistrationRequest{
 					UserId:              userID,
 					U2FId:               pkr.GetU2FId(),
@@ -135,11 +138,10 @@ func TestServer_VerifyU2FRegistration(t *testing.T) {
 				},
 			},
 		},
-		*/
 		{
 			name: "wrong credential",
 			args: args{
-				ctx: CTX,
+				ctx: ctx,
 				req: &user.VerifyU2FRegistrationRequest{
 					UserId: userID,
 					U2FId:  "123",

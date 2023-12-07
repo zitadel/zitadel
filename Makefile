@@ -103,7 +103,7 @@ core_unit_test:
 core_integration_setup:
 	go build -o zitadel main.go
 	./zitadel init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
-	./zitadel setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
+	./zitadel setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml --steps internal/integration/config/zitadel.yaml --steps internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 	$(RM) zitadel
 
 .PHONY: core_integration_test
