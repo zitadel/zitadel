@@ -75,6 +75,8 @@ export class FilterEventsComponent implements OnInit {
     eventTypesList: new FormControl<EventType.AsObject[]>([]),
   });
 
+  private initialValues = this.form.getRawValue();
+
   constructor(
     private adminService: AdminService,
     private toast: ToastService,
@@ -172,6 +174,7 @@ export class FilterEventsComponent implements OnInit {
 
   public reset(): void {
     this.form.reset();
+    this.form.setValue(this.initialValues);
     this.emitChange();
   }
 
