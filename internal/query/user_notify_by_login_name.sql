@@ -18,8 +18,8 @@ WITH found_users AS (
         OR (p.instance_id = $4 AND p.resource_owner = u.resource_owner)
       )
       AND (
-        (p.must_be_domain IS TRUE AND u.user_name ILIKE $1)
-        OR (p.must_be_domain IS FALSE AND u.user_name ILIKE $3)
+        (p.must_be_domain IS TRUE AND u.user_name_lower = $1)
+        OR (p.must_be_domain IS FALSE AND u.user_name_lower = $3)
       )
     ORDER BY is_default
     LIMIT 1
@@ -29,7 +29,7 @@ WITH found_users AS (
     ON 
       u.instance_id = d.instance_id
       AND u.resource_owner = d.resource_owner
-      AND CASE WHEN p.must_be_domain THEN d.name ILIKE $2 ELSE TRUE END
+      AND CASE WHEN p.must_be_domain THEN d.name_lower = $2 ELSE TRUE END
 ),
 login_names AS (SELECT 
   fu.id user_id
