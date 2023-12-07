@@ -19,7 +19,12 @@
 
 <div class="max-width-container">
   <cnsl-meta-layout>
-    <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList" queryParam="id">
+    <cnsl-sidenav
+      [(ngModel)]="currentSetting"
+      [settingsList]="settingsList"
+      queryParam="id"
+      (ngModelChange)="settingChanged()"
+    >
       <ng-container *ngIf="currentSetting === 'general'">
         <cnsl-card
           *ngIf="user && user.human && user.human.profile"
@@ -30,7 +35,7 @@
             [showEditImage]="true"
             [preferredLoginName]="user.preferredLoginName"
             [genders]="genders"
-            [languages]="languages"
+            [languages]="(langSvc.supported$ | async) || []"
             [username]="user.userName"
             [user]="user.human"
             [disabled]="false"

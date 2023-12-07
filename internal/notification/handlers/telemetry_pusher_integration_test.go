@@ -13,7 +13,7 @@ import (
 )
 
 func TestServer_TelemetryPushMilestones(t *testing.T) {
-	primaryDomain, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(CTX, SystemCTX)
+	primaryDomain, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
 	t.Log("testing against instance with primary domain", primaryDomain)
 	awaitMilestone(t, Tester.MilestoneChan, primaryDomain, "InstanceCreated")
 	project, err := Tester.Client.Mgmt.AddProject(iamOwnerCtx, &management.AddProjectRequest{Name: "integration"})

@@ -1261,8 +1261,10 @@
       "RESET_DESCRIPTION": "Vous êtes sur le point de restaurer toutes les valeurs par défaut. Toutes les modifications que vous avez apportées seront définitivement supprimées. Voulez-vous vraiment continuer ?",
       "UNSAVED_TITLE": "Continuer sans sauvegarder ?",
       "UNSAVED_DESCRIPTION": "Vous avez apporté des modifications sans les sauvegarder. Voulez-vous les enregistrer maintenant ?",
-      "LOCALE": "Code Locale",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Vous avez sélectionné une langue qui n'est pas autorisée. Vous pouvez continuer à modifier les textes. Mais si vous voulez que vos utilisateurs puissent réellement utiliser cette langue, modifiez les restrictions de vos instances.",
+      "LANGUAGES_NOT_ALLOWED": "Non autorisé:",
+      "LANGUAGE": "Langue",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",

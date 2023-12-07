@@ -1262,8 +1262,10 @@
       "RESET_DESCRIPTION": "You are about to restore all default values. All changes you have made will be permanently deleted. Do you really want to continue?",
       "UNSAVED_TITLE": "Continue without saving?",
       "UNSAVED_DESCRIPTION": "You have made changes without saving. Do you want to save now?",
-      "LOCALE": "Locale Code",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "You selected a language that is not allowed. You can go on modifying the texts. But if you want your users to actually be able to use this language, change your instances restrictions.",
+      "LANGUAGES_NOT_ALLOWED": "Not allowed:",
+      "LANGUAGE": "Language",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",

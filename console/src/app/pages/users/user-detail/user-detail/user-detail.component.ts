@@ -22,10 +22,11 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
-import { supportedLanguages } from 'src/app/utils/language';
 import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
 import { MachineSecretDialogComponent } from './machine-secret-dialog/machine-secret-dialog.component';
+import { Observable } from 'rxjs';
+import { LanguagesService } from '../../../../services/languages.service';
 
 const GENERAL: SidenavSetting = { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' };
 const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' };
@@ -45,7 +46,6 @@ export class UserDetailComponent implements OnInit {
   public user!: User.AsObject;
   public metadata: Metadata.AsObject[] = [];
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages: string[] = supportedLanguages;
 
   public ChangeType: any = ChangeType;
 
@@ -76,6 +76,7 @@ export class UserDetailComponent implements OnInit {
     private router: Router,
     activatedRoute: ActivatedRoute,
     private mediaMatcher: MediaMatcher,
+    public langSvc: LanguagesService,
     breadcrumbService: BreadcrumbService,
   ) {
     activatedRoute.queryParams.pipe(take(1)).subscribe((params: Params) => {
@@ -100,10 +101,6 @@ export class UserDetailComponent implements OnInit {
     this.mediaMatcher.matchMedia(mediaq).onchange = (small) => {
       this.changeSelection(small.matches);
     };
-
-    this.mgmtUserService.getSupportedLanguages().then((lang) => {
-      this.languages = lang.languagesList;
-    });
   }
 
   private changeSelection(small: boolean): void {

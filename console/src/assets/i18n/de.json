@@ -1261,8 +1261,10 @@
       "RESET_DESCRIPTION": "Sie sind im Begriff alle Standardwerte wiederherzustellen. Alle von Ihnen gesetzten Änderungen werden unwiderruflich gelöscht. Wollen Sie fortfahren?",
       "UNSAVED_TITLE": "Ohne speichern fortfahren?",
       "UNSAVED_DESCRIPTION": "Sie haben Änderungen vorgenommen ohne zu speichern. Möchten Sie jetzt speichern?",
-      "LOCALE": "Sprachcode",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Sie haben eine Sprache ausgewählt, die nicht erlaubt ist. Sie können weiterhin die Texte ändern. Wenn Sie jedoch möchten, dass Ihre Benutzer diese Sprache tatsächlich verwenden können, ändern Sie die Einschränkungen Ihrer Instanz.",
+      "LANGUAGES_NOT_ALLOWED": "Nicht erlaubt:",
+      "LANGUAGE": "Sprache",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",

@@ -268,7 +268,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Supported Languages";
-            description: "The supported/default languages of the system will be returned by the language abbreviation."
+            description: "Use GetSupportedLanguages on the admin service instead."
+            deprecated: true;
             tags: "General";
             responses: {
                 key: "200"
