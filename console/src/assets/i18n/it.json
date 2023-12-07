@@ -1272,8 +1272,8 @@
       "UNSAVED_TITLE": "Continuare senza salvare?",
       "UNSAVED_DESCRIPTION": "Hai fatto delle modifiche senza salvare. Vuoi salvare ora?",
       "ACTIVE_LANGUAGE_NOT_ALLOWED": "Hai selezionato una lingua non consentita. Puoi continuare a modificare i testi. Ma se vuoi che i tuoi utenti possano effettivamente utilizzare questa lingua, cambia le restrizioni delle tue istanze.",
-      "LANGUAGES_NOT_ALLOWED": "Non consentito:",
       "LANGUAGE": "Lingua",
+      "LANGUAGES_NOT_ALLOWED": "Non consentito:",
       "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
