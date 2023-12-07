@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -27,9 +28,11 @@ type Server struct {
 	command *command.Commands
 	keySet  *keySetCache
 
-	defaultLoginURL    string
-	defaultLoginURLV2  string
-	defaultLogoutURLV2 string
+	defaultLoginURL            string
+	defaultLoginURLV2          string
+	defaultLogoutURLV2         string
+	defaultAccessTokenLifetime time.Duration
+	defaultIdTokenLifetime     time.Duration
 
 	fallbackLogger      *slog.Logger
 	hashAlg             crypto.HashAlgorithm

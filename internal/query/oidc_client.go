@@ -37,8 +37,7 @@ type OIDCClient struct {
 	PublicKeys               map[string][]byte          `json:"public_keys,omitempty"`
 	ProjectID                string                     `json:"project_id,omitempty"`
 	ProjectRoleKeys          []string                   `json:"project_role_keys,omitempty"`
-	AccessTokenLifetime      time.Duration              `json:"access_token_lifetime,omitempty"`
-	IDTokenLifetime          time.Duration              `json:"id_token_lifetime,omitempty"`
+	Settings                 *OIDCSettings              `json:"settings,omitempty"`
 }
 
 //go:embed embed/oidc_client_by_id.sql
