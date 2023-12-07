@@ -13,6 +13,17 @@
     'ORG.PAGES.ORGDOMAIN.VERIFICATION_VALIDATION_DESC' | translate
   }}</cnsl-info-section>
 
+  <cnsl-info-section [type]="InfoSectionType.INFO" *ngIf="showNew && !(dns || http)" class="desc">
+    <a
+      href="https://zitadel.com/docs/guides/manage/console/organizations#verify-your-domain-name"
+      rel="noreferrer"
+      target="_blank"
+      external
+    >
+      {{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_DOCS' | translate }}
+    </a>
+  </cnsl-info-section>
+
   <p *ngIf="!showNew && !(dns || http)" class="desc">
     {{
       'ORG.PAGES.ORGDOMAIN.VERIFICATION_VALIDATION_ONGOING'
