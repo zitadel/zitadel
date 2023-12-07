@@ -871,14 +871,16 @@
         },
         "SEQUENCE": {
           "LABEL": "Sequenz",
-          "CHECKBOX": "Nach Sequenz filtern",
-          "SORT": "Sortierung",
-          "ASC": "aufsteigend",
-          "DESC": "absteigend"
+          "CHECKBOX": "Nach Sequenz filtern"
         },
+        "SORT": "Sortierung",
+        "ASC": "Aufsteigend",
+        "DESC": "Absteigend",
         "CREATIONDATE": {
-          "LABEL": "Erstelldatum",
-          "CHECKBOX": "Nach Erstelldatum filtern"
+          "RADIO_FROM": "Von",
+          "RADIO_RANGE": "Zeitraum",
+          "LABEL_SINCE": "Seit",
+          "LABEL_UNTIL": "Bis"
         },
         "OTHER": "weiterer",
         "OTHERS": "weitere"

@@ -12,6 +12,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { InputModule } from '../input/input.module';
 import { FilterEventsComponent } from './filter-events.component';
+import { MatInputModule } from '@angular/material/input';
+import { MatRadioModule } from '@angular/material/radio';
 
 @NgModule({
   declarations: [FilterEventsComponent],
@@ -28,6 +30,8 @@ import { FilterEventsComponent } from './filter-events.component';
     MatCheckboxModule,
     MatSelectModule,
     ActionKeysModule,
+    MatInputModule,
+    MatRadioModule,
   ],
   exports: [FilterEventsComponent],
 })

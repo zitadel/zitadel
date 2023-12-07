@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -36,6 +37,25 @@ func (s *Server) ListAggregateTypes(ctx context.Context, in *admin_pb.ListAggreg
 }
 
 func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) (*eventstore.SearchQueryBuilder, error) {
+	var fromTime, sinceTime, untilTime time.Time
+	// We ignore the deprecation warning here because we still need to support the deprecated field.
+	//nolint:staticcheck
+	if creationDatePb := req.GetCreationDate(); creationDatePb != nil {
+		fromTime = creationDatePb.AsTime()
+	}
+	if fromTimePb := req.GetFrom(); fromTimePb != nil {
+		fromTime = fromTimePb.AsTime()
+	}
+	if timeRange := req.GetRange(); timeRange != nil {
+		// If range is set, we ignore the from and the deprecated creation_date fields
+		fromTime = time.Time{}
+		if timeSincePb := timeRange.GetSince(); timeSincePb != nil {
+			sinceTime = timeSincePb.AsTime()
+		}
+		if timeUntilPb := timeRange.GetUntil(); timeUntilPb != nil {
+			untilTime = timeUntilPb.AsTime()
+		}
+	}
 	eventTypes := make([]eventstore.EventType, len(req.EventTypes))
 	for i, eventType := range req.EventTypes {
 		eventTypes[i] = eventstore.EventType(eventType)
@@ -60,7 +80,9 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 		AwaitOpenTransactions().
 		ResourceOwner(req.ResourceOwner).
 		EditorUser(req.EditorUserId).
-		SequenceGreater(req.Sequence)
+		SequenceGreater(req.Sequence).
+		CreationDateAfter(sinceTime).
+		CreationDateBefore(untilTime)
 
 	if len(aggregateIDs) > 0 || len(aggregateTypes) > 0 || len(eventTypes) > 0 {
 		builder.AddQuery().
@@ -72,10 +94,9 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 
 	if req.GetAsc() {
 		builder.OrderAsc()
-		builder.CreationDateAfter(req.CreationDate.AsTime())
+		builder.CreationDateAfter(fromTime)
 	} else {
-		builder.CreationDateBefore(req.CreationDate.AsTime())
+		builder.CreationDateBefore(fromTime)
 	}
-
 	return builder, nil
 }
