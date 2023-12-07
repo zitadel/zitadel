@@ -871,14 +871,16 @@
         },
         "SEQUENCE": {
           "LABEL": "序列",
-          "CHECKBOX": "按顺序过滤",
-          "SORT": "分拣",
-          "ASC": "上升中",
-          "DESC": "下降"
+          "CHECKBOX": "按顺序过滤"
         },
+        "SORT": "分拣",
+        "ASC": "上升中",
+        "DESC": "下降",
         "CREATIONDATE": {
-          "LABEL": "创建日期",
-          "CHECKBOX": "按创建日期过滤"
+          "RADIO_FROM": "从",
+          "RADIO_RANGE": "范围",
+          "LABEL_SINCE": "自从",
+          "LABEL_UNTIL": "直到"
         },
         "OTHER": "其他",
         "OTHERS": "其他"

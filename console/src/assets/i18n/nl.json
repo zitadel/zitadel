@@ -872,14 +872,16 @@
         },
         "SEQUENCE": {
           "LABEL": "Reeks",
-          "CHECKBOX": "Filter op Reeks",
-          "SORT": "Sortering",
-          "ASC": "Oplopend",
-          "DESC": "Aflopend"
+          "CHECKBOX": "Filter op Reeks"
         },
+        "SORT": "Sortering",
+        "ASC": "Oplopend",
+        "DESC": "Aflopend",
         "CREATIONDATE": {
-          "LABEL": "Aanmaakdatum",
-          "CHECKBOX": "Filter op Aanmaakdatum"
+          "RADIO_FROM": "Van",
+          "RADIO_RANGE": "Reeks",
+          "LABEL_SINCE": "Sinds",
+          "LABEL_UNTIL": "Tot"
         },
         "OTHER": "ander",
         "OTHERS": "anderen"
