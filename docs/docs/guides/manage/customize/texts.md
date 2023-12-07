@@ -51,8 +51,10 @@ ZITADEL is available in the following languages
 
 A language is displayed based on your agent's language header.
 
-If you only want to enable a subset of the supported languages, you can configure the allowed language using the [restrictions API](./restrictions.md).
+If you only want to enable a subset of the supported languages, you can configure the languages you'd like to allow using the [restrictions API](./restrictions.md).
 If a users language header doesn't match any of the allowed languages, the instances default language will be used.
+Also, the instances OIDC discovery endpoint will only list the allowed languages in the *ui_locales_supported* field.
+
 All language settings are also configurable in the consoles *Languages* instance settings.
 
 ![Languages](/img/guides/console/languages.png)
