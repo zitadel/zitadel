@@ -8,9 +8,26 @@ OAuth 2 Token Introspection.
 
 At the end of the guide you should have an API with a protected endpoint.
 
+> This documentation references our HTTP example. There's also one for GRPC. Check them out on [GitHub](https://github.com/zitadel/zitadel-go/tree/authorization/example/api).
+
+## Set up application and obtain keys
+
+Before we begin developing our API, we need to perform a few configuration steps in the ZITADEL Console.
+You'll need to provide some information about your app. We recommend creating a new app to start from scratch. Navigate to your Project, then add a new application at the top of the page.
+Select the **API** application type and continue.
+
+![Create app in console](/img/go/api-create.png)
+
+We recommend that you use JWT Profile for authenticating at the Introspection Endpoint.
+
+![Create app in console](/img/go/api-create-auth.png)
+
+Then create a new key with your desired expiration date. Be sure to download it, as you won't be able to retrieve it again.
+
+![Create api key in console](/img/go/api-create-key.png)
+
 ## Prerequisites
 
-The client [SDK](https://github.com/zitadel/zitadel-go) will provides an interceptor for both GRPC and HTTP.
 This will handle the OAuth 2.0 introspection request including authentication using JWT with Private Key using our [OIDC client library](https://github.com/zitadel/oidc).
 All that is required, is to create your API and download the private key file later called `Key JSON` for the service user.
 
@@ -18,134 +35,170 @@ All that is required, is to create your API and download the private key file la
 
 ### Add Go SDK to your project
 
-You need to add the SDK into Go Modules by:
+You need to add the [SDK](https://github.com/zitadel/zitadel-go) into Go Modules by:
 
 ```bash
-go get github.com/zitadel/zitadel-go/v2
+go get -u github.com/zitadel/zitadel-go/v3
 ```
 
 ### Create example API
 
-Create a new go file with the content below. This will create an API with two endpoints. On path `/public` it will always write
-back `ok` and the current timestamp. On `/protected` it will respond the same but only if a valid access_token is sent. The token
-must not be expired and the API has to be part of the audience (either client_id or project_id).
+Create a new go file with the content below. This will create an API with three endpoints:
+- `/api/healthz`: can be called by anyone and always returns `OK`
+- `/api/tasks`: requires authorization and returns the available tasks
+- `/api/add-task`: requires authorization with granted `admin` role and adds the task to the list
 
-Make sure to fill the var `issuer` with your own domain. This is the domain of your instance you can find it on the instance detail in the ZITADEL Cloud Customer Portal or in the ZITADEL Console.
-```go
-package main
+If authorization is required, the token must not be expired and the API has to be part of the audience (either client_id or project_id).
 
-import (
-	"flag"
-	"log"
-	"net/http"
-	"time"
+For tests we will use a Personal Access Token.
 
-	http_mw "github.com/zitadel/zitadel-go/v2/pkg/api/middleware/http"
-	"github.com/zitadel/zitadel-go/v2/pkg/client/middleware"
-)
-
-var (
-	issuer = flag.String("issuer", "", "issuer of your ZITADEL instance (in the form: https://<instance>.zitadel.cloud or https://<yourdomain>)")
-)
-
-func main() {
-	flag.Parse()
-
-	introspection, err := http_mw.NewIntrospectionInterceptor(*issuer, middleware.OSKeyPath())
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	router := http.NewServeMux()
-	router.HandleFunc("/public", writeOK)
-	router.HandleFunc("/protected", introspection.HandlerFunc(writeOK))
-
-	lis := "127.0.0.1:5001"
-	log.Fatal(http.ListenAndServe(lis, router))
-}
-
-func writeOK(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("OK " + time.Now().String()))
-}
-
+```go reference
+https://github.com/zitadel/zitadel-go/blob/next/example/api/http/main.go
 ```
 
-#### Key JSON
+You will need to provide some values for the program to run:
+- `domain`: Your ZITADEL instance domain, e.g. https://my-domain.zitadel.cloud
+- `key`: The path to the downloaded key.json
+- `port`: The port on which the API will be accessible, default it 8089
 
-To provide the key JSON to the SDK, simply set an environment variable `ZITADEL_KEY_PATH` with the path to the JSON as value.
-
-```bash
-export ZITADEL_KEY_PATH=/Users/test/apikey.json
-```
-
-For development purposes you should be able to set this in your IDE.
-
-If you're not able to set it via environment variable, you can also exchange the `middleware.OSKeyPath()` and pass it directly:
-
-```go
-introspection, err := http_mw.NewIntrospectionInterceptor(
-	client.Issuer,
-	"/Users/test/apikey.json",
-)
-```
-
-### Test API
+## Test API
 
 After you have configured everything correctly, you can simply start the example by:
 
 ```bash
-go run main.go
+go run main.go --domain <your domain> --key <path>
 ```
 
-You can now call the API by browser or curl. Try the public endpoint first:
+This could look like:
 
 ```bash
-curl -i localhost:5001/public
+go run main.go --domain https://my-domain.zitadel.cloud --key ./api.json
+```
+
+After you get a successful log:
+```
+2023/12/04 10:27:42 INFO server listening, press ctrl+c to stop addr=http://localhost:8089
+```
+
+### Public endpoint
+
+Now you can call the API by browser or curl. Try the healthz endpoint first:
+
+```bash
+curl -i http://localhost:8089/api/healthz
 ```
 
 it should return something like: 
 
 ```
 HTTP/1.1 200 OK
-Date: Tue, 24 Aug 2021 11:11:17 GMT
-Content-Length: 59
-Content-Type: text/plain; charset=utf-8
+Content-Type: application/json
+Date: Mon, 04 Dec 2023 09:29:38 GMT
+Content-Length: 4
 
-OK 2021-08-24 13:11:17.135719 +0200 CEST m=+30704.913892168
+"OK"
 ```
 
-and the protected:
+### Task list
+
+and the task list endpoint:
 
 ```bash
-curl -i localhost:5001/protected
+curl -i http://localhost:8089/api/tasks
 ```
 
 it will return:
 
 ```
 HTTP/1.1 401 Unauthorized
-Content-Type: application/json
-Date: Tue, 24 Aug 2021 11:13:10 GMT
-Content-Length: 21
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Mon, 04 Dec 2023 09:41:54 GMT
+Content-Length: 44
 
-"auth header missing"
+unauthorized: authorization header is empty
 ```
 
-Get a valid access_token for the API. You can achieve this by login into an application of the same project or
-by explicitly requesting the project_id for the audience by scope `urn:zitadel:iam:org:project:id:{projectid}:aud`.
+Get a valid access_token for the API. You can either achieve this by getting an access token with the project_id in the audience
+or use a PAT of a service account.
 
 If you provide a valid Bearer Token:
 
 ```bash
-curl -i -H "Authorization: Bearer ${token}" localhost:5001/protected
+curl -i -H "Authorization: Bearer ${token}" http://localhost:8089/api/tasks
 ```
 
-it will return an OK response as well:
+it will return an empty list:
 ```
 HTTP/1.1 200 OK
-Date: Tue, 24 Aug 2021 11:13:33 GMT
-Content-Length: 59
-Content-Type: text/plain; charset=utf-8
+Content-Type: application/json
+Date: Mon, 04 Dec 2023 09:49:06 GMT
+Content-Length: 2
 
-OK 2021-08-24 13:13:33.131943 +0200 CEST m=+30840.911149251
+{}
+```
+
+### Try to add a new task
+
+Let's see what happens if you call the AddTask endpoint:
+
+```bash
+curl -i -H "Authorization: Bearer ${token}" http://localhost:8089/api/add-task
+```
+
+it will complain about the missing `admin` role:
+```
+HTTP/1.1 403 Forbidden
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Mon, 04 Dec 2023 09:52:00 GMT
+Content-Length: 50
+
+permission denied: missing required role: `admin`
+```
+
+### Add admin role
+
+So let's create the role and grant it to the user. To do so, go to your project in ZITADEL Console
+and create the role by selecting `Roles` in the navigation and then clicking on the `New Role` button.
+Finally, create the role as shown below:
+
+![Create project role in console](/img/go/api-project-role.png)
+
+After you have created the role, let's grant it the user, who requested the tasks.
+Click on `Authorization` in the navigation and create a new one by selecting the user and the `admin` role.
+After successful creation, it should look like:
+
+![Created authorization in console](/img/go/api-project-auth.png)
+
+So you should now be able to add a new task:
+
+```bash
+curl -i -H "Authorization: Bearer ${token}" http://localhost:8089/api/add-task --data "task=My new task"
+```
+
+which will report back the successful addition:
+```
+HTTP/1.1 200 OK
+Content-Type: application/json
+Date: Mon, 04 Dec 2023 10:06:29 GMT
+Content-Length: 26
+
+"task `My new task` added"
+```
+
+Let's now retrieve the task list again:
+
+```bash
+curl -i -H "Authorization: Bearer ${token}" http://localhost:8089/api/tasks
+```
+
+As you can see your new task ist listed. And since you're an `admin` now, you will always get an additional `create a new task on /api/add-task`:
+```
+HTTP/1.1 200 OK
+Content-Type: application/json
+Date: Mon, 04 Dec 2023 10:08:38 GMT
+Content-Length: 62
+
+{"tasks":["My new task","create a new task on /api/add-task"]}
 ```

@@ -16,7 +16,8 @@ func TestServer_createDiscoveryConfig(t *testing.T) {
 		signingKeyAlgorithm string
 	}
 	type args struct {
-		ctx context.Context
+		ctx                context.Context
+		supportedUILocales []language.Tag
 	}
 	tests := []struct {
 		name   string
@@ -36,7 +37,6 @@ func TestServer_createDiscoveryConfig(t *testing.T) {
 								AuthMethodPrivateKeyJWT: true,
 								GrantTypeRefreshToken:   true,
 								RequestObjectSupported:  true,
-								SupportedUILocales:      []language.Tag{language.English, language.German},
 							},
 							nil,
 						)
@@ -56,7 +56,8 @@ func TestServer_createDiscoveryConfig(t *testing.T) {
 				signingKeyAlgorithm: "RS256",
 			},
 			args{
-				ctx: op.ContextWithIssuer(context.Background(), "https://issuer.com"),
+				ctx:                op.ContextWithIssuer(context.Background(), "https://issuer.com"),
+				supportedUILocales: []language.Tag{language.English, language.German},
 			},
 			&oidc.DiscoveryConfiguration{
 				Issuer:                                             "https://issuer.com",
@@ -113,7 +114,7 @@ func TestServer_createDiscoveryConfig(t *testing.T) {
 				LegacyServer:        tt.fields.LegacyServer,
 				signingKeyAlgorithm: tt.fields.signingKeyAlgorithm,
 			}
-			assert.Equalf(t, tt.want, s.createDiscoveryConfig(tt.args.ctx), "createDiscoveryConfig(%v)", tt.args.ctx)
+			assert.Equalf(t, tt.want, s.createDiscoveryConfig(tt.args.ctx, tt.args.supportedUILocales), "createDiscoveryConfig(%v)", tt.args.ctx)
 		})
 	}
 }
