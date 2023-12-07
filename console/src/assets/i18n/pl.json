@@ -1263,8 +1263,10 @@
       "RESET_DESCRIPTION": "Masz zamiar przywrócić domyślne linki dla TOS i polityki prywatności. Czy na pewno chcesz kontynuować?",
       "UNSAVED_TITLE": "Kontynuuj bez zapisywania?",
       "UNSAVED_DESCRIPTION": "Wprowadziłeś zmiany bez zapisywania. Czy chcesz zapisać teraz?",
-      "LOCALE": "Kod Języka",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Wybrałeś język, który nie jest dozwolony. Możesz kontynuować modyfikowanie tekstów. Ale jeśli chcesz, aby twoi użytkownicy mogli faktycznie używać tego języka, zmień ograniczenia swoich instancji.",
+      "LANGUAGES_NOT_ALLOWED": "Niedozwolone:",
+      "LANGUAGE": "Język",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",

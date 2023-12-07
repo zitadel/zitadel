@@ -1,5 +1,8 @@
 <h2>{{ 'POLICY.LOGIN_TEXTS.TITLE' | translate }}</h2>
 <p class="cnsl-secondary-text">{{ 'POLICY.LOGIN_TEXTS.DESCRIPTION' | translate }}</p>
+<cnsl-info-section class="locked" *ngIf="langSvc.isNotAllowed(language) | async" [type]="InfoSectionType.WARN">
+  {{ 'POLICY.LOGIN_TEXTS.ACTIVE_LANGUAGE_NOT_ALLOWED' | translate }}</cnsl-info-section
+>
 
 <div *ngIf="loading" class="spinner-wr">
   <mat-spinner diameter="30" color="primary"></mat-spinner>
@@ -24,7 +27,7 @@
     </div>
   </button>
 </div>
-<form *ngIf="form" class="top-actions" [formGroup]="form">
+<form *ngIf="allowed$ | async" class="top-actions" [formGroup]="form">
   <cnsl-form-field class="keys">
     <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.KEYNAME' | translate }}</cnsl-label>
     <mat-select formControlName="currentSubMap" name="currentSubMap">
@@ -35,18 +38,30 @@
   </cnsl-form-field>
 
   <cnsl-form-field class="language">
-    <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.LOCALE' | translate }}</cnsl-label>
-    <mat-select formControlName="locale" name="locale">
-      <mat-option *ngFor="let loc of LOCALES" [value]="loc">
+    <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.LANGUAGE' | translate }}</cnsl-label>
+    <mat-select formControlName="language" name="language">
+      <mat-option *ngFor="let lang of allowed$ | async" [value]="lang">
         <div class="centerline">
           <span
-            >{{ loc }}
+            >{{ lang }}
             <span class="lighter cnsl-secondary-text"
-              >|&nbsp;{{ 'POLICY.LOGIN_TEXTS.LOCALES.' + loc | translate }}</span
+              >|&nbsp;{{ 'POLICY.LOGIN_TEXTS.LANGUAGES.' + lang | translate }}</span
             ></span
           >
         </div>
       </mat-option>
+      <mat-optgroup [label]="'POLICY.LOGIN_TEXTS.LANGUAGES_NOT_ALLOWED' | translate" *ngIf="langSvc.restricted$ | async">
+        <mat-option *ngFor="let lang of langSvc.notAllowed$ | async" [value]="lang">
+          <div class="centerline">
+            <span
+              >{{ lang }}
+              <span class="lighter cnsl-secondary-text"
+                >|&nbsp;{{ 'POLICY.LOGIN_TEXTS.LANGUAGES.' + lang | translate }}</span
+              ></span
+            >
+          </div>
+        </mat-option>
+      </mat-optgroup>
     </mat-select>
   </cnsl-form-field>
 </form>

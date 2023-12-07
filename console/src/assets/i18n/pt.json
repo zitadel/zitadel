@@ -1265,8 +1265,10 @@
       "RESET_DESCRIPTION": "Você está prestes a restaurar todos os valores padrão. Todas as alterações que você fez serão excluídas permanentemente. Deseja realmente continuar?",
       "UNSAVED_TITLE": "Continuar sem salvar?",
       "UNSAVED_DESCRIPTION": "Você fez alterações sem salvar. Deseja salvar agora?",
-      "LOCALE": "Código de localidade",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Você selecionou um idioma que não é permitido. Você pode continuar modificando os textos. Mas se deseja que seus usuários realmente possam usar este idioma, altere as restrições de suas instâncias.",
+      "LANGUAGES_NOT_ALLOWED": "Não permitido:",
+      "LANGUAGE": "Idioma",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",

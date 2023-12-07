@@ -20,7 +20,7 @@ import (
 )
 
 func TestServer_Limits_AuditLogRetention(t *testing.T) {
-	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(CTX, SystemCTX)
+	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
 	userID, projectID, appID, projectGrantID := seedObjects(iamOwnerCtx, t)
 	beforeTime := time.Now()
 	zeroCounts := &eventCounts{}

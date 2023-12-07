@@ -69,6 +69,7 @@ import { StatehandlerService, StatehandlerServiceImpl } from './services/stateha
 import { StorageService } from './services/storage.service';
 import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
+import { LanguagesService } from './services/languages.service';
 
 registerLocaleData(localeDe);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/de.json'));
@@ -228,6 +229,7 @@ const authConfig: AuthConfig = {
     AssetService,
     ToastService,
     NavigationService,
+    LanguagesService,
     { provide: 'windowObject', useValue: window },
   ],
   bootstrap: [AppComponent],
