@@ -931,6 +931,7 @@
       "ORGDOMAIN": {
         "TITLE": "{{value}} の所有権を確認します",
         "VERIFICATION": "ドメインを手動で検証する 2 つの方法が提供されています。",
+        "VERIFICATION_DOCS": "詳細についてはドキュメントを参照してください",
         "VERIFICATION_HTML": "- HTTP。 Web サイト上で一時検証ファイルをホストする",
         "VERIFICATION_DNS": "-DNS。 TXT レコードの DNS エントリを作成する",
         "VERIFICATION_DNS_DESC": "{{ value }} を管理しており、DNS レコードにアクセスできる場合は、次の値を使用して新しい TXT レコードを作成できます。",

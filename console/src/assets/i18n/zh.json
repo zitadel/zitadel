@@ -930,6 +930,7 @@
       "ORGDOMAIN": {
         "TITLE": "验证 {{value}} 所有权",
         "VERIFICATION": "我们为您提供两种手动验证域的方法：",
+        "VERIFICATION_DOCS": "访问文档以获取更多信息",
         "VERIFICATION_HTML": "- HTTP。在您的网站上托管临时验证文件",
         "VERIFICATION_DNS": "- DNS。创建 TXT 记录 DNS 条目",
         "VERIFICATION_DNS_DESC": "如果您管理 {{ value }} 并且有权访问您的 DNS 记录，则可以使用以下值创建新的 TXT 记录：",

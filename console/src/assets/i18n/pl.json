@@ -930,6 +930,7 @@
       "ORGDOMAIN": {
         "TITLE": "Zweryfikuj własność {{value}}",
         "VERIFICATION": "Oferujemy dwie metody ręcznej weryfikacji domeny:",
+        "VERIFICATION_DOCS": "Odwiedź dokumenty, aby uzyskać więcej informacji",
         "VERIFICATION_HTML": "-HTTP. Umieść tymczasowy plik weryfikacyjny w swojej witrynie",
         "VERIFICATION_DNS": "-DNS. Utwórz wpis DNS rekordu TXT",
         "VERIFICATION_DNS_DESC": "Jeśli zarządzasz wartością {{ value }} i masz dostęp do swoich rekordów DNS, możesz utworzyć nowy rekord TXT z następującymi wartościami:",

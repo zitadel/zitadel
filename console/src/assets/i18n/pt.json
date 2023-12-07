@@ -931,6 +931,7 @@
       "ORGDOMAIN": {
         "TITLE": "Verifique a propriedade de {{value}}",
         "VERIFICATION": "Oferecemos dois métodos para validar manualmente o seu domínio:",
+        "VERIFICATION_DOCS": "Visite a documentação para obter mais informações",
         "VERIFICATION_HTML": "-HTTP. Hospede um arquivo de verificação temporário em seu site",
         "VERIFICATION_DNS": "-DNS. Crie uma entrada DNS de registro TXT",
         "VERIFICATION_DNS_DESC": "Se você gerencia {{ value }} e tem acesso aos seus registros DNS, poderá criar um novo registro TXT com os seguintes valores:",

@@ -931,6 +931,7 @@
       "ORGDOMAIN": {
         "TITLE": "Ověřte vlastnictví {{value}}",
         "VERIFICATION": "Nabízíme vám dva způsoby ručního ověření domény:",
+        "VERIFICATION_DOCS": "Další informace najdete v dokumentech",
         "VERIFICATION_HTML": "- HTTP. Hostujte na svém webu dočasný ověřovací soubor",
         "VERIFICATION_DNS": "- DNS. Vytvořte záznam DNS záznamu TXT",
         "VERIFICATION_DNS_DESC": "Pokud spravujete {{ value }} a máte přístup ke svým záznamům DNS, můžete vytvořit nový záznam TXT s následujícími hodnotami:",
