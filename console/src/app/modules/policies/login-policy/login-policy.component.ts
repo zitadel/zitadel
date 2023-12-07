@@ -1,8 +1,8 @@
-import { Component, Injector, Input, OnInit, Type } from '@angular/core';
+import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
-import { firstValueFrom, forkJoin, from, Observable, of, take } from 'rxjs';
+import { firstValueFrom, forkJoin, from, Observable, of, Subject, take } from 'rxjs';
 import {
   GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
   UpdateLoginPolicyRequest,
@@ -24,14 +24,14 @@ import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { LoginMethodComponentType } from './factor-table/factor-table.component';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'cnsl-login-policy',
   templateUrl: './login-policy.component.html',
   styleUrls: ['./login-policy.component.scss'],
 })
-export class LoginPolicyComponent implements OnInit {
+export class LoginPolicyComponent implements OnInit, OnDestroy {
   public LoginMethodComponentType: any = LoginMethodComponentType;
   public passwordlessTypes: Array<PasswordlessType> = [
     PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
@@ -54,6 +54,8 @@ export class LoginPolicyComponent implements OnInit {
     secondFactorCheckLifetime: [{ disabled: true }, [requiredValidator]],
     multiFactorCheckLifetime: [{ disabled: true }, [requiredValidator]],
   });
+  private destroy$: Subject<void> = new Subject();
+
   constructor(
     private toast: ToastService,
     private injector: Injector,
@@ -61,6 +63,11 @@ export class LoginPolicyComponent implements OnInit {
     private authService: GrpcAuthService,
     private dialog: MatDialog,
   ) {}
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   public fetchData(): void {
     const data$ = forkJoin([
@@ -72,7 +79,7 @@ export class LoginPolicyComponent implements OnInit {
       from(this.getData()),
     ]);
 
-    const sub = data$.subscribe({
+    const sub = data$.pipe(takeUntil(this.destroy$)).subscribe({
       next: ([disallowPublicOrgRegistration, resp]) => {
         this.allowOrgRegistration = !disallowPublicOrgRegistration;
         if (!resp.policy) {
