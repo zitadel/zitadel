@@ -1021,7 +1021,7 @@
       "DESCRIPTION": "これらの設定は、インスタンス設定を拡張・上書きします。"
     },
     "LIST": {
-      "GENERAL": "全般",
+      "LANGUAGES": "一般設定",
       "LOGIN": "ログイン動作とセキュリティ",
       "LOCKOUT": "ロックアウト",
       "COMPLEXITY": "パスワードの複雑さ",
@@ -1050,22 +1050,32 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "デフォルトの言語",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "言語設定",
+      "DEFAULT": "デフォルト言語",
+      "ALLOWED": "許可された言語",
+      "NOT_ALLOWED": "許可されていない言語",
+      "ALLOW_ALL": "すべての言語を許可する",
+      "DISALLOW_ALL": "すべての言語を許可しない",
+      "SETASDEFAULT": "デフォルト言語として設定する",
+      "DEFAULT_SAVED": "デフォルト言語が保存されました",
+      "ALLOWED_SAVED": "許可された言語が保存されました",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "SMTP設定",
@@ -1373,7 +1383,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP送信者アドレスはインスタンスドメインに一致しています",
       "ALLOWUSERNAMEPASSWORD": "ユーザー名とパスワードを許可",
       "ALLOWEXTERNALIDP": "外部IDPを許可",
-      "ALLOWREGISTER": "登録を許可",
+      "ALLOWREGISTERUSERS": "ユーザーの登録を許可",
+      "ALLOWREGISTERORGS": "組織の登録を許可",
       "ALLOWUSERNAMEPASSWORD_DESC": "ユーザー名とパスワードを使用した従来のログインを許可します。",
       "ALLOWEXTERNALIDP_DESC": "基礎となるIDプロバイダーにログインを許可します。",
       "ALLOWREGISTER_DESC": "このオプションが選択されている場合、ユーザーを登録するための追加のステップがログインに表示されます。",

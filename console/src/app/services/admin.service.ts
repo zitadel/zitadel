@@ -128,6 +128,7 @@ import {
   GetPrivacyPolicyResponse,
   GetProviderByIDRequest,
   GetProviderByIDResponse,
+  GetRestrictionsResponse,
   GetSecretGeneratorRequest,
   GetSecretGeneratorResponse,
   GetSecurityPolicyRequest,
@@ -194,6 +195,7 @@ import {
   ResetCustomDomainPolicyToDefaultResponse,
   ResetCustomLoginTextsToDefaultRequest,
   ResetCustomLoginTextsToDefaultResponse,
+  SelectLanguages,
   SetCustomLoginTextsRequest,
   SetCustomLoginTextsResponse,
   SetDefaultDomainClaimedMessageTextRequest,
@@ -218,6 +220,8 @@ import {
   SetDefaultVerifyPhoneMessageTextResponse,
   SetDefaultVerifySMSOTPMessageTextRequest,
   SetDefaultVerifySMSOTPMessageTextResponse,
+  SetRestrictionsRequest,
+  SetRestrictionsResponse,
   SetSecurityPolicyRequest,
   SetSecurityPolicyResponse,
   SetUpOrgRequest,
@@ -828,6 +832,29 @@ export class AdminService {
     req.setLanguage(language);
 
     return this.grpcService.admin.setDefaultLanguage(req, null).then((resp) => resp.toObject());
+  }
+
+  /* restrictions */
+
+  public getRestrictions(): Promise<GetRestrictionsResponse.AsObject> {
+    const req = new GetDefaultLanguageRequest();
+    return this.grpcService.admin.getRestrictions(req, null).then((resp) => resp.toObject());
+  }
+
+  public setRestrictions(
+    disallowPublicOrgRegistration?: boolean,
+    allowedLanguages?: string[],
+  ): Promise<SetRestrictionsResponse.AsObject> {
+    const req = new SetRestrictionsRequest();
+    if (disallowPublicOrgRegistration !== undefined) {
+      req.setDisallowPublicOrgRegistration(disallowPublicOrgRegistration);
+    }
+    if (allowedLanguages !== undefined) {
+      const langs = new SelectLanguages();
+      langs.setListList(allowedLanguages);
+      req.setAllowedLanguages(langs);
+    }
+    return this.grpcService.admin.setRestrictions(req, null).then((resp) => resp.toObject());
   }
 
   /* notification policy */

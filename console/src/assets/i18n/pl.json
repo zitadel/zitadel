@@ -1020,7 +1020,7 @@
       "DESCRIPTION": "Te ustawienia rozszerzają i nadpisują ustawienia instancji."
     },
     "LIST": {
-      "GENERAL": "Ogólne",
+      "LANGUAGES": "Języki",
       "LOGIN": "Zachowanie logowania i bezpieczeństwo",
       "LOCKOUT": "Blokada",
       "COMPLEXITY": "Złożoność hasła",
@@ -1049,22 +1049,32 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Domyślny język",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Ustawienia językowe",
+      "DEFAULT": "Domyślny język",
+      "ALLOWED": "Dozwolone języki",
+      "NOT_ALLOWED": "Niedozwolone języki",
+      "ALLOW_ALL": "Zezwól na wszystkie języki",
+      "DISALLOW_ALL": "Zabroń wszystkich języków",
+      "SETASDEFAULT": "Ustaw jako domyślny język",
+      "DEFAULT_SAVED": "Domyślny język zapisany",
+      "ALLOWED_SAVED": "Dozwolone języki zapisane",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "Ustawienia SMTP",
@@ -1377,7 +1387,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "Adres nadawcy SMTP pasuje do domeny instancji",
       "ALLOWUSERNAMEPASSWORD": "Zezwól na użycie nazwy użytkownika i hasła",
       "ALLOWEXTERNALIDP": "Zezwól na zewnętrznego dostawcę tożsamości",
-      "ALLOWREGISTER": "Zezwól na rejestrację",
+      "ALLOWREGISTERUSERS": "Zezwól na rejestrację użytkowników",
+      "ALLOWREGISTERORGS": "Zezwól na rejestrację organizacji",
       "ALLOWUSERNAMEPASSWORD_DESC": "Zwykłe logowanie za pomocą nazwy użytkownika i hasła jest dozwolone.",
       "ALLOWEXTERNALIDP_DESC": "Logowanie jest dozwolone dla dostawców tożsamości podstawowych",
       "ALLOWREGISTER_DESC": "Jeśli ta opcja jest zaznaczona, pojawi się dodatkowy krok rejestracji użytkownika w procesie logowania.",

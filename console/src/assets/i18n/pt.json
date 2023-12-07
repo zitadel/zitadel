@@ -1022,7 +1022,7 @@
       "DESCRIPTION": "Essas configurações estendem e sobrescrevem as configurações da sua instância."
     },
     "LIST": {
-      "GENERAL": "Geral",
+      "LANGUAGES": "Idiomas",
       "LOGIN": "Comportamento de Login e Segurança",
       "LOCKOUT": "Bloqueio",
       "COMPLEXITY": "Complexidade de Senha",
@@ -1051,22 +1051,32 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Idioma padrão",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Configurações de Idioma",
+      "DEFAULT": "Idioma Padrão",
+      "ALLOWED": "Idiomas Permitidos",
+      "NOT_ALLOWED": "Idiomas Não Permitidos",
+      "ALLOW_ALL": "Permitir Todos os Idiomas",
+      "DISALLOW_ALL": "Não Permitir Todos os Idiomas",
+      "SETASDEFAULT": "Definir como Idioma Padrão",
+      "DEFAULT_SAVED": "Idioma Padrão salvo",
+      "ALLOWED_SAVED": "Idiomas Permitidos salvos",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "Configurações SMTP",
@@ -1379,7 +1389,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "O endereço do remetente do SMTP corresponde ao domínio da Instância",
       "ALLOWUSERNAMEPASSWORD": "Permitir usuário e senha",
       "ALLOWEXTERNALIDP": "Permitir provedor de ID externo",
-      "ALLOWREGISTER": "Permitir registro",
+      "ALLOWREGISTERUSERS": "Permitir registro de usuários",
+      "ALLOWREGISTERORGS": "Permitir registro de organizações",
       "ALLOWUSERNAMEPASSWORD_DESC": "O login convencional com nome de usuário e senha é permitido.",
       "ALLOWEXTERNALIDP_DESC": "O login é permitido para os provedores de identidade subjacentes",
       "ALLOWREGISTER_DESC": "Se a opção estiver selecionada, uma etapa adicional para registrar um usuário aparecerá no login.",
