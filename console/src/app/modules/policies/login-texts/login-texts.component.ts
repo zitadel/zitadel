@@ -2,17 +2,7 @@ import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/co
 import { FormControl, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import {
-  BehaviorSubject,
-  from,
-  interval,
-  Observable,
-  of,
-  Subject,
-  Subscription, switchMap,
-  take,
-  tap,
-} from 'rxjs';
+import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription, switchMap, take, tap } from 'rxjs';
 import { map, pairwise, startWith, takeUntil } from 'rxjs/operators';
 import {
   GetCustomLoginTextsRequest as AdminGetCustomLoginTextsRequest,
@@ -185,13 +175,13 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     }
 
     interval(10000)
-        .pipe(
-            // debounceTime(5000),
-            takeUntil(this.destroy$),
-        )
-        .subscribe((x) => {
-          this.checkForChanges();
-        });
+      .pipe(
+        // debounceTime(5000),
+        takeUntil(this.destroy$),
+      )
+      .subscribe((x) => {
+        this.checkForChanges();
+      });
   }
 
   public getDefaultValues(req: any): Promise<any> {
