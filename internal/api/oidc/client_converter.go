@@ -92,11 +92,11 @@ func (c *Client) RestrictAdditionalAccessTokenScopes() func(scopes []string) []s
 }
 
 func (c *Client) AccessTokenLifetime() time.Duration {
-	return c.client.AccessTokenLifetime
+	return c.client.Settings.AccessTokenLifetime
 }
 
 func (c *Client) IDTokenLifetime() time.Duration {
-	return c.client.IDTokenLifetime
+	return c.client.Settings.IdTokenLifetime
 }
 
 func (c *Client) AccessTokenType() op.AccessTokenType {
