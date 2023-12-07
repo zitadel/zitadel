@@ -349,10 +349,12 @@ func (q *Queries) GetUserByLoginName(ctx context.Context, shouldTriggered bool, 
 		triggerUserProjections(ctx)
 	}
 
+	loginName = strings.ToLower(loginName)
+
 	username := loginName
 	domainIndex := strings.LastIndex(loginName, "@")
 	var domainSuffix string
-	// split between the last @ (so ignore it if the loginname ends with it)
+	// split between the last @ (so ignore it if the login name ends with it)
 	if domainIndex > 0 && domainIndex != len(loginName)-1 {
 		domainSuffix = loginName[domainIndex+1:]
 		username = loginName[:domainIndex]
@@ -506,10 +508,12 @@ func (q *Queries) GetNotifyUserByLoginName(ctx context.Context, shouldTriggered 
 		triggerUserProjections(ctx)
 	}
 
+	loginName = strings.ToLower(loginName)
+
 	username := loginName
 	domainIndex := strings.LastIndex(loginName, "@")
 	var domainSuffix string
-	// split between the last @ (so ignore it if the loginname ends with it)
+	// split between the last @ (so ignore it if the login name ends with it)
 	if domainIndex > 0 && domainIndex != len(loginName)-1 {
 		domainSuffix = loginName[domainIndex+1:]
 		username = loginName[:domainIndex]

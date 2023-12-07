@@ -175,6 +175,8 @@ func (*loginNameProjection) Init() *old_handler.Check {
 			[]*handler.InitColumn{
 				handler.NewColumn(LoginNameUserIDCol, handler.ColumnTypeText),
 				handler.NewColumn(LoginNameUserUserNameCol, handler.ColumnTypeText),
+				// TODO: implement computed columns
+				// handler.NewComputedColumn(loginNameUserUserNameLowerCol, handler.ColumnTypeText),
 				handler.NewColumn(LoginNameUserResourceOwnerCol, handler.ColumnTypeText),
 				handler.NewColumn(LoginNameUserInstanceIDCol, handler.ColumnTypeText),
 			},
@@ -190,29 +192,33 @@ func (*loginNameProjection) Init() *old_handler.Check {
 					),
 				),
 			),
-			handler.WithIndex(
-				handler.NewIndex("search", []string{LoginNameUserInstanceIDCol, loginNameUserUserNameLowerCol},
-					handler.WithInclude(LoginNameUserResourceOwnerCol),
-				),
-			),
+			// TODO: uncomment the following line when login_names4 will be created
+			// handler.WithIndex(
+			// 	handler.NewIndex("search", []string{LoginNameUserInstanceIDCol, loginNameUserUserNameLowerCol},
+			// 		handler.WithInclude(LoginNameUserResourceOwnerCol),
+			// 	),
+			// ),
 		),
 		handler.NewSuffixedTable(
 			[]*handler.InitColumn{
 				handler.NewColumn(LoginNameDomainNameCol, handler.ColumnTypeText),
+				// TODO: implement computed columns
+				// handler.NewComputedColumn(loginNameDomainNameLowerCol, handler.ColumnTypeText),
 				handler.NewColumn(LoginNameDomainIsPrimaryCol, handler.ColumnTypeBool, handler.Default(false)),
 				handler.NewColumn(LoginNameDomainResourceOwnerCol, handler.ColumnTypeText),
 				handler.NewColumn(LoginNameDomainInstanceIDCol, handler.ColumnTypeText),
 			},
 			handler.NewPrimaryKey(LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol, LoginNameDomainNameCol),
 			loginNameDomainSuffix,
-			handler.WithIndex(
-				handler.NewIndex("search", []string{LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol, loginNameDomainNameLowerCol}),
-			),
-			handler.WithIndex(
-				handler.NewIndex("search_result", []string{LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol},
-					handler.WithInclude(LoginNameDomainIsPrimaryCol),
-				),
-			),
+			// TODO: uncomment the following line when login_names4 will be created
+			// handler.WithIndex(
+			// 	handler.NewIndex("search", []string{LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol, loginNameDomainNameLowerCol}),
+			// ),
+			// handler.WithIndex(
+			// 	handler.NewIndex("search_result", []string{LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol},
+			// 		handler.WithInclude(LoginNameDomainIsPrimaryCol),
+			// 	),
+			// ),
 		),
 		handler.NewSuffixedTable(
 			[]*handler.InitColumn{
