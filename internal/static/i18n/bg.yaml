@@ -33,8 +33,13 @@ Errors:
     NoneSpecified: Не са посочени лимити
   Restrictions:
     NoneSpecified: Не са посочени ограничения
+    DefaultLanguageMustBeAllowed: Езикът по подразбиране трябва да бъде разрешен
   Language:
     NotParsed: Езикът не можа да бъде анализиран синтактично
+    NotSupported: Езикът не се поддържа
+    NotAllowed: Езикът не е разрешен
+    Undefined: Езикът е неопределен
+    Duplicate: Езиците имат дубликати
   OIDCSettings:
     NotFound: Конфигурацията на OIDC не е намерена
     AlreadyExists: OIDC конфигурацията вече съществува

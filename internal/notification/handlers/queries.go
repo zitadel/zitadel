@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"context"
-	"net/http"
-
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -25,6 +23,7 @@ type Queries interface {
 	SMSProviderConfig(ctx context.Context, queries ...query.SearchQuery) (*query.SMSConfig, error)
 	SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (*query.SMTPConfig, error)
 	GetDefaultLanguage(ctx context.Context) language.Tag
+	GetInstanceRestrictions(ctx context.Context) (restrictions query.Restrictions, err error)
 }
 
 type NotificationQueries struct {
@@ -37,7 +36,6 @@ type NotificationQueries struct {
 	UserDataCrypto     crypto.EncryptionAlgorithm
 	SMTPPasswordCrypto crypto.EncryptionAlgorithm
 	SMSTokenCrypto     crypto.EncryptionAlgorithm
-	statikDir          http.FileSystem
 }
 
 func NewNotificationQueries(
@@ -50,7 +48,6 @@ func NewNotificationQueries(
 	userDataCrypto crypto.EncryptionAlgorithm,
 	smtpPasswordCrypto crypto.EncryptionAlgorithm,
 	smsTokenCrypto crypto.EncryptionAlgorithm,
-	statikDir http.FileSystem,
 ) *NotificationQueries {
 	return &NotificationQueries{
 		Queries:            baseQueries,
@@ -62,6 +59,5 @@ func NewNotificationQueries(
 		UserDataCrypto:     userDataCrypto,
 		SMTPPasswordCrypto: smtpPasswordCrypto,
 		SMSTokenCrypto:     smsTokenCrypto,
-		statikDir:          statikDir,
 	}
 }

@@ -7,7 +7,6 @@ import (
 	errs "errors"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"time"
 
@@ -19,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -236,9 +236,9 @@ func (q *Queries) readNotificationTextMessages(ctx context.Context, language str
 	var err error
 	contents, ok := q.NotificationTranslationFileContents[language]
 	if !ok {
-		contents, err = q.readTranslationFile(q.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", language))
+		contents, err = q.readTranslationFile(i18n.NOTIFICATION, fmt.Sprintf("/i18n/%s.yaml", language))
 		if errors.IsNotFound(err) {
-			contents, err = q.readTranslationFile(q.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", authz.GetInstance(ctx).DefaultLanguage().String()))
+			contents, err = q.readTranslationFile(i18n.NOTIFICATION, fmt.Sprintf("/i18n/%s.yaml", authz.GetInstance(ctx).DefaultLanguage().String()))
 		}
 		if err != nil {
 			return nil, err
@@ -311,8 +311,8 @@ func prepareMessageTextQuery(ctx context.Context, db prepareDatabase) (sq.Select
 		}
 }
 
-func (q *Queries) readTranslationFile(dir http.FileSystem, filename string) ([]byte, error) {
-	r, err := dir.Open(filename)
+func (q *Queries) readTranslationFile(namespace i18n.Namespace, filename string) ([]byte, error) {
+	r, err := i18n.LoadFilesystem(namespace).Open(filename)
 	if os.IsNotExist(err) {
 		return nil, errors.ThrowNotFound(err, "QUERY-sN9wg", "Errors.TranslationFile.NotFound")
 	}

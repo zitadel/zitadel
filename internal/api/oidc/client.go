@@ -43,32 +43,14 @@ const (
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	client, err := o.query.AppByOIDCClientID(ctx, id)
+	client, err := o.query.GetOIDCClientByID(ctx, id, false)
 	if err != nil {
 		return nil, err
 	}
 	if client.State != domain.AppStateActive {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
 	}
-	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(client.ProjectID)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDC-mPxqP", "Errors.Internal")
-	}
-	projectRoles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
-	if err != nil {
-		return nil, err
-	}
-	allowedScopes := make([]string, len(projectRoles.ProjectRoles))
-	for i, role := range projectRoles.ProjectRoles {
-		allowedScopes[i] = ScopeProjectRolePrefix + role.Key
-	}
-
-	accessTokenLifetime, idTokenLifetime, _, _, err := o.getOIDCSettings(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultLoginURLV2, accessTokenLifetime, idTokenLifetime, allowedScopes)
+	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultLoginURLV2), nil
 }
 
 func (o *OPStorage) GetKeyByIDAndClientID(ctx context.Context, keyID, userID string) (_ *jose.JSONWebKey, err error) {
@@ -231,18 +213,10 @@ func (o *OPStorage) ClientCredentialsTokenRequest(ctx context.Context, clientID 
 	}, nil
 }
 
-func (o *OPStorage) ClientCredentials(ctx context.Context, clientID, clientSecret string) (op.Client, error) {
-	user, err := o.query.GetUserByLoginName(ctx, false, clientID)
-	if err != nil {
-		return nil, err
-	}
-	if _, err := o.command.VerifyMachineSecret(ctx, user.ID, user.ResourceOwner, clientSecret); err != nil {
-		return nil, err
-	}
-	return &clientCredentialsClient{
-		id:        clientID,
-		tokenType: accessTokenTypeToOIDC(user.Machine.AccessTokenType),
-	}, nil
+// ClientCredentials method is kept to keep the storage interface implemented.
+// However, it should never be called as the VerifyClient method on the Server is overridden.
+func (o *OPStorage) ClientCredentials(context.Context, string, string) (op.Client, error) {
+	return nil, errors.ThrowInternal(nil, "OIDC-Su8So", "Errors.Internal")
 }
 
 // isOriginAllowed checks whether a call by the client to the endpoint is allowed from the provided origin
@@ -925,4 +899,68 @@ func userinfoClaims(userInfo *oidc.UserInfo) func(c *actions.FieldConfig) interf
 		}
 		return c.Runtime.ToValue(claims)
 	}
+}
+
+func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCredentials]) (_ op.Client, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if oidc.GrantType(r.Form.Get("grant_type")) == oidc.GrantTypeClientCredentials {
+		return s.clientCredentialsAuth(ctx, r.Data.ClientID, r.Data.ClientSecret)
+	}
+
+	clientID, assertion, err := clientIDFromCredentials(r.Data)
+	if err != nil {
+		return nil, err
+	}
+	client, err := s.query.GetOIDCClientByID(ctx, clientID, assertion)
+	if errors.IsNotFound(err) {
+		return nil, oidc.ErrInvalidClient().WithParent(err).WithDescription("client not found")
+	}
+	if err != nil {
+		return nil, err // defaults to server error
+	}
+	if client.State != domain.AppStateActive {
+		return nil, oidc.ErrInvalidClient().WithDescription("client is not active")
+	}
+
+	switch client.AuthMethodType {
+	case domain.OIDCAuthMethodTypeBasic, domain.OIDCAuthMethodTypePost:
+		err = s.verifyClientSecret(ctx, client, r.Data.ClientSecret)
+	case domain.OIDCAuthMethodTypePrivateKeyJWT:
+		err = s.verifyClientAssertion(ctx, client, r.Data.ClientAssertion)
+	case domain.OIDCAuthMethodTypeNone:
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return ClientFromBusiness(client, s.defaultLoginURL, s.defaultLoginURLV2), nil
+}
+
+func (s *Server) verifyClientAssertion(ctx context.Context, client *query.OIDCClient, assertion string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if assertion == "" {
+		return oidc.ErrInvalidClient().WithDescription("empty client assertion")
+	}
+	verifier := op.NewJWTProfileVerifierKeySet(keySetMap(client.PublicKeys), op.IssuerFromContext(ctx), time.Hour, client.ClockSkew)
+	if _, err := op.VerifyJWTAssertion(ctx, assertion, verifier); err != nil {
+		return oidc.ErrInvalidClient().WithParent(err).WithDescription("invalid assertion")
+	}
+	return nil
+}
+
+func (s *Server) verifyClientSecret(ctx context.Context, client *query.OIDCClient, secret string) (err error) {
+	_, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if secret == "" {
+		return oidc.ErrInvalidClient().WithDescription("empty client secret")
+	}
+	if err = crypto.CompareHash(client.ClientSecret, []byte(secret), s.hashAlg); err != nil {
+		return oidc.ErrInvalidClient().WithParent(err).WithDescription("invalid secret")
+	}
+	return nil
 }

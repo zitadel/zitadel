@@ -10,7 +10,11 @@ import (
 )
 
 func (n *NotificationQueries) GetTranslatorWithOrgTexts(ctx context.Context, orgID, textType string) (*i18n.Translator, error) {
-	translator, err := i18n.NewTranslator(n.statikDir, n.GetDefaultLanguage(ctx), "")
+	restrictions, err := n.Queries.GetInstanceRestrictions(ctx)
+	if err != nil {
+		return nil, err
+	}
+	translator, err := i18n.NewNotificationTranslator(n.GetDefaultLanguage(ctx), restrictions.AllowedLanguages)
 	if err != nil {
 		return nil, err
 	}

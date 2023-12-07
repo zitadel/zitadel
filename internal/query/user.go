@@ -13,6 +13,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
@@ -92,7 +93,7 @@ type Phone struct {
 type Machine struct {
 	Name            string               `json:"name,omitempty"`
 	Description     string               `json:"description,omitempty"`
-	HasSecret       bool                 `json:"has_secret,omitempty"`
+	Secret          *crypto.CryptoValue  `json:"secret,omitempty"`
 	AccessTokenType domain.OIDCTokenType `json:"access_token_type,omitempty"`
 }
 
@@ -271,8 +272,8 @@ var (
 		name:  projection.MachineDescriptionCol,
 		table: machineTable,
 	}
-	MachineHasSecretCol = Column{
-		name:  projection.MachineHasSecretCol,
+	MachineSecretCol = Column{
+		name:  projection.MachineSecretCol,
 		table: machineTable,
 	}
 	MachineAccessTokenTypeCol = Column{
@@ -371,6 +372,7 @@ func (q *Queries) GetUserByLoginName(ctx context.Context, shouldTriggered bool, 
 	return user, err
 }
 
+// Deprecated: use either GetUserByID or GetUserByLoginName
 func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, queries ...SearchQuery) (user *User, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -785,7 +787,7 @@ func scanUser(row *sql.Row) (*User, error) {
 	machineID := sql.NullString{}
 	name := sql.NullString{}
 	description := sql.NullString{}
-	hasSecret := sql.NullBool{}
+	var secret *crypto.CryptoValue
 	accessTokenType := sql.NullInt32{}
 
 	err := row.Scan(
@@ -814,7 +816,7 @@ func scanUser(row *sql.Row) (*User, error) {
 		&machineID,
 		&name,
 		&description,
-		&hasSecret,
+		&secret,
 		&accessTokenType,
 		&count,
 	)
@@ -846,7 +848,7 @@ func scanUser(row *sql.Row) (*User, error) {
 		u.Machine = &Machine{
 			Name:            name.String,
 			Description:     description.String,
-			HasSecret:       hasSecret.Bool,
+			Secret:          secret,
 			AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
 		}
 	}
@@ -888,7 +890,7 @@ func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
-			MachineHasSecretCol.identifier(),
+			MachineSecretCol.identifier(),
 			MachineAccessTokenTypeCol.identifier(),
 			countColumn.identifier(),
 		).
@@ -1273,7 +1275,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
-			MachineHasSecretCol.identifier(),
+			MachineSecretCol.identifier(),
 			MachineAccessTokenTypeCol.identifier(),
 			countColumn.identifier()).
 			From(userTable.identifier()).
@@ -1312,7 +1314,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 				machineID := sql.NullString{}
 				name := sql.NullString{}
 				description := sql.NullString{}
-				hasSecret := sql.NullBool{}
+				secret := new(crypto.CryptoValue)
 				accessTokenType := sql.NullInt32{}
 
 				err := rows.Scan(
@@ -1341,7 +1343,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 					&machineID,
 					&name,
 					&description,
-					&hasSecret,
+					secret,
 					&accessTokenType,
 					&count,
 				)
@@ -1372,7 +1374,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 					u.Machine = &Machine{
 						Name:            name.String,
 						Description:     description.String,
-						HasSecret:       hasSecret.Bool,
+						Secret:          secret,
 						AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
 					}
 				}

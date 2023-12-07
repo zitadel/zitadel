@@ -3,12 +3,10 @@ package query
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"regexp"
 	"sync"
 	"time"
 
-	"github.com/rakyll/statik/fs"
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
@@ -47,8 +45,6 @@ type Queries struct {
 	checkPermission        domain.PermissionCheck
 
 	DefaultLanguage                     language.Tag
-	LoginDir                            http.FileSystem
-	NotificationDir                     http.FileSystem
 	mutex                               sync.Mutex
 	LoginTranslationFileContents        map[string][]byte
 	NotificationTranslationFileContents map[string][]byte
@@ -71,22 +67,10 @@ func StartQueries(
 	defaultAuditLogRetention time.Duration,
 	systemAPIUsers map[string]*authz.SystemAPIUser,
 ) (repo *Queries, err error) {
-	statikLoginFS, err := fs.NewWithNamespace("login")
-	if err != nil {
-		return nil, fmt.Errorf("unable to start login statik dir")
-	}
-
-	statikNotificationFS, err := fs.NewWithNamespace("notification")
-	if err != nil {
-		return nil, fmt.Errorf("unable to start notification statik dir")
-	}
-
 	repo = &Queries{
 		eventstore:                          es,
 		client:                              sqlClient,
 		DefaultLanguage:                     language.Und,
-		LoginDir:                            statikLoginFS,
-		NotificationDir:                     statikNotificationFS,
 		LoginTranslationFileContents:        make(map[string][]byte),
 		NotificationTranslationFileContents: make(map[string][]byte),
 		zitadelRoles:                        zitadelRoles,

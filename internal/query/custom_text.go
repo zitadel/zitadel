@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -217,9 +218,9 @@ func (q *Queries) readLoginTranslationFile(ctx context.Context, lang string) ([]
 	contents, ok := q.LoginTranslationFileContents[lang]
 	var err error
 	if !ok {
-		contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", lang))
+		contents, err = q.readTranslationFile(i18n.LOGIN, fmt.Sprintf("/i18n/%s.yaml", lang))
 		if errors.IsNotFound(err) {
-			contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", authz.GetInstance(ctx).DefaultLanguage().String()))
+			contents, err = q.readTranslationFile(i18n.LOGIN, fmt.Sprintf("/i18n/%s.yaml", authz.GetInstance(ctx).DefaultLanguage().String()))
 		}
 		if err != nil {
 			return nil, err

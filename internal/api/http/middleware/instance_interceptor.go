@@ -8,7 +8,6 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/rakyll/statik/fs"
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
@@ -112,7 +111,7 @@ func hostFromOrigin(ctx context.Context) (host string, err error) {
 	if err != nil {
 		return "", err
 	}
-	host = u.Hostname()
+	host = u.Host
 	if host == "" {
 		err = errors.New("empty host")
 	}
@@ -120,10 +119,7 @@ func hostFromOrigin(ctx context.Context) (host string, err error) {
 }
 
 func newZitadelTranslator() *i18n.Translator {
-	dir, err := fs.NewWithNamespace("zitadel")
-	logging.WithFields("namespace", "zitadel").OnError(err).Panic("unable to get namespace")
-
-	translator, err := i18n.NewTranslator(dir, language.English, "")
+	translator, err := i18n.NewZitadelTranslator(language.English)
 	logging.OnError(err).Panic("unable to get translator")
 	return translator
 }

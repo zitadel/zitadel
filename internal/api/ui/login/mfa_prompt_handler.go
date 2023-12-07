@@ -56,7 +56,7 @@ func (l *Login) renderMFAPrompt(w http.ResponseWriter, r *http.Request, authReq 
 	}
 	translator := l.getTranslator(r.Context(), authReq)
 	data := mfaData{
-		baseData:    l.getBaseData(r, authReq, "InitMFAPrompt.Title", "InitMFAPrompt.Description", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, translator, "InitMFAPrompt.Title", "InitMFAPrompt.Description", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 	}
 
