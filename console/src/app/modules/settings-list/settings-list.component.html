@@ -6,9 +6,6 @@
   [settingsList]="settingsList"
   queryParam="id"
 >
-  <ng-container *ngIf="currentSetting === 'general' && serviceType === PolicyComponentServiceType.ADMIN">
-    <cnsl-general-settings></cnsl-general-settings>
-  </ng-container>
   <ng-container *ngIf="currentSetting === 'complexity'">
     <cnsl-password-complexity-policy [serviceType]="serviceType"></cnsl-password-complexity-policy>
   </ng-container>
@@ -56,5 +53,8 @@
   </ng-container>
   <ng-container *ngIf="currentSetting === 'privacypolicy'">
     <cnsl-privacy-policy [serviceType]="serviceType"></cnsl-privacy-policy>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'languages' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-language-settings></cnsl-language-settings>
   </ng-container>
 </cnsl-sidenav>

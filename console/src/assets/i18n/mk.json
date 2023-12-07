@@ -1024,7 +1024,7 @@
       "DESCRIPTION": "Овие подесувања ги прошируваат и препишуваат подесувањата на вашата инстанца."
     },
     "LIST": {
-      "GENERAL": "Генерални",
+      "LANGUAGES": "Општо",
       "LOGIN": "Правила и безбедност при најава",
       "LOCKOUT": "Забрана на пристап",
       "COMPLEXITY": "Сложеност на лозинката",
@@ -1053,22 +1053,32 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Стандарден јазик",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Подесувања за јазик",
+      "DEFAULT": "Стандарден јазик",
+      "ALLOWED": "Дозволени јазици",
+      "NOT_ALLOWED": "Не дозволени јазици",
+      "ALLOW_ALL": "Дозволи ги сите јазици",
+      "DISALLOW_ALL": "Забрани ги сите јазици",
+      "SETASDEFAULT": "Постави како стандарден јазик",
+      "DEFAULT_SAVED": "Стандардниот јазик е зачуван",
+      "ALLOWED_SAVED": "Дозволените јазици се зачувани",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "SMTP подесувања",
@@ -1381,7 +1391,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP адресата на испраќачот се поклопува со доменот на инстанцата",
       "ALLOWUSERNAMEPASSWORD": "Дозволено корисничко име и лозинка",
       "ALLOWEXTERNALIDP": "Дозволен надворешен IDP",
-      "ALLOWREGISTER": "Дозволена регистрација",
+      "ALLOWREGISTERUSERS": "Дозволена регистрација на корисници",
+      "ALLOWREGISTERORGS": "Дозволена регистрација на организации",
       "ALLOWUSERNAMEPASSWORD_DESC": "Дозволена е конвенционална најава со корисничко име и лозинка.",
       "ALLOWEXTERNALIDP_DESC": "Најавата е дозволена за поддржуваните IDPs",
       "ALLOWREGISTER_DESC": "Доколку е избрана опцијата, се прикажува дополнителен чекор за регистрирање на корисник во најавата.",

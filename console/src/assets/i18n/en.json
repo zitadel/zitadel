@@ -1023,7 +1023,7 @@
       "DESCRIPTION": "These settings extend and overwrite your instance settings."
     },
     "LIST": {
-      "GENERAL": "General",
+      "LANGUAGES": "Languages",
       "LOGIN": "Login Behavior and Security",
       "LOCKOUT": "Lockout",
       "COMPLEXITY": "Password complexity",
@@ -1052,22 +1052,32 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Default Language",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Language Settings",
+      "DEFAULT": "Default Language",
+      "ALLOWED": "Allowed Languages",
+      "NOT_ALLOWED": "Not Allowed Languages",
+      "ALLOW_ALL": "Allow All",
+      "DISALLOW_ALL": "Disallow All",
+      "SETASDEFAULT": "Set as Default Language",
+      "DEFAULT_SAVED": "Default Language saved",
+      "ALLOWED_SAVED": "Allowed Languages saved",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
@@ -1380,7 +1390,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
       "ALLOWUSERNAMEPASSWORD": "Username Password allowed",
       "ALLOWEXTERNALIDP": "External IDP allowed",
-      "ALLOWREGISTER": "Register allowed",
+      "ALLOWREGISTERUSERS": "Register users allowed",
+      "ALLOWREGISTERORGS": "Register organizations allowed",
       "ALLOWUSERNAMEPASSWORD_DESC": "The conventional login with user name and password is allowed.",
       "ALLOWEXTERNALIDP_DESC": "The login is allowed for the underlying identity providers",
       "ALLOWREGISTER_DESC": "If the option is selected, an additional step for registering a user appears in the login.",

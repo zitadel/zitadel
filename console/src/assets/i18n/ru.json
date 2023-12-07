@@ -1019,7 +1019,7 @@
       "DESCRIPTION": "Эти настройки расширяют и перезаписывают настройки вашего экземпляра."
     },
     "LIST": {
-      "GENERAL": "Общие",
+      "LANGUAGES": "Языки",
       "LOGIN": "Поведение при входе и безопасность",
       "LOCKOUT": "Блокировка",
       "COMPLEXITY": "Сложность пароля",
@@ -1045,21 +1045,31 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Язык по умолчанию",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Настройки языка",
+      "DEFAULT": "Язык по умолчанию",
+      "ALLOWED": "Разрешенные языки",
+      "NOT_ALLOWED": "Неразрешенные языки",
+      "ALLOW_ALL": "Разрешить все языки",
+      "DISALLOW_ALL": "Запретить все языки",
+      "SETASDEFAULT": "Установить как язык по умолчанию",
+      "DEFAULT_SAVED": "Язык по умолчанию сохранен",
+      "ALLOWED_SAVED": "Разрешенные языки сохранены",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "Настройки SMTP",
@@ -1366,7 +1376,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "Адрес отправителя SMTP соответствует домену экземпляра",
       "ALLOWUSERNAMEPASSWORD": "Вход с паролем разрешен",
       "ALLOWEXTERNALIDP": "Внешний поставщик разрешен",
-      "ALLOWREGISTER": "Регистрация разрешена",
+      "ALLOWREGISTERUSERS": "Регистрация пользователей разрешена",
+      "ALLOWREGISTERORGS": "Регистрация организаций разрешена",
       "ALLOWUSERNAMEPASSWORD_DESC": "Разрешен обычный вход в систему с использованием имени пользователя и паролем.",
       "ALLOWEXTERNALIDP_DESC": "Вход разрешен для базовых поставщиков удостоверений.",
       "ALLOWREGISTER_DESC": "Если опция выбрана, в логине появляется дополнительный шаг для регистрации пользователя.",

@@ -1024,7 +1024,7 @@
       "DESCRIPTION": "Estas configuraciones amplían y sobrescriben tus configuraciones de instancia."
     },
     "LIST": {
-      "GENERAL": "General",
+      "LANGUAGES": "Idiomas",
       "LOGIN": "Comportamiento del inicio de sesión y de la seguridad",
       "LOCKOUT": "Bloqueo",
       "COMPLEXITY": "Complejidad de contraseña",
@@ -1053,22 +1053,32 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Idioma por defecto",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Ajustes de idioma",
+      "DEFAULT": "Idioma predeterminado",
+      "ALLOWED": "Idiomas permitidos",
+      "NOT_ALLOWED": "Idiomas no permitidos",
+      "ALLOW_ALL": "Permitir todos los idiomas",
+      "DISALLOW_ALL": "No permitir ningún idioma",
+      "SETASDEFAULT": "Establecer como idioma predeterminado",
+      "DEFAULT_SAVED": "Idioma predeterminado guardado",
+      "ALLOWED_SAVED": "Idiomas permitidos guardados",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "Ajustes SMTP",
@@ -1381,7 +1391,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "La dirección del remitente SMTP coincide con el dominio de la instancia",
       "ALLOWUSERNAMEPASSWORD": "Nombre de usuario y contraseña permitido",
       "ALLOWEXTERNALIDP": "Permitido IDP externo",
-      "ALLOWREGISTER": "Registro permitido",
+      "ALLOWREGISTERUSERS": "Registro de usuarios permitido",
+      "ALLOWREGISTERORGS": "Registro de organizaciones permitido",
       "ALLOWUSERNAMEPASSWORD_DESC": "El inicio de sesión convencional con nombre de usuario y contraseña está permitido.",
       "ALLOWEXTERNALIDP_DESC": "El inicio de sesión está permitido para los proveedores de identidad subyacentes",
       "ALLOWREGISTER_DESC": "Si esta opción es seleccionada, aparece un paso adicional durante el inicio de sesión para registrar un usuario.",

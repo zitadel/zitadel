@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GeneralSettingsComponent } from './general-settings.component';
+import { LanguageSettingsComponent } from './language-settings.component';
 
-describe('GeneralSettingsComponent', () => {
-  let component: GeneralSettingsComponent;
-  let fixture: ComponentFixture<GeneralSettingsComponent>;
+describe('LanguageSettingsComponent', () => {
+  let component: LanguageSettingsComponent;
+  let fixture: ComponentFixture<LanguageSettingsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [GeneralSettingsComponent],
+      declarations: [LanguageSettingsComponent],
     }).compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(GeneralSettingsComponent);
+    fixture = TestBed.createComponent(LanguageSettingsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

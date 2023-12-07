@@ -10,7 +10,7 @@ import {
   BRANDING,
   COMPLEXITY,
   DOMAIN,
-  GENERAL,
+  LANGUAGES,
   IDP,
   LOCKOUT,
   LOGIN,
@@ -34,7 +34,6 @@ export class InstanceSettingsComponent implements OnInit, OnDestroy {
   public id: string = '';
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public defaultSettingsList: SidenavSetting[] = [
-    GENERAL,
     // notifications
     // { showWarn: true, ...NOTIFICATIONS },
     NOTIFICATIONS,
@@ -53,6 +52,7 @@ export class InstanceSettingsComponent implements OnInit, OnDestroy {
     LOGINTEXTS,
     // others
     PRIVACYPOLICY,
+    LANGUAGES,
     OIDC,
     SECRETS,
     SECURITY,

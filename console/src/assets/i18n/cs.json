@@ -1023,7 +1023,7 @@
       "DESCRIPTION": "Tato nastavení rozšiřují a přepisují nastavení vaší instance."
     },
     "LIST": {
-      "GENERAL": "Obecné",
+      "LANGUAGES": "Jazyky",
       "LOGIN": "Chování při přihlášení a bezpečnost",
       "LOCKOUT": "Blokování",
       "COMPLEXITY": "Složitost hesla",
@@ -1052,22 +1052,32 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Výchozí jazyk",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Nastavení jazyka",
+      "DEFAULT": "Výchozí jazyk",
+      "ALLOWED": "Povolené jazyky",
+      "NOT_ALLOWED": "Nepovolené jazyky",
+      "ALLOW_ALL": "Povolit všechny jazyky",
+      "DISALLOW_ALL": "Zakázat všechny jazyky",
+      "SETASDEFAULT": "Nastavit jako výchozí",
+      "DEFAULT_SAVED": "Výchozí jazyk byl úspěšně nastaven.",
+      "ALLOWED_SAVED": "Povolené jazyky byly úspěšně nastaveny.",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "Nastavení SMTP",
@@ -1381,6 +1391,8 @@
       "ALLOWUSERNAMEPASSWORD": "Povoleno uživatelské jméno a heslo",
       "ALLOWEXTERNALIDP": "Povoleno externí IDP",
       "ALLOWREGISTER": "Registrace povolena",
+      "ALLOWREGISTERUSERS": "Registrace uživatelů povolena",
+      "ALLOWREGISTERORGS": "Registrace organizací povolena",
       "ALLOWUSERNAMEPASSWORD_DESC": "Je povoleno klasické přihlášení s uživatelským jménem a heslem.",
       "ALLOWEXTERNALIDP_DESC": "Přihlášení je povoleno pro níže uvedené poskytovatele identity.",
       "ALLOWREGISTER_DESC": "Pokud je možnost vybrána, objeví se při přihlášení další krok pro registraci uživatele.",
