@@ -1257,8 +1257,10 @@
       "RESET_DESCRIPTION": "すべてのデフォルト値を復元しようとしています。ユーザーが行ったすべての変更は完全に削除されます。本当によろしいですか？",
       "UNSAVED_TITLE": "保存せずに続行しますか？",
       "UNSAVED_DESCRIPTION": "あなたは保存せずに変更を加えました。今すぐ保存しますか？",
-      "LOCALE": "ロケールコード",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "許可されていない言語を選択しました。テキストを変更し続けることはできますが、実際にこの言語を使用できるようにするには、インスタンスの制限を変更してください。",
+      "LANGUAGES_NOT_ALLOWED": "許可されていない言語：",
+      "LANGUAGE": "言語",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",

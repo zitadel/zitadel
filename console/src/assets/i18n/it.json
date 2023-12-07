@@ -1261,8 +1261,10 @@
       "RESET_DESCRIPTION": "Stai per ripristinare tutti i valori predefiniti. Tutte le modifiche che hai fatto saranno cancellate in modo permanente. Vuoi davvero continuare?",
       "UNSAVED_TITLE": "Continuare senza salvare?",
       "UNSAVED_DESCRIPTION": "Hai fatto delle modifiche senza salvare. Vuoi salvare ora?",
-      "LOCALE": "Codice locale",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Hai selezionato una lingua non consentita. Puoi continuare a modificare i testi. Ma se vuoi che i tuoi utenti possano effettivamente utilizzare questa lingua, cambia le restrizioni delle tue istanze.",
+      "LANGUAGE": "Lingua",
+      "LANGUAGES_NOT_ALLOWED": "Non consentito:",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
