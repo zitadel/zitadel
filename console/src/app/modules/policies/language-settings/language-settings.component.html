@@ -38,7 +38,8 @@
             mat-list-item
           >
             <span class="index">{{ i + 1 }}</span>
-            <span> {{ lang }} - {{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }} </span>
+            <span class="locale">{{ lang }}</span>
+            <span class="lang">{{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }} </span>
             <span *ngIf="lang === (defaultLang$ | async)" class="state orgdefaultlabel">{{
               'SETTING.LANGUAGES.DEFAULT' | translate
             }}</span>
@@ -101,7 +102,8 @@
             [cdkDragDisabled]="(canWriteRestrictions$ | async) === false"
             mat-list-item
           >
-            <span> {{ lang }} - {{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }} </span>
+            <span class="locale">{{ lang }}</span>
+            <span class="lang">{{ 'SETTING.LANGUAGES.OPTIONS.' + lang | translate }} </span>
           </div>
         </div>
       </div>

@@ -3,6 +3,10 @@
   grid-template-columns: 1fr 1fr;
   column-gap: 2rem;
 
+  @media only screen and (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
+
   .languages-container {
     display: inline-block;
     max-width: 400px;
@@ -41,6 +45,7 @@
     flex-direction: row;
     align-items: center;
     margin-bottom: 1rem;
+    margin-top: 1.5rem;
 
     .label {
       margin-right: 1rem;
@@ -71,6 +76,15 @@
     left: 4px;
     opacity: 0.5;
     font-size: 10px;
+  }
+
+  .locale {
+    width: 35px;
+    margin-right: 1rem;
+  }
+
+  .lang {
+    flex: 1;
   }
 
   [hoveractions] {
