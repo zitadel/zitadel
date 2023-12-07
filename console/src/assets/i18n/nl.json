@@ -931,7 +931,6 @@
       "ORGDOMAIN": {
         "TITLE": "Verifieer het eigendom van {{value}}",
         "VERIFICATION": "Wij bieden u twee methoden aan om uw domein handmatig te valideren:",
-        "VERIFICATION_DOCS": "Ga naar documenten voor meer informatie",
         "VERIFICATION_HTML": "-HTTP. Host een tijdelijk verificatiebestand op uw website",
         "VERIFICATION_DNS": "- DNS. Maak een TXT Record DNS-vermelding",
         "VERIFICATION_DNS_DESC": "Als u {{ value }} beheert en toegang heeft tot uw DNS-records, kunt u een nieuw TXT-record maken met de volgende waarden:",

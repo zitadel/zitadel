@@ -36,15 +36,9 @@
     justify-content: space-between !important;
   }
 
-  cnsl-info-section a {
-    font-size: 14px;
-    cursor: pointer;
-    text-decoration: none;
-    color: inherit;
-    font-family: inherit;
-
-    &:hover {
-      text-decoration: underline;
-    }
+  .dialog-title {
+    display: flex;
+    align-items: center;
+    margin-top: -3rem;
   }
 }

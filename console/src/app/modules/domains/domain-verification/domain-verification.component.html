@@ -1,5 +1,19 @@
-<span class="title" mat-dialog-title>{{ 'ORG.PAGES.ORGDOMAIN.TITLE' | translate: { value: domain?.domainName } }}</span>
-<div mat-dialog-content>
+<div mat-dialog-title>
+  <div class="dialog-title">
+    <h2>{{ 'ORG.PAGES.ORGDOMAIN.TITLE' | translate: { value: domain?.domainName } }}</h2>
+    <a
+      mat-icon-button
+      href="https://zitadel.com/docs/guides/manage/console/organizations#verify-your-domain-name"
+      rel="noreferrer"
+      target="_blank"
+      aria-label="docs"
+    >
+      <mat-icon class="icon">info_outline</mat-icon>
+    </a>
+  </div>
+</div>
+
+<div mat-dialog-content cdkFocusInitial autofocus>
   <div *ngIf="showNew && !(dns || http)">
     <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION' | translate }}</p>
     <p class="desc">
@@ -12,17 +26,6 @@
   <cnsl-info-section [type]="InfoSectionType.WARN" *ngIf="showNew && !(dns || http)" class="desc">{{
     'ORG.PAGES.ORGDOMAIN.VERIFICATION_VALIDATION_DESC' | translate
   }}</cnsl-info-section>
-
-  <cnsl-info-section [type]="InfoSectionType.INFO" *ngIf="showNew && !(dns || http)" class="desc">
-    <a
-      href="https://zitadel.com/docs/guides/manage/console/organizations#verify-your-domain-name"
-      rel="noreferrer"
-      target="_blank"
-      external
-    >
-      {{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_DOCS' | translate }}
-    </a>
-  </cnsl-info-section>
 
   <p *ngIf="!showNew && !(dns || http)" class="desc">
     {{

@@ -931,7 +931,6 @@
       "ORGDOMAIN": {
         "TITLE": "Verify {{value}} ownership",
         "VERIFICATION": "We offer you two methods to manually validate your domain:",
-        "VERIFICATION_DOCS": "Visit docs for more info",
         "VERIFICATION_HTML": "- HTTP. Host a temporary verification file on your website",
         "VERIFICATION_DNS": "- DNS. Create a TXT Record DNS entry",
         "VERIFICATION_DNS_DESC": "If you manage {{ value }} and you have access to your DNS records, you can create a new TXT record with the following values:",
