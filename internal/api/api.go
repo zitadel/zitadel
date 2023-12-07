@@ -19,10 +19,10 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type API struct {
@@ -196,7 +196,7 @@ func (a *API) healthHandler() http.Handler {
 	checks := []ValidationFunction{
 		func(ctx context.Context) error {
 			if err := a.health.Health(ctx); err != nil {
-				return errors.ThrowInternal(err, "API-F24h2", "DB CONNECTION ERROR")
+				return zerrors.ThrowInternal(err, "API-F24h2", "DB CONNECTION ERROR")
 			}
 			return nil
 		},

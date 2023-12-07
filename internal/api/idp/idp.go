@@ -18,7 +18,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
-	z_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/form"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/apple"
@@ -32,6 +31,7 @@ import (
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	saml2 "github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -147,7 +147,7 @@ func (h *Handler) handleCertificate(w http.ResponseWriter, r *http.Request) {
 	}
 	samlProvider, ok := provider.(*saml2.Provider)
 	if !ok {
-		http.Error(w, z_errs.ThrowInvalidArgument(nil, "SAML-lrud8s9coi", "Errors.Intent.IDPInvalid").Error(), http.StatusBadRequest)
+		http.Error(w, zerrors.ThrowInvalidArgument(nil, "SAML-lrud8s9coi", "Errors.Intent.IDPInvalid").Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -178,7 +178,7 @@ func (h *Handler) handleMetadata(w http.ResponseWriter, r *http.Request) {
 
 	samlProvider, ok := provider.(*saml2.Provider)
 	if !ok {
-		http.Error(w, z_errs.ThrowInvalidArgument(nil, "SAML-lrud8s9coi", "Errors.Intent.IDPInvalid").Error(), http.StatusBadRequest)
+		http.Error(w, zerrors.ThrowInvalidArgument(nil, "SAML-lrud8s9coi", "Errors.Intent.IDPInvalid").Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -225,7 +225,7 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 	}
 	samlProvider, ok := provider.(*saml2.Provider)
 	if !ok {
-		err := z_errs.ThrowInvalidArgument(nil, "SAML-ui9wyux0hp", "Errors.Intent.IDPInvalid")
+		err := zerrors.ThrowInvalidArgument(nil, "SAML-ui9wyux0hp", "Errors.Intent.IDPInvalid")
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -237,7 +237,7 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 
 	intent, err := h.commands.GetActiveIntent(ctx, data.RelayState)
 	if err != nil {
-		if z_errs.IsNotFound(err) {
+		if zerrors.IsNotFound(err) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -264,7 +264,7 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 
 	token, err := h.commands.SucceedSAMLIDPIntent(ctx, intent, idpUser, userID, session.Assertion)
 	if err != nil {
-		redirectToFailureURLErr(w, r, intent, z_errs.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
+		redirectToFailureURLErr(w, r, intent, zerrors.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
 		return
 	}
 	redirectToSuccessURL(w, r, intent, token, userID)
@@ -279,7 +279,7 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	intent, err := h.commands.GetActiveIntent(ctx, data.State)
 	if err != nil {
-		if z_errs.IsNotFound(err) {
+		if zerrors.IsNotFound(err) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -320,7 +320,7 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 
 	token, err := h.commands.SucceedIDPIntent(ctx, intent, idpUser, idpSession, userID)
 	if err != nil {
-		redirectToFailureURLErr(w, r, intent, z_errs.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
+		redirectToFailureURLErr(w, r, intent, zerrors.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
 		return
 	}
 	redirectToSuccessURL(w, r, intent, token, userID)
@@ -349,7 +349,7 @@ func (h *Handler) parseCallbackRequest(r *http.Request) (*externalIDPCallbackDat
 		return nil, err
 	}
 	if data.State == "" {
-		return nil, z_errs.ThrowInvalidArgument(nil, "IDP-Hk38e", "Errors.Intent.StateMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "IDP-Hk38e", "Errors.Intent.StateMissing")
 	}
 	return data, nil
 }
@@ -368,7 +368,7 @@ func redirectToSuccessURL(w http.ResponseWriter, r *http.Request, intent *comman
 func redirectToFailureURLErr(w http.ResponseWriter, r *http.Request, i *command.IDPIntentWriteModel, err error) {
 	msg := err.Error()
 	var description string
-	zErr := new(z_errs.CaosError)
+	zErr := new(zerrors.ZitadelError)
 	if errors.As(err, &zErr) {
 		msg = zErr.GetID()
 		description = zErr.GetMessage() // TODO: i18n?
@@ -403,9 +403,9 @@ func (h *Handler) fetchIDPUserFromCode(ctx context.Context, identityProvider idp
 	case *apple.Provider:
 		session = &apple.Session{Session: &openid.Session{Provider: provider.Provider, Code: code}, UserFormValue: appleUser}
 	case *jwt.Provider, *ldap.Provider, *saml2.Provider:
-		return nil, nil, z_errs.ThrowInvalidArgument(nil, "IDP-52jmn", "Errors.ExternalIDP.IDPTypeNotImplemented")
+		return nil, nil, zerrors.ThrowInvalidArgument(nil, "IDP-52jmn", "Errors.ExternalIDP.IDPTypeNotImplemented")
 	default:
-		return nil, nil, z_errs.ThrowUnimplemented(nil, "IDP-SSDg", "Errors.ExternalIDP.IDPTypeNotImplemented")
+		return nil, nil, zerrors.ThrowUnimplemented(nil, "IDP-SSDg", "Errors.ExternalIDP.IDPTypeNotImplemented")
 	}
 
 	user, err = session.FetchUser(ctx)

@@ -6,10 +6,10 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type HumanPasswordReadModel struct {
@@ -31,14 +31,14 @@ func (q *Queries) GetHumanPassword(ctx context.Context, orgID, userID string) (e
 	defer func() { span.EndWithError(err) }()
 
 	if userID == "" {
-		return "", errors.ThrowInvalidArgument(nil, "QUERY-4Mfsf", "Errors.User.UserIDMissing")
+		return "", zerrors.ThrowInvalidArgument(nil, "QUERY-4Mfsf", "Errors.User.UserIDMissing")
 	}
 	existingPassword, err := q.passwordReadModel(ctx, userID, orgID)
 	if err != nil {
-		return "", errors.ThrowInternal(nil, "QUERY-p1k1n2i", "Errors.User.NotFound")
+		return "", zerrors.ThrowInternal(nil, "QUERY-p1k1n2i", "Errors.User.NotFound")
 	}
 	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
-		return "", errors.ThrowPreconditionFailed(nil, "QUERY-3n77z", "Errors.User.NotFound")
+		return "", zerrors.ThrowPreconditionFailed(nil, "QUERY-3n77z", "Errors.User.NotFound")
 	}
 	return existingPassword.EncodedHash, nil
 }

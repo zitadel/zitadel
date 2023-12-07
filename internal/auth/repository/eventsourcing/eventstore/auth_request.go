@@ -14,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
@@ -23,6 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	user_model "github.com/zitadel/zitadel/internal/user/model"
 	user_view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const unknownUserID = "UNKNOWN"
@@ -262,7 +262,7 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 		return err
 	}
 	err = repo.checkExternalUserLogin(ctx, request, externalUser.IDPConfigID, externalUser.ExternalUserID)
-	if errors.IsNotFound(err) {
+	if zerrors.IsNotFound(err) {
 		// clear potential user information (e.g. when username was entered but another external user was returned)
 		request.SetUserInfo("", "", "", "", "", request.UserOrgID)
 		// in case the check was done with an ID, that was retrieved by a session that allows migration,
@@ -328,7 +328,7 @@ func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAge
 		return err
 	}
 	if request.RequestedOrgID != "" && request.RequestedOrgID != user.ResourceOwner {
-		return errors.ThrowPreconditionFailed(nil, "EVENT-fJe2a", "Errors.User.NotAllowedOrg")
+		return zerrors.ThrowPreconditionFailed(nil, "EVENT-fJe2a", "Errors.User.NotAllowedOrg")
 	}
 	username := user.UserName
 	if request.RequestedOrgID == "" {
@@ -344,7 +344,7 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, authReqID, user
 	request, err := repo.getAuthRequestEnsureUser(ctx, authReqID, userAgentID, userID)
 	if err != nil {
 		if isIgnoreUserNotFoundError(err, request) {
-			return errors.ThrowInvalidArgument(nil, "EVENT-SDe2f", "Errors.User.UsernameOrPassword.Invalid")
+			return zerrors.ThrowInvalidArgument(nil, "EVENT-SDe2f", "Errors.User.UsernameOrPassword.Invalid")
 		}
 		return err
 	}
@@ -354,17 +354,17 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, authReqID, user
 	}
 	err = repo.Command.HumanCheckPassword(ctx, resourceOwner, userID, password, request.WithCurrentInfo(info), lockoutPolicyToDomain(policy))
 	if isIgnoreUserInvalidPasswordError(err, request) {
-		return errors.ThrowInvalidArgument(nil, "EVENT-Jsf32", "Errors.User.UsernameOrPassword.Invalid")
+		return zerrors.ThrowInvalidArgument(nil, "EVENT-Jsf32", "Errors.User.UsernameOrPassword.Invalid")
 	}
 	return err
 }
 
 func isIgnoreUserNotFoundError(err error, request *domain.AuthRequest) bool {
-	return request != nil && request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames && errors.IsNotFound(err) && errors.Contains(err, "Errors.User.NotFound")
+	return request != nil && request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames && zerrors.IsNotFound(err) && zerrors.Contains(err, "Errors.User.NotFound")
 }
 
 func isIgnoreUserInvalidPasswordError(err error, request *domain.AuthRequest) bool {
-	return request != nil && request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames && errors.IsErrorInvalidArgument(err) && errors.Contains(err, "Errors.User.Password.Invalid")
+	return request != nil && request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames && zerrors.IsErrorInvalidArgument(err) && zerrors.Contains(err, "Errors.User.Password.Invalid")
 }
 
 func lockoutPolicyToDomain(policy *query.LockoutPolicy) *domain.LockoutPolicy {
@@ -613,7 +613,7 @@ func (repo *AuthRequestRepo) getAuthRequestEnsureUser(ctx context.Context, authR
 		}
 	}
 	if request.UserID != userID {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-GBH32", "Errors.User.NotMatchingUserID")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "EVENT-GBH32", "Errors.User.NotMatchingUserID")
 	}
 	_, err = activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, request.UserID, false)
 	if err != nil {
@@ -631,7 +631,7 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID
 		return nil, err
 	}
 	if request.AgentID != userAgentID {
-		return nil, errors.ThrowPermissionDenied(nil, "EVENT-adk13", "Errors.AuthRequest.UserAgentNotCorresponding")
+		return nil, zerrors.ThrowPermissionDenied(nil, "EVENT-adk13", "Errors.AuthRequest.UserAgentNotCorresponding")
 	}
 	err = repo.fillPolicies(ctx, request)
 	if err != nil {
@@ -743,7 +743,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 		user, err = repo.checkLoginNameInput(ctx, request, preferredLoginName)
 	}
 	// return any error apart from not found ones directly
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
 	// if there's an active (human) user, let's use it
@@ -759,11 +759,11 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	}
 	// let's once again check if the user was just inactive
 	if user != nil && user.State == int32(domain.UserStateInactive) {
-		return errors.ThrowPreconditionFailed(nil, "AUTH-2n8fs", "Errors.User.Inactive")
+		return zerrors.ThrowPreconditionFailed(nil, "AUTH-2n8fs", "Errors.User.Inactive")
 	}
 	// or locked
 	if user != nil && user.State == int32(domain.UserStateLocked) {
-		return errors.ThrowPreconditionFailed(nil, "AUTH-SF3gb", "Errors.User.Locked")
+		return zerrors.ThrowPreconditionFailed(nil, "AUTH-SF3gb", "Errors.User.Locked")
 	}
 	// let's just check if unknown usernames are ignored
 	if request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames {
@@ -780,11 +780,11 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	}
 	// let's check if it was a machine user
 	if !user.MachineView.IsZero() {
-		return errors.ThrowPreconditionFailed(nil, "AUTH-DGV4g", "Errors.User.NotHuman")
+		return zerrors.ThrowPreconditionFailed(nil, "AUTH-DGV4g", "Errors.User.NotHuman")
 	}
 	// everything should be handled by now
 	logging.WithFields("authRequest", request.ID, "loginName", loginName).Error("unhandled state for checkLoginName")
-	return errors.ThrowInternal(nil, "AUTH-asf3df", "Errors.Internal")
+	return zerrors.ThrowInternal(nil, "AUTH-asf3df", "Errors.Internal")
 }
 
 func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *domain.AuthRequest, loginName string) (bool, error) {
@@ -889,12 +889,12 @@ func (repo *AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Conte
 		return err
 	}
 	if len(request.LinkingUsers) != 0 && !loginPolicy.AllowExternalIDPs {
-		return errors.ThrowInvalidArgument(nil, "LOGIN-s9sio", "Errors.User.NotAllowedToLink")
+		return zerrors.ThrowInvalidArgument(nil, "LOGIN-s9sio", "Errors.User.NotAllowedToLink")
 	}
 	if len(request.LinkingUsers) != 0 {
 		exists := linkingIDPConfigExistingInAllowedIDPs(request.LinkingUsers, idpProviders)
 		if !exists {
-			return errors.ThrowInvalidArgument(nil, "LOGIN-Dj89o", "Errors.User.NotAllowedToLink")
+			return zerrors.ThrowInvalidArgument(nil, "LOGIN-Dj89o", "Errors.User.NotAllowedToLink")
 		}
 	}
 	request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
@@ -941,7 +941,7 @@ func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *domain.AuthReques
 			return nil
 		}
 	}
-	return errors.ThrowNotFound(nil, "LOGIN-Nsm8r", "Errors.User.ExternalIDP.NotAllowed")
+	return zerrors.ThrowNotFound(nil, "LOGIN-Nsm8r", "Errors.User.ExternalIDP.NotAllowed")
 }
 
 func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request *domain.AuthRequest, idpConfigID, externalUserID string) (err error) {
@@ -968,7 +968,7 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request
 		return err
 	}
 	if len(links.Links) != 1 {
-		return errors.ThrowNotFound(nil, "AUTH-Sf8sd", "Errors.ExternalIDP.NotFound")
+		return zerrors.ThrowNotFound(nil, "AUTH-Sf8sd", "Errors.ExternalIDP.NotFound")
 	}
 	user, err := activeUserByID(ctx, repo.UserViewProvider, repo.UserEventProvider, repo.OrgViewProvider, repo.LockoutPolicyViewProvider, links.Links[0].UserID, false)
 	if err != nil {
@@ -988,7 +988,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	defer func() { span.EndWithError(err) }()
 
 	if request == nil {
-		return nil, errors.ThrowInvalidArgument(nil, "EVENT-ds27a", "Errors.Internal")
+		return nil, zerrors.ThrowInvalidArgument(nil, "EVENT-ds27a", "Errors.Internal")
 	}
 	steps = make([]domain.NextStep, 0)
 	if !checkLoggedIn && domain.IsPrompt(request.Prompt, domain.PromptNone) {
@@ -1216,7 +1216,7 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 	if promptRequired || !repo.mfaSkippedOrSetUp(user, request) {
 		types := user.MFATypesSetupPossible(mfaLevel, request.LoginPolicy)
 		if promptRequired && len(types) == 0 {
-			return nil, false, errors.ThrowPreconditionFailed(nil, "LOGIN-5Hm8s", "Errors.Login.LoginPolicy.MFA.ForceAndNotConfigured")
+			return nil, false, zerrors.ThrowPreconditionFailed(nil, "LOGIN-5Hm8s", "Errors.Login.LoginPolicy.MFA.ForceAndNotConfigured")
 		}
 		if len(types) == 0 {
 			return nil, true, nil
@@ -1265,7 +1265,7 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView, reques
 
 func (repo *AuthRequestRepo) GetPrivacyPolicy(ctx context.Context, orgID string) (*domain.PrivacyPolicy, error) {
 	policy, err := repo.PrivacyPolicyProvider.PrivacyPolicyByOrg(ctx, false, orgID, false)
-	if errors.IsNotFound(err) {
+	if zerrors.IsNotFound(err) {
 		return new(domain.PrivacyPolicy), nil
 	}
 	if err != nil {
@@ -1460,7 +1460,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	session, err := provider.UserSessionByIDs(agentID, user.ID, instanceID)
 	if err != nil {
-		if !errors.IsNotFound(err) {
+		if !zerrors.IsNotFound(err) {
 			return nil, err
 		}
 		sequence, err := provider.GetLatestUserSessionSequence(ctx, instanceID)
@@ -1506,7 +1506,7 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 				continue
 			}
 		case user_repo.UserRemovedType:
-			return nil, errors.ThrowPreconditionFailed(nil, "EVENT-dG2fe", "Errors.User.NotActive")
+			return nil, zerrors.ThrowPreconditionFailed(nil, "EVENT-dG2fe", "Errors.User.NotActive")
 		}
 		err := sessionCopy.AppendEvent(event)
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Warn("error appending event")
@@ -1518,7 +1518,7 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 	// PLANNED: Check LockoutPolicy
 	user, err = userByID(ctx, userViewProvider, userEventProvider, userID)
 	if err != nil {
-		if ignoreUnknownUsernames && errors.IsNotFound(err) {
+		if ignoreUnknownUsernames && zerrors.IsNotFound(err) {
 			return &user_model.UserView{
 				ID:        userID,
 				HumanView: &user_model.HumanView{},
@@ -1528,20 +1528,20 @@ func activeUserByID(ctx context.Context, userViewProvider userViewProvider, user
 	}
 
 	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Lm69x", "Errors.User.NotHuman")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "EVENT-Lm69x", "Errors.User.NotHuman")
 	}
 	if user.State == user_model.UserStateLocked || user.State == user_model.UserStateSuspend {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.Locked")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.Locked")
 	}
 	if !(user.State == user_model.UserStateActive || user.State == user_model.UserStateInitial) {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.NotActive")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "EVENT-FJ262", "Errors.User.NotActive")
 	}
 	org, err := queries.OrgByID(ctx, false, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if org.State != domain.OrgStateActive {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Zws3s", "Errors.User.NotActive")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "EVENT-Zws3s", "Errors.User.NotActive")
 	}
 	return user, nil
 }
@@ -1551,7 +1551,7 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	defer func() { span.EndWithError(err) }()
 
 	user, viewErr := viewProvider.UserByID(userID, authz.GetInstance(ctx).InstanceID())
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
+	if viewErr != nil && !zerrors.IsNotFound(viewErr) {
 		return nil, viewErr
 	} else if user == nil {
 		user = new(user_view_model.UserView)
@@ -1574,7 +1574,7 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 		}
 	}
 	if userCopy.State == int32(user_model.UserStateDeleted) {
-		return nil, errors.ThrowNotFound(nil, "EVENT-3F9so", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "EVENT-3F9so", "Errors.User.NotFound")
 	}
 	return user_view_model.UserToModel(&userCopy), nil
 }
@@ -1622,7 +1622,7 @@ func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *u
 			return false, err
 		}
 	default:
-		return false, errors.ThrowPreconditionFailed(nil, "EVENT-dfrw2", "Errors.AuthRequest.RequestTypeNotSupported")
+		return false, zerrors.ThrowPreconditionFailed(nil, "EVENT-dfrw2", "Errors.AuthRequest.RequestTypeNotSupported")
 	}
 	if !project.ProjectRoleCheck {
 		return false, nil
@@ -1643,7 +1643,7 @@ func projectRequired(ctx context.Context, request *domain.AuthRequest, projectPr
 			return false, err
 		}
 	default:
-		return false, errors.ThrowPreconditionFailed(nil, "EVENT-ku4He", "Errors.AuthRequest.RequestTypeNotSupported")
+		return false, zerrors.ThrowPreconditionFailed(nil, "EVENT-ku4He", "Errors.AuthRequest.RequestTypeNotSupported")
 	}
 	// if the user and project are part of the same organisation we do not need to check if the project exists on that org
 	if !project.HasProjectCheck || project.ResourceOwner == request.UserOrgID {

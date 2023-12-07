@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -73,6 +73,6 @@ func (l *Login) authRequestCallback(ctx context.Context, authReq *domain.AuthReq
 	case *domain.AuthRequestDevice:
 		return l.deviceAuthCallbackURL(authReq.ID), nil
 	default:
-		return "", caos_errs.ThrowInternal(nil, "LOGIN-rhjQF", "Errors.AuthRequest.RequestTypeNotSupported")
+		return "", zerrors.ThrowInternal(nil, "LOGIN-rhjQF", "Errors.AuthRequest.RequestTypeNotSupported")
 	}
 }

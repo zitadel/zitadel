@@ -6,9 +6,9 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type GenerateMachineSecret struct {
@@ -37,10 +37,10 @@ func (c *Commands) GenerateMachineSecret(ctx context.Context, userID string, res
 func prepareGenerateMachineSecret(a *user.Aggregate, generator crypto.Generator, set *GenerateMachineSecret) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if a.ResourceOwner == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-x0992n", "Errors.ResourceOwnerMissing")
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-x0992n", "Errors.ResourceOwnerMissing")
 		}
 		if a.ID == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-bzoqjs", "Errors.User.UserIDMissing")
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-bzoqjs", "Errors.User.UserIDMissing")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel, err := getMachineWriteModel(ctx, a.ID, a.ResourceOwner, filter)
@@ -48,7 +48,7 @@ func prepareGenerateMachineSecret(a *user.Aggregate, generator crypto.Generator,
 				return nil, err
 			}
 			if !isUserStateExists(writeModel.UserState) {
-				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-x8910n", "Errors.User.NotExisting")
+				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-x8910n", "Errors.User.NotExisting")
 			}
 
 			clientSecret, secretString, err := domain.NewMachineClientSecret(generator)
@@ -86,10 +86,10 @@ func (c *Commands) RemoveMachineSecret(ctx context.Context, userID string, resou
 func prepareRemoveMachineSecret(a *user.Aggregate) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if a.ResourceOwner == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-0qp2hus", "Errors.ResourceOwnerMissing")
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-0qp2hus", "Errors.ResourceOwnerMissing")
 		}
 		if a.ID == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-bzosjs", "Errors.User.UserIDMissing")
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-bzosjs", "Errors.User.UserIDMissing")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel, err := getMachineWriteModel(ctx, a.ID, a.ResourceOwner, filter)
@@ -97,10 +97,10 @@ func prepareRemoveMachineSecret(a *user.Aggregate) preparation.Validation {
 				return nil, err
 			}
 			if !isUserStateExists(writeModel.UserState) {
-				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-x7s802", "Errors.User.NotExisting")
+				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-x7s802", "Errors.User.NotExisting")
 			}
 			if writeModel.ClientSecret == nil {
-				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-coi82n", "Errors.User.Machine.Secret.NotExisting")
+				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-coi82n", "Errors.User.Machine.Secret.NotExisting")
 			}
 			return []eventstore.Command{
 				user.NewMachineSecretRemovedEvent(ctx, &a.Aggregate),

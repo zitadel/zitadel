@@ -11,9 +11,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -127,7 +127,7 @@ func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMe
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-j9NJd", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-j9NJd", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -158,7 +158,7 @@ func (q *Queries) ListActiveUserAuthMethodTypes(ctx context.Context, userID stri
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-Sfdrg", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-Sfdrg", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -189,7 +189,7 @@ func (q *Queries) ListUserAuthMethodTypesRequired(ctx context.Context, userID st
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, false, false, errors.ThrowInvalidArgument(err, "QUERY-E5ut4", "Errors.Query.InvalidRequest")
+		return nil, false, false, zerrors.ThrowInvalidArgument(err, "QUERY-E5ut4", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -197,7 +197,7 @@ func (q *Queries) ListUserAuthMethodTypesRequired(ctx context.Context, userID st
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, false, false, errors.ThrowInternal(err, "QUERY-Dun75", "Errors.Internal")
+		return nil, false, false, zerrors.ThrowInternal(err, "QUERY-Dun75", "Errors.Internal")
 	}
 	return userAuthMethodTypes, forceMFA, forceMFALocalOnly, nil
 }
@@ -330,7 +330,7 @@ func prepareUserAuthMethodsQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-3n9fl", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-3n9fl", "Errors.Query.CloseRows")
 			}
 
 			return &AuthMethods{
@@ -392,7 +392,7 @@ func prepareActiveUserAuthMethodTypesQuery(ctx context.Context, db prepareDataba
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-3n9fl", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-3n9fl", "Errors.Query.CloseRows")
 			}
 
 			return &AuthMethodTypes{
@@ -467,7 +467,7 @@ func prepareUserAuthMethodTypesRequiredQuery(ctx context.Context, db prepareData
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, false, false, errors.ThrowInternal(err, "QUERY-W4zje", "Errors.Query.CloseRows")
+				return nil, false, false, zerrors.ThrowInternal(err, "QUERY-W4zje", "Errors.Query.CloseRows")
 			}
 
 			return userAuthMethodTypes, forceMFA.Bool, forceMFALocalOnly.Bool, nil

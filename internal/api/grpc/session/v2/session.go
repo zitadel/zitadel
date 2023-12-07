@@ -15,8 +15,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	objpb "github.com/zitadel/zitadel/pkg/grpc/object"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 )
@@ -284,7 +284,7 @@ func sessionQueryToQuery(sq *session.SearchQuery) (query.SearchQuery, error) {
 	case *session.SearchQuery_CreationDateQuery:
 		return creationDateQueryToQuery(q.CreationDateQuery)
 	default:
-		return nil, caos_errs.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid")
 	}
 }
 
@@ -447,7 +447,7 @@ func (s *Server) createOTPEmailChallengeCommand(req *session.RequestChallenges_O
 	case nil:
 		return nil, s.command.CreateOTPEmailChallenge(), nil
 	default:
-		return nil, nil, caos_errs.ThrowUnimplementedf(nil, "SESSION-k3ng0", "delivery_type oneOf %T in OTPEmailChallenge not implemented", t)
+		return nil, nil, zerrors.ThrowUnimplementedf(nil, "SESSION-k3ng0", "delivery_type oneOf %T in OTPEmailChallenge not implemented", t)
 	}
 }
 
@@ -461,7 +461,7 @@ func userCheck(user *session.CheckUser) (userSearch, error) {
 	case *session.CheckUser_LoginName:
 		return userByLoginName(s.LoginName)
 	default:
-		return nil, caos_errs.ThrowUnimplementedf(nil, "SESSION-d3b4g0", "user search %T not implemented", s)
+		return nil, zerrors.ThrowUnimplementedf(nil, "SESSION-d3b4g0", "user search %T not implemented", s)
 	}
 }
 

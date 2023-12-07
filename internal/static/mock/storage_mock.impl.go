@@ -8,8 +8,8 @@ import (
 
 	"go.uber.org/mock/gomock"
 
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func NewStorage(t *testing.T) *MockStorage {
@@ -37,7 +37,7 @@ func (m *MockStorage) ExpectPutObject() *MockStorage {
 func (m *MockStorage) ExpectPutObjectError() *MockStorage {
 	m.EXPECT().
 		PutObject(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-		Return(nil, caos_errors.ThrowInternal(nil, "", ""))
+		Return(nil, zerrors.ThrowInternal(nil, "", ""))
 	return m
 }
 
@@ -58,6 +58,6 @@ func (m *MockStorage) ExpectRemoveObjectsNoError() *MockStorage {
 func (m *MockStorage) ExpectRemoveObjectError() *MockStorage {
 	m.EXPECT().
 		RemoveObject(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-		Return(caos_errors.ThrowInternal(nil, "", ""))
+		Return(zerrors.ThrowInternal(nil, "", ""))
 	return m
 }

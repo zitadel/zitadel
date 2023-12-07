@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -91,7 +91,7 @@ func (p *deviceAuthProjection) Reducers() []handler.AggregateReducer {
 func (p *deviceAuthProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*deviceauth.AddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-chu6O", "reduce.wrong.event.type %T != %s", event, deviceauth.AddedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-chu6O", "reduce.wrong.event.type %T != %s", event, deviceauth.AddedEventType)
 	}
 	return handler.NewCreateStatement(
 		e,
@@ -113,7 +113,7 @@ func (p *deviceAuthProjection) reduceAdded(event eventstore.Event) (*handler.Sta
 func (p *deviceAuthProjection) reduceAppoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*deviceauth.ApprovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-kei0A", "reduce.wrong.event.type %T != %s", event, deviceauth.ApprovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-kei0A", "reduce.wrong.event.type %T != %s", event, deviceauth.ApprovedEventType)
 	}
 	return handler.NewUpdateStatement(e,
 		[]handler.Column{
@@ -132,7 +132,7 @@ func (p *deviceAuthProjection) reduceAppoved(event eventstore.Event) (*handler.S
 func (p *deviceAuthProjection) reduceCanceled(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*deviceauth.CanceledEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-eeS8d", "reduce.wrong.event.type %T != %s", event, deviceauth.CanceledEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-eeS8d", "reduce.wrong.event.type %T != %s", event, deviceauth.CanceledEventType)
 	}
 	return handler.NewUpdateStatement(e,
 		[]handler.Column{
@@ -150,7 +150,7 @@ func (p *deviceAuthProjection) reduceCanceled(event eventstore.Event) (*handler.
 func (p *deviceAuthProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*deviceauth.RemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AJi1u", "reduce.wrong.event.type %T != %s", event, deviceauth.RemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-AJi1u", "reduce.wrong.event.type %T != %s", event, deviceauth.RemovedEventType)
 	}
 	return handler.NewDeleteStatement(e,
 		[]handler.Condition{

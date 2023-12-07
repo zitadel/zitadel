@@ -11,11 +11,11 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/limits"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestLimits_SetLimits(t *testing.T) {
@@ -217,7 +217,7 @@ func TestLimits_ResetLimits(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowNotFound(nil, "COMMAND-9JToT", "Errors.Limits.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-9JToT", "Errors.Limits.NotFound"))
 				},
 			},
 		},
@@ -251,7 +251,7 @@ func TestLimits_ResetLimits(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowNotFound(nil, "COMMAND-9JToT", "Errors.Limits.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-9JToT", "Errors.Limits.NotFound"))
 				},
 			},
 		},

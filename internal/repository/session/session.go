@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -66,7 +66,7 @@ func AddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(added)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "SESSION-DG4gn", "unable to unmarshal session added")
+		return nil, zerrors.ThrowInternal(err, "SESSION-DG4gn", "unable to unmarshal session added")
 	}
 
 	return added, nil
@@ -113,7 +113,7 @@ func UserCheckedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(added)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "SESSION-DSGn5", "unable to unmarshal user checked")
+		return nil, zerrors.ThrowInternal(err, "SESSION-DSGn5", "unable to unmarshal user checked")
 	}
 
 	return added, nil
@@ -154,7 +154,7 @@ func PasswordCheckedEventMapper(event eventstore.Event) (eventstore.Event, error
 	}
 	err := event.Unmarshal(added)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "SESSION-DGt21", "unable to unmarshal password checked")
+		return nil, zerrors.ThrowInternal(err, "SESSION-DGt21", "unable to unmarshal password checked")
 	}
 
 	return added, nil
@@ -195,7 +195,7 @@ func IntentCheckedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 	}
 	err := event.Unmarshal(added)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "SESSION-DGt90", "unable to unmarshal intent checked")
+		return nil, zerrors.ThrowInternal(err, "SESSION-DGt90", "unable to unmarshal intent checked")
 	}
 
 	return added, nil
@@ -564,7 +564,7 @@ func TokenSetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(added)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "SESSION-Sf3va", "unable to unmarshal token set")
+		return nil, zerrors.ThrowInternal(err, "SESSION-Sf3va", "unable to unmarshal token set")
 	}
 
 	return added, nil
@@ -605,7 +605,7 @@ func MetadataSetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(added)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "SESSION-BD21d", "unable to unmarshal metadata set")
+		return nil, zerrors.ThrowInternal(err, "SESSION-BD21d", "unable to unmarshal metadata set")
 	}
 
 	return added, nil

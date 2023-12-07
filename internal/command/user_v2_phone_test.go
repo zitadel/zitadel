@@ -13,11 +13,11 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_ChangeUserPhone(t *testing.T) {
@@ -78,7 +78,7 @@ func TestCommands_ChangeUserPhone(t *testing.T) {
 				resourceOwner: "org1",
 				phone:         "",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "missing phone",
@@ -122,7 +122,7 @@ func TestCommands_ChangeUserPhone(t *testing.T) {
 				resourceOwner: "org1",
 				phone:         "",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty"),
 		},
 		{
 			name: "not changed",
@@ -166,7 +166,7 @@ func TestCommands_ChangeUserPhone(t *testing.T) {
 				resourceOwner: "org1",
 				phone:         "+41791234567",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Phone.NotChanged"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Phone.NotChanged"),
 		},
 	}
 	for _, tt := range tests {
@@ -240,7 +240,7 @@ func TestCommands_ChangeUserPhoneReturnCode(t *testing.T) {
 				resourceOwner: "org1",
 				phone:         "+41791234567",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "missing phone",
@@ -284,7 +284,7 @@ func TestCommands_ChangeUserPhoneReturnCode(t *testing.T) {
 				resourceOwner: "org1",
 				phone:         "",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty"),
 		},
 	}
 	for _, tt := range tests {
@@ -328,7 +328,7 @@ func TestCommands_ChangeUserPhoneVerified(t *testing.T) {
 				resourceOwner: "org1",
 				phone:         "+41791234567",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-xP292j", "Errors.User.Phone.IDMissing"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-xP292j", "Errors.User.Phone.IDMissing"),
 		},
 		{
 			name: "missing permission",
@@ -363,7 +363,7 @@ func TestCommands_ChangeUserPhoneVerified(t *testing.T) {
 				resourceOwner: "org1",
 				phone:         "+41791234567",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "missing phone",
@@ -398,7 +398,7 @@ func TestCommands_ChangeUserPhoneVerified(t *testing.T) {
 				resourceOwner: "org1",
 				phone:         "",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty"),
 		},
 		{
 			name: "phone changed",
@@ -494,7 +494,7 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				phone:         "+41791234567",
 				returnCode:    false,
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-xP292j", "Errors.User.Phone.IDMissing"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-xP292j", "Errors.User.Phone.IDMissing"),
 		},
 		{
 			name: "missing permission",
@@ -530,7 +530,7 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				phone:         "+41791234567",
 				returnCode:    false,
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "missing phone",
@@ -566,7 +566,7 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				phone:         "",
 				returnCode:    false,
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty"),
 		},
 		{
 			name: "not changed",
@@ -602,7 +602,7 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				phone:         "+41791234567",
 				returnCode:    false,
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Phone.NotChanged"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Phone.NotChanged"),
 		},
 		{
 			name: "phone changed",

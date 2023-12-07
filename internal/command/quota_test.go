@@ -10,11 +10,11 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestQuota_AddQuota(t *testing.T) {
@@ -71,7 +71,7 @@ func TestQuota_AddQuota(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -96,7 +96,7 @@ func TestQuota_AddQuota(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "QUOTA-OTeSh", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "QUOTA-OTeSh", ""))
 				},
 			},
 		},
@@ -362,7 +362,7 @@ func TestQuota_SetQuota(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "QUOTA-OTeSh", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "QUOTA-OTeSh", ""))
 				},
 			},
 		},
@@ -579,7 +579,7 @@ func TestQuota_RemoveQuota(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowNotFound(nil, "COMMAND-WDfFf", ""))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-WDfFf", ""))
 				},
 			},
 		},
@@ -620,7 +620,7 @@ func TestQuota_RemoveQuota(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowNotFound(nil, "COMMAND-WDfFf", ""))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-WDfFf", ""))
 				},
 			},
 		},
@@ -707,7 +707,7 @@ func TestQuota_QuotaNotification_validate(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "QUOTA-bZ0Fj", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "QUOTA-bZ0Fj", ""))
 				},
 			},
 		},
@@ -722,7 +722,7 @@ func TestQuota_QuotaNotification_validate(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "QUOTA-HAYmN", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "QUOTA-HAYmN", ""))
 				},
 			},
 		},
@@ -737,7 +737,7 @@ func TestQuota_QuotaNotification_validate(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "QUOTA-HAYmN", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "QUOTA-HAYmN", ""))
 				},
 			},
 		},
@@ -752,7 +752,7 @@ func TestQuota_QuotaNotification_validate(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "QUOTA-pBfjq", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "QUOTA-pBfjq", ""))
 				},
 			},
 		},
@@ -815,7 +815,7 @@ func TestQuota_SetQuota_validate(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "QUOTA-bZ0Fj", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "QUOTA-bZ0Fj", ""))
 				},
 			},
 		},
@@ -833,7 +833,7 @@ func TestQuota_SetQuota_validate(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "QUOTA-OTeSh", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "QUOTA-OTeSh", ""))
 				},
 			},
 		},
@@ -851,7 +851,7 @@ func TestQuota_SetQuota_validate(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "QUOTA-R5otd", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "QUOTA-R5otd", ""))
 				},
 			},
 		},

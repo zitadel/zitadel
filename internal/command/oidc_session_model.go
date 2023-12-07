@@ -4,9 +4,9 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type OIDCSessionWriteModel struct {
@@ -128,27 +128,27 @@ func (wm *OIDCSessionWriteModel) reduceRefreshTokenRevoked(e *oidcsession.Refres
 
 func (wm *OIDCSessionWriteModel) CheckRefreshToken(refreshTokenID string) error {
 	if wm.State != domain.OIDCSessionStateActive {
-		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-s3hjk", "Errors.OIDCSession.RefreshTokenInvalid")
+		return zerrors.ThrowPreconditionFailed(nil, "OIDCS-s3hjk", "Errors.OIDCSession.RefreshTokenInvalid")
 	}
 	if wm.RefreshTokenID != refreshTokenID {
-		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-28ubl", "Errors.OIDCSession.RefreshTokenInvalid")
+		return zerrors.ThrowPreconditionFailed(nil, "OIDCS-28ubl", "Errors.OIDCSession.RefreshTokenInvalid")
 	}
 	now := time.Now()
 	if wm.RefreshTokenExpiration.Before(now) || wm.RefreshTokenIdleExpiration.Before(now) {
-		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-3jt2w", "Errors.OIDCSession.RefreshTokenInvalid")
+		return zerrors.ThrowPreconditionFailed(nil, "OIDCS-3jt2w", "Errors.OIDCSession.RefreshTokenInvalid")
 	}
 	return nil
 }
 
 func (wm *OIDCSessionWriteModel) CheckAccessToken(accessTokenID string) error {
 	if wm.State != domain.OIDCSessionStateActive {
-		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-KL2pk", "Errors.OIDCSession.Token.Invalid")
+		return zerrors.ThrowPreconditionFailed(nil, "OIDCS-KL2pk", "Errors.OIDCSession.Token.Invalid")
 	}
 	if wm.AccessTokenID != accessTokenID {
-		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-JLKW2", "Errors.OIDCSession.Token.Invalid")
+		return zerrors.ThrowPreconditionFailed(nil, "OIDCS-JLKW2", "Errors.OIDCSession.Token.Invalid")
 	}
 	if wm.AccessTokenExpiration.Before(time.Now()) {
-		return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-3j3md", "Errors.OIDCSession.Token.Invalid")
+		return zerrors.ThrowPreconditionFailed(nil, "OIDCS-3j3md", "Errors.OIDCSession.Token.Invalid")
 	}
 	return nil
 }
@@ -159,7 +159,7 @@ func (wm *OIDCSessionWriteModel) CheckClient(clientID string) error {
 			return nil
 		}
 	}
-	return caos_errs.ThrowPreconditionFailed(nil, "OIDCS-SKjl3", "Errors.OIDCSession.InvalidClient")
+	return zerrors.ThrowPreconditionFailed(nil, "OIDCS-SKjl3", "Errors.OIDCSession.InvalidClient")
 }
 
 func (wm *OIDCSessionWriteModel) OIDCRefreshTokenID(refreshTokenID string) string {

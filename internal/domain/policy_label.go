@@ -3,8 +3,8 @@ package domain
 import (
 	"regexp"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var colorRegex = regexp.MustCompile("^$|^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
@@ -58,28 +58,28 @@ const (
 
 func (f LabelPolicy) IsValid() error {
 	if !colorRegex.MatchString(f.PrimaryColor) {
-		return caos_errs.ThrowInvalidArgument(nil, "POLICY-391dG", "Errors.Policy.Label.Invalid.PrimaryColor")
+		return zerrors.ThrowInvalidArgument(nil, "POLICY-391dG", "Errors.Policy.Label.Invalid.PrimaryColor")
 	}
 	if !colorRegex.MatchString(f.BackgroundColor) {
-		return caos_errs.ThrowInvalidArgument(nil, "POLICY-502F1", "Errors.Policy.Label.Invalid.BackgroundColor")
+		return zerrors.ThrowInvalidArgument(nil, "POLICY-502F1", "Errors.Policy.Label.Invalid.BackgroundColor")
 	}
 	if !colorRegex.MatchString(f.WarnColor) {
-		return caos_errs.ThrowInvalidArgument(nil, "POLICY-nvw33", "Errors.Policy.Label.Invalid.WarnColor")
+		return zerrors.ThrowInvalidArgument(nil, "POLICY-nvw33", "Errors.Policy.Label.Invalid.WarnColor")
 	}
 	if !colorRegex.MatchString(f.FontColor) {
-		return caos_errs.ThrowInvalidArgument(nil, "POLICY-93mSf", "Errors.Policy.Label.Invalid.FontColor")
+		return zerrors.ThrowInvalidArgument(nil, "POLICY-93mSf", "Errors.Policy.Label.Invalid.FontColor")
 	}
 	if !colorRegex.MatchString(f.PrimaryColorDark) {
-		return caos_errs.ThrowInvalidArgument(nil, "POLICY-391dG", "Errors.Policy.Label.Invalid.PrimaryColorDark")
+		return zerrors.ThrowInvalidArgument(nil, "POLICY-391dG", "Errors.Policy.Label.Invalid.PrimaryColorDark")
 	}
 	if !colorRegex.MatchString(f.BackgroundColorDark) {
-		return caos_errs.ThrowInvalidArgument(nil, "POLICY-llsp2", "Errors.Policy.Label.Invalid.BackgroundColorDark")
+		return zerrors.ThrowInvalidArgument(nil, "POLICY-llsp2", "Errors.Policy.Label.Invalid.BackgroundColorDark")
 	}
 	if !colorRegex.MatchString(f.WarnColorDark) {
-		return caos_errs.ThrowInvalidArgument(nil, "POLICY-2b6sf", "Errors.Policy.Label.Invalid.WarnColorDark")
+		return zerrors.ThrowInvalidArgument(nil, "POLICY-2b6sf", "Errors.Policy.Label.Invalid.WarnColorDark")
 	}
 	if !colorRegex.MatchString(f.FontColorDark) {
-		return caos_errs.ThrowInvalidArgument(nil, "POLICY-3M0fs", "Errors.Policy.Label.Invalid.FontColorDark")
+		return zerrors.ThrowInvalidArgument(nil, "POLICY-3M0fs", "Errors.Policy.Label.Invalid.FontColorDark")
 	}
 	return nil
 }

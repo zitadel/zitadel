@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -70,7 +70,7 @@ func ApplicationAddedEventMapper(event eventstore.Event) (eventstore.Event, erro
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "APPLICATION-Nffg2", "unable to unmarshal application")
+		return nil, zerrors.ThrowInternal(err, "APPLICATION-Nffg2", "unable to unmarshal application")
 	}
 
 	return e, nil
@@ -121,7 +121,7 @@ func ApplicationChangedEventMapper(event eventstore.Event) (eventstore.Event, er
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "APPLICATION-9l0cs", "unable to unmarshal application")
+		return nil, zerrors.ThrowInternal(err, "APPLICATION-9l0cs", "unable to unmarshal application")
 	}
 
 	return e, nil
@@ -163,7 +163,7 @@ func ApplicationDeactivatedEventMapper(event eventstore.Event) (eventstore.Event
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "APPLICATION-0p9fB", "unable to unmarshal application")
+		return nil, zerrors.ThrowInternal(err, "APPLICATION-0p9fB", "unable to unmarshal application")
 	}
 
 	return e, nil
@@ -205,7 +205,7 @@ func ApplicationReactivatedEventMapper(event eventstore.Event) (eventstore.Event
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "APPLICATION-1m9e3", "unable to unmarshal application")
+		return nil, zerrors.ThrowInternal(err, "APPLICATION-1m9e3", "unable to unmarshal application")
 	}
 
 	return e, nil
@@ -257,7 +257,7 @@ func ApplicationRemovedEventMapper(event eventstore.Event) (eventstore.Event, er
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "APPLICATION-1m9e3", "unable to unmarshal application")
+		return nil, zerrors.ThrowInternal(err, "APPLICATION-1m9e3", "unable to unmarshal application")
 	}
 
 	return e, nil

@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
-	errs "errors"
+	"errors"
 	"fmt"
 	"time"
 
@@ -14,10 +14,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type AuthRequest struct {
@@ -36,7 +36,7 @@ type AuthRequest struct {
 
 func (a *AuthRequest) checkLoginClient(ctx context.Context) error {
 	if uid := authz.GetCtxData(ctx).UserID; uid != a.LoginClient {
-		return errors.ThrowPermissionDenied(nil, "OIDCv2-aL0ag", "Errors.AuthRequest.WrongLoginClient")
+		return zerrors.ThrowPermissionDenied(nil, "OIDCv2-aL0ag", "Errors.AuthRequest.WrongLoginClient")
 	}
 	return nil
 }
@@ -77,11 +77,11 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 		q.authRequestByIDQuery(ctx),
 		id, authz.GetInstance(ctx).InstanceID(),
 	)
-	if errs.Is(err, sql.ErrNoRows) {
-		return nil, errors.ThrowNotFound(err, "QUERY-Thee9", "Errors.AuthRequest.NotExisting")
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, zerrors.ThrowNotFound(err, "QUERY-Thee9", "Errors.AuthRequest.NotExisting")
 	}
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Ou8ue", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Ou8ue", "Errors.Internal")
 	}
 
 	dst.Scope = scope

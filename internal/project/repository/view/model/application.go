@@ -9,10 +9,10 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/project/model"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -173,7 +173,7 @@ func (a *ApplicationView) setRootData(event *models.Event) {
 func (a *ApplicationView) SetData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-lo9ds").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-8suie", "Could not unmarshal data")
+		return zerrors.ThrowInternal(err, "MODEL-8suie", "Could not unmarshal data")
 	}
 	return nil
 }
@@ -213,7 +213,7 @@ func (a *ApplicationView) setProjectChanges(event *models.Event) error {
 	}{}
 	if err := json.Unmarshal(event.Data, &changes); err != nil {
 		logging.Log("EVEN-DFbfg").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-Bw221", "Could not unmarshal data")
+		return zerrors.ThrowInternal(err, "MODEL-Bw221", "Could not unmarshal data")
 	}
 	if changes.ProjectRoleAssertion != nil {
 		a.ProjectRoleAssertion = *changes.ProjectRoleAssertion

@@ -4,12 +4,13 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
-	"github.com/zitadel/zitadel/internal/errors"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	"github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -91,7 +92,7 @@ func (v *View) userByID(ctx context.Context, instanceID string, queries ...query
 	}
 
 	user, err := view.UserByID(v.Db, userTable, queriedUser.ID, instanceID)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return nil, err
 	}
 
@@ -126,7 +127,7 @@ func (v *View) userByID(ctx context.Context, instanceID string, queries ...query
 	}
 
 	if user.State == int32(usr_model.UserStateDeleted) {
-		return nil, errors.ThrowNotFound(nil, "VIEW-r4y8r", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "VIEW-r4y8r", "Errors.User.NotFound")
 	}
 
 	return user, nil
@@ -146,7 +147,7 @@ func (v *View) PutUsers(users []*model.UserView, event eventstore.Event) error {
 
 func (v *View) DeleteUser(userID, instanceID string, event eventstore.Event) error {
 	err := view.DeleteUser(v.Db, userTable, userID, instanceID)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
 	return nil
@@ -154,7 +155,7 @@ func (v *View) DeleteUser(userID, instanceID string, event eventstore.Event) err
 
 func (v *View) DeleteInstanceUsers(event eventstore.Event) error {
 	err := view.DeleteInstanceUsers(v.Db, userTable, event.Aggregate().InstanceID)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
 	return nil
@@ -162,7 +163,7 @@ func (v *View) DeleteInstanceUsers(event eventstore.Event) error {
 
 func (v *View) UpdateOrgOwnerRemovedUsers(event eventstore.Event) error {
 	err := view.UpdateOrgOwnerRemovedUsers(v.Db, userTable, event.Aggregate().InstanceID, event.Aggregate().ID)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
 	return nil

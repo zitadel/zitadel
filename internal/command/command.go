@@ -20,7 +20,6 @@ import (
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/action"
@@ -42,6 +41,7 @@ import (
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	webauthn_helper "github.com/zitadel/zitadel/internal/webauthn"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Commands struct {
@@ -111,7 +111,7 @@ func StartCommands(
 	defaultSecretGenerators *SecretGenerators,
 ) (repo *Commands, err error) {
 	if externalDomain == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
 	}
 	idGenerator := id.SonyFlakeGenerator()
 	// reuse the oidcEncryption to be able to handle both tokens in the interceptor later on
@@ -255,7 +255,7 @@ func samlCertificateAndKeyGenerator(keySize int) func(id string) ([]byte, []byte
 
 		derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, pub, priv)
 		if err != nil {
-			return nil, nil, errors.ThrowInternalf(err, "COMMAND-x92u101j", "failed to create certificate")
+			return nil, nil, zerrors.ThrowInternalf(err, "COMMAND-x92u101j", "failed to create certificate")
 		}
 
 		keyBlock := &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(priv)}

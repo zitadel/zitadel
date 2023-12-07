@@ -9,10 +9,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type AddLoginPolicy struct {
@@ -111,7 +111,7 @@ func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, 
 
 func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-55Mg9", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-55Mg9", "Errors.ResourceOwnerMissing")
 	}
 	existingPolicy := NewOrgLoginPolicyWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
@@ -119,7 +119,7 @@ func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) (*domain
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-GHB37", "Errors.Org.LoginPolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "Org-GHB37", "Errors.Org.LoginPolicy.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewLoginPolicyRemovedEvent(ctx, orgAgg))
@@ -135,17 +135,17 @@ func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) (*domain
 
 func (c *Commands) AddIDPToLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
 	if resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M0fs9", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-M0fs9", "Errors.ResourceOwnerMissing")
 	}
 	if !idpProvider.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-9nf88", "Errors.Org.LoginPolicy.IDP.")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-9nf88", "Errors.Org.LoginPolicy.IDP.")
 	}
 	existingPolicy, err := c.orgLoginPolicyWriteModelByID(ctx, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-Ffgw2", "Errors.Org.LoginPolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "Org-Ffgw2", "Errors.Org.LoginPolicy.NotFound")
 	}
 
 	var exists bool
@@ -155,7 +155,7 @@ func (c *Commands) AddIDPToLoginPolicy(ctx context.Context, resourceOwner string
 		exists, err = ExistsInstanceIDP(ctx, c.eventstore.Filter, idpProvider.IDPConfigID)
 	}
 	if !exists || err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "Org-3N9fs", "Errors.IDPConfig.NotExisting")
+		return nil, zerrors.ThrowPreconditionFailed(err, "Org-3N9fs", "Errors.IDPConfig.NotExisting")
 	}
 	idpModel := NewOrgIdentityProviderWriteModel(resourceOwner, idpProvider.IDPConfigID)
 	err = c.eventstore.FilterToQueryReducer(ctx, idpModel)
@@ -163,7 +163,7 @@ func (c *Commands) AddIDPToLoginPolicy(ctx context.Context, resourceOwner string
 		return nil, err
 	}
 	if idpModel.State == domain.IdentityProviderStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-2B0ps", "Errors.Org.LoginPolicy.IDP.AlreadyExists")
+		return nil, zerrors.ThrowAlreadyExists(nil, "Org-2B0ps", "Errors.Org.LoginPolicy.IDP.AlreadyExists")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&idpModel.WriteModel)
@@ -180,17 +180,17 @@ func (c *Commands) AddIDPToLoginPolicy(ctx context.Context, resourceOwner string
 
 func (c *Commands) RemoveIDPFromLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.UserIDPLink) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M0fs9", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-M0fs9", "Errors.ResourceOwnerMissing")
 	}
 	if !idpProvider.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-66m9s", "Errors.Org.LoginPolicy.IDP.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-66m9s", "Errors.Org.LoginPolicy.IDP.Invalid")
 	}
 	existingPolicy, err := c.orgLoginPolicyWriteModelByID(ctx, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-GVDfe", "Errors.Org.LoginPolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "Org-GVDfe", "Errors.Org.LoginPolicy.NotFound")
 	}
 
 	idpModel := NewOrgIdentityProviderWriteModel(resourceOwner, idpProvider.IDPConfigID)
@@ -199,7 +199,7 @@ func (c *Commands) RemoveIDPFromLoginPolicy(ctx context.Context, resourceOwner s
 		return nil, err
 	}
 	if idpModel.State == domain.IdentityProviderStateUnspecified || idpModel.State == domain.IdentityProviderStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-39fjs", "Errors.Org.LoginPolicy.IDP.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "Org-39fjs", "Errors.Org.LoginPolicy.IDP.NotExisting")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
@@ -237,10 +237,10 @@ func (c *Commands) removeIDPFromLoginPolicy(ctx context.Context, orgAgg *eventst
 
 func (c *Commands) AddSecondFactorToLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType, orgID string) (domain.SecondFactorType, *domain.ObjectDetails, error) {
 	if orgID == "" {
-		return domain.SecondFactorTypeUnspecified, nil, caos_errs.ThrowInvalidArgument(nil, "Org-M0fs9", "Errors.ResourceOwnerMissing")
+		return domain.SecondFactorTypeUnspecified, nil, zerrors.ThrowInvalidArgument(nil, "Org-M0fs9", "Errors.ResourceOwnerMissing")
 	}
 	if !secondFactor.Valid() {
-		return domain.SecondFactorTypeUnspecified, nil, caos_errs.ThrowInvalidArgument(nil, "Org-5m9fs", "Errors.Org.LoginPolicy.MFA.Unspecified")
+		return domain.SecondFactorTypeUnspecified, nil, zerrors.ThrowInvalidArgument(nil, "Org-5m9fs", "Errors.Org.LoginPolicy.MFA.Unspecified")
 	}
 	secondFactorModel := NewOrgSecondFactorWriteModel(orgID, secondFactor)
 	addedEvent, err := c.addSecondFactorToLoginPolicy(ctx, secondFactorModel, secondFactor)
@@ -267,7 +267,7 @@ func (c *Commands) addSecondFactorToLoginPolicy(ctx context.Context, secondFacto
 	}
 
 	if secondFactorModel.State == domain.FactorStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-2B0ps", "Errors.Org.LoginPolicy.MFA.AlreadyExists")
+		return nil, zerrors.ThrowAlreadyExists(nil, "Org-2B0ps", "Errors.Org.LoginPolicy.MFA.AlreadyExists")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
@@ -276,10 +276,10 @@ func (c *Commands) addSecondFactorToLoginPolicy(ctx context.Context, secondFacto
 
 func (c *Commands) RemoveSecondFactorFromLoginPolicy(ctx context.Context, secondFactor domain.SecondFactorType, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-fM0gs", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-fM0gs", "Errors.ResourceOwnerMissing")
 	}
 	if !secondFactor.Valid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-55n8s", "Errors.Org.LoginPolicy.MFA.Unspecified")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-55n8s", "Errors.Org.LoginPolicy.MFA.Unspecified")
 	}
 	secondFactorModel := NewOrgSecondFactorWriteModel(orgID, secondFactor)
 	removedEvent, err := c.removeSecondFactorFromLoginPolicy(ctx, secondFactorModel, secondFactor)
@@ -304,7 +304,7 @@ func (c *Commands) removeSecondFactorFromLoginPolicy(ctx context.Context, second
 		return nil, err
 	}
 	if secondFactorModel.State == domain.FactorStateUnspecified || secondFactorModel.State == domain.FactorStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-3M9od", "Errors.Org.LoginPolicy.MFA.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "Org-3M9od", "Errors.Org.LoginPolicy.MFA.NotExisting")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
 	return org.NewLoginPolicySecondFactorRemovedEvent(ctx, orgAgg, secondFactor), nil
@@ -312,10 +312,10 @@ func (c *Commands) removeSecondFactorFromLoginPolicy(ctx context.Context, second
 
 func (c *Commands) AddMultiFactorToLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType, orgID string) (domain.MultiFactorType, *domain.ObjectDetails, error) {
 	if orgID == "" {
-		return domain.MultiFactorTypeUnspecified, nil, caos_errs.ThrowInvalidArgument(nil, "Org-M0fsf", "Errors.ResourceOwnerMissing")
+		return domain.MultiFactorTypeUnspecified, nil, zerrors.ThrowInvalidArgument(nil, "Org-M0fsf", "Errors.ResourceOwnerMissing")
 	}
 	if !multiFactor.Valid() {
-		return domain.MultiFactorTypeUnspecified, nil, caos_errs.ThrowInvalidArgument(nil, "Org-5m9fs", "Errors.Org.LoginPolicy.MFA.Unspecified")
+		return domain.MultiFactorTypeUnspecified, nil, zerrors.ThrowInvalidArgument(nil, "Org-5m9fs", "Errors.Org.LoginPolicy.MFA.Unspecified")
 	}
 	multiFactorModel := NewOrgMultiFactorWriteModel(orgID, multiFactor)
 	addedEvent, err := c.addMultiFactorToLoginPolicy(ctx, multiFactorModel, multiFactor)
@@ -340,7 +340,7 @@ func (c *Commands) addMultiFactorToLoginPolicy(ctx context.Context, multiFactorM
 		return nil, err
 	}
 	if multiFactorModel.State == domain.FactorStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-3M9od", "Errors.Org.LoginPolicy.MFA.AlreadyExists")
+		return nil, zerrors.ThrowAlreadyExists(nil, "Org-3M9od", "Errors.Org.LoginPolicy.MFA.AlreadyExists")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&multiFactorModel.WriteModel)
@@ -349,10 +349,10 @@ func (c *Commands) addMultiFactorToLoginPolicy(ctx context.Context, multiFactorM
 
 func (c *Commands) RemoveMultiFactorFromLoginPolicy(ctx context.Context, multiFactor domain.MultiFactorType, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M0fsf", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-M0fsf", "Errors.ResourceOwnerMissing")
 	}
 	if !multiFactor.Valid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-5m9fs", "Errors.Org.LoginPolicy.MFA.Unspecified")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-5m9fs", "Errors.Org.LoginPolicy.MFA.Unspecified")
 	}
 	multiFactorModel := NewOrgMultiFactorWriteModel(orgID, multiFactor)
 	removedEvent, err := c.removeMultiFactorFromLoginPolicy(ctx, multiFactorModel, multiFactor)
@@ -377,7 +377,7 @@ func (c *Commands) removeMultiFactorFromLoginPolicy(ctx context.Context, multiFa
 		return nil, err
 	}
 	if multiFactorModel.State == domain.FactorStateUnspecified || multiFactorModel.State == domain.FactorStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-3M9df", "Errors.Org.LoginPolicy.MFA.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "Org-3M9df", "Errors.Org.LoginPolicy.MFA.NotExisting")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&multiFactorModel.MultiFactorWriteModel.WriteModel)
 
@@ -399,26 +399,26 @@ func (c *Commands) orgLoginPolicyAuthFactorsWriteModel(ctx context.Context, orgI
 func prepareAddLoginPolicy(a *org.Aggregate, policy *AddLoginPolicy) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if ok := domain.ValidateDefaultRedirectURI(policy.DefaultRedirectURI); !ok {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "Org-WSfdq", "Errors.Org.LoginPolicy.RedirectURIInvalid")
+			return nil, zerrors.ThrowInvalidArgument(nil, "Org-WSfdq", "Errors.Org.LoginPolicy.RedirectURIInvalid")
 		}
 		for _, factor := range policy.SecondFactors {
 			if !factor.Valid() {
-				return nil, caos_errs.ThrowInvalidArgument(nil, "Org-SFeea", "Errors.Org.LoginPolicy.MFA.Unspecified")
+				return nil, zerrors.ThrowInvalidArgument(nil, "Org-SFeea", "Errors.Org.LoginPolicy.MFA.Unspecified")
 			}
 		}
 		for _, factor := range policy.MultiFactors {
 			if !factor.Valid() {
-				return nil, caos_errs.ThrowInvalidArgument(nil, "Org-WSfrg", "Errors.Org.LoginPolicy.MFA.Unspecified")
+				return nil, zerrors.ThrowInvalidArgument(nil, "Org-WSfrg", "Errors.Org.LoginPolicy.MFA.Unspecified")
 			}
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			if exists, err := exists(ctx, filter, NewOrgLoginPolicyWriteModel(a.ID)); exists || err != nil {
-				return nil, caos_errs.ThrowAlreadyExists(nil, "Org-Dgfb2", "Errors.Org.LoginPolicy.AlreadyExists")
+				return nil, zerrors.ThrowAlreadyExists(nil, "Org-Dgfb2", "Errors.Org.LoginPolicy.AlreadyExists")
 			}
 			for _, idp := range policy.IDPProviders {
 				exists, err := idpExists(ctx, filter, idp)
 				if !exists || err != nil {
-					return nil, caos_errs.ThrowPreconditionFailed(err, "Org-FEd32", "Errors.IDPConfig.NotExisting")
+					return nil, zerrors.ThrowPreconditionFailed(err, "Org-FEd32", "Errors.IDPConfig.NotExisting")
 				}
 			}
 			cmds := make([]eventstore.Command, 0, len(policy.SecondFactors)+len(policy.MultiFactors)+len(policy.IDPProviders)+1)
@@ -458,7 +458,7 @@ func prepareAddLoginPolicy(a *org.Aggregate, policy *AddLoginPolicy) preparation
 func prepareChangeLoginPolicy(a *org.Aggregate, policy *ChangeLoginPolicy) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if ok := domain.ValidateDefaultRedirectURI(policy.DefaultRedirectURI); !ok {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Sfd21", "Errors.Org.LoginPolicy.RedirectURIInvalid")
+			return nil, zerrors.ThrowInvalidArgument(nil, "Org-Sfd21", "Errors.Org.LoginPolicy.RedirectURIInvalid")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			wm := NewOrgLoginPolicyWriteModel(a.ID)
@@ -466,7 +466,7 @@ func prepareChangeLoginPolicy(a *org.Aggregate, policy *ChangeLoginPolicy) prepa
 				return nil, err
 			}
 			if !wm.State.Exists() {
-				return nil, caos_errs.ThrowNotFound(nil, "Org-M0sif", "Errors.Org.LoginPolicy.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "Org-M0sif", "Errors.Org.LoginPolicy.NotFound")
 			}
 			changedEvent, hasChanged := wm.NewChangedEvent(ctx, &a.Aggregate,
 				policy.AllowUsernamePassword,
@@ -487,7 +487,7 @@ func prepareChangeLoginPolicy(a *org.Aggregate, policy *ChangeLoginPolicy) prepa
 				policy.SecondFactorCheckLifetime,
 				policy.MultiFactorCheckLifetime)
 			if !hasChanged {
-				return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-5M9vdd", "Errors.Org.LoginPolicy.NotChanged")
+				return nil, zerrors.ThrowPreconditionFailed(nil, "Org-5M9vdd", "Errors.Org.LoginPolicy.NotChanged")
 			}
 			return []eventstore.Command{changedEvent}, nil
 		}, nil

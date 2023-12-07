@@ -6,9 +6,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, userCode string, expires time.Time, scopes []string) (string, *domain.ObjectDetails, error) {
@@ -46,7 +46,7 @@ func (c *Commands) ApproveDeviceAuth(ctx context.Context, id, subject string) (*
 		return nil, err
 	}
 	if !model.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Hief9", "Errors.DeviceAuth.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Hief9", "Errors.DeviceAuth.NotFound")
 	}
 	aggr := deviceauth.NewAggregate(model.AggregateID, model.InstanceID)
 
@@ -68,7 +68,7 @@ func (c *Commands) CancelDeviceAuth(ctx context.Context, id string, reason domai
 		return nil, err
 	}
 	if !model.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-gee5A", "Errors.DeviceAuth.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-gee5A", "Errors.DeviceAuth.NotFound")
 	}
 	aggr := deviceauth.NewAggregate(model.AggregateID, model.InstanceID)
 

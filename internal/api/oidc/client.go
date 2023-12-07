@@ -21,9 +21,9 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -48,7 +48,7 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 		return nil, err
 	}
 	if client.State != domain.AppStateActive {
-		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
 	}
 	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultLoginURLV2), nil
 }
@@ -117,7 +117,7 @@ func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo *oidc.Use
 
 	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
 	if err != nil {
-		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
+		return zerrors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
 	if token.ApplicationID != "" {
 		if err = o.isOriginAllowed(ctx, token.ApplicationID, origin); err != nil {
@@ -138,7 +138,7 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo *oidc.Us
 		if app.OIDCConfig.AssertIDTokenRole {
 			scopes, err = o.assertProjectRoleScopes(ctx, applicationID, scopes)
 			if err != nil {
-				return errors.ThrowPreconditionFailed(err, "OIDC-Dfe2s", "Errors.Internal")
+				return zerrors.ThrowPreconditionFailed(err, "OIDC-Dfe2s", "Errors.Internal")
 			}
 		}
 	}
@@ -168,7 +168,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 		}
 		projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
 		if err != nil {
-			return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
+			return zerrors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 		}
 		return o.introspect(ctx, introspection,
 			tokenID, token.UserID, token.ClientID, clientID, projectID,
@@ -178,16 +178,16 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 
 	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
 	if err != nil {
-		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
+		return zerrors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
 	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
 	if err != nil {
-		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
+		return zerrors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 	}
 	if token.IsPAT {
 		err = o.assertClientScopesForPAT(ctx, token, clientID, projectID)
 		if err != nil {
-			return errors.ThrowPreconditionFailed(err, "OIDC-AGefw", "Errors.Internal")
+			return zerrors.ThrowPreconditionFailed(err, "OIDC-AGefw", "Errors.Internal")
 		}
 	}
 	return o.introspect(ctx, introspection,
@@ -220,7 +220,7 @@ func (o *OPStorage) ClientCredentialsTokenRequest(ctx context.Context, clientID 
 // ClientCredentials method is kept to keep the storage interface implemented.
 // However, it should never be called as the VerifyClient method on the Server is overridden.
 func (o *OPStorage) ClientCredentials(context.Context, string, string) (op.Client, error) {
-	return nil, errors.ThrowInternal(nil, "OIDC-Su8So", "Errors.Internal")
+	return nil, zerrors.ThrowInternal(nil, "OIDC-Su8So", "Errors.Internal")
 }
 
 // isOriginAllowed checks whether a call by the client to the endpoint is allowed from the provided origin
@@ -236,7 +236,7 @@ func (o *OPStorage) isOriginAllowed(ctx context.Context, clientID, origin string
 	if api_http.IsOriginAllowed(app.OIDCConfig.AllowedOrigins, origin) {
 		return nil
 	}
-	return errors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
+	return zerrors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
 }
 
 func (o *OPStorage) introspect(
@@ -269,7 +269,7 @@ func (o *OPStorage) introspect(
 			return nil
 		}
 	}
-	return errors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
+	return zerrors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
 }
 
 func (o *OPStorage) checkOrgScopes(ctx context.Context, user *query.User, scopes []string) ([]string, error) {
@@ -736,7 +736,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	}
 	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID)
 	// applicationID might contain a username (e.g. client credentials) -> ignore the not found
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return nil, nil, err
 	}
 	// ensure the projectID of the requesting is part of the roleAudience
@@ -918,7 +918,7 @@ func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCreden
 		return nil, err
 	}
 	client, err := s.query.GetOIDCClientByID(ctx, clientID, assertion)
-	if errors.IsNotFound(err) {
+	if zerrors.IsNotFound(err) {
 		return nil, oidc.ErrInvalidClient().WithParent(err).WithDescription("client not found")
 	}
 	if err != nil {

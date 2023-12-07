@@ -3,12 +3,12 @@ package projection
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -92,7 +92,7 @@ func (p *orgMetadataProjection) Reducers() []handler.AggregateReducer {
 func (p *orgMetadataProjection) reduceMetadataSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MetadataSetEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Ghn53", "reduce.wrong.event.type %s", org.MetadataSetType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ghn53", "reduce.wrong.event.type %s", org.MetadataSetType)
 	}
 	return handler.NewUpsertStatement(
 		e,
@@ -117,7 +117,7 @@ func (p *orgMetadataProjection) reduceMetadataSet(event eventstore.Event) (*hand
 func (p *orgMetadataProjection) reduceMetadataRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MetadataRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Bm542", "reduce.wrong.event.type %s", org.MetadataRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Bm542", "reduce.wrong.event.type %s", org.MetadataRemovedType)
 	}
 	return handler.NewDeleteStatement(
 		e,
@@ -135,7 +135,7 @@ func (p *orgMetadataProjection) reduceMetadataRemovedAll(event eventstore.Event)
 		*org.OrgRemovedEvent:
 		//ok
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Bmnf3", "reduce.wrong.event.type %v", []eventstore.EventType{org.MetadataRemovedAllType, org.OrgRemovedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Bmnf3", "reduce.wrong.event.type %v", []eventstore.EventType{org.MetadataRemovedAllType, org.OrgRemovedEventType})
 	}
 	return handler.NewDeleteStatement(
 		event,
@@ -149,7 +149,7 @@ func (p *orgMetadataProjection) reduceMetadataRemovedAll(event eventstore.Event)
 func (p *orgMetadataProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Hkd1f", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Hkd1f", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
 	return handler.NewUpdateStatement(

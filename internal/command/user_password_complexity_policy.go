@@ -5,7 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func passwordComplexityPolicyWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer) (*PasswordComplexityPolicyWriteModel, error) {
@@ -17,7 +17,7 @@ func passwordComplexityPolicyWriteModel(ctx context.Context, filter preparation.
 	if err != nil || wm != nil {
 		return wm, err
 	}
-	return nil, errors.ThrowInternal(nil, "USER-uQ96e", "Errors.Internal")
+	return nil, zerrors.ThrowInternal(nil, "USER-uQ96e", "Errors.Internal")
 }
 
 func customPasswordComplexityPolicy(ctx context.Context, filter preparation.FilterToQueryReducer) (*PasswordComplexityPolicyWriteModel, error) {

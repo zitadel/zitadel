@@ -8,10 +8,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func Test_customDomainPolicy(t *testing.T) {
@@ -29,7 +29,7 @@ func Test_customDomainPolicy(t *testing.T) {
 			name: "err from filter",
 			args: args{
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-					return nil, errors.ThrowInternal(nil, "USER-IgYlN", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(nil, "USER-IgYlN", "Errors.Internal")
 				},
 				orgID: "id",
 			},
@@ -115,7 +115,7 @@ func Test_defaultDomainPolicy(t *testing.T) {
 			name: "err from filter",
 			args: args{
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-					return nil, errors.ThrowInternal(nil, "USER-IgYlN", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(nil, "USER-IgYlN", "Errors.Internal")
 				},
 			},
 			want:    nil,
@@ -200,7 +200,7 @@ func Test_DomainPolicy(t *testing.T) {
 			name: "err from filter custom",
 			args: args{
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-					return nil, errors.ThrowInternal(nil, "USER-IgYlN", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(nil, "USER-IgYlN", "Errors.Internal")
 				},
 				orgID: "id",
 			},
@@ -244,7 +244,7 @@ func Test_DomainPolicy(t *testing.T) {
 						return nil, nil
 					}).
 					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-						return nil, errors.ThrowInternal(nil, "USER-6HnsD", "Errors.Internal")
+						return nil, zerrors.ThrowInternal(nil, "USER-6HnsD", "Errors.Internal")
 					}).
 					Filter(),
 				orgID: "id",
