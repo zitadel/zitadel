@@ -49,6 +49,12 @@ ZITADEL is available in the following languages
 - Russian (ru)
 - Dutch (nl)
 
-A language is displayed based on your agent's language header. The default language is English.
+A language is displayed based on your agent's language header.
+
+If you only want to enable a subset of the supported languages, you can configure the allowed language using the [restrictions API](./restrictions.md).
+If a users language header doesn't match any of the allowed languages, the instances default language will be used.
+All language settings are also configurable in the consoles *Languages* instance settings.
+
+![Languages](/img/guides/console/languages.png)
 
 If you need support for a specific language we highly encourage you to [contribute translation files](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md) for the missing language.
