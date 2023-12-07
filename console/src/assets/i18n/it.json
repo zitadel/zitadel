@@ -870,14 +870,16 @@
         },
         "SEQUENCE": {
           "LABEL": "Sequence",
-          "CHECKBOX": "Filter per sequenza",
-          "SORT": "",
-          "ASC": "Ascending",
-          "DESC": "Descending"
+          "CHECKBOX": "Filter per sequenza"
         },
+        "SORT": "Ordina per",
+        "ASC": "Ascendente",
+        "DESC": "Discendente",
         "CREATIONDATE": {
-          "LABEL": "Creation Date",
-          "CHECKBOX": "Filter by Creation Date"
+          "RADIO_FROM": "Da",
+          "RADIO_RANGE": "Intervallo",
+          "LABEL_SINCE": "Da",
+          "LABEL_UNTIL": "A"
         },
         "OTHER": "altro",
         "OTHERS": "altri"

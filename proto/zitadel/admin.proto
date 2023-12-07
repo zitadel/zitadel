@@ -7972,11 +7972,35 @@ message ListEventsRequest {
         }
     ];
     google.protobuf.Timestamp creation_date = 9 [
+        deprecated = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"2019-04-01T08:45:00.000000Z\"";
-            description: "If asc is false, the events returned are older than creation_date. If asc is true, the events returned are younger than creation_date. If creation_date is not set the field is ignored.";
+            description: "Use from instead.";
         }
     ];
+    message creation_date_range {
+        google.protobuf.Timestamp since = 1 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"2019-04-01T08:45:00.000000Z\"";
+                description: "The events returned are younger than the UTC since date";
+            }
+        ];
+        google.protobuf.Timestamp until = 2 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"2019-04-01T08:45:00.000000Z\"";
+                description: "The events returned are older than the UTC until date.";
+            }
+        ];
+    }
+    oneof creation_date_filter {
+        creation_date_range range = 10;
+        google.protobuf.Timestamp from = 11 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"2019-04-01T08:45:00.000000Z\"";
+                description: "If asc is false, the events returned are older than the UTC from date. If asc is true, the events returned are younger than from.";
+            }
+        ];
+    }
 }
 
 message ListEventsResponse {

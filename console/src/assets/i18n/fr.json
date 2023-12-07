@@ -871,14 +871,16 @@
         },
         "SEQUENCE": {
           "LABEL": "séquence",
-          "CHECKBOX": "Filtrer par séquence",
-          "SORT": "Triage",
-          "ASC": "Ascendant",
-          "DESC": "Descendant"
+          "CHECKBOX": "Filtrer par séquence"
         },
+        "SORT": "Triage",
+        "ASC": "Ascendant",
+        "DESC": "Descendant",
         "CREATIONDATE": {
-          "LABEL": "Date de création",
-          "CHECKBOX": "Filtrer par date de création"
+          "RADIO_FROM": "De",
+          "RADIO_RANGE": "Gamme",
+          "LABEL_SINCE": "Depuis",
+          "LABEL_UNTIL": "Jusqu'à"
         },
         "OTHER": "autre",
         "OTHERS": "autres"
