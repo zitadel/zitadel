@@ -1,17 +1,22 @@
-.languages-container {
-  display: inline-block;
-  max-width: 400px;
-  vertical-align: top;
-  width: 350px;
-  max-width: 100%;
+.languages-container-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 2rem;
 
-  .spinner-wr {
-    margin: 0.5rem 0;
-  }
-
-  .default-language {
+  .languages-container {
+    display: inline-block;
     max-width: 400px;
-    display: block;
+    vertical-align: top;
+    width: 100%;
+
+    .spinner-wr {
+      margin: 0.5rem 0;
+    }
+
+    .default-language {
+      max-width: 400px;
+      display: block;
+    }
   }
 
   .general-btn-container {
@@ -21,36 +26,68 @@
 
     .save-button {
       display: block;
+      margin-left: 1rem;
     }
-  }
-
-  .example-custom-placeholder {
-    background: #ccc;
-    border: dotted 3px #999;
-    min-height: 60px;
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   }
 }
 
 .languages-list {
   overflow: hidden;
   display: block;
+  height: 100%;
+
+  .languages-top-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    .label {
+      margin-right: 1rem;
+      flex: 1;
+      white-space: nowrap;
+    }
+
+    .list-button {
+      white-space: nowrap;
+    }
+  }
+
+  .languages-drop-target {
+    background-color: #00000010;
+  }
 }
 
 .languages-box {
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 0.5rem;
-  min-height: 40px;
+  padding: 0.5rem 0.5rem 0.5rem 2rem;
+  height: 56px;
+  cursor: move;
+  margin: 2px 0;
 
-  &:last-child {
-    border: none;
+  .index {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    opacity: 0.5;
+    font-size: 10px;
   }
 
   [hoveractions] {
     display: none;
+  }
+
+  .more-button {
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
   }
 
   &:hover {

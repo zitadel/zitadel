@@ -17,6 +17,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TableActionsModule } from '../../table-actions/table-actions.module';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [LanguageSettingsComponent],
@@ -38,7 +39,7 @@ import { MatMenuModule } from '@angular/material/menu';
     MatRadioModule,
     MatTooltipModule,
     MatMenuModule,
-    TableActionsModule,
+    MatIconModule,
   ],
   exports: [LanguageSettingsComponent],
 })
