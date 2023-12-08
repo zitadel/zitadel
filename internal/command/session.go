@@ -405,19 +405,12 @@ func (c *Commands) checkSessionTerminationPermission(ctx context.Context, model 
 	// To be able to check the permission, we need to get the user's resourceOwner in this case
 	userResourceOwner := model.UserResourceOwner
 	if model.UserID != "" && userResourceOwner == "" {
-		events, err := c.eventstore.Filter(ctx,
-			eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-				InstanceID(authz.GetInstance(ctx).InstanceID()).
-				AddQuery().
-				AggregateTypes(user.AggregateType).
-				AggregateIDs(model.UserID).
-				Builder().
-				Limit(1),
-		)
+		r := NewResourceOwnerModel(ctx, user.AggregateType, model.UserID)
+		err := c.eventstore.FilterToQueryReducer(ctx, r)
 		if err != nil {
 			return err
 		}
-		userResourceOwner = events[0].Aggregate().ResourceOwner
+		userResourceOwner = r.resourceOwner
 	}
 	return c.checkPermission(ctx, domain.PermissionSessionDelete, userResourceOwner, model.UserID)
 }
