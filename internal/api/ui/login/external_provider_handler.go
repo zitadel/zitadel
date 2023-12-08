@@ -693,6 +693,9 @@ func (l *Login) updateExternalUser(ctx context.Context, authReq *domain.AuthRequ
 	err = l.updateExternalUserProfile(ctx, user, externalUser)
 	logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update profile")
 
+	err = l.updateExternalUsername(ctx, user, externalUser)
+	logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update external username")
+
 	return nil
 }
 
@@ -755,6 +758,36 @@ func (l *Login) updateExternalUserProfile(ctx context.Context, user *query.User,
 		Gender:            user.Human.Gender,
 	})
 	return err
+}
+
+func (l *Login) updateExternalUsername(ctx context.Context, user *query.User, externalUser *domain.ExternalUser) error {
+	externalIDQuery, err := query.NewIDPUserLinksExternalIDSearchQuery(externalUser.ExternalUserID)
+	if err != nil {
+		return err
+	}
+	idpIDQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(externalUser.IDPConfigID)
+	if err != nil {
+		return err
+	}
+	userIDQuery, err := query.NewIDPUserLinksUserIDSearchQuery(user.ID)
+	if err != nil {
+		return err
+	}
+	links, err := l.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{externalIDQuery, idpIDQuery, userIDQuery}}, false)
+	if err != nil || len(links.Links) == 0 {
+		return err
+	}
+	if links.Links[0].ProvidedUsername == externalUser.PreferredUsername {
+		return nil
+	}
+	return l.command.UpdateUserIDPLinkUsername(
+		setContext(ctx, user.ResourceOwner),
+		user.ID,
+		user.ResourceOwner,
+		externalUser.IDPConfigID,
+		externalUser.ExternalUserID,
+		externalUser.PreferredUsername,
+	)
 }
 
 func hasEmailChanged(user *query.User, externalUser *domain.ExternalUser) bool {
