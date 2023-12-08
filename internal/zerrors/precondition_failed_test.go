@@ -10,8 +10,7 @@ import (
 )
 
 func TestPreconditionFailedError(t *testing.T) {
-	var err interface{}
-	err = new(zerrors.PreconditionFailedError)
+	var err interface{} = new(zerrors.PreconditionFailedError)
 	_, ok := err.(zerrors.PreconditionFailed)
 	assert.True(t, ok)
 }

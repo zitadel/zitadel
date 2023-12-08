@@ -10,8 +10,7 @@ import (
 )
 
 func TestUnknownError(t *testing.T) {
-	var err interface{}
-	err = new(zerrors.UnknownError)
+	var err interface{} = new(zerrors.UnknownError)
 	_, ok := err.(zerrors.Unknown)
 	assert.True(t, ok)
 }

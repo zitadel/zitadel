@@ -10,8 +10,7 @@ import (
 )
 
 func TestUnimplementedError(t *testing.T) {
-	var unimplementedError interface{}
-	unimplementedError = new(zerrors.UnimplementedError)
+	var unimplementedError interface{} = new(zerrors.UnimplementedError)
 	_, ok := unimplementedError.(zerrors.Unimplemented)
 	assert.True(t, ok)
 }

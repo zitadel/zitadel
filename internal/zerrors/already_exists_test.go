@@ -9,8 +9,7 @@ import (
 )
 
 func TestAlreadyExistsError(t *testing.T) {
-	var alreadyExistsError interface{}
-	alreadyExistsError = new(zerrors.AlreadyExistsError)
+	var alreadyExistsError interface{} = new(zerrors.AlreadyExistsError)
 	_, ok := alreadyExistsError.(zerrors.AlreadyExists)
 	assert.True(t, ok)
 }

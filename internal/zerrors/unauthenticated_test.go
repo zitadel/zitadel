@@ -10,8 +10,7 @@ import (
 )
 
 func TestUnauthenticatedError(t *testing.T) {
-	var err interface{}
-	err = new(zerrors.UnauthenticatedError)
+	var err interface{} = new(zerrors.UnauthenticatedError)
 	_, ok := err.(zerrors.Unauthenticated)
 	assert.True(t, ok)
 }
