@@ -342,6 +342,15 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, resourceOwner string, hu
 	}
 
 	cmds := make([]eventstore.Command, 0)
+	// if user change has not all necessary elements check permission
+	if (human.Email != nil && human.Email.Verified) ||
+		(human.Phone != nil && human.Phone.Verified) ||
+		(human.Password != nil && human.Password.PasswordCode == nil && human.Password.OldPassword == nil) {
+		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingHuman.ResourceOwner, existingHuman.AggregateID); err != nil {
+			return err
+		}
+	}
+
 	if human.Username != nil {
 		cmds, err = c.changeUsername(ctx, cmds, existingHuman, *human.Username)
 		if err != nil {
@@ -473,12 +482,6 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 	// or have the old password to change it
 	if password.OldPassword != nil {
 		if _, err := c.verifyPassword(ctx, wm.PasswordEncodedHash, *password.OldPassword); err != nil {
-			return cmds, err
-		}
-	}
-	// or if neither, have the permission to do so
-	if password.PasswordCode == nil && password.OldPassword == nil {
-		if err := c.checkPermission(ctx, domain.PermissionUserWrite, wm.ResourceOwner, wm.AggregateID); err != nil {
 			return cmds, err
 		}
 	}

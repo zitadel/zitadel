@@ -1122,15 +1122,12 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 	}
 }
 
-func ptr[p any](ptr p) *p {
-	return &ptr
-}
-
 func TestCommandSide_ChangeUserHuman(t *testing.T) {
 	type fields struct {
 		eventstore         func(t *testing.T) *eventstore.Eventstore
 		userPasswordHasher *crypto.PasswordHasher
 		newCode            cryptoCodeFunc
+		checkPermission    domain.PermissionCheck
 	}
 	type args struct {
 		ctx     context.Context
@@ -1162,10 +1159,10 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "",
 				human: &ChangeHuman{
-					Username: ptr("username"),
+					Username: gu.Ptr("username"),
 					Profile: &Profile{
-						FirstName: ptr("firstname"),
-						LastName:  ptr("lastname"),
+						FirstName: gu.Ptr("firstname"),
+						LastName:  gu.Ptr("lastname"),
 					},
 					Email: &Email{
 						Address: "email@test.ch",
@@ -1195,7 +1192,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				human: &ChangeHuman{
-					Username: ptr("changed"),
+					Username: gu.Ptr("changed"),
 				},
 			},
 			res: res{
@@ -1237,7 +1234,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				human: &ChangeHuman{
-					Username: ptr("changed"),
+					Username: gu.Ptr("changed"),
 				},
 			},
 			res: res{
@@ -1263,7 +1260,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				ctx:   context.Background(),
 				orgID: "org1",
 				human: &ChangeHuman{
-					Username: ptr("username"),
+					Username: gu.Ptr("username"),
 				},
 			},
 			res: res{
@@ -1306,12 +1303,12 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Profile: &Profile{
-						FirstName:         ptr("changedfn"),
-						LastName:          ptr("changedln"),
-						NickName:          ptr("changednn"),
-						DisplayName:       ptr("changeddn"),
-						PreferredLanguage: ptr(language.Afrikaans),
-						Gender:            ptr(domain.GenderDiverse),
+						FirstName:         gu.Ptr("changedfn"),
+						LastName:          gu.Ptr("changedln"),
+						NickName:          gu.Ptr("changednn"),
+						DisplayName:       gu.Ptr("changeddn"),
+						PreferredLanguage: gu.Ptr(language.Afrikaans),
+						Gender:            gu.Ptr(domain.GenderDiverse),
 					},
 				},
 			},
@@ -1339,12 +1336,12 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Profile: &Profile{
-						FirstName:         ptr("firstname"),
-						LastName:          ptr("lastname"),
-						NickName:          ptr(""),
-						DisplayName:       ptr("firstname lastname"),
-						PreferredLanguage: ptr(language.English),
-						Gender:            ptr(domain.GenderUnspecified),
+						FirstName:         gu.Ptr("firstname"),
+						LastName:          gu.Ptr("lastname"),
+						NickName:          gu.Ptr(""),
+						DisplayName:       gu.Ptr("firstname lastname"),
+						PreferredLanguage: gu.Ptr(language.English),
+						Gender:            gu.Ptr(domain.GenderUnspecified),
 					},
 				},
 			},
@@ -1433,6 +1430,34 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 		},
 		{
+			name: "change human email verified, not allowed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Email: &Email{
+						Address:  "changed@example.com",
+						Verified: true,
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+				},
+			},
+		},
+		{
 			name: "change human email verified, ok",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -1451,6 +1476,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1485,6 +1511,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1550,7 +1577,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					EventDate:     time.Time{},
 					ResourceOwner: "org1",
 				},
-				wantEmailCode: ptr("emailCode"),
+				wantEmailCode: gu.Ptr("emailCode"),
 			},
 		},
 		{
@@ -1599,6 +1626,33 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					ResourceOwner: "org1",
 				},
 			},
+		}, {
+			name: "change human phone verified, not allowed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Phone: &Phone{
+						Number:   "+41791234567",
+						Verified: true,
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+				},
+			},
 		},
 		{
 			name: "change human phone verified, ok",
@@ -1619,6 +1673,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1653,6 +1708,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1717,7 +1773,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					EventDate:     time.Time{},
 					ResourceOwner: "org1",
 				},
-				wantPhoneCode: ptr("phoneCode"),
+				wantPhoneCode: gu.Ptr("phoneCode"),
 			},
 		},
 		{
@@ -1762,8 +1818,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       ptr("password2"),
-						OldPassword:    ptr("password"),
+						Password:       gu.Ptr("password2"),
+						OldPassword:    gu.Ptr("password"),
 						ChangeRequired: true,
 					},
 				},
@@ -1808,8 +1864,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       ptr("password2"),
-						OldPassword:    ptr("password"),
+						Password:       gu.Ptr("password2"),
+						OldPassword:    gu.Ptr("password"),
 						ChangeRequired: true,
 					},
 				},
@@ -1831,7 +1887,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						OldPassword:    ptr("password"),
+						OldPassword:    gu.Ptr("password"),
 						ChangeRequired: true,
 					},
 				},
@@ -1839,6 +1895,96 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			res: res{
 				err: func(err error) bool {
 					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Empty"))
+				},
+			},
+		},
+		{
+			name: "change human password, not allowed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
+								&userAgg.Aggregate,
+							),
+						),
+					),
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+				checkPermission:    newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Password: &Password{
+						Password:       gu.Ptr("password2"),
+						ChangeRequired: true,
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+				},
+			},
+		},
+		{
+			name: "change human password, permission, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
+								&userAgg.Aggregate,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&userAgg.Aggregate,
+							"$plain$x$password2",
+							true,
+							"",
+						),
+					),
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+				checkPermission:    newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Password: &Password{
+						Password:       gu.Ptr("password2"),
+						ChangeRequired: true,
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					Sequence:      0,
+					EventDate:     time.Time{},
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -1884,8 +2030,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       ptr("password2"),
-						OldPassword:    ptr("password"),
+						Password:       gu.Ptr("password2"),
+						OldPassword:    gu.Ptr("password"),
 						ChangeRequired: true,
 					},
 				},
@@ -1955,8 +2101,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       ptr("password2"),
-						PasswordCode:   ptr("code"),
+						Password:       gu.Ptr("password2"),
+						PasswordCode:   gu.Ptr("code"),
 						ChangeRequired: true,
 					},
 				},
@@ -2028,7 +2174,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				human: &ChangeHuman{
 					Password: &Password{
 						EncodedPasswordHash: gu.Ptr("$plain$x$password2"),
-						PasswordCode:        ptr("code"),
+						PasswordCode:        gu.Ptr("code"),
 						ChangeRequired:      true,
 					},
 				},
@@ -2073,6 +2219,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				eventstore:         tt.fields.eventstore(t),
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				newCode:            tt.fields.newCode,
+				checkPermission:    tt.fields.checkPermission,
 			}
 			err := r.ChangeUserHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.codeAlg)
 			if tt.res.err == nil {
