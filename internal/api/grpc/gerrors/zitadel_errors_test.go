@@ -1,7 +1,6 @@
-package errors
+package gerrors
 
 import (
-	"context"
 	"errors"
 	"testing"
 
@@ -37,8 +36,8 @@ func TestCaosToGRPCError(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := CaosToGRPCError(context.Background(), tt.args.err); (err != nil) != tt.wantErr {
-				t.Errorf("CaosToGRPCError() error = %v, wantErr %v", err, tt.wantErr)
+			if err := ZITADELToGRPCError(tt.args.err); (err != nil) != tt.wantErr {
+				t.Errorf("ZITADELToGRPCError() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -155,7 +154,7 @@ func Test_Extract(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotC, gotMsg, gotID, gotOk := ExtractCaosError(tt.args.err)
+			gotC, gotMsg, gotID, gotOk := ExtractZITADELError(tt.args.err)
 			if gotC != tt.wantC {
 				t.Errorf("extract() gotC = %v, want %v", gotC, tt.wantC)
 			}

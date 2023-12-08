@@ -3,7 +3,7 @@ package middleware
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/grpc/errors"
+	"github.com/zitadel/zitadel/internal/api/grpc/gerrors"
 
 	"google.golang.org/grpc"
 
@@ -18,5 +18,5 @@ func ErrorHandler() grpc.UnaryServerInterceptor {
 
 func toGRPCError(ctx context.Context, req interface{}, handler grpc.UnaryHandler) (interface{}, error) {
 	resp, err := handler(ctx, req)
-	return resp, errors.CaosToGRPCError(ctx, err)
+	return resp, gerrors.ZITADELToGRPCError(err)
 }
