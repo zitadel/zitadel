@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
