@@ -13,8 +13,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml/requesttracker"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestSession_FetchUser(t *testing.T) {
@@ -69,7 +69,7 @@ func TestSession_FetchUser(t *testing.T) {
 				requestID: "",
 			},
 			want: want{
-				err: caos_errs.ThrowInvalidArgument(nil, "SAML-d09hy0wkex", "Errors.Intent.ResponseInvalid"),
+				err: zerrors.ThrowInvalidArgument(nil, "SAML-d09hy0wkex", "Errors.Intent.ResponseInvalid"),
 			},
 		},
 		{
@@ -95,7 +95,7 @@ func TestSession_FetchUser(t *testing.T) {
 				requestID: "id-b22c90db88bf01d82ffb0a7b6fe25ac9fcb2c679",
 			},
 			want: want{
-				err: caos_errs.ThrowInvalidArgument(nil, "SAML-d09hy0wkex", "Errors.Intent.ResponseInvalid"),
+				err: zerrors.ThrowInvalidArgument(nil, "SAML-d09hy0wkex", "Errors.Intent.ResponseInvalid"),
 			},
 		},
 		{
@@ -125,7 +125,7 @@ func TestSession_FetchUser(t *testing.T) {
 				requestID: "id-b22c90db88bf01d82ffb0a7b6fe25ac9fcb2c679",
 			},
 			want: want{
-				err: caos_errs.ThrowInvalidArgument(nil, "SAML-nuo0vphhh9", "Errors.Intent.ResponseInvalid"),
+				err: zerrors.ThrowInvalidArgument(nil, "SAML-nuo0vphhh9", "Errors.Intent.ResponseInvalid"),
 			},
 		},
 		{

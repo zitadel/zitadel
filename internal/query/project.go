@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -13,10 +13,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -117,7 +117,7 @@ func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id st
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-2m00Q", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-2m00Q", "Errors.Query.SQLStatment")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -135,7 +135,7 @@ func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQuer
 	eq := sq.Eq{ProjectColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-fn9ew", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-fn9ew", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -143,7 +143,7 @@ func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQuer
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-2j00f", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-2j00f", "Errors.Internal")
 	}
 	projects.State, err = q.latestState(ctx, projectsTable)
 	return projects, err
@@ -225,10 +225,10 @@ func prepareProjectQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&p.PrivateLabelingSetting,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-fk2fs", "Errors.Project.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-fk2fs", "Errors.Project.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-dj2FF", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-dj2FF", "Errors.Internal")
 			}
 			return p, nil
 		}
@@ -276,7 +276,7 @@ func prepareProjectsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-QMXJv", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-QMXJv", "Errors.Query.CloseRows")
 			}
 
 			return &Projects{

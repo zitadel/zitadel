@@ -6,30 +6,30 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddOrgMemberCommand(a *org.Aggregate, userID string, roles ...string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if userID == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "ORG-4Mlfs", "Errors.Invalid.Argument")
+			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-4Mlfs", "Errors.Invalid.Argument")
 		}
 		if len(roles) == 0 {
-			return nil, errors.ThrowInvalidArgument(nil, "V2-PfYhb", "Errors.Invalid.Argument")
+			return nil, zerrors.ThrowInvalidArgument(nil, "V2-PfYhb", "Errors.Invalid.Argument")
 		}
 
 		if len(domain.CheckForInvalidRoles(roles, domain.OrgRolePrefix, c.zitadelRoles)) > 0 && len(domain.CheckForInvalidRoles(roles, domain.RoleSelfManagementGlobal, c.zitadelRoles)) > 0 {
-			return nil, errors.ThrowInvalidArgument(nil, "Org-4N8es", "Errors.Org.MemberInvalid")
+			return nil, zerrors.ThrowInvalidArgument(nil, "Org-4N8es", "Errors.Org.MemberInvalid")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 				if exists, err := ExistsUser(ctx, filter, userID, ""); err != nil || !exists {
-					return nil, errors.ThrowPreconditionFailed(err, "ORG-GoXOn", "Errors.User.NotFound")
+					return nil, zerrors.ThrowPreconditionFailed(err, "ORG-GoXOn", "Errors.User.NotFound")
 				}
 				if isMember, err := IsOrgMember(ctx, filter, a.ID, userID); err != nil || isMember {
-					return nil, errors.ThrowAlreadyExists(err, "ORG-poWwe", "Errors.Org.Member.AlreadyExists")
+					return nil, zerrors.ThrowAlreadyExists(err, "ORG-poWwe", "Errors.Org.Member.AlreadyExists")
 				}
 				return []eventstore.Command{org.NewMemberAddedEvent(ctx, &a.Aggregate, userID, roles...)}, nil
 			},
@@ -93,17 +93,17 @@ func (c *Commands) AddOrgMember(ctx context.Context, orgID, userID string, roles
 
 func (c *Commands) addOrgMember(ctx context.Context, orgAgg *eventstore.Aggregate, addedMember *OrgMemberWriteModel, member *domain.Member) (eventstore.Command, error) {
 	if !member.IsValid() {
-		return nil, errors.ThrowInvalidArgument(nil, "Org-W8m4l", "Errors.Org.MemberInvalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-W8m4l", "Errors.Org.MemberInvalid")
 	}
 	if len(domain.CheckForInvalidRoles(member.Roles, domain.OrgRolePrefix, c.zitadelRoles)) > 0 && len(domain.CheckForInvalidRoles(member.Roles, domain.RoleSelfManagementGlobal, c.zitadelRoles)) > 0 {
-		return nil, errors.ThrowInvalidArgument(nil, "Org-4N8es", "Errors.Org.MemberInvalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-4N8es", "Errors.Org.MemberInvalid")
 	}
 	err := c.eventstore.FilterToQueryReducer(ctx, addedMember)
 	if err != nil {
 		return nil, err
 	}
 	if addedMember.State == domain.MemberStateActive {
-		return nil, errors.ThrowAlreadyExists(nil, "Org-PtXi1", "Errors.Org.Member.AlreadyExists")
+		return nil, zerrors.ThrowAlreadyExists(nil, "Org-PtXi1", "Errors.Org.Member.AlreadyExists")
 	}
 
 	return org.NewMemberAddedEvent(ctx, orgAgg, member.UserID, member.Roles...), nil
@@ -112,10 +112,10 @@ func (c *Commands) addOrgMember(ctx context.Context, orgAgg *eventstore.Aggregat
 // ChangeOrgMember updates an existing member
 func (c *Commands) ChangeOrgMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
 	if !member.IsValid() {
-		return nil, errors.ThrowInvalidArgument(nil, "Org-LiaZi", "Errors.Org.MemberInvalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-LiaZi", "Errors.Org.MemberInvalid")
 	}
 	if len(domain.CheckForInvalidRoles(member.Roles, domain.OrgRolePrefix, c.zitadelRoles)) > 0 {
-		return nil, errors.ThrowInvalidArgument(nil, "IAM-m9fG8", "Errors.Org.MemberInvalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "IAM-m9fG8", "Errors.Org.MemberInvalid")
 	}
 
 	existingMember, err := c.orgMemberWriteModelByID(ctx, member.AggregateID, member.UserID)
@@ -124,7 +124,7 @@ func (c *Commands) ChangeOrgMember(ctx context.Context, member *domain.Member) (
 	}
 
 	if reflect.DeepEqual(existingMember.Roles, member.Roles) {
-		return nil, errors.ThrowPreconditionFailed(nil, "Org-LiaZi", "Errors.Org.Member.RolesNotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "Org-LiaZi", "Errors.Org.Member.RolesNotChanged")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewMemberChangedEvent(ctx, orgAgg, member.UserID, member.Roles...))
@@ -141,10 +141,10 @@ func (c *Commands) ChangeOrgMember(ctx context.Context, member *domain.Member) (
 
 func (c *Commands) RemoveOrgMember(ctx context.Context, orgID, userID string) (*domain.ObjectDetails, error) {
 	m, err := c.orgMemberWriteModelByID(ctx, orgID, userID)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return nil, err
 	}
-	if errors.IsNotFound(err) {
+	if zerrors.IsNotFound(err) {
 		// empty response because we have no data that match the request
 		return &domain.ObjectDetails{}, nil
 	}
@@ -184,7 +184,7 @@ func (c *Commands) orgMemberWriteModelByID(ctx context.Context, orgID, userID st
 	}
 
 	if writeModel.State == domain.MemberStateUnspecified || writeModel.State == domain.MemberStateRemoved {
-		return nil, errors.ThrowNotFound(nil, "Org-D8JxR", "Errors.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "Org-D8JxR", "Errors.NotFound")
 	}
 
 	return writeModel, nil

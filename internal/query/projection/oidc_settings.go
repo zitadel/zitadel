@@ -3,11 +3,11 @@ package projection
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -79,7 +79,7 @@ func (p *oidcSettingsProjection) Reducers() []handler.AggregateReducer {
 func (p *oidcSettingsProjection) reduceOIDCSettingsAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.OIDCSettingsAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-f9nwf", "reduce.wrong.event.type %s", instance.OIDCSettingsAddedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-f9nwf", "reduce.wrong.event.type %s", instance.OIDCSettingsAddedEventType)
 	}
 	return handler.NewCreateStatement(
 		e,
@@ -101,7 +101,7 @@ func (p *oidcSettingsProjection) reduceOIDCSettingsAdded(event eventstore.Event)
 func (p *oidcSettingsProjection) reduceOIDCSettingsChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.OIDCSettingsChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-8JJ2d", "reduce.wrong.event.type %s", instance.OIDCSettingsChangedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-8JJ2d", "reduce.wrong.event.type %s", instance.OIDCSettingsChangedEventType)
 	}
 
 	columns := make([]handler.Column, 0, 6)

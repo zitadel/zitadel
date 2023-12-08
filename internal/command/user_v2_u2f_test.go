@@ -11,13 +11,13 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	webauthn_helper "github.com/zitadel/zitadel/internal/webauthn"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_RegisterUserU2F(t *testing.T) {
@@ -51,7 +51,7 @@ func TestCommands_RegisterUserU2F(t *testing.T) {
 				userID:        "foo",
 				resourceOwner: "org1",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
 		},
 		{
 			name: "get human passwordless error",

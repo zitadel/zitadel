@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -81,7 +81,7 @@ func APIConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error)
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "API-BFd15", "unable to unmarshal api config")
+		return nil, zerrors.ThrowInternal(err, "API-BFd15", "unable to unmarshal api config")
 	}
 
 	return e, nil
@@ -110,7 +110,7 @@ func NewAPIConfigChangedEvent(
 	changes []APIConfigChanges,
 ) (*APIConfigChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "API-i8idç", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "API-i8idç", "Errors.NoChangesFound")
 	}
 
 	changeEvent := &APIConfigChangedEvent{
@@ -142,7 +142,7 @@ func APIConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, erro
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "API-BFd15", "unable to unmarshal api config")
+		return nil, zerrors.ThrowInternal(err, "API-BFd15", "unable to unmarshal api config")
 	}
 
 	return e, nil
@@ -187,7 +187,7 @@ func APIConfigSecretChangedEventMapper(event eventstore.Event) (eventstore.Event
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "API-M893d", "unable to unmarshal api config")
+		return nil, zerrors.ThrowInternal(err, "API-M893d", "unable to unmarshal api config")
 	}
 
 	return e, nil
@@ -229,7 +229,7 @@ func APIConfigSecretCheckSucceededEventMapper(event eventstore.Event) (eventstor
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "API-837gV", "unable to unmarshal api config")
+		return nil, zerrors.ThrowInternal(err, "API-837gV", "unable to unmarshal api config")
 	}
 
 	return e, nil
@@ -271,7 +271,7 @@ func APIConfigSecretCheckFailedEventMapper(event eventstore.Event) (eventstore.E
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "API-987g%", "unable to unmarshal api config")
+		return nil, zerrors.ThrowInternal(err, "API-987g%", "unable to unmarshal api config")
 	}
 
 	return e, nil

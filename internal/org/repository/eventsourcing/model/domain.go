@@ -2,10 +2,10 @@ package model
 
 import (
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/org/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type OrgDomain struct {
@@ -98,7 +98,7 @@ func (o *Org) appendVerificationDomainEvent(event eventstore.Event) error {
 func (m *OrgDomain) SetData(event eventstore.Event) error {
 	err := event.Unmarshal(m)
 	if err != nil {
-		return errors.ThrowInternal(err, "EVENT-Hz7Mb", "unable to unmarshal data")
+		return zerrors.ThrowInternal(err, "EVENT-Hz7Mb", "unable to unmarshal data")
 	}
 	return nil
 }

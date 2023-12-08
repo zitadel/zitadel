@@ -2,8 +2,8 @@ package idp
 
 import (
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type SAMLIDPAddedEvent struct {
@@ -58,7 +58,7 @@ func SAMLIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-v9uajo3k71", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-v9uajo3k71", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -83,7 +83,7 @@ func NewSAMLIDPChangedEvent(
 	changes []SAMLIDPChanges,
 ) (*SAMLIDPChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDP-cz6mnf860t", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-cz6mnf860t", "Errors.NoChangesFound")
 	}
 	changedEvent := &SAMLIDPChangedEvent{
 		BaseEvent: *base,
@@ -154,7 +154,7 @@ func SAMLIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error)
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-w1t1824tw5", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-w1t1824tw5", "unable to unmarshal event")
 	}
 
 	return e, nil

@@ -6,8 +6,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -72,7 +72,7 @@ func AddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "KEY-4n8vs", "unable to unmarshal key pair added")
+		return nil, zerrors.ThrowInternal(err, "KEY-4n8vs", "unable to unmarshal key pair added")
 	}
 
 	return e, nil

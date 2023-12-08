@@ -7,15 +7,15 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // ResendInitialMail resend initial mail and changes email if provided
 func (c *Commands) ResendInitialMail(ctx context.Context, userID string, email domain.EmailAddress, resourceOwner string, initCodeGenerator crypto.Generator) (objectDetails *domain.ObjectDetails, err error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2n8vs", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-2n8vs", "Errors.User.UserIDMissing")
 	}
 
 	existingCode, err := c.getHumanInitWriteModelByID(ctx, userID, resourceOwner)
@@ -23,10 +23,10 @@ func (c *Commands) ResendInitialMail(ctx context.Context, userID string, email d
 		return nil, err
 	}
 	if existingCode.UserState == domain.UserStateUnspecified || existingCode.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2M9df", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-2M9df", "Errors.User.NotFound")
 	}
 	if existingCode.UserState != domain.UserStateInitial {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9sd", "Errors.User.AlreadyInitialised")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-2M9sd", "Errors.User.AlreadyInitialised")
 	}
 	var events []eventstore.Command
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
@@ -52,10 +52,10 @@ func (c *Commands) ResendInitialMail(ctx context.Context, userID string, email d
 
 func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwner, code, password string, initCodeGenerator crypto.Generator) error {
 	if userID == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-mkM9f", "Errors.User.UserIDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-mkM9f", "Errors.User.UserIDMissing")
 	}
 	if code == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-44G8s", "Errors.User.Code.Empty")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-44G8s", "Errors.User.Code.Empty")
 	}
 
 	existingCode, err := c.getHumanInitWriteModelByID(ctx, userID, resourceOwner)
@@ -63,7 +63,7 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 		return err
 	}
 	if existingCode.Code == nil || existingCode.UserState == domain.UserStateUnspecified || existingCode.UserState == domain.UserStateDeleted {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-mmn5f", "Errors.User.Code.NotFound")
+		return zerrors.ThrowNotFound(nil, "COMMAND-mmn5f", "Errors.User.Code.NotFound")
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
@@ -71,7 +71,7 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 	if err != nil {
 		_, err = c.eventstore.Push(ctx, user.NewHumanInitializedCheckFailedEvent(ctx, userAgg))
 		logging.WithFields("userID", userAgg.ID).OnError(err).Error("NewHumanInitializedCheckFailedEvent push failed")
-		return caos_errs.ThrowInvalidArgument(err, "COMMAND-11v6G", "Errors.User.Code.Invalid")
+		return zerrors.ThrowInvalidArgument(err, "COMMAND-11v6G", "Errors.User.Code.Invalid")
 	}
 	commands := []eventstore.Command{
 		user.NewHumanInitializedCheckSucceededEvent(ctx, userAgg),
@@ -94,14 +94,14 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 
 func (c *Commands) HumanInitCodeSent(ctx context.Context, orgID, userID string) (err error) {
 	if userID == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M9fs", "Errors.IDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-3M9fs", "Errors.IDMissing")
 	}
 	existingInitCode, err := c.getHumanInitWriteModelByID(ctx, userID, orgID)
 	if err != nil {
 		return err
 	}
 	if existingInitCode.UserState == domain.UserStateUnspecified || existingInitCode.UserState == domain.UserStateDeleted {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-556zg", "Errors.User.Code.NotFound")
+		return zerrors.ThrowNotFound(nil, "COMMAND-556zg", "Errors.User.Code.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingInitCode.WriteModel)
 	_, err = c.eventstore.Push(ctx, user.NewHumanInitialCodeSentEvent(ctx, userAgg))

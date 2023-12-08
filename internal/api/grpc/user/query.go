@@ -2,8 +2,8 @@ package user
 
 import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
@@ -21,7 +21,7 @@ func UserQueriesToQuery(queries []*user_pb.SearchQuery, level uint8) (_ []query.
 func UserQueryToQuery(query *user_pb.SearchQuery, level uint8) (query.SearchQuery, error) {
 	if level > 20 {
 		// can't go deeper than 20 levels of nesting.
-		return nil, errors.ThrowInvalidArgument(nil, "USER-zsQ97", "Errors.User.TooManyNestingLevels")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-zsQ97", "Errors.User.TooManyNestingLevels")
 	}
 	switch q := query.Query.(type) {
 	case *user_pb.SearchQuery_UserNameQuery:
@@ -53,7 +53,7 @@ func UserQueryToQuery(query *user_pb.SearchQuery, level uint8) (query.SearchQuer
 	case *user_pb.SearchQuery_NotQuery:
 		return NotQueryToQuery(q.NotQuery, level)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}
 }
 

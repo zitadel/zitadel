@@ -9,9 +9,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	zitadel_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_SetDefaultMessageText(t *testing.T) {
@@ -45,7 +45,7 @@ func TestCommandSide_SetDefaultMessageText(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -80,7 +80,7 @@ func TestCommandSide_SetDefaultMessageText(t *testing.T) {
 				config: &domain.CustomMessageText{},
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -95,7 +95,7 @@ func TestCommandSide_SetDefaultMessageText(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{

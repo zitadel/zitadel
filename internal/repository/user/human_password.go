@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -72,7 +72,7 @@ func HumanPasswordChangedEventMapper(event eventstore.Event) (eventstore.Event, 
 	}
 	err := event.Unmarshal(humanAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-4M0sd", "unable to unmarshal human password changed")
+		return nil, zerrors.ThrowInternal(err, "USER-4M0sd", "unable to unmarshal human password changed")
 	}
 
 	return humanAdded, nil
@@ -141,7 +141,7 @@ func HumanPasswordCodeAddedEventMapper(event eventstore.Event) (eventstore.Event
 	}
 	err := event.Unmarshal(humanAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-Ms90d", "unable to unmarshal human password code added")
+		return nil, zerrors.ThrowInternal(err, "USER-Ms90d", "unable to unmarshal human password code added")
 	}
 
 	return humanAdded, nil
@@ -237,7 +237,7 @@ func HumanPasswordCheckSucceededEventMapper(event eventstore.Event) (eventstore.
 	}
 	err := event.Unmarshal(humanAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-5M9sd", "unable to unmarshal human password check succeeded")
+		return nil, zerrors.ThrowInternal(err, "USER-5M9sd", "unable to unmarshal human password check succeeded")
 	}
 
 	return humanAdded, nil
@@ -277,7 +277,7 @@ func HumanPasswordCheckFailedEventMapper(event eventstore.Event) (eventstore.Eve
 	}
 	err := event.Unmarshal(humanAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-4m9fs", "unable to unmarshal human password check failed")
+		return nil, zerrors.ThrowInternal(err, "USER-4m9fs", "unable to unmarshal human password check failed")
 	}
 
 	return humanAdded, nil

@@ -3,16 +3,16 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -82,7 +82,7 @@ func (q *Queries) DeviceAuthByDeviceCode(ctx context.Context, clientID, deviceCo
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-uk1Oh", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-uk1Oh", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -103,7 +103,7 @@ func (q *Queries) DeviceAuthByUserCode(ctx context.Context, userCode string) (de
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Axu7l", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Axu7l", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -136,11 +136,11 @@ func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				&dst.State,
 				&dst.Subject,
 			)
-			if errs.Is(err, sql.ErrNoRows) {
-				return nil, errors.ThrowNotFound(err, "QUERY-Sah9a", "Errors.DeviceAuth.NotExisting")
+			if errors.Is(err, sql.ErrNoRows) {
+				return nil, zerrors.ThrowNotFound(err, "QUERY-Sah9a", "Errors.DeviceAuth.NotExisting")
 			}
 			if err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-Voo3o", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-Voo3o", "Errors.Internal")
 			}
 
 			dst.Scopes = scopes

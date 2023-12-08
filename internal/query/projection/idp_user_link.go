@@ -3,13 +3,13 @@ package projection
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -116,7 +116,7 @@ func (p *idpUserLinkProjection) Reducers() []handler.AggregateReducer {
 func (p *idpUserLinkProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserIDPLinkAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DpmXq", "reduce.wrong.event.type %s", user.UserIDPLinkAddedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-DpmXq", "reduce.wrong.event.type %s", user.UserIDPLinkAddedType)
 	}
 
 	return handler.NewCreateStatement(e,
@@ -137,7 +137,7 @@ func (p *idpUserLinkProjection) reduceAdded(event eventstore.Event) (*handler.St
 func (p *idpUserLinkProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserIDPLinkRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AZmfJ", "reduce.wrong.event.type %s", user.UserIDPLinkRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-AZmfJ", "reduce.wrong.event.type %s", user.UserIDPLinkRemovedType)
 	}
 
 	return handler.NewDeleteStatement(e,
@@ -153,7 +153,7 @@ func (p *idpUserLinkProjection) reduceRemoved(event eventstore.Event) (*handler.
 func (p *idpUserLinkProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserIDPLinkCascadeRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-jQpv9", "reduce.wrong.event.type %s", user.UserIDPLinkCascadeRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-jQpv9", "reduce.wrong.event.type %s", user.UserIDPLinkCascadeRemovedType)
 	}
 
 	return handler.NewDeleteStatement(e,
@@ -169,7 +169,7 @@ func (p *idpUserLinkProjection) reduceCascadeRemoved(event eventstore.Event) (*h
 func (p *idpUserLinkProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-PGiAY", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-PGiAY", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
 	return handler.NewDeleteStatement(
@@ -184,7 +184,7 @@ func (p *idpUserLinkProjection) reduceOwnerRemoved(event eventstore.Event) (*han
 func (p *idpUserLinkProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uwlWE", "reduce.wrong.event.type %s", user.UserRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-uwlWE", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
 
 	return handler.NewDeleteStatement(e,
@@ -198,7 +198,7 @@ func (p *idpUserLinkProjection) reduceUserRemoved(event eventstore.Event) (*hand
 func (p *idpUserLinkProjection) reduceExternalIDMigrated(event eventstore.Event) (*handler.Statement, error) {
 	e, err := assertEvent[*user.UserIDPExternalIDMigratedEvent](event)
 	if err != nil {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AS3th", "reduce.wrong.event.type %s", user.UserIDPExternalIDMigratedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-AS3th", "reduce.wrong.event.type %s", user.UserIDPExternalIDMigratedType)
 	}
 
 	return handler.NewUpdateStatement(e,
@@ -225,7 +225,7 @@ func (p *idpUserLinkProjection) reduceIDPConfigRemoved(event eventstore.Event) (
 	case *instance.IDPConfigRemovedEvent:
 		idpID = e.ConfigID
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-iCKSj", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-iCKSj", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
 	}
 
 	return handler.NewDeleteStatement(event,

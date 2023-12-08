@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func Test_extractBearerToken(t *testing.T) {
@@ -58,7 +58,7 @@ func Test_extractBearerToken(t *testing.T) {
 				t.Errorf("got wrong result, should not get err: actual: %v ", err)
 			}
 
-			if tt.wantErr && !errors.IsUnauthenticated(err) {
+			if tt.wantErr && !zerrors.IsUnauthenticated(err) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 		})

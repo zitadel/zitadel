@@ -5,12 +5,12 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -141,7 +141,7 @@ func (p *keyProjection) Reducers() []handler.AggregateReducer {
 func (p *keyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*keypair.AddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAbr2", "reduce.wrong.event.type %s", keypair.AddedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAbr2", "reduce.wrong.event.type %s", keypair.AddedEventType)
 	}
 	if e.PrivateKey.Expiry.Before(time.Now()) && e.PublicKey.Expiry.Before(time.Now()) {
 		return handler.NewNoOpStatement(e), nil
@@ -174,7 +174,7 @@ func (p *keyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 	if e.PublicKey.Expiry.After(time.Now()) {
 		publicKey, err := crypto.Decrypt(e.PublicKey.Key, p.encryptionAlgorithm)
 		if err != nil {
-			return nil, errors.ThrowInternal(err, "HANDL-DAg2f", "cannot decrypt public key")
+			return nil, zerrors.ThrowInternal(err, "HANDL-DAg2f", "cannot decrypt public key")
 		}
 		creates = append(creates, handler.AddCreateStatement(
 			[]handler.Column{
@@ -193,7 +193,7 @@ func (p *keyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 func (p *keyProjection) reduceCertificateAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*keypair.AddedCertificateEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAbr09", "reduce.wrong.event.type %s", keypair.AddedCertificateEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAbr09", "reduce.wrong.event.type %s", keypair.AddedCertificateEventType)
 	}
 
 	if e.Certificate.Expiry.Before(time.Now()) {
@@ -202,7 +202,7 @@ func (p *keyProjection) reduceCertificateAdded(event eventstore.Event) (*handler
 
 	certificate, err := crypto.Decrypt(e.Certificate.Key, p.certEncryptionAlgorithm)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "HANDL-Dajwig2f", "cannot decrypt certificate")
+		return nil, zerrors.ThrowInternal(err, "HANDL-Dajwig2f", "cannot decrypt certificate")
 	}
 
 	creates := []func(eventstore.Event) handler.Exec{handler.AddCreateStatement(

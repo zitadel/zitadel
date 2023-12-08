@@ -5,15 +5,15 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddOrgDomainPolicy(ctx context.Context, resourceOwner string, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain bool) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-4Jfsf", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-4Jfsf", "Errors.ResourceOwnerMissing")
 	}
 	orgAgg := org.NewAggregate(resourceOwner)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddOrgDomainPolicy(orgAgg, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain))
@@ -29,7 +29,7 @@ func (c *Commands) AddOrgDomainPolicy(ctx context.Context, resourceOwner string,
 
 func (c *Commands) ChangeOrgDomainPolicy(ctx context.Context, resourceOwner string, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain bool) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-5H8fs", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-5H8fs", "Errors.ResourceOwnerMissing")
 	}
 	orgAgg := org.NewAggregate(resourceOwner)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareChangeOrgDomainPolicy(orgAgg, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain))
@@ -45,7 +45,7 @@ func (c *Commands) ChangeOrgDomainPolicy(ctx context.Context, resourceOwner stri
 
 func (c *Commands) RemoveOrgDomainPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-3H8fs", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-3H8fs", "Errors.ResourceOwnerMissing")
 	}
 	orgAgg := org.NewAggregate(orgID)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareRemoveOrgDomainPolicy(orgAgg))
@@ -95,7 +95,7 @@ func prepareAddOrgDomainPolicy(
 				return nil, err
 			}
 			if writeModel.State == domain.PolicyStateActive {
-				return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-1M8ds", "Errors.Org.DomainPolicy.AlreadyExists")
+				return nil, zerrors.ThrowAlreadyExists(nil, "ORG-1M8ds", "Errors.Org.DomainPolicy.AlreadyExists")
 			}
 			cmds := []eventstore.Command{
 				org.NewDomainPolicyAddedEvent(ctx, &a.Aggregate,
@@ -138,7 +138,7 @@ func prepareChangeOrgDomainPolicy(
 				return nil, err
 			}
 			if !writeModel.State.Exists() {
-				return nil, caos_errs.ThrowNotFound(nil, "ORG-2N9sd", "Errors.Org.DomainPolicy.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "ORG-2N9sd", "Errors.Org.DomainPolicy.NotFound")
 			}
 			changedEvent, usernameChange, err := writeModel.NewChangedEvent(ctx, &a.Aggregate,
 				userLoginMustBeDomain,
@@ -174,7 +174,7 @@ func prepareRemoveOrgDomainPolicy(
 				return nil, err
 			}
 			if !writeModel.State.Exists() {
-				return nil, caos_errs.ThrowNotFound(nil, "ORG-Dvsh3", "Errors.Org.DomainPolicy.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "ORG-Dvsh3", "Errors.Org.DomainPolicy.NotFound")
 			}
 			instancePolicy, err := instanceDomainPolicy(ctx, filter)
 			if err != nil {

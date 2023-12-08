@@ -8,10 +8,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/repository/restrictions"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type SetRestrictions struct {
@@ -21,7 +21,7 @@ type SetRestrictions struct {
 
 func (s *SetRestrictions) Validate(defaultLanguage language.Tag) error {
 	if s == nil || (s.DisallowPublicOrgRegistration == nil && s.AllowedLanguages == nil) {
-		return zitadel_errors.ThrowInvalidArgument(nil, "COMMAND-oASwj", "Errors.Restrictions.NoneSpecified")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-oASwj", "Errors.Restrictions.NoneSpecified")
 	}
 	if s.AllowedLanguages != nil {
 		if err := domain.LanguagesHaveDuplicates(s.AllowedLanguages); err != nil {
@@ -31,7 +31,7 @@ func (s *SetRestrictions) Validate(defaultLanguage language.Tag) error {
 			return err
 		}
 		if err := domain.LanguageIsAllowed(false, s.AllowedLanguages, defaultLanguage); err != nil {
-			return zitadel_errors.ThrowPreconditionFailedf(err, "COMMAND-L0m2u", "Errors.Restrictions.DefaultLanguageMustBeAllowed")
+			return zerrors.ThrowPreconditionFailedf(err, "COMMAND-L0m2u", "Errors.Restrictions.DefaultLanguageMustBeAllowed")
 		}
 	}
 	return nil

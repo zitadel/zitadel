@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -11,9 +11,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -127,7 +127,7 @@ func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQuerie
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-SDgwg", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-SDgwg", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -135,7 +135,7 @@ func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQuerie
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SDfr52", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-SDfr52", "Errors.Internal")
 	}
 
 	actions.State, err = q.latestState(ctx, actionTable)
@@ -157,7 +157,7 @@ func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string, wi
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Dgff3", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Dgff3", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -223,7 +223,7 @@ func prepareActionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-EGdff", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-EGdff", "Errors.Query.CloseRows")
 			}
 
 			return &Actions{
@@ -264,10 +264,10 @@ func prepareActionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 				&action.AllowedToFail,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-GEfnb", "Errors.Action.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-GEfnb", "Errors.Action.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-Dbnt4", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-Dbnt4", "Errors.Internal")
 			}
 			return action, nil
 		}

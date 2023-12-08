@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Phone struct {
@@ -56,7 +56,7 @@ func (p *Phone) setData(event *es_models.Event) error {
 	p.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, p); err != nil {
 		logging.Log("EVEN-lco9s").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-lre56", "could not unmarshal event")
+		return zerrors.ThrowInternal(err, "MODEL-lre56", "could not unmarshal event")
 	}
 	return nil
 }
@@ -66,7 +66,7 @@ func (c *PhoneCode) SetData(event *es_models.Event) error {
 	c.CreationDate = event.CreationDate
 	if err := json.Unmarshal(event.Data, c); err != nil {
 		logging.Log("EVEN-sk8ws").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-7hdj3", "could not unmarshal event")
+		return zerrors.ThrowInternal(err, "MODEL-7hdj3", "could not unmarshal event")
 	}
 	return nil
 }

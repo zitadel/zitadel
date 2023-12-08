@@ -12,12 +12,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
@@ -55,7 +55,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-D32ef", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-D32ef", ""))
 				},
 			},
 		},
@@ -74,7 +74,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Dbgzf", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Dbgzf", ""))
 				},
 			},
 		},
@@ -94,7 +94,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-DF4ga", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-DF4ga", ""))
 				},
 			},
 		},
@@ -115,7 +115,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-B23bs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-B23bs", ""))
 				},
 			},
 		},
@@ -137,7 +137,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-D2gj8", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-D2gj8", ""))
 				},
 			},
 		},
@@ -160,7 +160,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Fb8jk", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Fb8jk", ""))
 				},
 			},
 		},
@@ -184,7 +184,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-sadf3d", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-sadf3d", ""))
 				},
 			},
 		},
@@ -348,7 +348,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-asfsa", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-asfsa", ""))
 				},
 			},
 		},
@@ -365,7 +365,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-D32ef", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-D32ef", ""))
 				},
 			},
 		},
@@ -384,7 +384,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Dbgzf", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Dbgzf", ""))
 				},
 			},
 		},
@@ -404,7 +404,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-B23bs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-B23bs", ""))
 				},
 			},
 		},
@@ -425,7 +425,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-D2gj8", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-D2gj8", ""))
 				},
 			},
 		},
@@ -447,7 +447,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Fb8jk", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Fb8jk", ""))
 				},
 			},
 		},
@@ -470,7 +470,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SAe4gh", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-SAe4gh", ""))
 				},
 			},
 		},
@@ -495,7 +495,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -679,7 +679,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Sgtj5", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Sgtj5", ""))
 				},
 			},
 		},
@@ -698,7 +698,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Hz6zj", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Hz6zj", ""))
 				},
 			},
 		},
@@ -718,7 +718,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-fb5jm", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-fb5jm", ""))
 				},
 			},
 		},
@@ -739,7 +739,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Sfdf4", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Sfdf4", ""))
 				},
 			},
 		},
@@ -894,7 +894,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SAfd3", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-SAfd3", ""))
 				},
 			},
 		},
@@ -911,7 +911,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Dvf4f", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Dvf4f", ""))
 				},
 			},
 		},
@@ -930,7 +930,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-BDfr3", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-BDfr3", ""))
 				},
 			},
 		},
@@ -950,7 +950,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Db3bs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Db3bs", ""))
 				},
 			},
 		},
@@ -972,7 +972,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1143,7 +1143,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-sdf3g", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-sdf3g", ""))
 				},
 			},
 		},
@@ -1161,7 +1161,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Fhbr2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Fhbr2", ""))
 				},
 			},
 		},
@@ -1180,7 +1180,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Dzh3g", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Dzh3g", ""))
 				},
 			},
 		},
@@ -1202,7 +1202,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1389,7 +1389,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-D3fvs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-D3fvs", ""))
 				},
 			},
 		},
@@ -1408,7 +1408,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-W2vqs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-W2vqs", ""))
 				},
 			},
 		},
@@ -1429,7 +1429,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1606,7 +1606,7 @@ func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-sdf3g", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-sdf3g", ""))
 				},
 			},
 		},
@@ -1625,7 +1625,7 @@ func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Fhbr2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Fhbr2", ""))
 				},
 			},
 		},
@@ -1645,7 +1645,7 @@ func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Dzh3g", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Dzh3g", ""))
 				},
 			},
 		},
@@ -1799,7 +1799,7 @@ func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SAgh2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-SAgh2", ""))
 				},
 			},
 		},
@@ -1816,7 +1816,7 @@ func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-fh3h1", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-fh3h1", ""))
 				},
 			},
 		},
@@ -1835,7 +1835,7 @@ func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-dmitg", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-dmitg", ""))
 				},
 			},
 		},
@@ -1856,7 +1856,7 @@ func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -2028,7 +2028,7 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Jdsgf", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Jdsgf", ""))
 				},
 			},
 		},
@@ -2047,7 +2047,7 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-dsgz3", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-dsgz3", ""))
 				},
 			},
 		},
@@ -2194,7 +2194,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-sdf4h", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-sdf4h", ""))
 				},
 			},
 		},
@@ -2211,7 +2211,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-fdh5z", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-fdh5z", ""))
 				},
 			},
 		},
@@ -2231,7 +2231,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -2394,7 +2394,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Dg4td", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Dg4td", ""))
 				},
 			},
 		},
@@ -2413,7 +2413,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-dgj53", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-dgj53", ""))
 				},
 			},
 		},
@@ -2433,7 +2433,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Ghjjs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Ghjjs", ""))
 				},
 			},
 		},
@@ -2454,7 +2454,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-sani2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-sani2", ""))
 				},
 			},
 		},
@@ -2476,7 +2476,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-agj42", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-agj42", ""))
 				},
 			},
 		},
@@ -2499,7 +2499,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-sd5hn", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-sd5hn", ""))
 				},
 			},
 		},
@@ -2659,7 +2659,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-sdfh3", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-sdfh3", ""))
 				},
 			},
 		},
@@ -2676,7 +2676,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-shj42", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-shj42", ""))
 				},
 			},
 		},
@@ -2695,7 +2695,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-sdh73", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-sdh73", ""))
 				},
 			},
 		},
@@ -2715,7 +2715,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-acx2w", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-acx2w", ""))
 				},
 			},
 		},
@@ -2736,7 +2736,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-dgj6q", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-dgj6q", ""))
 				},
 			},
 		},
@@ -2758,7 +2758,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-ybj62", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-ybj62", ""))
 				},
 			},
 		},
@@ -2782,7 +2782,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -2961,7 +2961,7 @@ func TestCommandSide_AddOrgGitLabIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-adsg2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-adsg2", ""))
 				},
 			},
 		},
@@ -2980,7 +2980,7 @@ func TestCommandSide_AddOrgGitLabIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-GD1j2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-GD1j2", ""))
 				},
 			},
 		},
@@ -3126,7 +3126,7 @@ func TestCommandSide_UpdateOrgGitLabIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-HJK91", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-HJK91", ""))
 				},
 			},
 		},
@@ -3143,7 +3143,7 @@ func TestCommandSide_UpdateOrgGitLabIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-D12t6", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-D12t6", ""))
 				},
 			},
 		},
@@ -3163,7 +3163,7 @@ func TestCommandSide_UpdateOrgGitLabIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -3324,7 +3324,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-jw4ZT", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-jw4ZT", ""))
 				},
 			},
 		},
@@ -3343,7 +3343,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-AST4S", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-AST4S", ""))
 				},
 			},
 		},
@@ -3363,7 +3363,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-DBZHJ", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-DBZHJ", ""))
 				},
 			},
 		},
@@ -3384,7 +3384,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SDGJ4", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-SDGJ4", ""))
 				},
 			},
 		},
@@ -3536,7 +3536,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SAFG4", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-SAFG4", ""))
 				},
 			},
 		},
@@ -3553,7 +3553,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-DG4H", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-DG4H", ""))
 				},
 			},
 		},
@@ -3572,7 +3572,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SD4eb", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-SD4eb", ""))
 				},
 			},
 		},
@@ -3592,7 +3592,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-GHWE3", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-GHWE3", ""))
 				},
 			},
 		},
@@ -3614,7 +3614,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -3783,7 +3783,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-D3fvs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-D3fvs", ""))
 				},
 			},
 		},
@@ -3802,7 +3802,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-W2vqs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-W2vqs", ""))
 				},
 			},
 		},
@@ -3948,7 +3948,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-S32t1", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-S32t1", ""))
 				},
 			},
 		},
@@ -3965,7 +3965,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-ds432", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-ds432", ""))
 				},
 			},
 		},
@@ -3985,7 +3985,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -4146,7 +4146,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SAfdd", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-SAfdd", ""))
 				},
 			},
 		},
@@ -4165,7 +4165,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-sv31s", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-sv31s", ""))
 				},
 			},
 		},
@@ -4185,7 +4185,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-sdgf4", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-sdgf4", ""))
 				},
 			},
 		},
@@ -4206,7 +4206,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-AEG2w", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-AEG2w", ""))
 				},
 			},
 		},
@@ -4228,7 +4228,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SAD5n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-SAD5n", ""))
 				},
 			},
 		},
@@ -4251,7 +4251,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SAy945n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-SAy945n", ""))
 				},
 			},
 		},
@@ -4275,7 +4275,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-S1x705n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-S1x705n", ""))
 				},
 			},
 		},
@@ -4300,7 +4300,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-aAx9x1n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-aAx9x1n", ""))
 				},
 			},
 		},
@@ -4504,7 +4504,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Dgdbs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Dgdbs", ""))
 				},
 			},
 		},
@@ -4521,7 +4521,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Sffgd", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Sffgd", ""))
 				},
 			},
 		},
@@ -4540,7 +4540,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-vb3ss", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-vb3ss", ""))
 				},
 			},
 		},
@@ -4560,7 +4560,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-hbere", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-hbere", ""))
 				},
 			},
 		},
@@ -4581,7 +4581,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-DG45z", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-DG45z", ""))
 				},
 			},
 		},
@@ -4603,7 +4603,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Sxx945n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Sxx945n", ""))
 				},
 			},
 		},
@@ -4626,7 +4626,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-S1p605n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-S1p605n", ""))
 				},
 			},
 		},
@@ -4650,7 +4650,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-aBx901n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-aBx901n", ""))
 				},
 			},
 		},
@@ -4678,7 +4678,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowNotFound(nil, "ORG-ASF3F", ""))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "ORG-ASF3F", ""))
 				},
 			},
 		},
@@ -4905,7 +4905,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-jkn3w", "Errors.IDP.ClientIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-jkn3w", "Errors.IDP.ClientIDMissing"))
 				},
 			},
 		},
@@ -4924,7 +4924,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Ffg32", "Errors.IDP.TeamIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Ffg32", "Errors.IDP.TeamIDMissing"))
 				},
 			},
 		},
@@ -4944,7 +4944,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-GDjm5", "Errors.IDP.KeyIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-GDjm5", "Errors.IDP.KeyIDMissing"))
 				},
 			},
 		},
@@ -4965,7 +4965,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-GVD4n", "Errors.IDP.PrivateKeyMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-GVD4n", "Errors.IDP.PrivateKeyMissing"))
 				},
 			},
 		},
@@ -5119,7 +5119,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-FRHBH", "Errors.IDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-FRHBH", "Errors.IDMissing"))
 				},
 			},
 		},
@@ -5136,7 +5136,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SFm4l", "Errors.IDP.ClientIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-SFm4l", "Errors.IDP.ClientIDMissing"))
 				},
 			},
 		},
@@ -5155,7 +5155,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-SG34t", "Errors.IDP.TeamIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-SG34t", "Errors.IDP.TeamIDMissing"))
 				},
 			},
 		},
@@ -5175,7 +5175,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-Gh4z2", "Errors.IDP.KeyIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-Gh4z2", "Errors.IDP.KeyIDMissing"))
 				},
 			},
 		},
@@ -5197,7 +5197,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -5373,7 +5373,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-957lr0f8u3", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-957lr0f8u3", ""))
 				},
 			},
 		},
@@ -5392,7 +5392,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-78isv6m53a", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-78isv6m53a", ""))
 				},
 			},
 		},
@@ -5545,7 +5545,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-wwdwdlaya0", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-wwdwdlaya0", ""))
 				},
 			},
 		},
@@ -5562,7 +5562,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-egixaofgyl", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-egixaofgyl", ""))
 				},
 			},
 		},
@@ -5581,7 +5581,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-j6spncd74m", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-j6spncd74m", ""))
 				},
 			},
 		},
@@ -5603,7 +5603,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowNotFound(nil, "ORG-z82dddndql", ""))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "ORG-z82dddndql", ""))
 				},
 			},
 		},
@@ -5764,7 +5764,7 @@ func TestCommandSide_RegenerateOrgSAMLProviderCertificate(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "ORG-arv4vdrb6c", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "ORG-arv4vdrb6c", ""))
 				},
 			},
 		},
@@ -5782,7 +5782,7 @@ func TestCommandSide_RegenerateOrgSAMLProviderCertificate(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowNotFound(nil, "ORG-4dw21ch9o9", ""))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "ORG-4dw21ch9o9", ""))
 				},
 			},
 		},

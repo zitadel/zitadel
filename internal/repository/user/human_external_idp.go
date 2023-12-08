@@ -3,8 +3,8 @@ package user
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -75,7 +75,7 @@ func UserIDPLinkAddedEventMapper(event eventstore.Event) (eventstore.Event, erro
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-6M9sd", "unable to unmarshal user external idp added")
+		return nil, zerrors.ThrowInternal(err, "USER-6M9sd", "unable to unmarshal user external idp added")
 	}
 
 	return e, nil
@@ -120,7 +120,7 @@ func UserIDPLinkRemovedEventMapper(event eventstore.Event) (eventstore.Event, er
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-eAWoT", "unable to unmarshal user external idp removed")
+		return nil, zerrors.ThrowInternal(err, "USER-eAWoT", "unable to unmarshal user external idp removed")
 	}
 
 	return e, nil
@@ -165,7 +165,7 @@ func UserIDPLinkCascadeRemovedEventMapper(event eventstore.Event) (eventstore.Ev
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-dKGqO", "unable to unmarshal user external idp cascade removed")
+		return nil, zerrors.ThrowInternal(err, "USER-dKGqO", "unable to unmarshal user external idp cascade removed")
 	}
 
 	return e, nil
@@ -205,7 +205,7 @@ func UserIDPCheckSucceededEventMapper(event eventstore.Event) (eventstore.Event,
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-oikSS", "unable to unmarshal user external idp check succeeded")
+		return nil, zerrors.ThrowInternal(err, "USER-oikSS", "unable to unmarshal user external idp check succeeded")
 	}
 
 	return e, nil

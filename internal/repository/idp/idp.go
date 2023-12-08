@@ -1,8 +1,8 @@
 package idp
 
 import (
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Options struct {
@@ -86,7 +86,7 @@ func RemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-plSD2", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-plSD2", "unable to unmarshal event")
 	}
 
 	return e, nil

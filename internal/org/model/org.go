@@ -2,9 +2,9 @@ package model
 
 import (
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Org struct {
@@ -43,7 +43,7 @@ func (o *Org) GetPrimaryDomain() (string, error) {
 			return d.Domain, nil
 		}
 	}
-	return "", errors.ThrowInternalf(nil, "ORG-Dertg", "no primary domain found for org: %s (instanceID: %s)", o.AggregateID, o.InstanceID)
+	return "", zerrors.ThrowInternalf(nil, "ORG-Dertg", "no primary domain found for org: %s (instanceID: %s)", o.AggregateID, o.InstanceID)
 }
 
 func (o *Org) AddIAMDomain(iamDomain string) {

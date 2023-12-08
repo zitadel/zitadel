@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var _ SystemTokenVerifier = (*SystemTokenVerifierFromConfig)(nil)
@@ -61,7 +61,7 @@ func (s *SystemTokenVerifierFromConfig) VerifySystemToken(ctx context.Context, t
 	}
 	systemUserMemberships, ok := s.systemUsers[jwtReq.Subject]
 	if !ok {
-		return nil, "", zitadel_errors.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong")
+		return nil, "", zerrors.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong")
 	}
 	matchingMemberships = make(Memberships, 0, len(systemUserMemberships))
 	for _, membership := range systemUserMemberships {
@@ -91,7 +91,7 @@ func (s *SystemAPIUser) readKey() (*rsa.PublicKey, error) {
 		var err error
 		s.KeyData, err = os.ReadFile(s.Path)
 		if err != nil {
-			return nil, zitadel_errors.ThrowInternal(err, "AUTHZ-JK31F", "Errors.NotFound")
+			return nil, zerrors.ThrowInternal(err, "AUTHZ-JK31F", "Errors.NotFound")
 		}
 	}
 	return crypto.BytesToPublicKey(s.KeyData)
@@ -104,7 +104,7 @@ func (s *systemJWTStorage) GetKeyByIDAndClientID(_ context.Context, _, userID st
 	}
 	key, ok := s.keys[userID]
 	if !ok {
-		return nil, zitadel_errors.ThrowNotFound(nil, "AUTHZ-asfd3", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "AUTHZ-asfd3", "Errors.User.NotFound")
 	}
 	s.mutex.Lock()
 	defer s.mutex.Unlock()

@@ -7,11 +7,11 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	org_model "github.com/zitadel/zitadel/internal/org/model"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -116,7 +116,7 @@ func (u *NotifyUser) setRootData(event *models.Event) {
 func (u *NotifyUser) setData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, u); err != nil {
 		logging.Log("MODEL-lso9e").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(nil, "MODEL-8iows", "could not unmarshal data")
+		return zerrors.ThrowInternal(nil, "MODEL-8iows", "could not unmarshal data")
 	}
 	return nil
 }
@@ -125,7 +125,7 @@ func (u *NotifyUser) setPasswordData(event *models.Event) error {
 	password := new(es_model.Password)
 	if err := json.Unmarshal(event.Data, password); err != nil {
 		logging.Log("MODEL-dfhw6").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(nil, "MODEL-BHFD2", "could not unmarshal data")
+		return zerrors.ThrowInternal(nil, "MODEL-BHFD2", "could not unmarshal data")
 	}
 	u.PasswordSet = password.Secret != nil || password.EncodedHash != ""
 	return nil

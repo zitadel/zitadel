@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/passwap/scrypt"
 	"github.com/zitadel/passwap/verifier"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type PasswordHasher struct {
@@ -62,11 +62,11 @@ type PasswordHashConfig struct {
 func (c *PasswordHashConfig) PasswordHasher() (*PasswordHasher, error) {
 	verifiers, vPrefixes, err := c.buildVerifiers()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "CRYPT-sahW9", "password hash config invalid")
+		return nil, zerrors.ThrowInvalidArgument(err, "CRYPT-sahW9", "password hash config invalid")
 	}
 	hasher, hPrefixes, err := c.Hasher.buildHasher()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "CRYPT-Que4r", "password hash config invalid")
+		return nil, zerrors.ThrowInvalidArgument(err, "CRYPT-Que4r", "password hash config invalid")
 	}
 	return &PasswordHasher{
 		Swapper:  passwap.NewSwapper(hasher, verifiers...),
