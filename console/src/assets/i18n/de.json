@@ -871,14 +871,16 @@
         },
         "SEQUENCE": {
           "LABEL": "Sequenz",
-          "CHECKBOX": "Nach Sequenz filtern",
-          "SORT": "Sortierung",
-          "ASC": "aufsteigend",
-          "DESC": "absteigend"
+          "CHECKBOX": "Nach Sequenz filtern"
         },
+        "SORT": "Sortierung",
+        "ASC": "Aufsteigend",
+        "DESC": "Absteigend",
         "CREATIONDATE": {
-          "LABEL": "Erstelldatum",
-          "CHECKBOX": "Nach Erstelldatum filtern"
+          "RADIO_FROM": "Von",
+          "RADIO_RANGE": "Zeitraum",
+          "LABEL_SINCE": "Seit",
+          "LABEL_UNTIL": "Bis"
         },
         "OTHER": "weiterer",
         "OTHERS": "weitere"
@@ -928,20 +930,22 @@
         "BTN": "Umbenennen"
       },
       "ORGDOMAIN": {
-        "TITLE": "Verifikation der Domain der Organisation",
-        "VERIFICATION": "Überprüfe den Besitz Deiner Domain, indem Du eine Bestätigungsdatei herunterlädst und unter der angegebenen URL speicherst, oder indem Du sie mit einem DNS-Eintrag verifizierst.",
-        "VERIFICATION_SKIP": "Du kannst die Überprüfung vorerst überspringen und Deine Organisation erstellen. Um Deine Organisation jedoch verwenden zu können, muss dieser Schritt abgeschlossen sein.",
-        "VERIFICATION_VALIDATION_DESC": "Die Tokens werden regelmässig überprüft, um sicherzustellen, dass Du weiterhin im Besitz der Domain bist.",
-        "VERIFICATION_NEWTOKEN_TITLE": "Neues Token anfordern",
-        "VERIFICATION_NEWTOKEN_DESC": "Wenn Du ein neues Token anfordern willst, klicke auf die gewünschte Methode. Wenn Du ein vorhandenes Token validieren möchtest, klicke auf \"Verifizieren\".",
-        "VERIFICATION_VALIDATION_ONGOING": "Ein Token zur Validierung wurde bereits angefragt. Klicke auf \"Verifizieren\", um dieses Token zu validieren.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Typ des Tokens:",
-        "VERIFICATION_SUCCESSFUL": "Domain erfolgreich validiert!",
-        "REQUESTNEWTOKEN": "Neues Token anfordern",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "TITLE": "Bestätigen Sie die Inhaberschaft von {{value}}",
+        "VERIFICATION": "Wir bieten Ihnen zwei Methoden zur manuellen Validierung Ihrer Domain:",
+        "VERIFICATION_HTML": "- HTTP. Hosten Sie eine temporäre Verifizierungsdatei auf Ihrer Website",
+        "VERIFICATION_DNS": "- DNS. Erstellen Sie einen DNS-Eintrag für den TXT-Eintrag",
+        "VERIFICATION_DNS_DESC": "Wenn Sie {{ value }} verwalten und Zugriff auf Ihre DNS-Einträge haben, können Sie einen neuen TXT-Eintrag mit den folgenden Werten erstellen:",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Verwenden Sie diesen Code für den Wert des TXT-Datensatzes:",
+        "VERIFICATION_HTTP_DESC": "Wenn Sie Zugriff auf das Hosting Ihrer Website haben, laden Sie einfach die Bestätigungsdatei herunter und laden Sie sie unter der angegebenen URL hoch",
+        "VERIFICATION_HTTP_URL_LABEL": "Erwartete URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Verifizierungsdatei:",
+        "VERIFICATION_SKIP": "Sie können die Verifizierung vorerst überspringen und mit der Erstellung Ihrer Organisation fortfahren, aber um Ihre Domain nutzen zu können, muss dieser Schritt abgeschlossen sein!",
+        "VERIFICATION_VALIDATION_DESC": "Löschen Sie den Bestätigungscode nicht, da ZITADEL die Inhaberschaft Ihrer Domain von Zeit zu Zeit erneut überprüft.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Fordern Sie ein neues Token an",
+        "VERIFICATION_VALIDATION_ONGOING": "Zur Verifizierung Ihrer Domain wurde die Methode {{ value }} ausgewählt. Klicken Sie auf die Schaltfläche, um eine Verifizierungsprüfung auszulösen oder den Verifizierungsprozess zurückzusetzen.",
+        "VERIFICATION_SUCCESSFUL": "Domain erfolgreich verifiziert!",
+        "RESETMETHOD": "Verifizierungsmethode zurücksetzen"
       },
       "DOWNLOAD_FILE": "Datei herunterladen",
       "SELECTORGTOOLTIP": "Diese Organisation auswählen",
@@ -1018,7 +1022,7 @@
       "DESCRIPTION": "Diese Einstellungen erweitern bzw. überschreiben die Einstellungen Ihrer Instanz."
     },
     "LIST": {
-      "GENERAL": "Allgemein",
+      "LANGUAGES": "Sprachen",
       "LOGIN": "Loginverhalten und Sicherheit",
       "LOCKOUT": "Sperrmechanismen",
       "COMPLEXITY": "Passwordkomplexität",
@@ -1047,22 +1051,32 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Standardsprache",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Spracheinstellungen",
+      "DEFAULT": "Standardsprache",
+      "ALLOWED": "Erlaubte Sprachen",
+      "NOT_ALLOWED": "Nicht erlaubte Sprachen",
+      "ALLOW_ALL": "Alle Sprachen erlauben",
+      "DISALLOW_ALL": "Alle Sprachen verbieten",
+      "SETASDEFAULT": "Als Standard setzen",
+      "DEFAULT_SAVED": "Standard Sprache gesetzt",
+      "ALLOWED_SAVED": "Erlaubte Sprachen gesetzt",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -1261,8 +1275,10 @@
       "RESET_DESCRIPTION": "Sie sind im Begriff alle Standardwerte wiederherzustellen. Alle von Ihnen gesetzten Änderungen werden unwiderruflich gelöscht. Wollen Sie fortfahren?",
       "UNSAVED_TITLE": "Ohne speichern fortfahren?",
       "UNSAVED_DESCRIPTION": "Sie haben Änderungen vorgenommen ohne zu speichern. Möchten Sie jetzt speichern?",
-      "LOCALE": "Sprachcode",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Sie haben eine Sprache ausgewählt, die nicht erlaubt ist. Sie können weiterhin die Texte ändern. Wenn Sie jedoch möchten, dass Ihre Benutzer diese Sprache tatsächlich verwenden können, ändern Sie die Einschränkungen Ihrer Instanz.",
+      "LANGUAGES_NOT_ALLOWED": "Nicht erlaubt:",
+      "LANGUAGE": "Sprache",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1373,7 +1389,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Adresse entspricht Instanzdomain",
       "ALLOWUSERNAMEPASSWORD": "Benutzername Passwort erlaubt",
       "ALLOWEXTERNALIDP": "Externer IDP erlaubt",
-      "ALLOWREGISTER": "Registrieren erlaubt",
+      "ALLOWREGISTERUSERS": "Benutzerregistrierung erlaubt",
+      "ALLOWREGISTERORGS": "Organisationsregistrierung erlaubt",
       "ALLOWUSERNAMEPASSWORD_DESC": "Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
       "ALLOWEXTERNALIDP_DESC": "Der Login wird für die darunter liegenden Identitätsanbieter erlaubt.",
       "ALLOWREGISTER_DESC": "Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",

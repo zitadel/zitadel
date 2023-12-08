@@ -1,64 +1,87 @@
-<span class="title" mat-dialog-title>{{ 'ORG.PAGES.ORGDOMAIN.TITLE' | translate }} {{ domain?.domainName }}</span>
-<div mat-dialog-content>
-  <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION' | translate }}</p>
+<div mat-dialog-title>
+  <div class="dialog-title">
+    <h2>{{ 'ORG.PAGES.ORGDOMAIN.TITLE' | translate: { value: domain?.domainName } }}</h2>
+    <a
+      mat-icon-button
+      href="https://zitadel.com/docs/guides/manage/console/organizations#verify-your-domain-name"
+      rel="noreferrer"
+      target="_blank"
+      aria-label="docs"
+    >
+      <mat-icon class="icon">info_outline</mat-icon>
+    </a>
+  </div>
+</div>
 
-  <cnsl-info-section [type]="InfoSectionType.WARN" class="desc">{{
+<div mat-dialog-content cdkFocusInitial autofocus>
+  <div *ngIf="showNew && !(dns || http)">
+    <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION' | translate }}</p>
+    <p class="desc">
+      {{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_HTML' | translate }}
+    </p>
+    <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_DNS' | translate }}</p>
+    <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_SKIP' | translate }}</p>
+  </div>
+
+  <cnsl-info-section [type]="InfoSectionType.WARN" *ngIf="showNew && !(dns || http)" class="desc">{{
     'ORG.PAGES.ORGDOMAIN.VERIFICATION_VALIDATION_DESC' | translate
   }}</cnsl-info-section>
 
-  <p
-    *ngIf="domain?.validationType !== DomainValidationType.DOMAIN_VALIDATION_TYPE_UNSPECIFIED && !(dns || http)"
-    class="desc"
-  >
-    {{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_VALIDATION_ONGOING' | translate: domain }}
-    {{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_VALIDATION_ONGOING_TYPE' | translate }}
-    {{ 'ORG.PAGES.ORGDOMAIN.TYPES.' + domain?.validationType | translate }}
+  <p *ngIf="!showNew && !(dns || http)" class="desc">
+    {{
+      'ORG.PAGES.ORGDOMAIN.VERIFICATION_VALIDATION_ONGOING'
+        | translate: { value: domain?.validationType == 1 ? 'HTTP' : 'DNS' }
+    }}
   </p>
 
-  <div class="btn-container">
-    <button
-      [disabled]="domain?.validationType === DomainValidationType.DOMAIN_VALIDATION_TYPE_UNSPECIFIED"
-      color="primary"
-      type="submit"
-      mat-raised-button
-      *ngIf="!(dns || http)"
-      (click)="validate()"
-    >
-      {{ 'ACTIONS.VERIFY' | translate }}
-    </button>
-    <mat-spinner class="spinner" *ngIf="validating" diameter="20" mode="indeterminate"></mat-spinner>
-
-    <button *ngIf="!showNew" mat-stroked-button color="primary" (click)="showNew = true">
-      {{ 'ORG.PAGES.ORGDOMAIN.REQUESTNEWTOKEN' | translate }}
-    </button>
-  </div>
-
   <ng-container *ngIf="showNew">
-    <p>{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_NEWTOKEN_TITLE' | translate }}</p>
-    <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_NEWTOKEN_DESC' | translate }}</p>
-
-    <div class="btn-container" *ngIf="!(http || dns)">
-      <button color="primary" mat-raised-button (click)="loadHttpToken()">HTTP</button>
-      <button color="primary" mat-raised-button (click)="loadDnsToken()">DNS</button>
-    </div>
-
     <div *ngIf="http">
-      <p>HTTP TOKEN</p>
-      <p class="entry">{{ http.url }}</p>
-
-      <div class="btn-container">
-        <button mat-stroked-button (click)="saveFile()" color="primary">{{ 'ORG.PAGES.DOWNLOAD_FILE' | translate }}</button>
-        <button color="primary" class="verify-button" type="submit" mat-raised-button (click)="validate()">
-          <span>{{ 'ACTIONS.VERIFY' | translate }}</span>
+      <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_HTTP_DESC' | translate: { value: domain?.domainName } }}</p>
+      <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_HTTP_URL_LABEL' | translate }}</p>
+      <div class="domain-entry" *ngIf="http.url">
+        <p>{{ http.url }}</p>
+        <button
+          color="primary"
+          [disabled]="copied === data.clientSecret"
+          matTooltip="copy to clipboard"
+          cnslCopyToClipboard
+          [valueToCopy]="http.url"
+          (copiedValue)="copied = $event"
+          mat-icon-button
+        >
+          <i *ngIf="copied !== http.url" class="las la-clipboard"></i>
+          <i *ngIf="copied === http.url" class="las la-clipboard-check"></i>
         </button>
-        <mat-spinner class="spinner" *ngIf="validating" diameter="20" mode="indeterminate"></mat-spinner>
       </div>
+
+      <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_HTTP_FILE_LABEL' | translate }}</p>
+      <button mat-stroked-button (click)="saveFile()" color="primary">{{ 'ORG.PAGES.DOWNLOAD_FILE' | translate }}</button>
     </div>
 
     <div *ngIf="dns">
-      <p>DNS TOKEN</p>
-      <div class="domain-line" *ngIf="dns.token">
-        <p class="entry">{{ dns.token }}</p>
+      <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_DNS_DESC' | translate: { value: domain?.domainName } }}</p>
+      <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_DNS_HOST_LABEL' | translate }}</p>
+      <div class="domain-line">
+        <div class="domain-entry" *ngIf="dns.token">
+          <p>{{ dnsChallenge }}</p>
+          <button
+            color="primary"
+            [disabled]="copied === data.clientSecret"
+            matTooltip="copy to clipboard"
+            cnslCopyToClipboard
+            [valueToCopy]="dnsChallenge"
+            (copiedValue)="copied = $event"
+            mat-icon-button
+          >
+            <i *ngIf="copied !== dnsChallenge" class="las la-clipboard"></i>
+            <i *ngIf="copied === dnsChallenge" class="las la-clipboard-check"></i>
+          </button>
+        </div>
+        <span>.{{ domain?.domainName }}</span>
+      </div>
+      <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_DNS_CHALLENGE_LABEL' | translate }}</p>
+      <div class="domain-entry" *ngIf="dns.token">
+        <p>{{ dns.token }}</p>
         <button
           color="primary"
           [disabled]="copied === data.clientSecret"
@@ -71,16 +94,32 @@
           <i *ngIf="copied !== dns.token" class="las la-clipboard"></i>
           <i *ngIf="copied === dns.token" class="las la-clipboard-check"></i>
         </button>
-        <button color="primary" type="submit" mat-raised-button class="verify-button" (click)="validate()">
-          {{ 'ACTIONS.VERIFY' | translate }}
-        </button>
-        <mat-spinner class="spinner" *ngIf="validating" diameter="20" mode="indeterminate"></mat-spinner>
       </div>
-      <p class="entry">{{ dns.url }}</p>
     </div>
   </ng-container>
 </div>
 <div mat-dialog-actions class="action">
+  <button
+    *ngIf="!showNew || dns || http"
+    color="primary"
+    type="submit"
+    mat-raised-button
+    class="verify-button"
+    (click)="validate()"
+  >
+    {{ 'ACTIONS.VERIFY' | translate }}
+  </button>
+  <mat-spinner class="spinner" *ngIf="validating" diameter="20" mode="indeterminate"></mat-spinner>
+
+  <button *ngIf="!showNew" mat-stroked-button color="primary" (click)="showNew = true">
+    {{ 'ORG.PAGES.ORGDOMAIN.RESETMETHOD' | translate }}
+  </button>
+
+  <div>
+    <button color="primary" *ngIf="showNew && !(dns || http)" mat-raised-button (click)="loadHttpToken()">HTTP</button>
+    <button color="primary" *ngIf="showNew && !(dns || http)" mat-raised-button (click)="loadDnsToken()">DNS</button>
+  </div>
+
   <button mat-stroked-button (click)="closeDialog()">
     {{ 'ACTIONS.CLOSE' | translate }}
   </button>

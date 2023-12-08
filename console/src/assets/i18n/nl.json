@@ -872,14 +872,16 @@
         },
         "SEQUENCE": {
           "LABEL": "Reeks",
-          "CHECKBOX": "Filter op Reeks",
-          "SORT": "Sortering",
-          "ASC": "Oplopend",
-          "DESC": "Aflopend"
+          "CHECKBOX": "Filter op Reeks"
         },
+        "SORT": "Sortering",
+        "ASC": "Oplopend",
+        "DESC": "Aflopend",
         "CREATIONDATE": {
-          "LABEL": "Aanmaakdatum",
-          "CHECKBOX": "Filter op Aanmaakdatum"
+          "RADIO_FROM": "Van",
+          "RADIO_RANGE": "Reeks",
+          "LABEL_SINCE": "Sinds",
+          "LABEL_UNTIL": "Tot"
         },
         "OTHER": "ander",
         "OTHERS": "anderen"
@@ -929,20 +931,22 @@
         "BTN": "Hernoemen"
       },
       "ORGDOMAIN": {
-        "TITLE": "Verificatie van Organisatie Domein Eigendom",
-        "VERIFICATION": "Om het eigendom van uw domein te verifiëren, moet u een verificatiebestand downloaden en uploaden op de hieronder vermelde URL, of een TXT Record DNS-invoer plaatsen voor de verstrekte URL. Om te voltooien, klik op de knop om te verifiëren.",
-        "VERIFICATION_SKIP": "Je kunt de verificatie nu overslaan en doorgaan met het aanmaken van je organisatie, maar om je organisatie te kunnen gebruiken, moet deze stap worden voltooid!",
-        "VERIFICATION_VALIDATION_DESC": "De tokens worden regelmatig gecontroleerd om te zorgen dat u nog steeds eigenaar bent van het domein.",
-        "VERIFICATION_NEWTOKEN_TITLE": "Vraag nieuw token aan",
-        "VERIFICATION_NEWTOKEN_DESC": "Als u een nieuw token wilt aanvragen, selecteer dan uw voorkeursmethode. Als u een bestaand token wilt valideren, klik dan op de knop hierboven.",
-        "VERIFICATION_VALIDATION_ONGOING": "Er is al een verificatietoken aangevraagd. Klik op de knop om een verificatiecontrole te activeren.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Type van het token:",
+        "TITLE": "Verifieer het eigendom van {{value}}",
+        "VERIFICATION": "Wij bieden u twee methoden aan om uw domein handmatig te valideren:",
+        "VERIFICATION_HTML": "-HTTP. Host een tijdelijk verificatiebestand op uw website",
+        "VERIFICATION_DNS": "- DNS. Maak een TXT Record DNS-vermelding",
+        "VERIFICATION_DNS_DESC": "Als u {{ value }} beheert en toegang heeft tot uw DNS-records, kunt u een nieuw TXT-record maken met de volgende waarden:",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Gebruik deze code voor de waarde van het TXT-record:",
+        "VERIFICATION_HTTP_DESC": "Als u toegang heeft tot de hosting van uw website, downloadt u eenvoudigweg het verificatiebestand en uploadt u dit naar de opgegeven URL",
+        "VERIFICATION_HTTP_URL_LABEL": "Verwachte URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Verificatiebestand:",
+        "VERIFICATION_SKIP": "U kunt de verificatie voorlopig overslaan en doorgaan met het aanmaken van uw organisatie, maar om uw domein te gebruiken moet deze stap worden voltooid!",
+        "VERIFICATION_VALIDATION_DESC": "Verwijder de verificatiecode niet, aangezien ZITADEL van tijd tot tijd het eigendom van uw domein opnieuw zal controleren.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Vraag een nieuw token aan",
+        "VERIFICATION_VALIDATION_ONGOING": "De methode {{ value }} is geselecteerd om uw domein te verifiëren. Klik op de knop om een ​​verificatiecontrole te activeren of het verificatieproces opnieuw in te stellen.",
         "VERIFICATION_SUCCESSFUL": "Domein succesvol geverifieerd!",
-        "REQUESTNEWTOKEN": "Vraag nieuw token aan",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "RESETMETHOD": "Verificatiemethode opnieuw instellen"
       },
       "DOWNLOAD_FILE": "Download bestand",
       "SELECTORGTOOLTIP": "Selecteer deze organisatie.",
@@ -1019,7 +1023,7 @@
       "DESCRIPTION": "Deze instellingen breiden uw instantie instellingen uit en overschrijven deze."
     },
     "LIST": {
-      "GENERAL": "Algemeen",
+      "LANGUAGES": "Talen",
       "LOGIN": "Login Gedrag en Beveiliging",
       "LOCKOUT": "Lockout",
       "COMPLEXITY": "Wachtwoord complexiteit",
@@ -1048,22 +1052,32 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Standaard Taal",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "Engels",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portugees",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Taalinstellingen",
+      "DEFAULT": "Standaardtaal",
+      "ALLOWED": "Toegestane Talen",
+      "NOT_ALLOWED": "Niet Toegestane Talen",
+      "ALLOW_ALL": "Sta alle talen toe",
+      "DISALLOW_ALL": "Sta geen talen toe",
+      "SETASDEFAULT": "Stel in als standaardtaal",
+      "DEFAULT_SAVED": "Standaardtaal opgeslagen",
+      "ALLOWED_SAVED": "Toegestane talen opgeslagen",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "Engels",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portugees",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "SMTP Instellingen",
@@ -1261,9 +1275,11 @@
       "RESET_TITLE": "Herstel Standaard Waarden",
       "RESET_DESCRIPTION": "U staat op het punt om alle standaardwaarden te herstellen. Alle wijzigingen die u heeft gemaakt zullen permanent worden verwijderd. Weet u zeker dat u wilt doorgaan?",
       "UNSAVED_TITLE": "Doorgaan zonder opslaan?",
-      "UNSAAVED_DESCRIPTION": "U heeft wijzigingen gemaakt zonder op te slaan. Wilt u nu opslaan?",
-      "LOCALE": "Locale Code",
-      "LOCALES": {
+      "UNSAVED_DESCRIPTION": "U heeft wijzigingen gemaakt zonder op te slaan. Wilt u nu opslaan?",
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "U heeft een taal geselecteerd die niet is toegestaan. U kunt doorgaan met het wijzigen van de teksten. Maar als u wilt dat uw gebruikers deze taal daadwerkelijk kunnen gebruiken, wijzig dan de beperkingen van uw instantie.",
+      "LANGUAGES_NOT_ALLOWED": "Niet toegestaan:",
+      "LANGUAGE": "Taal",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1374,7 +1390,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Afzender Adres komt overeen met Instantie Domein",
       "ALLOWUSERNAMEPASSWORD": "Gebruikersnaam Wachtwoord toegestaan",
       "ALLOWEXTERNALIDP": "Externe IDP toegestaan",
-      "ALLOWREGISTER": "Registratie toegestaan",
+      "ALLOWREGISTERUSERS": "Gebruikersregistratie toegestaan",
+      "ALLOWREGISTERORGS": "Organisatieregistratie toegestaan",
       "ALLOWUSERNAMEPASSWORD_DESC": "De conventionele login met gebruikersnaam en wachtwoord is toegestaan.",
       "ALLOWEXTERNALIDP_DESC": "De login is toegestaan voor de onderliggende identiteitsproviders",
       "ALLOWREGISTER_DESC": "Als de optie is geselecteerd, verschijnt er een extra stap voor het registreren van een gebruiker in het login proces.",

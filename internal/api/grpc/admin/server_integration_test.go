@@ -17,8 +17,6 @@ import (
 var (
 	AdminCTX, SystemCTX context.Context
 	Tester              *integration.Tester
-	// NoopAssertionT is useful in combination with assert.Eventuallyf to use testify assertions in a callback
-	NoopAssertionT = new(noopAssertionT)
 )
 
 func TestMain(m *testing.M) {
@@ -36,17 +34,17 @@ func TestMain(m *testing.M) {
 	}())
 }
 
-func await(t *testing.T, ctx context.Context, cb func() bool) {
+func await(t *testing.T, ctx context.Context, cb func(*assert.CollectT)) {
 	deadline, ok := ctx.Deadline()
 	require.True(t, ok, "context must have deadline")
-	assert.Eventuallyf(
+	require.EventuallyWithT(
 		t,
-		func() bool {
+		func(tt *assert.CollectT) {
 			defer func() {
 				// Panics are not recovered and don't mark the test as failed, so we need to do that ourselves
 				require.Nil(t, recover(), "panic in await callback")
 			}()
-			return cb()
+			cb(tt)
 		},
 		time.Until(deadline),
 		100*time.Millisecond,

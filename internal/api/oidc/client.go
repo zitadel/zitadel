@@ -923,6 +923,12 @@ func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCreden
 	if client.State != domain.AppStateActive {
 		return nil, oidc.ErrInvalidClient().WithDescription("client is not active")
 	}
+	if client.Settings == nil {
+		client.Settings = &query.OIDCSettings{
+			AccessTokenLifetime: s.defaultAccessTokenLifetime,
+			IdTokenLifetime:     s.defaultIdTokenLifetime,
+		}
+	}
 
 	switch client.AuthMethodType {
 	case domain.OIDCAuthMethodTypeBasic, domain.OIDCAuthMethodTypePost:
