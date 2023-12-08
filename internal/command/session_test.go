@@ -487,11 +487,9 @@ func TestCommands_updateSession(t *testing.T) {
 			},
 			res{
 				want: &SessionChanged{
-					ObjectDetails: &domain.ObjectDetails{
-						ResourceOwner: "instance1",
-					},
-					ID:       "sessionID",
-					NewToken: "",
+					ObjectDetails: &domain.ObjectDetails{},
+					ID:            "sessionID",
+					NewToken:      "",
 				},
 			},
 		},
