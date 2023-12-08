@@ -61,14 +61,14 @@ SELECT
   , n.verified_phone
   , n.password_set
   , count(*) OVER ()
-FROM projections.users9 u
+FROM projections.users10 u
 LEFT JOIN
-  projections.users9_humans h
+  projections.users10_humans h
   ON
     u.id = h.user_id
     AND u.instance_id = h.instance_id
 LEFT JOIN
-  projections.users9_notifications n
+  projections.users10_notifications n
   ON
     u.id = n.user_id
     AND u.instance_id = n.instance_id
