@@ -1,6 +1,7 @@
 package gerrors
 
 import (
+	"errors"
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -34,7 +35,7 @@ func ExtractZITADELError(err error) (c codes.Code, msg, id string, ok bool) {
 		return codes.OK, "", "", false
 	}
 	zitadelErr := new(zerrors.ZitadelError)
-	if ok := zitadelErr.As(err); !ok {
+	if ok := errors.As(err, &zitadelErr); !ok {
 		return codes.Unknown, err.Error(), "", false
 	}
 	switch {
