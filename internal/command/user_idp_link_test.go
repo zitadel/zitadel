@@ -937,3 +937,141 @@ func TestCommandSide_MigrateUserIDP(t *testing.T) {
 		})
 	}
 }
+
+func TestCommandSide_UpdateUserIDPLinkUsername(t *testing.T) {
+	type fields struct {
+		eventstore func(t *testing.T) *eventstore.Eventstore
+	}
+	type args struct {
+		ctx            context.Context
+		userID         string
+		orgID          string
+		idpConfigID    string
+		externalUserID string
+		newUsername    string
+	}
+	type res struct {
+		err error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:            context.Background(),
+				userID:         "",
+				orgID:          "org1",
+				idpConfigID:    "idpConfig1",
+				externalUserID: "externalUserID",
+				newUsername:    "newUsername",
+			},
+			res: res{
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-SFegz", "Errors.IDMissing"),
+			},
+		},
+		{
+			name: "idp link not active, precondition failed error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"idpConfig1",
+								"displayName",
+								"externalUserID",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:            context.Background(),
+				userID:         "user1",
+				orgID:          "org1",
+				idpConfigID:    "idpConfig1",
+				externalUserID: "otherID",
+				newUsername:    "newUsername",
+			},
+			res: res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-DGhre", "Errors.User.ExternalIDP.NotFound"),
+			},
+		},
+		{
+			name: "external username not changed, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"idpConfig1",
+								"displayName",
+								"externalUserID",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:            context.Background(),
+				userID:         "user1",
+				orgID:          "org1",
+				idpConfigID:    "idpConfig1",
+				externalUserID: "externalUserID",
+				newUsername:    "displayName",
+			},
+			res: res{},
+		},
+		{
+			name: "external username update, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"idpConfig1",
+								"displayName",
+								"externalUserID",
+							),
+						),
+					),
+					expectPush(
+						user.NewUserIDPExternalUsernameEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"idpConfig1",
+							"externalUserID",
+							"newUsername",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:            context.Background(),
+				userID:         "user1",
+				orgID:          "org1",
+				idpConfigID:    "idpConfig1",
+				externalUserID: "externalUserID",
+				newUsername:    "newUsername",
+			},
+			res: res{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			err := r.UpdateUserIDPLinkUsername(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.idpConfigID, tt.args.externalUserID, tt.args.newUsername)
+			assert.ErrorIs(t, err, tt.res.err)
+		})
+	}
+}
