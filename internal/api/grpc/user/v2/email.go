@@ -7,7 +7,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
-
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )

@@ -3,10 +3,9 @@ package middleware
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/grpc/gerrors"
-
 	"google.golang.org/grpc"
 
+	"github.com/zitadel/zitadel/internal/api/grpc/gerrors"
 	_ "github.com/zitadel/zitadel/internal/statik"
 )
 
