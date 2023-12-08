@@ -1,9 +1,6 @@
 package command
 
 import (
-	"context"
-
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -17,9 +14,9 @@ type resourceOwnerModel struct {
 	resourceOwner string
 }
 
-func NewResourceOwnerModel(ctx context.Context, aggregateType eventstore.AggregateType, aggregateID string) *resourceOwnerModel {
+func NewResourceOwnerModel(instanceID string, aggregateType eventstore.AggregateType, aggregateID string) *resourceOwnerModel {
 	return &resourceOwnerModel{
-		instanceID:    authz.GetInstance(ctx).InstanceID(),
+		instanceID:    instanceID,
 		aggregateType: aggregateType,
 		aggregateID:   aggregateID,
 	}
