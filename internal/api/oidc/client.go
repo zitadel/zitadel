@@ -215,11 +215,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 }
 
 func (o *OPStorage) ClientCredentialsTokenRequest(ctx context.Context, clientID string, scope []string) (op.TokenRequest, error) {
-	loginname, err := query.NewUserLoginNamesSearchQuery(clientID)
-	if err != nil {
-		return nil, err
-	}
-	user, err := o.query.GetUser(ctx, false, loginname)
+	user, err := o.query.GetUserByLoginName(ctx, false, clientID)
 	if err != nil {
 		return nil, err
 	}

@@ -474,11 +474,7 @@ func userByID(userID string) userSearch {
 }
 
 func userByLoginName(loginName string) (userSearch, error) {
-	loginNameQuery, err := query.NewUserLoginNamesSearchQuery(loginName)
-	if err != nil {
-		return nil, err
-	}
-	return userSearchByLoginName{loginNameQuery}, nil
+	return userSearchByLoginName{loginName}, nil
 }
 
 type userSearchByID struct {
@@ -490,9 +486,9 @@ func (u userSearchByID) search(ctx context.Context, q *query.Queries) (*query.Us
 }
 
 type userSearchByLoginName struct {
-	loginNameQuery query.SearchQuery
+	loginName string
 }
 
 func (u userSearchByLoginName) search(ctx context.Context, q *query.Queries) (*query.User, error) {
-	return q.GetUser(ctx, true, u.loginNameQuery)
+	return q.GetUserByLoginName(ctx, true, u.loginName)
 }

@@ -586,12 +586,6 @@ func Test_sessionQueryToQuery(t *testing.T) {
 	}
 }
 
-func mustUserLoginNamesSearchQuery(t testing.TB, value string) query.SearchQuery {
-	loginNameQuery, err := query.NewUserLoginNamesSearchQuery("bar")
-	require.NoError(t, err)
-	return loginNameQuery
-}
-
 func Test_userCheck(t *testing.T) {
 	type args struct {
 		user *session.CheckUser
@@ -623,7 +617,7 @@ func Test_userCheck(t *testing.T) {
 					LoginName: "bar",
 				},
 			}},
-			want: userSearchByLoginName{mustUserLoginNamesSearchQuery(t, "bar")},
+			want: userSearchByLoginName{"bar"},
 		},
 		{
 			name: "unimplemented error",
