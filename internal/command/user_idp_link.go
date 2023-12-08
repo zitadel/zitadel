@@ -160,6 +160,27 @@ func (c *Commands) MigrateUserIDP(ctx context.Context, userID, orgID, idpConfigI
 	return err
 }
 
+func (c *Commands) UpdateUserIDPLinkUsername(ctx context.Context, userID, orgID, idpConfigID, externalID, newUsername string) (err error) {
+	if userID == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-SFegz", "Errors.IDMissing")
+	}
+
+	writeModel, err := c.userIDPLinkWriteModelByID(ctx, userID, idpConfigID, externalID, orgID)
+	if err != nil {
+		return err
+	}
+	if writeModel.State != domain.UserIDPLinkStateActive {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-DGhre", "Errors.User.ExternalIDP.NotFound")
+	}
+	if writeModel.DisplayName == newUsername {
+		return nil
+	}
+
+	userAgg := UserAggregateFromWriteModel(&writeModel.WriteModel) //nolint:contextcheck
+	_, err = c.eventstore.Push(ctx, user.NewUserIDPExternalUsernameEvent(ctx, userAgg, idpConfigID, externalID, newUsername))
+	return err
+}
+
 func (c *Commands) userIDPLinkWriteModelByID(ctx context.Context, userID, idpConfigID, externalUserID, resourceOwner string) (writeModel *UserIDPLinkWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

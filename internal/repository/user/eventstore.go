@@ -68,6 +68,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(AggregateType, UserIDPLinkCascadeRemovedType, UserIDPLinkCascadeRemovedEventMapper).
 		RegisterFilterEventMapper(AggregateType, UserIDPLoginCheckSucceededType, UserIDPCheckSucceededEventMapper).
 		RegisterFilterEventMapper(AggregateType, UserIDPExternalIDMigratedType, eventstore.GenericEventMapper[UserIDPExternalIDMigratedEvent]).
+		RegisterFilterEventMapper(AggregateType, UserIDPExternalUsernameChangedType, eventstore.GenericEventMapper[UserIDPExternalUsernameEvent]).
 		RegisterFilterEventMapper(AggregateType, HumanEmailChangedType, HumanEmailChangedEventMapper).
 		RegisterFilterEventMapper(AggregateType, HumanEmailVerifiedType, HumanEmailVerifiedEventMapper).
 		RegisterFilterEventMapper(AggregateType, HumanEmailVerificationFailedType, HumanEmailVerificationFailedEventMapper).

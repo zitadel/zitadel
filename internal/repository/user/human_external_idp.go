@@ -12,10 +12,11 @@ const (
 	UserIDPLinkEventPrefix = humanEventPrefix + "externalidp."
 	idpLoginEventPrefix    = humanEventPrefix + "externallogin."
 
-	UserIDPLinkAddedType          = UserIDPLinkEventPrefix + "added"
-	UserIDPLinkRemovedType        = UserIDPLinkEventPrefix + "removed"
-	UserIDPLinkCascadeRemovedType = UserIDPLinkEventPrefix + "cascade.removed"
-	UserIDPExternalIDMigratedType = UserIDPLinkEventPrefix + "id.migrated"
+	UserIDPLinkAddedType               = UserIDPLinkEventPrefix + "added"
+	UserIDPLinkRemovedType             = UserIDPLinkEventPrefix + "removed"
+	UserIDPLinkCascadeRemovedType      = UserIDPLinkEventPrefix + "cascade.removed"
+	UserIDPExternalIDMigratedType      = UserIDPLinkEventPrefix + "id.migrated"
+	UserIDPExternalUsernameChangedType = UserIDPLinkEventPrefix + "username.changed"
 
 	UserIDPLoginCheckSucceededType = idpLoginEventPrefix + "check.succeeded"
 )
@@ -246,5 +247,43 @@ func NewUserIDPExternalIDMigratedEvent(
 		IDPConfigID: idpConfigID,
 		PreviousID:  previousID,
 		NewID:       newID,
+	}
+}
+
+type UserIDPExternalUsernameEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	IDPConfigID          string `json:"idpConfigId"`
+	ExternalUserID       string `json:"userId"`
+	ExternalUsername     string `json:"username"`
+}
+
+func (e *UserIDPExternalUsernameEvent) Payload() interface{} {
+	return e
+}
+
+func (e *UserIDPExternalUsernameEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *UserIDPExternalUsernameEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewUserIDPExternalUsernameEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	idpConfigID,
+	externalUserID,
+	externalUsername string,
+) *UserIDPExternalUsernameEvent {
+	return &UserIDPExternalUsernameEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			UserIDPExternalUsernameChangedType,
+		),
+		IDPConfigID:      idpConfigID,
+		ExternalUserID:   externalUserID,
+		ExternalUsername: externalUsername,
 	}
 }

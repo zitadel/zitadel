@@ -82,6 +82,10 @@ func (p *idpUserLinkProjection) Reducers() []handler.AggregateReducer {
 					Event:  user.UserIDPExternalIDMigratedType,
 					Reduce: p.reduceExternalIDMigrated,
 				},
+				{
+					Event:  user.UserIDPExternalUsernameChangedType,
+					Reduce: p.reduceExternalUsernameChanged,
+				},
 			},
 		},
 		{
@@ -211,6 +215,27 @@ func (p *idpUserLinkProjection) reduceExternalIDMigrated(event eventstore.Event)
 			handler.NewCond(IDPUserLinkIDPIDCol, e.IDPConfigID),
 			handler.NewCond(IDPUserLinkUserIDCol, e.Aggregate().ID),
 			handler.NewCond(IDPUserLinkExternalUserIDCol, e.PreviousID),
+			handler.NewCond(IDPUserLinkInstanceIDCol, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *idpUserLinkProjection) reduceExternalUsernameChanged(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*user.UserIDPExternalUsernameEvent](event)
+	if err != nil {
+		return nil, err
+	}
+
+	return handler.NewUpdateStatement(e,
+		[]handler.Column{
+			handler.NewCol(IDPUserLinkChangeDateCol, e.CreationDate()),
+			handler.NewCol(IDPUserLinkSequenceCol, e.Sequence()),
+			handler.NewCol(IDPUserLinkDisplayNameCol, e.ExternalUsername),
+		},
+		[]handler.Condition{
+			handler.NewCond(IDPUserLinkIDPIDCol, e.IDPConfigID),
+			handler.NewCond(IDPUserLinkUserIDCol, e.Aggregate().ID),
+			handler.NewCond(IDPUserLinkExternalUserIDCol, e.ExternalUserID),
 			handler.NewCond(IDPUserLinkInstanceIDCol, e.Aggregate().InstanceID),
 		},
 	), nil
