@@ -10,13 +10,13 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/static/mock"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
@@ -90,7 +90,7 @@ func TestCommandSide_AddDefaultLabelPolicy(t *testing.T) {
 				themeMode:           domain.LabelPolicyThemeAuto,
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -208,7 +208,7 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -255,7 +255,7 @@ func TestCommandSide_ChangeDefaultLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -388,7 +388,7 @@ func TestCommandSide_ActivateDefaultLabelPolicy(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -490,7 +490,7 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -532,7 +532,7 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -636,7 +636,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -676,7 +676,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -787,7 +787,7 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -829,7 +829,7 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -933,7 +933,7 @@ func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1046,7 +1046,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1089,7 +1089,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -1193,7 +1193,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1233,7 +1233,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -1344,7 +1344,7 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1386,7 +1386,7 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -1490,7 +1490,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1530,7 +1530,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -1641,7 +1641,7 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1683,7 +1683,7 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -1787,7 +1787,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1827,7 +1827,7 @@ func TestCommandSide_RemoveFontDefaultLabelPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{

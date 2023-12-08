@@ -9,9 +9,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type OIDCConfig struct {
@@ -108,7 +108,7 @@ func (c *OIDCConfig) IsValid() bool {
 	return true
 }
 
-//ClientID random_number@projectname (eg. 495894098234@zitadel)
+// ClientID random_number@projectname (eg. 495894098234@zitadel)
 func (c *OIDCConfig) GenerateNewClientID(idGenerator id.Generator, project *Project) error {
 	rndID, err := idGenerator.Next()
 	if err != nil {
@@ -130,7 +130,7 @@ func (c *OIDCConfig) GenerateNewClientSecret(generator crypto.Generator) (string
 	cryptoValue, stringSecret, err := crypto.NewCode(generator)
 	if err != nil {
 		logging.Log("MODEL-UpnTI").OnError(err).Error("unable to create client secret")
-		return "", errors.ThrowInternal(err, "MODEL-gH2Wl", "Errors.Project.CouldNotGenerateClientSecret")
+		return "", zerrors.ThrowInternal(err, "MODEL-gH2Wl", "Errors.Project.CouldNotGenerateClientSecret")
 	}
 	c.ClientSecret = cryptoValue
 	return stringSecret, nil

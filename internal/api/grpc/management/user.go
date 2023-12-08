@@ -23,17 +23,17 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) getUserByID(ctx context.Context, id string) (*query.User, error) {
-	owner, err := query.NewUserResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID, query.TextEquals)
+	user, err := s.query.GetUserByID(ctx, true, id)
 	if err != nil {
 		return nil, err
 	}
-	user, err := s.query.GetUserByID(ctx, true, id, owner)
-	if err != nil {
-		return nil, err
+	if user.ResourceOwner != authz.GetCtxData(ctx).OrgID {
+		return nil, zerrors.ThrowNotFound(nil, "MANAG-fpo4B", "Errors.User.NotFound")
 	}
 	return user, nil
 }
@@ -49,11 +49,7 @@ func (s *Server) GetUserByID(ctx context.Context, req *mgmt_pb.GetUserByIDReques
 }
 
 func (s *Server) GetUserByLoginNameGlobal(ctx context.Context, req *mgmt_pb.GetUserByLoginNameGlobalRequest) (*mgmt_pb.GetUserByLoginNameGlobalResponse, error) {
-	loginName, err := query.NewUserPreferredLoginNameSearchQuery(req.LoginName, query.TextEquals)
-	if err != nil {
-		return nil, err
-	}
-	user, err := s.query.GetUser(ctx, true, loginName)
+	user, err := s.query.GetUserByLoginName(ctx, true, req.LoginName)
 	if err != nil {
 		return nil, err
 	}

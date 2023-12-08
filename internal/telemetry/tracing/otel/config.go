@@ -7,8 +7,8 @@ import (
 	otlpgrpc "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Config struct {
@@ -38,11 +38,11 @@ func FractionFromConfig(i interface{}) (float64, error) {
 	case string:
 		f, err := strconv.ParseFloat(fraction, 64)
 		if err != nil {
-			return 0, errors.ThrowInternal(err, "OTEL-SAfe1", "could not map fraction")
+			return 0, zerrors.ThrowInternal(err, "OTEL-SAfe1", "could not map fraction")
 		}
 		return f, nil
 	default:
-		return 0, errors.ThrowInternal(nil, "OTEL-Dd2s", "could not map fraction, unknown type")
+		return 0, zerrors.ThrowInternal(nil, "OTEL-Dd2s", "could not map fraction, unknown type")
 	}
 }
 

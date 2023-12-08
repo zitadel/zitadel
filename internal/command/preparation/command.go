@@ -3,8 +3,8 @@ package preparation
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // Validation of the input values of the command and if correct returns
@@ -21,7 +21,7 @@ type FilterToQueryReducer func(ctx context.Context, queryFactory *eventstore.Sea
 
 var (
 	//ErrNotExecutable is thrown if no command creator was created
-	ErrNotExecutable = errors.ThrowInvalidArgument(nil, "PREPA-pH70n", "Errors.Internal")
+	ErrNotExecutable = zerrors.ThrowInvalidArgument(nil, "PREPA-pH70n", "Errors.Internal")
 )
 
 // PrepareCommands checks the passed validations and if ok creates the commands

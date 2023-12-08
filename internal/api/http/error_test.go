@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"testing"
 
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestZitadelErrorToHTTPStatusCode(t *testing.T) {
@@ -30,7 +30,7 @@ func TestZitadelErrorToHTTPStatusCode(t *testing.T) {
 		{
 			name: "wrapped already exists",
 			args: args{
-				err: fmt.Errorf("wrapped %w", caos_errors.ThrowAlreadyExists(nil, "id", "message")),
+				err: fmt.Errorf("wrapped %w", zerrors.ThrowAlreadyExists(nil, "id", "message")),
 			},
 			wantStatusCode: http.StatusConflict,
 			wantOk:         true,
@@ -38,7 +38,7 @@ func TestZitadelErrorToHTTPStatusCode(t *testing.T) {
 		{
 			name: "wrapped deadline exceeded",
 			args: args{
-				err: fmt.Errorf("wrapped %w", caos_errors.ThrowDeadlineExceeded(nil, "id", "message")),
+				err: fmt.Errorf("wrapped %w", zerrors.ThrowDeadlineExceeded(nil, "id", "message")),
 			},
 			wantStatusCode: http.StatusGatewayTimeout,
 			wantOk:         true,
@@ -46,7 +46,7 @@ func TestZitadelErrorToHTTPStatusCode(t *testing.T) {
 		{
 			name: "wrapped internal",
 			args: args{
-				err: fmt.Errorf("wrapped %w", caos_errors.ThrowInternal(nil, "id", "message")),
+				err: fmt.Errorf("wrapped %w", zerrors.ThrowInternal(nil, "id", "message")),
 			},
 			wantStatusCode: http.StatusInternalServerError,
 			wantOk:         true,
@@ -54,7 +54,7 @@ func TestZitadelErrorToHTTPStatusCode(t *testing.T) {
 		{
 			name: "wrapped invalid argument",
 			args: args{
-				err: fmt.Errorf("wrapped %w", caos_errors.ThrowInvalidArgument(nil, "id", "message")),
+				err: fmt.Errorf("wrapped %w", zerrors.ThrowInvalidArgument(nil, "id", "message")),
 			},
 			wantStatusCode: http.StatusBadRequest,
 			wantOk:         true,
@@ -62,7 +62,7 @@ func TestZitadelErrorToHTTPStatusCode(t *testing.T) {
 		{
 			name: "wrapped not found",
 			args: args{
-				err: fmt.Errorf("wrapped %w", caos_errors.ThrowNotFound(nil, "id", "message")),
+				err: fmt.Errorf("wrapped %w", zerrors.ThrowNotFound(nil, "id", "message")),
 			},
 			wantStatusCode: http.StatusNotFound,
 			wantOk:         true,
@@ -70,7 +70,7 @@ func TestZitadelErrorToHTTPStatusCode(t *testing.T) {
 		{
 			name: "wrapped permission denied",
 			args: args{
-				err: fmt.Errorf("wrapped %w", caos_errors.ThrowPermissionDenied(nil, "id", "message")),
+				err: fmt.Errorf("wrapped %w", zerrors.ThrowPermissionDenied(nil, "id", "message")),
 			},
 			wantStatusCode: http.StatusForbidden,
 			wantOk:         true,
@@ -78,7 +78,7 @@ func TestZitadelErrorToHTTPStatusCode(t *testing.T) {
 		{
 			name: "wrapped precondition failed",
 			args: args{
-				err: fmt.Errorf("wrapped %w", caos_errors.ThrowPreconditionFailed(nil, "id", "message")),
+				err: fmt.Errorf("wrapped %w", zerrors.ThrowPreconditionFailed(nil, "id", "message")),
 			},
 			wantStatusCode: http.StatusBadRequest,
 			wantOk:         true,
@@ -86,7 +86,7 @@ func TestZitadelErrorToHTTPStatusCode(t *testing.T) {
 		{
 			name: "wrapped unauthenticated",
 			args: args{
-				err: fmt.Errorf("wrapped %w", caos_errors.ThrowUnauthenticated(nil, "id", "message")),
+				err: fmt.Errorf("wrapped %w", zerrors.ThrowUnauthenticated(nil, "id", "message")),
 			},
 			wantStatusCode: http.StatusUnauthorized,
 			wantOk:         true,
@@ -94,7 +94,7 @@ func TestZitadelErrorToHTTPStatusCode(t *testing.T) {
 		{
 			name: "wrapped unavailable",
 			args: args{
-				err: fmt.Errorf("wrapped %w", caos_errors.ThrowUnavailable(nil, "id", "message")),
+				err: fmt.Errorf("wrapped %w", zerrors.ThrowUnavailable(nil, "id", "message")),
 			},
 			wantStatusCode: http.StatusServiceUnavailable,
 			wantOk:         true,
@@ -102,7 +102,7 @@ func TestZitadelErrorToHTTPStatusCode(t *testing.T) {
 		{
 			name: "wrapped unimplemented",
 			args: args{
-				err: fmt.Errorf("wrapped %w", caos_errors.ThrowUnimplemented(nil, "id", "message")),
+				err: fmt.Errorf("wrapped %w", zerrors.ThrowUnimplemented(nil, "id", "message")),
 			},
 			wantStatusCode: http.StatusNotImplemented,
 			wantOk:         true,
@@ -110,7 +110,7 @@ func TestZitadelErrorToHTTPStatusCode(t *testing.T) {
 		{
 			name: "wrapped resource exhausted",
 			args: args{
-				err: fmt.Errorf("wrapped %w", caos_errors.ThrowResourceExhausted(nil, "id", "message")),
+				err: fmt.Errorf("wrapped %w", zerrors.ThrowResourceExhausted(nil, "id", "message")),
 			},
 			wantStatusCode: http.StatusTooManyRequests,
 			wantOk:         true,

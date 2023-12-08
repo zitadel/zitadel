@@ -11,7 +11,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 
 	"github.com/zitadel/zitadel/internal/database"
-	z_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -21,7 +21,7 @@ const (
 )
 
 var (
-	renewNoRowsAffectedErr = z_errs.ThrowAlreadyExists(nil, "CRDB-mmi4J", "projection already locked")
+	renewNoRowsAffectedErr = zerrors.ThrowAlreadyExists(nil, "CRDB-mmi4J", "projection already locked")
 	errLock                = errors.New("lock err")
 )
 

@@ -5,9 +5,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddDefaultNotificationPolicy(ctx context.Context, resourceOwner string, passwordChange bool) (*domain.ObjectDetails, error) {
@@ -52,7 +52,7 @@ func prepareAddDefaultNotificationPolicy(
 				return nil, err
 			}
 			if writeModel.State == domain.PolicyStateActive {
-				return nil, caos_errs.ThrowAlreadyExists(nil, "INSTANCE-xpo1bj", "Errors.Instance.NotificationPolicy.AlreadyExists")
+				return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-xpo1bj", "Errors.Instance.NotificationPolicy.AlreadyExists")
 			}
 			return []eventstore.Command{
 				instance.NewNotificationPolicyAddedEvent(ctx, &a.Aggregate, passwordChange),
@@ -78,11 +78,11 @@ func prepareChangeDefaultNotificationPolicy(
 			}
 
 			if writeModel.State == domain.PolicyStateUnspecified || writeModel.State == domain.PolicyStateRemoved {
-				return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-x891na", "Errors.IAM.NotificationPolicy.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "INSTANCE-x891na", "Errors.IAM.NotificationPolicy.NotFound")
 			}
 			change, hasChanged := writeModel.NewChangedEvent(ctx, &a.Aggregate, passwordChange)
 			if !hasChanged {
-				return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-29x02n", "Errors.IAM.NotificationPolicy.NotChanged")
+				return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-29x02n", "Errors.IAM.NotificationPolicy.NotChanged")
 			}
 			return []eventstore.Command{
 				change,

@@ -4,10 +4,11 @@ import (
 	"context"
 
 	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddProjectRole(ctx context.Context, projectRole *domain.ProjectRole, resourceOwner string) (_ *domain.ProjectRole, err error) {
@@ -62,7 +63,7 @@ func (c *Commands) addProjectRoles(ctx context.Context, projectAgg *eventstore.A
 	for _, projectRole := range projectRoles {
 		projectRole.AggregateID = projectAgg.ID
 		if !projectRole.IsValid() {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.Role.Invalid")
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.Role.Invalid")
 		}
 		events = append(events, project.NewRoleAddedEvent(
 			ctx,
@@ -78,7 +79,7 @@ func (c *Commands) addProjectRoles(ctx context.Context, projectAgg *eventstore.A
 
 func (c *Commands) ChangeProjectRole(ctx context.Context, projectRole *domain.ProjectRole, resourceOwner string) (_ *domain.ProjectRole, err error) {
 	if !projectRole.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2ilfW", "Errors.Project.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-2ilfW", "Errors.Project.Invalid")
 	}
 	err = c.checkProjectExists(ctx, projectRole.AggregateID, resourceOwner)
 	if err != nil {
@@ -90,7 +91,7 @@ func (c *Commands) ChangeProjectRole(ctx context.Context, projectRole *domain.Pr
 		return nil, err
 	}
 	if existingRole.State == domain.ProjectRoleStateUnspecified || existingRole.State == domain.ProjectRoleStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-vv8M9", "Errors.Project.Role.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-vv8M9", "Errors.Project.Role.NotExisting")
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingRole.WriteModel)
@@ -100,7 +101,7 @@ func (c *Commands) ChangeProjectRole(ctx context.Context, projectRole *domain.Pr
 		return nil, err
 	}
 	if !changed {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0cs", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5M0cs", "Errors.NoChangesFound")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, changeEvent)
@@ -116,14 +117,14 @@ func (c *Commands) ChangeProjectRole(ctx context.Context, projectRole *domain.Pr
 
 func (c *Commands) RemoveProjectRole(ctx context.Context, projectID, key, resourceOwner string, cascadingProjectGrantIds []string, cascadeUserGrantIDs ...string) (details *domain.ObjectDetails, err error) {
 	if projectID == "" || key == "" {
-		return details, caos_errs.ThrowInvalidArgument(nil, "COMMAND-fl9eF", "Errors.Project.Role.Invalid")
+		return details, zerrors.ThrowInvalidArgument(nil, "COMMAND-fl9eF", "Errors.Project.Role.Invalid")
 	}
 	existingRole, err := c.getProjectRoleWriteModelByID(ctx, key, projectID, resourceOwner)
 	if err != nil {
 		return details, err
 	}
 	if existingRole.State == domain.ProjectRoleStateUnspecified || existingRole.State == domain.ProjectRoleStateRemoved {
-		return details, caos_errs.ThrowNotFound(nil, "COMMAND-m9vMf", "Errors.Project.Role.NotExisting")
+		return details, zerrors.ThrowNotFound(nil, "COMMAND-m9vMf", "Errors.Project.Role.NotExisting")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingRole.WriteModel)
 	events := []eventstore.Command{

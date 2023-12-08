@@ -2,7 +2,7 @@ package start
 
 import (
 	"github.com/zitadel/zitadel/internal/crypto"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -106,7 +106,7 @@ func verifyDefaultKeys(keyStorage crypto.KeyStorage) (err error) {
 		return nil
 	}
 	if err := keyStorage.CreateKeys(keys...); err != nil {
-		return caos_errs.ThrowInternal(err, "START-aGBq2", "cannot create default keys")
+		return zerrors.ThrowInternal(err, "START-aGBq2", "cannot create default keys")
 	}
 	return nil
 }

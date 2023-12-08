@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -79,7 +79,7 @@ func ProjectAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-Bfg2f", "unable to unmarshal project")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-Bfg2f", "unable to unmarshal project")
 	}
 
 	return e, nil
@@ -117,7 +117,7 @@ func NewProjectChangeEvent(
 	changes []ProjectChanges,
 ) (*ProjectChangeEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "PROJECT-mV9xc", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-mV9xc", "Errors.NoChangesFound")
 	}
 	changeEvent := &ProjectChangeEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -172,7 +172,7 @@ func ProjectChangeEventMapper(event eventstore.Event) (eventstore.Event, error) 
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-M9osd", "unable to unmarshal project")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-M9osd", "unable to unmarshal project")
 	}
 
 	return e, nil

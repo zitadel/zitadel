@@ -14,10 +14,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_AddUserTOTP(t *testing.T) {
@@ -44,7 +44,7 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 				userID:        "foo",
 				resourceowner: "org1",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
 		},
 		{
 			name: "create otp error",
@@ -58,7 +58,7 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 					expectFilter(),
 				),
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SqyJz", "Errors.User.NotFound"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SqyJz", "Errors.User.NotFound"),
 		},
 		{
 			name: "push error",
@@ -217,7 +217,7 @@ func TestCommands_CheckUserTOTP(t *testing.T) {
 			args: args{
 				userID: "foo",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
 		},
 		{
 			name: "success",

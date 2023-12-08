@@ -4,15 +4,15 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) ChangeIDPJWTConfig(ctx context.Context, config *domain.JWTIDPConfig, resourceOwner string) (*domain.JWTIDPConfig, error) {
 	if resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-ff8NF", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-ff8NF", "Errors.ResourceOwnerMissing")
 	}
 	if config.IDPConfigID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-2n99f", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-2n99f", "Errors.IDMissing")
 	}
 	existingConfig := NewOrgIDPJWTConfigWriteModel(config.IDPConfigID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingConfig)
@@ -21,7 +21,7 @@ func (c *Commands) ChangeIDPJWTConfig(ctx context.Context, config *domain.JWTIDP
 	}
 
 	if existingConfig.State == domain.IDPConfigStateRemoved || existingConfig.State == domain.IDPConfigStateUnspecified {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-67J9d", "Errors.Org.IDPConfig.AlreadyExists")
+		return nil, zerrors.ThrowNotFound(nil, "Org-67J9d", "Errors.Org.IDPConfig.AlreadyExists")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingConfig.WriteModel)
@@ -37,7 +37,7 @@ func (c *Commands) ChangeIDPJWTConfig(ctx context.Context, config *domain.JWTIDP
 		return nil, err
 	}
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-2k9fs", "Errors.Org.IDPConfig.NotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "Org-2k9fs", "Errors.Org.IDPConfig.NotChanged")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)

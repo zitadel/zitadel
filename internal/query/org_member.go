@@ -9,9 +9,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -73,7 +73,7 @@ func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery) (mem
 	eq := sq.Eq{OrgMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-PDAVB", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-PDAVB", "Errors.Query.InvalidRequest")
 	}
 
 	currentSequence, err := q.latestState(ctx, orgsTable)
@@ -86,7 +86,7 @@ func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery) (mem
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-5g4yV", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-5g4yV", "Errors.Internal")
 	}
 
 	members.State = currentSequence
@@ -175,7 +175,7 @@ func prepareOrgMembersQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-N34NV", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-N34NV", "Errors.Query.CloseRows")
 			}
 
 			return &Members{

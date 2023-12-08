@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -63,7 +63,7 @@ func OrgAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(orgAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ORG-Bren2", "unable to unmarshal org added")
+		return nil, zerrors.ThrowInternal(err, "ORG-Bren2", "unable to unmarshal org added")
 	}
 
 	return orgAdded, nil
@@ -105,7 +105,7 @@ func OrgChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(orgChanged)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ORG-Bren2", "unable to unmarshal org added")
+		return nil, zerrors.ThrowInternal(err, "ORG-Bren2", "unable to unmarshal org added")
 	}
 
 	return orgChanged, nil

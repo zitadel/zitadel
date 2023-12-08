@@ -11,8 +11,8 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -74,10 +74,10 @@ func (h *locker) renewLock(ctx context.Context, lockDuration time.Duration, inst
 	lockStmt, values := h.lockStatement(lockDuration, instanceIDs)
 	res, err := h.client.ExecContext(ctx, lockStmt, values...)
 	if err != nil {
-		return errors.ThrowInternal(err, "CRDB-uaDoR", "unable to execute lock")
+		return zerrors.ThrowInternal(err, "CRDB-uaDoR", "unable to execute lock")
 	}
 	if rows, _ := res.RowsAffected(); rows == 0 {
-		return errors.ThrowAlreadyExists(nil, "CRDB-mmi4J", "projection already locked")
+		return zerrors.ThrowAlreadyExists(nil, "CRDB-mmi4J", "projection already locked")
 	}
 	return nil
 }
@@ -86,7 +86,7 @@ func (h *locker) Unlock(instanceIDs ...string) error {
 	lockStmt, values := h.lockStatement(0, instanceIDs)
 	_, err := h.client.Exec(lockStmt, values...)
 	if err != nil {
-		return errors.ThrowUnknown(err, "CRDB-JjfwO", "unlock failed")
+		return zerrors.ThrowUnknown(err, "CRDB-JjfwO", "unlock failed")
 	}
 	return nil
 }

@@ -5,7 +5,7 @@ import (
 
 	"go.uber.org/mock/gomock"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func CreateMockEncryptionAlg(ctrl *gomock.Controller) EncryptionAlgorithm {
@@ -26,7 +26,7 @@ func CreateMockEncryptionAlgWithCode(ctrl *gomock.Controller, code string) Encry
 		ctrl,
 		func(c []byte) ([]byte, error) {
 			if len(c) != len(code) {
-				return nil, errors.ThrowInvalidArgumentf(nil, "id", "invalid code length - expected %d, got %d", len(code), len(c))
+				return nil, zerrors.ThrowInvalidArgumentf(nil, "id", "invalid code length - expected %d, got %d", len(code), len(c))
 			}
 			return []byte(code), nil
 		},
@@ -44,7 +44,7 @@ func createMockEncryptionAlgorithm(ctrl *gomock.Controller, encryptFunction func
 	mCrypto.EXPECT().DecryptString(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
 		func(code []byte, keyID string) (string, error) {
 			if keyID != "id" {
-				return "", errors.ThrowInternal(nil, "id", "invalid key id")
+				return "", zerrors.ThrowInternal(nil, "id", "invalid key id")
 			}
 			return string(code), nil
 		},
@@ -52,7 +52,7 @@ func createMockEncryptionAlgorithm(ctrl *gomock.Controller, encryptFunction func
 	mCrypto.EXPECT().Decrypt(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
 		func(code []byte, keyID string) ([]byte, error) {
 			if keyID != "id" {
-				return nil, errors.ThrowInternal(nil, "id", "invalid key id")
+				return nil, zerrors.ThrowInternal(nil, "id", "invalid key id")
 			}
 			return code, nil
 		},
@@ -71,7 +71,7 @@ func CreateMockHashAlg(ctrl *gomock.Controller) HashAlgorithm {
 	mCrypto.EXPECT().CompareHash(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
 		func(hashed, comparer []byte) error {
 			if string(hashed) != string(comparer) {
-				return errors.ThrowInternal(nil, "id", "invalid")
+				return zerrors.ThrowInternal(nil, "id", "invalid")
 			}
 			return nil
 		},

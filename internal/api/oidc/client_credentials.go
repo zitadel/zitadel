@@ -8,8 +8,8 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type clientCredentialsRequest struct {
@@ -34,23 +34,19 @@ func (c *clientCredentialsRequest) GetScopes() []string {
 }
 
 func (s *Server) clientCredentialsAuth(ctx context.Context, clientID, clientSecret string) (op.Client, error) {
-	searchQuery, err := query.NewUserLoginNamesSearchQuery(clientID)
-	if err != nil {
-		return nil, err
-	}
-	user, err := s.query.GetUser(ctx, false, searchQuery)
-	if errors.IsNotFound(err) {
+	user, err := s.query.GetUserByLoginName(ctx, false, clientID)
+	if zerrors.IsNotFound(err) {
 		return nil, oidc.ErrInvalidClient().WithParent(err).WithDescription("client not found")
 	}
 	if err != nil {
 		return nil, err // defaults to server error
 	}
 	if user.Machine == nil || user.Machine.Secret == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-pieP8", "Errors.User.Machine.Secret.NotExisting")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-pieP8", "Errors.User.Machine.Secret.NotExisting")
 	}
 	if err = crypto.CompareHash(user.Machine.Secret, []byte(clientSecret), s.hashAlg); err != nil {
 		s.command.MachineSecretCheckFailed(ctx, user.ID, user.ResourceOwner)
-		return nil, errors.ThrowInvalidArgument(err, "OIDC-VoXo6", "Errors.User.Machine.Secret.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(err, "OIDC-VoXo6", "Errors.User.Machine.Secret.Invalid")
 	}
 
 	s.command.MachineSecretCheckSucceeded(ctx, user.ID, user.ResourceOwner)

@@ -13,9 +13,9 @@ import (
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/idp/providers/jwt"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type jwtRequest struct {
@@ -31,7 +31,7 @@ func (l *Login) handleJWTRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if data.AuthRequestID == "" || data.UserAgentID == "" {
-		l.renderError(w, r, nil, errors.ThrowInvalidArgument(nil, "LOGIN-adfzz", "Errors.AuthRequest.MissingParameters"))
+		l.renderError(w, r, nil, zerrors.ThrowInvalidArgument(nil, "LOGIN-adfzz", "Errors.AuthRequest.MissingParameters"))
 		return
 	}
 	id, err := base64.RawURLEncoding.DecodeString(data.UserAgentID)
@@ -158,7 +158,7 @@ func getToken(r *http.Request, headerName string) (string, error) {
 	}
 	auth := r.Header.Get(headerName)
 	if auth == "" {
-		return "", errors.ThrowInvalidArgument(nil, "LOGIN-adh42", "Errors.AuthRequest.TokenNotFound")
+		return "", zerrors.ThrowInvalidArgument(nil, "LOGIN-adh42", "Errors.AuthRequest.TokenNotFound")
 	}
 	return strings.TrimPrefix(auth, oidc.PrefixBearer), nil
 }

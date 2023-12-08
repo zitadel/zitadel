@@ -16,10 +16,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -83,11 +83,11 @@ func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.
 func (o *OPStorage) createAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
-		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
 	}
 	req.Scopes, err = o.assertProjectRoleScopes(ctx, req.ClientID, req.Scopes)
 	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(err, "OIDC-Gqrfg", "Errors.Internal")
+		return nil, zerrors.ThrowPreconditionFailed(err, "OIDC-Gqrfg", "Errors.Internal")
 	}
 	authRequest := CreateAuthRequestToBusiness(ctx, req, userAgentID, userID)
 	resp, err := o.repo.CreateAuthRequest(ctx, authRequest)
@@ -124,7 +124,7 @@ func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRe
 
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
-		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-D3g21", "no user agent id")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-D3g21", "no user agent id")
 	}
 	resp, err := o.repo.AuthRequestByIDCheckLoggedIn(ctx, id, userAgentID)
 	if err != nil {
@@ -174,7 +174,7 @@ func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err erro
 
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
-		return errors.ThrowPreconditionFailed(nil, "OIDC-Dgus2", "no user agent id")
+		return zerrors.ThrowPreconditionFailed(nil, "OIDC-Dgus2", "no user agent id")
 	}
 	return o.repo.SaveAuthCode(ctx, id, code, userAgentID)
 }
@@ -236,7 +236,7 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 	userAgentID, applicationID, userOrgID, authTime, authMethodsReferences := getInfoFromRequest(req)
 	scopes, err := o.assertProjectRoleScopes(ctx, applicationID, req.GetScopes())
 	if err != nil {
-		return "", "", time.Time{}, errors.ThrowPreconditionFailed(err, "OIDC-Df2fq", "Errors.Internal")
+		return "", "", time.Time{}, zerrors.ThrowPreconditionFailed(err, "OIDC-Df2fq", "Errors.Internal")
 	}
 	if request, ok := req.(op.RefreshTokenRequest); ok {
 		request.SetCurrentScopes(scopes)
@@ -251,7 +251,7 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 		refreshToken, req.GetAudience(), scopes, authMethodsReferences, accessTokenLifetime,
 		refreshTokenIdleExpiration, refreshTokenExpiration, authTime) //PLANNED: lifetime from client
 	if err != nil {
-		if errors.IsErrorInvalidArgument(err) {
+		if zerrors.IsErrorInvalidArgument(err) {
 			err = oidc.ErrInvalidGrant().WithParent(err)
 		}
 		return "", "", time.Time{}, err
@@ -308,7 +308,7 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		logging.Error("no user agent id")
-		return errors.ThrowPreconditionFailed(nil, "OIDC-fso7F", "no user agent id")
+		return zerrors.ThrowPreconditionFailed(nil, "OIDC-fso7F", "no user agent id")
 	}
 	userIDs, err := o.repo.UserSessionUserIDsByAgentID(ctx, userAgentID)
 	if err != nil {
@@ -366,7 +366,7 @@ func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID str
 		if err == nil {
 			return nil
 		}
-		if errors.IsPreconditionFailed(err) {
+		if zerrors.IsPreconditionFailed(err) {
 			return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
 		}
 		return oidc.ErrServerError().WithParent(err)
@@ -382,14 +382,14 @@ func (o *OPStorage) revokeTokenV1(ctx context.Context, token, userID, clientID s
 			return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
 		}
 		_, err = o.command.RevokeRefreshToken(ctx, refreshToken.UserID, refreshToken.ResourceOwner, refreshToken.ID)
-		if err == nil || errors.IsNotFound(err) {
+		if err == nil || zerrors.IsNotFound(err) {
 			return nil
 		}
 		return oidc.ErrServerError().WithParent(err)
 	}
 	accessToken, err := o.repo.TokenByIDs(ctx, userID, token)
 	if err != nil {
-		if errors.IsNotFound(err) {
+		if zerrors.IsNotFound(err) {
 			return nil
 		}
 		return oidc.ErrServerError().WithParent(err)
@@ -398,7 +398,7 @@ func (o *OPStorage) revokeTokenV1(ctx context.Context, token, userID, clientID s
 		return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
 	}
 	_, err = o.command.RevokeAccessToken(ctx, userID, accessToken.ResourceOwner, accessToken.ID)
-	if err == nil || errors.IsNotFound(err) {
+	if err == nil || zerrors.IsNotFound(err) {
 		return nil
 	}
 	return oidc.ErrServerError().WithParent(err)
@@ -434,18 +434,18 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 	}
 	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, clientID)
 	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
 	}
 	project, err := o.query.ProjectByID(ctx, false, projectID)
 	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-w4wIn", "Errors.Internal")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-w4wIn", "Errors.Internal")
 	}
 	if !project.ProjectRoleAssertion {
 		return scopes, nil
 	}
 	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(project.ID)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
 	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
@@ -468,7 +468,7 @@ func (o *OPStorage) assertProjectRoleScopesByProject(ctx context.Context, projec
 	}
 	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(project.ID)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
 	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
@@ -484,7 +484,7 @@ func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.T
 	token.Audience = append(token.Audience, clientID)
 	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(projectID)
 	if err != nil {
-		return errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
+		return zerrors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
 	roles, err := o.query.SearchProjectRoles(ctx, true, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
@@ -505,7 +505,7 @@ func setContextUserSystem(ctx context.Context) context.Context {
 
 func (o *OPStorage) getOIDCSettings(ctx context.Context) (accessTokenLifetime, idTokenLifetime, refreshTokenIdleExpiration, refreshTokenExpiration time.Duration, _ error) {
 	oidcSettings, err := o.query.OIDCSettingsByAggID(ctx, authz.GetInstance(ctx).InstanceID())
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return time.Duration(0), time.Duration(0), time.Duration(0), time.Duration(0), err
 	}
 

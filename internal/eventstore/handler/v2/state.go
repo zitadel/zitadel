@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type state struct {
@@ -97,7 +97,7 @@ func (h *Handler) setState(tx *sql.Tx, updatedState *state) error {
 	}
 	if affected, err := res.RowsAffected(); affected == 0 {
 		h.log().OnError(err).Error("unable to check if states are updated")
-		return errs.ThrowInternal(err, "V2-FGEKi", "unable to update state")
+		return zerrors.ThrowInternal(err, "V2-FGEKi", "unable to update state")
 	}
 	return nil
 }
@@ -111,7 +111,7 @@ func (h *Handler) lockState(tx *sql.Tx, instanceID string) error {
 		return err
 	}
 	if affected, err := res.RowsAffected(); affected == 0 || err != nil {
-		return errs.ThrowInternal(err, "V2-lpiK0", "projection already locked")
+		return zerrors.ThrowInternal(err, "V2-lpiK0", "projection already locked")
 	}
 	return nil
 }

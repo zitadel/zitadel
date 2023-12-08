@@ -3,11 +3,11 @@ package view
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -32,7 +32,7 @@ func (v *View) PutTokens(token []*model.TokenView) error {
 
 func (v *View) DeleteToken(tokenID, instanceID string) error {
 	err := usr_view.DeleteToken(v.Db, tokenTable, tokenID, instanceID)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
 	return nil
@@ -40,7 +40,7 @@ func (v *View) DeleteToken(tokenID, instanceID string) error {
 
 func (v *View) DeleteSessionTokens(agentID string, event eventstore.Event) error {
 	err := usr_view.DeleteSessionTokens(v.Db, tokenTable, agentID, event.Aggregate().ID, event.Aggregate().InstanceID)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
 	return nil
@@ -48,7 +48,7 @@ func (v *View) DeleteSessionTokens(agentID string, event eventstore.Event) error
 
 func (v *View) DeleteUserTokens(event eventstore.Event) error {
 	err := usr_view.DeleteUserTokens(v.Db, tokenTable, event.Aggregate().ID, event.Aggregate().InstanceID)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
 	return nil
@@ -56,7 +56,7 @@ func (v *View) DeleteUserTokens(event eventstore.Event) error {
 
 func (v *View) DeleteApplicationTokens(event eventstore.Event, ids ...string) error {
 	err := usr_view.DeleteApplicationTokens(v.Db, tokenTable, event.Aggregate().InstanceID, ids)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
 	return nil
@@ -64,7 +64,7 @@ func (v *View) DeleteApplicationTokens(event eventstore.Event, ids ...string) er
 
 func (v *View) DeleteTokensFromRefreshToken(refreshTokenID, instanceID string) error {
 	err := usr_view.DeleteTokensFromRefreshToken(v.Db, tokenTable, refreshTokenID, instanceID)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
 	return nil
@@ -72,7 +72,7 @@ func (v *View) DeleteTokensFromRefreshToken(refreshTokenID, instanceID string) e
 
 func (v *View) DeleteInstanceTokens(event eventstore.Event) error {
 	err := usr_view.DeleteInstanceTokens(v.Db, tokenTable, event.Aggregate().InstanceID)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
 	return nil
@@ -80,7 +80,7 @@ func (v *View) DeleteInstanceTokens(event eventstore.Event) error {
 
 func (v *View) DeleteOrgTokens(event eventstore.Event) error {
 	err := usr_view.DeleteOrgTokens(v.Db, tokenTable, event.Aggregate().InstanceID, event.Aggregate().ResourceOwner)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
 	return nil

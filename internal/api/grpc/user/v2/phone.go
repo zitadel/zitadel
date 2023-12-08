@@ -6,7 +6,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
@@ -25,7 +25,7 @@ func (s *Server) SetPhone(ctx context.Context, req *user.SetPhoneRequest) (resp 
 	case nil:
 		phone, err = s.command.ChangeUserPhone(ctx, req.GetUserId(), resourceOwner, req.GetPhone(), s.userCodeAlg)
 	default:
-		err = caos_errs.ThrowUnimplementedf(nil, "USERv2-Ahng0", "verification oneOf %T in method SetPhone not implemented", v)
+		err = zerrors.ThrowUnimplementedf(nil, "USERv2-Ahng0", "verification oneOf %T in method SetPhone not implemented", v)
 	}
 	if err != nil {
 		return nil, err

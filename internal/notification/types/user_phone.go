@@ -5,10 +5,10 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func generateSms(
@@ -23,7 +23,7 @@ func generateSms(
 	smsChannels, twilioConfig, err := channels.SMS(ctx)
 	logging.OnError(err).Error("could not create sms channel")
 	if smsChannels == nil || smsChannels.Len() == 0 {
-		return errors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent")
+		return zerrors.ThrowPreconditionFailed(nil, "PHONE-w8nfow", "Errors.Notification.Channels.NotPresent")
 	}
 	if err == nil {
 		number = twilioConfig.SenderNumber

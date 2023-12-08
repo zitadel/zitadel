@@ -12,7 +12,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	providers "github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/apple"
@@ -30,6 +29,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type OAuthIDPWriteModel struct {
@@ -2172,7 +2172,7 @@ func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idp
 		case domain.IDPTypeUnspecified:
 			fallthrough
 		default:
-			return nil, errors.ThrowInternal(nil, "COMMAND-xw921211", "Errors.IDPConfig.NotExisting")
+			return nil, zerrors.ThrowInternal(nil, "COMMAND-xw921211", "Errors.IDPConfig.NotExisting")
 		}
 	} else {
 		switch idpType {
@@ -2203,7 +2203,7 @@ func NewAllIDPWriteModel(resourceOwner string, instanceBool bool, id string, idp
 		case domain.IDPTypeUnspecified:
 			fallthrough
 		default:
-			return nil, errors.ThrowInternal(nil, "COMMAND-xw921111", "Errors.IDPConfig.NotExisting")
+			return nil, zerrors.ThrowInternal(nil, "COMMAND-xw921111", "Errors.IDPConfig.NotExisting")
 		}
 	}
 	return writeModel, nil
@@ -2233,7 +2233,7 @@ func (wm *AllIDPWriteModel) AppendEvents(events ...eventstore.Event) {
 
 func (wm *AllIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm) (providers.Provider, error) {
 	if wm.model == nil {
-		return nil, errors.ThrowInternal(nil, "COMMAND-afvf0gc9sa", "ErrorsIDPConfig.NotExisting")
+		return nil, zerrors.ThrowInternal(nil, "COMMAND-afvf0gc9sa", "ErrorsIDPConfig.NotExisting")
 	}
 	return wm.model.ToProvider(callbackURL, idpAlg)
 }
@@ -2247,7 +2247,7 @@ func (wm *AllIDPWriteModel) GetProviderOptions() idp.Options {
 
 func (wm *AllIDPWriteModel) ToSAMLProvider(callbackURL string, idpAlg crypto.EncryptionAlgorithm, getRequest requesttracker.GetRequest, addRequest requesttracker.AddRequest) (providers.Provider, error) {
 	if wm.samlModel == nil {
-		return nil, errors.ThrowInternal(nil, "COMMAND-csi30hdscv", "ErrorsIDPConfig.NotExisting")
+		return nil, zerrors.ThrowInternal(nil, "COMMAND-csi30hdscv", "ErrorsIDPConfig.NotExisting")
 	}
 	return wm.samlModel.ToProvider(callbackURL, idpAlg, getRequest, addRequest)
 }

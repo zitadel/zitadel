@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -11,9 +11,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type LabelPolicy struct {
@@ -66,7 +66,7 @@ func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string, with
 		OrderBy(LabelPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-V22un", "unable to create sql stmt")
+		return nil, zerrors.ThrowInternal(err, "QUERY-V22un", "unable to create sql stmt")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -99,7 +99,7 @@ func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (po
 		OrderBy(LabelPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-AG5eq", "unable to create sql stmt")
+		return nil, zerrors.ThrowInternal(err, "QUERY-AG5eq", "unable to create sql stmt")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -122,7 +122,7 @@ func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (policy *LabelPo
 		OrderBy(LabelPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-mN0Ci", "unable to create sql stmt")
+		return nil, zerrors.ThrowInternal(err, "QUERY-mN0Ci", "unable to create sql stmt")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -145,7 +145,7 @@ func (q *Queries) DefaultPreviewLabelPolicy(ctx context.Context) (policy *LabelP
 		OrderBy(LabelPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-B3JQR", "unable to create sql stmt")
+		return nil, zerrors.ThrowInternal(err, "QUERY-B3JQR", "unable to create sql stmt")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -321,10 +321,10 @@ func prepareLabelPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Select
 				&darkIconURL,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-bJEsm", "Errors.Org.PolicyNotExisting")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-bJEsm", "Errors.Org.PolicyNotExisting")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-awLM6", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-awLM6", "Errors.Internal")
 			}
 
 			policy.FontURL = fontURL.String

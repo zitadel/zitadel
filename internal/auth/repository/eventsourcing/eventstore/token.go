@@ -8,12 +8,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type TokenRepo struct {
@@ -25,10 +25,10 @@ func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (
 	instanceID := authz.GetInstance(ctx).InstanceID()
 
 	token, viewErr := repo.View.TokenByIDs(tokenID, userID, instanceID)
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
+	if viewErr != nil && !zerrors.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
-	if errors.IsNotFound(viewErr) {
+	if zerrors.IsNotFound(viewErr) {
 		sequence, err := repo.View.GetLatestTokenSequence(ctx, instanceID)
 		logging.WithFields("instanceID", instanceID, "userID", userID, "tokenID", tokenID).
 			OnError(err).
@@ -44,8 +44,8 @@ func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (
 	}
 
 	events, esErr := repo.getUserEvents(ctx, userID, token.InstanceID, token.Sequence, token.GetRelevantEventTypes())
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
+	if zerrors.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, zerrors.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
 	}
 
 	if esErr != nil {
@@ -60,7 +60,7 @@ func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (
 		}
 	}
 	if !token.Expiration.After(time.Now().UTC()) || token.Deactivated {
-		return nil, errors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.Token.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.Token.NotFound")
 	}
 	return model.TokenViewToModel(token), nil
 }

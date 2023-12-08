@@ -9,8 +9,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/zitadel/logging"
-
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func PrepareGetByQuery(table string, queries ...SearchQuery) func(db *gorm.DB, res interface{}) error {
@@ -20,7 +19,7 @@ func PrepareGetByQuery(table string, queries ...SearchQuery) func(db *gorm.DB, r
 			var err error
 			query, err = SetQuery(query, q.GetKey(), q.GetValue(), q.GetMethod())
 			if err != nil {
-				return caos_errs.ThrowInvalidArgument(err, "VIEW-KaGue", "query is invalid")
+				return zerrors.ThrowInvalidArgument(err, "VIEW-KaGue", "query is invalid")
 			}
 		}
 
@@ -36,10 +35,10 @@ func PrepareGetByQuery(table string, queries ...SearchQuery) func(db *gorm.DB, r
 			return nil
 		}
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return caos_errs.ThrowNotFound(err, "VIEW-hodc6", "object not found")
+			return zerrors.ThrowNotFound(err, "VIEW-hodc6", "object not found")
 		}
 		logging.LogWithFields("VIEW-Mg6la", "table ", table).WithError(err).Warn("get from cache error")
-		return caos_errs.ThrowInternal(err, "VIEW-qJBg9", "cache error")
+		return zerrors.ThrowInternal(err, "VIEW-qJBg9", "cache error")
 	}
 }
 
@@ -48,16 +47,16 @@ func PrepareBulkSave(table string) func(db *gorm.DB, objects ...interface{}) err
 		db = db.Table(table)
 		db = db.Begin()
 		if err := db.Error; err != nil {
-			return caos_errs.ThrowInternal(err, "REPOS-Fl0Is", "unable to begin")
+			return zerrors.ThrowInternal(err, "REPOS-Fl0Is", "unable to begin")
 		}
 		for _, object := range objects {
 			err := db.Save(object).Error
 			if err != nil {
-				return caos_errs.ThrowInternal(err, "VIEW-oJJSm", "unable to put object to view")
+				return zerrors.ThrowInternal(err, "VIEW-oJJSm", "unable to put object to view")
 			}
 		}
 		if err := db.Commit().Error; err != nil {
-			return caos_errs.ThrowInternal(err, "REPOS-IfhUE", "unable to commit")
+			return zerrors.ThrowInternal(err, "REPOS-IfhUE", "unable to commit")
 		}
 		return nil
 	}
@@ -67,7 +66,7 @@ func PrepareSave(table string) func(db *gorm.DB, object interface{}) error {
 	return func(db *gorm.DB, object interface{}) error {
 		err := db.Table(table).Save(object).Error
 		if err != nil {
-			return caos_errs.ThrowInternal(err, "VIEW-2m9fs", "unable to put object to view")
+			return zerrors.ThrowInternal(err, "VIEW-2m9fs", "unable to put object to view")
 		}
 		return nil
 	}
@@ -82,7 +81,7 @@ func PrepareSaveOnConflict(table string, conflictColumns, updateColumns []string
 	return func(db *gorm.DB, object interface{}) error {
 		err := db.Table(table).Set("gorm:insert_option", onConflict).Save(object).Error
 		if err != nil {
-			return caos_errs.ThrowInternal(err, "VIEW-AfC7G", "unable to put object to view")
+			return zerrors.ThrowInternal(err, "VIEW-AfC7G", "unable to put object to view")
 		}
 		return nil
 	}
@@ -95,7 +94,7 @@ func PrepareDeleteByKey(table string, key ColumnKey, id interface{}) func(db *go
 			Delete(nil).
 			Error
 		if err != nil {
-			return caos_errs.ThrowInternal(err, "VIEW-die73", "could not delete object")
+			return zerrors.ThrowInternal(err, "VIEW-die73", "could not delete object")
 		}
 		return nil
 	}
@@ -111,7 +110,7 @@ func PrepareUpdateByKeys(table string, column ColumnKey, value interface{}, keys
 			Update(column.ToColumnName(), value).
 			Error
 		if err != nil {
-			return caos_errs.ThrowInternal(err, "VIEW-ps099xj", "could not update object")
+			return zerrors.ThrowInternal(err, "VIEW-ps099xj", "could not update object")
 		}
 		return nil
 	}
@@ -132,7 +131,7 @@ func PrepareDeleteByKeys(table string, keys ...Key) func(db *gorm.DB) error {
 			Delete(nil).
 			Error
 		if err != nil {
-			return caos_errs.ThrowInternal(err, "VIEW-die73", "could not delete object")
+			return zerrors.ThrowInternal(err, "VIEW-die73", "could not delete object")
 		}
 		return nil
 	}
