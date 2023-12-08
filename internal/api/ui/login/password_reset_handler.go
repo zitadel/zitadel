@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -18,12 +17,7 @@ func (l *Login) handlePasswordReset(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	loginName, err := query.NewUserLoginNamesSearchQuery(authReq.LoginName)
-	if err != nil {
-		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
-		return
-	}
-	user, err := l.query.GetUser(setContext(r.Context(), authReq.UserOrgID), true, loginName)
+	user, err := l.query.GetUserByLoginName(setContext(r.Context(), authReq.UserOrgID), true, authReq.LoginName)
 	if err != nil {
 		if authReq.LoginPolicy.IgnoreUnknownUsernames && zerrors.IsNotFound(err) {
 			err = nil
