@@ -105,6 +105,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s15CurrentStates = &CurrentProjectionState{dbClient: zitadelDBClient}
 	steps.s16UniqueConstraintsLower = &UniqueConstraintToLower{dbClient: zitadelDBClient}
 	steps.s17AddOffsetToUniqueConstraints = &AddOffsetToCurrentStates{dbClient: zitadelDBClient}
+	steps.s18AddLowerFieldsToLoginNames = &AddLowerFieldsToLoginNames{dbClient: zitadelDBClient}
 
 	err = projection.Create(ctx, zitadelDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -154,6 +155,10 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)
 		logging.OnError(err).Fatalf("unable to migrate repeatable step: %s", repeatableStep.String())
 	}
+
+	// This step is executed after the repeatable steps because it adds fields to the login_names3 projection
+	err = migration.Migrate(ctx, eventstoreClient, steps.s18AddLowerFieldsToLoginNames)
+	logging.WithFields("name", steps.s18AddLowerFieldsToLoginNames.String()).OnError(err).Fatal("migration failed")
 }
 
 func readStmt(fs embed.FS, folder, typ, filename string) (string, error) {

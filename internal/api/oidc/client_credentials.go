@@ -34,11 +34,7 @@ func (c *clientCredentialsRequest) GetScopes() []string {
 }
 
 func (s *Server) clientCredentialsAuth(ctx context.Context, clientID, clientSecret string) (op.Client, error) {
-	searchQuery, err := query.NewUserLoginNamesSearchQuery(clientID)
-	if err != nil {
-		return nil, err
-	}
-	user, err := s.query.GetUser(ctx, false, searchQuery)
+	user, err := s.query.GetUserByLoginName(ctx, false, clientID)
 	if errors.IsNotFound(err) {
 		return nil, oidc.ErrInvalidClient().WithParent(err).WithDescription("client not found")
 	}
