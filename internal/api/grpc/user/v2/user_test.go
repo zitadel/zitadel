@@ -16,8 +16,8 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
@@ -78,11 +78,11 @@ func Test_idpIntentToIDPIntentPb(t *testing.T) {
 					UserID:             "userID",
 					State:              domain.IDPIntentStateSucceeded,
 				},
-				alg: decryption(caos_errs.ThrowInternal(nil, "id", "invalid key id")),
+				alg: decryption(zerrors.ThrowInternal(nil, "id", "invalid key id")),
 			},
 			res{
 				resp: nil,
-				err:  caos_errs.ThrowInternal(nil, "id", "invalid key id"),
+				err:  zerrors.ThrowInternal(nil, "id", "invalid key id"),
 			},
 		}, {
 			"successful oauth",

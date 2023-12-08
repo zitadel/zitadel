@@ -5,7 +5,7 @@ import (
 
 	"golang.org/x/text/language"
 
-	z_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func StringsToLanguages(langs []string) []language.Tag {
@@ -47,7 +47,7 @@ func LanguageIsAllowed(allowUndefined bool, allowedLanguages []language.Tag, lan
 		return err
 	}
 	if len(allowedLanguages) > 0 && !languageIsContained(allowedLanguages, lang) {
-		return z_errors.ThrowPreconditionFailed(nil, "LANG-2M9fs", "Errors.Language.NotAllowed")
+		return zerrors.ThrowPreconditionFailed(nil, "LANG-2M9fs", "Errors.Language.NotAllowed")
 	}
 	return nil
 }
@@ -66,14 +66,14 @@ func LanguagesAreSupported(supportedLanguages []language.Tag, lang ...language.T
 		return nil
 	}
 	if len(unsupported) == 1 {
-		return z_errors.ThrowInvalidArgument(nil, "LANG-lg4DP", "Errors.Language.NotSupported")
+		return zerrors.ThrowInvalidArgument(nil, "LANG-lg4DP", "Errors.Language.NotSupported")
 	}
-	return z_errors.ThrowInvalidArgumentf(nil, "LANG-XHiK5", "Errors.Languages.NotSupported: %s", LanguagesToStrings(unsupported))
+	return zerrors.ThrowInvalidArgumentf(nil, "LANG-XHiK5", "Errors.Languages.NotSupported: %s", LanguagesToStrings(unsupported))
 }
 
 func LanguageIsDefined(lang language.Tag) error {
 	if lang.IsRoot() {
-		return z_errors.ThrowInvalidArgument(nil, "LANG-3M9f2", "Errors.Language.Undefined")
+		return zerrors.ThrowInvalidArgument(nil, "LANG-3M9f2", "Errors.Language.Undefined")
 	}
 	return nil
 }
@@ -93,9 +93,9 @@ func LanguagesHaveDuplicates(langs []language.Tag) error {
 		return nil
 	}
 	if len(duplicates) > 1 {
-		return z_errors.ThrowInvalidArgument(nil, "LANG-3M9f2", "Errors.Language.Duplicate")
+		return zerrors.ThrowInvalidArgument(nil, "LANG-3M9f2", "Errors.Language.Duplicate")
 	}
-	return z_errors.ThrowInvalidArgumentf(nil, "LANG-XHiK5", "Errors.Languages.Duplicate: %s", LanguagesToStrings(duplicates))
+	return zerrors.ThrowInvalidArgumentf(nil, "LANG-XHiK5", "Errors.Languages.Duplicate: %s", LanguagesToStrings(duplicates))
 }
 
 func ParseLanguage(lang ...string) (tags []language.Tag, err error) {
@@ -106,7 +106,7 @@ func ParseLanguage(lang ...string) (tags []language.Tag, err error) {
 		err = errors.Join(err, parseErr)
 	}
 	if err != nil {
-		err = z_errors.ThrowInvalidArgument(err, "LANG-jc8Sq", "Errors.Language.NotParsed")
+		err = zerrors.ThrowInvalidArgument(err, "LANG-jc8Sq", "Errors.Language.NotParsed")
 	}
 	return tags, err
 }

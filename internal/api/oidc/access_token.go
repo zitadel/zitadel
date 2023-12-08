@@ -10,9 +10,9 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/command"
-	zerrors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type accessToken struct {

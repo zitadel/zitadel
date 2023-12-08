@@ -7,9 +7,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/limits"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type SetLimits struct {
@@ -62,7 +62,7 @@ func (c *Commands) ResetLimits(ctx context.Context, resourceOwner string) (*doma
 		return nil, err
 	}
 	if wm.AggregateID == "" {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-9JToT", "Errors.Limits.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-9JToT", "Errors.Limits.NotFound")
 	}
 	aggregate := limits.NewAggregate(wm.AggregateID, instanceId, resourceOwner)
 	events := []eventstore.Command{limits.NewResetEvent(ctx, &aggregate.Aggregate)}
@@ -85,7 +85,7 @@ func (c *Commands) getLimitsWriteModel(ctx context.Context, instanceId, resource
 func (c *Commands) SetLimitsCommand(a *limits.Aggregate, wm *limitsWriteModel, setLimits *SetLimits) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if setLimits == nil || setLimits.AuditLogRetention == nil {
-			return nil, errors.ThrowInvalidArgument(nil, "COMMAND-4M9vs", "Errors.Limits.NoneSpecified")
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4M9vs", "Errors.Limits.NoneSpecified")
 		}
 		return func(ctx context.Context, _ preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			changes := wm.NewChanges(setLimits)

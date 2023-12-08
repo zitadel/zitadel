@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -14,10 +14,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -124,7 +124,7 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, shouldTriggerBulk bool, 
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Nf93d", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Nf93d", "Errors.Query.SQLStatment")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -146,7 +146,7 @@ func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, granted
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-MO9fs", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-MO9fs", "Errors.Query.SQLStatment")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -166,7 +166,7 @@ func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrant
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-N9fsg", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-N9fsg", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -174,7 +174,7 @@ func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrant
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-PP02n", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-PP02n", "Errors.Internal")
 	}
 
 	grants.State, err = q.latestState(ctx, projectGrantsTable)
@@ -310,10 +310,10 @@ func prepareProjectGrantQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				&resourceOwnerName,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-n98GGs", "Errors.ProjectGrant.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-n98GGs", "Errors.ProjectGrant.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-w9fsH", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-w9fsH", "Errors.Internal")
 			}
 
 			grant.ProjectName = projectName.String
@@ -385,7 +385,7 @@ func prepareProjectGrantsQuery(ctx context.Context, db prepareDatabase) (sq.Sele
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-K9gEE", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-K9gEE", "Errors.Query.CloseRows")
 			}
 
 			return &ProjectGrants{

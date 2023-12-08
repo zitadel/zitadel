@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddAccessAndRefreshToken(
@@ -46,7 +46,7 @@ func (c *Commands) AddNewRefreshTokenAndAccessToken(
 	authTime time.Time,
 ) (accessToken *domain.Token, newRefreshToken string, err error) {
 	if userID == "" || agentID == "" || clientID == "" {
-		return nil, "", caos_errs.ThrowInvalidArgument(nil, "COMMAND-adg4r", "Errors.IDMissing")
+		return nil, "", zerrors.ThrowInvalidArgument(nil, "COMMAND-adg4r", "Errors.IDMissing")
 	}
 	userWriteModel := NewUserWriteModel(userID, orgID)
 	refreshTokenID, err := c.idGenerator.Next()
@@ -114,7 +114,7 @@ func (c *Commands) RevokeRefreshToken(ctx context.Context, userID, orgID, tokenI
 
 func (c *Commands) RevokeRefreshTokens(ctx context.Context, userID, orgID string, tokenIDs []string) (err error) {
 	if len(tokenIDs) == 0 {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Gfj42", "Errors.IDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-Gfj42", "Errors.IDMissing")
 	}
 	events := make([]eventstore.Command, len(tokenIDs))
 	for i, tokenID := range tokenIDs {
@@ -142,15 +142,15 @@ func (c *Commands) addRefreshToken(ctx context.Context, accessToken *domain.Toke
 
 func (c *Commands) renewRefreshToken(ctx context.Context, userID, orgID, refreshToken string, idleExpiration time.Duration) (event *user.HumanRefreshTokenRenewedEvent, refreshTokenID, newRefreshToken string, err error) {
 	if refreshToken == "" {
-		return nil, "", "", caos_errs.ThrowInvalidArgument(nil, "COMMAND-DHrr3", "Errors.IDMissing")
+		return nil, "", "", zerrors.ThrowInvalidArgument(nil, "COMMAND-DHrr3", "Errors.IDMissing")
 	}
 
 	tokenUserID, tokenID, token, err := domain.FromRefreshToken(refreshToken, c.keyAlgorithm)
 	if err != nil {
-		return nil, "", "", caos_errs.ThrowInvalidArgument(err, "COMMAND-Dbfe4", "Errors.User.RefreshToken.Invalid")
+		return nil, "", "", zerrors.ThrowInvalidArgument(err, "COMMAND-Dbfe4", "Errors.User.RefreshToken.Invalid")
 	}
 	if tokenUserID != userID {
-		return nil, "", "", caos_errs.ThrowInvalidArgument(nil, "COMMAND-Ht2g2", "Errors.User.RefreshToken.Invalid")
+		return nil, "", "", zerrors.ThrowInvalidArgument(nil, "COMMAND-Ht2g2", "Errors.User.RefreshToken.Invalid")
 	}
 	refreshTokenWriteModel := NewHumanRefreshTokenWriteModel(userID, orgID, tokenID)
 	err = c.eventstore.FilterToQueryReducer(ctx, refreshTokenWriteModel)
@@ -158,12 +158,12 @@ func (c *Commands) renewRefreshToken(ctx context.Context, userID, orgID, refresh
 		return nil, "", "", err
 	}
 	if refreshTokenWriteModel.UserState != domain.UserStateActive {
-		return nil, "", "", caos_errs.ThrowInvalidArgument(nil, "COMMAND-BHnhs", "Errors.User.RefreshToken.Invalid")
+		return nil, "", "", zerrors.ThrowInvalidArgument(nil, "COMMAND-BHnhs", "Errors.User.RefreshToken.Invalid")
 	}
 	if refreshTokenWriteModel.RefreshToken != token ||
 		refreshTokenWriteModel.IdleExpiration.Before(time.Now()) ||
 		refreshTokenWriteModel.Expiration.Before(time.Now()) {
-		return nil, "", "", caos_errs.ThrowInvalidArgument(nil, "COMMAND-Vr43e", "Errors.User.RefreshToken.Invalid")
+		return nil, "", "", zerrors.ThrowInvalidArgument(nil, "COMMAND-Vr43e", "Errors.User.RefreshToken.Invalid")
 	}
 
 	newToken, err := c.idGenerator.Next()
@@ -180,7 +180,7 @@ func (c *Commands) renewRefreshToken(ctx context.Context, userID, orgID, refresh
 
 func (c *Commands) removeRefreshToken(ctx context.Context, userID, orgID, tokenID string) (*user.HumanRefreshTokenRemovedEvent, *HumanRefreshTokenWriteModel, error) {
 	if userID == "" || orgID == "" || tokenID == "" {
-		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-GVDgf", "Errors.IDMissing")
+		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-GVDgf", "Errors.IDMissing")
 	}
 	refreshTokenWriteModel := NewHumanRefreshTokenWriteModel(userID, orgID, tokenID)
 	err := c.eventstore.FilterToQueryReducer(ctx, refreshTokenWriteModel)
@@ -188,7 +188,7 @@ func (c *Commands) removeRefreshToken(ctx context.Context, userID, orgID, tokenI
 		return nil, nil, err
 	}
 	if refreshTokenWriteModel.UserState != domain.UserStateActive {
-		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-BHt2w", "Errors.User.RefreshToken.NotFound")
+		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-BHt2w", "Errors.User.RefreshToken.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&refreshTokenWriteModel.WriteModel)
 	return user.NewHumanRefreshTokenRemovedEvent(ctx, userAgg, tokenID), refreshTokenWriteModel, nil

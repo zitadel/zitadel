@@ -14,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/apple"
@@ -23,20 +22,21 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID string, successURL, failureURL string) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if idpID == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "COMMAND-x8j2bk", "Errors.Intent.IDPMissing")
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-x8j2bk", "Errors.Intent.IDPMissing")
 		}
 		successURL, err := url.Parse(successURL)
 		if err != nil {
-			return nil, errors.ThrowInvalidArgument(nil, "COMMAND-x8j3bk", "Errors.Intent.SuccessURLMissing")
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-x8j3bk", "Errors.Intent.SuccessURLMissing")
 		}
 		failureURL, err := url.Parse(failureURL)
 		if err != nil {
-			return nil, errors.ThrowInvalidArgument(nil, "COMMAND-x8j4bk", "Errors.Intent.FailureURLMissing")
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-x8j4bk", "Errors.Intent.FailureURLMissing")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			err = getIDPIntentWriteModel(ctx, writeModel, filter)
@@ -45,7 +45,7 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, idpID st
 			}
 			exists, err := ExistsIDP(ctx, filter, idpID, writeModel.ResourceOwner)
 			if !exists || err != nil {
-				return nil, errors.ThrowPreconditionFailed(err, "COMMAND-39n221fs", "Errors.IDPConfig.NotExisting")
+				return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-39n221fs", "Errors.IDPConfig.NotExisting")
 			}
 			return []eventstore.Command{
 				idpintent.NewStartedEvent(ctx, writeModel.aggregate, successURL, failureURL, idpID),
@@ -117,10 +117,10 @@ func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIn
 		return nil, err
 	}
 	if intent.State == domain.IDPIntentStateUnspecified {
-		return nil, errors.ThrowNotFound(nil, "IDP-Hk38e", "Errors.Intent.NotStarted")
+		return nil, zerrors.ThrowNotFound(nil, "IDP-Hk38e", "Errors.Intent.NotStarted")
 	}
 	if intent.State != domain.IDPIntentStateStarted {
-		return nil, errors.ThrowInvalidArgument(nil, "IDP-Sfrgs", "Errors.Intent.NotStarted")
+		return nil, zerrors.ThrowInvalidArgument(nil, "IDP-Sfrgs", "Errors.Intent.NotStarted")
 	}
 	return intent, nil
 }

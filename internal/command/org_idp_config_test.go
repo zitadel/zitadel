@@ -10,7 +10,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
@@ -18,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddIDPConfig(t *testing.T) {
@@ -65,7 +65,7 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -81,7 +81,7 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 				config:        &domain.IDPConfig{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -261,7 +261,7 @@ func TestCommandSide_ChangeIDPConfig(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -276,7 +276,7 @@ func TestCommandSide_ChangeIDPConfig(t *testing.T) {
 				config: &domain.IDPConfig{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -295,7 +295,7 @@ func TestCommandSide_ChangeIDPConfig(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -433,7 +433,7 @@ func TestCommands_RemoveIDPConfig(t *testing.T) {
 			},
 			res{
 				nil,
-				caos_errs.IsNotFound,
+				zerrors.IsNotFound,
 			},
 		},
 		{

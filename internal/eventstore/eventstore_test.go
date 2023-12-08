@@ -10,7 +10,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/service"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // testEvent implements the Event interface
@@ -122,7 +122,7 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 				eventMapper: map[EventType]eventTypeInterceptors{
 					"event.type": {
 						eventMapper: func(Event) (Event, error) {
-							return nil, errors.ThrowUnimplemented(nil, "V2-1qPvn", "unimplemented")
+							return nil, zerrors.ThrowUnimplemented(nil, "V2-1qPvn", "unimplemented")
 						},
 					},
 				},
@@ -661,7 +661,7 @@ func TestEventstore_Push(t *testing.T) {
 			fields: fields{
 				pusher: &testPusher{
 					t:   t,
-					err: errors.ThrowInternal(nil, "V2-qaa4S", "test err"),
+					err: zerrors.ThrowInternal(nil, "V2-qaa4S", "test err"),
 				},
 			},
 			res: res{
@@ -684,7 +684,7 @@ func TestEventstore_Push(t *testing.T) {
 			fields: fields{
 				pusher: &testPusher{
 					t:   t,
-					err: errors.ThrowInternal(nil, "V2-qaa4S", "test err"),
+					err: zerrors.ThrowInternal(nil, "V2-qaa4S", "test err"),
 				},
 			},
 			res: res{
@@ -775,7 +775,7 @@ func TestEventstore_FilterEvents(t *testing.T) {
 			fields: fields{
 				repo: &testQuerier{
 					t:   t,
-					err: errors.ThrowInternal(nil, "V2-RfkBa", "test err"),
+					err: zerrors.ThrowInternal(nil, "V2-RfkBa", "test err"),
 				},
 				eventMapper: map[EventType]func(Event) (Event, error){
 					"test.event": func(e Event) (Event, error) {
@@ -901,7 +901,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			fields: fields{
 				repo: &testQuerier{
 					t:   t,
-					err: errors.ThrowInternal(nil, "V2-RfkBa", "test err"),
+					err: zerrors.ThrowInternal(nil, "V2-RfkBa", "test err"),
 				},
 			},
 			res: res{
@@ -1038,7 +1038,7 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 			fields: fields{
 				repo: &testQuerier{
 					t:   t,
-					err: errors.ThrowInternal(nil, "V2-RfkBa", "test err"),
+					err: zerrors.ThrowInternal(nil, "V2-RfkBa", "test err"),
 				},
 				eventMapper: map[EventType]func(Event) (Event, error){
 					"test.event": func(e Event) (Event, error) {
@@ -1100,7 +1100,7 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 				},
 				readModel: &testReducer{
 					t:              t,
-					err:            errors.ThrowInvalidArgument(nil, "V2-W06TG", "test err"),
+					err:            zerrors.ThrowInvalidArgument(nil, "V2-W06TG", "test err"),
 					expectedLength: 1,
 				},
 			},
@@ -1212,7 +1212,7 @@ func TestEventstore_mapEvents(t *testing.T) {
 			fields: fields{
 				eventMapper: map[EventType]func(Event) (Event, error){
 					"test.event": func(Event) (Event, error) {
-						return nil, errors.ThrowInternal(nil, "V2-8FbQk", "test err")
+						return nil, zerrors.ThrowInternal(nil, "V2-8FbQk", "test err")
 					},
 				},
 			},

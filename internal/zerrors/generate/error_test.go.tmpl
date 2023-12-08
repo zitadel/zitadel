@@ -1,0 +1,33 @@
+package errors_test
+
+import (
+	"errors"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/zitadel/zitadel/internal/zerrors"
+)
+
+func Test{{.ErrorName}}Error(t *testing.T) {
+	var err interface{}
+	err = new(zerrors.{{.ErrorName}}Error)
+	_, ok := err.(*zerrors.{{.ErrorName}})
+	assert.True(t, ok)
+}
+
+func TestThrow{{.ErrorName}}f(t *testing.T) {
+	err := zerrors.Throw{{.ErrorName}}f(nil, "id", "msg")
+	_, ok := err.(*zerrors.{{.ErrorName}}Error)
+	assert.True(t, ok)
+}
+
+func TestIs{{.ErrorName}}(t *testing.T) {
+	err := zerrors.Throw{{.ErrorName}}(nil, "id", "msg")
+	ok := zerrors.Is{{.ErrorName}}(err)
+	assert.True(t, ok)
+
+	err = errors.New("I am found!")
+	ok = zerrors.Is{{.ErrorName}}(err)
+	assert.False(t, ok)
+}

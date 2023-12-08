@@ -14,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/auth_request/repository/mock"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -22,6 +21,7 @@ import (
 	user_model "github.com/zitadel/zitadel/internal/user/model"
 	user_es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
 	user_view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -31,7 +31,7 @@ var (
 type mockViewNoUserSession struct{}
 
 func (m *mockViewNoUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
-	return nil, errors.ThrowNotFound(nil, "id", "user session not found")
+	return nil, zerrors.ThrowNotFound(nil, "id", "user session not found")
 }
 
 func (m *mockViewNoUserSession) UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error) {
@@ -45,11 +45,11 @@ func (m *mockViewNoUserSession) GetLatestUserSessionSequence(ctx context.Context
 type mockViewErrUserSession struct{}
 
 func (m *mockViewErrUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
-	return nil, errors.ThrowInternal(nil, "id", "internal error")
+	return nil, zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
 func (m *mockViewErrUserSession) UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error) {
-	return nil, errors.ThrowInternal(nil, "id", "internal error")
+	return nil, zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
 func (m *mockViewErrUserSession) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*query.CurrentState, error) {
@@ -102,7 +102,7 @@ func (m *mockViewUserSession) GetLatestUserSessionSequence(ctx context.Context, 
 type mockViewNoUser struct{}
 
 func (m *mockViewNoUser) UserByID(string, string) (*user_view_model.UserView, error) {
-	return nil, errors.ThrowNotFound(nil, "id", "user not found")
+	return nil, zerrors.ThrowNotFound(nil, "id", "user not found")
 }
 
 type mockEventUser struct {
@@ -127,11 +127,11 @@ func (m *mockEventUser) BulkAddExternalIDPs(ctx context.Context, userID string, 
 type mockEventErrUser struct{}
 
 func (m *mockEventErrUser) UserEventsByID(ctx context.Context, id string, sequence uint64, types []eventstore.EventType) ([]eventstore.Event, error) {
-	return nil, errors.ThrowInternal(nil, "id", "internal error")
+	return nil, zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
 func (m *mockEventErrUser) BulkAddExternalIDPs(ctx context.Context, userID string, externalIDPs []*user_model.ExternalIDP) error {
-	return errors.ThrowInternal(nil, "id", "internal error")
+	return zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
 type mockViewUser struct {
@@ -226,11 +226,11 @@ func (m *mockViewOrg) OrgByPrimaryDomain(context.Context, string) (*query.Org, e
 type mockViewErrOrg struct{}
 
 func (m *mockViewErrOrg) OrgByID(context.Context, bool, string) (*query.Org, error) {
-	return nil, errors.ThrowInternal(nil, "id", "internal error")
+	return nil, zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
 func (m *mockViewErrOrg) OrgByPrimaryDomain(context.Context, string) (*query.Org, error) {
-	return nil, errors.ThrowInternal(nil, "id", "internal error")
+	return nil, zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
 type mockUserGrants struct {
@@ -276,7 +276,7 @@ func (m *mockApp) AppByOIDCClientID(ctx context.Context, id string) (*query.App,
 	if m.app != nil {
 		return m.app, nil
 	}
-	return nil, errors.ThrowNotFound(nil, "ERROR", "error")
+	return nil, zerrors.ThrowNotFound(nil, "ERROR", "error")
 }
 
 type mockIDPUserLinks struct {
@@ -321,7 +321,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			fields{},
 			args{nil, false},
 			nil,
-			errors.IsErrorInvalidArgument,
+			zerrors.IsErrorInvalidArgument,
 		},
 		{
 			"prompt none and checkLoggedIn false, callback step",
@@ -386,7 +386,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}}, false},
 			nil,
-			errors.IsInternal,
+			zerrors.IsInternal,
 		},
 		{
 			"user not set, prompt select account, select account step",
@@ -666,7 +666,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			nil,
-			errors.IsNotFound,
+			zerrors.IsNotFound,
 		},
 		{
 			"user not active, precondition failed error",
@@ -688,7 +688,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			nil,
-			errors.IsPreconditionFailed,
+			zerrors.IsPreconditionFailed,
 		},
 		{
 			"user locked, precondition failed error",
@@ -709,7 +709,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			nil,
-			errors.IsPreconditionFailed,
+			zerrors.IsPreconditionFailed,
 		},
 		{
 			"org error, internal error",
@@ -725,7 +725,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			nil,
-			errors.IsInternal,
+			zerrors.IsInternal,
 		},
 		{
 			"org not active, precondition failed error",
@@ -741,7 +741,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			nil,
-			errors.IsPreconditionFailed,
+			zerrors.IsPreconditionFailed,
 		},
 		{
 			"usersession not found, new user session, password step",
@@ -779,7 +779,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			nil,
-			errors.IsInternal,
+			zerrors.IsInternal,
 		},
 		{
 			"user not initialized, init user step",
@@ -1716,7 +1716,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			nil,
 			false,
-			errors.IsPreconditionFailed,
+			zerrors.IsPreconditionFailed,
 		},
 		{
 			"not set up, no mfas configured, no prompt and true",
@@ -2073,7 +2073,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				user:         &user_model.UserView{ID: "id"},
 			},
 			nil,
-			errors.IsInternal,
+			zerrors.IsInternal,
 		},
 		{
 			"error user events, old view model state",
@@ -2184,7 +2184,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				},
 			},
 			nil,
-			errors.IsPreconditionFailed,
+			zerrors.IsPreconditionFailed,
 		},
 	}
 	for _, tt := range tests {
@@ -2220,7 +2220,7 @@ func Test_userByID(t *testing.T) {
 				eventProvider: &mockEventUser{},
 			},
 			nil,
-			errors.IsNotFound,
+			zerrors.IsNotFound,
 		},
 		{
 			"error user events, old view model state",

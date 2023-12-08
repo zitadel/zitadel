@@ -2,8 +2,8 @@ package policy
 
 import (
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -48,7 +48,7 @@ func IdentityProviderAddedEventMapper(event eventstore.Event) (eventstore.Event,
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROVI-bfNnp", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "PROVI-bfNnp", "Errors.Internal")
 	}
 
 	return e, nil
@@ -85,7 +85,7 @@ func IdentityProviderRemovedEventMapper(event eventstore.Event) (eventstore.Even
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROVI-6H0KQ", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "PROVI-6H0KQ", "Errors.Internal")
 	}
 
 	return e, nil
@@ -122,7 +122,7 @@ func IdentityProviderCascadeRemovedEventMapper(event eventstore.Event) (eventsto
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROVI-7M9fs", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "PROVI-7M9fs", "Errors.Internal")
 	}
 
 	return e, nil

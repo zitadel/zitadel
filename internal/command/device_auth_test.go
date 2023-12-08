@@ -12,11 +12,11 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_AddDeviceAuth(t *testing.T) {
@@ -176,7 +176,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 				),
 			},
 			args:    args{ctx, "1999", "subj"},
-			wantErr: caos_errs.ThrowNotFound(nil, "COMMAND-Hief9", "Errors.DeviceAuth.NotFound"),
+			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-Hief9", "Errors.DeviceAuth.NotFound"),
 		},
 		{
 			name: "push error",
@@ -283,7 +283,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 				),
 			},
 			args:    args{ctx, "1999", domain.DeviceAuthCanceledDenied},
-			wantErr: caos_errs.ThrowNotFound(nil, "COMMAND-gee5A", "Errors.DeviceAuth.NotFound"),
+			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-gee5A", "Errors.DeviceAuth.NotFound"),
 		},
 		{
 			name: "push error",

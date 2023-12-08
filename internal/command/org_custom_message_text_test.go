@@ -8,9 +8,9 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	zitadel_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_SetCustomMessageText(t *testing.T) {
@@ -42,7 +42,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 				config: &domain.CustomMessageText{},
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -58,7 +58,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -95,7 +95,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 				config:        &domain.CustomMessageText{},
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -111,7 +111,7 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -396,7 +396,7 @@ func TestCommandSide_RemoveCustomMessageText(t *testing.T) {
 				lang:         language.English,
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -412,7 +412,7 @@ func TestCommandSide_RemoveCustomMessageText(t *testing.T) {
 				lang:          language.English,
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -428,7 +428,7 @@ func TestCommandSide_RemoveCustomMessageText(t *testing.T) {
 				mailTextType:  "Template",
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{

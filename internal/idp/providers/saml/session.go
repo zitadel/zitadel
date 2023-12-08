@@ -9,8 +9,8 @@ import (
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var _ idp.Session = (*Session)(nil)
@@ -48,12 +48,12 @@ func (s *Session) GetAuth(ctx context.Context) (string, bool) {
 // FetchUser implements the [idp.Session] interface.
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if s.RequestID == "" || s.Request == nil {
-		return nil, errors.ThrowInvalidArgument(nil, "SAML-d09hy0wkex", "Errors.Intent.ResponseInvalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "SAML-d09hy0wkex", "Errors.Intent.ResponseInvalid")
 	}
 
 	s.Assertion, err = s.ServiceProvider.ServiceProvider.ParseResponse(s.Request, []string{s.RequestID})
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "SAML-nuo0vphhh9", "Errors.Intent.ResponseInvalid")
+		return nil, zerrors.ThrowInvalidArgument(err, "SAML-nuo0vphhh9", "Errors.Intent.ResponseInvalid")
 	}
 
 	userMapper := NewUser()

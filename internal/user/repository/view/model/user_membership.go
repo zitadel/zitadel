@@ -7,7 +7,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	iam_es_model "github.com/zitadel/zitadel/internal/iam/repository/eventsourcing/model"
 	org_es_model "github.com/zitadel/zitadel/internal/org/repository/eventsourcing/model"
@@ -16,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -93,7 +93,7 @@ func (u *UserMembershipView) setIamMemberData(event *models.Event) error {
 	member := new(iam_es_model.IAMMember)
 	if err := json.Unmarshal(event.Data, member); err != nil {
 		logging.New().WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
+		return zerrors.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
 	u.UserID = member.UserID
 	u.Roles = member.Roles
@@ -104,7 +104,7 @@ func (u *UserMembershipView) setOrgMemberData(event *models.Event) error {
 	member := new(org_es_model.OrgMember)
 	if err := json.Unmarshal(event.Data, member); err != nil {
 		logging.New().WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
+		return zerrors.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
 	u.UserID = member.UserID
 	u.Roles = member.Roles
@@ -115,7 +115,7 @@ func (u *UserMembershipView) setProjectMemberData(event *models.Event) error {
 	member := new(proj_es_model.ProjectMember)
 	if err := json.Unmarshal(event.Data, member); err != nil {
 		logging.New().WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
+		return zerrors.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
 	u.UserID = member.UserID
 	u.Roles = member.Roles
@@ -126,7 +126,7 @@ func (u *UserMembershipView) setProjectGrantMemberData(event *models.Event) erro
 	member := new(proj_es_model.ProjectGrantMember)
 	if err := json.Unmarshal(event.Data, member); err != nil {
 		logging.New().WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
+		return zerrors.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
 	u.UserID = member.UserID
 	u.ObjectID = member.GrantID

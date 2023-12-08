@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -103,7 +103,7 @@ func (p *orgProjection) Reducers() []handler.AggregateReducer {
 func (p *orgProjection) reduceOrgAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.OrgAddedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.OrgAddedEventType)
 	}
 	return handler.NewCreateStatement(
 		e,
@@ -123,7 +123,7 @@ func (p *orgProjection) reduceOrgAdded(event eventstore.Event) (*handler.Stateme
 func (p *orgProjection) reduceOrgChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Bg8oM", "reduce.wrong.event.type %s", org.OrgChangedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Bg8oM", "reduce.wrong.event.type %s", org.OrgChangedEventType)
 	}
 	if e.Name == "" {
 		return handler.NewNoOpStatement(e), nil
@@ -145,7 +145,7 @@ func (p *orgProjection) reduceOrgChanged(event eventstore.Event) (*handler.State
 func (p *orgProjection) reduceOrgDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgDeactivatedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-BApK4", "reduce.wrong.event.type %s", org.OrgDeactivatedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-BApK4", "reduce.wrong.event.type %s", org.OrgDeactivatedEventType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -164,7 +164,7 @@ func (p *orgProjection) reduceOrgDeactivated(event eventstore.Event) (*handler.S
 func (p *orgProjection) reduceOrgReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgReactivatedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-o37De", "reduce.wrong.event.type %s", org.OrgReactivatedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-o37De", "reduce.wrong.event.type %s", org.OrgReactivatedEventType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -183,7 +183,7 @@ func (p *orgProjection) reduceOrgReactivated(event eventstore.Event) (*handler.S
 func (p *orgProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainPrimarySetEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-4TbKT", "reduce.wrong.event.type %s", org.OrgDomainPrimarySetEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-4TbKT", "reduce.wrong.event.type %s", org.OrgDomainPrimarySetEventType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -202,7 +202,7 @@ func (p *orgProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler
 func (p *orgProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-DgMSg", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-DgMSg", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 	return handler.NewDeleteStatement(
 		e,

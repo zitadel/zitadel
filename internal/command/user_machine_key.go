@@ -6,10 +6,10 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type AddMachineKey struct {
@@ -53,23 +53,23 @@ func (key *MachineKey) SetExpirationDate(t time.Time) {
 
 func (key *MachineKey) Detail() ([]byte, error) {
 	if len(key.PrivateKey) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "KEY-sp2l2m", "Errors.Internal")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "KEY-sp2l2m", "Errors.Internal")
 	}
 	if key.Type == domain.AuthNKeyTypeJSON {
 		return domain.MachineKeyMarshalJSON(key.KeyID, key.PrivateKey, key.AggregateID)
 	}
-	return nil, errors.ThrowPreconditionFailed(nil, "KEY-dsg52", "Errors.Internal")
+	return nil, zerrors.ThrowPreconditionFailed(nil, "KEY-dsg52", "Errors.Internal")
 }
 
 func (key *MachineKey) content() error {
 	if key.ResourceOwner == "" {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-kqpoix", "Errors.ResourceOwnerMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-kqpoix", "Errors.ResourceOwnerMissing")
 	}
 	if key.AggregateID == "" {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-xuiwk2", "Errors.User.UserIDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-xuiwk2", "Errors.User.UserIDMissing")
 	}
 	if key.KeyID == "" {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-0p2m1h", "Errors.IDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-0p2m1h", "Errors.IDMissing")
 	}
 	return nil
 }
@@ -84,7 +84,7 @@ func (key *MachineKey) valid() (err error) {
 
 func (key *MachineKey) checkAggregate(ctx context.Context, filter preparation.FilterToQueryReducer) error {
 	if exists, err := ExistsUser(ctx, filter, key.AggregateID, key.ResourceOwner); err != nil || !exists {
-		return errors.ThrowPreconditionFailed(err, "COMMAND-bnipwm1", "Errors.User.NotFound")
+		return zerrors.ThrowPreconditionFailed(err, "COMMAND-bnipwm1", "Errors.User.NotFound")
 	}
 	return nil
 }
@@ -133,7 +133,7 @@ func prepareAddUserMachineKey(machineKey *MachineKey, keySize int) preparation.V
 				return nil, err
 			}
 			if writeModel.Exists() {
-				return nil, errors.ThrowAlreadyExists(nil, "COMMAND-091mops", "Errors.User.Machine.Key.AlreadyExists")
+				return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-091mops", "Errors.User.Machine.Key.AlreadyExists")
 			}
 			return []eventstore.Command{
 				user.NewMachineKeyAddedEvent(
@@ -177,7 +177,7 @@ func prepareRemoveUserMachineKey(machineKey *MachineKey) preparation.Validation 
 				return nil, err
 			}
 			if !writeModel.Exists() {
-				return nil, errors.ThrowNotFound(nil, "COMMAND-4m77G", "Errors.User.Machine.Key.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "COMMAND-4m77G", "Errors.User.Machine.Key.NotFound")
 			}
 			return []eventstore.Command{
 				user.NewMachineKeyRemovedEvent(

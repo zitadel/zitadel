@@ -9,13 +9,13 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
@@ -56,7 +56,7 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-03j8f", "Errors.IDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-03j8f", "Errors.IDMissing"),
 			},
 		},
 		{
@@ -72,7 +72,7 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-Ek9s", "Errors.User.ExternalIDP.MinimumExternalIDPNeeded"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-Ek9s", "Errors.User.ExternalIDP.MinimumExternalIDPNeeded"),
 			},
 		},
 		{
@@ -114,7 +114,7 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-33M0g", "Errors.IDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-33M0g", "Errors.IDMissing"),
 			},
 		},
 		{
@@ -156,7 +156,7 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-6m9Kd", "Errors.User.ExternalIDP.Invalid"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-6m9Kd", "Errors.User.ExternalIDP.Invalid"),
 			},
 		},
 		{
@@ -199,7 +199,7 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-as02jin", "Errors.IDPConfig.NotExisting"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-as02jin", "Errors.IDPConfig.NotExisting"),
 			},
 		},
 		{
@@ -304,7 +304,7 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfee2", "Errors.ExternalIDP.LinkingNotAllowed"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfee2", "Errors.ExternalIDP.LinkingNotAllowed"),
 			},
 		},
 		{
@@ -553,7 +553,7 @@ func TestCommandSide_RemoveUserIDPLink(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -571,7 +571,7 @@ func TestCommandSide_RemoveUserIDPLink(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -610,7 +610,7 @@ func TestCommandSide_RemoveUserIDPLink(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -632,7 +632,7 @@ func TestCommandSide_RemoveUserIDPLink(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -727,7 +727,7 @@ func TestCommandSide_ExternalLoginCheck(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -761,7 +761,7 @@ func TestCommandSide_ExternalLoginCheck(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -861,7 +861,7 @@ func TestCommandSide_MigrateUserIDP(t *testing.T) {
 				newID:       "newID",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-Sn3l1", "Errors.IDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-Sn3l1", "Errors.IDMissing"),
 			},
 		},
 		{
@@ -889,7 +889,7 @@ func TestCommandSide_MigrateUserIDP(t *testing.T) {
 				newID:       "newID",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-KJH2o", "Errors.User.ExternalIDP.NotFound"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-KJH2o", "Errors.User.ExternalIDP.NotFound"),
 			},
 		},
 		{

@@ -2,8 +2,8 @@ package user
 
 import (
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type HumanWebAuthNAddedEvent struct {
@@ -42,7 +42,7 @@ func HumanWebAuthNAddedEventMapper(event eventstore.Event) (eventstore.Event, er
 	}
 	err := event.Unmarshal(webAuthNAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-tB8sf", "unable to unmarshal human webAuthN added")
+		return nil, zerrors.ThrowInternal(err, "USER-tB8sf", "unable to unmarshal human webAuthN added")
 	}
 	return webAuthNAdded, nil
 }
@@ -98,7 +98,7 @@ func HumanWebAuthNVerifiedEventMapper(event eventstore.Event) (eventstore.Event,
 	}
 	err := event.Unmarshal(webauthNVerified)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-B0zDs", "unable to unmarshal human webAuthN verified")
+		return nil, zerrors.ThrowInternal(err, "USER-B0zDs", "unable to unmarshal human webAuthN verified")
 	}
 	return webauthNVerified, nil
 }
@@ -136,7 +136,7 @@ func HumanWebAuthNSignCountChangedEventMapper(event eventstore.Event) (eventstor
 	}
 	err := event.Unmarshal(webauthNVerified)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-5Gm0s", "unable to unmarshal human webAuthN sign count")
+		return nil, zerrors.ThrowInternal(err, "USER-5Gm0s", "unable to unmarshal human webAuthN sign count")
 	}
 	return webauthNVerified, nil
 }
@@ -172,7 +172,7 @@ func HumanWebAuthNRemovedEventMapper(event eventstore.Event) (eventstore.Event, 
 	}
 	err := event.Unmarshal(webauthNVerified)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-gM9sd", "unable to unmarshal human webAuthN token removed")
+		return nil, zerrors.ThrowInternal(err, "USER-gM9sd", "unable to unmarshal human webAuthN token removed")
 	}
 	return webauthNVerified, nil
 }
@@ -210,7 +210,7 @@ func HumanWebAuthNBeginLoginEventMapper(event eventstore.Event) (eventstore.Even
 	}
 	err := event.Unmarshal(webAuthNAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-rMb8x", "unable to unmarshal human webAuthN begin login")
+		return nil, zerrors.ThrowInternal(err, "USER-rMb8x", "unable to unmarshal human webAuthN begin login")
 	}
 	return webAuthNAdded, nil
 }
@@ -243,7 +243,7 @@ func HumanWebAuthNCheckSucceededEventMapper(event eventstore.Event) (eventstore.
 	}
 	err := event.Unmarshal(webAuthNAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-2M0fg", "unable to unmarshal human webAuthN check succeeded")
+		return nil, zerrors.ThrowInternal(err, "USER-2M0fg", "unable to unmarshal human webAuthN check succeeded")
 	}
 	return webAuthNAdded, nil
 }
@@ -276,7 +276,7 @@ func HumanWebAuthNCheckFailedEventMapper(event eventstore.Event) (eventstore.Eve
 	}
 	err := event.Unmarshal(webAuthNAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-O0dse", "unable to unmarshal human webAuthN check failed")
+		return nil, zerrors.ThrowInternal(err, "USER-O0dse", "unable to unmarshal human webAuthN check failed")
 	}
 	return webAuthNAdded, nil
 }

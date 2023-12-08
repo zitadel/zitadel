@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"context"
-	errs "errors"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -14,9 +14,9 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -46,8 +46,8 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 			ctx = authz.WithInstanceID(ctx, withInstanceIDProperty.GetInstanceId())
 			instance, err := verifier.InstanceByID(ctx)
 			if err != nil {
-				notFoundErr := new(errors.NotFoundError)
-				if errs.As(err, &notFoundErr) {
+				notFoundErr := new(zerrors.NotFoundError)
+				if errors.As(err, &notFoundErr) {
 					notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 				}
 				return nil, status.Error(codes.NotFound, err.Error())
@@ -62,8 +62,8 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 	}
 	instance, err := verifier.InstanceByHost(interceptorCtx, host)
 	if err != nil {
-		notFoundErr := new(errors.NotFoundError)
-		if errs.As(err, &notFoundErr) {
+		notFoundErr := new(zerrors.NotFoundError)
+		if errors.As(err, &notFoundErr) {
 			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 		}
 		return nil, status.Error(codes.NotFound, err.Error())

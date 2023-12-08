@@ -3,8 +3,8 @@ package authz
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func CheckPermission(ctx context.Context, resolver MembershipsResolver, roleMappings []RoleMapping, permission, orgID, resourceID string) (err error) {
@@ -27,7 +27,7 @@ func getUserPermissions(ctx context.Context, resolver MembershipsResolver, requi
 	defer func() { span.EndWithError(err) }()
 
 	if ctxData.IsZero() {
-		return nil, nil, errors.ThrowUnauthenticated(nil, "AUTH-rKLWEH", "context missing")
+		return nil, nil, zerrors.ThrowUnauthenticated(nil, "AUTH-rKLWEH", "context missing")
 	}
 
 	if ctxData.SystemMemberships != nil {
@@ -43,7 +43,7 @@ func getUserPermissions(ctx context.Context, resolver MembershipsResolver, requi
 	if len(memberships) == 0 {
 		memberships, err = resolver.SearchMyMemberships(ctx, orgID, true)
 		if len(memberships) == 0 {
-			return nil, nil, errors.ThrowNotFound(nil, "AUTHZ-cdgFk", "membership not found")
+			return nil, nil, zerrors.ThrowNotFound(nil, "AUTHZ-cdgFk", "membership not found")
 		}
 		if err != nil {
 			return nil, nil, err
@@ -57,7 +57,7 @@ func getUserPermissions(ctx context.Context, resolver MembershipsResolver, requi
 // or the specific resource (project.write:123)
 func checkUserResourcePermissions(userPerms []string, resourceID string) error {
 	if len(userPerms) == 0 {
-		return errors.ThrowPermissionDenied(nil, "AUTH-AWfge", "No matching permissions found")
+		return zerrors.ThrowPermissionDenied(nil, "AUTH-AWfge", "No matching permissions found")
 	}
 
 	if resourceID == "" {
@@ -72,7 +72,7 @@ func checkUserResourcePermissions(userPerms []string, resourceID string) error {
 		return nil
 	}
 
-	return errors.ThrowPermissionDenied(nil, "AUTH-Swrgg2", "No matching permissions found")
+	return zerrors.ThrowPermissionDenied(nil, "AUTH-Swrgg2", "No matching permissions found")
 }
 
 func hasContextResourcePermission(permissions []string, resourceID string) bool {

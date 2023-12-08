@@ -11,8 +11,8 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/i18n"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -81,17 +81,17 @@ func (r *Renderer) loadTemplates(dir http.FileSystem, translator *i18n.Translato
 	}
 	templatesDir, err := dir.Open(templatesPath)
 	if err != nil {
-		return errors.ThrowNotFound(err, "RENDE-G3aea", "path not found")
+		return zerrors.ThrowNotFound(err, "RENDE-G3aea", "path not found")
 	}
 	defer templatesDir.Close()
 	files, err := templatesDir.Readdir(0)
 	if err != nil {
-		return errors.ThrowNotFound(err, "RENDE-dfR33", "cannot read dir")
+		return zerrors.ThrowNotFound(err, "RENDE-dfR33", "cannot read dir")
 	}
 	tmpl := template.New("")
 	for _, file := range files {
 		if err := r.addFileToTemplate(dir, tmpl, tmplMapping, funcs, file); err != nil {
-			return errors.ThrowNotFound(err, "RENDE-dfTe1", "cannot append file to templates")
+			return zerrors.ThrowNotFound(err, "RENDE-dfTe1", "cannot append file to templates")
 		}
 	}
 	r.Templates = make(map[string]*template.Template, len(tmplMapping))

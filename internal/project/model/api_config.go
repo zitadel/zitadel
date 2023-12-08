@@ -7,9 +7,9 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type APIConfig struct {
@@ -32,7 +32,7 @@ func (c *APIConfig) IsValid() bool {
 	return true
 }
 
-//ClientID random_number@projectname (eg. 495894098234@zitadel)
+// ClientID random_number@projectname (eg. 495894098234@zitadel)
 func (c *APIConfig) GenerateNewClientID(idGenerator id.Generator, project *Project) error {
 	rndID, err := idGenerator.Next()
 	if err != nil {
@@ -54,7 +54,7 @@ func (c *APIConfig) GenerateNewClientSecret(generator crypto.Generator) (string,
 	cryptoValue, stringSecret, err := crypto.NewCode(generator)
 	if err != nil {
 		logging.Log("MODEL-ADvd2").OnError(err).Error("unable to create client secret")
-		return "", errors.ThrowInternal(err, "MODEL-dsvr43", "Errors.Project.CouldNotGenerateClientSecret")
+		return "", zerrors.ThrowInternal(err, "MODEL-dsvr43", "Errors.Project.CouldNotGenerateClientSecret")
 	}
 	c.ClientSecret = cryptoValue
 	return stringSecret, nil

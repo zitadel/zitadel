@@ -14,11 +14,10 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	objpb "github.com/zitadel/zitadel/pkg/grpc/object"
-
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
+	objpb "github.com/zitadel/zitadel/pkg/grpc/object"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 )
@@ -439,7 +438,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 					},
 				},
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid"),
 		},
 	}
 	for _, tt := range tests {
@@ -479,7 +478,7 @@ func Test_sessionQueriesToQuery(t *testing.T) {
 					{Query: nil},
 				},
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid"),
 		},
 		{
 			name: "creator and sessions",
@@ -529,7 +528,7 @@ func Test_sessionQueryToQuery(t *testing.T) {
 			args: args{&session.SearchQuery{
 				Query: nil,
 			}},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid"),
 		},
 		{
 			name: "ids query",
@@ -624,7 +623,7 @@ func Test_userCheck(t *testing.T) {
 			args: args{&session.CheckUser{
 				Search: nil,
 			}},
-			wantErr: caos_errs.ThrowUnimplementedf(nil, "SESSION-d3b4g0", "user search %T not implemented", nil),
+			wantErr: zerrors.ThrowUnimplementedf(nil, "SESSION-d3b4g0", "user search %T not implemented", nil),
 		},
 	}
 	for _, tt := range tests {

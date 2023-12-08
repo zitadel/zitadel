@@ -6,7 +6,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -78,7 +78,7 @@ func UserGrantAddedEventMapper(event eventstore.Event) (eventstore.Event, error)
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "UGRANT-0p9ol", "unable to unmarshal user grant")
+		return nil, zerrors.ThrowInternal(err, "UGRANT-0p9ol", "unable to unmarshal user grant")
 	}
 
 	return e, nil
@@ -118,7 +118,7 @@ func UserGrantChangedEventMapper(event eventstore.Event) (eventstore.Event, erro
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "UGRANT-4M0sd", "unable to unmarshal user grant")
+		return nil, zerrors.ThrowInternal(err, "UGRANT-4M0sd", "unable to unmarshal user grant")
 	}
 
 	return e, nil
@@ -158,7 +158,7 @@ func UserGrantCascadeChangedEventMapper(event eventstore.Event) (eventstore.Even
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "UGRANT-Gs9df", "unable to unmarshal user grant")
+		return nil, zerrors.ThrowInternal(err, "UGRANT-Gs9df", "unable to unmarshal user grant")
 	}
 
 	return e, nil

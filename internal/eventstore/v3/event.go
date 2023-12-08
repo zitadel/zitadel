@@ -6,8 +6,8 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -31,7 +31,7 @@ func commandToEvent(sequence *latestSequence, command eventstore.Command) (_ *ev
 		payload, err = json.Marshal(command.Payload())
 		if err != nil {
 			logging.WithError(err).Warn("marshal payload failed")
-			return nil, errors.ThrowInternal(err, "V3-MInPK", "Errors.Internal")
+			return nil, zerrors.ThrowInternal(err, "V3-MInPK", "Errors.Internal")
 		}
 	}
 	return &event{
@@ -95,7 +95,7 @@ func (e *event) Unmarshal(ptr any) error {
 		return nil
 	}
 	if err := json.Unmarshal(e.payload, ptr); err != nil {
-		return errors.ThrowInternal(err, "V3-u8qVo", "Errors.Internal")
+		return zerrors.ThrowInternal(err, "V3-u8qVo", "Errors.Internal")
 	}
 
 	return nil

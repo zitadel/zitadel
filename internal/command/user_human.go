@@ -9,10 +9,10 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) getHuman(ctx context.Context, userID, resourceowner string) (*domain.Human, error) {
@@ -21,7 +21,7 @@ func (c *Commands) getHuman(ctx context.Context, userID, resourceowner string) (
 		return nil, err
 	}
 	if !isUserStateExists(human.UserState) {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-M9dsd", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-M9dsd", "Errors.User.NotFound")
 	}
 	return writeModelToHuman(human), nil
 }
@@ -82,14 +82,14 @@ func (h *AddHuman) Validate(hasher *crypto.PasswordHasher) (err error) {
 		return err
 	}
 	if h.Username = strings.TrimSpace(h.Username); h.Username == "" {
-		return errors.ThrowInvalidArgument(nil, "V2-zzad3", "Errors.Invalid.Argument")
+		return zerrors.ThrowInvalidArgument(nil, "V2-zzad3", "Errors.Invalid.Argument")
 	}
 
 	if h.FirstName = strings.TrimSpace(h.FirstName); h.FirstName == "" {
-		return errors.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.User.Profile.FirstNameEmpty")
+		return zerrors.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.User.Profile.FirstNameEmpty")
 	}
 	if h.LastName = strings.TrimSpace(h.LastName); h.LastName == "" {
-		return errors.ThrowInvalidArgument(nil, "USER-4hB7d", "Errors.User.Profile.LastNameEmpty")
+		return zerrors.ThrowInvalidArgument(nil, "USER-4hB7d", "Errors.User.Profile.LastNameEmpty")
 	}
 	h.ensureDisplayName()
 
@@ -106,7 +106,7 @@ func (h *AddHuman) Validate(hasher *crypto.PasswordHasher) (err error) {
 	}
 	if h.EncodedPasswordHash != "" {
 		if !hasher.EncodingSupported(h.EncodedPasswordHash) {
-			return errors.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.User.Password.NotSupported")
+			return zerrors.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.User.Password.NotSupported")
 		}
 	}
 	return nil
@@ -119,17 +119,17 @@ type AddMetadataEntry struct {
 
 func (m *AddMetadataEntry) Valid() error {
 	if m.Key = strings.TrimSpace(m.Key); m.Key == "" {
-		return errors.ThrowInvalidArgument(nil, "USER-Drght", "Errors.User.Metadata.KeyEmpty")
+		return zerrors.ThrowInvalidArgument(nil, "USER-Drght", "Errors.User.Metadata.KeyEmpty")
 	}
 	if len(m.Value) == 0 {
-		return errors.ThrowInvalidArgument(nil, "USER-Dbgth", "Errors.User.Metadata.ValueEmpty")
+		return zerrors.ThrowInvalidArgument(nil, "USER-Dbgth", "Errors.User.Metadata.ValueEmpty")
 	}
 	return nil
 }
 
 func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *AddHuman, allowInitMail bool) (err error) {
 	if resourceOwner == "" {
-		return errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
+		return zerrors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
 	}
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter,
 		c.AddHumanCommand(
@@ -288,7 +288,7 @@ func (c *Commands) addHumanCommandEmail(ctx context.Context, filter preparation.
 func addLink(ctx context.Context, filter preparation.FilterToQueryReducer, a *user.Aggregate, link *AddLink) (eventstore.Command, error) {
 	exists, err := ExistsIDP(ctx, filter, link.IDPID, a.ResourceOwner)
 	if !exists || err != nil {
-		return nil, errors.ThrowPreconditionFailed(err, "COMMAND-39nf2", "Errors.IDPConfig.NotExisting")
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-39nf2", "Errors.IDPConfig.NotExisting")
 	}
 	return user.NewUserIDPLinkAddedEvent(ctx, &a.Aggregate, link.IDPID, link.DisplayName, link.IDPExternalID), nil
 }
@@ -322,7 +322,7 @@ func (c *Commands) addHumanCommandCheckID(ctx context.Context, filter preparatio
 		return err
 	}
 	if isUserStateExists(existingHuman.UserState) {
-		return errors.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting")
 	}
 	return nil
 }
@@ -368,7 +368,7 @@ func userValidateDomain(ctx context.Context, a *user.Aggregate, username string,
 	}
 
 	if domainCheck.Verified && domainCheck.ResourceOwner != a.ResourceOwner {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
 	}
 
 	return nil
@@ -413,15 +413,15 @@ func (h *AddHuman) shouldAddInitCode() bool {
 
 func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, links []*domain.UserIDPLink, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator crypto.Generator) (_ *domain.Human, passwordlessCode *domain.PasswordlessInitCode, err error) {
 	if orgID == "" {
-		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-5N8fs", "Errors.ResourceOwnerMissing")
+		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-5N8fs", "Errors.ResourceOwnerMissing")
 	}
 	domainPolicy, err := c.getOrgDomainPolicy(ctx, orgID)
 	if err != nil {
-		return nil, nil, errors.ThrowPreconditionFailed(err, "COMMAND-2N9fs", "Errors.Org.DomainPolicy.NotFound")
+		return nil, nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-2N9fs", "Errors.Org.DomainPolicy.NotFound")
 	}
 	pwPolicy, err := c.getOrgPasswordComplexityPolicy(ctx, orgID)
 	if err != nil {
-		return nil, nil, errors.ThrowPreconditionFailed(err, "COMMAND-4N8gs", "Errors.Org.PasswordComplexityPolicy.NotFound")
+		return nil, nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-4N8gs", "Errors.Org.PasswordComplexityPolicy.NotFound")
 	}
 
 	if human.AggregateID != "" {
@@ -431,7 +431,7 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 		}
 
 		if existing.UserState != domain.UserStateUnspecified {
-			return nil, nil, errors.ThrowPreconditionFailed(nil, "COMMAND-ziuna", "Errors.User.AlreadyExisting")
+			return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-ziuna", "Errors.User.AlreadyExisting")
 		}
 	}
 
@@ -461,23 +461,23 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 
 func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, orgMemberRoles []string, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator crypto.Generator) (*domain.Human, error) {
 	if orgID == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-GEdf2", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-GEdf2", "Errors.ResourceOwnerMissing")
 	}
 	domainPolicy, err := c.getOrgDomainPolicy(ctx, orgID)
 	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.Org.DomainPolicy.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.Org.DomainPolicy.NotFound")
 	}
 	pwPolicy, err := c.getOrgPasswordComplexityPolicy(ctx, orgID)
 	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Org.PasswordComplexityPolicy.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Org.PasswordComplexityPolicy.NotFound")
 	}
 	loginPolicy, err := c.getOrgLoginPolicy(ctx, orgID)
 	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(err, "COMMAND-Dfg3g", "Errors.Org.LoginPolicy.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-Dfg3g", "Errors.Org.LoginPolicy.NotFound")
 	}
 	// check only if local registration is allowed, the idp will be checked separately
 	if !loginPolicy.AllowRegister && link == nil {
-		return nil, errors.ThrowPreconditionFailed(err, "COMMAND-SAbr3", "Errors.Org.LoginPolicy.RegistrationNotAllowed")
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-SAbr3", "Errors.Org.LoginPolicy.RegistrationNotAllowed")
 	}
 	userEvents, registeredHuman, err := c.registerHuman(ctx, orgID, human, link, domainPolicy, pwPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
 	if err != nil {
@@ -515,7 +515,7 @@ func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domai
 
 func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, links []*domain.UserIDPLink, domainPolicy *domain.DomainPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator crypto.Generator) (events []eventstore.Command, humanWriteModel *HumanWriteModel, passwordlessCodeWriteModel *HumanPasswordlessInitCodeWriteModel, code string, err error) {
 	if orgID == "" {
-		return nil, nil, nil, "", errors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.Org.Empty")
+		return nil, nil, nil, "", zerrors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.Org.Empty")
 	}
 	if err := human.Normalize(); err != nil {
 		return nil, nil, nil, "", err
@@ -537,19 +537,19 @@ func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.
 
 func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, domainPolicy *domain.DomainPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator crypto.Generator) ([]eventstore.Command, *HumanWriteModel, error) {
 	if human == nil {
-		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-JKefw", "Errors.User.Invalid")
+		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-JKefw", "Errors.User.Invalid")
 	}
 	if human.Username = strings.TrimSpace(human.Username); human.Username == "" {
 		human.Username = string(human.EmailAddress)
 	}
 	if orgID == "" {
-		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-hYsVH", "Errors.Org.Empty")
+		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-hYsVH", "Errors.Org.Empty")
 	}
 	if err := human.Normalize(); err != nil {
 		return nil, nil, err
 	}
 	if link == nil && (human.Password == nil || human.Password.SecretString == "") {
-		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-X23na", "Errors.User.Password.Empty")
+		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-X23na", "Errors.User.Password.Empty")
 	}
 	if human.Password != nil && human.Password.SecretString != "" {
 		human.Password.ChangeRequired = false
@@ -575,7 +575,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 				return nil, nil, err
 			}
 			if domainCheck.Verified && domainCheck.ResourceOwner != orgID {
-				return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
+				return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
 			}
 		}
 	}
@@ -646,7 +646,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 
 func (c *Commands) HumanSkipMFAInit(ctx context.Context, userID, resourceowner string) (err error) {
 	if userID == "" {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-2xpX9", "Errors.User.UserIDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-2xpX9", "Errors.User.UserIDMissing")
 	}
 
 	existingHuman, err := c.getHumanWriteModelByID(ctx, userID, resourceowner)
@@ -654,7 +654,7 @@ func (c *Commands) HumanSkipMFAInit(ctx context.Context, userID, resourceowner s
 		return err
 	}
 	if !isUserStateExists(existingHuman.UserState) {
-		return errors.ThrowNotFound(nil, "COMMAND-m9cV8", "Errors.User.NotFound")
+		return zerrors.ThrowNotFound(nil, "COMMAND-m9cV8", "Errors.User.NotFound")
 	}
 
 	_, err = c.eventstore.Push(ctx,
@@ -733,10 +733,10 @@ func createRegisterHumanEvent(ctx context.Context, aggregate *eventstore.Aggrega
 
 func (c *Commands) HumansSignOut(ctx context.Context, agentID string, userIDs []string) error {
 	if agentID == "" {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
 	if len(userIDs) == 0 {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-M0od3", "Errors.User.UserIDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-M0od3", "Errors.User.UserIDMissing")
 	}
 	events := make([]eventstore.Command, 0)
 	for _, userID := range userIDs {

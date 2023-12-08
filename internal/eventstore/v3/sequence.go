@@ -10,8 +10,8 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type latestSequence struct {
@@ -28,18 +28,18 @@ func latestSequences(ctx context.Context, tx *sql.Tx, commands []eventstore.Comm
 	conditions, args := sequencesToSql(sequences)
 	rows, err := tx.QueryContext(ctx, fmt.Sprintf(latestSequencesStmt, strings.Join(conditions, " OR ")), args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "V3-5jU5z", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "V3-5jU5z", "Errors.Internal")
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		if err := scanToSequence(rows, sequences); err != nil {
-			return nil, errors.ThrowInternal(err, "V3-Ydiwv", "Errors.Internal")
+			return nil, zerrors.ThrowInternal(err, "V3-Ydiwv", "Errors.Internal")
 		}
 	}
 
 	if rows.Err() != nil {
-		return nil, errors.ThrowInternal(rows.Err(), "V3-XApDk", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(rows.Err(), "V3-XApDk", "Errors.Internal")
 	}
 	return sequences, nil
 }
@@ -110,7 +110,7 @@ func scanToSequence(rows *sql.Rows, sequences []*latestSequence) error {
 	var resourceOwner string
 
 	if err := rows.Scan(&instanceID, &resourceOwner, &aggregateType, &aggregateID, &currentSequence); err != nil {
-		return errors.ThrowInternal(err, "V3-OIWqj", "Errors.Internal")
+		return zerrors.ThrowInternal(err, "V3-OIWqj", "Errors.Internal")
 	}
 
 	sequence := searchSequence(sequences, aggregateType, aggregateID, instanceID)

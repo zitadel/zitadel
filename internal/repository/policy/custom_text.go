@@ -3,8 +3,8 @@ package policy
 import (
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -54,7 +54,7 @@ func CustomTextSetEventMapper(event eventstore.Event) (eventstore.Event, error) 
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "TEXT-28dwe", "unable to unmarshal custom text")
+		return nil, zerrors.ThrowInternal(err, "TEXT-28dwe", "unable to unmarshal custom text")
 	}
 
 	return e, nil
@@ -92,7 +92,7 @@ func CustomTextRemovedEventMapper(event eventstore.Event) (eventstore.Event, err
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "TEXT-28sMf", "unable to unmarshal custom text removed")
+		return nil, zerrors.ThrowInternal(err, "TEXT-28sMf", "unable to unmarshal custom text removed")
 	}
 
 	return e, nil
@@ -128,7 +128,7 @@ func CustomTextTemplateRemovedEventMapper(event eventstore.Event) (eventstore.Ev
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "TEXT-mKKRs", "unable to unmarshal custom text message removed")
+		return nil, zerrors.ThrowInternal(err, "TEXT-mKKRs", "unable to unmarshal custom text message removed")
 	}
 
 	return e, nil

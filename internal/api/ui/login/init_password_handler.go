@@ -6,7 +6,7 @@ import (
 
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -64,7 +64,7 @@ func (l *Login) handleInitPasswordCheck(w http.ResponseWriter, r *http.Request) 
 
 func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *initPasswordFormData) {
 	if data.Password != data.PasswordConfirm {
-		err := errors.ThrowInvalidArgument(nil, "VIEW-KaGue", "Errors.User.Password.ConfirmationWrong")
+		err := zerrors.ThrowInvalidArgument(nil, "VIEW-KaGue", "Errors.User.Password.ConfirmationWrong")
 		l.renderInitPassword(w, r, authReq, data.UserID, data.Code, err)
 		return
 	}
@@ -83,7 +83,7 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *dom
 
 func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	if authReq == nil {
-		l.renderError(w, r, nil, errors.ThrowInternal(nil, "LOGIN-8sn7s", "Errors.AuthRequest.NotFound"))
+		l.renderError(w, r, nil, zerrors.ThrowInternal(nil, "LOGIN-8sn7s", "Errors.AuthRequest.NotFound"))
 		return
 	}
 	userOrg := login

@@ -3,11 +3,11 @@ package projection
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -82,7 +82,7 @@ func (p *instanceDomainProjection) Reducers() []handler.AggregateReducer {
 func (p *instanceDomainProjection) reduceDomainAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DomainAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-38nNf", "reduce.wrong.event.type %s", instance.InstanceDomainAddedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-38nNf", "reduce.wrong.event.type %s", instance.InstanceDomainAddedEventType)
 	}
 	return handler.NewCreateStatement(
 		e,
@@ -101,7 +101,7 @@ func (p *instanceDomainProjection) reduceDomainAdded(event eventstore.Event) (*h
 func (p *instanceDomainProjection) reduceDomainPrimarySet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DomainPrimarySetEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-f8nlw", "reduce.wrong.event.type %s", instance.InstanceDomainPrimarySetEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-f8nlw", "reduce.wrong.event.type %s", instance.InstanceDomainPrimarySetEventType)
 	}
 	return handler.NewMultiStatement(
 		e,
@@ -133,7 +133,7 @@ func (p *instanceDomainProjection) reduceDomainPrimarySet(event eventstore.Event
 func (p *instanceDomainProjection) reduceDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DomainRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-388Nk", "reduce.wrong.event.type %s", instance.InstanceDomainRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-388Nk", "reduce.wrong.event.type %s", instance.InstanceDomainRemovedEventType)
 	}
 	return handler.NewDeleteStatement(
 		e,

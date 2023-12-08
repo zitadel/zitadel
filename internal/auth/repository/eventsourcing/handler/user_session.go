@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -18,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -241,7 +241,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			}
 			session, err = u.view.UserSessionByIDs(eventData.UserAgentID, event.Aggregate().ID, event.Aggregate().InstanceID)
 			if err != nil {
-				if !errors.IsNotFound(err) {
+				if !zerrors.IsNotFound(err) {
 					return err
 				}
 				session = &view_model.UserSessionView{
@@ -392,7 +392,7 @@ func (u *UserSession) getOrgByID(ctx context.Context, orgID, instanceID string) 
 	}
 
 	if esOrg.Sequence == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-3m9vs", "Errors.Org.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "EVENT-3m9vs", "Errors.Org.NotFound")
 	}
 	return org_es_model.OrgToModel(esOrg), nil
 }

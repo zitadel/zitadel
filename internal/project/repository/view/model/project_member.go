@@ -7,9 +7,9 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -60,7 +60,7 @@ func (r *ProjectMemberView) setRootData(event *models.Event) {
 func (r *ProjectMemberView) SetData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, r); err != nil {
 		logging.Log("EVEN-slo9s").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-lub6s", "Could not unmarshal data")
+		return zerrors.ThrowInternal(err, "MODEL-lub6s", "Could not unmarshal data")
 	}
 	return nil
 }
