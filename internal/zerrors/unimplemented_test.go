@@ -18,6 +18,7 @@ func TestUnimplementedError(t *testing.T) {
 
 func TestThrowUnimplementedf(t *testing.T) {
 	err := zerrors.ThrowUnimplementedf(nil, "id", "msg")
+	//nolint:errorlint
 	_, ok := err.(*zerrors.UnimplementedError)
 	assert.True(t, ok)
 }

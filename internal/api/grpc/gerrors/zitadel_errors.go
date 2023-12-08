@@ -33,28 +33,32 @@ func ExtractZITADELError(err error) (c codes.Code, msg, id string, ok bool) {
 	if err == nil {
 		return codes.OK, "", "", false
 	}
-	switch zitadelErr := err.(type) {
-	case *zerrors.AlreadyExistsError:
+	zitadelErr := new(zerrors.ZitadelError)
+	if ok := zitadelErr.As(err); !ok {
+		return codes.Unknown, err.Error(), "", false
+	}
+	switch {
+	case zerrors.IsErrorAlreadyExists(err):
 		return codes.AlreadyExists, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case *zerrors.DeadlineExceededError:
+	case zerrors.IsDeadlineExceeded(err):
 		return codes.DeadlineExceeded, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case *zerrors.InternalError:
+	case zerrors.IsInternal(err):
 		return codes.Internal, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case *zerrors.InvalidArgumentError:
+	case zerrors.IsErrorInvalidArgument(err):
 		return codes.InvalidArgument, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case *zerrors.NotFoundError:
+	case zerrors.IsNotFound(err):
 		return codes.NotFound, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case *zerrors.PermissionDeniedError:
+	case zerrors.IsPermissionDenied(err):
 		return codes.PermissionDenied, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case *zerrors.PreconditionFailedError:
+	case zerrors.IsPreconditionFailed(err):
 		return codes.FailedPrecondition, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case *zerrors.UnauthenticatedError:
+	case zerrors.IsUnauthenticated(err):
 		return codes.Unauthenticated, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case *zerrors.UnavailableError:
+	case zerrors.IsUnavailable(err):
 		return codes.Unavailable, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case *zerrors.UnimplementedError:
+	case zerrors.IsUnimplemented(err):
 		return codes.Unimplemented, zitadelErr.GetMessage(), zitadelErr.GetID(), true
-	case *zerrors.ResourceExhaustedError:
+	case zerrors.IsResourceExhausted(err):
 		return codes.ResourceExhausted, zitadelErr.GetMessage(), zitadelErr.GetID(), true
 	default:
 		return codes.Unknown, err.Error(), "", false

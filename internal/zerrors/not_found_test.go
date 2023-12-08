@@ -18,6 +18,7 @@ func TestNotFoundError(t *testing.T) {
 
 func TestThrowNotFoundf(t *testing.T) {
 	err := zerrors.ThrowNotFoundf(nil, "id", "msg")
+	//nolint:errorlint
 	_, ok := err.(*zerrors.NotFoundError)
 	assert.True(t, ok)
 }

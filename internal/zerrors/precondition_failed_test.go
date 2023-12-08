@@ -18,6 +18,7 @@ func TestPreconditionFailedError(t *testing.T) {
 
 func TestThrowPreconditionFailedf(t *testing.T) {
 	err := zerrors.ThrowPreconditionFailedf(nil, "id", "msg")
+	//nolint:errorlint
 	_, ok := err.(*zerrors.PreconditionFailedError)
 	assert.True(t, ok)
 }

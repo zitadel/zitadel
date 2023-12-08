@@ -17,7 +17,7 @@ func TestAlreadyExistsError(t *testing.T) {
 
 func TestThrowAlreadyExistsf(t *testing.T) {
 	err := zerrors.ThrowAlreadyExistsf(nil, "id", "msg")
-
+	//nolint:errorlint
 	_, ok := err.(*zerrors.AlreadyExistsError)
 	assert.True(t, ok)
 }

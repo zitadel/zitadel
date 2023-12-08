@@ -240,7 +240,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			event := baseEvent(t)
 			got, err := tt.reduce(event)
-			if _, ok := err.(zerrors.InvalidArgument); !ok {
+			if ok := zerrors.IsErrorInvalidArgument(err); !ok {
 				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
 			}
 

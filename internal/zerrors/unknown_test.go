@@ -18,6 +18,7 @@ func TestUnknownError(t *testing.T) {
 
 func TestThrowUnknownf(t *testing.T) {
 	err := zerrors.ThrowUnknownf(nil, "id", "msg")
+	//nolint:errorlint
 	_, ok := err.(*zerrors.UnknownError)
 	assert.True(t, ok)
 }

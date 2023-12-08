@@ -18,6 +18,7 @@ func TestDeadlineExceededError(t *testing.T) {
 
 func TestThrowDeadlineExceededf(t *testing.T) {
 	err := zerrors.ThrowDeadlineExceededf(nil, "id", "msg")
+	//nolint:errorlint
 	_, ok := err.(*zerrors.DeadlineExceededError)
 	assert.True(t, ok)
 }

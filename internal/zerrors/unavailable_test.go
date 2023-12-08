@@ -18,6 +18,7 @@ func TestUnavailableError(t *testing.T) {
 
 func TestThrowUnavailablef(t *testing.T) {
 	err := zerrors.ThrowUnavailablef(nil, "id", "msg")
+	//nolint:errorlint
 	_, ok := err.(*zerrors.UnavailableError)
 	assert.True(t, ok)
 }

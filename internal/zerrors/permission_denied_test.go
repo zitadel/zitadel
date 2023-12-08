@@ -18,6 +18,7 @@ func TestPermissionDeniedError(t *testing.T) {
 
 func TestThrowPermissionDeniedf(t *testing.T) {
 	err := zerrors.ThrowPermissionDeniedf(nil, "id", "msg")
+	//nolint:errorlint
 	_, ok := err.(*zerrors.PermissionDeniedError)
 	assert.True(t, ok)
 }

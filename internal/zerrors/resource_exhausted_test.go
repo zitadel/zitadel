@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -16,7 +17,6 @@ func TestResourceExhaustedError(t *testing.T) {
 
 func TestThrowResourceExhaustedf(t *testing.T) {
 	err := zerrors.ThrowResourceExhaustedf(nil, "id", "msg")
-	// TODO: refactor errors package
 	//nolint:errorlint
 	_, ok := err.(*zerrors.ResourceExhaustedError)
 	assert.True(t, ok)

@@ -18,6 +18,7 @@ func TestInvalidArgumentError(t *testing.T) {
 
 func TestThrowInvalidArgumentf(t *testing.T) {
 	err := zerrors.ThrowInvalidArgumentf(nil, "id", "msg")
+	//nolint:errorlint
 	_, ok := err.(*zerrors.InvalidArgumentError)
 	assert.True(t, ok)
 }

@@ -18,6 +18,7 @@ func TestUnauthenticatedError(t *testing.T) {
 
 func TestThrowUnauthenticatedf(t *testing.T) {
 	err := zerrors.ThrowUnauthenticatedf(nil, "id", "msg")
+	//nolint:errorlint
 	_, ok := err.(*zerrors.UnauthenticatedError)
 	assert.True(t, ok)
 }

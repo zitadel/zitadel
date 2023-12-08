@@ -18,6 +18,7 @@ func TestInternalError(t *testing.T) {
 
 func TestThrowInternalf(t *testing.T) {
 	err := zerrors.ThrowInternalf(nil, "id", "msg")
+	//nolint:errorlint
 	_, ok := err.(*zerrors.InternalError)
 	assert.True(t, ok)
 }
