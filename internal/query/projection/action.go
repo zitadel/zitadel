@@ -4,13 +4,13 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -113,7 +113,7 @@ func (p *actionProjection) Reducers() []handler.AggregateReducer {
 func (p *actionProjection) reduceActionAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.AddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dff21", "reduce.wrong.event.type% s", action.AddedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Dff21", "reduce.wrong.event.type% s", action.AddedEventType)
 	}
 	return handler.NewCreateStatement(
 		e,
@@ -136,7 +136,7 @@ func (p *actionProjection) reduceActionAdded(event eventstore.Event) (*handler.S
 func (p *actionProjection) reduceActionChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.ChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Gg43d", "reduce.wrong.event.type %s", action.ChangedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Gg43d", "reduce.wrong.event.type %s", action.ChangedEventType)
 	}
 	values := []handler.Column{
 		handler.NewCol(ActionChangeDateCol, e.CreationDate()),
@@ -167,7 +167,7 @@ func (p *actionProjection) reduceActionChanged(event eventstore.Event) (*handler
 func (p *actionProjection) reduceActionDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.DeactivatedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Fgh32", "reduce.wrong.event.type %s", action.DeactivatedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Fgh32", "reduce.wrong.event.type %s", action.DeactivatedEventType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -186,7 +186,7 @@ func (p *actionProjection) reduceActionDeactivated(event eventstore.Event) (*han
 func (p *actionProjection) reduceActionReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.ReactivatedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-hwdqa", "reduce.wrong.event.type %s", action.ReactivatedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-hwdqa", "reduce.wrong.event.type %s", action.ReactivatedEventType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -205,7 +205,7 @@ func (p *actionProjection) reduceActionReactivated(event eventstore.Event) (*han
 func (p *actionProjection) reduceActionRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.RemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dgh2d", "reduce.wrong.event.type %s", action.RemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Dgh2d", "reduce.wrong.event.type %s", action.RemovedEventType)
 	}
 	return handler.NewDeleteStatement(
 		e,
@@ -219,7 +219,7 @@ func (p *actionProjection) reduceActionRemoved(event eventstore.Event) (*handler
 func (p *actionProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-mSmWM", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-mSmWM", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 	return handler.NewDeleteStatement(
 		e,

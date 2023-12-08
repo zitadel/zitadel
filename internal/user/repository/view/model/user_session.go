@@ -6,11 +6,11 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/user/model"
 	es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -49,7 +49,7 @@ func UserSessionFromEvent(event eventstore.Event) (*UserSessionView, error) {
 	v := new(UserSessionView)
 	if err := event.Unmarshal(v); err != nil {
 		logging.Log("EVEN-lso9e").WithError(err).Error("could not unmarshal event data")
-		return nil, caos_errs.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
+		return nil, zerrors.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
 	}
 	return v, nil
 }
@@ -212,7 +212,7 @@ func avatarKeyFromEvent(event eventstore.Event) (string, error) {
 	data := make(map[string]string)
 	if err := event.Unmarshal(&data); err != nil {
 		logging.Log("EVEN-Sfew2").WithError(err).Error("could not unmarshal event data")
-		return "", caos_errs.ThrowInternal(err, "MODEL-SFw2q", "could not unmarshal event")
+		return "", zerrors.ThrowInternal(err, "MODEL-SFw2q", "could not unmarshal event")
 	}
 	return data["storeKey"], nil
 }

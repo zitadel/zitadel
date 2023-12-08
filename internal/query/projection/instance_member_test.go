@@ -8,12 +8,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestInstanceMemberProjection_reduces(t *testing.T) {
@@ -256,7 +256,7 @@ func TestInstanceMemberProjection_reduces(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			event := baseEvent(t)
 			got, err := tt.reduce(event)
-			if _, ok := err.(errors.InvalidArgument); !ok {
+			if ok := zerrors.IsErrorInvalidArgument(err); !ok {
 				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
 			}
 

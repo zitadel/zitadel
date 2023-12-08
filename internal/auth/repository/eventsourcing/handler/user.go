@@ -5,7 +5,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -18,6 +17,7 @@ import (
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
 	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -388,7 +388,7 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err er
 			user_repo.HumanPasswordlessInitCodeRequestedType:
 			user, err = u.view.UserByID(event.Aggregate().ID, event.Aggregate().InstanceID)
 			if err != nil {
-				if !errors.IsNotFound(err) {
+				if !zerrors.IsNotFound(err) {
 					return err
 				}
 				user, err = u.userFromEventstore(event.Aggregate(), user.EventTypes())
@@ -401,7 +401,7 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err er
 			user_repo.UserUserNameChangedType:
 			user, err = u.view.UserByID(event.Aggregate().ID, event.Aggregate().InstanceID)
 			if err != nil {
-				if !errors.IsNotFound(err) {
+				if !zerrors.IsNotFound(err) {
 					return err
 				}
 				user, err = u.userFromEventstore(event.Aggregate(), user.EventTypes())
@@ -520,7 +520,7 @@ func (u *User) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_m
 		return nil, err
 	}
 	if esOrg.Sequence == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-3m9vs", "Errors.Org.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "EVENT-3m9vs", "Errors.Org.NotFound")
 	}
 
 	return org_es_model.OrgToModel(esOrg), nil

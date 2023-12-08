@@ -9,7 +9,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
@@ -17,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddUserGrant(t *testing.T) {
@@ -54,7 +54,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -98,7 +98,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -147,7 +147,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -189,7 +189,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				resourceOwner: "org2",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -232,7 +232,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -276,7 +276,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -336,7 +336,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -396,7 +396,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				resourceOwner: "org2",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -604,7 +604,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -634,7 +634,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPermissionDenied,
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
@@ -658,7 +658,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -682,7 +682,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -714,7 +714,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -770,7 +770,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -831,7 +831,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -886,7 +886,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -942,7 +942,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1014,7 +1014,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1250,7 +1250,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1265,7 +1265,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 				userGrantID: "usergrant1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1282,7 +1282,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1314,7 +1314,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1339,7 +1339,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPermissionDenied,
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
@@ -1368,7 +1368,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1454,7 +1454,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1469,7 +1469,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				userGrantID: "usergrant1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1486,7 +1486,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1518,7 +1518,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1547,7 +1547,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPermissionDenied,
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
@@ -1572,7 +1572,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1662,7 +1662,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1679,7 +1679,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1711,7 +1711,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1740,7 +1740,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPermissionDenied,
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
@@ -1864,7 +1864,7 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1881,7 +1881,7 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1913,7 +1913,7 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1938,7 +1938,7 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPermissionDenied,
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{

@@ -3,11 +3,10 @@ package command
 import (
 	"context"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type OrgDomainPolicyWriteModel struct {
@@ -72,7 +71,7 @@ func (wm *OrgDomainPolicyWriteModel) NewChangedEvent(
 		changes = append(changes, policy.ChangeSMTPSenderAddressMatchesInstanceDomain(smtpSenderAddressMatchesInstanceDomain))
 	}
 	if len(changes) == 0 {
-		return nil, false, caos_errs.ThrowPreconditionFailed(nil, "ORG-3M9ds", "Errors.Org.LabelPolicy.NotChanged")
+		return nil, false, zerrors.ThrowPreconditionFailed(nil, "ORG-3M9ds", "Errors.Org.LabelPolicy.NotChanged")
 	}
 	changedEvent, err = org.NewDomainPolicyChangedEvent(ctx, aggregate, changes)
 	return changedEvent, usernameChange, err

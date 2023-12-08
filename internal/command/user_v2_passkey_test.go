@@ -14,13 +14,13 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	webauthn_helper "github.com/zitadel/zitadel/internal/webauthn"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_RegisterUserPasskey(t *testing.T) {
@@ -56,7 +56,7 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 				resourceOwner: "org1",
 				authenticator: domain.AuthenticatorAttachmentCrossPlattform,
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
 		},
 		{
 			name: "get human passwordless error",
@@ -186,7 +186,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 				codeID:        "123",
 				code:          "wrong",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(err, "COMMAND-Eeb2a", "Errors.User.Code.Invalid"),
+			wantErr: zerrors.ThrowInvalidArgument(err, "COMMAND-Eeb2a", "Errors.User.Code.Invalid"),
 		},
 		{
 			name: "code verification ok, get human passwordless error",
@@ -296,7 +296,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 				codeID:        "123",
 				code:          "wrong",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(err, "COMMAND-Eeb2a", "Errors.User.Code.Invalid"),
+			wantErr: zerrors.ThrowInvalidArgument(err, "COMMAND-Eeb2a", "Errors.User.Code.Invalid"),
 		},
 		{
 			name: "success",
@@ -573,7 +573,7 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 				resourceOwner: "org1",
 				urlTmpl:       "{{",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
 		},
 		{
 			name: "id generator error",

@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -63,7 +63,7 @@ func SMSConfigTwilioAddedEventMapper(event eventstore.Event) (eventstore.Event, 
 	}
 	err := event.Unmarshal(smsConfigAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-smwiR", "unable to unmarshal sms config twilio added")
+		return nil, zerrors.ThrowInternal(err, "IAM-smwiR", "unable to unmarshal sms config twilio added")
 	}
 
 	return smsConfigAdded, nil
@@ -84,7 +84,7 @@ func NewSMSConfigTwilioChangedEvent(
 	changes []SMSConfigTwilioChanges,
 ) (*SMSConfigTwilioChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IAM-smn8e", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-smn8e", "Errors.NoChangesFound")
 	}
 	changeEvent := &SMSConfigTwilioChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -128,7 +128,7 @@ func SMSConfigTwilioChangedEventMapper(event eventstore.Event) (eventstore.Event
 	}
 	err := event.Unmarshal(smsConfigChanged)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-smwiR", "unable to unmarshal sms config twilio added")
+		return nil, zerrors.ThrowInternal(err, "IAM-smwiR", "unable to unmarshal sms config twilio added")
 	}
 
 	return smsConfigChanged, nil
@@ -172,7 +172,7 @@ func SMSConfigTwilioTokenChangedEventMapper(event eventstore.Event) (eventstore.
 	}
 	err := event.Unmarshal(smtpConfigTokenChagned)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-fi9Wf", "unable to unmarshal sms config token changed")
+		return nil, zerrors.ThrowInternal(err, "IAM-fi9Wf", "unable to unmarshal sms config token changed")
 	}
 
 	return smtpConfigTokenChagned, nil
@@ -212,7 +212,7 @@ func SMSConfigActivatedEventMapper(event eventstore.Event) (eventstore.Event, er
 	}
 	err := event.Unmarshal(smsConfigActivated)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-dn92f", "unable to unmarshal sms config twilio activated changed")
+		return nil, zerrors.ThrowInternal(err, "IAM-dn92f", "unable to unmarshal sms config twilio activated changed")
 	}
 
 	return smsConfigActivated, nil
@@ -252,7 +252,7 @@ func SMSConfigDeactivatedEventMapper(event eventstore.Event) (eventstore.Event, 
 	}
 	err := event.Unmarshal(smsConfigDeactivated)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-dn92f", "unable to unmarshal sms config twilio deactivated changed")
+		return nil, zerrors.ThrowInternal(err, "IAM-dn92f", "unable to unmarshal sms config twilio deactivated changed")
 	}
 
 	return smsConfigDeactivated, nil
@@ -292,7 +292,7 @@ func SMSConfigRemovedEventMapper(event eventstore.Event) (eventstore.Event, erro
 	}
 	err := event.Unmarshal(smsConfigRemoved)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-99iNF", "unable to unmarshal sms config removed")
+		return nil, zerrors.ThrowInternal(err, "IAM-99iNF", "unable to unmarshal sms config removed")
 	}
 
 	return smsConfigRemoved, nil

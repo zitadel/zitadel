@@ -16,12 +16,12 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/notification/templates"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/renderer"
 	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -247,7 +247,7 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 
 func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	if authReq == nil {
-		l.renderInternalError(w, r, nil, caos_errs.ThrowInvalidArgument(nil, "LOGIN-Df3f2", "Errors.AuthRequest.NotFound"))
+		l.renderInternalError(w, r, nil, zerrors.ThrowInvalidArgument(nil, "LOGIN-Df3f2", "Errors.AuthRequest.NotFound"))
 		return
 	}
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
@@ -256,7 +256,7 @@ func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		return
 	}
 	if len(authReq.PossibleSteps) == 0 {
-		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-9sdp4", "no possible steps"))
+		l.renderInternalError(w, r, authReq, zerrors.ThrowInternal(nil, "APP-9sdp4", "no possible steps"))
 		return
 	}
 	l.chooseNextStep(w, r, authReq, 0, nil)
@@ -268,7 +268,7 @@ func (l *Login) renderError(w http.ResponseWriter, r *http.Request, authReq *dom
 		return
 	}
 	if authReq == nil || len(authReq.PossibleSteps) == 0 {
-		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(err, "APP-OVOiT", "no possible steps"))
+		l.renderInternalError(w, r, authReq, zerrors.ThrowInternal(err, "APP-OVOiT", "no possible steps"))
 		return
 	}
 	l.chooseNextStep(w, r, authReq, 0, err)
@@ -323,11 +323,11 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	case *domain.ExternalLoginStep:
 		l.handleExternalLoginStep(w, r, authReq, step.SelectedIDPConfigID)
 	case *domain.GrantRequiredStep:
-		l.renderInternalError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-asb43", "Errors.User.GrantRequired"))
+		l.renderInternalError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "APP-asb43", "Errors.User.GrantRequired"))
 	case *domain.ProjectRequiredStep:
-		l.renderInternalError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-m92d", "Errors.User.ProjectRequired"))
+		l.renderInternalError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "APP-m92d", "Errors.User.ProjectRequired"))
 	default:
-		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
+		l.renderInternalError(w, r, authReq, zerrors.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}
 }
 
@@ -470,7 +470,7 @@ func (l *Login) setLinksOnBaseData(baseData baseData, privacyPolicy *domain.Priv
 }
 
 func (l *Login) getErrorMessage(r *http.Request, err error) (errID, errMsg string) {
-	caosErr := new(caos_errs.CaosError)
+	caosErr := new(zerrors.ZitadelError)
 	if errors.As(err, &caosErr) {
 		localized := l.renderer.LocalizeFromRequest(l.getTranslator(r.Context(), nil), r, caosErr.Message, nil)
 		return caosErr.ID, localized

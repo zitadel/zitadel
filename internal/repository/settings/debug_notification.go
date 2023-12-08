@@ -1,8 +1,8 @@
 package settings
 
 import (
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -45,7 +45,7 @@ func DebugNotificationProviderAddedEventMapper(event eventstore.Event) (eventsto
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "SET-f93ns", "unable to unmarshal debug notification added")
+		return nil, zerrors.ThrowInternal(err, "SET-f93ns", "unable to unmarshal debug notification added")
 	}
 
 	return e, nil
@@ -70,7 +70,7 @@ func NewDebugNotificationProviderChangedEvent(
 	changes []DebugNotificationProviderChanges,
 ) (*DebugNotificationProviderChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "SET-hj90s", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "SET-hj90s", "Errors.NoChangesFound")
 	}
 	changeEvent := &DebugNotificationProviderChangedEvent{
 		BaseEvent: *base,
@@ -96,7 +96,7 @@ func DebugNotificationProviderChangedEventMapper(event eventstore.Event) (events
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-ehssl", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-ehssl", "unable to unmarshal policy")
 	}
 
 	return e, nil

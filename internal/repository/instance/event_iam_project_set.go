@@ -3,8 +3,8 @@ package instance
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -47,7 +47,7 @@ func ProjectSetMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-cdFZH", "unable to unmarshal global org set")
+		return nil, zerrors.ThrowInternal(err, "IAM-cdFZH", "unable to unmarshal global org set")
 	}
 
 	return e, nil
@@ -91,7 +91,7 @@ func ConsoleSetMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-cdFZH", "unable to unmarshal console set")
+		return nil, zerrors.ThrowInternal(err, "IAM-cdFZH", "unable to unmarshal console set")
 	}
 
 	return e, nil

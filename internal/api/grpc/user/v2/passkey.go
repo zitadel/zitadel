@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
@@ -47,7 +47,7 @@ func webAuthNRegistrationDetailsToPb(details *domain.WebAuthNRegistrationDetails
 	}
 	options := new(structpb.Struct)
 	if err := options.UnmarshalJSON(details.PublicKeyCredentialCreationOptions); err != nil {
-		return nil, nil, caos_errs.ThrowInternal(err, "USERv2-Dohr6", "Errors.Internal")
+		return nil, nil, zerrors.ThrowInternal(err, "USERv2-Dohr6", "Errors.Internal")
 	}
 	return object.DomainToDetailsPb(details.ObjectDetails), options, nil
 }
@@ -68,7 +68,7 @@ func (s *Server) VerifyPasskeyRegistration(ctx context.Context, req *user.Verify
 	resourceOwner := authz.GetCtxData(ctx).OrgID
 	pkc, err := req.GetPublicKeyCredential().MarshalJSON()
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "USERv2-Pha2o", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "USERv2-Pha2o", "Errors.Internal")
 	}
 	objectDetails, err := s.command.HumanHumanPasswordlessSetup(ctx, req.GetUserId(), resourceOwner, req.GetPasskeyName(), "", pkc)
 	if err != nil {
@@ -96,7 +96,7 @@ func (s *Server) CreatePasskeyRegistrationLink(ctx context.Context, req *user.Cr
 			s.command.AddUserPasskeyCodeReturn(ctx, req.GetUserId(), resourceOwner, s.userCodeAlg),
 		)
 	default:
-		return nil, caos_errs.ThrowUnimplementedf(nil, "USERv2-gaD8y", "verification oneOf %T in method CreatePasskeyRegistrationLink not implemented", medium)
+		return nil, zerrors.ThrowUnimplementedf(nil, "USERv2-gaD8y", "verification oneOf %T in method CreatePasskeyRegistrationLink not implemented", medium)
 	}
 }
 

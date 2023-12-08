@@ -1,8 +1,8 @@
 package metadata
 
 import (
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -45,7 +45,7 @@ func SetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "META-3n9fs", "unable to unmarshal metadata set")
+		return nil, zerrors.ThrowInternal(err, "META-3n9fs", "unable to unmarshal metadata set")
 	}
 
 	return e, nil
@@ -83,7 +83,7 @@ func RemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "META-2m99f", "unable to unmarshal metadata removed")
+		return nil, zerrors.ThrowInternal(err, "META-2m99f", "unable to unmarshal metadata removed")
 	}
 
 	return e, nil

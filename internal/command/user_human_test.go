@@ -14,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	zitadel_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
@@ -22,6 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddHuman(t *testing.T) {
@@ -74,7 +74,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zitadel_errs.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal"))
 				},
 			},
 		},
@@ -94,7 +94,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zitadel_errs.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty"))
 				},
 			},
 		},
@@ -126,7 +126,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zitadel_errs.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting"))
 				},
 			},
 		},
@@ -157,7 +157,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zitadel_errs.ThrowInternal(nil, "USER-Ggk9n", "Errors.Internal"))
+					return errors.Is(err, zerrors.ThrowInternal(nil, "USER-Ggk9n", "Errors.Internal"))
 				},
 			},
 		},
@@ -199,7 +199,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zitadel_errs.ThrowInternal(nil, "USER-uQ96e", "Errors.Internal"))
+					return errors.Is(err, zerrors.ThrowInternal(nil, "USER-uQ96e", "Errors.Internal"))
 				},
 			},
 		},
@@ -857,7 +857,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zitadel_errs.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername"))
 				},
 			},
 		},
@@ -1312,7 +1312,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					}
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1342,7 +1342,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					}
 			},
 			res: res{
-				err: zitadel_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1382,7 +1382,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					}
 			},
 			res: res{
-				err: zitadel_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1428,7 +1428,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					}
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		}, {
 			name: "add human (with password and initial code), ok",
@@ -2452,7 +2452,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					}
 			},
 			res: res{
-				err: zitadel_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 	}
@@ -2525,7 +2525,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -2555,7 +2555,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zitadel_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -2595,7 +2595,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zitadel_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -2643,7 +2643,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zitadel_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -2713,7 +2713,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zitadel_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -2783,7 +2783,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -2870,7 +2870,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -4005,7 +4005,7 @@ func TestCommandSide_HumanMFASkip(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -4022,7 +4022,7 @@ func TestCommandSide_HumanMFASkip(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: zitadel_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -4115,7 +4115,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 				userIDs: []string{"user1"},
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -4131,7 +4131,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 				userIDs: []string{},
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -4341,7 +4341,7 @@ func TestAddHumanCommand(t *testing.T) {
 				orgID: "ro",
 			},
 			want: Want{
-				ValidationErr: zitadel_errs.ThrowInvalidArgument(nil, "EMAIL-599BI", "Errors.User.Email.Invalid"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "EMAIL-599BI", "Errors.User.Email.Invalid"),
 			},
 		},
 		{
@@ -4357,7 +4357,7 @@ func TestAddHumanCommand(t *testing.T) {
 				orgID: "ro",
 			},
 			want: Want{
-				ValidationErr: zitadel_errs.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.User.Profile.FirstNameEmpty"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.User.Profile.FirstNameEmpty"),
 			},
 		},
 		{
@@ -4372,7 +4372,7 @@ func TestAddHumanCommand(t *testing.T) {
 				orgID: "ro",
 			},
 			want: Want{
-				ValidationErr: zitadel_errs.ThrowInvalidArgument(nil, "USER-4hB7d", "Errors.User.Profile.LastNameEmpty"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "USER-4hB7d", "Errors.User.Profile.LastNameEmpty"),
 			},
 		},
 		{
@@ -4390,7 +4390,7 @@ func TestAddHumanCommand(t *testing.T) {
 				hasher: mockPasswordHasher("x"),
 			},
 			want: Want{
-				ValidationErr: zitadel_errs.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.User.Password.NotSupported"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.User.Password.NotSupported"),
 			},
 		},
 		{
@@ -4441,7 +4441,7 @@ func TestAddHumanCommand(t *testing.T) {
 					Filter(),
 			},
 			want: Want{
-				CreateErr: zitadel_errs.ThrowInvalidArgument(nil, "COMMA-HuJf6", "Errors.User.PasswordComplexityPolicy.MinLength"),
+				CreateErr: zerrors.ThrowInvalidArgument(nil, "COMMA-HuJf6", "Errors.User.PasswordComplexityPolicy.MinLength"),
 			},
 		},
 		{

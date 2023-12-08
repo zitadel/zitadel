@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -66,7 +66,7 @@ func ApplicationKeyAddedEventMapper(event eventstore.Event) (eventstore.Event, e
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "API-BFd15", "unable to unmarshal api config")
+		return nil, zerrors.ThrowInternal(err, "API-BFd15", "unable to unmarshal api config")
 	}
 
 	return e, nil
@@ -107,7 +107,7 @@ func ApplicationKeyRemovedEventMapper(event eventstore.Event) (eventstore.Event,
 	}
 	err := event.Unmarshal(applicationKeyRemoved)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-cjLeA", "unable to unmarshal application key removed")
+		return nil, zerrors.ThrowInternal(err, "USER-cjLeA", "unable to unmarshal application key removed")
 	}
 
 	return applicationKeyRemoved, nil

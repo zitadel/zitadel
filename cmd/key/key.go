@@ -9,11 +9,10 @@ import (
 	"github.com/spf13/viper"
 	"sigs.k8s.io/yaml"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -86,7 +85,7 @@ func keysFromArgs(args []string) ([]*crypto.Key, error) {
 	for i, arg := range args {
 		key := strings.Split(arg, "=")
 		if len(key) != 2 {
-			return nil, caos_errs.ThrowInternal(nil, "KEY-JKd82", "argument is not in the valid format [keyID=key]")
+			return nil, zerrors.ThrowInternal(nil, "KEY-JKd82", "argument is not in the valid format [keyID=key]")
 		}
 		keys[i] = &crypto.Key{
 			ID:    key[0],
@@ -99,11 +98,11 @@ func keysFromArgs(args []string) ([]*crypto.Key, error) {
 func keysFromYAML(file io.Reader) ([]*crypto.Key, error) {
 	data, err := io.ReadAll(file)
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "KEY-ajGFr", "unable to extract keys from file")
+		return nil, zerrors.ThrowInternal(err, "KEY-ajGFr", "unable to extract keys from file")
 	}
 	keysYAML := make(map[string]string)
 	if err = yaml.Unmarshal(data, &keysYAML); err != nil {
-		return nil, caos_errs.ThrowInternal(err, "KEY-sd34K", "unable to extract keys from file")
+		return nil, zerrors.ThrowInternal(err, "KEY-sd34K", "unable to extract keys from file")
 	}
 	keys := make([]*crypto.Key, 0, len(keysYAML))
 	for id, key := range keysYAML {
@@ -118,7 +117,7 @@ func keysFromYAML(file io.Reader) ([]*crypto.Key, error) {
 func openFile(fileName string) (io.Reader, error) {
 	file, err := os.Open(fileName)
 	if err != nil {
-		return nil, caos_errs.ThrowInternalf(err, "KEY-asGr2", "failed to open file: %s", fileName)
+		return nil, zerrors.ThrowInternalf(err, "KEY-asGr2", "failed to open file: %s", fileName)
 	}
 	return file, nil
 }

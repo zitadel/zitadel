@@ -7,8 +7,8 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type ValidationFunction func(ctx context.Context) error
@@ -29,7 +29,7 @@ func (v *Validator) Ready(ctx context.Context, e *emptypb.Empty) (*emptypb.Empty
 	if len(validate(ctx, v.validations)) == 0 {
 		return e, nil
 	}
-	return nil, errors.ThrowInternal(nil, "API-2jD9a", "not ready")
+	return nil, zerrors.ThrowInternal(nil, "API-2jD9a", "not ready")
 }
 
 func (v *Validator) Validate(ctx context.Context, _ *emptypb.Empty) (*structpb.Struct, error) {

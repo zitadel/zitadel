@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/i18n"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type localizers interface {
@@ -29,7 +29,7 @@ func translateError(ctx context.Context, err error, translator *i18n.Translator)
 	if translator == nil || err == nil {
 		return err
 	}
-	caosErr := new(caos_errs.CaosError)
+	caosErr := new(zerrors.ZitadelError)
 	if errors.As(err, &caosErr) {
 		caosErr.SetMessage(translator.LocalizeFromCtx(ctx, caosErr.GetMessage(), nil))
 	}

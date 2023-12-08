@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -12,9 +12,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -144,7 +144,7 @@ func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType domai
 		SecretGeneratorColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-3k99f", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-3k99f", "Errors.Query.SQLStatment")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -164,7 +164,7 @@ func (q *Queries) SearchSecretGenerators(ctx context.Context, queries *SecretGen
 			SecretGeneratorColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-sn9lw", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-sn9lw", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -172,7 +172,7 @@ func (q *Queries) SearchSecretGenerators(ctx context.Context, queries *SecretGen
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-4miii", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-4miii", "Errors.Internal")
 	}
 	secretGenerators.State, err = q.latestState(ctx, secretGeneratorsTable)
 	return secretGenerators, err
@@ -223,10 +223,10 @@ func prepareSecretGeneratorQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&secretGenerator.IncludeSymbols,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-m9wff", "Errors.SecretGenerator.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-m9wff", "Errors.SecretGenerator.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-2k99d", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-2k99d", "Errors.Internal")
 			}
 			return secretGenerator, nil
 		}
@@ -276,7 +276,7 @@ func prepareSecretGeneratorsQuery(ctx context.Context, db prepareDatabase) (sq.S
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-em9fs", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-em9fs", "Errors.Query.CloseRows")
 			}
 
 			return &SecretGenerators{

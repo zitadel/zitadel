@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -25,7 +25,7 @@ func SessionTokenVerifier(algorithm crypto.EncryptionAlgorithm) func(ctx context
 		token, err := algorithm.DecryptString(decodedToken, algorithm.EncryptionKeyID())
 		spanPasswordComparison.EndWithError(err)
 		if err != nil || token != fmt.Sprintf(SessionTokenFormat, sessionID, tokenID) {
-			return zitadel_errors.ThrowPermissionDenied(err, "COMMAND-sGr42", "Errors.Session.Token.Invalid")
+			return zerrors.ThrowPermissionDenied(err, "COMMAND-sGr42", "Errors.Session.Token.Invalid")
 		}
 		return nil
 	}

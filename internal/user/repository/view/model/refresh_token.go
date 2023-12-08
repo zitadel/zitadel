@@ -6,10 +6,10 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -122,7 +122,7 @@ func (t *RefreshTokenView) appendAddedEvent(event eventstore.Event) error {
 	e := new(user_repo.HumanRefreshTokenAddedEvent)
 	if err := event.Unmarshal(e); err != nil {
 		logging.Log("EVEN-Dbb31").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-Bbr42", "could not unmarshal event")
+		return zerrors.ThrowInternal(err, "MODEL-Bbr42", "could not unmarshal event")
 	}
 	t.ID = e.TokenID
 	t.CreationDate = event.CreatedAt()
@@ -142,7 +142,7 @@ func (t *RefreshTokenView) appendRenewedEvent(event eventstore.Event) error {
 	e := new(user_repo.HumanRefreshTokenRenewedEvent)
 	if err := event.Unmarshal(e); err != nil {
 		logging.Log("EVEN-Vbbn2").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-Bbrn4", "could not unmarshal event")
+		return zerrors.ThrowInternal(err, "MODEL-Bbrn4", "could not unmarshal event")
 	}
 	t.ID = e.TokenID
 	t.IdleExpiration = event.CreatedAt().Add(e.IdleExpiration)

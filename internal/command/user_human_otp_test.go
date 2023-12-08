@@ -16,11 +16,11 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddHumanTOTP(t *testing.T) {
@@ -57,7 +57,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -74,7 +74,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -105,7 +105,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -143,7 +143,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -202,7 +202,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 	}
@@ -254,7 +254,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SqyJz", "Errors.User.NotFound"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SqyJz", "Errors.User.NotFound"),
 		},
 		{
 			name: "org not existing, not found error",
@@ -285,7 +285,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-55M9f", "Errors.Org.NotFound"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-55M9f", "Errors.Org.NotFound"),
 		},
 		{
 			name: "org iam policy not existing, not found error",
@@ -325,7 +325,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-8ugTs", "Errors.Org.DomainPolicy.NotFound"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-8ugTs", "Errors.Org.DomainPolicy.NotFound"),
 		},
 		{
 			name: "otp already exists, already exists error",
@@ -389,7 +389,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
-			wantErr: caos_errs.ThrowAlreadyExists(nil, "COMMAND-do9se", "Errors.User.MFA.OTP.AlreadyReady"),
+			wantErr: zerrors.ThrowAlreadyExists(nil, "COMMAND-do9se", "Errors.User.MFA.OTP.AlreadyReady"),
 		},
 		{
 			name: "issuer not in context",
@@ -438,7 +438,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
-			wantErr: caos_errs.ThrowInternal(nil, "TOTP-ieY3o", "Errors.Internal"),
+			wantErr: zerrors.ThrowInternal(nil, "TOTP-ieY3o", "Errors.Internal"),
 		},
 		{
 			name: "success",
@@ -544,7 +544,7 @@ func TestCommands_HumanCheckMFATOTPSetup(t *testing.T) {
 		{
 			name:    "missing user id",
 			args:    args{},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing"),
 		},
 		{
 			name: "filter error",
@@ -578,7 +578,7 @@ func TestCommands_HumanCheckMFATOTPSetup(t *testing.T) {
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
-			wantErr: caos_errs.ThrowNotFound(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotExisting"),
+			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotExisting"),
 		},
 		{
 			name: "otp already ready error",
@@ -602,7 +602,7 @@ func TestCommands_HumanCheckMFATOTPSetup(t *testing.T) {
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-qx4ls", "Errors.Users.MFA.OTP.AlreadyReady"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-qx4ls", "Errors.Users.MFA.OTP.AlreadyReady"),
 		},
 		{
 			name: "wrong code",
@@ -621,7 +621,7 @@ func TestCommands_HumanCheckMFATOTPSetup(t *testing.T) {
 				code:          "wrong",
 				userID:        "user1",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.MFA.OTP.InvalidCode"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.MFA.OTP.InvalidCode"),
 		},
 		{
 			name: "push error",
@@ -727,7 +727,7 @@ func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -744,7 +744,7 @@ func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -831,7 +831,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-QSF2s", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-QSF2s", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -845,7 +845,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+				err: zerrors.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
 			},
 		},
 		{
@@ -867,7 +867,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowAlreadyExists(nil, "COMMAND-Ad3g2", "Errors.User.MFA.OTP.AlreadyReady"),
+				err: zerrors.ThrowAlreadyExists(nil, "COMMAND-Ad3g2", "Errors.User.MFA.OTP.AlreadyReady"),
 			},
 		},
 		{
@@ -883,7 +883,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Q54j2", "Errors.User.MFA.OTP.NotReady"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Q54j2", "Errors.User.MFA.OTP.NotReady"),
 			},
 		},
 		{
@@ -916,7 +916,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Q54j2", "Errors.User.MFA.OTP.NotReady"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Q54j2", "Errors.User.MFA.OTP.NotReady"),
 			},
 		},
 		{
@@ -1128,7 +1128,7 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-S3br2", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-S3br2", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -1145,7 +1145,7 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+				err: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 			},
 		},
 		{
@@ -1162,7 +1162,7 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowNotFound(nil, "COMMAND-Sr3h3", "Errors.User.MFA.OTP.NotExisting"),
+				err: zerrors.ThrowNotFound(nil, "COMMAND-Sr3h3", "Errors.User.MFA.OTP.NotExisting"),
 			},
 		},
 		{
@@ -1256,7 +1256,7 @@ func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-S3SF1", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-S3SF1", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -1273,7 +1273,7 @@ func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SFD52", "Errors.User.MFA.OTP.NotReady"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFD52", "Errors.User.MFA.OTP.NotReady"),
 			},
 		},
 		{
@@ -1484,7 +1484,7 @@ func TestCommandSide_HumanOTPSMSCodeSent(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-AE2h2", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-AE2h2", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -1500,7 +1500,7 @@ func TestCommandSide_HumanOTPSMSCodeSent(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SD3gh", "Errors.User.MFA.OTP.NotReady"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SD3gh", "Errors.User.MFA.OTP.NotReady"),
 			},
 		},
 		{
@@ -1581,7 +1581,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-S453v", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-S453v", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -1596,7 +1596,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-SJl2g", "Errors.User.Code.Empty"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-SJl2g", "Errors.User.Code.Empty"),
 			},
 		},
 		{
@@ -1613,7 +1613,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-d2r52", "Errors.User.MFA.OTP.NotReady"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-d2r52", "Errors.User.MFA.OTP.NotReady"),
 			},
 		},
 		{
@@ -1636,7 +1636,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-S34gh", "Errors.User.Code.NotFound"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-S34gh", "Errors.User.Code.NotFound"),
 			},
 		},
 		{
@@ -1704,7 +1704,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "CODE-woT0xc", "Errors.User.Code.Invalid"),
+				err: zerrors.ThrowInvalidArgument(nil, "CODE-woT0xc", "Errors.User.Code.Invalid"),
 			},
 		},
 		{
@@ -1823,7 +1823,7 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-Sg1hz", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-Sg1hz", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -1845,7 +1845,7 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowAlreadyExists(nil, "COMMAND-MKL2s", "Errors.User.MFA.OTP.AlreadyReady"),
+				err: zerrors.ThrowAlreadyExists(nil, "COMMAND-MKL2s", "Errors.User.MFA.OTP.AlreadyReady"),
 			},
 		},
 		{
@@ -1861,7 +1861,7 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-KLJ2d", "Errors.User.MFA.OTP.NotReady"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-KLJ2d", "Errors.User.MFA.OTP.NotReady"),
 			},
 		},
 		{
@@ -2073,7 +2073,7 @@ func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-S2h11", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-S2h11", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -2090,7 +2090,7 @@ func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+				err: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 			},
 		},
 		{
@@ -2107,7 +2107,7 @@ func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowNotFound(nil, "COMMAND-b312D", "Errors.User.MFA.OTP.NotExisting"),
+				err: zerrors.ThrowNotFound(nil, "COMMAND-b312D", "Errors.User.MFA.OTP.NotExisting"),
 			},
 		},
 		{
@@ -2201,7 +2201,7 @@ func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-S3SF1", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-S3SF1", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -2218,7 +2218,7 @@ func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SFD52", "Errors.User.MFA.OTP.NotReady"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFD52", "Errors.User.MFA.OTP.NotReady"),
 			},
 		},
 		{
@@ -2429,7 +2429,7 @@ func TestCommandSide_HumanOTPEmailCodeSent(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-AE2h2", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-AE2h2", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -2445,7 +2445,7 @@ func TestCommandSide_HumanOTPEmailCodeSent(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SD3gh", "Errors.User.MFA.OTP.NotReady"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SD3gh", "Errors.User.MFA.OTP.NotReady"),
 			},
 		},
 		{
@@ -2526,7 +2526,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-S453v", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-S453v", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -2541,7 +2541,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-SJl2g", "Errors.User.Code.Empty"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-SJl2g", "Errors.User.Code.Empty"),
 			},
 		},
 		{
@@ -2558,7 +2558,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-d2r52", "Errors.User.MFA.OTP.NotReady"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-d2r52", "Errors.User.MFA.OTP.NotReady"),
 			},
 		},
 		{
@@ -2581,7 +2581,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-S34gh", "Errors.User.Code.NotFound"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-S34gh", "Errors.User.Code.NotFound"),
 			},
 		},
 		{
@@ -2649,7 +2649,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "CODE-woT0xc", "Errors.User.Code.Invalid"),
+				err: zerrors.ThrowInvalidArgument(nil, "CODE-woT0xc", "Errors.User.Code.Invalid"),
 			},
 		},
 		{

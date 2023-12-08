@@ -2,8 +2,8 @@ package idp
 
 import (
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type AzureADIDPAddedEvent struct {
@@ -58,7 +58,7 @@ func AzureADIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-Grh2g", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-Grh2g", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -83,7 +83,7 @@ func NewAzureADIDPChangedEvent(
 	changes []AzureADIDPChanges,
 ) (*AzureADIDPChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDP-BH3dl", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-BH3dl", "Errors.NoChangesFound")
 	}
 	changedEvent := &AzureADIDPChangedEvent{
 		BaseEvent: *base,
@@ -154,7 +154,7 @@ func AzureADIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, err
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-D3gjzh", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-D3gjzh", "unable to unmarshal event")
 	}
 
 	return e, nil

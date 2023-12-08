@@ -10,9 +10,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -75,7 +75,7 @@ func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID s
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-HBRh3", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-HBRh3", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -99,7 +99,7 @@ func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flow
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Dgff3", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Dgff3", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -120,7 +120,7 @@ func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string) (
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-Dh311", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-Dh311", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -192,7 +192,7 @@ func prepareTriggerActionsQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-Df42d", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-Df42d", "Errors.Query.CloseRows")
 			}
 
 			return actions, nil
@@ -281,7 +281,7 @@ func prepareFlowQuery(ctx context.Context, db prepareDatabase, flowType domain.F
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-Dfbe2", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-Dfbe2", "Errors.Query.CloseRows")
 			}
 
 			return flow, nil

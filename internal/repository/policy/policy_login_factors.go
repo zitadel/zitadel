@@ -2,8 +2,8 @@ package policy
 
 import (
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -39,7 +39,7 @@ func SecondFactorAddedEventMapper(event eventstore.Event) (eventstore.Event, err
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-Lp0dE", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-Lp0dE", "unable to unmarshal policy")
 	}
 
 	return e, nil
@@ -75,7 +75,7 @@ func SecondFactorRemovedEventMapper(event eventstore.Event) (eventstore.Event, e
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-5M9gd", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-5M9gd", "unable to unmarshal policy")
 	}
 
 	return e, nil
@@ -112,7 +112,7 @@ func MultiFactorAddedEventMapper(event eventstore.Event) (eventstore.Event, erro
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-5Ms90", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-5Ms90", "unable to unmarshal policy")
 	}
 
 	return e, nil
@@ -148,7 +148,7 @@ func MultiFactorRemovedEventMapper(event eventstore.Event) (eventstore.Event, er
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-1N8sd", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-1N8sd", "unable to unmarshal policy")
 	}
 
 	return e, nil

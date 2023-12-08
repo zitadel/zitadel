@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type InstanceDomainPolicyWriteModel struct {
@@ -71,7 +71,7 @@ func (wm *InstanceDomainPolicyWriteModel) NewChangedEvent(
 		changes = append(changes, policy.ChangeSMTPSenderAddressMatchesInstanceDomain(smtpSenderAddresssMatchesInstanceDomain))
 	}
 	if len(changes) == 0 {
-		return nil, false, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-pl9fN", "Errors.IAM.DomainPolicy.NotChanged")
+		return nil, false, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-pl9fN", "Errors.IAM.DomainPolicy.NotChanged")
 	}
 	changedEvent, err = instance.NewDomainPolicyChangedEvent(ctx, aggregate, changes)
 	return changedEvent, usernameChange, err

@@ -9,9 +9,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type IDPUserLink struct {
@@ -100,7 +100,7 @@ func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQ
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-4zzFK", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-4zzFK", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -108,7 +108,7 @@ func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQ
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-C1E4D", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-C1E4D", "Errors.Internal")
 	}
 	idps.State, err = q.latestState(ctx, idpUserLinkTable)
 	return idps, err
@@ -176,7 +176,7 @@ func prepareIDPUserLinksQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-nwx6U", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-nwx6U", "Errors.Query.CloseRows")
 			}
 
 			return &IDPUserLinks{

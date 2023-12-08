@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (o *OPStorage) JWTProfileTokenType(ctx context.Context, request op.TokenRequest) (op.AccessTokenType, error) {
@@ -18,7 +18,7 @@ func (o *OPStorage) JWTProfileTokenType(ctx context.Context, request op.TokenReq
 	}
 	// the user should always be a machine, but let's just be sure
 	if user.Machine == nil {
-		return 0, errors.ThrowInvalidArgument(nil, "OIDC-jk26S", "invalid client type")
+		return 0, zerrors.ThrowInvalidArgument(nil, "OIDC-jk26S", "invalid client type")
 	}
 	return accessTokenTypeToOIDC(user.Machine.AccessTokenType), nil
 }

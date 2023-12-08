@@ -5,12 +5,12 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -300,7 +300,7 @@ func (q *quotaProjection) IncrementUsage(ctx context.Context, unit quota.Unit, i
 		instanceID, unit, periodStart, count,
 	).Scan(&sum)
 	if err != nil {
-		return 0, zitadel_errors.ThrowInternalf(err, "PROJ-SJL3h", "incrementing usage for unit %d failed for at least one quota period", unit)
+		return 0, zerrors.ThrowInternalf(err, "PROJ-SJL3h", "incrementing usage for unit %d failed for at least one quota period", unit)
 	}
 	return sum, err
 }

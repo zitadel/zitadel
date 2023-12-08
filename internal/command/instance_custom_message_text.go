@@ -7,10 +7,10 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // SetDefaultMessageText only validates if the language is supported, not if it is allowed.
@@ -97,14 +97,14 @@ func (c *Commands) setDefaultMessageText(ctx context.Context, instanceAgg *event
 
 func (c *Commands) RemoveInstanceMessageTexts(ctx context.Context, messageTextType string, lang language.Tag) (*domain.ObjectDetails, error) {
 	if messageTextType == "" || lang == language.Und {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-fjw9b", "Errors.CustomMessageText.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-fjw9b", "Errors.CustomMessageText.Invalid")
 	}
 	customText, err := c.defaultCustomMessageTextWriteModelByID(ctx, messageTextType, lang)
 	if err != nil {
 		return nil, err
 	}
 	if customText.State == domain.PolicyStateUnspecified || customText.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-fju90", "Errors.CustomMessageText.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-fju90", "Errors.CustomMessageText.NotFound")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&customText.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewCustomTextTemplateRemovedEvent(ctx, instanceAgg, messageTextType, lang))

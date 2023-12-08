@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -13,10 +13,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type LockoutPolicy struct {
@@ -113,7 +113,7 @@ func (q *Queries) LockoutPolicyByOrg(ctx context.Context, shouldTriggerBulk bool
 		OrderBy(LockoutColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SKR6X", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-SKR6X", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -135,7 +135,7 @@ func (q *Queries) DefaultLockoutPolicy(ctx context.Context) (policy *LockoutPoli
 		OrderBy(LockoutColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-mN0Ci", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-mN0Ci", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -173,10 +173,10 @@ func prepareLockoutPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Sele
 				&policy.State,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-63mtI", "Errors.PasswordComplexityPolicy.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-63mtI", "Errors.PasswordComplexityPolicy.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-uulCZ", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-uulCZ", "Errors.Internal")
 			}
 			return policy, nil
 		}

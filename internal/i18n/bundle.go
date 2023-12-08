@@ -14,7 +14,7 @@ import (
 	"sigs.k8s.io/yaml"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const i18nPath = "/i18n"
@@ -26,12 +26,12 @@ func newBundle(dir http.FileSystem, defaultLanguage language.Tag, allowedLanguag
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
 	i18nDir, err := dir.Open(i18nPath)
 	if err != nil {
-		return nil, zitadel_errors.ThrowNotFound(err, "I18N-MnXRie", "path not found")
+		return nil, zerrors.ThrowNotFound(err, "I18N-MnXRie", "path not found")
 	}
 	defer i18nDir.Close()
 	files, err := i18nDir.Readdir(0)
 	if err != nil {
-		return nil, zitadel_errors.ThrowNotFound(err, "I18N-Gew23", "cannot read dir")
+		return nil, zerrors.ThrowNotFound(err, "I18N-Gew23", "cannot read dir")
 	}
 	for _, file := range files {
 		fileLang, _ := strings.CutSuffix(file.Name(), filepath.Ext(file.Name()))
@@ -39,7 +39,7 @@ func newBundle(dir http.FileSystem, defaultLanguage language.Tag, allowedLanguag
 			continue
 		}
 		if err := addFileFromFileSystemToBundle(dir, bundle, file); err != nil {
-			return nil, zitadel_errors.ThrowNotFoundf(err, "I18N-ZS2AW", "cannot append file %s to Bundle", file.Name())
+			return nil, zerrors.ThrowNotFoundf(err, "I18N-ZS2AW", "cannot append file %s to Bundle", file.Name())
 		}
 	}
 	return bundle, nil

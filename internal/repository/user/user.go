@@ -6,8 +6,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -262,7 +262,7 @@ func UserTokenAddedEventMapper(event eventstore.Event) (eventstore.Event, error)
 	}
 	err := event.Unmarshal(tokenAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-7M9sd", "unable to unmarshal token added")
+		return nil, zerrors.ThrowInternal(err, "USER-7M9sd", "unable to unmarshal token added")
 	}
 
 	return tokenAdded, nil
@@ -303,7 +303,7 @@ func UserTokenRemovedEventMapper(event eventstore.Event) (eventstore.Event, erro
 	}
 	err := event.Unmarshal(tokenRemoved)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-7M9sd", "unable to unmarshal token added")
+		return nil, zerrors.ThrowInternal(err, "USER-7M9sd", "unable to unmarshal token added")
 	}
 
 	return tokenRemoved, nil
@@ -359,7 +359,7 @@ func DomainClaimedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 	}
 	err := event.Unmarshal(domainClaimed)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-aR8jc", "unable to unmarshal domain claimed")
+		return nil, zerrors.ThrowInternal(err, "USER-aR8jc", "unable to unmarshal domain claimed")
 	}
 
 	return domainClaimed, nil
@@ -457,7 +457,7 @@ func UsernameChangedEventMapper(event eventstore.Event) (eventstore.Event, error
 	}
 	err := event.Unmarshal(domainClaimed)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-4Bm9s", "unable to unmarshal username changed")
+		return nil, zerrors.ThrowInternal(err, "USER-4Bm9s", "unable to unmarshal username changed")
 	}
 
 	return domainClaimed, nil

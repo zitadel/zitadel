@@ -10,13 +10,13 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_UsernameChange(t *testing.T) {
@@ -53,7 +53,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "username",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -68,7 +68,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "username",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -83,7 +83,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -98,7 +98,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "  ",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -115,7 +115,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "username",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -147,7 +147,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "username",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -179,7 +179,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "username ",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -211,7 +211,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "username",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -262,7 +262,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				username: "test@test.ch",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -539,7 +539,7 @@ func TestCommandSide_DeactivateUser(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -556,7 +556,7 @@ func TestCommandSide_DeactivateUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -593,7 +593,7 @@ func TestCommandSide_DeactivateUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -689,7 +689,7 @@ func TestCommandSide_ReactivateUser(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -706,7 +706,7 @@ func TestCommandSide_ReactivateUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -738,7 +738,7 @@ func TestCommandSide_ReactivateUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -838,7 +838,7 @@ func TestCommandSide_LockUser(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -855,7 +855,7 @@ func TestCommandSide_LockUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -892,7 +892,7 @@ func TestCommandSide_LockUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -988,7 +988,7 @@ func TestCommandSide_UnlockUser(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1005,7 +1005,7 @@ func TestCommandSide_UnlockUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1037,7 +1037,7 @@ func TestCommandSide_UnlockUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1140,7 +1140,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1157,7 +1157,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1191,7 +1191,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1473,7 +1473,7 @@ func TestCommandSide_AddUserToken(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1490,7 +1490,7 @@ func TestCommandSide_AddUserToken(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 	}
@@ -1547,7 +1547,7 @@ func TestCommands_RevokeAccessToken(t *testing.T) {
 			},
 			res{
 				nil,
-				errors.IsErrorInvalidArgument,
+				zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1579,7 +1579,7 @@ func TestCommands_RevokeAccessToken(t *testing.T) {
 			},
 			res{
 				nil,
-				errors.IsNotFound,
+				zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1672,7 +1672,7 @@ func TestCommandSide_UserDomainClaimedSent(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1689,7 +1689,7 @@ func TestCommandSide_UserDomainClaimedSent(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1875,7 +1875,7 @@ func TestExistsUser(t *testing.T) {
 			name: "error durring filter",
 			args: args{
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-					return nil, errors.ThrowInternal(nil, "USER-Drebn", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(nil, "USER-Drebn", "Errors.Internal")
 				},
 				id:            "id",
 				resourceOwner: "ro",

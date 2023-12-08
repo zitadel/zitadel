@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestEmailValid(t *testing.T) {
@@ -100,7 +100,7 @@ func TestRenderConfirmURLTemplate(t *testing.T) {
 				code:   "123",
 				orgID:  "org1",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
 		},
 		{
 			name: "execution error",
@@ -110,7 +110,7 @@ func TestRenderConfirmURLTemplate(t *testing.T) {
 				code:   "123",
 				orgID:  "org1",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "DOMAIN-ieYa7", "Errors.User.InvalidURLTemplate"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-ieYa7", "Errors.User.InvalidURLTemplate"),
 		},
 		{
 			name: "success",

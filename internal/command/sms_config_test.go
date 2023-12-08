@@ -9,12 +9,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
@@ -132,7 +132,7 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 				sms: &twilio.Config{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -150,7 +150,7 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 				id:         "id",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -188,7 +188,7 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 				id:         "providerid",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -289,7 +289,7 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -306,7 +306,7 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 				id:         "id",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -396,7 +396,7 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -413,7 +413,7 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 				id:         "id",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -510,7 +510,7 @@ func TestCommandSide_RemoveSMSConfig(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -527,7 +527,7 @@ func TestCommandSide_RemoveSMSConfig(t *testing.T) {
 				id:         "id",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{

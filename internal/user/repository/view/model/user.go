@@ -9,12 +9,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	org_model "github.com/zitadel/zitadel/internal/org/model"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/user/model"
 	es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -317,14 +317,14 @@ func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
 		user.HumanMFAOTPAddedType:
 		if u.HumanView == nil {
 			logging.WithFields("event_sequence", event.Sequence, "aggregate_id", event.Aggregate().ID, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
-			return errors.ThrowInvalidArgument(nil, "MODEL-p2BXx", "event ignored: human not exists")
+			return zerrors.ThrowInvalidArgument(nil, "MODEL-p2BXx", "event ignored: human not exists")
 		}
 		u.OTPState = int32(model.MFAStateNotReady)
 	case user.UserV1MFAOTPVerifiedType,
 		user.HumanMFAOTPVerifiedType:
 		if u.HumanView == nil {
 			logging.WithFields("event_sequence", event.Sequence, "aggregate_id", event.Aggregate().ID, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
-			return errors.ThrowInvalidArgument(nil, "MODEL-o6Lcq", "event ignored: human not exists")
+			return zerrors.ThrowInvalidArgument(nil, "MODEL-o6Lcq", "event ignored: human not exists")
 		}
 		u.OTPState = int32(model.MFAStateReady)
 		u.MFAInitSkipped = time.Time{}
@@ -368,7 +368,7 @@ func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
 		user.HumanPasswordlessInitCodeRequestedType:
 		if u.HumanView == nil {
 			logging.WithFields("event_sequence", event.Sequence, "aggregate_id", event.Aggregate().ID, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
-			return errors.ThrowInvalidArgument(nil, "MODEL-MbyC0", "event ignored: human not exists")
+			return zerrors.ThrowInvalidArgument(nil, "MODEL-MbyC0", "event ignored: human not exists")
 		}
 		if !u.PasswordSet {
 			u.PasswordlessInitRequired = true
@@ -388,7 +388,7 @@ func (u *UserView) setRootData(event eventstore.Event) {
 func (u *UserView) setData(event eventstore.Event) error {
 	if err := event.Unmarshal(u); err != nil {
 		logging.Log("MODEL-lso9e").WithError(err).Error("could not unmarshal event data")
-		return errors.ThrowInternal(nil, "MODEL-8iows", "could not unmarshal data")
+		return zerrors.ThrowInternal(nil, "MODEL-8iows", "could not unmarshal data")
 	}
 	return nil
 }
@@ -397,7 +397,7 @@ func (u *UserView) setPasswordData(event eventstore.Event) error {
 	password := new(es_model.Password)
 	if err := event.Unmarshal(password); err != nil {
 		logging.Log("MODEL-sdw4r").WithError(err).Error("could not unmarshal event data")
-		return errors.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
+		return zerrors.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
 	u.PasswordSet = password.Secret != nil || password.EncodedHash != ""
 	u.PasswordInitRequired = !u.PasswordSet
@@ -503,7 +503,7 @@ func webAuthNViewFromEvent(event eventstore.Event) (*WebAuthNView, error) {
 	token := new(WebAuthNView)
 	err := event.Unmarshal(token)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "MODEL-FSaq1", "could not unmarshal data")
+		return nil, zerrors.ThrowInternal(err, "MODEL-FSaq1", "could not unmarshal data")
 	}
 	return token, err
 }

@@ -8,12 +8,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/feature"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_SetBooleanInstanceFeature(t *testing.T) {
@@ -47,7 +47,7 @@ func TestCommands_SetBooleanInstanceFeature(t *testing.T) {
 				value: true,
 			},
 			res{
-				err: errors.ThrowPreconditionFailed(nil, "FEAT-AS4k1", "Errors.Feature.InvalidValue"),
+				err: zerrors.ThrowPreconditionFailed(nil, "FEAT-AS4k1", "Errors.Feature.InvalidValue"),
 			},
 		},
 		{
@@ -71,7 +71,7 @@ func TestCommands_SetBooleanInstanceFeature(t *testing.T) {
 				value: true,
 			},
 			res{
-				err: errors.ThrowPreconditionFailed(nil, "FEAT-SDfjk", "Errors.Feature.TypeNotSupported"),
+				err: zerrors.ThrowPreconditionFailed(nil, "FEAT-SDfjk", "Errors.Feature.TypeNotSupported"),
 			},
 		},
 		{
