@@ -162,7 +162,7 @@ func (c *Commands) MigrateUserIDP(ctx context.Context, userID, orgID, idpConfigI
 
 func (c *Commands) UpdateUserIDPLinkUsername(ctx context.Context, userID, orgID, idpConfigID, externalID, newUsername string) (err error) {
 	if userID == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-SFegz", "Errors.IDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-SFegz", "Errors.IDMissing")
 	}
 
 	writeModel, err := c.userIDPLinkWriteModelByID(ctx, userID, idpConfigID, externalID, orgID)
@@ -170,7 +170,7 @@ func (c *Commands) UpdateUserIDPLinkUsername(ctx context.Context, userID, orgID,
 		return err
 	}
 	if writeModel.State != domain.UserIDPLinkStateActive {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-DGhre", "Errors.User.ExternalIDP.NotFound")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-DGhre", "Errors.User.ExternalIDP.NotFound")
 	}
 	if writeModel.DisplayName == newUsername {
 		return nil

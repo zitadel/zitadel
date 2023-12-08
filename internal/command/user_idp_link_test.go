@@ -973,7 +973,7 @@ func TestCommandSide_UpdateUserIDPLinkUsername(t *testing.T) {
 				newUsername:    "newUsername",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-SFegz", "Errors.IDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-SFegz", "Errors.IDMissing"),
 			},
 		},
 		{
@@ -1001,7 +1001,7 @@ func TestCommandSide_UpdateUserIDPLinkUsername(t *testing.T) {
 				newUsername:    "newUsername",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-DGhre", "Errors.User.ExternalIDP.NotFound"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-DGhre", "Errors.User.ExternalIDP.NotFound"),
 			},
 		},
 		{
