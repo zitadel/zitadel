@@ -24,6 +24,7 @@ func TestCommands_ChangeUserEmail(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
+		newCode         cryptoCodeFunc
 	}
 	type args struct {
 		userID        string
@@ -34,6 +35,7 @@ func TestCommands_ChangeUserEmail(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
+		want    *domain.Email
 		wantErr error
 	}{
 		{
@@ -41,15 +43,6 @@ func TestCommands_ChangeUserEmail(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate("inst1").Aggregate,
-								domain.SecretGeneratorTypeVerifyEmailCode,
-								12, time.Minute, true, true, true, true,
-							),
-						),
-					),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -83,15 +76,6 @@ func TestCommands_ChangeUserEmail(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate("inst1").Aggregate,
-								domain.SecretGeneratorTypeVerifyEmailCode,
-								12, time.Minute, true, true, true, true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"username",
@@ -123,15 +107,6 @@ func TestCommands_ChangeUserEmail(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate("inst1").Aggregate,
-								domain.SecretGeneratorTypeVerifyEmailCode,
-								12, time.Minute, true, true, true, true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"username",
@@ -156,16 +131,73 @@ func TestCommands_ChangeUserEmail(t *testing.T) {
 			},
 			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Email.NotChanged"),
 		},
+		{
+			name: "email changed",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanEmailChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"email-changed@test.ch",
+						),
+						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("emailCode"),
+							},
+							time.Hour*1,
+							"", false,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockCode("emailCode", time.Hour),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				email:         "email-changed@test.ch",
+			},
+			want: &domain.Email{
+				ObjectRoot: models.ObjectRoot{
+					AggregateID:   "user1",
+					ResourceOwner: "org1",
+				},
+				EmailAddress:    "email-changed@test.ch",
+				IsEmailVerified: false,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
+				newCode:         tt.fields.newCode,
 			}
-			_, err := c.ChangeUserEmail(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.email, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			got, err := c.ChangeUserEmail(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.email, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 			require.ErrorIs(t, err, tt.wantErr)
-			// successful cases are tested in TestCommands_changeUserEmailWithGenerator
+			assert.Equal(t, got, tt.want)
 		})
 	}
 }
@@ -174,6 +206,7 @@ func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
+		newCode         cryptoCodeFunc
 	}
 	type args struct {
 		userID        string
@@ -186,6 +219,7 @@ func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 		fields  fields
 		args    args
 		wantErr error
+		want    *domain.Email
 	}{
 		{
 			name: "invalid template",
@@ -207,15 +241,6 @@ func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate("inst1").Aggregate,
-								domain.SecretGeneratorTypeVerifyEmailCode,
-								12, time.Minute, true, true, true, true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"username",
@@ -248,15 +273,6 @@ func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate("inst1").Aggregate,
-								domain.SecretGeneratorTypeVerifyEmailCode,
-								12, time.Minute, true, true, true, true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"username",
@@ -282,16 +298,74 @@ func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 			},
 			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Email.NotChanged"),
 		},
+		{
+			name: "email changed, URL template",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanEmailChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"email-changed@test.ch",
+						),
+						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("emailCode"),
+							},
+							time.Hour*1,
+							"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}", false,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockCode("emailCode", time.Hour),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				email:         "email-changed@test.ch",
+				urlTmpl:       "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+			},
+			want: &domain.Email{
+				ObjectRoot: models.ObjectRoot{
+					AggregateID:   "user1",
+					ResourceOwner: "org1",
+				},
+				EmailAddress:    "email-changed@test.ch",
+				IsEmailVerified: false,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
+				newCode:         tt.fields.newCode,
 			}
-			_, err := c.ChangeUserEmailURLTemplate(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.email, crypto.CreateMockEncryptionAlg(gomock.NewController(t)), tt.args.urlTmpl)
+			got, err := c.ChangeUserEmailURLTemplate(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.email, crypto.CreateMockEncryptionAlg(gomock.NewController(t)), tt.args.urlTmpl)
 			require.ErrorIs(t, err, tt.wantErr)
-			// successful cases are tested in TestCommands_changeUserEmailWithGenerator
+			require.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -300,6 +374,7 @@ func TestCommands_ChangeUserEmailReturnCode(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
+		newCode         cryptoCodeFunc
 	}
 	type args struct {
 		userID        string
@@ -310,6 +385,7 @@ func TestCommands_ChangeUserEmailReturnCode(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
+		want    *domain.Email
 		wantErr error
 	}{
 		{
@@ -317,15 +393,6 @@ func TestCommands_ChangeUserEmailReturnCode(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate("inst1").Aggregate,
-								domain.SecretGeneratorTypeVerifyEmailCode,
-								12, time.Minute, true, true, true, true,
-							),
-						),
-					),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -359,15 +426,6 @@ func TestCommands_ChangeUserEmailReturnCode(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate("inst1").Aggregate,
-								domain.SecretGeneratorTypeVerifyEmailCode,
-								12, time.Minute, true, true, true, true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"username",
@@ -392,16 +450,74 @@ func TestCommands_ChangeUserEmailReturnCode(t *testing.T) {
 			},
 			wantErr: caos_errs.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty"),
 		},
+		{
+			name: "email changed, return code",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanEmailChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"email-changed@test.ch",
+						),
+						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("emailCode"),
+							},
+							time.Hour*1,
+							"", true,
+						),
+					),
+				),
+				newCode:         mockCode("emailCode", time.Hour),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				email:         "email-changed@test.ch",
+			},
+			want: &domain.Email{
+				ObjectRoot: models.ObjectRoot{
+					AggregateID:   "user1",
+					ResourceOwner: "org1",
+				},
+				EmailAddress:    "email-changed@test.ch",
+				IsEmailVerified: false,
+				PlainCode:       gu.Ptr("emailCode"),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
+				newCode:         tt.fields.newCode,
 			}
-			_, err := c.ChangeUserEmailReturnCode(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.email, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			got, err := c.ChangeUserEmailReturnCode(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.email, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 			require.ErrorIs(t, err, tt.wantErr)
-			// successful cases are tested in TestCommands_changeUserEmailWithGenerator
+			require.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -559,10 +675,11 @@ func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 	}
 }
 
-func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
+func TestCommands_changeUserEmailWithCode(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
+		newCode         cryptoCodeFunc
 	}
 	type args struct {
 		userID        string
@@ -723,7 +840,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
 								KeyID:      "id",
-								Crypted:    []byte("a"),
+								Crypted:    []byte("emailCode"),
 							},
 							time.Hour*1,
 							"", false,
@@ -731,6 +848,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockCode("emailCode", time.Hour),
 			},
 			args: args{
 				userID:        "user1",
@@ -780,13 +898,14 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
 								KeyID:      "id",
-								Crypted:    []byte("a"),
+								Crypted:    []byte("emailCode"),
 							},
 							time.Hour*1,
 							"", true,
 						),
 					),
 				),
+				newCode:         mockCode("emailCode", time.Hour),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
@@ -803,7 +922,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 				},
 				EmailAddress:    "email-changed@test.ch",
 				IsEmailVerified: false,
-				PlainCode:       gu.Ptr("a"),
+				PlainCode:       gu.Ptr("emailCode"),
 			},
 		},
 		{
@@ -838,7 +957,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
 								KeyID:      "id",
-								Crypted:    []byte("a"),
+								Crypted:    []byte("emailCode"),
 							},
 							time.Hour*1,
 							"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}", false,
@@ -846,6 +965,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockCode("emailCode", time.Hour),
 			},
 			args: args{
 				userID:        "user1",
@@ -869,8 +989,9 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 			c := &Commands{
 				eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
+				newCode:         tt.fields.newCode,
 			}
-			got, err := c.changeUserEmailWithGenerator(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.email, GetMockSecretGenerator(t), tt.args.returnCode, tt.args.urlTmpl)
+			got, err := c.changeUserEmailWithCode(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.email, crypto.CreateMockEncryptionAlg(gomock.NewController(t)), tt.args.returnCode, tt.args.urlTmpl)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, got, tt.want)
 		})
@@ -890,160 +1011,15 @@ func TestCommands_VerifyUserEmail(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		wantErr error
-	}{
-		{
-			name: "missing userID",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate("inst1").Aggregate,
-								domain.SecretGeneratorTypeVerifyEmailCode,
-								12, time.Minute, true, true, true, true,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				userID:        "",
-				resourceOwner: "org1",
-				code:          "a",
-			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing"),
-		},
-		{
-			name: "missing code",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate("inst1").Aggregate,
-								domain.SecretGeneratorTypeVerifyEmailCode,
-								12, time.Minute, true, true, true, true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				userID:        "user1",
-				resourceOwner: "org1",
-				code:          "",
-			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty"),
-		},
-		{
-			name: "wrong code",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate("inst1").Aggregate,
-								domain.SecretGeneratorTypeVerifyEmailCode,
-								12, time.Minute, true, true, true, true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-						eventFromEventPusher(
-							user.NewHumanEmailCodeAddedEventV2(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("a"),
-								},
-								time.Hour*1,
-								"", false,
-							),
-						),
-					),
-					expectPush(
-						user.NewHumanEmailVerificationFailedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-						),
-					),
-				),
-			},
-			args: args{
-				userID:        "user1",
-				resourceOwner: "org1",
-				code:          "wrong",
-			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-eis9R", "Errors.User.Code.Invalid"),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &Commands{
-				eventstore: tt.fields.eventstore,
-			}
-			_, err := c.VerifyUserEmail(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.code, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
-			require.ErrorIs(t, err, tt.wantErr)
-			// successful cases are tested in TestCommands_verifyUserEmailWithGenerator
-		})
-	}
-}
-
-func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
-	type fields struct {
-		eventstore *eventstore.Eventstore
-	}
-	type args struct {
-		userID        string
-		resourceOwner string
-		code          string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
 		want    *domain.ObjectDetails
 		wantErr error
 	}{
 		{
 			name: "missing userID",
 			fields: fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: eventstoreExpect(
+					t,
+				),
 			},
 			args: args{
 				userID:        "",
@@ -1083,7 +1059,7 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty"),
 		},
 		{
-			name: "good code",
+			name: "wrong code",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -1116,6 +1092,15 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(context.Background(),
+								&instance.NewAggregate("inst1").Aggregate,
+								domain.SecretGeneratorTypeVerifyEmailCode,
+								12, time.Minute, true, true, true, true,
+							),
+						),
+					),
 					expectPush(
 						user.NewHumanEmailVerificationFailedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -1131,7 +1116,7 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-eis9R", "Errors.User.Code.Invalid"),
 		},
 		{
-			name: "wrong code",
+			name: "good code",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -1164,6 +1149,15 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(context.Background(),
+								&instance.NewAggregate("inst1").Aggregate,
+								domain.SecretGeneratorTypeVerifyEmailCode,
+								12, time.Minute, true, true, true, true,
+							),
+						),
+					),
 					expectPush(
 						user.NewHumanEmailVerifiedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -1186,9 +1180,10 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := c.verifyUserEmailWithGenerator(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.code, GetMockSecretGenerator(t))
+			got, err := c.VerifyUserEmail(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.code, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, got, tt.want)
+			require.Equal(t, tt.want, got)
+			// successful cases are tested in TestCommands_verifyUserEmailWithGenerator
 		})
 	}
 }

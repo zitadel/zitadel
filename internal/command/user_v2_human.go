@@ -405,14 +405,15 @@ func (c *Commands) changeUserEmail(ctx context.Context, cmds []eventstore.Comman
 		if email.Address == "" || email.Address == wm.Email {
 			return cmds, code, err
 		}
-		c, err := c.newEmailCode(ctx, c.eventstore.Filter, alg)
+
+		cmd, plain, err := generateEmailCodeCommand(ctx, &wm.Aggregate().Aggregate, c.newEmailCodeFunc(alg), email.URLTemplate, email.ReturnCode)
 		if err != nil {
-			return cmds, code, err
+			return nil, code, err
 		}
-		cmds = append(cmds, user.NewHumanEmailCodeAddedEventV2(ctx, &wm.Aggregate().Aggregate, c.Crypted, c.Expiry, email.URLTemplate, email.ReturnCode))
 		if email.ReturnCode {
-			code = &c.Plain
+			code = &plain
 		}
+		cmds = append(cmds, cmd)
 	}
 	return cmds, code, nil
 }
@@ -437,14 +438,14 @@ func (c *Commands) changeUserPhone(ctx context.Context, cmds []eventstore.Comman
 		if phone.Number == "" || phone.Number == wm.Phone {
 			return cmds, code, err
 		}
-		c, err := c.newPhoneCode(ctx, c.eventstore.Filter, alg)
+		cmd, plain, err := generatePhoneCodeCommand(ctx, &wm.Aggregate().Aggregate, c.newPhoneCodeFunc(alg), phone.ReturnCode)
 		if err != nil {
-			return cmds, code, err
+			return nil, code, err
 		}
-		cmds = append(cmds, user.NewHumanPhoneCodeAddedEventV2(ctx, &wm.Aggregate().Aggregate, c.Crypted, c.Expiry, phone.ReturnCode))
 		if phone.ReturnCode {
-			code = &c.Plain
+			code = &plain
 		}
+		cmds = append(cmds, cmd)
 	}
 	return cmds, code, nil
 }

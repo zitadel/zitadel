@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -25,4 +26,16 @@ func (e *Email) Validate() error {
 
 func (c *Commands) newEmailCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCode, error) {
 	return c.newCode(ctx, filter, domain.SecretGeneratorTypeVerifyEmailCode, alg)
+}
+
+func (c *Commands) newEmailCodeFunc(alg crypto.EncryptionAlgorithm) getCryptoCodeFunc {
+	return func(ctx context.Context) (*CryptoCode, error) {
+		return c.newEmailCode(ctx, c.eventstore.Filter, alg)
+	}
+}
+
+func (c *Commands) verifyEmailCodeFunc(alg crypto.EncryptionAlgorithm) verifyCryptoCodeFunc {
+	return func(ctx context.Context, creation time.Time, expiry time.Duration, crypted *crypto.CryptoValue, plain string) error {
+		return verifyCryptoCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode, alg, creation, expiry, crypted, plain)
+	}
 }

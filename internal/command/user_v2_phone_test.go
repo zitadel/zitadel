@@ -16,7 +16,6 @@ import (
 	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
@@ -24,6 +23,7 @@ func TestCommands_ChangeUserPhone(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
+		newCode         cryptoCodeFunc
 	}
 	type args struct {
 		userID        string
@@ -34,6 +34,7 @@ func TestCommands_ChangeUserPhone(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
+		want    *domain.Phone
 		wantErr error
 	}{
 		{
@@ -41,15 +42,6 @@ func TestCommands_ChangeUserPhone(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate("inst1").Aggregate,
-								domain.SecretGeneratorTypeVerifyPhoneCode,
-								12, time.Minute, true, true, true, true,
-							),
-						),
-					),
 					expectFilter(
 						eventFromEventPusher(
 							func() eventstore.Command {
@@ -85,15 +77,6 @@ func TestCommands_ChangeUserPhone(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate("inst1").Aggregate,
-								domain.SecretGeneratorTypeVerifyPhoneCode,
-								12, time.Minute, true, true, true, true,
-							),
-						),
-					),
 					expectFilter(
 						eventFromEventPusher(
 							func() eventstore.Command {
@@ -131,15 +114,6 @@ func TestCommands_ChangeUserPhone(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate("inst1").Aggregate,
-								domain.SecretGeneratorTypeVerifyPhoneCode,
-								12, time.Minute, true, true, true, true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
 							func() eventstore.Command {
 								event := user.NewHumanAddedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
@@ -168,15 +142,77 @@ func TestCommands_ChangeUserPhone(t *testing.T) {
 			},
 			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Phone.NotChanged"),
 		},
+		{
+			name: "phone changed",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								event := user.NewHumanAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"username",
+									"firstname",
+									"lastname",
+									"nickname",
+									"displayname",
+									language.German,
+									domain.GenderUnspecified,
+									"email@test.ch",
+									true,
+								)
+								event.AddPhoneData("+41791234567")
+								return event
+							}(),
+						),
+					),
+					expectPush(
+						user.NewHumanPhoneChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"+41791234568",
+						),
+						user.NewHumanPhoneCodeAddedEventV2(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("phoneCode"),
+							},
+							time.Hour*1,
+							false,
+						),
+					),
+				),
+				newCode:         mockCode("phoneCode", time.Hour),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				phone:         "+41791234568",
+			},
+			want: &domain.Phone{
+				ObjectRoot: models.ObjectRoot{
+					AggregateID:   "user1",
+					ResourceOwner: "org1",
+				},
+				PhoneNumber:     "+41791234568",
+				IsPhoneVerified: false,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
+				newCode:         tt.fields.newCode,
 			}
-			_, err := c.ChangeUserPhone(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.phone, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			got, err := c.ChangeUserPhone(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.phone, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 			require.ErrorIs(t, err, tt.wantErr)
+			require.Equal(t, tt.want, got)
 			// successful cases are tested in TestCommands_changeUserPhoneWithGenerator
 		})
 	}
@@ -186,6 +222,7 @@ func TestCommands_ChangeUserPhoneReturnCode(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
+		newCode         cryptoCodeFunc
 	}
 	type args struct {
 		userID        string
@@ -196,6 +233,7 @@ func TestCommands_ChangeUserPhoneReturnCode(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
+		want    *domain.Phone
 		wantErr error
 	}{
 		{
@@ -203,15 +241,6 @@ func TestCommands_ChangeUserPhoneReturnCode(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate("inst1").Aggregate,
-								domain.SecretGeneratorTypeVerifyPhoneCode,
-								12, time.Minute, true, true, true, true,
-							),
-						),
-					),
 					expectFilter(
 						eventFromEventPusher(
 							func() eventstore.Command {
@@ -249,15 +278,6 @@ func TestCommands_ChangeUserPhoneReturnCode(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewSecretGeneratorAddedEvent(context.Background(),
-								&instance.NewAggregate("inst1").Aggregate,
-								domain.SecretGeneratorTypeVerifyEmailCode,
-								12, time.Minute, true, true, true, true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
 							func() eventstore.Command {
 								event := user.NewHumanAddedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
@@ -286,16 +306,78 @@ func TestCommands_ChangeUserPhoneReturnCode(t *testing.T) {
 			},
 			wantErr: caos_errs.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty"),
 		},
+		{
+			name: "phone changed, return code",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								event := user.NewHumanAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"username",
+									"firstname",
+									"lastname",
+									"nickname",
+									"displayname",
+									language.German,
+									domain.GenderUnspecified,
+									"email@test.ch",
+									true,
+								)
+								event.AddPhoneData("+41791234567")
+								return event
+							}(),
+						),
+					),
+					expectPush(
+						user.NewHumanPhoneChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"+41791234568",
+						),
+						user.NewHumanPhoneCodeAddedEventV2(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("phoneCode"),
+							},
+							time.Hour*1,
+							true,
+						),
+					),
+				),
+				newCode:         mockCode("phoneCode", time.Hour),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				userID:        "user1",
+				resourceOwner: "org1",
+				phone:         "+41791234568",
+			},
+			want: &domain.Phone{
+				ObjectRoot: models.ObjectRoot{
+					AggregateID:   "user1",
+					ResourceOwner: "org1",
+				},
+				PhoneNumber:     "+41791234568",
+				IsPhoneVerified: false,
+				PlainCode:       gu.Ptr("phoneCode"),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
+				newCode:         tt.fields.newCode,
 			}
-			_, err := c.ChangeUserPhoneReturnCode(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.phone, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			got, err := c.ChangeUserPhoneReturnCode(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.phone, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 			require.ErrorIs(t, err, tt.wantErr)
-			// successful cases are tested in TestCommands_changeUserPhoneWithGenerator
+			require.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -465,10 +547,11 @@ func TestCommands_ChangeUserPhoneVerified(t *testing.T) {
 	}
 }
 
-func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
+func TestCommands_changeUserPhoneWithCode(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
+		newCode         cryptoCodeFunc
 	}
 	type args struct {
 		userID        string
@@ -640,13 +723,14 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
 								KeyID:      "id",
-								Crypted:    []byte("a"),
+								Crypted:    []byte("phoneCode"),
 							},
 							time.Hour*1,
 							false,
 						),
 					),
 				),
+				newCode:         mockCode("phoneCode", time.Hour),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
@@ -700,13 +784,14 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
 								KeyID:      "id",
-								Crypted:    []byte("a"),
+								Crypted:    []byte("phoneCode"),
 							},
 							time.Hour*1,
 							true,
 						),
 					),
 				),
+				newCode:         mockCode("phoneCode", time.Hour),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
@@ -722,7 +807,7 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				},
 				PhoneNumber:     "+41791234568",
 				IsPhoneVerified: false,
-				PlainCode:       gu.Ptr("a"),
+				PlainCode:       gu.Ptr("phoneCode"),
 			},
 		},
 	}
@@ -731,8 +816,9 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 			c := &Commands{
 				eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
+				newCode:         tt.fields.newCode,
 			}
-			got, err := c.changeUserPhoneWithGenerator(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.phone, GetMockSecretGenerator(t), tt.args.returnCode)
+			got, err := c.changeUserPhoneWithCode(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.phone, crypto.CreateMockEncryptionAlg(gomock.NewController(t)), tt.args.returnCode)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, got, tt.want)
 		})

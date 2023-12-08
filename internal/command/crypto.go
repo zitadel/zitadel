@@ -14,6 +14,9 @@ type cryptoCodeFunc func(ctx context.Context, filter preparation.FilterToQueryRe
 
 type cryptoCodeWithDefaultFunc func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto, defaultConfig *crypto.GeneratorConfig) (*CryptoCode, error)
 
+type getCryptoCodeFunc func(ctx context.Context) (*CryptoCode, error)
+type verifyCryptoCodeFunc func(ctx context.Context, creation time.Time, expiry time.Duration, crypted *crypto.CryptoValue, plain string) error
+
 var emptyConfig = &crypto.GeneratorConfig{}
 
 type CryptoCode struct {

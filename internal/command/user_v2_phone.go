@@ -42,19 +42,10 @@ func (c *Commands) ChangeUserPhoneVerified(ctx context.Context, userID, resource
 	return cmd.Push(ctx)
 }
 
-func (c *Commands) changeUserPhoneWithCode(ctx context.Context, userID, resourceOwner, phone string, alg crypto.EncryptionAlgorithm, returnCode bool) (*domain.Phone, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode)
-	if err != nil {
-		return nil, err
-	}
-	gen := crypto.NewEncryptionGenerator(*config, alg)
-	return c.changeUserPhoneWithGenerator(ctx, userID, resourceOwner, phone, gen, returnCode)
-}
-
-// changeUserPhoneWithGenerator set a user's phone number.
+// changeUserPhoneWithCode set a user's phone number.
 // returnCode controls if the plain text version of the code will be set in the return object.
 // When the plain text code is returned, no notification sms will be send to the user.
-func (c *Commands) changeUserPhoneWithGenerator(ctx context.Context, userID, resourceOwner, phone string, gen crypto.Generator, returnCode bool) (*domain.Phone, error) {
+func (c *Commands) changeUserPhoneWithCode(ctx context.Context, userID, resourceOwner, phone string, alg crypto.EncryptionAlgorithm, returnCode bool) (*domain.Phone, error) {
 	cmd, err := c.NewUserPhoneEvents(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -67,27 +58,18 @@ func (c *Commands) changeUserPhoneWithGenerator(ctx context.Context, userID, res
 	if err = cmd.Change(ctx, domain.PhoneNumber(phone)); err != nil {
 		return nil, err
 	}
-	if err = cmd.AddGeneratedCode(ctx, gen, returnCode); err != nil {
+	if err = cmd.AddGeneratedCode(ctx, c.newPhoneCodeFunc(alg), returnCode); err != nil {
 		return nil, err
 	}
 	return cmd.Push(ctx)
 }
 
 func (c *Commands) VerifyUserPhone(ctx context.Context, userID, resourceOwner, code string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode)
-	if err != nil {
-		return nil, err
-	}
-	gen := crypto.NewEncryptionGenerator(*config, alg)
-	return c.verifyUserPhoneWithGenerator(ctx, userID, resourceOwner, code, gen)
-}
-
-func (c *Commands) verifyUserPhoneWithGenerator(ctx context.Context, userID, resourceOwner, code string, gen crypto.Generator) (*domain.ObjectDetails, error) {
 	cmd, err := c.NewUserPhoneEvents(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	err = cmd.VerifyCode(ctx, code, gen)
+	err = cmd.VerifyCode(ctx, code, c.verifyPhoneCodeFunc(alg))
 	if err != nil {
 		return nil, err
 	}
@@ -155,25 +137,34 @@ func (c *UserPhoneEvents) SetVerified(ctx context.Context) {
 
 // AddGeneratedCode generates a new encrypted code and sets it to the phone number.
 // When returnCode a plain text of the code will be returned from Push.
-func (c *UserPhoneEvents) AddGeneratedCode(ctx context.Context, gen crypto.Generator, returnCode bool) error {
-	value, plain, err := crypto.NewCode(gen)
+func (c *UserPhoneEvents) AddGeneratedCode(ctx context.Context, newCode func(context.Context) (*CryptoCode, error), returnCode bool) error {
+	cmd, code, err := generatePhoneCodeCommand(ctx, c.aggregate, newCode, returnCode)
 	if err != nil {
 		return err
 	}
 
-	c.events = append(c.events, user.NewHumanPhoneCodeAddedEventV2(ctx, c.aggregate, value, gen.Expiry(), returnCode))
+	c.events = append(c.events, cmd)
 	if returnCode {
-		c.plainCode = &plain
+		c.plainCode = &code
 	}
 	return nil
 }
 
-func (c *UserPhoneEvents) VerifyCode(ctx context.Context, code string, gen crypto.Generator) error {
+func generatePhoneCodeCommand(ctx context.Context, agg *eventstore.Aggregate, newCode func(context.Context) (*CryptoCode, error), returnCode bool) (eventstore.Command, string, error) {
+	code, err := newCode(ctx)
+	if err != nil {
+		return nil, "", err
+	}
+
+	return user.NewHumanPhoneCodeAddedEventV2(ctx, agg, code.Crypted, code.Expiry, returnCode), code.Plain, nil
+}
+
+func (c *UserPhoneEvents) VerifyCode(ctx context.Context, code string, verify verifyCryptoCodeFunc) error {
 	if code == "" {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty")
 	}
 
-	err := crypto.VerifyCode(c.model.CodeCreationDate, c.model.CodeExpiry, c.model.Code, code, gen)
+	err := verify(ctx, c.model.CodeCreationDate, c.model.CodeExpiry, c.model.Code, code)
 	if err == nil {
 		c.events = append(c.events, user.NewHumanPhoneVerifiedEvent(ctx, c.aggregate))
 		return nil

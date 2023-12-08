@@ -53,28 +53,11 @@ func (c *Commands) ChangeUserEmailVerified(ctx context.Context, userID, resource
 	return cmd.Push(ctx)
 }
 
-func (c *Commands) changeUserEmailWithCode(ctx context.Context, userID, resourceOwner, email string, alg crypto.EncryptionAlgorithm, returnCode bool, urlTmpl string) (*domain.Email, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode)
-	if err != nil {
-		return nil, err
-	}
-	gen := crypto.NewEncryptionGenerator(*config, alg)
-	return c.changeUserEmailWithGenerator(ctx, userID, resourceOwner, email, gen, returnCode, urlTmpl)
-}
-
-// changeUserEmailWithGenerator set a user's email address.
+// changeUserEmailWithCode set a user's email address.
 // returnCode controls if the plain text version of the code will be set in the return object.
 // When the plain text code is returned, no notification e-mail will be send to the user.
 // urlTmpl allows changing the target URL that is used by the e-mail and should be a validated Go template, if used.
-func (c *Commands) changeUserEmailWithGenerator(ctx context.Context, userID, resourceOwner, email string, gen crypto.Generator, returnCode bool, urlTmpl string) (*domain.Email, error) {
-	cmd, err := c.changeUserEmailWithGeneratorEvents(ctx, userID, resourceOwner, email, gen, returnCode, urlTmpl)
-	if err != nil {
-		return nil, err
-	}
-	return cmd.Push(ctx)
-}
-
-func (c *Commands) changeUserEmailWithGeneratorEvents(ctx context.Context, userID, resourceOwner, email string, gen crypto.Generator, returnCode bool, urlTmpl string) (*UserEmailEvents, error) {
+func (c *Commands) changeUserEmailWithCode(ctx context.Context, userID, resourceOwner, email string, alg crypto.EncryptionAlgorithm, returnCode bool, urlTmpl string) (*domain.Email, error) {
 	cmd, err := c.NewUserEmailEvents(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -87,27 +70,18 @@ func (c *Commands) changeUserEmailWithGeneratorEvents(ctx context.Context, userI
 	if err = cmd.Change(ctx, domain.EmailAddress(email)); err != nil {
 		return nil, err
 	}
-	if err = cmd.AddGeneratedCode(ctx, gen, urlTmpl, returnCode); err != nil {
+	if err = cmd.AddGeneratedCode(ctx, c.newEmailCodeFunc(alg), urlTmpl, returnCode); err != nil {
 		return nil, err
 	}
-	return cmd, nil
+	return cmd.Push(ctx)
 }
 
 func (c *Commands) VerifyUserEmail(ctx context.Context, userID, resourceOwner, code string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode)
-	if err != nil {
-		return nil, err
-	}
-	gen := crypto.NewEncryptionGenerator(*config, alg)
-	return c.verifyUserEmailWithGenerator(ctx, userID, resourceOwner, code, gen)
-}
-
-func (c *Commands) verifyUserEmailWithGenerator(ctx context.Context, userID, resourceOwner, code string, gen crypto.Generator) (*domain.ObjectDetails, error) {
 	cmd, err := c.NewUserEmailEvents(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
-	err = cmd.VerifyCode(ctx, code, gen)
+	err = cmd.VerifyCode(ctx, code, c.verifyEmailCodeFunc(alg))
 	if err != nil {
 		return nil, err
 	}
@@ -174,8 +148,8 @@ func (c *UserEmailEvents) SetVerified(ctx context.Context) {
 
 // AddGeneratedCode generates a new encrypted code and sets it to the email address.
 // When returnCode a plain text of the code will be returned from Push.
-func (c *UserEmailEvents) AddGeneratedCode(ctx context.Context, gen crypto.Generator, urlTmpl string, returnCode bool) error {
-	cmd, code, err := generateCodeCommand(ctx, c.aggregate, gen, urlTmpl, returnCode)
+func (c *UserEmailEvents) AddGeneratedCode(ctx context.Context, newCode func(context.Context) (*CryptoCode, error), urlTmpl string, returnCode bool) error {
+	cmd, code, err := generateEmailCodeCommand(ctx, c.aggregate, newCode, urlTmpl, returnCode)
 	if err != nil {
 		return err
 	}
@@ -186,25 +160,21 @@ func (c *UserEmailEvents) AddGeneratedCode(ctx context.Context, gen crypto.Gener
 	return nil
 }
 
-func generateCodeCommand(ctx context.Context, agg *eventstore.Aggregate, gen crypto.Generator, urlTmpl string, returnCode bool) (eventstore.Command, string, error) {
-	value, plain, err := crypto.NewCode(gen)
+func generateEmailCodeCommand(ctx context.Context, agg *eventstore.Aggregate, newCode func(context.Context) (*CryptoCode, error), urlTmpl string, returnCode bool) (eventstore.Command, string, error) {
+	code, err := newCode(ctx)
 	if err != nil {
 		return nil, "", err
 	}
 
-	cmd := user.NewHumanEmailCodeAddedEventV2(ctx, agg, value, gen.Expiry(), urlTmpl, returnCode)
-	if returnCode {
-		return cmd, plain, nil
-	}
-	return cmd, "", nil
+	return user.NewHumanEmailCodeAddedEventV2(ctx, agg, code.Crypted, code.Expiry, urlTmpl, returnCode), code.Plain, nil
 }
 
-func (c *UserEmailEvents) VerifyCode(ctx context.Context, code string, gen crypto.Generator) error {
+func (c *UserEmailEvents) VerifyCode(ctx context.Context, code string, verify verifyCryptoCodeFunc) error {
 	if code == "" {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty")
 	}
 
-	err := crypto.VerifyCode(c.model.CodeCreationDate, c.model.CodeExpiry, c.model.Code, code, gen)
+	err := verify(ctx, c.model.CodeCreationDate, c.model.CodeExpiry, c.model.Code, code)
 	if err == nil {
 		c.events = append(c.events, user.NewHumanEmailVerifiedEvent(ctx, c.aggregate))
 		return nil
