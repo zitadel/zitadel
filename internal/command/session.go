@@ -400,7 +400,27 @@ func (c *Commands) checkSessionTerminationPermission(ctx context.Context, model 
 	if model.UserID != "" && model.UserID == authz.GetCtxData(ctx).UserID {
 		return nil
 	}
-	return c.checkPermission(ctx, domain.PermissionSessionDelete, model.UserResourceOwner, model.UserID)
+	userResourceOwner, err := c.sessionUserResourceOwner(ctx, model)
+	if err != nil {
+		return err
+	}
+	return c.checkPermission(ctx, domain.PermissionSessionDelete, userResourceOwner, model.UserID)
+}
+
+// sessionUserResourceOwner will return the resourceOwner of the session form the [SessionWriteModel] or by additionally calling the eventstore,
+// because before 2.42.0, the resourceOwner of a session used to be the organisation of the creator.
+// Further the (checked) users organisation id was not stored.
+// To be able to check the permission, we need to get the user's resourceOwner in this case.
+func (c *Commands) sessionUserResourceOwner(ctx context.Context, model *SessionWriteModel) (string, error) {
+	if model.UserID == "" || model.UserResourceOwner != "" {
+		return model.UserResourceOwner, nil
+	}
+	r := NewResourceOwnerModel(authz.GetInstance(ctx).InstanceID(), user.AggregateType, model.UserID)
+	err := c.eventstore.FilterToQueryReducer(ctx, r)
+	if err != nil {
+		return "", err
+	}
+	return r.resourceOwner, nil
 }
 
 func sessionTokenCreator(idGenerator id.Generator, sessionAlg crypto.EncryptionAlgorithm) func(sessionID string) (id string, token string, err error) {

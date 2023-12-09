@@ -62,8 +62,7 @@ type SessionWriteModel struct {
 func NewSessionWriteModel(sessionID string, instanceID string) *SessionWriteModel {
 	return &SessionWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:   sessionID,
-			ResourceOwner: instanceID,
+			AggregateID: sessionID,
 		},
 		Metadata:  make(map[string][]byte),
 		aggregate: &session.NewAggregate(sessionID, instanceID).Aggregate,
