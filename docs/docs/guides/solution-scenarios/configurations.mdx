@@ -137,3 +137,14 @@ Content-Security-Policy: frame-ancestors https://custom-domain.com
 ```
 
 and remove the X-Frame-Options header.
+
+### Disable Multi-factor (MFA) Prompt
+
+To encourage the users to more security for their accounts, a Multi-factor prompt is shown after a certain time, to allow them to configure an additional factor.
+The prompt is shown even if Multi-factor is not enforced for the users.
+
+If you do want to disable the prompt for your users, go to the login behaviour settings and set the "Multifactor Init Lifetime" to 0.
+If the setting is not configured to 0, it means that after that time, the user will be asked to setup a factor again.
+
+![Login Behaviour Settings: Multi-factor init lifetime](/img/guides/scenarios/login-settings-mfa-init-lifetime.png)
+
