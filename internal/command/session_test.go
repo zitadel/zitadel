@@ -487,11 +487,9 @@ func TestCommands_updateSession(t *testing.T) {
 			},
 			res{
 				want: &SessionChanged{
-					ObjectDetails: &domain.ObjectDetails{
-						ResourceOwner: "instance1",
-					},
-					ID:       "sessionID",
-					NewToken: "",
+					ObjectDetails: &domain.ObjectDetails{},
+					ID:            "sessionID",
+					NewToken:      "",
 				},
 			},
 		},
@@ -1233,6 +1231,52 @@ func TestCommands_TerminateSession(t *testing.T) {
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 								"tokenID"),
 						),
+					),
+					expectPush(
+						session.NewTerminateEvent(authz.NewMockContext("instance1", "org1", "admin1"), &session.NewAggregate("sessionID", "instance1").Aggregate),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx:          authz.NewMockContext("instance1", "org1", "admin1"),
+				sessionID:    "sessionID",
+				sessionToken: "",
+			},
+			res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "instance1",
+				},
+			},
+		},
+		{
+			"terminate session owned by org with permission",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							),
+						),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org2").Aggregate,
+								"userID", "", testNow),
+						),
+						eventFromEventPusher(
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org2").Aggregate,
+								"tokenID"),
+						),
+					),
+					expectFilter(
+						user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+							"username", "firstname", "lastname", "nickname", "displayname", language.English, domain.GenderUnspecified, "email", false),
 					),
 					expectPush(
 						session.NewTerminateEvent(authz.NewMockContext("instance1", "org1", "admin1"), &session.NewAggregate("sessionID", "instance1").Aggregate),
