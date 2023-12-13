@@ -44,5 +44,5 @@ func (repo *UserRepo) UserEventsByID(ctx context.Context, id string, changeDate 
 	if err != nil {
 		return nil, err
 	}
-	return repo.Eventstore.Filter(ctx, query)
+	return repo.Eventstore.Filter(ctx, query) //nolint:staticcheck
 }
