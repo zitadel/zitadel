@@ -131,7 +131,7 @@ export class PasswordLockoutPolicyComponent implements OnInit {
       } else {
         if ((this.lockoutData as LockoutPolicy.AsObject).isDefault) {
           promise = (this.service as ManagementService)
-            .addCustomLockoutPolicy(this.lockoutData.maxPasswordAttempts)
+            .addCustomLockoutPolicy(this.lockoutData.maxPasswordAttempts, this.lockoutData.maxOtpAttempts)
             .then(() => {
               this.toast.showInfo('POLICY.TOAST.SET', true);
               this.fetchData();
@@ -141,7 +141,7 @@ export class PasswordLockoutPolicyComponent implements OnInit {
             });
         } else {
           promise = (this.service as ManagementService)
-            .updateCustomLockoutPolicy(this.lockoutData.maxPasswordAttempts)
+            .updateCustomLockoutPolicy(this.lockoutData.maxPasswordAttempts, this.lockoutData.maxOtpAttempts)
             .then(() => {
               this.toast.showInfo('POLICY.TOAST.SET', true);
               this.fetchData();
