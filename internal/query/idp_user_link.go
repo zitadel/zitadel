@@ -134,6 +134,10 @@ func NewIDPUserLinksExternalIDSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(IDPUserLinkExternalUserIDCol, value, TextEquals)
 }
 
+func NewIDPUserLinksActiveQuery(value bool) (SearchQuery, error) {
+	return NewBoolQuery(IDPUserLinkActiveCol, value)
+}
+
 func prepareIDPUserLinksQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLinks, error)) {
 	return sq.Select(
 			IDPUserLinkIDPIDCol.identifier(),
