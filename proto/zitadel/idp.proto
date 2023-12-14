@@ -79,6 +79,11 @@ message IDPUserLink {
             description: "the authorization framework of the identity provider";
         }
     ];
+    bool has_login_policy = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "if the IDP is linked to the login policy";
+        }
+    ];
 }
 
 message IDPLoginPolicyLink {

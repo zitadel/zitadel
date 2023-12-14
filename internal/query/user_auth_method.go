@@ -72,11 +72,11 @@ var (
 	authMethodTypeTypes      = UserAuthMethodColumnMethodType.setTable(authMethodTypeTable)
 	authMethodTypeState      = UserAuthMethodColumnState.setTable(authMethodTypeTable)
 
-	userIDPsCountTable      = idpUserLinkTable.setAlias("user_idps_count")
-	userIDPsCountUserID     = IDPUserLinkUserIDCol.setTable(userIDPsCountTable)
-	userIDPsCountInstanceID = IDPUserLinkInstanceIDCol.setTable(userIDPsCountTable)
-	userIDPsCountActive     = IDPUserLinkActiveCol.setTable(userIDPsCountTable)
-	userIDPsCountCount      = Column{
+	userIDPsCountTable          = idpUserLinkTable.setAlias("user_idps_count")
+	userIDPsCountUserID         = IDPUserLinkUserIDCol.setTable(userIDPsCountTable)
+	userIDPsCountInstanceID     = IDPUserLinkInstanceIDCol.setTable(userIDPsCountTable)
+	userIDPsCountHasLoginPolicy = IDPUserLinkHasLoginPolicyCol.setTable(userIDPsCountTable)
+	userIDPsCountCount          = Column{
 		name:  "count",
 		table: userIDPsCountTable,
 	}
@@ -488,7 +488,7 @@ func prepareAuthMethodsIDPsQuery() (string, []interface{}, error) {
 			userIDPsCountUserID.identifier(),
 			userIDPsCountInstanceID.identifier(),
 		).
-		Where(sq.Eq{userIDPsCountActive.identifier(): true}).
+		Where(sq.Eq{userIDPsCountHasLoginPolicy.identifier(): true}).
 		ToSql()
 	return idpsQuery, idpsArgs, err
 }

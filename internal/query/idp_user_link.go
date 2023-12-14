@@ -22,6 +22,7 @@ type IDPUserLink struct {
 	ProvidedUsername string
 	ResourceOwner    string
 	IDPType          domain.IDPType
+	HasLoginPolicy   bool
 }
 
 type IDPUserLinks struct {
@@ -87,8 +88,8 @@ var (
 		name:  projection.IDPUserLinkOwnerRemovedCol,
 		table: idpUserLinkTable,
 	}
-	IDPUserLinkActiveCol = Column{
-		name:  projection.IDPUserLinkActiveCol,
+	IDPUserLinkHasLoginPolicyCol = Column{
+		name:  projection.IDPUserLinkHasLoginPolicyCol,
 		table: idpUserLinkTable,
 	}
 )
@@ -134,8 +135,8 @@ func NewIDPUserLinksExternalIDSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(IDPUserLinkExternalUserIDCol, value, TextEquals)
 }
 
-func NewIDPUserLinksActiveQuery(value bool) (SearchQuery, error) {
-	return NewBoolQuery(IDPUserLinkActiveCol, value)
+func NewIDPUserLinksWithLoginPolicyOnlySearchQuery() (SearchQuery, error) {
+	return NewBoolQuery(IDPUserLinkHasLoginPolicyCol, true)
 }
 
 func prepareIDPUserLinksQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLinks, error)) {
@@ -147,6 +148,7 @@ func prepareIDPUserLinksQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			IDPUserLinkDisplayNameCol.identifier(),
 			IDPTemplateTypeCol.identifier(),
 			IDPUserLinkResourceOwnerCol.identifier(),
+			IDPUserLinkHasLoginPolicyCol.identifier(),
 			countColumn.identifier()).
 			From(idpUserLinkTable.identifier()).
 			LeftJoin(join(IDPTemplateIDCol, IDPUserLinkIDPIDCol) + db.Timetravel(call.Took(ctx))).
@@ -168,6 +170,7 @@ func prepareIDPUserLinksQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&idp.ProvidedUsername,
 					&idpType,
 					&idp.ResourceOwner,
+					&idp.HasLoginPolicy,
 					&count,
 				)
 				if err != nil {

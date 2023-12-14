@@ -941,6 +941,7 @@ func (repo *AuthRequestRepo) checkSelectedExternalIDP(request *domain.AuthReques
 			return nil
 		}
 	}
+	// TODO: PreconditionFailed?
 	return zerrors.ThrowNotFound(nil, "LOGIN-Nsm8r", "Errors.User.ExternalIDP.NotAllowed")
 }
 
@@ -953,8 +954,12 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request
 	if err != nil {
 		return err
 	}
+	withPolicyQuery, err := query.NewIDPUserLinksWithLoginPolicyOnlySearchQuery()
+	if err != nil {
+		return err
+	}
 	queries := []query.SearchQuery{
-		idQuery, externalIDQuery,
+		idQuery, externalIDQuery, withPolicyQuery,
 	}
 	if request.RequestedOrgID != "" {
 		orgIDQuery, err := query.NewIDPUserLinksResourceOwnerSearchQuery(request.RequestedOrgID)
@@ -963,9 +968,15 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request
 		}
 		queries = append(queries, orgIDQuery)
 	}
+	// If the link has no login policy, the user is not allowed to login, so we return a precondition failed error.
+	// We return a precondition error because we try to create a new link on not found errors.
+	// But we don't want new links on idps without login policy.
 	links, err := repo.Query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
 	if err != nil {
 		return err
+	}
+	if len(links.Links) == 1 && !links.Links[0].HasLoginPolicy {
+		return zerrors.ThrowPreconditionFailedf(nil, "AUTH-Sf8sd", "Errors.User.ExternalIDP.NotAllowed")
 	}
 	if len(links.Links) != 1 {
 		return zerrors.ThrowNotFound(nil, "AUTH-Sf8sd", "Errors.ExternalIDP.NotFound")
@@ -1148,7 +1159,11 @@ func checkExternalIDPsOfUser(ctx context.Context, idpUserLinksProvider idpUserLi
 	if err != nil {
 		return nil, err
 	}
-	return idpUserLinksProvider.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userIDQuery}}, false)
+	withPolicyQuery, err := query.NewIDPUserLinksWithLoginPolicyOnlySearchQuery()
+	if err != nil {
+		return nil, err
+	}
+	return idpUserLinksProvider.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userIDQuery, withPolicyQuery}}, false)
 }
 
 func (repo *AuthRequestRepo) usersForUserSelection(ctx context.Context, request *domain.AuthRequest) ([]domain.UserSelection, error) {

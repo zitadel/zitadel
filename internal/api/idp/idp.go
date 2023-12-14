@@ -424,9 +424,14 @@ func (h *Handler) checkExternalUser(ctx context.Context, idpID, externalUserID s
 	if err != nil {
 		return "", err
 	}
-	queries := []query.SearchQuery{
-		idQuery, externalIDQuery,
+	withPolicyQuery, err := query.NewIDPUserLinksWithLoginPolicyOnlySearchQuery()
+	if err != nil {
+		return "", err
 	}
+	queries := []query.SearchQuery{
+		idQuery, externalIDQuery, withPolicyQuery,
+	}
+	// As this is only used in the v1 ZITADEL API for SAML, we only allow links with a login policy
 	links, err := h.queries.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
 	if err != nil {
 		return "", err

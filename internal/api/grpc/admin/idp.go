@@ -110,6 +110,7 @@ func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) 
 	if err != nil {
 		return nil, err
 	}
+	// We remove all links, with and without a login policy
 	userLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
 		Queries: []query.SearchQuery{idpQuery},
 	}, true)

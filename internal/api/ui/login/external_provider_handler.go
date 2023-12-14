@@ -106,6 +106,7 @@ func (l *Login) handleExternalLoginStep(w http.ResponseWriter, r *http.Request, 
 			return
 		}
 	}
+	// TODO: PreconditionFailed?
 	l.renderLogin(w, r, authReq, zerrors.ThrowInvalidArgument(nil, "VIEW-Fsj7f", "Errors.User.ExternalIDP.NotAllowed"))
 }
 
@@ -333,6 +334,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		l.renderLogin(w, r, authReq, zerrors.ThrowInvalidArgument(nil, "LOGIN-SFefg", "Errors.ExternalIDP.IDPTypeNotImplemented"))
 		return
 	}
+
 	user, err := session.FetchUser(r.Context())
 	if err != nil {
 		l.externalAuthFailed(w, r, authReq, tokens(session), user, err)
@@ -391,10 +393,6 @@ func (l *Login) handleExternalUserAuthenticated(
 	user idp.User,
 	callback func(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest),
 ) {
-	if err := l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, provider.ID, authReq.AgentID); err != nil {
-		l.externalAuthFailed(w, r, authReq, tokens(session), nil, err)
-		return
-	}
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
 	// check and fill in local linked user
 	externalErr := l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r), false)
@@ -779,6 +777,9 @@ func (l *Login) updateExternalUsername(ctx context.Context, user *query.User, ex
 	links, err := l.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{externalIDQuery, idpIDQuery, userIDQuery}}, false)
 	if err != nil || len(links.Links) == 0 {
 		return err
+	}
+	if !links.Links[0].HasLoginPolicy {
+		return zerrors.ThrowPreconditionFailedf(nil, "LOGIN-321xR", "Errors.User.ExternalIDP.NotAllowed")
 	}
 	if links.Links[0].ProvidedUsername == externalUser.PreferredUsername {
 		return nil
@@ -1244,6 +1245,7 @@ func (l *Login) getUserLinks(ctx context.Context, userID, idpID string) (*query.
 	if err != nil {
 		return nil, err
 	}
+	// If we find a link without a login policy, we should return an error
 	return l.query.IDPUserLinks(ctx,
 		&query.IDPUserLinksSearchQuery{
 			Queries: []query.SearchQuery{
