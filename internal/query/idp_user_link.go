@@ -87,6 +87,10 @@ var (
 		name:  projection.IDPUserLinkOwnerRemovedCol,
 		table: idpUserLinkTable,
 	}
+	IDPUserLinkActiveCol = Column{
+		name:  projection.IDPUserLinkActiveCol,
+		table: idpUserLinkTable,
+	}
 )
 
 func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQuery, withOwnerRemoved bool) (idps *IDPUserLinks, err error) {
