@@ -83,7 +83,7 @@
                 [preferredLoginName]="user.preferredLoginName"
                 [disabled]="(canWrite$ | async) === false"
                 [genders]="genders"
-                [languages]="languages"
+                [languages]="(langSvc.supported$ | async) || []"
                 [username]="user.userName"
                 [user]="user.human"
                 (submitData)="saveProfile($event)"

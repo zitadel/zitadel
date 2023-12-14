@@ -2,7 +2,7 @@ package migrate
 
 import (
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type encryptionKeyConfig struct {
@@ -63,7 +63,7 @@ func verifyDefaultKeys(keyStorage crypto.KeyStorage) (err error) {
 		return nil
 	}
 	if err := keyStorage.CreateKeys(keys...); err != nil {
-		return errors.ThrowInternal(err, "MIGRA-aGBq2", "cannot create default keys")
+		return zerrors.ThrowInternal(err, "MIGRA-aGBq2", "cannot create default keys")
 	}
 	return nil
 }

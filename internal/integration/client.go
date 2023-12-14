@@ -8,6 +8,7 @@ import (
 
 	crewjam_saml "github.com/crewjam/saml"
 	"github.com/muhlemmer/gu"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -59,8 +60,8 @@ func newClient(cc *grpc.ClientConn) Client {
 	}
 }
 
-func (t *Tester) UseIsolatedInstance(iamOwnerCtx, systemCtx context.Context) (primaryDomain, instanceId string, authenticatedIamOwnerCtx context.Context) {
-	primaryDomain = randString(5) + ".integration.localhost"
+func (t *Tester) UseIsolatedInstance(tt *testing.T, iamOwnerCtx, systemCtx context.Context) (primaryDomain, instanceId string, authenticatedIamOwnerCtx context.Context) {
+	primaryDomain = RandString(5) + ".integration.localhost"
 	instance, err := t.Client.System.CreateInstance(systemCtx, &system.CreateInstanceRequest{
 		InstanceName: "testinstance",
 		CustomDomain: primaryDomain,
@@ -80,13 +81,33 @@ func (t *Tester) UseIsolatedInstance(iamOwnerCtx, systemCtx context.Context) (pr
 	t.Users.Set(instanceId, IAMOwner, &User{
 		Token: instance.GetPat(),
 	})
-	return primaryDomain, instanceId, t.WithInstanceAuthorization(iamOwnerCtx, IAMOwner, instanceId)
+	newCtx := t.WithInstanceAuthorization(iamOwnerCtx, IAMOwner, instanceId)
+	// the following serves two purposes:
+	// 1. it ensures that the instance is ready to be used
+	// 2. it enables a normal login with the default admin user credentials
+	require.EventuallyWithT(tt, func(collectT *assert.CollectT) {
+		_, importErr := t.Client.Mgmt.ImportHumanUser(newCtx, &mgmt.ImportHumanUserRequest{
+			UserName: "zitadel-admin@zitadel.localhost",
+			Email: &mgmt.ImportHumanUserRequest_Email{
+				Email:           "zitadel-admin@zitadel.localhost",
+				IsEmailVerified: true,
+			},
+			Password: "Password1!",
+			Profile: &mgmt.ImportHumanUserRequest_Profile{
+				FirstName: "hodor",
+				LastName:  "hodor",
+				NickName:  "hodor",
+			},
+		})
+		assert.NoError(collectT, importErr)
+	}, 2*time.Minute, 100*time.Millisecond, "instance not ready")
+	return primaryDomain, instanceId, newCtx
 }
 
 func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse {
 	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user.AddHumanUserRequest{
-		Organisation: &object.Organisation{
-			Org: &object.Organisation_OrgId{
+		Organization: &object.Organization{
+			Org: &object.Organization_OrgId{
 				OrgId: s.Organisation.ID,
 			},
 		},

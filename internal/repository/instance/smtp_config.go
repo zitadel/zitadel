@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -69,7 +69,7 @@ func SMTPConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error
 	}
 	err := event.Unmarshal(smtpConfigAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-39fks", "unable to unmarshal smtp config added")
+		return nil, zerrors.ThrowInternal(err, "IAM-39fks", "unable to unmarshal smtp config added")
 	}
 
 	return smtpConfigAdded, nil
@@ -100,7 +100,7 @@ func NewSMTPConfigChangeEvent(
 	changes []SMTPConfigChanges,
 ) (*SMTPConfigChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IAM-o0pWf", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-o0pWf", "Errors.NoChangesFound")
 	}
 	changeEvent := &SMTPConfigChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -160,7 +160,7 @@ func SMTPConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, err
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-m09oo", "unable to unmarshal smtp changed")
+		return nil, zerrors.ThrowInternal(err, "IAM-m09oo", "unable to unmarshal smtp changed")
 	}
 
 	return e, nil
@@ -201,7 +201,7 @@ func SMTPConfigPasswordChangedEventMapper(event eventstore.Event) (eventstore.Ev
 	}
 	err := event.Unmarshal(smtpConfigPasswordChagned)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-99iNF", "unable to unmarshal smtp config password changed")
+		return nil, zerrors.ThrowInternal(err, "IAM-99iNF", "unable to unmarshal smtp config password changed")
 	}
 
 	return smtpConfigPasswordChagned, nil
@@ -238,7 +238,7 @@ func SMTPConfigRemovedEventMapper(event eventstore.Event) (eventstore.Event, err
 	}
 	err := event.Unmarshal(smtpConfigRemoved)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-DVw1s", "unable to unmarshal smtp config removed")
+		return nil, zerrors.ThrowInternal(err, "IAM-DVw1s", "unable to unmarshal smtp config removed")
 	}
 
 	return smtpConfigRemoved, nil

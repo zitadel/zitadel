@@ -11,9 +11,9 @@ import (
 
 	"github.com/dop251/goja"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/record"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func Test_isHostBlocked(t *testing.T) {
@@ -208,7 +208,7 @@ func TestHTTP_fetchConfigFromArg(t *testing.T) {
 			},
 			wantConfig: fetchConfig{},
 			wantErr: func(err error) bool {
-				return errors.IsErrorInvalidArgument(err)
+				return zerrors.IsErrorInvalidArgument(err)
 			},
 		},
 	}

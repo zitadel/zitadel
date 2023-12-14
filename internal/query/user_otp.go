@@ -5,10 +5,10 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (q *Queries) GetHumanOTPSecret(ctx context.Context, userID, resourceowner string) (_ string, err error) {
@@ -16,14 +16,14 @@ func (q *Queries) GetHumanOTPSecret(ctx context.Context, userID, resourceowner s
 	defer func() { span.EndWithError(err) }()
 
 	if userID == "" {
-		return "", errors.ThrowPreconditionFailed(nil, "QUERY-8N9ds", "Errors.User.UserIDMissing")
+		return "", zerrors.ThrowPreconditionFailed(nil, "QUERY-8N9ds", "Errors.User.UserIDMissing")
 	}
 	existingOTP, err := q.otpReadModelByID(ctx, userID, resourceowner)
 	if err != nil {
 		return "", err
 	}
 	if existingOTP.State != domain.MFAStateReady {
-		return "", errors.ThrowNotFound(nil, "QUERY-01982h", "Errors.User.NotFound")
+		return "", zerrors.ThrowNotFound(nil, "QUERY-01982h", "Errors.User.NotFound")
 	}
 
 	return crypto.DecryptString(existingOTP.Secret, q.multifactors.OTP.CryptoMFA)

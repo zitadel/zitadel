@@ -54,7 +54,7 @@ func (l *Login) renderRegisterOption(w http.ResponseWriter, r *http.Request, aut
 	}
 	translator := l.getTranslator(r.Context(), authReq)
 	data := registerOptionData{
-		baseData: l.getBaseData(r, authReq, "RegisterOption.Title", "RegisterOption.Description", errID, errMessage),
+		baseData: l.getBaseData(r, authReq, translator, "RegisterOption.Title", "RegisterOption.Description", errID, errMessage),
 	}
 	funcs := map[string]interface{}{
 		"hasRegistration": func() bool {

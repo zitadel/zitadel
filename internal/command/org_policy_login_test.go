@@ -8,13 +8,13 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -96,7 +96,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -190,7 +190,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -301,7 +301,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -451,7 +451,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -509,7 +509,7 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -642,7 +642,7 @@ func TestCommandSide_RemoveLoginPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -658,7 +658,7 @@ func TestCommandSide_RemoveLoginPolicy(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -761,7 +761,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -777,7 +777,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 				provider:      &domain.IDPProvider{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -798,7 +798,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -843,7 +843,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -908,7 +908,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -1037,7 +1037,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1053,7 +1053,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 				provider:      &domain.IDPProvider{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1072,7 +1072,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1117,7 +1117,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1174,7 +1174,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1435,7 +1435,7 @@ func TestCommandSide_AddSecondFactorLoginPolicy(t *testing.T) {
 				factor: domain.SecondFactorTypeU2F,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1450,7 +1450,7 @@ func TestCommandSide_AddSecondFactorLoginPolicy(t *testing.T) {
 				factor: domain.SecondFactorTypeUnspecified,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1474,7 +1474,7 @@ func TestCommandSide_AddSecondFactorLoginPolicy(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -1623,7 +1623,7 @@ func TestCommandSide_RemoveSecondFactoroginPolicy(t *testing.T) {
 				factor: domain.SecondFactorTypeTOTP,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1638,7 +1638,7 @@ func TestCommandSide_RemoveSecondFactoroginPolicy(t *testing.T) {
 				factor: domain.SecondFactorTypeUnspecified,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1655,7 +1655,7 @@ func TestCommandSide_RemoveSecondFactoroginPolicy(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1685,7 +1685,7 @@ func TestCommandSide_RemoveSecondFactoroginPolicy(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1715,7 +1715,7 @@ func TestCommandSide_RemoveSecondFactoroginPolicy(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1745,7 +1745,7 @@ func TestCommandSide_RemoveSecondFactoroginPolicy(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1889,7 +1889,7 @@ func TestCommandSide_AddMultiFactorLoginPolicy(t *testing.T) {
 				factor: domain.MultiFactorTypeU2FWithPIN,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1904,7 +1904,7 @@ func TestCommandSide_AddMultiFactorLoginPolicy(t *testing.T) {
 				factor: domain.MultiFactorTypeUnspecified,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1928,7 +1928,7 @@ func TestCommandSide_AddMultiFactorLoginPolicy(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -2004,7 +2004,7 @@ func TestCommandSide_RemoveMultiFactorLoginPolicy(t *testing.T) {
 				factor: domain.MultiFactorTypeU2FWithPIN,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -2019,7 +2019,7 @@ func TestCommandSide_RemoveMultiFactorLoginPolicy(t *testing.T) {
 				factor: domain.MultiFactorTypeUnspecified,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -2036,7 +2036,7 @@ func TestCommandSide_RemoveMultiFactorLoginPolicy(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -2066,7 +2066,7 @@ func TestCommandSide_RemoveMultiFactorLoginPolicy(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{

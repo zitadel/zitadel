@@ -2,9 +2,9 @@ package admin
 
 import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	milestone_pb "github.com/zitadel/zitadel/pkg/grpc/milestone"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -48,7 +48,7 @@ func milestoneQueryToModel(milestoneQuery *milestone_pb.MilestoneQuery) (query.S
 		}
 		return query.NewIsNullQuery(query.MilestoneReachedDateColID)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ADMIN-sE7pc", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ADMIN-sE7pc", "List.Query.Invalid")
 	}
 }
 

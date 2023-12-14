@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"reflect"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type OrgMember struct {
@@ -34,7 +34,7 @@ func (m *OrgMember) AppendEvent(event *es_models.Event) error {
 func (m *OrgMember) SetData(event *es_models.Event) error {
 	err := json.Unmarshal(event.Data, m)
 	if err != nil {
-		return errors.ThrowInternal(err, "EVENT-Hz7Mb", "unable to unmarshal data")
+		return zerrors.ThrowInternal(err, "EVENT-Hz7Mb", "unable to unmarshal data")
 	}
 	return nil
 }

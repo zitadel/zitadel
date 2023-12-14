@@ -6,8 +6,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/repository/idp"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type GenericOAuthProvider struct {
@@ -167,7 +167,7 @@ func IDPProviderWriteModel(ctx context.Context, filter preparation.FilterToQuery
 		return nil, err
 	}
 	if len(events) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-as02jin", "Errors.IDPConfig.NotExisting")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-as02jin", "Errors.IDPConfig.NotExisting")
 	}
 	writeModel.AppendEvents(events...)
 	if err := writeModel.Reduce(); err != nil {

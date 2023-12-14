@@ -1,8 +1,8 @@
 import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
-import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { FormControl, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, from, interval, Observable, of, Subject, Subscription, switchMap, take, tap } from 'rxjs';
 import { map, pairwise, startWith, takeUntil } from 'rxjs/operators';
 import {
   GetCustomLoginTextsRequest as AdminGetCustomLoginTextsRequest,
@@ -19,11 +19,11 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { supportedLanguages } from 'src/app/utils/language';
 import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { mapRequestValues } from './helper';
+import { LanguagesService } from '../../../services/languages.service';
 
 const MIN_INTERVAL_SECONDS = 10; // if the difference of a newer version to the current exceeds this time, a refresh button is shown.
 
@@ -110,7 +110,6 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
   @Input() public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
   public KeyNamesArray: string[] = KeyNamesArray;
-  public LOCALES: string[] = supportedLanguages;
 
   private sub: Subscription = new Subscription();
 
@@ -119,9 +118,15 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
   public destroy$: Subject<void> = new Subject();
   public InfoSectionType: any = InfoSectionType;
   public form: UntypedFormGroup = new UntypedFormGroup({
-    currentSubMap: new UntypedFormControl('emailVerificationDoneText'),
-    locale: new UntypedFormControl('en'),
+    currentSubMap: new FormControl<string>('emailVerificationDoneText'),
+    language: new FormControl<string>('en'),
   });
+  public allowed$: Observable<string[]> = this.langSvc.allowed$.pipe(
+    take(1),
+    tap(([firstAllowed]) => {
+      this.form.get('language')?.setValue(firstAllowed);
+    }),
+  );
 
   public isDefault: boolean = false;
 
@@ -137,9 +142,10 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     private injector: Injector,
     private dialog: MatDialog,
     private toast: ToastService,
+    public langSvc: LanguagesService,
   ) {
     this.form.valueChanges
-      .pipe(startWith({ currentSubMap: 'emailVerificationDoneText', locale: 'en' }), pairwise(), takeUntil(this.destroy$))
+      .pipe(startWith({ currentSubMap: 'emailVerificationDoneText', language: 'en' }), pairwise(), takeUntil(this.destroy$))
       .subscribe((pair) => {
         this.checkForUnsaved(pair[0].currentSubMap).then((wantsToSave) => {
           if (wantsToSave) {
@@ -162,21 +168,9 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         this.service = this.injector.get(ManagementService as Type<ManagementService>);
-
-        this.service.getSupportedLanguages().then((lang) => {
-          this.LOCALES = lang.languagesList;
-        });
-
-        this.loadData();
         break;
       case PolicyComponentServiceType.ADMIN:
         this.service = this.injector.get(AdminService as Type<AdminService>);
-
-        this.service.getSupportedLanguages().then((lang) => {
-          this.LOCALES = lang.languagesList;
-        });
-
-        this.loadData();
         break;
     }
 
@@ -215,10 +209,10 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
   public async loadData(): Promise<any> {
     this.loading = true;
     const reqDefaultInit = REQUESTMAP[this.serviceType].getDefault;
-    reqDefaultInit.setLanguage(this.locale);
+    reqDefaultInit.setLanguage(this.language);
     this.getDefaultInitMessageTextMap$ = from(this.getDefaultValues(reqDefaultInit)).pipe(map((m) => m[this.currentSubMap]));
 
-    const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.locale);
+    const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.language);
     return this.getCurrentValues(reqCustomInit)
       .then((policy) => {
         this.loading = false;
@@ -236,14 +230,14 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
   }
 
   private async patchSingleCurrentMap(): Promise<any> {
-    const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.locale);
+    const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.language);
     this.getCurrentValues(reqCustomInit).then((policy) => {
       this.getCustomInitMessageTextMap$.next(policy[this.currentSubMap]);
     });
   }
 
   public checkForChanges(): void {
-    const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.locale);
+    const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.language);
 
     (this.service as ManagementService).getCustomLoginTexts(reqCustomInit).then((policy) => {
       this.newerPolicyChangeDate = policy.customText?.details?.changeDate;
@@ -282,7 +276,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
       this.totalCustomPolicy[this.currentSubMap] = values;
 
       this.updateRequest = setFcn(this.totalCustomPolicy);
-      this.updateRequest.setLanguage(this.locale);
+      this.updateRequest.setLanguage(this.language);
     }
   }
 
@@ -350,7 +344,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
       if (resp) {
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
           (this.service as ManagementService)
-            .resetCustomLoginTextToDefault(this.locale)
+            .resetCustomLoginTextToDefault(this.language)
             .then(() => {
               this.updateCurrentPolicyDate();
               this.isDefault = true;
@@ -363,7 +357,7 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
             });
         } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
           (this.service as AdminService)
-            .resetCustomLoginTextToDefault(this.locale)
+            .resetCustomLoginTextToDefault(this.language)
             .then(() => {
               this.updateCurrentPolicyDate();
               setTimeout(() => {
@@ -397,8 +391,12 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     }
   }
 
-  public get locale(): string {
-    return this.form.get('locale')?.value;
+  public get language(): string {
+    return this.form.get('language')?.value;
+  }
+
+  public set language(lang: string) {
+    this.form.get('language')?.setValue(lang);
   }
 
   public get currentSubMap(): string {

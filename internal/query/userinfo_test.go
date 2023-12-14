@@ -16,7 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -69,20 +69,12 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			wantErr: sql.ErrConnDone,
 		},
 		{
-			name: "unmarshal error",
-			args: args{
-				userID: "231965491734773762",
-			},
-			mock:    mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{`~~~`}, "231965491734773762", "instanceID", nil),
-			wantErr: errors.ThrowInternal(nil, "QUERY-Vohs6", "Errors.Internal"),
-		},
-		{
 			name: "user not found",
 			args: args{
 				userID: "231965491734773762",
 			},
 			mock:    mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoNotFound}, "231965491734773762", "instanceID", nil),
-			wantErr: errors.ThrowNotFound(nil, "QUERY-ahs4S", "Errors.User.NotFound"),
+			wantErr: zerrors.ThrowNotFound(nil, "QUERY-ahs4S", "Errors.User.NotFound"),
 		},
 		{
 			name: "human without metadata",

@@ -2,7 +2,7 @@ package user
 
 import (
 	"context"
-	errs "errors"
+	"errors"
 	"io"
 
 	"golang.org/x/text/language"
@@ -14,10 +14,10 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
@@ -28,8 +28,7 @@ func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest
 		return nil, err
 	}
 	orgID := authz.GetCtxData(ctx).OrgID
-	err = s.command.AddHuman(ctx, orgID, human, false)
-	if err != nil {
+	if err = s.command.AddHuman(ctx, orgID, human, false); err != nil {
 		return nil, err
 	}
 	return &user.AddHumanUserResponse{
@@ -136,7 +135,7 @@ func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *user.Star
 	case *user.StartIdentityProviderIntentRequest_Ldap:
 		return s.startLDAPIntent(ctx, req.GetIdpId(), t.Ldap)
 	default:
-		return nil, errors.ThrowUnimplementedf(nil, "USERv2-S2g21", "type oneOf %T in method StartIdentityProviderIntent not implemented", t)
+		return nil, zerrors.ThrowUnimplementedf(nil, "USERv2-S2g21", "type oneOf %T in method StartIdentityProviderIntent not implemented", t)
 	}
 }
 
@@ -221,12 +220,12 @@ func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string
 	}
 	ldapProvider, ok := provider.(*ldap.Provider)
 	if !ok {
-		return nil, "", nil, errors.ThrowInvalidArgument(nil, "IDP-9a02j2n2bh", "Errors.ExternalIDP.IDPTypeNotImplemented")
+		return nil, "", nil, zerrors.ThrowInvalidArgument(nil, "IDP-9a02j2n2bh", "Errors.ExternalIDP.IDPTypeNotImplemented")
 	}
 	session := ldapProvider.GetSession(username, password)
 	externalUser, err := session.FetchUser(ctx)
-	if errs.Is(err, ldap.ErrFailedLogin) || errs.Is(err, ldap.ErrNoSingleUser) {
-		return nil, "", nil, errors.ThrowInvalidArgument(nil, "COMMAND-nzun2i", "Errors.User.ExternalIDP.LoginFailed")
+	if errors.Is(err, ldap.ErrFailedLogin) || errors.Is(err, ldap.ErrNoSingleUser) {
+		return nil, "", nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-nzun2i", "Errors.User.ExternalIDP.LoginFailed")
 	}
 	if err != nil {
 		return nil, "", nil, err
@@ -252,7 +251,7 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.R
 		return nil, err
 	}
 	if intent.State != domain.IDPIntentStateSucceeded {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDP-Hk38e", "Errors.Intent.NotSucceeded")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-Hk38e", "Errors.Intent.NotSucceeded")
 	}
 	return idpIntentToIDPIntentPb(intent, s.idpAlg)
 }

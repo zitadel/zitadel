@@ -9,9 +9,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // ChangeUserEmail sets a user's email address, generates a code
@@ -125,7 +125,7 @@ type UserEmailEvents struct {
 // If a model cannot be found, or it's state is invalid and error is returned.
 func (c *Commands) NewUserEmailEvents(ctx context.Context, userID, resourceOwner string) (*UserEmailEvents, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing")
 	}
 
 	model, err := c.emailWriteModel(ctx, userID, resourceOwner)
@@ -133,10 +133,10 @@ func (c *Commands) NewUserEmailEvents(ctx context.Context, userID, resourceOwner
 		return nil, err
 	}
 	if model.UserState == domain.UserStateUnspecified || model.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-ieJ2e", "Errors.User.Email.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-ieJ2e", "Errors.User.Email.NotFound")
 	}
 	if model.UserState == domain.UserStateInitial {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-uz0Uu", "Errors.User.NotInitialised")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-uz0Uu", "Errors.User.NotInitialised")
 	}
 	return &UserEmailEvents{
 		eventstore: c.eventstore,
@@ -153,7 +153,7 @@ func (c *UserEmailEvents) Change(ctx context.Context, email domain.EmailAddress)
 	}
 	event, hasChanged := c.model.NewChangedEvent(ctx, c.aggregate, email)
 	if !hasChanged {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Email.NotChanged")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Email.NotChanged")
 	}
 	c.events = append(c.events, event)
 	return nil
@@ -181,7 +181,7 @@ func (c *UserEmailEvents) AddGeneratedCode(ctx context.Context, gen crypto.Gener
 
 func (c *UserEmailEvents) VerifyCode(ctx context.Context, code string, gen crypto.Generator) error {
 	if code == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty")
 	}
 
 	err := crypto.VerifyCode(c.model.CodeCreationDate, c.model.CodeExpiry, c.model.Code, code, gen)
@@ -191,7 +191,7 @@ func (c *UserEmailEvents) VerifyCode(ctx context.Context, code string, gen crypt
 	}
 	_, err = c.eventstore.Push(ctx, user.NewHumanEmailVerificationFailedEvent(ctx, c.aggregate))
 	logging.WithFields("id", "COMMAND-Zoo6b", "userID", c.aggregate.ID).OnError(err).Error("NewHumanEmailVerificationFailedEvent push failed")
-	return caos_errs.ThrowInvalidArgument(err, "COMMAND-eis9R", "Errors.User.Code.Invalid")
+	return zerrors.ThrowInvalidArgument(err, "COMMAND-eis9R", "Errors.User.Code.Invalid")
 }
 
 // Push all events to the eventstore and Reduce them into the Model.

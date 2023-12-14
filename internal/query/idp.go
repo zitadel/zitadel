@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -15,10 +15,10 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type IDP struct {
@@ -219,7 +219,7 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk
 	stmt, scan := prepareIDPByIDQuery(ctx, q.client)
 	query, args, err := stmt.Where(where).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-0gocI", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-0gocI", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -243,7 +243,7 @@ func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries, withOwner
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-X6X7y", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-X6X7y", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -251,7 +251,7 @@ func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries, withOwner
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-xPlVH", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-xPlVH", "Errors.Internal")
 	}
 	idps.State, err = q.latestState(ctx, idpTable)
 	return idps, err
@@ -370,10 +370,10 @@ func prepareIDPByIDQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&jwtEndpoint,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-rhR2o", "Errors.IDPConfig.NotExisting")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-rhR2o", "Errors.IDPConfig.NotExisting")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-zE3Ro", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-zE3Ro", "Errors.Internal")
 			}
 
 			if oidcIDPID.Valid {
@@ -515,7 +515,7 @@ func prepareIDPsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-iiBgK", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-iiBgK", "Errors.Query.CloseRows")
 			}
 
 			return &IDPs{
@@ -539,5 +539,5 @@ func (q *Queries) GetOIDCIDPClientSecret(ctx context.Context, shouldRealTime boo
 	if idp.ClientSecret != nil && idp.ClientSecret.Crypted != nil {
 		return crypto.DecryptString(idp.ClientSecret, q.idpConfigEncryption)
 	}
-	return "", errors.ThrowNotFound(nil, "QUERY-bsm2o", "Errors.Query.NotFound")
+	return "", zerrors.ThrowNotFound(nil, "QUERY-bsm2o", "Errors.Query.NotFound")
 }

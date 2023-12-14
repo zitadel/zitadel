@@ -5,7 +5,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestPrepareSearchQuery(t *testing.T) {
@@ -126,7 +126,7 @@ func TestPrepareSearchQuery(t *testing.T) {
 			res{
 				count:   1,
 				wantErr: true,
-				errFunc: caos_errs.IsInternal,
+				errFunc: zerrors.IsInternal,
 			},
 		},
 	}

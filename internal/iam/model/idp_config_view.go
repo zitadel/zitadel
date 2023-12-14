@@ -1,11 +1,11 @@
 package model
 
 import (
+	"time"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
-
-	"time"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type IDPConfigView struct {
@@ -72,7 +72,7 @@ type IDPConfigSearchResponse struct {
 
 func (r *IDPConfigSearchRequest) EnsureLimit(limit uint64) error {
 	if r.Limit > limit {
-		return caos_errors.ThrowInvalidArgument(nil, "SEARCH-Mv9sd", "Errors.Limit.ExceedsDefault")
+		return zerrors.ThrowInvalidArgument(nil, "SEARCH-Mv9sd", "Errors.Limit.ExceedsDefault")
 	}
 	if r.Limit == 0 {
 		r.Limit = limit

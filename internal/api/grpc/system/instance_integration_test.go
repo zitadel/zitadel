@@ -13,7 +13,7 @@ import (
 )
 
 func TestServer_ListInstances(t *testing.T) {
-	domain, instanceID, _ := Tester.UseIsolatedInstance(CTX, SystemCTX)
+	domain, instanceID, _ := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
 
 	tests := []struct {
 		name    string

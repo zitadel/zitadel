@@ -8,8 +8,8 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -86,7 +86,7 @@ func (q *Queries) SearchFailedEvents(ctx context.Context, queries *FailedEventSe
 	query, scan := prepareFailedEventsQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-n8rjJ", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-n8rjJ", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -94,7 +94,7 @@ func (q *Queries) SearchFailedEvents(ctx context.Context, queries *FailedEventSe
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-3j99J", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-3j99J", "Errors.Internal")
 	}
 	return failedEvents, nil
 }
@@ -109,11 +109,11 @@ func (q *Queries) RemoveFailedEvent(ctx context.Context, projectionName, instanc
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return errors.ThrowInternal(err, "QUERY-DGgh3", "Errors.RemoveFailed")
+		return zerrors.ThrowInternal(err, "QUERY-DGgh3", "Errors.RemoveFailed")
 	}
 	_, err = q.client.ExecContext(ctx, stmt, args...)
 	if err != nil {
-		return errors.ThrowInternal(err, "QUERY-0kbFF", "Errors.RemoveFailed")
+		return zerrors.ThrowInternal(err, "QUERY-0kbFF", "Errors.RemoveFailed")
 	}
 	return nil
 }
@@ -175,7 +175,7 @@ func prepareFailedEventsQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-En99f", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-En99f", "Errors.Query.CloseRows")
 			}
 
 			return &FailedEvents{

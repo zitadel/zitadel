@@ -3,8 +3,8 @@ package instance
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -25,7 +25,7 @@ func NewSecurityPolicySetEvent(
 	changes []SecurityPolicyChanges,
 ) (*SecurityPolicySetEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-EWsf3", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "POLICY-EWsf3", "Errors.NoChangesFound")
 	}
 	event := &SecurityPolicySetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -71,7 +71,7 @@ func SecurityPolicySetEventMapper(event eventstore.Event) (eventstore.Event, err
 	}
 	err := event.Unmarshal(securityPolicyAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-soiwj", "unable to unmarshal oidc config added")
+		return nil, zerrors.ThrowInternal(err, "IAM-soiwj", "unable to unmarshal oidc config added")
 	}
 
 	return securityPolicyAdded, nil

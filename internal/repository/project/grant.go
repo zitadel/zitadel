@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -74,7 +74,7 @@ func GrantAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-mL0vs", "unable to unmarshal project grant")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-mL0vs", "unable to unmarshal project grant")
 	}
 
 	return e, nil
@@ -119,7 +119,7 @@ func GrantChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-mL0vs", "unable to unmarshal project grant")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-mL0vs", "unable to unmarshal project grant")
 	}
 
 	return e, nil
@@ -164,7 +164,7 @@ func GrantCascadeChangedEventMapper(event eventstore.Event) (eventstore.Event, e
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-9o0se", "unable to unmarshal project grant")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-9o0se", "unable to unmarshal project grant")
 	}
 
 	return e, nil
@@ -206,7 +206,7 @@ func GrantDeactivateEventMapper(event eventstore.Event) (eventstore.Event, error
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-9o0se", "unable to unmarshal project grant")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-9o0se", "unable to unmarshal project grant")
 	}
 
 	return e, nil
@@ -248,7 +248,7 @@ func GrantReactivatedEventMapper(event eventstore.Event) (eventstore.Event, erro
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-78f7D", "unable to unmarshal project grant")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-78f7D", "unable to unmarshal project grant")
 	}
 
 	return e, nil
@@ -293,7 +293,7 @@ func GrantRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-28jM8", "unable to unmarshal project grant")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-28jM8", "unable to unmarshal project grant")
 	}
 
 	return e, nil

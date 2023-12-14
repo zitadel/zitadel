@@ -7,9 +7,9 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddSecretGeneratorConfig(ctx context.Context, typ domain.SecretGeneratorType, config *crypto.GeneratorConfig) (*domain.ObjectDetails, error) {
@@ -33,10 +33,10 @@ func (c *Commands) AddSecretGeneratorConfig(ctx context.Context, typ domain.Secr
 func prepareAddSecretGeneratorConfig(a *instance.Aggregate, typ domain.SecretGeneratorType, config *crypto.GeneratorConfig) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if !typ.Valid() {
-			return nil, errors.ThrowInvalidArgument(nil, "V2-FGqVj", "Errors.InvalidArgument")
+			return nil, zerrors.ThrowInvalidArgument(nil, "V2-FGqVj", "Errors.InvalidArgument")
 		}
 		if config.Length < 1 {
-			return nil, errors.ThrowInvalidArgument(nil, "V2-jEqCt", "Errors.InvalidArgument")
+			return nil, zerrors.ThrowInvalidArgument(nil, "V2-jEqCt", "Errors.InvalidArgument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewInstanceSecretGeneratorConfigWriteModel(ctx, typ)
@@ -50,7 +50,7 @@ func prepareAddSecretGeneratorConfig(a *instance.Aggregate, typ domain.SecretGen
 			}
 
 			if writeModel.State == domain.SecretGeneratorStateActive {
-				return nil, errors.ThrowAlreadyExists(nil, "V2-6CqKo", "Errors.SecretGenerator.AlreadyExists")
+				return nil, zerrors.ThrowAlreadyExists(nil, "V2-6CqKo", "Errors.SecretGenerator.AlreadyExists")
 			}
 
 			return []eventstore.Command{
@@ -72,7 +72,7 @@ func prepareAddSecretGeneratorConfig(a *instance.Aggregate, typ domain.SecretGen
 
 func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, generatorType domain.SecretGeneratorType, config *crypto.GeneratorConfig) (*domain.ObjectDetails, error) {
 	if generatorType == domain.SecretGeneratorTypeUnspecified {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-33k9f", "Errors.SecretGenerator.TypeMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-33k9f", "Errors.SecretGenerator.TypeMissing")
 	}
 
 	generatorWriteModel, err := c.getSecretConfig(ctx, generatorType)
@@ -114,7 +114,7 @@ func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, generatorTyp
 		return nil, err
 	}
 	if !hasChanged {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-m0o3f", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-m0o3f", "Errors.NoChangesFound")
 	}
 	if err = c.pushAppendAndReduce(ctx, generatorWriteModel, changedEvent); err != nil {
 		return nil, err
@@ -124,7 +124,7 @@ func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, generatorTyp
 
 func (c *Commands) RemoveSecretGeneratorConfig(ctx context.Context, generatorType domain.SecretGeneratorType) (*domain.ObjectDetails, error) {
 	if generatorType == domain.SecretGeneratorTypeUnspecified {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-2j9lw", "Errors.SecretGenerator.TypeMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-2j9lw", "Errors.SecretGenerator.TypeMissing")
 	}
 
 	generatorWriteModel, err := c.getSecretConfig(ctx, generatorType)
@@ -132,7 +132,7 @@ func (c *Commands) RemoveSecretGeneratorConfig(ctx context.Context, generatorTyp
 		return nil, err
 	}
 	if generatorWriteModel.State == domain.SecretGeneratorStateUnspecified || generatorWriteModel.State == domain.SecretGeneratorStateRemoved {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-b8les", "Errors.SecretGenerator.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-b8les", "Errors.SecretGenerator.NotFound")
 	}
 	instanceAgg := InstanceAggregateFromWriteModel(&generatorWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSecretGeneratorRemovedEvent(ctx, instanceAgg, generatorType))

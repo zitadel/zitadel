@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -76,7 +76,7 @@ func AddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ACTION-4n8vs", "unable to unmarshal action added")
+		return nil, zerrors.ThrowInternal(err, "ACTION-4n8vs", "unable to unmarshal action added")
 	}
 
 	return e, nil
@@ -112,7 +112,7 @@ func NewChangedEvent(
 	changes []ActionChanges,
 ) (*ChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "ACTION-dg4t2", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "ACTION-dg4t2", "Errors.NoChangesFound")
 	}
 	changeEvent := &ChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -161,7 +161,7 @@ func ChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ACTION-4n8vs", "unable to unmarshal action changed")
+		return nil, zerrors.ThrowInternal(err, "ACTION-4n8vs", "unable to unmarshal action changed")
 	}
 
 	return e, nil

@@ -3,11 +3,11 @@ package view
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -44,7 +44,7 @@ func (v *View) PutUserSessions(userSession []*model.UserSessionView) error {
 
 func (v *View) DeleteUserSessions(userID, instanceID string) error {
 	err := view.DeleteUserSessions(v.Db, userSessionTable, userID, instanceID)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
 	return nil
@@ -52,7 +52,7 @@ func (v *View) DeleteUserSessions(userID, instanceID string) error {
 
 func (v *View) DeleteInstanceUserSessions(instanceID string) error {
 	err := view.DeleteInstanceUserSessions(v.Db, userSessionTable, instanceID)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
 	return nil
@@ -60,7 +60,7 @@ func (v *View) DeleteInstanceUserSessions(instanceID string) error {
 
 func (v *View) DeleteOrgUserSessions(event eventstore.Event) error {
 	err := view.DeleteOrgUserSessions(v.Db, userSessionTable, event.Aggregate().InstanceID, event.Aggregate().ResourceOwner)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
 	return nil

@@ -1,8 +1,8 @@
 package asset
 
 import (
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -42,7 +42,7 @@ func AddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ASSET-1WEAx", "unable to unmarshal asset")
+		return nil, zerrors.ThrowInternal(err, "ASSET-1WEAx", "unable to unmarshal asset")
 	}
 
 	return e, nil
@@ -80,7 +80,7 @@ func RemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ASSET-1m9PP", "unable to unmarshal asset")
+		return nil, zerrors.ThrowInternal(err, "ASSET-1m9PP", "unable to unmarshal asset")
 	}
 
 	return e, nil

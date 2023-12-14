@@ -9,9 +9,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -73,7 +73,7 @@ func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQue
 	eq := sq.Eq{ProjectMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-T8CuT", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-T8CuT", "Errors.Query.InvalidRequest")
 	}
 
 	currentSequence, err := q.latestState(ctx, projectMemberTable)
@@ -86,7 +86,7 @@ func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQue
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-uh6pj", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-uh6pj", "Errors.Internal")
 	}
 
 	members.State = currentSequence
@@ -175,7 +175,7 @@ func prepareProjectMembersQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-ZJ1Ii", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-ZJ1Ii", "Errors.Query.CloseRows")
 			}
 
 			return &Members{

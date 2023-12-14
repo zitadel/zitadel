@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Unit uint
@@ -113,7 +113,7 @@ func SetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUOTA-kmIpI", "unable to unmarshal quota set")
+		return nil, zerrors.ThrowInternal(err, "QUOTA-kmIpI", "unable to unmarshal quota set")
 	}
 
 	return e, nil
@@ -169,7 +169,7 @@ func NotificationDueEventMapper(event eventstore.Event) (eventstore.Event, error
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUOTA-k56rT", "unable to unmarshal notification due")
+		return nil, zerrors.ThrowInternal(err, "QUOTA-k56rT", "unable to unmarshal notification due")
 	}
 
 	return e, nil
@@ -228,7 +228,7 @@ func NotifiedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUOTA-4n8vs", "unable to unmarshal quota notified")
+		return nil, zerrors.ThrowInternal(err, "QUOTA-4n8vs", "unable to unmarshal quota notified")
 	}
 
 	return e, nil
@@ -269,7 +269,7 @@ func RemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUOTA-4bReE", "unable to unmarshal quota removed")
+		return nil, zerrors.ThrowInternal(err, "QUOTA-4bReE", "unable to unmarshal quota removed")
 	}
 
 	return e, nil

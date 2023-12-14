@@ -4,10 +4,10 @@ import (
 	"github.com/jinzhu/gorm"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	proj_model "github.com/zitadel/zitadel/internal/project/model"
 	"github.com/zitadel/zitadel/internal/project/repository/view/model"
 	"github.com/zitadel/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func OrgProjectMappingByIDs(db *gorm.DB, table, orgID, projectID, instanceID string) (*model.OrgProjectMapping, error) {
@@ -19,8 +19,8 @@ func OrgProjectMappingByIDs(db *gorm.DB, table, orgID, projectID, instanceID str
 	ownerRemovedQuery := model.OrgProjectMappingSearchQuery{Key: proj_model.OrgProjectMappingSearchKeyOwnerRemoved, Value: false, Method: domain.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, projectIDQuery, orgIDQuery, instanceIDQuery, ownerRemovedQuery)
 	err := query(db, orgProjectMapping)
-	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-fn9fs", "Errors.OrgProjectMapping.NotExisting")
+	if zerrors.IsNotFound(err) {
+		return nil, zerrors.ThrowNotFound(nil, "VIEW-fn9fs", "Errors.OrgProjectMapping.NotExisting")
 	}
 	return orgProjectMapping, err
 }

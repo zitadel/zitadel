@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/logging"
 
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -18,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -242,7 +242,7 @@ func agentIDFromSession(event eventstore.Event) (string, error) {
 	session := make(map[string]interface{})
 	if err := event.Unmarshal(&session); err != nil {
 		logging.WithError(err).Error("could not unmarshal event data")
-		return "", caos_errs.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
+		return "", zerrors.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
 	}
 	return session["userAgentID"].(string), nil
 }
@@ -251,7 +251,7 @@ func applicationFromSession(event eventstore.Event) (*project_es_model.Applicati
 	application := new(project_es_model.Application)
 	if err := event.Unmarshal(application); err != nil {
 		logging.WithError(err).Error("could not unmarshal event data")
-		return nil, caos_errs.ThrowInternal(nil, "MODEL-Hrw1q", "could not unmarshal data")
+		return nil, zerrors.ThrowInternal(nil, "MODEL-Hrw1q", "could not unmarshal data")
 	}
 	return application, nil
 }
@@ -260,7 +260,7 @@ func tokenIDFromRemovedEvent(event eventstore.Event) (string, error) {
 	removed := make(map[string]interface{})
 	if err := event.Unmarshal(&removed); err != nil {
 		logging.WithError(err).Error("could not unmarshal event data")
-		return "", caos_errs.ThrowInternal(nil, "MODEL-Sff32", "could not unmarshal data")
+		return "", zerrors.ThrowInternal(nil, "MODEL-Sff32", "could not unmarshal data")
 	}
 	return removed["tokenId"].(string), nil
 }
@@ -269,7 +269,7 @@ func refreshTokenIDFromRemovedEvent(event eventstore.Event) (string, error) {
 	removed := make(map[string]interface{})
 	if err := event.Unmarshal(&removed); err != nil {
 		logging.WithError(err).Error("could not unmarshal event data")
-		return "", caos_errs.ThrowInternal(nil, "MODEL-Dfb3w", "could not unmarshal data")
+		return "", zerrors.ThrowInternal(nil, "MODEL-Dfb3w", "could not unmarshal data")
 	}
 	return removed["tokenId"].(string), nil
 }
@@ -293,7 +293,7 @@ func (t *Token) getProjectByID(ctx context.Context, projID, instanceID string) (
 	}
 
 	if esProject.Sequence == 0 {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-Dsdw2", "Errors.Project.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "EVENT-Dsdw2", "Errors.Project.NotFound")
 	}
 	return project_es_model.ProjectToModel(esProject), nil
 }

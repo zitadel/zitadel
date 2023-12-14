@@ -8,8 +8,8 @@ import (
 	"github.com/dop251/goja_nodejs/require"
 	"github.com/sirupsen/logrus"
 
-	z_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Config struct {
@@ -32,7 +32,7 @@ func actionFailedMessage(err error) string {
 func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script, name string, opts ...Option) (err error) {
 	config := newRunConfig(ctx, append(opts, withLogger(ctx))...)
 	if config.functionTimeout == 0 {
-		return z_errs.ThrowInternal(nil, "ACTIO-uCpCx", "Errrors.Internal")
+		return zerrors.ThrowInternal(nil, "ACTIO-uCpCx", "Errrors.Internal")
 	}
 
 	remaining := logstoreService.Limit(ctx, config.instanceID)
@@ -40,7 +40,7 @@ func Run(ctx context.Context, ctxParam contextFields, apiParam apiFields, script
 
 	config.logger.Log(actionStartedMessage)
 	if remaining != nil && *remaining == 0 {
-		return z_errs.ThrowResourceExhausted(nil, "ACTIO-f19Ii", "Errors.Quota.Execution.Exhausted")
+		return zerrors.ThrowResourceExhausted(nil, "ACTIO-f19Ii", "Errors.Quota.Execution.Exhausted")
 	}
 
 	defer func() {

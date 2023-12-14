@@ -7,11 +7,11 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddProjectRole(t *testing.T) {
@@ -67,7 +67,7 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -96,7 +96,7 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -113,7 +113,7 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 							),
 						),
 					),
-					expectPushFailed(caos_errs.ThrowAlreadyExists(nil, "id", "internal"),
+					expectPushFailed(zerrors.ThrowAlreadyExists(nil, "id", "internal"),
 						project.NewRoleAddedEvent(
 							context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -137,7 +137,7 @@ func TestCommandSide_AddProjectRole(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -265,7 +265,7 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -298,7 +298,7 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -315,7 +315,7 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 							),
 						),
 					),
-					expectPushFailed(caos_errs.ThrowAlreadyExists(nil, "id", "internal"),
+					expectPushFailed(zerrors.ThrowAlreadyExists(nil, "id", "internal"),
 						project.NewRoleAddedEvent(
 							context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -351,7 +351,7 @@ func TestCommandSide_BulkAddProjectRole(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -465,7 +465,7 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -502,7 +502,7 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -550,7 +550,7 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -592,7 +592,7 @@ func TestCommandSide_ChangeProjectRole(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -703,7 +703,7 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -720,7 +720,7 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -738,7 +738,7 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -771,7 +771,7 @@ func TestCommandSide_RemoveProjectRole(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{

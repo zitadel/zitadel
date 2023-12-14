@@ -3,8 +3,8 @@ package org
 import (
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	instance_pb "github.com/zitadel/zitadel/pkg/grpc/instance"
 )
 
@@ -66,7 +66,7 @@ func InstanceQueryToModel(searchQuery *instance_pb.Query) (query.SearchQuery, er
 	case *instance_pb.Query_DomainQuery:
 		return query.NewInstanceDomainsListSearchQuery(q.DomainQuery.Domains...)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "INST-3m0se", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INST-3m0se", "List.Query.Invalid")
 	}
 }
 
@@ -90,7 +90,7 @@ func DomainQueryToModel(searchQuery *instance_pb.DomainSearchQuery) (query.Searc
 	case *instance_pb.DomainSearchQuery_PrimaryQuery:
 		return query.NewInstanceDomainPrimarySearchQuery(q.PrimaryQuery.Primary)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "INST-Ags42", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INST-Ags42", "List.Query.Invalid")
 	}
 }
 
