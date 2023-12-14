@@ -127,6 +127,7 @@ func (m *AddMetadataEntry) Valid() error {
 	return nil
 }
 
+// Deprecated: use commands.AddUserHuman
 func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *AddHuman, allowInitMail bool) (err error) {
 	if resourceOwner == "" {
 		return errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
@@ -310,7 +311,7 @@ func (c *Commands) addHumanCommandPhone(ctx context.Context, filter preparation.
 	return append(cmds, user.NewHumanPhoneCodeAddedEventV2(ctx, &a.Aggregate, phoneCode.Crypted, phoneCode.Expiry, human.Phone.ReturnCode)), nil
 }
 
-// TODO remove
+// Deprecated: use commands.NewUserHumanWriteModel, to remove deprecated eventstore.Filter
 func (c *Commands) addHumanCommandCheckID(ctx context.Context, filter preparation.FilterToQueryReducer, human *AddHuman, orgID string) (err error) {
 	if human.ID == "" {
 		human.ID, err = c.idGenerator.Next()
@@ -407,6 +408,7 @@ func (h *AddHuman) shouldAddInitCode() bool {
 			h.Password == ""
 }
 
+// Deprecated: use commands.AddUserHuman
 func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, links []*domain.UserIDPLink, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator crypto.Generator) (_ *domain.Human, passwordlessCode *domain.PasswordlessInitCode, err error) {
 	if orgID == "" {
 		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-5N8fs", "Errors.ResourceOwnerMissing")
@@ -455,6 +457,7 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 	return writeModelToHuman(addedHuman), passwordlessCode, nil
 }
 
+// Deprecated: use commands.AddUserHuman
 func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, orgMemberRoles []string, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator crypto.Generator) (*domain.Human, error) {
 	if orgID == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-GEdf2", "Errors.ResourceOwnerMissing")

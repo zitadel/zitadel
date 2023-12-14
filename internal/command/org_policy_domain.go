@@ -59,12 +59,13 @@ func (c *Commands) RemoveOrgDomainPolicy(ctx context.Context, orgID string) (*do
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
+// Deprecated: Use commands.domainPolicyWriteModel directly, to remove the domain.DomainPolicy struct
 func (c *Commands) getOrgDomainPolicy(ctx context.Context, orgID string) (*domain.DomainPolicy, error) {
 	policy, err := c.orgDomainPolicyWriteModel(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
-	if policy.State == domain.PolicyStateActive {
+	if policy.State.Exists() {
 		return orgWriteModelToDomainPolicy(policy), nil
 	}
 	return c.getDefaultDomainPolicy(ctx)

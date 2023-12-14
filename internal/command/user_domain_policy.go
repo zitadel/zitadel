@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/errors"
 )
 
+// Deprecated: User commands.domainPolicyWriteModel directly, to remove use of eventstore.Filter function
 func domainPolicyWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) (*PolicyDomainWriteModel, error) {
 	wm, err := orgDomainPolicy(ctx, filter, orgID)
 	if err != nil {
@@ -43,6 +44,7 @@ func (c *Commands) domainPolicyWriteModel(ctx context.Context, orgID string) (*P
 	return nil, errors.ThrowInternal(nil, "USER-Ggk9n", "Errors.Internal")
 }
 
+// Deprecated: Use commands.orgDomainPolicyWriteModel directly, to remove use of eventstore.Filter function
 func orgDomainPolicy(ctx context.Context, filter preparation.FilterToQueryReducer, orgID string) (*OrgDomainPolicyWriteModel, error) {
 	policy := NewOrgDomainPolicyWriteModel(orgID)
 	events, err := filter(ctx, policy.Query())
@@ -57,6 +59,7 @@ func orgDomainPolicy(ctx context.Context, filter preparation.FilterToQueryReduce
 	return policy, err
 }
 
+// Deprecated: Use commands.instanceDomainPolicyWriteModel directly, to remove use of eventstore.Filter function
 func instanceDomainPolicy(ctx context.Context, filter preparation.FilterToQueryReducer) (*InstanceDomainPolicyWriteModel, error) {
 	policy := NewInstanceDomainPolicyWriteModel(ctx)
 	events, err := filter(ctx, policy.Query())

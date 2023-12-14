@@ -15,7 +15,7 @@ func (c *Commands) changeUsername(ctx context.Context, cmds []eventstore.Command
 	}
 	orgID := wm.ResourceOwner
 
-	domainPolicy, err := c.getOrgDomainPolicy(ctx, orgID)
+	domainPolicy, err := c.domainPolicyWriteModel(ctx, orgID)
 	if err != nil {
 		return cmds, errors.ThrowPreconditionFailed(err, "COMMAND-38fnu", "Errors.Org.DomainPolicy.NotExisting")
 	}

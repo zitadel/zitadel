@@ -81,9 +81,6 @@ func (p *Password) Validate(hasher *crypto.PasswordHasher) error {
 	if p.Password == nil && p.EncodedPasswordHash == nil {
 		return errors.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Empty")
 	}
-	if p.Password != nil && p.EncodedPasswordHash != nil {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-3M0fsss", "Errors.User.Password.NotSupported")
-	}
 	return nil
 }
 
@@ -479,13 +476,22 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 			return cmds, err
 		}
 	}
+	var encodedPassword string
 	// or have the old password to change it
 	if password.OldPassword != nil {
-		if _, err := c.verifyPassword(ctx, wm.PasswordEncodedHash, *password.OldPassword); err != nil {
+		// newly encode old password if no new and already encoded password is set
+		pw := *password.OldPassword
+		if password.Password != nil {
+			pw = *password.Password
+		}
+		alreadyEncodedPassword, err := c.verifyAndUpdatePassword(ctx, wm.PasswordEncodedHash, *password.OldPassword, pw)
+		if err != nil {
 			return cmds, err
 		}
+		encodedPassword = alreadyEncodedPassword
 	}
 
+	// password already hashed in request
 	if password.EncodedPasswordHash != nil {
 		cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, *password.EncodedPasswordHash, password.ChangeRequired, true)
 		if cmd != nil {
@@ -493,6 +499,15 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 		}
 		return cmds, err
 	}
+	// password already hashed in verify
+	if encodedPassword != "" {
+		cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, encodedPassword, password.ChangeRequired, true)
+		if cmd != nil {
+			return append(cmds, cmd), err
+		}
+		return cmds, err
+	}
+	// password still to be hashed
 	if password.Password != nil {
 		cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, *password.Password, password.ChangeRequired, false)
 		if cmd != nil {
@@ -500,6 +515,7 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 		}
 		return cmds, err
 	}
+	// no password changes necessary
 	return cmds, nil
 }
 

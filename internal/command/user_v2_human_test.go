@@ -2187,10 +2187,57 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					ResourceOwner: "org1",
 				},
 			},
-		}, {
-			name: "change human password encoded, password code, not supported",
+		},
+		{
+			name: "change human password and password encoded, password code, encoded used",
 			fields: fields{
-				eventstore:         expectEventstore(),
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
+								&userAgg.Aggregate,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanPasswordCodeAddedEventV2(context.Background(),
+								&userAgg.Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour*1,
+								domain.NotificationTypeEmail,
+								"",
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&userAgg.Aggregate,
+							"$plain$x$password2",
+							true,
+							"",
+						),
+					),
+				),
 				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
@@ -2198,7 +2245,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:            gu.Ptr("password"),
+						Password:            gu.Ptr("passwordnotused"),
 						EncodedPasswordHash: gu.Ptr("$plain$x$password2"),
 						PasswordCode:        gu.Ptr("code"),
 						ChangeRequired:      true,
@@ -2207,8 +2254,10 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				codeAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M0fsss", "Errors.User.Password.NotSupported"))
+				want: &domain.ObjectDetails{
+					Sequence:      0,
+					EventDate:     time.Time{},
+					ResourceOwner: "org1",
 				},
 			},
 		},
