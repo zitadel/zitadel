@@ -93,17 +93,17 @@ SELECT
   , count(*) OVER ()
 FROM found_users fu
 JOIN
-  projections.users10 u
+  projections.users9 u
   ON
     fu.id = u.id
     AND fu.instance_id = u.instance_id
 LEFT JOIN
-  projections.users10_humans h
+  projections.users9_humans h
   ON
     fu.id = h.user_id
     AND fu.instance_id = h.instance_id
 LEFT JOIN
-  projections.users10_notifications n
+  projections.users9_notifications n
   ON
     fu.id = n.user_id
     AND fu.instance_id = n.instance_id

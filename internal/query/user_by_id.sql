@@ -60,17 +60,17 @@ SELECT
   , m.user_id
   , m.name
   , m.description
-  , m.secret
+  , m.has_secret
   , m.access_token_type
   , count(*) OVER ()
-FROM projections.users10 u
+FROM projections.users9 u
 LEFT JOIN
-  projections.users10_humans h
+  projections.users9_humans h
   ON
     u.id = h.user_id
     AND u.instance_id = h.instance_id
 LEFT JOIN
-  projections.users10_machines m
+  projections.users9_machines m
   ON
     u.id = m.user_id
     AND u.instance_id = m.instance_id
