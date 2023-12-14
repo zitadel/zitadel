@@ -126,9 +126,6 @@ func (h *Handler) schedule(ctx context.Context) {
 		case <-t.C:
 			instances, err := h.queryInstances(ctx, didInitialize)
 			h.log().OnError(err).Debug("unable to query instances")
-			if !didInitialize && h.projection.Name() == "projections.apps6" {
-				instances = nil
-			}
 
 			var instanceFailed bool
 			scheduledCtx := call.WithTimestamp(ctx)
