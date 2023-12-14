@@ -287,7 +287,7 @@ func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_
 	}, nil
 }
 
-func (s *Server) RemoveUser(ctx context.Context, req *user.RemoveUserRequest) (_ *user.RemoveUserResponse, err error) {
+func (s *Server) DeleteUser(ctx context.Context, req *user.DeleteUserRequest) (_ *user.DeleteUserResponse, err error) {
 	memberships, grants, err := s.removeUserDependencies(ctx, req.GetUserId())
 	if err != nil {
 		return nil, err
@@ -297,7 +297,7 @@ func (s *Server) RemoveUser(ctx context.Context, req *user.RemoveUserRequest) (_
 	if err != nil {
 		return nil, err
 	}
-	return &user.RemoveUserResponse{
+	return &user.DeleteUserResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
 }

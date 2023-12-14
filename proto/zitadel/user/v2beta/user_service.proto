@@ -253,11 +253,9 @@ service UserService {
       }
     };
 
-
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Delete user";
-      description: "The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found"
-      tags: "Users";
+      summary: "Update User";
+      description: "Update all information from a user."
       responses: {
         key: "200"
         value: {
@@ -286,7 +284,6 @@ service UserService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Deactivate user";
       description: "The state of the user will be changed to 'deactivated'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'deactivated'. Use deactivate user when the user should not be able to use the account anymore, but you still need access to the user data."
-      tags: "Users";
       responses: {
         key: "200"
         value: {
@@ -315,7 +312,6 @@ service UserService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Reactivate user";
       description: "Reactivate a user with the state 'deactivated'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'deactivated'."
-      tags: "Users";
       responses: {
         key: "200"
         value: {
@@ -344,7 +340,6 @@ service UserService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Lock user";
       description: "The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.)"
-      tags: "Users";
       responses: {
         key: "200"
         value: {
@@ -373,7 +368,6 @@ service UserService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Unlock user";
       description: "Unlock a user with the state 'locked'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'locked'."
-      tags: "Users";
       responses: {
         key: "200"
         value: {
@@ -383,7 +377,7 @@ service UserService {
     };
   }
 
-  rpc RemoveUser(RemoveUserRequest) returns (RemoveUserResponse) {
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
     option (google.api.http) = {
       delete: "/v2beta/users/{user_id}"
     };
@@ -402,35 +396,6 @@ service UserService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Delete user";
       description: "The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found"
-      tags: "Users";
-      responses: {
-        key: "200"
-        value: {
-          description: "OK";
-        }
-      };
-    };
-  }
-
-  rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
-    option (google.api.http) = {
-      get: "/v2beta/users/{user_id}"
-    };
-
-    option (zitadel.protoc_gen_zitadel.v2.options) = {
-      auth_option: {
-        permission: "user.read"
-        org_field: "organization"
-      }
-      http_response: {
-        success_code: 201
-      }
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "User by ID";
-      description: "Returns the full user object (human or machine) including the profile, email, etc."
-      tags: "Users";
       responses: {
         key: "200"
         value: {
@@ -1006,7 +971,7 @@ message VerifyPhoneResponse{
   zitadel.object.v2beta.Details details = 1;
 }
 
-message RemoveUserRequest {
+message DeleteUserRequest {
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -1018,7 +983,7 @@ message RemoveUserRequest {
   zitadel.object.v2beta.Organization organization = 2;
 }
 
-message RemoveUserResponse {
+message DeleteUserResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
