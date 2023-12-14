@@ -333,7 +333,6 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		l.renderLogin(w, r, authReq, zerrors.ThrowInvalidArgument(nil, "LOGIN-SFefg", "Errors.ExternalIDP.IDPTypeNotImplemented"))
 		return
 	}
-
 	user, err := session.FetchUser(r.Context())
 	if err != nil {
 		l.externalAuthFailed(w, r, authReq, tokens(session), user, err)
@@ -382,7 +381,7 @@ func (l *Login) migrateExternalUserID(r *http.Request, authReq *domain.AuthReque
 	return previousIDMatched, l.command.MigrateUserIDP(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, externalUser.IDPConfigID, previousID, externalUserID)
 }
 
-// handleExternalUserAuthenticated maps the IDP user, checks for a corresponding externalID
+// handleExternalUserAuthenticated maps the IDP user, checks for a corresponding externalID and that the IDP is allowed
 func (l *Login) handleExternalUserAuthenticated(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -392,6 +391,10 @@ func (l *Login) handleExternalUserAuthenticated(
 	user idp.User,
 	callback func(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest),
 ) {
+	if err := l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, provider.ID, authReq.AgentID); err != nil {
+		l.externalAuthFailed(w, r, authReq, tokens(session), nil, err)
+		return
+	}
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
 	// check and fill in local linked user
 	externalErr := l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r), false)

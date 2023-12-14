@@ -1006,10 +1006,9 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx                 context.Context
-		resourceOwner       string
-		provider            *domain.IDPProvider
-		cascadeExternalIDPs []*domain.UserIDPLink
+		ctx           context.Context
+		resourceOwner string
+		provider      *domain.IDPProvider
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1290,14 +1289,6 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 					Name:        "name",
 					Type:        domain.IdentityProviderTypeOrg,
 				},
-				cascadeExternalIDPs: []*domain.UserIDPLink{
-					{
-						ObjectRoot: models.ObjectRoot{
-							AggregateID: "user1",
-						},
-						IDPConfigID: "config1",
-					},
-				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1355,10 +1346,6 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 							&org.NewAggregate("org1").Aggregate,
 							"config1",
 						),
-						user.NewUserIDPLinkCascadeRemovedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-							"config1", "externaluser1",
-						),
 					),
 				),
 			},
@@ -1367,15 +1354,6 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 				resourceOwner: "org1",
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
-				},
-				cascadeExternalIDPs: []*domain.UserIDPLink{
-					{
-						ObjectRoot: models.ObjectRoot{
-							AggregateID: "user1",
-						},
-						IDPConfigID:    "config1",
-						ExternalUserID: "externaluser1",
-					},
 				},
 			},
 			res: res{
@@ -1390,7 +1368,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveIDPFromLoginPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.provider, tt.args.cascadeExternalIDPs...)
+			got, err := r.RemoveIDPFromLoginPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
