@@ -25,7 +25,7 @@ import (
 
 func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 	ctx := authz.NewMockContext("inst1", "org1", "user1")
-
+	timestamp := time.Date(2015, 12, 15, 22, 13, 45, 0, time.UTC)
 	tests := []struct {
 		name       string
 		eventstore func(t *testing.T) *eventstore.Eventstore
@@ -53,7 +53,7 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 					eventFromEventPusher(deviceauth.NewAddedEvent(
 						ctx,
 						deviceauth.NewAggregate("device1", "instance1"),
-						"client1", "device1", "user-code", time.Unix(123, 456), []string{"foo", "bar"},
+						"client1", "device1", "user-code", timestamp, []string{"foo", "bar"},
 					)),
 				),
 			),
@@ -61,7 +61,7 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 				ClientID:   "client1",
 				DeviceCode: "device1",
 				UserCode:   "user-code",
-				Expires:    time.Unix(123, 456),
+				Expires:    timestamp,
 				Scopes:     []string{"foo", "bar"},
 				State:      domain.DeviceAuthStateInitiated,
 			},
@@ -73,13 +73,13 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 					eventFromEventPusher(deviceauth.NewAddedEvent(
 						ctx,
 						deviceauth.NewAggregate("device1", "instance1"),
-						"client1", "device1", "user-code", time.Unix(123, 456), []string{"foo", "bar"},
+						"client1", "device1", "user-code", timestamp, []string{"foo", "bar"},
 					)),
 					eventFromEventPusher(deviceauth.NewApprovedEvent(
 						ctx,
 						deviceauth.NewAggregate("device1", "instance1"),
 						"user1", []domain.UserAuthMethodType{domain.UserAuthMethodTypePasswordless},
-						time.Unix(700, 800),
+						timestamp,
 					)),
 				),
 			),
@@ -87,12 +87,12 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 				ClientID:        "client1",
 				DeviceCode:      "device1",
 				UserCode:        "user-code",
-				Expires:         time.Unix(123, 456),
+				Expires:         timestamp,
 				Scopes:          []string{"foo", "bar"},
 				State:           domain.DeviceAuthStateApproved,
 				Subject:         "user1",
 				UserAuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePasswordless},
-				AuthTime:        time.Unix(700, 800),
+				AuthTime:        timestamp,
 			},
 		},
 		{
@@ -102,7 +102,7 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 					eventFromEventPusher(deviceauth.NewAddedEvent(
 						ctx,
 						deviceauth.NewAggregate("device1", "instance1"),
-						"client1", "device1", "user-code", time.Unix(123, 456), []string{"foo", "bar"},
+						"client1", "device1", "user-code", timestamp, []string{"foo", "bar"},
 					)),
 					eventFromEventPusher(deviceauth.NewCanceledEvent(
 						ctx,
@@ -115,7 +115,7 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 				ClientID:   "client1",
 				DeviceCode: "device1",
 				UserCode:   "user-code",
-				Expires:    time.Unix(123, 456),
+				Expires:    timestamp,
 				Scopes:     []string{"foo", "bar"},
 				State:      domain.DeviceAuthStateDenied,
 			},
@@ -127,7 +127,7 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 					eventFromEventPusher(deviceauth.NewAddedEvent(
 						ctx,
 						deviceauth.NewAggregate("device1", "instance1"),
-						"client1", "device1", "user-code", time.Unix(123, 456), []string{"foo", "bar"},
+						"client1", "device1", "user-code", timestamp, []string{"foo", "bar"},
 					)),
 					eventFromEventPusher(deviceauth.NewCanceledEvent(
 						ctx,
@@ -140,7 +140,7 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 				ClientID:   "client1",
 				DeviceCode: "device1",
 				UserCode:   "user-code",
-				Expires:    time.Unix(123, 456),
+				Expires:    timestamp,
 				Scopes:     []string{"foo", "bar"},
 				State:      domain.DeviceAuthStateExpired,
 			},
