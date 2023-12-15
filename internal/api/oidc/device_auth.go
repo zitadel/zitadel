@@ -103,14 +103,14 @@ func newDeviceAuthorizationState(d *query.DeviceAuth) *op.DeviceAuthorizationSta
 	}
 }
 
-// GetDeviceAuthorizatonState retieves the current state of the Device Authorization process.
+// GetDeviceAuthorizatonState retrieves the current state of the Device Authorization process.
 // It implements the [op.DeviceAuthorizationStorage] interface and is used by devices that
 // are polling until they successfully receive a token or we indicate a denied or expired state.
 // As generated user codes are of low entropy, this implementation also takes care or
 // device authorization request cleanup, when it has been Approved, Denied or Expired.
 func (o *OPStorage) GetDeviceAuthorizatonState(ctx context.Context, clientID, deviceCode string) (state *op.DeviceAuthorizationState, err error) {
 	const logMsg = "get device authorization state"
-	logger := logging.WithFields("client_id", clientID, "device_code", deviceCode)
+	logger := logging.WithFields("device_code", deviceCode)
 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
@@ -120,7 +120,7 @@ func (o *OPStorage) GetDeviceAuthorizatonState(ctx context.Context, clientID, de
 		span.EndWithError(err)
 	}()
 
-	deviceAuth, err := o.query.DeviceAuthByDeviceCode(ctx, clientID, deviceCode)
+	deviceAuth, err := o.query.DeviceAuthByDeviceCode(ctx, deviceCode)
 	if err != nil {
 		return nil, err
 	}
@@ -136,15 +136,6 @@ func (o *OPStorage) GetDeviceAuthorizatonState(ctx context.Context, clientID, de
 			return nil, err
 		}
 		deviceAuth.State = domain.DeviceAuthStateExpired
-	}
-
-	// When the request is more then initiated, it has been either Approved, Denied or Expired.
-	// At this point we should remove it from the DB to avoid user code conflicts.
-	if deviceAuth.State > domain.DeviceAuthStateInitiated {
-		_, err = o.command.RemoveDeviceAuth(ctx, deviceAuth.DeviceCode)
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	return newDeviceAuthorizationState(deviceAuth), nil

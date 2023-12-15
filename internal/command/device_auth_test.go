@@ -21,7 +21,7 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 	pushErr := errors.New("pushErr")
 	now := time.Now()
 
-	unique := deviceauth.NewAddUniqueConstraints("client_id", "123", "456")
+	unique := deviceauth.NewAddUniqueConstraints("123", "456")
 	require.Len(t, unique, 2)
 
 	type fields struct {
@@ -127,23 +127,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 			name: "not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(
-						eventFromEventPusherWithInstanceID("instance1",
-							deviceauth.NewAddedEvent(
-								ctx,
-								deviceauth.NewAggregate("123", "instance1"),
-								"client_id", "123", "456", now,
-								[]string{"a", "b", "c"},
-							),
-						),
-						eventFromEventPusherWithInstanceID("instance1",
-							deviceauth.NewRemovedEvent(
-								ctx,
-								deviceauth.NewAggregate("123", "instance1"),
-								"client_id", "123", "456",
-							),
-						),
-					),
+					expectFilter(),
 				),
 			},
 			args: args{
@@ -250,23 +234,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 			name: "not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(
-						eventFromEventPusherWithInstanceID("instance1",
-							deviceauth.NewAddedEvent(
-								ctx,
-								deviceauth.NewAggregate("123", "instance1"),
-								"client_id", "123", "456", now,
-								[]string{"a", "b", "c"},
-							),
-						),
-						eventFromEventPusherWithInstanceID("instance1",
-							deviceauth.NewRemovedEvent(
-								ctx,
-								deviceauth.NewAggregate("123", "instance1"),
-								"client_id", "123", "456",
-							),
-						),
-					),
+					expectFilter(),
 				),
 			},
 			args:    args{ctx, "123", domain.DeviceAuthCanceledDenied},
@@ -355,91 +323,6 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 				eventstore: tt.fields.eventstore,
 			}
 			gotDetails, err := c.CancelDeviceAuth(tt.args.ctx, tt.args.id, tt.args.reason)
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, gotDetails, tt.wantDetails)
-		})
-	}
-}
-
-func TestCommands_RemoveDeviceAuth(t *testing.T) {
-	ctx := authz.WithInstanceID(context.Background(), "instance1")
-	now := time.Now()
-	pushErr := errors.New("pushErr")
-
-	unique := deviceauth.NewRemoveUniqueConstraints("client_id", "123", "456")
-	require.Len(t, unique, 2)
-
-	type fields struct {
-		eventstore *eventstore.Eventstore
-	}
-	type args struct {
-		ctx context.Context
-		id  string
-	}
-	tests := []struct {
-		name        string
-		fields      fields
-		args        args
-		wantDetails *domain.ObjectDetails
-		wantErr     error
-	}{
-		{
-			name: "push error",
-			fields: fields{
-				eventstore: eventstoreExpect(t,
-					expectFilter(eventFromEventPusherWithInstanceID(
-						"instance1",
-						deviceauth.NewAddedEvent(
-							ctx,
-							deviceauth.NewAggregate("123", "instance1"),
-							"client_id", "123", "456", now,
-							[]string{"a", "b", "c"},
-						),
-					)),
-					expectPushFailed(pushErr,
-						deviceauth.NewRemovedEvent(
-							ctx, deviceauth.NewAggregate("123", "instance1"),
-							"client_id", "123", "456",
-						),
-					),
-				),
-			},
-			args:    args{ctx, "123"},
-			wantErr: pushErr,
-		},
-		{
-			name: "success",
-			fields: fields{
-				eventstore: eventstoreExpect(t,
-					expectFilter(eventFromEventPusherWithInstanceID(
-						"instance1",
-						deviceauth.NewAddedEvent(
-							ctx,
-							deviceauth.NewAggregate("123", "instance1"),
-							"client_id", "123", "456", now,
-							[]string{"a", "b", "c"},
-						),
-					)),
-					expectPush(
-						deviceauth.NewRemovedEvent(
-							ctx, deviceauth.NewAggregate("123", "instance1"),
-							"client_id", "123", "456",
-						),
-					),
-				),
-			},
-			args: args{ctx, "123"},
-			wantDetails: &domain.ObjectDetails{
-				ResourceOwner: "instance1",
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &Commands{
-				eventstore: tt.fields.eventstore,
-			}
-			gotDetails, err := c.RemoveDeviceAuth(tt.args.ctx, tt.args.id)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, gotDetails, tt.wantDetails)
 		})

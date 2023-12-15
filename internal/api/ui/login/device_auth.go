@@ -100,7 +100,7 @@ func (l *Login) handleDeviceAuthUserCode(w http.ResponseWriter, r *http.Request)
 		l.renderDeviceAuthUserCode(w, r, err)
 		return
 	}
-	deviceAuth, err := l.query.DeviceAuthByUserCode(ctx, userCode)
+	deviceAuthReq, err := l.query.DeviceAuthRequestByUserCode(ctx, userCode)
 	if err != nil {
 		l.renderDeviceAuthUserCode(w, r, err)
 		return
@@ -113,13 +113,9 @@ func (l *Login) handleDeviceAuthUserCode(w http.ResponseWriter, r *http.Request)
 	authRequest, err := l.authRepo.CreateAuthRequest(ctx, &domain.AuthRequest{
 		CreationDate:  time.Now(),
 		AgentID:       userAgentID,
-		ApplicationID: deviceAuth.ClientID,
+		ApplicationID: deviceAuthReq.ClientID,
 		InstanceID:    authz.GetInstance(ctx).InstanceID(),
-		Request: &domain.AuthRequestDevice{
-			DeviceCode: deviceAuth.DeviceCode,
-			UserCode:   deviceAuth.UserCode,
-			Scopes:     deviceAuth.Scopes,
-		},
+		Request:       deviceAuthReq,
 	})
 	if err != nil {
 		l.renderDeviceAuthUserCode(w, r, err)

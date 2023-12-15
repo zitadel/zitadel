@@ -17,61 +17,41 @@ import (
 )
 
 var (
-	deviceAuthTable = table{
-		name:          projection.DeviceAuthProjectionTable,
-		instanceIDCol: projection.DeviceAuthColumnInstanceID,
+	deviceAuthRequestTable = table{
+		name:          projection.DeviceAuthRequestProjectionTable,
+		instanceIDCol: projection.DeviceAuthRequestColumnInstanceID,
 	}
-	DeviceAuthColumnClientID = Column{
-		name:  projection.DeviceAuthColumnClientID,
-		table: deviceAuthTable,
+	DeviceAuthRequestColumnClientID = Column{
+		name:  projection.DeviceAuthRequestColumnClientID,
+		table: deviceAuthRequestTable,
 	}
-	DeviceAuthColumnDeviceCode = Column{
-		name:  projection.DeviceAuthColumnDeviceCode,
-		table: deviceAuthTable,
+	DeviceAuthRequestColumnDeviceCode = Column{
+		name:  projection.DeviceAuthRequestColumnDeviceCode,
+		table: deviceAuthRequestTable,
 	}
-	DeviceAuthColumnUserCode = Column{
-		name:  projection.DeviceAuthColumnUserCode,
-		table: deviceAuthTable,
+	DeviceAuthRequestColumnUserCode = Column{
+		name:  projection.DeviceAuthRequestColumnUserCode,
+		table: deviceAuthRequestTable,
 	}
-	DeviceAuthColumnExpires = Column{
-		name:  projection.DeviceAuthColumnExpires,
-		table: deviceAuthTable,
+	DeviceAuthRequestColumnScopes = Column{
+		name:  projection.DeviceAuthRequestColumnScopes,
+		table: deviceAuthRequestTable,
 	}
-	DeviceAuthColumnScopes = Column{
-		name:  projection.DeviceAuthColumnScopes,
-		table: deviceAuthTable,
+	DeviceAuthRequestColumnCreationDate = Column{
+		name:  projection.DeviceAuthRequestColumnCreationDate,
+		table: deviceAuthRequestTable,
 	}
-	DeviceAuthColumnState = Column{
-		name:  projection.DeviceAuthColumnState,
-		table: deviceAuthTable,
+	DeviceAuthRequestColumnChangeDate = Column{
+		name:  projection.DeviceAuthRequestColumnChangeDate,
+		table: deviceAuthRequestTable,
 	}
-	DeviceAuthColumnSubject = Column{
-		name:  projection.DeviceAuthColumnSubject,
-		table: deviceAuthTable,
+	DeviceAuthRequestColumnSequence = Column{
+		name:  projection.DeviceAuthRequestColumnSequence,
+		table: deviceAuthRequestTable,
 	}
-	DeviceAuthColumnUserAuthMethods = Column{
-		name:  projection.DeviceAuthColumnUserAuthMethods,
-		table: deviceAuthTable,
-	}
-	DeviceAuthColumnAuthTime = Column{
-		name:  projection.DeviceAuthColumnAuthTime,
-		table: deviceAuthTable,
-	}
-	DeviceAuthColumnCreationDate = Column{
-		name:  projection.DeviceAuthColumnCreationDate,
-		table: deviceAuthTable,
-	}
-	DeviceAuthColumnChangeDate = Column{
-		name:  projection.DeviceAuthColumnChangeDate,
-		table: deviceAuthTable,
-	}
-	DeviceAuthColumnSequence = Column{
-		name:  projection.DeviceAuthColumnSequence,
-		table: deviceAuthTable,
-	}
-	DeviceAuthColumnInstanceID = Column{
-		name:  projection.DeviceAuthColumnInstanceID,
-		table: deviceAuthTable,
+	DeviceAuthRequestColumnInstanceID = Column{
+		name:  projection.DeviceAuthRequestColumnInstanceID,
+		table: deviceAuthRequestTable,
 	}
 )
 
@@ -87,36 +67,30 @@ type DeviceAuth struct {
 	AuthTime        time.Time
 }
 
-func (q *Queries) DeviceAuthByDeviceCode(ctx context.Context, clientID, deviceCode string) (deviceAuth *DeviceAuth, err error) {
+// DeviceAuthByDeviceCode gets the current state of a Device Authorization directly from the eventstore.
+func (q *Queries) DeviceAuthByDeviceCode(ctx context.Context, deviceCode string) (deviceAuth *DeviceAuth, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	stmt, scan := prepareDeviceAuthQuery(ctx, q.client)
-	eq := sq.Eq{
-		DeviceAuthColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		DeviceAuthColumnClientID.identifier():   clientID,
-		DeviceAuthColumnDeviceCode.identifier(): deviceCode,
+	model := NewDeviceAuthReadModel(deviceCode, authz.GetInstance(ctx).InstanceID())
+	if err := q.eventstore.FilterToQueryReducer(ctx, model); err != nil {
+		return nil, err
 	}
-	query, args, err := stmt.Where(eq).ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-uk1Oh", "Errors.Query.SQLStatement")
+	if !model.State.Exists() {
+		return nil, zerrors.ThrowNotFound(nil, "QUERY-eeR0e", "Errors.DeviceAuth.NotExisting")
 	}
-
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		deviceAuth, err = scan(row)
-		return err
-	}, query, args...)
-	return deviceAuth, err
+	return &model.DeviceAuth, nil
 }
 
-func (q *Queries) DeviceAuthByUserCode(ctx context.Context, userCode string) (deviceAuth *DeviceAuth, err error) {
+// DeviceAuthRequestByUserCode finds a Device Authorization request by User-Code from the `device_auth_requests` projection.
+func (q *Queries) DeviceAuthRequestByUserCode(ctx context.Context, userCode string) (authReq *domain.AuthRequestDevice, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	stmt, scan := prepareDeviceAuthQuery(ctx, q.client)
 	eq := sq.Eq{
-		DeviceAuthColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-		DeviceAuthColumnUserCode.identifier():   userCode,
+		DeviceAuthRequestColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		DeviceAuthRequestColumnUserCode.identifier():   userCode,
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
@@ -124,39 +98,32 @@ func (q *Queries) DeviceAuthByUserCode(ctx context.Context, userCode string) (de
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		deviceAuth, err = scan(row)
+		authReq, err = scan(row)
 		return err
 	}, query, args...)
-	return deviceAuth, err
+	return authReq, err
 }
 
 var deviceAuthSelectColumns = []string{
-	DeviceAuthColumnClientID.identifier(),
-	DeviceAuthColumnScopes.identifier(),
-	DeviceAuthColumnExpires.identifier(),
-	DeviceAuthColumnState.identifier(),
-	DeviceAuthColumnSubject.identifier(),
-	DeviceAuthColumnUserAuthMethods.identifier(),
-	DeviceAuthColumnAuthTime.identifier(),
+	DeviceAuthRequestColumnClientID.identifier(),
+	DeviceAuthRequestColumnDeviceCode.identifier(),
+	DeviceAuthRequestColumnUserCode.identifier(),
+	DeviceAuthRequestColumnScopes.identifier(),
 }
 
-func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*DeviceAuth, error)) {
-	return sq.Select(deviceAuthSelectColumns...).From(deviceAuthTable.identifier()).PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*DeviceAuth, error) {
-			dst := new(DeviceAuth)
+func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*domain.AuthRequestDevice, error)) {
+	return sq.Select(deviceAuthSelectColumns...).From(deviceAuthRequestTable.identifier()).PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) (*domain.AuthRequestDevice, error) {
+			dst := new(domain.AuthRequestDevice)
 			var (
-				scopes      database.TextArray[string]
-				authMethods database.Array[domain.UserAuthMethodType]
+				scopes database.TextArray[string]
 			)
 
 			err := row.Scan(
 				&dst.ClientID,
+				&dst.DeviceCode,
+				&dst.UserCode,
 				&scopes,
-				&dst.Expires,
-				&dst.State,
-				&dst.Subject,
-				&authMethods,
-				&dst.AuthTime,
 			)
 			if errors.Is(err, sql.ErrNoRows) {
 				return nil, zerrors.ThrowNotFound(err, "QUERY-Sah9a", "Errors.DeviceAuth.NotExisting")
@@ -164,9 +131,7 @@ func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			if err != nil {
 				return nil, zerrors.ThrowInternal(err, "QUERY-Voo3o", "Errors.Internal")
 			}
-
 			dst.Scopes = scopes
-			dst.UserAuthMethods = authMethods
 			return dst, nil
 		}
 }

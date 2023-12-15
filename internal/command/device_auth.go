@@ -79,25 +79,6 @@ func (c *Commands) CancelDeviceAuth(ctx context.Context, id string, reason domai
 	return writeModelToObjectDetails(&model.WriteModel), nil
 }
 
-func (c *Commands) RemoveDeviceAuth(ctx context.Context, id string) (*domain.ObjectDetails, error) {
-	model, err := c.getDeviceAuthWriteModelByDeviceCode(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	aggr := deviceauth.NewAggregate(model.AggregateID, model.InstanceID)
-
-	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewRemovedEvent(ctx, aggr, model.ClientID, model.DeviceCode, model.UserCode))
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(model, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-
-	return writeModelToObjectDetails(&model.WriteModel), nil
-}
-
 func (c *Commands) getDeviceAuthWriteModelByDeviceCode(ctx context.Context, deviceCode string) (*DeviceAuthWriteModel, error) {
 	model := &DeviceAuthWriteModel{WriteModel: eventstore.WriteModel{AggregateID: deviceCode}}
 	err := c.eventstore.FilterToQueryReducer(ctx, model)
