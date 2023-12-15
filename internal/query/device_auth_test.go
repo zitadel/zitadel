@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
@@ -15,25 +16,25 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
 const (
 	expectedDeviceAuthQueryC = `SELECT` +
-		` projections.device_authorizations.id,` +
-		` projections.device_authorizations.client_id,` +
-		` projections.device_authorizations.scopes,` +
-		` projections.device_authorizations.expires,` +
-		` projections.device_authorizations.state,` +
-		` projections.device_authorizations.subject` +
-		` FROM projections.device_authorizations`
+		` projections.device_authorizations1.client_id,` +
+		` projections.device_authorizations1.scopes,` +
+		` projections.device_authorizations1.expires,` +
+		` projections.device_authorizations1.state,` +
+		` projections.device_authorizations1.subject,` +
+		` projections.device_authorizations1.user_auth_methods,` +
+		` projections.device_authorizations1.auth_time` +
+		` FROM projections.device_authorizations1`
 	expectedDeviceAuthWhereDeviceCodeQueryC = expectedDeviceAuthQueryC +
-		` WHERE projections.device_authorizations.client_id = $1` +
-		` AND projections.device_authorizations.device_code = $2` +
-		` AND projections.device_authorizations.instance_id = $3`
+		` WHERE projections.device_authorizations1.client_id = $1` +
+		` AND projections.device_authorizations1.device_code = $2` +
+		` AND projections.device_authorizations1.instance_id = $3`
 	expectedDeviceAuthWhereUserCodeQueryC = expectedDeviceAuthQueryC +
-		` WHERE projections.device_authorizations.instance_id = $1` +
-		` AND projections.device_authorizations.user_code = $2`
+		` WHERE projections.device_authorizations1.instance_id = $1` +
+		` AND projections.device_authorizations1.user_code = $2`
 )
 
 var (
@@ -41,22 +42,22 @@ var (
 	expectedDeviceAuthWhereDeviceCodeQuery = regexp.QuoteMeta(expectedDeviceAuthWhereDeviceCodeQueryC)
 	expectedDeviceAuthWhereUserCodeQuery   = regexp.QuoteMeta(expectedDeviceAuthWhereUserCodeQueryC)
 	expectedDeviceAuthValues               = []driver.Value{
-		"primary-id",
 		"client-id",
 		database.TextArray[string]{"a", "b", "c"},
 		testNow,
 		domain.DeviceAuthStateApproved,
 		"subject",
+		database.Array[domain.UserAuthMethodType]{4},
+		time.Unix(123, 456),
 	}
-	expectedDeviceAuth = &domain.DeviceAuth{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: "primary-id",
-		},
-		ClientID: "client-id",
-		Scopes:   []string{"a", "b", "c"},
-		Expires:  testNow,
-		State:    domain.DeviceAuthStateApproved,
-		Subject:  "subject",
+	expectedDeviceAuth = &DeviceAuth{
+		ClientID:        "client-id",
+		Scopes:          []string{"a", "b", "c"},
+		Expires:         testNow,
+		State:           domain.DeviceAuthStateApproved,
+		Subject:         "subject",
+		UserAuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+		AuthTime:        time.Unix(123, 456),
 	}
 )
 
@@ -137,7 +138,7 @@ func Test_prepareDeviceAuthQuery(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: (*domain.DeviceAuth)(nil),
+			object: (*DeviceAuth)(nil),
 		},
 		{
 			name: "other error",
@@ -153,7 +154,7 @@ func Test_prepareDeviceAuthQuery(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: (*domain.DeviceAuth)(nil),
+			object: (*DeviceAuth)(nil),
 		},
 	}
 	for _, tt := range tests {

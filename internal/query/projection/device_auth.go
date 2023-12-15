@@ -12,16 +12,17 @@ import (
 )
 
 const (
-	DeviceAuthProjectionTable = "projections.device_authorizations"
+	DeviceAuthProjectionTable = "projections.device_authorizations1"
 
-	DeviceAuthColumnID         = "id"
-	DeviceAuthColumnClientID   = "client_id"
-	DeviceAuthColumnDeviceCode = "device_code"
-	DeviceAuthColumnUserCode   = "user_code"
-	DeviceAuthColumnExpires    = "expires"
-	DeviceAuthColumnScopes     = "scopes"
-	DeviceAuthColumnState      = "state"
-	DeviceAuthColumnSubject    = "subject"
+	DeviceAuthColumnClientID        = "client_id"
+	DeviceAuthColumnDeviceCode      = "device_code"
+	DeviceAuthColumnUserCode        = "user_code"
+	DeviceAuthColumnExpires         = "expires"
+	DeviceAuthColumnScopes          = "scopes"
+	DeviceAuthColumnState           = "state"
+	DeviceAuthColumnSubject         = "subject"
+	DeviceAuthColumnUserAuthMethods = "user_auth_methods"
+	DeviceAuthColumnAuthTime        = "auth_time"
 
 	DeviceAuthColumnCreationDate = "creation_date"
 	DeviceAuthColumnChangeDate   = "change_date"
@@ -42,7 +43,6 @@ func (*deviceAuthProjection) Name() string {
 func (*deviceAuthProjection) Init() *old_handler.Check {
 	return handler.NewTableCheck(
 		handler.NewTable([]*handler.InitColumn{
-			handler.NewColumn(DeviceAuthColumnID, handler.ColumnTypeText),
 			handler.NewColumn(DeviceAuthColumnClientID, handler.ColumnTypeText),
 			handler.NewColumn(DeviceAuthColumnDeviceCode, handler.ColumnTypeText),
 			handler.NewColumn(DeviceAuthColumnUserCode, handler.ColumnTypeText),
@@ -54,10 +54,11 @@ func (*deviceAuthProjection) Init() *old_handler.Check {
 			handler.NewColumn(DeviceAuthColumnChangeDate, handler.ColumnTypeTimestamp),
 			handler.NewColumn(DeviceAuthColumnSequence, handler.ColumnTypeInt64),
 			handler.NewColumn(DeviceAuthColumnInstanceID, handler.ColumnTypeText),
+			handler.NewColumn(DeviceAuthColumnUserAuthMethods, handler.ColumnTypeEnumArray),
+			handler.NewColumn(DeviceAuthColumnAuthTime, handler.ColumnTypeTimestamp),
 		},
-			handler.NewPrimaryKey(DeviceAuthColumnInstanceID, DeviceAuthColumnID),
+			handler.NewPrimaryKey(DeviceAuthColumnInstanceID, DeviceAuthColumnDeviceCode),
 			handler.WithIndex(handler.NewIndex("user_code", []string{DeviceAuthColumnInstanceID, DeviceAuthColumnUserCode})),
-			handler.WithIndex(handler.NewIndex("device_code", []string{DeviceAuthColumnInstanceID, DeviceAuthColumnClientID, DeviceAuthColumnDeviceCode})),
 		),
 	)
 }
@@ -73,7 +74,7 @@ func (p *deviceAuthProjection) Reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  deviceauth.ApprovedEventType,
-					Reduce: p.reduceAppoved,
+					Reduce: p.reduceApproved,
 				},
 				{
 					Event:  deviceauth.CanceledEventType,
@@ -96,7 +97,6 @@ func (p *deviceAuthProjection) reduceAdded(event eventstore.Event) (*handler.Sta
 	return handler.NewCreateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(DeviceAuthColumnID, e.Aggregate().ID),
 			handler.NewCol(DeviceAuthColumnClientID, e.ClientID),
 			handler.NewCol(DeviceAuthColumnDeviceCode, e.DeviceCode),
 			handler.NewCol(DeviceAuthColumnUserCode, e.UserCode),
@@ -110,7 +110,7 @@ func (p *deviceAuthProjection) reduceAdded(event eventstore.Event) (*handler.Sta
 	), nil
 }
 
-func (p *deviceAuthProjection) reduceAppoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *deviceAuthProjection) reduceApproved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*deviceauth.ApprovedEvent)
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-kei0A", "reduce.wrong.event.type %T != %s", event, deviceauth.ApprovedEventType)
@@ -119,12 +119,14 @@ func (p *deviceAuthProjection) reduceAppoved(event eventstore.Event) (*handler.S
 		[]handler.Column{
 			handler.NewCol(DeviceAuthColumnState, domain.DeviceAuthStateApproved),
 			handler.NewCol(DeviceAuthColumnSubject, e.Subject),
+			handler.NewCol(DeviceAuthColumnUserAuthMethods, e.UserAuthMethods),
+			handler.NewCol(DeviceAuthColumnAuthTime, e.AuthTime),
 			handler.NewCol(DeviceAuthColumnChangeDate, e.CreationDate()),
 			handler.NewCol(DeviceAuthColumnSequence, e.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(DeviceAuthColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCond(DeviceAuthColumnID, e.Aggregate().ID),
+			handler.NewCond(DeviceAuthColumnDeviceCode, e.Aggregate().ID),
 		},
 	), nil
 }
@@ -142,7 +144,7 @@ func (p *deviceAuthProjection) reduceCanceled(event eventstore.Event) (*handler.
 		},
 		[]handler.Condition{
 			handler.NewCond(DeviceAuthColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCond(DeviceAuthColumnID, e.Aggregate().ID),
+			handler.NewCond(DeviceAuthColumnDeviceCode, e.Aggregate().ID),
 		},
 	), nil
 }
@@ -155,7 +157,7 @@ func (p *deviceAuthProjection) reduceRemoved(event eventstore.Event) (*handler.S
 	return handler.NewDeleteStatement(e,
 		[]handler.Condition{
 			handler.NewCond(DeviceAuthColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCond(DeviceAuthColumnID, e.Aggregate().ID),
+			handler.NewCond(DeviceAuthColumnDeviceCode, e.Aggregate().ID),
 		},
 	), nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
@@ -19,10 +20,6 @@ var (
 	deviceAuthTable = table{
 		name:          projection.DeviceAuthProjectionTable,
 		instanceIDCol: projection.DeviceAuthColumnInstanceID,
-	}
-	DeviceAuthColumnID = Column{
-		name:  projection.DeviceAuthColumnID,
-		table: deviceAuthTable,
 	}
 	DeviceAuthColumnClientID = Column{
 		name:  projection.DeviceAuthColumnClientID,
@@ -52,6 +49,14 @@ var (
 		name:  projection.DeviceAuthColumnSubject,
 		table: deviceAuthTable,
 	}
+	DeviceAuthColumnUserAuthMethods = Column{
+		name:  projection.DeviceAuthColumnUserAuthMethods,
+		table: deviceAuthTable,
+	}
+	DeviceAuthColumnAuthTime = Column{
+		name:  projection.DeviceAuthColumnAuthTime,
+		table: deviceAuthTable,
+	}
 	DeviceAuthColumnCreationDate = Column{
 		name:  projection.DeviceAuthColumnCreationDate,
 		table: deviceAuthTable,
@@ -70,7 +75,19 @@ var (
 	}
 )
 
-func (q *Queries) DeviceAuthByDeviceCode(ctx context.Context, clientID, deviceCode string) (deviceAuth *domain.DeviceAuth, err error) {
+type DeviceAuth struct {
+	ClientID        string
+	DeviceCode      string
+	UserCode        string
+	Expires         time.Time
+	Scopes          []string
+	State           domain.DeviceAuthState
+	Subject         string
+	UserAuthMethods []domain.UserAuthMethodType
+	AuthTime        time.Time
+}
+
+func (q *Queries) DeviceAuthByDeviceCode(ctx context.Context, clientID, deviceCode string) (deviceAuth *DeviceAuth, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -92,7 +109,7 @@ func (q *Queries) DeviceAuthByDeviceCode(ctx context.Context, clientID, deviceCo
 	return deviceAuth, err
 }
 
-func (q *Queries) DeviceAuthByUserCode(ctx context.Context, userCode string) (deviceAuth *domain.DeviceAuth, err error) {
+func (q *Queries) DeviceAuthByUserCode(ctx context.Context, userCode string) (deviceAuth *DeviceAuth, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -114,27 +131,32 @@ func (q *Queries) DeviceAuthByUserCode(ctx context.Context, userCode string) (de
 }
 
 var deviceAuthSelectColumns = []string{
-	DeviceAuthColumnID.identifier(),
 	DeviceAuthColumnClientID.identifier(),
 	DeviceAuthColumnScopes.identifier(),
 	DeviceAuthColumnExpires.identifier(),
 	DeviceAuthColumnState.identifier(),
 	DeviceAuthColumnSubject.identifier(),
+	DeviceAuthColumnUserAuthMethods.identifier(),
+	DeviceAuthColumnAuthTime.identifier(),
 }
 
-func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*domain.DeviceAuth, error)) {
+func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*DeviceAuth, error)) {
 	return sq.Select(deviceAuthSelectColumns...).From(deviceAuthTable.identifier()).PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*domain.DeviceAuth, error) {
-			dst := new(domain.DeviceAuth)
-			var scopes database.TextArray[string]
+		func(row *sql.Row) (*DeviceAuth, error) {
+			dst := new(DeviceAuth)
+			var (
+				scopes      database.TextArray[string]
+				authMethods database.Array[domain.UserAuthMethodType]
+			)
 
 			err := row.Scan(
-				&dst.AggregateID,
 				&dst.ClientID,
 				&scopes,
 				&dst.Expires,
 				&dst.State,
 				&dst.Subject,
+				&authMethods,
+				&dst.AuthTime,
 			)
 			if errors.Is(err, sql.ErrNoRows) {
 				return nil, zerrors.ThrowNotFound(err, "QUERY-Sah9a", "Errors.DeviceAuth.NotExisting")
@@ -144,6 +166,7 @@ func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			}
 
 			dst.Scopes = scopes
+			dst.UserAuthMethods = authMethods
 			return dst, nil
 		}
 }

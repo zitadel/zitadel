@@ -2,28 +2,11 @@ package domain
 
 import (
 	"strconv"
-	"time"
-
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
-
-// DeviceAuth describes a Device Authorization request.
-// It is used as input and output model in the command and query packages.
-type DeviceAuth struct {
-	models.ObjectRoot
-
-	ClientID   string
-	DeviceCode string
-	UserCode   string
-	Expires    time.Time
-	Scopes     []string
-	Subject    string
-	State      DeviceAuthState
-}
 
 // DeviceAuthState describes the step the
 // the device authorization process is in.
-// We generate the Stringer implemntation for pretier
+// We generate the Stringer implementation for prettier
 // log output.
 //
 //go:generate stringer -type=DeviceAuthState -linecomment

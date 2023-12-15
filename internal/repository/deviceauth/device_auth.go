@@ -58,7 +58,9 @@ func NewAddedEvent(
 type ApprovedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	Subject string
+	Subject         string
+	UserAuthMethods []domain.UserAuthMethodType
+	AuthTime        time.Time
 }
 
 func (e *ApprovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -77,12 +79,16 @@ func NewApprovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	subject string,
+	userAuthMethods []domain.UserAuthMethodType,
+	authTime time.Time,
 ) *ApprovedEvent {
 	return &ApprovedEvent{
 		eventstore.NewBaseEventForPush(
 			ctx, aggregate, ApprovedEventType,
 		),
 		subject,
+		userAuthMethods,
+		authTime,
 	}
 }
 
