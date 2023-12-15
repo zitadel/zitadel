@@ -157,20 +157,3 @@ func (o *OPStorage) GetDeviceAuthorizatonState(ctx context.Context, clientID, de
 
 	return newDeviceAuthorizationState(deviceAuth), nil
 }
-
-// TODO(muhlemmer): remove the following methods with oidc v3.
-// They are actually not used, but are required by the oidc device storage interface.
-// https://github.com/zitadel/oidc/issues/371
-func (o *OPStorage) GetDeviceAuthorizationByUserCode(ctx context.Context, userCode string) (*op.DeviceAuthorizationState, error) {
-	return nil, nil
-}
-
-func (o *OPStorage) CompleteDeviceAuthorization(ctx context.Context, userCode, subject string) (err error) {
-	return nil
-}
-
-func (o *OPStorage) DenyDeviceAuthorization(ctx context.Context, userCode string) (err error) {
-	return nil
-}
-
-// TODO end.
