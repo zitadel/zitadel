@@ -114,7 +114,7 @@ func (l *publicFileDownloader) ResourceOwner(_ context.Context, ownerPath string
 	return ownerPath
 }
 
-const maxMemory = 2 << 20
+const maxMemory = 2 << 25 // 32MB
 const paramFile = "file"
 
 func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWriter, *http.Request) {
