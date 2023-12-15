@@ -47,7 +47,7 @@ var (
 		` LEFT JOIN (SELECT DISTINCT(auth_method_types.method_type), auth_method_types.user_id, auth_method_types.instance_id FROM projections.user_auth_methods4 AS auth_method_types` +
 		` WHERE auth_method_types.state = $1) AS auth_method_types` +
 		` ON auth_method_types.user_id = projections.users10.id AND auth_method_types.instance_id = projections.users10.instance_id` +
-		` LEFT JOIN (SELECT user_idps_count.user_id, user_idps_count.instance_id, COUNT(user_idps_count.user_id) AS count FROM projections.idp_user_links3 AS user_idps_count` +
+		` LEFT JOIN (SELECT user_idps_count.user_id, user_idps_count.instance_id, COUNT(user_idps_count.user_id) AS count FROM projections.idp_user_links4 AS user_idps_count WHERE user_idps_count.has_login_policy = $2` +
 		` GROUP BY user_idps_count.user_id, user_idps_count.instance_id) AS user_idps_count` +
 		` ON user_idps_count.user_id = projections.users10.id AND user_idps_count.instance_id = projections.users10.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms`
@@ -56,6 +56,7 @@ var (
 		"method_type",
 		"idps_count",
 	}
+
 	prepareAuthMethodTypesRequiredStmt = `SELECT projections.users10_notifications.password_set,` +
 		` auth_method_types.method_type,` +
 		` user_idps_count.count,` +
@@ -66,7 +67,7 @@ var (
 		` LEFT JOIN (SELECT DISTINCT(auth_method_types.method_type), auth_method_types.user_id, auth_method_types.instance_id FROM projections.user_auth_methods4 AS auth_method_types` +
 		` WHERE auth_method_types.state = $1) AS auth_method_types` +
 		` ON auth_method_types.user_id = projections.users10.id AND auth_method_types.instance_id = projections.users10.instance_id` +
-		` LEFT JOIN (SELECT user_idps_count.user_id, user_idps_count.instance_id, COUNT(user_idps_count.user_id) AS count FROM projections.idp_user_links3 AS user_idps_count` +
+		` LEFT JOIN (SELECT user_idps_count.user_id, user_idps_count.instance_id, COUNT(user_idps_count.user_id) AS count FROM projections.idp_user_links4 AS user_idps_count WHERE user_idps_count.has_login_policy = $2` +
 		` GROUP BY user_idps_count.user_id, user_idps_count.instance_id) AS user_idps_count` +
 		` ON user_idps_count.user_id = projections.users10.id AND user_idps_count.instance_id = projections.users10.instance_id` +
 		` LEFT JOIN (SELECT auth_methods_force_mfa.force_mfa, auth_methods_force_mfa.force_mfa_local_only, auth_methods_force_mfa.instance_id, auth_methods_force_mfa.aggregate_id FROM projections.login_policies5 AS auth_methods_force_mfa ORDER BY auth_methods_force_mfa.is_default) AS auth_methods_force_mfa` +

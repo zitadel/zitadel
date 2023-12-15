@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
-	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -1332,13 +1331,6 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 								"config1",
 								domain.IdentityProviderTypeOrg,
 							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							user.NewUserIDPLinkAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"config1", "", "externaluser1"),
 						),
 					),
 					expectPush(

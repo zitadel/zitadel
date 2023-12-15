@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/policy"
-	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -458,9 +457,8 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx                 context.Context
-		provider            *domain.IDPProvider
-		cascadeExternalIDPs []*domain.UserIDPLink
+		ctx      context.Context
+		provider *domain.IDPProvider
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -707,14 +705,6 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 				},
-				cascadeExternalIDPs: []*domain.UserIDPLink{
-					{
-						ObjectRoot: models.ObjectRoot{
-							AggregateID: "user1",
-						},
-						IDPConfigID: "config1",
-					},
-				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -759,20 +749,10 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							user.NewUserIDPLinkAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"config1", "", "externaluser1"),
-						),
-					),
 					expectPush(
 						instance.NewIdentityProviderRemovedEvent(context.Background(),
 							&instance.NewAggregate("INSTANCE").Aggregate,
 							"config1"),
-						user.NewUserIDPLinkCascadeRemovedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-							"config1", "externaluser1"),
 					),
 				),
 			},
@@ -780,15 +760,6 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 				ctx: context.Background(),
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
-				},
-				cascadeExternalIDPs: []*domain.UserIDPLink{
-					{
-						ObjectRoot: models.ObjectRoot{
-							AggregateID: "user1",
-						},
-						IDPConfigID:    "config1",
-						ExternalUserID: "externaluser1",
-					},
 				},
 			},
 			res: res{
@@ -803,7 +774,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveIDPProviderFromDefaultLoginPolicy(tt.args.ctx, tt.args.provider, tt.args.cascadeExternalIDPs...)
+			got, err := r.RemoveIDPProviderFromDefaultLoginPolicy(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
