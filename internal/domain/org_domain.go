@@ -6,8 +6,8 @@ import (
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type OrgDomain struct {
@@ -73,7 +73,7 @@ func NewIAMDomainName(orgName, iamDomain string) (string, error) {
 		return strings.ToLower(label + "." + iamDomain), nil
 	}
 
-	return "", errors.ThrowInvalidArgument(nil, "ORG-RrfXY", "Errors.Org.Domain.EmptyString")
+	return "", zerrors.ThrowInvalidArgument(nil, "ORG-RrfXY", "Errors.Org.Domain.EmptyString")
 }
 
 type OrgDomainValidationType int32

@@ -13,9 +13,9 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func mockCode(code string, exp time.Duration) cryptoCodeFunc {
@@ -270,7 +270,7 @@ func Test_secretGenerator(t *testing.T) {
 				alg:           nil,
 				defaultConfig: emptyConfig,
 			},
-			wantErr: errors.ThrowInternalf(nil, "COMMA-RreV6", "Errors.Internal unsupported crypto algorithm type %T", nil),
+			wantErr: zerrors.ThrowInternalf(nil, "COMMA-RreV6", "Errors.Internal unsupported crypto algorithm type %T", nil),
 		},
 	}
 	for _, tt := range tests {

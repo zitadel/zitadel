@@ -8,10 +8,10 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/call"
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -54,13 +54,13 @@ func (q *Queries) GetRemainingQuotaUsage(ctx context.Context, instanceID string,
 		}).
 		ToSql()
 	if err != nil {
-		return nil, zitadel_errors.ThrowInternal(err, "QUERY-FSA3g", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-FSA3g", "Errors.Query.SQLStatement")
 	}
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
 		remaining, err = scan(row)
 		return err
 	}, query, args...)
-	if zitadel_errors.IsNotFound(err) {
+	if zerrors.IsNotFound(err) {
 		return nil, nil
 	}
 	return remaining, err
@@ -78,9 +78,9 @@ func prepareRemainingQuotaUsageQuery(ctx context.Context, db prepareDatabase) (s
 			err := row.Scan(remaining)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
-					return nil, zitadel_errors.ThrowNotFound(err, "QUERY-quiowi2", "Errors.Internal")
+					return nil, zerrors.ThrowNotFound(err, "QUERY-quiowi2", "Errors.Internal")
 				}
-				return nil, zitadel_errors.ThrowInternal(err, "QUERY-81j1jn2", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-81j1jn2", "Errors.Internal")
 			}
 			return remaining, nil
 		}

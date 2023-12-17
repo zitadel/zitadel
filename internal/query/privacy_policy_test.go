@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -62,7 +62,7 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be NotFoundError got: %w", err), false
 					}
 					return nil, true

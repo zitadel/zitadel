@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -65,7 +65,7 @@ func MachineKeyAddedEventMapper(event eventstore.Event) (eventstore.Event, error
 		if unwrapErr, ok := err.(*json.UnmarshalTypeError); ok && unwrapErr.Field == "publicKey" {
 			return machineKeyAdded, nil
 		}
-		return nil, errors.ThrowInternal(err, "USER-p0ovS", "unable to unmarshal machine key added")
+		return nil, zerrors.ThrowInternal(err, "USER-p0ovS", "unable to unmarshal machine key added")
 	}
 
 	return machineKeyAdded, nil
@@ -106,7 +106,7 @@ func MachineKeyRemovedEventMapper(event eventstore.Event) (eventstore.Event, err
 	}
 	err := event.Unmarshal(machineRemoved)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-5Gm9s", "unable to unmarshal machine key removed")
+		return nil, zerrors.ThrowInternal(err, "USER-5Gm9s", "unable to unmarshal machine key removed")
 	}
 
 	return machineRemoved, nil

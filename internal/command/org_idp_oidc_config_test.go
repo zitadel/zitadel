@@ -9,11 +9,11 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
@@ -52,7 +52,7 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -68,7 +68,7 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -87,7 +87,7 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -143,7 +143,7 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -200,7 +200,7 @@ func TestCommandSide_ChangeIDPOIDCConfig(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{

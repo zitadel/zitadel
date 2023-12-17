@@ -1,7 +1,7 @@
 package login
 
 import (
-	errs "errors"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -95,7 +95,7 @@ func (l *Login) handleDeviceAuthUserCode(w http.ResponseWriter, r *http.Request)
 	userCode := r.Form.Get("user_code")
 	if userCode == "" {
 		if prompt, _ := url.QueryUnescape(r.Form.Get("prompt")); prompt != "" {
-			err = errs.New(prompt)
+			err = errors.New(prompt)
 		}
 		l.renderDeviceAuthUserCode(w, r, err)
 		return
@@ -107,7 +107,7 @@ func (l *Login) handleDeviceAuthUserCode(w http.ResponseWriter, r *http.Request)
 	}
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
-		l.renderDeviceAuthUserCode(w, r, errs.New("internal error: agent ID missing"))
+		l.renderDeviceAuthUserCode(w, r, errors.New("internal error: agent ID missing"))
 		return
 	}
 	authRequest, err := l.authRepo.CreateAuthRequest(ctx, &domain.AuthRequest{
@@ -151,7 +151,7 @@ func (l *Login) redirectDeviceAuthStart(w http.ResponseWriter, r *http.Request, 
 func (l *Login) handleDeviceAuthAction(w http.ResponseWriter, r *http.Request) {
 	authReq, err := l.getAuthRequest(r)
 	if authReq == nil {
-		err = errors.ThrowInvalidArgument(err, "LOGIN-OLah8", "invalid or missing auth request")
+		err = zerrors.ThrowInvalidArgument(err, "LOGIN-OLah8", "invalid or missing auth request")
 		l.redirectDeviceAuthStart(w, r, err.Error())
 		return
 	}

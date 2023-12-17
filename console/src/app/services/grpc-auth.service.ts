@@ -32,8 +32,6 @@ import {
   GetMyProfileResponse,
   GetMyUserRequest,
   GetMyUserResponse,
-  GetSupportedLanguagesRequest,
-  GetSupportedLanguagesResponse,
   ListMyAuthFactorsRequest,
   ListMyAuthFactorsResponse,
   ListMyLinkedIDPsRequest,
@@ -492,11 +490,6 @@ export class GrpcAuthService {
   public resendMyEmailVerification(): Promise<ResendMyEmailVerificationResponse.AsObject> {
     const req = new ResendMyEmailVerificationRequest();
     return this.grpcService.auth.resendMyEmailVerification(req, null).then((resp) => resp.toObject());
-  }
-
-  public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
-    const req = new GetSupportedLanguagesRequest();
-    return this.grpcService.auth.getSupportedLanguages(req, null).then((resp) => resp.toObject());
   }
 
   public getMyLoginPolicy(): Promise<GetMyLoginPolicyResponse.AsObject> {

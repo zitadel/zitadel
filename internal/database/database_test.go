@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/database/mock"
-	zerrors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestQueryJSONObject(t *testing.T) {

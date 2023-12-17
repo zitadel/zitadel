@@ -871,14 +871,16 @@
         },
         "SEQUENCE": {
           "LABEL": "séquence",
-          "CHECKBOX": "Filtrer par séquence",
-          "SORT": "Triage",
-          "ASC": "Ascendant",
-          "DESC": "Descendant"
+          "CHECKBOX": "Filtrer par séquence"
         },
+        "SORT": "Triage",
+        "ASC": "Ascendant",
+        "DESC": "Descendant",
         "CREATIONDATE": {
-          "LABEL": "Date de création",
-          "CHECKBOX": "Filtrer par date de création"
+          "RADIO_FROM": "De",
+          "RADIO_RANGE": "Gamme",
+          "LABEL_SINCE": "Depuis",
+          "LABEL_UNTIL": "Jusqu'à"
         },
         "OTHER": "autre",
         "OTHERS": "autres"
@@ -928,20 +930,22 @@
         "BTN": "Renommer"
       },
       "ORGDOMAIN": {
-        "TITLE": "Vérification de la propriété du domaine de l'organisation",
-        "VERIFICATION": "Pour vérifier la propriété de votre domaine, vous devez télécharger un fichier de vérification et le charger à l'URL indiquée ci-dessous, ou placer une entrée DNS TXT Record pour l'URL indiquée. Pour terminer, cliquez sur le bouton de vérification.",
-        "VERIFICATION_SKIP": "Vous pouvez ignorer la vérification pour l'instant et continuer à créer votre organisation, mais cette étape doit être terminée pour pouvoir utiliser votre organisation !",
-        "VERIFICATION_VALIDATION_DESC": "Les jetons sont vérifiés régulièrement pour s'assurer que vous êtes toujours propriétaire du domaine.",
+        "TITLE": "Vérifier la propriété de {{value}}",
+        "VERIFICATION": "Nous vous proposons deux méthodes pour valider manuellement votre domaine :",
+        "VERIFICATION_HTML": "-HTTP. Hébergez un fichier de vérification temporaire sur votre site Web",
+        "VERIFICATION_DNS": "-DNS. Créer une entrée DNS d'enregistrement TXT",
+        "VERIFICATION_DNS_DESC": "Si vous gérez {{ value }} et que vous avez accès à vos enregistrements DNS, vous pouvez créer un nouvel enregistrement TXT avec les valeurs suivantes :",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Utilisez ce code pour la valeur de l'enregistrement TXT :",
+        "VERIFICATION_HTTP_DESC": "Si vous avez accès à l'hébergement de votre site Web, téléchargez simplement le fichier de vérification et téléchargez-le à l'URL fournie.",
+        "VERIFICATION_HTTP_URL_LABEL": "URL attendue :",
+        "VERIFICATION_HTTP_FILE_LABEL": "Dossier de vérification :",
+        "VERIFICATION_SKIP": "Vous pouvez ignorer la vérification pour le moment et continuer à créer votre organisation, mais pour pouvoir utiliser votre domaine, cette étape doit être complétée !",
+        "VERIFICATION_VALIDATION_DESC": "Ne supprimez pas le code de vérification, car ZITADEL revérifiera de temps en temps la propriété de votre domaine.",
         "VERIFICATION_NEWTOKEN_TITLE": "Demander un nouveau jeton",
-        "VERIFICATION_NEWTOKEN_DESC": "Si vous voulez demander un nouveau jeton, sélectionnez votre méthode préférée. Si vous voulez valider un jeton persistant, cliquez sur le bouton ci-dessus.",
-        "VERIFICATION_VALIDATION_ONGOING": "Un jeton de vérification a déjà été demandé. Cliquez sur le bouton pour déclencher un contrôle de vérification.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Type de jeton",
-        "VERIFICATION_SUCCESSFUL": "Domaine vérifié avec succès !",
-        "REQUESTNEWTOKEN": "Demander un nouveau jeton",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "VERIFICATION_VALIDATION_ONGOING": "La méthode {{ value }} a été sélectionnée pour vérifier votre domaine. Cliquez sur le bouton pour déclencher une vérification ou réinitialiser le processus de vérification.",
+        "VERIFICATION_SUCCESSFUL": "Domaine vérifié avec succès !",
+        "RESETMETHOD": "Réinitialiser la méthode de vérification"
       },
       "DOWNLOAD_FILE": "Télécharger le fichier",
       "SELECTORGTOOLTIP": "Sélectionnez cette organisation.",
@@ -1018,7 +1022,7 @@
       "DESCRIPTION": "Ces paramètres étendent et remplacent les paramètres de votre instance."
     },
     "LIST": {
-      "GENERAL": "Général",
+      "LANGUAGES": "Langues",
       "LOGIN": "Comportement de connexion et sécurité",
       "LOCKOUT": "Verrouillage",
       "COMPLEXITY": "Complexité du mot de passe",
@@ -1047,22 +1051,32 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Langue par défaut",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Paramètres de langue",
+      "DEFAULT": "Langue par défaut",
+      "ALLOWED": "Langues autorisées",
+      "NOT_ALLOWED": "Langues non autorisées",
+      "ALLOW_ALL": "Autoriser toutes les langues",
+      "DISALLOW_ALL": "Interdire toutes les langues",
+      "SETASDEFAULT": "Définir comme langue par défaut",
+      "DEFAULT_SAVED": "Langue par défaut enregistrée",
+      "ALLOWED_SAVED": "Langues autorisées enregistrées",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "Paramètres SMTP",
@@ -1261,8 +1275,10 @@
       "RESET_DESCRIPTION": "Vous êtes sur le point de restaurer toutes les valeurs par défaut. Toutes les modifications que vous avez apportées seront définitivement supprimées. Voulez-vous vraiment continuer ?",
       "UNSAVED_TITLE": "Continuer sans sauvegarder ?",
       "UNSAVED_DESCRIPTION": "Vous avez apporté des modifications sans les sauvegarder. Voulez-vous les enregistrer maintenant ?",
-      "LOCALE": "Code Locale",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Vous avez sélectionné une langue qui n'est pas autorisée. Vous pouvez continuer à modifier les textes. Mais si vous voulez que vos utilisateurs puissent réellement utiliser cette langue, modifiez les restrictions de vos instances.",
+      "LANGUAGES_NOT_ALLOWED": "Non autorisé:",
+      "LANGUAGE": "Langue",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1373,7 +1389,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "L'adresse de l'expéditeur SMTP correspond au domaine de l'instance",
       "ALLOWUSERNAMEPASSWORD": "Nom d'utilisateur Mot de passe autorisé",
       "ALLOWEXTERNALIDP": "IDP externe autorisé",
-      "ALLOWREGISTER": "Enregistrement autorisé",
+      "ALLOWREGISTERUSERS": "Enregistrer les utilisateurs autorisés",
+      "ALLOWREGISTERORGS": "Enregistrer les organisations autorisées",
       "ALLOWUSERNAMEPASSWORD_DESC": "La connexion classique avec nom d'utilisateur et mot de passe est autorisée.",
       "ALLOWEXTERNALIDP_DESC": "La connexion est autorisée pour les fournisseurs d'identité sous-jacents",
       "ALLOWREGISTER_DESC": "Si l'option est sélectionnée, une étape supplémentaire pour l'enregistrement d'un utilisateur apparaît dans la connexion.",

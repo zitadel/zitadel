@@ -13,8 +13,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 )
 
@@ -81,7 +81,7 @@ func (s *Server) CreateCallback(ctx context.Context, req *oidc_pb.CreateCallback
 	case *oidc_pb.CreateCallbackRequest_Session:
 		return s.linkSessionToAuthRequest(ctx, req.GetAuthRequestId(), v.Session)
 	default:
-		return nil, errors.ThrowUnimplementedf(nil, "OIDCv2-zee7A", "verification oneOf %T in method CreateCallback not implemented", v)
+		return nil, zerrors.ThrowUnimplementedf(nil, "OIDCv2-zee7A", "verification oneOf %T in method CreateCallback not implemented", v)
 	}
 }
 

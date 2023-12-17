@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -340,7 +340,7 @@ func Test_UserPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -566,7 +566,7 @@ func Test_UserPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -637,7 +637,7 @@ func Test_UserPrepares(t *testing.T) {
 					},
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsPreconditionFailed(err) {
+					if !zerrors.IsPreconditionFailed(err) {
 						return fmt.Errorf("err should be zitadel.PredconditionError got: %w", err), false
 					}
 					return nil, true
@@ -672,7 +672,7 @@ func Test_UserPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -731,7 +731,7 @@ func Test_UserPrepares(t *testing.T) {
 					},
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsPreconditionFailed(err) {
+					if !zerrors.IsPreconditionFailed(err) {
 						return fmt.Errorf("err should be zitadel.PredconditionError got: %w", err), false
 					}
 					return nil, true
@@ -766,7 +766,7 @@ func Test_UserPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -825,7 +825,7 @@ func Test_UserPrepares(t *testing.T) {
 					},
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsPreconditionFailed(err) {
+					if !zerrors.IsPreconditionFailed(err) {
 						return fmt.Errorf("err should be zitadel.PredconditionError got: %w", err), false
 					}
 					return nil, true
@@ -860,7 +860,7 @@ func Test_UserPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -914,7 +914,7 @@ func Test_UserPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -1022,7 +1022,7 @@ func Test_UserPrepares(t *testing.T) {
 					},
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsPreconditionFailed(err) {
+					if !zerrors.IsPreconditionFailed(err) {
 						return fmt.Errorf("err should be zitadel.PredconditionError got: %w", err), false
 					}
 					return nil, true
@@ -1057,7 +1057,7 @@ func Test_UserPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true

@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/command"
-	z_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/form"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func Test_redirectToSuccessURL(t *testing.T) {
@@ -146,7 +146,7 @@ func Test_redirectToFailureURLErr(t *testing.T) {
 				id:         "id",
 				failureURL: "https://example.com/failure",
 				successURL: "https://example.com/success",
-				err:        z_errors.ThrowError(nil, "test", "testdesc"),
+				err:        zerrors.ThrowError(nil, "test", "testdesc"),
 			},
 			res{
 				"https://example.com/failure?error=test&error_description=testdesc&id=id",

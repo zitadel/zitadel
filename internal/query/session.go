@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"net"
 	"net/http"
 	"time"
@@ -16,10 +16,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Sessions struct {
@@ -215,7 +215,7 @@ func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, s
 		},
 	).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
 	}
 
 	var tokenID string
@@ -230,7 +230,7 @@ func (q *Queries) SessionByID(ctx context.Context, shouldTriggerBulk bool, id, s
 		return session, nil
 	}
 	if err := q.sessionTokenVerifier(ctx, sessionToken, session.ID, tokenID); err != nil {
-		return nil, errors.ThrowPermissionDenied(nil, "QUERY-dsfr3", "Errors.PermissionDenied")
+		return nil, zerrors.ThrowPermissionDenied(nil, "QUERY-dsfr3", "Errors.PermissionDenied")
 	}
 	return session, nil
 }
@@ -246,7 +246,7 @@ func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQue
 		}).
 		ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-sn9Jf", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-sn9Jf", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -254,7 +254,7 @@ func (q *Queries) SearchSessions(ctx context.Context, queries *SessionsSearchQue
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Sfg42", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Sfg42", "Errors.Internal")
 	}
 
 	sessions.State, err = q.latestState(ctx, sessionsTable)
@@ -366,10 +366,10 @@ func prepareSessionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			)
 
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, "", errors.ThrowNotFound(err, "QUERY-SFeaa", "Errors.Session.NotExisting")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, "", zerrors.ThrowNotFound(err, "QUERY-SFeaa", "Errors.Session.NotExisting")
 				}
-				return nil, "", errors.ThrowInternal(err, "QUERY-SAder", "Errors.Internal")
+				return nil, "", zerrors.ThrowInternal(err, "QUERY-SAder", "Errors.Internal")
 			}
 
 			session.UserFactor.UserID = userID.String
@@ -471,7 +471,7 @@ func prepareSessionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 				)
 
 				if err != nil {
-					return nil, errors.ThrowInternal(err, "QUERY-SAfeg", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(err, "QUERY-SAfeg", "Errors.Internal")
 				}
 				session.UserFactor.UserID = userID.String
 				session.UserFactor.ResourceOwner = userResourceOwner.String

@@ -4,7 +4,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type authNKey interface {
@@ -53,12 +53,12 @@ func NewAuthNKeyPair(keySize int) (privateKey, publicKey []byte, err error) {
 	private, public, err := crypto.GenerateKeyPair(keySize)
 	if err != nil {
 		logging.Log("AUTHN-Ud51I").WithError(err).Error("unable to create authn key pair")
-		return nil, nil, errors.ThrowInternal(err, "AUTHN-gdg2l", "Errors.Project.CouldNotGenerateClientSecret")
+		return nil, nil, zerrors.ThrowInternal(err, "AUTHN-gdg2l", "Errors.Project.CouldNotGenerateClientSecret")
 	}
 	publicKey, err = crypto.PublicKeyToBytes(public)
 	if err != nil {
 		logging.Log("AUTHN-Dbb35").WithError(err).Error("unable to convert public key")
-		return nil, nil, errors.ThrowInternal(err, "AUTHN-Bne3f", "Errors.Project.CouldNotGenerateClientSecret")
+		return nil, nil, zerrors.ThrowInternal(err, "AUTHN-Bne3f", "Errors.Project.CouldNotGenerateClientSecret")
 	}
 	privateKey = crypto.PrivateKeyToBytes(private)
 	return privateKey, publicKey, nil

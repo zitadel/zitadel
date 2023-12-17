@@ -11,9 +11,9 @@ import (
 	"github.com/k3a/html2text"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func InitFSChannel(config Config) (channels.NotificationChannel, error) {
@@ -44,7 +44,7 @@ func InitFSChannel(config Config) (channels.NotificationChannel, error) {
 		case *messages.JSON:
 			fileName = "message.json"
 		default:
-			return errors.ThrowUnimplementedf(nil, "NOTIF-6f9a1", "filesystem provider doesn't support message type %T", message)
+			return zerrors.ThrowUnimplementedf(nil, "NOTIF-6f9a1", "filesystem provider doesn't support message type %T", message)
 		}
 
 		return os.WriteFile(filepath.Join(config.Path, fileName), []byte(content), 0666)

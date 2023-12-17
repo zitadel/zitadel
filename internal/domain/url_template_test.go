@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func Test_renderURLTemplate(t *testing.T) {
@@ -26,7 +26,7 @@ func Test_renderURLTemplate(t *testing.T) {
 			args: args{
 				tmpl: "{{",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
 		},
 		{
 			name: "execution error",
@@ -34,7 +34,7 @@ func Test_renderURLTemplate(t *testing.T) {
 				tmpl: "{{.Some}}",
 				data: struct{ Foo int }{Foo: 1},
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "DOMAIN-ieYa7", "Errors.User.InvalidURLTemplate"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-ieYa7", "Errors.User.InvalidURLTemplate"),
 		},
 		{
 			name: "success",

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // Deprecated: User commands.domainPolicyWriteModel directly, to remove use of eventstore.Filter function
@@ -23,7 +23,7 @@ func domainPolicyWriteModel(ctx context.Context, filter preparation.FilterToQuer
 	if instanceWriteModel != nil && instanceWriteModel.State.Exists() {
 		return &instanceWriteModel.PolicyDomainWriteModel, err
 	}
-	return nil, errors.ThrowInternal(nil, "USER-Ggk9n", "Errors.Internal")
+	return nil, zerrors.ThrowInternal(nil, "USER-Ggk9n", "Errors.Internal")
 }
 
 func (c *Commands) domainPolicyWriteModel(ctx context.Context, orgID string) (*PolicyDomainWriteModel, error) {

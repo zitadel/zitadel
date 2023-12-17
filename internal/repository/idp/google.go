@@ -2,8 +2,8 @@ package idp
 
 import (
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type GoogleIDPAddedEvent struct {
@@ -52,7 +52,7 @@ func GoogleIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error)
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-SAff1", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-SAff1", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -75,7 +75,7 @@ func NewGoogleIDPChangedEvent(
 	changes []GoogleIDPChanges,
 ) (*GoogleIDPChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDP-Dg3qs", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-Dg3qs", "Errors.NoChangesFound")
 	}
 	changedEvent := &GoogleIDPChangedEvent{
 		BaseEvent: *base,
@@ -133,7 +133,7 @@ func GoogleIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, erro
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-SF3t2", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-SF3t2", "unable to unmarshal event")
 	}
 
 	return e, nil

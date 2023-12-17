@@ -2,8 +2,8 @@ package idpconfig
 
 import (
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -66,7 +66,7 @@ func IDPConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error)
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -103,7 +103,7 @@ func NewIDPConfigChangedEvent(
 	changes []IDPConfigChanges,
 ) (*IDPConfigChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDPCONFIG-Dsg21", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDPCONFIG-Dsg21", "Errors.NoChangesFound")
 	}
 	changeEvent := &IDPConfigChangedEvent{
 		BaseEvent: *base,
@@ -143,7 +143,7 @@ func IDPConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, erro
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -181,7 +181,7 @@ func IDPConfigDeactivatedEventMapper(event eventstore.Event) (eventstore.Event, 
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -219,7 +219,7 @@ func IDPConfigReactivatedEventMapper(event eventstore.Event) (eventstore.Event, 
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -260,7 +260,7 @@ func IDPConfigRemovedEventMapper(event eventstore.Event) (eventstore.Event, erro
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
 	}
 
 	return e, nil

@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	"golang.org/x/text/language"
 )
 
@@ -39,7 +39,7 @@ func NewHumanProfileChangedEvent(
 	changes []ProfileChanges,
 ) (*HumanProfileChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "USER-33n8F", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "USER-33n8F", "Errors.NoChangesFound")
 	}
 	changeEvent := &HumanProfileChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -98,7 +98,7 @@ func HumanProfileChangedEventMapper(event eventstore.Event) (eventstore.Event, e
 	}
 	err := event.Unmarshal(profileChanged)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-5M0pd", "unable to unmarshal human profile changed")
+		return nil, zerrors.ThrowInternal(err, "USER-5M0pd", "unable to unmarshal human profile changed")
 	}
 
 	return profileChanged, nil

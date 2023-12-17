@@ -5,8 +5,8 @@ import (
 	"net/url"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -60,7 +60,7 @@ func StartedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-Sf3f1", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-Sf3f1", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -118,7 +118,7 @@ func SucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-HBreq", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-HBreq", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -173,7 +173,7 @@ func SAMLSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) 
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-l4tw23y6lq", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-l4tw23y6lq", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -215,7 +215,7 @@ func SAMLRequestEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-l85678vwlf", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-l85678vwlf", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -270,7 +270,7 @@ func LDAPSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) 
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-HBreq", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-HBreq", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -312,7 +312,7 @@ func FailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-Sfer3", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-Sfer3", "unable to unmarshal event")
 	}
 
 	return e, nil

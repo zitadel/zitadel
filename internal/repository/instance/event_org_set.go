@@ -3,8 +3,8 @@ package instance
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -46,7 +46,7 @@ func DefaultOrgSetMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-cdFZH", "unable to unmarshal default org set")
+		return nil, zerrors.ThrowInternal(err, "IAM-cdFZH", "unable to unmarshal default org set")
 	}
 
 	return e, nil

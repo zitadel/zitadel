@@ -6,7 +6,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -14,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -679,7 +679,7 @@ func (p *idpTemplateProjection) reduceOAuthIDPAdded(event eventstore.Event) (*ha
 		idpEvent = e.OAuthIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ap9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPAddedEventType, instance.OAuthIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ap9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPAddedEventType, instance.OAuthIDPAddedEventType})
 	}
 
 	return handler.NewMultiStatement(
@@ -727,7 +727,7 @@ func (p *idpTemplateProjection) reduceOAuthIDPChanged(event eventstore.Event) (*
 	case *instance.OAuthIDPChangedEvent:
 		idpEvent = e.OAuthIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPChangedEventType, instance.OAuthIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPChangedEventType, instance.OAuthIDPChangedEventType})
 	}
 
 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
@@ -771,7 +771,7 @@ func (p *idpTemplateProjection) reduceOIDCIDPAdded(event eventstore.Event) (*han
 		idpEvent = e.OIDCIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPAddedEventType, instance.OIDCIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPAddedEventType, instance.OIDCIDPAddedEventType})
 	}
 
 	return handler.NewMultiStatement(
@@ -817,7 +817,7 @@ func (p *idpTemplateProjection) reduceOIDCIDPChanged(event eventstore.Event) (*h
 	case *instance.OIDCIDPChangedEvent:
 		idpEvent = e.OIDCIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
 	}
 
 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
@@ -858,7 +858,7 @@ func (p *idpTemplateProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Ev
 	case *instance.OIDCIDPMigratedAzureADEvent:
 		idpEvent = e.OIDCIDPMigratedAzureADEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
 	}
 
 	return handler.NewMultiStatement(
@@ -909,7 +909,7 @@ func (p *idpTemplateProjection) reduceOIDCIDPMigratedGoogle(event eventstore.Eve
 	case *instance.OIDCIDPMigratedGoogleEvent:
 		idpEvent = e.OIDCIDPMigratedGoogleEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedGoogleEventType, instance.OIDCIDPMigratedGoogleEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedGoogleEventType, instance.OIDCIDPMigratedGoogleEventType})
 	}
 
 	return handler.NewMultiStatement(
@@ -961,7 +961,7 @@ func (p *idpTemplateProjection) reduceJWTIDPAdded(event eventstore.Event) (*hand
 		idpEvent = e.JWTIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-xopi2s", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPAddedEventType, instance.JWTIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xopi2s", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPAddedEventType, instance.JWTIDPAddedEventType})
 	}
 
 	return handler.NewMultiStatement(
@@ -1006,7 +1006,7 @@ func (p *idpTemplateProjection) reduceJWTIDPChanged(event eventstore.Event) (*ha
 	case *instance.JWTIDPChangedEvent:
 		idpEvent = e.JWTIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
 	}
 
 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
@@ -1050,7 +1050,7 @@ func (p *idpTemplateProjection) reduceOldConfigAdded(event eventstore.Event) (*h
 		idpEvent = e.IDPConfigAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ADfeg", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigAddedEventType, instance.IDPConfigAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ADfeg", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigAddedEventType, instance.IDPConfigAddedEventType})
 	}
 
 	return handler.NewCreateStatement(
@@ -1082,7 +1082,7 @@ func (p *idpTemplateProjection) reduceOldConfigChanged(event eventstore.Event) (
 	case *instance.IDPConfigChangedEvent:
 		idpEvent = e.IDPConfigChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAfg2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigChangedEventType, instance.IDPConfigChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAfg2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigChangedEventType, instance.IDPConfigChangedEventType})
 	}
 
 	cols := make([]handler.Column, 0, 4)
@@ -1115,7 +1115,7 @@ func (p *idpTemplateProjection) reduceOldOIDCConfigAdded(event eventstore.Event)
 	case *instance.IDPOIDCConfigAddedEvent:
 		idpEvent = e.OIDCConfigAddedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ASFdq2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigAddedEventType, instance.IDPOIDCConfigAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ASFdq2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigAddedEventType, instance.IDPOIDCConfigAddedEventType})
 	}
 
 	return handler.NewMultiStatement(
@@ -1154,7 +1154,7 @@ func (p *idpTemplateProjection) reduceOldOIDCConfigChanged(event eventstore.Even
 	case *instance.IDPOIDCConfigChangedEvent:
 		idpEvent = e.OIDCConfigChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
 	}
 
 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
@@ -1210,7 +1210,7 @@ func (p *idpTemplateProjection) reduceOldJWTConfigAdded(event eventstore.Event) 
 	case *instance.IDPJWTConfigAddedEvent:
 		idpEvent = e.JWTConfigAddedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ASFdq2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigAddedEventType, instance.IDPJWTConfigAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ASFdq2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigAddedEventType, instance.IDPJWTConfigAddedEventType})
 	}
 
 	return handler.NewMultiStatement(
@@ -1248,7 +1248,7 @@ func (p *idpTemplateProjection) reduceOldJWTConfigChanged(event eventstore.Event
 	case *instance.IDPJWTConfigChangedEvent:
 		idpEvent = e.JWTConfigChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
 	}
 
 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
@@ -1307,7 +1307,7 @@ func (p *idpTemplateProjection) reduceAzureADIDPAdded(event eventstore.Event) (*
 		idpEvent = e.AzureADIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPAddedEventType, instance.AzureADIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPAddedEventType, instance.AzureADIDPAddedEventType})
 	}
 
 	return handler.NewMultiStatement(
@@ -1353,7 +1353,7 @@ func (p *idpTemplateProjection) reduceAzureADIDPChanged(event eventstore.Event) 
 	case *instance.AzureADIDPChangedEvent:
 		idpEvent = e.AzureADIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
 	}
 
 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
@@ -1397,7 +1397,7 @@ func (p *idpTemplateProjection) reduceGitHubIDPAdded(event eventstore.Event) (*h
 		idpEvent = e.GitHubIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPAddedEventType, instance.GitHubIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPAddedEventType, instance.GitHubIDPAddedEventType})
 	}
 
 	return handler.NewMultiStatement(
@@ -1444,7 +1444,7 @@ func (p *idpTemplateProjection) reduceGitHubEnterpriseIDPAdded(event eventstore.
 		idpEvent = e.GitHubEnterpriseIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Sf3g2a", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPAddedEventType, instance.GitHubEnterpriseIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Sf3g2a", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPAddedEventType, instance.GitHubEnterpriseIDPAddedEventType})
 	}
 
 	return handler.NewMultiStatement(
@@ -1491,7 +1491,7 @@ func (p *idpTemplateProjection) reduceGitHubIDPChanged(event eventstore.Event) (
 	case *instance.GitHubIDPChangedEvent:
 		idpEvent = e.GitHubIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPChangedEventType, instance.GitHubIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPChangedEventType, instance.GitHubIDPChangedEventType})
 	}
 
 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
@@ -1532,7 +1532,7 @@ func (p *idpTemplateProjection) reduceGitHubEnterpriseIDPChanged(event eventstor
 	case *instance.GitHubEnterpriseIDPChangedEvent:
 		idpEvent = e.GitHubEnterpriseIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SDg3g", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPChangedEventType, instance.GitHubEnterpriseIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SDg3g", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPChangedEventType, instance.GitHubEnterpriseIDPChangedEventType})
 	}
 
 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
@@ -1576,7 +1576,7 @@ func (p *idpTemplateProjection) reduceGitLabIDPAdded(event eventstore.Event) (*h
 		idpEvent = e.GitLabIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPAddedEventType, instance.GitLabIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPAddedEventType, instance.GitLabIDPAddedEventType})
 	}
 
 	return handler.NewMultiStatement(
@@ -1620,7 +1620,7 @@ func (p *idpTemplateProjection) reduceGitLabIDPChanged(event eventstore.Event) (
 	case *instance.GitLabIDPChangedEvent:
 		idpEvent = e.GitLabIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
 	}
 
 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
@@ -1664,7 +1664,7 @@ func (p *idpTemplateProjection) reduceGitLabSelfHostedIDPAdded(event eventstore.
 		idpEvent = e.GitLabSelfHostedIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAF3gw", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPAddedEventType, instance.GitLabSelfHostedIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAF3gw", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPAddedEventType, instance.GitLabSelfHostedIDPAddedEventType})
 	}
 
 	return handler.NewMultiStatement(
@@ -1709,7 +1709,7 @@ func (p *idpTemplateProjection) reduceGitLabSelfHostedIDPChanged(event eventstor
 	case *instance.GitLabSelfHostedIDPChangedEvent:
 		idpEvent = e.GitLabSelfHostedIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAf3g2", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPChangedEventType, instance.GitLabSelfHostedIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAf3g2", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPChangedEventType, instance.GitLabSelfHostedIDPChangedEventType})
 	}
 
 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
@@ -1753,7 +1753,7 @@ func (p *idpTemplateProjection) reduceGoogleIDPAdded(event eventstore.Event) (*h
 		idpEvent = e.GoogleIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ap9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPAddedEventType, instance.GoogleIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ap9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPAddedEventType, instance.GoogleIDPAddedEventType})
 	}
 
 	return handler.NewMultiStatement(
@@ -1797,7 +1797,7 @@ func (p *idpTemplateProjection) reduceGoogleIDPChanged(event eventstore.Event) (
 	case *instance.GoogleIDPChangedEvent:
 		idpEvent = e.GoogleIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
 	}
 
 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
@@ -1841,7 +1841,7 @@ func (p *idpTemplateProjection) reduceLDAPIDPAdded(event eventstore.Event) (*han
 		idpEvent = e.LDAPIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPAddedEventType, instance.LDAPIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPAddedEventType, instance.LDAPIDPAddedEventType})
 	}
 
 	return handler.NewMultiStatement(
@@ -1904,7 +1904,7 @@ func (p *idpTemplateProjection) reduceLDAPIDPChanged(event eventstore.Event) (*h
 	case *instance.LDAPIDPChangedEvent:
 		idpEvent = e.LDAPIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPChangedEventType, instance.LDAPIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPChangedEventType, instance.LDAPIDPChangedEventType})
 	}
 
 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
@@ -1949,7 +1949,7 @@ func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*han
 		idpEvent = e.SAMLIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPAddedEventType, instance.SAMLIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPAddedEventType, instance.SAMLIDPAddedEventType})
 	}
 
 	return handler.NewMultiStatement(
@@ -1995,7 +1995,7 @@ func (p *idpTemplateProjection) reduceSAMLIDPChanged(event eventstore.Event) (*h
 	case *instance.SAMLIDPChangedEvent:
 		idpEvent = e.SAMLIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-o7c0fii4ad", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPChangedEventType, instance.SAMLIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-o7c0fii4ad", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPChangedEventType, instance.SAMLIDPChangedEventType})
 	}
 
 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
@@ -2040,7 +2040,7 @@ func (p *idpTemplateProjection) reduceAppleIDPAdded(event eventstore.Event) (*ha
 		idpEvent = e.AppleIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SFvg3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPAddedEventType /*, instance.AppleIDPAddedEventType*/})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SFvg3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPAddedEventType /*, instance.AppleIDPAddedEventType*/})
 	}
 
 	return handler.NewMultiStatement(
@@ -2086,7 +2086,7 @@ func (p *idpTemplateProjection) reduceAppleIDPChanged(event eventstore.Event) (*
 	case *instance.AppleIDPChangedEvent:
 		idpEvent = e.AppleIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-GBez3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPChangedEventType /*, instance.AppleIDPChangedEventType*/})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-GBez3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPChangedEventType /*, instance.AppleIDPChangedEventType*/})
 	}
 
 	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
@@ -2127,7 +2127,7 @@ func (p *idpTemplateProjection) reduceIDPConfigRemoved(event eventstore.Event) (
 	case *instance.IDPConfigRemovedEvent:
 		idpEvent = e.IDPConfigRemovedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAFet", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAFet", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
 	}
 
 	return handler.NewDeleteStatement(
@@ -2147,7 +2147,7 @@ func (p *idpTemplateProjection) reduceIDPRemoved(event eventstore.Event) (*handl
 	case *instance.IDPRemovedEvent:
 		idpEvent = e.RemovedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-xbcvwin2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xbcvwin2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType})
 	}
 
 	return handler.NewDeleteStatement(
@@ -2162,7 +2162,7 @@ func (p *idpTemplateProjection) reduceIDPRemoved(event eventstore.Event) (*handl
 func (p *idpTemplateProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Jp0D2K", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Jp0D2K", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
 	return handler.NewDeleteStatement(

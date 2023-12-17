@@ -9,9 +9,9 @@ import (
 	authn_grpc "github.com/zitadel/zitadel/internal/api/grpc/authn"
 	text_grpc "github.com/zitadel/zitadel/internal/api/grpc/text"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	app_pb "github.com/zitadel/zitadel/pkg/grpc/app"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
@@ -325,7 +325,7 @@ func (s *Server) getIDPs(ctx context.Context, orgID string) (_ []*v1_pb.DataOIDC
 	for _, idp := range idps.IDPs {
 		if idp.OIDCIDP != nil {
 			clientSecret, err := s.query.GetOIDCIDPClientSecret(ctx, false, orgID, idp.ID, false)
-			if err != nil && !caos_errors.IsNotFound(err) {
+			if err != nil && !zerrors.IsNotFound(err) {
 				return nil, nil, err
 			}
 			oidcIdps = append(oidcIdps, &v1_pb.DataOIDCIDP{
@@ -590,7 +590,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 				ctx, pwspan := tracing.NewSpan(ctx)
 				encodedHash, err := s.query.GetHumanPassword(ctx, org, user.ID)
 				pwspan.EndWithError(err)
-				if err != nil && !caos_errors.IsNotFound(err) {
+				if err != nil && !zerrors.IsNotFound(err) {
 					return nil, nil, nil, nil, err
 				}
 				if err == nil && encodedHash != "" {
@@ -603,7 +603,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 				ctx, otpspan := tracing.NewSpan(ctx)
 				code, err := s.query.GetHumanOTPSecret(ctx, user.ID, org)
 				otpspan.EndWithError(err)
-				if err != nil && !caos_errors.IsNotFound(err) {
+				if err != nil && !zerrors.IsNotFound(err) {
 					return nil, nil, nil, nil, err
 				}
 				if err == nil && code != "" {

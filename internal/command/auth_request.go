@@ -6,9 +6,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type AuthRequest struct {
@@ -50,7 +50,7 @@ func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest)
 		return nil, err
 	}
 	if writeModel.AuthRequestState != domain.AuthRequestStateUnspecified {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-Sf3gt", "Errors.AuthRequest.AlreadyExisting")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sf3gt", "Errors.AuthRequest.AlreadyExisting")
 	}
 	err = c.pushAppendAndReduce(ctx, writeModel, authrequest.NewAddedEvent(
 		ctx,
@@ -82,13 +82,13 @@ func (c *Commands) LinkSessionToAuthRequest(ctx context.Context, id, sessionID, 
 		return nil, nil, err
 	}
 	if writeModel.AuthRequestState == domain.AuthRequestStateUnspecified {
-		return nil, nil, errors.ThrowNotFound(nil, "COMMAND-jae5P", "Errors.AuthRequest.NotExisting")
+		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-jae5P", "Errors.AuthRequest.NotExisting")
 	}
 	if writeModel.AuthRequestState != domain.AuthRequestStateAdded {
-		return nil, nil, errors.ThrowPreconditionFailed(nil, "COMMAND-Sx208nt", "Errors.AuthRequest.AlreadyHandled")
+		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sx208nt", "Errors.AuthRequest.AlreadyHandled")
 	}
 	if checkLoginClient && authz.GetCtxData(ctx).UserID != writeModel.LoginClient {
-		return nil, nil, errors.ThrowPermissionDenied(nil, "COMMAND-rai9Y", "Errors.AuthRequest.WrongLoginClient")
+		return nil, nil, zerrors.ThrowPermissionDenied(nil, "COMMAND-rai9Y", "Errors.AuthRequest.WrongLoginClient")
 	}
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
@@ -120,7 +120,7 @@ func (c *Commands) FailAuthRequest(ctx context.Context, id string, reason domain
 		return nil, nil, err
 	}
 	if writeModel.AuthRequestState != domain.AuthRequestStateAdded {
-		return nil, nil, errors.ThrowPreconditionFailed(nil, "COMMAND-Sx202nt", "Errors.AuthRequest.AlreadyHandled")
+		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sx202nt", "Errors.AuthRequest.AlreadyHandled")
 	}
 	err = c.pushAppendAndReduce(ctx, writeModel, authrequest.NewFailedEvent(
 		ctx,
@@ -135,14 +135,14 @@ func (c *Commands) FailAuthRequest(ctx context.Context, id string, reason domain
 
 func (c *Commands) AddAuthRequestCode(ctx context.Context, authRequestID, code string) (err error) {
 	if code == "" {
-		return errors.ThrowPreconditionFailed(nil, "COMMAND-Ht52d", "Errors.AuthRequest.InvalidCode")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Ht52d", "Errors.AuthRequest.InvalidCode")
 	}
 	writeModel, err := c.getAuthRequestWriteModel(ctx, authRequestID)
 	if err != nil {
 		return err
 	}
 	if writeModel.AuthRequestState != domain.AuthRequestStateAdded || writeModel.SessionID == "" {
-		return errors.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.AlreadyHandled")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.AlreadyHandled")
 	}
 	return c.pushAppendAndReduce(ctx, writeModel, authrequest.NewCodeAddedEvent(ctx,
 		&authrequest.NewAggregate(writeModel.AggregateID, authz.GetInstance(ctx).InstanceID()).Aggregate))
@@ -150,14 +150,14 @@ func (c *Commands) AddAuthRequestCode(ctx context.Context, authRequestID, code s
 
 func (c *Commands) ExchangeAuthCode(ctx context.Context, code string) (authRequest *CurrentAuthRequest, err error) {
 	if code == "" {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-Sf3g2", "Errors.AuthRequest.InvalidCode")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sf3g2", "Errors.AuthRequest.InvalidCode")
 	}
 	writeModel, err := c.getAuthRequestWriteModel(ctx, code)
 	if err != nil {
 		return nil, err
 	}
 	if writeModel.AuthRequestState != domain.AuthRequestStateCodeAdded {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.NoCode")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.NoCode")
 	}
 	err = c.pushAppendAndReduce(ctx, writeModel, authrequest.NewCodeExchangedEvent(ctx,
 		&authrequest.NewAggregate(writeModel.AggregateID, authz.GetInstance(ctx).InstanceID()).Aggregate))

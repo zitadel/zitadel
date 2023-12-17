@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestLabelPolicyPrimaryColorValid(t *testing.T) {
@@ -40,21 +40,21 @@ func TestLabelPolicyPrimaryColorValid(t *testing.T) {
 			args: args{
 				policy: &LabelPolicy{PrimaryColor: "#0f9wfm"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "color code with wrong count of characters, invalid",
 			args: args{
 				policy: &LabelPolicy{PrimaryColor: "#00"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "color code with no #, invalid",
 			args: args{
 				policy: &LabelPolicy{PrimaryColor: "#00"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 	}
 	for _, tt := range tests {
@@ -102,21 +102,21 @@ func TestLabelPolicyBackgroundColorValid(t *testing.T) {
 			args: args{
 				policy: &LabelPolicy{BackgroundColor: "#0f9wfm"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "color code with wrong count of characters, invalid",
 			args: args{
 				policy: &LabelPolicy{BackgroundColor: "#00"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "color code with no #, invalid",
 			args: args{
 				policy: &LabelPolicy{BackgroundColor: "#00"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 	}
 	for _, tt := range tests {
@@ -164,21 +164,21 @@ func TestLabelPolicyWarnColorValid(t *testing.T) {
 			args: args{
 				policy: &LabelPolicy{WarnColor: "#0f9wfm"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "color code with wrong count of characters, invalid",
 			args: args{
 				policy: &LabelPolicy{WarnColor: "#00"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "color code with no #, invalid",
 			args: args{
 				policy: &LabelPolicy{WarnColor: "#00"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 	}
 	for _, tt := range tests {
@@ -226,21 +226,21 @@ func TestLabelPolicyFontColorValid(t *testing.T) {
 			args: args{
 				policy: &LabelPolicy{FontColor: "#0f9wfm"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "color code with wrong count of characters, invalid",
 			args: args{
 				policy: &LabelPolicy{FontColor: "#00"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "color code with no #, invalid",
 			args: args{
 				policy: &LabelPolicy{FontColor: "#00"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 	}
 	for _, tt := range tests {
@@ -288,21 +288,21 @@ func TestLabelPolicyPrimaryColorDarkValid(t *testing.T) {
 			args: args{
 				policy: &LabelPolicy{PrimaryColorDark: "#0f9wfm"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "color code with wrong count of characters, invalid",
 			args: args{
 				policy: &LabelPolicy{PrimaryColorDark: "#00"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "color code with no #, invalid",
 			args: args{
 				policy: &LabelPolicy{PrimaryColorDark: "#00"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 	}
 	for _, tt := range tests {
@@ -350,21 +350,21 @@ func TestLabelPolicyBackgroundColorDarkValid(t *testing.T) {
 			args: args{
 				policy: &LabelPolicy{BackgroundColorDark: "#0f9wfm"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "color code with wrong count of characters, invalid",
 			args: args{
 				policy: &LabelPolicy{BackgroundColorDark: "#00"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "color code with no #, invalid",
 			args: args{
 				policy: &LabelPolicy{BackgroundColorDark: "#00"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 	}
 	for _, tt := range tests {
@@ -412,21 +412,21 @@ func TestLabelPolicyWarnColorDarkValid(t *testing.T) {
 			args: args{
 				policy: &LabelPolicy{WarnColorDark: "#0f9wfm"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "color code with wrong count of characters, invalid",
 			args: args{
 				policy: &LabelPolicy{WarnColorDark: "#00"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "color code with no #, invalid",
 			args: args{
 				policy: &LabelPolicy{WarnColorDark: "#00"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 	}
 	for _, tt := range tests {
@@ -474,21 +474,21 @@ func TestLabelPolicyFontColorDarkValid(t *testing.T) {
 			args: args{
 				policy: &LabelPolicy{FontColorDark: "#0f9wfm"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "color code with wrong count of characters, invalid",
 			args: args{
 				policy: &LabelPolicy{FontColorDark: "#00"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "color code with no #, invalid",
 			args: args{
 				policy: &LabelPolicy{FontColorDark: "#00"},
 			},
-			err: caos_errs.IsErrorInvalidArgument,
+			err: zerrors.IsErrorInvalidArgument,
 		},
 	}
 	for _, tt := range tests {

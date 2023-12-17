@@ -10,8 +10,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type cookieKey int
@@ -95,7 +95,7 @@ func (ua *userAgentHandler) getUserAgent(r *http.Request) (*UserAgent, error) {
 	userAgent := new(UserAgent)
 	err := ua.cookieHandler.GetEncryptedCookieValue(r, ua.cookieName, userAgent)
 	if err != nil {
-		return nil, errors.ThrowPermissionDenied(err, "HTTP-YULqH4", "cannot read user agent cookie")
+		return nil, zerrors.ThrowPermissionDenied(err, "HTTP-YULqH4", "cannot read user agent cookie")
 	}
 	return userAgent, nil
 }
@@ -103,7 +103,7 @@ func (ua *userAgentHandler) getUserAgent(r *http.Request) (*UserAgent, error) {
 func (ua *userAgentHandler) setUserAgent(w http.ResponseWriter, host string, agent *UserAgent, iframe bool) error {
 	err := ua.cookieHandler.SetEncryptedCookie(w, ua.cookieName, host, agent, iframe)
 	if err != nil {
-		return errors.ThrowPermissionDenied(err, "HTTP-AqgqdA", "cannot set user agent cookie")
+		return zerrors.ThrowPermissionDenied(err, "HTTP-AqgqdA", "cannot set user agent cookie")
 	}
 	return nil
 }

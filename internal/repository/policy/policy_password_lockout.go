@@ -1,8 +1,8 @@
 package policy
 
 import (
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -46,7 +46,7 @@ func LockoutPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, er
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-8XiVd", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-8XiVd", "unable to unmarshal policy")
 	}
 
 	return e, nil
@@ -72,7 +72,7 @@ func NewLockoutPolicyChangedEvent(
 	changes []LockoutPolicyChanges,
 ) (*LockoutPolicyChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-sdgh6", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "POLICY-sdgh6", "Errors.NoChangesFound")
 	}
 	changeEvent := &LockoutPolicyChangedEvent{
 		BaseEvent: *base,
@@ -104,7 +104,7 @@ func LockoutPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, 
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-lWGRc", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-lWGRc", "unable to unmarshal policy")
 	}
 
 	return e, nil

@@ -6,10 +6,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddDefaultDomainPolicy(ctx context.Context, userLoginMustBeDomain, validateOrgDomains, smtpSenderAddressMatchesInstanceDomain bool) (*domain.ObjectDetails, error) {
@@ -49,7 +49,7 @@ func (c *Commands) getDefaultDomainPolicy(ctx context.Context) (*domain.DomainPo
 		return nil, err
 	}
 	if !policyWriteModel.State.Exists() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-3n8fs", "Errors.IAM.PasswordComplexityPolicy.NotFound")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-3n8fs", "Errors.IAM.PasswordComplexityPolicy.NotFound")
 	}
 	policy := writeModelToDomainPolicy(policyWriteModel)
 	policy.Default = true
@@ -81,7 +81,7 @@ func prepareAddDefaultDomainPolicy(
 				return nil, err
 			}
 			if writeModel.State == domain.PolicyStateActive {
-				return nil, caos_errs.ThrowAlreadyExists(nil, "INSTANCE-Lk0dS", "Errors.Instance.DomainPolicy.AlreadyExists")
+				return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-Lk0dS", "Errors.Instance.DomainPolicy.AlreadyExists")
 			}
 			return []eventstore.Command{
 				instance.NewDomainPolicyAddedEvent(ctx, &a.Aggregate,
@@ -107,7 +107,7 @@ func prepareChangeDefaultDomainPolicy(
 				return nil, err
 			}
 			if !writeModel.State.Exists() {
-				return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-0Pl0d", "Errors.Instance.DomainPolicy.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "INSTANCE-0Pl0d", "Errors.Instance.DomainPolicy.NotFound")
 			}
 			changedEvent, usernameChange, err := writeModel.NewChangedEvent(ctx, &a.Aggregate,
 				userLoginMustBeDomain,

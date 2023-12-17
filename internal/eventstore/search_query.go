@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // SearchQueryBuilder represents the builder for your filter
@@ -141,7 +141,7 @@ const (
 
 func (c Columns) Validate() error {
 	if c <= 0 || c >= columnsCount {
-		return errors.ThrowPreconditionFailed(nil, "REPOS-x8R35", "column out of range")
+		return zerrors.ThrowPreconditionFailed(nil, "REPOS-x8R35", "column out of range")
 	}
 	return nil
 }

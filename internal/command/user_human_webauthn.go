@@ -8,11 +8,11 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) getHumanU2FTokens(ctx context.Context, userID, resourceowner string) ([]*domain.WebAuthNToken, error) {
@@ -22,7 +22,7 @@ func (c *Commands) getHumanU2FTokens(ctx context.Context, userID, resourceowner 
 		return nil, err
 	}
 	if tokenReadModel.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-4M0ds", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-4M0ds", "Errors.User.NotFound")
 	}
 	return readModelToWebAuthNTokens(tokenReadModel), nil
 }
@@ -34,7 +34,7 @@ func (c *Commands) getHumanPasswordlessTokens(ctx context.Context, userID, resou
 		return nil, err
 	}
 	if tokenReadModel.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Mv9sd", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Mv9sd", "Errors.User.NotFound")
 	}
 	return readModelToWebAuthNTokens(tokenReadModel), nil
 }
@@ -46,7 +46,7 @@ func (c *Commands) getHumanU2FLogin(ctx context.Context, userID, authReqID, reso
 		return nil, err
 	}
 	if tokenReadModel.State == domain.UserStateUnspecified || tokenReadModel.State == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-5m88U", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-5m88U", "Errors.User.NotFound")
 	}
 	return &domain.WebAuthNLogin{
 		ObjectRoot: models.ObjectRoot{
@@ -65,7 +65,7 @@ func (c *Commands) getHumanPasswordlessLogin(ctx context.Context, userID, authRe
 		return nil, err
 	}
 	if tokenReadModel.State == domain.UserStateUnspecified || tokenReadModel.State == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-fm84R", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-fm84R", "Errors.User.NotFound")
 	}
 	return &domain.WebAuthNLogin{
 		ObjectRoot: models.ObjectRoot{
@@ -139,7 +139,7 @@ func (c *Commands) HumanAddPasswordlessSetupInitCode(ctx context.Context, userID
 
 func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner, rpID string, tokens []*domain.WebAuthNToken, authenticatorPlatform domain.AuthenticatorAttachment, userVerification domain.UserVerificationRequirement) (*HumanWebAuthNWriteModel, *eventstore.Aggregate, *domain.WebAuthNToken, error) {
 	if userID == "" {
-		return nil, nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M0od", "Errors.IDMissing")
+		return nil, nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3M0od", "Errors.IDMissing")
 	}
 	user, err := c.getHuman(ctx, userID, resourceowner)
 	if err != nil {
@@ -265,7 +265,7 @@ func (c *Commands) humanHumanPasswordlessSetup(ctx context.Context, userID, reso
 
 func (c *Commands) verifyHumanWebAuthN(ctx context.Context, userID, resourceowner, tokenName, userAgentID string, credentialData []byte, tokens []*domain.WebAuthNToken) (*eventstore.Aggregate, *domain.WebAuthNToken, *HumanWebAuthNWriteModel, error) {
 	if userID == "" {
-		return nil, nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M0od", "Errors.IDMissing")
+		return nil, nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3M0od", "Errors.IDMissing")
 	}
 	user, err := c.getHuman(ctx, userID, resourceowner)
 	if err != nil {
@@ -336,7 +336,7 @@ func (c *Commands) HumanBeginPasswordlessLogin(ctx context.Context, userID, reso
 
 func (c *Commands) beginWebAuthNLogin(ctx context.Context, userID, resourceOwner string, tokens []*domain.WebAuthNToken, userVerification domain.UserVerificationRequirement) (*eventstore.Aggregate, *domain.WebAuthNLogin, error) {
 	if userID == "" {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-hh8K9", "Errors.IDMissing")
+		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-hh8K9", "Errors.IDMissing")
 	}
 
 	human, err := c.getHuman(ctx, userID, resourceOwner)
@@ -447,7 +447,7 @@ func (c *Commands) HumanFinishPasswordlessLogin(ctx context.Context, userID, res
 
 func (c *Commands) finishWebAuthNLogin(ctx context.Context, userID, resourceOwner string, credentialData []byte, webAuthN *domain.WebAuthNLogin, tokens []*domain.WebAuthNToken) (*eventstore.Aggregate, *domain.WebAuthNToken, uint32, error) {
 	if userID == "" {
-		return nil, nil, 0, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-hh8K9", "Errors.IDMissing")
+		return nil, nil, 0, zerrors.ThrowPreconditionFailed(nil, "COMMAND-hh8K9", "Errors.IDMissing")
 	}
 
 	human, err := c.getHuman(ctx, userID, resourceOwner)
@@ -461,7 +461,7 @@ func (c *Commands) finishWebAuthNLogin(ctx context.Context, userID, resourceOwne
 
 	_, token := domain.GetTokenByKeyID(tokens, credential.ID)
 	if token == nil {
-		return nil, nil, 0, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3b7zs", "Errors.User.WebAuthN.NotFound")
+		return nil, nil, 0, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3b7zs", "Errors.User.WebAuthN.NotFound")
 	}
 
 	writeModel, err := c.webauthNWriteModelByID(ctx, userID, "", resourceOwner)
@@ -517,7 +517,7 @@ func (c *Commands) HumanSendPasswordlessInitCode(ctx context.Context, userID, re
 
 func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string, direct bool, passwordlessCodeGenerator crypto.Generator) (eventstore.Command, *HumanPasswordlessInitCodeWriteModel, string, error) {
 	if userID == "" {
-		return nil, nil, "", caos_errs.ThrowPreconditionFailed(nil, "COMMAND-GVfg3", "Errors.IDMissing")
+		return nil, nil, "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-GVfg3", "Errors.IDMissing")
 	}
 
 	codeID, err := c.idGenerator.Next()
@@ -548,7 +548,7 @@ func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, res
 
 func (c *Commands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, resourceOwner, codeID string) error {
 	if userID == "" || codeID == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-ADggh", "Errors.IDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-ADggh", "Errors.IDMissing")
 	}
 	initCode := NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, initCode)
@@ -557,7 +557,7 @@ func (c *Commands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, re
 	}
 
 	if initCode.State != domain.PasswordlessInitCodeStateRequested {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-Gdfg3", "Errors.User.Code.NotFound")
+		return zerrors.ThrowNotFound(nil, "COMMAND-Gdfg3", "Errors.User.Code.NotFound")
 	}
 
 	_, err = c.eventstore.Push(ctx,
@@ -568,7 +568,7 @@ func (c *Commands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, re
 
 func (c *Commands) humanVerifyPasswordlessInitCode(ctx context.Context, userID, resourceOwner, codeID, verificationCode string, passwordlessCodeGenerator crypto.Generator) error {
 	if userID == "" || codeID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-GVfg3", "Errors.IDMissing")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-GVfg3", "Errors.IDMissing")
 	}
 	initCode := NewHumanPasswordlessInitCodeWriteModel(userID, codeID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, initCode)
@@ -580,14 +580,14 @@ func (c *Commands) humanVerifyPasswordlessInitCode(ctx context.Context, userID, 
 		userAgg := UserAggregateFromWriteModel(&initCode.WriteModel)
 		_, err = c.eventstore.Push(ctx, usr_repo.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, codeID))
 		logging.WithFields("userID", userAgg.ID).OnError(err).Error("NewHumanPasswordlessInitCodeCheckFailedEvent push failed")
-		return caos_errs.ThrowInvalidArgument(err, "COMMAND-Dhz8i", "Errors.User.Code.Invalid")
+		return zerrors.ThrowInvalidArgument(err, "COMMAND-Dhz8i", "Errors.User.Code.Invalid")
 	}
 	return nil
 }
 
 func (c *Commands) removeHumanWebAuthN(ctx context.Context, userID, webAuthNID, resourceOwner string, preparedEvent func(*eventstore.Aggregate) eventstore.Command) (*domain.ObjectDetails, error) {
 	if userID == "" || webAuthNID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M9de", "Errors.IDMissing")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-6M9de", "Errors.IDMissing")
 	}
 
 	existingWebAuthN, err := c.webauthNWriteModelByID(ctx, userID, webAuthNID, resourceOwner)
@@ -595,7 +595,7 @@ func (c *Commands) removeHumanWebAuthN(ctx context.Context, userID, webAuthNID, 
 		return nil, err
 	}
 	if existingWebAuthN.State == domain.MFAStateUnspecified || existingWebAuthN.State == domain.MFAStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-DAfb2", "Errors.User.WebAuthN.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-DAfb2", "Errors.User.WebAuthN.NotFound")
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingWebAuthN.WriteModel)

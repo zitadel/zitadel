@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddApplicationKeyWithID(ctx context.Context, key *domain.ApplicationKey, resourceOwner string) (_ *domain.ApplicationKey, err error) {
@@ -15,28 +15,28 @@ func (c *Commands) AddApplicationKeyWithID(ctx context.Context, key *domain.Appl
 		return nil, err
 	}
 	if writeModel.State != domain.AppStateUnspecified {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-so20alo", "Errors.Project.App.Key.AlreadyExisting")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-so20alo", "Errors.Project.App.Key.AlreadyExisting")
 	}
 	application, err := c.getApplicationWriteModel(ctx, key.AggregateID, key.ApplicationID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if !application.State.Exists() {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-sak24", "Errors.Project.App.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-sak24", "Errors.Project.App.NotFound")
 	}
 	return c.addApplicationKey(ctx, key, resourceOwner)
 }
 
 func (c *Commands) AddApplicationKey(ctx context.Context, key *domain.ApplicationKey, resourceOwner string) (_ *domain.ApplicationKey, err error) {
 	if key.AggregateID == "" || key.ApplicationID == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-55m9fs", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-55m9fs", "Errors.IDMissing")
 	}
 	application, err := c.getApplicationWriteModel(ctx, key.AggregateID, key.ApplicationID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if !application.State.Exists() {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-sak25", "Errors.Project.App.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-sak25", "Errors.Project.App.NotFound")
 	}
 	key.KeyID, err = c.idGenerator.Next()
 	if err != nil {
@@ -55,7 +55,7 @@ func (c *Commands) addApplicationKey(ctx context.Context, key *domain.Applicatio
 	}
 
 	if !keyWriteModel.KeysAllowed {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-Dff54", "Errors.Project.App.AuthMethodNoPrivateKeyJWT")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Dff54", "Errors.Project.App.AuthMethodNoPrivateKeyJWT")
 	}
 
 	if err := domain.EnsureValidExpirationDate(key); err != nil {
@@ -102,7 +102,7 @@ func (c *Commands) RemoveApplicationKey(ctx context.Context, projectID, applicat
 		return nil, err
 	}
 	if !keyWriteModel.State.Exists() {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-4m77G", "Errors.Project.App.Key.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-4m77G", "Errors.Project.App.Key.NotFound")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationKeyRemovedEvent(ctx, ProjectAggregateFromWriteModel(&keyWriteModel.WriteModel), keyID))
@@ -118,7 +118,7 @@ func (c *Commands) RemoveApplicationKey(ctx context.Context, projectID, applicat
 
 func (c *Commands) applicationKeyWriteModelByID(ctx context.Context, projectID, appID, keyID, resourceOwner string) (writeModel *ApplicationKeyWriteModel, err error) {
 	if appID == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-029sn", "Errors.Project.App.NotFound")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-029sn", "Errors.Project.App.NotFound")
 	}
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

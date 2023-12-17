@@ -9,9 +9,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type InstanceDomain struct {
@@ -68,7 +68,7 @@ func (q *Queries) SearchInstanceDomains(ctx context.Context, queries *InstanceDo
 			InstanceDomainInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-inlsF", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-inlsF", "Errors.Query.SQLStatement")
 	}
 
 	return q.queryInstanceDomains(ctx, stmt, scan, args...)
@@ -81,7 +81,7 @@ func (q *Queries) SearchInstanceDomainsGlobal(ctx context.Context, queries *Inst
 	query, scan := prepareInstanceDomainsQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-IHhLR", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-IHhLR", "Errors.Query.SQLStatement")
 	}
 
 	return q.queryInstanceDomains(ctx, stmt, scan, args...)
@@ -133,7 +133,7 @@ func prepareInstanceDomainsQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-8nlWW", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-8nlWW", "Errors.Query.CloseRows")
 			}
 
 			return &InstanceDomains{

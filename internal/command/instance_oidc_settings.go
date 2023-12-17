@@ -7,9 +7,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) prepareAddOIDCSettings(a *instance.Aggregate, accessTokenLifetime, idTokenLifetime, refreshTokenIdleExpiration, refreshTokenExpiration time.Duration) preparation.Validation {
@@ -18,7 +18,7 @@ func (c *Commands) prepareAddOIDCSettings(a *instance.Aggregate, accessTokenLife
 			idTokenLifetime == time.Duration(0) ||
 			refreshTokenIdleExpiration == time.Duration(0) ||
 			refreshTokenExpiration == time.Duration(0) {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-10s82j", "Errors.Invalid.Argument")
+			return nil, zerrors.ThrowInvalidArgument(nil, "INST-10s82j", "Errors.Invalid.Argument")
 		}
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -27,7 +27,7 @@ func (c *Commands) prepareAddOIDCSettings(a *instance.Aggregate, accessTokenLife
 				return nil, err
 			}
 			if writeModel.State == domain.OIDCSettingsStateActive {
-				return nil, errors.ThrowAlreadyExists(nil, "INST-0aaj1o", "Errors.OIDCSettings.AlreadyExists")
+				return nil, zerrors.ThrowAlreadyExists(nil, "INST-0aaj1o", "Errors.OIDCSettings.AlreadyExists")
 			}
 			return []eventstore.Command{
 				instance.NewOIDCSettingsAddedEvent(
@@ -49,7 +49,7 @@ func (c *Commands) prepareUpdateOIDCSettings(a *instance.Aggregate, accessTokenL
 			idTokenLifetime == time.Duration(0) ||
 			refreshTokenIdleExpiration == time.Duration(0) ||
 			refreshTokenExpiration == time.Duration(0) {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-10sxks", "Errors.Invalid.Argument")
+			return nil, zerrors.ThrowInvalidArgument(nil, "INST-10sxks", "Errors.Invalid.Argument")
 		}
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -58,7 +58,7 @@ func (c *Commands) prepareUpdateOIDCSettings(a *instance.Aggregate, accessTokenL
 				return nil, err
 			}
 			if writeModel.State != domain.OIDCSettingsStateActive {
-				return nil, errors.ThrowNotFound(nil, "INST-90s32oj", "Errors.OIDCSettings.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "INST-90s32oj", "Errors.OIDCSettings.NotFound")
 			}
 			changedEvent, hasChanged, err := writeModel.NewChangedEvent(
 				ctx,
@@ -72,7 +72,7 @@ func (c *Commands) prepareUpdateOIDCSettings(a *instance.Aggregate, accessTokenL
 				return nil, err
 			}
 			if !hasChanged {
-				return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-0pk2nu", "Errors.NoChangesFound")
+				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-0pk2nu", "Errors.NoChangesFound")
 			}
 			return []eventstore.Command{
 				changedEvent,

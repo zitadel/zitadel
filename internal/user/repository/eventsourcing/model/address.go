@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/logging"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Address struct {
@@ -50,7 +50,7 @@ func (a *Address) setData(event *es_models.Event) error {
 	a.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-clos0").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-so92s", "could not unmarshal event")
+		return zerrors.ThrowInternal(err, "MODEL-so92s", "could not unmarshal event")
 	}
 	return nil
 }
