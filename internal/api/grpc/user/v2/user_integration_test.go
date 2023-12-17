@@ -1340,25 +1340,25 @@ func TestServer_ReactivateHumanUser(t *testing.T) {
 	}
 }
 
-func TestServer_RemoveUser(t *testing.T) {
+func TestServer_DeleteUser(t *testing.T) {
 	projectResp, err := Tester.CreateProject(CTX)
 	require.NoError(t, err)
 	type args struct {
 		ctx     context.Context
-		req     *user.RemoveUserRequest
-		prepare func(request *user.RemoveUserRequest) error
+		req     *user.DeleteUserRequest
+		prepare func(request *user.DeleteUserRequest) error
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *user.RemoveUserResponse
+		want    *user.DeleteUserResponse
 		wantErr bool
 	}{
 		{
 			name: "remove, not existing",
 			args: args{
 				CTX,
-				&user.RemoveUserRequest{
+				&user.DeleteUserRequest{
 					UserId: "notexisting",
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
@@ -1366,7 +1366,7 @@ func TestServer_RemoveUser(t *testing.T) {
 						},
 					},
 				},
-				func(request *user.RemoveUserRequest) error { return nil },
+				func(request *user.DeleteUserRequest) error { return nil },
 			},
 			wantErr: true,
 		},
@@ -1374,20 +1374,20 @@ func TestServer_RemoveUser(t *testing.T) {
 			name: "remove, ok",
 			args: args{
 				ctx: CTX,
-				req: &user.RemoveUserRequest{
+				req: &user.DeleteUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
 							OrgId: Tester.Organisation.ID,
 						},
 					},
 				},
-				prepare: func(request *user.RemoveUserRequest) error {
+				prepare: func(request *user.DeleteUserRequest) error {
 					resp := Tester.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					return err
 				},
 			},
-			want: &user.RemoveUserResponse{
+			want: &user.DeleteUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
@@ -1398,14 +1398,14 @@ func TestServer_RemoveUser(t *testing.T) {
 			name: "remove dependencies, ok",
 			args: args{
 				ctx: CTX,
-				req: &user.RemoveUserRequest{
+				req: &user.DeleteUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
 							OrgId: Tester.Organisation.ID,
 						},
 					},
 				},
-				prepare: func(request *user.RemoveUserRequest) error {
+				prepare: func(request *user.DeleteUserRequest) error {
 					resp := Tester.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					Tester.CreateProjectUserGrant(t, CTX, projectResp.GetId(), request.UserId)
@@ -1414,7 +1414,7 @@ func TestServer_RemoveUser(t *testing.T) {
 					return err
 				},
 			},
-			want: &user.RemoveUserResponse{
+			want: &user.DeleteUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
@@ -1427,7 +1427,7 @@ func TestServer_RemoveUser(t *testing.T) {
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
 
-			got, err := Client.RemoveUser(tt.args.ctx, tt.args.req)
+			got, err := Client.DeleteUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
