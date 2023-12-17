@@ -15,7 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 )
 
-type EventsConfig struct {
+type Migration struct {
 	Source      database.Config
 	Destination database.Config
 
@@ -29,8 +29,8 @@ var (
 	configPaths   []string
 )
 
-func mustNewEventsConfig(v *viper.Viper) *EventsConfig {
-	config := new(EventsConfig)
+func mustNewMigrationConfig(v *viper.Viper) *Migration {
+	config := new(Migration)
 	mustNewConfig(v, config)
 
 	err := config.Log.SetLogger()

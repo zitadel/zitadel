@@ -20,6 +20,7 @@ func New() *cobra.Command {
 	migrateFlags(cmd)
 	cmd.AddCommand(
 		eventsCmd(),
+		keysCmd(),
 		projectionsCmd(),
 	)
 

@@ -23,7 +23,7 @@ func eventsCmd() *cobra.Command {
 ZITADEL needs to be initialized
 Migrate only copies the events`,
 		Run: func(cmd *cobra.Command, args []string) {
-			config := mustNewEventsConfig(viper.GetViper())
+			config := mustNewMigrationConfig(viper.GetViper())
 			events(cmd.Context(), config, instanceID)
 		},
 	}
@@ -37,7 +37,7 @@ func migrateEventsFlags(cmd *cobra.Command) {
 	cmd.Flags().StringArrayVar(&configPaths, "config", nil, "paths to config files")
 }
 
-func events(ctx context.Context, config *EventsConfig, instanceID string) {
+func events(ctx context.Context, config *Migration, instanceID string) {
 	start := time.Now()
 	if instanceID == "" {
 		logging.Fatal("no instance id set")
@@ -67,6 +67,7 @@ func events(ctx context.Context, config *EventsConfig, instanceID string) {
 			// TODO: sql injection
 			_, err := conn.PgConn().CopyTo(ctx, w, "COPY (SELECT instance_id, aggregate_type, aggregate_id, event_type, sequence, revision, created_at, payload, creator, owner, (SELECT "+position+"::DECIMAL) AS position, row_number() OVER () AS in_tx_order FROM eventstore.events2 where instance_id = '"+instanceID+"' ORDER BY position, in_tx_order) TO stdout")
 			w.Close()
+			// TODO: unique constraints, assets
 			return err
 		})
 		errs <- err
@@ -92,6 +93,7 @@ func events(ctx context.Context, config *EventsConfig, instanceID string) {
 
 		tag, err := conn.PgConn().CopyFrom(ctx, r, "COPY eventstore.events2 FROM stdin")
 		eventCount = tag.RowsAffected()
+		// TODO: unique constraints, assets
 
 		return err
 	})
