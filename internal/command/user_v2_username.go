@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) changeUsername(ctx context.Context, cmds []eventstore.Command, wm *UserHumanWriteModel, userName string) ([]eventstore.Command, error) {
@@ -17,7 +17,7 @@ func (c *Commands) changeUsername(ctx context.Context, cmds []eventstore.Command
 
 	domainPolicy, err := c.domainPolicyWriteModel(ctx, orgID)
 	if err != nil {
-		return cmds, errors.ThrowPreconditionFailed(err, "COMMAND-38fnu", "Errors.Org.DomainPolicy.NotExisting")
+		return cmds, zerrors.ThrowPreconditionFailed(err, "COMMAND-38fnu", "Errors.Org.DomainPolicy.NotExisting")
 	}
 	if !domainPolicy.UserLoginMustBeDomain {
 		index := strings.LastIndex(userName, "@")
@@ -27,7 +27,7 @@ func (c *Commands) changeUsername(ctx context.Context, cmds []eventstore.Command
 				return cmds, err
 			}
 			if domainCheck.Verified && domainCheck.ResourceOwner != orgID {
-				return cmds, errors.ThrowInvalidArgument(nil, "COMMAND-Di2ei", "Errors.User.DomainNotAllowedAsUsername")
+				return cmds, zerrors.ThrowInvalidArgument(nil, "COMMAND-Di2ei", "Errors.User.DomainNotAllowedAsUsername")
 			}
 		}
 	}

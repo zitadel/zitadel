@@ -41,7 +41,7 @@ func (c *Commands) domainPolicyWriteModel(ctx context.Context, orgID string) (*P
 	if instanceWriteModel != nil && instanceWriteModel.State.Exists() {
 		return &instanceWriteModel.PolicyDomainWriteModel, err
 	}
-	return nil, errors.ThrowInternal(nil, "USER-Ggk9n", "Errors.Internal")
+	return nil, zerrors.ThrowInternal(nil, "USER-Ggk9n", "Errors.Internal")
 }
 
 // Deprecated: Use commands.orgDomainPolicyWriteModel directly, to remove use of eventstore.Filter function

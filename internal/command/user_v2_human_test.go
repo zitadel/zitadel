@@ -13,12 +13,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddUserHuman(t *testing.T) {
@@ -71,7 +71,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal"))
 				},
 			},
 		},
@@ -91,7 +91,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty"))
 				},
 			},
 		},
@@ -123,7 +123,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting"))
 				},
 			},
 		},
@@ -153,7 +153,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInternal(nil, "USER-Ggk9n", "Errors.Internal"))
+					return errors.Is(err, zerrors.ThrowInternal(nil, "USER-Ggk9n", "Errors.Internal"))
 				},
 			},
 		},
@@ -195,7 +195,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInternal(nil, "USER-uQ96e", "Errors.Internal"))
+					return errors.Is(err, zerrors.ThrowInternal(nil, "USER-uQ96e", "Errors.Internal"))
 				},
 			},
 		},
@@ -718,7 +718,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername"))
 				},
 			},
 		},
@@ -1171,7 +1171,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal"))
 				},
 			},
 		},
@@ -1197,7 +1197,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-38fnu", "Errors.Org.DomainPolicy.NotExisting"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-38fnu", "Errors.Org.DomainPolicy.NotExisting"))
 				},
 			},
 		},
@@ -1453,7 +1453,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
 				},
 			},
 		},
@@ -1650,7 +1650,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
 				},
 			},
 		},
@@ -1791,7 +1791,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Empty"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Empty"))
 				},
 			},
 		},
@@ -1826,7 +1826,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-M9dse", "Errors.User.NotInitialised"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-M9dse", "Errors.User.NotInitialised"))
 				},
 			},
 		},
@@ -1872,7 +1872,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "DOMAIN-VoaRj", "Errors.User.PasswordComplexityPolicy.HasUpper"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "DOMAIN-VoaRj", "Errors.User.PasswordComplexityPolicy.HasUpper"))
 				},
 			},
 		},
@@ -1894,7 +1894,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Empty"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Empty"))
 				},
 			},
 		},
@@ -1928,7 +1928,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
 				},
 			},
 		},
@@ -2323,7 +2323,7 @@ func TestCommandSide_LockUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing"))
 				},
 			},
 		},
@@ -2342,7 +2342,7 @@ func TestCommandSide_LockUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -2381,7 +2381,7 @@ func TestCommandSide_LockUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3NN8v", "Errors.User.ShouldBeActiveOrInitial"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3NN8v", "Errors.User.ShouldBeActiveOrInitial"))
 				},
 			},
 		},
@@ -2479,7 +2479,7 @@ func TestCommandSide_UnlockUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing"))
 				},
 			},
 		},
@@ -2498,7 +2498,7 @@ func TestCommandSide_UnlockUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -2532,7 +2532,7 @@ func TestCommandSide_UnlockUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.NotLocked"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.NotLocked"))
 				},
 			},
 		},
@@ -2633,7 +2633,7 @@ func TestCommandSide_DeactivateUserHuman(t *testing.T) {
 		},
 		res: res{
 			err: func(err error) bool {
-				return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal"))
+				return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal"))
 			},
 		},
 	},
@@ -2651,7 +2651,7 @@ func TestCommandSide_DeactivateUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing"))
 				},
 			},
 		},
@@ -2670,7 +2670,7 @@ func TestCommandSide_DeactivateUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -2710,7 +2710,7 @@ func TestCommandSide_DeactivateUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-ke0fw", "Errors.User.CantDeactivateInitial"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-ke0fw", "Errors.User.CantDeactivateInitial"))
 				},
 			},
 		},
@@ -2749,7 +2749,7 @@ func TestCommandSide_DeactivateUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0sf", "Errors.User.AlreadyInactive"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5M0sf", "Errors.User.AlreadyInactive"))
 				},
 			},
 		},
@@ -2852,7 +2852,7 @@ func TestCommandSide_ReactivateUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal"))
 				},
 			},
 		},
@@ -2870,7 +2870,7 @@ func TestCommandSide_ReactivateUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing"))
 				},
 			},
 		},
@@ -2889,7 +2889,7 @@ func TestCommandSide_ReactivateUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -2923,7 +2923,7 @@ func TestCommandSide_ReactivateUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0sf", "Errors.User.NotInactive"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-6M0sf", "Errors.User.NotInactive"))
 				},
 			},
 		},

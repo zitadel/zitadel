@@ -7,10 +7,10 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type ChangeHuman struct {
@@ -75,18 +75,18 @@ func (h *ChangeHuman) Validate(hasher *crypto.PasswordHasher) (err error) {
 func (p *Password) Validate(hasher *crypto.PasswordHasher) error {
 	if p.EncodedPasswordHash != nil {
 		if !hasher.EncodingSupported(*p.EncodedPasswordHash) {
-			return errors.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.User.Password.NotSupported")
+			return zerrors.ThrowInvalidArgument(nil, "USER-JDk4t", "Errors.User.Password.NotSupported")
 		}
 	}
 	if p.Password == nil && p.EncodedPasswordHash == nil {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Empty")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Empty")
 	}
 	return nil
 }
 
 func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human *AddHuman, allowInitMail bool, alg crypto.EncryptionAlgorithm) (err error) {
 	if resourceOwner == "" {
-		return errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
+		return zerrors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
 	}
 
 	if err := human.Validate(c.userPasswordHasher); err != nil {
@@ -115,7 +115,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		return err
 	}
 	if isUserStateExists(existingHuman.UserState) {
-		return errors.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting")
 	}
 
 	domainPolicy, err := c.domainPolicyWriteModel(ctx, resourceOwner)
@@ -211,10 +211,10 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 
 func (c *Commands) LockUserHuman(ctx context.Context, resourceOwner string, userID string) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
 	}
 	if userID == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
 	}
 
 	existingHuman, err := c.userHumanStateWriteModel(ctx, userID, resourceOwner)
@@ -222,10 +222,10 @@ func (c *Commands) LockUserHuman(ctx context.Context, resourceOwner string, user
 		return nil, err
 	}
 	if !isUserStateExists(existingHuman.UserState) {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound")
 	}
 	if !hasUserState(existingHuman.UserState, domain.UserStateActive, domain.UserStateInitial) {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-3NN8v", "Errors.User.ShouldBeActiveOrInitial")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3NN8v", "Errors.User.ShouldBeActiveOrInitial")
 	}
 
 	if err := c.pushAppendAndReduce(ctx, existingHuman, user.NewUserLockedEvent(ctx, &existingHuman.Aggregate().Aggregate)); err != nil {
@@ -236,10 +236,10 @@ func (c *Commands) LockUserHuman(ctx context.Context, resourceOwner string, user
 
 func (c *Commands) UnlockUserHuman(ctx context.Context, resourceOwner string, userID string) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
 	}
 	if userID == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
 	}
 
 	existingHuman, err := c.userHumanStateWriteModel(ctx, userID, resourceOwner)
@@ -247,10 +247,10 @@ func (c *Commands) UnlockUserHuman(ctx context.Context, resourceOwner string, us
 		return nil, err
 	}
 	if !isUserStateExists(existingHuman.UserState) {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound")
 	}
 	if !hasUserState(existingHuman.UserState, domain.UserStateLocked) {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.NotLocked")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.NotLocked")
 	}
 
 	if err := c.pushAppendAndReduce(ctx, existingHuman, user.NewUserUnlockedEvent(ctx, &existingHuman.Aggregate().Aggregate)); err != nil {
@@ -261,10 +261,10 @@ func (c *Commands) UnlockUserHuman(ctx context.Context, resourceOwner string, us
 
 func (c *Commands) DeactivateUserHuman(ctx context.Context, resourceOwner string, userID string) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
 	}
 	if userID == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
 	}
 
 	existingHuman, err := c.userHumanStateWriteModel(ctx, userID, resourceOwner)
@@ -272,13 +272,13 @@ func (c *Commands) DeactivateUserHuman(ctx context.Context, resourceOwner string
 		return nil, err
 	}
 	if !isUserStateExists(existingHuman.UserState) {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound")
 	}
 	if isUserStateInitial(existingHuman.UserState) {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-ke0fw", "Errors.User.CantDeactivateInitial")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-ke0fw", "Errors.User.CantDeactivateInitial")
 	}
 	if isUserStateInactive(existingHuman.UserState) {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-5M0sf", "Errors.User.AlreadyInactive")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5M0sf", "Errors.User.AlreadyInactive")
 	}
 
 	if err := c.pushAppendAndReduce(ctx, existingHuman, user.NewUserDeactivatedEvent(ctx, &existingHuman.Aggregate().Aggregate)); err != nil {
@@ -289,10 +289,10 @@ func (c *Commands) DeactivateUserHuman(ctx context.Context, resourceOwner string
 
 func (c *Commands) ReactivateUserHuman(ctx context.Context, resourceOwner string, userID string) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
 	}
 	if userID == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
 	}
 
 	existingHuman, err := c.userHumanStateWriteModel(ctx, userID, resourceOwner)
@@ -300,10 +300,10 @@ func (c *Commands) ReactivateUserHuman(ctx context.Context, resourceOwner string
 		return nil, err
 	}
 	if !isUserStateExists(existingHuman.UserState) {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound")
 	}
 	if !isUserStateInactive(existingHuman.UserState) {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-6M0sf", "Errors.User.NotInactive")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-6M0sf", "Errors.User.NotInactive")
 	}
 
 	if err := c.pushAppendAndReduce(ctx, existingHuman, user.NewUserReactivatedEvent(ctx, &existingHuman.Aggregate().Aggregate)); err != nil {
@@ -314,7 +314,7 @@ func (c *Commands) ReactivateUserHuman(ctx context.Context, resourceOwner string
 
 func (c *Commands) ChangeUserHuman(ctx context.Context, resourceOwner string, human *ChangeHuman, alg crypto.EncryptionAlgorithm) (err error) {
 	if resourceOwner == "" {
-		return errors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
+		return zerrors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
 	}
 	if err := human.Validate(c.userPasswordHasher); err != nil {
 		return err
@@ -335,7 +335,7 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, resourceOwner string, hu
 		return err
 	}
 	if !isUserStateExists(existingHuman.UserState) {
-		return errors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound")
+		return zerrors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound")
 	}
 
 	cmds := make([]eventstore.Command, 0)
