@@ -145,11 +145,15 @@ func (c *HasherConfig) buildHasher() (hasher passwap.Hasher, prefixes []string, 
 	}
 }
 
+// decodeParams uses a mapstructure decoder from the Params map to dst.
+// The decoder fails when there are unused fields in dst.
+// It uses weak input typing, to allow conversion of env strings to ints.
 func (c *HasherConfig) decodeParams(dst any) error {
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		ErrorUnused: false,
-		ErrorUnset:  true,
-		Result:      dst,
+		ErrorUnused:      false,
+		ErrorUnset:       true,
+		WeaklyTypedInput: true,
+		Result:           dst,
 	})
 	if err != nil {
 		return err
