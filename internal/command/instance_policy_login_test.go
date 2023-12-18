@@ -712,62 +712,6 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "remove provider with external idps, ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								domain.PasswordlessTypeAllowed,
-								"",
-								time.Hour*1,
-								time.Hour*2,
-								time.Hour*3,
-								time.Hour*4,
-								time.Hour*5,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewIdentityProviderAddedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								"config1",
-							),
-						),
-					),
-					expectPush(
-						instance.NewIdentityProviderRemovedEvent(context.Background(),
-							&instance.NewAggregate("INSTANCE").Aggregate,
-							"config1"),
-					),
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				provider: &domain.IDPProvider{
-					IDPConfigID: "config1",
-				},
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "INSTANCE",
-				},
-			},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -425,7 +425,6 @@ func (l *Login) resourceOwnerOfUserIDPLink(ctx context.Context, idpConfigID stri
 	queries := []query.SearchQuery{
 		idQuery, externalIDQuery,
 	}
-	// This is only used to map session params, so we check if the link has a login policy elsewhere.
 	links, err := l.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
 	if err != nil {
 		return "", err

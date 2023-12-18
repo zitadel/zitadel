@@ -1324,7 +1324,7 @@ message RemoveMyAvatarResponse {
 message ListMyLinkedIDPsRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
-    bool with_linked_login_policy_only = 2;
+
     //PLANNED: queries for IDP name and login name
 }
 

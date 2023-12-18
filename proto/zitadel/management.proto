@@ -8490,7 +8490,6 @@ message ListHumanLinkedIDPsRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
-    bool with_linked_login_policy_only = 3;
 }
 
 message ListHumanLinkedIDPsResponse {

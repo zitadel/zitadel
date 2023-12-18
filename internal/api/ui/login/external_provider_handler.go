@@ -1247,7 +1247,6 @@ func (l *Login) getUserLinks(ctx context.Context, userID, idpID string) (*query.
 	if err != nil {
 		return nil, err
 	}
-	// If we find a link without a login policy, we should return an error
 	return l.query.IDPUserLinks(ctx,
 		&query.IDPUserLinksSearchQuery{
 			Queries: []query.SearchQuery{

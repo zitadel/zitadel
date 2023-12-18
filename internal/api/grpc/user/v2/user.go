@@ -203,7 +203,6 @@ func (s *Server) checkLinkedExternalUser(ctx context.Context, idpID, externalUse
 	queries := []query.SearchQuery{
 		idQuery, externalIDQuery,
 	}
-	// the user v2 API doesn't care about the login policy, so we can't only query links with a policy.
 	links, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
 	if err != nil {
 		return "", err
