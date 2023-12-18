@@ -1,17 +1,18 @@
 package migrate
 
 import (
-	"bytes"
 	_ "embed"
-	"strings"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/actions"
+	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/id"
 )
 
@@ -26,7 +27,6 @@ type Migration struct {
 var (
 	//go:embed defaults.yaml
 	defaultConfig []byte
-	configPaths   []string
 )
 
 func mustNewMigrationConfig(v *viper.Viper) *Migration {
@@ -54,20 +54,7 @@ func mustNewProjectionsConfig(v *viper.Viper) *ProjectionsConfig {
 }
 
 func mustNewConfig(v *viper.Viper, config any) {
-	v.AutomaticEnv()
-	v.SetEnvPrefix("ZITADEL")
-	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	v.SetConfigType("yaml")
-	err := v.ReadConfig(bytes.NewBuffer(defaultConfig))
-	logging.OnError(err).Fatal("unable to read setup steps")
-
-	for _, file := range configPaths {
-		v.SetConfigFile(file)
-		err := v.MergeInConfig()
-		logging.WithFields("file", file).OnError(err).Warn("unable to read config file")
-	}
-
-	err = v.Unmarshal(config,
+	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
@@ -75,6 +62,10 @@ func mustNewConfig(v *viper.Viper, config any) {
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
+			actions.HTTPConfigDecodeHook,
+			systemAPIUsersDecodeHook,
+			hook.EnumHookFunc(domain.FeatureString),
+			hook.EnumHookFunc(internal_authz.MemberTypeString),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")

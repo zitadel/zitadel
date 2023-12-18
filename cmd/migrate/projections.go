@@ -1,7 +1,9 @@
 package migrate
 
 import (
+	"bytes"
 	"context"
+	"net/http"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -9,18 +11,30 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/key"
+	"github.com/zitadel/zitadel/cmd/tls"
+	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	admin_handler "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/handler"
 	admin_view "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/view"
-	"github.com/zitadel/zitadel/internal/api/authz"
+	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/api/ui/login"
+	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
 	auth_handler "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/handler"
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
+	"github.com/zitadel/zitadel/internal/authz"
+	authz_es "github.com/zitadel/zitadel/internal/authz/repository/eventsourcing/eventstore"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	crypto_db "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
+	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification"
+	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/action"
@@ -38,18 +52,26 @@ import (
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
 	"github.com/zitadel/zitadel/internal/static"
+	static_config "github.com/zitadel/zitadel/internal/static/config"
+	"github.com/zitadel/zitadel/internal/webauthn"
 )
 
 func projectionsCmd() *cobra.Command {
+	err := viper.MergeConfig(bytes.NewBuffer(defaultConfig))
+	logging.OnError(err).Fatal("unable to read setup steps")
+
 	cmd := &cobra.Command{
 		Use:   "projections",
 		Short: "calls the projections synchronously",
 		Run: func(cmd *cobra.Command, args []string) {
 			config := mustNewProjectionsConfig(viper.GetViper())
-			ctx := authz.WithInstanceID(cmd.Context(), instanceID)
+			ctx := internal_authz.WithInstanceID(cmd.Context(), instanceID)
 
 			masterKey, err := key.MasterKey(cmd)
 			logging.OnError(err).Fatal("unable to read master key")
+
+			all := viper.GetViper().AllSettings()
+			_ = all
 
 			projections(ctx, config, masterKey)
 		},
@@ -61,22 +83,34 @@ func projectionsCmd() *cobra.Command {
 }
 
 type ProjectionsConfig struct {
-	Database       database.Config
+	Destination    database.Config
 	Projections    projection.Config
 	EncryptionKeys *encryptionKeyConfig
 	SystemAPIUsers SystemAPIUsers
 	Eventstore     *eventstore.Config
 
-	Admin admin_handler.Config
-	Auth  auth_handler.Config
+	Admin admin_es.Config
+	Auth  auth_es.Config
 
 	Log     *logging.Config
 	Machine *id.Config
+
+	ExternalPort    uint16
+	ExternalDomain  string
+	ExternalSecure  bool
+	InternalAuthZ   internal_authz.Config
+	SystemDefaults  systemdefaults.SystemDefaults
+	Telemetry       *handlers.TelemetryPusherConfig
+	Login           login.Config
+	OIDC            oidc.Config
+	WebAuthNName    string
+	DefaultInstance command.InstanceSetup
+	AssetStorage    static_config.AssetStorageConfig
 }
 
 func migrateProjectionsFlags(cmd *cobra.Command) {
 	key.AddMasterKeyFlag(cmd)
-	cmd.Flags().StringArrayVar(&configPaths, "config", nil, "paths to config files")
+	tls.AddTLSModeFlag(cmd)
 }
 
 func projections(
@@ -86,7 +120,7 @@ func projections(
 ) {
 	start := time.Now()
 
-	client, err := database.Connect(config.Database, false, false)
+	client, err := database.Connect(config.Destination, false, false)
 	logging.OnError(err).Fatal("unable to connect to database")
 
 	keyStorage, err := crypto_db.NewKeyStorage(client, masterKey)
@@ -95,36 +129,85 @@ func projections(
 	keys, err := ensureEncryptionKeys(config.EncryptionKeys, keyStorage)
 	logging.OnError(err).Fatal("unable to read encryption keys")
 
-	staticStorage, err := static.CreateStorage(client, config.Static)
+	staticStorage, err := config.AssetStorage.NewStorage(client.DB)
 	logging.OnError(err).Fatal("unable create static storage")
 
 	config.Eventstore.Querier = old_es.NewCRDB(client)
+	esPusherDBClient, err := database.Connect(config.Destination, false, true)
+	logging.OnError(err).Fatal("unable to connect eventstore push client")
+	config.Eventstore.Pusher = new_es.NewEventstore(esPusherDBClient)
 	es := eventstore.NewEventstore(config.Eventstore)
+
+	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 
 	queries, err := query.StartQueries(
 		ctx,
 		es,
 		client,
 		config.Projections,
-		defaults,
-		keys.idpConfigEncryption,
-		keys.otpConfigEncryption,
-		nil,
-		nil,
-		config.RoleMapping,
+		config.SystemDefaults,
+		keys.IDPConfig,
+		keys.OTP,
+		keys.OIDC,
+		keys.SAML,
+		config.InternalAuthZ.RolePermissionMappings,
 		sessionTokenVerifier,
-		permissionCheck,
+		func(q *query.Queries) domain.PermissionCheck {
+			return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+				return internal_authz.CheckPermission(ctx, &authz_es.UserMembershipRepo{Queries: q}, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
+			}
+		},
 		0,
-		nil,
+		config.SystemAPIUsers,
 	)
 	logging.OnError(err).Fatal("unable to start queries")
+
+	authZRepo, err := authz.Start(queries, es, client, keys.OIDC, config.ExternalSecure)
+	logging.OnError(err).Fatal("unable to start authz repo")
+
+	webAuthNConfig := &webauthn.Config{
+		DisplayName:    config.WebAuthNName,
+		ExternalSecure: config.ExternalSecure,
+	}
+	commands, err := command.StartCommands(
+		es,
+		config.SystemDefaults,
+		config.InternalAuthZ.RolePermissionMappings,
+		staticStorage,
+		webAuthNConfig,
+		config.ExternalDomain,
+		config.ExternalSecure,
+		config.ExternalPort,
+		keys.IDPConfig,
+		keys.OTP,
+		keys.SMTP,
+		keys.SMS,
+		keys.User,
+		keys.DomainVerification,
+		keys.OIDC,
+		keys.SAML,
+		&http.Client{},
+		func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+			return internal_authz.CheckPermission(ctx, authZRepo, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
+		},
+		sessionTokenVerifier,
+		config.OIDC.DefaultAccessTokenLifetime,
+		config.OIDC.DefaultRefreshTokenExpiration,
+		config.OIDC.DefaultRefreshTokenIdleExpiration,
+		config.DefaultInstance.SecretGenerators,
+	)
+	logging.OnError(err).Fatal("unable to start commands")
 
 	registerMappers(es)
 
 	projectProjections(ctx, client, es, keys, config)
-	projectAdmin(ctx, config.Admin, staticStorage, client)
-	projectAuth(ctx, config.Auth, queries, es, client)
-	projectNotification(ctx, es, keys, config.Projections)
+	config.Admin.Spooler.Client = client
+	config.Admin.Spooler.Eventstore = es
+	projectAdmin(ctx, config.Admin, staticStorage)
+	config.Auth.Spooler.Client = client
+	config.Auth.Spooler.Eventstore = es
+	projectAuth(ctx, config.Auth, queries, keys)
+	projectNotification(ctx, es, queries, commands, keys, config)
 
 	logging.WithFields("took", time.Since(start)).Info("projections executed")
 }
@@ -138,6 +221,8 @@ func projectProjections(ctx context.Context, client *database.DB, es *eventstore
 }
 
 func projectNotification(ctx context.Context, es *eventstore.Eventstore, queries *query.Queries, commands *command.Commands, keys *encryptionKeys, config *ProjectionsConfig) {
+	i18n.MustLoadSupportedLanguagesFromDir()
+
 	notification.Register(
 		ctx,
 		config.Projections.Customizations["notifications"],
@@ -161,21 +246,21 @@ func projectNotification(ctx context.Context, es *eventstore.Eventstore, queries
 	logging.OnError(err).Fatal("trigger notification failed")
 }
 
-func projectAuth(ctx context.Context, config auth_handler.Config, queries *query.Queries, es *eventstore.Eventstore, client *database.DB) {
-	view, err := auth_view.StartView(client, oidcEncryption, queries, es)
+func projectAuth(ctx context.Context, config auth_es.Config, queries *query.Queries, keys *encryptionKeys) {
+	view, err := auth_view.StartView(config.Spooler.Client, keys.OIDC, queries, config.Spooler.Eventstore)
 	logging.OnError(err).Fatal("unable to start auth view")
 
-	auth_handler.Register(ctx, config, view, queries)
+	auth_handler.Register(ctx, config.Spooler, view, queries)
 
 	err = auth_handler.ProjectInstance(ctx)
 	logging.OnError(err).Fatal("trigger auth handler failed")
 }
 
-func projectAdmin(ctx context.Context, config admin_handler.Config, staticStorage static.Storage, client *database.DB) {
-	view, err := admin_view.StartView(client)
+func projectAdmin(ctx context.Context, config admin_es.Config, staticStorage static.Storage) {
+	view, err := admin_view.StartView(config.Spooler.Client)
 	logging.OnError(err).Fatal("unable to start admin view")
 
-	admin_handler.Register(ctx, config, view, staticStorage)
+	admin_handler.Register(ctx, config.Spooler, view, staticStorage)
 
 	err = admin_handler.ProjectInstance(ctx)
 	logging.OnError(err).Fatal("trigger admin handler failed")

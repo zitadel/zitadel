@@ -1,8 +1,3 @@
-Log:
-  Level: info # ZITADEL_LOG_LEVEL
-  Formatter:
-    Format: text # ZITADEL_LOG_LEVEL
-
 Source:
   cockroach:
     Host: localhost # ZITADEL_DATABASE_COCKROACH_HOST
@@ -62,8 +57,8 @@ Destination:
     Host: localhost # ZITADEL_DATABASE_COCKROACH_HOST
     Port: 26257 # ZITADEL_DATABASE_COCKROACH_PORT
     Database: zitadel # ZITADEL_DATABASE_COCKROACH_DATABASE
-    MaxOpenConns: 2 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
-    MaxIdleConns: 2 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
+    MaxOpenConns: 30 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
+    MaxIdleConns: 30 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
     MaxConnLifetime: 30m # ZITADEL_DATABASE_COCKROACH_MAXCONNLIFETIME
     MaxConnIdleTime: 5m # ZITADEL_DATABASE_COCKROACH_MAXCONNIDLETIME
     Options: "" # ZITADEL_DATABASE_COCKROACH_OPTIONS
@@ -111,182 +106,9 @@ Destination:
         Cert: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_CERT
         Key: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_KEY
 
-
-Database:
-  # This setting defines the ratio of how many connections defined below
-  # are used to push events. ZITADEL manages two database connection pools
-  # one to push events and one for the remaining queries. 
-  EventPushConnRatio: 0.2 # ZITADEL_DATABASE_COCKROACH_EVENTPUSHCONNRATIO
-  # CockroachDB is the default database of ZITADEL
-  cockroach:
-    Host: localhost # ZITADEL_DATABASE_COCKROACH_HOST
-    Port: 26257 # ZITADEL_DATABASE_COCKROACH_PORT
-    Database: zitadel # ZITADEL_DATABASE_COCKROACH_DATABASE
-    MaxOpenConns: 40 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
-    MaxIdleConns: 20 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
-    MaxConnLifetime: 30m # ZITADEL_DATABASE_COCKROACH_MAXCONNLIFETIME
-    MaxConnIdleTime: 5m # ZITADEL_DATABASE_COCKROACH_MAXCONNIDLETIME
-    Options: "" # ZITADEL_DATABASE_COCKROACH_OPTIONS
-    User:
-      Username: zitadel # ZITADEL_DATABASE_COCKROACH_USER_USERNAME
-      Password: "" # ZITADEL_DATABASE_COCKROACH_USER_PASSWORD
-      SSL:
-        Mode: disable # ZITADEL_DATABASE_COCKROACH_USER_SSL_MODE
-        RootCert: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_ROOTCERT
-        Cert: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_CERT
-        Key: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_KEY
-    Admin:
-      Username: root # ZITADEL_DATABASE_COCKROACH_ADMIN_USERNAME
-      Password: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_PASSWORD
-      SSL:
-        Mode: disable # ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_MODE
-        RootCert: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_ROOTCERT
-        Cert: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_CERT
-        Key: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_SSL_KEY
-  # Postgres is used as soon as a value is set
-  # The values describe the possible fields to set values
-  postgres:
-    Host: # ZITADEL_DATABASE_POSTGRES_HOST
-    Port: # ZITADEL_DATABASE_POSTGRES_PORT
-    Database: # ZITADEL_DATABASE_POSTGRES_DATABASE
-    MaxOpenConns: # ZITADEL_DATABASE_POSTGRES_MAXOPENCONNS
-    MaxIdleConns: # ZITADEL_DATABASE_POSTGRES_MAXIDLECONNS
-    MaxConnLifetime: # ZITADEL_DATABASE_POSTGRES_MAXCONNLIFETIME
-    MaxConnIdleTime: # ZITADEL_DATABASE_POSTGRES_MAXCONNIDLETIME
-    Options: # ZITADEL_DATABASE_POSTGRES_OPTIONS
-    User:
-      Username: # ZITADEL_DATABASE_POSTGRES_USER_USERNAME
-      Password: # ZITADEL_DATABASE_POSTGRES_USER_PASSWORD
-      SSL:
-        Mode: # ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE
-        RootCert: # ZITADEL_DATABASE_POSTGRES_USER_SSL_ROOTCERT
-        Cert: # ZITADEL_DATABASE_POSTGRES_USER_SSL_CERT
-        Key: # ZITADEL_DATABASE_POSTGRES_USER_SSL_KEY
-    Admin:
-      Username: # ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME
-      Password: # ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD
-      SSL:
-        Mode: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE
-        RootCert: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_ROOTCERT
-        Cert: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_CERT
-        Key: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_KEY
-
-
-# The Projections section defines the behavior for the scheduled and synchronous events projections.
 Projections:
   # The maximum duration a transaction remains open 
   # before it spots left folding additional events
   # and updates the table.
-  TransactionDuration: 500ms # ZITADEL_PROJECTIONS_TRANSACTIONDURATION
-  # Time interval between scheduled projections
-  RequeueEvery: 60s # ZITADEL_PROJECTIONS_REQUEUEEVERY
-  # Time between retried database statements resulting from projected events
-  RetryFailedAfter: 1s # ZITADEL_PROJECTIONS_RETRYFAILED
-  # Retried execution number of database statements resulting from projected events
-  MaxFailureCount: 5 # ZITADEL_PROJECTIONS_MAXFAILURECOUNT
-  # Limit of returned events per query
-  BulkLimit: 200 # ZITADEL_PROJECTIONS_BULKLIMIT
-  # Only instances are projected, for which at least a projection-relevant event exists within the timeframe
-  # from HandleActiveInstances duration in the past until the projection's current time
-  # Defaults to twice the RequeueEvery duration
-  HandleActiveInstances: 120s # ZITADEL_PROJECTIONS_HANDLEACTIVEINSTANCES
-  # In the Customizations section, all settings from above can be overwritten for each specific projection
-  Customizations:
-    Projects:
-      TransactionDuration: 2s
-    custom_texts:
-      TransactionDuration: 2s
-      BulkLimit: 400
-    # The Notifications projection is used for sending emails and SMS to users
-    Notifications:
-      # As notification projections don't result in database statements, retries don't have an effect
-      MaxFailureCount: 10 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONS_MAXFAILURECOUNT
-      # Sending emails can take longer than 500ms
-      TransactionDuration: 5s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONS_TRANSACTIONDURATION
-    password_complexities:
-      TransactionDuration: 2s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_PASSWORD_COMPLEXITIES_TRANSACTIONDURATION
-    lockout_policy:
-      TransactionDuration: 2s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_LOCKOUT_POLICY_TRANSACTIONDURATION
-    # The NotificationsQuotas projection is used for calling quota webhooks
-    NotificationsQuotas:
-      # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
-      # An instance is active, as long as there are projected events on the instance, that are not older than the HandleActiveInstances duration.
-      # Delivery guarantee requirements are higher for quota webhooks
-      # Defaults to 45 days
-      HandleActiveInstances: 1080h # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_HANDLEACTIVEINSTANCES
-      # As quota notification projections don't result in database statements, retries don't have an effect
-      MaxFailureCount: 10 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_MAXFAILURECOUNT
-      # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the db too much.
-      RequeueEvery: 300s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_REQUEUEEVERY
-      # Sending emails can take longer than 500ms
-      TransactionDuration: 5s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONQUOTAS_TRANSACTIONDURATION
-    milestones:
-      BulkLimit: 50
-    # The Telemetry projection is used for calling telemetry webhooks
-    Telemetry:
-      # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
-      # An instance is active, as long as there are projected events on the instance, that are not older than the HandleActiveInstances duration.
-      # Telemetry delivery guarantee requirements are a bit higher than normal data projections, as they are not interactively retryable.
-      # Defaults to 15 days
-      HandleActiveInstances: 360h # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_HANDLEACTIVEINSTANCES
-      # As sending telemetry data doesn't result in database statements, retries don't have any effects
-      MaxFailureCount: 0 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_MAXFAILURECOUNT
-      # Telemetry data synchronization is not time critical. Setting RequeueEvery to 55 minutes doesn't annoy the database too much.
-      RequeueEvery: 3300s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_REQUEUEEVERY
-
-EncryptionKeys:
-  DomainVerification:
-    EncryptionKeyID: "domainVerificationKey" # ZITADEL_ENCRYPTIONKEYS_DOMAINVERIFICATION_ENCRYPTIONKEYID
-    DecryptionKeyIDs:
-  IDPConfig:
-    EncryptionKeyID: "idpConfigKey" # ZITADEL_ENCRYPTIONKEYS_IDPCONFIG_ENCRYPTIONKEYID
-    DecryptionKeyIDs:
-  OIDC:
-    EncryptionKeyID: "oidcKey" # ZITADEL_ENCRYPTIONKEYS_OIDC_ENCRYPTIONKEYID
-    DecryptionKeyIDs:
-  SAML:
-    EncryptionKeyID: "samlKey" # ZITADEL_ENCRYPTIONKEYS_SAML_ENCRYPTIONKEYID
-    DecryptionKeyIDs:
-  OTP:
-    EncryptionKeyID: "otpKey" # ZITADEL_ENCRYPTIONKEYS_OTP_ENCRYPTIONKEYID
-    DecryptionKeyIDs:
-  SMS:
-    EncryptionKeyID: "smsKey" # ZITADEL_ENCRYPTIONKEYS_SMS_ENCRYPTIONKEYID
-    DecryptionKeyIDs:
-  SMTP:
-    EncryptionKeyID: "smtpKey" # ZITADEL_ENCRYPTIONKEYS_SMTP_ENCRYPTIONKEYID
-    DecryptionKeyIDs:
-  User:
-    EncryptionKeyID: "userKey" # ZITADEL_ENCRYPTIONKEYS_USER_ENCRYPTIONKEYID
-    DecryptionKeyIDs:
-  CSRFCookieKeyID: "csrfCookieKey" # ZITADEL_ENCRYPTIONKEYS_CSRFCOOKIEKEYID
-  UserAgentCookieKeyID: "userAgentCookieKey" # ZITADEL_ENCRYPTIONKEYS_USERAGENTCOOKIEKEYID
-
-
-SystemAPIUsers:
-# # Add keys for authentication of the systemAPI here:
-# # you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
-# - superuser:
-#     Path: /path/to/superuser/ey.pem  # you can provide the key either by reference with the path
-#     Memberships:
-#       # MemberType System allows the user to access all APIs for all instances or organizations
-#       - MemberType: System
-#         Roles:
-#           - "SYSTEM_OWNER"
-#           # Actually, we don't recommend adding IAM_OWNER and ORG_OWNER to the System membership, as this basically enables god mode for the system user
-#           - "IAM_OWNER"
-#           - "ORG_OWNER"
-#       # MemberType IAM and Organization let you restrict access to a specific instance or organization by specifying the AggregateID
-#       - MemberType: IAM
-#         Roles: "IAM_OWNER"
-#         AggregateID: "123456789012345678"
-#       - MemberType: Organization
-#         Roles: "ORG_OWNER"
-#         AggregateID: "123456789012345678"
-# - superuser2:
-#     # If no memberships are specified, the user has a membership of type System with the role "SYSTEM_OWNER"
-#     KeyData: <base64 encoded key>     # or you can directly embed it as base64 encoded value
-
-Eventstore:
-  # Sets the maximum duration of transactions pushing events
-  PushTimeout: 15s #ZITADEL_EVENTSTORE_PUSHTIMEOUT
+  TransactionDuration: 0s # ZITADEL_PROJECTIONS_TRANSACTIONDURATION
+  RequeueEvery: 0s

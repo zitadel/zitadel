@@ -15,7 +15,7 @@ import (
 )
 
 func keysCmd() *cobra.Command {
-	cmd := &cobra.Command{
+	return &cobra.Command{
 		Use:   "keys",
 		Short: "migrates the keys of the system from one database to another",
 		Long: `migrates the keys of the system from one database to another
@@ -26,14 +26,6 @@ Migrations only copies the keys`,
 			keys(cmd.Context(), config)
 		},
 	}
-
-	migrateKeysFlags(cmd)
-
-	return cmd
-}
-
-func migrateKeysFlags(cmd *cobra.Command) {
-	cmd.Flags().StringArrayVar(&configPaths, "config", nil, "paths to config files")
 }
 
 func keys(ctx context.Context, config *Migration) {

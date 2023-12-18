@@ -16,7 +16,7 @@ import (
 )
 
 func eventsCmd() *cobra.Command {
-	cmd := &cobra.Command{
+	return &cobra.Command{
 		Use:   "events",
 		Short: "migrates the events of an instance from one database to another",
 		Long: `migrates the events of an instance from one database to another
@@ -27,14 +27,6 @@ Migrate only copies the events`,
 			events(cmd.Context(), config, instanceID)
 		},
 	}
-
-	migrateEventsFlags(cmd)
-
-	return cmd
-}
-
-func migrateEventsFlags(cmd *cobra.Command) {
-	cmd.Flags().StringArrayVar(&configPaths, "config", nil, "paths to config files")
 }
 
 func events(ctx context.Context, config *Migration, instanceID string) {

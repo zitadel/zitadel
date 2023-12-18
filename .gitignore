@@ -81,3 +81,5 @@ go.work
 go.work.sum
 # Local Netlify folder
 .netlify
+
+!/docs/docs/self-hosting/manage/configure/defaults.yaml

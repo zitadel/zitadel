@@ -111,6 +111,10 @@ func (h *Handler) Start(ctx context.Context) {
 }
 
 func (h *Handler) schedule(ctx context.Context) {
+	if h.requeueEvery <= 0 {
+		h.log().Info("schedule skipped")
+		return
+	}
 	// if there was no run before trigger instantly
 	t := time.NewTimer(0)
 	didInitialize := h.didProjectionInitialize(ctx)

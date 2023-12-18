@@ -11,8 +11,17 @@ type encryptionKeyConfig struct {
 }
 
 type encryptionKeys struct {
-	OIDC crypto.EncryptionAlgorithm
-	SAML crypto.EncryptionAlgorithm
+	DomainVerification crypto.EncryptionAlgorithm
+	IDPConfig          crypto.EncryptionAlgorithm
+	OIDC               crypto.EncryptionAlgorithm
+	SAML               crypto.EncryptionAlgorithm
+	OTP                crypto.EncryptionAlgorithm
+	SMS                crypto.EncryptionAlgorithm
+	SMTP               crypto.EncryptionAlgorithm
+	User               crypto.EncryptionAlgorithm
+	CSRFCookieKey      []byte
+	UserAgentCookieKey []byte
+	OIDCKey            []byte
 }
 
 func ensureEncryptionKeys(keyConfig *encryptionKeyConfig, keyStorage crypto.KeyStorage) (keys *encryptionKeys, err error) {
