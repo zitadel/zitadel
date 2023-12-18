@@ -97,23 +97,26 @@ func (v *View) userByID(ctx context.Context, instanceID string, queries ...query
 		return nil, err
 	}
 
+	// always load the latest sequence first, so in case the user was not found by id,
+	// the sequence will be equal or lower than the actual projection and no events are lost
+	sequence, err := v.GetLatestUserSequence(ctx, instanceID)
+	logging.WithFields("instanceID", instanceID).
+		OnError(err).
+		Errorf("could not get current sequence for userByID")
+
 	user, err := view.UserByID(v.Db, userTable, queriedUser.ID, instanceID)
 	if err != nil && !zerrors.IsNotFound(err) {
 		return nil, err
 	}
 
 	if err != nil {
-		sequence, err := v.GetLatestUserSequence(ctx, instanceID)
-		logging.WithFields("instanceID", instanceID).
-			OnError(err).
-			Errorf("could not get current sequence for userByID")
 		user = new(model.UserView)
 		if sequence != nil {
-			user.Sequence = sequence.Sequence
+			user.ChangeDate = sequence.EventCreatedAt
 		}
 	}
 
-	query, err := view.UserByIDQuery(queriedUser.ID, instanceID, user.Sequence, user.EventTypes())
+	query, err := view.UserByIDQuery(queriedUser.ID, instanceID, user.ChangeDate, user.EventTypes())
 	if err != nil {
 		return nil, err
 	}

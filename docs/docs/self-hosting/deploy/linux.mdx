@@ -3,11 +3,10 @@ title: Install ZITADEL on Linux
 sidebar_label: Linux
 ---
 
-import Disclaimer from './_disclaimer.mdx'
-import DefaultUser from './_defaultuser.mdx'
-import Next from './_next.mdx'
-import NoteInstanceNotFound from './troubleshooting/_note_instance_not_found.mdx';
-
+import Disclaimer from "./_disclaimer.mdx";
+import DefaultUser from "./_defaultuser.mdx";
+import Next from "./_next.mdx";
+import NoteInstanceNotFound from "./troubleshooting/_note_instance_not_found.mdx";
 
 ## Install CockroachDB
 
@@ -22,15 +21,10 @@ cockroach start-single-node --insecure --background --http-addr :9090 --listen-a
 
 ## Install ZITADEL
 
-Download the ZITADEL release according to your architecture from [Github](https://github.com/zitadel/zitadel/releases/latest) 
-
-## Unpack the archive
-move to your download location and unpack the archive
+Download the ZITADEL release according to your architecture from [Github](https://github.com/zitadel/zitadel/releases/latest), unpack the archive and copy zitadel binary to /usr/local/bin
 
 ```bash
-#unpack and copy to /usr/local/bin
-LATEST=$(curl -i https://github.com/zitadel/zitadel/releases/latest | grep location: | cut -d '/' -f 8 | tr -d '\r'); wget -qO-  https://github.com/zitadel/zitadel/releases/download/$LATEST/zitadel_Linux_$(uname -m).tar.gz  | tar -xz zitadel && sudo mv zitadel /usr/local/bin
-
+LATEST=$(curl -i https://github.com/zitadel/zitadel/releases/latest | grep location: | cut -d '/' -f 8 | tr -d '\r'); ARCH=$(uname -m); case $ARCH in armv5*) ARCH="armv5";; armv6*) ARCH="armv6";; armv7*) ARCH="arm";; aarch64) ARCH="arm64";; x86) ARCH="386";; x86_64) ARCH="amd64";;  i686) ARCH="386";; i386) ARCH="386";; esac; wget -c https://github.com/zitadel/zitadel/releases/download/$LATEST/zitadel-linux-$ARCH.tar.gz -O - | tar -xz && sudo mv zitadel-linux-$ARCH/zitadel /usr/local/bin
 ```
 
 ## Run ZITADEL
@@ -41,10 +35,19 @@ ZITADEL_EXTERNALSECURE=false zitadel start-from-init --masterkey "MasterkeyNeeds
 
 <DefaultUser components={props.components} />
 
-<NoteInstanceNotFound/>
+<NoteInstanceNotFound />
 
 ## VideoGuide
-<iframe width="100%" height="315" src="https://www.youtube.com/embed/YVLua-q7dbs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<iframe
+  width="100%"
+  height="315"
+  src="https://www.youtube.com/embed/YVLua-q7dbs"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+></iframe>
 
 ### Setup ZITADEL with a service account
 
@@ -59,5 +62,3 @@ This key can be used to provision resources with for example [Terraform](/docs/g
 
 <Next components={props.components} />
 <Disclaimer components={props.components} />
-
-
