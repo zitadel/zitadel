@@ -96,7 +96,7 @@ func copyAssets(ctx context.Context, source, dest *database.DB) {
 		err = sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
 			// ignore hash column because it's computed
-			_, err := conn.PgConn().CopyTo(ctx, w, "COPY (SELECT instance_id, asset_type, resource_owner, name, content_type, data, updated_at FROM system.assets where instance_id = '"+instanceID+"') TO stdout")
+			_, err := conn.PgConn().CopyTo(ctx, w, "COPY (SELECT instance_id, asset_type, resource_owner, name, content_type, data, updated_at FROM system.assets "+instanceClause()+") TO stdout")
 			w.Close()
 			return err
 		})

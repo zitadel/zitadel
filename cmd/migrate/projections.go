@@ -3,6 +3,7 @@ package migrate
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	"net/http"
 	"time"
 
@@ -65,15 +66,11 @@ func projectionsCmd() *cobra.Command {
 		Short: "calls the projections synchronously",
 		Run: func(cmd *cobra.Command, args []string) {
 			config := mustNewProjectionsConfig(viper.GetViper())
-			ctx := internal_authz.WithInstanceID(cmd.Context(), instanceID)
 
 			masterKey, err := key.MasterKey(cmd)
 			logging.OnError(err).Fatal("unable to read master key")
 
-			all := viper.GetViper().AllSettings()
-			_ = all
-
-			projections(ctx, config, masterKey)
+			projections(cmd.Context(), config, masterKey)
 		},
 	}
 
@@ -200,14 +197,18 @@ func projections(
 
 	registerMappers(es)
 
-	projectProjections(ctx, client, es, keys, config)
-	config.Admin.Spooler.Client = client
-	config.Admin.Spooler.Eventstore = es
-	projectAdmin(ctx, config.Admin, staticStorage)
-	config.Auth.Spooler.Client = client
-	config.Auth.Spooler.Eventstore = es
-	projectAuth(ctx, config.Auth, queries, keys)
-	projectNotification(ctx, es, queries, commands, keys, config)
+	for _, instance := range instanceIDs(ctx, client) {
+		ctx = internal_authz.WithInstanceID(ctx, instance)
+
+		projectProjections(ctx, client, es, keys, config)
+		config.Admin.Spooler.Client = client
+		config.Admin.Spooler.Eventstore = es
+		projectAdmin(ctx, config.Admin, staticStorage)
+		config.Auth.Spooler.Client = client
+		config.Auth.Spooler.Eventstore = es
+		projectAuth(ctx, config.Auth, queries, keys)
+		projectNotification(ctx, es, queries, commands, keys, config)
+	}
 
 	logging.WithFields("took", time.Since(start)).Info("projections executed")
 }
@@ -281,4 +282,31 @@ func registerMappers(es *eventstore.Eventstore) {
 	quota.RegisterEventMappers(es)
 	limits.RegisterEventMappers(es)
 	restrictions.RegisterEventMappers(es)
+}
+
+// returns the instance configured by flag
+// or all instances which are not removed
+func instanceIDs(ctx context.Context, source *database.DB) []string {
+	if instanceID != "" {
+		return []string{instanceID}
+	}
+
+	instances := []string{}
+	err := source.Query(
+		func(r *sql.Rows) error {
+			for r.Next() {
+				var instance string
+
+				if err := r.Scan(&instance); err != nil {
+					return err
+				}
+				instances = append(instances, instance)
+			}
+			return r.Err()
+		},
+		"SELECT DISTINCT instance_id FROM eventstore.events2 WHERE instance_id <> '' AND aggregate_type = 'instance' AND event_type = 'instance.added' AND instance_id NOT IN (SELECT instance_id FROM eventstore.events2 WHERE instance_id <> '' AND aggregate_type = 'instance' AND event_type = 'instance.removed')",
+	)
+	logging.OnError(err).Fatal("unable to query instances")
+
+	return instances
 }

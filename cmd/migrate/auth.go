@@ -29,9 +29,6 @@ Migrations only copies auth requests`,
 }
 
 func copyAuth(ctx context.Context, config *Migration) {
-	if instanceID == "" {
-		logging.Fatal("no instance id set")
-	}
 	sourceClient, err := database.Connect(config.Source, false, false)
 	logging.OnError(err).Fatal("unable to connect to source database")
 	defer sourceClient.Close()
@@ -56,7 +53,7 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB) {
 	go func() {
 		err = sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
-			_, err := conn.PgConn().CopyTo(ctx, w, "COPY (SELECT * FROM auth.auth_requests where instance_id = '"+instanceID+"') TO stdout")
+			_, err := conn.PgConn().CopyTo(ctx, w, "COPY (SELECT * FROM auth.auth_requests "+instanceClause()+") TO stdout")
 			w.Close()
 			return err
 		})

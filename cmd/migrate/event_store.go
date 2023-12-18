@@ -30,9 +30,6 @@ Migrate only copies events2 and unique constraints`,
 }
 
 func copyEventstore(ctx context.Context, config *Migration, instanceID string) {
-	if instanceID == "" {
-		logging.Fatal("no instance id set")
-	}
 	sourceClient, err := database.Connect(config.Source, false, false)
 	logging.OnError(err).Fatal("unable to connect to source database")
 	defer sourceClient.Close()
@@ -73,9 +70,8 @@ func copyEvents(ctx context.Context, source, dest *database.DB) {
 		err := sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
 			// TODO: sql injection
-			_, err := conn.PgConn().CopyTo(ctx, writer, "COPY (SELECT instance_id, aggregate_type, aggregate_id, event_type, sequence, revision, created_at, payload, creator, owner, (SELECT "+position+"::DECIMAL) AS position, row_number() OVER () AS in_tx_order FROM eventstore.events2 where instance_id = '"+instanceID+"' ORDER BY position, in_tx_order) TO stdout")
+			_, err := conn.PgConn().CopyTo(ctx, writer, "COPY (SELECT instance_id, aggregate_type, aggregate_id, event_type, sequence, revision, created_at, payload, creator, owner, (SELECT "+position+"::DECIMAL) AS position, row_number() OVER () AS in_tx_order FROM eventstore.events2 "+instanceClause()+" ORDER BY position, in_tx_order) TO stdout")
 			writer.Close()
-			// TODO: unique constraints, assets, auth.auth_requests
 			return err
 		})
 		errs <- err
@@ -101,7 +97,6 @@ func copyEvents(ctx context.Context, source, dest *database.DB) {
 
 		tag, err := conn.PgConn().CopyFrom(ctx, reader, "COPY eventstore.events2 FROM stdin")
 		eventCount = tag.RowsAffected()
-		// TODO: assets
 
 		return err
 	})
@@ -122,7 +117,7 @@ func copyUniqueConstraints(ctx context.Context, source, dest *database.DB) {
 		err := sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
 			// TODO: sql injection
-			_, err := conn.PgConn().CopyTo(ctx, writer, "COPY (SELECT instance_id, unique_type, unique_field FROM eventstore.unique_constraints where instance_id = '"+instanceID+"') TO stdout")
+			_, err := conn.PgConn().CopyTo(ctx, writer, "COPY (SELECT instance_id, unique_type, unique_field FROM eventstore.unique_constraints "+instanceClause()+") TO stdout")
 			writer.Close()
 			return err
 		})

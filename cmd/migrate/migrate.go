@@ -31,4 +31,12 @@ func New() *cobra.Command {
 func migrateFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringVar(&instanceID, "instance", "", "id of the instance to migrate")
 	cmd.PersistentFlags().BoolVar(&system, "system", false, "migrates the whole system")
+	cmd.MarkFlagsOneRequired("system", "instance")
+}
+
+func instanceClause() string {
+	if system {
+		return "WHERE instance_id <> ''"
+	}
+	return "WHERE instance_id = '" + instanceID + "'"
 }
