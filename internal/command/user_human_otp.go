@@ -166,7 +166,7 @@ func (c *Commands) HumanCheckMFATOTP(ctx context.Context, userID, code, resource
 		return recheckErr
 	}
 	if existingOTP.UserLocked {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SF3fg", "Errors.User.Locked")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-SF3fg", "Errors.User.Locked")
 	}
 
 	// the OTP check succeeded and the user was not locked in the meantime
@@ -546,7 +546,7 @@ func (c *Commands) humanCheckOTP(
 		return recheckErr
 	}
 	if existingOTP.UserLocked() {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-S6h4R", "Errors.User.Locked")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-S6h4R", "Errors.User.Locked")
 	}
 
 	// the OTP check succeeded and the user was not locked in the meantime
