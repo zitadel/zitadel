@@ -29,9 +29,6 @@ Migrations only copies keys and assets`,
 }
 
 func copySystem(ctx context.Context, config *Migration) {
-	if instanceID == "" {
-		logging.Fatal("no instance id set")
-	}
 	sourceClient, err := database.Connect(config.Source, false, false)
 	logging.OnError(err).Fatal("unable to connect to source database")
 	defer sourceClient.Close()

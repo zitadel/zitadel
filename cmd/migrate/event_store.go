@@ -24,12 +24,12 @@ ZITADEL needs to be initialized
 Migrate only copies events2 and unique constraints`,
 		Run: func(cmd *cobra.Command, args []string) {
 			config := mustNewMigrationConfig(viper.GetViper())
-			copyEventstore(cmd.Context(), config, instanceID)
+			copyEventstore(cmd.Context(), config)
 		},
 	}
 }
 
-func copyEventstore(ctx context.Context, config *Migration, instanceID string) {
+func copyEventstore(ctx context.Context, config *Migration) {
 	sourceClient, err := database.Connect(config.Source, false, false)
 	logging.OnError(err).Fatal("unable to connect to source database")
 	defer sourceClient.Close()

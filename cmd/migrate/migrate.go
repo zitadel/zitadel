@@ -23,6 +23,7 @@ func New() *cobra.Command {
 		systemCmd(),
 		projectionsCmd(),
 		authCmd(),
+		verifyCmd(),
 	)
 
 	return cmd
