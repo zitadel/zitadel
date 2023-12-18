@@ -467,7 +467,6 @@ func (s *Server) getUserLinks(ctx context.Context, orgID string) (_ []*idp_pb.ID
 	if err != nil {
 		return nil, err
 	}
-	// We export user links with and without a login policy
 	idpUserLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userLinksResourceOwner}}, false)
 	if err != nil {
 		return nil, err
@@ -481,7 +480,6 @@ func (s *Server) getUserLinks(ctx context.Context, orgID string) (_ []*idp_pb.ID
 			ProvidedUserId:   idpUserLink.ProvidedUserID,
 			ProvidedUserName: idpUserLink.ProvidedUsername,
 			IdpType:          idp_pb.IDPType(idpUserLink.IDPType),
-			HasLoginPolicy:   idpUserLink.HasLoginPolicy,
 		})
 	}
 

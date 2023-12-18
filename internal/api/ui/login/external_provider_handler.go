@@ -394,6 +394,11 @@ func (l *Login) handleExternalUserAuthenticated(
 	callback func(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest),
 ) {
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
+	// ensure the linked IDP is added to the login policy
+	if err := l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, provider.ID, authReq.AgentID); err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
 	// check and fill in local linked user
 	externalErr := l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r), false)
 	if externalErr != nil && !zerrors.IsNotFound(externalErr) {
@@ -777,9 +782,6 @@ func (l *Login) updateExternalUsername(ctx context.Context, user *query.User, ex
 	links, err := l.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{externalIDQuery, idpIDQuery, userIDQuery}}, false)
 	if err != nil || len(links.Links) == 0 {
 		return err
-	}
-	if !links.Links[0].HasLoginPolicy {
-		return zerrors.ThrowPreconditionFailedf(nil, "LOGIN-321xR", "Errors.User.ExternalIDP.NotAllowed")
 	}
 	if links.Links[0].ProvidedUsername == externalUser.PreferredUsername {
 		return nil
