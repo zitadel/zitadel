@@ -1066,18 +1066,15 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		ClientSecret: "client_secret",
 	})
 	require.NoError(t, err)
-	_, err = Tester.Client.Mgmt.AddCustomLoginPolicy(CTX, &mgmt.AddCustomLoginPolicyRequest{
-		Idps: []*mgmt.AddCustomLoginPolicyRequest_IDP{{
-			IdpId:     provider.GetId(),
-			OwnerType: idp.IDPOwnerType_IDP_OWNER_TYPE_ORG,
-		}},
+	_, err = Tester.Client.Mgmt.AddCustomLoginPolicy(CTX, &mgmt.AddCustomLoginPolicyRequest{})
+	require.Condition(t, func() bool {
+		code := status.Convert(err).Code()
+		return code == codes.AlreadyExists || code == codes.OK
 	})
-	if status.Convert(err).Code() == codes.AlreadyExists {
-		_, err = Tester.Client.Mgmt.AddIDPToLoginPolicy(CTX, &mgmt.AddIDPToLoginPolicyRequest{
-			IdpId:     provider.GetId(),
-			OwnerType: idp.IDPOwnerType_IDP_OWNER_TYPE_ORG,
-		})
-	}
+	_, err = Tester.Client.Mgmt.AddIDPToLoginPolicy(CTX, &mgmt.AddIDPToLoginPolicyRequest{
+		IdpId:     provider.GetId(),
+		OwnerType: idp.IDPOwnerType_IDP_OWNER_TYPE_ORG,
+	})
 	require.NoError(t, err)
 	idpLink, err := Tester.Client.UserV2.AddIDPLink(CTX, &user.AddIDPLinkRequest{UserId: userMultipleAuth, IdpLink: &user.IDPLink{
 		IdpId:    provider.GetId(),
