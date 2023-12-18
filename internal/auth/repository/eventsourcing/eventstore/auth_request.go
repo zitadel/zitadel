@@ -90,7 +90,7 @@ type idpUserLinksProvider interface {
 }
 
 type userEventProvider interface {
-	UserEventsByID(ctx context.Context, id string, sequence uint64, eventTypes []eventstore.EventType) ([]eventstore.Event, error)
+	UserEventsByID(ctx context.Context, id string, changeDate time.Time, eventTypes []eventstore.EventType) ([]eventstore.Event, error)
 }
 
 type userCommandProvider interface {
@@ -963,15 +963,9 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request
 		}
 		queries = append(queries, orgIDQuery)
 	}
-	// If the link has no login policy, the user is not allowed to log in, so we return a precondition failed error.
-	// We return a precondition error because we try to create a new link on not found errors.
-	// But we don't want new links on IDPs without login policy.
 	links, err := repo.Query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
 	if err != nil {
 		return err
-	}
-	if len(links.Links) == 1 && !links.Links[0].HasLoginPolicy {
-		return zerrors.ThrowPreconditionFailedf(nil, "AUTH-s1m64", "Errors.User.ExternalIDP.NotAllowed")
 	}
 	if len(links.Links) != 1 {
 		return zerrors.ThrowNotFound(nil, "AUTH-Sf8sd", "Errors.ExternalIDP.NotFound")
@@ -1154,11 +1148,7 @@ func checkExternalIDPsOfUser(ctx context.Context, idpUserLinksProvider idpUserLi
 	if err != nil {
 		return nil, err
 	}
-	withPolicyQuery, err := query.NewIDPUserLinksWithLoginPolicyOnlySearchQuery()
-	if err != nil {
-		return nil, err
-	}
-	return idpUserLinksProvider.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userIDQuery, withPolicyQuery}}, false)
+	return idpUserLinksProvider.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userIDQuery}}, false)
 }
 
 func (repo *AuthRequestRepo) usersForUserSelection(ctx context.Context, request *domain.AuthRequest) ([]domain.UserSelection, error) {
@@ -1468,21 +1458,25 @@ var (
 
 func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eventProvider userEventProvider, agentID string, user *user_model.UserView) (*user_model.UserSessionView, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
+
+	// always load the latest sequence first, so in case the session was not found by id,
+	// the sequence will be equal or lower than the actual projection and no events are lost
+	sequence, err := provider.GetLatestUserSessionSequence(ctx, instanceID)
+	logging.WithFields("instanceID", instanceID, "userID", user.ID).
+		OnError(err).
+		Errorf("could not get current sequence for userSessionByIDs")
+
 	session, err := provider.UserSessionByIDs(agentID, user.ID, instanceID)
 	if err != nil {
 		if !zerrors.IsNotFound(err) {
 			return nil, err
 		}
-		sequence, err := provider.GetLatestUserSessionSequence(ctx, instanceID)
-		logging.WithFields("instanceID", instanceID, "userID", user.ID).
-			OnError(err).
-			Errorf("could not get current sequence for userSessionByIDs")
 		session = &user_view_model.UserSessionView{UserAgentID: agentID, UserID: user.ID}
 		if sequence != nil {
-			session.Sequence = sequence.Sequence
+			session.ChangeDate = sequence.EventCreatedAt
 		}
 	}
-	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence, append(session.EventTypes(), userSessionEventTypes...))
+	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.ChangeDate, append(session.EventTypes(), userSessionEventTypes...))
 	if err != nil {
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserSessionToModel(session), nil
@@ -1566,7 +1560,7 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	} else if user == nil {
 		user = new(user_view_model.UserView)
 	}
-	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence, user.EventTypes())
+	events, err := eventProvider.UserEventsByID(ctx, userID, user.ChangeDate, user.EventTypes())
 	if err != nil {
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserToModel(user), nil

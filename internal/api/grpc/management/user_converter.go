@@ -324,22 +324,13 @@ func ListHumanLinkedIDPsRequestToQuery(ctx context.Context, req *mgmt_pb.ListHum
 	if err != nil {
 		return nil, err
 	}
-	queries := make([]query.SearchQuery, 0, 3)
-	queries = append(queries, userQuery, resourceOwnerQuery)
-	if !req.GetWithLinkedLoginPolicyOnly() {
-		withPolicyQuery, err := query.NewIDPUserLinksWithLoginPolicyOnlySearchQuery()
-		if err != nil {
-			return nil, err
-		}
-		queries = append(queries, withPolicyQuery)
-	}
 	return &query.IDPUserLinksSearchQuery{
 		SearchRequest: query.SearchRequest{
 			Offset: offset,
 			Limit:  limit,
 			Asc:    asc,
 		},
-		Queries: queries,
+		Queries: []query.SearchQuery{userQuery, resourceOwnerQuery},
 	}, nil
 }
 

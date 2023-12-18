@@ -12,18 +12,9 @@ import (
 
 func ListMyLinkedIDPsRequestToQuery(ctx context.Context, req *auth_pb.ListMyLinkedIDPsRequest) (*query.IDPUserLinksSearchQuery, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	q := make([]query.SearchQuery, 0, 2)
-	userIDQuery, err := query.NewIDPUserLinksUserIDSearchQuery(authz.GetCtxData(ctx).UserID)
+	q, err := query.NewIDPUserLinksUserIDSearchQuery(authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
-	}
-	q = append(q, userIDQuery)
-	if !req.GetWithLinkedLoginPolicyOnly() {
-		withPolicyQuery, err := query.NewIDPUserLinksWithLoginPolicyOnlySearchQuery()
-		if err != nil {
-			return nil, err
-		}
-		q = append(q, withPolicyQuery)
 	}
 	return &query.IDPUserLinksSearchQuery{
 		SearchRequest: query.SearchRequest{
@@ -31,7 +22,7 @@ func ListMyLinkedIDPsRequestToQuery(ctx context.Context, req *auth_pb.ListMyLink
 			Limit:  limit,
 			Asc:    asc,
 		},
-		Queries: q,
+		Queries: []query.SearchQuery{q},
 	}, nil
 }
 

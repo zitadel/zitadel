@@ -1236,7 +1236,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 			},
 		},
 		{
-			name: "remove provider external idp not found, ok",
+			name: "remove provider from login policy, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -1287,65 +1287,6 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 					IDPConfigID: "config1",
 					Name:        "name",
 					Type:        domain.IdentityProviderTypeOrg,
-				},
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-		{
-			name: "remove provider with external idps, ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								domain.PasswordlessTypeAllowed,
-								"",
-								time.Hour*1,
-								time.Hour*2,
-								time.Hour*3,
-								time.Hour*4,
-								time.Hour*5,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewIdentityProviderAddedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								"config1",
-								domain.IdentityProviderTypeOrg,
-							),
-						),
-					),
-					expectPush(
-						org.NewIdentityProviderRemovedEvent(context.Background(),
-							&org.NewAggregate("org1").Aggregate,
-							"config1",
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:           context.Background(),
-				resourceOwner: "org1",
-				provider: &domain.IDPProvider{
-					IDPConfigID: "config1",
 				},
 			},
 			res: res{

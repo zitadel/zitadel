@@ -72,11 +72,10 @@ var (
 	authMethodTypeTypes      = UserAuthMethodColumnMethodType.setTable(authMethodTypeTable)
 	authMethodTypeState      = UserAuthMethodColumnState.setTable(authMethodTypeTable)
 
-	userIDPsCountTable          = idpUserLinkTable.setAlias("user_idps_count")
-	userIDPsCountUserID         = IDPUserLinkUserIDCol.setTable(userIDPsCountTable)
-	userIDPsCountInstanceID     = IDPUserLinkInstanceIDCol.setTable(userIDPsCountTable)
-	userIDPsCountHasLoginPolicy = IDPUserLinkHasLoginPolicyCol.setTable(userIDPsCountTable)
-	userIDPsCountCount          = Column{
+	userIDPsCountTable      = idpUserLinkTable.setAlias("user_idps_count")
+	userIDPsCountUserID     = IDPUserLinkUserIDCol.setTable(userIDPsCountTable)
+	userIDPsCountInstanceID = IDPUserLinkInstanceIDCol.setTable(userIDPsCountTable)
+	userIDPsCountCount      = Column{
 		name:  "count",
 		table: userIDPsCountTable,
 	}
@@ -348,7 +347,7 @@ func prepareActiveUserAuthMethodTypesQuery(ctx context.Context, db prepareDataba
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
-	idpsQuery, idpsArgs, err := prepareAuthMethodsIDPsQuery()
+	idpsQuery, err := prepareAuthMethodsIDPsQuery()
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
@@ -362,11 +361,9 @@ func prepareActiveUserAuthMethodTypesQuery(ctx context.Context, db prepareDataba
 				authMethodTypeUserID.identifier()+" = "+UserIDCol.identifier()+" AND "+
 				authMethodTypeInstanceID.identifier()+" = "+UserInstanceIDCol.identifier(),
 				authMethodsArgs...).
-			LeftJoin("("+idpsQuery+") AS "+userIDPsCountTable.alias+" ON "+
-				userIDPsCountUserID.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userIDPsCountInstanceID.identifier()+" = "+UserInstanceIDCol.identifier()+
-				db.Timetravel(call.Took(ctx)),
-				idpsArgs...).
+			LeftJoin("(" + idpsQuery + ") AS " + userIDPsCountTable.alias + " ON " +
+				userIDPsCountUserID.identifier() + " = " + UserIDCol.identifier() + " AND " +
+				userIDPsCountInstanceID.identifier() + " = " + UserInstanceIDCol.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*AuthMethodTypes, error) {
 			userAuthMethodTypes := make([]domain.UserAuthMethodType, 0)
@@ -416,7 +413,7 @@ func prepareUserAuthMethodTypesRequiredQuery(ctx context.Context, db prepareData
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
-	idpsQuery, idpsArgs, err := prepareAuthMethodsIDPsQuery()
+	idpsQuery, err := prepareAuthMethodsIDPsQuery()
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
@@ -432,10 +429,9 @@ func prepareUserAuthMethodTypesRequiredQuery(ctx context.Context, db prepareData
 				authMethodTypeUserID.identifier()+" = "+UserIDCol.identifier()+" AND "+
 				authMethodTypeInstanceID.identifier()+" = "+UserInstanceIDCol.identifier(),
 				authMethodsArgs...).
-			LeftJoin("("+idpsQuery+") AS "+userIDPsCountTable.alias+" ON "+
-				userIDPsCountUserID.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				userIDPsCountInstanceID.identifier()+" = "+UserInstanceIDCol.identifier(),
-				idpsArgs...).
+			LeftJoin("(" + idpsQuery + ") AS " + userIDPsCountTable.alias + " ON " +
+				userIDPsCountUserID.identifier() + " = " + UserIDCol.identifier() + " AND " +
+				userIDPsCountInstanceID.identifier() + " = " + UserInstanceIDCol.identifier()).
 			LeftJoin("(" + loginPolicyQuery + ") AS " + forceMFATable.alias + " ON " +
 				"(" + forceMFAOrgID.identifier() + " = " + UserInstanceIDCol.identifier() + " OR " + forceMFAOrgID.identifier() + " = " + UserResourceOwnerCol.identifier() + ") AND " +
 				forceMFAInstanceID.identifier() + " = " + UserInstanceIDCol.identifier() + db.Timetravel(call.Took(ctx))).
@@ -478,8 +474,8 @@ func prepareUserAuthMethodTypesRequiredQuery(ctx context.Context, db prepareData
 		}
 }
 
-func prepareAuthMethodsIDPsQuery() (string, []interface{}, error) {
-	idpsQuery, idpsArgs, err := sq.Select(
+func prepareAuthMethodsIDPsQuery() (string, error) {
+	idpsQuery, _, err := sq.Select(
 		userIDPsCountUserID.identifier(),
 		userIDPsCountInstanceID.identifier(),
 		"COUNT("+userIDPsCountUserID.identifier()+") AS "+userIDPsCountCount.name).
@@ -488,9 +484,8 @@ func prepareAuthMethodsIDPsQuery() (string, []interface{}, error) {
 			userIDPsCountUserID.identifier(),
 			userIDPsCountInstanceID.identifier(),
 		).
-		Where(sq.Eq{userIDPsCountHasLoginPolicy.identifier(): true}).
 		ToSql()
-	return idpsQuery, idpsArgs, err
+	return idpsQuery, err
 }
 
 func prepareAuthMethodQuery() (string, []interface{}, error) {

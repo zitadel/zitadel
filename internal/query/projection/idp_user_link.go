@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	IDPUserLinkTable             = "projections.idp_user_links4"
+	IDPUserLinkTable             = "projections.idp_user_links3"
 	IDPUserLinkIDPIDCol          = "idp_id"
 	IDPUserLinkUserIDCol         = "user_id"
 	IDPUserLinkExternalUserIDCol = "external_user_id"
@@ -24,7 +24,6 @@ const (
 	IDPUserLinkInstanceIDCol     = "instance_id"
 	IDPUserLinkDisplayNameCol    = "display_name"
 	IDPUserLinkOwnerRemovedCol   = "owner_removed"
-	IDPUserLinkHasLoginPolicyCol = "has_login_policy"
 )
 
 type idpUserLinkProjection struct{}
@@ -50,7 +49,6 @@ func (*idpUserLinkProjection) Init() *old_handler.Check {
 			handler.NewColumn(IDPUserLinkInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(IDPUserLinkDisplayNameCol, handler.ColumnTypeText),
 			handler.NewColumn(IDPUserLinkOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
-			handler.NewColumn(IDPUserLinkHasLoginPolicyCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(IDPUserLinkInstanceIDCol, IDPUserLinkIDPIDCol, IDPUserLinkExternalUserIDCol),
 			handler.WithIndex(handler.NewIndex("user_id", []string{IDPUserLinkUserIDCol})),
@@ -101,14 +99,6 @@ func (p *idpUserLinkProjection) Reducers() []handler.AggregateReducer {
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceOwnerRemoved,
 				},
-				{
-					Event:  org.LoginPolicyIDPProviderAddedEventType,
-					Reduce: p.reduceLoginPolicyChanged,
-				},
-				{
-					Event:  org.LoginPolicyIDPProviderRemovedEventType,
-					Reduce: p.reduceLoginPolicyChanged,
-				},
 			},
 		},
 		{
@@ -121,14 +111,6 @@ func (p *idpUserLinkProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(IDPUserLinkInstanceIDCol),
-				},
-				{
-					Event:  instance.LoginPolicyIDPProviderAddedEventType,
-					Reduce: p.reduceLoginPolicyChanged,
-				},
-				{
-					Event:  instance.LoginPolicyIDPProviderRemovedEventType,
-					Reduce: p.reduceLoginPolicyChanged,
 				},
 			},
 		},
@@ -272,38 +254,6 @@ func (p *idpUserLinkProjection) reduceIDPConfigRemoved(event eventstore.Event) (
 	}
 
 	return handler.NewDeleteStatement(event,
-		[]handler.Condition{
-			handler.NewCond(IDPUserLinkIDPIDCol, idpID),
-			handler.NewCond(IDPUserLinkResourceOwnerCol, event.Aggregate().ResourceOwner),
-			handler.NewCond(IDPUserLinkInstanceIDCol, event.Aggregate().InstanceID),
-		},
-	), nil
-}
-
-func (p *idpUserLinkProjection) reduceLoginPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
-	var idpID string
-	var hasLoginPolicy bool
-	switch e := event.(type) {
-	case *org.IdentityProviderAddedEvent:
-		idpID = e.IDPConfigID
-		hasLoginPolicy = true
-	case *instance.IdentityProviderAddedEvent:
-		idpID = e.IDPConfigID
-		hasLoginPolicy = true
-	case *org.IdentityProviderRemovedEvent:
-		idpID = e.IDPConfigID
-		hasLoginPolicy = false
-	case *instance.IdentityProviderRemovedEvent:
-		idpID = e.IDPConfigID
-		hasLoginPolicy = false
-	default:
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-5lYqQ", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyIDPProviderAddedEventType, instance.LoginPolicyIDPProviderAddedEventType, org.LoginPolicyIDPProviderRemovedEventType, instance.LoginPolicyIDPProviderRemovedEventType})
-	}
-
-	return handler.NewUpdateStatement(event,
-		[]handler.Column{
-			handler.NewCol(IDPUserLinkHasLoginPolicyCol, hasLoginPolicy),
-		},
 		[]handler.Condition{
 			handler.NewCond(IDPUserLinkIDPIDCol, idpID),
 			handler.NewCond(IDPUserLinkResourceOwnerCol, event.Aggregate().ResourceOwner),
