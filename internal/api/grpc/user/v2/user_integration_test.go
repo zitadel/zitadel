@@ -566,11 +566,6 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.UpdateHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 					Username: gu.Ptr("changed"),
 				},
 			},
@@ -586,11 +581,6 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.UpdateHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 					Username: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
 				},
 			},
@@ -611,11 +601,6 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.UpdateHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 					Profile: &user.SetHumanProfile{
 						GivenName:         "Donald",
 						FamilyName:        "Duck",
@@ -643,11 +628,6 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.UpdateHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 					Email: &user.SetHumanEmail{
 						Email:        "changed@test.com",
 						Verification: &user.SetHumanEmail_IsVerified{IsVerified: true},
@@ -671,11 +651,6 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.UpdateHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 					Email: &user.SetHumanEmail{
 						Email:        "changed@test.com",
 						Verification: &user.SetHumanEmail_ReturnCode{},
@@ -700,11 +675,6 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.UpdateHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 					Phone: &user.SetHumanPhone{
 						Phone:        "+41791234567",
 						Verification: &user.SetHumanPhone_IsVerified{IsVerified: true},
@@ -728,11 +698,6 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.UpdateHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 					Phone: &user.SetHumanPhone{
 						Phone:        "+41791234568",
 						Verification: &user.SetHumanPhone_ReturnCode{},
@@ -769,11 +734,6 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.UpdateHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 					Password: &user.SetPassword{
 						PasswordType: &user.SetPassword_Password{
 							Password: &user.Password{
@@ -813,11 +773,6 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.UpdateHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 					Password: &user.SetPassword{
 						PasswordType: &user.SetPassword_HashedPassword{
 							HashedPassword: &user.HashedPassword{
@@ -858,11 +813,6 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.UpdateHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 					Password: &user.SetPassword{
 						PasswordType: &user.SetPassword_HashedPassword{
 							HashedPassword: &user.HashedPassword{
@@ -911,11 +861,6 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.UpdateHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 					Password: &user.SetPassword{
 						PasswordType: &user.SetPassword_Password{
 							Password: &user.Password{
@@ -956,31 +901,26 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 	}
 }
 
-func TestServer_LockHumanUser(t *testing.T) {
+func TestServer_LockUser(t *testing.T) {
 	type args struct {
 		ctx     context.Context
-		req     *user.LockHumanUserRequest
-		prepare func(request *user.LockHumanUserRequest) error
+		req     *user.LockUserRequest
+		prepare func(request *user.LockUserRequest) error
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *user.LockHumanUserResponse
+		want    *user.LockUserResponse
 		wantErr bool
 	}{
 		{
 			name: "lock, not existing",
 			args: args{
 				CTX,
-				&user.LockHumanUserRequest{
+				&user.LockUserRequest{
 					UserId: "notexisting",
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 				},
-				func(request *user.LockHumanUserRequest) error { return nil },
+				func(request *user.LockUserRequest) error { return nil },
 			},
 			wantErr: true,
 		},
@@ -988,20 +928,32 @@ func TestServer_LockHumanUser(t *testing.T) {
 			name: "lock, ok",
 			args: args{
 				CTX,
-				&user.LockHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
-				},
-				func(request *user.LockHumanUserRequest) error {
+				&user.LockUserRequest{},
+				func(request *user.LockUserRequest) error {
 					resp := Tester.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
 			},
-			want: &user.LockHumanUserResponse{
+			want: &user.LockUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+		{
+			name: "lock machine, ok",
+			args: args{
+				CTX,
+				&user.LockUserRequest{},
+				func(request *user.LockUserRequest) error {
+					resp := Tester.CreateMachineUser(CTX)
+					request.UserId = resp.GetUserId()
+					return nil
+				},
+			},
+			want: &user.LockUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
@@ -1012,23 +964,28 @@ func TestServer_LockHumanUser(t *testing.T) {
 			name: "lock, already locked",
 			args: args{
 				CTX,
-				&user.LockHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
-				},
-				func(request *user.LockHumanUserRequest) error {
+				&user.LockUserRequest{},
+				func(request *user.LockUserRequest) error {
 					resp := Tester.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
-					_, err := Client.LockHumanUser(CTX, &user.LockHumanUserRequest{
+					_, err := Client.LockUser(CTX, &user.LockUserRequest{
 						UserId: resp.GetUserId(),
-						Organization: &object.Organization{
-							Org: &object.Organization_OrgId{
-								OrgId: Tester.Organisation.ID,
-							},
-						},
+					})
+					return err
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "lock machine, already locked",
+			args: args{
+				CTX,
+				&user.LockUserRequest{},
+				func(request *user.LockUserRequest) error {
+					resp := Tester.CreateMachineUser(CTX)
+					request.UserId = resp.GetUserId()
+					_, err := Client.LockUser(CTX, &user.LockUserRequest{
+						UserId: resp.GetUserId(),
 					})
 					return err
 				},
@@ -1041,7 +998,7 @@ func TestServer_LockHumanUser(t *testing.T) {
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
 
-			got, err := Client.LockHumanUser(tt.args.ctx, tt.args.req)
+			got, err := Client.LockUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -1052,31 +1009,26 @@ func TestServer_LockHumanUser(t *testing.T) {
 	}
 }
 
-func TestServer_UnlockHumanUser(t *testing.T) {
+func TestServer_UnLockUser(t *testing.T) {
 	type args struct {
 		ctx     context.Context
-		req     *user.UnlockHumanUserRequest
-		prepare func(request *user.UnlockHumanUserRequest) error
+		req     *user.UnlockUserRequest
+		prepare func(request *user.UnlockUserRequest) error
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *user.UnlockHumanUserResponse
+		want    *user.UnlockUserResponse
 		wantErr bool
 	}{
 		{
 			name: "unlock, not existing",
 			args: args{
 				CTX,
-				&user.UnlockHumanUserRequest{
+				&user.UnlockUserRequest{
 					UserId: "notexisting",
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 				},
-				func(request *user.UnlockHumanUserRequest) error { return nil },
+				func(request *user.UnlockUserRequest) error { return nil },
 			},
 			wantErr: true,
 		},
@@ -1084,15 +1036,22 @@ func TestServer_UnlockHumanUser(t *testing.T) {
 			name: "unlock, not locked",
 			args: args{
 				ctx: CTX,
-				req: &user.UnlockHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
-				},
-				prepare: func(request *user.UnlockHumanUserRequest) error {
+				req: &user.UnlockUserRequest{},
+				prepare: func(request *user.UnlockUserRequest) error {
 					resp := Tester.CreateHumanUser(CTX)
+					request.UserId = resp.GetUserId()
+					return nil
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "unlock machine, not locked",
+			args: args{
+				ctx: CTX,
+				req: &user.UnlockUserRequest{},
+				prepare: func(request *user.UnlockUserRequest) error {
+					resp := Tester.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1103,28 +1062,38 @@ func TestServer_UnlockHumanUser(t *testing.T) {
 			name: "unlock, ok",
 			args: args{
 				ctx: CTX,
-				req: &user.UnlockHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
-				},
-				prepare: func(request *user.UnlockHumanUserRequest) error {
+				req: &user.UnlockUserRequest{},
+				prepare: func(request *user.UnlockUserRequest) error {
 					resp := Tester.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
-					_, err := Client.LockHumanUser(CTX, &user.LockHumanUserRequest{
+					_, err := Client.LockUser(CTX, &user.LockUserRequest{
 						UserId: resp.GetUserId(),
-						Organization: &object.Organization{
-							Org: &object.Organization_OrgId{
-								OrgId: Tester.Organisation.ID,
-							},
-						},
 					})
 					return err
 				},
 			},
-			want: &user.UnlockHumanUserResponse{
+			want: &user.UnlockUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+		{
+			name: "unlock machine, ok",
+			args: args{
+				ctx: CTX,
+				req: &user.UnlockUserRequest{},
+				prepare: func(request *user.UnlockUserRequest) error {
+					resp := Tester.CreateMachineUser(CTX)
+					request.UserId = resp.GetUserId()
+					_, err := Client.LockUser(CTX, &user.LockUserRequest{
+						UserId: resp.GetUserId(),
+					})
+					return err
+				},
+			},
+			want: &user.UnlockUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
@@ -1137,7 +1106,7 @@ func TestServer_UnlockHumanUser(t *testing.T) {
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
 
-			got, err := Client.UnlockHumanUser(tt.args.ctx, tt.args.req)
+			got, err := Client.UnlockUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -1148,31 +1117,26 @@ func TestServer_UnlockHumanUser(t *testing.T) {
 	}
 }
 
-func TestServer_DeactivateHumanUser(t *testing.T) {
+func TestServer_DeactivateUser(t *testing.T) {
 	type args struct {
 		ctx     context.Context
-		req     *user.DeactivateHumanUserRequest
-		prepare func(request *user.DeactivateHumanUserRequest) error
+		req     *user.DeactivateUserRequest
+		prepare func(request *user.DeactivateUserRequest) error
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *user.DeactivateHumanUserResponse
+		want    *user.DeactivateUserResponse
 		wantErr bool
 	}{
 		{
 			name: "deactivate, not existing",
 			args: args{
 				CTX,
-				&user.DeactivateHumanUserRequest{
+				&user.DeactivateUserRequest{
 					UserId: "notexisting",
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 				},
-				func(request *user.DeactivateHumanUserRequest) error { return nil },
+				func(request *user.DeactivateUserRequest) error { return nil },
 			},
 			wantErr: true,
 		},
@@ -1180,20 +1144,32 @@ func TestServer_DeactivateHumanUser(t *testing.T) {
 			name: "deactivate, ok",
 			args: args{
 				CTX,
-				&user.DeactivateHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
-				},
-				func(request *user.DeactivateHumanUserRequest) error {
+				&user.DeactivateUserRequest{},
+				func(request *user.DeactivateUserRequest) error {
 					resp := Tester.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
 			},
-			want: &user.DeactivateHumanUserResponse{
+			want: &user.DeactivateUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+		{
+			name: "deactivate machine, ok",
+			args: args{
+				CTX,
+				&user.DeactivateUserRequest{},
+				func(request *user.DeactivateUserRequest) error {
+					resp := Tester.CreateMachineUser(CTX)
+					request.UserId = resp.GetUserId()
+					return nil
+				},
+			},
+			want: &user.DeactivateUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
@@ -1204,23 +1180,28 @@ func TestServer_DeactivateHumanUser(t *testing.T) {
 			name: "deactivate, already deactivated",
 			args: args{
 				CTX,
-				&user.DeactivateHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
-				},
-				func(request *user.DeactivateHumanUserRequest) error {
+				&user.DeactivateUserRequest{},
+				func(request *user.DeactivateUserRequest) error {
 					resp := Tester.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
-					_, err := Client.DeactivateHumanUser(CTX, &user.DeactivateHumanUserRequest{
+					_, err := Client.DeactivateUser(CTX, &user.DeactivateUserRequest{
 						UserId: resp.GetUserId(),
-						Organization: &object.Organization{
-							Org: &object.Organization_OrgId{
-								OrgId: Tester.Organisation.ID,
-							},
-						},
+					})
+					return err
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "deactivate machine, already deactivated",
+			args: args{
+				CTX,
+				&user.DeactivateUserRequest{},
+				func(request *user.DeactivateUserRequest) error {
+					resp := Tester.CreateMachineUser(CTX)
+					request.UserId = resp.GetUserId()
+					_, err := Client.DeactivateUser(CTX, &user.DeactivateUserRequest{
+						UserId: resp.GetUserId(),
 					})
 					return err
 				},
@@ -1233,7 +1214,7 @@ func TestServer_DeactivateHumanUser(t *testing.T) {
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
 
-			got, err := Client.DeactivateHumanUser(tt.args.ctx, tt.args.req)
+			got, err := Client.DeactivateUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -1244,31 +1225,26 @@ func TestServer_DeactivateHumanUser(t *testing.T) {
 	}
 }
 
-func TestServer_ReactivateHumanUser(t *testing.T) {
+func TestServer_ReactivateUser(t *testing.T) {
 	type args struct {
 		ctx     context.Context
-		req     *user.ReactivateHumanUserRequest
-		prepare func(request *user.ReactivateHumanUserRequest) error
+		req     *user.ReactivateUserRequest
+		prepare func(request *user.ReactivateUserRequest) error
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *user.ReactivateHumanUserResponse
+		want    *user.ReactivateUserResponse
 		wantErr bool
 	}{
 		{
 			name: "reactivate, not existing",
 			args: args{
 				CTX,
-				&user.ReactivateHumanUserRequest{
+				&user.ReactivateUserRequest{
 					UserId: "notexisting",
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 				},
-				func(request *user.ReactivateHumanUserRequest) error { return nil },
+				func(request *user.ReactivateUserRequest) error { return nil },
 			},
 			wantErr: true,
 		},
@@ -1276,15 +1252,22 @@ func TestServer_ReactivateHumanUser(t *testing.T) {
 			name: "reactivate, not deactivated",
 			args: args{
 				ctx: CTX,
-				req: &user.ReactivateHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
-				},
-				prepare: func(request *user.ReactivateHumanUserRequest) error {
+				req: &user.ReactivateUserRequest{},
+				prepare: func(request *user.ReactivateUserRequest) error {
 					resp := Tester.CreateHumanUser(CTX)
+					request.UserId = resp.GetUserId()
+					return nil
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "reactivate machine, not deactivated",
+			args: args{
+				ctx: CTX,
+				req: &user.ReactivateUserRequest{},
+				prepare: func(request *user.ReactivateUserRequest) error {
+					resp := Tester.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1295,28 +1278,38 @@ func TestServer_ReactivateHumanUser(t *testing.T) {
 			name: "reactivate, ok",
 			args: args{
 				ctx: CTX,
-				req: &user.ReactivateHumanUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
-				},
-				prepare: func(request *user.ReactivateHumanUserRequest) error {
+				req: &user.ReactivateUserRequest{},
+				prepare: func(request *user.ReactivateUserRequest) error {
 					resp := Tester.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
-					_, err := Client.DeactivateHumanUser(CTX, &user.DeactivateHumanUserRequest{
+					_, err := Client.DeactivateUser(CTX, &user.DeactivateUserRequest{
 						UserId: resp.GetUserId(),
-						Organization: &object.Organization{
-							Org: &object.Organization_OrgId{
-								OrgId: Tester.Organisation.ID,
-							},
-						},
 					})
 					return err
 				},
 			},
-			want: &user.ReactivateHumanUserResponse{
+			want: &user.ReactivateUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+		{
+			name: "reactivate machine, ok",
+			args: args{
+				ctx: CTX,
+				req: &user.ReactivateUserRequest{},
+				prepare: func(request *user.ReactivateUserRequest) error {
+					resp := Tester.CreateMachineUser(CTX)
+					request.UserId = resp.GetUserId()
+					_, err := Client.DeactivateUser(CTX, &user.DeactivateUserRequest{
+						UserId: resp.GetUserId(),
+					})
+					return err
+				},
+			},
+			want: &user.ReactivateUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
@@ -1329,7 +1322,7 @@ func TestServer_ReactivateHumanUser(t *testing.T) {
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
 
-			got, err := Client.ReactivateHumanUser(tt.args.ctx, tt.args.req)
+			got, err := Client.ReactivateUser(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {

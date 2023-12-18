@@ -130,46 +130,46 @@ func (s *Server) UpdateHumanUser(ctx context.Context, req *user.UpdateHumanUserR
 	}, nil
 }
 
-func (s *Server) LockHumanUser(ctx context.Context, req *user.LockHumanUserRequest) (_ *user.LockHumanUserResponse, err error) {
+func (s *Server) LockUser(ctx context.Context, req *user.LockUserRequest) (_ *user.LockUserResponse, err error) {
 	orgID := authz.GetCtxData(ctx).OrgID
 	details, err := s.command.LockUserHuman(ctx, orgID, req.UserId)
 	if err != nil {
 		return nil, err
 	}
-	return &user.LockHumanUserResponse{
+	return &user.LockUserResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
-func (s *Server) UnlockHumanUser(ctx context.Context, req *user.UnlockHumanUserRequest) (_ *user.UnlockHumanUserResponse, err error) {
+func (s *Server) UnlockUser(ctx context.Context, req *user.UnlockUserRequest) (_ *user.UnlockUserResponse, err error) {
 	orgID := authz.GetCtxData(ctx).OrgID
 	details, err := s.command.UnlockUserHuman(ctx, orgID, req.UserId)
 	if err != nil {
 		return nil, err
 	}
-	return &user.UnlockHumanUserResponse{
+	return &user.UnlockUserResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
-func (s *Server) DeactivateHumanUser(ctx context.Context, req *user.DeactivateHumanUserRequest) (_ *user.DeactivateHumanUserResponse, err error) {
+func (s *Server) DeactivateUser(ctx context.Context, req *user.DeactivateUserRequest) (_ *user.DeactivateUserResponse, err error) {
 	orgID := authz.GetCtxData(ctx).OrgID
 	details, err := s.command.DeactivateUserHuman(ctx, orgID, req.UserId)
 	if err != nil {
 		return nil, err
 	}
-	return &user.DeactivateHumanUserResponse{
+	return &user.DeactivateUserResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
-func (s *Server) ReactivateHumanUser(ctx context.Context, req *user.ReactivateHumanUserRequest) (_ *user.ReactivateHumanUserResponse, err error) {
+func (s *Server) ReactivateUser(ctx context.Context, req *user.ReactivateUserRequest) (_ *user.ReactivateUserResponse, err error) {
 	orgID := authz.GetCtxData(ctx).OrgID
 	details, err := s.command.ReactivateUserHuman(ctx, orgID, req.UserId)
 	if err != nil {
 		return nil, err
 	}
-	return &user.ReactivateHumanUserResponse{
+	return &user.ReactivateUserResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
 }

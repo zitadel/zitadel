@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
+func TestCommandSide_userExistsWriteModel(t *testing.T) {
 	type fields struct {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
@@ -24,7 +24,7 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 		userID string
 	}
 	type res struct {
-		want *UserHumanWriteModel
+		want *UserV2WriteModel
 		err  func(error) bool
 	}
 
@@ -53,7 +53,9 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -93,7 +95,9 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:   "user1",
 						Events:        []eventstore.Event{},
@@ -112,6 +116,40 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 					InitCodeExpiry:         0,
 					PreferredLanguage:      language.English,
 					UserState:              domain.UserStateActive,
+				},
+			},
+		},
+		{
+			name: "user machine added",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddMachineEvent(true, domain.OIDCTokenTypeBearer),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
+					WriteModel: eventstore.WriteModel{
+						AggregateID:       "user1",
+						Events:            []eventstore.Event{},
+						ProcessedSequence: 0,
+						ResourceOwner:     "org1",
+					},
+					UserName:        "username",
+					Name:            "name",
+					Description:     "description",
+					AccessTokenType: domain.OIDCTokenTypeBearer,
+					UserState:       domain.UserStateActive,
 				},
 			},
 		},
@@ -144,7 +182,9 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -206,7 +246,9 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -260,7 +302,9 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -314,7 +358,9 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -359,7 +405,9 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -379,13 +427,55 @@ func TestCommandSide_userHumanWriteModel_existing(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "user machine removed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddMachineEvent(true, domain.OIDCTokenTypeBearer),
+						),
+						eventFromEventPusher(
+							user.NewUserRemovedEvent(context.Background(),
+								&userAgg.Aggregate,
+								"username",
+								[]*domain.UserIDPLink{},
+								true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
+					WriteModel: eventstore.WriteModel{
+						AggregateID:       "user1",
+						Events:            []eventstore.Event{},
+						ProcessedSequence: 0,
+						ResourceOwner:     "org1",
+					},
+					UserName:        "username",
+					Name:            "name",
+					Description:     "description",
+					AccessTokenType: domain.OIDCTokenTypeBearer,
+					UserState:       domain.UserStateDeleted,
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID, false, false, false, false, false, false)
+			wm, err := r.userExistsWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -411,7 +501,7 @@ func TestCommandSide_userHumanWriteModel_profile(t *testing.T) {
 		userID string
 	}
 	type res struct {
-		want *UserHumanWriteModel
+		want *UserV2WriteModel
 		err  func(error) bool
 	}
 
@@ -455,8 +545,10 @@ func TestCommandSide_userHumanWriteModel_profile(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
 					ProfileWriteModel: true,
+					StateWriteModel:   true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -484,7 +576,7 @@ func TestCommandSide_userHumanWriteModel_profile(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID, true, false, false, false, false, false)
+			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID, true, false, false, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -510,7 +602,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 		userID string
 	}
 	type res struct {
-		want *UserHumanWriteModel
+		want *UserV2WriteModel
 		err  func(error) bool
 	}
 
@@ -545,8 +637,10 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel: true,
 					EmailWriteModel: true,
+					StateWriteModel: true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -600,8 +694,10 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel: true,
 					EmailWriteModel: true,
+					StateWriteModel: true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -665,8 +761,10 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel: true,
 					EmailWriteModel: true,
+					StateWriteModel: true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -722,8 +820,10 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel: true,
 					EmailWriteModel: true,
+					StateWriteModel: true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -794,8 +894,10 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel: true,
 					EmailWriteModel: true,
+					StateWriteModel: true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -821,7 +923,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID, false, true, false, false, false, false)
+			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID, false, true, false, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -847,7 +949,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 		userID string
 	}
 	type res struct {
-		want *UserHumanWriteModel
+		want *UserV2WriteModel
 		err  func(error) bool
 	}
 
@@ -882,8 +984,10 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel: true,
 					PhoneWriteModel: true,
+					StateWriteModel: true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -941,8 +1045,10 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel: true,
 					PhoneWriteModel: true,
+					StateWriteModel: true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -1013,8 +1119,10 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel: true,
 					PhoneWriteModel: true,
+					StateWriteModel: true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -1078,8 +1186,10 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel: true,
 					PhoneWriteModel: true,
+					StateWriteModel: true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -1157,8 +1267,10 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel: true,
 					PhoneWriteModel: true,
+					StateWriteModel: true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -1186,7 +1298,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID, false, false, true, false, false, false)
+			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID, false, false, true, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -1212,7 +1324,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 		userID string
 	}
 	type res struct {
-		want *UserHumanWriteModel
+		want *UserV2WriteModel
 		err  func(error) bool
 	}
 
@@ -1247,8 +1359,10 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel:    true,
 					PasswordWriteModel: true,
+					StateWriteModel:    true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -1293,8 +1407,10 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel:    true,
 					PasswordWriteModel: true,
+					StateWriteModel:    true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -1346,8 +1462,10 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel:    true,
 					PasswordWriteModel: true,
+					StateWriteModel:    true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -1415,8 +1533,10 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel:    true,
 					PasswordWriteModel: true,
+					StateWriteModel:    true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -1442,7 +1562,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID, false, false, false, true, false, false)
+			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID, false, false, false, true, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -1458,7 +1578,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 	}
 }
 
-func TestCommandSide_userHumanWriteModel_state(t *testing.T) {
+func TestCommandSide_userStateWriteModel(t *testing.T) {
 	type fields struct {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
@@ -1468,7 +1588,7 @@ func TestCommandSide_userHumanWriteModel_state(t *testing.T) {
 		userID string
 	}
 	type res struct {
-		want *UserHumanWriteModel
+		want *UserV2WriteModel
 		err  func(error) bool
 	}
 
@@ -1480,6 +1600,128 @@ func TestCommandSide_userHumanWriteModel_state(t *testing.T) {
 		args   args
 		res    res
 	}{
+		{
+			name: "user added",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
+					StateWriteModel:   true,
+					WriteModel: eventstore.WriteModel{
+						AggregateID:       "user1",
+						Events:            []eventstore.Event{},
+						ProcessedSequence: 0,
+						ResourceOwner:     "org1",
+					},
+					UserName:                 "username",
+					FirstName:                "firstname",
+					LastName:                 "lastname",
+					DisplayName:              "firstname lastname",
+					PreferredLanguage:        language.English,
+					PasswordEncodedHash:      "$plain$x$password",
+					PasswordChangeRequired:   true,
+					PasswordCheckFailedCount: 0,
+					Email:                    "email@test.ch",
+					IsEmailVerified:          false,
+					UserState:                domain.UserStateActive,
+				},
+			},
+		},
+		{
+			name: "user added initialized",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
+								&userAgg.Aggregate,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
+					StateWriteModel:   true,
+					WriteModel: eventstore.WriteModel{
+						AggregateID:       "user1",
+						Events:            []eventstore.Event{},
+						ProcessedSequence: 0,
+						ResourceOwner:     "org1",
+					},
+					UserName:                 "username",
+					FirstName:                "firstname",
+					LastName:                 "lastname",
+					DisplayName:              "firstname lastname",
+					PreferredLanguage:        language.English,
+					PasswordEncodedHash:      "$plain$x$password",
+					PasswordChangeRequired:   true,
+					PasswordCheckFailedCount: 0,
+					Email:                    "email@test.ch",
+					IsEmailVerified:          false,
+					UserState:                domain.UserStateActive,
+				},
+			},
+		},
+		{
+			name: "user machine added",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddMachineEvent(true, domain.OIDCTokenTypeBearer),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
+					StateWriteModel:   true,
+					WriteModel: eventstore.WriteModel{
+						AggregateID:       "user1",
+						Events:            []eventstore.Event{},
+						ProcessedSequence: 0,
+						ResourceOwner:     "org1",
+					},
+					UserName:        "username",
+					Name:            "name",
+					Description:     "description",
+					AccessTokenType: domain.OIDCTokenTypeBearer,
+					UserState:       domain.UserStateActive,
+				},
+			},
+		},
 		{
 			name: "user added locked",
 			fields: fields{
@@ -1520,8 +1762,10 @@ func TestCommandSide_userHumanWriteModel_state(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
-					StateWriteModel: true,
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
+					StateWriteModel:   true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -1587,8 +1831,10 @@ func TestCommandSide_userHumanWriteModel_state(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
-					StateWriteModel: true,
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
+					StateWriteModel:   true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -1631,8 +1877,10 @@ func TestCommandSide_userHumanWriteModel_state(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
-					StateWriteModel: true,
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
+					StateWriteModel:   true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -1651,7 +1899,8 @@ func TestCommandSide_userHumanWriteModel_state(t *testing.T) {
 					UserState:              domain.UserStateInactive,
 				},
 			},
-		}, {
+		},
+		{
 			name: "user added deactivated and reactived",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -1678,8 +1927,10 @@ func TestCommandSide_userHumanWriteModel_state(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
-					StateWriteModel: true,
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
+					StateWriteModel:   true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -1705,7 +1956,7 @@ func TestCommandSide_userHumanWriteModel_state(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID, false, false, false, false, true, false)
+			wm, err := r.userStateWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -1731,7 +1982,7 @@ func TestCommandSide_userHumanWriteModel_avatar(t *testing.T) {
 		userID string
 	}
 	type res struct {
-		want *UserHumanWriteModel
+		want *UserV2WriteModel
 		err  func(error) bool
 	}
 
@@ -1766,8 +2017,10 @@ func TestCommandSide_userHumanWriteModel_avatar(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel:  true,
 					AvatarWriteModel: true,
+					StateWriteModel:  true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -1818,8 +2071,10 @@ func TestCommandSide_userHumanWriteModel_avatar(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				want: &UserHumanWriteModel{
+				want: &UserV2WriteModel{
+					HumanWriteModel:  true,
 					AvatarWriteModel: true,
+					StateWriteModel:  true,
 					WriteModel: eventstore.WriteModel{
 						AggregateID:       "user1",
 						Events:            []eventstore.Event{},
@@ -1845,7 +2100,7 @@ func TestCommandSide_userHumanWriteModel_avatar(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID, false, false, false, false, false, true)
+			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID, false, false, false, false, true)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()

@@ -12,10 +12,18 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
-type UserHumanWriteModel struct {
+type UserV2WriteModel struct {
 	eventstore.WriteModel
 
 	UserName string
+
+	MachineWriteModel bool
+	Name              string
+	Description       string
+	AccessTokenType   domain.OIDCTokenType
+
+	MachineSecretWriteModel bool
+	ClientSecret            *crypto.CryptoValue
 
 	ProfileWriteModel bool
 	FirstName         string
@@ -28,6 +36,7 @@ type UserHumanWriteModel struct {
 	AvatarWriteModel bool
 	Avatar           string
 
+	HumanWriteModel      bool
 	InitCode             *crypto.CryptoValue
 	InitCodeCreationDate time.Time
 	InitCodeExpiry       time.Duration
@@ -61,16 +70,26 @@ type UserHumanWriteModel struct {
 	UserState       domain.UserState
 }
 
-func NewUserHumanStateWriteModel(userID, resourceOwner string) *UserHumanWriteModel {
-	return NewUserHumanWriteModel(userID, resourceOwner, false, false, false, false, true, false)
+func NewUserExistsWriteModel(userID, resourceOwner string) *UserV2WriteModel {
+	return newUserV2WriteModel(userID, resourceOwner, true, true, false, false, false, false, false, false)
 }
 
-func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM, stateWM, avatarWM bool) *UserHumanWriteModel {
-	return &UserHumanWriteModel{
+func NewUserStateWriteModel(userID, resourceOwner string) *UserV2WriteModel {
+	return newUserV2WriteModel(userID, resourceOwner, true, true, false, false, false, false, true, false)
+}
+
+func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM, avatarWM bool) *UserV2WriteModel {
+	return newUserV2WriteModel(userID, resourceOwner, true, false, profileWM, emailWM, phoneWM, passwordWM, true, avatarWM)
+}
+
+func newUserV2WriteModel(userID, resourceOwner string, humanWM, machineWM, profileWM, emailWM, phoneWM, passwordWM, stateWM, avatarWM bool) *UserV2WriteModel {
+	return &UserV2WriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
+		HumanWriteModel:    humanWM,
+		MachineWriteModel:  machineWM,
 		ProfileWriteModel:  profileWM,
 		EmailWriteModel:    emailWM,
 		PhoneWriteModel:    phoneWM,
@@ -80,7 +99,7 @@ func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, ph
 	}
 }
 
-func (wm *UserHumanWriteModel) Reduce() error {
+func (wm *UserV2WriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
@@ -101,6 +120,24 @@ func (wm *UserHumanWriteModel) Reduce() error {
 			wm.UserName = e.UserName
 		case *user.HumanProfileChangedEvent:
 			wm.reduceHumanProfileChangedEvent(e)
+
+		case *user.MachineChangedEvent:
+			if e.Name != nil {
+				wm.Name = *e.Name
+			}
+			if e.Description != nil {
+				wm.Description = *e.Description
+			}
+			if e.AccessTokenType != nil {
+				wm.AccessTokenType = *e.AccessTokenType
+			}
+
+		case *user.MachineAddedEvent:
+			wm.UserName = e.UserName
+			wm.Name = e.Name
+			wm.Description = e.Description
+			wm.AccessTokenType = e.AccessTokenType
+			wm.UserState = domain.UserStateActive
 
 		case *user.HumanEmailChangedEvent:
 			wm.Email = e.EmailAddress
@@ -168,70 +205,75 @@ func (wm *UserHumanWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *UserHumanWriteModel) EmptyInitCode() {
+func (wm *UserV2WriteModel) EmptyInitCode() {
 	wm.InitCode = nil
 	wm.InitCodeExpiry = 0
 	wm.InitCodeCreationDate = time.Time{}
 	wm.InitCheckFailedCount = 0
 }
-func (wm *UserHumanWriteModel) SetInitCode(code *crypto.CryptoValue, expiry time.Duration, creationDate time.Time) {
+func (wm *UserV2WriteModel) SetInitCode(code *crypto.CryptoValue, expiry time.Duration, creationDate time.Time) {
 	wm.InitCode = code
 	wm.InitCodeExpiry = expiry
 	wm.InitCodeCreationDate = creationDate
 	wm.InitCheckFailedCount = 0
 }
-func (wm *UserHumanWriteModel) EmptyEmailCode() {
+func (wm *UserV2WriteModel) EmptyEmailCode() {
 	wm.EmailCode = nil
 	wm.EmailCodeExpiry = 0
 	wm.EmailCodeCreationDate = time.Time{}
 	wm.EmailCheckFailedCount = 0
 }
-func (wm *UserHumanWriteModel) SetEMailCode(code *crypto.CryptoValue, expiry time.Duration, creationDate time.Time) {
+func (wm *UserV2WriteModel) SetEMailCode(code *crypto.CryptoValue, expiry time.Duration, creationDate time.Time) {
 	wm.EmailCode = code
 	wm.EmailCodeExpiry = expiry
 	wm.EmailCodeCreationDate = creationDate
 	wm.EmailCheckFailedCount = 0
 }
-func (wm *UserHumanWriteModel) EmptyPhoneCode() {
+func (wm *UserV2WriteModel) EmptyPhoneCode() {
 	wm.PhoneCode = nil
 	wm.PhoneCodeExpiry = 0
 	wm.PhoneCodeCreationDate = time.Time{}
 	wm.PhoneCheckFailedCount = 0
 }
-func (wm *UserHumanWriteModel) SetPhoneCode(code *crypto.CryptoValue, expiry time.Duration, creationDate time.Time) {
+func (wm *UserV2WriteModel) SetPhoneCode(code *crypto.CryptoValue, expiry time.Duration, creationDate time.Time) {
 	wm.PhoneCode = code
 	wm.PhoneCodeExpiry = expiry
 	wm.PhoneCodeCreationDate = creationDate
 	wm.PhoneCheckFailedCount = 0
 }
-func (wm *UserHumanWriteModel) EmptyPasswordCode() {
+func (wm *UserV2WriteModel) EmptyPasswordCode() {
 	wm.PasswordCode = nil
 	wm.PasswordCodeExpiry = 0
 	wm.PasswordCodeCreationDate = time.Time{}
 }
-func (wm *UserHumanWriteModel) SetPasswordCode(code *crypto.CryptoValue, expiry time.Duration, creationDate time.Time) {
+func (wm *UserV2WriteModel) SetPasswordCode(code *crypto.CryptoValue, expiry time.Duration, creationDate time.Time) {
 	wm.PasswordCode = code
 	wm.PasswordCodeExpiry = expiry
 	wm.PasswordCodeCreationDate = creationDate
 }
 
-func (wm *UserHumanWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *UserV2WriteModel) Query() *eventstore.SearchQueryBuilder {
+	// remove events are always processed
+	// and username is based for machine and human
 	eventTypes := []eventstore.EventType{
-		user.UserV1AddedType,
-		user.HumanAddedType,
-		user.UserV1RegisteredType,
-		user.HumanRegisteredType,
-
-		user.UserV1InitialCodeAddedType,
-		user.HumanInitialCodeAddedType,
-
-		user.UserV1InitializedCheckSucceededType,
-		user.HumanInitializedCheckSucceededType,
-		user.HumanInitializedCheckFailedType,
-		user.UserV1InitializedCheckFailedType,
-
 		user.UserRemovedType,
 		user.UserUserNameChangedType,
+	}
+
+	if wm.HumanWriteModel {
+		eventTypes = append(eventTypes,
+			user.UserV1AddedType,
+			user.HumanAddedType,
+			user.UserV1RegisteredType,
+			user.HumanRegisteredType,
+		)
+	}
+
+	if wm.MachineWriteModel {
+		eventTypes = append(eventTypes,
+			user.MachineChangedEventType,
+			user.MachineAddedEventType,
+		)
 	}
 
 	if wm.EmailWriteModel {
@@ -271,6 +313,14 @@ func (wm *UserHumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 	}
 	if wm.StateWriteModel {
 		eventTypes = append(eventTypes,
+			user.UserV1InitialCodeAddedType,
+			user.HumanInitialCodeAddedType,
+
+			user.UserV1InitializedCheckSucceededType,
+			user.HumanInitializedCheckSucceededType,
+			user.HumanInitializedCheckFailedType,
+			user.UserV1InitializedCheckFailedType,
+
 			user.UserLockedType,
 			user.UserUnlockedType,
 			user.UserDeactivatedType,
@@ -300,7 +350,6 @@ func (wm *UserHumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
@@ -312,7 +361,7 @@ func (wm *UserHumanWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return query
 }
 
-func (wm *UserHumanWriteModel) reduceHumanAddedEvent(e *user.HumanAddedEvent) {
+func (wm *UserV2WriteModel) reduceHumanAddedEvent(e *user.HumanAddedEvent) {
 	wm.UserName = e.UserName
 	wm.FirstName = e.FirstName
 	wm.LastName = e.LastName
@@ -327,7 +376,7 @@ func (wm *UserHumanWriteModel) reduceHumanAddedEvent(e *user.HumanAddedEvent) {
 	wm.PasswordChangeRequired = e.ChangeRequired
 }
 
-func (wm *UserHumanWriteModel) reduceHumanRegisteredEvent(e *user.HumanRegisteredEvent) {
+func (wm *UserV2WriteModel) reduceHumanRegisteredEvent(e *user.HumanRegisteredEvent) {
 	wm.UserName = e.UserName
 	wm.FirstName = e.FirstName
 	wm.LastName = e.LastName
@@ -342,7 +391,7 @@ func (wm *UserHumanWriteModel) reduceHumanRegisteredEvent(e *user.HumanRegistere
 	wm.PasswordChangeRequired = e.ChangeRequired
 }
 
-func (wm *UserHumanWriteModel) reduceHumanProfileChangedEvent(e *user.HumanProfileChangedEvent) {
+func (wm *UserV2WriteModel) reduceHumanProfileChangedEvent(e *user.HumanProfileChangedEvent) {
 	if e.FirstName != "" {
 		wm.FirstName = e.FirstName
 	}
@@ -363,7 +412,7 @@ func (wm *UserHumanWriteModel) reduceHumanProfileChangedEvent(e *user.HumanProfi
 	}
 }
 
-func (wm *UserHumanWriteModel) NewEmailAddressChangedEvent(
+func (wm *UserV2WriteModel) NewEmailAddressChangedEvent(
 	ctx context.Context,
 	email domain.EmailAddress,
 ) *user.HumanEmailChangedEvent {
@@ -373,7 +422,7 @@ func (wm *UserHumanWriteModel) NewEmailAddressChangedEvent(
 	return user.NewHumanEmailChangedEvent(ctx, &wm.Aggregate().Aggregate, email)
 }
 
-func (wm *UserHumanWriteModel) NewEmailIsVerifiedEvent(
+func (wm *UserV2WriteModel) NewEmailIsVerifiedEvent(
 	ctx context.Context,
 	isVerified bool,
 ) *user.HumanEmailVerifiedEvent {
@@ -383,7 +432,7 @@ func (wm *UserHumanWriteModel) NewEmailIsVerifiedEvent(
 	return user.NewHumanEmailVerifiedEvent(ctx, &wm.Aggregate().Aggregate)
 }
 
-func (wm *UserHumanWriteModel) NewPhoneNumberChangedEvent(
+func (wm *UserV2WriteModel) NewPhoneNumberChangedEvent(
 	ctx context.Context,
 	phone domain.PhoneNumber,
 ) *user.HumanPhoneChangedEvent {
@@ -393,7 +442,7 @@ func (wm *UserHumanWriteModel) NewPhoneNumberChangedEvent(
 	return user.NewHumanPhoneChangedEvent(ctx, &wm.Aggregate().Aggregate, phone)
 }
 
-func (wm *UserHumanWriteModel) NewPhoneIsVerifiedEvent(
+func (wm *UserV2WriteModel) NewPhoneIsVerifiedEvent(
 	ctx context.Context,
 	isVerified bool,
 ) *user.HumanPhoneVerifiedEvent {
@@ -403,11 +452,11 @@ func (wm *UserHumanWriteModel) NewPhoneIsVerifiedEvent(
 	return user.NewHumanPhoneVerifiedEvent(ctx, &wm.Aggregate().Aggregate)
 }
 
-func (wm *UserHumanWriteModel) Aggregate() *user.Aggregate {
+func (wm *UserV2WriteModel) Aggregate() *user.Aggregate {
 	return user.NewAggregate(wm.AggregateID, wm.ResourceOwner)
 }
 
-func (wm *UserHumanWriteModel) NewProfileChangedEvent(
+func (wm *UserV2WriteModel) NewProfileChangedEvent(
 	ctx context.Context,
 	firstName,
 	lastName,

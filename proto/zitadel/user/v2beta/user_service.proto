@@ -248,9 +248,6 @@ service UserService {
         permission: "user.write"
         org_field: "organization"
       }
-      http_response: {
-        success_code: 201
-      }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -265,7 +262,7 @@ service UserService {
     };
   }
 
-  rpc DeactivateHumanUser(DeactivateHumanUserRequest) returns (DeactivateHumanUserResponse) {
+  rpc DeactivateUser(DeactivateUserRequest) returns (DeactivateUserResponse) {
     option (google.api.http) = {
       post: "/v2beta/users/{user_id}/deactivate"
       body: "*"
@@ -275,9 +272,6 @@ service UserService {
       auth_option: {
         permission: "user.write"
         org_field: "organization"
-      }
-      http_response: {
-        success_code: 201
       }
     };
 
@@ -293,7 +287,7 @@ service UserService {
     };
   }
 
-  rpc ReactivateHumanUser(ReactivateHumanUserRequest) returns (ReactivateHumanUserResponse) {
+  rpc ReactivateUser(ReactivateUserRequest) returns (ReactivateUserResponse) {
     option (google.api.http) = {
       post: "/v2beta/users/{user_id}/reactivate"
       body: "*"
@@ -303,9 +297,6 @@ service UserService {
       auth_option: {
         permission: "user.write"
         org_field: "organization"
-      }
-      http_response: {
-        success_code: 201
       }
     };
 
@@ -321,7 +312,7 @@ service UserService {
     };
   }
 
-  rpc LockHumanUser(LockHumanUserRequest) returns (LockHumanUserResponse) {
+  rpc LockUser(LockUserRequest) returns (LockUserResponse) {
     option (google.api.http) = {
       post: "/v2beta/users/{user_id}/lock"
       body: "*"
@@ -331,9 +322,6 @@ service UserService {
       auth_option: {
         permission: "user.write"
         org_field: "organization"
-      }
-      http_response: {
-        success_code: 201
       }
     };
 
@@ -349,7 +337,7 @@ service UserService {
     };
   }
 
-  rpc UnlockHumanUser(UnlockHumanUserRequest) returns (UnlockHumanUserResponse) {
+  rpc UnlockUser(UnlockUserRequest) returns (UnlockUserResponse) {
     option (google.api.http) = {
       post: "/v2beta/users/{user_id}/unlock"
       body: "*"
@@ -359,9 +347,6 @@ service UserService {
       auth_option: {
         permission: "user.write"
         org_field: "organization"
-      }
-      http_response: {
-        success_code: 201
       }
     };
 
@@ -386,9 +371,6 @@ service UserService {
       auth_option: {
         permission: "user.delete"
         org_field: "organization"
-      }
-      http_response: {
-        success_code: 201
       }
     };
 
@@ -1022,11 +1004,10 @@ message UpdateHumanUserRequest{
       example: "\"minnie-mouse\"";
     }
   ];
-  zitadel.object.v2beta.Organization organization = 3;
-  optional SetHumanProfile profile = 4;
-  optional SetHumanEmail email = 5;
-  optional SetHumanPhone phone = 6;
-  optional SetPassword password = 7;
+  optional SetHumanProfile profile = 3;
+  optional SetHumanEmail email = 4;
+  optional SetHumanPhone phone = 5;
+  optional SetPassword password = 6;
 }
 
 message UpdateHumanUserResponse {
@@ -1035,7 +1016,7 @@ message UpdateHumanUserResponse {
   optional string phone_code = 3;
 }
 
-message DeactivateHumanUserRequest {
+message DeactivateUserRequest {
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -1045,15 +1026,14 @@ message DeactivateHumanUserRequest {
       example: "\"69629012906488334\"";
     }
   ];
-  zitadel.object.v2beta.Organization organization = 2;
 }
 
-message DeactivateHumanUserResponse {
+message DeactivateUserResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
 
-message ReactivateHumanUserRequest {
+message ReactivateUserRequest {
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -1063,14 +1043,13 @@ message ReactivateHumanUserRequest {
       example: "\"69629012906488334\"";
     }
   ];
-  zitadel.object.v2beta.Organization organization = 2;
 }
 
-message ReactivateHumanUserResponse {
+message ReactivateUserResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
-message LockHumanUserRequest {
+message LockUserRequest {
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -1080,14 +1059,13 @@ message LockHumanUserRequest {
       example: "\"69629012906488334\"";
     }
   ];
-  zitadel.object.v2beta.Organization organization = 2;
 }
 
-message LockHumanUserResponse {
+message LockUserResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
-message UnlockHumanUserRequest {
+message UnlockUserRequest {
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -1097,10 +1075,9 @@ message UnlockHumanUserRequest {
       example: "\"69629012906488334\"";
     }
   ];
-  zitadel.object.v2beta.Organization organization = 2;
 }
 
-message UnlockHumanUserResponse {
+message UnlockUserResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 

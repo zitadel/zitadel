@@ -32,6 +32,7 @@ import (
 	organisation "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
+	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
@@ -130,6 +131,17 @@ func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse
 				ReturnCode: &user.ReturnPhoneVerificationCode{},
 			},
 		},
+	})
+	logging.OnError(err).Fatal("create human user")
+	return resp
+}
+
+func (s *Tester) CreateMachineUser(ctx context.Context) *mgmt.AddMachineUserResponse {
+	resp, err := s.Client.Mgmt.AddMachineUser(ctx, &mgmt.AddMachineUserRequest{
+		UserName:        fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
+		Name:            "Mickey",
+		Description:     "Mickey Mouse",
+		AccessTokenType: user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER,
 	})
 	logging.OnError(err).Fatal("create human user")
 	return resp

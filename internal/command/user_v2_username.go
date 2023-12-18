@@ -9,7 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) changeUsername(ctx context.Context, cmds []eventstore.Command, wm *UserHumanWriteModel, userName string) ([]eventstore.Command, error) {
+func (c *Commands) changeUsername(ctx context.Context, cmds []eventstore.Command, wm *UserV2WriteModel, userName string) ([]eventstore.Command, error) {
 	if wm.UserName == userName {
 		return cmds, nil
 	}
@@ -17,7 +17,7 @@ func (c *Commands) changeUsername(ctx context.Context, cmds []eventstore.Command
 
 	domainPolicy, err := c.domainPolicyWriteModel(ctx, orgID)
 	if err != nil {
-		return cmds, zerrors.ThrowPreconditionFailed(err, "COMMAND-38fnu", "Errors.Org.DomainPolicy.NotExisting")
+		return cmds, zerrors.ThrowPreconditionFailed(err, "COMMAND-79pv6e1q62", "Errors.Org.DomainPolicy.NotExisting")
 	}
 	if !domainPolicy.UserLoginMustBeDomain {
 		index := strings.LastIndex(userName, "@")

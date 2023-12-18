@@ -71,7 +71,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMA-095xh8fll1", "Errors.Internal"))
 				},
 			},
 		},
@@ -123,7 +123,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-k2unb", "Errors.User.AlreadyExisting"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-7yiox1isql", "Errors.User.AlreadyExisting"))
 				},
 			},
 		},
@@ -1151,31 +1151,6 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "orgid missing, invalid argument error",
-			fields: fields{
-				eventstore: expectEventstore(),
-			},
-			args: args{
-				ctx:   context.Background(),
-				orgID: "",
-				human: &ChangeHuman{
-					Username: gu.Ptr("username"),
-					Profile: &Profile{
-						FirstName: gu.Ptr("firstname"),
-						LastName:  gu.Ptr("lastname"),
-					},
-					Email: &Email{
-						Address: "email@test.ch",
-					},
-				},
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal"))
-				},
-			},
-		},
-		{
 			name: "domain policy not found, precondition error",
 			fields: fields{
 				eventstore: expectEventstore(
@@ -1197,7 +1172,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-38fnu", "Errors.Org.DomainPolicy.NotExisting"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-79pv6e1q62", "Errors.Org.DomainPolicy.NotExisting"))
 				},
 			},
 		},
@@ -1791,7 +1766,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Empty"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-3klek4sbns", "Errors.User.Password.Empty"))
 				},
 			},
 		},
@@ -1894,7 +1869,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Empty"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-3klek4sbns", "Errors.User.Password.Empty"))
 				},
 			},
 		},
@@ -2323,7 +2298,7 @@ func TestCommandSide_LockUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-agz3eczifm", "Errors.User.UserIDMissing"))
 				},
 			},
 		},
@@ -2342,7 +2317,7 @@ func TestCommandSide_LockUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-450yxuqrh1", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -2381,7 +2356,42 @@ func TestCommandSide_LockUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3NN8v", "Errors.User.ShouldBeActiveOrInitial"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-lgws8wtsqf", "Errors.User.ShouldBeActiveOrInitial"))
+				},
+			},
+		},
+		{
+			name: "user already locked, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMachineAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"name",
+								"description",
+								true,
+								domain.OIDCTokenTypeBearer,
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserLockedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-lgws8wtsqf", "Errors.User.ShouldBeActiveOrInitial"))
 				},
 			},
 		},
@@ -2403,6 +2413,41 @@ func TestCommandSide_LockUserHuman(t *testing.T) {
 								domain.GenderUnspecified,
 								"email@test.ch",
 								true,
+							),
+						),
+					),
+					expectPush(
+						user.NewUserLockedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "lock user, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMachineAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"name",
+								"description",
+								true,
+								domain.OIDCTokenTypeBearer,
 							),
 						),
 					),
@@ -2479,7 +2524,7 @@ func TestCommandSide_UnlockUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-a9ld4xckax", "Errors.User.UserIDMissing"))
 				},
 			},
 		},
@@ -2498,7 +2543,7 @@ func TestCommandSide_UnlockUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-x377t913pw", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -2532,7 +2577,35 @@ func TestCommandSide_UnlockUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.NotLocked"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-olb9vb0oca", "Errors.User.NotLocked"))
+				},
+			},
+		},
+		{
+			name: "user already active, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						user.NewMachineAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							"name",
+							"description",
+							true,
+							domain.OIDCTokenTypeBearer,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-olb9vb0oca", "Errors.User.NotLocked"))
 				},
 			},
 		},
@@ -2554,6 +2627,45 @@ func TestCommandSide_UnlockUserHuman(t *testing.T) {
 								domain.GenderUnspecified,
 								"email@test.ch",
 								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserLockedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate),
+						),
+					),
+					expectPush(
+						user.NewUserUnlockedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "unlock user machine, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMachineAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"name",
+								"description",
+								true,
+								domain.OIDCTokenTypeBearer,
 							),
 						),
 						eventFromEventPusher(
@@ -2633,7 +2745,7 @@ func TestCommandSide_DeactivateUserHuman(t *testing.T) {
 		},
 		res: res{
 			err: func(err error) bool {
-				return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal"))
+				return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMA-r1etf6eex9", "Errors.Internal"))
 			},
 		},
 	},
@@ -2651,7 +2763,7 @@ func TestCommandSide_DeactivateUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-78iiirat8y", "Errors.User.UserIDMissing"))
 				},
 			},
 		},
@@ -2670,7 +2782,7 @@ func TestCommandSide_DeactivateUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-5gp2p62iin", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -2710,7 +2822,7 @@ func TestCommandSide_DeactivateUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-ke0fw", "Errors.User.CantDeactivateInitial"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-gvx4kct9r2", "Errors.User.CantDeactivateInitial"))
 				},
 			},
 		},
@@ -2749,7 +2861,7 @@ func TestCommandSide_DeactivateUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5M0sf", "Errors.User.AlreadyInactive"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5gunjw0cd7", "Errors.User.AlreadyInactive"))
 				},
 			},
 		},
@@ -2776,6 +2888,77 @@ func TestCommandSide_DeactivateUserHuman(t *testing.T) {
 						eventFromEventPusher(
 							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectPush(
+						user.NewUserDeactivatedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+
+		{
+			name: "user machine already inactive, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMachineAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"name",
+								"description",
+								true,
+								domain.OIDCTokenTypeBearer,
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserDeactivatedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5gunjw0cd7", "Errors.User.AlreadyInactive"))
+				},
+			},
+		},
+		{
+			name: "deactivate user machine, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMachineAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"name",
+								"description",
+								true,
+								domain.OIDCTokenTypeBearer,
 							),
 						),
 					),
@@ -2852,7 +3035,7 @@ func TestCommandSide_ReactivateUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMA-0vlu1bb5uo", "Errors.Internal"))
 				},
 			},
 		},
@@ -2870,7 +3053,7 @@ func TestCommandSide_ReactivateUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-0nx1ie38fw", "Errors.User.UserIDMissing"))
 				},
 			},
 		},
@@ -2889,7 +3072,7 @@ func TestCommandSide_ReactivateUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-k2unb", "Errors.User.NotFound"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-9hy5kzbuk6", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -2923,7 +3106,37 @@ func TestCommandSide_ReactivateUserHuman(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-6M0sf", "Errors.User.NotInactive"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-s5qqcz97hf", "Errors.User.NotInactive"))
+				},
+			},
+		},
+		{
+			name: "user machine already active, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMachineAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"name",
+								"description",
+								true,
+								domain.OIDCTokenTypeBearer,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-s5qqcz97hf", "Errors.User.NotInactive"))
 				},
 			},
 		},
@@ -2945,6 +3158,45 @@ func TestCommandSide_ReactivateUserHuman(t *testing.T) {
 								domain.GenderUnspecified,
 								"email@test.ch",
 								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserDeactivatedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate),
+						),
+					),
+					expectPush(
+						user.NewUserReactivatedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "reactivate user machine, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMachineAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"name",
+								"description",
+								true,
+								domain.OIDCTokenTypeBearer,
 							),
 						),
 						eventFromEventPusher(
