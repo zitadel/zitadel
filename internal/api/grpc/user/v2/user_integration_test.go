@@ -13,6 +13,8 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -1064,10 +1066,18 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		ClientSecret: "client_secret",
 	})
 	require.NoError(t, err)
-	_, err = Tester.Client.Mgmt.AddIDPToLoginPolicy(CTX, &mgmt.AddIDPToLoginPolicyRequest{
-		IdpId:     provider.GetId(),
-		OwnerType: idp.IDPOwnerType_IDP_OWNER_TYPE_ORG,
+	_, err = Tester.Client.Mgmt.AddCustomLoginPolicy(CTX, &mgmt.AddCustomLoginPolicyRequest{
+		Idps: []*mgmt.AddCustomLoginPolicyRequest_IDP{{
+			IdpId:     provider.GetId(),
+			OwnerType: idp.IDPOwnerType_IDP_OWNER_TYPE_ORG,
+		}},
 	})
+	if status.Convert(err).Code() == codes.AlreadyExists {
+		_, err = Tester.Client.Mgmt.AddIDPToLoginPolicy(CTX, &mgmt.AddIDPToLoginPolicyRequest{
+			IdpId:     provider.GetId(),
+			OwnerType: idp.IDPOwnerType_IDP_OWNER_TYPE_ORG,
+		})
+	}
 	require.NoError(t, err)
 	idpLink, err := Tester.Client.UserV2.AddIDPLink(CTX, &user.AddIDPLinkRequest{UserId: userMultipleAuth, IdpLink: &user.IDPLink{
 		IdpId:    provider.GetId(),
