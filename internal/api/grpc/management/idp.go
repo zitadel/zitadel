@@ -89,7 +89,6 @@ func (s *Server) RemoveOrgIDP(ctx context.Context, req *mgmt_pb.RemoveOrgIDPRequ
 	if err != nil {
 		return nil, err
 	}
-	// We remove all links, with and without a login policy
 	userLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
 		Queries: []query.SearchQuery{idpQuery},
 	}, true)

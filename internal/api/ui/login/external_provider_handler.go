@@ -106,7 +106,6 @@ func (l *Login) handleExternalLoginStep(w http.ResponseWriter, r *http.Request, 
 			return
 		}
 	}
-	// TODO: PreconditionFailed?
 	l.renderLogin(w, r, authReq, zerrors.ThrowInvalidArgument(nil, "VIEW-Fsj7f", "Errors.User.ExternalIDP.NotAllowed"))
 }
 
