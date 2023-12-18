@@ -19,9 +19,10 @@ func New() *cobra.Command {
 
 	migrateFlags(cmd)
 	cmd.AddCommand(
-		eventsCmd(),
-		keysCmd(),
+		eventstoreCmd(),
+		systemCmd(),
 		projectionsCmd(),
+		authCmd(),
 	)
 
 	return cmd

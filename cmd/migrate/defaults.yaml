@@ -111,4 +111,5 @@ Projections:
   # before it spots left folding additional events
   # and updates the table.
   TransactionDuration: 0s # ZITADEL_PROJECTIONS_TRANSACTIONDURATION
+  # turn off scheduler during operation
   RequeueEvery: 0s
