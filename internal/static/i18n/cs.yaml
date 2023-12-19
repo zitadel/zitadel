@@ -143,7 +143,7 @@ Errors:
     ExternalIDP:
       Invalid: Externí IDP je neplatné
       IDPConfigNotExisting: Konfigurace poskytovatele IDP je pro tuto organizaci neplatná
-      NotAllowed: Externí IDP není v této organizaci povoleno
+      NotAllowed: Externí IDP není povolen
       MinimumExternalIDPNeeded: Musí být přidán alespoň jeden IDP
       AlreadyExists: Externí IDP již obsazeno
       NotFound: Externí IDP nenalezeno

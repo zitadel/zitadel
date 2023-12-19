@@ -7,9 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
-	"github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
@@ -94,21 +92,7 @@ func (s *Server) AddIDPToLoginPolicy(ctx context.Context, req *mgmt_pb.AddIDPToL
 
 func (s *Server) RemoveIDPFromLoginPolicy(ctx context.Context, req *mgmt_pb.RemoveIDPFromLoginPolicyRequest) (*mgmt_pb.RemoveIDPFromLoginPolicyResponse, error) {
 	orgID := authz.GetCtxData(ctx).OrgID
-	idpQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(req.IdpId)
-	if err != nil {
-		return nil, err
-	}
-	resourceOwnerQuery, err := query.NewIDPUserLinksResourceOwnerSearchQuery(orgID)
-	if err != nil {
-		return nil, err
-	}
-	userLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
-		Queries: []query.SearchQuery{idpQuery, resourceOwnerQuery},
-	}, false)
-	if err != nil {
-		return nil, err
-	}
-	objectDetails, err := s.command.RemoveIDPFromLoginPolicy(ctx, orgID, &domain.IDPProvider{IDPConfigID: req.IdpId}, user.ExternalIDPViewsToExternalIDPs(userLinks.Links)...)
+	objectDetails, err := s.command.RemoveIDPFromLoginPolicy(ctx, orgID, &domain.IDPProvider{IDPConfigID: req.IdpId})
 	if err != nil {
 		return nil, err
 	}
