@@ -56,7 +56,8 @@ func verifyMigration(ctx context.Context, config *Migration) {
 }
 
 func getTables(ctx context.Context, dest *database.DB, schema string) (tables []string) {
-	err := dest.Query(
+	err := dest.QueryContext(
+		ctx,
 		func(r *sql.Rows) error {
 			for r.Next() {
 				var table string
@@ -75,7 +76,8 @@ func getTables(ctx context.Context, dest *database.DB, schema string) (tables []
 }
 
 func getViews(ctx context.Context, dest *database.DB, schema string) (tables []string) {
-	err := dest.Query(
+	err := dest.QueryContext(
+		ctx,
 		func(r *sql.Rows) error {
 			for r.Next() {
 				var table string
@@ -94,7 +96,8 @@ func getViews(ctx context.Context, dest *database.DB, schema string) (tables []s
 }
 
 func countEntries(ctx context.Context, client *database.DB, table string) (count int) {
-	err := client.QueryRow(
+	err := client.QueryRowContext(
+		ctx,
 		func(r *sql.Row) error {
 			return r.Scan(&count)
 		},

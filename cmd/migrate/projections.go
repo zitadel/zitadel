@@ -278,7 +278,8 @@ func queryInstanceIDs(ctx context.Context, source *database.DB) []string {
 	}
 
 	instances := []string{}
-	err := source.Query(
+	err := source.QueryContext(
+		ctx,
 		func(r *sql.Rows) error {
 			for r.Next() {
 				var instance string
