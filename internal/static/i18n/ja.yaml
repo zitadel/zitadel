@@ -136,7 +136,7 @@ Errors:
     ExternalIDP:
       Invalid: 無効な外部IDPです
       IDPConfigNotExisting: この組織はIDPプロバイダーが無効です
-      NotAllowed: この組織では外部IDPが許可されていません
+      NotAllowed: 外部IDPは許可されていません
       MinimumExternalIDPNeeded: 少なくとも1つのIDPを追加する必要があります
       AlreadyExists: 外部IDPはすでに使用されています
       NotFound: 外部IDPが見つかりません
