@@ -13,6 +13,10 @@ type DetailsMsg interface {
 	GetDetails() *object.Details
 }
 
+type ListDetailsMsg interface {
+	GetDetails() *object.ListDetails
+}
+
 // AssertDetails asserts values in a message's object Details,
 // if the object Details in expected is a non-nil value.
 // It targets API v2 messages that have the `GetDetails()` method.
@@ -38,4 +42,20 @@ func AssertDetails[D DetailsMsg](t testing.TB, expected, actual D) {
 	assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
 	assert.Equal(t, wantDetails.GetResourceOwner(), gotDetails.GetResourceOwner())
+}
+
+func AssertListDetails[D ListDetailsMsg](t testing.TB, expected, actual D) {
+	wantDetails, gotDetails := expected.GetDetails(), actual.GetDetails()
+	if wantDetails == nil {
+		assert.Nil(t, gotDetails)
+		return
+	}
+
+	//assert.NotZero(t, gotDetails.GetProcessedSequence())
+
+	gotCD := gotDetails.GetTimestamp().AsTime()
+	now := time.Now()
+	assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
+
+	assert.Equal(t, wantDetails.GetTotalResult(), gotDetails.GetTotalResult())
 }

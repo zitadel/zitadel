@@ -10,6 +10,7 @@ import "zitadel/user/v2beta/phone.proto";
 import "zitadel/user/v2beta/idp.proto";
 import "zitadel/user/v2beta/password.proto";
 import "zitadel/user/v2beta/user.proto";
+import "zitadel/user/v2beta/query.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/duration.proto";
@@ -134,6 +135,75 @@ service UserService {
         value: {
           description: "OK";
         }
+      };
+    };
+  }
+
+
+  rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
+    option (google.api.http) = {
+      get: "/v2beta/users/{user_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "user.read"
+        org_field: "organization"
+      }
+      http_response: {
+        success_code: 200
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "User by ID";
+      description: "Returns the full user object (human or machine) including the profile, email, etc."
+      tags: "Users";
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/users"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "user.read"
+        org_field: "organization"
+      }
+      http_response: {
+        success_code: 200
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Users";
+      summary: "Search Users";
+      description: "Search for users. By default, we will return users of your organization. Make sure to include a limit and sorting for pagination."
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all users matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
       };
     };
   }
@@ -684,6 +754,40 @@ message AddHumanUserResponse {
   zitadel.object.v2beta.Details details = 2;
   optional string email_code = 3;
   optional string phone_code = 4;
+}
+
+message GetUserByIDRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629012906488334\"";
+      description: "User ID of the user you like to get."
+    }
+  ];
+  zitadel.object.v2beta.Organization organization = 2;
+}
+
+message GetUserByIDResponse {
+  zitadel.object.v2beta.Details details = 1;
+  zitadel.user.v2beta.User user = 2;
+}
+
+message ListUsersRequest {
+  //list limitations and ordering
+  zitadel.object.v2beta.ListQuery query = 1;
+  // the field the result is sorted
+  zitadel.user.v2beta.UserFieldName sorting_column = 2;
+  //criteria the client is looking for
+  repeated zitadel.user.v2beta.SearchQuery queries = 3;
+}
+
+message ListUsersResponse {
+  zitadel.object.v2beta.ListDetails details = 1;
+  zitadel.user.v2beta.UserFieldName sorting_column = 2;
+  repeated zitadel.user.v2beta.User result = 3;
 }
 
 message SetEmailRequest{

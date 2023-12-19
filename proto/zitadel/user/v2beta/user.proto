@@ -7,10 +7,9 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2beta;user";
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
-
-message User {
-  string id = 1;
-}
+import "zitadel/object/v2beta/object.proto";
+import "zitadel/user/v2beta/email.proto";
+import "zitadel/user/v2beta/phone.proto";
 
 enum Gender {
   GENDER_UNSPECIFIED = 0;
@@ -59,13 +58,58 @@ message SetHumanProfile {
       example: "\"en\"";
     }
   ];
-  optional zitadel.user.v2beta.Gender gender = 6 [
+  optional Gender gender = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"GENDER_FEMALE\"";
     }
   ];
 }
 
+message HumanProfile {
+  string given_name = 1  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"Minnie\"";
+    }
+  ];
+  string family_name = 2  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"Mouse\"";
+    }
+  ];
+  optional string nick_name = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"Mini\"";
+    }
+  ];
+  optional string display_name = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"Minnie Mouse\"";
+    }
+  ];
+  optional string preferred_language = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 10;
+      example: "\"en\"";
+    }
+  ];
+  optional Gender gender = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"GENDER_FEMALE\"";
+    }
+  ];
+  string avatar_url = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "avatar URL of the user"
+      example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
+    }
+  ];
+}
 
 message SetMetadataEntry {
   string key = 1 [
@@ -87,4 +131,87 @@ message SetMetadataEntry {
       max_length: 500000;
     }
   ];
+}
+
+message User {
+  string user_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  UserState state = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "current state of the user";
+    }
+  ];
+  string username = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"minnie-mouse\"";
+    }
+  ];
+  repeated string login_names = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"gigi@zitadel.com\", \"gigi@zitadel.zitadel.ch\"]";
+    }
+  ];
+  string preferred_login_name = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"gigi@zitadel.com\"";
+    }
+  ];
+  oneof type {
+    HumanUser human = 6 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "one of type use human or machine"
+      }
+    ];
+    MachineUser machine = 7 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "one of type use human or machine"
+      }
+    ];
+  }
+}
+
+message HumanUser {
+  HumanProfile profile = 1;
+  HumanEmail email = 2;
+  HumanPhone phone = 3;
+}
+
+message MachineUser {
+  string name = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"zitadel\"";
+    }
+  ];
+  string description = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"The one and only IAM\"";
+    }
+  ];
+  bool has_secret = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"true\"";
+    }
+  ];
+  AccessTokenType access_token_type = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Type of access token to receive";
+    }
+  ];
+}
+
+enum AccessTokenType {
+  ACCESS_TOKEN_TYPE_BEARER = 0;
+  ACCESS_TOKEN_TYPE_JWT = 1;
+}
+
+enum UserState {
+  USER_STATE_UNSPECIFIED = 0;
+  USER_STATE_ACTIVE = 1;
+  USER_STATE_INACTIVE = 2;
+  USER_STATE_DELETED = 3;
+  USER_STATE_LOCKED = 4;
+  USER_STATE_INITIAL = 5;
 }

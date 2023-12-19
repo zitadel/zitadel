@@ -23,6 +23,8 @@ type Server struct {
 	idpAlg      crypto.EncryptionAlgorithm
 	idpCallback func(ctx context.Context) string
 	samlRootURL func(ctx context.Context, idpID string) string
+
+	assetAPIPrefix func(context.Context) string
 }
 
 type Config struct{}
@@ -34,14 +36,16 @@ func CreateServer(
 	idpAlg crypto.EncryptionAlgorithm,
 	idpCallback func(ctx context.Context) string,
 	samlRootURL func(ctx context.Context, idpID string) string,
+	assetAPIPrefix func(ctx context.Context) string,
 ) *Server {
 	return &Server{
-		command:     command,
-		query:       query,
-		userCodeAlg: userCodeAlg,
-		idpAlg:      idpAlg,
-		idpCallback: idpCallback,
-		samlRootURL: samlRootURL,
+		command:        command,
+		query:          query,
+		userCodeAlg:    userCodeAlg,
+		idpAlg:         idpAlg,
+		idpCallback:    idpCallback,
+		samlRootURL:    samlRootURL,
+		assetAPIPrefix: assetAPIPrefix,
 	}
 }
 
