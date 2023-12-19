@@ -121,12 +121,11 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	if err = c.userValidateDomain(ctx, resourceOwner, human.Username, domainPolicy.UserLoginMustBeDomain); err != nil {
 		return err
 	}
-
 	var createCmd humanCreationCommand
 	if human.Register {
 		createCmd = user.NewHumanRegisteredEvent(
 			ctx,
-			UserAggregateFromWriteModel(&existingHuman.WriteModel),
+			&existingHuman.Aggregate().Aggregate,
 			human.Username,
 			human.FirstName,
 			human.LastName,
@@ -140,7 +139,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	} else {
 		createCmd = user.NewHumanAddedEvent(
 			ctx,
-			UserAggregateFromWriteModel(&existingHuman.WriteModel),
+			&existingHuman.Aggregate().Aggregate,
 			human.Username,
 			human.FirstName,
 			human.LastName,
@@ -157,7 +156,8 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		createCmd.AddPhoneData(human.Phone.Number)
 	}
 
-	filter := c.eventstore.Filter
+	// separated to change when old user logic is not used anymore
+	filter := c.eventstore.Filter //nolint:staticcheck
 	if err := addHumanCommandPassword(ctx, filter, createCmd, human, c.userPasswordHasher); err != nil {
 		return err
 	}
@@ -178,7 +178,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	for _, metadataEntry := range human.Metadata {
 		cmds = append(cmds, user.NewMetadataSetEvent(
 			ctx,
-			UserAggregateFromWriteModel(&existingHuman.WriteModel),
+			&existingHuman.Aggregate().Aggregate,
 			metadataEntry.Key,
 			metadataEntry.Value,
 		))
@@ -402,7 +402,7 @@ func (c *Commands) changeUserEmail(ctx context.Context, cmds []eventstore.Comman
 		if email.Address == "" || email.Address == wm.Email {
 			return cmds, code, err
 		}
-		c, err := c.newEmailCode(ctx, c.eventstore.Filter, alg)
+		c, err := c.newEmailCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
 		if err != nil {
 			return cmds, code, err
 		}
@@ -434,7 +434,7 @@ func (c *Commands) changeUserPhone(ctx context.Context, cmds []eventstore.Comman
 		if phone.Number == "" || phone.Number == wm.Phone {
 			return cmds, code, err
 		}
-		c, err := c.newPhoneCode(ctx, c.eventstore.Filter, alg)
+		c, err := c.newPhoneCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
 		if err != nil {
 			return cmds, code, err
 		}

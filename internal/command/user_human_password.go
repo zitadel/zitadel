@@ -63,7 +63,8 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID,
 
 // setEncodedPassword add change event from already encoded password to HumanPasswordWriteModel and return the necessary object details for response
 func (c *Commands) setEncodedPassword(ctx context.Context, wm *HumanPasswordWriteModel, password string, changeRequired bool) (objectDetails *domain.ObjectDetails, err error) {
-	command, err := c.setPasswordCommand(ctx, UserAggregateFromWriteModel(&wm.WriteModel), wm.UserState, password, changeRequired, true)
+	agg := user.NewAggregate(wm.AggregateID, wm.ResourceOwner)
+	command, err := c.setPasswordCommand(ctx, &agg.Aggregate, wm.UserState, password, changeRequired, true)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +77,8 @@ func (c *Commands) setEncodedPassword(ctx context.Context, wm *HumanPasswordWrit
 
 // setPassword add change event to HumanPasswordWriteModel and return the necessary object details for response
 func (c *Commands) setPassword(ctx context.Context, wm *HumanPasswordWriteModel, password string, changeRequired bool) (objectDetails *domain.ObjectDetails, err error) {
-	command, err := c.setPasswordCommand(ctx, UserAggregateFromWriteModel(&wm.WriteModel), wm.UserState, password, changeRequired, false)
+	agg := user.NewAggregate(wm.AggregateID, wm.ResourceOwner)
+	command, err := c.setPasswordCommand(ctx, &agg.Aggregate, wm.UserState, password, changeRequired, false)
 	if err != nil {
 		return nil, err
 	}
