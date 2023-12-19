@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
-	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -1006,10 +1005,9 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx                 context.Context
-		resourceOwner       string
-		provider            *domain.IDPProvider
-		cascadeExternalIDPs []*domain.UserIDPLink
+		ctx           context.Context
+		resourceOwner string
+		provider      *domain.IDPProvider
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1238,7 +1236,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 			},
 		},
 		{
-			name: "remove provider external idp not found, ok",
+			name: "remove provider from login policy, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -1290,93 +1288,6 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 					Name:        "name",
 					Type:        domain.IdentityProviderTypeOrg,
 				},
-				cascadeExternalIDPs: []*domain.UserIDPLink{
-					{
-						ObjectRoot: models.ObjectRoot{
-							AggregateID: "user1",
-						},
-						IDPConfigID: "config1",
-					},
-				},
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-		{
-			name: "remove provider with external idps, ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							org.NewLoginPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								domain.PasswordlessTypeAllowed,
-								"",
-								time.Hour*1,
-								time.Hour*2,
-								time.Hour*3,
-								time.Hour*4,
-								time.Hour*5,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewIdentityProviderAddedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								"config1",
-								domain.IdentityProviderTypeOrg,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							user.NewUserIDPLinkAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"config1", "", "externaluser1"),
-						),
-					),
-					expectPush(
-						org.NewIdentityProviderRemovedEvent(context.Background(),
-							&org.NewAggregate("org1").Aggregate,
-							"config1",
-						),
-						user.NewUserIDPLinkCascadeRemovedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-							"config1", "externaluser1",
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:           context.Background(),
-				resourceOwner: "org1",
-				provider: &domain.IDPProvider{
-					IDPConfigID: "config1",
-				},
-				cascadeExternalIDPs: []*domain.UserIDPLink{
-					{
-						ObjectRoot: models.ObjectRoot{
-							AggregateID: "user1",
-						},
-						IDPConfigID:    "config1",
-						ExternalUserID: "externaluser1",
-					},
-				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1390,7 +1301,7 @@ func TestCommandSide_RemoveIDPProviderLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveIDPFromLoginPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.provider, tt.args.cascadeExternalIDPs...)
+			got, err := r.RemoveIDPFromLoginPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
