@@ -57,7 +57,7 @@ type Queries struct {
 func StartQueries(
 	ctx context.Context,
 	es *eventstore.Eventstore,
-	sqlClient *database.DB,
+	querySqlClient, projectionSqlClient *database.DB,
 	projections projection.Config,
 	defaults sd.SystemDefaults,
 	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm,
@@ -69,7 +69,7 @@ func StartQueries(
 ) (repo *Queries, err error) {
 	repo = &Queries{
 		eventstore:                          es,
-		client:                              sqlClient,
+		client:                              querySqlClient,
 		DefaultLanguage:                     language.Und,
 		LoginTranslationFileContents:        make(map[string][]byte),
 		NotificationTranslationFileContents: make(map[string][]byte),
@@ -102,7 +102,7 @@ func StartQueries(
 
 	repo.checkPermission = permissionCheck(repo)
 
-	err = projection.Create(ctx, sqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm, systemAPIUsers)
+	err = projection.Create(ctx, projectionSqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm, systemAPIUsers)
 	if err != nil {
 		return nil, err
 	}

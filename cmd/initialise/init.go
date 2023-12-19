@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
 var (
@@ -75,7 +76,7 @@ func initialise(config database.Config, steps ...func(*database.DB) error) error
 		return err
 	}
 
-	db, err := database.Connect(config, true, false)
+	db, err := database.Connect(config, true, dialect.DBPurposeQuery)
 	if err != nil {
 		return err
 	}

@@ -69,31 +69,23 @@ func (c *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 	return c, nil
 }
 
-func (c *Config) Connect(useAdmin, isEventPusher bool, pusherRatio float32, appName string) (*sql.DB, error) {
-	db, err := sql.Open("pgx", c.String(useAdmin, appName))
+func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpose dialect.DBPurpose) (*sql.DB, error) {
+	client, err := sql.Open("pgx", c.String(useAdmin, purpose.AppName()))
 	if err != nil {
 		return nil, err
 	}
 
-	connInfo, err := dialect.NewConnectionInfo(c.MaxOpenConns, c.MaxIdleConns, float64(pusherRatio))
+	connConfig, err := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns, spoolerRatio, pusherRatio, purpose)
 	if err != nil {
 		return nil, err
 	}
 
-	var maxConns, maxIdleConns uint32
-	if isEventPusher {
-		maxConns = connInfo.EventstorePusher.MaxOpenConns
-		maxIdleConns = connInfo.EventstorePusher.MaxIdleConns
-	} else {
-		maxConns = connInfo.ZITADEL.MaxOpenConns
-		maxIdleConns = connInfo.ZITADEL.MaxIdleConns
-	}
-	db.SetMaxOpenConns(int(maxConns))
-	db.SetMaxIdleConns(int(maxIdleConns))
-	db.SetConnMaxLifetime(c.MaxConnLifetime)
-	db.SetConnMaxIdleTime(c.MaxConnIdleTime)
+	client.SetMaxOpenConns(int(connConfig.MaxIdleConns))
+	client.SetMaxIdleConns(int(connConfig.MaxIdleConns))
+	client.SetConnMaxLifetime(c.MaxConnLifetime)
+	client.SetConnMaxIdleTime(c.MaxConnIdleTime)
 
-	return db, nil
+	return client, nil
 }
 
 func (c *Config) DatabaseName() string {
