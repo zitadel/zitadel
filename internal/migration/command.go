@@ -98,7 +98,6 @@ func (s *SetupStep) UniqueConstraints() []*eventstore.UniqueConstraint {
 func RegisterMappers(es *eventstore.Eventstore) {
 	es.RegisterFilterEventMapper(aggregateType, StartedType, SetupMapper)
 	es.RegisterFilterEventMapper(aggregateType, doneType, SetupMapper)
-	es.RegisterFilterEventMapper(aggregateType, skippedType, SetupMapper)
 	es.RegisterFilterEventMapper(aggregateType, failedType, SetupMapper)
 	es.RegisterFilterEventMapper(aggregateType, repeatableDoneType, SetupMapper)
 }

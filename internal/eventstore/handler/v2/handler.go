@@ -112,10 +112,10 @@ func (h *Handler) Start(ctx context.Context) {
 }
 
 func (h *Handler) schedule(ctx context.Context) {
-	if h.requeueEvery <= 0 {
-		h.log().Info("schedule skipped")
-		return
-	}
+	// if h.requeueEvery <= 0 {
+	// 	h.log().Info("schedule skipped")
+	// 	return
+	// }
 	// if there was no run before trigger within half a second
 	start := randomizeStart(0, 0.5)
 	t := time.NewTimer(start)

@@ -14,7 +14,6 @@ import (
 const (
 	StartedType        = eventstore.EventType("system.migration.started")
 	doneType           = eventstore.EventType("system.migration.done")
-	skippedType        = eventstore.EventType("system.migration.skipped")
 	failedType         = eventstore.EventType("system.migration.failed")
 	repeatableDoneType = eventstore.EventType("system.migration.repeatable.done")
 	aggregateType      = eventstore.AggregateType("system")
@@ -171,7 +170,6 @@ func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migrat
 		case StartedType, failedType:
 			isStarted = !isStarted
 		case doneType,
-			skippedType,
 			repeatableDoneType:
 			repeatable, ok := migration.(RepeatableMigration)
 			if !ok {
