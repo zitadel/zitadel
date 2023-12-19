@@ -184,92 +184,104 @@ func ifNotNilPtr[v, p any](value *v, conv func(v) p) *p {
 }
 
 func UpdateUserRequestToChangeHuman(req *user.UpdateHumanUserRequest) (*command.ChangeHuman, error) {
-	var profile *command.Profile
-	if req.Profile != nil {
-		var firstName *string
-		if req.Profile.GivenName != "" {
-			firstName = &req.Profile.GivenName
-		}
-		var lastName *string
-		if req.Profile.FamilyName != "" {
-			lastName = &req.Profile.FamilyName
-		}
-
-		profile = &command.Profile{
-			FirstName:         firstName,
-			LastName:          lastName,
-			NickName:          req.Profile.NickName,
-			DisplayName:       req.Profile.DisplayName,
-			PreferredLanguage: ifNotNilPtr(req.Profile.PreferredLanguage, language.Make),
-			Gender:            ifNotNilPtr(req.Profile.Gender, genderToDomain),
-		}
+	email, err := SetHumanEmailToEmail(req.Email, req.GetUserId())
+	if err != nil {
+		return nil, err
 	}
-	var email *command.Email
-	if req.Email != nil {
-		var urlTemplate string
-		if req.Email.GetSendCode() != nil && req.Email.GetSendCode().UrlTemplate != nil {
-			urlTemplate = *req.Email.GetSendCode().UrlTemplate
-			if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, req.GetUserId(), "code", "orgID"); err != nil {
-				return nil, err
-			}
-		}
-		email = &command.Email{
-			Address:     domain.EmailAddress(req.Email.Email),
-			Verified:    req.Email.GetIsVerified(),
-			ReturnCode:  req.Email.GetReturnCode() != nil,
-			URLTemplate: urlTemplate,
-		}
-	}
-
-	var phone *command.Phone
-	if req.Phone != nil {
-		phone = &command.Phone{
-			Number:     domain.PhoneNumber(req.GetPhone().GetPhone()),
-			Verified:   req.Phone.GetIsVerified(),
-			ReturnCode: req.Phone.GetReturnCode() != nil,
-		}
-	}
-	var password *command.Password
-	if req.Password != nil {
-		var changeRequired bool
-		var passwordStr *string
-		if req.Password.GetPassword() != nil {
-			passwordStr = &req.Password.GetPassword().Password
-			changeRequired = req.Password.GetPassword().GetChangeRequired()
-		}
-		var hash *string
-		if req.Password.GetHashedPassword() != nil {
-			hash = &req.Password.GetHashedPassword().Hash
-			changeRequired = req.Password.GetHashedPassword().GetChangeRequired()
-		}
-		var code *string
-		if req.Password.GetVerificationCode() != "" {
-			codeT := req.Password.GetVerificationCode()
-			code = &codeT
-		}
-		var oldPassword *string
-		if req.Password.GetCurrentPassword() != "" {
-			oldPasswordT := req.Password.GetCurrentPassword()
-			oldPassword = &oldPasswordT
-		}
-
-		password = &command.Password{
-			PasswordCode:        code,
-			OldPassword:         oldPassword,
-			Password:            passwordStr,
-			EncodedPasswordHash: hash,
-			ChangeRequired:      changeRequired,
-		}
-	}
-
 	return &command.ChangeHuman{
 		ID:       req.GetUserId(),
 		Username: req.Username,
-		Profile:  profile,
+		Profile:  SetHumanProfileToProfile(req.Profile),
 		Email:    email,
-		Phone:    phone,
-		Password: password,
+		Phone:    SetHumanPhoneToPhone(req.Phone),
+		Password: SetHumanPasswordToPassword(req.Password),
 	}, nil
+}
+
+func SetHumanProfileToProfile(profile *user.SetHumanProfile) *command.Profile {
+	if profile == nil {
+		return nil
+	}
+	var firstName *string
+	if profile.GivenName != "" {
+		firstName = &profile.GivenName
+	}
+	var lastName *string
+	if profile.FamilyName != "" {
+		lastName = &profile.FamilyName
+	}
+	return &command.Profile{
+		FirstName:         firstName,
+		LastName:          lastName,
+		NickName:          profile.NickName,
+		DisplayName:       profile.DisplayName,
+		PreferredLanguage: ifNotNilPtr(profile.PreferredLanguage, language.Make),
+		Gender:            ifNotNilPtr(profile.Gender, genderToDomain),
+	}
+}
+
+func SetHumanEmailToEmail(email *user.SetHumanEmail, userID string) (*command.Email, error) {
+	if email == nil {
+		return nil, nil
+	}
+	var urlTemplate string
+	if email.GetSendCode() != nil && email.GetSendCode().UrlTemplate != nil {
+		urlTemplate = *email.GetSendCode().UrlTemplate
+		if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, userID, "code", "orgID"); err != nil {
+			return nil, err
+		}
+	}
+	return &command.Email{
+		Address:     domain.EmailAddress(email.Email),
+		Verified:    email.GetIsVerified(),
+		ReturnCode:  email.GetReturnCode() != nil,
+		URLTemplate: urlTemplate,
+	}, nil
+}
+
+func SetHumanPhoneToPhone(phone *user.SetHumanPhone) *command.Phone {
+	if phone == nil {
+		return nil
+	}
+	return &command.Phone{
+		Number:     domain.PhoneNumber(phone.GetPhone()),
+		Verified:   phone.GetIsVerified(),
+		ReturnCode: phone.GetReturnCode() != nil,
+	}
+}
+
+func SetHumanPasswordToPassword(password *user.SetPassword) *command.Password {
+	if password == nil {
+		return nil
+	}
+	var changeRequired bool
+	var passwordStr *string
+	if password.GetPassword() != nil {
+		passwordStr = &password.GetPassword().Password
+		changeRequired = password.GetPassword().GetChangeRequired()
+	}
+	var hash *string
+	if password.GetHashedPassword() != nil {
+		hash = &password.GetHashedPassword().Hash
+		changeRequired = password.GetHashedPassword().GetChangeRequired()
+	}
+	var code *string
+	if password.GetVerificationCode() != "" {
+		codeT := password.GetVerificationCode()
+		code = &codeT
+	}
+	var oldPassword *string
+	if password.GetCurrentPassword() != "" {
+		oldPasswordT := password.GetCurrentPassword()
+		oldPassword = &oldPasswordT
+	}
+	return &command.Password{
+		PasswordCode:        code,
+		OldPassword:         oldPassword,
+		Password:            passwordStr,
+		EncodedPasswordHash: hash,
+		ChangeRequired:      changeRequired,
+	}
 }
 
 func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_ *user.AddIDPLinkResponse, err error) {
