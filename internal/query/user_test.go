@@ -21,7 +21,6 @@ import (
 func Test_RemoveNoPermission(t *testing.T) {
 	type want struct {
 		users []*User
-		err   checkErr
 	}
 	tests := []struct {
 		name        string

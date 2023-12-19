@@ -51,8 +51,6 @@ func AssertListDetails[D ListDetailsMsg](t testing.TB, expected, actual D) {
 		return
 	}
 
-	//assert.NotZero(t, gotDetails.GetProcessedSequence())
-
 	gotCD := gotDetails.GetTimestamp().AsTime()
 	now := time.Now()
 	assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))

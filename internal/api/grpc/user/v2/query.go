@@ -132,6 +132,8 @@ func GenderToPb(gender domain.Gender) user.Gender {
 		return user.Gender_GENDER_FEMALE
 	case domain.GenderMale:
 		return user.Gender_GENDER_MALE
+	case domain.GenderUnspecified:
+		return user.Gender_GENDER_UNSPECIFIED
 	default:
 		return user.Gender_GENDER_UNSPECIFIED
 	}
@@ -185,6 +187,8 @@ func UserFieldNameToSortingColumn(field user.UserFieldName) query.Column {
 		return query.HumanNickNameCol
 	case user.UserFieldName_USER_FIELD_NAME_CREATION_DATE:
 		return query.UserCreationDateCol
+	case user.UserFieldName_USER_FIELD_NAME_UNSPECIFIED:
+		return query.UserIDCol
 	default:
 		return query.UserIDCol
 	}
