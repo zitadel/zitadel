@@ -15,7 +15,7 @@ import (
 )
 
 func systemCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "system",
 		Short: "migrates the system tables of ZITADEL from one database to another",
 		Long: `migrates the system tables of ZITADEL from one database to another
@@ -26,6 +26,10 @@ Migrations only copies keys and assets`,
 			copySystem(cmd.Context(), config)
 		},
 	}
+
+	cmd.Flags().BoolVar(&shouldReplace, "replace", false, "allow delete ALL keys and assets of defined instances before copy")
+
+	return cmd
 }
 
 func copySystem(ctx context.Context, config *Migration) {
@@ -69,6 +73,13 @@ func copyKeys(ctx context.Context, source, dest *database.DB) {
 	err = destConn.Raw(func(driverConn interface{}) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
 
+		if shouldReplace {
+			_, err := conn.Exec(ctx, "TRUNCATE system.encryption_keys")
+			if err != nil {
+				return err
+			}
+		}
+
 		tag, err := conn.PgConn().CopyFrom(ctx, r, "COPY system.encryption_keys FROM stdin")
 		eventCount = tag.RowsAffected()
 
@@ -107,6 +118,13 @@ func copyAssets(ctx context.Context, source, dest *database.DB) {
 	var eventCount int64
 	err = destConn.Raw(func(driverConn interface{}) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
+
+		if shouldReplace {
+			_, err := conn.Exec(ctx, "DELETE FROM system.assets "+instanceClause())
+			if err != nil {
+				return err
+			}
+		}
 
 		tag, err := conn.PgConn().CopyFrom(ctx, r, "COPY system.assets FROM stdin")
 		eventCount = tag.RowsAffected()

@@ -8,8 +8,9 @@ import (
 )
 
 var (
-	instanceIDs []string
-	system      bool
+	instanceIDs   []string
+	system        bool
+	shouldReplace bool
 )
 
 func New() *cobra.Command {

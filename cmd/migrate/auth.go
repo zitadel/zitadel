@@ -15,7 +15,7 @@ import (
 )
 
 func authCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "auth",
 		Short: "migrates the auth requests table from one database to another",
 		Long: `migrates the auth requests table from one database to another
@@ -26,6 +26,10 @@ Migrations only copies auth requests`,
 			copyAuth(cmd.Context(), config)
 		},
 	}
+
+	cmd.Flags().BoolVar(&shouldReplace, "replace", false, "allow delete auth requests of defined instances before copy")
+
+	return cmd
 }
 
 func copyAuth(ctx context.Context, config *Migration) {
@@ -67,6 +71,13 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB) {
 	var eventCount int64
 	err = destConn.Raw(func(driverConn interface{}) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
+
+		if shouldReplace {
+			_, err := conn.Exec(ctx, "DELETE FROM auth.auth_requests "+instanceClause())
+			if err != nil {
+				return err
+			}
+		}
 
 		tag, err := conn.PgConn().CopyFrom(ctx, r, "COPY auth.auth_requests FROM STDIN")
 		eventCount = tag.RowsAffected()
