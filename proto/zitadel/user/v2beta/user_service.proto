@@ -147,8 +147,7 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "user.read"
-        org_field: "organization"
+        permission: "authenticated"
       }
       http_response: {
         success_code: 200
@@ -176,8 +175,7 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "user.read"
-        org_field: "organization"
+        permission: "authenticated"
       }
       http_response: {
         success_code: 200

@@ -1,6 +1,7 @@
 package query
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -8,6 +9,7 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -15,6 +17,132 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+func Test_RemoveNoPermission(t *testing.T) {
+	type want struct {
+		users []*User
+		err   checkErr
+	}
+	tests := []struct {
+		name        string
+		want        want
+		users       *Users
+		permissions []string
+	}{
+		{
+			"permissions for all users",
+			want{
+				users: []*User{
+					{ID: "first"}, {ID: "second"}, {ID: "third"},
+				},
+			},
+			&Users{
+				Users: []*User{
+					{ID: "first"}, {ID: "second"}, {ID: "third"},
+				},
+			},
+			[]string{"first", "second", "third"},
+		},
+		{
+			"permissions for one user, first",
+			want{
+				users: []*User{
+					{ID: "first"},
+				},
+			},
+			&Users{
+				Users: []*User{
+					{ID: "first"}, {ID: "second"}, {ID: "third"},
+				},
+			},
+			[]string{"first"},
+		},
+		{
+			"permissions for one user, second",
+			want{
+				users: []*User{
+					{ID: "second"},
+				},
+			},
+			&Users{
+				Users: []*User{
+					{ID: "first"}, {ID: "second"}, {ID: "third"},
+				},
+			},
+			[]string{"second"},
+		},
+		{
+			"permissions for one user, third",
+			want{
+				users: []*User{
+					{ID: "third"},
+				},
+			},
+			&Users{
+				Users: []*User{
+					{ID: "first"}, {ID: "second"}, {ID: "third"},
+				},
+			},
+			[]string{"third"},
+		},
+		{
+			"permissions for two users, first",
+			want{
+				users: []*User{
+					{ID: "first"}, {ID: "third"},
+				},
+			},
+			&Users{
+				Users: []*User{
+					{ID: "first"}, {ID: "second"}, {ID: "third"},
+				},
+			},
+			[]string{"first", "third"},
+		},
+		{
+			"permissions for two users, second",
+			want{
+				users: []*User{
+					{ID: "second"}, {ID: "third"},
+				},
+			},
+			&Users{
+				Users: []*User{
+					{ID: "first"}, {ID: "second"}, {ID: "third"},
+				},
+			},
+			[]string{"second", "third"},
+		},
+		{
+			"no permissions",
+			want{
+				users: []*User{},
+			},
+			&Users{
+				Users: []*User{
+					{ID: "first"}, {ID: "second"}, {ID: "third"},
+				},
+			},
+			[]string{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			q := &Queries{
+				checkPermission: func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+					for _, perm := range tt.permissions {
+						if resourceID == perm {
+							return nil
+						}
+					}
+					return errors.New("failed")
+				},
+			}
+			tt.users.RemoveNoPermission(context.Background(), q)
+			require.Equal(t, tt.want.users, tt.users.Users)
+		})
+	}
+}
 
 var (
 	loginNamesQuery = `SELECT login_names.user_id, ARRAY_AGG(login_names.login_name)::TEXT[] AS loginnames, ARRAY_AGG(LOWER(login_names.login_name))::TEXT[] AS loginnames_lower, login_names.instance_id` +

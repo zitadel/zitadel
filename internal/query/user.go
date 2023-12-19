@@ -122,6 +122,27 @@ type NotifyUser struct {
 	PasswordSet        bool
 }
 
+func (u *Users) RemoveNoPermission(ctx context.Context, q *Queries) {
+	removableIndexes := make([]int, 0)
+	for i := range u.Users {
+		ctxData := authz.GetCtxData(ctx)
+		if ctxData.UserID != u.Users[i].ID {
+			if err := q.checkPermission(ctx, domain.PermissionUserRead, ctxData.OrgID, u.Users[i].ID); err != nil {
+				removableIndexes = append(removableIndexes, i)
+			}
+		}
+	}
+	removed := 0
+	for _, removeIndex := range removableIndexes {
+		u.Users = removeUser(u.Users, removeIndex-removed)
+		removed++
+	}
+}
+
+func removeUser(slice []*User, s int) []*User {
+	return append(slice[:s], slice[s+1:]...)
+}
+
 type UserSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
@@ -586,7 +607,6 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries) (
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-AG4gs", "Errors.Internal")
 	}
-
 	users.State, err = q.latestState(ctx, userTable)
 	return users, err
 }
