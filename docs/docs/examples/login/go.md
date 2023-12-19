@@ -57,7 +57,7 @@ go get -u github.com/zitadel/zitadel-go/v3
 Create a new go file with the content below. This will create an application with a home and profile page.
 
 ```go reference
-https://github.com/zitadel/zitadel-go/blob/authentication/example/app/app.go
+https://github.com/zitadel/zitadel-go/blob/next/example/app/app.go
 ```
 
 This will basically set up everything. So let's look at some parts of the code.
@@ -104,7 +104,7 @@ Now create two HTML files in the new `templates` folder and copy the content of 
 The home page will display a short welcome message and allow the user to manually start the login process.
 
 ```go reference
-https://github.com/zitadel/zitadel-go/blob/authentication/example/app/templates/home.html
+https://github.com/zitadel/zitadel-go/blob/next/example/app/templates/home.html
 ```
 
 **profile.html**
@@ -112,7 +112,7 @@ https://github.com/zitadel/zitadel-go/blob/authentication/example/app/templates/
 The profile page will display the Userinfo from the authentication context and allow the user to logout.
 
 ```go reference
-https://github.com/zitadel/zitadel-go/blob/authentication/example/app/templates/profile.html
+https://github.com/zitadel/zitadel-go/blob/next/example/app/templates/profile.html
 ```
 
 ### Start your application
