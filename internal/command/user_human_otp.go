@@ -10,10 +10,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) ImportHumanTOTP(ctx context.Context, userID, userAgentID, resourceOwner string, key string) error {
@@ -30,7 +30,7 @@ func (c *Commands) ImportHumanTOTP(ctx context.Context, userID, userAgentID, res
 		return err
 	}
 	if otpWriteModel.State == domain.MFAStateReady {
-		return caos_errs.ThrowAlreadyExists(nil, "COMMAND-do9se", "Errors.User.MFA.OTP.AlreadyReady")
+		return zerrors.ThrowAlreadyExists(nil, "COMMAND-do9se", "Errors.User.MFA.OTP.AlreadyReady")
 	}
 	userAgg := UserAggregateFromWriteModel(&otpWriteModel.WriteModel)
 
@@ -43,7 +43,7 @@ func (c *Commands) ImportHumanTOTP(ctx context.Context, userID, userAgentID, res
 
 func (c *Commands) AddHumanTOTP(ctx context.Context, userID, resourceOwner string) (*domain.TOTP, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
 	}
 	prep, err := c.createHumanTOTP(ctx, userID, resourceOwner)
 	if err != nil {
@@ -71,17 +71,17 @@ func (c *Commands) createHumanTOTP(ctx context.Context, userID, resourceOwner st
 	human, err := c.getHuman(ctx, userID, resourceOwner)
 	if err != nil {
 		logging.WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get human for loginname")
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-SqyJz", "Errors.User.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-SqyJz", "Errors.User.NotFound")
 	}
 	org, err := c.getOrg(ctx, human.ResourceOwner)
 	if err != nil {
 		logging.WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get org for loginname")
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-55M9f", "Errors.Org.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-55M9f", "Errors.Org.NotFound")
 	}
 	orgPolicy, err := c.getOrgDomainPolicy(ctx, org.AggregateID)
 	if err != nil {
 		logging.WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get org policy for loginname")
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-8ugTs", "Errors.Org.DomainPolicy.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-8ugTs", "Errors.Org.DomainPolicy.NotFound")
 	}
 
 	otpWriteModel, err := c.totpWriteModelByID(ctx, userID, resourceOwner)
@@ -89,7 +89,7 @@ func (c *Commands) createHumanTOTP(ctx context.Context, userID, resourceOwner st
 		return nil, err
 	}
 	if otpWriteModel.State == domain.MFAStateReady {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-do9se", "Errors.User.MFA.OTP.AlreadyReady")
+		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-do9se", "Errors.User.MFA.OTP.AlreadyReady")
 	}
 	userAgg := UserAggregateFromWriteModel(&otpWriteModel.WriteModel)
 
@@ -117,7 +117,7 @@ func (c *Commands) createHumanTOTP(ctx context.Context, userID, resourceOwner st
 
 func (c *Commands) HumanCheckMFATOTPSetup(ctx context.Context, userID, code, userAgentID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing")
 	}
 
 	existingOTP, err := c.totpWriteModelByID(ctx, userID, resourceOwner)
@@ -125,10 +125,10 @@ func (c *Commands) HumanCheckMFATOTPSetup(ctx context.Context, userID, code, use
 		return nil, err
 	}
 	if existingOTP.State == domain.MFAStateUnspecified || existingOTP.State == domain.MFAStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotExisting")
 	}
 	if existingOTP.State == domain.MFAStateReady {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-qx4ls", "Errors.Users.MFA.OTP.AlreadyReady")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-qx4ls", "Errors.Users.MFA.OTP.AlreadyReady")
 	}
 	if err := domain.VerifyTOTP(code, existingOTP.Secret, c.multifactors.OTP.CryptoMFA); err != nil {
 		return nil, err
@@ -148,14 +148,14 @@ func (c *Commands) HumanCheckMFATOTPSetup(ctx context.Context, userID, code, use
 
 func (c *Commands) HumanCheckMFATOTP(ctx context.Context, userID, code, resourceOwner string, authRequest *domain.AuthRequest) error {
 	if userID == "" {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing")
 	}
 	existingOTP, err := c.totpWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
 	if existingOTP.State != domain.MFAStateReady {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotReady")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotReady")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
 	err = domain.VerifyTOTP(code, existingOTP.Secret, c.multifactors.OTP.CryptoMFA)
@@ -170,7 +170,7 @@ func (c *Commands) HumanCheckMFATOTP(ctx context.Context, userID, code, resource
 
 func (c *Commands) HumanRemoveTOTP(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-5M0sd", "Errors.User.UserIDMissing")
 	}
 
 	existingOTP, err := c.totpWriteModelByID(ctx, userID, resourceOwner)
@@ -178,7 +178,7 @@ func (c *Commands) HumanRemoveTOTP(ctx context.Context, userID, resourceOwner st
 		return nil, err
 	}
 	if existingOTP.State == domain.MFAStateUnspecified || existingOTP.State == domain.MFAStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Hd9sd", "Errors.User.MFA.OTP.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Hd9sd", "Errors.User.MFA.OTP.NotExisting")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanOTPRemovedEvent(ctx, userAgg))
@@ -213,7 +213,7 @@ func (c *Commands) AddHumanOTPSMSWithCheckSucceeded(ctx context.Context, userID,
 
 func (c *Commands) addHumanOTPSMS(ctx context.Context, userID, resourceOwner string, events ...eventCallback) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-QSF2s", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-QSF2s", "Errors.User.UserIDMissing")
 	}
 	if err := authz.UserIDInCTX(ctx, userID); err != nil {
 		return nil, err
@@ -223,10 +223,10 @@ func (c *Commands) addHumanOTPSMS(ctx context.Context, userID, resourceOwner str
 		return nil, err
 	}
 	if otpWriteModel.otpAdded {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-Ad3g2", "Errors.User.MFA.OTP.AlreadyReady")
+		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-Ad3g2", "Errors.User.MFA.OTP.AlreadyReady")
 	}
 	if !otpWriteModel.phoneVerified {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Q54j2", "Errors.User.MFA.OTP.NotReady")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Q54j2", "Errors.User.MFA.OTP.NotReady")
 	}
 	userAgg := UserAggregateFromWriteModel(&otpWriteModel.WriteModel)
 	cmds := make([]eventstore.Command, len(events)+1)
@@ -242,7 +242,7 @@ func (c *Commands) addHumanOTPSMS(ctx context.Context, userID, resourceOwner str
 
 func (c *Commands) RemoveHumanOTPSMS(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-S3br2", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-S3br2", "Errors.User.UserIDMissing")
 	}
 
 	existingOTP, err := c.otpSMSWriteModelByID(ctx, userID, resourceOwner)
@@ -255,7 +255,7 @@ func (c *Commands) RemoveHumanOTPSMS(ctx context.Context, userID, resourceOwner 
 		}
 	}
 	if !existingOTP.otpAdded {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Sr3h3", "Errors.User.MFA.OTP.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Sr3h3", "Errors.User.MFA.OTP.NotExisting")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
 	if err = c.pushAppendAndReduce(ctx, existingOTP, user.NewHumanOTPSMSRemovedEvent(ctx, userAgg)); err != nil {
@@ -336,17 +336,17 @@ func (c *Commands) AddHumanOTPEmailWithCheckSucceeded(ctx context.Context, userI
 
 func (c *Commands) addHumanOTPEmail(ctx context.Context, userID, resourceOwner string, events ...eventCallback) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Sg1hz", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Sg1hz", "Errors.User.UserIDMissing")
 	}
 	otpWriteModel, err := c.otpEmailWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if otpWriteModel.otpAdded {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-MKL2s", "Errors.User.MFA.OTP.AlreadyReady")
+		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-MKL2s", "Errors.User.MFA.OTP.AlreadyReady")
 	}
 	if !otpWriteModel.emailVerified {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-KLJ2d", "Errors.User.MFA.OTP.NotReady")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-KLJ2d", "Errors.User.MFA.OTP.NotReady")
 	}
 	userAgg := UserAggregateFromWriteModel(&otpWriteModel.WriteModel)
 	cmds := make([]eventstore.Command, len(events)+1)
@@ -362,7 +362,7 @@ func (c *Commands) addHumanOTPEmail(ctx context.Context, userID, resourceOwner s
 
 func (c *Commands) RemoveHumanOTPEmail(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-S2h11", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-S2h11", "Errors.User.UserIDMissing")
 	}
 
 	existingOTP, err := c.otpEmailWriteModelByID(ctx, userID, resourceOwner)
@@ -375,7 +375,7 @@ func (c *Commands) RemoveHumanOTPEmail(ctx context.Context, userID, resourceOwne
 		}
 	}
 	if !existingOTP.otpAdded {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-b312D", "Errors.User.MFA.OTP.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-b312D", "Errors.User.MFA.OTP.NotExisting")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
 	if err = c.pushAppendAndReduce(ctx, existingOTP, user.NewHumanOTPEmailRemovedEvent(ctx, userAgg)); err != nil {
@@ -446,14 +446,14 @@ func (c *Commands) sendHumanOTP(
 	codeAddedEvent func(ctx context.Context, aggregate *eventstore.Aggregate, code *crypto.CryptoValue, expiry time.Duration, info *user.AuthRequestInfo) eventstore.Command,
 ) (err error) {
 	if userID == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-S3SF1", "Errors.User.UserIDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-S3SF1", "Errors.User.UserIDMissing")
 	}
 	existingOTP, err := writeModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
 	if !existingOTP.OTPAdded() {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SFD52", "Errors.User.MFA.OTP.NotReady")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFD52", "Errors.User.MFA.OTP.NotReady")
 	}
 	config, err := secretGeneratorConfigWithDefault(ctx, c.eventstore.Filter, secretGeneratorType, defaultSecretGenerator)
 	if err != nil {
@@ -476,14 +476,14 @@ func (c *Commands) humanOTPSent(
 	codeSentEvent func(ctx context.Context, aggregate *eventstore.Aggregate) eventstore.Command,
 ) (err error) {
 	if userID == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-AE2h2", "Errors.User.UserIDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-AE2h2", "Errors.User.UserIDMissing")
 	}
 	existingOTP, err := writeModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
 	if !existingOTP.OTPAdded() {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SD3gh", "Errors.User.MFA.OTP.NotReady")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-SD3gh", "Errors.User.MFA.OTP.NotReady")
 	}
 	userAgg := &user.NewAggregate(userID, resourceOwner).Aggregate
 	_, err = c.eventstore.Push(ctx, codeSentEvent(ctx, userAgg))
@@ -499,20 +499,20 @@ func (c *Commands) humanCheckOTP(
 	checkFailedEvent func(ctx context.Context, aggregate *eventstore.Aggregate, info *user.AuthRequestInfo) eventstore.Command,
 ) error {
 	if userID == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-S453v", "Errors.User.UserIDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-S453v", "Errors.User.UserIDMissing")
 	}
 	if code == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-SJl2g", "Errors.User.Code.Empty")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-SJl2g", "Errors.User.Code.Empty")
 	}
 	existingOTP, err := writeModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err
 	}
 	if !existingOTP.OTPAdded() {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-d2r52", "Errors.User.MFA.OTP.NotReady")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-d2r52", "Errors.User.MFA.OTP.NotReady")
 	}
 	if existingOTP.Code() == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-S34gh", "Errors.User.Code.NotFound")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-S34gh", "Errors.User.Code.NotFound")
 	}
 	userAgg := &user.NewAggregate(userID, existingOTP.ResourceOwner()).Aggregate
 	err = crypto.VerifyCodeWithAlgorithm(existingOTP.CodeCreationDate(), existingOTP.CodeExpiry(), existingOTP.Code(), code, c.userEncryption)

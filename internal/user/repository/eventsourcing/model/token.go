@@ -7,9 +7,9 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Token struct {
@@ -49,7 +49,7 @@ func (t *Token) setData(event *es_models.Event) error {
 	t.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, t); err != nil {
 		logging.Log("EVEN-4Fm9s").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-5Gms9", "could not unmarshal event")
+		return zerrors.ThrowInternal(err, "MODEL-5Gms9", "could not unmarshal event")
 	}
 	return nil
 }

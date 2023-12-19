@@ -13,7 +13,7 @@ import (
 	_ "github.com/zitadel/zitadel/internal/database/cockroach"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	_ "github.com/zitadel/zitadel/internal/database/postgres"
-	zerrors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Config struct {

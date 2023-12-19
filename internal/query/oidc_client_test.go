@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	zerrors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -24,6 +24,8 @@ var (
 	testdataOidcClientPublic string
 	//go:embed testdata/oidc_client_secret.json
 	testdataOidcClientSecret string
+	//go:embed testdata/oidc_client_no_settings.json
+	testdataOidcClientNoSettings string
 )
 
 func TestQueries_GetOIDCClientByID(t *testing.T) {
@@ -81,8 +83,10 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				ProjectID:                "236645808328409090",
 				PublicKeys:               map[string][]byte{"236647201860747266": []byte(pubkey)},
 				ProjectRoleKeys:          []string{"role1", "role2"},
-				AccessTokenLifetime:      43200000000000,
-				IDTokenLifetime:          43200000000000,
+				Settings: &OIDCSettings{
+					AccessTokenLifetime: 43200000000000,
+					IdTokenLifetime:     43200000000000,
+				},
 			},
 		},
 		{
@@ -110,8 +114,10 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				PublicKeys:               nil,
 				ProjectID:                "236645808328409090",
 				ProjectRoleKeys:          []string{"role1", "role2"},
-				AccessTokenLifetime:      43200000000000,
-				IDTokenLifetime:          43200000000000,
+				Settings: &OIDCSettings{
+					AccessTokenLifetime: 43200000000000,
+					IdTokenLifetime:     43200000000000,
+				},
 			},
 		},
 		{
@@ -143,8 +149,43 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				PublicKeys:               nil,
 				ProjectID:                "236645808328409090",
 				ProjectRoleKeys:          []string{"role1", "role2"},
-				AccessTokenLifetime:      43200000000000,
-				IDTokenLifetime:          43200000000000,
+				Settings: &OIDCSettings{
+					AccessTokenLifetime: 43200000000000,
+					IdTokenLifetime:     43200000000000,
+				},
+			},
+		},
+		{
+			name: "no oidc settings",
+			mock: mockQuery(expQuery, cols, []driver.Value{testdataOidcClientNoSettings}, "instanceID", "clientID", true),
+			want: &OIDCClient{
+				InstanceID:   "239520764275982338",
+				AppID:        "239520764276441090",
+				State:        domain.AppStateActive,
+				ClientID:     "239520764779364354@zitadel",
+				ClientSecret: nil,
+				RedirectURIs: []string{
+					"http://test2-qucuh5.localhost:9000/ui/console/auth/callback",
+					"http://test.localhost.com:9000/ui/console/auth/callback"},
+				ResponseTypes:   []domain.OIDCResponseType{0},
+				GrantTypes:      []domain.OIDCGrantType{0},
+				ApplicationType: domain.OIDCApplicationTypeUserAgent,
+				AuthMethodType:  domain.OIDCAuthMethodTypeNone,
+				PostLogoutRedirectURIs: []string{
+					"http://test2-qucuh5.localhost:9000/ui/console/signedout",
+					"http://test.localhost.com:9000/ui/console/signedout",
+				},
+				IsDevMode:                true,
+				AccessTokenType:          domain.OIDCTokenTypeBearer,
+				AccessTokenRoleAssertion: false,
+				IDTokenRoleAssertion:     false,
+				IDTokenUserinfoAssertion: false,
+				ClockSkew:                0,
+				AdditionalOrigins:        nil,
+				PublicKeys:               nil,
+				ProjectID:                "239520764276178946",
+				ProjectRoleKeys:          nil,
+				Settings:                 nil,
 			},
 		},
 	}

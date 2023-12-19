@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -12,9 +12,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type SMSConfigs struct {
@@ -127,7 +127,7 @@ func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (config 
 		},
 	).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -151,7 +151,7 @@ func (q *Queries) SMSProviderConfig(ctx context.Context, queries ...SearchQuery)
 		},
 	).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -171,7 +171,7 @@ func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearc
 			SMSConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-sn9Jf", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-sn9Jf", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -179,7 +179,7 @@ func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearc
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
 	}
 	configs.State, err = q.latestState(ctx, smsConfigsTable)
 	return configs, err
@@ -228,10 +228,10 @@ func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			)
 
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-fn99w", "Errors.SMSConfig.NotExisting")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-fn99w", "Errors.SMSConfig.NotExisting")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-3n9Js", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-3n9Js", "Errors.Internal")
 			}
 
 			twilioConfig.set(config)
@@ -283,7 +283,7 @@ func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				)
 
 				if err != nil {
-					return nil, errors.ThrowInternal(err, "QUERY-d9jJd", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(err, "QUERY-d9jJd", "Errors.Internal")
 				}
 
 				twilioConfig.set(config)

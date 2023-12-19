@@ -11,9 +11,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Certificate interface {
@@ -85,7 +85,7 @@ func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage dom
 		},
 	).OrderBy(KeyPrivateColExpiry.identifier()).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SDfkg", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-SDfkg", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -93,11 +93,11 @@ func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage dom
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Sgan4", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Sgan4", "Errors.Internal")
 	}
 
 	certs.State, err = q.latestState(ctx, keyTable)
-	if !errors.IsNotFound(err) {
+	if !zerrors.IsNotFound(err) {
 		return certs, err
 	}
 	return certs, nil
@@ -146,7 +146,7 @@ func prepareCertificateQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-rKd6k", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-rKd6k", "Errors.Query.CloseRows")
 			}
 
 			return &Certificates{

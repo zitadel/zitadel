@@ -3,10 +3,10 @@ package view
 import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 
 	"github.com/jinzhu/gorm"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
 )
@@ -35,8 +35,8 @@ func ExternalIDPByExternalUserIDAndIDPConfigID(db *gorm.DB, table, externalUserI
 	}
 	query := repository.PrepareGetByQuery(table, userIDQuery, idpConfigIDQuery, instanceIDQuery, ownerRemovedQuery)
 	err := query(db, user)
-	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Mso9f", "Errors.ExternalIDP.NotFound")
+	if zerrors.IsNotFound(err) {
+		return nil, zerrors.ThrowNotFound(nil, "VIEW-Mso9f", "Errors.ExternalIDP.NotFound")
 	}
 	return user, err
 }
@@ -70,8 +70,8 @@ func ExternalIDPByExternalUserIDAndIDPConfigIDAndResourceOwner(db *gorm.DB, tabl
 	}
 	query := repository.PrepareGetByQuery(table, userIDQuery, idpConfigIDQuery, resourceOwnerQuery, instanceIDQuery, ownerRemovedQuery)
 	err := query(db, user)
-	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Sf8sd", "Errors.ExternalIDP.NotFound")
+	if zerrors.IsNotFound(err) {
+		return nil, zerrors.ThrowNotFound(nil, "VIEW-Sf8sd", "Errors.ExternalIDP.NotFound")
 	}
 	return user, err
 }

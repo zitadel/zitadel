@@ -176,13 +176,13 @@ export class EventsComponent implements OnDestroy {
     req.setEditorUserId(filterRequest.getEditorUserId());
     req.setResourceOwner(filterRequest.getResourceOwner());
     req.setSequence(filterRequest.getSequence());
-    req.setCreationDate(filterRequest.getCreationDate());
+    req.setRange(filterRequest.getRange());
+    req.setFrom(filterRequest.getFrom());
     const isAsc: boolean = filterRequest.getAsc();
     req.setAsc(isAsc);
     if (this.sortAsc !== isAsc) {
-      this.sort.sort({ id: 'sequence', start: isAsc ? 'asc' : 'desc', disableClear: true });
+      this.sort.sort({ id: 'creationDate', start: isAsc ? 'asc' : 'desc', disableClear: true });
     }
-
     this.loadEvents(req, true);
   }
 

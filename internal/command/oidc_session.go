@@ -11,12 +11,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -88,7 +88,7 @@ func (c *Commands) OIDCSessionByRefreshToken(ctx context.Context, refreshToken s
 	writeModel := NewOIDCSessionWriteModel(oidcSessionID, "")
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "OIDCS-SAF31", "Errors.OIDCSession.RefreshTokenInvalid")
+		return nil, zerrors.ThrowPreconditionFailed(err, "OIDCS-SAF31", "Errors.OIDCSession.RefreshTokenInvalid")
 	}
 	if err = writeModel.CheckRefreshToken(refreshTokenID); err != nil {
 		return nil, err
@@ -99,7 +99,7 @@ func (c *Commands) OIDCSessionByRefreshToken(ctx context.Context, refreshToken s
 func oidcSessionTokenIDsFromToken(token string) (oidcSessionID, refreshTokenID, accessTokenID string, err error) {
 	split := strings.Split(token, TokenDelimiter)
 	if len(split) != 2 {
-		return "", "", "", caos_errs.ThrowPreconditionFailed(nil, "OIDCS-S87kl", "Errors.OIDCSession.Token.Invalid")
+		return "", "", "", zerrors.ThrowPreconditionFailed(nil, "OIDCS-S87kl", "Errors.OIDCSession.Token.Invalid")
 	}
 	if strings.HasPrefix(split[1], RefreshTokenPrefix) {
 		return split[0], split[1], "", nil
@@ -107,7 +107,7 @@ func oidcSessionTokenIDsFromToken(token string) (oidcSessionID, refreshTokenID, 
 	if strings.HasPrefix(split[1], AccessTokenPrefix) {
 		return split[0], "", split[1], nil
 	}
-	return "", "", "", caos_errs.ThrowPreconditionFailed(nil, "OIDCS-S87kl", "Errors.OIDCSession.Token.Invalid")
+	return "", "", "", zerrors.ThrowPreconditionFailed(nil, "OIDCS-S87kl", "Errors.OIDCSession.Token.Invalid")
 }
 
 // RevokeOIDCSessionToken revokes an access_token or refresh_token
@@ -124,7 +124,7 @@ func (c *Commands) RevokeOIDCSessionToken(ctx context.Context, token, clientID s
 	writeModel := NewOIDCSessionWriteModel(oidcSessionID, "")
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
-		return caos_errs.ThrowInternal(err, "OIDCS-NB3t2", "Errors.Internal")
+		return zerrors.ThrowInternal(err, "OIDCS-NB3t2", "Errors.Internal")
 	}
 	if err = writeModel.CheckClient(clientID); err != nil {
 		return err
@@ -198,7 +198,7 @@ func (c *Commands) getResourceOwnerOfSessionUser(ctx context.Context, userID, in
 		AggregateIDs(userID).
 		Builder())
 	if err != nil || len(events) != 1 {
-		return "", caos_errs.ThrowInternal(err, "OIDCS-sferh", "Errors.Internal")
+		return "", zerrors.ThrowInternal(err, "OIDCS-sferh", "Errors.Internal")
 	}
 	return events[0].Aggregate().ResourceOwner, nil
 }
@@ -219,7 +219,7 @@ func (c *Commands) decryptRefreshToken(refreshToken string) (refreshTokenID stri
 func parseRefreshToken(refreshToken string) (oidcSessionID, refreshTokenID string, err error) {
 	split := strings.Split(refreshToken, TokenDelimiter)
 	if len(split) < 2 || !strings.HasPrefix(split[1], RefreshTokenPrefix) {
-		return "", "", caos_errs.ThrowPreconditionFailed(nil, "OIDCS-JOI23", "Errors.OIDCSession.RefreshTokenInvalid")
+		return "", "", zerrors.ThrowPreconditionFailed(nil, "OIDCS-JOI23", "Errors.OIDCSession.RefreshTokenInvalid")
 	}
 	// the oidc library requires that every token has the format of <tokenID>:<userID>
 	// the V2 tokens don't use the userID anymore, so let's just remove it

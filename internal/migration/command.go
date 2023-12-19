@@ -6,8 +6,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/service"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // SetupStep is the command pushed on the eventstore
@@ -22,7 +22,7 @@ type SetupStep struct {
 func (s *SetupStep) UnmarshalJSON(data []byte) error {
 	fields := struct {
 		Name    string                 `json:"name,"`
-		Error   *errors.CaosError      `json:"error"`
+		Error   *zerrors.ZitadelError  `json:"error"`
 		LastRun map[string]interface{} `json:"lastRun,omitempty"`
 	}{}
 	if err := json.Unmarshal(data, &fields); err != nil {
@@ -108,7 +108,7 @@ func SetupMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(step)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-hYp7M", "unable to unmarshal step")
+		return nil, zerrors.ThrowInternal(err, "IAM-hYp7M", "unable to unmarshal step")
 	}
 
 	return step, nil

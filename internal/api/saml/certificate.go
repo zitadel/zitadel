@@ -12,11 +12,11 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -60,7 +60,7 @@ func (p *Storage) GetCertificateAndKey(ctx context.Context, usage domain.KeyUsag
 			return err
 		}
 		if certAndKey == nil {
-			return errors.ThrowInternal(err, "SAML-8u01nks", "no certificate found")
+			return zerrors.ThrowInternal(err, "SAML-8u01nks", "no certificate found")
 		}
 		return nil
 	})
@@ -120,7 +120,7 @@ func (p *Storage) lockAndGenerateCertificateAndKey(ctx context.Context, usage do
 	errs := p.locker.Lock(ctx, lockDuration, authz.GetInstance(ctx).InstanceID())
 	err, ok := <-errs
 	if err != nil || !ok {
-		if errors.IsErrorAlreadyExists(err) {
+		if zerrors.IsErrorAlreadyExists(err) {
 			return nil
 		}
 		logging.OnError(err).Debug("initial lock failed")

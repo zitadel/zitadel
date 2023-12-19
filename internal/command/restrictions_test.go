@@ -10,11 +10,11 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	zitadel_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/restrictions"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestSetRestrictions(t *testing.T) {
@@ -162,7 +162,7 @@ func TestSetRestrictions(t *testing.T) {
 				setRestrictions: &SetRestrictions{},
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -189,7 +189,7 @@ func TestSetRestrictions(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zitadel_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -216,7 +216,7 @@ func TestSetRestrictions(t *testing.T) {
 				},
 			},
 			res: res{
-				err: zitadel_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 	}

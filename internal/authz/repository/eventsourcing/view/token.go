@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
 	usr_view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -25,7 +25,7 @@ func (v *View) PutToken(token *usr_view_model.TokenView, event *models.Event) er
 
 func (v *View) DeleteToken(tokenID, instanceID string, event *models.Event) error {
 	err := usr_view.DeleteToken(v.Db, tokenTable, tokenID, instanceID)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
 	return nil
@@ -33,7 +33,7 @@ func (v *View) DeleteToken(tokenID, instanceID string, event *models.Event) erro
 
 func (v *View) DeleteSessionTokens(agentID, userID, instanceID string, event *models.Event) error {
 	err := usr_view.DeleteSessionTokens(v.Db, tokenTable, agentID, userID, instanceID)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
 	return nil

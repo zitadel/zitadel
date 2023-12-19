@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	"github.com/zitadel/zitadel/internal/activity"
-	"github.com/zitadel/zitadel/internal/api/grpc/errors"
+	"github.com/zitadel/zitadel/internal/api/grpc/gerrors"
 	ainfo "github.com/zitadel/zitadel/internal/api/info"
 )
 
@@ -18,7 +18,7 @@ func ActivityInterceptor() grpc.UnaryServerInterceptor {
 		ctx = activityInfoFromGateway(ctx).SetMethod(info.FullMethod).IntoContext(ctx)
 		resp, err := handler(ctx, req)
 		if isResourceAPI(info.FullMethod) {
-			code, _, _, _ := errors.ExtractCaosError(err)
+			code, _, _, _ := gerrors.ExtractZITADELError(err)
 			ctx = ainfo.ActivityInfoFromContext(ctx).SetGRPCStatus(code).IntoContext(ctx)
 			activity.TriggerGRPCWithContext(ctx, activity.ResourceAPI)
 		}

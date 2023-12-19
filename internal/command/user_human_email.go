@@ -7,15 +7,15 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email, emailCodeGenerator crypto.Generator) (*domain.Email, error) {
 	if email.AggregateID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing")
 	}
 	if err := email.Validate(); err != nil {
 		return nil, err
@@ -26,17 +26,17 @@ func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email, em
 		return nil, err
 	}
 	if existingEmail.UserState == domain.UserStateUnspecified || existingEmail.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-0Pe4r", "Errors.User.Email.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-0Pe4r", "Errors.User.Email.NotFound")
 	}
 	if existingEmail.UserState == domain.UserStateInitial {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-J8dsk", "Errors.User.NotInitialised")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-J8dsk", "Errors.User.NotInitialised")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
 	changedEvent, hasChanged := existingEmail.NewChangedEvent(ctx, userAgg, email.EmailAddress)
 
 	// only continue if there were changes or there were no changes and the email should be set to verified
 	if !hasChanged && !(email.IsEmailVerified && existingEmail.IsEmailVerified != email.IsEmailVerified) {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2b7fM", "Errors.User.Email.NotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-2b7fM", "Errors.User.Email.NotChanged")
 	}
 
 	events := make([]eventstore.Command, 0)
@@ -66,10 +66,10 @@ func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email, em
 
 func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceowner string, emailCodeGenerator crypto.Generator) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
 	if code == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-çm0ds", "Errors.User.Code.Empty")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-çm0ds", "Errors.User.Code.Empty")
 	}
 
 	existingCode, err := c.emailWriteModel(ctx, userID, resourceowner)
@@ -77,7 +77,7 @@ func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceo
 		return nil, err
 	}
 	if existingCode.Code == nil || existingCode.UserState == domain.UserStateUnspecified || existingCode.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3n8ud", "Errors.User.Code.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3n8ud", "Errors.User.Code.NotFound")
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
@@ -96,12 +96,12 @@ func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceo
 
 	_, err = c.eventstore.Push(ctx, user.NewHumanEmailVerificationFailedEvent(ctx, userAgg))
 	logging.LogWithFields("COMMAND-Dg2z5", "userID", userAgg.ID).OnError(err).Error("NewHumanEmailVerificationFailedEvent push failed")
-	return nil, caos_errs.ThrowInvalidArgument(err, "COMMAND-Gdsgs", "Errors.User.Code.Invalid")
+	return nil, zerrors.ThrowInvalidArgument(err, "COMMAND-Gdsgs", "Errors.User.Code.Invalid")
 }
 
 func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID, resourceOwner string, emailCodeGenerator crypto.Generator) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
 
 	existingEmail, err := c.emailWriteModel(ctx, userID, resourceOwner)
@@ -109,13 +109,13 @@ func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID,
 		return nil, err
 	}
 	if existingEmail.UserState == domain.UserStateUnspecified || existingEmail.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-0Pe4r", "Errors.User.Email.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-0Pe4r", "Errors.User.Email.NotFound")
 	}
 	if existingEmail.UserState == domain.UserStateInitial {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-E3fbw", "Errors.User.NotInitialised")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-E3fbw", "Errors.User.NotInitialised")
 	}
 	if existingEmail.IsEmailVerified {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M9ds", "Errors.User.Email.AlreadyVerified")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3M9ds", "Errors.User.Email.AlreadyVerified")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
 	emailCode, _, err := domain.NewEmailCode(emailCodeGenerator)
@@ -135,14 +135,14 @@ func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID,
 
 func (c *Commands) HumanEmailVerificationCodeSent(ctx context.Context, orgID, userID string) (err error) {
 	if userID == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-4m9fs", "Errors.IDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-4m9fs", "Errors.IDMissing")
 	}
 	existingEmail, err := c.emailWriteModel(ctx, userID, orgID)
 	if err != nil {
 		return err
 	}
 	if existingEmail.UserState == domain.UserStateUnspecified || existingEmail.UserState == domain.UserStateDeleted {
-		return caos_errs.ThrowNotFound(nil, "COMMAND-6n8uH", "Errors.User.Email.NotFound")
+		return zerrors.ThrowNotFound(nil, "COMMAND-6n8uH", "Errors.User.Email.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
 	_, err = c.eventstore.Push(ctx, user.NewHumanEmailCodeSentEvent(ctx, userAgg))

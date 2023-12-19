@@ -6,7 +6,7 @@ import (
 
 	"github.com/gorilla/securecookie"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -102,7 +102,7 @@ func (c *CookieHandler) GetEncryptedCookieValue(r *http.Request, name string, va
 		return err
 	}
 	if c.securecookie == nil {
-		return errors.ThrowInternal(nil, "HTTP-X6XpnL", "securecookie not configured")
+		return zerrors.ThrowInternal(nil, "HTTP-X6XpnL", "securecookie not configured")
 	}
 	return c.securecookie.Decode(name, cookie.Value, value)
 }
@@ -113,7 +113,7 @@ func (c *CookieHandler) SetCookie(w http.ResponseWriter, name, domain, value str
 
 func (c *CookieHandler) SetEncryptedCookie(w http.ResponseWriter, name, domain string, value interface{}, sameSiteNone bool) error {
 	if c.securecookie == nil {
-		return errors.ThrowInternal(nil, "HTTP-s2HUtx", "securecookie not configured")
+		return zerrors.ThrowInternal(nil, "HTTP-s2HUtx", "securecookie not configured")
 	}
 	encoded, err := c.securecookie.Encode(name, value)
 	if err != nil {

@@ -8,9 +8,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type QuotaUnit string
@@ -43,7 +43,7 @@ func (c *Commands) AddQuota(
 		return nil, err
 	}
 	if wm.AggregateID != "" {
-		return nil, errors.ThrowAlreadyExists(nil, "COMMAND-WDfFf", "Errors.Quota.AlreadyExists")
+		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-WDfFf", "Errors.Quota.AlreadyExists")
 	}
 	aggregateId, err := c.idGenerator.Next()
 	if err != nil {
@@ -106,7 +106,7 @@ func (c *Commands) RemoveQuota(ctx context.Context, unit QuotaUnit) (*domain.Obj
 		return nil, err
 	}
 	if wm.AggregateID == "" {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-WDfFf", "Errors.Quota.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-WDfFf", "Errors.Quota.NotFound")
 	}
 	aggregate := quota.NewAggregate(wm.AggregateID, instanceId)
 	events := []eventstore.Command{quota.NewRemovedEvent(ctx, &aggregate.Aggregate, unit.Enum())}
@@ -147,13 +147,13 @@ type QuotaNotifications []*QuotaNotification
 func (q *QuotaNotification) validate() error {
 	u, err := url.Parse(q.CallURL)
 	if err != nil {
-		return errors.ThrowInvalidArgument(err, "QUOTA-bZ0Fj", "Errors.Quota.Invalid.CallURL")
+		return zerrors.ThrowInvalidArgument(err, "QUOTA-bZ0Fj", "Errors.Quota.Invalid.CallURL")
 	}
 	if !u.IsAbs() || u.Host == "" {
-		return errors.ThrowInvalidArgument(nil, "QUOTA-HAYmN", "Errors.Quota.Invalid.CallURL")
+		return zerrors.ThrowInvalidArgument(nil, "QUOTA-HAYmN", "Errors.Quota.Invalid.CallURL")
 	}
 	if q.Percent < 1 {
-		return errors.ThrowInvalidArgument(nil, "QUOTA-pBfjq", "Errors.Quota.Invalid.Percent")
+		return zerrors.ThrowInvalidArgument(nil, "QUOTA-pBfjq", "Errors.Quota.Invalid.Percent")
 	}
 	return nil
 }
@@ -165,10 +165,10 @@ func (q *SetQuota) validate() error {
 		}
 	}
 	if q.Unit.Enum() == quota.Unimplemented {
-		return errors.ThrowInvalidArgument(nil, "QUOTA-OTeSh", "Errors.Quota.Invalid.Unimplemented")
+		return zerrors.ThrowInvalidArgument(nil, "QUOTA-OTeSh", "Errors.Quota.Invalid.Unimplemented")
 	}
 	if q.ResetInterval < time.Minute {
-		return errors.ThrowInvalidArgument(nil, "QUOTA-R5otd", "Errors.Quota.Invalid.ResetInterval")
+		return zerrors.ThrowInvalidArgument(nil, "QUOTA-R5otd", "Errors.Quota.Invalid.ResetInterval")
 	}
 	return nil
 }

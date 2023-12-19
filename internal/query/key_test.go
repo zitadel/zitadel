@@ -20,9 +20,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	key_repo "github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -88,7 +88,7 @@ func Test_KeyPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -169,7 +169,7 @@ func Test_KeyPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -292,7 +292,7 @@ func TestQueries_GetActivePublicKeyByID(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 			),
-			wantErr: errs.ThrowNotFound(nil, "QUERY-Ahf7x", "Errors.Key.NotFound"),
+			wantErr: zerrors.ThrowNotFound(nil, "QUERY-Ahf7x", "Errors.Key.NotFound"),
 		},
 		{
 			name: "expired error",
@@ -324,7 +324,7 @@ func TestQueries_GetActivePublicKeyByID(t *testing.T) {
 					)),
 				),
 			),
-			wantErr: errs.ThrowInvalidArgument(nil, "QUERY-ciF4k", "Errors.Key.ExpireBeforeNow"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "QUERY-ciF4k", "Errors.Key.ExpireBeforeNow"),
 		},
 		{
 			name: "decrypt error",
@@ -363,7 +363,7 @@ func TestQueries_GetActivePublicKeyByID(t *testing.T) {
 				expect.DecryptionKeyIDs().Return([]string{})
 				return encryption
 			},
-			wantErr: errs.ThrowInternal(nil, "QUERY-Ie4oh", "Errors.Internal"),
+			wantErr: zerrors.ThrowInternal(nil, "QUERY-Ie4oh", "Errors.Internal"),
 		},
 		{
 			name: "parse error",
@@ -403,7 +403,7 @@ func TestQueries_GetActivePublicKeyByID(t *testing.T) {
 				expect.Decrypt([]byte("public"), "keyID").Return([]byte("foo"), nil)
 				return encryption
 			},
-			wantErr: errs.ThrowInternal(nil, "QUERY-Kai2Z", "Errors.Internal"),
+			wantErr: zerrors.ThrowInternal(nil, "QUERY-Kai2Z", "Errors.Internal"),
 		},
 		{
 			name: "success",

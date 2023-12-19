@@ -12,17 +12,17 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName string) (*domain.ObjectDetails, error) {
 	userName = strings.TrimSpace(userName)
 	if orgID == "" || userID == "" || userName == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-2N9fs", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-2N9fs", "Errors.IDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, orgID)
@@ -31,16 +31,16 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 	}
 
 	if !isUserStateExists(existingUser.UserState) {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-5N9ds", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-5N9ds", "Errors.User.NotFound")
 	}
 
 	if existingUser.UserName == userName {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-6m9gs", "Errors.User.UsernameNotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-6m9gs", "Errors.User.UsernameNotChanged")
 	}
 
 	domainPolicy, err := c.getOrgDomainPolicy(ctx, orgID)
 	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(err, "COMMAND-38fnu", "Errors.Org.DomainPolicy.NotExisting")
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-38fnu", "Errors.Org.DomainPolicy.NotExisting")
 	}
 	if !domainPolicy.UserLoginMustBeDomain {
 		index := strings.LastIndex(userName, "@")
@@ -50,7 +50,7 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 				return nil, err
 			}
 			if domainCheck.Verified && domainCheck.ResourceOwner != orgID {
-				return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Di2ei", "Errors.User.DomainNotAllowedAsUsername")
+				return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Di2ei", "Errors.User.DomainNotAllowedAsUsername")
 			}
 		}
 	}
@@ -70,7 +70,7 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 
 func (c *Commands) DeactivateUser(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-m0gDf", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-m0gDf", "Errors.User.UserIDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
@@ -78,13 +78,13 @@ func (c *Commands) DeactivateUser(ctx context.Context, userID, resourceOwner str
 		return nil, err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-3M9ds", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9ds", "Errors.User.NotFound")
 	}
 	if isUserStateInitial(existingUser.UserState) {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-ke0fw", "Errors.User.CantDeactivateInitial")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-ke0fw", "Errors.User.CantDeactivateInitial")
 	}
 	if isUserStateInactive(existingUser.UserState) {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-5M0sf", "Errors.User.AlreadyInactive")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5M0sf", "Errors.User.AlreadyInactive")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx,
@@ -101,7 +101,7 @@ func (c *Commands) DeactivateUser(ctx context.Context, userID, resourceOwner str
 
 func (c *Commands) ReactivateUser(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-4M9ds", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4M9ds", "Errors.User.UserIDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
@@ -109,10 +109,10 @@ func (c *Commands) ReactivateUser(ctx context.Context, userID, resourceOwner str
 		return nil, err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-4M0sd", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-4M0sd", "Errors.User.NotFound")
 	}
 	if !isUserStateInactive(existingUser.UserState) {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-6M0sf", "Errors.User.NotInactive")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-6M0sf", "Errors.User.NotInactive")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx,
@@ -129,7 +129,7 @@ func (c *Commands) ReactivateUser(ctx context.Context, userID, resourceOwner str
 
 func (c *Commands) LockUser(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0sd", "Errors.User.UserIDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
@@ -137,10 +137,10 @@ func (c *Commands) LockUser(ctx context.Context, userID, resourceOwner string) (
 		return nil, err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-5M9fs", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-5M9fs", "Errors.User.NotFound")
 	}
 	if !hasUserState(existingUser.UserState, domain.UserStateActive, domain.UserStateInitial) {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-3NN8v", "Errors.User.ShouldBeActiveOrInitial")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3NN8v", "Errors.User.ShouldBeActiveOrInitial")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx,
@@ -157,7 +157,7 @@ func (c *Commands) LockUser(ctx context.Context, userID, resourceOwner string) (
 
 func (c *Commands) UnlockUser(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-M0dse", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-M0dse", "Errors.User.UserIDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
@@ -165,10 +165,10 @@ func (c *Commands) UnlockUser(ctx context.Context, userID, resourceOwner string)
 		return nil, err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-M0dos", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-M0dos", "Errors.User.NotFound")
 	}
 	if !hasUserState(existingUser.UserState, domain.UserStateLocked) {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.NotLocked")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-4M0ds", "Errors.User.NotLocked")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx,
@@ -185,7 +185,7 @@ func (c *Commands) UnlockUser(ctx context.Context, userID, resourceOwner string)
 
 func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
 	if userID == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
 
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
@@ -193,12 +193,12 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 		return nil, err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-m9od", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-m9od", "Errors.User.NotFound")
 	}
 
 	domainPolicy, err := c.getOrgDomainPolicy(ctx, existingUser.ResourceOwner)
 	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.DomainPolicy.NotExisting")
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.DomainPolicy.NotExisting")
 	}
 	var events []eventstore.Command
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
@@ -234,7 +234,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 
 func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {
 	if userID == "" { //do not check for empty orgID (JWT Profile requests won't provide it, so service user requests fail)
-		return nil, errors.ThrowInvalidArgument(nil, "COMMAND-Dbge4", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Dbge4", "Errors.IDMissing")
 	}
 	userWriteModel := NewUserWriteModel(userID, orgID)
 	event, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, "", audience, scopes, lifetime)
@@ -270,7 +270,7 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 		return nil, nil, err
 	}
 	if userWriteModel.UserState != domain.UserStateActive {
-		return nil, nil, errors.ThrowNotFound(nil, "COMMAND-1d6Gg", "Errors.User.NotFound")
+		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-1d6Gg", "Errors.User.NotFound")
 	}
 
 	audience = domain.AddAudScopeToAudience(ctx, audience, scopes)
@@ -305,7 +305,7 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 
 func (c *Commands) removeAccessToken(ctx context.Context, userID, orgID, tokenID string) (*user.UserTokenRemovedEvent, *UserAccessTokenWriteModel, error) {
 	if userID == "" || orgID == "" || tokenID == "" {
-		return nil, nil, errors.ThrowInvalidArgument(nil, "COMMAND-Dng42", "Errors.IDMissing")
+		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Dng42", "Errors.IDMissing")
 	}
 	refreshTokenWriteModel := NewUserAccessTokenWriteModel(userID, orgID, tokenID)
 	err := c.eventstore.FilterToQueryReducer(ctx, refreshTokenWriteModel)
@@ -313,7 +313,7 @@ func (c *Commands) removeAccessToken(ctx context.Context, userID, orgID, tokenID
 		return nil, nil, err
 	}
 	if refreshTokenWriteModel.UserState != domain.UserStateActive {
-		return nil, nil, errors.ThrowNotFound(nil, "COMMAND-BF4hd", "Errors.User.AccessToken.NotFound")
+		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-BF4hd", "Errors.User.AccessToken.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&refreshTokenWriteModel.WriteModel)
 	return user.NewUserTokenRemovedEvent(ctx, userAgg, tokenID), refreshTokenWriteModel, nil
@@ -325,7 +325,7 @@ func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events
 		return nil, nil, err
 	}
 	if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
-		return nil, nil, errors.ThrowNotFound(nil, "COMMAND-ii9K0", "Errors.User.NotFound")
+		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-ii9K0", "Errors.User.NotFound")
 	}
 	changedUserGrant := NewUserWriteModel(userID, existingUser.ResourceOwner)
 	userAgg := UserAggregateFromWriteModel(&changedUserGrant.WriteModel)
@@ -355,7 +355,7 @@ func (c *Commands) prepareUserDomainClaimed(ctx context.Context, filter preparat
 		return nil, err
 	}
 	if !userWriteModel.UserState.Exists() {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-ii9K0", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-ii9K0", "Errors.User.NotFound")
 	}
 	domainPolicy, err := domainPolicyWriteModel(ctx, filter, userWriteModel.ResourceOwner)
 	if err != nil {
@@ -378,14 +378,14 @@ func (c *Commands) prepareUserDomainClaimed(ctx context.Context, filter preparat
 
 func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID string) (err error) {
 	if userID == "" {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-5m0fs", "Errors.IDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-5m0fs", "Errors.IDMissing")
 	}
 	existingUser, err := c.userWriteModelByID(ctx, userID, orgID)
 	if err != nil {
 		return err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return errors.ThrowNotFound(nil, "COMMAND-5m9gK", "Errors.User.NotFound")
+		return zerrors.ThrowNotFound(nil, "COMMAND-5m9gK", "Errors.User.NotFound")
 	}
 
 	_, err = c.eventstore.Push(ctx,
@@ -399,7 +399,7 @@ func (c *Commands) checkUserExists(ctx context.Context, userID, resourceOwner st
 		return err
 	}
 	if !isUserStateExists(existingUser.UserState) {
-		return errors.ThrowPreconditionFailed(nil, "COMMAND-uXHNj", "Errors.User.NotFound")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-uXHNj", "Errors.User.NotFound")
 	}
 	return nil
 }

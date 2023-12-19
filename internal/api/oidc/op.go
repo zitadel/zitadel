@@ -18,11 +18,11 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Config struct {
@@ -101,7 +101,7 @@ func NewServer(
 ) (*Server, error) {
 	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
+		return nil, zerrors.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
 	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections, externalSecure)
 	var options []op.Option
@@ -109,7 +109,7 @@ func NewServer(
 		options = append(options, op.WithAllowInsecure())
 	}
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "OIDC-D3gq1", "cannot create options: %w")
+		return nil, zerrors.ThrowInternal(err, "OIDC-D3gq1", "cannot create options: %w")
 	}
 	provider, err := op.NewProvider(
 		opConfig,
@@ -118,23 +118,25 @@ func NewServer(
 		options...,
 	)
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "OIDC-DAtg3", "cannot create provider")
+		return nil, zerrors.ThrowInternal(err, "OIDC-DAtg3", "cannot create provider")
 	}
 
 	server := &Server{
-		LegacyServer:        op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
-		features:            config.Features,
-		repo:                repo,
-		query:               query,
-		command:             command,
-		keySet:              newKeySet(context.TODO(), time.Hour, query.GetActivePublicKeyByID),
-		defaultLoginURL:     fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
-		defaultLoginURLV2:   config.DefaultLoginURLV2,
-		defaultLogoutURLV2:  config.DefaultLogoutURLV2,
-		fallbackLogger:      fallbackLogger,
-		hashAlg:             crypto.NewBCrypt(10), // as we are only verifying in oidc, the cost is already part of the hash string and the config here is irrelevant.
-		signingKeyAlgorithm: config.SigningKeyAlgorithm,
-		assetAPIPrefix:      assets.AssetAPI(externalSecure),
+		LegacyServer:               op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
+		features:                   config.Features,
+		repo:                       repo,
+		query:                      query,
+		command:                    command,
+		keySet:                     newKeySet(context.TODO(), time.Hour, query.GetActivePublicKeyByID),
+		defaultLoginURL:            fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
+		defaultLoginURLV2:          config.DefaultLoginURLV2,
+		defaultLogoutURLV2:         config.DefaultLogoutURLV2,
+		defaultAccessTokenLifetime: config.DefaultAccessTokenLifetime,
+		defaultIdTokenLifetime:     config.DefaultIdTokenLifetime,
+		fallbackLogger:             fallbackLogger,
+		hashAlg:                    crypto.NewBCrypt(10), // as we are only verifying in oidc, the cost is already part of the hash string and the config here is irrelevant.
+		signingKeyAlgorithm:        config.SigningKeyAlgorithm,
+		assetAPIPrefix:             assets.AssetAPI(externalSecure),
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	server.Handler = op.RegisterLegacyServer(server, op.WithHTTPMiddleware(
@@ -177,7 +179,7 @@ func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []
 		DeviceAuthorization:      config.DeviceAuth.toOPConfig(),
 	}
 	if cryptoLength := len(cryptoKey); cryptoLength != 32 {
-		return nil, caos_errs.ThrowInternalf(nil, "OIDC-D43gf", "crypto key must be 32 bytes, but is %d", cryptoLength)
+		return nil, zerrors.ThrowInternalf(nil, "OIDC-D43gf", "crypto key must be 32 bytes, but is %d", cryptoLength)
 	}
 	copy(opConfig.CryptoKey[:], cryptoKey)
 	return opConfig, nil

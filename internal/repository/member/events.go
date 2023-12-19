@@ -3,8 +3,8 @@ package member
 import (
 	"fmt"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -64,7 +64,7 @@ func MemberAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-puqv4", "unable to unmarshal label policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-puqv4", "unable to unmarshal label policy")
 	}
 
 	return e, nil
@@ -104,7 +104,7 @@ func ChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-puqv4", "unable to unmarshal label policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-puqv4", "unable to unmarshal label policy")
 	}
 
 	return e, nil
@@ -142,7 +142,7 @@ func RemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "MEMBER-Ep4ip", "unable to unmarshal label policy")
+		return nil, zerrors.ThrowInternal(err, "MEMBER-Ep4ip", "unable to unmarshal label policy")
 	}
 
 	return e, nil
@@ -180,7 +180,7 @@ func CascadeRemovedEventMapper(event eventstore.Event) (eventstore.Event, error)
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "MEMBER-3j9sf", "unable to unmarshal label policy")
+		return nil, zerrors.ThrowInternal(err, "MEMBER-3j9sf", "unable to unmarshal label policy")
 	}
 
 	return e, nil

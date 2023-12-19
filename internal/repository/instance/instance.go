@@ -3,8 +3,8 @@ package instance
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -44,7 +44,7 @@ func InstanceAddedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 	}
 	err := event.Unmarshal(instanceAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "INSTANCE-s9l3F", "unable to unmarshal instance added")
+		return nil, zerrors.ThrowInternal(err, "INSTANCE-s9l3F", "unable to unmarshal instance added")
 	}
 
 	return instanceAdded, nil
@@ -81,7 +81,7 @@ func InstanceChangedEventMapper(event eventstore.Event) (eventstore.Event, error
 	}
 	err := event.Unmarshal(instanceChanged)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "INSTANCE-3hfo8", "unable to unmarshal instance changed")
+		return nil, zerrors.ThrowInternal(err, "INSTANCE-3hfo8", "unable to unmarshal instance changed")
 	}
 
 	return instanceChanged, nil

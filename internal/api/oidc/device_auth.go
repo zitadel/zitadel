@@ -10,8 +10,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -85,12 +85,12 @@ func (o *OPStorage) StoreDeviceAuthorization(ctx context.Context, clientID, devi
 		return err
 	}
 	if !op.ValidateGrantType(client, oidc.GrantTypeDeviceCode) {
-		return errors.ThrowPermissionDeniedf(nil, "OIDC-et1Ae", "grant type %q not allowed for client", oidc.GrantTypeDeviceCode)
+		return zerrors.ThrowPermissionDeniedf(nil, "OIDC-et1Ae", "grant type %q not allowed for client", oidc.GrantTypeDeviceCode)
 	}
 
 	scopes, err = o.assertProjectRoleScopes(ctx, clientID, scopes)
 	if err != nil {
-		return errors.ThrowPreconditionFailed(err, "OIDC-She4t", "Errors.Internal")
+		return zerrors.ThrowPreconditionFailed(err, "OIDC-She4t", "Errors.Internal")
 	}
 	aggrID, details, err := o.command.AddDeviceAuth(ctx, clientID, deviceCode, userCode, expires, scopes)
 	if err == nil {

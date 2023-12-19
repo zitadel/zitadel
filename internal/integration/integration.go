@@ -32,11 +32,11 @@ import (
 	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/webauthn"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -181,7 +181,7 @@ func (s *Tester) createMachineUserOrgOwner(ctx context.Context) {
 
 	ctx, user := s.createMachineUser(ctx, MachineUserOrgOwner, OrgOwner)
 	_, err = s.Commands.AddOrgMember(ctx, user.ResourceOwner, user.ID, "ORG_OWNER")
-	target := new(caos_errs.AlreadyExistsError)
+	target := new(zerrors.AlreadyExistsError)
 	if !errors.As(err, &target) {
 		logging.OnError(err).Fatal("add org member")
 	}
@@ -192,7 +192,7 @@ func (s *Tester) createMachineUserInstanceOwner(ctx context.Context) {
 
 	ctx, user := s.createMachineUser(ctx, MachineUserInstanceOwner, IAMOwner)
 	_, err = s.Commands.AddInstanceMember(ctx, user.ID, "IAM_OWNER")
-	target := new(caos_errs.AlreadyExistsError)
+	target := new(zerrors.AlreadyExistsError)
 	if !errors.As(err, &target) {
 		logging.OnError(err).Fatal("add instance member")
 	}

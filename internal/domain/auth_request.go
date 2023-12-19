@@ -6,7 +6,7 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type AuthRequest struct {
@@ -139,7 +139,7 @@ func NewAuthRequestFromType(requestType AuthRequestType) (*AuthRequest, error) {
 	case AuthRequestTypeDevice:
 		return &AuthRequest{Request: &AuthRequestDevice{}}, nil
 	}
-	return nil, errors.ThrowInvalidArgument(nil, "DOMAIN-ds2kl", "invalid request type")
+	return nil, zerrors.ThrowInvalidArgument(nil, "DOMAIN-ds2kl", "invalid request type")
 }
 
 func (a *AuthRequest) WithCurrentInfo(info *BrowserInfo) *AuthRequest {

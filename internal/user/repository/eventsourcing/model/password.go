@@ -6,9 +6,9 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Password struct {
@@ -51,7 +51,7 @@ func (pw *Password) setData(event eventstore.Event) error {
 	pw.ObjectRoot.AppendEvent(event)
 	if err := event.Unmarshal(pw); err != nil {
 		logging.Log("EVEN-dks93").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-sl9xlo2rsw", "could not unmarshal event")
+		return zerrors.ThrowInternal(err, "MODEL-sl9xlo2rsw", "could not unmarshal event")
 	}
 	return nil
 }
@@ -61,7 +61,7 @@ func (c *PasswordCode) SetData(event eventstore.Event) error {
 	c.CreationDate = event.CreatedAt()
 	if err := event.Unmarshal(c); err != nil {
 		logging.Log("EVEN-lo0y2").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-q21dr", "could not unmarshal event")
+		return zerrors.ThrowInternal(err, "MODEL-q21dr", "could not unmarshal event")
 	}
 	return nil
 }
@@ -69,7 +69,7 @@ func (c *PasswordCode) SetData(event eventstore.Event) error {
 func (pw *PasswordChange) SetData(event eventstore.Event) error {
 	if err := event.Unmarshal(pw); err != nil {
 		logging.Log("EVEN-ADs31").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-BDd32", "could not unmarshal event")
+		return zerrors.ThrowInternal(err, "MODEL-BDd32", "could not unmarshal event")
 	}
 	pw.ObjectRoot.AppendEvent(event)
 	return nil

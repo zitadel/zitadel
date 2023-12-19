@@ -5,8 +5,8 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -48,7 +48,7 @@ func DefaultLanguageSetMapper(event eventstore.Event) (eventstore.Event, error) 
 	}
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-3j9fs", "unable to unmarshal default language set")
+		return nil, zerrors.ThrowInternal(err, "IAM-3j9fs", "unable to unmarshal default language set")
 	}
 
 	return e, nil

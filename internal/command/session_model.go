@@ -5,9 +5,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/session"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type WebAuthNChallengeModel struct {
@@ -62,8 +62,7 @@ type SessionWriteModel struct {
 func NewSessionWriteModel(sessionID string, instanceID string) *SessionWriteModel {
 	return &SessionWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:   sessionID,
-			ResourceOwner: instanceID,
+			AggregateID: sessionID,
 		},
 		Metadata:  make(map[string][]byte),
 		aggregate: &session.NewAggregate(sessionID, instanceID).Aggregate,
@@ -261,10 +260,10 @@ func (wm *SessionWriteModel) AuthMethodTypes() []domain.UserAuthMethodType {
 // or automatically (expired).
 func (wm *SessionWriteModel) CheckNotInvalidated() error {
 	if wm.State == domain.SessionStateTerminated {
-		return errors.ThrowPreconditionFailed(nil, "COMMAND-Hewfq", "Errors.Session.Terminated")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Hewfq", "Errors.Session.Terminated")
 	}
 	if !wm.Expiration.IsZero() && wm.Expiration.Before(time.Now()) {
-		return errors.ThrowPreconditionFailed(nil, "COMMAND-Hkl3d", "Errors.Session.Expired")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Hkl3d", "Errors.Session.Expired")
 	}
 	return nil
 }
@@ -272,7 +271,7 @@ func (wm *SessionWriteModel) CheckNotInvalidated() error {
 // CheckIsActive checks that the session was not invalidated ([CheckNotInvalidated]) and actually already exists.
 func (wm *SessionWriteModel) CheckIsActive() error {
 	if wm.State == domain.SessionStateUnspecified {
-		return errors.ThrowPreconditionFailed(nil, "COMMAND-Flk38", "Errors.Session.NotExisting")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Flk38", "Errors.Session.NotExisting")
 	}
 	return wm.CheckNotInvalidated()
 }
