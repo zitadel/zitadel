@@ -121,7 +121,7 @@ func (h *Handler) schedule(ctx context.Context) {
 			<-t.C
 		}
 		// if there was a trigger before, start the projection
-		// within a second (should generally be after the not initialized projections)
+		// after a second (should generally be after the not initialized projections)
 		// and its configured `RequeueEvery`
 		reset := randomizeStart(1, h.requeueEvery.Seconds())
 		t.Reset(reset)
