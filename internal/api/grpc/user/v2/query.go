@@ -119,6 +119,10 @@ func UserStateToPb(state domain.UserState) user.UserState {
 		return user.UserState_USER_STATE_INITIAL
 	case domain.UserStateLocked:
 		return user.UserState_USER_STATE_LOCKED
+	case domain.UserStateUnspecified:
+		return user.UserState_USER_STATE_UNSPECIFIED
+	case domain.UserStateSuspend:
+		return user.UserState_USER_STATE_UNSPECIFIED
 	default:
 		return user.UserState_USER_STATE_UNSPECIFIED
 	}
