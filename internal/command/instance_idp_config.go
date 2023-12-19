@@ -163,7 +163,7 @@ func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idp
 			events = append(events, userEvents...)
 		}
 		orgAgg := OrgAggregateFromWriteModel(&NewOrgIdentityProviderWriteModel(idpProvider.AggregateID, idpID).WriteModel)
-		orgEvents := c.removeIDPFromLoginPolicy(ctx, orgAgg, idpID, true)
+		orgEvents := c.removeIDPFromLoginPolicy(ctx, orgAgg, idpID, true, externalIDPs...)
 		events = append(events, orgEvents...)
 	}
 
