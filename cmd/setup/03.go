@@ -172,10 +172,6 @@ func (mig *FirstInstance) String() string {
 	return "03_default_instance"
 }
 
-func (mig *FirstInstance) ShouldSkip() bool {
-	return mig.Skip
-}
-
 func verifyKey(key *crypto.KeyConfig, storage crypto.KeyStorage) (err error) {
 	_, err = crypto.LoadKey(key.EncryptionKeyID, storage)
 	if err == nil {

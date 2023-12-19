@@ -43,7 +43,3 @@ func (mig *CurrentProjectionState) Execute(ctx context.Context) error {
 func (mig *CurrentProjectionState) String() string {
 	return "15_current_projection_state"
 }
-
-func (mig *CurrentProjectionState) ShouldSkip() bool {
-	return false
-}

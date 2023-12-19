@@ -24,7 +24,3 @@ func (mig *AddLowerFieldsToLoginNames) Execute(ctx context.Context) error {
 func (mig *AddLowerFieldsToLoginNames) String() string {
 	return "18_add_lower_fields_to_login_names"
 }
-
-func (mig *AddLowerFieldsToLoginNames) ShouldSkip() bool {
-	return false
-}

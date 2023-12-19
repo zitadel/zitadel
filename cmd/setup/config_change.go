@@ -69,7 +69,3 @@ func (mig *externalConfigChange) Execute(ctx context.Context) error {
 func (mig *externalConfigChange) String() string {
 	return "config_change"
 }
-
-func (mig *externalConfigChange) ShouldSkip() bool {
-	return false
-}

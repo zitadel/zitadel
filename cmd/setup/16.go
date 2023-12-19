@@ -31,7 +31,3 @@ func (mig *UniqueConstraintToLower) Execute(ctx context.Context) error {
 func (mig *UniqueConstraintToLower) String() string {
 	return "16_unique_constraint_lower"
 }
-
-func (mig *UniqueConstraintToLower) ShouldSkip() bool {
-	return false
-}

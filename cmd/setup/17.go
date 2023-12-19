@@ -24,6 +24,3 @@ func (mig *AddOffsetToCurrentStates) Execute(ctx context.Context) error {
 func (mig *AddOffsetToCurrentStates) String() string {
 	return "17_add_offset_col_to_current_states"
 }
-func (mig *AddOffsetToCurrentStates) ShouldSkip() bool {
-	return false
-}

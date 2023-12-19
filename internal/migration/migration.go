@@ -28,7 +28,6 @@ var (
 type Migration interface {
 	String() string
 	Execute(context.Context) error
-	ShouldSkip() bool
 }
 
 type errCheckerMigration interface {
@@ -62,18 +61,8 @@ func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration
 		return nil
 	}
 
-	commands := make([]eventstore.Command, 0, 2)
-	commands = append(commands, setupStartedCmd(ctx, migration))
-	if migration.ShouldSkip() {
-		commands = append(commands, setupSkippedCmd(ctx, migration))
-	}
-
-	if _, err = es.Push(ctx, commands...); err != nil && !continueOnErr(err) {
+	if _, err = es.Push(ctx, setupStartedCmd(ctx, migration)); err != nil && !continueOnErr(err) {
 		return err
-	}
-
-	if migration.ShouldSkip() {
-		return nil
 	}
 
 	logging.WithFields("name", migration.String()).Info("starting migration")
@@ -111,11 +100,6 @@ var _ Migration = (*cancelMigration)(nil)
 
 type cancelMigration struct {
 	name string
-}
-
-// ShouldSkip implements Migration.
-func (*cancelMigration) ShouldSkip() bool {
-	return false
 }
 
 // Execute implements Migration
@@ -159,71 +143,46 @@ func checkExec(ctx context.Context, es *eventstore.Eventstore, migration Migrati
 	}
 }
 
-var _ eventstore.QueryReducer = (*migrationState)(nil)
-
-type migrationState struct {
-	eventstore.ReadModel
-	mig Migration
-
-	shouldMigrate bool
-	isStarted     bool
-}
-
-// Query implements eventstore.QueryReducer.
-func (*migrationState) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migration) (should bool, err error) {
+	events, err := es.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		OrderAsc().
 		InstanceID("").
 		AddQuery().
 		AggregateTypes(aggregateType).
 		AggregateIDs(aggregateID).
-		EventTypes(StartedType, skippedType, doneType, repeatableDoneType, failedType).
-		Builder()
-}
-
-func (r *migrationState) Reduce() error {
-	for _, event := range r.Events {
-		e, ok := event.(*SetupStep)
-		if !ok {
-			r.shouldMigrate = false
-			return zerrors.ThrowInternal(nil, "MIGRA-IJY3D", "Errors.Internal")
-		}
-
-		if e.Name != r.mig.String() {
-			continue
-		}
-
-		switch event.Type() {
-		case StartedType:
-			r.isStarted = true
-		case failedType:
-			r.isStarted = false
-		case doneType,
-			repeatableDoneType,
-			skippedType:
-			repeatable, ok := r.mig.(RepeatableMigration)
-			if !ok {
-				r.shouldMigrate = false
-				return nil
-			}
-			r.isStarted = false
-			repeatable.SetLastExecution(e.LastRun.(map[string]interface{}))
-		}
-	}
-	return r.ReadModel.Reduce()
-}
-
-func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migration) (should bool, err error) {
-	state := migrationState{
-		ReadModel: eventstore.ReadModel{},
-		mig:       migration,
-	}
-	err = es.FilterToQueryReducer(ctx, &state)
+		EventTypes(StartedType, doneType, repeatableDoneType, failedType).
+		Builder())
 	if err != nil {
 		return false, err
 	}
 
-	if state.isStarted {
+	var isStarted bool
+	for _, event := range events {
+		e, ok := event.(*SetupStep)
+		if !ok {
+			return false, zerrors.ThrowInternal(nil, "MIGRA-IJY3D", "Errors.Internal")
+		}
+
+		if e.Name != migration.String() {
+			continue
+		}
+
+		switch event.Type() {
+		case StartedType, failedType:
+			isStarted = !isStarted
+		case doneType,
+			skippedType,
+			repeatableDoneType:
+			repeatable, ok := migration.(RepeatableMigration)
+			if !ok {
+				return false, nil
+			}
+			isStarted = false
+			repeatable.SetLastExecution(e.LastRun.(map[string]interface{}))
+		}
+	}
+
+	if isStarted {
 		return false, errMigrationAlreadyStarted
 	}
 	repeatable, ok := migration.(RepeatableMigration)

@@ -23,7 +23,3 @@ func (mig *LastFailed) Execute(ctx context.Context) error {
 func (mig *LastFailed) String() string {
 	return "05_last_failed"
 }
-
-func (mig *LastFailed) ShouldSkip() bool {
-	return false
-}

@@ -26,7 +26,3 @@ func (mig *OwnerRemoveColumns) Execute(ctx context.Context) error {
 func (mig *OwnerRemoveColumns) String() string {
 	return "06_resource_owner_columns"
 }
-
-func (mig *OwnerRemoveColumns) ShouldSkip() bool {
-	return false
-}
