@@ -249,8 +249,5 @@ func (a *AuthRequest) UserAuthMethodTypes() []UserAuthMethodType {
 	for _, mfa := range a.MFAsVerified {
 		list = append(list, mfa.UserAuthMethodType())
 	}
-
-	// TBD: How to establish the UserAuthMethodTypeIDP?
-
 	return list
 }
