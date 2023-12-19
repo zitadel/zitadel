@@ -144,7 +144,7 @@ Errors:
     ExternalIDP:
       Invalid: 外部 IDP 无效
       IDPConfigNotExisting: IDP 提供者对此组织无效
-      NotAllowed: 此组织不允许外部 IDP
+      NotAllowed: 外部 IDP 不允许
       MinimumExternalIDPNeeded: 必须添加至少一个 IDP
       AlreadyExists: 外部 IDP 已存在
       NotFound: 未找到外部 IDP

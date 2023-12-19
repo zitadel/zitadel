@@ -90,7 +90,7 @@ type idpUserLinksProvider interface {
 }
 
 type userEventProvider interface {
-	UserEventsByID(ctx context.Context, id string, sequence uint64, eventTypes []eventstore.EventType) ([]eventstore.Event, error)
+	UserEventsByID(ctx context.Context, id string, changeDate time.Time, eventTypes []eventstore.EventType) ([]eventstore.Event, error)
 }
 
 type userCommandProvider interface {
@@ -1458,21 +1458,25 @@ var (
 
 func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eventProvider userEventProvider, agentID string, user *user_model.UserView) (*user_model.UserSessionView, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
+
+	// always load the latest sequence first, so in case the session was not found by id,
+	// the sequence will be equal or lower than the actual projection and no events are lost
+	sequence, err := provider.GetLatestUserSessionSequence(ctx, instanceID)
+	logging.WithFields("instanceID", instanceID, "userID", user.ID).
+		OnError(err).
+		Errorf("could not get current sequence for userSessionByIDs")
+
 	session, err := provider.UserSessionByIDs(agentID, user.ID, instanceID)
 	if err != nil {
 		if !zerrors.IsNotFound(err) {
 			return nil, err
 		}
-		sequence, err := provider.GetLatestUserSessionSequence(ctx, instanceID)
-		logging.WithFields("instanceID", instanceID, "userID", user.ID).
-			OnError(err).
-			Errorf("could not get current sequence for userSessionByIDs")
 		session = &user_view_model.UserSessionView{UserAgentID: agentID, UserID: user.ID}
 		if sequence != nil {
-			session.Sequence = sequence.Sequence
+			session.ChangeDate = sequence.EventCreatedAt
 		}
 	}
-	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.Sequence, append(session.EventTypes(), userSessionEventTypes...))
+	events, err := eventProvider.UserEventsByID(ctx, user.ID, session.ChangeDate, append(session.EventTypes(), userSessionEventTypes...))
 	if err != nil {
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserSessionToModel(session), nil
@@ -1556,7 +1560,7 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	} else if user == nil {
 		user = new(user_view_model.UserView)
 	}
-	events, err := eventProvider.UserEventsByID(ctx, userID, user.Sequence, user.EventTypes())
+	events, err := eventProvider.UserEventsByID(ctx, userID, user.ChangeDate, user.EventTypes())
 	if err != nil {
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error retrieving new events")
 		return user_view_model.UserToModel(user), nil

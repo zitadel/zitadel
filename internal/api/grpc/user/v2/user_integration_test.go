@@ -13,11 +13,14 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
@@ -1067,11 +1070,26 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		ClientSecret: "client_secret",
 	})
 	require.NoError(t, err)
+	_, err = Tester.Client.Mgmt.AddCustomLoginPolicy(CTX, &mgmt.AddCustomLoginPolicyRequest{})
+	require.Condition(t, func() bool {
+		code := status.Convert(err).Code()
+		return code == codes.AlreadyExists || code == codes.OK
+	})
+	_, err = Tester.Client.Mgmt.AddIDPToLoginPolicy(CTX, &mgmt.AddIDPToLoginPolicyRequest{
+		IdpId:     provider.GetId(),
+		OwnerType: idp.IDPOwnerType_IDP_OWNER_TYPE_ORG,
+	})
+	require.NoError(t, err)
 	idpLink, err := Tester.Client.UserV2.AddIDPLink(CTX, &user.AddIDPLinkRequest{UserId: userMultipleAuth, IdpLink: &user.IDPLink{
 		IdpId:    provider.GetId(),
 		UserId:   "external-id",
 		UserName: "displayName",
 	}})
+	require.NoError(t, err)
+	// This should not remove the user IDP links
+	_, err = Tester.Client.Mgmt.RemoveIDPFromLoginPolicy(CTX, &mgmt.RemoveIDPFromLoginPolicyRequest{
+		IdpId: provider.GetId(),
+	})
 	require.NoError(t, err)
 
 	type args struct {

@@ -144,7 +144,7 @@ Errors:
     ExternalIDP:
       Invalid: External IDP invalid
       IDPConfigNotExisting: IDP provider invalid for this organization
-      NotAllowed: External IDP not allowed on this organization
+      NotAllowed: External IDP not allowed
       MinimumExternalIDPNeeded: At least one IDP must be added
       AlreadyExists: External IDP already taken
       NotFound: External IDP not found

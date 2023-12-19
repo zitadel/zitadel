@@ -143,7 +143,7 @@ Errors:
     ExternalIDP:
       Invalid: Внешний идентификационный номер недействителен.
       IDPConfigNotExisting: Поставщик МВУ недействителен для этой организации.
-      NotAllowed: Внешний IDP не разрешен в этой организации.
+      NotAllowed: Внешний IDP не разрешен
       MinimumExternalIDPNeeded: Необходимо добавить хотя бы одного ВПЛ.
       AlreadyExists: Внешнее ВПЛ уже занято
       NotFound: Внешний IDP не найден

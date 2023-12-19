@@ -873,6 +873,8 @@ github.com/zitadel/passwap v0.4.0 h1:cMaISx+Ve7ilgG7Q8xOli4Z6IWr8Gndss+jeBk5A3O0
 github.com/zitadel/passwap v0.4.0/go.mod h1:yHaDM4A68yRkdic5BZ4iUNoc19hT+kYt8n1/Nz+I87g=
 github.com/zitadel/saml v0.1.2 h1:RICwNTuP2upX4A1sZ8iq1rv4/x3DhZHzFx1e5bTKoTo=
 github.com/zitadel/saml v0.1.2/go.mod h1:M+X+3vMUulpoLofKeH/W1/qjQQ3owitc2GuGDu3oYpM=
+github.com/zitadel/saml v0.1.3 h1:LI4DOCVyyU1qKPkzs3vrGcA5J3H4pH3+CL9zr9ShkpM=
+github.com/zitadel/saml v0.1.3/go.mod h1:MdkjyU3mwnTuh4lNnhPG+RyZL/VfzD72wUG/eWWBaXc=
 github.com/zitadel/schema v1.3.0 h1:kQ9W9tvIwZICCKWcMvCEweXET1OcOyGEuFbHs4o5kg0=
 github.com/zitadel/schema v1.3.0/go.mod h1:NptN6mkBDFvERUCvZHlvWmmME+gmZ44xzwRXwhzsbtc=
 go.etcd.io/bbolt v1.3.3/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
