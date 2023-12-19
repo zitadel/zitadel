@@ -66,7 +66,7 @@ func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpPr
 	return writeModelToIDPProvider(&idpModel.IdentityProviderWriteModel), nil
 }
 
-func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.UserIDPLink) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider) (*domain.ObjectDetails, error) {
 	if !idpProvider.IsValid() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-66m9s", "Errors.IAM.LoginPolicy.IDP.Invalid")
 	}
@@ -89,7 +89,7 @@ func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, 
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
-	events := c.removeIDPProviderFromDefaultLoginPolicy(ctx, instanceAgg, idpProvider, false, cascadeExternalIDPs...)
+	events := c.removeIDPProviderFromDefaultLoginPolicy(ctx, instanceAgg, idpProvider, false)
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
