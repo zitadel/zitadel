@@ -53,7 +53,7 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB) {
 	go func() {
 		err = sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
-			_, err := conn.PgConn().CopyTo(ctx, w, "COPY (SELECT * FROM auth.auth_requests "+instanceClause()+") TO stdout")
+			_, err := conn.PgConn().CopyTo(ctx, w, "COPY (SELECT id, regexp_replace(request::TEXT, '\\\\u0000', '', 'g')::JSON request, code, request_type, creation_date, change_date, instance_id FROM auth.auth_requests "+instanceClause()+") TO STDOUT")
 			w.Close()
 			return err
 		})
@@ -68,7 +68,7 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB) {
 	err = destConn.Raw(func(driverConn interface{}) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
 
-		tag, err := conn.PgConn().CopyFrom(ctx, r, "COPY auth.auth_requests FROM stdin")
+		tag, err := conn.PgConn().CopyFrom(ctx, r, "COPY auth.auth_requests FROM STDIN")
 		eventCount = tag.RowsAffected()
 
 		return err

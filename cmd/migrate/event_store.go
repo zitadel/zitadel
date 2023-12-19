@@ -70,7 +70,7 @@ func copyEvents(ctx context.Context, source, dest *database.DB) {
 		err := sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
 			// TODO: sql injection
-			_, err := conn.PgConn().CopyTo(ctx, writer, "COPY (SELECT instance_id, aggregate_type, aggregate_id, event_type, sequence, revision, created_at, payload, creator, owner, (SELECT "+position+"::DECIMAL) AS position, row_number() OVER () AS in_tx_order FROM eventstore.events2 "+instanceClause()+" ORDER BY position, in_tx_order) TO stdout")
+			_, err := conn.PgConn().CopyTo(ctx, writer, "COPY (SELECT instance_id, aggregate_type, aggregate_id, event_type, sequence, revision, created_at,  regexp_replace(payload::TEXT, '\\\\u0000', '', 'g')::JSON payload, creator, owner, (SELECT "+position+"::DECIMAL) AS position, row_number() OVER (PARTITION BY instance_id ORDER BY position, in_tx_order) AS in_tx_order FROM eventstore.events2 "+instanceClause()+" ORDER BY instance_id, position, in_tx_order) TO STDOUT")
 			writer.Close()
 			return err
 		})
@@ -95,7 +95,7 @@ func copyEvents(ctx context.Context, source, dest *database.DB) {
 		_ = tx.Commit(ctx)
 		pos <- position
 
-		tag, err := conn.PgConn().CopyFrom(ctx, reader, "COPY eventstore.events2 FROM stdin")
+		tag, err := conn.PgConn().CopyFrom(ctx, reader, "COPY eventstore.events2 FROM STDIN")
 		eventCount = tag.RowsAffected()
 
 		return err

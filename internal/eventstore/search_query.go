@@ -14,7 +14,7 @@ import (
 type SearchQueryBuilder struct {
 	columns               Columns
 	limit                 uint64
-	offset                uint16
+	offset                uint64
 	desc                  bool
 	resourceOwner         string
 	instanceID            *string
@@ -38,7 +38,7 @@ func (b *SearchQueryBuilder) GetLimit() uint64 {
 	return b.limit
 }
 
-func (b *SearchQueryBuilder) GetOffset() uint16 {
+func (b *SearchQueryBuilder) GetOffset() uint64 {
 	return b.offset
 }
 
@@ -160,7 +160,7 @@ func (builder *SearchQueryBuilder) Matches(commands ...Command) []Command {
 		if builder.limit > 0 && builder.limit <= uint64(len(matches)) {
 			break
 		}
-		if builder.offset > 0 && uint16(i) < builder.offset {
+		if builder.offset > 0 && uint64(i) < builder.offset {
 			continue
 		}
 
@@ -213,7 +213,7 @@ func (builder *SearchQueryBuilder) Limit(limit uint64) *SearchQueryBuilder {
 }
 
 // Limit defines how many events are returned maximally.
-func (builder *SearchQueryBuilder) Offset(offset uint16) *SearchQueryBuilder {
+func (builder *SearchQueryBuilder) Offset(offset uint64) *SearchQueryBuilder {
 	builder.offset = offset
 	return builder
 }

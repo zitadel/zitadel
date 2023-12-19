@@ -52,7 +52,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/session"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
-	"github.com/zitadel/zitadel/internal/static"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 	"github.com/zitadel/zitadel/internal/webauthn"
 )
@@ -197,31 +196,9 @@ func projections(
 
 	registerMappers(es)
 
-	for _, instance := range instanceIDs(ctx, client) {
-		ctx = internal_authz.WithInstanceID(ctx, instance)
-
-		projectProjections(ctx, client, es, keys, config)
-		config.Admin.Spooler.Client = client
-		config.Admin.Spooler.Eventstore = es
-		projectAdmin(ctx, config.Admin, staticStorage)
-		config.Auth.Spooler.Client = client
-		config.Auth.Spooler.Eventstore = es
-		projectAuth(ctx, config.Auth, queries, keys)
-		projectNotification(ctx, es, queries, commands, keys, config)
-	}
-
-	logging.WithFields("took", time.Since(start)).Info("projections executed")
-}
-
-func projectProjections(ctx context.Context, client *database.DB, es *eventstore.Eventstore, keys *encryptionKeys, config *ProjectionsConfig) {
-	err := projection.Create(ctx, client, es, config.Projections, keys.OIDC, keys.SAML, config.SystemAPIUsers)
+	err = projection.Create(ctx, client, es, config.Projections, keys.OIDC, keys.SAML, config.SystemAPIUsers)
 	logging.OnError(err).Fatal("unable to start projections")
 
-	err = projection.ProjectInstance(ctx)
-	logging.OnError(err).Fatal("trigger failed")
-}
-
-func projectNotification(ctx context.Context, es *eventstore.Eventstore, queries *query.Queries, commands *command.Commands, keys *encryptionKeys, config *ProjectionsConfig) {
 	i18n.MustLoadSupportedLanguagesFromDir()
 
 	notification.Register(
@@ -243,28 +220,37 @@ func projectNotification(ctx context.Context, es *eventstore.Eventstore, queries
 		keys.SMS,
 	)
 
-	err := notification.ProjectInstance(ctx)
-	logging.OnError(err).Fatal("trigger notification failed")
-}
-
-func projectAuth(ctx context.Context, config auth_es.Config, queries *query.Queries, keys *encryptionKeys) {
-	view, err := auth_view.StartView(config.Spooler.Client, keys.OIDC, queries, config.Spooler.Eventstore)
+	config.Auth.Spooler.Client = client
+	config.Auth.Spooler.Eventstore = es
+	authView, err := auth_view.StartView(config.Auth.Spooler.Client, keys.OIDC, queries, config.Auth.Spooler.Eventstore)
 	logging.OnError(err).Fatal("unable to start auth view")
+	auth_handler.Register(ctx, config.Auth.Spooler, authView, queries)
 
-	auth_handler.Register(ctx, config.Spooler, view, queries)
-
-	err = auth_handler.ProjectInstance(ctx)
-	logging.OnError(err).Fatal("trigger auth handler failed")
-}
-
-func projectAdmin(ctx context.Context, config admin_es.Config, staticStorage static.Storage) {
-	view, err := admin_view.StartView(config.Spooler.Client)
+	config.Admin.Spooler.Client = client
+	config.Admin.Spooler.Eventstore = es
+	adminView, err := admin_view.StartView(config.Admin.Spooler.Client)
 	logging.OnError(err).Fatal("unable to start admin view")
 
-	admin_handler.Register(ctx, config.Spooler, view, staticStorage)
+	admin_handler.Register(ctx, config.Admin.Spooler, adminView, staticStorage)
 
-	err = admin_handler.ProjectInstance(ctx)
-	logging.OnError(err).Fatal("trigger admin handler failed")
+	for _, instance := range queryInstanceIDs(ctx, client) {
+		logging.WithFields("instance", instance).Info("projections")
+		ctx = internal_authz.WithInstanceID(ctx, instance)
+
+		err = projection.ProjectInstance(ctx)
+		logging.OnError(err).Fatal("trigger failed")
+
+		err = admin_handler.ProjectInstance(ctx)
+		logging.OnError(err).Fatal("trigger admin handler failed")
+
+		err = auth_handler.ProjectInstance(ctx)
+		logging.OnError(err).Fatal("trigger auth handler failed")
+
+		err = notification.ProjectInstance(ctx)
+		logging.OnError(err).Fatal("trigger notification failed")
+	}
+
+	logging.WithFields("took", time.Since(start)).Info("projections executed")
 }
 
 func registerMappers(es *eventstore.Eventstore) {
@@ -286,9 +272,9 @@ func registerMappers(es *eventstore.Eventstore) {
 
 // returns the instance configured by flag
 // or all instances which are not removed
-func instanceIDs(ctx context.Context, source *database.DB) []string {
-	if instanceID != "" {
-		return []string{instanceID}
+func queryInstanceIDs(ctx context.Context, source *database.DB) []string {
+	if len(instanceIDs) > 0 {
+		return instanceIDs
 	}
 
 	instances := []string{}
