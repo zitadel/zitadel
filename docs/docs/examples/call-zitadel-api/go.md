@@ -8,7 +8,7 @@ It demonstrates how to fetch some data from the ZITADEL management API.
 
 At the end of the guide you should have an application able to read the details of your organization.
 
-> This documentation references our [CLI example](https://github.com/zitadel/zitadel-go/blob/client/example/client/cli/cli.go).
+> This documentation references our [CLI example](https://github.com/zitadel/zitadel-go/blob/next/example/client/cli/cli.go).
 
 ## Prerequisites
 
@@ -37,7 +37,7 @@ Create a new go file with the content below. This will create a client and call 
 The SDK will make sure you will have access to the API by retrieving a Bearer Token using JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:zitadel:aud`).
 
 ```go reference
-https://github.com/zitadel/zitadel-go/blob/client/example/client/cli/cli.go
+https://github.com/zitadel/zitadel-go/blob/next/example/client/cli/cli.go
 ```
 
 ### Test
@@ -78,6 +78,6 @@ Now you can proceed implementing our APIs by adding more calls or using a differ
 api.SessionService().CreateSession(ctx, &session.CreateSessionRequest{})
 ```
 Checkout more [examples from the SDK](https://github.com/zitadel/zitadel-go/blob/next/example),
-like how you can integrate the [client in your own API](https://github.com/zitadel/zitadel-go/blob/client/example/api/client/main.go)
+like how you can integrate the [client in your own API](https://github.com/zitadel/zitadel-go/blob/next/example/api/client/main.go)
 or refer to our [API Docs](/apis/introduction).
 
