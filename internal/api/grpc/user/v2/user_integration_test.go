@@ -1356,29 +1356,36 @@ func TestServer_DeleteUser(t *testing.T) {
 				CTX,
 				&user.DeleteUserRequest{
 					UserId: "notexisting",
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 				},
 				func(request *user.DeleteUserRequest) error { return nil },
 			},
 			wantErr: true,
 		},
 		{
-			name: "remove, ok",
+			name: "remove human, ok",
 			args: args{
 				ctx: CTX,
-				req: &user.DeleteUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
-				},
+				req: &user.DeleteUserRequest{},
 				prepare: func(request *user.DeleteUserRequest) error {
 					resp := Tester.CreateHumanUser(CTX)
+					request.UserId = resp.GetUserId()
+					return err
+				},
+			},
+			want: &user.DeleteUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+		{
+			name: "remove machine, ok",
+			args: args{
+				ctx: CTX,
+				req: &user.DeleteUserRequest{},
+				prepare: func(request *user.DeleteUserRequest) error {
+					resp := Tester.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
 					return err
 				},
@@ -1394,13 +1401,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			name: "remove dependencies, ok",
 			args: args{
 				ctx: CTX,
-				req: &user.DeleteUserRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
-				},
+				req: &user.DeleteUserRequest{},
 				prepare: func(request *user.DeleteUserRequest) error {
 					resp := Tester.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
