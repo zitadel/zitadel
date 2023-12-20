@@ -5,7 +5,6 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -229,16 +228,6 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	return nil
 }
 
-func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string) error {
-	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
-		return nil
-	}
-	if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, userID); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg crypto.EncryptionAlgorithm) (err error) {
 	if err := human.Validate(c.userPasswordHasher); err != nil {
 		return err
@@ -252,6 +241,7 @@ func (c *Commands) ChangeUserHuman(ctx context.Context, human *ChangeHuman, alg 
 		human.Phone != nil,
 		human.Password != nil,
 		false, // avatar not updateable
+		false, // IDPLinks not updateable
 	)
 	if err != nil {
 		return err
@@ -442,11 +432,11 @@ func (c *Commands) userExistsWriteModel(ctx context.Context, userID string) (wri
 	return writeModel, nil
 }
 
-func (c *Commands) userHumanWriteModel(ctx context.Context, userID string, profileWM, emailWM, phoneWM, passwordWM, avatarWM bool) (writeModel *UserV2WriteModel, err error) {
+func (c *Commands) userHumanWriteModel(ctx context.Context, userID string, profileWM, emailWM, phoneWM, passwordWM, avatarWM, idpLinksWM bool) (writeModel *UserV2WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel = NewUserHumanWriteModel(userID, "", profileWM, emailWM, phoneWM, passwordWM, avatarWM)
+	writeModel = NewUserHumanWriteModel(userID, "", profileWM, emailWM, phoneWM, passwordWM, avatarWM, idpLinksWM)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

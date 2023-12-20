@@ -3,7 +3,11 @@ package command
 import (
 	"context"
 
+	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -113,11 +117,95 @@ func (c *Commands) ReactivateUserV2(ctx context.Context, userID string) (*domain
 	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
 }
 
+func (c *Commands) checkPermissionUpdateUser(ctx context.Context, resourceOwner, userID string) error {
+	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
+		return nil
+	}
+	if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, userID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Commands) checkPermissionDeleteUser(ctx context.Context, resourceOwner, userID string) error {
+	if userID != "" && userID == authz.GetCtxData(ctx).UserID {
+		return nil
+	}
+	if err := c.checkPermission(ctx, domain.PermissionUserDelete, resourceOwner, userID); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *Commands) userStateWriteModel(ctx context.Context, userID string) (writeModel *UserV2WriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	writeModel = NewUserStateWriteModel(userID, "")
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	if err != nil {
+		return nil, err
+	}
+	return writeModel, nil
+}
+
+func (c *Commands) RemoveUserV2(ctx context.Context, userID string, cascadingUserMemberships []*CascadingMembership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
+	if userID == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-vaipl7s13l", "Errors.User.UserIDMissing")
+	}
+
+	existingUser, err := c.userRemoveWriteModel(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if !isUserStateExists(existingUser.UserState) {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-bd4ir1mblj", "Errors.User.NotFound")
+	}
+	if err := c.checkPermissionDeleteUser(ctx, existingUser.ResourceOwner, existingUser.AggregateID); err != nil {
+		return nil, err
+	}
+
+	domainPolicy, err := c.domainPolicyWriteModel(ctx, existingUser.ResourceOwner)
+	if err != nil {
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-l40ykb3xh2", "Errors.Org.DomainPolicy.NotExisting")
+	}
+	var events []eventstore.Command
+	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
+	events = append(events, user.NewUserRemovedEvent(ctx, userAgg, existingUser.UserName, existingUser.IDPLinks, domainPolicy.UserLoginMustBeDomain))
+
+	for _, grantID := range cascadingGrantIDs {
+		removeEvent, _, err := c.removeUserGrant(ctx, grantID, "", true)
+		if err != nil {
+			logging.WithFields("usergrantid", grantID).WithError(err).Warn("could not cascade remove role on user grant")
+			continue
+		}
+		events = append(events, removeEvent)
+	}
+
+	if len(cascadingUserMemberships) > 0 {
+		membershipEvents, err := c.removeUserMemberships(ctx, cascadingUserMemberships)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, membershipEvents...)
+	}
+
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(existingUser, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&existingUser.WriteModel), nil
+}
+
+func (c *Commands) userRemoveWriteModel(ctx context.Context, userID string) (writeModel *UserV2WriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	writeModel = NewUserRemoveWriteModel(userID, "")
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

@@ -68,6 +68,9 @@ type UserV2WriteModel struct {
 
 	StateWriteModel bool
 	UserState       domain.UserState
+
+	IDPLinkWriteModel bool
+	IDPLinks          []*domain.UserIDPLink
 }
 
 func NewUserExistsWriteModel(userID, resourceOwner string) *UserV2WriteModel {
@@ -78,7 +81,11 @@ func NewUserStateWriteModel(userID, resourceOwner string) *UserV2WriteModel {
 	return newUserV2WriteModel(userID, resourceOwner, WithHuman(), WithMachine(), WithState())
 }
 
-func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM, avatarWM bool) *UserV2WriteModel {
+func NewUserRemoveWriteModel(userID, resourceOwner string) *UserV2WriteModel {
+	return newUserV2WriteModel(userID, resourceOwner, WithHuman(), WithMachine(), WithState(), WithIDPLinks())
+}
+
+func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM, avatarWM, idpLinks bool) *UserV2WriteModel {
 	opts := []UserV2WMOption{WithHuman(), WithState()}
 	if profileWM {
 		opts = append(opts, WithProfile())
@@ -94,6 +101,9 @@ func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, ph
 	}
 	if avatarWM {
 		opts = append(opts, WithAvatar())
+	}
+	if idpLinks {
+		opts = append(opts, WithIDPLinks())
 	}
 	return newUserV2WriteModel(userID, resourceOwner, opts...)
 }
@@ -152,6 +162,11 @@ func WithState() UserV2WMOption {
 func WithAvatar() UserV2WMOption {
 	return func(o *UserV2WriteModel) {
 		o.AvatarWriteModel = true
+	}
+}
+func WithIDPLinks() UserV2WMOption {
+	return func(o *UserV2WriteModel) {
+		o.IDPLinkWriteModel = true
 	}
 }
 
@@ -256,9 +271,29 @@ func (wm *UserV2WriteModel) Reduce() error {
 			wm.EmptyPasswordCode()
 		case *user.HumanPasswordCodeAddedEvent:
 			wm.SetPasswordCode(e.Code, e.Expiry, e.CreationDate())
+		case *user.UserIDPLinkAddedEvent:
+			wm.AddIDPLink(e.IDPConfigID, e.DisplayName, e.ExternalUserID)
+		case *user.UserIDPLinkRemovedEvent:
+			wm.RemoveIDPLink(e.IDPConfigID, e.ExternalUserID)
+		case *user.UserIDPLinkCascadeRemovedEvent:
+			wm.RemoveIDPLink(e.IDPConfigID, e.ExternalUserID)
 		}
 	}
 	return wm.WriteModel.Reduce()
+}
+
+func (wm *UserV2WriteModel) AddIDPLink(configID, displayName, externalUserID string) {
+	wm.IDPLinks = append(wm.IDPLinks, &domain.UserIDPLink{IDPConfigID: configID, DisplayName: displayName, ExternalUserID: externalUserID})
+}
+
+func (wm *UserV2WriteModel) RemoveIDPLink(configID, externalUserID string) {
+	idx, _ := wm.IDPLinkByID(configID, externalUserID)
+	if idx < 0 {
+		return
+	}
+	copy(wm.IDPLinks[idx:], wm.IDPLinks[idx+1:])
+	wm.IDPLinks[len(wm.IDPLinks)-1] = nil
+	wm.IDPLinks = wm.IDPLinks[:len(wm.IDPLinks)-1]
 }
 
 func (wm *UserV2WriteModel) EmptyInitCode() {
@@ -404,6 +439,13 @@ func (wm *UserV2WriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserV1PasswordCheckSucceededType,
 		)
 	}
+	if wm.IDPLinkWriteModel {
+		eventTypes = append(eventTypes,
+			user.UserIDPLinkAddedType,
+			user.UserIDPLinkRemovedType,
+			user.UserIDPLinkCascadeRemovedType,
+		)
+	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
@@ -504,4 +546,13 @@ func (wm *UserV2WriteModel) NewProfileChangedEvent(
 		return nil, nil
 	}
 	return user.NewHumanProfileChangedEvent(ctx, &wm.Aggregate().Aggregate, changes)
+}
+
+func (wm *UserV2WriteModel) IDPLinkByID(idpID, externalUserID string) (idx int, idp *domain.UserIDPLink) {
+	for idx, idp = range wm.IDPLinks {
+		if idp.IDPConfigID == idpID && idp.ExternalUserID == externalUserID {
+			return idx, idp
+		}
+	}
+	return -1, nil
 }

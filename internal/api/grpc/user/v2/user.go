@@ -299,8 +299,7 @@ func (s *Server) DeleteUser(ctx context.Context, req *user.DeleteUserRequest) (_
 	if err != nil {
 		return nil, err
 	}
-	orgID := authz.GetCtxData(ctx).OrgID
-	details, err := s.command.RemoveUser(ctx, req.UserId, orgID, memberships, grants...)
+	details, err := s.command.RemoveUserV2(ctx, req.UserId, memberships, grants...)
 	if err != nil {
 		return nil, err
 	}

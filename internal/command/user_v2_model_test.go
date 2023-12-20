@@ -564,7 +564,7 @@ func TestCommandSide_userHumanWriteModel_profile(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, true, false, false, false, false)
+			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, true, false, false, false, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -905,7 +905,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, false, true, false, false, false)
+			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, false, true, false, false, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -1274,7 +1274,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, true, false, false)
+			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, true, false, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -1533,7 +1533,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, false, true, false)
+			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, false, true, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -2060,7 +2060,316 @@ func TestCommandSide_userHumanWriteModel_avatar(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, false, false, true)
+			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, false, false, true, false)
+			if tt.res.err == nil {
+				if !assert.NoError(t, err) {
+					t.FailNow()
+				}
+			} else if !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+				return
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, wm)
+			}
+		})
+	}
+}
+
+func TestCommandSide_userHumanWriteModel_idpLinks(t *testing.T) {
+	type fields struct {
+		eventstore func(t *testing.T) *eventstore.Eventstore
+	}
+	type args struct {
+		ctx    context.Context
+		userID string
+	}
+	type res struct {
+		want *UserV2WriteModel
+		err  func(error) bool
+	}
+
+	userAgg := user.NewAggregate("user1", "org1")
+
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "user added with idp link",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								"idp",
+								"name",
+								"externalID",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				userID: "user1",
+			},
+			res: res{
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
+					StateWriteModel:   true,
+					IDPLinkWriteModel: true,
+					WriteModel: eventstore.WriteModel{
+						AggregateID:       "user1",
+						Events:            []eventstore.Event{},
+						ProcessedSequence: 0,
+						ResourceOwner:     "org1",
+					},
+					UserName:               "username",
+					FirstName:              "firstname",
+					LastName:               "lastname",
+					DisplayName:            "firstname lastname",
+					PreferredLanguage:      language.English,
+					PasswordEncodedHash:    "$plain$x$password",
+					PasswordChangeRequired: true,
+					Email:                  "email@test.ch",
+					IsEmailVerified:        false,
+					UserState:              domain.UserStateActive,
+					IDPLinks: []*domain.UserIDPLink{
+						{IDPConfigID: "idp", DisplayName: "name", ExternalUserID: "externalID"},
+					},
+				},
+			},
+		},
+		{
+			name: "user added with idp links",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								"idp1",
+								"name1",
+								"externalID1",
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								"idp2",
+								"name2",
+								"externalID2",
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								"idp3",
+								"name3",
+								"externalID3",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				userID: "user1",
+			},
+			res: res{
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
+					StateWriteModel:   true,
+					IDPLinkWriteModel: true,
+					WriteModel: eventstore.WriteModel{
+						AggregateID:       "user1",
+						Events:            []eventstore.Event{},
+						ProcessedSequence: 0,
+						ResourceOwner:     "org1",
+					},
+					UserName:               "username",
+					FirstName:              "firstname",
+					LastName:               "lastname",
+					DisplayName:            "firstname lastname",
+					PreferredLanguage:      language.English,
+					PasswordEncodedHash:    "$plain$x$password",
+					PasswordChangeRequired: true,
+					Email:                  "email@test.ch",
+					IsEmailVerified:        false,
+					UserState:              domain.UserStateActive,
+					IDPLinks: []*domain.UserIDPLink{
+						{IDPConfigID: "idp1", DisplayName: "name1", ExternalUserID: "externalID1"},
+						{IDPConfigID: "idp2", DisplayName: "name2", ExternalUserID: "externalID2"},
+						{IDPConfigID: "idp3", DisplayName: "name3", ExternalUserID: "externalID3"},
+					},
+				},
+			},
+		},
+		{
+			name: "user added with idp links and removed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								"idp1",
+								"name1",
+								"externalID1",
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								"idp2",
+								"name2",
+								"externalID2",
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								"idp3",
+								"name3",
+								"externalID3",
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserIDPLinkCascadeRemovedEvent(context.Background(),
+								&userAgg.Aggregate,
+								"idp2",
+								"externalID2",
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserIDPLinkRemovedEvent(context.Background(),
+								&userAgg.Aggregate,
+								"idp3",
+								"externalID3",
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								"idp4",
+								"name4",
+								"externalID4",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				userID: "user1",
+			},
+			res: res{
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
+					StateWriteModel:   true,
+					IDPLinkWriteModel: true,
+					WriteModel: eventstore.WriteModel{
+						AggregateID:       "user1",
+						Events:            []eventstore.Event{},
+						ProcessedSequence: 0,
+						ResourceOwner:     "org1",
+					},
+					UserName:               "username",
+					FirstName:              "firstname",
+					LastName:               "lastname",
+					DisplayName:            "firstname lastname",
+					PreferredLanguage:      language.English,
+					PasswordEncodedHash:    "$plain$x$password",
+					PasswordChangeRequired: true,
+					Email:                  "email@test.ch",
+					IsEmailVerified:        false,
+					UserState:              domain.UserStateActive,
+					IDPLinks: []*domain.UserIDPLink{
+						{IDPConfigID: "idp1", DisplayName: "name1", ExternalUserID: "externalID1"},
+						{IDPConfigID: "idp4", DisplayName: "name4", ExternalUserID: "externalID4"},
+					},
+				},
+			},
+		},
+		{
+			name: "user added with idp link and removed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								"idp",
+								"name",
+								"externalID",
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserIDPLinkRemovedEvent(context.Background(),
+								&userAgg.Aggregate,
+								"idp",
+								"externalID",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    context.Background(),
+				userID: "user1",
+			},
+			res: res{
+				want: &UserV2WriteModel{
+					HumanWriteModel:   true,
+					MachineWriteModel: true,
+					StateWriteModel:   true,
+					IDPLinkWriteModel: true,
+					WriteModel: eventstore.WriteModel{
+						AggregateID:       "user1",
+						Events:            []eventstore.Event{},
+						ProcessedSequence: 0,
+						ResourceOwner:     "org1",
+					},
+					UserName:               "username",
+					FirstName:              "firstname",
+					LastName:               "lastname",
+					DisplayName:            "firstname lastname",
+					PreferredLanguage:      language.English,
+					PasswordEncodedHash:    "$plain$x$password",
+					PasswordChangeRequired: true,
+					Email:                  "email@test.ch",
+					IsEmailVerified:        false,
+					UserState:              domain.UserStateActive,
+					IDPLinks:               []*domain.UserIDPLink{},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			wm, err := r.userRemoveWriteModel(tt.args.ctx, tt.args.userID)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
