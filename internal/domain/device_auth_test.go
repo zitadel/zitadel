@@ -30,7 +30,7 @@ func TestDeviceAuthState_Exists(t *testing.T) {
 			want: true,
 		},
 		{
-			s:    DeviceAuthStateRemoved,
+			s:    deviceAuthStateCount,
 			want: false,
 		},
 	}
@@ -68,10 +68,6 @@ func TestDeviceAuthState_Done(t *testing.T) {
 			s:    DeviceAuthStateExpired,
 			want: false,
 		},
-		{
-			s:    DeviceAuthStateRemoved,
-			want: false,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.s.String(), func(t *testing.T) {
@@ -106,10 +102,6 @@ func TestDeviceAuthState_Denied(t *testing.T) {
 		},
 		{
 			s:    DeviceAuthStateExpired,
-			want: true,
-		},
-		{
-			s:    DeviceAuthStateRemoved,
 			want: true,
 		},
 	}

@@ -110,6 +110,23 @@ const (
 	MFATypeOTPEmail
 )
 
+func (m MFAType) UserAuthMethodType() UserAuthMethodType {
+	switch m {
+	case MFATypeTOTP:
+		return UserAuthMethodTypeTOTP
+	case MFATypeU2F:
+		return UserAuthMethodTypeU2F
+	case MFATypeU2FUserVerification:
+		return UserAuthMethodTypePasswordless
+	case MFATypeOTPSMS:
+		return UserAuthMethodTypeOTPSMS
+	case MFATypeOTPEmail:
+		return UserAuthMethodTypeOTPEmail
+	default:
+		return UserAuthMethodTypeUnspecified
+	}
+}
+
 type MFALevel int
 
 const (
@@ -222,4 +239,15 @@ func (a *AuthRequest) PrivateLabelingOrgID(defaultID string) string {
 		return a.ApplicationResourceOwner
 	}
 	return defaultID
+}
+
+func (a *AuthRequest) UserAuthMethodTypes() []UserAuthMethodType {
+	list := make([]UserAuthMethodType, 0, len(a.MFAsVerified)+1)
+	if a.PasswordVerified {
+		list = append(list, UserAuthMethodTypePassword)
+	}
+	for _, mfa := range a.MFAsVerified {
+		list = append(list, mfa.UserAuthMethodType())
+	}
+	return list
 }
