@@ -245,8 +245,7 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "user.write"
-        org_field: "organization"
+        permission: "authenticated"
       }
     };
 
@@ -270,8 +269,7 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "user.write"
-        org_field: "organization"
+        permission: "authenticated"
       }
     };
 
@@ -295,8 +293,7 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "user.write"
-        org_field: "organization"
+        permission: "authenticated"
       }
     };
 
@@ -320,8 +317,7 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "user.write"
-        org_field: "organization"
+        permission: "authenticated"
       }
     };
 
@@ -345,8 +341,7 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "user.write"
-        org_field: "organization"
+        permission: "authenticated"
       }
     };
 
@@ -370,7 +365,6 @@ service UserService {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "user.delete"
-        org_field: "organization"
       }
     };
 
@@ -962,7 +956,6 @@ message DeleteUserRequest {
       max_length: 200;
       example: "\"69629012906488334\"";
     }];
-  zitadel.object.v2beta.Organization organization = 2;
 }
 
 message DeleteUserResponse {

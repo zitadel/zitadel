@@ -1162,6 +1162,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					expectFilter(),
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1173,6 +1174,52 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			res: res{
 				err: func(err error) bool {
 					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-79pv6e1q62", "Errors.Org.DomainPolicy.NotExisting"))
+				},
+			},
+		},
+		{
+			name: "change human username, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Username: gu.Ptr("changed"),
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+				},
+			},
+		},
+		{
+			name: "change human username, not found",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Username: gu.Ptr("changed"),
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-ugjs0upun6", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -1204,6 +1251,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1230,6 +1278,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1243,6 +1292,38 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					Sequence:      0,
 					EventDate:     time.Time{},
 					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "change human profile, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Profile: &Profile{
+						FirstName:         gu.Ptr("changedfn"),
+						LastName:          gu.Ptr("changedln"),
+						NickName:          gu.Ptr("changednn"),
+						DisplayName:       gu.Ptr("changeddn"),
+						PreferredLanguage: gu.Ptr(language.Afrikaans),
+						Gender:            gu.Ptr(domain.GenderDiverse),
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
 				},
 			},
 		},
@@ -1272,6 +1353,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						}(),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1305,6 +1387,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1356,7 +1439,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
-				newCode: mockCode("emailCode", time.Hour),
+				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockCode("emailCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1386,6 +1470,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1533,7 +1618,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
-				newCode: mockCode("emailCode", time.Hour),
+				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockCode("emailCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1582,7 +1668,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
-				newCode: mockCode("phoneCode", time.Hour),
+				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockCode("phoneCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1729,7 +1816,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
-				newCode: mockCode("phoneCode", time.Hour),
+				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockCode("phoneCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1755,6 +1843,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			name: "password change, no password, invalid argument error",
 			fields: fields{
 				eventstore:         expectEventstore(),
+				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
@@ -1786,6 +1875,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
+				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
@@ -1832,6 +1922,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
+				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
@@ -1855,6 +1946,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			name: "change human password, empty",
 			fields: fields{
 				eventstore:         expectEventstore(),
+				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
@@ -1998,6 +2090,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
+				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
@@ -2016,6 +2109,41 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					Sequence:      0,
 					EventDate:     time.Time{},
 					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "change human password, old password, failed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
+								&userAgg.Aggregate,
+							),
+						),
+					),
+				),
+				checkPermission:    newMockPermissionCheckAllowed(),
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Password: &Password{
+						Password:       gu.Ptr("password2"),
+						OldPassword:    gu.Ptr("wrong"),
+						ChangeRequired: true,
+					},
+				},
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Invalid"))
 				},
 			},
 		},
@@ -2069,6 +2197,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
+				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
@@ -2088,6 +2217,57 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					Sequence:      0,
 					EventDate:     time.Time{},
 					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "change human password, password code, wrong code",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
+								&userAgg.Aggregate,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanPasswordCodeAddedEventV2(context.Background(),
+								&userAgg.Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour*1,
+								domain.NotificationTypeEmail,
+								"",
+								false,
+							),
+						),
+					),
+				),
+				checkPermission:    newMockPermissionCheckAllowed(),
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Password: &Password{
+						Password:       gu.Ptr("password2"),
+						PasswordCode:   gu.Ptr("wrong"),
+						ChangeRequired: true,
+					},
+				},
+				codeAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			res: res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "CODE-woT0xc", "Errors.User.Code.Invalid"))
 				},
 			},
 		},
@@ -2141,6 +2321,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
+				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
@@ -2213,6 +2394,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 						),
 					),
 				),
+				checkPermission:    newMockPermissionCheckAllowed(),
 				userPasswordHasher: mockPasswordHasher("x"),
 			},
 			args: args{
@@ -2245,7 +2427,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				newCode:            tt.fields.newCode,
 				checkPermission:    tt.fields.checkPermission,
 			}
-			err := r.ChangeUserHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.codeAlg)
+			err := r.ChangeUserHuman(tt.args.ctx, tt.args.human, tt.args.codeAlg)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -2258,985 +2440,6 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				assert.Equal(t, tt.res.want, tt.args.human.Details)
 				assert.Equal(t, tt.res.wantEmailCode, tt.args.human.EmailCode)
 				assert.Equal(t, tt.res.wantPhoneCode, tt.args.human.PhoneCode)
-			}
-		})
-	}
-}
-
-func TestCommandSide_LockUserHuman(t *testing.T) {
-	type fields struct {
-		eventstore *eventstore.Eventstore
-	}
-	type (
-		args struct {
-			ctx    context.Context
-			orgID  string
-			userID string
-		}
-	)
-	type res struct {
-		want *domain.ObjectDetails
-		err  func(error) bool
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		res    res
-	}{
-		{
-			name: "userid missing, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-agz3eczifm", "Errors.User.UserIDMissing"))
-				},
-			},
-		},
-		{
-			name: "user not existing, not found error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-450yxuqrh1", "Errors.User.NotFound"))
-				},
-			},
-		},
-		{
-			name: "user already locked, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-						eventFromEventPusher(
-							user.NewUserLockedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-lgws8wtsqf", "Errors.User.ShouldBeActiveOrInitial"))
-				},
-			},
-		},
-		{
-			name: "user already locked, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"name",
-								"description",
-								true,
-								domain.OIDCTokenTypeBearer,
-							),
-						),
-						eventFromEventPusher(
-							user.NewUserLockedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-lgws8wtsqf", "Errors.User.ShouldBeActiveOrInitial"))
-				},
-			},
-		},
-		{
-			name: "lock user, ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-					),
-					expectPush(
-						user.NewUserLockedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-		{
-			name: "lock user, ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"name",
-								"description",
-								true,
-								domain.OIDCTokenTypeBearer,
-							),
-						),
-					),
-					expectPush(
-						user.NewUserLockedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
-				eventstore: tt.fields.eventstore,
-			}
-			got, err := r.LockUserHuman(tt.args.ctx, tt.args.orgID, tt.args.userID)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
-			}
-		})
-	}
-}
-
-func TestCommandSide_UnlockUserHuman(t *testing.T) {
-	type fields struct {
-		eventstore *eventstore.Eventstore
-	}
-	type (
-		args struct {
-			ctx    context.Context
-			orgID  string
-			userID string
-		}
-	)
-	type res struct {
-		want *domain.ObjectDetails
-		err  func(error) bool
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		res    res
-	}{
-		{
-			name: "userid missing, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-a9ld4xckax", "Errors.User.UserIDMissing"))
-				},
-			},
-		},
-		{
-			name: "user not existing, not found error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-x377t913pw", "Errors.User.NotFound"))
-				},
-			},
-		},
-		{
-			name: "user already active, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-olb9vb0oca", "Errors.User.NotLocked"))
-				},
-			},
-		},
-		{
-			name: "user already active, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						user.NewMachineAddedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-							"username",
-							"name",
-							"description",
-							true,
-							domain.OIDCTokenTypeBearer,
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-olb9vb0oca", "Errors.User.NotLocked"))
-				},
-			},
-		},
-		{
-			name: "unlock user, ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-						eventFromEventPusher(
-							user.NewUserLockedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate),
-						),
-					),
-					expectPush(
-						user.NewUserUnlockedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-		{
-			name: "unlock user machine, ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"name",
-								"description",
-								true,
-								domain.OIDCTokenTypeBearer,
-							),
-						),
-						eventFromEventPusher(
-							user.NewUserLockedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate),
-						),
-					),
-					expectPush(
-						user.NewUserUnlockedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
-				eventstore: tt.fields.eventstore,
-			}
-			got, err := r.UnlockUserHuman(tt.args.ctx, tt.args.orgID, tt.args.userID)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
-			}
-		})
-	}
-}
-
-func TestCommandSide_DeactivateUserHuman(t *testing.T) {
-	type fields struct {
-		eventstore *eventstore.Eventstore
-	}
-	type (
-		args struct {
-			ctx    context.Context
-			orgID  string
-			userID string
-		}
-	)
-	type res struct {
-		want *domain.ObjectDetails
-		err  func(error) bool
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		res    res
-	}{{
-		name: "resourceowner missing, invalid argument error",
-		fields: fields{
-			eventstore: eventstoreExpect(
-				t,
-			),
-		},
-		args: args{
-			ctx:    context.Background(),
-			orgID:  "",
-			userID: "",
-		},
-		res: res{
-			err: func(err error) bool {
-				return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMA-r1etf6eex9", "Errors.Internal"))
-			},
-		},
-	},
-		{
-			name: "userid missing, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-78iiirat8y", "Errors.User.UserIDMissing"))
-				},
-			},
-		},
-		{
-			name: "user not existing, not found error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-5gp2p62iin", "Errors.User.NotFound"))
-				},
-			},
-		},
-		{
-			name: "user initial, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-						eventFromEventPusher(
-							user.NewHumanInitialCodeAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								nil, time.Hour*1,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-gvx4kct9r2", "Errors.User.CantDeactivateInitial"))
-				},
-			},
-		},
-		{
-			name: "user already inactive, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-						eventFromEventPusher(
-							user.NewUserDeactivatedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5gunjw0cd7", "Errors.User.AlreadyInactive"))
-				},
-			},
-		},
-		{
-			name: "deactivate user, ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-						eventFromEventPusher(
-							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-					expectPush(
-						user.NewUserDeactivatedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-
-		{
-			name: "user machine already inactive, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"name",
-								"description",
-								true,
-								domain.OIDCTokenTypeBearer,
-							),
-						),
-						eventFromEventPusher(
-							user.NewUserDeactivatedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5gunjw0cd7", "Errors.User.AlreadyInactive"))
-				},
-			},
-		},
-		{
-			name: "deactivate user machine, ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"name",
-								"description",
-								true,
-								domain.OIDCTokenTypeBearer,
-							),
-						),
-					),
-					expectPush(
-						user.NewUserDeactivatedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
-				eventstore: tt.fields.eventstore,
-			}
-			got, err := r.DeactivateUserHuman(tt.args.ctx, tt.args.orgID, tt.args.userID)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
-			}
-		})
-	}
-}
-
-func TestCommandSide_ReactivateUserHuman(t *testing.T) {
-	type fields struct {
-		eventstore *eventstore.Eventstore
-	}
-	type (
-		args struct {
-			ctx    context.Context
-			orgID  string
-			userID string
-		}
-	)
-	type res struct {
-		want *domain.ObjectDetails
-		err  func(error) bool
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		res    res
-	}{
-		{
-			name: "resourceowner missing, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "",
-				userID: "",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMA-0vlu1bb5uo", "Errors.Internal"))
-				},
-			},
-		},
-		{
-			name: "userid missing, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-0nx1ie38fw", "Errors.User.UserIDMissing"))
-				},
-			},
-		},
-		{
-			name: "user not existing, not found error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-9hy5kzbuk6", "Errors.User.NotFound"))
-				},
-			},
-		},
-		{
-			name: "user already active, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-s5qqcz97hf", "Errors.User.NotInactive"))
-				},
-			},
-		},
-		{
-			name: "user machine already active, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"name",
-								"description",
-								true,
-								domain.OIDCTokenTypeBearer,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-s5qqcz97hf", "Errors.User.NotInactive"))
-				},
-			},
-		},
-		{
-			name: "reactivate user, ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
-						),
-						eventFromEventPusher(
-							user.NewUserDeactivatedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate),
-						),
-					),
-					expectPush(
-						user.NewUserReactivatedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-		{
-			name: "reactivate user machine, ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"name",
-								"description",
-								true,
-								domain.OIDCTokenTypeBearer,
-							),
-						),
-						eventFromEventPusher(
-							user.NewUserDeactivatedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate),
-						),
-					),
-					expectPush(
-						user.NewUserReactivatedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
-				eventstore: tt.fields.eventstore,
-			}
-			got, err := r.ReactivateUserHuman(tt.args.ctx, tt.args.orgID, tt.args.userID)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
 			}
 		})
 	}

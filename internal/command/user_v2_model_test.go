@@ -20,7 +20,6 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 	}
 	type args struct {
 		ctx    context.Context
-		orgID  string
 		userID string
 	}
 	type res struct {
@@ -49,7 +48,6 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -91,7 +89,6 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -132,7 +129,6 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -178,7 +174,6 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -242,7 +237,6 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -298,7 +292,6 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -354,7 +347,6 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -401,7 +393,6 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -448,7 +439,6 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -475,7 +465,7 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userExistsWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID)
+			wm, err := r.userExistsWriteModel(tt.args.ctx, tt.args.userID)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -497,7 +487,6 @@ func TestCommandSide_userHumanWriteModel_profile(t *testing.T) {
 	}
 	type args struct {
 		ctx    context.Context
-		orgID  string
 		userID string
 	}
 	type res struct {
@@ -541,7 +530,6 @@ func TestCommandSide_userHumanWriteModel_profile(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -576,7 +564,7 @@ func TestCommandSide_userHumanWriteModel_profile(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID, true, false, false, false, false)
+			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, true, false, false, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -598,7 +586,6 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 	}
 	type args struct {
 		ctx    context.Context
-		orgID  string
 		userID string
 	}
 	type res struct {
@@ -633,7 +620,6 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -690,7 +676,6 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -757,7 +742,6 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -816,7 +800,6 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -890,7 +873,6 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -923,7 +905,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID, false, true, false, false, false)
+			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, false, true, false, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -945,7 +927,6 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 	}
 	type args struct {
 		ctx    context.Context
-		orgID  string
 		userID string
 	}
 	type res struct {
@@ -980,7 +961,6 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -1041,7 +1021,6 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -1115,7 +1094,6 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -1182,7 +1160,6 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -1263,7 +1240,6 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -1298,7 +1274,7 @@ func TestCommandSide_userHumanWriteModel_phone(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID, false, false, true, false, false)
+			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, true, false, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -1320,7 +1296,6 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 	}
 	type args struct {
 		ctx    context.Context
-		orgID  string
 		userID string
 	}
 	type res struct {
@@ -1355,7 +1330,6 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -1403,7 +1377,6 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -1458,7 +1431,6 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -1529,7 +1501,6 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -1562,7 +1533,7 @@ func TestCommandSide_userHumanWriteModel_password(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID, false, false, false, true, false)
+			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, false, true, false)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -1584,7 +1555,6 @@ func TestCommandSide_userStateWriteModel(t *testing.T) {
 	}
 	type args struct {
 		ctx    context.Context
-		orgID  string
 		userID string
 	}
 	type res struct {
@@ -1613,7 +1583,6 @@ func TestCommandSide_userStateWriteModel(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -1659,7 +1628,6 @@ func TestCommandSide_userStateWriteModel(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -1700,7 +1668,6 @@ func TestCommandSide_userStateWriteModel(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -1758,7 +1725,6 @@ func TestCommandSide_userStateWriteModel(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -1827,7 +1793,6 @@ func TestCommandSide_userStateWriteModel(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -1873,7 +1838,6 @@ func TestCommandSide_userStateWriteModel(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -1923,7 +1887,6 @@ func TestCommandSide_userStateWriteModel(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -1956,7 +1919,7 @@ func TestCommandSide_userStateWriteModel(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userStateWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID)
+			wm, err := r.userStateWriteModel(tt.args.ctx, tt.args.userID)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -1978,7 +1941,6 @@ func TestCommandSide_userHumanWriteModel_avatar(t *testing.T) {
 	}
 	type args struct {
 		ctx    context.Context
-		orgID  string
 		userID string
 	}
 	type res struct {
@@ -2013,7 +1975,6 @@ func TestCommandSide_userHumanWriteModel_avatar(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -2067,7 +2028,6 @@ func TestCommandSide_userHumanWriteModel_avatar(t *testing.T) {
 			},
 			args: args{
 				ctx:    context.Background(),
-				orgID:  "org1",
 				userID: "user1",
 			},
 			res: res{
@@ -2100,7 +2060,7 @@ func TestCommandSide_userHumanWriteModel_avatar(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, tt.args.orgID, false, false, false, false, true)
+			wm, err := r.userHumanWriteModel(tt.args.ctx, tt.args.userID, false, false, false, false, true)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
 					t.FailNow()

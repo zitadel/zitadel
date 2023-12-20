@@ -71,31 +71,87 @@ type UserV2WriteModel struct {
 }
 
 func NewUserExistsWriteModel(userID, resourceOwner string) *UserV2WriteModel {
-	return newUserV2WriteModel(userID, resourceOwner, true, true, false, false, false, false, false, false)
+	return newUserV2WriteModel(userID, resourceOwner, WithHuman(), WithMachine())
 }
 
 func NewUserStateWriteModel(userID, resourceOwner string) *UserV2WriteModel {
-	return newUserV2WriteModel(userID, resourceOwner, true, true, false, false, false, false, true, false)
+	return newUserV2WriteModel(userID, resourceOwner, WithHuman(), WithMachine(), WithState())
 }
 
 func NewUserHumanWriteModel(userID, resourceOwner string, profileWM, emailWM, phoneWM, passwordWM, avatarWM bool) *UserV2WriteModel {
-	return newUserV2WriteModel(userID, resourceOwner, true, false, profileWM, emailWM, phoneWM, passwordWM, true, avatarWM)
+	opts := []UserV2WMOption{WithHuman(), WithState()}
+	if profileWM {
+		opts = append(opts, WithProfile())
+	}
+	if emailWM {
+		opts = append(opts, WithEmail())
+	}
+	if phoneWM {
+		opts = append(opts, WithPhone())
+	}
+	if passwordWM {
+		opts = append(opts, WithPassword())
+	}
+	if avatarWM {
+		opts = append(opts, WithAvatar())
+	}
+	return newUserV2WriteModel(userID, resourceOwner, opts...)
 }
 
-func newUserV2WriteModel(userID, resourceOwner string, humanWM, machineWM, profileWM, emailWM, phoneWM, passwordWM, stateWM, avatarWM bool) *UserV2WriteModel {
-	return &UserV2WriteModel{
+func newUserV2WriteModel(userID, resourceOwner string, opts ...UserV2WMOption) *UserV2WriteModel {
+	wm := &UserV2WriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
-		HumanWriteModel:    humanWM,
-		MachineWriteModel:  machineWM,
-		ProfileWriteModel:  profileWM,
-		EmailWriteModel:    emailWM,
-		PhoneWriteModel:    phoneWM,
-		PasswordWriteModel: passwordWM,
-		StateWriteModel:    stateWM,
-		AvatarWriteModel:   avatarWM,
+	}
+
+	for _, optFunc := range opts {
+		optFunc(wm)
+	}
+	return wm
+}
+
+type UserV2WMOption func(o *UserV2WriteModel)
+
+func WithHuman() UserV2WMOption {
+	return func(o *UserV2WriteModel) {
+		o.HumanWriteModel = true
+	}
+}
+func WithMachine() UserV2WMOption {
+	return func(o *UserV2WriteModel) {
+		o.MachineWriteModel = true
+	}
+}
+func WithProfile() UserV2WMOption {
+	return func(o *UserV2WriteModel) {
+		o.ProfileWriteModel = true
+	}
+}
+func WithEmail() UserV2WMOption {
+	return func(o *UserV2WriteModel) {
+		o.EmailWriteModel = true
+	}
+}
+func WithPhone() UserV2WMOption {
+	return func(o *UserV2WriteModel) {
+		o.PhoneWriteModel = true
+	}
+}
+func WithPassword() UserV2WMOption {
+	return func(o *UserV2WriteModel) {
+		o.PasswordWriteModel = true
+	}
+}
+func WithState() UserV2WMOption {
+	return func(o *UserV2WriteModel) {
+		o.StateWriteModel = true
+	}
+}
+func WithAvatar() UserV2WMOption {
+	return func(o *UserV2WriteModel) {
+		o.AvatarWriteModel = true
 	}
 }
 
@@ -410,46 +466,6 @@ func (wm *UserV2WriteModel) reduceHumanProfileChangedEvent(e *user.HumanProfileC
 	if e.Gender != nil {
 		wm.Gender = *e.Gender
 	}
-}
-
-func (wm *UserV2WriteModel) NewEmailAddressChangedEvent(
-	ctx context.Context,
-	email domain.EmailAddress,
-) *user.HumanEmailChangedEvent {
-	if wm.Email == email {
-		return nil
-	}
-	return user.NewHumanEmailChangedEvent(ctx, &wm.Aggregate().Aggregate, email)
-}
-
-func (wm *UserV2WriteModel) NewEmailIsVerifiedEvent(
-	ctx context.Context,
-	isVerified bool,
-) *user.HumanEmailVerifiedEvent {
-	if !isVerified || wm.IsEmailVerified == isVerified {
-		return nil
-	}
-	return user.NewHumanEmailVerifiedEvent(ctx, &wm.Aggregate().Aggregate)
-}
-
-func (wm *UserV2WriteModel) NewPhoneNumberChangedEvent(
-	ctx context.Context,
-	phone domain.PhoneNumber,
-) *user.HumanPhoneChangedEvent {
-	if wm.Phone == phone {
-		return nil
-	}
-	return user.NewHumanPhoneChangedEvent(ctx, &wm.Aggregate().Aggregate, phone)
-}
-
-func (wm *UserV2WriteModel) NewPhoneIsVerifiedEvent(
-	ctx context.Context,
-	isVerified bool,
-) *user.HumanPhoneVerifiedEvent {
-	if !isVerified || wm.IsPhoneVerified == isVerified {
-		return nil
-	}
-	return user.NewHumanPhoneVerifiedEvent(ctx, &wm.Aggregate().Aggregate)
 }
 
 func (wm *UserV2WriteModel) Aggregate() *user.Aggregate {

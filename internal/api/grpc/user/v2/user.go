@@ -118,8 +118,7 @@ func (s *Server) UpdateHumanUser(ctx context.Context, req *user.UpdateHumanUserR
 	if err != nil {
 		return nil, err
 	}
-	orgID := authz.GetCtxData(ctx).OrgID
-	err = s.command.ChangeUserHuman(ctx, orgID, human, s.userCodeAlg)
+	err = s.command.ChangeUserHuman(ctx, human, s.userCodeAlg)
 	if err != nil {
 		return nil, err
 	}
@@ -131,8 +130,7 @@ func (s *Server) UpdateHumanUser(ctx context.Context, req *user.UpdateHumanUserR
 }
 
 func (s *Server) LockUser(ctx context.Context, req *user.LockUserRequest) (_ *user.LockUserResponse, err error) {
-	orgID := authz.GetCtxData(ctx).OrgID
-	details, err := s.command.LockUserHuman(ctx, orgID, req.UserId)
+	details, err := s.command.LockUserV2(ctx, req.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -142,8 +140,7 @@ func (s *Server) LockUser(ctx context.Context, req *user.LockUserRequest) (_ *us
 }
 
 func (s *Server) UnlockUser(ctx context.Context, req *user.UnlockUserRequest) (_ *user.UnlockUserResponse, err error) {
-	orgID := authz.GetCtxData(ctx).OrgID
-	details, err := s.command.UnlockUserHuman(ctx, orgID, req.UserId)
+	details, err := s.command.UnlockUserV2(ctx, req.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -153,8 +150,7 @@ func (s *Server) UnlockUser(ctx context.Context, req *user.UnlockUserRequest) (_
 }
 
 func (s *Server) DeactivateUser(ctx context.Context, req *user.DeactivateUserRequest) (_ *user.DeactivateUserResponse, err error) {
-	orgID := authz.GetCtxData(ctx).OrgID
-	details, err := s.command.DeactivateUserHuman(ctx, orgID, req.UserId)
+	details, err := s.command.DeactivateUserV2(ctx, req.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -164,8 +160,7 @@ func (s *Server) DeactivateUser(ctx context.Context, req *user.DeactivateUserReq
 }
 
 func (s *Server) ReactivateUser(ctx context.Context, req *user.ReactivateUserRequest) (_ *user.ReactivateUserResponse, err error) {
-	orgID := authz.GetCtxData(ctx).OrgID
-	details, err := s.command.ReactivateUserHuman(ctx, orgID, req.UserId)
+	details, err := s.command.ReactivateUserV2(ctx, req.UserId)
 	if err != nil {
 		return nil, err
 	}
