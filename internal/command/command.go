@@ -24,6 +24,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
+	"github.com/zitadel/zitadel/internal/repository/deviceauth"
 	"github.com/zitadel/zitadel/internal/repository/feature"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	instance_repo "github.com/zitadel/zitadel/internal/repository/instance"
@@ -166,6 +167,7 @@ func StartCommands(
 	oidcsession.RegisterEventMappers(repo.eventstore)
 	milestone.RegisterEventMappers(repo.eventstore)
 	feature.RegisterEventMappers(repo.eventstore)
+	deviceauth.RegisterEventMappers(repo.eventstore)
 
 	repo.codeAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.userPasswordHasher, err = defaults.PasswordHasher.PasswordHasher()
