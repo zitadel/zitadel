@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
+	"github.com/zitadel/zitadel/internal/repository/deviceauth"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
@@ -99,6 +100,7 @@ func StartQueries(
 	quota.RegisterEventMappers(repo.eventstore)
 	limits.RegisterEventMappers(repo.eventstore)
 	restrictions.RegisterEventMappers(repo.eventstore)
+	deviceauth.RegisterEventMappers(repo.eventstore)
 
 	repo.checkPermission = permissionCheck(repo)
 

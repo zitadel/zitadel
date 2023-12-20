@@ -1,37 +1,26 @@
-package command
+package query
 
 import (
-	"time"
-
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
 )
 
-type DeviceAuthWriteModel struct {
-	eventstore.WriteModel
-
-	ClientID        string
-	DeviceCode      string
-	UserCode        string
-	Expires         time.Time
-	Scopes          []string
-	State           domain.DeviceAuthState
-	Subject         string
-	UserAuthMethods []domain.UserAuthMethodType
-	AuthTime        time.Time
+type DeviceAuthReadModel struct {
+	eventstore.ReadModel
+	DeviceAuth
 }
 
-func NewDeviceAuthWriteModel(deviceCode, resourceOwner string) *DeviceAuthWriteModel {
-	return &DeviceAuthWriteModel{
-		WriteModel: eventstore.WriteModel{
+func NewDeviceAuthReadModel(deviceCode, resourceOwner string) *DeviceAuthReadModel {
+	return &DeviceAuthReadModel{
+		ReadModel: eventstore.ReadModel{
 			AggregateID:   deviceCode,
 			ResourceOwner: resourceOwner,
 		},
 	}
 }
 
-func (m *DeviceAuthWriteModel) Reduce() error {
+func (m *DeviceAuthReadModel) Reduce() error {
 	for _, event := range m.Events {
 		switch e := event.(type) {
 		case *deviceauth.AddedEvent:
@@ -51,10 +40,10 @@ func (m *DeviceAuthWriteModel) Reduce() error {
 		}
 	}
 
-	return m.WriteModel.Reduce()
+	return m.ReadModel.Reduce()
 }
 
-func (m *DeviceAuthWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (m *DeviceAuthReadModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(m.ResourceOwner).
 		AddQuery().
