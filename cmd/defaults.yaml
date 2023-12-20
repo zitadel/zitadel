@@ -88,10 +88,17 @@ HTTP1HostHeader: "host" # ZITADEL_HTTP1HOSTHEADER
 WebAuthNName: ZITADEL # ZITADEL_WEBAUTHN_NAME
 
 Database:
-  # This setting defines the ratio of how many connections defined below
-  # are used to push events. ZITADEL manages two database connection pools
-  # one to push events and one for the remaining queries. 
+  # ZITADEL manages three database connection pools.
+  # The *ConnRatio settings define the ratio of how many connections from
+  # MaxOpenConns and MaxIdleConns are used to push events and spool projections.
+  # Remaining connection are used for queries (search).
+  # Values may not be negative and the sum of the ratios must always be less than 1.
+  # For example this defaults define 40 MaxOpenConns overall.
+  # - 40*0.2=8 connections are allocated to the event pusher;
+  # - 40*0.2=8 connections are allocated to the projection spooler;
+  # - 40-(8+8)=24 connections are remaining for queries;
   EventPushConnRatio: 0.2 # ZITADEL_DATABASE_COCKROACH_EVENTPUSHCONNRATIO
+  ProjectionSpoolerConnRatio: 0.2 # ZITADEL_DATABASE_COCKROACH_PROJECTIONSPOOLERCONNRATIO
   # CockroachDB is the default database of ZITADEL
   cockroach:
     Host: localhost # ZITADEL_DATABASE_COCKROACH_HOST

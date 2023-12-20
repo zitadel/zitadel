@@ -3,6 +3,8 @@ package database
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
+	"errors"
 	"reflect"
 
 	"github.com/mitchellh/mapstructure"
@@ -11,13 +13,14 @@ import (
 	_ "github.com/zitadel/zitadel/internal/database/cockroach"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	_ "github.com/zitadel/zitadel/internal/database/postgres"
-	"github.com/zitadel/zitadel/internal/errors"
+	zerrors "github.com/zitadel/zitadel/internal/errors"
 )
 
 type Config struct {
-	Dialects           map[string]interface{} `mapstructure:",remain"`
-	EventPushConnRatio float32
-	connector          dialect.Connector
+	Dialects                   map[string]interface{} `mapstructure:",remain"`
+	EventPushConnRatio         float64
+	ProjectionSpoolerConnRatio float64
+	connector                  dialect.Connector
 }
 
 func (c *Config) SetConnector(connector dialect.Connector) {
@@ -89,24 +92,32 @@ func (db *DB) QueryRowContext(ctx context.Context, scan func(row *sql.Row) error
 	return row.Err()
 }
 
-const (
-	zitadelAppName          = "zitadel"
-	EventstorePusherAppName = "zitadel_es_pusher"
-)
-
-func Connect(config Config, useAdmin, isEventPusher bool) (*DB, error) {
-	appName := zitadelAppName
-	if isEventPusher {
-		appName = EventstorePusherAppName
+func QueryJSONObject[T any](ctx context.Context, db *DB, query string, args ...any) (*T, error) {
+	var data []byte
+	err := db.QueryRowContext(ctx, func(row *sql.Row) error {
+		return row.Scan(&data)
+	}, query, args...)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, err
 	}
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "DATAB-Oath6", "Errors.Internal")
+	}
+	obj := new(T)
+	if err = json.Unmarshal(data, obj); err != nil {
+		return nil, zerrors.ThrowInternal(err, "DATAB-Vohs6", "Errors.Internal")
+	}
+	return obj, nil
+}
 
-	client, err := config.connector.Connect(useAdmin, isEventPusher, config.EventPushConnRatio, appName)
+func Connect(config Config, useAdmin bool, purpose dialect.DBPurpose) (*DB, error) {
+	client, err := config.connector.Connect(useAdmin, config.EventPushConnRatio, config.ProjectionSpoolerConnRatio, purpose)
 	if err != nil {
 		return nil, err
 	}
 
 	if err := client.Ping(); err != nil {
-		return nil, errors.ThrowPreconditionFailed(err, "DATAB-0pIWD", "Errors.Database.Connection.Failed")
+		return nil, zerrors.ThrowPreconditionFailed(err, "DATAB-0pIWD", "Errors.Database.Connection.Failed")
 	}
 
 	return &DB{

@@ -9,11 +9,11 @@ import (
 	"github.com/spf13/viper"
 	"sigs.k8s.io/yaml"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/dialect"
+	caos_errs "github.com/zitadel/zitadel/internal/errors"
 )
 
 const (
@@ -124,7 +124,7 @@ func openFile(fileName string) (io.Reader, error) {
 }
 
 func keyStorage(config database.Config, masterKey string) (crypto.KeyStorage, error) {
-	db, err := database.Connect(config, false, false)
+	db, err := database.Connect(config, false, dialect.DBPurposeQuery)
 	if err != nil {
 		return nil, err
 	}
