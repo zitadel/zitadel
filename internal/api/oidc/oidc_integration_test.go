@@ -32,7 +32,7 @@ var (
 
 const (
 	redirectURI          = "https://callback"
-	redirectURIImplicit  = "http://localhost:9999/callback"
+	redirectURIImplicitf = "http://%s:9999/callback"
 	logoutRedirectURI    = "https://logged-out"
 	zitadelAudienceScope = domain.ProjectIDScope + domain.ProjectIDScopeZITADEL + domain.AudSuffix
 )
@@ -265,19 +265,19 @@ func createClient(t testing.TB) string {
 }
 
 func createImplicitClient(t testing.TB) string {
-	app, err := Tester.CreateOIDCImplicitFlowClient(CTX, redirectURIImplicit)
+	app, err := Tester.CreateOIDCImplicitFlowClient(CTX, fmt.Sprintf(redirectURIImplicitf, Tester.FirstInstancePrimaryDomain))
 	require.NoError(t, err)
 	return app.GetClientId()
 }
 
 func createAuthRequest(t testing.TB, clientID, redirectURI string, scope ...string) string {
-	redURL, err := Tester.CreateOIDCAuthRequest(CTX, clientID, Tester.Users[integration.FirstInstanceUsersKey][integration.Login].ID, redirectURI, scope...)
+	redURL, err := Tester.CreateOIDCAuthRequest(CTX, clientID, Tester.GetUser(integration.FirstInstanceUsersKey, integration.Login).ID, redirectURI, scope...)
 	require.NoError(t, err)
 	return redURL
 }
 
 func createAuthRequestImplicit(t testing.TB, clientID, redirectURI string, scope ...string) string {
-	redURL, err := Tester.CreateOIDCAuthRequestImplicit(CTX, clientID, Tester.Users[integration.FirstInstanceUsersKey][integration.Login].ID, redirectURI, scope...)
+	redURL, err := Tester.CreateOIDCAuthRequestImplicit(CTX, clientID, Tester.GetUser(integration.FirstInstanceUsersKey, integration.Login).ID, redirectURI, scope...)
 	require.NoError(t, err)
 	return redURL
 }

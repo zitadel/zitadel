@@ -187,7 +187,7 @@ func (s *Tester) CreateOIDCAuthRequestImplicit(ctx context.Context, clientID, lo
 }
 
 func (s *Tester) OIDCIssuer() string {
-	return http_util.BuildHTTP(s.Config.ExternalDomain, s.Config.Port, s.Config.ExternalSecure)
+	return http_util.BuildHTTP(s.FirstInstancePrimaryDomain, s.Config.Port, s.Config.ExternalSecure)
 }
 
 func (s *Tester) CreateRelyingParty(ctx context.Context, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {

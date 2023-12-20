@@ -262,7 +262,7 @@ func TestServer_VerifyClient(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			fmt.Printf("\n\n%s\n\n", tt.client.keyData)
 
-			authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, tt.client.authReqClientID, Tester.Users[integration.FirstInstanceUsersKey][integration.Login].ID, redirectURI, oidc.ScopeOpenID)
+			authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, tt.client.authReqClientID, Tester.			GetUser(integration.FirstInstanceUsersKey, integration.Login).ID, redirectURI, oidc.ScopeOpenID)
 			require.NoError(t, err)
 			linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: authRequestID,

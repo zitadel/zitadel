@@ -4,6 +4,7 @@ package oidc_test
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"testing"
 	"time"
@@ -75,7 +76,7 @@ func TestOPStorage_CreateAccessToken_code(t *testing.T) {
 
 func TestOPStorage_CreateAccessToken_implicit(t *testing.T) {
 	clientID := createImplicitClient(t)
-	authRequestID := createAuthRequestImplicit(t, clientID, redirectURIImplicit)
+	authRequestID := createAuthRequestImplicit(t, clientID, fmt.Sprintf(redirectURIImplicitf, Tester.FirstInstancePrimaryDomain))
 	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
@@ -104,7 +105,7 @@ func TestOPStorage_CreateAccessToken_implicit(t *testing.T) {
 	assert.Equal(t, "state", values.Get("state"))
 
 	// check id_token / claims
-	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURIImplicit)
+	provider, err := Tester.CreateRelyingParty(CTX, clientID, fmt.Sprintf(redirectURIImplicitf, Tester.FirstInstancePrimaryDomain))
 	require.NoError(t, err)
 	claims, err := rp.VerifyTokens[*oidc.IDTokenClaims](context.Background(), accessToken, idToken, provider.IDTokenVerifier())
 	require.NoError(t, err)

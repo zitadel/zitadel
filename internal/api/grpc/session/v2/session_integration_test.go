@@ -245,7 +245,7 @@ func TestServer_CreateSession(t *testing.T) {
 			req: &session.CreateSessionRequest{
 				Challenges: &session.RequestChallenges{
 					WebAuthN: &session.RequestChallenges_WebAuthN{
-						Domain:                      Tester.Config.ExternalDomain,
+						Domain:                      Tester.FirstInstancePrimaryDomain,
 						UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 					},
 				},
@@ -298,7 +298,7 @@ func TestServer_CreateSession_webauthn(t *testing.T) {
 		},
 		Challenges: &session.RequestChallenges{
 			WebAuthN: &session.RequestChallenges_WebAuthN{
-				Domain:                      Tester.Config.ExternalDomain,
+				Domain:                      Tester.FirstInstancePrimaryDomain,
 				UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 			},
 		},
@@ -486,7 +486,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 			SessionToken: sessionToken,
 			Challenges: &session.RequestChallenges{
 				WebAuthN: &session.RequestChallenges_WebAuthN{
-					Domain:                      Tester.Config.ExternalDomain,
+					Domain:                      Tester.FirstInstancePrimaryDomain,
 					UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 				},
 			},
@@ -530,7 +530,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 					SessionToken: sessionToken,
 					Challenges: &session.RequestChallenges{
 						WebAuthN: &session.RequestChallenges_WebAuthN{
-							Domain:                      Tester.Config.ExternalDomain,
+							Domain:                      Tester.FirstInstancePrimaryDomain,
 							UserVerificationRequirement: userVerificationRequirement,
 						},
 					},

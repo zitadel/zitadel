@@ -72,6 +72,7 @@ const (
 )
 
 const (
+	SetupInstanceUserKey  = "setup"
 	FirstInstanceUsersKey = "first"
 	UserPassword          = "VeryS3cret!"
 )
@@ -89,14 +90,22 @@ type User struct {
 
 type InstanceUserMap map[string]map[UserType]*User
 
-func (m InstanceUserMap) Set(instanceID string, typ UserType, user *User) {
+func (t *Tester) SetUser(instanceID string, typ UserType, user *User) {
+	m := t.Users
+	if instanceID == FirstInstanceUsersKey {
+		instanceID = t.FirstInstanceID
+	}
 	if m[instanceID] == nil {
 		m[instanceID] = make(map[UserType]*User)
 	}
 	m[instanceID][typ] = user
 }
 
-func (m InstanceUserMap) Get(instanceID string, typ UserType) *User {
+func (t *Tester) GetUser(instanceID string, typ UserType) *User {
+	m := t.Users
+	if instanceID == FirstInstanceUsersKey {
+		instanceID = t.FirstInstanceID
+	}
 	if users, ok := m[instanceID]; ok {
 		return users[typ]
 	}
@@ -107,9 +116,12 @@ func (m InstanceUserMap) Get(instanceID string, typ UserType) *User {
 type Tester struct {
 	*start.Server
 
-	Instance     authz.Instance
-	Organisation *query.Org
-	Users        InstanceUserMap
+	Instance                   authz.Instance
+	Organisation               *query.Org
+	Users                      InstanceUserMap
+	FirstInstanceID            string
+	FirstInstancePrimaryDomain string
+	FirstInstanceIAMOwnerCtx   context.Context
 
 	MilestoneChan           chan []byte
 	milestoneServer         *httptest.Server
@@ -124,7 +136,7 @@ type Tester struct {
 const commandLine = `start --masterkeyFromEnv`
 
 func (s *Tester) Host() string {
-	return fmt.Sprintf("%s:%d", s.Config.ExternalDomain, s.Config.Port)
+	return fmt.Sprintf("%s:%d", s.FirstInstancePrimaryDomain, s.Config.Port)
 }
 
 func (s *Tester) createClientConn(ctx context.Context, target string) {
@@ -204,14 +216,6 @@ func (s *Tester) createLoginClient(ctx context.Context) {
 
 func (s *Tester) createMachineUser(ctx context.Context, username string, userType UserType) (context.Context, *query.User) {
 	var err error
-
-	s.Instance, err = s.Queries.InstanceByHost(ctx, s.Host())
-	logging.OnError(err).Fatal("query instance")
-	ctx = authz.WithInstance(ctx, s.Instance)
-
-	s.Organisation, err = s.Queries.OrgByID(ctx, true, s.Instance.DefaultOrganisationID())
-	logging.OnError(err).Fatal("query organisation")
-
 	usernameQuery, err := query.NewUserUsernameSearchQuery(username, query.TextEquals)
 	logging.OnError(err).Fatal("user query")
 	user, err := s.Queries.GetUser(ctx, true, usernameQuery)
@@ -233,8 +237,8 @@ func (s *Tester) createMachineUser(ctx context.Context, username string, userTyp
 	scopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner}
 	pat := command.NewPersonalAccessToken(user.ResourceOwner, user.ID, time.Now().Add(time.Hour), scopes, domain.UserTypeMachine)
 	_, err = s.Commands.AddPersonalAccessToken(ctx, pat)
-	logging.WithFields("username", SystemUser).OnError(err).Fatal("add pat")
-	s.Users.Set(FirstInstanceUsersKey, userType, &User{
+	logging.WithFields("machine user", SystemUser).OnError(err).Fatal("add pat")
+	s.SetUser(s.FirstInstanceID, userType, &User{
 		User:  user,
 		Token: pat.Token,
 	})
@@ -248,8 +252,12 @@ func (s *Tester) WithAuthorization(ctx context.Context, u UserType) context.Cont
 func (s *Tester) WithInstanceAuthorization(ctx context.Context, u UserType, instanceID string) context.Context {
 	if u == SystemUser {
 		s.ensureSystemUser()
+		instanceID = SetupInstanceUserKey
 	}
-	return s.WithAuthorizationToken(ctx, s.Users.Get(instanceID, u).Token)
+	if instanceID == FirstInstanceUsersKey {
+		instanceID = s.FirstInstanceID
+	}
+	return s.WithAuthorizationToken(ctx, s.GetUser(instanceID, u).Token)
 }
 
 func (s *Tester) WithAuthorizationToken(ctx context.Context, token string) context.Context {
@@ -263,19 +271,19 @@ func (s *Tester) WithAuthorizationToken(ctx context.Context, token string) conte
 
 func (s *Tester) ensureSystemUser() {
 	const ISSUER = "tester"
-	if s.Users.Get(FirstInstanceUsersKey, SystemUser) != nil {
+	if s.GetUser(SetupInstanceUserKey, SystemUser) != nil {
 		return
 	}
-	audience := http_util.BuildOrigin(s.Host(), s.Server.Config.ExternalSecure)
+	audience := http_util.BuildHTTP(s.Server.Config.ExternalDomain, s.Server.Config.ExternalPort, s.Server.Config.ExternalSecure)
 	signer, err := client.NewSignerFromPrivateKeyByte(systemUserKey, "")
 	logging.OnError(err).Fatal("system key signer")
 	jwt, err := client.SignedJWTProfileAssertion(ISSUER, []string{audience}, time.Hour, signer)
 	logging.OnError(err).Fatal("system key jwt")
-	s.Users.Set(FirstInstanceUsersKey, SystemUser, &User{Token: jwt})
+	s.SetUser(SetupInstanceUserKey, SystemUser, &User{Token: jwt})
 }
 
 func (s *Tester) WithSystemAuthorizationHTTP(u UserType) map[string]string {
-	return map[string]string{"Authorization": fmt.Sprintf("Bearer %s", s.Users.Get(FirstInstanceUsersKey, u).Token)}
+	return map[string]string{"Authorization": fmt.Sprintf("Bearer %s", s.GetUser(SetupInstanceUserKey, u).Token)}
 }
 
 // Done send an interrupt signal to cleanly shutdown the server.
@@ -345,13 +353,18 @@ func NewTester(ctx context.Context) *Tester {
 	case <-ctx.Done():
 		logging.OnError(ctx.Err()).Fatal("waiting for integration tester server")
 	}
-	host := tester.Host()
-	tester.createClientConn(ctx, host)
-	tester.createLoginClient(ctx)
-	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, http_util.BuildOrigin(host, tester.Config.ExternalSecure))
-	tester.createMachineUserOrgOwner(ctx)
-	tester.createMachineUserInstanceOwner(ctx)
-	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, "https://"+tester.Host())
+	tester.createClientConn(ctx, fmt.Sprintf("%s:%d", tester.Config.ExternalDomain, tester.Config.Port))
+	systemCtx := tester.WithInstanceAuthorization(ctx, SystemUser, SetupInstanceUserKey)
+	tester.FirstInstancePrimaryDomain, tester.FirstInstanceID, tester.FirstInstanceIAMOwnerCtx = tester.UseIsolatedInstance(ctx, systemCtx)
+	tester.Instance, err = tester.Queries.InstanceByHost(ctx, tester.FirstInstancePrimaryDomain)
+	tester.FirstInstanceIAMOwnerCtx = authz.WithInstance(tester.FirstInstanceIAMOwnerCtx, tester.Instance)
+	logging.OnError(err).Fatal("query instance")
+	tester.Organisation, err = tester.Queries.OrgByID(tester.FirstInstanceIAMOwnerCtx, true, tester.Instance.DefaultOrganisationID())
+	logging.OnError(err).Fatal("query organisation")
+	tester.createLoginClient(tester.FirstInstanceIAMOwnerCtx)
+	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.FirstInstancePrimaryDomain, http_util.BuildOrigin(tester.FirstInstancePrimaryDomain, tester.Config.ExternalSecure))
+	tester.createMachineUserOrgOwner(tester.FirstInstanceIAMOwnerCtx)
+	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.FirstInstancePrimaryDomain, "https://"+tester.FirstInstancePrimaryDomain)
 	return &tester
 }
 
