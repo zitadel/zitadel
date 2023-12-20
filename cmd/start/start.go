@@ -134,7 +134,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	if err != nil {
 		return fmt.Errorf("cannot start client for event store pusher: %w", err)
 	}
-	projectionDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeEventPusher)
+	projectionDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeProjectionSpooler)
 	if err != nil {
 		return fmt.Errorf("cannot start client for projection spooler: %w", err)
 	}
