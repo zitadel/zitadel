@@ -122,12 +122,12 @@ type NotifyUser struct {
 	PasswordSet        bool
 }
 
-func (u *Users) RemoveNoPermission(ctx context.Context, q *Queries) {
+func (u *Users) RemoveNoPermission(ctx context.Context, permissionCheck domain.PermissionCheck) {
 	removableIndexes := make([]int, 0)
 	for i := range u.Users {
 		ctxData := authz.GetCtxData(ctx)
 		if ctxData.UserID != u.Users[i].ID {
-			if err := q.checkPermission(ctx, domain.PermissionUserRead, ctxData.OrgID, u.Users[i].ID); err != nil {
+			if err := permissionCheck(ctx, domain.PermissionUserRead, ctxData.OrgID, u.Users[i].ID); err != nil {
 				removableIndexes = append(removableIndexes, i)
 			}
 		}
@@ -340,13 +340,6 @@ var (
 var userByIDQuery string
 
 func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string) (user *User, err error) {
-	/*ctxData := authz.GetCtxData(ctx)
-	if ctxData.UserID != userID {
-		if err := q.checkPermission(ctx, domain.PermissionUserRead, ctxData.OrgID, userID); err != nil {
-			return nil, err
-		}
-	}*/
-
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

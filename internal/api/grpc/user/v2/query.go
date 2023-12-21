@@ -5,6 +5,7 @@ import (
 
 	"github.com/muhlemmer/gu"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -13,6 +14,13 @@ import (
 )
 
 func (s *Server) GetUserByID(ctx context.Context, req *user.GetUserByIDRequest) (_ *user.GetUserByIDResponse, err error) {
+	ctxData := authz.GetCtxData(ctx)
+	if ctxData.UserID != req.GetUserId() {
+		if err := s.checkPermission(ctx, domain.PermissionUserRead, ctxData.OrgID, req.GetUserId()); err != nil {
+			return nil, err
+		}
+	}
+
 	resp, err := s.query.GetUserByID(ctx, true, req.GetUserId())
 	if err != nil {
 		return nil, err
@@ -36,7 +44,7 @@ func (s *Server) ListUsers(ctx context.Context, req *user.ListUsersRequest) (*us
 	if err != nil {
 		return nil, err
 	}
-	//res.RemoveNoPermission(ctx, s.query)
+	res.RemoveNoPermission(ctx, s.checkPermission)
 	return &user.ListUsersResponse{
 		Result:  UsersToPb(res.Users, s.assetAPIPrefix(ctx)),
 		Details: object.ToListDetails(res.SearchResponse),
