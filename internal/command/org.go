@@ -453,7 +453,7 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 				return nil, zerrors.ThrowNotFound(nil, "COMMA-aps2n", "Errors.Org.NotFound")
 			}
 
-			domainPolicy, err := c.getOrgDomainPolicy(ctx, a.ID)
+			domainPolicy, err := c.domainPolicyWriteModel(ctx, a.ID)
 			if err != nil {
 				return nil, err
 			}

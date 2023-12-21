@@ -4266,6 +4266,17 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 	}
 }
 
+func newAddMachineEvent(userLoginMustBeDomain bool, accessTokenType domain.OIDCTokenType) *user.MachineAddedEvent {
+	return user.NewMachineAddedEvent(context.Background(),
+		&user.NewAggregate("user1", "org1").Aggregate,
+		"username",
+		"name",
+		"description",
+		userLoginMustBeDomain,
+		accessTokenType,
+	)
+}
+
 func newAddHumanEvent(password string, changeRequired, userLoginMustBeDomain bool, phone string, preferredLanguage language.Tag) *user.HumanAddedEvent {
 	event := user.NewHumanAddedEvent(context.Background(),
 		&user.NewAggregate("user1", "org1").Aggregate,
