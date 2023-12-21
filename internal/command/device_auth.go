@@ -11,14 +11,9 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, userCode string, expires time.Time, scopes []string) (string, *domain.ObjectDetails, error) {
-	aggrID, err := c.idGenerator.Next()
-	if err != nil {
-		return "", nil, err
-	}
-
-	aggr := deviceauth.NewAggregate(aggrID, authz.GetInstance(ctx).InstanceID())
-	model := NewDeviceAuthWriteModel(aggrID, aggr.ResourceOwner)
+func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, userCode string, expires time.Time, scopes []string) (*domain.ObjectDetails, error) {
+	aggr := deviceauth.NewAggregate(deviceCode, authz.GetInstance(ctx).InstanceID())
+	model := NewDeviceAuthWriteModel(deviceCode, aggr.ResourceOwner)
 
 	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewAddedEvent(
 		ctx,
@@ -30,18 +25,18 @@ func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, user
 		scopes,
 	))
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
 	err = AppendAndReduce(model, pushedEvents...)
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
 
-	return model.AggregateID, writeModelToObjectDetails(&model.WriteModel), nil
+	return writeModelToObjectDetails(&model.WriteModel), nil
 }
 
-func (c *Commands) ApproveDeviceAuth(ctx context.Context, id, subject string) (*domain.ObjectDetails, error) {
-	model, err := c.getDeviceAuthWriteModelByID(ctx, id)
+func (c *Commands) ApproveDeviceAuth(ctx context.Context, deviceCode, subject string, authMethods []domain.UserAuthMethodType, authTime time.Time) (*domain.ObjectDetails, error) {
+	model, err := c.getDeviceAuthWriteModelByDeviceCode(ctx, deviceCode)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +45,7 @@ func (c *Commands) ApproveDeviceAuth(ctx context.Context, id, subject string) (*
 	}
 	aggr := deviceauth.NewAggregate(model.AggregateID, model.InstanceID)
 
-	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewApprovedEvent(ctx, aggr, subject))
+	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewApprovedEvent(ctx, aggr, subject, authMethods, authTime))
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +58,7 @@ func (c *Commands) ApproveDeviceAuth(ctx context.Context, id, subject string) (*
 }
 
 func (c *Commands) CancelDeviceAuth(ctx context.Context, id string, reason domain.DeviceAuthCanceled) (*domain.ObjectDetails, error) {
-	model, err := c.getDeviceAuthWriteModelByID(ctx, id)
+	model, err := c.getDeviceAuthWriteModelByDeviceCode(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -84,27 +79,8 @@ func (c *Commands) CancelDeviceAuth(ctx context.Context, id string, reason domai
 	return writeModelToObjectDetails(&model.WriteModel), nil
 }
 
-func (c *Commands) RemoveDeviceAuth(ctx context.Context, id string) (*domain.ObjectDetails, error) {
-	model, err := c.getDeviceAuthWriteModelByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	aggr := deviceauth.NewAggregate(model.AggregateID, model.InstanceID)
-
-	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewRemovedEvent(ctx, aggr, model.ClientID, model.DeviceCode, model.UserCode))
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(model, pushedEvents...)
-	if err != nil {
-		return nil, err
-	}
-
-	return writeModelToObjectDetails(&model.WriteModel), nil
-}
-
-func (c *Commands) getDeviceAuthWriteModelByID(ctx context.Context, id string) (*DeviceAuthWriteModel, error) {
-	model := &DeviceAuthWriteModel{WriteModel: eventstore.WriteModel{AggregateID: id}}
+func (c *Commands) getDeviceAuthWriteModelByDeviceCode(ctx context.Context, deviceCode string) (*DeviceAuthWriteModel, error) {
+	model := &DeviceAuthWriteModel{WriteModel: eventstore.WriteModel{AggregateID: deviceCode}}
 	err := c.eventstore.FilterToQueryReducer(ctx, model)
 	if err != nil {
 		return nil, err
