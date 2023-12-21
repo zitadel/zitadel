@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -62,7 +62,7 @@ func MachineAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(machineAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-tMv9s", "unable to unmarshal machine added")
+		return nil, zerrors.ThrowInternal(err, "USER-tMv9s", "unable to unmarshal machine added")
 	}
 
 	return machineAdded, nil
@@ -90,7 +90,7 @@ func NewMachineChangedEvent(
 	changes []MachineChanges,
 ) (*MachineChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "USER-3M9fs", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "USER-3M9fs", "Errors.NoChangesFound")
 	}
 	changeEvent := &MachineChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -131,7 +131,7 @@ func MachineChangedEventMapper(event eventstore.Event) (eventstore.Event, error)
 	}
 	err := event.Unmarshal(machineChanged)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-4M9ds", "unable to unmarshal machine changed")
+		return nil, zerrors.ThrowInternal(err, "USER-4M9ds", "unable to unmarshal machine changed")
 	}
 
 	return machineChanged, nil

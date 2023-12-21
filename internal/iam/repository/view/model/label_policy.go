@@ -6,11 +6,11 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -179,7 +179,7 @@ func (r *LabelPolicyView) setRootData(event eventstore.Event) {
 func (r *LabelPolicyView) SetData(event eventstore.Event) error {
 	if err := event.Unmarshal(r); err != nil {
 		logging.Log("MODEL-Flp9C").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")
+		return zerrors.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")
 	}
 	return nil
 }
@@ -187,7 +187,7 @@ func (r *LabelPolicyView) SetData(event eventstore.Event) error {
 func (r *AssetView) SetData(event eventstore.Event) error {
 	if err := event.Unmarshal(r); err != nil {
 		logging.Log("MODEL-Ms8f2").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")
+		return zerrors.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")
 	}
 	return nil
 }

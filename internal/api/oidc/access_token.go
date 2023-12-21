@@ -10,9 +10,9 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/command"
-	errz "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type accessToken struct {
@@ -55,7 +55,7 @@ func (s *Server) verifyAccessToken(ctx context.Context, tkn string) (*accessToke
 
 	token, err := s.repo.TokenByIDs(ctx, subject, tokenID)
 	if err != nil {
-		return nil, errz.ThrowPermissionDenied(err, "OIDC-Dsfb2", "token is not valid or has expired")
+		return nil, zerrors.ThrowPermissionDenied(err, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
 	return accessTokenV1(tokenID, subject, token), nil
 }
@@ -91,7 +91,7 @@ func (s *Server) assertClientScopesForPAT(ctx context.Context, token *accessToke
 	token.audience = append(token.audience, clientID)
 	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(projectID)
 	if err != nil {
-		return errz.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
+		return zerrors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}
 	roles, err := s.query.SearchProjectRoles(ctx, s.features.TriggerIntrospectionProjections, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {

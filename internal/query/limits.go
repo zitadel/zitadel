@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -11,9 +11,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -71,7 +71,7 @@ func (q *Queries) Limits(ctx context.Context, resourceOwner string) (limits *Lim
 		LimitsColumnResourceOwner.identifier(): resourceOwner,
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-jJe80", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-jJe80", "Errors.Query.SQLStatment")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -106,10 +106,10 @@ func prepareLimitsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 				&auditLogRetention,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-GU1em", "Errors.Limits.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-GU1em", "Errors.Limits.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-00jgy", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-00jgy", "Errors.Internal")
 			}
 			if auditLogRetention.Valid {
 				limits.AuditLogRetention = &auditLogRetention.Duration

@@ -1,8 +1,8 @@
 package policy
 
 import (
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -42,7 +42,7 @@ func NotificationPolicyAddedEventMapper(event eventstore.Event) (eventstore.Even
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-0sp2nios", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-0sp2nios", "unable to unmarshal policy")
 	}
 
 	return e, nil
@@ -67,7 +67,7 @@ func NewNotificationPolicyChangedEvent(
 	changes []NotificationPolicyChanges,
 ) (*NotificationPolicyChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-09sp2m", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "POLICY-09sp2m", "Errors.NoChangesFound")
 	}
 	changeEvent := &NotificationPolicyChangedEvent{
 		BaseEvent: *base,
@@ -93,7 +93,7 @@ func NotificationPolicyChangedEventMapper(event eventstore.Event) (eventstore.Ev
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-09s2oss", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-09s2oss", "unable to unmarshal policy")
 	}
 
 	return e, nil

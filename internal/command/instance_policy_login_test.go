@@ -9,12 +9,11 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/policy"
-	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
@@ -51,7 +50,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -108,7 +107,7 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -241,7 +240,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 				provider: &domain.IDPProvider{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -259,7 +258,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -301,7 +300,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -362,7 +361,7 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -458,9 +457,8 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx                 context.Context
-		provider            *domain.IDPProvider
-		cascadeExternalIDPs []*domain.UserIDPLink
+		ctx      context.Context
+		provider *domain.IDPProvider
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -484,7 +482,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 				provider: &domain.IDPProvider{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -502,7 +500,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -544,7 +542,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -599,7 +597,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -707,89 +705,6 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 				},
-				cascadeExternalIDPs: []*domain.UserIDPLink{
-					{
-						ObjectRoot: models.ObjectRoot{
-							AggregateID: "user1",
-						},
-						IDPConfigID: "config1",
-					},
-				},
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "INSTANCE",
-				},
-			},
-		},
-		{
-			name: "remove provider with external idps, ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewLoginPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								true,
-								domain.PasswordlessTypeAllowed,
-								"",
-								time.Hour*1,
-								time.Hour*2,
-								time.Hour*3,
-								time.Hour*4,
-								time.Hour*5,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							instance.NewIdentityProviderAddedEvent(context.Background(),
-								&instance.NewAggregate("INSTANCE").Aggregate,
-								"config1",
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							user.NewUserIDPLinkAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"config1", "", "externaluser1"),
-						),
-					),
-					expectPush(
-						instance.NewIdentityProviderRemovedEvent(context.Background(),
-							&instance.NewAggregate("INSTANCE").Aggregate,
-							"config1"),
-						user.NewUserIDPLinkCascadeRemovedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-							"config1", "externaluser1"),
-					),
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				provider: &domain.IDPProvider{
-					IDPConfigID: "config1",
-				},
-				cascadeExternalIDPs: []*domain.UserIDPLink{
-					{
-						ObjectRoot: models.ObjectRoot{
-							AggregateID: "user1",
-						},
-						IDPConfigID:    "config1",
-						ExternalUserID: "externaluser1",
-					},
-				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -803,7 +718,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveIDPProviderFromDefaultLoginPolicy(tt.args.ctx, tt.args.provider, tt.args.cascadeExternalIDPs...)
+			got, err := r.RemoveIDPProviderFromDefaultLoginPolicy(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -847,7 +762,7 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 				factor: domain.SecondFactorTypeUnspecified,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -870,7 +785,7 @@ func TestCommandSide_AddSecondFactorDefaultLoginPolicy(t *testing.T) {
 				factor: domain.SecondFactorTypeTOTP,
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -1022,7 +937,7 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 				factor: domain.SecondFactorTypeUnspecified,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1038,7 +953,7 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 				factor: domain.SecondFactorTypeTOTP,
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1067,7 +982,7 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 				factor: domain.SecondFactorTypeTOTP,
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1096,7 +1011,7 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 				factor: domain.SecondFactorTypeOTPEmail,
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1125,7 +1040,7 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 				factor: domain.SecondFactorTypeOTPSMS,
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1238,7 +1153,7 @@ func TestCommandSide_RemoveSecondFactorDefaultLoginPolicy(t *testing.T) {
 				factor: domain.SecondFactorTypeOTPSMS,
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 	}
@@ -1291,7 +1206,7 @@ func TestCommandSide_AddMultiFactorDefaultLoginPolicy(t *testing.T) {
 				factor: domain.MultiFactorTypeUnspecified,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1314,7 +1229,7 @@ func TestCommandSide_AddMultiFactorDefaultLoginPolicy(t *testing.T) {
 				factor: domain.MultiFactorTypeU2FWithPIN,
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -1390,7 +1305,7 @@ func TestCommandSide_RemoveMultiFactorDefaultLoginPolicy(t *testing.T) {
 				factor: domain.MultiFactorTypeUnspecified,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1406,7 +1321,7 @@ func TestCommandSide_RemoveMultiFactorDefaultLoginPolicy(t *testing.T) {
 				factor: domain.MultiFactorTypeU2FWithPIN,
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1435,7 +1350,7 @@ func TestCommandSide_RemoveMultiFactorDefaultLoginPolicy(t *testing.T) {
 				factor: domain.MultiFactorTypeU2FWithPIN,
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{

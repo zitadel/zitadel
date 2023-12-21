@@ -4,7 +4,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
-	grpc_errs "github.com/zitadel/zitadel/internal/api/grpc/errors"
+	"github.com/zitadel/zitadel/internal/api/grpc/gerrors"
 )
 
 type Span struct {
@@ -41,6 +41,6 @@ func (s *Span) SetStatusByError(err error) {
 		)
 	}
 
-	code, msg, id, _ := grpc_errs.ExtractCaosError(err)
+	code, msg, id, _ := gerrors.ExtractZITADELError(err)
 	s.span.SetAttributes(attribute.Int("grpc_code", int(code)), attribute.String("grpc_msg", msg), attribute.String("error_id", id))
 }

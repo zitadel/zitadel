@@ -8,9 +8,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
-
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func Test_keysFromArgs(t *testing.T) {
@@ -39,7 +38,7 @@ func Test_keysFromArgs(t *testing.T) {
 				args: []string{"keyID", "value"},
 			},
 			res{
-				err: caos_errors.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -110,7 +109,7 @@ func Test_keysFromYAML(t *testing.T) {
 				file: bytes.NewReader([]byte("keyID=ds")),
 			},
 			res{
-				err: caos_errors.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{

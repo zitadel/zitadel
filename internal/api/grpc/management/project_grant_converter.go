@@ -7,9 +7,9 @@ import (
 	member_grpc "github.com/zitadel/zitadel/internal/api/grpc/member"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 	proj_pb "github.com/zitadel/zitadel/pkg/grpc/project"
 )
@@ -55,7 +55,7 @@ func ProjectGrantQueryToModel(apiQuery *proj_pb.ProjectGrantQuery) (query.Search
 	case *proj_pb.ProjectGrantQuery_RoleKeyQuery:
 		return query.NewProjectGrantRoleKeySearchQuery(q.RoleKeyQuery.RoleKey)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-M099f", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-M099f", "List.Query.Invalid")
 	}
 }
 func listAllProjectGrantsRequestToModel(req *mgmt_pb.ListAllProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
@@ -97,7 +97,7 @@ func AllProjectGrantQueryToModel(apiQuery *proj_pb.AllProjectGrantQuery) (query.
 	case *proj_pb.AllProjectGrantQuery_GrantedOrgIdQuery:
 		return query.NewProjectGrantGrantedOrgIDSearchQuery(q.GrantedOrgIdQuery.GrantedOrgId)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-M099f", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-M099f", "List.Query.Invalid")
 	}
 }
 func AddProjectGrantRequestToDomain(req *mgmt_pb.AddProjectGrantRequest) *domain.ProjectGrant {

@@ -11,19 +11,21 @@ import (
 type DeviceAuthWriteModel struct {
 	eventstore.WriteModel
 
-	ClientID   string
-	DeviceCode string
-	UserCode   string
-	Expires    time.Time
-	Scopes     []string
-	Subject    string
-	State      domain.DeviceAuthState
+	ClientID        string
+	DeviceCode      string
+	UserCode        string
+	Expires         time.Time
+	Scopes          []string
+	State           domain.DeviceAuthState
+	Subject         string
+	UserAuthMethods []domain.UserAuthMethodType
+	AuthTime        time.Time
 }
 
-func NewDeviceAuthWriteModel(aggrID, resourceOwner string) *DeviceAuthWriteModel {
+func NewDeviceAuthWriteModel(deviceCode, resourceOwner string) *DeviceAuthWriteModel {
 	return &DeviceAuthWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:   aggrID,
+			AggregateID:   deviceCode,
 			ResourceOwner: resourceOwner,
 		},
 	}
@@ -40,12 +42,12 @@ func (m *DeviceAuthWriteModel) Reduce() error {
 			m.Scopes = e.Scopes
 			m.State = e.State
 		case *deviceauth.ApprovedEvent:
-			m.Subject = e.Subject
 			m.State = domain.DeviceAuthStateApproved
+			m.Subject = e.Subject
+			m.UserAuthMethods = e.UserAuthMethods
+			m.AuthTime = e.AuthTime
 		case *deviceauth.CanceledEvent:
 			m.State = e.Reason.State()
-		case *deviceauth.RemovedEvent:
-			m.State = domain.DeviceAuthStateRemoved
 		}
 	}
 
@@ -54,8 +56,14 @@ func (m *DeviceAuthWriteModel) Reduce() error {
 
 func (m *DeviceAuthWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(m.ResourceOwner).
 		AddQuery().
 		AggregateTypes(deviceauth.AggregateType).
 		AggregateIDs(m.AggregateID).
+		EventTypes(
+			deviceauth.AddedEventType,
+			deviceauth.ApprovedEventType,
+			deviceauth.CanceledEventType,
+		).
 		Builder()
 }

@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func NewRefreshToken(userID, tokenID string, algorithm crypto.EncryptionAlgorithm) (string, error) {
@@ -31,7 +31,7 @@ func FromRefreshToken(refreshToken string, algorithm crypto.EncryptionAlgorithm)
 	}
 	split := strings.Split(string(decrypted), ":")
 	if len(split) != 3 {
-		return "", "", "", caos_errors.ThrowInternal(nil, "DOMAIN-BGDhn", "Errors.User.RefreshToken.Invalid")
+		return "", "", "", zerrors.ThrowInternal(nil, "DOMAIN-BGDhn", "Errors.User.RefreshToken.Invalid")
 	}
 	return split[0], split[1], split[2], nil
 }

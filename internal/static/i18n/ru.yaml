@@ -33,8 +33,13 @@ Errors:
     NoneSpecified: Не указаны лимиты
   Restrictions:
     NoneSpecified: Не указаны ограничения
+    DefaultLanguageMustBeAllowed: Язык по умолчанию должен быть разрешен
   Language:
     NotParsed: Не удалось разобрать язык
+    NotSupported: Язык не поддерживается
+    NotAllowed: Язык не разрешен
+    Undefined: Язык не определен
+    Duplicate: Языки имеют дубликаты
   OIDCSettings:
     NotFound: Конфигурация OIDC не найдена
     AlreadyExists: Конфигурация OIDC уже существует
@@ -138,7 +143,7 @@ Errors:
     ExternalIDP:
       Invalid: Внешний идентификационный номер недействителен.
       IDPConfigNotExisting: Поставщик МВУ недействителен для этой организации.
-      NotAllowed: Внешний IDP не разрешен в этой организации.
+      NotAllowed: Внешний IDP не разрешен
       MinimumExternalIDPNeeded: Необходимо добавить хотя бы одного ВПЛ.
       AlreadyExists: Внешнее ВПЛ уже занято
       NotFound: Внешний IDP не найден

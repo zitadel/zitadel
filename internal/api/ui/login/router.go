@@ -64,7 +64,7 @@ var (
 	}
 )
 
-func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.MiddlewareFunc) *mux.Router {
+func CreateRouter(login *Login, interceptors ...mux.MiddlewareFunc) *mux.Router {
 	router := mux.NewRouter()
 	router.Use(interceptors...)
 	router.HandleFunc(EndpointRoot, login.handleLogin).Methods(http.MethodGet)
@@ -113,7 +113,7 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointExternalRegisterCallback, login.handleExternalLoginCallback).Methods(http.MethodGet)
 	router.HandleFunc(EndpointLogoutDone, login.handleLogoutDone).Methods(http.MethodGet)
 	router.HandleFunc(EndpointDynamicResources, login.handleDynamicResources).Methods(http.MethodGet)
-	router.PathPrefix(EndpointResources).Handler(login.handleResources(staticDir)).Methods(http.MethodGet)
+	router.PathPrefix(EndpointResources).Handler(login.handleResources()).Methods(http.MethodGet)
 	router.HandleFunc(EndpointRegisterOrg, login.handleRegisterOrg).Methods(http.MethodGet)
 	router.HandleFunc(EndpointRegisterOrg, login.handleRegisterOrgCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointLoginSuccess, login.handleLoginSuccess).Methods(http.MethodGet)

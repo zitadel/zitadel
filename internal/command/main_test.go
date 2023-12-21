@@ -14,12 +14,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
 	action_repo "github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
+	"github.com/zitadel/zitadel/internal/repository/deviceauth"
 	"github.com/zitadel/zitadel/internal/repository/feature"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
@@ -33,6 +33,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/session"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type expect func(mockRepository *mock.MockRepository)
@@ -63,6 +64,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	limits.RegisterEventMappers(es)
 	restrictions.RegisterEventMappers(es)
 	feature.RegisterEventMappers(es)
+	deviceauth.RegisterEventMappers(es)
 	return es
 }
 
@@ -95,7 +97,13 @@ func eventPusherToEvents(eventsPushes ...eventstore.Command) []*repository.Event
 
 func expectPush(commands ...eventstore.Command) expect {
 	return func(m *mock.MockRepository) {
-		m.ExpectPush(commands)
+		m.ExpectPush(commands, 0)
+	}
+}
+
+func expectPushSlow(sleep time.Duration, commands ...eventstore.Command) expect {
+	return func(m *mock.MockRepository) {
+		m.ExpectPush(commands, sleep)
 	}
 }
 
@@ -212,7 +220,7 @@ func (m *mockInstance) ConsoleApplicationID() string {
 }
 
 func (m *mockInstance) DefaultLanguage() language.Tag {
-	return language.English
+	return AllowedLanguage
 }
 
 func (m *mockInstance) DefaultOrganisationID() string {
@@ -239,7 +247,7 @@ func newMockPermissionCheckAllowed() domain.PermissionCheck {
 
 func newMockPermissionCheckNotAllowed() domain.PermissionCheck {
 	return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
-		return errors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied")
+		return zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied")
 	}
 }
 
@@ -250,7 +258,7 @@ func newMockTokenVerifierValid() func(ctx context.Context, sessionToken, session
 }
 func newMockTokenVerifierInvalid() func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
 	return func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
-		return errors.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid")
+		return zerrors.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid")
 	}
 }
 

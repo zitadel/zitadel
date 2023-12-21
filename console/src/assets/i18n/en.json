@@ -872,14 +872,16 @@
         },
         "SEQUENCE": {
           "LABEL": "Sequence",
-          "CHECKBOX": "Filter by Sequence",
-          "SORT": "Sorting",
-          "ASC": "Ascending",
-          "DESC": "Descending"
+          "CHECKBOX": "Filter by Sequence"
         },
+        "SORT": "Sort",
+        "ASC": "Ascending",
+        "DESC": "Descending",
         "CREATIONDATE": {
-          "LABEL": "Creation Date",
-          "CHECKBOX": "Filter by Creation Date"
+          "RADIO_FROM": "From",
+          "RADIO_RANGE": "Range",
+          "LABEL_SINCE": "Since",
+          "LABEL_UNTIL": "Until"
         },
         "OTHER": "other",
         "OTHERS": "others"
@@ -929,20 +931,22 @@
         "BTN": "Rename"
       },
       "ORGDOMAIN": {
-        "TITLE": "Organization Domain Ownership Verification",
-        "VERIFICATION": "To verify the ownership of your domain, you need to download a verification file and upload it at the provided URL listed below, or place a TXT Record DNS entry for the provided URL. To complete, click the button to verify.",
-        "VERIFICATION_SKIP": "You can skip verification for now and continue to create your organization, but in order to use your organization this step has to be completed!",
-        "VERIFICATION_VALIDATION_DESC": "The tokens are checked regularly to ensure you are still owner of the domain.",
+        "TITLE": "Verify {{value}} ownership",
+        "VERIFICATION": "We offer you two methods to manually validate your domain:",
+        "VERIFICATION_HTML": "- HTTP. Host a temporary verification file on your website",
+        "VERIFICATION_DNS": "- DNS. Create a TXT Record DNS entry",
+        "VERIFICATION_DNS_DESC": "If you manage {{ value }} and you have access to your DNS records, you can create a new TXT record with the following values:",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Use this code for the value of the TXT record:",
+        "VERIFICATION_HTTP_DESC": "If you have access to your website hosting, simply download the verification file and upload it at the provided URL",
+        "VERIFICATION_HTTP_URL_LABEL": "Expected URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Verification file:",
+        "VERIFICATION_SKIP": "You can skip verification for now and continue to create your organization, but in order to use your domain this step has to be completed!",
+        "VERIFICATION_VALIDATION_DESC": "Do not delete the verification code, as ZITADEL will re-check the ownership of your domain from time to time.",
         "VERIFICATION_NEWTOKEN_TITLE": "Request New Token",
-        "VERIFICATION_NEWTOKEN_DESC": "If you want to request a new token, select you preferred method. If you want to validate a persisting token, click the button above.",
-        "VERIFICATION_VALIDATION_ONGOING": "A verification token has already been requested. Click on the button to trigger a verification check.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Type of the token:",
+        "VERIFICATION_VALIDATION_ONGOING": "The {{ value }} method has been selected to verify your domain. Click on the button to trigger a verification check or reset the verification process.",
         "VERIFICATION_SUCCESSFUL": "Domain successfully verified!",
-        "REQUESTNEWTOKEN": "Request new token",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "RESETMETHOD": "Reset verification method"
       },
       "DOWNLOAD_FILE": "Download File",
       "SELECTORGTOOLTIP": "Select this organization.",
@@ -1019,7 +1023,7 @@
       "DESCRIPTION": "These settings extend and overwrite your instance settings."
     },
     "LIST": {
-      "GENERAL": "General",
+      "LANGUAGES": "Languages",
       "LOGIN": "Login Behavior and Security",
       "LOCKOUT": "Lockout",
       "COMPLEXITY": "Password complexity",
@@ -1048,22 +1052,32 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Default Language",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Language Settings",
+      "DEFAULT": "Default Language",
+      "ALLOWED": "Allowed Languages",
+      "NOT_ALLOWED": "Not Allowed Languages",
+      "ALLOW_ALL": "Allow All",
+      "DISALLOW_ALL": "Disallow All",
+      "SETASDEFAULT": "Set as Default Language",
+      "DEFAULT_SAVED": "Default Language saved",
+      "ALLOWED_SAVED": "Allowed Languages saved",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
@@ -1262,8 +1276,10 @@
       "RESET_DESCRIPTION": "You are about to restore all default values. All changes you have made will be permanently deleted. Do you really want to continue?",
       "UNSAVED_TITLE": "Continue without saving?",
       "UNSAVED_DESCRIPTION": "You have made changes without saving. Do you want to save now?",
-      "LOCALE": "Locale Code",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "You selected a language that is not allowed. You can go on modifying the texts. But if you want your users to actually be able to use this language, change your instances restrictions.",
+      "LANGUAGES_NOT_ALLOWED": "Not allowed:",
+      "LANGUAGE": "Language",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1374,7 +1390,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
       "ALLOWUSERNAMEPASSWORD": "Username Password allowed",
       "ALLOWEXTERNALIDP": "External IDP allowed",
-      "ALLOWREGISTER": "Register allowed",
+      "ALLOWREGISTERUSERS": "Register users allowed",
+      "ALLOWREGISTERORGS": "Register organizations allowed",
       "ALLOWUSERNAMEPASSWORD_DESC": "The conventional login with user name and password is allowed.",
       "ALLOWEXTERNALIDP_DESC": "The login is allowed for the underlying identity providers",
       "ALLOWREGISTER_DESC": "If the option is selected, an additional step for registering a user appears in the login.",

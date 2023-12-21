@@ -3,8 +3,8 @@ package idpconfig
 import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -69,7 +69,7 @@ func OIDCConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -105,7 +105,7 @@ func NewOIDCConfigChangedEvent(
 	changes []OIDCConfigChanges,
 ) (*OIDCConfigChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDPCONFIG-ADzr5", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDPCONFIG-ADzr5", "Errors.NoChangesFound")
 	}
 	changeEvent := &OIDCConfigChangedEvent{
 		BaseEvent:   *base,
@@ -174,7 +174,7 @@ func OIDCConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, err
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "OIDC-plaBZ", "unable to unmarshal event")
 	}
 
 	return e, nil

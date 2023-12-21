@@ -870,14 +870,16 @@
         },
         "SEQUENCE": {
           "LABEL": "Sequence",
-          "CHECKBOX": "Filter per sequenza",
-          "SORT": "",
-          "ASC": "Ascending",
-          "DESC": "Descending"
+          "CHECKBOX": "Filter per sequenza"
         },
+        "SORT": "Ordina per",
+        "ASC": "Ascendente",
+        "DESC": "Discendente",
         "CREATIONDATE": {
-          "LABEL": "Creation Date",
-          "CHECKBOX": "Filter by Creation Date"
+          "RADIO_FROM": "Da",
+          "RADIO_RANGE": "Intervallo",
+          "LABEL_SINCE": "Da",
+          "LABEL_UNTIL": "A"
         },
         "OTHER": "altro",
         "OTHERS": "altri"
@@ -928,20 +930,22 @@
         "BTN": "Rinomina"
       },
       "ORGDOMAIN": {
-        "TITLE": "Verificazione della propriet\u00e0 del dominio dell'organizzazione",
-        "VERIFICATION": "Verifica la propriet\u00e0 del tuo dominio. \u00c8 necessario scaricare un file di verifica e caricarlo all'URL fornito elencato di seguito, o inserire una voce DNS TXT Record per l'URL fornito. Per completare, clicca sul pulsante di verifica.",
-        "VERIFICATION_SKIP": "Puoi saltare la verifica per ora e continuare a creare la tua organizzazione, ma per usare la tua organizzazione questo passo deve essere completato!",
-        "VERIFICATION_VALIDATION_DESC": "I token sono controllati regolarmente per assicurarsi che tu sia ancora proprietario del dominio.",
-        "VERIFICATION_NEWTOKEN_TITLE": "Richiesta di un nuovo token",
-        "VERIFICATION_NEWTOKEN_DESC": "Se vuoi richiedere un nuovo token, seleziona il tuo metodo preferito. Se vuoi convalidare un token persistente, clicca sul pulsante qui sopra.",
-        "VERIFICATION_VALIDATION_ONGOING": "\u00c8 gi\u00e0 stato richiesto un token di verifica. Clicca sul pulsante per richiedere un altro controllo di verifica.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Tipo di token:",
+        "TITLE": "Verifica la proprietà di {{value}}",
+        "VERIFICATION": "Ti offriamo due metodi per convalidare manualmente il tuo dominio:",
+        "VERIFICATION_HTML": "-HTTP. Ospita un file di verifica temporaneo sul tuo sito web",
+        "VERIFICATION_DNS": "-DNS. Crea una voce DNS del record TXT",
+        "VERIFICATION_DNS_DESC": "Se gestisci {{ value }} e hai accesso ai tuoi record DNS, puoi creare un nuovo record TXT con i seguenti valori:",
+        "VERIFICATION_DNS_HOST_LABEL": "Ospite:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Utilizza questo codice per il valore del record TXT:",
+        "VERIFICATION_HTTP_DESC": "Se hai accesso all'hosting del tuo sito web, scarica semplicemente il file di verifica e caricalo all'URL fornito",
+        "VERIFICATION_HTTP_URL_LABEL": "URL previsto:",
+        "VERIFICATION_HTTP_FILE_LABEL": "File di verifica:",
+        "VERIFICATION_SKIP": "Per ora puoi saltare la verifica e continuare a creare la tua organizzazione, ma per poter utilizzare il tuo dominio è necessario completare questo passaggio!",
+        "VERIFICATION_VALIDATION_DESC": "Non eliminare il codice di verifica, poiché ZITADEL ricontrollerà di tanto in tanto la proprietà del tuo dominio.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Richiedi nuovo token",
+        "VERIFICATION_VALIDATION_ONGOING": "Il metodo {{ value }} è stato selezionato per verificare il tuo dominio. Fare clic sul pulsante per attivare un controllo di verifica o reimpostare il processo di verifica.",
         "VERIFICATION_SUCCESSFUL": "Dominio verificato con successo!",
-        "REQUESTNEWTOKEN": "Richiedi un nuovo token",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "RESETMETHOD": "Reimposta il metodo di verifica"
       },
       "DOWNLOAD_FILE": "Scaricare il file",
       "SELECTORGTOOLTIP": "Seleziona questa organizzazione.",
@@ -1018,7 +1022,7 @@
       "DESCRIPTION": "Queste impostazioni si applicheranno alla organizzazione corrente."
     },
     "LIST": {
-      "GENERAL": "Generale",
+      "LANGUAGES": "Lingue",
       "LOGIN": "Comportamento login e sicurezza",
       "LOCKOUT": "Meccanismi di bloccaggio",
       "COMPLEXITY": "Complessità della password",
@@ -1047,22 +1051,32 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Lingua standard",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Impostazioni della lingua",
+      "DEFAULT": "Lingua predefinita",
+      "ALLOWED": "Lingue consentite",
+      "NOT_ALLOWED": "Lingue non consentite",
+      "ALLOW_ALL": "Consenti tutte le lingue",
+      "DISALLOW_ALL": "Non consentire tutte le lingue",
+      "SETASDEFAULT": "Imposta come lingua predefinita",
+      "DEFAULT_SAVED": "Lingua predefinita salvata",
+      "ALLOWED_SAVED": "Lingue consentite salvate",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "Impostazioni SMTP",
@@ -1261,8 +1275,10 @@
       "RESET_DESCRIPTION": "Stai per ripristinare tutti i valori predefiniti. Tutte le modifiche che hai fatto saranno cancellate in modo permanente. Vuoi davvero continuare?",
       "UNSAVED_TITLE": "Continuare senza salvare?",
       "UNSAVED_DESCRIPTION": "Hai fatto delle modifiche senza salvare. Vuoi salvare ora?",
-      "LOCALE": "Codice locale",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Hai selezionato una lingua non consentita. Puoi continuare a modificare i testi. Ma se vuoi che i tuoi utenti possano effettivamente utilizzare questa lingua, cambia le restrizioni delle tue istanze.",
+      "LANGUAGE": "Lingua",
+      "LANGUAGES_NOT_ALLOWED": "Non consentito:",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1373,7 +1389,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "L'indirizzo mittente SMTP corrisponde al dominio dell'istanza",
       "ALLOWUSERNAMEPASSWORD": "Autenticazione classica con password consentita",
       "ALLOWEXTERNALIDP": "IDP esterno consentito",
-      "ALLOWREGISTER": "Registrazione consentita",
+      "ALLOWREGISTERUSERS": "Registrazione utenti consentita",
+      "ALLOWREGISTERORGS": "Registrazione organizzazioni consentita",
       "ALLOWUSERNAMEPASSWORD_DESC": "Autenticazione classica con nome utente e password \u00e8 permessa.",
       "ALLOWEXTERNALIDP_DESC": "Il login \u00e8 permesso per gli IDP sottostanti",
       "ALLOWREGISTER_DESC": "Se l'opzione \u00e8 selezionata, nel login apparirà un passo aggiuntivo per la registrazione di un utente.",

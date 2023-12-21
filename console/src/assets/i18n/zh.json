@@ -871,14 +871,16 @@
         },
         "SEQUENCE": {
           "LABEL": "序列",
-          "CHECKBOX": "按顺序过滤",
-          "SORT": "分拣",
-          "ASC": "上升中",
-          "DESC": "下降"
+          "CHECKBOX": "按顺序过滤"
         },
+        "SORT": "分拣",
+        "ASC": "上升中",
+        "DESC": "下降",
         "CREATIONDATE": {
-          "LABEL": "创建日期",
-          "CHECKBOX": "按创建日期过滤"
+          "RADIO_FROM": "从",
+          "RADIO_RANGE": "范围",
+          "LABEL_SINCE": "自从",
+          "LABEL_UNTIL": "直到"
         },
         "OTHER": "其他",
         "OTHERS": "其他"
@@ -928,20 +930,22 @@
         "BTN": "改名"
       },
       "ORGDOMAIN": {
-        "TITLE": "组织域所有权验证",
-        "VERIFICATION": "要验证您对域的所有权，您需要下载验证文件并将其上传到下面列出的提供的 URL，或者为提供的域名添加一条类型为TXT的DNS解析记录。完成后请单击按钮进行验证。",
-        "VERIFICATION_SKIP": "您现在可以跳过验证并继续创建您的组织，但要使用您的组织，必须完成此步骤！",
-        "VERIFICATION_VALIDATION_DESC": "定期检查令牌以确保您仍然是域的所有者。",
+        "TITLE": "验证 {{value}} 所有权",
+        "VERIFICATION": "我们为您提供两种手动验证域的方法：",
+        "VERIFICATION_HTML": "- HTTP。在您的网站上托管临时验证文件",
+        "VERIFICATION_DNS": "- DNS。创建 TXT 记录 DNS 条目",
+        "VERIFICATION_DNS_DESC": "如果您管理 {{ value }} 并且有权访问您的 DNS 记录，则可以使用以下值创建新的 TXT 记录：",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "使用此代码作为 TXT 记录的值：",
+        "VERIFICATION_HTTP_DESC": "如果您有权访问您的网站托管，只需下载验证文件并将其上传到提供的 URL",
+        "VERIFICATION_HTTP_URL_LABEL": "预期网址：",
+        "VERIFICATION_HTTP_FILE_LABEL": "验证文件：",
+        "VERIFICATION_SKIP": "您现在可以跳过验证并继续创建您的组织，但为了使用您的域，必须完成此步骤！",
+        "VERIFICATION_VALIDATION_DESC": "不要删除验证码，因为 ZITADEL 会不时重新检查您的域名所有权。",
         "VERIFICATION_NEWTOKEN_TITLE": "请求新令牌",
-        "VERIFICATION_NEWTOKEN_DESC": "如果您想请求新令牌，请选择您喜欢的方法。如果要验证持久性令牌，请单击上面的按钮。",
-        "VERIFICATION_VALIDATION_ONGOING": "已请求验证令牌，单击按钮以触发验证检查。",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "输入令牌：",
+        "VERIFICATION_VALIDATION_ONGOING": "已选择 {{ value }} 方法来验证您的域。单击该按钮可触发验证检查或重置验证过程。",
         "VERIFICATION_SUCCESSFUL": "域名验证成功！",
-        "REQUESTNEWTOKEN": "请求新令牌",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "RESETMETHOD": "重置验证方式"
       },
       "DOWNLOAD_FILE": "下载文件",
       "SELECTORGTOOLTIP": "选择此组织。",
@@ -1018,7 +1022,7 @@
       "DESCRIPTION": "这些设置将扩展或覆盖您的实例设置。"
     },
     "LIST": {
-      "GENERAL": "通用",
+      "LANGUAGES": "语言",
       "LOGIN": "登录行为和安全",
       "LOCKOUT": "安全锁策略",
       "COMPLEXITY": "密码复杂性",
@@ -1047,22 +1051,32 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "默认语言",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "语言设置",
+      "DEFAULT": "默认语言",
+      "ALLOWED": "允许的语言",
+      "NOT_ALLOWED": "不允许的语言",
+      "ALLOW_ALL": "允许所有语言",
+      "DISALLOW_ALL": "禁止所有语言",
+      "SETASDEFAULT": "设置为默认语言",
+      "DEFAULT_SAVED": "默认语言已保存",
+      "ALLOWED_SAVED": "允许的语言已保存",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "SMTP 设置",
@@ -1260,8 +1274,10 @@
       "RESET_DESCRIPTION": "您即将恢复所有默认值。您所做的所有更改都将被永久删除。你真的要继续吗？",
       "UNSAVED_TITLE": "继续但不保存？",
       "UNSAVED_DESCRIPTION": "您在未保存的情况下进行了更改。您现在要保存吗？",
-      "LOCALE": "本地化",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "您选择了不允许的语言。您可以继续修改文本。但是，如果您希望您的用户实际上能够使用此语言，请更改您的实例限制。",
+      "LANGUAGES_NOT_ALLOWED": "不允许：",
+      "LANGUAGE": "语言",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1372,7 +1388,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP 发件人地址与实例域名匹配",
       "ALLOWUSERNAMEPASSWORD": "允许用户名密码",
       "ALLOWEXTERNALIDP": "允许外部身份提供者",
-      "ALLOWREGISTER": "允许注册",
+      "ALLOWREGISTERUSERS": "允许注册用户",
+      "ALLOWREGISTERORGS": "允许注册组织",
       "ALLOWUSERNAMEPASSWORD_DESC": "允许使用用户名和密码进行登录。",
       "ALLOWEXTERNALIDP_DESC": "允许外部身份提供者进行登录",
       "ALLOWREGISTER_DESC": "如果选择了该选项，登录中会出现一个用于注册用户的附加步骤。",

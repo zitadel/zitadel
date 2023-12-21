@@ -23,17 +23,17 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) getUserByID(ctx context.Context, id string) (*query.User, error) {
-	owner, err := query.NewUserResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID, query.TextEquals)
+	user, err := s.query.GetUserByID(ctx, true, id)
 	if err != nil {
 		return nil, err
 	}
-	user, err := s.query.GetUserByID(ctx, true, id, owner)
-	if err != nil {
-		return nil, err
+	if user.ResourceOwner != authz.GetCtxData(ctx).OrgID {
+		return nil, zerrors.ThrowNotFound(nil, "MANAG-fpo4B", "Errors.User.NotFound")
 	}
 	return user, nil
 }
@@ -49,11 +49,7 @@ func (s *Server) GetUserByID(ctx context.Context, req *mgmt_pb.GetUserByIDReques
 }
 
 func (s *Server) GetUserByLoginNameGlobal(ctx context.Context, req *mgmt_pb.GetUserByLoginNameGlobalRequest) (*mgmt_pb.GetUserByLoginNameGlobalResponse, error) {
-	loginName, err := query.NewUserPreferredLoginNameSearchQuery(req.LoginName, query.TextEquals)
-	if err != nil {
-		return nil, err
-	}
-	user, err := s.query.GetUser(ctx, true, loginName)
+	user, err := s.query.GetUserByLoginName(ctx, true, req.LoginName)
 	if err != nil {
 		return nil, err
 	}
@@ -220,8 +216,7 @@ func (s *Server) BulkRemoveUserMetadata(ctx context.Context, req *mgmt_pb.BulkRe
 
 func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequest) (*mgmt_pb.AddHumanUserResponse, error) {
 	human := AddHumanUserRequestToAddHuman(req)
-	err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, human, true)
-	if err != nil {
+	if err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, human, true); err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.AddHumanUserResponse{

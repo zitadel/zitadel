@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
@@ -21,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestAddOrg(t *testing.T) {
@@ -44,7 +44,7 @@ func TestAddOrg(t *testing.T) {
 				name: "",
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument"),
 			},
 		},
 		{
@@ -106,7 +106,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -123,7 +123,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				name:          "  ",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -141,7 +141,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 								"lastname1",
 								"nickname1",
 								"displayname1",
-								language.German,
+								language.English,
 								domain.GenderMale,
 								"email1",
 								true,
@@ -167,7 +167,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -185,7 +185,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 								"lastname1",
 								"nickname1",
 								"displayname1",
-								language.German,
+								language.English,
 								domain.GenderMale,
 								"email1",
 								true,
@@ -193,7 +193,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 						),
 					),
 					expectFilterOrgMemberNotFound(),
-					expectPushFailed(errors.ThrowAlreadyExists(nil, "id", "internal"),
+					expectPushFailed(zerrors.ThrowAlreadyExists(nil, "id", "internal"),
 						org.NewOrgAddedEvent(
 							context.Background(),
 							&org.NewAggregate("org2").Aggregate,
@@ -235,7 +235,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -253,7 +253,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 								"lastname1",
 								"nickname1",
 								"displayname1",
-								language.German,
+								language.English,
 								domain.GenderMale,
 								"email1",
 								true,
@@ -261,7 +261,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 						),
 					),
 					expectFilterOrgMemberNotFound(),
-					expectPushFailed(errors.ThrowInternal(nil, "id", "internal"),
+					expectPushFailed(zerrors.ThrowInternal(nil, "id", "internal"),
 						org.NewOrgAddedEvent(
 							context.Background(),
 							&org.NewAggregate("org2").Aggregate,
@@ -303,7 +303,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -321,7 +321,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 								"lastname1",
 								"nickname1",
 								"displayname1",
-								language.German,
+								language.English,
 								domain.GenderMale,
 								"email1",
 								true,
@@ -392,7 +392,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 								"lastname1",
 								"nickname1",
 								"displayname1",
-								language.German,
+								language.English,
 								domain.GenderMale,
 								"email1",
 								true,
@@ -500,7 +500,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -516,7 +516,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				name:  "  ",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -533,7 +533,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				name:  "org",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -556,7 +556,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				name:  " org ",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -573,7 +573,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 					),
 					expectFilter(),
 					expectPushFailed(
-						errors.ThrowInternal(nil, "id", "message"),
+						zerrors.ThrowInternal(nil, "id", "message"),
 						org.NewOrgChangedEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate, "org", "neworg",
 						),
@@ -586,7 +586,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				name:  "neworg",
 			},
 			res: res{
-				err: errors.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -751,7 +751,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -777,7 +777,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -793,7 +793,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 						),
 					),
 					expectPushFailed(
-						errors.ThrowInternal(nil, "id", "message"),
+						zerrors.ThrowInternal(nil, "id", "message"),
 						org.NewOrgDeactivatedEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate,
 						),
@@ -805,7 +805,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: errors.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -884,7 +884,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -906,7 +906,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -927,7 +927,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 						),
 					),
 					expectPushFailed(
-						errors.ThrowInternal(nil, "id", "message"),
+						zerrors.ThrowInternal(nil, "id", "message"),
 						org.NewOrgReactivatedEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate,
 						),
@@ -939,7 +939,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: errors.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -1019,7 +1019,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 				orgID: "defaultOrgID",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1045,7 +1045,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1062,7 +1062,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1093,7 +1093,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 					expectFilter(),
 					expectFilter(),
 					expectPushFailed(
-						errors.ThrowInternal(nil, "id", "message"),
+						zerrors.ThrowInternal(nil, "id", "message"),
 						org.NewOrgRemovedEvent(
 							context.Background(), &org.NewAggregate("org1").Aggregate, "org", []string{}, false, []string{}, []*domain.UserIDPLink{}, []string{},
 						),
@@ -1105,7 +1105,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: errors.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -1181,7 +1181,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 								"lastname1",
 								"nickname1",
 								"displayname1",
-								language.German,
+								language.English,
 								domain.GenderMale,
 								"email1",
 								false,
@@ -1292,7 +1292,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument"),
+				err: zerrors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument"),
 			},
 		},
 		{
@@ -1315,7 +1315,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.ThrowPreconditionFailed(nil, "ORG-GoXOn", "Errors.User.NotFound"),
+				err: zerrors.ThrowPreconditionFailed(nil, "ORG-GoXOn", "Errors.User.NotFound"),
 			},
 		},
 		{
@@ -1346,7 +1346,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 				allowInitialMail: true,
 			},
 			res: res{
-				err: errors.ThrowInvalidArgument(nil, "V2-zzad3", "Errors.Invalid.Argument"),
+				err: zerrors.ThrowInvalidArgument(nil, "V2-zzad3", "Errors.Invalid.Argument"),
 			},
 		},
 		{

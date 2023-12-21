@@ -145,7 +145,6 @@
             </cnsl-form-field>
           </div>
         </div>
-
         <div class="filter-events-section">
           <div class="checkbox-wrapper">
             <mat-checkbox id="sequenceFilterSet" name="sequenceFilterSet" class="cb" formControlName="sequenceFilterSet"
@@ -153,46 +152,73 @@
             </mat-checkbox>
           </div>
           <div class="filter-events-sub" *ngIf="sequenceFilterSet?.value">
-            <cnsl-form-field class="aggregate-type-select">
-              <cnsl-label>{{ 'IAM.EVENTS.FILTERS.SEQUENCE.SORT' | translate }}</cnsl-label>
-
-              <mat-select id="isAsc" name="isAsc" formControlName="isAsc">
-                <mat-option [value]="false"> {{ 'IAM.EVENTS.FILTERS.SEQUENCE.DESC' | translate }} </mat-option>
-                <mat-option [value]="true">{{ 'IAM.EVENTS.FILTERS.SEQUENCE.ASC' | translate }} </mat-option>
-              </mat-select>
-            </cnsl-form-field>
-
             <cnsl-form-field class="filter-input-value">
               <cnsl-label>{{ 'IAM.EVENTS.FILTERS.SEQUENCE.LABEL' | translate }}</cnsl-label>
               <input cnslInput id="sequence" name="sequence" formControlName="sequence" />
             </cnsl-form-field>
           </div>
         </div>
-
         <div class="filter-events-section">
-          <div class="checkbox-wrapper">
-            <mat-checkbox
-              id="creationDateFilterSet"
-              name="creationDateFilterSet"
-              class="cb"
-              formControlName="creationDateFilterSet"
-              >{{ 'IAM.EVENTS.FILTERS.CREATIONDATE.CHECKBOX' | translate }}
-            </mat-checkbox>
+          <mat-radio-group aria-label="Select an option" class="filter-events-sub" formControlName="creationDateFilterType">
+            <mat-radio-button [value]="CreationDateFilterType.FROM">
+              {{ 'IAM.EVENTS.FILTERS.CREATIONDATE.RADIO_FROM' | translate }}
+            </mat-radio-button>
+            <mat-radio-button [value]="CreationDateFilterType.RANGE">
+              {{ 'IAM.EVENTS.FILTERS.CREATIONDATE.RADIO_RANGE' | translate }}
+            </mat-radio-button>
+          </mat-radio-group>
+          <div class="filter-events-sub">
+            <ng-container *ngIf="creationDateFilterType!.value === CreationDateFilterType.FROM">
+              <mat-form-field class="datetime-input">
+                <input
+                  class="datetime"
+                  matInput
+                  type="datetime-local"
+                  name="creationDateFrom"
+                  [value]="creationDateFrom!.value | date: 'yyyy-MM-dd HH:mm:ss'"
+                  (change)="creationDateFrom = $event.target"
+                />
+              </mat-form-field>
+            </ng-container>
+            <ng-container *ngIf="creationDateFilterType!.value === CreationDateFilterType.RANGE">
+              <div class="datetime-range">
+                <mat-form-field class="datetime-input">
+                  <cnsl-label
+                    >{{ 'IAM.EVENTS.FILTERS.CREATIONDATE.LABEL_SINCE' | translate }}
+                    <input
+                      matInput
+                      type="datetime-local"
+                      name="creationDateSince"
+                      [value]="creationDateSince!.value | date: 'yyyy-MM-dd HH:mm:ss'"
+                      (change)="creationDateSince = $event.target"
+                    />
+                  </cnsl-label>
+                </mat-form-field>
+                <mat-form-field class="datetime-input">
+                  <cnsl-label
+                    >{{ 'IAM.EVENTS.FILTERS.CREATIONDATE.LABEL_UNTIL' | translate }}
+                    <input
+                      matInput
+                      type="datetime-local"
+                      name="creationDateUntil"
+                      [value]="creationDateUntil!.value | date: 'yyyy-MM-dd HH:mm:ss'"
+                      (change)="creationDateUntil = $event.target"
+                    />
+                  </cnsl-label>
+                </mat-form-field>
+              </div>
+            </ng-container>
           </div>
-          <div class="filter-events-sub" *ngIf="creationDateFilterSet?.value">
-            <cnsl-form-field class="filter-input-value">
-              <cnsl-label>{{ 'IAM.EVENTS.FILTERS.CREATIONDATE.LABEL' | translate }}</cnsl-label>
-              <input
-                cnslInput
-                id="creationDate"
-                name="creationDate"
-                [matDatepicker]="picker"
-                formControlName="creationDate"
-              />
-              <mat-datepicker-toggle style="top: 0" cnslSuffix [for]="picker"></mat-datepicker-toggle>
-              <mat-datepicker #picker></mat-datepicker>
-            </cnsl-form-field>
-          </div>
+        </div>
+        <div class="filter-events-section">
+          <cnsl-form-field class="aggregate-type-select">
+            <cnsl-label>{{ 'IAM.EVENTS.FILTERS.SORT' | translate }}</cnsl-label>
+
+            <mat-select id="isAsc" name="isAsc" formControlName="isAsc">
+              <mat-option [value]="false"> {{ 'IAM.EVENTS.FILTERS.DESC' | translate }} </mat-option>
+              <mat-option [value]="true">{{ 'IAM.EVENTS.FILTERS.ASC' | translate }} </mat-option>
+            </mat-select>
+          </cnsl-form-field>
         </div>
       </form>
     </div>

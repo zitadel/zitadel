@@ -13,13 +13,13 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestAddDomain(t *testing.T) {
@@ -45,7 +45,7 @@ func TestAddDomain(t *testing.T) {
 				domain: "",
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-r3h4J", "Errors.Invalid.Argument"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "ORG-r3h4J", "Errors.Invalid.Argument"),
 			},
 		},
 		{
@@ -124,7 +124,7 @@ func TestAddDomain(t *testing.T) {
 				},
 			},
 			want: Want{
-				CreateErr: errors.ThrowAlreadyExists(nil, "", ""),
+				CreateErr: zerrors.ThrowAlreadyExists(nil, "", ""),
 			},
 		},
 	}
@@ -159,7 +159,7 @@ func TestVerifyDomain(t *testing.T) {
 				domain: "",
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-yqlVQ", "Errors.Invalid.Argument"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "ORG-yqlVQ", "Errors.Invalid.Argument"),
 			},
 		},
 		{
@@ -203,7 +203,7 @@ func TestSetDomainPrimary(t *testing.T) {
 				domain: "",
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-gmNqY", "Errors.Invalid.Argument"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "ORG-gmNqY", "Errors.Invalid.Argument"),
 			},
 		},
 		{
@@ -216,7 +216,7 @@ func TestSetDomainPrimary(t *testing.T) {
 				},
 			},
 			want: Want{
-				CreateErr: errors.ThrowNotFound(nil, "", ""),
+				CreateErr: zerrors.ThrowNotFound(nil, "", ""),
 			},
 		},
 		{
@@ -229,7 +229,7 @@ func TestSetDomainPrimary(t *testing.T) {
 				},
 			},
 			want: Want{
-				CreateErr: errors.ThrowPreconditionFailed(nil, "", ""),
+				CreateErr: zerrors.ThrowPreconditionFailed(nil, "", ""),
 			},
 		},
 		{
@@ -247,7 +247,7 @@ func TestSetDomainPrimary(t *testing.T) {
 				},
 			},
 			want: Want{
-				CreateErr: errors.ThrowPreconditionFailed(nil, "", ""),
+				CreateErr: zerrors.ThrowPreconditionFailed(nil, "", ""),
 			},
 		},
 		{
@@ -308,7 +308,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -338,7 +338,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 				domain: "domain.ch",
 			},
 			res: res{
-				err: errors.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -439,7 +439,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -456,7 +456,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -476,7 +476,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -505,7 +505,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -546,7 +546,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -710,7 +710,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -727,7 +727,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -756,7 +756,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -797,7 +797,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -832,7 +832,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -888,7 +888,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1154,7 +1154,7 @@ func TestCommandSide_SetPrimaryDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1171,7 +1171,7 @@ func TestCommandSide_SetPrimaryDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1200,7 +1200,7 @@ func TestCommandSide_SetPrimaryDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1234,7 +1234,7 @@ func TestCommandSide_SetPrimaryDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1339,7 +1339,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1356,7 +1356,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1385,7 +1385,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1431,7 +1431,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1545,7 +1545,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 }
 
 func invalidDomainVerification(domain, token, verifier string, checkType http.CheckType) error {
-	return errors.ThrowInvalidArgument(nil, "HTTP-GH422", "Errors.Internal")
+	return zerrors.ThrowInvalidArgument(nil, "HTTP-GH422", "Errors.Internal")
 }
 
 func validDomainVerification(domain, token, verifier string, checkType http.CheckType) error {

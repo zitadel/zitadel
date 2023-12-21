@@ -9,8 +9,8 @@ import (
 
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestNotify_SendEmailVerificationCode(t *testing.T) {
@@ -56,7 +56,7 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 				urlTmpl: "{{",
 			},
 			want:    &notifyResult{},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
 		},
 		{
 			name: "template success",

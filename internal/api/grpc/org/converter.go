@@ -3,8 +3,8 @@ package org
 import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	org_pb "github.com/zitadel/zitadel/pkg/grpc/org"
 )
 
@@ -28,7 +28,7 @@ func OrgQueryToModel(apiQuery *org_pb.OrgQuery) (query.SearchQuery, error) {
 	case *org_pb.OrgQuery_StateQuery:
 		return query.NewOrgStateSearchQuery(OrgStateToDomain(q.StateQuery.State))
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
 	}
 }
 
@@ -52,7 +52,7 @@ func OrgQueryToQuery(search *org_pb.OrgQuery) (query.SearchQuery, error) {
 	case *org_pb.OrgQuery_StateQuery:
 		return query.NewOrgStateSearchQuery(OrgStateToDomain(q.StateQuery.State))
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ADMIN-ADvsd", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ADMIN-ADvsd", "List.Query.Invalid")
 	}
 }
 
@@ -137,7 +137,7 @@ func DomainQueryToModel(searchQuery *org_pb.DomainSearchQuery) (query.SearchQuer
 	case *org_pb.DomainSearchQuery_DomainNameQuery:
 		return query.NewOrgDomainDomainSearchQuery(object.TextMethodToQuery(q.DomainNameQuery.Method), q.DomainNameQuery.Name)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ORG-Ags42", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-Ags42", "List.Query.Invalid")
 	}
 }
 

@@ -6,9 +6,9 @@ import (
 
 	"github.com/zitadel/logging"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -53,7 +53,7 @@ func (r *ExternalIDPView) setRootData(event *models.Event) {
 func (r *ExternalIDPView) SetData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, r); err != nil {
 		logging.Log("EVEN-48sfs").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")
+		return zerrors.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")
 	}
 	return nil
 }

@@ -551,11 +551,6 @@ export class ManagementService {
 
   constructor(private readonly grpcService: GrpcService) {}
 
-  public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
-    const req = new GetSupportedLanguagesRequest();
-    return this.grpcService.mgmt.getSupportedLanguages(req, null).then((resp) => resp.toObject());
-  }
-
   public getDefaultLoginTexts(req: GetDefaultLoginTextsRequest): Promise<GetDefaultLoginTextsResponse.AsObject> {
     return this.grpcService.mgmt.getDefaultLoginTexts(req, null).then((resp) => resp.toObject());
   }

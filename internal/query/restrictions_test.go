@@ -7,16 +7,21 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
+
+	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 var (
-	expectedRestrictionsQuery = regexp.QuoteMeta("SELECT projections.restrictions.aggregate_id," +
-		" projections.restrictions.creation_date," +
-		" projections.restrictions.change_date," +
-		" projections.restrictions.resource_owner," +
-		" projections.restrictions.sequence," +
-		" projections.restrictions.disallow_public_org_registration" +
-		" FROM projections.restrictions" +
+	expectedRestrictionsQuery = regexp.QuoteMeta("SELECT projections.restrictions2.aggregate_id," +
+		" projections.restrictions2.creation_date," +
+		" projections.restrictions2.change_date," +
+		" projections.restrictions2.resource_owner," +
+		" projections.restrictions2.sequence," +
+		" projections.restrictions2.disallow_public_org_registration," +
+		" projections.restrictions2.allowed_languages" +
+		" FROM projections.restrictions2" +
 		" AS OF SYSTEM TIME '-1 ms'",
 	)
 
@@ -27,6 +32,7 @@ var (
 		"resource_owner",
 		"sequence",
 		"disallow_public_org_registration",
+		"allowed_languages",
 	}
 )
 
@@ -56,7 +62,9 @@ func Test_RestrictionsPrepare(t *testing.T) {
 					}
 					return nil, true
 				},
-				object: Restrictions{},
+				object: Restrictions{
+					AllowedLanguages: make([]language.Tag, 0),
+				},
 			},
 		},
 		{
@@ -73,6 +81,7 @@ func Test_RestrictionsPrepare(t *testing.T) {
 						"instance1",
 						0,
 						true,
+						database.TextArray[string]([]string{"en", "de", "ru"}),
 					},
 				),
 				object: Restrictions{
@@ -82,6 +91,7 @@ func Test_RestrictionsPrepare(t *testing.T) {
 					ResourceOwner:                 "instance1",
 					Sequence:                      0,
 					DisallowPublicOrgRegistration: true,
+					AllowedLanguages:              []language.Tag{language.Make("en"), language.Make("de"), language.Make("ru")},
 				},
 			},
 		},

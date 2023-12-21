@@ -5,8 +5,9 @@ import (
 	"testing"
 
 	"github.com/VictoriaMetrics/fastcache"
-	"github.com/zitadel/zitadel/internal/errors"
+
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type TestStruct struct {
@@ -47,7 +48,7 @@ func TestSet(t *testing.T) {
 				value: &TestStruct{Test: "Test"},
 			},
 			res: res{
-				errFunc: errors.IsErrorInvalidArgument,
+				errFunc: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -57,7 +58,7 @@ func TestSet(t *testing.T) {
 				key:   "KEY",
 			},
 			res: res{
-				errFunc: errors.IsErrorInvalidArgument,
+				errFunc: zerrors.IsErrorInvalidArgument,
 			},
 		},
 	}
@@ -119,7 +120,7 @@ func TestGet(t *testing.T) {
 				getValue: &TestStruct{Test: "Test"},
 			},
 			res: res{
-				errFunc: errors.IsErrorInvalidArgument,
+				errFunc: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -130,7 +131,7 @@ func TestGet(t *testing.T) {
 				setValue: &TestStruct{Test: "Test"},
 			},
 			res: res{
-				errFunc: errors.IsErrorInvalidArgument,
+				errFunc: zerrors.IsErrorInvalidArgument,
 			},
 		},
 	}
@@ -192,7 +193,7 @@ func TestDelete(t *testing.T) {
 				getValue: &TestStruct{Test: "Test"},
 			},
 			res: res{
-				errFunc: errors.IsErrorInvalidArgument,
+				errFunc: zerrors.IsErrorInvalidArgument,
 			},
 		},
 	}

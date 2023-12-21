@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestConfig_serverFromContext(t *testing.T) {
@@ -27,7 +27,7 @@ func TestConfig_serverFromContext(t *testing.T) {
 		{
 			name:    "webauthn error",
 			args:    args{context.Background(), "", ""},
-			wantErr: caos_errs.ThrowInternal(nil, "WEBAU-UX9ta", "Errors.User.WebAuthN.ServerConfig"),
+			wantErr: zerrors.ThrowInternal(nil, "WEBAU-UX9ta", "Errors.User.WebAuthN.ServerConfig"),
 		},
 		{
 			name: "success from ctx",

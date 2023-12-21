@@ -83,8 +83,8 @@ export class ActionTableComponent implements OnInit {
         this.mgmtService
           .deleteAction(action.id)
           .then(() => {
+            this.selection.clear();
             this.toast.showInfo('FLOWS.DIALOG.DELETEACTION.DELETE_SUCCESS', true);
-
             this.refreshPage();
           })
           .catch((error: any) => {

@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -13,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -163,7 +163,7 @@ func (p *authNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 		authNKeyEvent.publicKey = e.PublicKey
 		authNKeyEvent.keyType = e.KeyType
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Dgb32", "reduce.wrong.event.type %v", []eventstore.EventType{project.ApplicationKeyAddedEventType, user.MachineKeyAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Dgb32", "reduce.wrong.event.type %v", []eventstore.EventType{project.ApplicationKeyAddedEventType, user.MachineKeyAddedEventType})
 	}
 	return handler.NewCreateStatement(
 		&authNKeyEvent,
@@ -207,7 +207,7 @@ func (p *authNKeyProjection) reduceAuthNKeyEnabledChanged(event eventstore.Event
 		changeDate = e.CreationDate()
 		sequence = e.Sequence()
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Dbrt1", "reduce.wrong.event.type %v", []eventstore.EventType{project.APIConfigChangedType, project.OIDCConfigChangedType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Dbrt1", "reduce.wrong.event.type %v", []eventstore.EventType{project.APIConfigChangedType, project.OIDCConfigChangedType})
 	}
 	return handler.NewUpdateStatement(
 		event,
@@ -237,7 +237,7 @@ func (p *authNKeyProjection) reduceAuthNKeyRemoved(event eventstore.Event) (*han
 	case *user.UserRemovedEvent:
 		condition = handler.NewCond(AuthNKeyAggregateIDCol, e.Aggregate().ID)
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-BGge42", "reduce.wrong.event.type %v", []eventstore.EventType{project.ApplicationKeyRemovedEventType, project.ApplicationRemovedType, project.ProjectRemovedType, user.MachineKeyRemovedEventType, user.UserRemovedType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-BGge42", "reduce.wrong.event.type %v", []eventstore.EventType{project.ApplicationKeyRemovedEventType, project.ApplicationRemovedType, project.ProjectRemovedType, user.MachineKeyRemovedEventType, user.UserRemovedType})
 	}
 	return handler.NewDeleteStatement(
 		event,
@@ -251,7 +251,7 @@ func (p *authNKeyProjection) reduceAuthNKeyRemoved(event eventstore.Event) (*han
 func (p *authNKeyProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Hyd1f", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Hyd1f", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
 	return handler.NewDeleteStatement(
