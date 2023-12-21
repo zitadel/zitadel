@@ -200,6 +200,8 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 		// trigger activity log for authentication for user
 		activity.Trigger(ctx, "", authReq.CurrentAuthRequest.UserID, activity.OIDCAccessToken)
 		return o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.GetID())
+	case op.IDTokenRequest:
+		applicationID = authReq.GetClientID()
 	}
 
 	accessTokenLifetime, _, _, _, err := o.getOIDCSettings(ctx)
@@ -263,15 +265,16 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 }
 
 func getInfoFromRequest(req op.TokenRequest) (string, string, string, time.Time, []string) {
-	authReq, ok := req.(*AuthRequest)
-	if ok {
-		return authReq.AgentID, authReq.ApplicationID, authReq.UserOrgID, authReq.AuthTime, authReq.GetAMR()
+	switch r := req.(type) {
+	case *AuthRequest:
+		return r.AgentID, r.ApplicationID, r.UserOrgID, r.AuthTime, r.GetAMR()
+	case *RefreshTokenRequest:
+		return r.UserAgentID, r.ClientID, "", r.AuthTime, r.AuthMethodsReferences
+	case op.IDTokenRequest:
+		return "", r.GetClientID(), "", r.GetAuthTime(), r.GetAMR()
+	default:
+		return "", "", "", time.Time{}, nil
 	}
-	refreshReq, ok := req.(*RefreshTokenRequest)
-	if ok {
-		return refreshReq.UserAgentID, refreshReq.ClientID, "", refreshReq.AuthTime, refreshReq.AuthMethodsReferences
-	}
-	return "", "", "", time.Time{}, nil
 }
 
 func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken string) (_ op.RefreshTokenRequest, err error) {
