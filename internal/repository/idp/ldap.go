@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type LDAPIDPAddedEvent struct {
@@ -178,7 +178,7 @@ func LDAPIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-Dgh42", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-Dgh42", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -241,7 +241,7 @@ func NewLDAPIDPChangedEvent(
 	changes []LDAPIDPChanges,
 ) (*LDAPIDPChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDP-SDf3f", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-SDf3f", "Errors.NoChangesFound")
 	}
 	changedEvent := &LDAPIDPChangedEvent{
 		BaseEvent: *base,
@@ -342,7 +342,7 @@ func LDAPIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error)
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-Sfth3", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-Sfth3", "unable to unmarshal event")
 	}
 
 	return e, nil

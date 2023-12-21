@@ -11,8 +11,8 @@ import (
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var _ idp.Provider = (*Provider)(nil)
@@ -154,7 +154,7 @@ func (p *Provider) IsAutoUpdate() bool {
 func (p *Provider) GetSP() (*samlsp.Middleware, error) {
 	sp, err := samlsp.New(*p.spOptions)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "SAML-qee09ffuq5", "Errors.Intent.IDPInvalid")
+		return nil, zerrors.ThrowInternal(err, "SAML-qee09ffuq5", "Errors.Intent.IDPInvalid")
 	}
 	if p.requestTracker != nil {
 		sp.RequestTracker = p.requestTracker

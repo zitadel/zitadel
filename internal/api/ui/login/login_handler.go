@@ -7,7 +7,7 @@ import (
 
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -77,7 +77,7 @@ func (l *Login) handleLoginNameCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if authReq == nil {
-		l.renderLogin(w, r, nil, errors.ThrowInvalidArgument(nil, "LOGIN-adrg3", "Errors.AuthRequest.NotFound"))
+		l.renderLogin(w, r, nil, zerrors.ThrowInvalidArgument(nil, "LOGIN-adrg3", "Errors.AuthRequest.NotFound"))
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())

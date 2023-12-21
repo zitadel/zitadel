@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -13,10 +13,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Apps struct {
@@ -264,7 +264,7 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bo
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-AFDgg", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-AFDgg", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -285,7 +285,7 @@ func (q *Queries) AppByID(ctx context.Context, appID string) (app *App, err erro
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-immt9", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-immt9", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -306,7 +306,7 @@ func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string) (app *
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-JgUop", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-JgUop", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -331,7 +331,7 @@ func (q *Queries) ProjectByClientID(ctx context.Context, appID string) (project 
 		},
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-XhJi3", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-XhJi3", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -352,7 +352,7 @@ func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string) (
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return "", errors.ThrowInternal(err, "QUERY-7d92U", "Errors.Query.SQLStatement")
+		return "", zerrors.ThrowInternal(err, "QUERY-7d92U", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -378,7 +378,7 @@ func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (id s
 	}
 	query, args, err := stmt.Where(where).ToSql()
 	if err != nil {
-		return "", errors.ThrowInternal(err, "QUERY-SDfg3", "Errors.Query.SQLStatement")
+		return "", zerrors.ThrowInternal(err, "QUERY-SDfg3", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -399,7 +399,7 @@ func (q *Queries) ProjectByOIDCClientID(ctx context.Context, id string) (project
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-XhJi4", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-XhJi4", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -420,7 +420,7 @@ func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string) (app *
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-JgVop", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-JgVop", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -444,7 +444,7 @@ func (q *Queries) AppByClientID(ctx context.Context, clientID string) (app *App,
 		},
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Dfge2", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Dfge2", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -462,7 +462,7 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, wit
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-fajp8", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-fajp8", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -470,7 +470,7 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, wit
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
 	}
 	apps.State, err = q.latestState(ctx, appsTable)
 	return apps, err
@@ -484,7 +484,7 @@ func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-fajp8", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-fajp8", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -492,7 +492,7 @@ func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
 	}
 	return ids, nil
 }
@@ -594,10 +594,10 @@ func prepareAppQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder,
 			)
 
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-pCP8P", "Errors.App.NotExisting")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-pCP8P", "Errors.App.NotExisting")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-4SJlx", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-4SJlx", "Errors.Internal")
 			}
 
 			apiConfig.set(app)
@@ -621,10 +621,10 @@ func prepareProjectIDByAppQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			)
 
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return "", errors.ThrowNotFound(err, "QUERY-aKcc2", "Errors.Project.NotExisting")
+				if errors.Is(err, sql.ErrNoRows) {
+					return "", zerrors.ThrowNotFound(err, "QUERY-aKcc2", "Errors.Project.NotExisting")
 				}
-				return "", errors.ThrowInternal(err, "QUERY-3A5TG", "Errors.Internal")
+				return "", zerrors.ThrowInternal(err, "QUERY-3A5TG", "Errors.Internal")
 			}
 
 			return projectID, nil
@@ -666,10 +666,10 @@ func prepareProjectByAppQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				&p.PrivateLabelingSetting,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-yxTMh", "Errors.Project.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-yxTMh", "Errors.Project.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-dj2FF", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-dj2FF", "Errors.Internal")
 			}
 			return p, nil
 		}
@@ -769,7 +769,7 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 				)
 
 				if err != nil {
-					return nil, errors.ThrowInternal(err, "QUERY-XGWAX", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(err, "QUERY-XGWAX", "Errors.Internal")
 				}
 
 				apiConfig.set(app)
@@ -800,7 +800,7 @@ func prepareClientIDsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 					&apiID,
 					&oidcID,
 				); err != nil {
-					return nil, errors.ThrowInternal(err, "QUERY-0R2Nw", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(err, "QUERY-0R2Nw", "Errors.Internal")
 				}
 				if apiID.Valid {
 					ids = append(ids, apiID.String)

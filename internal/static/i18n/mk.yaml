@@ -144,7 +144,7 @@ Errors:
     ExternalIDP:
       Invalid: Невалиден надворешен IDP
       IDPConfigNotExisting: IDP не е валиден за оваа организација
-      NotAllowed: Надворешниоте IDP не е дозволен на оваа организација
+      NotAllowed: Надворешниот IDP не е дозволен
       MinimumExternalIDPNeeded: Мора да се додаде најмалку еден надворешен IDP
       AlreadyExists: Надворешниот IDP е веќе зафатен
       NotFound: Надворешниот IDP не е пронајден

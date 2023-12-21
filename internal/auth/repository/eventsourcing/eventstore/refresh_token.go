@@ -10,12 +10,12 @@ import (
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type RefreshTokenRepo struct {
@@ -35,35 +35,38 @@ func (r *RefreshTokenRepo) RefreshTokenByToken(ctx context.Context, refreshToken
 		return nil, err
 	}
 	if tokenView.Token != token {
-		return nil, errors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.User.RefreshToken.Invalid")
+		return nil, zerrors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.User.RefreshToken.Invalid")
 	}
 	return tokenView, nil
 }
 
 func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, tokenID, userID string) (*usr_model.RefreshTokenView, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
+
+	// always load the latest sequence first, so in case the token was not found by id,
+	// the sequence will be equal or lower than the actual projection and no events are lost
+	sequence, err := r.View.GetLatestRefreshTokenSequence(ctx)
+	logging.WithFields("instanceID", instanceID, "userID", userID, "tokenID", tokenID).
+		OnError(err).
+		Errorf("could not get current sequence for RefreshTokenByID")
+
 	tokenView, viewErr := r.View.RefreshTokenByID(tokenID, instanceID)
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
+	if viewErr != nil && !zerrors.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
-	if errors.IsNotFound(viewErr) {
-		sequence, err := r.View.GetLatestRefreshTokenSequence(ctx)
-		logging.WithFields("instanceID", instanceID, "userID", userID, "tokenID", tokenID).
-			OnError(err).
-			Errorf("could not get current sequence for RefreshTokenByID")
-
+	if zerrors.IsNotFound(viewErr) {
 		tokenView = new(model.RefreshTokenView)
 		tokenView.ID = tokenID
 		tokenView.UserID = userID
 		tokenView.InstanceID = instanceID
 		if sequence != nil {
-			tokenView.Sequence = sequence.Sequence
+			tokenView.ChangeDate = sequence.EventCreatedAt
 		}
 	}
 
-	events, esErr := r.getUserEvents(ctx, userID, tokenView.InstanceID, tokenView.Sequence, tokenView.GetRelevantEventTypes())
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-BHB52", "Errors.User.RefreshToken.Invalid")
+	events, esErr := r.getUserEvents(ctx, userID, tokenView.InstanceID, tokenView.ChangeDate, tokenView.GetRelevantEventTypes())
+	if zerrors.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, zerrors.ThrowNotFound(nil, "EVENT-BHB52", "Errors.User.RefreshToken.Invalid")
 	}
 
 	if esErr != nil {
@@ -78,7 +81,7 @@ func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, tokenID, userID
 		}
 	}
 	if !tokenView.Expiration.After(time.Now()) {
-		return nil, errors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.User.RefreshToken.Invalid")
+		return nil, zerrors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.User.RefreshToken.Invalid")
 	}
 	return model.RefreshTokenViewToModel(tokenView), nil
 }
@@ -105,8 +108,8 @@ func (r *RefreshTokenRepo) SearchMyRefreshTokens(ctx context.Context, userID str
 	}, nil
 }
 
-func (r *RefreshTokenRepo) getUserEvents(ctx context.Context, userID, instanceID string, sequence uint64, eventTypes []eventstore.EventType) ([]eventstore.Event, error) {
-	query, err := usr_view.UserByIDQuery(userID, instanceID, sequence, eventTypes)
+func (r *RefreshTokenRepo) getUserEvents(ctx context.Context, userID, instanceID string, changeDate time.Time, eventTypes []eventstore.EventType) ([]eventstore.Event, error) {
+	query, err := usr_view.UserByIDQuery(userID, instanceID, changeDate, eventTypes)
 	if err != nil {
 		return nil, err
 	}

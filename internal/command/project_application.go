@@ -6,8 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type AddApp struct {
@@ -22,7 +22,7 @@ func (c *Commands) newAppClientSecret(ctx context.Context, filter preparation.Fi
 
 func (c *Commands) ChangeApplication(ctx context.Context, projectID string, appChange domain.Application, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || appChange.GetAppID() == "" || appChange.GetApplicationName() == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.App.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.App.Invalid")
 	}
 
 	existingApp, err := c.getApplicationWriteModel(ctx, projectID, appChange.GetAppID(), resourceOwner)
@@ -30,10 +30,10 @@ func (c *Commands) ChangeApplication(ctx context.Context, projectID string, appC
 		return nil, err
 	}
 	if existingApp.State == domain.AppStateUnspecified || existingApp.State == domain.AppStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-28di9", "Errors.Project.App.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-28di9", "Errors.Project.App.NotExisting")
 	}
 	if existingApp.Name == appChange.GetApplicationName() {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2m8vx", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-2m8vx", "Errors.NoChangesFound")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 	pushedEvents, err := c.eventstore.Push(
@@ -51,7 +51,7 @@ func (c *Commands) ChangeApplication(ctx context.Context, projectID string, appC
 
 func (c *Commands) DeactivateApplication(ctx context.Context, projectID, appID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || appID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-88fi0", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-88fi0", "Errors.IDMissing")
 	}
 
 	existingApp, err := c.getApplicationWriteModel(ctx, projectID, appID, resourceOwner)
@@ -59,10 +59,10 @@ func (c *Commands) DeactivateApplication(ctx context.Context, projectID, appID, 
 		return nil, err
 	}
 	if existingApp.State == domain.AppStateUnspecified || existingApp.State == domain.AppStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-ov9d3", "Errors.Project.App.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-ov9d3", "Errors.Project.App.NotExisting")
 	}
 	if existingApp.State != domain.AppStateActive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-dsh35", "Errors.Project.App.NotActive")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-dsh35", "Errors.Project.App.NotActive")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationDeactivatedEvent(ctx, projectAgg, appID))
@@ -78,7 +78,7 @@ func (c *Commands) DeactivateApplication(ctx context.Context, projectID, appID, 
 
 func (c *Commands) ReactivateApplication(ctx context.Context, projectID, appID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || appID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-983dF", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-983dF", "Errors.IDMissing")
 	}
 
 	existingApp, err := c.getApplicationWriteModel(ctx, projectID, appID, resourceOwner)
@@ -86,10 +86,10 @@ func (c *Commands) ReactivateApplication(ctx context.Context, projectID, appID, 
 		return nil, err
 	}
 	if existingApp.State == domain.AppStateUnspecified || existingApp.State == domain.AppStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-ov9d3", "Errors.Project.App.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-ov9d3", "Errors.Project.App.NotExisting")
 	}
 	if existingApp.State != domain.AppStateInactive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1n8cM", "Errors.Project.App.NotInactive")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-1n8cM", "Errors.Project.App.NotInactive")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 
@@ -106,7 +106,7 @@ func (c *Commands) ReactivateApplication(ctx context.Context, projectID, appID, 
 
 func (c *Commands) RemoveApplication(ctx context.Context, projectID, appID, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || appID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-1b7Jf", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-1b7Jf", "Errors.IDMissing")
 	}
 
 	existingApp, err := c.getApplicationWriteModel(ctx, projectID, appID, resourceOwner)
@@ -114,7 +114,7 @@ func (c *Commands) RemoveApplication(ctx context.Context, projectID, appID, reso
 		return nil, err
 	}
 	if existingApp.State == domain.AppStateUnspecified || existingApp.State == domain.AppStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-0po9s", "Errors.Project.App.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-0po9s", "Errors.Project.App.NotExisting")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingApp.WriteModel)
 

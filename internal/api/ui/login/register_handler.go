@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -57,7 +57,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if data.Password != data.Password2 {
-		err := caos_errs.ThrowInvalidArgument(nil, "VIEW-KaGue", "Errors.User.Password.ConfirmationWrong")
+		err := zerrors.ThrowInvalidArgument(nil, "VIEW-KaGue", "Errors.User.Password.ConfirmationWrong")
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}

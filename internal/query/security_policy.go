@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -11,8 +11,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -63,7 +63,7 @@ func (q *Queries) SecurityPolicy(ctx context.Context) (policy *SecurityPolicy, e
 		SecurityPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Sf6d1", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Sf6d1", "Errors.Query.SQLStatment")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -95,8 +95,8 @@ func prepareSecurityPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 				&securityPolicy.Enabled,
 				&securityPolicy.AllowedOrigins,
 			)
-			if err != nil && !errs.Is(err, sql.ErrNoRows) { // ignore not found errors
-				return nil, errors.ThrowInternal(err, "QUERY-Dfrt2", "Errors.Internal")
+			if err != nil && !errors.Is(err, sql.ErrNoRows) { // ignore not found errors
+				return nil, zerrors.ThrowInternal(err, "QUERY-Dfrt2", "Errors.Internal")
 			}
 			return securityPolicy, nil
 		}

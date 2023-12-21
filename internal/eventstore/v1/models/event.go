@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type EventType string
@@ -101,7 +101,7 @@ func eventData(i interface{}) ([]byte, error) {
 	case map[string]interface{}:
 		bytes, err := json.Marshal(v)
 		if err != nil {
-			return nil, errors.ThrowInvalidArgument(err, "MODEL-s2fgE", "unable to marshal data")
+			return nil, zerrors.ThrowInvalidArgument(err, "MODEL-s2fgE", "unable to marshal data")
 		}
 		return bytes, nil
 	case nil:
@@ -112,11 +112,11 @@ func eventData(i interface{}) ([]byte, error) {
 			t = t.Elem()
 		}
 		if t.Kind() != reflect.Struct {
-			return nil, errors.ThrowInvalidArgument(nil, "MODEL-rjWdN", "data is not valid")
+			return nil, zerrors.ThrowInvalidArgument(nil, "MODEL-rjWdN", "data is not valid")
 		}
 		bytes, err := json.Marshal(v)
 		if err != nil {
-			return nil, errors.ThrowInvalidArgument(err, "MODEL-Y2OpM", "unable to marshal data")
+			return nil, zerrors.ThrowInvalidArgument(err, "MODEL-Y2OpM", "unable to marshal data")
 		}
 		return bytes, nil
 	}
@@ -124,29 +124,29 @@ func eventData(i interface{}) ([]byte, error) {
 
 func (e *Event) Validate() error {
 	if e == nil {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-oEAG4", "event is nil")
+		return zerrors.ThrowPreconditionFailed(nil, "MODEL-oEAG4", "event is nil")
 	}
 	if string(e.Typ) == "" {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-R2sB0", "type not defined")
+		return zerrors.ThrowPreconditionFailed(nil, "MODEL-R2sB0", "type not defined")
 	}
 
 	if e.AggregateID == "" {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-A6WwL", "aggregate id not set")
+		return zerrors.ThrowPreconditionFailed(nil, "MODEL-A6WwL", "aggregate id not set")
 	}
 	if e.AggregateType == "" {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-EzdyK", "aggregate type not set")
+		return zerrors.ThrowPreconditionFailed(nil, "MODEL-EzdyK", "aggregate type not set")
 	}
 	if err := e.AggregateVersion.Validate(); err != nil {
-		return errors.ThrowPreconditionFailed(err, "MODEL-KO71q", "version invalid")
+		return zerrors.ThrowPreconditionFailed(err, "MODEL-KO71q", "version invalid")
 	}
 	if e.Service == "" {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-4Yqik", "editor service not set")
+		return zerrors.ThrowPreconditionFailed(nil, "MODEL-4Yqik", "editor service not set")
 	}
 	if e.User == "" {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-L3NHO", "editor user not set")
+		return zerrors.ThrowPreconditionFailed(nil, "MODEL-L3NHO", "editor user not set")
 	}
 	if e.ResourceOwner == "" {
-		return errors.ThrowPreconditionFailed(nil, "MODEL-omFVT", "resource ow")
+		return zerrors.ThrowPreconditionFailed(nil, "MODEL-omFVT", "resource ow")
 	}
 	return nil
 }

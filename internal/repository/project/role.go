@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -71,7 +71,7 @@ func RoleAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-2M0xy", "unable to unmarshal project role")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-2M0xy", "unable to unmarshal project role")
 	}
 
 	return e, nil
@@ -100,7 +100,7 @@ func NewRoleChangedEvent(
 	changes []RoleChanges,
 ) (*RoleChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "PROJECT-eR9vx", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-eR9vx", "Errors.NoChangesFound")
 	}
 	changeEvent := &RoleChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -142,7 +142,7 @@ func RoleChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-3M0vx", "unable to unmarshal project role")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-3M0vx", "unable to unmarshal project role")
 	}
 
 	return e, nil
@@ -183,7 +183,7 @@ func RoleRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-1M0xs", "unable to unmarshal project role")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-1M0xs", "unable to unmarshal project role")
 	}
 
 	return e, nil

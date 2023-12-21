@@ -60,9 +60,9 @@ require (
 	github.com/superseriousbusiness/exifremove v0.0.0-20210330092427-6acd27eac203
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/zitadel/logging v0.5.0
-	github.com/zitadel/oidc/v3 v3.5.0
+	github.com/zitadel/oidc/v3 v3.8.0
 	github.com/zitadel/passwap v0.4.0
-	github.com/zitadel/saml v0.1.2
+	github.com/zitadel/saml v0.1.3
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.46.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.0
 	go.opentelemetry.io/otel v1.21.0
@@ -155,7 +155,7 @@ require (
 	github.com/golang/geo v0.0.0-20230421003525-6adc56603217 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/uuid v1.4.0
+	github.com/google/uuid v1.5.0
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
 	github.com/gorilla/handlers v1.5.2 // indirect

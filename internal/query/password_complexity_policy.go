@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -13,10 +13,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type PasswordComplexityPolicy struct {
@@ -62,7 +62,7 @@ func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, shouldTrigg
 		OrderBy(PasswordComplexityColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-lDnrk", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-lDnrk", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -91,7 +91,7 @@ func (q *Queries) DefaultPasswordComplexityPolicy(ctx context.Context, shouldTri
 		OrderBy(PasswordComplexityColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-h4Uyr", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-h4Uyr", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -198,10 +198,10 @@ func preparePasswordComplexityPolicyQuery(ctx context.Context, db prepareDatabas
 				&policy.State,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-63mtI", "Errors.PasswordComplexity.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-63mtI", "Errors.PasswordComplexity.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-uulCZ", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-uulCZ", "Errors.Internal")
 			}
 			return policy, nil
 		}

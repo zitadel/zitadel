@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -308,7 +308,7 @@ func HumanPasswordlessInitCodeAddedEventMapper(event eventstore.Event) (eventsto
 	}
 	err := event.Unmarshal(webAuthNAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-BDf32", "unable to unmarshal human passwordless code added")
+		return nil, zerrors.ThrowInternal(err, "USER-BDf32", "unable to unmarshal human passwordless code added")
 	}
 	return webAuthNAdded, nil
 }
@@ -366,7 +366,7 @@ func HumanPasswordlessInitCodeRequestedEventMapper(event eventstore.Event) (even
 	}
 	err := event.Unmarshal(webAuthNAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-VGfg3", "unable to unmarshal human passwordless code delivery added")
+		return nil, zerrors.ThrowInternal(err, "USER-VGfg3", "unable to unmarshal human passwordless code delivery added")
 	}
 	return webAuthNAdded, nil
 }
@@ -406,7 +406,7 @@ func HumanPasswordlessInitCodeSentEventMapper(event eventstore.Event) (eventstor
 	}
 	err := event.Unmarshal(webAuthNAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-Gtg4j", "unable to unmarshal human passwordless code sent")
+		return nil, zerrors.ThrowInternal(err, "USER-Gtg4j", "unable to unmarshal human passwordless code sent")
 	}
 	return webAuthNAdded, nil
 }
@@ -446,7 +446,7 @@ func HumanPasswordlessInitCodeCodeCheckFailedEventMapper(event eventstore.Event)
 	}
 	err := event.Unmarshal(webAuthNAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-Gtg4j", "unable to unmarshal human passwordless code check failed")
+		return nil, zerrors.ThrowInternal(err, "USER-Gtg4j", "unable to unmarshal human passwordless code check failed")
 	}
 	return webAuthNAdded, nil
 }
@@ -486,7 +486,7 @@ func HumanPasswordlessInitCodeCodeCheckSucceededEventMapper(event eventstore.Eve
 	}
 	err := event.Unmarshal(webAuthNAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-Gtg4j", "unable to unmarshal human passwordless code check succeeded")
+		return nil, zerrors.ThrowInternal(err, "USER-Gtg4j", "unable to unmarshal human passwordless code check succeeded")
 	}
 	return webAuthNAdded, nil
 }

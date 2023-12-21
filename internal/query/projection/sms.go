@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -111,7 +111,7 @@ func (p *smsConfigProjection) Reducers() []handler.AggregateReducer {
 func (p *smsConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SMSConfigTwilioAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-s8efs", "reduce.wrong.event.type %s", instance.SMSConfigTwilioAddedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-s8efs", "reduce.wrong.event.type %s", instance.SMSConfigTwilioAddedEventType)
 	}
 
 	return handler.NewMultiStatement(
@@ -144,7 +144,7 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event)
 func (p *smsConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SMSConfigTwilioChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fi99F", "reduce.wrong.event.type %s", instance.SMSConfigTwilioChangedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-fi99F", "reduce.wrong.event.type %s", instance.SMSConfigTwilioChangedEventType)
 	}
 	columns := make([]handler.Column, 0)
 	if e.SID != nil {
@@ -180,7 +180,7 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Even
 func (p *smsConfigProjection) reduceSMSConfigTwilioTokenChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SMSConfigTwilioTokenChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fi99F", "reduce.wrong.event.type %s", instance.SMSConfigTwilioTokenChangedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-fi99F", "reduce.wrong.event.type %s", instance.SMSConfigTwilioTokenChangedEventType)
 	}
 	columns := make([]handler.Column, 0)
 	if e.Token != nil {
@@ -213,7 +213,7 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioTokenChanged(event eventstore
 func (p *smsConfigProjection) reduceSMSConfigActivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SMSConfigActivatedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fj9Ef", "reduce.wrong.event.type %s", instance.SMSConfigActivatedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-fj9Ef", "reduce.wrong.event.type %s", instance.SMSConfigActivatedEventType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -232,7 +232,7 @@ func (p *smsConfigProjection) reduceSMSConfigActivated(event eventstore.Event) (
 func (p *smsConfigProjection) reduceSMSConfigDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SMSConfigDeactivatedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-dj9Js", "reduce.wrong.event.type %s", instance.SMSConfigDeactivatedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-dj9Js", "reduce.wrong.event.type %s", instance.SMSConfigDeactivatedEventType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -251,7 +251,7 @@ func (p *smsConfigProjection) reduceSMSConfigDeactivated(event eventstore.Event)
 func (p *smsConfigProjection) reduceSMSConfigRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SMSConfigRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-s9JJf", "reduce.wrong.event.type %s", instance.SMSConfigRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-s9JJf", "reduce.wrong.event.type %s", instance.SMSConfigRemovedEventType)
 	}
 	return handler.NewDeleteStatement(
 		e,

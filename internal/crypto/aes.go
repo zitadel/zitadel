@@ -7,7 +7,7 @@ import (
 	"encoding/base64"
 	"io"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var _ EncryptionAlgorithm = (*AESCrypto)(nil)
@@ -73,7 +73,7 @@ func (a *AESCrypto) encryptionKey() string {
 func (a *AESCrypto) decryptionKey(keyID string) (string, error) {
 	key, ok := a.keys[keyID]
 	if !ok {
-		return "", errors.ThrowNotFound(nil, "CRYPT-nkj1s", "unknown key id")
+		return "", zerrors.ThrowNotFound(nil, "CRYPT-nkj1s", "unknown key id")
 	}
 	return key, nil
 }
@@ -94,7 +94,7 @@ func EncryptAES(plainText []byte, key string) ([]byte, error) {
 
 	maxSize := 64 * 1024 * 1024
 	if len(plainText) > maxSize {
-		return nil, errors.ThrowPreconditionFailedf(nil, "CRYPT-AGg4t3", "data too large, max bytes: %v", maxSize)
+		return nil, zerrors.ThrowPreconditionFailedf(nil, "CRYPT-AGg4t3", "data too large, max bytes: %v", maxSize)
 	}
 	cipherText := make([]byte, aes.BlockSize+len(plainText))
 	iv := cipherText[:aes.BlockSize]
@@ -130,7 +130,7 @@ func DecryptAES(text []byte, key string) ([]byte, error) {
 	}
 
 	if len(cipherText) < aes.BlockSize {
-		err = errors.ThrowPreconditionFailed(nil, "CRYPT-23kH1", "cipher text block too short")
+		err = zerrors.ThrowPreconditionFailed(nil, "CRYPT-23kH1", "cipher text block too short")
 		return nil, err
 	}
 	iv := cipherText[:aes.BlockSize]

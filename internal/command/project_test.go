@@ -7,12 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddProject(t *testing.T) {
@@ -49,7 +49,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -57,7 +57,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectPushFailed(errors.ThrowAlreadyExists(nil, "ERROR", "internl"),
+					expectPushFailed(zerrors.ThrowAlreadyExists(nil, "ERROR", "internl"),
 						project.NewProjectAddedEvent(
 							context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
@@ -87,7 +87,7 @@ func TestCommandSide_AddProject(t *testing.T) {
 				ownerID:       "user1",
 			},
 			res: res{
-				err: errors.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -195,7 +195,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -213,7 +213,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -235,7 +235,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -270,7 +270,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -303,7 +303,7 @@ func TestCommandSide_ChangeProject(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -468,7 +468,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -484,7 +484,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 				resourceOwner: "",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -501,7 +501,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -531,7 +531,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -559,7 +559,7 @@ func TestCommandSide_DeactivateProject(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -644,7 +644,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -660,7 +660,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 				resourceOwner: "",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -677,7 +677,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -707,7 +707,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -731,7 +731,7 @@ func TestCommandSide_ReactivateProject(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -820,7 +820,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -836,7 +836,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 				resourceOwner: "",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -853,7 +853,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -883,7 +883,7 @@ func TestCommandSide_RemoveProject(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1115,7 +1115,7 @@ func TestAddProject(t *testing.T) {
 				privateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-C01yo", "Errors.Invalid.Argument"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "PROJE-C01yo", "Errors.Invalid.Argument"),
 			},
 		},
 		{
@@ -1127,7 +1127,7 @@ func TestAddProject(t *testing.T) {
 				privateLabelingSetting: -1,
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-AO52V", "Errors.Invalid.Argument"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "PROJE-AO52V", "Errors.Invalid.Argument"),
 			},
 		},
 		{
@@ -1139,7 +1139,7 @@ func TestAddProject(t *testing.T) {
 				privateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 			},
 			want: Want{
-				ValidationErr: errors.ThrowPreconditionFailed(nil, "PROJE-hzxwo", "Errors.Invalid.Argument"),
+				ValidationErr: zerrors.ThrowPreconditionFailed(nil, "PROJE-hzxwo", "Errors.Invalid.Argument"),
 			},
 		},
 		{

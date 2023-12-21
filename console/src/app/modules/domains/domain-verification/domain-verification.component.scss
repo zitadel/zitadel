@@ -1,28 +1,44 @@
-.btn-container {
-  display: flex;
-  margin: -0.5rem;
-  align-items: center;
+@mixin domain-verification-theme($theme) {
+  $is-dark-theme: map-get($theme, is-dark);
+  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
 
-  button {
-    margin: 1rem 0.5rem;
+  .desc {
+    font-size: 0.9rem;
   }
-}
 
-.desc {
-  font-size: 0.9rem;
-}
+  .entry {
+    margin: 0.5rem 0;
+    display: inline-block;
+  }
 
-.entry {
-  margin: 0.5rem 0;
-  display: inline-block;
-}
+  .domain-entry {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    border: 1px solid $border-color;
 
-.domain-line {
-  display: flex;
-  align-items: center;
-}
+    p {
+      padding-left: 1rem;
+    }
+  }
 
-.action {
-  display: flex;
-  justify-content: flex-start;
+  .domain-line {
+    display: flex;
+    align-items: center;
+
+    span {
+      padding-left: 0.2rem;
+    }
+  }
+
+  .action {
+    display: flex !important;
+    justify-content: space-between !important;
+  }
+
+  .dialog-title {
+    display: flex;
+    align-items: center;
+    margin-top: -3rem;
+  }
 }

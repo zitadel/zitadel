@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type ApplicationKey struct {
@@ -40,7 +40,7 @@ func (k *ApplicationKey) Detail() ([]byte, error) {
 	if k.Type == AuthNKeyTypeJSON {
 		return k.MarshalJSON()
 	}
-	return nil, errors.ThrowPreconditionFailed(nil, "KEY-dsg52", "Errors.Internal")
+	return nil, zerrors.ThrowPreconditionFailed(nil, "KEY-dsg52", "Errors.Internal")
 }
 
 func (k *ApplicationKey) MarshalJSON() ([]byte, error) {

@@ -70,7 +70,7 @@
       </ng-container>
 
       <ng-container matColumnDef="sequence">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header [start]="'desc'" [disableClear]="true">
+        <th mat-header-cell *matHeaderCellDef>
           {{ 'IAM.EVENTS.SEQUENCE' | translate }}
         </th>
         <td mat-cell *matCellDef="let event">
@@ -81,10 +81,12 @@
       </ng-container>
 
       <ng-container matColumnDef="creationDate">
-        <th mat-header-cell *matHeaderCellDef>{{ 'IAM.EVENTS.CREATIONDATE' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header [start]="'desc'" [disableClear]="true">
+          {{ 'IAM.EVENTS.CREATIONDATE' | translate }}
+        </th>
         <td mat-cell *matCellDef="let event">
           <ng-container *ngIf="event | toobject as event">
-            <span>{{ event?.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
+            <span>{{ event?.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm:ss' }}</span>
           </ng-container>
         </td>
       </ng-container>

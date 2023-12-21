@@ -5,7 +5,7 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type KeyConfig struct {
@@ -41,7 +41,7 @@ func LoadKey(id string, keyStorage KeyStorage) (string, error) {
 
 func LoadKeys(config *KeyConfig, keyStorage KeyStorage) (Keys, []string, error) {
 	if config == nil {
-		return nil, nil, errors.ThrowInvalidArgument(nil, "CRYPT-dJK8s", "config must not be nil")
+		return nil, nil, zerrors.ThrowInvalidArgument(nil, "CRYPT-dJK8s", "config must not be nil")
 	}
 	readKeys, err := keyStorage.ReadKeys()
 	if err != nil {
@@ -52,7 +52,7 @@ func LoadKeys(config *KeyConfig, keyStorage KeyStorage) (Keys, []string, error) 
 	if config.EncryptionKeyID != "" {
 		key, ok := readKeys[config.EncryptionKeyID]
 		if !ok {
-			return nil, nil, errors.ThrowInternalf(nil, "CRYPT-v2Kas", "encryption key %s not found", config.EncryptionKeyID)
+			return nil, nil, zerrors.ThrowInternalf(nil, "CRYPT-v2Kas", "encryption key %s not found", config.EncryptionKeyID)
 		}
 		keys[config.EncryptionKeyID] = key
 		ids = append(ids, config.EncryptionKeyID)

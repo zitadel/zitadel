@@ -1,0 +1,112 @@
+.languages-container-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 2rem;
+
+  @media only screen and (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
+
+  .languages-container {
+    display: inline-block;
+    max-width: 400px;
+    vertical-align: top;
+    width: 100%;
+
+    .spinner-wr {
+      margin: 0.5rem 0;
+    }
+
+    .default-language {
+      max-width: 400px;
+      display: block;
+    }
+  }
+
+  .general-btn-container {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 1rem;
+
+    .save-button {
+      display: block;
+      margin-left: 1rem;
+    }
+  }
+}
+
+.languages-list {
+  overflow: hidden;
+  display: block;
+  height: 100%;
+
+  .languages-top-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 1rem;
+    margin-top: 1.5rem;
+
+    .label {
+      margin-right: 1rem;
+      flex: 1;
+      white-space: nowrap;
+    }
+
+    .list-button {
+      white-space: nowrap;
+    }
+  }
+}
+
+.languages-box {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.5rem 0.5rem 2rem;
+  height: 56px;
+  cursor: move;
+  margin: 2px 0;
+
+  .index {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    opacity: 0.5;
+    font-size: 10px;
+  }
+
+  .locale {
+    width: 35px;
+    margin-right: 1rem;
+  }
+
+  .lang {
+    flex: 1;
+  }
+
+  [hoveractions] {
+    display: none;
+  }
+
+  .more-button {
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+
+  &:hover {
+    [hoveractions] {
+      display: flex;
+    }
+  }
+
+  .defaultlanglabel {
+    margin-left: 0.5rem;
+  }
+}

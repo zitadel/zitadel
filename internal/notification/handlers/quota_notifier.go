@@ -5,13 +5,13 @@ import (
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	_ "github.com/zitadel/zitadel/internal/notification/statik"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -60,7 +60,7 @@ func (u *quotaNotifier) Reducers() []handler.AggregateReducer {
 func (u *quotaNotifier) reduceNotificationDue(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*quota.NotificationDueEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DLxdE", "reduce.wrong.event.type %s", quota.NotificationDueEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-DLxdE", "reduce.wrong.event.type %s", quota.NotificationDueEventType)
 	}
 
 	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {

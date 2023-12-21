@@ -4,10 +4,10 @@ import (
 	"github.com/jinzhu/gorm"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 	"github.com/zitadel/zitadel/internal/iam/repository/view/model"
 	"github.com/zitadel/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func GetIDPProviderByAggregateIDAndConfigID(db *gorm.DB, table, aggregateID, idpConfigID, instanceID string) (*model.IDPProviderView, error) {
@@ -18,8 +18,8 @@ func GetIDPProviderByAggregateIDAndConfigID(db *gorm.DB, table, aggregateID, idp
 	ownerRemovedQuery := &model.IDPProviderSearchQuery{Key: iam_model.IDPProviderSearchKeyOwnerRemoved, Value: false, Method: domain.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, aggIDQuery, idpConfigIDQuery, instanceIDQuery, ownerRemovedQuery)
 	err := query(db, policy)
-	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Skvi8", "Errors.IAM.LoginPolicy.IDP.NotExisting")
+	if zerrors.IsNotFound(err) {
+		return nil, zerrors.ThrowNotFound(nil, "VIEW-Skvi8", "Errors.IAM.LoginPolicy.IDP.NotExisting")
 	}
 	return policy, err
 }

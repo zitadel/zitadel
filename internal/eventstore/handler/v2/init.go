@@ -9,8 +9,8 @@ import (
 	"github.com/jackc/pgconn"
 	"github.com/zitadel/logging"
 
-	errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Table struct {
@@ -196,7 +196,7 @@ func (h *Handler) Init(ctx context.Context) error {
 	}
 	tx, err := h.client.BeginTx(ctx, nil)
 	if err != nil {
-		return errs.ThrowInternal(err, "CRDB-SAdf2", "begin failed")
+		return zerrors.ThrowInternal(err, "CRDB-SAdf2", "begin failed")
 	}
 	for i, execute := range check.Init().Executes {
 		logging.WithFields("projection", h.projection.Name(), "execute", i).Debug("executing check")
@@ -274,7 +274,7 @@ func execNextIfExists(config execConfig, q query, opts []execOption, executeNext
 }
 
 func isErrAlreadyExists(err error) bool {
-	caosErr := &errs.CaosError{}
+	caosErr := &zerrors.ZitadelError{}
 	if !errors.As(err, &caosErr) {
 		return false
 	}

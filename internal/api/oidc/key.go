@@ -14,12 +14,12 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // keySetCache implements oidc.KeySet for Access Token verification.
@@ -97,7 +97,7 @@ func (k *keySetCache) getKey(ctx context.Context, keyID string) (_ *jose.JSONWeb
 		if key.Expiry().After(k.clock.Now()) {
 			return jsonWebkey(key), nil
 		}
-		return nil, errors.ThrowInvalidArgument(nil, "OIDC-Zoh9E", "Errors.Key.ExpireBeforeNow")
+		return nil, zerrors.ThrowInvalidArgument(nil, "OIDC-Zoh9E", "Errors.Key.ExpireBeforeNow")
 	}
 
 	key, err = k.queryKey(ctx, keyID, k.clock.Now())
@@ -114,7 +114,7 @@ func (k *keySetCache) VerifySignature(ctx context.Context, jws *jose.JSONWebSign
 	defer func() { span.EndWithError(err) }()
 
 	if len(jws.Signatures) != 1 {
-		return nil, errors.ThrowInvalidArgument(nil, "OIDC-Gid9s", "Errors.Token.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "OIDC-Gid9s", "Errors.Token.Invalid")
 	}
 	key, err := k.getKey(ctx, jws.Signatures[0].Header.KeyID)
 	if err != nil {
@@ -152,7 +152,7 @@ func (k keySetMap) getKey(keyID string) (*jose.JSONWebKey, error) {
 // VerifySignature implements the oidc.KeySet interface.
 func (k keySetMap) VerifySignature(ctx context.Context, jws *jose.JSONWebSignature) ([]byte, error) {
 	if len(jws.Signatures) != 1 {
-		return nil, errors.ThrowInvalidArgument(nil, "OIDC-Eeth6", "Errors.Token.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "OIDC-Eeth6", "Errors.Token.Invalid")
 	}
 	key, err := k.getKey(jws.Signatures[0].Header.KeyID)
 	if err != nil {
@@ -248,7 +248,7 @@ func (o *OPStorage) SigningKey(ctx context.Context) (key op.SigningKey, err erro
 			return err
 		}
 		if key == nil {
-			return errors.ThrowInternal(nil, "test", "test")
+			return zerrors.ThrowInternal(nil, "test", "test")
 		}
 		return nil
 	})
@@ -273,13 +273,13 @@ func (o *OPStorage) getSigningKey(ctx context.Context) (op.SigningKey, error) {
 func (o *OPStorage) refreshSigningKey(ctx context.Context, algorithm string, position float64) error {
 	ok, err := o.ensureIsLatestKey(ctx, position)
 	if err != nil || !ok {
-		return errors.ThrowInternal(err, "OIDC-ASfh3", "cannot ensure that projection is up to date")
+		return zerrors.ThrowInternal(err, "OIDC-ASfh3", "cannot ensure that projection is up to date")
 	}
 	err = o.lockAndGenerateSigningKeyPair(ctx, algorithm)
 	if err != nil {
-		return errors.ThrowInternal(err, "OIDC-ADh31", "could not create signing key")
+		return zerrors.ThrowInternal(err, "OIDC-ADh31", "could not create signing key")
 	}
-	return errors.ThrowInternal(nil, "OIDC-Df1bh", "")
+	return zerrors.ThrowInternal(nil, "OIDC-Df1bh", "")
 }
 
 func (o *OPStorage) ensureIsLatestKey(ctx context.Context, position float64) (bool, error) {
@@ -315,7 +315,7 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm
 	errs := o.locker.Lock(ctx, lockDuration, authz.GetInstance(ctx).InstanceID())
 	err, ok := <-errs
 	if err != nil || !ok {
-		if errors.IsErrorAlreadyExists(err) {
+		if zerrors.IsErrorAlreadyExists(err) {
 			return nil
 		}
 		logging.OnError(err).Debug("initial lock failed")
