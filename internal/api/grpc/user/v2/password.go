@@ -53,9 +53,9 @@ func (s *Server) SetPassword(ctx context.Context, req *user.SetPasswordRequest) 
 
 	switch v := req.GetVerification().(type) {
 	case *user.SetPasswordRequest_CurrentPassword:
-		details, err = s.command.ChangePassword(ctx, resourceOwner, req.GetUserId(), v.CurrentPassword, req.GetNewPassword().GetPassword(), "")
+		details, err = s.command.ChangePassword(ctx, resourceOwner, req.GetUserId(), v.CurrentPassword, req.GetNewPassword().GetPassword())
 	case *user.SetPasswordRequest_VerificationCode:
-		details, err = s.command.SetPasswordWithVerifyCode(ctx, resourceOwner, req.GetUserId(), v.VerificationCode, req.GetNewPassword().GetPassword(), "")
+		details, err = s.command.SetPasswordWithVerifyCode(ctx, resourceOwner, req.GetUserId(), v.VerificationCode, req.GetNewPassword().GetPassword())
 	case nil:
 		details, err = s.command.SetPassword(ctx, resourceOwner, req.GetUserId(), req.GetNewPassword().GetPassword(), req.GetNewPassword().GetChangeRequired())
 	default:

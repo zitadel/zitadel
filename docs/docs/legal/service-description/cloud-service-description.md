@@ -27,7 +27,7 @@ You will benefit from the transparency of the open source and the hyper-scalabil
 
 #### Benefits over using open source / community license
 
-- [Enterprise supported features](support-services) are only supported under an Enterprise license
+- [Enterprise supported features](/docs/support/software-release-cycles-support#enterprise-supported) are only supported under an Enterprise license
 - Individual [onboarding support](./support-services#onboarding-support) tailored to your needs and team
 - Get access to our support with a [Service Level Agreement](support-services#service-level-agreement) that is tailored to your needs
 - Benefit from personal [technical account management](support-services#technical-account-manager) provided by our engineers to help you with architecture, integration, migration, and operational improvements of your setup
