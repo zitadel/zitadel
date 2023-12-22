@@ -1,0 +1,35 @@
+---
+title: Onboarding of new Customers and Users
+sidebar_label: Onboard customers and Users
+---
+
+
+## Introduction
+
+When building your own application, one of the first questions you have to face, is how do my customers onboard to my application.
+This guide will show you the built-in solution you have, within ZITADEL and how you can use ZITADEL when you have more advanced needs.
+
+### Onboarding Process for B2B Customers
+
+When you want to build an onboarding process for your business customers you have to go through the following steps:
+1. Create an organization: The organization represents the customer or a team
+2. Create the first administrator user: This user is the account for your customer, which should be able to configure settings such as SSO, MFA, etc.
+3. Give the user the correct permission to be able to configure settings, create users and assign roles to users
+
+ZITADEL does have multiple possibilities on how to achieve that process.
+
+## Built-in register organization form
+
+A basic form that allows a customer to enter an organization name and a user account is hosted on the follwing URL:
+{custom-domain}/ui/login/register/org
+
+When a user registers through this form, an organization and a user are created.
+The user will automatically get the role "ORG_OWNER" withing ZITADEL and is able to manage the whole organization.
+You can read more about the managers, roles and there meanings [here](/docs/guides/manage/console/managers)
+
+<img src="/docs/img/guides/solution-scenarios/register-organization.png" alt="Register Organization Form"/>
+
+If you do not want to allow users to register organizations with this form, you can disable it with the following request:
+[Restrict the instance features](/docs/apis/resources/admin/admin-service-set-restrictions)
+
+## Build your own form
