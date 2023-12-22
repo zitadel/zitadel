@@ -5,14 +5,11 @@ import es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 type UserGrant struct {
 	es_models.ObjectRoot
 
-	State                UserGrantState
-	UserID               string
-	UserResourceOwner    string
-	ProjectID            string
-	ProjectResourceOwner string
-	ProjectGrantID       string
-	GrantedOrg           string
-	RoleKeys             []string
+	State          UserGrantState
+	UserID         string
+	ProjectID      string
+	ProjectGrantID string
+	RoleKeys       []string
 }
 
 type UserGrantState int32

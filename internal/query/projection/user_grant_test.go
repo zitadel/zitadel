@@ -594,7 +594,7 @@ func Test_getResourceOwners(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilterError(errors.ThrowNotFound(nil, "error", "error")),
+					expectFilterError(zerrors.ThrowNotFound(nil, "error", "error")),
 				),
 			},
 			args: args{
@@ -690,13 +690,11 @@ func Test_getResourceOwners(t *testing.T) {
 				instanceID: "instance",
 				userID:     "user",
 				projectID:  "project",
-				grantID:    "",
 			},
 			want: want{
-				userRO:     "org",
-				projectRO:  "org",
-				grantedOrg: "",
-				wantErr:    false,
+				userRO:    "org",
+				projectRO: "org",
+				wantErr:   false,
 			},
 		},
 		{
@@ -770,7 +768,6 @@ func Test_getResourceOwners(t *testing.T) {
 			},
 			want: want{
 				userRO:     "org",
-				projectRO:  "org",
 				grantedOrg: "grantedorg1",
 				wantErr:    false,
 			},

@@ -446,7 +446,6 @@ func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, u
 		switch e := event.(type) {
 		case *project.GrantAddedEvent:
 			grantedOrg = e.GrantedOrgID
-			projectRO = e.Aggregate().ResourceOwner
 		case *project.ProjectAddedEvent:
 			projectRO = e.Aggregate().ResourceOwner
 		case *user.HumanRegisteredEvent, *user.HumanAddedEvent, *user.MachineAddedEvent:
