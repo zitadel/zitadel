@@ -127,17 +127,15 @@ func Test_RemoveNoPermission(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			q := &Queries{
-				checkPermission: func(ctx context.Context, permission, orgID, resourceID string) (err error) {
-					for _, perm := range tt.permissions {
-						if resourceID == perm {
-							return nil
-						}
+			checkPermission := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+				for _, perm := range tt.permissions {
+					if resourceID == perm {
+						return nil
 					}
-					return errors.New("failed")
-				},
+				}
+				return errors.New("failed")
 			}
-			tt.users.RemoveNoPermission(context.Background(), q)
+			tt.users.RemoveNoPermission(context.Background(), checkPermission)
 			require.Equal(t, tt.want.users, tt.users.Users)
 		})
 	}
