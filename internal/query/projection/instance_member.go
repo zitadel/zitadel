@@ -105,7 +105,7 @@ func (p *instanceMemberProjection) reduceAdded(event eventstore.Event) (*handler
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pGNCu", "reduce.wrong.event.type %s", instance.MemberAddedEventType)
 	}
 	ctx := setMemberContext(e.Aggregate())
-	userOwner, err := getResourceOwnerOfUser(ctx, p.es, e.Aggregate().InstanceID, e.UserID)
+	userOwner, err := getUserResourceOwner(ctx, p.es, e.Aggregate().InstanceID, e.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -150,25 +150,4 @@ func (p *instanceMemberProjection) reduceUserOwnerRemoved(event eventstore.Event
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-mkDHa", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 	return reduceMemberUserOwnerRemoved(e)
-}
-
-func getResourceOwnerOfUser(ctx context.Context, es handler.EventStore, instanceID, aggID string) (string, error) {
-	events, err := es.Filter(
-		ctx,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-			AwaitOpenTransactions().
-			InstanceID(instanceID).
-			AddQuery().
-			AggregateTypes(user.AggregateType).
-			AggregateIDs(aggID).
-			EventTypes(user.HumanRegisteredType, user.HumanAddedType, user.MachineAddedEventType).
-			Builder(),
-	)
-	if err != nil {
-		return "", err
-	}
-	if len(events) != 1 {
-		return "", errors.ThrowNotFound(nil, "PROJ-0I92sp", "Errors.User.NotFound")
-	}
-	return events[0].Aggregate().ResourceOwner, nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/database"
@@ -562,6 +563,291 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
 			assertReduce(t, got, err, UserGrantProjectionTable, tt.want)
+		})
+	}
+}
+
+func Test_getResourceOwners(t *testing.T) {
+	type args struct {
+		instanceID string
+		userID     string
+		projectID  string
+		grantID    string
+	}
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type want struct {
+		userRO     string
+		projectRO  string
+		grantedOrg string
+		wantErr    bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   want
+	}{
+		{
+			name: "user RO, filter error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilterError(errors.ThrowNotFound(nil, "error", "error")),
+				),
+			},
+			args: args{
+				instanceID: "instance",
+				userID:     "user",
+			},
+			want: want{
+				wantErr: true,
+			},
+		},
+		{
+			name: "user RO",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user", "org").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				instanceID: "instance",
+				userID:     "user",
+			},
+			want: want{
+				userRO:  "org",
+				wantErr: false,
+			},
+		},
+		{
+			name: "user RO, no user",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				instanceID: "instance",
+				userID:     "user",
+			},
+			want: want{
+				wantErr: true,
+			},
+		},
+		{
+			name: "user and project RO",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user", "org").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project", "org").Aggregate,
+								"project",
+								false,
+								false,
+								false,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				instanceID: "instance",
+				userID:     "user",
+				projectID:  "project",
+				grantID:    "",
+			},
+			want: want{
+				userRO:     "org",
+				projectRO:  "org",
+				grantedOrg: "",
+				wantErr:    false,
+			},
+		},
+		{
+			name: "user and project RO, no project",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user", "org").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				instanceID: "instance",
+				userID:     "user",
+				projectID:  "project",
+			},
+			want: want{
+				wantErr: true,
+			},
+		},
+		{
+			name: "user and grant RO",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user", "org").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project", "org").Aggregate,
+								"projectgrant1",
+								"grantedorg1",
+								[]string{"key1"},
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				instanceID: "instance",
+				userID:     "user",
+				projectID:  "project",
+				grantID:    "projectgrant1",
+			},
+			want: want{
+				userRO:     "org",
+				projectRO:  "org",
+				grantedOrg: "grantedorg1",
+				wantErr:    false,
+			},
+		},
+		{
+			name: "user and grant RO, no grant",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user", "org").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				instanceID: "instance",
+				userID:     "user",
+				projectID:  "project",
+				grantID:    "projectgrant1",
+			},
+			want: want{
+				wantErr: true,
+			},
+		},
+		{
+			name: "user and grant RO, no user",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project", "org").Aggregate,
+								"projectgrant1",
+								"grantedorg1",
+								[]string{"key1"},
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				instanceID: "instance",
+				userID:     "user",
+				projectID:  "project",
+				grantID:    "projectgrant1",
+			},
+			want: want{
+				wantErr: true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			userRO, projectRO, grantedOrg, err := getResourceOwners(context.Background(), tt.fields.eventstore, tt.args.instanceID, tt.args.userID, tt.args.projectID, tt.args.grantID)
+			if tt.want.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tt.want.userRO, userRO)
+				require.Equal(t, tt.want.projectRO, projectRO)
+				require.Equal(t, tt.want.grantedOrg, grantedOrg)
+			}
 		})
 	}
 }

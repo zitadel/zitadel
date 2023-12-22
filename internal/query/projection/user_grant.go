@@ -400,7 +400,13 @@ func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 	), nil
 }
 
-func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, userID, projectID, grantID string) (string, string, string, error) {
+func getUserResourceOwner(ctx context.Context, es handler.EventStore, instanceID, userID string) (string, error) {
+	userRO, _, _, err := getResourceOwners(ctx, es, instanceID, userID, "", "")
+	return userRO, err
+}
+
+func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, userID, projectID, grantID string) (userRO string, projectRO string, grantedOrg string, err error) {
+	eventCount := 1
 	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AwaitOpenTransactions().
 		InstanceID(instanceID).
@@ -411,6 +417,7 @@ func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, u
 
 	// if it's a project grant then we only need the resourceowner for the projectgrant, else the project
 	if grantID != "" {
+		eventCount++
 		builder = builder.Or().
 			AggregateTypes(project.AggregateType).
 			AggregateIDs(projectID).
@@ -419,6 +426,7 @@ func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, u
 				"grantId": grantID,
 			})
 	} else if projectID != "" {
+		eventCount++
 		builder = builder.Or().
 			AggregateTypes(project.AggregateType).
 			AggregateIDs(projectID).
@@ -432,14 +440,14 @@ func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, u
 	if err != nil {
 		return "", "", "", err
 	}
-	if len(events) != 2 {
+	if len(events) != eventCount {
 		return "", "", "", errors.ThrowNotFound(nil, "PROJ-0I91sp", "Errors.NotFound")
 	}
-	var userRO, projectRO, grantedOrg string
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.GrantAddedEvent:
 			grantedOrg = e.GrantedOrgID
+			projectRO = e.Aggregate().ResourceOwner
 		case *project.ProjectAddedEvent:
 			projectRO = e.Aggregate().ResourceOwner
 		case *user.HumanRegisteredEvent, *user.HumanAddedEvent, *user.MachineAddedEvent:
