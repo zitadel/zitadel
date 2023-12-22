@@ -2,12 +2,10 @@ package instance
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -46,21 +44,21 @@ func NewOIDCSettingsAddedEvent(
 	}
 }
 
-func (e *OIDCSettingsAddedEvent) Data() interface{} {
+func (e *OIDCSettingsAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OIDCSettingsAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OIDCSettingsAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func OIDCSettingsAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCSettingsAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	oidcSettingsAdded := &OIDCSettingsAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, oidcSettingsAdded)
+	err := event.Unmarshal(oidcSettingsAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-soiwj", "unable to unmarshal oidc config added")
+		return nil, zerrors.ThrowInternal(err, "IAM-soiwj", "unable to unmarshal oidc config added")
 	}
 
 	return oidcSettingsAdded, nil
@@ -75,11 +73,11 @@ type OIDCSettingsChangedEvent struct {
 	RefreshTokenExpiration     *time.Duration `json:"refreshTokenExpiration,omitempty"`
 }
 
-func (e *OIDCSettingsChangedEvent) Data() interface{} {
+func (e *OIDCSettingsChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OIDCSettingsChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OIDCSettingsChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -89,7 +87,7 @@ func NewOIDCSettingsChangeEvent(
 	changes []OIDCSettingsChanges,
 ) (*OIDCSettingsChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IAM-dnlwe", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-dnlwe", "Errors.NoChangesFound")
 	}
 	changeEvent := &OIDCSettingsChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -130,14 +128,14 @@ func ChangeOIDCSettingsRefreshTokenExpiration(refreshTokenExpiration time.Durati
 	}
 }
 
-func OIDCSettingsChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCSettingsChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &OIDCSettingsChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-f98uf", "unable to unmarshal oidc settings changed")
+		return nil, zerrors.ThrowInternal(err, "IAM-f98uf", "unable to unmarshal oidc settings changed")
 	}
 
 	return e, nil

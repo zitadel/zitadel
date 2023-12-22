@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"net/http"
 	"strings"
@@ -9,6 +10,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -89,11 +91,15 @@ func CreateGatewayWithPrefix(
 	http1HostName string,
 	accessInterceptor *http_mw.AccessInterceptor,
 	queries *query.Queries,
+	tlsConfig *tls.Config,
 ) (http.Handler, string, error) {
 	runtimeMux := runtime.NewServeMux(serveMuxOptions...)
 	opts := []grpc.DialOption{
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithUnaryInterceptor(client_middleware.DefaultTracingClient()),
+		grpc.WithTransportCredentials(grpcCredentials(tlsConfig)),
+		grpc.WithChainUnaryInterceptor(
+			client_middleware.DefaultTracingClient(),
+			client_middleware.UnaryActivityClientInterceptor(),
+		),
 	}
 	connection, err := dial(ctx, port, opts)
 	if err != nil {
@@ -106,12 +112,21 @@ func CreateGatewayWithPrefix(
 	return addInterceptors(runtimeMux, http1HostName, accessInterceptor, queries), g.GatewayPathPrefix(), nil
 }
 
-func CreateGateway(ctx context.Context, port uint16, http1HostName string, accessInterceptor *http_mw.AccessInterceptor) (*Gateway, error) {
+func CreateGateway(
+	ctx context.Context,
+	port uint16,
+	http1HostName string,
+	accessInterceptor *http_mw.AccessInterceptor,
+	tlsConfig *tls.Config,
+) (*Gateway, error) {
 	connection, err := dial(ctx,
 		port,
 		[]grpc.DialOption{
-			grpc.WithTransportCredentials(insecure.NewCredentials()),
-			grpc.WithUnaryInterceptor(client_middleware.DefaultTracingClient()),
+			grpc.WithTransportCredentials(grpcCredentials(tlsConfig)),
+			grpc.WithChainUnaryInterceptor(
+				client_middleware.DefaultTracingClient(),
+				client_middleware.UnaryActivityClientInterceptor(),
+			),
 		})
 	if err != nil {
 		return nil, err
@@ -167,6 +182,7 @@ func addInterceptors(
 	handler = http_mw.CORSInterceptor(handler)
 	handler = http_mw.RobotsTagHandler(handler)
 	handler = http_mw.DefaultTelemetryHandler(handler)
+	handler = http_mw.ActivityHandler(handler)
 	// For some non-obvious reason, the exhaustedCookieInterceptor sends the SetCookie header
 	// only if it follows the http_mw.DefaultTelemetryHandler
 	handler = exhaustedCookieInterceptor(handler, accessInterceptor, queries)
@@ -216,4 +232,16 @@ func (r *cookieResponseWriter) WriteHeader(status int) {
 		r.accessInterceptor.SetExhaustedCookie(r.ResponseWriter, r.request)
 	}
 	r.ResponseWriter.WriteHeader(status)
+}
+
+func grpcCredentials(tlsConfig *tls.Config) credentials.TransportCredentials {
+	creds := insecure.NewCredentials()
+	if tlsConfig != nil {
+		tlsConfigClone := tlsConfig.Clone()
+		// We don't want to verify the certificate of the internal grpc server
+		// That's up to the client who called the gRPC gateway
+		tlsConfigClone.InsecureSkipVerify = true
+		creds = credentials.NewTLS(tlsConfigClone)
+	}
+	return creds
 }

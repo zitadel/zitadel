@@ -7,11 +7,10 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Human struct {
@@ -50,7 +49,7 @@ func (p *Human) AppendEvents(events ...*es_models.Event) error {
 }
 
 func (h *Human) AppendEvent(event *es_models.Event) (err error) {
-	switch eventstore.EventType(event.Type) {
+	switch event.Type() {
 	case user.UserV1AddedType,
 		user.UserV1RegisteredType,
 		user.UserV1ProfileChangedType,
@@ -160,7 +159,7 @@ func (h *Human) ComputeObject() {
 func (u *Human) setData(event *es_models.Event) error {
 	if err := json.Unmarshal(event.Data, u); err != nil {
 		logging.Log("EVEN-8ujgd").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-sj4jd", "could not unmarshal event")
+		return zerrors.ThrowInternal(err, "MODEL-sj4jd", "could not unmarshal event")
 	}
 	return nil
 }
@@ -180,7 +179,7 @@ func (c *InitUserCode) SetData(event *es_models.Event) error {
 	c.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, c); err != nil {
 		logging.Log("EVEN-7duwe").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-lo34s", "could not unmarshal event")
+		return zerrors.ThrowInternal(err, "MODEL-lo34s", "could not unmarshal event")
 	}
 	return nil
 }

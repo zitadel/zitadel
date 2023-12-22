@@ -67,8 +67,80 @@ We understand that these advisories may include breaking changes, and we aim to 
       facing UI yourself and not use ZITADELs console UI.
       ZITADEL hosted Login-UI is not affected by this change.
     </td>
-    <td>TBD</td>
-      <td>Calendar week 40/41</td>
+    <td>2.40.0</td>
+    <td>Calendar week 44</td>
+  </tr>
+  <tr>
+    <td>
+      <a href="./advisory/a10003">A-10003</a>
+    </td>
+    <td>Login-UI - Default Context</td>
+    <td>Breaking Behaviour Change</td>
+    <td>
+        When users are redirected to the ZITADEL Login-UI without any organizational context,
+        they're currently presented a login screen, based on the instance settings,
+        e.g. available IDPs and possible login mechanisms. If the user will then register himself,
+        by the registration form or through an IDP, the user will always be created on the default organization.
+        With the introduced change, the settings will no longer be loaded from the instance, but rather the default organization directly.
+    </td>
+    <td>2.38.0</td>
+    <td>Calendar week 41</td>
+  </tr>
+  <tr>
+    <td>
+      <a href="./advisory/a10004">A-10004</a>
+    </td>
+    <td>Sequence uniquenes</td>
+    <td>Breaking Behaviour Change</td>
+    <td>
+      Due to storage optimisations ZITADEL changes the behaviour of sequences. 
+      This change improves command (create, update, delete) performance of ZITADEL.
+      Sequences are no longer unique inside an instance.
+      From now on sequences are upcounting per aggregate id. 
+      For example sequences of newly created users begin at 1.
+      Existing sequences remain untouched.
+    </td>
+    <td>2.39.0</td>
+    <td>2023-10-14</td>
+  </tr>
+  <tr>
+    <td>
+      <a href="./advisory/a10005">A-10005</a>
+    </td>
+    <td>Expected downtime during upgrade</td>
+    <td>Expected downtime during upgrade</td>
+    <td>
+      Migrating to versions &gt;= 2.39 from &lt; 2.39 will cause down time during setup starts and the new version is started.
+      This is caused by storage optimisations which replace the `eventstore.events` database table with the new `eventstore.events2` table.
+      All existing events are migrated during the execution of the `zitadel setup` command.
+      New events will be inserted into the new `eventstore.events2` table. The old table `evetstore.events` is renamed to `eventstore.events_old` and will be dropped in a future release of ZITADEL.
+    </td>
+    <td>2.39.0</td>
+    <td>Calendar week 41/42 2023</td>
+  </tr>
+  <tr>
+    <td>
+      <a href="./advisory/a10006">A-10006</a>
+    </td>
+    <td>Additional grant to cockroach database user</td>
+    <td>Breaking Behaviour Change</td>
+    <td>
+      Versions &gt;= 2.39.0 require the cockroach database user of ZITADEL to be granted to the `VIEWACTIVITY` grant. This can either be reached by grant the role manually or execute the `zitadel init` command.
+    </td>
+    <td>2.39.0</td>
+    <td>Calendar week 41/42 2023</td>
+  </tr>
+  <tr>
+    <td>
+      <a href="./advisory/a10007">A-10006</a>
+    </td>
+    <td>Additional grant to cockroach database user</td>
+    <td>Breaking Behaviour Change</td>
+    <td>
+      Upcoming Versions require the SYSTEM_OWNER role to be available in the permission role mappings. Self-hosting ZITADEL users who define custom permission role mappings need to make sure their system users don't lose access to the system API.
+    </td>
+    <td>Upcoming</td>
+    <td>Upcoming</td>
   </tr>
 </table>
 
@@ -87,3 +159,10 @@ A breaking behavior change refers to a modification or update that changes the b
 This change does not necessarily affect the APIs or any functions you are calling, so it may not require an update to your code.
 However, if you rely on specific results or behaviors, they may no longer be guaranteed after the change is implemented.
 Therefore, it is important to be aware of breaking behavior changes and their potential impact on your use of ZITADEL, and to take appropriate action if needed to ensure continued functionality.
+
+### Expected downtime during upgrade
+
+Expected downtime during upgrade means that ZITADEL might become unavailable during and upgrade.
+ZITADEL is built for [zero downtime upgrades](/docs/concepts/architecture/solution#zero-downtime-updates) at upgrades can be executed without downtime by just updating to a more recent version.
+When deploying certain changes a zero downtime upgrade might not be possible, for example to guarantee data integrity.
+In such cases we will issue a technical advisory to make you aware of this unexpected behavior.

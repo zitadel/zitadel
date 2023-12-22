@@ -6,10 +6,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddDefaultPasswordComplexityPolicy(ctx context.Context, minLength uint64, hasLowercase, hasUppercase, hasNumber, hasSymbol bool) (*domain.ObjectDetails, error) {
@@ -35,13 +35,13 @@ func (c *Commands) ChangeDefaultPasswordComplexityPolicy(ctx context.Context, po
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-0oPew", "Errors.IAM.PasswordComplexityPolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-0oPew", "Errors.IAM.PasswordComplexityPolicy.NotFound")
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.PasswordComplexityPolicyWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol)
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-9jlsf", "Errors.IAM.PasswordComplexityPolicy.NotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-9jlsf", "Errors.IAM.PasswordComplexityPolicy.NotChanged")
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
@@ -64,7 +64,7 @@ func prepareAddDefaultPasswordComplexityPolicy(
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if minLength == 0 || minLength > 72 {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-Lsp0e", "Errors.Instance.PasswordComplexityPolicy.MinLengthNotAllowed")
+			return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-Lsp0e", "Errors.Instance.PasswordComplexityPolicy.MinLengthNotAllowed")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			writeModel := NewInstancePasswordComplexityPolicyWriteModel(ctx)
@@ -77,7 +77,7 @@ func prepareAddDefaultPasswordComplexityPolicy(
 				return nil, err
 			}
 			if writeModel.State == domain.PolicyStateActive {
-				return nil, caos_errs.ThrowAlreadyExists(nil, "INSTANCE-Lk0dS", "Errors.Instance.PasswordComplexityPolicy.AlreadyExists")
+				return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-Lk0dS", "Errors.Instance.PasswordComplexityPolicy.AlreadyExists")
 			}
 			return []eventstore.Command{
 				instance.NewPasswordComplexityPolicyAddedEvent(ctx, &a.Aggregate,
@@ -99,7 +99,7 @@ func (c *Commands) getDefaultPasswordComplexityPolicy(ctx context.Context) (*dom
 		return nil, err
 	}
 	if !policyWriteModel.State.Exists() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-M0gsf", "Errors.IAM.PasswordComplexityPolicy.NotFound")
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTANCE-M0gsf", "Errors.IAM.PasswordComplexityPolicy.NotFound")
 	}
 	policy := writeModelToPasswordComplexityPolicy(&policyWriteModel.PasswordComplexityPolicyWriteModel)
 	policy.Default = true

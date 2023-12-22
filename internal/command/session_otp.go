@@ -8,8 +8,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/repository/session"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) CreateOTPSMSChallengeReturnCode(dst *string) SessionCommand {
@@ -23,14 +23,14 @@ func (c *Commands) CreateOTPSMSChallenge() SessionCommand {
 func (c *Commands) createOTPSMSChallenge(returnCode bool, dst *string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) error {
 		if cmd.sessionWriteModel.UserID == "" {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JKL3g", "Errors.User.UserIDMissing")
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-JKL3g", "Errors.User.UserIDMissing")
 		}
 		writeModel := NewHumanOTPSMSWriteModel(cmd.sessionWriteModel.UserID, "")
 		if err := cmd.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 			return err
 		}
 		if !writeModel.OTPAdded() {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-BJ2g3", "Errors.User.MFA.OTP.NotReady")
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-BJ2g3", "Errors.User.MFA.OTP.NotReady")
 		}
 		code, err := cmd.createCode(ctx, cmd.eventstore.Filter, domain.SecretGeneratorTypeOTPSMS, cmd.otpAlg, c.defaultSecretGenerators.OTPSMS)
 		if err != nil {
@@ -51,7 +51,7 @@ func (c *Commands) OTPSMSSent(ctx context.Context, sessionID, resourceOwner stri
 		return err
 	}
 	if sessionWriteModel.OTPSMSCodeChallenge == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-G3t31", "Errors.User.Code.NotFound")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-G3t31", "Errors.User.Code.NotFound")
 	}
 	return c.pushAppendAndReduce(ctx, sessionWriteModel,
 		session.NewOTPSMSSentEvent(ctx, &session.NewAggregate(sessionID, sessionWriteModel.ResourceOwner).Aggregate),
@@ -76,14 +76,14 @@ func (c *Commands) CreateOTPEmailChallenge() SessionCommand {
 func (c *Commands) createOTPEmailChallenge(returnCode bool, urlTmpl string, dst *string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) error {
 		if cmd.sessionWriteModel.UserID == "" {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JK3gp", "Errors.User.UserIDMissing")
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-JK3gp", "Errors.User.UserIDMissing")
 		}
 		writeModel := NewHumanOTPEmailWriteModel(cmd.sessionWriteModel.UserID, "")
 		if err := cmd.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 			return err
 		}
 		if !writeModel.OTPAdded() {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JKLJ3", "Errors.User.MFA.OTP.NotReady")
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-JKLJ3", "Errors.User.MFA.OTP.NotReady")
 		}
 		code, err := cmd.createCode(ctx, cmd.eventstore.Filter, domain.SecretGeneratorTypeOTPEmail, cmd.otpAlg, c.defaultSecretGenerators.OTPEmail)
 		if err != nil {
@@ -104,7 +104,7 @@ func (c *Commands) OTPEmailSent(ctx context.Context, sessionID, resourceOwner st
 		return err
 	}
 	if sessionWriteModel.OTPEmailCodeChallenge == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SLr02", "Errors.User.Code.NotFound")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-SLr02", "Errors.User.Code.NotFound")
 	}
 	return c.pushAppendAndReduce(ctx, sessionWriteModel,
 		session.NewOTPEmailSentEvent(ctx, &session.NewAggregate(sessionID, sessionWriteModel.ResourceOwner).Aggregate),
@@ -114,11 +114,11 @@ func (c *Commands) OTPEmailSent(ctx context.Context, sessionID, resourceOwner st
 func CheckOTPSMS(code string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) (err error) {
 		if cmd.sessionWriteModel.UserID == "" {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-VDrh3", "Errors.User.UserIDMissing")
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-VDrh3", "Errors.User.UserIDMissing")
 		}
 		challenge := cmd.sessionWriteModel.OTPSMSCodeChallenge
 		if challenge == nil {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SF3tv", "Errors.User.Code.NotFound")
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-SF3tv", "Errors.User.Code.NotFound")
 		}
 		err = crypto.VerifyCodeWithAlgorithm(challenge.CreationDate, challenge.Expiry, challenge.Code, code, cmd.otpAlg)
 		if err != nil {
@@ -132,11 +132,11 @@ func CheckOTPSMS(code string) SessionCommand {
 func CheckOTPEmail(code string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) (err error) {
 		if cmd.sessionWriteModel.UserID == "" {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-ejo2w", "Errors.User.UserIDMissing")
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-ejo2w", "Errors.User.UserIDMissing")
 		}
 		challenge := cmd.sessionWriteModel.OTPEmailCodeChallenge
 		if challenge == nil {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-zF3g3", "Errors.User.Code.NotFound")
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-zF3g3", "Errors.User.Code.NotFound")
 		}
 		err = crypto.VerifyCodeWithAlgorithm(challenge.CreationDate, challenge.Expiry, challenge.Code, code, cmd.otpAlg)
 		if err != nil {

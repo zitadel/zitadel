@@ -15,16 +15,17 @@ import (
 
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/actions/object"
+	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var _ provider.EntityStorage = &Storage{}
@@ -54,12 +55,12 @@ type Storage struct {
 }
 
 func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*serviceprovider.ServiceProvider, error) {
-	app, err := p.query.AppBySAMLEntityID(ctx, entityID, false)
+	app, err := p.query.AppBySAMLEntityID(ctx, entityID)
 	if err != nil {
 		return nil, err
 	}
 	if app.State != domain.AppStateActive {
-		return nil, errors.ThrowPreconditionFailed(nil, "SAML-sdaGg", "app is not active")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "SAML-sdaGg", "app is not active")
 	}
 	return serviceprovider.NewServiceProvider(
 		app.ID,
@@ -71,12 +72,12 @@ func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*servicep
 }
 
 func (p *Storage) GetEntityIDByAppID(ctx context.Context, appID string) (string, error) {
-	app, err := p.query.AppByID(ctx, appID, false)
+	app, err := p.query.AppByID(ctx, appID)
 	if err != nil {
 		return "", err
 	}
 	if app.State != domain.AppStateActive {
-		return "", errors.ThrowPreconditionFailed(nil, "SAML-sdaGg", "app is not active")
+		return "", zerrors.ThrowPreconditionFailed(nil, "SAML-sdaGg", "app is not active")
 	}
 	return app.SAMLConfig.EntityID, nil
 }
@@ -102,7 +103,7 @@ func (p *Storage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequest
 	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
-		return nil, errors.ThrowPreconditionFailed(nil, "SAML-sd436", "no user agent id")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "SAML-sd436", "no user agent id")
 	}
 
 	authRequest := CreateAuthRequestToBusiness(ctx, req, acsUrl, protocolBinding, applicationID, relayState, userAgentID)
@@ -120,7 +121,7 @@ func (p *Storage) AuthRequestByID(ctx context.Context, id string) (_ models.Auth
 	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
-		return nil, errors.ThrowPreconditionFailed(nil, "SAML-D3g21", "no user agent id")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "SAML-D3g21", "no user agent id")
 	}
 	resp, err := p.repo.AuthRequestByIDCheckLoggedIn(ctx, id, userAgentID)
 	if err != nil {
@@ -132,7 +133,7 @@ func (p *Storage) AuthRequestByID(ctx context.Context, id string) (_ models.Auth
 func (p *Storage) SetUserinfoWithUserID(ctx context.Context, applicationID string, userinfo models.AttributeSetter, userID string, attributes []int) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	user, err := p.query.GetUserByID(ctx, true, userID, false)
+	user, err := p.query.GetUserByID(ctx, true, userID)
 	if err != nil {
 		return err
 	}
@@ -148,6 +149,9 @@ func (p *Storage) SetUserinfoWithUserID(ctx context.Context, applicationID strin
 	}
 
 	setUserinfo(user, userinfo, attributes, customAttributes)
+
+	// trigger activity log for authentication for user
+	activity.Trigger(ctx, user.ResourceOwner, user.ID, activity.SAMLResponse)
 	return nil
 }
 
@@ -155,11 +159,7 @@ func (p *Storage) SetUserinfoWithLoginName(ctx context.Context, userinfo models.
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	loginNameSQ, err := query.NewUserLoginNamesSearchQuery(loginName)
-	if err != nil {
-		return err
-	}
-	user, err := p.query.GetUser(ctx, true, false, loginNameSQ)
+	user, err := p.query.GetUserByLoginName(ctx, true, loginName)
 	if err != nil {
 		return err
 	}
@@ -212,7 +212,7 @@ func setUserinfo(user *query.User, userinfo models.AttributeSetter, attributes [
 
 func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, userGrants *query.UserGrants) (map[string]*customAttribute, error) {
 	customAttributes := make(map[string]*customAttribute, 0)
-	queriedActions, err := p.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomizeSAMLResponse, domain.TriggerTypePreSAMLResponseCreation, user.ResourceOwner, false)
+	queriedActions, err := p.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomizeSAMLResponse, domain.TriggerTypePreSAMLResponseCreation, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -310,7 +310,7 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 }
 
 func (p *Storage) getGrants(ctx context.Context, userID, applicationID string) (*query.UserGrants, error) {
-	projectID, err := p.query.ProjectIDFromClientID(ctx, applicationID, false)
+	projectID, err := p.query.ProjectIDFromClientID(ctx, applicationID)
 	if err != nil {
 		return nil, err
 	}

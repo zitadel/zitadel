@@ -12,9 +12,11 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Key interface {
@@ -191,7 +193,7 @@ func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time) (keys *Publ
 			sq.Gt{KeyPublicColExpiry.identifier(): t},
 		}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SDFfg", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-SDFfg", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -199,11 +201,11 @@ func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time) (keys *Publ
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Sghn4", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Sghn4", "Errors.Internal")
 	}
 
-	keys.LatestSequence, err = q.latestSequence(ctx, keyTable)
-	if !errors.IsNotFound(err) {
+	keys.State, err = q.latestState(ctx, keyTable)
+	if !zerrors.IsNotFound(err) {
 		return keys, err
 	}
 	return keys, nil
@@ -226,7 +228,7 @@ func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (key
 			sq.Gt{KeyPrivateColExpiry.identifier(): t},
 		}).OrderBy(KeyPrivateColExpiry.identifier()).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SDff2", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-SDff2", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -234,10 +236,10 @@ func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (key
 		return err
 	}, query, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-WRFG4", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-WRFG4", "Errors.Internal")
 	}
-	keys.LatestSequence, err = q.latestSequence(ctx, keyTable)
-	if !errors.IsNotFound(err) {
+	keys.State, err = q.latestState(ctx, keyTable)
+	if !zerrors.IsNotFound(err) {
 		return keys, err
 	}
 	return keys, nil
@@ -287,7 +289,7 @@ func preparePublicKeysQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-rKd6k", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-rKd6k", "Errors.Query.CloseRows")
 			}
 
 			return &PublicKeys{
@@ -338,7 +340,7 @@ func preparePrivateKeysQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-rKd6k", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-rKd6k", "Errors.Query.CloseRows")
 			}
 
 			return &PrivateKeys{
@@ -348,4 +350,89 @@ func preparePrivateKeysQuery(ctx context.Context, db prepareDatabase) (sq.Select
 				},
 			}, nil
 		}
+}
+
+type PublicKeyReadModel struct {
+	eventstore.ReadModel
+
+	Algorithm string
+	Key       *crypto.CryptoValue
+	Expiry    time.Time
+	Usage     domain.KeyUsage
+}
+
+func NewPublicKeyReadModel(keyID, resourceOwner string) *PublicKeyReadModel {
+	return &PublicKeyReadModel{
+		ReadModel: eventstore.ReadModel{
+			AggregateID:   keyID,
+			ResourceOwner: resourceOwner,
+		},
+	}
+}
+
+func (wm *PublicKeyReadModel) AppendEvents(events ...eventstore.Event) {
+	wm.ReadModel.AppendEvents(events...)
+}
+
+func (wm *PublicKeyReadModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *keypair.AddedEvent:
+			wm.Algorithm = e.Algorithm
+			wm.Key = e.PublicKey.Key
+			wm.Expiry = e.PublicKey.Expiry
+			wm.Usage = e.Usage
+		default:
+		}
+	}
+	return wm.ReadModel.Reduce()
+}
+
+func (wm *PublicKeyReadModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(keypair.AggregateType).
+		AggregateIDs(wm.AggregateID).
+		EventTypes(keypair.AddedEventType).
+		Builder()
+}
+
+func (q *Queries) GetActivePublicKeyByID(ctx context.Context, keyID string, current time.Time) (_ PublicKey, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	model := NewPublicKeyReadModel(keyID, authz.GetInstance(ctx).InstanceID())
+	if err := q.eventstore.FilterToQueryReducer(ctx, model); err != nil {
+		return nil, err
+	}
+	if model.Algorithm == "" || model.Key == nil {
+		return nil, zerrors.ThrowNotFound(err, "QUERY-Ahf7x", "Errors.Key.NotFound")
+	}
+	if model.Expiry.Before(current) {
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-ciF4k", "Errors.Key.ExpireBeforeNow")
+	}
+	keyValue, err := crypto.Decrypt(model.Key, q.keyEncryptionAlgorithm)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-Ie4oh", "Errors.Internal")
+	}
+	publicKey, err := crypto.BytesToPublicKey(keyValue)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-Kai2Z", "Errors.Internal")
+	}
+
+	return &rsaPublicKey{
+		key: key{
+			id:            model.AggregateID,
+			creationDate:  model.CreationDate,
+			changeDate:    model.ChangeDate,
+			sequence:      model.ProcessedSequence,
+			resourceOwner: model.ResourceOwner,
+			algorithm:     model.Algorithm,
+			use:           model.Usage,
+		},
+		expiry:    model.Expiry,
+		publicKey: publicKey,
+	}, nil
 }

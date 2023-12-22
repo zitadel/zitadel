@@ -2,7 +2,7 @@ import { Location } from '@angular/common';
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Subject, debounceTime, Observable } from 'rxjs';
 import { AddHumanUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { Domain } from 'src/app/proto/generated/zitadel/org_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
@@ -13,7 +13,6 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { CountryCallingCodesService, CountryPhoneCode } from 'src/app/services/country-calling-codes.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
-import { supportedLanguages } from 'src/app/utils/language';
 import {
   containsLowerCaseValidator,
   containsNumberValidator,
@@ -25,6 +24,7 @@ import {
   phoneValidator,
   requiredValidator,
 } from '../../../modules/form-field/validators/validators';
+import { LanguagesService } from '../../../services/languages.service';
 
 @Component({
   selector: 'cnsl-user-create',
@@ -34,8 +34,11 @@ import {
 export class UserCreateComponent implements OnInit, OnDestroy {
   public user: AddHumanUserRequest.AsObject = new AddHumanUserRequest().toObject();
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
-  public languages: string[] = supportedLanguages;
-  public selected: CountryPhoneCode | undefined;
+  public selected: CountryPhoneCode | undefined = {
+    countryCallingCode: '1',
+    countryCode: 'US',
+    countryName: 'United States of America',
+  };
   public countryPhoneCodes: CountryPhoneCode[] = [];
   public userForm!: UntypedFormGroup;
   public pwdForm!: UntypedFormGroup;
@@ -57,6 +60,7 @@ export class UserCreateComponent implements OnInit, OnDestroy {
     private changeDetRef: ChangeDetectorRef,
     private _location: Location,
     private countryCallingCodesService: CountryCallingCodesService,
+    public langSvc: LanguagesService,
     breadcrumbService: BreadcrumbService,
   ) {
     breadcrumbService.setBreadcrumb([
@@ -65,7 +69,6 @@ export class UserCreateComponent implements OnInit, OnDestroy {
         routerLink: ['/org'],
       }),
     ]);
-
     this.loading = true;
     this.loadOrg();
     this.mgmtService
@@ -84,10 +87,6 @@ export class UserCreateComponent implements OnInit, OnDestroy {
         this.loading = false;
         this.changeDetRef.detectChanges();
       });
-
-    this.mgmtService.getSupportedLanguages().then((lang) => {
-      this.languages = lang.languagesList;
-    });
   }
 
   public close(): void {
@@ -145,6 +144,14 @@ export class UserCreateComponent implements OnInit, OnDestroy {
         });
       }
     });
+
+    this.phone?.valueChanges.pipe(debounceTime(200)).subscribe((value: string) => {
+      const phoneNumber = formatPhone(value);
+      if (phoneNumber) {
+        this.selected = this.countryPhoneCodes.find((code) => code.countryCode === phoneNumber.country);
+        this.phone?.setValue(phoneNumber.phone);
+      }
+    });
   }
 
   public createUser(): void {
@@ -175,8 +182,10 @@ export class UserCreateComponent implements OnInit, OnDestroy {
     if (this.phone && this.phone.value) {
       // Try to parse number and format it according to country
       const phoneNumber = formatPhone(this.phone.value);
-      this.selected = this.countryPhoneCodes.find((code) => code.countryCode === phoneNumber.country);
-      humanReq.setPhone(new AddHumanUserRequest.Phone().setPhone(phoneNumber.phone));
+      if (phoneNumber) {
+        this.selected = this.countryPhoneCodes.find((code) => code.countryCode === phoneNumber.country);
+        humanReq.setPhone(new AddHumanUserRequest.Phone().setPhone(phoneNumber.phone));
+      }
     }
 
     this.mgmtService
@@ -257,5 +266,15 @@ export class UserCreateComponent implements OnInit, OnDestroy {
     } else {
       return;
     }
+  }
+
+  public compareCountries(i1: CountryPhoneCode, i2: CountryPhoneCode) {
+    return (
+      i1 &&
+      i2 &&
+      i1.countryCallingCode === i2.countryCallingCode &&
+      i1.countryCode == i2.countryCode &&
+      i1.countryName == i2.countryName
+    );
   }
 }

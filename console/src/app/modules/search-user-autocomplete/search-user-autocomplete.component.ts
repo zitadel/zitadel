@@ -11,11 +11,8 @@ import {
   ViewChild,
 } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
-import {
-  MatLegacyAutocomplete as MatAutocomplete,
-  MatLegacyAutocompleteSelectedEvent as MatAutocompleteSelectedEvent,
-} from '@angular/material/legacy-autocomplete';
-import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
+import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatChipInputEvent } from '@angular/material/chips';
 import { from, of, Subject } from 'rxjs';
 import { debounceTime, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { ListUsersResponse } from 'src/app/proto/generated/zitadel/management_pb';
@@ -35,7 +32,6 @@ export enum UserTarget {
   styleUrls: ['./search-user-autocomplete.component.scss'],
 })
 export class SearchUserAutocompleteComponent implements OnInit, AfterContentChecked {
-  public selectable: boolean = true;
   public removable: boolean = true;
   public addOnBlur: boolean = true;
   public separatorKeysCodes: number[] = [ENTER, COMMA];
@@ -57,7 +53,11 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
   @Input() public singleOutput: boolean = false;
 
   private unsubscribed$: Subject<void> = new Subject();
-  constructor(private userService: ManagementService, private toast: ToastService, private cdref: ChangeDetectorRef) {}
+  constructor(
+    private userService: ManagementService,
+    private toast: ToastService,
+    private cdref: ChangeDetectorRef,
+  ) {}
 
   public ngOnInit(): void {
     if (this.target === UserTarget.EXTERNAL) {

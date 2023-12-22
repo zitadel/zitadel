@@ -8,10 +8,12 @@
   </cnsl-filter-org>
 
   <ng-template actions cnslHasRole [hasRole]="['org.create', 'iam.write']">
-    <a [routerLink]="['/orgs', 'create']" color="primary" mat-raised-button class="cnsl-action-button">
-      <mat-icon class="icon">add</mat-icon>
-      <span>{{ 'ACTIONS.NEW' | translate }}</span>
-      <cnsl-action-keys (actionTriggered)="gotoRouterLink(['/orgs', 'create'])"> </cnsl-action-keys>
+    <a [routerLink]="['/orgs', 'create']" color="primary" mat-raised-button>
+      <div class="cnsl-action-button">
+        <mat-icon class="icon">add</mat-icon>
+        <span>{{ 'ACTIONS.NEW' | translate }}</span>
+        <cnsl-action-keys (actionTriggered)="gotoRouterLink(['/orgs', 'create'])"> </cnsl-action-keys>
+      </div>
     </a>
   </ng-template>
 
@@ -31,20 +33,21 @@
     <ng-container matColumnDef="primaryDomain">
       <th mat-header-cell *matHeaderCellDef>{{ 'ORG.PAGES.PRIMARYDOMAIN' | translate }}</th>
       <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">
-        <span>{{ org.primaryDomain }}</span>
-        <button
-          color="primary"
-          class="cpy-button"
-          mat-icon-button
-          [disabled]="copied === org.primaryDomain"
-          [matTooltip]="(copied !== org.primaryDomain ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
-          cnslCopyToClipboard
-          [valueToCopy]="org.primaryDomain"
-          (copiedValue)="copied = $event"
-        >
-          <i *ngIf="copied !== org.primaryDomain" class="las la-clipboard"></i>
-          <i *ngIf="copied === org.primaryDomain" class="las la-clipboard-check"></i>
-        </button>
+        <div class="primary-domain-wrapper">
+          <span>{{ org.primaryDomain }}</span>
+          <button
+            class="cpy-button"
+            mat-icon-button
+            [disabled]="copied === org.primaryDomain"
+            [matTooltip]="(copied !== org.primaryDomain ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
+            cnslCopyToClipboard
+            [valueToCopy]="org.primaryDomain"
+            (copiedValue)="copied = $event"
+          >
+            <i *ngIf="copied !== org.primaryDomain" class="las la-clipboard"></i>
+            <i *ngIf="copied === org.primaryDomain" class="las la-clipboard-check"></i>
+          </button>
+        </div>
       </td>
     </ng-container>
 
@@ -80,7 +83,7 @@
         {{ 'ORG.PAGES.CREATIONDATE' | translate }}
       </th>
       <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">
-        {{ org.details?.creationDate | timestampToDate | localizedDate : 'fromNow' }}
+        {{ org.details?.creationDate | timestampToDate | localizedDate: 'fromNow' }}
       </td>
     </ng-container>
 
@@ -89,7 +92,7 @@
         {{ 'ORG.PAGES.DATECHANGED' | translate }}
       </th>
       <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">
-        {{ org.details?.changeDate | timestampToDate | localizedDate : 'fromNow' }}
+        {{ org.details?.changeDate | timestampToDate | localizedDate: 'fromNow' }}
       </td>
     </ng-container>
 

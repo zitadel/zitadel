@@ -3,17 +3,17 @@ package projection
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
-	UserMetadataProjectionTable = "projections.user_metadata4"
+	UserMetadataProjectionTable = "projections.user_metadata5"
 
 	UserMetadataColumnUserID        = "user_id"
 	UserMetadataColumnCreationDate  = "creation_date"
@@ -23,44 +23,41 @@ const (
 	UserMetadataColumnInstanceID    = "instance_id"
 	UserMetadataColumnKey           = "key"
 	UserMetadataColumnValue         = "value"
-	UserMetadataColumnOwnerRemoved  = "owner_removed"
 )
 
-type userMetadataProjection struct {
-	crdb.StatementHandler
+type userMetadataProjection struct{}
+
+func newUserMetadataProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(userMetadataProjection))
 }
 
-func newUserMetadataProjection(ctx context.Context, config crdb.StatementHandlerConfig) *userMetadataProjection {
-	p := new(userMetadataProjection)
-	config.ProjectionName = UserMetadataProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(UserMetadataColumnUserID, crdb.ColumnTypeText),
-			crdb.NewColumn(UserMetadataColumnCreationDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(UserMetadataColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(UserMetadataColumnSequence, crdb.ColumnTypeInt64),
-			crdb.NewColumn(UserMetadataColumnResourceOwner, crdb.ColumnTypeText),
-			crdb.NewColumn(UserMetadataColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(UserMetadataColumnKey, crdb.ColumnTypeText),
-			crdb.NewColumn(UserMetadataColumnValue, crdb.ColumnTypeBytes, crdb.Nullable()),
-			crdb.NewColumn(UserMetadataColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
+func (*userMetadataProjection) Name() string {
+	return UserMetadataProjectionTable
+}
+
+func (*userMetadataProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(UserMetadataColumnUserID, handler.ColumnTypeText),
+			handler.NewColumn(UserMetadataColumnCreationDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(UserMetadataColumnChangeDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(UserMetadataColumnSequence, handler.ColumnTypeInt64),
+			handler.NewColumn(UserMetadataColumnResourceOwner, handler.ColumnTypeText),
+			handler.NewColumn(UserMetadataColumnInstanceID, handler.ColumnTypeText),
+			handler.NewColumn(UserMetadataColumnKey, handler.ColumnTypeText),
+			handler.NewColumn(UserMetadataColumnValue, handler.ColumnTypeBytes, handler.Nullable()),
 		},
-			crdb.NewPrimaryKey(UserMetadataColumnInstanceID, UserMetadataColumnUserID, UserMetadataColumnKey),
-			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{UserGrantResourceOwner})),
-			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{UserMetadataColumnOwnerRemoved})),
+			handler.NewPrimaryKey(UserMetadataColumnInstanceID, UserMetadataColumnUserID, UserMetadataColumnKey),
+			handler.WithIndex(handler.NewIndex("resource_owner", []string{UserGrantResourceOwner})),
 		),
 	)
-
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *userMetadataProjection) reducers() []handler.AggregateReducer {
+func (p *userMetadataProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  user.MetadataSetType,
 					Reduce: p.reduceMetadataSet,
@@ -81,7 +78,7 @@ func (p *userMetadataProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceOwnerRemoved,
@@ -90,7 +87,7 @@ func (p *userMetadataProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(UserMetadataColumnInstanceID),
@@ -103,9 +100,9 @@ func (p *userMetadataProjection) reducers() []handler.AggregateReducer {
 func (p *userMetadataProjection) reduceMetadataSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.MetadataSetEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Ghn52", "reduce.wrong.event.type %s", user.MetadataSetType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ghn52", "reduce.wrong.event.type %s", user.MetadataSetType)
 	}
-	return crdb.NewUpsertStatement(
+	return handler.NewUpsertStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(UserMetadataColumnInstanceID, nil),
@@ -128,9 +125,9 @@ func (p *userMetadataProjection) reduceMetadataSet(event eventstore.Event) (*han
 func (p *userMetadataProjection) reduceMetadataRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.MetadataRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Bm542", "reduce.wrong.event.type %s", user.MetadataRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Bm542", "reduce.wrong.event.type %s", user.MetadataRemovedType)
 	}
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(UserMetadataColumnUserID, e.Aggregate().ID),
@@ -146,9 +143,9 @@ func (p *userMetadataProjection) reduceMetadataRemovedAll(event eventstore.Event
 		*user.UserRemovedEvent:
 		//ok
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Bmnf2", "reduce.wrong.event.type %v", []eventstore.EventType{user.MetadataRemovedAllType, user.UserRemovedType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Bmnf2", "reduce.wrong.event.type %v", []eventstore.EventType{user.MetadataRemovedAllType, user.UserRemovedType})
 	}
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		event,
 		[]handler.Condition{
 			handler.NewCond(UserMetadataColumnUserID, event.Aggregate().ID),
@@ -160,10 +157,10 @@ func (p *userMetadataProjection) reduceMetadataRemovedAll(event eventstore.Event
 func (p *userMetadataProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-oqwul", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-oqwul", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(UserMetadataColumnInstanceID, e.Aggregate().InstanceID),

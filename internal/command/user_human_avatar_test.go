@@ -5,17 +5,16 @@ import (
 	"context"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/static/mock"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddHumanAvatar(t *testing.T) {
@@ -60,7 +59,7 @@ func TestCommandSide_AddHumanAvatar(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -85,7 +84,7 @@ func TestCommandSide_AddHumanAvatar(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -126,7 +125,7 @@ func TestCommandSide_AddHumanAvatar(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -151,14 +150,10 @@ func TestCommandSide_AddHumanAvatar(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanAvatarAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"avatar?v=test",
-								),
-							),
-						},
+						user.NewHumanAvatarAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"avatar?v=test",
+						),
 					),
 				),
 				storage: mock.NewStorage(t).ExpectPutObject(),
@@ -236,7 +231,7 @@ func TestCommandSide_RemoveHumanAvatar(t *testing.T) {
 				storageKey: "key",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -254,7 +249,7 @@ func TestCommandSide_RemoveHumanAvatar(t *testing.T) {
 				storageKey: "key",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -294,7 +289,7 @@ func TestCommandSide_RemoveHumanAvatar(t *testing.T) {
 				storageKey: "key",
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -326,14 +321,10 @@ func TestCommandSide_RemoveHumanAvatar(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanAvatarRemovedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"key",
-								),
-							),
-						},
+						user.NewHumanAvatarRemovedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key",
+						),
 					),
 				),
 			},

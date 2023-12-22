@@ -4,13 +4,13 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) ChangeHumanProfile(ctx context.Context, profile *domain.Profile) (*domain.Profile, error) {
 	if profile.AggregateID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-AwbEB", "Errors.User.Profile.IDMissing")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-AwbEB", "Errors.User.Profile.IDMissing")
 	}
 	if err := profile.Validate(); err != nil {
 		return nil, err
@@ -20,7 +20,7 @@ func (c *Commands) ChangeHumanProfile(ctx context.Context, profile *domain.Profi
 		return nil, err
 	}
 	if existingProfile.UserState == domain.UserStateUnspecified || existingProfile.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M9sd", "Errors.User.Profile.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3M9sd", "Errors.User.Profile.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingProfile.WriteModel)
 	changedEvent, hasChanged, err := existingProfile.NewChangedEvent(ctx, userAgg, profile.FirstName, profile.LastName, profile.NickName, profile.DisplayName, profile.PreferredLanguage, profile.Gender)
@@ -28,7 +28,7 @@ func (c *Commands) ChangeHumanProfile(ctx context.Context, profile *domain.Profi
 		return nil, err
 	}
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0fs", "Errors.User.Profile.NotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-2M0fs", "Errors.User.Profile.NotChanged")
 	}
 
 	events, err := c.eventstore.Push(ctx, changedEvent)

@@ -3,13 +3,12 @@ package projection
 import (
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestIDPUserLinkProjection_reduces(t *testing.T) {
@@ -25,21 +24,21 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserIDPLinkAddedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserIDPLinkAddedType,
+						user.AggregateType,
+						[]byte(`{
 	"idpConfigId": "idp-config-id",
     "userId": "external-user-id",
     "displayName": "gigi@caos.ch" 
 }`),
-				), user.UserIDPLinkAddedEventMapper),
+					), user.UserIDPLinkAddedEventMapper),
 			},
 			reduce: (&idpUserLinkProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -63,20 +62,20 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 		{
 			name: "reduceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserIDPLinkRemovedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserIDPLinkRemovedType,
+						user.AggregateType,
+						[]byte(`{
 	"idpConfigId": "idp-config-id",
     "userId": "external-user-id"
 }`),
-				), user.UserIDPLinkRemovedEventMapper),
+					), user.UserIDPLinkRemovedEventMapper),
 			},
 			reduce: (&idpUserLinkProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -95,20 +94,20 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 		{
 			name: "reduceCascadeRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserIDPLinkCascadeRemovedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserIDPLinkCascadeRemovedType,
+						user.AggregateType,
+						[]byte(`{
 	"idpConfigId": "idp-config-id",
     "userId": "external-user-id"
 }`),
-				), user.UserIDPLinkCascadeRemovedEventMapper),
+					), user.UserIDPLinkCascadeRemovedEventMapper),
 			},
 			reduce: (&idpUserLinkProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -127,17 +126,17 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 		{
 			name: "reduceOwnerRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					[]byte(`{}`),
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						[]byte(`{}`),
+					), org.OrgRemovedEventMapper),
 			},
 			reduce: (&idpUserLinkProjection{}).reduceOwnerRemoved,
 			want: wantReduce{
-				aggregateType:    org.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: org.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -154,17 +153,17 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(IDPUserLinkInstanceIDCol),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -180,17 +179,17 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserRemovedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.UserRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserRemovedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.UserRemovedEventMapper),
 			},
 			reduce: (&idpUserLinkProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -208,7 +207,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			name: "reduceExternalIDMigrated",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(user.UserIDPExternalIDMigratedType),
+					user.UserIDPExternalIDMigratedType,
 					user.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
@@ -219,9 +218,8 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 			reduce: (&idpUserLinkProjection{}).reduceExternalIDMigrated,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -241,21 +239,56 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "org IDPConfigRemovedEvent",
+			name: "reduceExternalUsernameChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.IDPConfigRemovedEventType),
-					org.AggregateType,
+					user.UserIDPExternalUsernameChangedType,
+					user.AggregateType,
 					[]byte(`{
+	"idpConfigId": "idp-config-id",
+    "userId": "external-user-id",
+	"username": "new-username"
+}`),
+				), eventstore.GenericEventMapper[user.UserIDPExternalUsernameEvent]),
+			},
+			reduce: (&idpUserLinkProjection{}).reduceExternalUsernameChanged,
+			want: wantReduce{
+				aggregateType: user.AggregateType,
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.idp_user_links3 SET (change_date, sequence, display_name) = ($1, $2, $3) WHERE (idp_id = $4) AND (user_id = $5) AND (external_user_id = $6) AND (instance_id = $7)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"new-username",
+								"idp-config-id",
+								"agg-id",
+								"external-user-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org IDPConfigRemovedEvent",
+			args: args{
+				event: getEvent(
+					testEvent(
+						org.IDPConfigRemovedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"idpConfigId": "idp-config-id"
 					}`),
-				), org.IDPConfigRemovedEventMapper),
+					), org.IDPConfigRemovedEventMapper),
 			},
 			reduce: (&idpUserLinkProjection{}).reduceIDPConfigRemoved,
 			want: wantReduce{
-				aggregateType:    org.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: org.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -273,19 +306,19 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 		{
 			name: "iam IDPConfigRemovedEvent",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.IDPConfigRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.IDPConfigRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"idpConfigId": "idp-config-id"
 					}`),
-				), instance.IDPConfigRemovedEventMapper),
+					), instance.IDPConfigRemovedEventMapper),
 			},
 			reduce: (&idpUserLinkProjection{}).reduceIDPConfigRemoved,
 			want: wantReduce{
-				aggregateType:    instance.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: instance.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -305,7 +338,7 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			event := baseEvent(t)
 			got, err := tt.reduce(event)
-			if _, ok := err.(errors.InvalidArgument); !ok {
+			if ok := zerrors.IsErrorInvalidArgument(err); !ok {
 				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
 			}
 

@@ -6,10 +6,9 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Machine struct {
@@ -29,7 +28,7 @@ func (sa *Machine) AppendEvents(events ...*es_models.Event) error {
 }
 
 func (sa *Machine) AppendEvent(event *es_models.Event) (err error) {
-	switch eventstore.EventType(event.Type) {
+	switch event.Type() {
 	case user_repo.MachineAddedEventType, user_repo.MachineChangedEventType:
 		err = sa.setData(event)
 	}
@@ -40,7 +39,7 @@ func (sa *Machine) AppendEvent(event *es_models.Event) (err error) {
 func (sa *Machine) setData(event *es_models.Event) error {
 	if err := json.Unmarshal(event.Data, sa); err != nil {
 		logging.Log("EVEN-8ujgd").WithError(err).Error("could not unmarshal event data")
-		return errors.ThrowInternal(err, "MODEL-GwjY9", "could not unmarshal event")
+		return zerrors.ThrowInternal(err, "MODEL-GwjY9", "could not unmarshal event")
 	}
 	return nil
 }
@@ -66,11 +65,11 @@ func (key *MachineKey) AppendEvents(events ...*es_models.Event) error {
 
 func (key *MachineKey) AppendEvent(event *es_models.Event) (err error) {
 	key.ObjectRoot.AppendEvent(event)
-	switch eventstore.EventType(event.Type) {
+	switch event.Type() {
 	case user_repo.MachineKeyAddedEventType:
 		err = json.Unmarshal(event.Data, key)
 		if err != nil {
-			return errors.ThrowInternal(err, "MODEL-SjI4S", "Errors.Internal")
+			return zerrors.ThrowInternal(err, "MODEL-SjI4S", "Errors.Internal")
 		}
 	case user_repo.MachineKeyRemovedEventType:
 		key.ExpirationDate = event.CreationDate

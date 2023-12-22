@@ -28,8 +28,18 @@ Errors:
       RemoveFailed: Објектот не може да се отстрани
   Limit:
     ExceedsDefault: Лимитот го надминува стандардниот лимит
+  Limits:
+    NotFound: Лимитот не е пронајден
+    NoneSpecified: Не се наведени лимити
+  Restrictions:
+    NoneSpecified: Не се наведени ограничувања
+    DefaultLanguageMustBeAllowed: Стандардниот јазик мора да биде дозволен
   Language:
     NotParsed: Јазикот не може да се парсира
+    NotSupported: Јазикот не е поддржан
+    NotAllowed: Јазикот не е дозволен
+    Undefined: Јазикот е недефиниран
+    Duplicate: Јазиците имаат дупликати
   OIDCSettings:
     NotFound: OIDC конфигурацијата не е пронајдена
     AlreadyExists: OIDC конфигурацијата веќе постои
@@ -48,6 +58,7 @@ Errors:
   Notification:
     NoDomain: Не е пронајден домен за пораката
   User:
+    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: Корисникот не е пронајден
     AlreadyExists: Корисникот веќе постои
     NotFoundOnOrg: Корисникот не е пронајден во избраната организација
@@ -133,7 +144,7 @@ Errors:
     ExternalIDP:
       Invalid: Невалиден надворешен IDP
       IDPConfigNotExisting: IDP не е валиден за оваа организација
-      NotAllowed: Надворешниоте IDP не е дозволен на оваа организација
+      NotAllowed: Надворешниот IDP не е дозволен
       MinimumExternalIDPNeeded: Мора да се додаде најмалку еден надворешен IDP
       AlreadyExists: Надворешниот IDP е веќе зафатен
       NotFound: Надворешниот IDP не е пронајден
@@ -182,6 +193,11 @@ Errors:
     DomainVerificationTypeInvalid: Типот на верификација на доменот е невалиден
     DomainVerificationMissing: Верификацијата на доменот сè уште не е започната
     DomainVerificationFailed: Верификацијата на доменот не успеа
+    DomainVerificationTXTNotFound: Записот _zitadel-challenge TXT не беше пронајден за вашиот домен. Проверете дали сте го додале на вашиот DNS сервер или почекајте додека не се пропагира новиот запис
+    DomainVerificationTXTNoMatch: Записот _zitadel-challenge TXT е пронајден за вашиот домен, но не го содржи вистинскиот токен текст. Проверете дали сте го додале вистинскиот токен на вашиот DNS сервер или почекајте додека не се пропагира новиот запис
+    DomainVerificationHTTPNotFound: Датотеката што го содржи предизвикот не беше пронајдена во очекуваната URL-адреса. Проверете дали сте ја подигнале датотеката на вистинското место со дозволи за читање
+    DomainVerificationHTTPNoMatch: Датотеката што го содржи предизвикот е пронајдена во очекуваната URL-адреса, но не го содржи вистинскиот токен текст. Проверете ја неговата содржина
+    DomainVerificationTimeout: Имаше истек на барање на DNS-серверот
     PrimaryDomainNotDeletable: Примарниот домен не смее да биде избришан
     DomainNotFound: Доменот не е пронајден
     MemberIDMissing: Недостасува ID на членот
@@ -197,6 +213,7 @@ Errors:
     Domain:
       AlreadyExists: Доменот веќе постои
       InvalidCharacter: Дозволени се само алфанумерички знаци, . и - се дозволени за домен
+      EmptyString: Неважечките ненумерички и азбучни знаци се заменети со празни места и добиениот домен е празна низа
     IDP:
       InvalidSearchQuery: Невалидно пребарување
       ClientID Missing: ClientID недостасува
@@ -308,7 +325,7 @@ Errors:
       NotActive: Овластувањето за проектот не е активно
       NotInactive: Овластувањето за проектот не е неактивно
   IAM:
-    NotFound: Инстанцата не е пронајдена
+    NotFound: Инстанцата не е пронајдена. Проверете https://zitadel.com/docs/self-hosting/manage/custom-domain
     Member:
       RolesNotChanged: Улогите не се променети
     MemberInvalid: Членот е невалиден
@@ -415,9 +432,11 @@ Errors:
     AuditRetention: Историјата е надвор од задржувањето на аудитот
   Token:
     NotFound: Токенот не е пронајден
+    Invalid: Токенот е невалиден
   UserSession:
     NotFound: Корисничката сесија не е пронајдена
   Key:
+    NotFound: Клучот не е пронајден
     ExpireBeforeNow: Датумот на истекување е во минатото
   Login:
     LoginPolicy:
@@ -481,12 +500,16 @@ Errors:
   Session:
     NotExisting: Сесијата не постои
     Terminated: Сесијата е веќе завршена
+    Expired: Сесијата истече
+    PositiveLifetime: Времетраењето на сесијата не смее да биде помало од 0
     Token:
       Invalid: Токенот за сесија е невалиден
     WebAuthN:
       NoChallenge: Сесија без предизвик WebAuthN
   Intent:
-    IDPMissing: ID на IDP недостасува во барањето
+    IDPMissing: ID на IDP недостасува во барањето6bg
+    IDPInvalid: ВРЛ неважечки за барањето
+    ResponseInvalid: Одговорот на ВРЛ е неважечки
     SuccessURLMissing: URL за успех недостасува во барањето
     FailureURLMissing: URL за неуспех недостасува во барањето
     StateMissing: Параметарот State недостасува во барањето
@@ -505,6 +528,10 @@ Errors:
       Invalid: токенот е неважечки
       Expired: токенот е истечен
     InvalidClient: Токен не беше издаден на овој клиент
+  Feature:
+    NotExisting: Функцијата не постои
+    TypeNotSupported: Типот на функција не е поддржан
+    InvalidValue: Неважечка вредност за оваа функција
 
 AggregateTypes:
   action: Акција
@@ -515,6 +542,7 @@ AggregateTypes:
   user: Корисник
   usergrant: Овластување на корисник
   quota: Квота
+  feature: Карактеристика
 
 EventTypes:
   user:

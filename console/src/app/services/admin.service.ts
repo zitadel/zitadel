@@ -40,6 +40,8 @@ import {
   AddNotificationPolicyResponse,
   AddOIDCSettingsRequest,
   AddOIDCSettingsResponse,
+  AddSAMLProviderRequest,
+  AddSAMLProviderResponse,
   AddSecondFactorToLoginPolicyRequest,
   AddSecondFactorToLoginPolicyResponse,
   AddSMSProviderTwilioRequest,
@@ -52,6 +54,8 @@ import {
   DeactivateSMSProviderResponse,
   DeleteProviderRequest,
   DeleteProviderResponse,
+  GetAllowedLanguagesRequest,
+  GetAllowedLanguagesResponse,
   GetCustomDomainClaimedMessageTextRequest,
   GetCustomDomainClaimedMessageTextResponse,
   GetCustomDomainPolicyRequest,
@@ -124,6 +128,7 @@ import {
   GetPrivacyPolicyResponse,
   GetProviderByIDRequest,
   GetProviderByIDResponse,
+  GetRestrictionsResponse,
   GetSecretGeneratorRequest,
   GetSecretGeneratorResponse,
   GetSecurityPolicyRequest,
@@ -152,6 +157,8 @@ import {
   ListLoginPolicyMultiFactorsResponse,
   ListLoginPolicySecondFactorsRequest,
   ListLoginPolicySecondFactorsResponse,
+  ListMilestonesRequest,
+  ListMilestonesResponse,
   ListProvidersRequest,
   ListProvidersResponse,
   ListSecretGeneratorsRequest,
@@ -188,6 +195,7 @@ import {
   ResetCustomDomainPolicyToDefaultResponse,
   ResetCustomLoginTextsToDefaultRequest,
   ResetCustomLoginTextsToDefaultResponse,
+  SelectLanguages,
   SetCustomLoginTextsRequest,
   SetCustomLoginTextsResponse,
   SetDefaultDomainClaimedMessageTextRequest,
@@ -212,6 +220,8 @@ import {
   SetDefaultVerifyPhoneMessageTextResponse,
   SetDefaultVerifySMSOTPMessageTextRequest,
   SetDefaultVerifySMSOTPMessageTextResponse,
+  SetRestrictionsRequest,
+  SetRestrictionsResponse,
   SetSecurityPolicyRequest,
   SetSecurityPolicyResponse,
   SetUpOrgRequest,
@@ -260,6 +270,8 @@ import {
   UpdatePasswordComplexityPolicyResponse,
   UpdatePrivacyPolicyRequest,
   UpdatePrivacyPolicyResponse,
+  UpdateSAMLProviderRequest,
+  UpdateSAMLProviderResponse,
   UpdateSecretGeneratorRequest,
   UpdateSecretGeneratorResponse,
   UpdateSMSProviderTwilioRequest,
@@ -296,79 +308,80 @@ import { SearchQuery } from '../proto/generated/zitadel/member_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { GrpcService } from './grpc.service';
 import { StorageLocation, StorageService } from './storage.service';
+import {
+  IsReachedQuery,
+  Milestone,
+  MilestoneQuery,
+  MilestoneType,
+} from '../proto/generated/zitadel/milestone/v1/milestone_pb';
 
 export interface OnboardingActions {
   order: number;
-  eventType: string;
-  oneof: string[];
-  link: string | string[];
+  milestoneType: MilestoneType;
+  link: string;
+  externalLink?: boolean;
   fragment?: string | undefined;
   iconClasses?: string;
   darkcolor: string;
   lightcolor: string;
 }
 
-type OnboardingEvent = {
+type OnboardingMilestone = {
   order: number;
   link: string;
+  externalLink?: boolean;
   fragment: string | undefined;
-  event: Event.AsObject | undefined;
+  reached: Milestone.AsObject | undefined;
   iconClasses?: string;
   darkcolor: string;
   lightcolor: string;
 };
-type OnboardingEventEntries = Array<[string, OnboardingEvent]> | [];
+type OnboardingMilestoneEntries = Array<[string, OnboardingMilestone]> | [];
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
+  private readonly milestoneTypePrefixLength = 'MILESTONE_TYPE_'.length;
   public hideOnboarding: boolean = false;
-  public loadEvents: Subject<OnboardingActions[]> = new Subject();
+  public loadMilestones: Subject<OnboardingActions[]> = new Subject();
   public onboardingLoading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  public progressEvents$: Observable<OnboardingEventEntries> = this.loadEvents.pipe(
+  public progressMilestones$: Observable<OnboardingMilestoneEntries> = this.loadMilestones.pipe(
     tap(() => this.onboardingLoading.next(true)),
     switchMap((actions) => {
-      const searchForTypes = actions.map((oe) => oe.oneof).flat();
-      const eventsReq = new ListEventsRequest().setAsc(true).setEventTypesList(searchForTypes).setAsc(false);
-      return from(this.listEvents(eventsReq)).pipe(
-        map((events) => {
-          const el = events.toObject().eventsList.filter((e) => e.editor?.service !== 'System-API' && e.editor?.userId);
-
-          let obj: { [type: string]: OnboardingEvent } = {};
+      const milestonesListQuery = new ListQuery();
+      milestonesListQuery.setAsc(true);
+      milestonesListQuery.setLimit(20);
+      const milestoneIsReachedQuery = new IsReachedQuery().setReached(true);
+      const milestonesQuery = new MilestoneQuery().setIsReachedQuery(milestoneIsReachedQuery);
+      const milestonesReq = new ListMilestonesRequest().setQuery(milestonesListQuery).setQueriesList([milestonesQuery]);
+      return from(this.listMilestones(milestonesReq)).pipe(
+        map((reachedMilestones) => {
+          let obj: { [type: string]: OnboardingMilestone } = {};
           actions.map((action) => {
-            const filtered = el.filter((event) => event.type?.type && action.oneof.includes(event.type.type));
-            (obj as any)[action.eventType] = filtered.length
-              ? {
-                  order: action.order,
-                  link: action.link,
-                  fragment: action.fragment,
-                  event: filtered[0],
-                  iconClasses: action.iconClasses,
-                  darkcolor: action.darkcolor,
-                  lightcolor: action.lightcolor,
-                }
-              : {
-                  order: action.order,
-                  link: action.link,
-                  fragment: action.fragment,
-                  event: undefined,
-                  iconClasses: action.iconClasses,
-                  darkcolor: action.darkcolor,
-                  lightcolor: action.lightcolor,
-                };
+            obj[Object.keys(MilestoneType)[action.milestoneType].substring(this.milestoneTypePrefixLength)] = {
+              order: action.order,
+              link: action.link,
+              externalLink: action.externalLink,
+              fragment: action.fragment,
+              iconClasses: action.iconClasses,
+              darkcolor: action.darkcolor,
+              lightcolor: action.lightcolor,
+              reached: reachedMilestones.resultList.find((reached) => {
+                return reached.type.valueOf() == action.milestoneType;
+              }),
+            };
           });
-
           const toArray = Object.entries(obj).sort(([key0, a], [key1, b]) => a.order - b.order);
 
-          const toDo = toArray.filter(([key, value]) => value.event === undefined);
-          const done = toArray.filter(([key, value]) => !!value.event);
+          const toDo = toArray.filter(([key, value]) => value.reached === undefined);
+          const done = toArray.filter(([key, value]) => !!value.reached);
 
           return [...toDo, ...done];
         }),
-        tap((events) => {
-          const total = events.length;
-          const done = events.map(([type, value]) => value.event !== undefined).filter((res) => !!res).length;
+        tap((milestones) => {
+          const total = milestones.length;
+          const done = milestones.map(([type, value]) => value.reached !== undefined).filter((res) => !!res).length;
           const percentage = Math.round((done / total) * 100);
           this.progressDone.next(done);
           this.progressTotal.next(total);
@@ -384,14 +397,19 @@ export class AdminService {
     }),
   );
 
-  public progressEvents: BehaviorSubject<OnboardingEventEntries> = new BehaviorSubject<OnboardingEventEntries>([]);
+  public progressMilestones: BehaviorSubject<OnboardingMilestoneEntries> = new BehaviorSubject<OnboardingMilestoneEntries>(
+    [],
+  );
   public progressPercentage: BehaviorSubject<number> = new BehaviorSubject(0);
   public progressDone: BehaviorSubject<number> = new BehaviorSubject(0);
   public progressTotal: BehaviorSubject<number> = new BehaviorSubject(0);
   public progressAllDone: BehaviorSubject<boolean> = new BehaviorSubject(true);
 
-  constructor(private readonly grpcService: GrpcService, private storageService: StorageService) {
-    this.progressEvents$.subscribe(this.progressEvents);
+  constructor(
+    private readonly grpcService: GrpcService,
+    private storageService: StorageService,
+  ) {
+    this.progressMilestones$.subscribe(this.progressMilestones);
 
     this.hideOnboarding =
       this.storageService.getItem('onboarding-dismissed', StorageLocation.local) === 'true' ? true : false;
@@ -419,6 +437,11 @@ export class AdminService {
   public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
     const req = new GetSupportedLanguagesRequest();
     return this.grpcService.admin.getSupportedLanguages(req, null).then((resp) => resp.toObject());
+  }
+
+  public getAllowedLanguages(): Promise<GetAllowedLanguagesResponse.AsObject> {
+    const req = new GetAllowedLanguagesRequest();
+    return this.grpcService.admin.getAllowedLanguages(req, null).then((resp) => resp.toObject());
   }
 
   public getDefaultLoginTexts(req: GetDefaultLoginTextsRequest): Promise<GetDefaultLoginTextsResponse.AsObject> {
@@ -811,6 +834,29 @@ export class AdminService {
     return this.grpcService.admin.setDefaultLanguage(req, null).then((resp) => resp.toObject());
   }
 
+  /* restrictions */
+
+  public getRestrictions(): Promise<GetRestrictionsResponse.AsObject> {
+    const req = new GetDefaultLanguageRequest();
+    return this.grpcService.admin.getRestrictions(req, null).then((resp) => resp.toObject());
+  }
+
+  public setRestrictions(
+    disallowPublicOrgRegistration?: boolean,
+    allowedLanguages?: string[],
+  ): Promise<SetRestrictionsResponse.AsObject> {
+    const req = new SetRestrictionsRequest();
+    if (disallowPublicOrgRegistration !== undefined) {
+      req.setDisallowPublicOrgRegistration(disallowPublicOrgRegistration);
+    }
+    if (allowedLanguages !== undefined) {
+      const langs = new SelectLanguages();
+      langs.setListList(allowedLanguages);
+      req.setAllowedLanguages(langs);
+    }
+    return this.grpcService.admin.setRestrictions(req, null).then((resp) => resp.toObject());
+  }
+
   /* notification policy */
 
   public getNotificationPolicy(): Promise<GetNotificationPolicyResponse.AsObject> {
@@ -1165,6 +1211,14 @@ export class AdminService {
     return this.grpcService.admin.updateJWTProvider(req, null).then((resp) => resp.toObject());
   }
 
+  public addSAMLProvider(req: AddSAMLProviderRequest): Promise<AddSAMLProviderResponse.AsObject> {
+    return this.grpcService.admin.addSAMLProvider(req, null).then((resp) => resp.toObject());
+  }
+
+  public updateSAMLProvider(req: UpdateSAMLProviderRequest): Promise<UpdateSAMLProviderResponse.AsObject> {
+    return this.grpcService.admin.updateSAMLProvider(req, null).then((resp) => resp.toObject());
+  }
+
   public addGitHubEnterpriseServerProvider(
     req: AddGitHubEnterpriseServerProviderRequest,
   ): Promise<AddGitHubEnterpriseServerProviderResponse.AsObject> {
@@ -1244,5 +1298,9 @@ export class AdminService {
     req.setRolesList(rolesList);
 
     return this.grpcService.admin.updateIAMMember(req, null).then((resp) => resp.toObject());
+  }
+
+  public listMilestones(req: ListMilestonesRequest): Promise<ListMilestonesResponse.AsObject> {
+    return this.grpcService.admin.listMilestones(req, null).then((resp) => resp.toObject());
   }
 }

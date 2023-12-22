@@ -7,11 +7,10 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/project/model"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -24,18 +23,18 @@ const (
 )
 
 type ProjectGrantView struct {
-	GrantID           string               `json:"-" gorm:"column:grant_id;primary_key"`
-	ProjectID         string               `json:"-" gorm:"column:project_id"`
-	OrgID             string               `json:"-" gorm:"column:org_id"`
-	Name              string               `json:"name" gorm:"column:project_name"`
-	CreationDate      time.Time            `json:"-" gorm:"column:creation_date"`
-	ChangeDate        time.Time            `json:"-" gorm:"column:change_date"`
-	State             int32                `json:"-" gorm:"column:project_state"`
-	ResourceOwner     string               `json:"-" gorm:"column:resource_owner"`
-	ResourceOwnerName string               `json:"-" gorm:"column:resource_owner_name"`
-	OrgName           string               `json:"-" gorm:"column:org_name"`
-	Sequence          uint64               `json:"-" gorm:"column:sequence"`
-	GrantedRoleKeys   database.StringArray `json:"-" gorm:"column:granted_role_keys"`
+	GrantID           string                     `json:"-" gorm:"column:grant_id;primary_key"`
+	ProjectID         string                     `json:"-" gorm:"column:project_id"`
+	OrgID             string                     `json:"-" gorm:"column:org_id"`
+	Name              string                     `json:"name" gorm:"column:project_name"`
+	CreationDate      time.Time                  `json:"-" gorm:"column:creation_date"`
+	ChangeDate        time.Time                  `json:"-" gorm:"column:change_date"`
+	State             int32                      `json:"-" gorm:"column:project_state"`
+	ResourceOwner     string                     `json:"-" gorm:"column:resource_owner"`
+	ResourceOwnerName string                     `json:"-" gorm:"column:resource_owner_name"`
+	OrgName           string                     `json:"-" gorm:"column:org_name"`
+	Sequence          uint64                     `json:"-" gorm:"column:sequence"`
+	GrantedRoleKeys   database.TextArray[string] `json:"-" gorm:"column:granted_role_keys"`
 }
 
 type ProjectGrant struct {
@@ -47,8 +46,8 @@ type ProjectGrant struct {
 
 func (p *ProjectGrantView) AppendEvent(event *models.Event) (err error) {
 	p.ChangeDate = event.CreationDate
-	p.Sequence = event.Sequence
-	switch eventstore.EventType(event.Type) {
+	p.Sequence = event.Seq
+	switch event.Type() {
 	case project.GrantAddedType:
 		p.State = int32(model.ProjectStateActive)
 		p.CreationDate = event.CreationDate
@@ -94,7 +93,7 @@ func (p *ProjectGrantView) setProjectGrantData(event *models.Event) error {
 func (p *ProjectGrant) SetData(event *models.Event) error {
 	if err := json.Unmarshal(event.Data, p); err != nil {
 		logging.Log("EVEN-dlo92").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-s9ols", "Could not unmarshal data")
+		return zerrors.ThrowInternal(err, "MODEL-s9ols", "Could not unmarshal data")
 	}
 	return nil
 }

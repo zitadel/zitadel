@@ -8,13 +8,12 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddDomainPolicy(t *testing.T) {
@@ -52,7 +51,7 @@ func TestCommandSide_AddDomainPolicy(t *testing.T) {
 				smtpSenderAddressMatchesInstanceDomain: true,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -80,7 +79,7 @@ func TestCommandSide_AddDomainPolicy(t *testing.T) {
 				smtpSenderAddressMatchesInstanceDomain: true,
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -100,16 +99,12 @@ func TestCommandSide_AddDomainPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewDomainPolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									true,
-									true,
-									true,
-								),
-							),
-						},
+						org.NewDomainPolicyAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							true,
+							true,
+							true,
+						),
 					),
 				),
 			},
@@ -202,38 +197,26 @@ func TestCommandSide_AddDomainPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewDomainPolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									true,
-									true,
-									true,
-								),
-							),
-							eventFromEventPusher(
-								user.NewUsernameChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"user1@org.com",
-									"user1",
-									true,
-									user.UsernameChangedEventWithPolicyChange(),
-								),
-							),
-							eventFromEventPusher(
-								user.NewUsernameChangedEvent(context.Background(),
-									&user.NewAggregate("user2", "org1").Aggregate,
-									"user@test.com",
-									"user@test.com",
-									true,
-									user.UsernameChangedEventWithPolicyChange(),
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("user1@org.com", "org1", false)),
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("user1", "org1", true)),
-						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("user@test.com", "org1", false)),
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("user@test.com", "org1", true)),
+						org.NewDomainPolicyAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							true,
+							true,
+							true,
+						),
+						user.NewUsernameChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"user1@org.com",
+							"user1",
+							true,
+							user.UsernameChangedEventWithPolicyChange(),
+						),
+						user.NewUsernameChangedEvent(context.Background(),
+							&user.NewAggregate("user2", "org1").Aggregate,
+							"user@test.com",
+							"user@test.com",
+							true,
+							user.UsernameChangedEventWithPolicyChange(),
+						),
 					),
 				),
 			},
@@ -305,7 +288,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 				smtpSenderAddressMatchesInstanceDomain: true,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -324,7 +307,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 				smtpSenderAddressMatchesInstanceDomain: true,
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -352,7 +335,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 				smtpSenderAddressMatchesInstanceDomain: true,
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -371,14 +354,10 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newDomainPolicyChangedEvent(context.Background(), "org1",
-									policy.ChangeValidateOrgDomains(false),
-									policy.ChangeSMTPSenderAddressMatchesInstanceDomain(false),
-								),
-							),
-						},
+						newDomainPolicyChangedEvent(context.Background(), "org1",
+							policy.ChangeValidateOrgDomains(false),
+							policy.ChangeSMTPSenderAddressMatchesInstanceDomain(false),
+						),
 					),
 				),
 			},
@@ -440,26 +419,18 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newDomainPolicyChangedEvent(context.Background(), "org1",
-									policy.ChangeUserLoginMustBeDomain(false),
-									policy.ChangeValidateOrgDomains(false),
-									policy.ChangeSMTPSenderAddressMatchesInstanceDomain(false),
-								),
-							),
-							eventFromEventPusher(
-								user.NewUsernameChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"user1",
-									"user1@org.com",
-									false,
-									user.UsernameChangedEventWithPolicyChange(),
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("user1", "org1", true)),
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("user1@org.com", "org1", false)),
+						newDomainPolicyChangedEvent(context.Background(), "org1",
+							policy.ChangeUserLoginMustBeDomain(false),
+							policy.ChangeValidateOrgDomains(false),
+							policy.ChangeSMTPSenderAddressMatchesInstanceDomain(false),
+						),
+						user.NewUsernameChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"user1",
+							"user1@org.com",
+							false,
+							user.UsernameChangedEventWithPolicyChange(),
+						),
 					),
 				),
 			},
@@ -525,7 +496,7 @@ func TestCommandSide_RemoveDomainPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -541,7 +512,7 @@ func TestCommandSide_RemoveDomainPolicy(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -570,12 +541,8 @@ func TestCommandSide_RemoveDomainPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewDomainPolicyRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate),
-							),
-						},
+						org.NewDomainPolicyRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate),
 					),
 				),
 			},
@@ -644,23 +611,16 @@ func TestCommandSide_RemoveDomainPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewDomainPolicyRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate),
-							),
-							eventFromEventPusher(
-								user.NewUsernameChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"user1",
-									"user1@org.com",
-									false,
-									user.UsernameChangedEventWithPolicyChange(),
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("user1", "org1", true)),
-						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("user1@org.com", "org1", false)),
+						org.NewDomainPolicyRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+						),
+						user.NewUsernameChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"user1",
+							"user1@org.com",
+							false,
+							user.UsernameChangedEventWithPolicyChange(),
+						),
 					),
 				),
 			},

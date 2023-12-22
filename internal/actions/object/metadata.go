@@ -16,11 +16,32 @@ func UserMetadataListFromQuery(c *actions.FieldConfig, metadata *query.UserMetad
 	result := &userMetadataList{
 		Count:     metadata.Count,
 		Sequence:  metadata.Sequence,
-		Timestamp: metadata.Timestamp,
+		Timestamp: metadata.LastRun,
 		Metadata:  make([]*userMetadata, len(metadata.Metadata)),
 	}
 
 	for i, md := range metadata.Metadata {
+		result.Metadata[i] = &userMetadata{
+			CreationDate:  md.CreationDate,
+			ChangeDate:    md.ChangeDate,
+			ResourceOwner: md.ResourceOwner,
+			Sequence:      md.Sequence,
+			Key:           md.Key,
+			Value:         metadataByteArrayToValue(md.Value, c.Runtime),
+		}
+	}
+
+	return c.Runtime.ToValue(result)
+}
+
+func UserMetadataListFromSlice(c *actions.FieldConfig, metadata []query.UserMetadata) goja.Value {
+	result := &userMetadataList{
+		// Count was the only field ever queried from the DB in the old implementation,
+		// so Sequence and LastRun are omitted.
+		Count:    uint64(len(metadata)),
+		Metadata: make([]*userMetadata, len(metadata)),
+	}
+	for i, md := range metadata {
 		result.Metadata[i] = &userMetadata{
 			CreationDate:  md.CreationDate,
 			ChangeDate:    md.ChangeDate,

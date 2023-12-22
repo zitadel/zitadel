@@ -3,16 +3,19 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type OrgMetadataList struct {
@@ -82,7 +85,10 @@ func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk boo
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.OrgMetadataProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerOrgMetadataProjection")
+		ctx, err = projection.OrgMetadataProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	query, scan := prepareOrgMetadataQuery(ctx, q.client)
@@ -99,7 +105,7 @@ func (q *Queries) GetOrgMetadataByKey(ctx context.Context, shouldTriggerBulk boo
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-aDaG2", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-aDaG2", "Errors.Query.SQLStatment")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -114,7 +120,10 @@ func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool,
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.OrgMetadataProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerOrgMetadataProjection")
+		ctx, err = projection.OrgMetadataProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 	eq := sq.Eq{
 		OrgMetadataOrgIDCol.identifier():      orgID,
@@ -126,7 +135,7 @@ func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool,
 	query, scan := prepareOrgMetadataListQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Egbld", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Egbld", "Errors.Query.SQLStatment")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -134,10 +143,10 @@ func (q *Queries) SearchOrgMetadata(ctx context.Context, shouldTriggerBulk bool,
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Ho2wf", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Ho2wf", "Errors.Internal")
 	}
 
-	metadata.LatestSequence, err = q.latestSequence(ctx, orgMetadataTable)
+	metadata.State, err = q.latestState(ctx, orgMetadataTable)
 	return metadata, err
 }
 
@@ -189,10 +198,10 @@ func prepareOrgMetadataQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			)
 
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-Rph32", "Errors.Metadata.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-Rph32", "Errors.Metadata.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-Hajt2", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-Hajt2", "Errors.Internal")
 			}
 			return m, nil
 		}
@@ -231,7 +240,7 @@ func prepareOrgMetadataListQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-dd3gh", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-dd3gh", "Errors.Query.CloseRows")
 			}
 
 			return &OrgMetadataList{

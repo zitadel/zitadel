@@ -28,8 +28,18 @@ Errors:
       RemoveFailed: Não foi possível remover o objeto
   Limit:
     ExceedsDefault: Limite excede o limite padrão
+  Limits:
+    NotFound: Limite não encontrado
+    NoneSpecified: Nenhum limite especificado
+  Restrictions:
+    NoneSpecified: Nenhuma restrição especificada
+    DefaultLanguageMustBeAllowed: O idioma padrão deve ser permitido
   Language:
     NotParsed: Não foi possível analisar o idioma
+    NotSupported: Idioma não suportado
+    NotAllowed: Idioma não permitido
+    Undefined: Idioma indefinido
+    Duplicate: Idiomas têm duplicatas
   OIDCSettings:
     NotFound: Configuração OIDC não encontrada
     AlreadyExists: Configuração OIDC já existe
@@ -48,6 +58,7 @@ Errors:
   Notification:
     NoDomain: Nenhum domínio encontrado para a mensagem
   User:
+    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: Usuário não pôde ser encontrado
     AlreadyExists: Usuário já existe
     NotFoundOnOrg: Usuário não pôde ser encontrado na organização escolhida
@@ -132,7 +143,7 @@ Errors:
     ExternalIDP:
       Invalid: IDP externo inválido
       IDPConfigNotExisting: Provedor de IDP inválido para esta organização
-      NotAllowed: IDP externo não permitido nesta organização
+      NotAllowed: IDP externo não permitido
       MinimumExternalIDPNeeded: Pelo menos um IDP deve ser adicionado
       AlreadyExists: IDP externo já está em uso
       NotFound: IDP externo não encontrado
@@ -180,6 +191,11 @@ Errors:
     DomainVerificationTypeInvalid: O tipo de verificação do domínio é inválido
     DomainVerificationMissing: A verificação do domínio ainda não foi iniciada
     DomainVerificationFailed: Falha na verificação do domínio
+    DomainVerificationTXTNotFound: O registro TXT _zitadel-challenge não foi encontrado para seu domínio. Verifique se você o adicionou ao seu servidor DNS ou espere até que o novo registro seja propagado
+    DomainVerificationTXTNoMatch: O registro TXT _zitadel-challenge foi encontrado para seu domínio, mas não contém o texto do token correto. Verifique se você adicionou o token correto ao seu servidor DNS ou espere até que o novo registro seja propagado
+    DomainVerificationHTTPNotFound: O arquivo que contém o desafio não foi encontrado na URL esperada. Verifique se você carregou o arquivo no lugar certo com permissões de leitura
+    DomainVerificationHTTPNoMatch: O arquivo que contém o desafio foi encontrado na URL esperada, mas não contém o texto do token correto. Verifique seu conteúdo
+    DomainVerificationTimeout: Houve um tempo limite na consulta do servidor DNS
     PrimaryDomainNotDeletable: O domínio principal não pode ser excluído
     DomainNotFound: Domínio não encontrado
     MemberIDMissing: ID do membro ausente
@@ -195,6 +211,7 @@ Errors:
     Domain:
       AlreadyExists: Domínio já existe
       InvalidCharacter: Apenas caracteres alfanuméricos, . e - são permitidos para um domínio
+      EmptyString: Caracteres não numéricos e alfabéticos inválidos foram substituídos por espaços vazios e o domínio resultante é uma string vazia
     IDP:
       InvalidSearchQuery: Consulta de pesquisa inválida
       ClientIDMissing: ClientID ausente
@@ -306,7 +323,7 @@ Errors:
       NotActive: A concessão do projeto não está ativa
       NotInactive: A concessão do projeto não está inativa
   IAM:
-    NotFound: Instância não encontrada
+    NotFound: Instância não encontrada. Confira https://zitadel.com/docs/self-hosting/manage/custom-domain
     Member:
       RolesNotChanged: As funções não foram alteradas
     MemberInvalid: O membro é inválido
@@ -413,9 +430,11 @@ Errors:
     AuditRetention: O histórico está fora do período de retenção do registro de auditoria
   Token:
     NotFound: Token não encontrado
+    Invalid: Token inválido
   UserSession:
     NotFound: Sessão do usuário não encontrada
   Key:
+    NotFound: Chave não encontrada
     ExpireBeforeNow: A data de expiração está no passado
   Login:
     LoginPolicy:
@@ -479,12 +498,16 @@ Errors:
   Session:
     NotExisting: A sessão não existe
     Terminated: A sessão já foi encerrada
+    Expired: A Sessão expirou
+    PositiveLifetime: O tempo de vida da sessão não deve ser inferior a 0
     Token:
       Invalid: O token da sessão é inválido
     WebAuthN:
       NoChallenge: Sessão sem desafio WebAuthN
   Intent:
     IDPMissing: O ID do IDP está faltando na solicitação
+    IDPInvalid: IDP inválido para o pedido
+    ResponseInvalid: A resposta da PDI é inválida
     SuccessURLMissing: A URL de sucesso está faltando na solicitação
     FailureURLMissing: A URL de falha está faltando na solicitação
     StateMissing: O parâmetro de estado está faltando na solicitação
@@ -499,6 +522,10 @@ Errors:
     WrongLoginClient: A solicitação de autenticação foi criada por outro cliente de login
   OIDCSession:
     RefreshTokenInvalid: O Refresh Token é inválido
+  Feature:
+    NotExisting: O recurso não existe
+    TypeNotSupported: O tipo de recurso não é compatível
+    InvalidValue: Valor inválido para este recurso
 
 AggregateTypes:
   action: Ação
@@ -509,6 +536,7 @@ AggregateTypes:
   user: Usuário
   usergrant: Concessão de usuário
   quota: Cota
+  feature: Recurso
 
 EventTypes:
   user:

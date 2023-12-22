@@ -75,7 +75,7 @@
                   [routerLinkActiveOptions]="{ exact: false }"
                   [routerLinkActive]="['active']"
                   [routerLink]="['/settings']"
-                  *ngIf="['iam.read', 'iam.policy.read'] | hasRole : true | async"
+                  *ngIf="['iam.read', 'iam.policy.read'] | hasRole: true | async"
                 >
                   <div class="c_label">
                     <span> {{ 'MENU.SETTINGS' | translate }} </span>
@@ -181,17 +181,6 @@
                   <a
                     class="nav-item"
                     [routerLinkActive]="['active']"
-                    [routerLink]="['/domains']"
-                    [routerLinkActiveOptions]="{ exact: true }"
-                  >
-                    <span class="label">{{ 'MENU.DOMAINS' | translate }}</span>
-                  </a>
-                </ng-template>
-
-                <ng-template cnslHasRole [hasRole]="['org.read']">
-                  <a
-                    class="nav-item"
-                    [routerLinkActive]="['active']"
                     [routerLinkActiveOptions]="{ exact: false }"
                     [routerLink]="['/org-settings']"
                     *ngIf="['policy.read'] | hasRole | async"
@@ -215,19 +204,22 @@
     <ng-template cnslHasRole [hasRole]="['iam.read']">
       <span class="fill-space"></span>
       <ng-container *ngIf="!adminService.hideOnboarding && (adminService.progressAllDone | async) === false">
-        <button
+        <div
           cdkOverlayOrigin
+          role="button"
           #trigger="cdkOverlayOrigin"
           matRipple
           class="progress-bar"
           (click)="showInstanceProgress = !showInstanceProgress"
         >
-          <mat-progress-bar
-            class="progress"
-            mode="determinate"
-            [value]="adminService.progressPercentage | async"
-          ></mat-progress-bar>
-        </button>
+          <div class="progress-div">
+            <mat-progress-bar
+              class="progress"
+              mode="determinate"
+              [value]="adminService.progressPercentage | async"
+            ></mat-progress-bar>
+          </div>
+        </div>
 
         <ng-template
           cdkConnectedOverlay

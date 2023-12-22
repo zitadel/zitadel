@@ -6,9 +6,8 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -26,11 +25,11 @@ type MachineKeyAddedEvent struct {
 	PublicKey      []byte              `json:"publicKey,omitempty"`
 }
 
-func (e *MachineKeyAddedEvent) Data() interface{} {
+func (e *MachineKeyAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *MachineKeyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MachineKeyAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -55,18 +54,18 @@ func NewMachineKeyAddedEvent(
 	}
 }
 
-func MachineKeyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MachineKeyAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	machineKeyAdded := &MachineKeyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, machineKeyAdded)
+	err := event.Unmarshal(machineKeyAdded)
 	if err != nil {
 		//first events had wrong payload.
 		// the keys were removed later, that's why we ignore them here.
 		if unwrapErr, ok := err.(*json.UnmarshalTypeError); ok && unwrapErr.Field == "publicKey" {
 			return machineKeyAdded, nil
 		}
-		return nil, errors.ThrowInternal(err, "USER-p0ovS", "unable to unmarshal machine key added")
+		return nil, zerrors.ThrowInternal(err, "USER-p0ovS", "unable to unmarshal machine key added")
 	}
 
 	return machineKeyAdded, nil
@@ -78,11 +77,11 @@ type MachineKeyRemovedEvent struct {
 	KeyID string `json:"keyId,omitempty"`
 }
 
-func (e *MachineKeyRemovedEvent) Data() interface{} {
+func (e *MachineKeyRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *MachineKeyRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MachineKeyRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -101,13 +100,13 @@ func NewMachineKeyRemovedEvent(
 	}
 }
 
-func MachineKeyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MachineKeyRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	machineRemoved := &MachineKeyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, machineRemoved)
+	err := event.Unmarshal(machineRemoved)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-5Gm9s", "unable to unmarshal machine key removed")
+		return nil, zerrors.ThrowInternal(err, "USER-5Gm9s", "unable to unmarshal machine key removed")
 	}
 
 	return machineRemoved, nil

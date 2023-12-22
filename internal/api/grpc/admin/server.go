@@ -6,7 +6,6 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/zitadel/zitadel/internal/admin/repository"
 	"github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/api/assets"
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -29,7 +28,6 @@ type Server struct {
 	database          string
 	command           *command.Commands
 	query             *query.Queries
-	administrator     repository.AdministratorRepository
 	assetsAPIDomain   func(context.Context) string
 	userCodeAlg       crypto.EncryptionAlgorithm
 	passwordHashAlg   crypto.HashAlgorithm
@@ -45,7 +43,6 @@ func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
 	sd systemdefaults.SystemDefaults,
-	repo repository.Repository,
 	externalSecure bool,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	auditLogRetention time.Duration,
@@ -54,7 +51,6 @@ func CreateServer(
 		database:          database,
 		command:           command,
 		query:             query,
-		administrator:     repo,
 		assetsAPIDomain:   assets.AssetAPI(externalSecure),
 		userCodeAlg:       userCodeAlg,
 		passwordHashAlg:   crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
@@ -83,5 +79,9 @@ func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
 }
 
 func (s *Server) GatewayPathPrefix() string {
+	return GatewayPathPrefix()
+}
+
+func GatewayPathPrefix() string {
 	return "/admin/v1"
 }

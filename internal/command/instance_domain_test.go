@@ -9,13 +9,11 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/repository/project"
-
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddInstanceDomain(t *testing.T) {
@@ -49,7 +47,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 				domain: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -64,7 +62,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 				domain: "hodor's-org.localhost",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -79,7 +77,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 				domain: "bücher.ch",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -94,7 +92,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 				domain: "🦒.ch",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -118,7 +116,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 				domain: "domain.ch",
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -167,20 +165,17 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewDomainAddedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									"domain.ch",
-									false,
-								)),
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								newOIDCAppChangedEventInstanceDomain(context.Background(), "consoleApplicationID", "projectID", "org1"),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(instance.NewAddInstanceDomainUniqueConstraint("domain.ch")),
+						instance.NewDomainAddedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"domain.ch",
+							false,
+						),
+						newOIDCAppChangedEventInstanceDomain(
+							context.Background(),
+							"consoleApplicationID",
+							"projectID",
+							"org1",
+						),
 					),
 				),
 				externalSecure: true,
@@ -205,13 +200,11 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 			got, err := r.AddInstanceDomain(tt.args.ctx, tt.args.domain)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
+			} else if !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
+				return
 			}
-			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
-			}
+			assert.Equal(t, tt.res.want, got)
 		})
 	}
 }
@@ -246,7 +239,7 @@ func TestCommandSide_SetPrimaryInstanceDomain(t *testing.T) {
 				domain: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -262,7 +255,7 @@ func TestCommandSide_SetPrimaryInstanceDomain(t *testing.T) {
 				domain: "domain.ch",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -281,14 +274,10 @@ func TestCommandSide_SetPrimaryInstanceDomain(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewDomainPrimarySetEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									"domain.ch",
-								)),
-						},
+						instance.NewDomainPrimarySetEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"domain.ch",
+						),
 					),
 				),
 			},
@@ -352,7 +341,7 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 				domain: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -368,7 +357,7 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 				domain: "domain.ch",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -387,15 +376,10 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewDomainRemovedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									"domain.ch",
-								)),
-						},
-						uniqueConstraintsFromEventConstraint(instance.NewRemoveInstanceDomainUniqueConstraint("domain.ch")),
+						instance.NewDomainRemovedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"domain.ch",
+						),
 					),
 				),
 			},
@@ -430,7 +414,7 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 				domain: "domain.ch",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 	}
@@ -458,8 +442,12 @@ func newOIDCAppChangedEventInstanceDomain(ctx context.Context, appID, projectID,
 		project.ChangeRedirectURIs([]string{"https://test.ch", "https://domain.ch/ui/console/auth/callback"}),
 		project.ChangePostLogoutRedirectURIs([]string{"https://test.ch/logout", "https://domain.ch/ui/console/signedout"}),
 	}
+
+	aggregate := project.NewAggregate(projectID, resourceOwner).Aggregate
+	aggregate.InstanceID = "INSTANCE"
+
 	event, _ := project.NewOIDCConfigChangedEvent(ctx,
-		&project.NewAggregate(projectID, resourceOwner).Aggregate,
+		&aggregate,
 		appID,
 		changes,
 	)

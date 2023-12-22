@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -150,7 +150,7 @@ func Test_IDPPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -181,7 +181,7 @@ func Test_IDPPrepares(t *testing.T) {
 						"oidc-client-id",
 						nil,
 						"oidc-issuer",
-						database.StringArray{"scope"},
+						database.TextArray[string]{"scope"},
 						domain.OIDCMappingFieldEmail,
 						domain.OIDCMappingFieldPreferredLoginName,
 						"auth.endpoint.ch",
@@ -211,7 +211,7 @@ func Test_IDPPrepares(t *testing.T) {
 					ClientID:              "oidc-client-id",
 					ClientSecret:          &crypto.CryptoValue{},
 					Issuer:                "oidc-issuer",
-					Scopes:                database.StringArray{"scope"},
+					Scopes:                database.TextArray[string]{"scope"},
 					DisplayNameMapping:    domain.OIDCMappingFieldEmail,
 					UsernameMapping:       domain.OIDCMappingFieldPreferredLoginName,
 					AuthorizationEndpoint: "auth.endpoint.ch",
@@ -353,7 +353,7 @@ func Test_IDPPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -385,7 +385,7 @@ func Test_IDPPrepares(t *testing.T) {
 							"oidc-client-id",
 							nil,
 							"oidc-issuer",
-							database.StringArray{"scope"},
+							database.TextArray[string]{"scope"},
 							domain.OIDCMappingFieldEmail,
 							domain.OIDCMappingFieldPreferredLoginName,
 							"auth.endpoint.ch",
@@ -421,7 +421,7 @@ func Test_IDPPrepares(t *testing.T) {
 							ClientID:              "oidc-client-id",
 							ClientSecret:          &crypto.CryptoValue{},
 							Issuer:                "oidc-issuer",
-							Scopes:                database.StringArray{"scope"},
+							Scopes:                database.TextArray[string]{"scope"},
 							DisplayNameMapping:    domain.OIDCMappingFieldEmail,
 							UsernameMapping:       domain.OIDCMappingFieldPreferredLoginName,
 							AuthorizationEndpoint: "auth.endpoint.ch",
@@ -608,7 +608,7 @@ func Test_IDPPrepares(t *testing.T) {
 							"oidc-client-id",
 							nil,
 							"oidc-issuer",
-							database.StringArray{"scope"},
+							database.TextArray[string]{"scope"},
 							domain.OIDCMappingFieldEmail,
 							domain.OIDCMappingFieldPreferredLoginName,
 							"auth.endpoint.ch",
@@ -684,7 +684,7 @@ func Test_IDPPrepares(t *testing.T) {
 							ClientID:              "oidc-client-id",
 							ClientSecret:          &crypto.CryptoValue{},
 							Issuer:                "oidc-issuer",
-							Scopes:                database.StringArray{"scope"},
+							Scopes:                database.TextArray[string]{"scope"},
 							DisplayNameMapping:    domain.OIDCMappingFieldEmail,
 							UsernameMapping:       domain.OIDCMappingFieldPreferredLoginName,
 							AuthorizationEndpoint: "auth.endpoint.ch",

@@ -3,8 +3,8 @@ package oauth
 import (
 	"context"
 
-	"github.com/zitadel/oidc/v2/pkg/client/rp"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/oauth2"
 
 	"github.com/zitadel/zitadel/internal/idp"
@@ -87,15 +87,26 @@ func (p *Provider) Name() string {
 
 // BeginAuth implements the [idp.Provider] interface.
 // It will create a [Session] with an OAuth2.0 authorization request as AuthURL.
-func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (idp.Session, error) {
-	opts := []rp.AuthURLOpt{rp.WithPrompt(oidc.PromptSelectAccount)}
+func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Parameter) (idp.Session, error) {
+	opts := make([]rp.AuthURLOpt, 0)
+	var loginHintSet bool
 	for _, param := range params {
-		if option, ok := param.(rp.AuthURLOpt); ok {
-			opts = append(opts, option)
+		if username, ok := param.(idp.LoginHintParam); ok {
+			loginHintSet = true
+			opts = append(opts, loginHint(string(username)))
 		}
+	}
+	if !loginHintSet {
+		opts = append(opts, rp.WithPrompt(oidc.PromptSelectAccount))
 	}
 	url := rp.AuthURL(state, p.RelyingParty, opts...)
 	return &Session{AuthURL: url, Provider: p}, nil
+}
+
+func loginHint(hint string) rp.AuthURLOpt {
+	return func() []oauth2.AuthCodeOption {
+		return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam("login_hint", hint)}
+	}
 }
 
 // IsLinkingAllowed implements the [idp.Provider] interface.

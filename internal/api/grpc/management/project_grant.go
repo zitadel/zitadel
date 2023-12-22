@@ -13,7 +13,7 @@ import (
 )
 
 func (s *Server) GetProjectGrantByID(ctx context.Context, req *mgmt_pb.GetProjectGrantByIDRequest) (*mgmt_pb.GetProjectGrantByIDResponse, error) {
-	grant, err := s.query.ProjectGrantByID(ctx, true, req.GrantId, false)
+	grant, err := s.query.ProjectGrantByID(ctx, true, req.GrantId)
 	if err != nil {
 		return nil, err
 	}
@@ -31,13 +31,13 @@ func (s *Server) ListProjectGrants(ctx context.Context, req *mgmt_pb.ListProject
 	if err != nil {
 		return nil, err
 	}
-	grants, err := s.query.SearchProjectGrants(ctx, queries, false)
+	grants, err := s.query.SearchProjectGrants(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectGrantsResponse{
 		Result:  proj_grpc.GrantedProjectViewsToPb(grants.ProjectGrants),
-		Details: object_grpc.ToListDetails(grants.Count, grants.Sequence, grants.Timestamp),
+		Details: object_grpc.ToListDetails(grants.Count, grants.Sequence, grants.LastRun),
 	}, nil
 }
 
@@ -54,13 +54,13 @@ func (s *Server) ListAllProjectGrants(ctx context.Context, req *mgmt_pb.ListAllP
 	if err != nil {
 		return nil, err
 	}
-	grants, err := s.query.SearchProjectGrants(ctx, queries, false)
+	grants, err := s.query.SearchProjectGrants(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListAllProjectGrantsResponse{
 		Result:  proj_grpc.GrantedProjectViewsToPb(grants.ProjectGrants),
-		Details: object_grpc.ToListDetails(grants.Count, grants.Sequence, grants.Timestamp),
+		Details: object_grpc.ToListDetails(grants.Count, grants.Sequence, grants.LastRun),
 	}, nil
 }
 
@@ -164,13 +164,13 @@ func (s *Server) ListProjectGrantMembers(ctx context.Context, req *mgmt_pb.ListP
 	if err != nil {
 		return nil, err
 	}
-	response, err := s.query.ProjectGrantMembers(ctx, queries, false)
+	response, err := s.query.ProjectGrantMembers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectGrantMembersResponse{
 		Result:  member_grpc.MembersToPb(s.assetAPIPrefix(ctx), response.Members),
-		Details: object_grpc.ToListDetails(response.Count, response.Sequence, response.Timestamp),
+		Details: object_grpc.ToListDetails(response.Count, response.Sequence, response.LastRun),
 	}, nil
 }
 

@@ -26,6 +26,14 @@ core_static:
 	go generate internal/notification/statik/generate.go
 	go generate internal/statik/generate.go
 
+.PHONY: core_generate_all
+core_generate_all:
+	go install github.com/dmarkham/enumer@v1.5.9
+	go install github.com/rakyll/statik@v0.1.7
+	go install go.uber.org/mock/mockgen@v0.3.0
+	go install golang.org/x/tools/cmd/stringer@v0.15.0
+	go generate ./...
+
 .PHONY: core_assets
 core_assets:
 	mkdir -p docs/apis/assets
@@ -44,12 +52,12 @@ endif
 
 .PHONY: core_grpc_dependencies
 core_grpc_dependencies:
-	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.30 
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.31 
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3 
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.15.2 
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.15.2 
-	go install github.com/envoyproxy/protoc-gen-validate@v0.10.1
-	go install github.com/bufbuild/buf/cmd/buf@v1.25.1
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.18.1 
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.18.1 
+	go install github.com/envoyproxy/protoc-gen-validate@v1.0.2
+	go install github.com/bufbuild/buf/cmd/buf@v1.27.2
 
 .PHONY: core_api
 core_api: core_api_generator core_grpc_dependencies
@@ -83,7 +91,7 @@ console_build: console_dependencies console_client
 
 .PHONY: clean
 clean:
-	$(RM) .artifacts/grpc
+	$(RM) -r .artifacts/grpc
 	$(RM) $(gen_authopt_path)
 	$(RM) $(gen_zitadel_path)
 
@@ -95,12 +103,12 @@ core_unit_test:
 core_integration_setup:
 	go build -o zitadel main.go
 	./zitadel init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
-	./zitadel setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
+	./zitadel setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml --steps internal/integration/config/zitadel.yaml --steps internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 	$(RM) zitadel
 
 .PHONY: core_integration_test
 core_integration_test: core_integration_setup
-	go test -tags=integration -race -p 1 -v -coverprofile=profile.cov -coverpkg=./internal/...,./cmd/... ./internal/integration ./internal/api/grpc/...  ./internal/notification/handlers/... ./internal/api/oidc/...
+	go test -tags=integration -race -p 1 -coverprofile=profile.cov -coverpkg=./internal/...,./cmd/... ./internal/integration ./internal/api/grpc/...  ./internal/notification/handlers/... ./internal/api/oidc/...
 
 .PHONY: console_lint
 console_lint:

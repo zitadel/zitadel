@@ -3,7 +3,7 @@ package authz
 import (
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type TestRequest struct {
@@ -77,7 +77,7 @@ func Test_CheckUserPermissions(t *testing.T) {
 				t.Errorf("shouldn't get err: %v ", err)
 			}
 
-			if tt.wantErr && !errors.IsPermissionDenied(err) {
+			if tt.wantErr && !zerrors.IsPermissionDenied(err) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 		})

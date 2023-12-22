@@ -6,10 +6,10 @@ import (
 	"slices"
 	"time"
 
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type quotaWriteModel struct {
@@ -37,8 +37,8 @@ func newQuotaWriteModel(instanceId, resourceOwner string, unit quota.Unit) *quot
 func (wm *quotaWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
-		AddQuery().
 		InstanceID(wm.InstanceID).
+		AddQuery().
 		AggregateTypes(quota.AggregateType).
 		EventTypes(
 			quota.AddedEventType,
@@ -51,7 +51,7 @@ func (wm *quotaWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *quotaWriteModel) Reduce() error {
 	for _, event := range wm.Events {
-		wm.ChangeDate = event.CreationDate()
+		wm.ChangeDate = event.CreatedAt()
 		switch e := event.(type) {
 		case *quota.SetEvent:
 			wm.rollingAggregateID = e.Aggregate().ID
@@ -79,7 +79,7 @@ func (wm *quotaWriteModel) Reduce() error {
 	}
 	// wm.WriteModel.Reduce() sets the aggregateID to the first event's aggregateID, but we need the last one
 	wm.AggregateID = wm.rollingAggregateID
-	return nil
+	return wm.WriteModel.Reduce()
 }
 
 // NewChanges returns all changes that need to be applied to the aggregate.
@@ -168,17 +168,17 @@ func (q QuotaNotifications) newSetEventNotifications(idGenerator id.Generator) (
 func sortSetEventNotifications(notifications []*quota.SetEventNotification) (err error) {
 	slices.SortFunc(notifications, func(i, j *quota.SetEventNotification) int {
 		if i == nil || j == nil {
-			err = zitadel_errors.ThrowInternal(errors.New("sorting slices of *quota.SetEventNotification with nil pointers is not supported"), "QUOTA-8YXPk", "Errors.Internal")
+			err = zerrors.ThrowInternal(errors.New("sorting slices of *quota.SetEventNotification with nil pointers is not supported"), "QUOTA-8YXPk", "Errors.Internal")
 			return 0
 		}
 		if i.Percent == j.Percent && i.CallURL == j.CallURL && i.Repeat == j.Repeat {
 			// TODO: translate
-			err = zitadel_errors.ThrowInternal(fmt.Errorf("%+v", i), "QUOTA-Pty2n", "Errors.Quota.Notifications.Duplicate")
+			err = zerrors.ThrowInternal(fmt.Errorf("%+v", i), "QUOTA-Pty2n", "Errors.Quota.Notifications.Duplicate")
 			return 0
 		}
 		if i.Percent < j.Percent ||
 			i.Percent == j.Percent && i.CallURL < j.CallURL ||
-			i.Percent == j.Percent && i.CallURL == j.CallURL && i.Repeat == false && j.Repeat == true {
+			i.Percent == j.Percent && i.CallURL == j.CallURL && !i.Repeat && j.Repeat {
 			return -1
 		}
 		return +1

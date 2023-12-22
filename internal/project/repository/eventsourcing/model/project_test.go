@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/project/model"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -11,7 +14,7 @@ import (
 
 func TestProjectFromEvents(t *testing.T) {
 	type args struct {
-		event   []*es_models.Event
+		event   []eventstore.Event
 		project *Project
 	}
 	tests := []struct {
@@ -22,8 +25,8 @@ func TestProjectFromEvents(t *testing.T) {
 		{
 			name: "project from events, ok",
 			args: args{
-				event: []*es_models.Event{
-					{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectAddedType)},
+				event: []eventstore.Event{
+					&es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ProjectAddedType},
 				},
 				project: &Project{Name: "ProjectName"},
 			},
@@ -32,19 +35,40 @@ func TestProjectFromEvents(t *testing.T) {
 		{
 			name: "project from events, nil project",
 			args: args{
-				event: []*es_models.Event{
-					{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectAddedType)},
+				event: []eventstore.Event{
+					&es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ProjectAddedType},
 				},
 				project: nil,
 			},
 			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive)},
+		},
+		{
+			name: "project from events with OIDC Application, ok",
+			args: args{
+				event: []eventstore.Event{
+					&es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ProjectAddedType, Data: []byte(`{"name": "ProjectName"}`)},
+					&es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.OIDCConfigAddedType, Data: []byte(`{"appId":"appId", "clientId": "clientID"}`)},
+				},
+				project: nil,
+			},
+			result: &Project{
+				ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+				State:      int32(model.ProjectStateActive),
+				Name:       "ProjectName",
+				OIDCApplications: []*oidcApp{
+					{
+						AppID:    "appID",
+						ClientID: "clientID",
+					},
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.args.project != nil {
 				data, _ := json.Marshal(tt.args.project)
-				tt.args.event[0].Data = data
+				tt.args.event[0].(*es_models.Event).Data = data
 			}
 			result, _ := ProjectFromEvents(tt.args.project, tt.args.event...)
 			if result.Name != tt.result.Name {
@@ -67,7 +91,7 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append added event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectAddedType)},
+				event:   &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ProjectAddedType},
 				project: &Project{Name: "ProjectName"},
 			},
 			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive), Name: "ProjectName"},
@@ -75,7 +99,7 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append change event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectChangedType)},
+				event:   &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ProjectChangedType},
 				project: &Project{Name: "ProjectName"},
 			},
 			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive), Name: "ProjectName"},
@@ -83,14 +107,38 @@ func TestAppendEvent(t *testing.T) {
 		{
 			name: "append deactivate event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectDeactivatedType)},
+				event: &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ProjectDeactivatedType},
 			},
 			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateInactive)},
 		},
 		{
 			name: "append reactivate event",
 			args: args{
-				event: &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_models.EventType(project.ProjectReactivatedType)},
+				event: &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ProjectReactivatedType},
+			},
+			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive)},
+		},
+		{
+			name: "append oidc config added event",
+			args: args{
+				event: &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.OIDCConfigAddedType, Data: []byte(`{"appId":"appID", "clientId": "clientID"}`)},
+			},
+			result: &Project{
+				ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"},
+				State:      int32(model.ProjectStateActive),
+				OIDCApplications: []*oidcApp{{
+					AppID:    "appID",
+					ClientID: "clientID",
+				}}},
+		},
+		{
+			name: "append application removed event",
+			args: args{
+				project: &Project{Name: "ProjectName", OIDCApplications: []*oidcApp{{
+					AppID:    "appID",
+					ClientID: "clientID",
+				}}},
+				event: &es_models.Event{AggregateID: "AggregateID", Seq: 1, Typ: project.ApplicationRemovedType, Data: []byte(`{"appId": "appID"}`)},
 			},
 			result: &Project{ObjectRoot: es_models.ObjectRoot{AggregateID: "AggregateID"}, State: int32(model.ProjectStateActive)},
 		},
@@ -112,6 +160,7 @@ func TestAppendEvent(t *testing.T) {
 			if result.ObjectRoot.AggregateID != tt.result.ObjectRoot.AggregateID {
 				t.Errorf("got wrong result id: expected: %v, actual: %v ", tt.result.ObjectRoot.AggregateID, result.ObjectRoot.AggregateID)
 			}
+			assert.Equal(t, tt.result.OIDCApplications, result.OIDCApplications)
 		})
 	}
 }

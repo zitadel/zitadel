@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -13,9 +13,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Apps struct {
@@ -40,23 +41,23 @@ type App struct {
 }
 
 type OIDCApp struct {
-	RedirectURIs             database.StringArray
-	ResponseTypes            database.EnumArray[domain.OIDCResponseType]
-	GrantTypes               database.EnumArray[domain.OIDCGrantType]
+	RedirectURIs             database.TextArray[string]
+	ResponseTypes            database.Array[domain.OIDCResponseType]
+	GrantTypes               database.Array[domain.OIDCGrantType]
 	AppType                  domain.OIDCApplicationType
 	ClientID                 string
 	AuthMethodType           domain.OIDCAuthMethodType
-	PostLogoutRedirectURIs   database.StringArray
+	PostLogoutRedirectURIs   database.TextArray[string]
 	Version                  domain.OIDCVersion
-	ComplianceProblems       database.StringArray
+	ComplianceProblems       database.TextArray[string]
 	IsDevMode                bool
 	AccessTokenType          domain.OIDCTokenType
 	AssertAccessTokenRole    bool
 	AssertIDTokenRole        bool
 	AssertIDTokenUserinfo    bool
 	ClockSkew                time.Duration
-	AdditionalOrigins        database.StringArray
-	AllowedOrigins           database.StringArray
+	AdditionalOrigins        database.TextArray[string]
+	AllowedOrigins           database.TextArray[string]
 	SkipNativeAppSuccessPage bool
 }
 
@@ -123,10 +124,6 @@ var (
 	}
 	AppColumnSequence = Column{
 		name:  projection.AppColumnSequence,
-		table: appsTable,
-	}
-	AppColumnOwnerRemoved = Column{
-		name:  projection.AppColumnOwnerRemoved,
 		table: appsTable,
 	}
 )
@@ -248,12 +245,15 @@ var (
 	}
 )
 
-func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bool, projectID, appID string, withOwnerRemoved bool) (app *App, err error) {
+func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bool, projectID, appID string) (app *App, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.AppProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerAppProjection")
+		ctx, err = projection.AppProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	stmt, scan := prepareAppQuery(ctx, q.client)
@@ -262,12 +262,9 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bo
 		AppColumnProjectID.identifier():  projectID,
 		AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	if !withOwnerRemoved {
-		eq[AppColumnOwnerRemoved.identifier()] = false
-	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-AFDgg", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-AFDgg", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -277,7 +274,7 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, shouldTriggerBulk bo
 	return app, err
 }
 
-func (q *Queries) AppByID(ctx context.Context, appID string, withOwnerRemoved bool) (app *App, err error) {
+func (q *Queries) AppByID(ctx context.Context, appID string) (app *App, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -286,12 +283,9 @@ func (q *Queries) AppByID(ctx context.Context, appID string, withOwnerRemoved bo
 		AppColumnID.identifier():         appID,
 		AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	if !withOwnerRemoved {
-		eq[AppColumnOwnerRemoved.identifier()] = false
-	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-immt9", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-immt9", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -301,7 +295,7 @@ func (q *Queries) AppByID(ctx context.Context, appID string, withOwnerRemoved bo
 	return app, err
 }
 
-func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string, withOwnerRemoved bool) (app *App, err error) {
+func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string) (app *App, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -310,12 +304,9 @@ func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string, withOw
 		AppSAMLConfigColumnEntityID.identifier(): entityID,
 		AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
 	}
-	if !withOwnerRemoved {
-		eq[AppColumnOwnerRemoved.identifier()] = false
-	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-JgUop", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-JgUop", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -325,15 +316,12 @@ func (q *Queries) AppBySAMLEntityID(ctx context.Context, entityID string, withOw
 	return app, err
 }
 
-func (q *Queries) ProjectByClientID(ctx context.Context, appID string, withOwnerRemoved bool) (project *Project, err error) {
+func (q *Queries) ProjectByClientID(ctx context.Context, appID string) (project *Project, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	stmt, scan := prepareProjectByAppQuery(ctx, q.client)
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		eq[ProjectColumnOwnerRemoved.identifier()] = false
-	}
 	query, args, err := stmt.Where(sq.And{
 		eq,
 		sq.Or{
@@ -343,7 +331,7 @@ func (q *Queries) ProjectByClientID(ctx context.Context, appID string, withOwner
 		},
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-XhJi3", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-XhJi3", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -353,7 +341,7 @@ func (q *Queries) ProjectByClientID(ctx context.Context, appID string, withOwner
 	return project, err
 }
 
-func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string, withOwnerRemoved bool) (id string, err error) {
+func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string) (id string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -362,12 +350,9 @@ func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string, w
 		AppOIDCConfigColumnClientID.identifier(): appID,
 		AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
 	}
-	if !withOwnerRemoved {
-		eq[AppColumnOwnerRemoved.identifier()] = false
-	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return "", errors.ThrowInternal(err, "QUERY-7d92U", "Errors.Query.SQLStatement")
+		return "", zerrors.ThrowInternal(err, "QUERY-7d92U", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -377,15 +362,12 @@ func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string, w
 	return id, err
 }
 
-func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string, withOwnerRemoved bool) (id string, err error) {
+func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (id string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	stmt, scan := prepareProjectIDByAppQuery(ctx, q.client)
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		eq[AppColumnOwnerRemoved.identifier()] = false
-	}
 	where := sq.And{
 		eq,
 		sq.Or{
@@ -396,7 +378,7 @@ func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string, withO
 	}
 	query, args, err := stmt.Where(where).ToSql()
 	if err != nil {
-		return "", errors.ThrowInternal(err, "QUERY-SDfg3", "Errors.Query.SQLStatement")
+		return "", zerrors.ThrowInternal(err, "QUERY-SDfg3", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -406,7 +388,7 @@ func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string, withO
 	return id, err
 }
 
-func (q *Queries) ProjectByOIDCClientID(ctx context.Context, id string, withOwnerRemoved bool) (project *Project, err error) {
+func (q *Queries) ProjectByOIDCClientID(ctx context.Context, id string) (project *Project, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -415,12 +397,9 @@ func (q *Queries) ProjectByOIDCClientID(ctx context.Context, id string, withOwne
 		AppOIDCConfigColumnClientID.identifier(): id,
 		AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
 	}
-	if !withOwnerRemoved {
-		eq[AppColumnOwnerRemoved.identifier()] = false
-	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-XhJi4", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-XhJi4", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -430,7 +409,7 @@ func (q *Queries) ProjectByOIDCClientID(ctx context.Context, id string, withOwne
 	return project, err
 }
 
-func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string, withOwnerRemoved bool) (app *App, err error) {
+func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string) (app *App, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -439,12 +418,9 @@ func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string, withOw
 		AppOIDCConfigColumnClientID.identifier(): clientID,
 		AppColumnInstanceID.identifier():         authz.GetInstance(ctx).InstanceID(),
 	}
-	if !withOwnerRemoved {
-		eq[AppColumnOwnerRemoved.identifier()] = false
-	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-JgVop", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-JgVop", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -454,15 +430,12 @@ func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string, withOw
 	return app, err
 }
 
-func (q *Queries) AppByClientID(ctx context.Context, clientID string, withOwnerRemoved bool) (app *App, err error) {
+func (q *Queries) AppByClientID(ctx context.Context, clientID string) (app *App, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	stmt, scan := prepareAppQuery(ctx, q.client)
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		eq[AppColumnOwnerRemoved.identifier()] = false
-	}
 	query, args, err := stmt.Where(sq.And{
 		eq,
 		sq.Or{
@@ -471,7 +444,7 @@ func (q *Queries) AppByClientID(ctx context.Context, clientID string, withOwnerR
 		},
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Dfge2", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Dfge2", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -487,12 +460,9 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, wit
 
 	query, scan := prepareAppsQuery(ctx, q.client)
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		eq[AppColumnOwnerRemoved.identifier()] = false
-	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-fajp8", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-fajp8", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -500,24 +470,21 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, wit
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
 	}
-	apps.LatestSequence, err = q.latestSequence(ctx, appsTable)
+	apps.State, err = q.latestState(ctx, appsTable)
 	return apps, err
 }
 
-func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries, withOwnerRemoved bool) (ids []string, err error) {
+func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries) (ids []string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareClientIDsQuery(ctx, q.client)
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		eq[AppColumnOwnerRemoved.identifier()] = false
-	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-fajp8", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-fajp8", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -525,7 +492,7 @@ func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
 	}
 	return ids, nil
 }
@@ -627,10 +594,10 @@ func prepareAppQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder,
 			)
 
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-pCP8P", "Errors.App.NotExisting")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-pCP8P", "Errors.App.NotExisting")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-0R2Nw", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-4SJlx", "Errors.Internal")
 			}
 
 			apiConfig.set(app)
@@ -654,10 +621,10 @@ func prepareProjectIDByAppQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			)
 
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return "", errors.ThrowNotFound(err, "QUERY-aKcc2", "Errors.Project.NotExisting")
+				if errors.Is(err, sql.ErrNoRows) {
+					return "", zerrors.ThrowNotFound(err, "QUERY-aKcc2", "Errors.Project.NotExisting")
 				}
-				return "", errors.ThrowInternal(err, "QUERY-3A5TG", "Errors.Internal")
+				return "", zerrors.ThrowInternal(err, "QUERY-3A5TG", "Errors.Internal")
 			}
 
 			return projectID, nil
@@ -699,10 +666,10 @@ func prepareProjectByAppQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				&p.PrivateLabelingSetting,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-fk2fs", "Errors.Project.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-yxTMh", "Errors.Project.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-dj2FF", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-dj2FF", "Errors.Internal")
 			}
 			return p, nil
 		}
@@ -802,7 +769,7 @@ func prepareAppsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 				)
 
 				if err != nil {
-					return nil, errors.ThrowInternal(err, "QUERY-0R2Nw", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(err, "QUERY-XGWAX", "Errors.Internal")
 				}
 
 				apiConfig.set(app)
@@ -824,7 +791,7 @@ func prepareClientIDsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) ([]string, error) {
-			ids := database.StringArray{}
+			ids := database.TextArray[string]{}
 
 			for rows.Next() {
 				var apiID sql.NullString
@@ -833,7 +800,7 @@ func prepareClientIDsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 					&apiID,
 					&oidcID,
 				); err != nil {
-					return nil, errors.ThrowInternal(err, "QUERY-0R2Nw", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(err, "QUERY-0R2Nw", "Errors.Internal")
 				}
 				if apiID.Valid {
 					ids = append(ids, apiID.String)
@@ -850,19 +817,19 @@ type sqlOIDCConfig struct {
 	appID                    sql.NullString
 	version                  sql.NullInt32
 	clientID                 sql.NullString
-	redirectUris             database.StringArray
+	redirectUris             database.TextArray[string]
 	applicationType          sql.NullInt16
 	authMethodType           sql.NullInt16
-	postLogoutRedirectUris   database.StringArray
+	postLogoutRedirectUris   database.TextArray[string]
 	devMode                  sql.NullBool
 	accessTokenType          sql.NullInt16
 	accessTokenRoleAssertion sql.NullBool
 	iDTokenRoleAssertion     sql.NullBool
 	iDTokenUserinfoAssertion sql.NullBool
 	clockSkew                sql.NullInt64
-	additionalOrigins        database.StringArray
-	responseTypes            database.EnumArray[domain.OIDCResponseType]
-	grantTypes               database.EnumArray[domain.OIDCGrantType]
+	additionalOrigins        database.TextArray[string]
+	responseTypes            database.Array[domain.OIDCResponseType]
+	grantTypes               database.Array[domain.OIDCGrantType]
 	skipNativeAppSuccessPage sql.NullBool
 }
 

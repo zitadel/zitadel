@@ -5,18 +5,17 @@ import (
 	"context"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/static/mock"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddLabelPolicy(t *testing.T) {
@@ -53,7 +52,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -76,6 +75,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -99,7 +99,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -109,24 +109,21 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 					t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"#ffffff",
-									"#ffffff",
-									"#ffffff",
-									"#ffffff",
-									"#ffffff",
-									"#ffffff",
-									"#ffffff",
-									"#ffffff",
-									true,
-									true,
-									true,
-								),
-							),
-						},
+						org.NewLabelPolicyAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"#ffffff",
+							"#ffffff",
+							"#ffffff",
+							"#ffffff",
+							"#ffffff",
+							"#ffffff",
+							"#ffffff",
+							"#ffffff",
+							true,
+							true,
+							true,
+							domain.LabelPolicyThemeDark,
+						),
 					),
 				),
 			},
@@ -145,6 +142,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 					HideLoginNameSuffix: true,
 					ErrorMsgPopup:       true,
 					DisableWatermark:    true,
+					ThemeMode:           domain.LabelPolicyThemeDark,
 				},
 			},
 			res: res{
@@ -164,6 +162,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 					HideLoginNameSuffix: true,
 					ErrorMsgPopup:       true,
 					DisableWatermark:    true,
+					ThemeMode:           domain.LabelPolicyThemeDark,
 				},
 			},
 		},
@@ -221,7 +220,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -242,7 +241,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -265,6 +264,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -285,10 +285,11 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 					HideLoginNameSuffix: true,
 					ErrorMsgPopup:       true,
 					DisableWatermark:    true,
+					ThemeMode:           domain.LabelPolicyThemeAuto,
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -311,28 +312,26 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newLabelPolicyChangedEvent(
-									context.Background(),
-									"org1",
-									"#000000",
-									"#000000",
-									"#000000",
-									"#000000",
-									"#000000",
-									"#000000",
-									"#000000",
-									"#000000",
-									false,
-									false,
-									false),
-							),
-						},
+						newLabelPolicyChangedEvent(
+							context.Background(),
+							"org1",
+							"#000000",
+							"#000000",
+							"#000000",
+							"#000000",
+							"#000000",
+							"#000000",
+							"#000000",
+							"#000000",
+							false,
+							false,
+							false,
+							domain.LabelPolicyThemeDark),
 					),
 				),
 			},
@@ -351,6 +350,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 					HideLoginNameSuffix: false,
 					ErrorMsgPopup:       false,
 					DisableWatermark:    false,
+					ThemeMode:           domain.LabelPolicyThemeDark,
 				},
 			},
 			res: res{
@@ -370,6 +370,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 					HideLoginNameSuffix: false,
 					ErrorMsgPopup:       false,
 					DisableWatermark:    false,
+					ThemeMode:           domain.LabelPolicyThemeDark,
 				},
 			},
 		},
@@ -421,7 +422,7 @@ func TestCommandSide_ActivateLabelPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -437,7 +438,7 @@ func TestCommandSide_ActivateLabelPolicy(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -460,16 +461,13 @@ func TestCommandSide_ActivateLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyActivatedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate),
-							),
-						},
+						org.NewLabelPolicyActivatedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate),
 					),
 				),
 			},
@@ -525,7 +523,7 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -541,7 +539,7 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -564,16 +562,13 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate),
-							),
-						},
+						org.NewLabelPolicyRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate),
 					),
 				),
 				static: mock.NewMockStorage(gomock.NewController(t)).ExpectRemoveObjectsNoError(),
@@ -642,7 +637,7 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -666,7 +661,7 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -689,6 +684,7 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -708,7 +704,7 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -731,18 +727,15 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyLogoAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"logo",
-								),
-							),
-						},
+						org.NewLabelPolicyLogoAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"logo",
+						),
 					),
 				),
 				storage: mock.NewStorage(t).ExpectPutObject(),
@@ -818,7 +811,7 @@ func TestCommandSide_RemoveLogoLabelPolicy(t *testing.T) {
 				storageKey: "key",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -835,7 +828,7 @@ func TestCommandSide_RemoveLogoLabelPolicy(t *testing.T) {
 				storageKey: "key",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -859,6 +852,7 @@ func TestCommandSide_RemoveLogoLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 						eventFromEventPusher(
@@ -869,14 +863,10 @@ func TestCommandSide_RemoveLogoLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyLogoRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"key",
-								),
-							),
-						},
+						org.NewLabelPolicyLogoRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key",
+						),
 					),
 				),
 			},
@@ -952,7 +942,7 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -976,7 +966,7 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -999,6 +989,7 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -1018,7 +1009,7 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -1041,18 +1032,15 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyIconAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"icon",
-								),
-							),
-						},
+						org.NewLabelPolicyIconAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"icon",
+						),
 					),
 				),
 				storage: mock.NewStorage(t).ExpectPutObject(),
@@ -1127,7 +1115,7 @@ func TestCommandSide_RemoveIconLabelPolicy(t *testing.T) {
 				orgID: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1143,7 +1131,7 @@ func TestCommandSide_RemoveIconLabelPolicy(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1167,6 +1155,7 @@ func TestCommandSide_RemoveIconLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 						eventFromEventPusher(
@@ -1177,14 +1166,10 @@ func TestCommandSide_RemoveIconLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyIconRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"key",
-								),
-							),
-						},
+						org.NewLabelPolicyIconRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key",
+						),
 					),
 				),
 			},
@@ -1259,7 +1244,7 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1283,7 +1268,7 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1306,6 +1291,7 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -1325,7 +1311,7 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -1348,18 +1334,15 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyLogoDarkAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"logo",
-								),
-							),
-						},
+						org.NewLabelPolicyLogoDarkAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"logo",
+						),
 					),
 				),
 				storage: mock.NewStorage(t).ExpectPutObject(),
@@ -1435,7 +1418,7 @@ func TestCommandSide_RemoveLogoDarkLabelPolicy(t *testing.T) {
 				storageKey: "key",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1452,7 +1435,7 @@ func TestCommandSide_RemoveLogoDarkLabelPolicy(t *testing.T) {
 				storageKey: "key",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1476,6 +1459,7 @@ func TestCommandSide_RemoveLogoDarkLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 						eventFromEventPusher(
@@ -1486,14 +1470,10 @@ func TestCommandSide_RemoveLogoDarkLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyLogoDarkRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"key",
-								),
-							),
-						},
+						org.NewLabelPolicyLogoDarkRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key",
+						),
 					),
 				),
 			},
@@ -1569,7 +1549,7 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1593,7 +1573,7 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1616,6 +1596,7 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -1635,7 +1616,7 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -1658,18 +1639,15 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyIconDarkAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"icon",
-								),
-							),
-						},
+						org.NewLabelPolicyIconDarkAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"icon",
+						),
 					),
 				),
 				storage: mock.NewStorage(t).ExpectPutObject(),
@@ -1743,7 +1721,7 @@ func TestCommandSide_RemoveIconDarkLabelPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1759,7 +1737,7 @@ func TestCommandSide_RemoveIconDarkLabelPolicy(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1782,6 +1760,7 @@ func TestCommandSide_RemoveIconDarkLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 						eventFromEventPusher(
@@ -1792,14 +1771,10 @@ func TestCommandSide_RemoveIconDarkLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyIconDarkRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"key",
-								),
-							),
-						},
+						org.NewLabelPolicyIconDarkRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key",
+						),
 					),
 				),
 			},
@@ -1874,7 +1849,7 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1890,7 +1865,7 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1913,6 +1888,7 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
@@ -1932,7 +1908,7 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -1955,18 +1931,15 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyFontAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"font",
-								),
-							),
-						},
+						org.NewLabelPolicyFontAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"font",
+						),
 					),
 				),
 				storage: mock.NewStorage(t).ExpectPutObject(),
@@ -2040,7 +2013,7 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -2056,7 +2029,7 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -2079,6 +2052,7 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.LabelPolicyThemeAuto,
 							),
 						),
 						eventFromEventPusher(
@@ -2089,14 +2063,10 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewLabelPolicyFontRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									"key",
-								),
-							),
-						},
+						org.NewLabelPolicyFontRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"key",
+						),
 					),
 				),
 			},
@@ -2131,7 +2101,7 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 	}
 }
 
-func newLabelPolicyChangedEvent(ctx context.Context, orgID, primaryColor, backgroundColor, warnColor, fontColor, primaryColorDark, backgroundColorDark, warnColorDark, fontColorDark string, hideLoginNameSuffix, errMsgPopup, disableWatermark bool) *org.LabelPolicyChangedEvent {
+func newLabelPolicyChangedEvent(ctx context.Context, orgID, primaryColor, backgroundColor, warnColor, fontColor, primaryColorDark, backgroundColorDark, warnColorDark, fontColorDark string, hideLoginNameSuffix, errMsgPopup, disableWatermark bool, theme domain.LabelPolicyThemeMode) *org.LabelPolicyChangedEvent {
 	event, _ := org.NewLabelPolicyChangedEvent(ctx,
 		&org.NewAggregate(orgID).Aggregate,
 		[]policy.LabelPolicyChanges{
@@ -2146,6 +2116,7 @@ func newLabelPolicyChangedEvent(ctx context.Context, orgID, primaryColor, backgr
 			policy.ChangeHideLoginNameSuffix(hideLoginNameSuffix),
 			policy.ChangeErrorMsgPopup(errMsgPopup),
 			policy.ChangeDisableWatermark(disableWatermark),
+			policy.ChangeThemeMode(theme),
 		},
 	)
 	return event

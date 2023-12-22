@@ -9,15 +9,14 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddUserGrant(t *testing.T) {
@@ -55,7 +54,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -99,7 +98,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -148,7 +147,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -190,7 +189,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				resourceOwner: "org2",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -233,7 +232,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -277,7 +276,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -337,7 +336,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -397,7 +396,7 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 				resourceOwner: "org2",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -437,16 +436,13 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(usergrant.NewUserGrantAddedEvent(context.Background(),
-								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
-								"user1",
-								"project1",
-								"",
-								[]string{"rolekey1"},
-							)),
-						},
-						uniqueConstraintsFromEventConstraint(usergrant.NewAddUserGrantUniqueConstraint("org1", "user1", "project1", "")),
+						usergrant.NewUserGrantAddedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							"project1",
+							"",
+							[]string{"rolekey1"},
+						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "usergrant1"),
@@ -518,16 +514,13 @@ func TestCommandSide_AddUserGrant(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(usergrant.NewUserGrantAddedEvent(context.Background(),
-								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
-								"user1",
-								"project1",
-								"projectgrant1",
-								[]string{"rolekey1"},
-							)),
-						},
-						uniqueConstraintsFromEventConstraint(usergrant.NewAddUserGrantUniqueConstraint("org1", "user1", "project1", "projectgrant1")),
+						usergrant.NewUserGrantAddedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							"project1",
+							"projectgrant1",
+							[]string{"rolekey1"},
+						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "usergrant1"),
@@ -611,7 +604,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -641,7 +634,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPermissionDenied,
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
@@ -665,7 +658,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -689,7 +682,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -721,7 +714,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -777,7 +770,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -838,7 +831,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -893,7 +886,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -949,7 +942,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1021,7 +1014,7 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1078,12 +1071,10 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(usergrant.NewUserGrantChangedEvent(context.Background(),
-								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
-								[]string{"rolekey1", "rolekey2"},
-							)),
-						},
+						usergrant.NewUserGrantChangedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							[]string{"rolekey1", "rolekey2"},
+						),
 					),
 				),
 			},
@@ -1174,12 +1165,10 @@ func TestCommandSide_ChangeUserGrant(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(usergrant.NewUserGrantChangedEvent(context.Background(),
-								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
-								[]string{"rolekey1", "rolekey2"},
-							)),
-						},
+						usergrant.NewUserGrantChangedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							[]string{"rolekey1", "rolekey2"},
+						),
 					),
 				),
 			},
@@ -1261,7 +1250,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1276,7 +1265,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 				userGrantID: "usergrant1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1293,7 +1282,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1325,7 +1314,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1350,7 +1339,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPermissionDenied,
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
@@ -1379,7 +1368,7 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1397,13 +1386,9 @@ func TestCommandSide_DeactivateUserGrant(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								usergrant.NewUserGrantDeactivatedEvent(context.Background(),
-									&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
-								),
-							),
-						},
+						usergrant.NewUserGrantDeactivatedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -1469,7 +1454,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1484,7 +1469,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				userGrantID: "usergrant1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1501,7 +1486,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1533,7 +1518,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1562,7 +1547,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPermissionDenied,
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
@@ -1587,7 +1572,7 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1609,13 +1594,9 @@ func TestCommandSide_ReactivateUserGrant(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								usergrant.NewUserGrantReactivatedEvent(context.Background(),
-									&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
-								),
-							),
-						},
+						usergrant.NewUserGrantReactivatedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -1681,7 +1662,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1698,7 +1679,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1730,7 +1711,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1759,7 +1740,7 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPermissionDenied,
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
@@ -1777,17 +1758,12 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								usergrant.NewUserGrantRemovedEvent(context.Background(),
-									&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
-									"user1",
-									"project1",
-									"",
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(usergrant.NewRemoveUserGrantUniqueConstraint("org1", "user1", "project1", "")),
+						usergrant.NewUserGrantRemovedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							"project1",
+							"",
+						),
 					),
 				),
 			},
@@ -1817,17 +1793,12 @@ func TestCommandSide_RemoveUserGrant(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								usergrant.NewUserGrantRemovedEvent(context.Background(),
-									&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
-									"user1",
-									"project1",
-									"projectgrant1",
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(usergrant.NewRemoveUserGrantUniqueConstraint("org1", "user1", "project1", "projectgrant1")),
+						usergrant.NewUserGrantRemovedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							"project1",
+							"projectgrant1",
+						),
 					),
 				),
 			},
@@ -1893,7 +1864,7 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1910,7 +1881,7 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1942,7 +1913,7 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1967,7 +1938,7 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPermissionDenied,
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
@@ -1994,26 +1965,18 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								usergrant.NewUserGrantRemovedEvent(context.Background(),
-									&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
-									"user1",
-									"project1",
-									"",
-								),
-							),
-							eventFromEventPusher(
-								usergrant.NewUserGrantRemovedEvent(context.Background(),
-									&usergrant.NewAggregate("usergrant2", "org1").Aggregate,
-									"user2",
-									"project2",
-									"",
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(usergrant.NewRemoveUserGrantUniqueConstraint("org1", "user1", "project1", "")),
-						uniqueConstraintsFromEventConstraint(usergrant.NewRemoveUserGrantUniqueConstraint("org1", "user2", "project2", "")),
+						usergrant.NewUserGrantRemovedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							"project1",
+							"",
+						),
+						usergrant.NewUserGrantRemovedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant2", "org1").Aggregate,
+							"user2",
+							"project2",
+							"",
+						),
 					),
 				),
 			},
@@ -2048,26 +2011,18 @@ func TestCommandSide_BulkRemoveUserGrant(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								usergrant.NewUserGrantRemovedEvent(context.Background(),
-									&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
-									"user1",
-									"project1",
-									"projectgrant1",
-								),
-							),
-							eventFromEventPusher(
-								usergrant.NewUserGrantRemovedEvent(context.Background(),
-									&usergrant.NewAggregate("usergrant2", "org1").Aggregate,
-									"user2",
-									"project2",
-									"projectgrant2",
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(usergrant.NewRemoveUserGrantUniqueConstraint("org1", "user1", "project1", "projectgrant1")),
-						uniqueConstraintsFromEventConstraint(usergrant.NewRemoveUserGrantUniqueConstraint("org1", "user2", "project2", "projectgrant2")),
+						usergrant.NewUserGrantRemovedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							"project1",
+							"projectgrant1",
+						),
+						usergrant.NewUserGrantRemovedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant2", "org1").Aggregate,
+							"user2",
+							"project2",
+							"projectgrant2",
+						),
 					),
 				),
 			},

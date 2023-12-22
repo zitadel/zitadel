@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/asset"
 )
 
@@ -29,7 +28,7 @@ func NewHumanAvatarAddedEvent(ctx context.Context, aggregate *eventstore.Aggrega
 	}
 }
 
-func HumanAvatarAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanAvatarAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := asset.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -53,7 +52,7 @@ func NewHumanAvatarRemovedEvent(ctx context.Context, aggregate *eventstore.Aggre
 	}
 }
 
-func HumanAvatarRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanAvatarRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := asset.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err

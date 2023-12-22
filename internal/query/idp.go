@@ -3,19 +3,22 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type IDP struct {
@@ -43,7 +46,7 @@ type OIDCIDP struct {
 	ClientID              string
 	ClientSecret          *crypto.CryptoValue
 	Issuer                string
-	Scopes                database.StringArray
+	Scopes                database.TextArray[string]
 	DisplayNameMapping    domain.OIDCMappingField
 	UsernameMapping       domain.OIDCMappingField
 	AuthorizationEndpoint string
@@ -193,7 +196,10 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.IDPProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerIDPProjection")
+		ctx, err = projection.IDPProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	eq := sq.Eq{
@@ -213,7 +219,7 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, shouldTriggerBulk
 	stmt, scan := prepareIDPByIDQuery(ctx, q.client)
 	query, args, err := stmt.Where(where).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-0gocI", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-0gocI", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -237,7 +243,7 @@ func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries, withOwner
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-X6X7y", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-X6X7y", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -245,9 +251,9 @@ func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries, withOwner
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-xPlVH", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-xPlVH", "Errors.Internal")
 	}
-	idps.LatestSequence, err = q.latestSequence(ctx, idpTable)
+	idps.State, err = q.latestState(ctx, idpTable)
 	return idps, err
 }
 
@@ -325,7 +331,7 @@ func prepareIDPByIDQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			oidcClientID := sql.NullString{}
 			oidcClientSecret := new(crypto.CryptoValue)
 			oidcIssuer := sql.NullString{}
-			oidcScopes := database.StringArray{}
+			oidcScopes := database.TextArray[string]{}
 			oidcDisplayNameMapping := sql.NullInt32{}
 			oidcUsernameMapping := sql.NullInt32{}
 			oidcAuthorizationEndpoint := sql.NullString{}
@@ -364,10 +370,10 @@ func prepareIDPByIDQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&jwtEndpoint,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-rhR2o", "Errors.IDPConfig.NotExisting")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-rhR2o", "Errors.IDPConfig.NotExisting")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-zE3Ro", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-zE3Ro", "Errors.Internal")
 			}
 
 			if oidcIDPID.Valid {
@@ -437,7 +443,7 @@ func prepareIDPsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 				oidcClientID := sql.NullString{}
 				oidcClientSecret := new(crypto.CryptoValue)
 				oidcIssuer := sql.NullString{}
-				oidcScopes := database.StringArray{}
+				oidcScopes := database.TextArray[string]{}
 				oidcDisplayNameMapping := sql.NullInt32{}
 				oidcUsernameMapping := sql.NullInt32{}
 				oidcAuthorizationEndpoint := sql.NullString{}
@@ -509,7 +515,7 @@ func prepareIDPsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-iiBgK", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-iiBgK", "Errors.Query.CloseRows")
 			}
 
 			return &IDPs{
@@ -533,5 +539,5 @@ func (q *Queries) GetOIDCIDPClientSecret(ctx context.Context, shouldRealTime boo
 	if idp.ClientSecret != nil && idp.ClientSecret.Crypted != nil {
 		return crypto.DecryptString(idp.ClientSecret, q.idpConfigEncryption)
 	}
-	return "", errors.ThrowNotFound(nil, "QUERY-bsm2o", "Errors.Query.NotFound")
+	return "", zerrors.ThrowNotFound(nil, "QUERY-bsm2o", "Errors.Query.NotFound")
 }

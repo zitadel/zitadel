@@ -3,18 +3,21 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type LoginPolicy struct {
@@ -27,8 +30,8 @@ type LoginPolicy struct {
 	AllowExternalIDPs          bool
 	ForceMFA                   bool
 	ForceMFALocalOnly          bool
-	SecondFactors              database.EnumArray[domain.SecondFactorType]
-	MultiFactors               database.EnumArray[domain.MultiFactorType]
+	SecondFactors              database.Array[domain.SecondFactorType]
+	MultiFactors               database.Array[domain.MultiFactorType]
 	PasswordlessType           domain.PasswordlessType
 	IsDefault                  bool
 	HidePasswordReset          bool
@@ -47,12 +50,12 @@ type LoginPolicy struct {
 
 type SecondFactors struct {
 	SearchResponse
-	Factors database.EnumArray[domain.SecondFactorType]
+	Factors database.Array[domain.SecondFactorType]
 }
 
 type MultiFactors struct {
 	SearchResponse
-	Factors database.EnumArray[domain.MultiFactorType]
+	Factors database.Array[domain.MultiFactorType]
 }
 
 var (
@@ -171,7 +174,10 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.LoginPolicyProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerLoginPolicyProjection")
+		ctx, err = projection.LoginPolicyProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 	eq := sq.Eq{LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
 	if !withOwnerRemoved {
@@ -188,7 +194,7 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 			},
 		}).Limit(1).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -196,7 +202,7 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SWgr3", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-SWgr3", "Errors.Internal")
 	}
 	return policy, nil
 }
@@ -227,7 +233,7 @@ func (q *Queries) DefaultLoginPolicy(ctx context.Context) (policy *LoginPolicy, 
 		LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-t4TBK", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-t4TBK", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -235,7 +241,7 @@ func (q *Queries) DefaultLoginPolicy(ctx context.Context) (policy *LoginPolicy, 
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SArt2", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-SArt2", "Errors.Internal")
 	}
 	return policy, nil
 }
@@ -262,7 +268,7 @@ func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (factors
 		OrderBy(LoginPolicyColumnIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -272,7 +278,7 @@ func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (factors
 	if err != nil {
 		return nil, err
 	}
-	factors.LatestSequence, err = q.latestSequence(ctx, loginPolicyTable)
+	factors.State, err = q.latestState(ctx, loginPolicyTable)
 	return factors, err
 }
 
@@ -286,7 +292,7 @@ func (q *Queries) DefaultSecondFactors(ctx context.Context) (factors *SecondFact
 		LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-CZ2Nv", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-CZ2Nv", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -296,7 +302,7 @@ func (q *Queries) DefaultSecondFactors(ctx context.Context) (factors *SecondFact
 	if err != nil {
 		return nil, err
 	}
-	factors.LatestSequence, err = q.latestSequence(ctx, loginPolicyTable)
+	factors.State, err = q.latestState(ctx, loginPolicyTable)
 	return factors, err
 }
 
@@ -322,7 +328,7 @@ func (q *Queries) MultiFactorsByOrg(ctx context.Context, orgID string) (factors 
 		OrderBy(LoginPolicyColumnIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-B4o7h", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-B4o7h", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -332,7 +338,7 @@ func (q *Queries) MultiFactorsByOrg(ctx context.Context, orgID string) (factors 
 	if err != nil {
 		return nil, err
 	}
-	factors.LatestSequence, err = q.latestSequence(ctx, loginPolicyTable)
+	factors.State, err = q.latestState(ctx, loginPolicyTable)
 	return factors, err
 }
 
@@ -346,7 +352,7 @@ func (q *Queries) DefaultMultiFactors(ctx context.Context) (factors *MultiFactor
 		LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-WxYjr", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-WxYjr", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -356,7 +362,7 @@ func (q *Queries) DefaultMultiFactors(ctx context.Context) (factors *MultiFactor
 	if err != nil {
 		return nil, err
 	}
-	factors.LatestSequence, err = q.latestSequence(ctx, loginPolicyTable)
+	factors.State, err = q.latestState(ctx, loginPolicyTable)
 	return factors, err
 }
 
@@ -419,11 +425,11 @@ func prepareLoginPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Select
 					&p.MultiFactorCheckLifetime,
 				)
 				if err != nil {
-					return nil, errors.ThrowInternal(err, "QUERY-YcC53", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(err, "QUERY-YcC53", "Errors.Internal")
 				}
 			}
 			if p.OrgID == "" {
-				return nil, errors.ThrowNotFound(nil, "QUERY-QsUBJ", "Errors.LoginPolicy.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "QUERY-QsUBJ", "Errors.LoginPolicy.NotFound")
 			}
 			p.DefaultRedirectURI = defaultRedirectURI.String
 			return p, nil
@@ -441,10 +447,10 @@ func prepareLoginPolicy2FAsQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&p.Factors,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-yPqIZ", "Errors.LoginPolicy.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-yPqIZ", "Errors.LoginPolicy.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-Mr6H3", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-Mr6H3", "Errors.Internal")
 			}
 
 			p.Count = uint64(len(p.Factors))
@@ -463,10 +469,10 @@ func prepareLoginPolicyMFAsQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&p.Factors,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-yPqIZ", "Errors.LoginPolicy.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-yPqIZ", "Errors.LoginPolicy.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-Mr6H3", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-Mr6H3", "Errors.Internal")
 			}
 
 			p.Count = uint64(len(p.Factors))

@@ -4,8 +4,7 @@ import (
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -18,19 +17,17 @@ func (l *Login) handlePasswordReset(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	loginName, err := query.NewUserLoginNamesSearchQuery(authReq.LoginName)
+	user, err := l.query.GetUserByLoginName(setContext(r.Context(), authReq.UserOrgID), true, authReq.LoginName)
 	if err != nil {
-		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
-		return
-	}
-	user, err := l.query.GetUser(setContext(r.Context(), authReq.UserOrgID), true, false, loginName)
-	if err != nil {
+		if authReq.LoginPolicy.IgnoreUnknownUsernames && zerrors.IsNotFound(err) {
+			err = nil
+		}
 		l.renderPasswordResetDone(w, r, authReq, err)
 		return
 	}
 	passwordCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypePasswordResetCode, l.userCodeAlg)
 	if err != nil {
-		if authReq.LoginPolicy.IgnoreUnknownUsernames && errors.IsNotFound(err) {
+		if authReq.LoginPolicy.IgnoreUnknownUsernames && zerrors.IsNotFound(err) {
 			err = nil
 		}
 		l.renderPasswordResetDone(w, r, authReq, err)
@@ -45,6 +42,7 @@ func (l *Login) renderPasswordResetDone(w http.ResponseWriter, r *http.Request, 
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	data := l.getUserData(r, authReq, "PasswordResetDone.Title", "PasswordResetDone.Description", errID, errMessage)
-	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplPasswordResetDone], data, nil)
+	translator := l.getTranslator(r.Context(), authReq)
+	data := l.getUserData(r, authReq, translator, "PasswordResetDone.Title", "PasswordResetDone.Description", errID, errMessage)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplPasswordResetDone], data, nil)
 }

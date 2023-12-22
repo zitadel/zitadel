@@ -6,14 +6,14 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -29,6 +29,7 @@ const (
 	IDPTemplateGoogleTable           = IDPTemplateTable + "_" + IDPTemplateGoogleSuffix
 	IDPTemplateLDAPTable             = IDPTemplateTable + "_" + IDPTemplateLDAPSuffix
 	IDPTemplateAppleTable            = IDPTemplateTable + "_" + IDPTemplateAppleSuffix
+	IDPTemplateSAMLTable             = IDPTemplateTable + "_" + IDPTemplateSAMLSuffix
 
 	IDPTemplateOAuthSuffix            = "oauth2"
 	IDPTemplateOIDCSuffix             = "oidc"
@@ -41,6 +42,7 @@ const (
 	IDPTemplateGoogleSuffix           = "google"
 	IDPTemplateLDAPSuffix             = "ldap2"
 	IDPTemplateAppleSuffix            = "apple"
+	IDPTemplateSAMLSuffix             = "saml"
 
 	IDPTemplateIDCol                = "id"
 	IDPTemplateCreationDateCol      = "creation_date"
@@ -157,203 +159,225 @@ const (
 	AppleKeyIDCol      = "key_id"
 	ApplePrivateKeyCol = "private_key"
 	AppleScopesCol     = "scopes"
+
+	SAMLIDCol                = "idp_id"
+	SAMLInstanceIDCol        = "instance_id"
+	SAMLMetadataCol          = "metadata"
+	SAMLKeyCol               = "key"
+	SAMLCertificateCol       = "certificate"
+	SAMLBindingCol           = "binding"
+	SAMLWithSignedRequestCol = "with_signed_request"
 )
 
-type idpTemplateProjection struct {
-	crdb.StatementHandler
+type idpTemplateProjection struct{}
+
+func newIDPTemplateProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(idpTemplateProjection))
 }
 
-func newIDPTemplateProjection(ctx context.Context, config crdb.StatementHandlerConfig) *idpTemplateProjection {
-	p := new(idpTemplateProjection)
-	config.ProjectionName = IDPTemplateTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewMultiTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(IDPTemplateIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(IDPTemplateCreationDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(IDPTemplateChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(IDPTemplateSequenceCol, crdb.ColumnTypeInt64),
-			crdb.NewColumn(IDPTemplateResourceOwnerCol, crdb.ColumnTypeText),
-			crdb.NewColumn(IDPTemplateInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(IDPTemplateStateCol, crdb.ColumnTypeEnum),
-			crdb.NewColumn(IDPTemplateNameCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(IDPTemplateOwnerTypeCol, crdb.ColumnTypeEnum),
-			crdb.NewColumn(IDPTemplateTypeCol, crdb.ColumnTypeEnum),
-			crdb.NewColumn(IDPTemplateOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
-			crdb.NewColumn(IDPTemplateIsCreationAllowedCol, crdb.ColumnTypeBool, crdb.Default(false)),
-			crdb.NewColumn(IDPTemplateIsLinkingAllowedCol, crdb.ColumnTypeBool, crdb.Default(false)),
-			crdb.NewColumn(IDPTemplateIsAutoCreationCol, crdb.ColumnTypeBool, crdb.Default(false)),
-			crdb.NewColumn(IDPTemplateIsAutoUpdateCol, crdb.ColumnTypeBool, crdb.Default(false)),
+func (*idpTemplateProjection) Name() string {
+	return IDPTemplateTable
+}
+
+func (*idpTemplateProjection) Init() *old_handler.Check {
+	return handler.NewMultiTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(IDPTemplateIDCol, handler.ColumnTypeText),
+			handler.NewColumn(IDPTemplateCreationDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(IDPTemplateChangeDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(IDPTemplateSequenceCol, handler.ColumnTypeInt64),
+			handler.NewColumn(IDPTemplateResourceOwnerCol, handler.ColumnTypeText),
+			handler.NewColumn(IDPTemplateInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(IDPTemplateStateCol, handler.ColumnTypeEnum),
+			handler.NewColumn(IDPTemplateNameCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(IDPTemplateOwnerTypeCol, handler.ColumnTypeEnum),
+			handler.NewColumn(IDPTemplateTypeCol, handler.ColumnTypeEnum),
+			handler.NewColumn(IDPTemplateOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(IDPTemplateIsCreationAllowedCol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(IDPTemplateIsLinkingAllowedCol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(IDPTemplateIsAutoCreationCol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(IDPTemplateIsAutoUpdateCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
-			crdb.NewPrimaryKey(IDPTemplateInstanceIDCol, IDPTemplateIDCol),
-			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{IDPTemplateResourceOwnerCol})),
-			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{IDPTemplateOwnerRemovedCol})),
+			handler.NewPrimaryKey(IDPTemplateInstanceIDCol, IDPTemplateIDCol),
+			handler.WithIndex(handler.NewIndex("resource_owner", []string{IDPTemplateResourceOwnerCol})),
+			handler.WithIndex(handler.NewIndex("owner_removed", []string{IDPTemplateOwnerRemovedCol})),
 		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(OAuthIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(OAuthInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(OAuthClientIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(OAuthClientSecretCol, crdb.ColumnTypeJSONB),
-			crdb.NewColumn(OAuthAuthorizationEndpointCol, crdb.ColumnTypeText),
-			crdb.NewColumn(OAuthTokenEndpointCol, crdb.ColumnTypeText),
-			crdb.NewColumn(OAuthUserEndpointCol, crdb.ColumnTypeText),
-			crdb.NewColumn(OAuthScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
-			crdb.NewColumn(OAuthIDAttributeCol, crdb.ColumnTypeText),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(OAuthIDCol, handler.ColumnTypeText),
+			handler.NewColumn(OAuthInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(OAuthClientIDCol, handler.ColumnTypeText),
+			handler.NewColumn(OAuthClientSecretCol, handler.ColumnTypeJSONB),
+			handler.NewColumn(OAuthAuthorizationEndpointCol, handler.ColumnTypeText),
+			handler.NewColumn(OAuthTokenEndpointCol, handler.ColumnTypeText),
+			handler.NewColumn(OAuthUserEndpointCol, handler.ColumnTypeText),
+			handler.NewColumn(OAuthScopesCol, handler.ColumnTypeTextArray, handler.Nullable()),
+			handler.NewColumn(OAuthIDAttributeCol, handler.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(OAuthInstanceIDCol, OAuthIDCol),
+			handler.NewPrimaryKey(OAuthInstanceIDCol, OAuthIDCol),
 			IDPTemplateOAuthSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(OIDCIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(OIDCInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(OIDCIssuerCol, crdb.ColumnTypeText),
-			crdb.NewColumn(OIDCClientIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(OIDCClientSecretCol, crdb.ColumnTypeJSONB),
-			crdb.NewColumn(OIDCScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
-			crdb.NewColumn(OIDCIDTokenMappingCol, crdb.ColumnTypeBool, crdb.Default(false)),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(OIDCIDCol, handler.ColumnTypeText),
+			handler.NewColumn(OIDCInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(OIDCIssuerCol, handler.ColumnTypeText),
+			handler.NewColumn(OIDCClientIDCol, handler.ColumnTypeText),
+			handler.NewColumn(OIDCClientSecretCol, handler.ColumnTypeJSONB),
+			handler.NewColumn(OIDCScopesCol, handler.ColumnTypeTextArray, handler.Nullable()),
+			handler.NewColumn(OIDCIDTokenMappingCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
-			crdb.NewPrimaryKey(OIDCInstanceIDCol, OIDCIDCol),
+			handler.NewPrimaryKey(OIDCInstanceIDCol, OIDCIDCol),
 			IDPTemplateOIDCSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(JWTIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(JWTInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(JWTIssuerCol, crdb.ColumnTypeText),
-			crdb.NewColumn(JWTEndpointCol, crdb.ColumnTypeText),
-			crdb.NewColumn(JWTKeysEndpointCol, crdb.ColumnTypeText),
-			crdb.NewColumn(JWTHeaderNameCol, crdb.ColumnTypeText, crdb.Nullable()),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(JWTIDCol, handler.ColumnTypeText),
+			handler.NewColumn(JWTInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(JWTIssuerCol, handler.ColumnTypeText),
+			handler.NewColumn(JWTEndpointCol, handler.ColumnTypeText),
+			handler.NewColumn(JWTKeysEndpointCol, handler.ColumnTypeText),
+			handler.NewColumn(JWTHeaderNameCol, handler.ColumnTypeText, handler.Nullable()),
 		},
-			crdb.NewPrimaryKey(JWTInstanceIDCol, JWTIDCol),
+			handler.NewPrimaryKey(JWTInstanceIDCol, JWTIDCol),
 			IDPTemplateJWTSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(AzureADIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(AzureADInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(AzureADClientIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(AzureADClientSecretCol, crdb.ColumnTypeJSONB),
-			crdb.NewColumn(AzureADScopesCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(AzureADTenantCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(AzureADIsEmailVerified, crdb.ColumnTypeBool, crdb.Default(false)),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(AzureADIDCol, handler.ColumnTypeText),
+			handler.NewColumn(AzureADInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(AzureADClientIDCol, handler.ColumnTypeText),
+			handler.NewColumn(AzureADClientSecretCol, handler.ColumnTypeJSONB),
+			handler.NewColumn(AzureADScopesCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(AzureADTenantCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(AzureADIsEmailVerified, handler.ColumnTypeBool, handler.Default(false)),
 		},
-			crdb.NewPrimaryKey(AzureADInstanceIDCol, AzureADIDCol),
+			handler.NewPrimaryKey(AzureADInstanceIDCol, AzureADIDCol),
 			IDPTemplateAzureADSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(GitHubIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GitHubInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GitHubClientIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GitHubClientSecretCol, crdb.ColumnTypeJSONB),
-			crdb.NewColumn(GitHubScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(GitHubIDCol, handler.ColumnTypeText),
+			handler.NewColumn(GitHubInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(GitHubClientIDCol, handler.ColumnTypeText),
+			handler.NewColumn(GitHubClientSecretCol, handler.ColumnTypeJSONB),
+			handler.NewColumn(GitHubScopesCol, handler.ColumnTypeTextArray, handler.Nullable()),
 		},
-			crdb.NewPrimaryKey(GitHubInstanceIDCol, GitHubIDCol),
+			handler.NewPrimaryKey(GitHubInstanceIDCol, GitHubIDCol),
 			IDPTemplateGitHubSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(GitHubEnterpriseIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GitHubEnterpriseInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GitHubEnterpriseClientIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GitHubEnterpriseClientSecretCol, crdb.ColumnTypeJSONB),
-			crdb.NewColumn(GitHubEnterpriseAuthorizationEndpointCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GitHubEnterpriseTokenEndpointCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GitHubEnterpriseUserEndpointCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GitHubEnterpriseScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(GitHubEnterpriseIDCol, handler.ColumnTypeText),
+			handler.NewColumn(GitHubEnterpriseInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(GitHubEnterpriseClientIDCol, handler.ColumnTypeText),
+			handler.NewColumn(GitHubEnterpriseClientSecretCol, handler.ColumnTypeJSONB),
+			handler.NewColumn(GitHubEnterpriseAuthorizationEndpointCol, handler.ColumnTypeText),
+			handler.NewColumn(GitHubEnterpriseTokenEndpointCol, handler.ColumnTypeText),
+			handler.NewColumn(GitHubEnterpriseUserEndpointCol, handler.ColumnTypeText),
+			handler.NewColumn(GitHubEnterpriseScopesCol, handler.ColumnTypeTextArray, handler.Nullable()),
 		},
-			crdb.NewPrimaryKey(GitHubEnterpriseInstanceIDCol, GitHubEnterpriseIDCol),
+			handler.NewPrimaryKey(GitHubEnterpriseInstanceIDCol, GitHubEnterpriseIDCol),
 			IDPTemplateGitHubEnterpriseSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(GitLabIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GitLabInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GitLabClientIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GitLabClientSecretCol, crdb.ColumnTypeJSONB),
-			crdb.NewColumn(GitLabScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(GitLabIDCol, handler.ColumnTypeText),
+			handler.NewColumn(GitLabInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(GitLabClientIDCol, handler.ColumnTypeText),
+			handler.NewColumn(GitLabClientSecretCol, handler.ColumnTypeJSONB),
+			handler.NewColumn(GitLabScopesCol, handler.ColumnTypeTextArray, handler.Nullable()),
 		},
-			crdb.NewPrimaryKey(GitLabInstanceIDCol, GitLabIDCol),
+			handler.NewPrimaryKey(GitLabInstanceIDCol, GitLabIDCol),
 			IDPTemplateGitLabSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(GitLabSelfHostedIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GitLabSelfHostedInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GitLabSelfHostedIssuerCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GitLabSelfHostedClientIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GitLabSelfHostedClientSecretCol, crdb.ColumnTypeJSONB),
-			crdb.NewColumn(GitLabSelfHostedScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(GitLabSelfHostedIDCol, handler.ColumnTypeText),
+			handler.NewColumn(GitLabSelfHostedInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(GitLabSelfHostedIssuerCol, handler.ColumnTypeText),
+			handler.NewColumn(GitLabSelfHostedClientIDCol, handler.ColumnTypeText),
+			handler.NewColumn(GitLabSelfHostedClientSecretCol, handler.ColumnTypeJSONB),
+			handler.NewColumn(GitLabSelfHostedScopesCol, handler.ColumnTypeTextArray, handler.Nullable()),
 		},
-			crdb.NewPrimaryKey(GitLabSelfHostedInstanceIDCol, GitLabSelfHostedIDCol),
+			handler.NewPrimaryKey(GitLabSelfHostedInstanceIDCol, GitLabSelfHostedIDCol),
 			IDPTemplateGitLabSelfHostedSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(GoogleIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GoogleInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GoogleClientIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(GoogleClientSecretCol, crdb.ColumnTypeJSONB),
-			crdb.NewColumn(GoogleScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(GoogleIDCol, handler.ColumnTypeText),
+			handler.NewColumn(GoogleInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(GoogleClientIDCol, handler.ColumnTypeText),
+			handler.NewColumn(GoogleClientSecretCol, handler.ColumnTypeJSONB),
+			handler.NewColumn(GoogleScopesCol, handler.ColumnTypeTextArray, handler.Nullable()),
 		},
-			crdb.NewPrimaryKey(GoogleInstanceIDCol, GoogleIDCol),
+			handler.NewPrimaryKey(GoogleInstanceIDCol, GoogleIDCol),
 			IDPTemplateGoogleSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(LDAPIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(LDAPInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(LDAPServersCol, crdb.ColumnTypeTextArray),
-			crdb.NewColumn(LDAPStartTLSCol, crdb.ColumnTypeBool),
-			crdb.NewColumn(LDAPBaseDNCol, crdb.ColumnTypeText),
-			crdb.NewColumn(LDAPBindDNCol, crdb.ColumnTypeText),
-			crdb.NewColumn(LDAPBindPasswordCol, crdb.ColumnTypeJSONB),
-			crdb.NewColumn(LDAPUserBaseCol, crdb.ColumnTypeText),
-			crdb.NewColumn(LDAPUserObjectClassesCol, crdb.ColumnTypeTextArray),
-			crdb.NewColumn(LDAPUserFiltersCol, crdb.ColumnTypeTextArray),
-			crdb.NewColumn(LDAPTimeoutCol, crdb.ColumnTypeInt64),
-			crdb.NewColumn(LDAPIDAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPFirstNameAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPLastNameAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPDisplayNameAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPNickNameAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPPreferredUsernameAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPEmailAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPEmailVerifiedAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPPhoneAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPPhoneVerifiedAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPPreferredLanguageAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPAvatarURLAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
-			crdb.NewColumn(LDAPProfileAttributeCol, crdb.ColumnTypeText, crdb.Nullable()),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(LDAPIDCol, handler.ColumnTypeText),
+			handler.NewColumn(LDAPInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(LDAPServersCol, handler.ColumnTypeTextArray),
+			handler.NewColumn(LDAPStartTLSCol, handler.ColumnTypeBool),
+			handler.NewColumn(LDAPBaseDNCol, handler.ColumnTypeText),
+			handler.NewColumn(LDAPBindDNCol, handler.ColumnTypeText),
+			handler.NewColumn(LDAPBindPasswordCol, handler.ColumnTypeJSONB),
+			handler.NewColumn(LDAPUserBaseCol, handler.ColumnTypeText),
+			handler.NewColumn(LDAPUserObjectClassesCol, handler.ColumnTypeTextArray),
+			handler.NewColumn(LDAPUserFiltersCol, handler.ColumnTypeTextArray),
+			handler.NewColumn(LDAPTimeoutCol, handler.ColumnTypeInt64),
+			handler.NewColumn(LDAPIDAttributeCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(LDAPFirstNameAttributeCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(LDAPLastNameAttributeCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(LDAPDisplayNameAttributeCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(LDAPNickNameAttributeCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(LDAPPreferredUsernameAttributeCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(LDAPEmailAttributeCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(LDAPEmailVerifiedAttributeCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(LDAPPhoneAttributeCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(LDAPPhoneVerifiedAttributeCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(LDAPPreferredLanguageAttributeCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(LDAPAvatarURLAttributeCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(LDAPProfileAttributeCol, handler.ColumnTypeText, handler.Nullable()),
 		},
-			crdb.NewPrimaryKey(LDAPInstanceIDCol, LDAPIDCol),
+			handler.NewPrimaryKey(LDAPInstanceIDCol, LDAPIDCol),
 			IDPTemplateLDAPSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(AppleIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(AppleInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(AppleClientIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(AppleTeamIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(AppleKeyIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(ApplePrivateKeyCol, crdb.ColumnTypeJSONB),
-			crdb.NewColumn(AppleScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(AppleIDCol, handler.ColumnTypeText),
+			handler.NewColumn(AppleInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(AppleClientIDCol, handler.ColumnTypeText),
+			handler.NewColumn(AppleTeamIDCol, handler.ColumnTypeText),
+			handler.NewColumn(AppleKeyIDCol, handler.ColumnTypeText),
+			handler.NewColumn(ApplePrivateKeyCol, handler.ColumnTypeJSONB),
+			handler.NewColumn(AppleScopesCol, handler.ColumnTypeTextArray, handler.Nullable()),
 		},
-			crdb.NewPrimaryKey(AppleInstanceIDCol, AppleIDCol),
+			handler.NewPrimaryKey(AppleInstanceIDCol, AppleIDCol),
 			IDPTemplateAppleSuffix,
-			crdb.WithForeignKey(crdb.NewForeignKeyOfPublicKeys()),
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
+		),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(SAMLIDCol, handler.ColumnTypeText),
+			handler.NewColumn(SAMLInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(SAMLMetadataCol, handler.ColumnTypeBytes),
+			handler.NewColumn(SAMLKeyCol, handler.ColumnTypeJSONB),
+			handler.NewColumn(SAMLCertificateCol, handler.ColumnTypeBytes),
+			handler.NewColumn(SAMLBindingCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(SAMLWithSignedRequestCol, handler.ColumnTypeBool, handler.Nullable()),
+		},
+			handler.NewPrimaryKey(SAMLInstanceIDCol, SAMLIDCol),
+			IDPTemplateSAMLSuffix,
+			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
+func (p *idpTemplateProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.OAuthIDPAddedEventType,
 					Reduce: p.reduceOAuthIDPAdded,
@@ -475,6 +499,14 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceAppleIDPChanged,
 				},
 				{
+					Event:  instance.SAMLIDPAddedEventType,
+					Reduce: p.reduceSAMLIDPAdded,
+				},
+				{
+					Event:  instance.SAMLIDPChangedEventType,
+					Reduce: p.reduceSAMLIDPChanged,
+				},
+				{
 					Event:  instance.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
 				},
@@ -490,7 +522,7 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.OAuthIDPAddedEventType,
 					Reduce: p.reduceOAuthIDPAdded,
@@ -612,6 +644,14 @@ func (p *idpTemplateProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceAppleIDPChanged,
 				},
 				{
+					Event:  org.SAMLIDPAddedEventType,
+					Reduce: p.reduceSAMLIDPAdded,
+				},
+				{
+					Event:  org.SAMLIDPChangedEventType,
+					Reduce: p.reduceSAMLIDPChanged,
+				},
+				{
 					Event:  org.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
 				},
@@ -639,12 +679,12 @@ func (p *idpTemplateProjection) reduceOAuthIDPAdded(event eventstore.Event) (*ha
 		idpEvent = e.OAuthIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ap9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPAddedEventType, instance.OAuthIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ap9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPAddedEventType, instance.OAuthIDPAddedEventType})
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
@@ -662,7 +702,7 @@ func (p *idpTemplateProjection) reduceOAuthIDPAdded(event eventstore.Event) (*ha
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
 			},
 		),
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(OAuthIDCol, idpEvent.ID),
 				handler.NewCol(OAuthInstanceIDCol, idpEvent.Aggregate().InstanceID),
@@ -671,10 +711,10 @@ func (p *idpTemplateProjection) reduceOAuthIDPAdded(event eventstore.Event) (*ha
 				handler.NewCol(OAuthAuthorizationEndpointCol, idpEvent.AuthorizationEndpoint),
 				handler.NewCol(OAuthTokenEndpointCol, idpEvent.TokenEndpoint),
 				handler.NewCol(OAuthUserEndpointCol, idpEvent.UserEndpoint),
-				handler.NewCol(OAuthScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(OAuthScopesCol, database.TextArray[string](idpEvent.Scopes)),
 				handler.NewCol(OAuthIDAttributeCol, idpEvent.IDAttribute),
 			},
-			crdb.WithTableSuffix(IDPTemplateOAuthSuffix),
+			handler.WithTableSuffix(IDPTemplateOAuthSuffix),
 		),
 	), nil
 }
@@ -687,12 +727,12 @@ func (p *idpTemplateProjection) reduceOAuthIDPChanged(event eventstore.Event) (*
 	case *instance.OAuthIDPChangedEvent:
 		idpEvent = e.OAuthIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPChangedEventType, instance.OAuthIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OAuthIDPChangedEventType, instance.OAuthIDPChangedEventType})
 	}
 
-	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
 	ops = append(ops,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -703,18 +743,18 @@ func (p *idpTemplateProjection) reduceOAuthIDPChanged(event eventstore.Event) (*
 	oauthCols := reduceOAuthIDPChangedColumns(idpEvent)
 	if len(oauthCols) > 0 {
 		ops = append(ops,
-			crdb.AddUpdateStatement(
+			handler.AddUpdateStatement(
 				oauthCols,
 				[]handler.Condition{
 					handler.NewCond(OAuthIDCol, idpEvent.ID),
 					handler.NewCond(OAuthInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
-				crdb.WithTableSuffix(IDPTemplateOAuthSuffix),
+				handler.WithTableSuffix(IDPTemplateOAuthSuffix),
 			),
 		)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
 		ops...,
 	), nil
@@ -731,12 +771,12 @@ func (p *idpTemplateProjection) reduceOIDCIDPAdded(event eventstore.Event) (*han
 		idpEvent = e.OIDCIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPAddedEventType, instance.OIDCIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPAddedEventType, instance.OIDCIDPAddedEventType})
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
@@ -754,17 +794,17 @@ func (p *idpTemplateProjection) reduceOIDCIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
 			},
 		),
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(OIDCIDCol, idpEvent.ID),
 				handler.NewCol(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(OIDCIssuerCol, idpEvent.Issuer),
 				handler.NewCol(OIDCClientIDCol, idpEvent.ClientID),
 				handler.NewCol(OIDCClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(OIDCScopesCol, database.TextArray[string](idpEvent.Scopes)),
 				handler.NewCol(OIDCIDTokenMappingCol, idpEvent.IsIDTokenMapping),
 			},
-			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
+			handler.WithTableSuffix(IDPTemplateOIDCSuffix),
 		),
 	), nil
 }
@@ -777,12 +817,12 @@ func (p *idpTemplateProjection) reduceOIDCIDPChanged(event eventstore.Event) (*h
 	case *instance.OIDCIDPChangedEvent:
 		idpEvent = e.OIDCIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
 	}
 
-	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
 	ops = append(ops,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -793,18 +833,18 @@ func (p *idpTemplateProjection) reduceOIDCIDPChanged(event eventstore.Event) (*h
 	oidcCols := reduceOIDCIDPChangedColumns(idpEvent)
 	if len(oidcCols) > 0 {
 		ops = append(ops,
-			crdb.AddUpdateStatement(
+			handler.AddUpdateStatement(
 				oidcCols,
 				[]handler.Condition{
 					handler.NewCond(OIDCIDCol, idpEvent.ID),
 					handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
-				crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
+				handler.WithTableSuffix(IDPTemplateOIDCSuffix),
 			),
 		)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
 		ops...,
 	), nil
@@ -818,12 +858,12 @@ func (p *idpTemplateProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Ev
 	case *instance.OIDCIDPMigratedAzureADEvent:
 		idpEvent = e.OIDCIDPMigratedAzureADEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedAzureADEventType, instance.OIDCIDPMigratedAzureADEventType})
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
@@ -839,24 +879,24 @@ func (p *idpTemplateProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Ev
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
 		),
-		crdb.AddDeleteStatement(
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(OIDCIDCol, idpEvent.ID),
 				handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
-			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
+			handler.WithTableSuffix(IDPTemplateOIDCSuffix),
 		),
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(AzureADIDCol, idpEvent.ID),
 				handler.NewCol(AzureADInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(AzureADClientIDCol, idpEvent.ClientID),
 				handler.NewCol(AzureADClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(AzureADScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(AzureADScopesCol, database.TextArray[string](idpEvent.Scopes)),
 				handler.NewCol(AzureADTenantCol, idpEvent.Tenant),
 				handler.NewCol(AzureADIsEmailVerified, idpEvent.IsEmailVerified),
 			},
-			crdb.WithTableSuffix(IDPTemplateAzureADSuffix),
+			handler.WithTableSuffix(IDPTemplateAzureADSuffix),
 		),
 	), nil
 }
@@ -869,12 +909,12 @@ func (p *idpTemplateProjection) reduceOIDCIDPMigratedGoogle(event eventstore.Eve
 	case *instance.OIDCIDPMigratedGoogleEvent:
 		idpEvent = e.OIDCIDPMigratedGoogleEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedGoogleEventType, instance.OIDCIDPMigratedGoogleEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPMigratedGoogleEventType, instance.OIDCIDPMigratedGoogleEventType})
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
@@ -890,22 +930,22 @@ func (p *idpTemplateProjection) reduceOIDCIDPMigratedGoogle(event eventstore.Eve
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
 		),
-		crdb.AddDeleteStatement(
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(OIDCIDCol, idpEvent.ID),
 				handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
-			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
+			handler.WithTableSuffix(IDPTemplateOIDCSuffix),
 		),
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(GoogleIDCol, idpEvent.ID),
 				handler.NewCol(GoogleInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(GoogleClientIDCol, idpEvent.ClientID),
 				handler.NewCol(GoogleClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(GoogleScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(GoogleScopesCol, database.TextArray[string](idpEvent.Scopes)),
 			},
-			crdb.WithTableSuffix(IDPTemplateGoogleSuffix),
+			handler.WithTableSuffix(IDPTemplateGoogleSuffix),
 		),
 	), nil
 }
@@ -921,12 +961,12 @@ func (p *idpTemplateProjection) reduceJWTIDPAdded(event eventstore.Event) (*hand
 		idpEvent = e.JWTIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-xopi2s", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPAddedEventType, instance.JWTIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xopi2s", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPAddedEventType, instance.JWTIDPAddedEventType})
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
@@ -944,7 +984,7 @@ func (p *idpTemplateProjection) reduceJWTIDPAdded(event eventstore.Event) (*hand
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
 			},
 		),
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(JWTIDCol, idpEvent.ID),
 				handler.NewCol(JWTInstanceIDCol, idpEvent.Aggregate().InstanceID),
@@ -953,7 +993,7 @@ func (p *idpTemplateProjection) reduceJWTIDPAdded(event eventstore.Event) (*hand
 				handler.NewCol(JWTKeysEndpointCol, idpEvent.KeysEndpoint),
 				handler.NewCol(JWTHeaderNameCol, idpEvent.HeaderName),
 			},
-			crdb.WithTableSuffix(IDPTemplateJWTSuffix),
+			handler.WithTableSuffix(IDPTemplateJWTSuffix),
 		),
 	), nil
 }
@@ -966,12 +1006,12 @@ func (p *idpTemplateProjection) reduceJWTIDPChanged(event eventstore.Event) (*ha
 	case *instance.JWTIDPChangedEvent:
 		idpEvent = e.JWTIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
 	}
 
-	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
 	ops = append(ops,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -982,18 +1022,18 @@ func (p *idpTemplateProjection) reduceJWTIDPChanged(event eventstore.Event) (*ha
 	jwtCols := reduceJWTIDPChangedColumns(idpEvent)
 	if len(jwtCols) > 0 {
 		ops = append(ops,
-			crdb.AddUpdateStatement(
+			handler.AddUpdateStatement(
 				jwtCols,
 				[]handler.Condition{
 					handler.NewCond(JWTIDCol, idpEvent.ID),
 					handler.NewCond(JWTInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
-				crdb.WithTableSuffix(IDPTemplateJWTSuffix),
+				handler.WithTableSuffix(IDPTemplateJWTSuffix),
 			),
 		)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
 		ops...,
 	), nil
@@ -1010,10 +1050,10 @@ func (p *idpTemplateProjection) reduceOldConfigAdded(event eventstore.Event) (*h
 		idpEvent = e.IDPConfigAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ADfeg", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigAddedEventType, instance.IDPConfigAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ADfeg", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigAddedEventType, instance.IDPConfigAddedEventType})
 	}
 
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		event,
 		[]handler.Column{
 			handler.NewCol(IDPTemplateIDCol, idpEvent.ConfigID),
@@ -1042,7 +1082,7 @@ func (p *idpTemplateProjection) reduceOldConfigChanged(event eventstore.Event) (
 	case *instance.IDPConfigChangedEvent:
 		idpEvent = e.IDPConfigChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAfg2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigChangedEventType, instance.IDPConfigChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAfg2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigChangedEventType, instance.IDPConfigChangedEventType})
 	}
 
 	cols := make([]handler.Column, 0, 4)
@@ -1057,7 +1097,7 @@ func (p *idpTemplateProjection) reduceOldConfigChanged(event eventstore.Event) (
 		handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
 	)
 
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		event,
 		cols,
 		[]handler.Condition{
@@ -1075,12 +1115,12 @@ func (p *idpTemplateProjection) reduceOldOIDCConfigAdded(event eventstore.Event)
 	case *instance.IDPOIDCConfigAddedEvent:
 		idpEvent = e.OIDCConfigAddedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ASFdq2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigAddedEventType, instance.IDPOIDCConfigAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ASFdq2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPOIDCConfigAddedEventType, instance.IDPOIDCConfigAddedEventType})
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
@@ -1091,17 +1131,17 @@ func (p *idpTemplateProjection) reduceOldOIDCConfigAdded(event eventstore.Event)
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
 		),
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(OIDCIDCol, idpEvent.IDPConfigID),
 				handler.NewCol(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(OIDCIssuerCol, idpEvent.Issuer),
 				handler.NewCol(OIDCClientIDCol, idpEvent.ClientID),
 				handler.NewCol(OIDCClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(OIDCScopesCol, database.TextArray[string](idpEvent.Scopes)),
 				handler.NewCol(OIDCIDTokenMappingCol, true),
 			},
-			crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
+			handler.WithTableSuffix(IDPTemplateOIDCSuffix),
 		),
 	), nil
 }
@@ -1114,12 +1154,12 @@ func (p *idpTemplateProjection) reduceOldOIDCConfigChanged(event eventstore.Even
 	case *instance.IDPOIDCConfigChangedEvent:
 		idpEvent = e.OIDCConfigChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.OIDCIDPChangedEventType, instance.OIDCIDPChangedEventType})
 	}
 
-	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
 	ops = append(ops,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
@@ -1141,22 +1181,22 @@ func (p *idpTemplateProjection) reduceOldOIDCConfigChanged(event eventstore.Even
 		oidcCols = append(oidcCols, handler.NewCol(OIDCIssuerCol, *idpEvent.Issuer))
 	}
 	if idpEvent.Scopes != nil {
-		oidcCols = append(oidcCols, handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)))
+		oidcCols = append(oidcCols, handler.NewCol(OIDCScopesCol, database.TextArray[string](idpEvent.Scopes)))
 	}
 	if len(oidcCols) > 0 {
 		ops = append(ops,
-			crdb.AddUpdateStatement(
+			handler.AddUpdateStatement(
 				oidcCols,
 				[]handler.Condition{
 					handler.NewCond(OIDCIDCol, idpEvent.IDPConfigID),
 					handler.NewCond(OIDCInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
-				crdb.WithTableSuffix(IDPTemplateOIDCSuffix),
+				handler.WithTableSuffix(IDPTemplateOIDCSuffix),
 			),
 		)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
 		ops...,
 	), nil
@@ -1170,12 +1210,12 @@ func (p *idpTemplateProjection) reduceOldJWTConfigAdded(event eventstore.Event) 
 	case *instance.IDPJWTConfigAddedEvent:
 		idpEvent = e.JWTConfigAddedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ASFdq2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigAddedEventType, instance.IDPJWTConfigAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ASFdq2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPJWTConfigAddedEventType, instance.IDPJWTConfigAddedEventType})
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
@@ -1186,7 +1226,7 @@ func (p *idpTemplateProjection) reduceOldJWTConfigAdded(event eventstore.Event) 
 				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			},
 		),
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(JWTIDCol, idpEvent.IDPConfigID),
 				handler.NewCol(JWTInstanceIDCol, idpEvent.Aggregate().InstanceID),
@@ -1195,7 +1235,7 @@ func (p *idpTemplateProjection) reduceOldJWTConfigAdded(event eventstore.Event) 
 				handler.NewCol(JWTKeysEndpointCol, idpEvent.KeysEndpoint),
 				handler.NewCol(JWTHeaderNameCol, idpEvent.HeaderName),
 			},
-			crdb.WithTableSuffix(IDPTemplateJWTSuffix),
+			handler.WithTableSuffix(IDPTemplateJWTSuffix),
 		),
 	), nil
 }
@@ -1208,12 +1248,12 @@ func (p *idpTemplateProjection) reduceOldJWTConfigChanged(event eventstore.Event
 	case *instance.IDPJWTConfigChangedEvent:
 		idpEvent = e.JWTConfigChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.JWTIDPChangedEventType, instance.JWTIDPChangedEventType})
 	}
 
-	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
 	ops = append(ops,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
 				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
@@ -1239,18 +1279,18 @@ func (p *idpTemplateProjection) reduceOldJWTConfigChanged(event eventstore.Event
 	}
 	if len(jwtCols) > 0 {
 		ops = append(ops,
-			crdb.AddUpdateStatement(
+			handler.AddUpdateStatement(
 				jwtCols,
 				[]handler.Condition{
 					handler.NewCond(JWTIDCol, idpEvent.IDPConfigID),
 					handler.NewCond(JWTInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
-				crdb.WithTableSuffix(IDPTemplateJWTSuffix),
+				handler.WithTableSuffix(IDPTemplateJWTSuffix),
 			),
 		)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
 		ops...,
 	), nil
@@ -1267,12 +1307,12 @@ func (p *idpTemplateProjection) reduceAzureADIDPAdded(event eventstore.Event) (*
 		idpEvent = e.AzureADIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPAddedEventType, instance.AzureADIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPAddedEventType, instance.AzureADIDPAddedEventType})
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
@@ -1290,17 +1330,17 @@ func (p *idpTemplateProjection) reduceAzureADIDPAdded(event eventstore.Event) (*
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
 			},
 		),
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(AzureADIDCol, idpEvent.ID),
 				handler.NewCol(AzureADInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(AzureADClientIDCol, idpEvent.ClientID),
 				handler.NewCol(AzureADClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(AzureADScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(AzureADScopesCol, database.TextArray[string](idpEvent.Scopes)),
 				handler.NewCol(AzureADTenantCol, idpEvent.Tenant),
 				handler.NewCol(AzureADIsEmailVerified, idpEvent.IsEmailVerified),
 			},
-			crdb.WithTableSuffix(IDPTemplateAzureADSuffix),
+			handler.WithTableSuffix(IDPTemplateAzureADSuffix),
 		),
 	), nil
 }
@@ -1313,12 +1353,12 @@ func (p *idpTemplateProjection) reduceAzureADIDPChanged(event eventstore.Event) 
 	case *instance.AzureADIDPChangedEvent:
 		idpEvent = e.AzureADIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.AzureADIDPChangedEventType, instance.AzureADIDPChangedEventType})
 	}
 
-	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
 	ops = append(ops,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -1329,18 +1369,18 @@ func (p *idpTemplateProjection) reduceAzureADIDPChanged(event eventstore.Event) 
 	githubCols := reduceAzureADIDPChangedColumns(idpEvent)
 	if len(githubCols) > 0 {
 		ops = append(ops,
-			crdb.AddUpdateStatement(
+			handler.AddUpdateStatement(
 				githubCols,
 				[]handler.Condition{
 					handler.NewCond(AzureADIDCol, idpEvent.ID),
 					handler.NewCond(AzureADInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
-				crdb.WithTableSuffix(IDPTemplateAzureADSuffix),
+				handler.WithTableSuffix(IDPTemplateAzureADSuffix),
 			),
 		)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
 		ops...,
 	), nil
@@ -1357,12 +1397,12 @@ func (p *idpTemplateProjection) reduceGitHubIDPAdded(event eventstore.Event) (*h
 		idpEvent = e.GitHubIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPAddedEventType, instance.GitHubIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPAddedEventType, instance.GitHubIDPAddedEventType})
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
@@ -1380,15 +1420,15 @@ func (p *idpTemplateProjection) reduceGitHubIDPAdded(event eventstore.Event) (*h
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
 			},
 		),
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(GitHubIDCol, idpEvent.ID),
 				handler.NewCol(GitHubInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(GitHubClientIDCol, idpEvent.ClientID),
 				handler.NewCol(GitHubClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(GitHubScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(GitHubScopesCol, database.TextArray[string](idpEvent.Scopes)),
 			},
-			crdb.WithTableSuffix(IDPTemplateGitHubSuffix),
+			handler.WithTableSuffix(IDPTemplateGitHubSuffix),
 		),
 	), nil
 }
@@ -1404,12 +1444,12 @@ func (p *idpTemplateProjection) reduceGitHubEnterpriseIDPAdded(event eventstore.
 		idpEvent = e.GitHubEnterpriseIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Sf3g2a", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPAddedEventType, instance.GitHubEnterpriseIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Sf3g2a", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPAddedEventType, instance.GitHubEnterpriseIDPAddedEventType})
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
@@ -1427,7 +1467,7 @@ func (p *idpTemplateProjection) reduceGitHubEnterpriseIDPAdded(event eventstore.
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
 			},
 		),
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(GitHubEnterpriseIDCol, idpEvent.ID),
 				handler.NewCol(GitHubEnterpriseInstanceIDCol, idpEvent.Aggregate().InstanceID),
@@ -1436,9 +1476,9 @@ func (p *idpTemplateProjection) reduceGitHubEnterpriseIDPAdded(event eventstore.
 				handler.NewCol(GitHubEnterpriseAuthorizationEndpointCol, idpEvent.AuthorizationEndpoint),
 				handler.NewCol(GitHubEnterpriseTokenEndpointCol, idpEvent.TokenEndpoint),
 				handler.NewCol(GitHubEnterpriseUserEndpointCol, idpEvent.UserEndpoint),
-				handler.NewCol(GitHubEnterpriseScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(GitHubEnterpriseScopesCol, database.TextArray[string](idpEvent.Scopes)),
 			},
-			crdb.WithTableSuffix(IDPTemplateGitHubEnterpriseSuffix),
+			handler.WithTableSuffix(IDPTemplateGitHubEnterpriseSuffix),
 		),
 	), nil
 }
@@ -1451,12 +1491,12 @@ func (p *idpTemplateProjection) reduceGitHubIDPChanged(event eventstore.Event) (
 	case *instance.GitHubIDPChangedEvent:
 		idpEvent = e.GitHubIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPChangedEventType, instance.GitHubIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubIDPChangedEventType, instance.GitHubIDPChangedEventType})
 	}
 
-	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
 	ops = append(ops,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -1467,18 +1507,18 @@ func (p *idpTemplateProjection) reduceGitHubIDPChanged(event eventstore.Event) (
 	githubCols := reduceGitHubIDPChangedColumns(idpEvent)
 	if len(githubCols) > 0 {
 		ops = append(ops,
-			crdb.AddUpdateStatement(
+			handler.AddUpdateStatement(
 				githubCols,
 				[]handler.Condition{
 					handler.NewCond(GitHubIDCol, idpEvent.ID),
 					handler.NewCond(GitHubInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
-				crdb.WithTableSuffix(IDPTemplateGitHubSuffix),
+				handler.WithTableSuffix(IDPTemplateGitHubSuffix),
 			),
 		)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
 		ops...,
 	), nil
@@ -1492,12 +1532,12 @@ func (p *idpTemplateProjection) reduceGitHubEnterpriseIDPChanged(event eventstor
 	case *instance.GitHubEnterpriseIDPChangedEvent:
 		idpEvent = e.GitHubEnterpriseIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SDg3g", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPChangedEventType, instance.GitHubEnterpriseIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SDg3g", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitHubEnterpriseIDPChangedEventType, instance.GitHubEnterpriseIDPChangedEventType})
 	}
 
-	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
 	ops = append(ops,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -1508,18 +1548,18 @@ func (p *idpTemplateProjection) reduceGitHubEnterpriseIDPChanged(event eventstor
 	githubCols := reduceGitHubEnterpriseIDPChangedColumns(idpEvent)
 	if len(githubCols) > 0 {
 		ops = append(ops,
-			crdb.AddUpdateStatement(
+			handler.AddUpdateStatement(
 				githubCols,
 				[]handler.Condition{
 					handler.NewCond(GitHubEnterpriseIDCol, idpEvent.ID),
 					handler.NewCond(GitHubEnterpriseInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
-				crdb.WithTableSuffix(IDPTemplateGitHubEnterpriseSuffix),
+				handler.WithTableSuffix(IDPTemplateGitHubEnterpriseSuffix),
 			),
 		)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
 		ops...,
 	), nil
@@ -1536,12 +1576,12 @@ func (p *idpTemplateProjection) reduceGitLabIDPAdded(event eventstore.Event) (*h
 		idpEvent = e.GitLabIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPAddedEventType, instance.GitLabIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x9a022b", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPAddedEventType, instance.GitLabIDPAddedEventType})
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
@@ -1559,15 +1599,15 @@ func (p *idpTemplateProjection) reduceGitLabIDPAdded(event eventstore.Event) (*h
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
 			},
 		),
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(GitLabIDCol, idpEvent.ID),
 				handler.NewCol(GitLabInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(GitLabClientIDCol, idpEvent.ClientID),
 				handler.NewCol(GitLabClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(GitLabScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(GitLabScopesCol, database.TextArray[string](idpEvent.Scopes)),
 			},
-			crdb.WithTableSuffix(IDPTemplateGitLabSuffix),
+			handler.WithTableSuffix(IDPTemplateGitLabSuffix),
 		),
 	), nil
 }
@@ -1580,12 +1620,12 @@ func (p *idpTemplateProjection) reduceGitLabIDPChanged(event eventstore.Event) (
 	case *instance.GitLabIDPChangedEvent:
 		idpEvent = e.GitLabIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabIDPChangedEventType, instance.GitLabIDPChangedEventType})
 	}
 
-	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
 	ops = append(ops,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -1596,18 +1636,18 @@ func (p *idpTemplateProjection) reduceGitLabIDPChanged(event eventstore.Event) (
 	gitlabCols := reduceGitLabIDPChangedColumns(idpEvent)
 	if len(gitlabCols) > 0 {
 		ops = append(ops,
-			crdb.AddUpdateStatement(
+			handler.AddUpdateStatement(
 				gitlabCols,
 				[]handler.Condition{
 					handler.NewCond(GitLabIDCol, idpEvent.ID),
 					handler.NewCond(GitLabInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
-				crdb.WithTableSuffix(IDPTemplateGitLabSuffix),
+				handler.WithTableSuffix(IDPTemplateGitLabSuffix),
 			),
 		)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
 		ops...,
 	), nil
@@ -1624,12 +1664,12 @@ func (p *idpTemplateProjection) reduceGitLabSelfHostedIDPAdded(event eventstore.
 		idpEvent = e.GitLabSelfHostedIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAF3gw", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPAddedEventType, instance.GitLabSelfHostedIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAF3gw", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPAddedEventType, instance.GitLabSelfHostedIDPAddedEventType})
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
@@ -1647,16 +1687,16 @@ func (p *idpTemplateProjection) reduceGitLabSelfHostedIDPAdded(event eventstore.
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
 			},
 		),
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(GitLabSelfHostedIDCol, idpEvent.ID),
 				handler.NewCol(GitLabSelfHostedInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(GitLabSelfHostedIssuerCol, idpEvent.Issuer),
 				handler.NewCol(GitLabSelfHostedClientIDCol, idpEvent.ClientID),
 				handler.NewCol(GitLabSelfHostedClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(GitLabSelfHostedScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(GitLabSelfHostedScopesCol, database.TextArray[string](idpEvent.Scopes)),
 			},
-			crdb.WithTableSuffix(IDPTemplateGitLabSelfHostedSuffix),
+			handler.WithTableSuffix(IDPTemplateGitLabSelfHostedSuffix),
 		),
 	), nil
 }
@@ -1669,12 +1709,12 @@ func (p *idpTemplateProjection) reduceGitLabSelfHostedIDPChanged(event eventstor
 	case *instance.GitLabSelfHostedIDPChangedEvent:
 		idpEvent = e.GitLabSelfHostedIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAf3g2", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPChangedEventType, instance.GitLabSelfHostedIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAf3g2", "reduce.wrong.event.type %v", []eventstore.EventType{org.GitLabSelfHostedIDPChangedEventType, instance.GitLabSelfHostedIDPChangedEventType})
 	}
 
-	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
 	ops = append(ops,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -1685,18 +1725,18 @@ func (p *idpTemplateProjection) reduceGitLabSelfHostedIDPChanged(event eventstor
 	gitlabCols := reduceGitLabSelfHostedIDPChangedColumns(idpEvent)
 	if len(gitlabCols) > 0 {
 		ops = append(ops,
-			crdb.AddUpdateStatement(
+			handler.AddUpdateStatement(
 				gitlabCols,
 				[]handler.Condition{
 					handler.NewCond(GitLabSelfHostedIDCol, idpEvent.ID),
 					handler.NewCond(GitLabSelfHostedInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
-				crdb.WithTableSuffix(IDPTemplateGitLabSelfHostedSuffix),
+				handler.WithTableSuffix(IDPTemplateGitLabSelfHostedSuffix),
 			),
 		)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
 		ops...,
 	), nil
@@ -1713,12 +1753,12 @@ func (p *idpTemplateProjection) reduceGoogleIDPAdded(event eventstore.Event) (*h
 		idpEvent = e.GoogleIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ap9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPAddedEventType, instance.GoogleIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ap9ihb", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPAddedEventType, instance.GoogleIDPAddedEventType})
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
@@ -1736,15 +1776,15 @@ func (p *idpTemplateProjection) reduceGoogleIDPAdded(event eventstore.Event) (*h
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
 			},
 		),
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(GoogleIDCol, idpEvent.ID),
 				handler.NewCol(GoogleInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				handler.NewCol(GoogleClientIDCol, idpEvent.ClientID),
 				handler.NewCol(GoogleClientSecretCol, idpEvent.ClientSecret),
-				handler.NewCol(GoogleScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(GoogleScopesCol, database.TextArray[string](idpEvent.Scopes)),
 			},
-			crdb.WithTableSuffix(IDPTemplateGoogleSuffix),
+			handler.WithTableSuffix(IDPTemplateGoogleSuffix),
 		),
 	), nil
 }
@@ -1757,12 +1797,12 @@ func (p *idpTemplateProjection) reduceGoogleIDPChanged(event eventstore.Event) (
 	case *instance.GoogleIDPChangedEvent:
 		idpEvent = e.GoogleIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.GoogleIDPChangedEventType, instance.GoogleIDPChangedEventType})
 	}
 
-	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
 	ops = append(ops,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -1773,18 +1813,18 @@ func (p *idpTemplateProjection) reduceGoogleIDPChanged(event eventstore.Event) (
 	googleCols := reduceGoogleIDPChangedColumns(idpEvent)
 	if len(googleCols) > 0 {
 		ops = append(ops,
-			crdb.AddUpdateStatement(
+			handler.AddUpdateStatement(
 				googleCols,
 				[]handler.Condition{
 					handler.NewCond(GoogleIDCol, idpEvent.ID),
 					handler.NewCond(GoogleInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
-				crdb.WithTableSuffix(IDPTemplateGoogleSuffix),
+				handler.WithTableSuffix(IDPTemplateGoogleSuffix),
 			),
 		)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
 		ops...,
 	), nil
@@ -1801,12 +1841,12 @@ func (p *idpTemplateProjection) reduceLDAPIDPAdded(event eventstore.Event) (*han
 		idpEvent = e.LDAPIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPAddedEventType, instance.LDAPIDPAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPAddedEventType, instance.LDAPIDPAddedEventType})
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
@@ -1824,18 +1864,18 @@ func (p *idpTemplateProjection) reduceLDAPIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
 			},
 		),
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(LDAPIDCol, idpEvent.ID),
 				handler.NewCol(LDAPInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(LDAPServersCol, database.StringArray(idpEvent.Servers)),
+				handler.NewCol(LDAPServersCol, database.TextArray[string](idpEvent.Servers)),
 				handler.NewCol(LDAPStartTLSCol, idpEvent.StartTLS),
 				handler.NewCol(LDAPBaseDNCol, idpEvent.BaseDN),
 				handler.NewCol(LDAPBindDNCol, idpEvent.BindDN),
 				handler.NewCol(LDAPBindPasswordCol, idpEvent.BindPassword),
 				handler.NewCol(LDAPUserBaseCol, idpEvent.UserBase),
-				handler.NewCol(LDAPUserObjectClassesCol, database.StringArray(idpEvent.UserObjectClasses)),
-				handler.NewCol(LDAPUserFiltersCol, database.StringArray(idpEvent.UserFilters)),
+				handler.NewCol(LDAPUserObjectClassesCol, database.TextArray[string](idpEvent.UserObjectClasses)),
+				handler.NewCol(LDAPUserFiltersCol, database.TextArray[string](idpEvent.UserFilters)),
 				handler.NewCol(LDAPTimeoutCol, idpEvent.Timeout),
 				handler.NewCol(LDAPIDAttributeCol, idpEvent.IDAttribute),
 				handler.NewCol(LDAPFirstNameAttributeCol, idpEvent.FirstNameAttribute),
@@ -1851,7 +1891,7 @@ func (p *idpTemplateProjection) reduceLDAPIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(LDAPAvatarURLAttributeCol, idpEvent.AvatarURLAttribute),
 				handler.NewCol(LDAPProfileAttributeCol, idpEvent.ProfileAttribute),
 			},
-			crdb.WithTableSuffix(IDPTemplateLDAPSuffix),
+			handler.WithTableSuffix(IDPTemplateLDAPSuffix),
 		),
 	), nil
 }
@@ -1864,12 +1904,12 @@ func (p *idpTemplateProjection) reduceLDAPIDPChanged(event eventstore.Event) (*h
 	case *instance.LDAPIDPChangedEvent:
 		idpEvent = e.LDAPIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPChangedEventType, instance.LDAPIDPChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-p1582ks", "reduce.wrong.event.type %v", []eventstore.EventType{org.LDAPIDPChangedEventType, instance.LDAPIDPChangedEventType})
 	}
 
-	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
 	ops = append(ops,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -1881,18 +1921,109 @@ func (p *idpTemplateProjection) reduceLDAPIDPChanged(event eventstore.Event) (*h
 	ldapCols := reduceLDAPIDPChangedColumns(idpEvent)
 	if len(ldapCols) > 0 {
 		ops = append(ops,
-			crdb.AddUpdateStatement(
+			handler.AddUpdateStatement(
 				ldapCols,
 				[]handler.Condition{
 					handler.NewCond(LDAPIDCol, idpEvent.ID),
 					handler.NewCond(LDAPInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
-				crdb.WithTableSuffix(IDPTemplateLDAPSuffix),
+				handler.WithTableSuffix(IDPTemplateLDAPSuffix),
 			),
 		)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
+		&idpEvent,
+		ops...,
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.SAMLIDPAddedEvent
+	var idpOwnerType domain.IdentityProviderType
+	switch e := event.(type) {
+	case *org.SAMLIDPAddedEvent:
+		idpEvent = e.SAMLIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeOrg
+	case *instance.SAMLIDPAddedEvent:
+		idpEvent = e.SAMLIDPAddedEvent
+		idpOwnerType = domain.IdentityProviderTypeSystem
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPAddedEventType, instance.SAMLIDPAddedEventType})
+	}
+
+	return handler.NewMultiStatement(
+		&idpEvent,
+		handler.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateChangeDateCol, idpEvent.CreationDate()),
+				handler.NewCol(IDPTemplateSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTemplateResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
+				handler.NewCol(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(IDPTemplateStateCol, domain.IDPStateActive),
+				handler.NewCol(IDPTemplateNameCol, idpEvent.Name),
+				handler.NewCol(IDPTemplateOwnerTypeCol, idpOwnerType),
+				handler.NewCol(IDPTemplateTypeCol, domain.IDPTypeSAML),
+				handler.NewCol(IDPTemplateIsCreationAllowedCol, idpEvent.IsCreationAllowed),
+				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
+				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
+				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
+			},
+		),
+		handler.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(SAMLIDCol, idpEvent.ID),
+				handler.NewCol(SAMLInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				handler.NewCol(SAMLMetadataCol, idpEvent.Metadata),
+				handler.NewCol(SAMLKeyCol, idpEvent.Key),
+				handler.NewCol(SAMLCertificateCol, idpEvent.Certificate),
+				handler.NewCol(SAMLBindingCol, idpEvent.Binding),
+				handler.NewCol(SAMLWithSignedRequestCol, idpEvent.WithSignedRequest),
+			},
+			handler.WithTableSuffix(IDPTemplateSAMLSuffix),
+		),
+	), nil
+}
+
+func (p *idpTemplateProjection) reduceSAMLIDPChanged(event eventstore.Event) (*handler.Statement, error) {
+	var idpEvent idp.SAMLIDPChangedEvent
+	switch e := event.(type) {
+	case *org.SAMLIDPChangedEvent:
+		idpEvent = e.SAMLIDPChangedEvent
+	case *instance.SAMLIDPChangedEvent:
+		idpEvent = e.SAMLIDPChangedEvent
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-o7c0fii4ad", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPChangedEventType, instance.SAMLIDPChangedEventType})
+	}
+
+	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
+	ops = append(ops,
+		handler.AddUpdateStatement(
+			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
+			[]handler.Condition{
+				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
+				handler.NewCond(IDPTemplateInstanceIDCol, idpEvent.Aggregate().InstanceID),
+			},
+		),
+	)
+
+	SAMLCols := reduceSAMLIDPChangedColumns(idpEvent)
+	if len(SAMLCols) > 0 {
+		ops = append(ops,
+			handler.AddUpdateStatement(
+				SAMLCols,
+				[]handler.Condition{
+					handler.NewCond(SAMLIDCol, idpEvent.ID),
+					handler.NewCond(SAMLInstanceIDCol, idpEvent.Aggregate().InstanceID),
+				},
+				handler.WithTableSuffix(IDPTemplateSAMLSuffix),
+			),
+		)
+	}
+
+	return handler.NewMultiStatement(
 		&idpEvent,
 		ops...,
 	), nil
@@ -1909,12 +2040,12 @@ func (p *idpTemplateProjection) reduceAppleIDPAdded(event eventstore.Event) (*ha
 		idpEvent = e.AppleIDPAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SFvg3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPAddedEventType /*, instance.AppleIDPAddedEventType*/})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SFvg3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPAddedEventType /*, instance.AppleIDPAddedEventType*/})
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(IDPTemplateIDCol, idpEvent.ID),
 				handler.NewCol(IDPTemplateCreationDateCol, idpEvent.CreationDate()),
@@ -1932,7 +2063,7 @@ func (p *idpTemplateProjection) reduceAppleIDPAdded(event eventstore.Event) (*ha
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
 			},
 		),
-		crdb.AddCreateStatement(
+		handler.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(AppleIDCol, idpEvent.ID),
 				handler.NewCol(AppleInstanceIDCol, idpEvent.Aggregate().InstanceID),
@@ -1940,9 +2071,9 @@ func (p *idpTemplateProjection) reduceAppleIDPAdded(event eventstore.Event) (*ha
 				handler.NewCol(AppleTeamIDCol, idpEvent.TeamID),
 				handler.NewCol(AppleKeyIDCol, idpEvent.KeyID),
 				handler.NewCol(ApplePrivateKeyCol, idpEvent.PrivateKey),
-				handler.NewCol(AppleScopesCol, database.StringArray(idpEvent.Scopes)),
+				handler.NewCol(AppleScopesCol, database.TextArray[string](idpEvent.Scopes)),
 			},
-			crdb.WithTableSuffix(IDPTemplateAppleSuffix),
+			handler.WithTableSuffix(IDPTemplateAppleSuffix),
 		),
 	), nil
 }
@@ -1955,12 +2086,12 @@ func (p *idpTemplateProjection) reduceAppleIDPChanged(event eventstore.Event) (*
 	case *instance.AppleIDPChangedEvent:
 		idpEvent = e.AppleIDPChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-GBez3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPChangedEventType /*, instance.AppleIDPChangedEventType*/})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-GBez3", "reduce.wrong.event.type %v", []eventstore.EventType{org.AppleIDPChangedEventType /*, instance.AppleIDPChangedEventType*/})
 	}
 
-	ops := make([]func(eventstore.Event) crdb.Exec, 0, 2)
+	ops := make([]func(eventstore.Event) handler.Exec, 0, 2)
 	ops = append(ops,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			reduceIDPChangedTemplateColumns(idpEvent.Name, idpEvent.CreationDate(), idpEvent.Sequence(), idpEvent.OptionChanges),
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -1971,18 +2102,18 @@ func (p *idpTemplateProjection) reduceAppleIDPChanged(event eventstore.Event) (*
 	appleCols := reduceAppleIDPChangedColumns(idpEvent)
 	if len(appleCols) > 0 {
 		ops = append(ops,
-			crdb.AddUpdateStatement(
+			handler.AddUpdateStatement(
 				appleCols,
 				[]handler.Condition{
 					handler.NewCond(AppleIDCol, idpEvent.ID),
 					handler.NewCond(AppleInstanceIDCol, idpEvent.Aggregate().InstanceID),
 				},
-				crdb.WithTableSuffix(IDPTemplateAppleSuffix),
+				handler.WithTableSuffix(IDPTemplateAppleSuffix),
 			),
 		)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		&idpEvent,
 		ops...,
 	), nil
@@ -1996,10 +2127,10 @@ func (p *idpTemplateProjection) reduceIDPConfigRemoved(event eventstore.Event) (
 	case *instance.IDPConfigRemovedEvent:
 		idpEvent = e.IDPConfigRemovedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAFet", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAFet", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
 	}
 
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		&idpEvent,
 		[]handler.Condition{
 			handler.NewCond(IDPTemplateIDCol, idpEvent.ConfigID),
@@ -2016,10 +2147,10 @@ func (p *idpTemplateProjection) reduceIDPRemoved(event eventstore.Event) (*handl
 	case *instance.IDPRemovedEvent:
 		idpEvent = e.RemovedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-xbcvwin2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xbcvwin2", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPRemovedEventType, instance.IDPRemovedEventType})
 	}
 
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		&idpEvent,
 		[]handler.Condition{
 			handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -2031,10 +2162,10 @@ func (p *idpTemplateProjection) reduceIDPRemoved(event eventstore.Event) (*handl
 func (p *idpTemplateProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Jp0D2K", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Jp0D2K", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(IDPTemplateInstanceIDCol, e.Aggregate().InstanceID),
@@ -2067,7 +2198,7 @@ func reduceIDPChangedTemplateColumns(name *string, creationDate time.Time, seque
 }
 
 func reduceOAuthIDPChangedColumns(idpEvent idp.OAuthIDPChangedEvent) []handler.Column {
-	oauthCols := make([]handler.Column, 0, 6)
+	oauthCols := make([]handler.Column, 0, 7)
 	if idpEvent.ClientID != nil {
 		oauthCols = append(oauthCols, handler.NewCol(OAuthClientIDCol, *idpEvent.ClientID))
 	}
@@ -2084,7 +2215,7 @@ func reduceOAuthIDPChangedColumns(idpEvent idp.OAuthIDPChangedEvent) []handler.C
 		oauthCols = append(oauthCols, handler.NewCol(OAuthUserEndpointCol, *idpEvent.UserEndpoint))
 	}
 	if idpEvent.Scopes != nil {
-		oauthCols = append(oauthCols, handler.NewCol(OAuthScopesCol, database.StringArray(idpEvent.Scopes)))
+		oauthCols = append(oauthCols, handler.NewCol(OAuthScopesCol, database.TextArray[string](idpEvent.Scopes)))
 	}
 	if idpEvent.IDAttribute != nil {
 		oauthCols = append(oauthCols, handler.NewCol(OAuthIDAttributeCol, *idpEvent.IDAttribute))
@@ -2093,7 +2224,7 @@ func reduceOAuthIDPChangedColumns(idpEvent idp.OAuthIDPChangedEvent) []handler.C
 }
 
 func reduceOIDCIDPChangedColumns(idpEvent idp.OIDCIDPChangedEvent) []handler.Column {
-	oidcCols := make([]handler.Column, 0, 4)
+	oidcCols := make([]handler.Column, 0, 5)
 	if idpEvent.ClientID != nil {
 		oidcCols = append(oidcCols, handler.NewCol(OIDCClientIDCol, *idpEvent.ClientID))
 	}
@@ -2104,7 +2235,7 @@ func reduceOIDCIDPChangedColumns(idpEvent idp.OIDCIDPChangedEvent) []handler.Col
 		oidcCols = append(oidcCols, handler.NewCol(OIDCIssuerCol, *idpEvent.Issuer))
 	}
 	if idpEvent.Scopes != nil {
-		oidcCols = append(oidcCols, handler.NewCol(OIDCScopesCol, database.StringArray(idpEvent.Scopes)))
+		oidcCols = append(oidcCols, handler.NewCol(OIDCScopesCol, database.TextArray[string](idpEvent.Scopes)))
 	}
 	if idpEvent.IsIDTokenMapping != nil {
 		oidcCols = append(oidcCols, handler.NewCol(OIDCIDTokenMappingCol, *idpEvent.IsIDTokenMapping))
@@ -2138,7 +2269,7 @@ func reduceAzureADIDPChangedColumns(idpEvent idp.AzureADIDPChangedEvent) []handl
 		azureADCols = append(azureADCols, handler.NewCol(AzureADClientSecretCol, *idpEvent.ClientSecret))
 	}
 	if idpEvent.Scopes != nil {
-		azureADCols = append(azureADCols, handler.NewCol(AzureADScopesCol, database.StringArray(idpEvent.Scopes)))
+		azureADCols = append(azureADCols, handler.NewCol(AzureADScopesCol, database.TextArray[string](idpEvent.Scopes)))
 	}
 	if idpEvent.Tenant != nil {
 		azureADCols = append(azureADCols, handler.NewCol(AzureADTenantCol, *idpEvent.Tenant))
@@ -2158,7 +2289,7 @@ func reduceGitHubIDPChangedColumns(idpEvent idp.GitHubIDPChangedEvent) []handler
 		oauthCols = append(oauthCols, handler.NewCol(GitHubClientSecretCol, *idpEvent.ClientSecret))
 	}
 	if idpEvent.Scopes != nil {
-		oauthCols = append(oauthCols, handler.NewCol(GitHubScopesCol, database.StringArray(idpEvent.Scopes)))
+		oauthCols = append(oauthCols, handler.NewCol(GitHubScopesCol, database.TextArray[string](idpEvent.Scopes)))
 	}
 	return oauthCols
 }
@@ -2181,7 +2312,7 @@ func reduceGitHubEnterpriseIDPChangedColumns(idpEvent idp.GitHubEnterpriseIDPCha
 		oauthCols = append(oauthCols, handler.NewCol(GitHubEnterpriseUserEndpointCol, *idpEvent.UserEndpoint))
 	}
 	if idpEvent.Scopes != nil {
-		oauthCols = append(oauthCols, handler.NewCol(GitHubEnterpriseScopesCol, database.StringArray(idpEvent.Scopes)))
+		oauthCols = append(oauthCols, handler.NewCol(GitHubEnterpriseScopesCol, database.TextArray[string](idpEvent.Scopes)))
 	}
 	return oauthCols
 }
@@ -2195,7 +2326,7 @@ func reduceGitLabIDPChangedColumns(idpEvent idp.GitLabIDPChangedEvent) []handler
 		gitlabCols = append(gitlabCols, handler.NewCol(GitLabClientSecretCol, *idpEvent.ClientSecret))
 	}
 	if idpEvent.Scopes != nil {
-		gitlabCols = append(gitlabCols, handler.NewCol(GitLabScopesCol, database.StringArray(idpEvent.Scopes)))
+		gitlabCols = append(gitlabCols, handler.NewCol(GitLabScopesCol, database.TextArray[string](idpEvent.Scopes)))
 	}
 	return gitlabCols
 }
@@ -2212,7 +2343,7 @@ func reduceGitLabSelfHostedIDPChangedColumns(idpEvent idp.GitLabSelfHostedIDPCha
 		gitlabCols = append(gitlabCols, handler.NewCol(GitLabSelfHostedClientSecretCol, *idpEvent.ClientSecret))
 	}
 	if idpEvent.Scopes != nil {
-		gitlabCols = append(gitlabCols, handler.NewCol(GitLabSelfHostedScopesCol, database.StringArray(idpEvent.Scopes)))
+		gitlabCols = append(gitlabCols, handler.NewCol(GitLabSelfHostedScopesCol, database.TextArray[string](idpEvent.Scopes)))
 	}
 	return gitlabCols
 }
@@ -2226,15 +2357,15 @@ func reduceGoogleIDPChangedColumns(idpEvent idp.GoogleIDPChangedEvent) []handler
 		googleCols = append(googleCols, handler.NewCol(GoogleClientSecretCol, *idpEvent.ClientSecret))
 	}
 	if idpEvent.Scopes != nil {
-		googleCols = append(googleCols, handler.NewCol(GoogleScopesCol, database.StringArray(idpEvent.Scopes)))
+		googleCols = append(googleCols, handler.NewCol(GoogleScopesCol, database.TextArray[string](idpEvent.Scopes)))
 	}
 	return googleCols
 }
 
 func reduceLDAPIDPChangedColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Column {
-	ldapCols := make([]handler.Column, 0, 4)
+	ldapCols := make([]handler.Column, 0, 22)
 	if idpEvent.Servers != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPServersCol, database.StringArray(idpEvent.Servers)))
+		ldapCols = append(ldapCols, handler.NewCol(LDAPServersCol, database.TextArray[string](idpEvent.Servers)))
 	}
 	if idpEvent.StartTLS != nil {
 		ldapCols = append(ldapCols, handler.NewCol(LDAPStartTLSCol, *idpEvent.StartTLS))
@@ -2252,10 +2383,10 @@ func reduceLDAPIDPChangedColumns(idpEvent idp.LDAPIDPChangedEvent) []handler.Col
 		ldapCols = append(ldapCols, handler.NewCol(LDAPUserBaseCol, *idpEvent.UserBase))
 	}
 	if idpEvent.UserObjectClasses != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPUserObjectClassesCol, database.StringArray(idpEvent.UserObjectClasses)))
+		ldapCols = append(ldapCols, handler.NewCol(LDAPUserObjectClassesCol, database.TextArray[string](idpEvent.UserObjectClasses)))
 	}
 	if idpEvent.UserFilters != nil {
-		ldapCols = append(ldapCols, handler.NewCol(LDAPUserFiltersCol, database.StringArray(idpEvent.UserFilters)))
+		ldapCols = append(ldapCols, handler.NewCol(LDAPUserFiltersCol, database.TextArray[string](idpEvent.UserFilters)))
 	}
 	if idpEvent.Timeout != nil {
 		ldapCols = append(ldapCols, handler.NewCol(LDAPTimeoutCol, *idpEvent.Timeout))
@@ -2317,7 +2448,27 @@ func reduceAppleIDPChangedColumns(idpEvent idp.AppleIDPChangedEvent) []handler.C
 		appleCols = append(appleCols, handler.NewCol(ApplePrivateKeyCol, *idpEvent.PrivateKey))
 	}
 	if idpEvent.Scopes != nil {
-		appleCols = append(appleCols, handler.NewCol(AppleScopesCol, database.StringArray(idpEvent.Scopes)))
+		appleCols = append(appleCols, handler.NewCol(AppleScopesCol, database.TextArray[string](idpEvent.Scopes)))
 	}
 	return appleCols
+}
+
+func reduceSAMLIDPChangedColumns(idpEvent idp.SAMLIDPChangedEvent) []handler.Column {
+	SAMLCols := make([]handler.Column, 0, 5)
+	if idpEvent.Metadata != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLMetadataCol, idpEvent.Metadata))
+	}
+	if idpEvent.Key != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLKeyCol, idpEvent.Key))
+	}
+	if idpEvent.Certificate != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLCertificateCol, idpEvent.Certificate))
+	}
+	if idpEvent.Binding != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLBindingCol, *idpEvent.Binding))
+	}
+	if idpEvent.WithSignedRequest != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLWithSignedRequestCol, *idpEvent.WithSignedRequest))
+	}
+	return SAMLCols
 }

@@ -268,7 +268,8 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Supported Languages";
-            description: "The supported/default languages of the system will be returned by the language abbreviation."
+            description: "Use GetSupportedLanguages on the admin service instead."
+            deprecated: true;
             tags: "General";
             responses: {
                 key: "200"
@@ -1255,7 +1256,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor OTP";
-            description: "Remove the configured One-Time-Password (OTP) as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator.."
+            description: "Remove the configured One-Time-Password (OTP) as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator."
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -1287,6 +1288,68 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor U2F";
             description: "Remove the configured Universal-Second-Factor (U2F) as a factor from the user. U2F is a device-dependent factor like FingerPrint, Windows-Hello, etc."
+            tags: "Users";
+            tags: "User Human";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc RemoveHumanAuthFactorOTPSMS(RemoveHumanAuthFactorOTPSMSRequest) returns (RemoveHumanAuthFactorOTPSMSResponse) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/auth_factors/otp_sms"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Remove Multi-Factor OTP SMS";
+            description: "Remove the configured One-Time-Password (OTP) SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward."
+            tags: "Users";
+            tags: "User Human";
+            responses: {
+                key: "200"
+                value: {
+                    description: "OK";
+                }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
+        };
+    }
+
+    rpc RemoveHumanAuthFactorOTPEmail(RemoveHumanAuthFactorOTPEmailRequest) returns (RemoveHumanAuthFactorOTPEmailResponse) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/auth_factors/otp_email"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Remove Multi-Factor OTP SMS";
+            description: "Remove the configured One-Time-Password (OTP) Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward."
             tags: "Users";
             tags: "User Human";
             responses: {
@@ -6806,7 +6869,7 @@ service ManagementService {
         };
     }
 
-    // Add a new Azure AD identity provider in the organisation
+    // Add a new Azure AD identity provider in the organization
     rpc AddAzureADProvider(AddAzureADProviderRequest) returns (AddAzureADProviderResponse) {
         option (google.api.http) = {
             post: "/idps/azure"
@@ -6824,7 +6887,7 @@ service ManagementService {
         };
     }
 
-    // Change an existing Azure AD identity provider in the organisation
+    // Change an existing Azure AD identity provider in the organization
     rpc UpdateAzureADProvider(UpdateAzureADProviderRequest) returns (UpdateAzureADProviderResponse) {
         option (google.api.http) = {
             put: "/idps/azure/{id}"
@@ -7090,6 +7153,60 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Identity Providers";
             summary: "Update Apple Identity Provider";
+            description: "";
+        };
+    }
+
+    // Add a new SAML identity provider in the organization
+    rpc AddSAMLProvider(AddSAMLProviderRequest) returns (AddSAMLProviderResponse) {
+        option (google.api.http) = {
+            post: "/idps/saml"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Add SAML Identity Provider";
+            description: "";
+        };
+    }
+
+    // Change an existing SAML identity provider in the organization
+    rpc UpdateSAMLProvider(UpdateSAMLProviderRequest) returns (UpdateSAMLProviderResponse) {
+        option (google.api.http) = {
+            put: "/idps/saml/{id}"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Update SAML Identity Provider";
+            description: "";
+        };
+    }
+
+    // Regenerate certificate for an existing SAML identity provider in the organization
+    rpc RegenerateSAMLProviderCertificate(RegenerateSAMLProviderCertificateRequest) returns (RegenerateSAMLProviderCertificateResponse) {
+        option (google.api.http) = {
+            post: "/idps/saml/{id}/_generate_certificate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.idp.write"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Identity Providers";
+            summary: "Regenerate SAML Identity Provider Certificate";
             description: "";
         };
     }
@@ -7639,7 +7756,7 @@ message ImportHumanUserRequest {
         string value = 1 [
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 example: "\"$2y$12$hXUrnqdq1RIIYZ2HPytIIe5lXdIvbhqrTvdPsSF7o.jFh817Z6lwm\"";
-                description: "Encoded hash of a password in Modular Crypt Format: https://passlib.readthedocs.io/en/stable/modular_crypt_format.html"
+                description: "Encoded hash of a password in Modular Crypt Format: https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets"
             }
         ];
         reserved 2; // was algortithm, which is actually obtained from the encoded hash
@@ -8189,6 +8306,22 @@ message RemoveHumanAuthFactorU2FRequest {
 }
 
 message RemoveHumanAuthFactorU2FResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveHumanAuthFactorOTPSMSRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveHumanAuthFactorOTPSMSResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveHumanAuthFactorOTPEmailRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveHumanAuthFactorOTPEmailResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -10451,6 +10584,11 @@ message AddCustomLabelPolicyRequest {
         }
     ];
     bool disable_watermark = 11;
+    zitadel.policy.v1.ThemeMode theme_mode = 12 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "setting if there should be a restriction on which themes are available";
+        }
+    ];
 }
 
 message AddCustomLabelPolicyResponse {
@@ -10521,6 +10659,11 @@ message UpdateCustomLabelPolicyRequest {
         }
     ];
     bool disable_watermark = 11;
+    zitadel.policy.v1.ThemeMode theme_mode = 12 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "setting if there should be a restriction on which themes are available";
+        }
+    ];
 }
 
 message UpdateCustomLabelPolicyResponse {
@@ -10860,7 +11003,7 @@ message SetCustomVerifyEmailMessageTextRequest {
     string text = 6 [
         (validate.rules).string = {max_bytes: 40000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"A new email has been added. Please use the button below to verify your mail. (Code {{.Code}}) If you didn't add a new email, please ignore this email.\""
+            example: "\"A new email has been added. Please use the button below to verify your email. (Code {{.Code}}) If you didn't add a new email, please ignore this email.\""
             max_length: 10000;
         }
     ];
@@ -11705,7 +11848,7 @@ message AddGenericOAuthProviderRequest {
         }
     ];
     string client_secret = 3 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
+        (validate.rules).string = {min_len: 1, max_len: 1000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"client-secret\"";
             description: "Client secret generated by the identity provider";
@@ -11772,7 +11915,7 @@ message UpdateGenericOAuthProviderRequest {
     ];
     // client_secret will only be updated if provided
     string client_secret = 4 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_len: 1000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"client-secret\"";
             description: "Client secret will only be updated if provided";
@@ -11843,7 +11986,7 @@ message AddGenericOIDCProviderRequest {
         }
     ];
     string client_secret = 4 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
+        (validate.rules).string = {min_len: 1, max_len: 1000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"secret\"";
             description: "secret generated by the identity provider"
@@ -11894,7 +12037,7 @@ message UpdateGenericOIDCProviderRequest {
     ];
     // client_secret will only be updated if provided
     string client_secret = 5 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {max_len: 1000},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"secret\"";
             description: "client secret will only be updated if provided";
@@ -12482,6 +12625,86 @@ message UpdateLDAPProviderRequest {
 }
 
 message UpdateLDAPProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message AddSAMLProviderRequest {
+    string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    oneof metadata {
+        option (validate.required) = true;
+        bytes metadata_xml = 2 [
+            (validate.rules).bytes.max_len = 500000,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "Metadata of the SAML identity provider";
+            }
+        ];
+        string metadata_url = 3 [
+            (validate.rules).string.max_len = 200,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"https://test.com/saml/metadata\""
+                description: "Url to the metadata of the SAML identity provider";
+            }
+        ];
+    }
+    zitadel.idp.v1.SAMLBinding binding = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Binding which defines the type of communication with the identity provider";
+        }
+    ];
+    bool with_signed_request = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Boolean which defines if the authentication requests are signed";
+        }
+    ];
+    zitadel.idp.v1.Options provider_options = 6;
+}
+
+message AddSAMLProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateSAMLProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    oneof metadata {
+        option (validate.required) = true;
+        bytes metadata_xml = 3 [
+            (validate.rules).bytes.max_len = 500000,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                description: "Metadata of the SAML identity provider";
+            }
+        ];
+        string metadata_url = 4 [
+            (validate.rules).string.max_len = 200,
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"https://test.com/saml/metadata\""
+                description: "Url to the metadata of the SAML identity provider";
+            }
+        ];
+    }
+    zitadel.idp.v1.SAMLBinding binding = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Binding which defines the type of communication with the identity provider";
+        }
+    ];
+    bool with_signed_request = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Boolean which defines if the authentication requests are signed";
+        }
+    ];
+    zitadel.idp.v1.Options provider_options = 7;
+}
+
+message UpdateSAMLProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RegenerateSAMLProviderCertificateRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RegenerateSAMLProviderCertificateResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

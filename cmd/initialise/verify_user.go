@@ -1,13 +1,14 @@
 package initialise
 
 import (
-	"database/sql"
 	_ "embed"
 	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 func newUser() *cobra.Command {
@@ -33,8 +34,8 @@ The user provided by flags needs priviledge to
 	}
 }
 
-func VerifyUser(username, password string) func(*sql.DB) error {
-	return func(db *sql.DB) error {
+func VerifyUser(username, password string) func(*database.DB) error {
+	return func(db *database.DB) error {
 		logging.WithFields("username", username).Info("verify user")
 
 		if password != "" {

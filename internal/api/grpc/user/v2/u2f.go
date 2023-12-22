@@ -6,13 +6,13 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func (s *Server) RegisterU2F(ctx context.Context, req *user.RegisterU2FRequest) (*user.RegisterU2FResponse, error) {
 	return u2fRegistrationDetailsToPb(
-		s.command.RegisterUserU2F(ctx, req.GetUserId(), authz.GetCtxData(ctx).ResourceOwner, req.GetDomain()),
+		s.command.RegisterUserU2F(ctx, req.GetUserId(), authz.GetCtxData(ctx).OrgID, req.GetDomain()),
 	)
 }
 
@@ -29,10 +29,10 @@ func u2fRegistrationDetailsToPb(details *domain.WebAuthNRegistrationDetails, err
 }
 
 func (s *Server) VerifyU2FRegistration(ctx context.Context, req *user.VerifyU2FRegistrationRequest) (*user.VerifyU2FRegistrationResponse, error) {
-	resourceOwner := authz.GetCtxData(ctx).ResourceOwner
+	resourceOwner := authz.GetCtxData(ctx).OrgID
 	pkc, err := req.GetPublicKeyCredential().MarshalJSON()
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "USERv2-IeTh4", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "USERv2-IeTh4", "Errors.Internal")
 	}
 	objectDetails, err := s.command.HumanVerifyU2FSetup(ctx, req.GetUserId(), resourceOwner, req.GetTokenName(), "", pkc)
 	if err != nil {

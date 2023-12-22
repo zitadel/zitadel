@@ -6,6 +6,7 @@ import "zitadel/instance.proto";
 import "zitadel/member.proto";
 import "zitadel/quota.proto";
 import "zitadel/auth_n_key.proto";
+import "zitadel/feature.proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -114,7 +115,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.instance.read";
     };
   }
 
@@ -125,7 +126,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.instance.read";
     };
   }
 
@@ -139,7 +140,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.instance.write";
     };
   }
 
@@ -151,7 +152,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.instance.write";
     };
   }
 
@@ -164,7 +165,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.instance.write";
     };
   }
 
@@ -176,12 +177,13 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.instance.delete";
     };
   }
 
   //Returns all instance members matching the request
   // all queries need to match (ANDed)
+  // Deprecated: Use the Admin APIs ListIAMMembers instead
   rpc ListIAMMembers(ListIAMMembersRequest) returns (ListIAMMembersResponse) {
     option (google.api.http) = {
       post: "/instances/{instance_id}/members/_search";
@@ -189,11 +191,11 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.iam.member.read";
     };
   }
 
-  // Checks if a domain exists
+  //Checks if a domain exists
   rpc ExistsDomain(ExistsDomainRequest) returns (ExistsDomainResponse) {
     option (google.api.http) = {
       post: "/domains/{domain}/_exists";
@@ -201,11 +203,13 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.domain.read";
     };
   }
 
   // Returns the custom domains of an instance
+  //Checks if a domain exists
+  // Deprecated: Use the Admin APIs ListInstanceDomains on the admin API instead
   rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {
     option (google.api.http) = {
       post: "/instances/{instance_id}/domains/_search";
@@ -213,7 +217,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.domain.read";
     };
   }
 
@@ -225,7 +229,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.domain.write";
     };
   }
 
@@ -236,7 +240,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.domain.delete";
     };
   }
 
@@ -248,7 +252,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.domain.write";
     };
   }
 
@@ -262,7 +266,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.debug.read";
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -286,7 +290,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.debug.write";
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -310,7 +314,7 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.debug.read";
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -335,9 +339,8 @@ service SystemService {
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.debug.delete";
     };
-
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       tags: "failed events";
       responses: {
@@ -364,37 +367,126 @@ service SystemService {
   // Returns an error if the quota already exists for the specified unit
   // Deprecated: use SetQuota instead
   rpc AddQuota(AddQuotaRequest) returns (AddQuotaResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Usage Control", "Quotas"];
+    };
+
     option (google.api.http) = {
       post: "/instances/{instance_id}/quotas"
       body: "*"
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.quota.write";
     };
   }
 
   // Sets quota configuration properties
   // Creates a new quota if it doesn't exist for the specified unit
   rpc SetQuota(SetQuotaRequest) returns (SetQuotaResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Usage Control", "Quotas"];
+    };
+
     option (google.api.http) = {
       put: "/instances/{instance_id}/quotas"
       body: "*"
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.quota.write";
     };
   }
 
   // Removes a quota
   rpc RemoveQuota(RemoveQuotaRequest) returns (RemoveQuotaResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Usage Control", "Quotas"];
+    };
+
     option (google.api.http) = {
       delete: "/instances/{instance_id}/quotas/{unit}"
     };
 
     option (zitadel.v1.auth_option) = {
-      permission: "authenticated";
+      permission: "system.quota.delete";
+    };
+  }
+
+  // Set a feature flag on an instance
+  rpc SetInstanceFeature(SetInstanceFeatureRequest) returns (SetInstanceFeatureResponse) {
+    option (google.api.http) = {
+      put: "/instances/{instance_id}/features/{feature_id}"
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "system.feature.write";
+    };
+  }
+
+  // Sets instance level limits
+  rpc SetLimits(SetLimitsRequest) returns (SetLimitsResponse) {
+    option (google.api.http) = {
+      put: "/instances/{instance_id}/limits"
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "system.limits.write";
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Usage Control", "Limits"];
+      responses: {
+        key: "200";
+        value: {
+          description: "Instance limits set";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "At least one limit must be specified";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+
+  // Resets instance level limits
+  rpc ResetLimits(ResetLimitsRequest) returns (ResetLimitsResponse) {
+    option (google.api.http) = {
+      delete: "/instances/{instance_id}/limits"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "system.limits.delete";
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Usage Control", "Limits"];
+      responses: {
+        key: "200";
+        value: {
+          description: "Limits are reset to the system defaults";
+        };
+      };
+      responses: {
+        key: "404";
+        value: {
+          description: "Limits are already set to the system defaults";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
     };
   }
 }
@@ -670,6 +762,27 @@ message RemoveQuotaResponse {
   zitadel.v1.ObjectDetails details = 1;
 }
 
+message SetLimitsRequest {
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  google.protobuf.Duration audit_log_retention = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "auditLogRetention limits the number of events that can be queried via the events API by their age. A value of '0s' means that all events are available. If this value is set, it overwrites the system default.";
+    }
+  ];
+}
+
+message SetLimitsResponse {
+  zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetLimitsRequest {
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetLimitsResponse {
+  zitadel.v1.ObjectDetails details = 1;
+}
+
 message ExistsDomainRequest {
   string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -878,4 +991,19 @@ message FailedEvent {
       description: "The timestamp the failure last occurred";
     }
   ];
+}
+
+message SetInstanceFeatureRequest {
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  zitadel.feature.v1.InstanceFeature feature_id = 2 [(validate.rules).enum = {not_in: 0, defined_only: true}];
+  // value based on the feature type
+  oneof value {
+    option (validate.required) = true;
+
+    bool bool = 3;
+  }
+}
+
+message SetInstanceFeatureResponse {
+  zitadel.v1.ObjectDetails details = 1;
 }

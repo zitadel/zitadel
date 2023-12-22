@@ -26,7 +26,7 @@ type UniqueConstraintReadModel struct {
 }
 
 type commandProvider interface {
-	getOrgDomainPolicy(ctx context.Context, orgID string) (*domain.DomainPolicy, error)
+	domainPolicyWriteModel(ctx context.Context, orgID string) (*PolicyDomainWriteModel, error)
 }
 
 func NewUniqueConstraintReadModel(ctx context.Context, provider commandProvider) *UniqueConstraintReadModel {
@@ -114,21 +114,21 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 		case *project.RoleRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.Key, project.UniqueRoleType)
 		case *user.HumanAddedEvent:
-			policy, err := rm.commandProvider.getOrgDomainPolicy(rm.ctx, e.Aggregate().ResourceOwner)
+			policy, err := rm.commandProvider.domainPolicyWriteModel(rm.ctx, e.Aggregate().ResourceOwner)
 			if err != nil {
 				logging.Log("COMMAND-0k9Gs").WithError(err).Error("could not read policy for human added event unique constraint")
 				continue
 			}
 			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, policy.UserLoginMustBeDomain))
 		case *user.HumanRegisteredEvent:
-			policy, err := rm.commandProvider.getOrgDomainPolicy(rm.ctx, e.Aggregate().ResourceOwner)
+			policy, err := rm.commandProvider.domainPolicyWriteModel(rm.ctx, e.Aggregate().ResourceOwner)
 			if err != nil {
 				logging.Log("COMMAND-m9fod").WithError(err).Error("could not read policy for human registered event unique constraint")
 				continue
 			}
 			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, policy.UserLoginMustBeDomain))
 		case *user.MachineAddedEvent:
-			policy, err := rm.commandProvider.getOrgDomainPolicy(rm.ctx, e.Aggregate().ResourceOwner)
+			policy, err := rm.commandProvider.domainPolicyWriteModel(rm.ctx, e.Aggregate().ResourceOwner)
 			if err != nil {
 				logging.Log("COMMAND-2n8vs").WithError(err).Error("could not read policy for machine added event unique constraint")
 				continue
@@ -138,14 +138,14 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.UniqueUsername)
 			rm.listRemoveUniqueConstraint(e.Aggregate().ID, user.UniqueUserIDPLinkType)
 		case *user.UsernameChangedEvent:
-			policy, err := rm.commandProvider.getOrgDomainPolicy(rm.ctx, e.Aggregate().ResourceOwner)
+			policy, err := rm.commandProvider.domainPolicyWriteModel(rm.ctx, e.Aggregate().ResourceOwner)
 			if err != nil {
 				logging.Log("COMMAND-5n8gk").WithError(err).Error("could not read policy for username changed event unique constraint")
 				continue
 			}
 			rm.changeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, policy.UserLoginMustBeDomain))
 		case *user.DomainClaimedEvent:
-			policy, err := rm.commandProvider.getOrgDomainPolicy(rm.ctx, e.Aggregate().ResourceOwner)
+			policy, err := rm.commandProvider.domainPolicyWriteModel(rm.ctx, e.Aggregate().ResourceOwner)
 			if err != nil {
 				logging.Log("COMMAND-xb8uf").WithError(err).Error("could not read policy for domain claimed event unique constraint")
 				continue
@@ -183,7 +183,7 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.UserID, member.UniqueMember)
 		}
 	}
-	return nil
+	return rm.WriteModel.Reduce()
 }
 
 func (rm *UniqueConstraintReadModel) Query() *eventstore.SearchQueryBuilder {
@@ -256,7 +256,7 @@ func (rm *UniqueConstraintReadModel) getUniqueConstraint(aggregateID, objectID, 
 	return nil
 }
 
-func (rm *UniqueConstraintReadModel) addUniqueConstraint(aggregateID, objectID string, constraint *eventstore.EventUniqueConstraint) {
+func (rm *UniqueConstraintReadModel) addUniqueConstraint(aggregateID, objectID string, constraint *eventstore.UniqueConstraint) {
 	migrateUniqueConstraint := &domain.UniqueConstraintMigration{
 		AggregateID:  aggregateID,
 		ObjectID:     objectID,
@@ -267,7 +267,7 @@ func (rm *UniqueConstraintReadModel) addUniqueConstraint(aggregateID, objectID s
 	rm.UniqueConstraints = append(rm.UniqueConstraints, migrateUniqueConstraint)
 }
 
-func (rm *UniqueConstraintReadModel) changeUniqueConstraint(aggregateID, objectID string, constraint *eventstore.EventUniqueConstraint) {
+func (rm *UniqueConstraintReadModel) changeUniqueConstraint(aggregateID, objectID string, constraint *eventstore.UniqueConstraint) {
 	for i, uniqueConstraint := range rm.UniqueConstraints {
 		if uniqueConstraint.AggregateID == aggregateID && uniqueConstraint.ObjectID == objectID && uniqueConstraint.UniqueType == constraint.UniqueType {
 			rm.UniqueConstraints[i] = &domain.UniqueConstraintMigration{

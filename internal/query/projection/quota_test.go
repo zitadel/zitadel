@@ -10,12 +10,11 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestQuotasProjection_reduces(t *testing.T) {
@@ -32,7 +31,7 @@ func TestQuotasProjection_reduces(t *testing.T) {
 			name: "reduceQuotaSet with added type",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(quota.AddedEventType),
+					quota.AddedEventType,
 					quota.AggregateType,
 					[]byte(`{
 							"unit": 1,
@@ -45,9 +44,8 @@ func TestQuotasProjection_reduces(t *testing.T) {
 			},
 			reduce: (&quotaProjection{}).reduceQuotaSet,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("quota"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("quota"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -70,7 +68,7 @@ func TestQuotasProjection_reduces(t *testing.T) {
 			name: "reduceQuotaAdded with added type and notification",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(quota.AddedEventType),
+					quota.AddedEventType,
 					quota.AggregateType,
 					[]byte(`{
 							"unit": 1,
@@ -91,9 +89,8 @@ func TestQuotasProjection_reduces(t *testing.T) {
 			},
 			reduce: (&quotaProjection{}).reduceQuotaSet,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("quota"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("quota"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -134,7 +131,7 @@ func TestQuotasProjection_reduces(t *testing.T) {
 			name: "reduceQuotaSet with set type",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(quota.SetEventType),
+					quota.SetEventType,
 					quota.AggregateType,
 					[]byte(`{
 							"unit": 1,
@@ -147,9 +144,8 @@ func TestQuotasProjection_reduces(t *testing.T) {
 			},
 			reduce: (&quotaProjection{}).reduceQuotaSet,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("quota"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("quota"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -172,7 +168,7 @@ func TestQuotasProjection_reduces(t *testing.T) {
 			name: "reduceQuotaAdded with set type and notification",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(quota.SetEventType),
+					quota.SetEventType,
 					quota.AggregateType,
 					[]byte(`{
 							"unit": 1,
@@ -193,9 +189,8 @@ func TestQuotasProjection_reduces(t *testing.T) {
 			},
 			reduce: (&quotaProjection{}).reduceQuotaSet,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("quota"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("quota"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -236,7 +231,7 @@ func TestQuotasProjection_reduces(t *testing.T) {
 			name: "reduceQuotaNotificationDue",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(quota.NotificationDueEventType),
+					quota.NotificationDueEventType,
 					quota.AggregateType,
 					[]byte(`{
 							"id": "id",
@@ -250,9 +245,8 @@ func TestQuotasProjection_reduces(t *testing.T) {
 			},
 			reduce: (&quotaProjection{}).reduceQuotaNotificationDue,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("quota"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("quota"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -273,7 +267,7 @@ func TestQuotasProjection_reduces(t *testing.T) {
 			name: "reduceQuotaRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(quota.RemovedEventType),
+					quota.RemovedEventType,
 					quota.AggregateType,
 					[]byte(`{
 							"unit": 1
@@ -282,9 +276,8 @@ func TestQuotasProjection_reduces(t *testing.T) {
 			},
 			reduce: (&quotaProjection{}).reduceQuotaRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("quota"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("quota"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -315,7 +308,7 @@ func TestQuotasProjection_reduces(t *testing.T) {
 			name: "reduceInstanceRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
+					instance.InstanceRemovedEventType,
 					instance.AggregateType,
 					[]byte(`{
 							"name": "name"
@@ -324,9 +317,8 @@ func TestQuotasProjection_reduces(t *testing.T) {
 			},
 			reduce: (&quotaProjection{}).reduceInstanceRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -356,7 +348,7 @@ func TestQuotasProjection_reduces(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			event := baseEvent(t)
 			got, err := tt.reduce(event)
-			if !errors.IsErrorInvalidArgument(err) {
+			if !zerrors.IsErrorInvalidArgument(err) {
 				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
 			}
 			event = tt.args.event(t)

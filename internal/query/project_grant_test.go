@@ -10,27 +10,27 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
-	projectGrantsQuery = `SELECT projections.project_grants3.project_id,` +
-		` projections.project_grants3.grant_id,` +
-		` projections.project_grants3.creation_date,` +
-		` projections.project_grants3.change_date,` +
-		` projections.project_grants3.resource_owner,` +
-		` projections.project_grants3.state,` +
-		` projections.project_grants3.sequence,` +
-		` projections.projects3.name,` +
-		` projections.project_grants3.granted_org_id,` +
+	projectGrantsQuery = `SELECT projections.project_grants4.project_id,` +
+		` projections.project_grants4.grant_id,` +
+		` projections.project_grants4.creation_date,` +
+		` projections.project_grants4.change_date,` +
+		` projections.project_grants4.resource_owner,` +
+		` projections.project_grants4.state,` +
+		` projections.project_grants4.sequence,` +
+		` projections.projects4.name,` +
+		` projections.project_grants4.granted_org_id,` +
 		` o.name,` +
-		` projections.project_grants3.granted_role_keys,` +
+		` projections.project_grants4.granted_role_keys,` +
 		` r.name,` +
 		` COUNT(*) OVER () ` +
-		` FROM projections.project_grants3 ` +
-		` LEFT JOIN projections.projects3 ON projections.project_grants3.project_id = projections.projects3.id AND projections.project_grants3.instance_id = projections.projects3.instance_id ` +
-		` LEFT JOIN projections.orgs1 AS r ON projections.project_grants3.resource_owner = r.id AND projections.project_grants3.instance_id = r.instance_id` +
-		` LEFT JOIN projections.orgs1 AS o ON projections.project_grants3.granted_org_id = o.id AND projections.project_grants3.instance_id = o.instance_id` +
+		` FROM projections.project_grants4 ` +
+		` LEFT JOIN projections.projects4 ON projections.project_grants4.project_id = projections.projects4.id AND projections.project_grants4.instance_id = projections.projects4.instance_id ` +
+		` LEFT JOIN projections.orgs1 AS r ON projections.project_grants4.resource_owner = r.id AND projections.project_grants4.instance_id = r.instance_id` +
+		` LEFT JOIN projections.orgs1 AS o ON projections.project_grants4.granted_org_id = o.id AND projections.project_grants4.instance_id = o.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	projectGrantsCols = []string{
 		"project_id",
@@ -47,22 +47,22 @@ var (
 		"name",
 		"count",
 	}
-	projectGrantQuery = `SELECT projections.project_grants3.project_id,` +
-		` projections.project_grants3.grant_id,` +
-		` projections.project_grants3.creation_date,` +
-		` projections.project_grants3.change_date,` +
-		` projections.project_grants3.resource_owner,` +
-		` projections.project_grants3.state,` +
-		` projections.project_grants3.sequence,` +
-		` projections.projects3.name,` +
-		` projections.project_grants3.granted_org_id,` +
+	projectGrantQuery = `SELECT projections.project_grants4.project_id,` +
+		` projections.project_grants4.grant_id,` +
+		` projections.project_grants4.creation_date,` +
+		` projections.project_grants4.change_date,` +
+		` projections.project_grants4.resource_owner,` +
+		` projections.project_grants4.state,` +
+		` projections.project_grants4.sequence,` +
+		` projections.projects4.name,` +
+		` projections.project_grants4.granted_org_id,` +
 		` o.name,` +
-		` projections.project_grants3.granted_role_keys,` +
+		` projections.project_grants4.granted_role_keys,` +
 		` r.name` +
-		` FROM projections.project_grants3 ` +
-		` LEFT JOIN projections.projects3 ON projections.project_grants3.project_id = projections.projects3.id AND projections.project_grants3.instance_id = projections.projects3.instance_id ` +
-		` LEFT JOIN projections.orgs1 AS r ON projections.project_grants3.resource_owner = r.id AND projections.project_grants3.instance_id = r.instance_id` +
-		` LEFT JOIN projections.orgs1 AS o ON projections.project_grants3.granted_org_id = o.id AND projections.project_grants3.instance_id = o.instance_id` +
+		` FROM projections.project_grants4 ` +
+		` LEFT JOIN projections.projects4 ON projections.project_grants4.project_id = projections.projects4.id AND projections.project_grants4.instance_id = projections.projects4.instance_id ` +
+		` LEFT JOIN projections.orgs1 AS r ON projections.project_grants4.resource_owner = r.id AND projections.project_grants4.instance_id = r.instance_id` +
+		` LEFT JOIN projections.orgs1 AS o ON projections.project_grants4.granted_org_id = o.id AND projections.project_grants4.instance_id = o.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	projectGrantCols = []string{
 		"project_id",
@@ -122,7 +122,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 							"project-name",
 							"org-id",
 							"org-name",
-							database.StringArray{"role-key"},
+							database.TextArray[string]{"role-key"},
 							"ro-name",
 						},
 					},
@@ -144,7 +144,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 						ProjectName:       "project-name",
 						GrantedOrgID:      "org-id",
 						OrgName:           "org-name",
-						GrantedRoleKeys:   database.StringArray{"role-key"},
+						GrantedRoleKeys:   database.TextArray[string]{"role-key"},
 						ResourceOwnerName: "ro-name",
 					},
 				},
@@ -169,7 +169,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 							nil,
 							"org-id",
 							"org-name",
-							database.StringArray{"role-key"},
+							database.TextArray[string]{"role-key"},
 							"ro-name",
 						},
 					},
@@ -191,7 +191,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 						ProjectName:       "",
 						GrantedOrgID:      "org-id",
 						OrgName:           "org-name",
-						GrantedRoleKeys:   database.StringArray{"role-key"},
+						GrantedRoleKeys:   database.TextArray[string]{"role-key"},
 						ResourceOwnerName: "ro-name",
 					},
 				},
@@ -216,7 +216,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 							"project-name",
 							"org-id",
 							nil,
-							database.StringArray{"role-key"},
+							database.TextArray[string]{"role-key"},
 							"ro-name",
 						},
 					},
@@ -238,7 +238,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 						ProjectName:       "project-name",
 						GrantedOrgID:      "org-id",
 						OrgName:           "",
-						GrantedRoleKeys:   database.StringArray{"role-key"},
+						GrantedRoleKeys:   database.TextArray[string]{"role-key"},
 						ResourceOwnerName: "ro-name",
 					},
 				},
@@ -263,7 +263,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 							"project-name",
 							"org-id",
 							"org-name",
-							database.StringArray{"role-key"},
+							database.TextArray[string]{"role-key"},
 							nil,
 						},
 					},
@@ -285,7 +285,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 						ProjectName:       "project-name",
 						GrantedOrgID:      "org-id",
 						OrgName:           "org-name",
-						GrantedRoleKeys:   database.StringArray{"role-key"},
+						GrantedRoleKeys:   database.TextArray[string]{"role-key"},
 						ResourceOwnerName: "",
 					},
 				},
@@ -310,7 +310,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 							"project-name",
 							"org-id",
 							"org-name",
-							database.StringArray{"role-key"},
+							database.TextArray[string]{"role-key"},
 							"ro-name",
 						},
 						{
@@ -324,7 +324,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 							"project-name",
 							"org-id",
 							"org-name",
-							database.StringArray{"role-key"},
+							database.TextArray[string]{"role-key"},
 							"ro-name",
 						},
 					},
@@ -346,7 +346,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 						ProjectName:       "project-name",
 						GrantedOrgID:      "org-id",
 						OrgName:           "org-name",
-						GrantedRoleKeys:   database.StringArray{"role-key"},
+						GrantedRoleKeys:   database.TextArray[string]{"role-key"},
 						ResourceOwnerName: "ro-name",
 					},
 					{
@@ -360,7 +360,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 						ProjectName:       "project-name",
 						GrantedOrgID:      "org-id",
 						OrgName:           "org-name",
-						GrantedRoleKeys:   database.StringArray{"role-key"},
+						GrantedRoleKeys:   database.TextArray[string]{"role-key"},
 						ResourceOwnerName: "ro-name",
 					},
 				},
@@ -393,7 +393,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -419,7 +419,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 						"project-name",
 						"org-id",
 						"org-name",
-						database.StringArray{"role-key"},
+						database.TextArray[string]{"role-key"},
 						"ro-name",
 					},
 				),
@@ -435,7 +435,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 				ProjectName:       "project-name",
 				GrantedOrgID:      "org-id",
 				OrgName:           "org-name",
-				GrantedRoleKeys:   database.StringArray{"role-key"},
+				GrantedRoleKeys:   database.TextArray[string]{"role-key"},
 				ResourceOwnerName: "ro-name",
 			},
 		},
@@ -457,7 +457,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 						"project-name",
 						"org-id",
 						nil,
-						database.StringArray{"role-key"},
+						database.TextArray[string]{"role-key"},
 						"ro-name",
 					},
 				),
@@ -473,7 +473,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 				ProjectName:       "project-name",
 				GrantedOrgID:      "org-id",
 				OrgName:           "",
-				GrantedRoleKeys:   database.StringArray{"role-key"},
+				GrantedRoleKeys:   database.TextArray[string]{"role-key"},
 				ResourceOwnerName: "ro-name",
 			},
 		},
@@ -495,7 +495,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 						"project-name",
 						"org-id",
 						"org-name",
-						database.StringArray{"role-key"},
+						database.TextArray[string]{"role-key"},
 						nil,
 					},
 				),
@@ -511,7 +511,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 				ProjectName:       "project-name",
 				GrantedOrgID:      "org-id",
 				OrgName:           "org-name",
-				GrantedRoleKeys:   database.StringArray{"role-key"},
+				GrantedRoleKeys:   database.TextArray[string]{"role-key"},
 				ResourceOwnerName: "",
 			},
 		},
@@ -533,7 +533,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 						nil,
 						"org-id",
 						"org-name",
-						database.StringArray{"role-key"},
+						database.TextArray[string]{"role-key"},
 						"ro-name",
 					},
 				),
@@ -549,7 +549,7 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 				ProjectName:       "",
 				GrantedOrgID:      "org-id",
 				OrgName:           "org-name",
-				GrantedRoleKeys:   database.StringArray{"role-key"},
+				GrantedRoleKeys:   database.TextArray[string]{"role-key"},
 				ResourceOwnerName: "ro-name",
 			},
 		},

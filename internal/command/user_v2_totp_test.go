@@ -5,20 +5,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/pquerna/otp/totp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_AddUserTOTP(t *testing.T) {
@@ -45,7 +44,7 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 				userID:        "foo",
 				resourceowner: "org1",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
 		},
 		{
 			name: "create otp error",
@@ -59,7 +58,7 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 					expectFilter(),
 				),
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-MM9fs", "Errors.User.NotFound"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SqyJz", "Errors.User.NotFound"),
 		},
 		{
 			name: "push error",
@@ -105,9 +104,9 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 						),
 					),
 					expectFilter(),
-					expectRandomPushFailed(io.ErrClosedPipe, []*repository.Event{eventFromEventPusher(
+					expectRandomPushFailed(io.ErrClosedPipe, []eventstore.Command{
 						user.NewHumanOTPAddedEvent(ctx, userAgg, nil),
-					)}),
+					}),
 				),
 			},
 			wantErr: io.ErrClosedPipe,
@@ -156,9 +155,9 @@ func TestCommands_AddUserTOTP(t *testing.T) {
 						),
 					),
 					expectFilter(),
-					expectRandomPush([]*repository.Event{eventFromEventPusher(
+					expectRandomPush([]eventstore.Command{
 						user.NewHumanOTPAddedEvent(ctx, userAgg, nil),
-					)}),
+					}),
 				),
 			},
 			want: true,
@@ -218,7 +217,7 @@ func TestCommands_CheckUserTOTP(t *testing.T) {
 			args: args{
 				userID: "foo",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
 		},
 		{
 			name: "success",
@@ -230,9 +229,9 @@ func TestCommands_CheckUserTOTP(t *testing.T) {
 							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
 						),
 					),
-					expectPush([]*repository.Event{eventFromEventPusher(
+					expectPush(
 						user.NewHumanOTPVerifiedEvent(ctx, userAgg, ""),
-					)}),
+					),
 				),
 			},
 			args: args{

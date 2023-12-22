@@ -10,13 +10,12 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestAddOIDCApp(t *testing.T) {
@@ -57,7 +56,7 @@ func TestAddOIDCApp(t *testing.T) {
 				},
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-NnavI", "Errors.Invalid.Argument"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "PROJE-NnavI", "Errors.Invalid.Argument"),
 			},
 		},
 		{
@@ -79,7 +78,7 @@ func TestAddOIDCApp(t *testing.T) {
 				},
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-Fef31", "Errors.Invalid.Argument"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "PROJE-Fef31", "Errors.Invalid.Argument"),
 			},
 		},
 		{
@@ -106,7 +105,7 @@ func TestAddOIDCApp(t *testing.T) {
 					Filter(),
 			},
 			want: Want{
-				CreateErr: errors.ThrowNotFound(nil, "PROJE-6swVG", ""),
+				CreateErr: zerrors.ThrowNotFound(nil, "PROJE-6swVG", ""),
 			},
 		},
 		{
@@ -224,7 +223,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -247,7 +246,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -277,7 +276,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -294,44 +293,37 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewApplicationAddedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"app1",
-									"app",
-								),
-							),
-							eventFromEventPusher(
-								project.NewOIDCConfigAddedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									domain.OIDCVersionV1,
-									"app1",
-									"client1@project",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									[]string{"https://test.ch"},
-									[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
-									[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
-									domain.OIDCApplicationTypeWeb,
-									domain.OIDCAuthMethodTypePost,
-									[]string{"https://test.ch/logout"},
-									true,
-									domain.OIDCTokenTypeBearer,
-									true,
-									true,
-									true,
-									time.Second*1,
-									[]string{"https://sub.test.ch"},
-									true,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewAddApplicationUniqueConstraint("app", "project1")),
+						project.NewApplicationAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"app",
+						),
+						project.NewOIDCConfigAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							domain.OIDCVersionV1,
+							"app1",
+							"client1@project",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							[]string{"https://test.ch"},
+							[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+							[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+							domain.OIDCApplicationTypeWeb,
+							domain.OIDCAuthMethodTypePost,
+							[]string{"https://test.ch/logout"},
+							true,
+							domain.OIDCTokenTypeBearer,
+							true,
+							true,
+							true,
+							time.Second*1,
+							[]string{"https://sub.test.ch"},
+							true,
+						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1"),
@@ -450,7 +442,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -474,7 +466,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -498,7 +490,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -523,7 +515,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -597,7 +589,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -643,14 +635,10 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newOIDCAppChangedEvent(context.Background(),
-									"app1",
-									"project1",
-									"org1"),
-							),
-						},
+						newOIDCAppChangedEvent(context.Background(),
+							"app1",
+							"project1",
+							"org1"),
 					),
 				),
 			},
@@ -763,7 +751,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -780,7 +768,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -798,7 +786,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -844,19 +832,16 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewOIDCConfigSecretChangedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"app1",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									}),
-							),
-						},
+						project.NewOIDCConfigSecretChangedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+						),
 					),
 				),
 			},

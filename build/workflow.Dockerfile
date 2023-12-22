@@ -103,7 +103,7 @@ COPY --from=core-assets /go/src/github.com/zitadel/zitadel/internal ./internal
 # #######################################
 # download console dependencies
 # #######################################
-FROM node:18-buster AS console-deps
+FROM node:20-buster AS console-deps
 
 WORKDIR /zitadel/console
 
@@ -115,7 +115,7 @@ RUN yarn install --frozen-lockfile
 # #######################################
 # generate console client
 # #######################################
-FROM node:18-buster AS console-client
+FROM node:20-buster AS console-client
 
 WORKDIR /zitadel/console
 

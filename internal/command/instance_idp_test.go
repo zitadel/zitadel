@@ -6,20 +6,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	openid "github.com/zitadel/oidc/v2/pkg/oidc"
+	openid "github.com/zitadel/oidc/v3/pkg/oidc"
+	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
@@ -55,7 +54,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D32ef", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-D32ef", ""))
 				},
 			},
 		},
@@ -73,7 +72,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dbgzf", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Dbgzf", ""))
 				},
 			},
 		},
@@ -92,7 +91,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DF4ga", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-DF4ga", ""))
 				},
 			},
 		},
@@ -112,7 +111,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-B23bs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-B23bs", ""))
 				},
 			},
 		},
@@ -133,7 +132,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D2gj8", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-D2gj8", ""))
 				},
 			},
 		},
@@ -155,7 +154,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Fb8jk", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Fb8jk", ""))
 				},
 			},
 		},
@@ -178,7 +177,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdf3f", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sdf3f", ""))
 				},
 			},
 		},
@@ -188,27 +187,23 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewOAuthIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									"auth",
-									"token",
-									"user",
-									"idAttribute",
-									nil,
-									idp.Options{},
-								)),
-						},
+						instance.NewOAuthIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							"auth",
+							"token",
+							"user",
+							"idAttribute",
+							nil,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -237,32 +232,28 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewOAuthIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									"auth",
-									"token",
-									"user",
-									"idAttribute",
-									[]string{"user"},
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewOAuthIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							"auth",
+							"token",
+							"user",
+							"idAttribute",
+							[]string{"user"},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -346,7 +337,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAffg", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SAffg", ""))
 				},
 			},
 		},
@@ -362,7 +353,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Sf3gh", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Sf3gh", ""))
 				},
 			},
 		},
@@ -380,7 +371,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SHJ3ui", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SHJ3ui", ""))
 				},
 			},
 		},
@@ -399,7 +390,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SVrgh", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SVrgh", ""))
 				},
 			},
 		},
@@ -419,7 +410,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DJKeio", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-DJKeio", ""))
 				},
 			},
 		},
@@ -440,7 +431,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-ILSJi", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-ILSJi", ""))
 				},
 			},
 		},
@@ -462,7 +453,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-JKD3h", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-JKD3h", ""))
 				},
 			},
 		},
@@ -486,7 +477,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -556,39 +547,34 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewOAuthIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.OAuthIDPChanges{
-											idp.ChangeOAuthName("new name"),
-											idp.ChangeOAuthClientID("clientID2"),
-											idp.ChangeOAuthClientSecret(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("newSecret"),
-											}),
-											idp.ChangeOAuthAuthorizationEndpoint("new auth"),
-											idp.ChangeOAuthTokenEndpoint("new token"),
-											idp.ChangeOAuthUserEndpoint("new user"),
-											idp.ChangeOAuthScopes([]string{"openid", "profile"}),
-											idp.ChangeOAuthIDAttribute("newAttribute"),
-											idp.ChangeOAuthOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewOAuthIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.OAuthIDPChanges{
+									idp.ChangeOAuthName("new name"),
+									idp.ChangeOAuthClientID("clientID2"),
+									idp.ChangeOAuthClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeOAuthAuthorizationEndpoint("new auth"),
+									idp.ChangeOAuthTokenEndpoint("new token"),
+									idp.ChangeOAuthUserEndpoint("new user"),
+									idp.ChangeOAuthScopes([]string{"openid", "profile"}),
+									idp.ChangeOAuthIDAttribute("newAttribute"),
+									idp.ChangeOAuthOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -671,7 +657,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Sgtj5", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Sgtj5", ""))
 				},
 			},
 		},
@@ -689,7 +675,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Hz6zj", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Hz6zj", ""))
 				},
 			},
 		},
@@ -708,7 +694,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-fb5jm", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-fb5jm", ""))
 				},
 			},
 		},
@@ -728,7 +714,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Sfdf4", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Sfdf4", ""))
 				},
 			},
 		},
@@ -738,25 +724,21 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewOIDCIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"issuer",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									nil,
-									false,
-									idp.Options{},
-								)),
-						},
+						instance.NewOIDCIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"issuer",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							nil,
+							false,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -782,30 +764,26 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewOIDCIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"issuer",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									[]string{openid.ScopeOpenID},
-									true,
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewOIDCIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"issuer",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							[]string{openid.ScopeOpenID},
+							true,
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -887,7 +865,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAfd3", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SAfd3", ""))
 				},
 			},
 		},
@@ -903,7 +881,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dvf4f", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Dvf4f", ""))
 				},
 			},
 		},
@@ -921,7 +899,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-BDfr3", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-BDfr3", ""))
 				},
 			},
 		},
@@ -940,7 +918,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Db3bs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Db3bs", ""))
 				},
 			},
 		},
@@ -961,7 +939,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1024,37 +1002,32 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewOIDCIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.OIDCIDPChanges{
-											idp.ChangeOIDCName("new name"),
-											idp.ChangeOIDCIssuer("new issuer"),
-											idp.ChangeOIDCClientID("clientID2"),
-											idp.ChangeOIDCClientSecret(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("newSecret"),
-											}),
-											idp.ChangeOIDCScopes([]string{"openid", "profile"}),
-											idp.ChangeOIDCIsIDTokenMapping(true),
-											idp.ChangeOIDCOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewOIDCIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.OIDCIDPChanges{
+									idp.ChangeOIDCName("new name"),
+									idp.ChangeOIDCIssuer("new issuer"),
+									idp.ChangeOIDCClientID("clientID2"),
+									idp.ChangeOIDCClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeOIDCScopes([]string{"openid", "profile"}),
+									idp.ChangeOIDCIsIDTokenMapping(true),
+									idp.ChangeOIDCOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -1134,7 +1107,7 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdf3g", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sdf3g", ""))
 				},
 			},
 		},
@@ -1151,7 +1124,7 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Fhbr2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Fhbr2", ""))
 				},
 			},
 		},
@@ -1169,7 +1142,7 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dzh3g", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Dzh3g", ""))
 				},
 			},
 		},
@@ -1190,7 +1163,7 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1216,29 +1189,24 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									event := instance.NewOIDCIDPMigratedAzureADEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										"name",
-										"clientID",
-										&crypto.CryptoValue{
-											CryptoType: crypto.TypeEncryption,
-											Algorithm:  "enc",
-											KeyID:      "id",
-											Crypted:    []byte("clientSecret"),
-										},
-										nil,
-										"",
-										false,
-										idp.Options{},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							event := instance.NewOIDCIDPMigratedAzureADEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								nil,
+								"",
+								false,
+								idp.Options{},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -1279,34 +1247,29 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									event := instance.NewOIDCIDPMigratedAzureADEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										"name",
-										"clientID",
-										&crypto.CryptoValue{
-											CryptoType: crypto.TypeEncryption,
-											Algorithm:  "enc",
-											KeyID:      "id",
-											Crypted:    []byte("clientSecret"),
-										},
-										[]string{"openid"},
-										"tenant",
-										true,
-										idp.Options{
-											IsCreationAllowed: true,
-											IsLinkingAllowed:  true,
-											IsAutoCreation:    true,
-											IsAutoUpdate:      true,
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							event := instance.NewOIDCIDPMigratedAzureADEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								[]string{"openid"},
+								"tenant",
+								true,
+								idp.Options{
+									IsCreationAllowed: true,
+									IsLinkingAllowed:  true,
+									IsAutoCreation:    true,
+									IsAutoUpdate:      true,
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -1385,7 +1348,7 @@ func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D3fvs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-D3fvs", ""))
 				},
 			},
 		},
@@ -1402,7 +1365,7 @@ func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-W2vqs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-W2vqs", ""))
 				},
 			},
 		},
@@ -1422,7 +1385,7 @@ func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1448,23 +1411,19 @@ func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewOIDCIDPMigratedGoogleEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									nil,
-									idp.Options{},
-								)),
-						},
+						instance.NewOIDCIDPMigratedGoogleEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							nil,
+							idp.Options{},
+						),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -1504,28 +1463,24 @@ func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewOIDCIDPMigratedGoogleEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									[]string{"openid"},
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewOIDCIDPMigratedGoogleEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							[]string{"openid"},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -1603,7 +1558,7 @@ func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdf3g", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sdf3g", ""))
 				},
 			},
 		},
@@ -1621,7 +1576,7 @@ func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Fhbr2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Fhbr2", ""))
 				},
 			},
 		},
@@ -1640,7 +1595,7 @@ func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dzh3g", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Dzh3g", ""))
 				},
 			},
 		},
@@ -1650,25 +1605,21 @@ func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewAzureADIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									nil,
-									"",
-									false,
-									idp.Options{},
-								)),
-						},
+						instance.NewAzureADIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							nil,
+							"",
+							false,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -1693,30 +1644,26 @@ func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewAzureADIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									[]string{"openid"},
-									"tenant",
-									true,
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewAzureADIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							[]string{"openid"},
+							"tenant",
+							true,
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -1798,7 +1745,7 @@ func TestCommandSide_UpdateInstanceAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAgh2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SAgh2", ""))
 				},
 			},
 		},
@@ -1814,7 +1761,7 @@ func TestCommandSide_UpdateInstanceAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-fh3h1", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-fh3h1", ""))
 				},
 			},
 		},
@@ -1832,7 +1779,7 @@ func TestCommandSide_UpdateInstanceAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-dmitg", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-dmitg", ""))
 				},
 			},
 		},
@@ -1852,7 +1799,7 @@ func TestCommandSide_UpdateInstanceAzureADIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1914,37 +1861,32 @@ func TestCommandSide_UpdateInstanceAzureADIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewAzureADIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.AzureADIDPChanges{
-											idp.ChangeAzureADName("new name"),
-											idp.ChangeAzureADClientID("new clientID"),
-											idp.ChangeAzureADClientSecret(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("new clientSecret"),
-											}),
-											idp.ChangeAzureADScopes([]string{"openid", "profile"}),
-											idp.ChangeAzureADTenant("new tenant"),
-											idp.ChangeAzureADIsEmailVerified(true),
-											idp.ChangeAzureADOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewAzureADIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.AzureADIDPChanges{
+									idp.ChangeAzureADName("new name"),
+									idp.ChangeAzureADClientID("new clientID"),
+									idp.ChangeAzureADClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("new clientSecret"),
+									}),
+									idp.ChangeAzureADScopes([]string{"openid", "profile"}),
+									idp.ChangeAzureADTenant("new tenant"),
+									idp.ChangeAzureADIsEmailVerified(true),
+									idp.ChangeAzureADOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -2025,7 +1967,7 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Jdsgf", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Jdsgf", ""))
 				},
 			},
 		},
@@ -2043,7 +1985,7 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-dsgz3", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-dsgz3", ""))
 				},
 			},
 		},
@@ -2053,23 +1995,19 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGitHubIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									nil,
-									idp.Options{},
-								)),
-						},
+						instance.NewGitHubIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							nil,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -2093,28 +2031,24 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGitHubIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									[]string{"openid"},
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewGitHubIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							[]string{"openid"},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -2194,7 +2128,7 @@ func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdf4h", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sdf4h", ""))
 				},
 			},
 		},
@@ -2210,7 +2144,7 @@ func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-fdh5z", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-fdh5z", ""))
 				},
 			},
 		},
@@ -2229,7 +2163,7 @@ func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -2286,35 +2220,30 @@ func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewGitHubIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.GitHubIDPChanges{
-											idp.ChangeGitHubName("new name"),
-											idp.ChangeGitHubClientID("new clientID"),
-											idp.ChangeGitHubClientSecret(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("new clientSecret"),
-											}),
-											idp.ChangeGitHubScopes([]string{"openid", "profile"}),
-											idp.ChangeGitHubOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewGitHubIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.GitHubIDPChanges{
+									idp.ChangeGitHubName("new name"),
+									idp.ChangeGitHubClientID("new clientID"),
+									idp.ChangeGitHubClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("new clientSecret"),
+									}),
+									idp.ChangeGitHubScopes([]string{"openid", "profile"}),
+									idp.ChangeGitHubOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -2393,7 +2322,7 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dg4td", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Dg4td", ""))
 				},
 			},
 		},
@@ -2411,7 +2340,7 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-dgj53", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-dgj53", ""))
 				},
 			},
 		},
@@ -2430,7 +2359,7 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Ghjjs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Ghjjs", ""))
 				},
 			},
 		},
@@ -2450,7 +2379,7 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sani2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sani2", ""))
 				},
 			},
 		},
@@ -2471,7 +2400,7 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-agj42", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-agj42", ""))
 				},
 			},
 		},
@@ -2493,7 +2422,7 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sd5hn", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sd5hn", ""))
 				},
 			},
 		},
@@ -2503,26 +2432,22 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGitHubEnterpriseIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									"auth",
-									"token",
-									"user",
-									nil,
-									idp.Options{},
-								)),
-						},
+						instance.NewGitHubEnterpriseIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							"auth",
+							"token",
+							"user",
+							nil,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -2550,31 +2475,27 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGitHubEnterpriseIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									"auth",
-									"token",
-									"user",
-									[]string{"user"},
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewGitHubEnterpriseIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							"auth",
+							"token",
+							"user",
+							[]string{"user"},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -2657,7 +2578,7 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdfh3", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sdfh3", ""))
 				},
 			},
 		},
@@ -2673,7 +2594,7 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-shj42", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-shj42", ""))
 				},
 			},
 		},
@@ -2691,7 +2612,7 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdh73", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sdh73", ""))
 				},
 			},
 		},
@@ -2710,7 +2631,7 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-acx2w", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-acx2w", ""))
 				},
 			},
 		},
@@ -2730,7 +2651,7 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-dgj6q", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-dgj6q", ""))
 				},
 			},
 		},
@@ -2751,7 +2672,7 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-ybj62", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-ybj62", ""))
 				},
 			},
 		},
@@ -2774,7 +2695,7 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -2841,38 +2762,33 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewGitHubEnterpriseIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.GitHubEnterpriseIDPChanges{
-											idp.ChangeGitHubEnterpriseName("new name"),
-											idp.ChangeGitHubEnterpriseClientID("clientID2"),
-											idp.ChangeGitHubEnterpriseClientSecret(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("newSecret"),
-											}),
-											idp.ChangeGitHubEnterpriseAuthorizationEndpoint("new auth"),
-											idp.ChangeGitHubEnterpriseTokenEndpoint("new token"),
-											idp.ChangeGitHubEnterpriseUserEndpoint("new user"),
-											idp.ChangeGitHubEnterpriseScopes([]string{"openid", "profile"}),
-											idp.ChangeGitHubEnterpriseOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewGitHubEnterpriseIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.GitHubEnterpriseIDPChanges{
+									idp.ChangeGitHubEnterpriseName("new name"),
+									idp.ChangeGitHubEnterpriseClientID("clientID2"),
+									idp.ChangeGitHubEnterpriseClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeGitHubEnterpriseAuthorizationEndpoint("new auth"),
+									idp.ChangeGitHubEnterpriseTokenEndpoint("new token"),
+									idp.ChangeGitHubEnterpriseUserEndpoint("new user"),
+									idp.ChangeGitHubEnterpriseScopes([]string{"openid", "profile"}),
+									idp.ChangeGitHubEnterpriseOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -2954,7 +2870,7 @@ func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-adsg2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-adsg2", ""))
 				},
 			},
 		},
@@ -2972,7 +2888,7 @@ func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GD1j2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-GD1j2", ""))
 				},
 			},
 		},
@@ -2982,23 +2898,19 @@ func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGitLabIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									nil,
-									idp.Options{},
-								)),
-						},
+						instance.NewGitLabIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							nil,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -3022,28 +2934,24 @@ func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGitLabIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									[]string{"openid"},
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewGitLabIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							[]string{"openid"},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -3122,7 +3030,7 @@ func TestCommandSide_UpdateInstanceGitLabIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-HJK91", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-HJK91", ""))
 				},
 			},
 		},
@@ -3138,7 +3046,7 @@ func TestCommandSide_UpdateInstanceGitLabIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D12t6", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-D12t6", ""))
 				},
 			},
 		},
@@ -3157,7 +3065,7 @@ func TestCommandSide_UpdateInstanceGitLabIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -3214,34 +3122,29 @@ func TestCommandSide_UpdateInstanceGitLabIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewGitLabIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.GitLabIDPChanges{
-											idp.ChangeGitLabClientID("clientID2"),
-											idp.ChangeGitLabClientSecret(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("newSecret"),
-											}),
-											idp.ChangeGitLabScopes([]string{"openid", "profile"}),
-											idp.ChangeGitLabOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewGitLabIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.GitLabIDPChanges{
+									idp.ChangeGitLabClientID("clientID2"),
+									idp.ChangeGitLabClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeGitLabScopes([]string{"openid", "profile"}),
+									idp.ChangeGitLabOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -3319,7 +3222,7 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-jw4ZT", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-jw4ZT", ""))
 				},
 			},
 		},
@@ -3337,7 +3240,7 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-AST4S", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-AST4S", ""))
 				},
 			},
 		},
@@ -3356,7 +3259,7 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DBZHJ", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-DBZHJ", ""))
 				},
 			},
 		},
@@ -3376,7 +3279,7 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SDGJ4", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SDGJ4", ""))
 				},
 			},
 		},
@@ -3386,24 +3289,20 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGitLabSelfHostedIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"issuer",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									nil,
-									idp.Options{},
-								)),
-						},
+						instance.NewGitLabSelfHostedIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"issuer",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							nil,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -3429,29 +3328,25 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGitLabSelfHostedIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									"issuer",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									[]string{"openid"},
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewGitLabSelfHostedIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							"issuer",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							[]string{"openid"},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -3532,7 +3427,7 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAFG4", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SAFG4", ""))
 				},
 			},
 		},
@@ -3548,7 +3443,7 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DG4H", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-DG4H", ""))
 				},
 			},
 		},
@@ -3566,7 +3461,7 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SD4eb", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SD4eb", ""))
 				},
 			},
 		},
@@ -3585,7 +3480,7 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GHWE3", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-GHWE3", ""))
 				},
 			},
 		},
@@ -3606,7 +3501,7 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -3667,36 +3562,31 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewGitLabSelfHostedIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.GitLabSelfHostedIDPChanges{
-											idp.ChangeGitLabSelfHostedClientID("clientID2"),
-											idp.ChangeGitLabSelfHostedIssuer("newIssuer"),
-											idp.ChangeGitLabSelfHostedName("newName"),
-											idp.ChangeGitLabSelfHostedClientSecret(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("newSecret"),
-											}),
-											idp.ChangeGitLabSelfHostedScopes([]string{"openid", "profile"}),
-											idp.ChangeGitLabSelfHostedOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewGitLabSelfHostedIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.GitLabSelfHostedIDPChanges{
+									idp.ChangeGitLabSelfHostedClientID("clientID2"),
+									idp.ChangeGitLabSelfHostedIssuer("newIssuer"),
+									idp.ChangeGitLabSelfHostedName("newName"),
+									idp.ChangeGitLabSelfHostedClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeGitLabSelfHostedScopes([]string{"openid", "profile"}),
+									idp.ChangeGitLabSelfHostedOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -3776,7 +3666,7 @@ func TestCommandSide_AddInstanceGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D3fvs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-D3fvs", ""))
 				},
 			},
 		},
@@ -3794,7 +3684,7 @@ func TestCommandSide_AddInstanceGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-W2vqs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-W2vqs", ""))
 				},
 			},
 		},
@@ -3804,23 +3694,19 @@ func TestCommandSide_AddInstanceGoogleIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGoogleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									nil,
-									idp.Options{},
-								)),
-						},
+						instance.NewGoogleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							nil,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -3844,28 +3730,24 @@ func TestCommandSide_AddInstanceGoogleIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewGoogleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"",
-									"clientID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("clientSecret"),
-									},
-									[]string{"openid"},
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewGoogleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"",
+							"clientID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("clientSecret"),
+							},
+							[]string{"openid"},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -3944,7 +3826,7 @@ func TestCommandSide_UpdateInstanceGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-S32t1", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-S32t1", ""))
 				},
 			},
 		},
@@ -3960,7 +3842,7 @@ func TestCommandSide_UpdateInstanceGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-ds432", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-ds432", ""))
 				},
 			},
 		},
@@ -3979,7 +3861,7 @@ func TestCommandSide_UpdateInstanceGoogleIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -4036,34 +3918,29 @@ func TestCommandSide_UpdateInstanceGoogleIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewGoogleIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.GoogleIDPChanges{
-											idp.ChangeGoogleClientID("clientID2"),
-											idp.ChangeGoogleClientSecret(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("newSecret"),
-											}),
-											idp.ChangeGoogleScopes([]string{"openid", "profile"}),
-											idp.ChangeGoogleOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewGoogleIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.GoogleIDPChanges{
+									idp.ChangeGoogleClientID("clientID2"),
+									idp.ChangeGoogleClientSecret(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newSecret"),
+									}),
+									idp.ChangeGoogleScopes([]string{"openid", "profile"}),
+									idp.ChangeGoogleOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -4141,7 +4018,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAfdd", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SAfdd", ""))
 				},
 			},
 		},
@@ -4159,7 +4036,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sv31s", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sv31s", ""))
 				},
 			},
 		},
@@ -4178,7 +4055,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdgf4", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sdgf4", ""))
 				},
 			},
 		},
@@ -4198,7 +4075,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-AEG2w", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-AEG2w", ""))
 				},
 			},
 		},
@@ -4219,7 +4096,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAD5n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SAD5n", ""))
 				},
 			},
 		},
@@ -4241,7 +4118,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAx905n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SAx905n", ""))
 				},
 			},
 		},
@@ -4264,7 +4141,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-S1x905n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-S1x905n", ""))
 				},
 			},
 		},
@@ -4288,7 +4165,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-aAx905n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-aAx905n", ""))
 				},
 			},
 		},
@@ -4298,30 +4175,26 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewLDAPIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									[]string{"server"},
-									false,
-									"baseDN",
-									"dn",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("password"),
-									},
-									"user",
-									[]string{"object"},
-									[]string{"filter"},
-									time.Second*30,
-									idp.LDAPAttributes{},
-									idp.Options{},
-								)),
-						},
+						instance.NewLDAPIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							[]string{"server"},
+							false,
+							"baseDN",
+							"dn",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("password"),
+							},
+							"user",
+							[]string{"object"},
+							[]string{"filter"},
+							time.Second*30,
+							idp.LDAPAttributes{},
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -4353,49 +4226,45 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewLDAPIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"name",
-									[]string{"server"},
-									false,
-									"baseDN",
-									"dn",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("password"),
-									},
-									"user",
-									[]string{"object"},
-									[]string{"filter"},
-									time.Second*30,
-									idp.LDAPAttributes{
-										IDAttribute:                "id",
-										FirstNameAttribute:         "firstName",
-										LastNameAttribute:          "lastName",
-										DisplayNameAttribute:       "displayName",
-										NickNameAttribute:          "nickName",
-										PreferredUsernameAttribute: "preferredUsername",
-										EmailAttribute:             "email",
-										EmailVerifiedAttribute:     "emailVerified",
-										PhoneAttribute:             "phone",
-										PhoneVerifiedAttribute:     "phoneVerified",
-										PreferredLanguageAttribute: "preferredLanguage",
-										AvatarURLAttribute:         "avatarURL",
-										ProfileAttribute:           "profile",
-									},
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewLDAPIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							[]string{"server"},
+							false,
+							"baseDN",
+							"dn",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("password"),
+							},
+							"user",
+							[]string{"object"},
+							[]string{"filter"},
+							time.Second*30,
+							idp.LDAPAttributes{
+								IDAttribute:                "id",
+								FirstNameAttribute:         "firstName",
+								LastNameAttribute:          "lastName",
+								DisplayNameAttribute:       "displayName",
+								NickNameAttribute:          "nickName",
+								PreferredUsernameAttribute: "preferredUsername",
+								EmailAttribute:             "email",
+								EmailVerifiedAttribute:     "emailVerified",
+								PhoneAttribute:             "phone",
+								PhoneVerifiedAttribute:     "phoneVerified",
+								PreferredLanguageAttribute: "preferredLanguage",
+								AvatarURLAttribute:         "avatarURL",
+								ProfileAttribute:           "profile",
+							},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -4496,7 +4365,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dgdbs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Dgdbs", ""))
 				},
 			},
 		},
@@ -4512,7 +4381,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Sffgd", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Sffgd", ""))
 				},
 			},
 		},
@@ -4530,7 +4399,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-vb3ss", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-vb3ss", ""))
 				},
 			},
 		},
@@ -4549,7 +4418,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-hbere", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-hbere", ""))
 				},
 			},
 		},
@@ -4569,7 +4438,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DG45z", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-DG45z", ""))
 				},
 			},
 		},
@@ -4590,7 +4459,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAx945n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SAx945n", ""))
 				},
 			},
 		},
@@ -4612,7 +4481,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-S1x605n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-S1x605n", ""))
 				},
 			},
 		},
@@ -4635,7 +4504,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-aAx901n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-aAx901n", ""))
 				},
 			},
 		},
@@ -4662,7 +4531,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowNotFound(nil, "INST-ASF3F", ""))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "INST-ASF3F", ""))
 				},
 			},
 		},
@@ -4742,56 +4611,51 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewLDAPIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.LDAPIDPChanges{
-											idp.ChangeLDAPName("new name"),
-											idp.ChangeLDAPServers([]string{"new server"}),
-											idp.ChangeLDAPStartTLS(true),
-											idp.ChangeLDAPBaseDN("new basedn"),
-											idp.ChangeLDAPBindDN("new binddn"),
-											idp.ChangeLDAPBindPassword(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("new password"),
-											}),
-											idp.ChangeLDAPUserBase("new user"),
-											idp.ChangeLDAPUserObjectClasses([]string{"new object"}),
-											idp.ChangeLDAPUserFilters([]string{"new filter"}),
-											idp.ChangeLDAPTimeout(time.Second * 20),
-											idp.ChangeLDAPAttributes(idp.LDAPAttributeChanges{
-												IDAttribute:                stringPointer("new id"),
-												FirstNameAttribute:         stringPointer("new firstName"),
-												LastNameAttribute:          stringPointer("new lastName"),
-												DisplayNameAttribute:       stringPointer("new displayName"),
-												NickNameAttribute:          stringPointer("new nickName"),
-												PreferredUsernameAttribute: stringPointer("new preferredUsername"),
-												EmailAttribute:             stringPointer("new email"),
-												EmailVerifiedAttribute:     stringPointer("new emailVerified"),
-												PhoneAttribute:             stringPointer("new phone"),
-												PhoneVerifiedAttribute:     stringPointer("new phoneVerified"),
-												PreferredLanguageAttribute: stringPointer("new preferredLanguage"),
-												AvatarURLAttribute:         stringPointer("new avatarURL"),
-												ProfileAttribute:           stringPointer("new profile"),
-											}),
-											idp.ChangeLDAPOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewLDAPIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.LDAPIDPChanges{
+									idp.ChangeLDAPName("new name"),
+									idp.ChangeLDAPServers([]string{"new server"}),
+									idp.ChangeLDAPStartTLS(true),
+									idp.ChangeLDAPBaseDN("new basedn"),
+									idp.ChangeLDAPBindDN("new binddn"),
+									idp.ChangeLDAPBindPassword(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("new password"),
+									}),
+									idp.ChangeLDAPUserBase("new user"),
+									idp.ChangeLDAPUserObjectClasses([]string{"new object"}),
+									idp.ChangeLDAPUserFilters([]string{"new filter"}),
+									idp.ChangeLDAPTimeout(time.Second * 20),
+									idp.ChangeLDAPAttributes(idp.LDAPAttributeChanges{
+										IDAttribute:                stringPointer("new id"),
+										FirstNameAttribute:         stringPointer("new firstName"),
+										LastNameAttribute:          stringPointer("new lastName"),
+										DisplayNameAttribute:       stringPointer("new displayName"),
+										NickNameAttribute:          stringPointer("new nickName"),
+										PreferredUsernameAttribute: stringPointer("new preferredUsername"),
+										EmailAttribute:             stringPointer("new email"),
+										EmailVerifiedAttribute:     stringPointer("new emailVerified"),
+										PhoneAttribute:             stringPointer("new phone"),
+										PhoneVerifiedAttribute:     stringPointer("new phoneVerified"),
+										PreferredLanguageAttribute: stringPointer("new preferredLanguage"),
+										AvatarURLAttribute:         stringPointer("new avatarURL"),
+										ProfileAttribute:           stringPointer("new profile"),
+									}),
+									idp.ChangeLDAPOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -4891,7 +4755,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-jkn3w", "Errors.IDP.ClientIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-jkn3w", "Errors.IDP.ClientIDMissing"))
 				},
 			},
 		},
@@ -4909,7 +4773,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Ffg32", "Errors.IDP.TeamIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Ffg32", "Errors.IDP.TeamIDMissing"))
 				},
 			},
 		},
@@ -4928,7 +4792,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GDjm5", "Errors.IDP.KeyIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-GDjm5", "Errors.IDP.KeyIDMissing"))
 				},
 			},
 		},
@@ -4948,7 +4812,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.IDP.PrivateKeyMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.IDP.PrivateKeyMissing"))
 				},
 			},
 		},
@@ -4958,25 +4822,21 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewAppleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"",
-									"clientID",
-									"teamID",
-									"keyID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("privateKey"),
-									},
-									nil,
-									idp.Options{},
-								)),
-						},
+						instance.NewAppleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"",
+							"clientID",
+							"teamID",
+							"keyID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("privateKey"),
+							},
+							nil,
+							idp.Options{},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -5002,30 +4862,26 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								instance.NewAppleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-									"id1",
-									"",
-									"clientID",
-									"teamID",
-									"keyID",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("privateKey"),
-									},
-									[]string{"name", "email"},
-									idp.Options{
-										IsCreationAllowed: true,
-										IsLinkingAllowed:  true,
-										IsAutoCreation:    true,
-										IsAutoUpdate:      true,
-									},
-								)),
-						},
+						instance.NewAppleIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"",
+							"clientID",
+							"teamID",
+							"keyID",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("privateKey"),
+							},
+							[]string{"name", "email"},
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "id1"),
@@ -5106,7 +4962,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-FRHBH", "Errors.IDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-FRHBH", "Errors.IDMissing"))
 				},
 			},
 		},
@@ -5122,7 +4978,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SFm4l", "Errors.IDP.ClientIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SFm4l", "Errors.IDP.ClientIDMissing"))
 				},
 			},
 		},
@@ -5140,7 +4996,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SG34t", "Errors.IDP.TeamIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SG34t", "Errors.IDP.TeamIDMissing"))
 				},
 			},
 		},
@@ -5159,7 +5015,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Gh4z2", "Errors.IDP.KeyIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Gh4z2", "Errors.IDP.KeyIDMissing"))
 				},
 			},
 		},
@@ -5180,7 +5036,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -5243,36 +5099,31 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 							)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								func() eventstore.Command {
-									t := true
-									event, _ := instance.NewAppleIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
-										"id1",
-										[]idp.AppleIDPChanges{
-											idp.ChangeAppleClientID("clientID2"),
-											idp.ChangeAppleTeamID("teamID2"),
-											idp.ChangeAppleKeyID("keyID2"),
-											idp.ChangeApplePrivateKey(&crypto.CryptoValue{
-												CryptoType: crypto.TypeEncryption,
-												Algorithm:  "enc",
-												KeyID:      "id",
-												Crypted:    []byte("newPrivateKey"),
-											}),
-											idp.ChangeAppleScopes([]string{"name", "email"}),
-											idp.ChangeAppleOptions(idp.OptionChanges{
-												IsCreationAllowed: &t,
-												IsLinkingAllowed:  &t,
-												IsAutoCreation:    &t,
-												IsAutoUpdate:      &t,
-											}),
-										},
-									)
-									return event
-								}(),
-							),
-						},
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewAppleIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.AppleIDPChanges{
+									idp.ChangeAppleClientID("clientID2"),
+									idp.ChangeAppleTeamID("teamID2"),
+									idp.ChangeAppleKeyID("keyID2"),
+									idp.ChangeApplePrivateKey(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("newPrivateKey"),
+									}),
+									idp.ChangeAppleScopes([]string{"name", "email"}),
+									idp.ChangeAppleOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -5306,6 +5157,512 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateInstanceAppleProvider(tt.args.ctx, tt.args.id, tt.args.provider)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
+	type fields struct {
+		eventstore                 *eventstore.Eventstore
+		idGenerator                id.Generator
+		secretCrypto               crypto.EncryptionAlgorithm
+		certificateAndKeyGenerator func(id string) ([]byte, []byte, error)
+	}
+	type args struct {
+		ctx      context.Context
+		provider SAMLProvider
+	}
+	type res struct {
+		id   string
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid name",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
+				provider: SAMLProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-o07zjotgnd", ""))
+				},
+			},
+		},
+		{
+			"invalid metadata",
+			fields{
+				eventstore:  eventstoreExpect(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: SAMLProvider{
+					Name: "name",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-3bi3esi16t", "Errors.Invalid.Argument"))
+				},
+			},
+		},
+		{
+			name: "ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectPush(
+						instance.NewSAMLIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							[]byte("metadata"),
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("key"),
+							},
+							[]byte("certificate"),
+							"",
+							false,
+							idp.Options{},
+						),
+					),
+				),
+				idGenerator:                id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+				secretCrypto:               crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				certificateAndKeyGenerator: func(id string) ([]byte, []byte, error) { return []byte("key"), []byte("certificate"), nil },
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: SAMLProvider{
+					Name:     "name",
+					Metadata: []byte("metadata"),
+				},
+			},
+			res: res{
+				id:   "id1",
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+		{
+			name: "ok all set",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectPush(
+						instance.NewSAMLIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+							"id1",
+							"name",
+							[]byte("metadata"),
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("key"),
+							},
+							[]byte("certificate"),
+							"binding",
+							true,
+							idp.Options{
+								IsCreationAllowed: true,
+								IsLinkingAllowed:  true,
+								IsAutoCreation:    true,
+								IsAutoUpdate:      true,
+							},
+						),
+					),
+				),
+				idGenerator:                id_mock.NewIDGeneratorExpectIDs(t, "id1"),
+				secretCrypto:               crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				certificateAndKeyGenerator: func(id string) ([]byte, []byte, error) { return []byte("key"), []byte("certificate"), nil },
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				provider: SAMLProvider{
+					Name:              "name",
+					Metadata:          []byte("metadata"),
+					Binding:           "binding",
+					WithSignedRequest: true,
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+				},
+			},
+			res: res{
+				id:   "id1",
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:                     tt.fields.eventstore,
+				idGenerator:                    tt.fields.idGenerator,
+				idpConfigEncryption:            tt.fields.secretCrypto,
+				samlCertificateAndKeyGenerator: tt.fields.certificateAndKeyGenerator,
+			}
+			id, got, err := c.AddInstanceSAMLProvider(tt.args.ctx, tt.args.provider)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.id, id)
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
+	type fields struct {
+		eventstore   *eventstore.Eventstore
+		secretCrypto crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx      context.Context
+		id       string
+		provider SAMLProvider
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid id",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
+				provider: SAMLProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-7o3rq1owpm", ""))
+				},
+			},
+		},
+		{
+			"invalid name",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:      authz.WithInstanceID(context.Background(), "instance1"),
+				id:       "id1",
+				provider: SAMLProvider{},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-q2s9rak7o9", ""))
+				},
+			},
+		},
+		{
+			"invalid metadata",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: SAMLProvider{
+					Name: "name",
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-iw1rxnf4sf", ""))
+				},
+			},
+		},
+		{
+			name: "not found",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: SAMLProvider{
+					Name:     "name",
+					Metadata: []byte("metadata"),
+				},
+			},
+			res: res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			name: "no changes",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSAMLIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								[]byte("metadata"),
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("key"),
+								},
+								[]byte("certificate"),
+								"",
+								false,
+								idp.Options{},
+							)),
+					),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: SAMLProvider{
+					Name:     "name",
+					Metadata: []byte("metadata"),
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+		{
+			name: "change ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSAMLIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								[]byte("metadata"),
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("key"),
+								},
+								[]byte("certificate"),
+								"binding",
+								false,
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						func() eventstore.Command {
+							t := true
+							event, _ := instance.NewSAMLIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.SAMLIDPChanges{
+									idp.ChangeSAMLName("new name"),
+									idp.ChangeSAMLMetadata([]byte("new metadata")),
+									idp.ChangeSAMLBinding("new binding"),
+									idp.ChangeSAMLWithSignedRequest(true),
+									idp.ChangeSAMLOptions(idp.OptionChanges{
+										IsCreationAllowed: &t,
+										IsLinkingAllowed:  &t,
+										IsAutoCreation:    &t,
+										IsAutoUpdate:      &t,
+									}),
+								},
+							)
+							return event
+						}(),
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+				provider: SAMLProvider{
+					Name:              "new name",
+					Metadata:          []byte("new metadata"),
+					Binding:           "new binding",
+					WithSignedRequest: true,
+					IDPOptions: idp.Options{
+						IsCreationAllowed: true,
+						IsLinkingAllowed:  true,
+						IsAutoCreation:    true,
+						IsAutoUpdate:      true,
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:          tt.fields.eventstore,
+				idpConfigEncryption: tt.fields.secretCrypto,
+			}
+			got, err := c.UpdateInstanceSAMLProvider(tt.args.ctx, tt.args.id, tt.args.provider)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_RegenerateInstanceSAMLProviderCertificate(t *testing.T) {
+	type fields struct {
+		eventstore                 *eventstore.Eventstore
+		secretCrypto               crypto.EncryptionAlgorithm
+		certificateAndKeyGenerator func(id string) ([]byte, []byte, error)
+	}
+	type args struct {
+		ctx context.Context
+		id  string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"invalid id",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-7de108gqya", ""))
+				},
+			},
+		},
+		{
+			name: "not found",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+			},
+			res: res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			name: "change ok",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSAMLIDPAddedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								"name",
+								[]byte("metadata"),
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("key"),
+								},
+								[]byte("certificate"),
+								"binding",
+								false,
+								idp.Options{},
+							)),
+					),
+					expectPush(
+						func() eventstore.Command {
+							event, _ := instance.NewSAMLIDPChangedEvent(context.Background(), &instance.NewAggregate("instance1").Aggregate,
+								"id1",
+								[]idp.SAMLIDPChanges{
+									idp.ChangeSAMLKey(&crypto.CryptoValue{
+										CryptoType: crypto.TypeEncryption,
+										Algorithm:  "enc",
+										KeyID:      "id",
+										Crypted:    []byte("new key"),
+									}),
+									idp.ChangeSAMLCertificate([]byte("new certificate")),
+								},
+							)
+							return event
+						}(),
+					),
+				),
+				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				certificateAndKeyGenerator: func(id string) ([]byte, []byte, error) {
+					return []byte("new key"), []byte("new certificate"), nil
+				},
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
+				id:  "id1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{ResourceOwner: "instance1"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:                     tt.fields.eventstore,
+				idpConfigEncryption:            tt.fields.secretCrypto,
+				samlCertificateAndKeyGenerator: tt.fields.certificateAndKeyGenerator,
+			}
+			got, err := c.RegenerateInstanceSAMLProviderCertificate(tt.args.ctx, tt.args.id)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

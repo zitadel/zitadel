@@ -4,8 +4,7 @@ import (
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/domain"
-
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -56,12 +55,12 @@ func (l *Login) renderMFAPrompt(w http.ResponseWriter, r *http.Request, authReq 
 	}
 	translator := l.getTranslator(r.Context(), authReq)
 	data := mfaData{
-		baseData:    l.getBaseData(r, authReq, "InitMFAPrompt.Title", "InitMFAPrompt.Description", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, translator, "InitMFAPrompt.Title", "InitMFAPrompt.Description", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 	}
 
 	if mfaPromptData == nil {
-		l.renderError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-XU0tj", "Errors.User.MFA.NoProviders"))
+		l.renderError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "APP-XU0tj", "Errors.User.MFA.NoProviders"))
 		return
 	}
 
@@ -93,7 +92,7 @@ func (l *Login) handleMFACreation(w http.ResponseWriter, r *http.Request, authRe
 		l.renderRegisterU2F(w, r, authReq, nil)
 		return
 	}
-	l.renderError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-Or3HO", "Errors.User.MFA.NoProviders"))
+	l.renderError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "APP-Or3HO", "Errors.User.MFA.NoProviders"))
 }
 
 func (l *Login) handleTOTPCreation(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *mfaVerifyData) {

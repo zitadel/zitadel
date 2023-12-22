@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/passwap/scrypt"
 	"github.com/zitadel/passwap/verifier"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type PasswordHasher struct {
@@ -62,11 +62,11 @@ type PasswordHashConfig struct {
 func (c *PasswordHashConfig) PasswordHasher() (*PasswordHasher, error) {
 	verifiers, vPrefixes, err := c.buildVerifiers()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "CRYPT-sahW9", "password hash config invalid")
+		return nil, zerrors.ThrowInvalidArgument(err, "CRYPT-sahW9", "password hash config invalid")
 	}
 	hasher, hPrefixes, err := c.Hasher.buildHasher()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "CRYPT-Que4r", "password hash config invalid")
+		return nil, zerrors.ThrowInvalidArgument(err, "CRYPT-Que4r", "password hash config invalid")
 	}
 	return &PasswordHasher{
 		Swapper:  passwap.NewSwapper(hasher, verifiers...),
@@ -145,11 +145,15 @@ func (c *HasherConfig) buildHasher() (hasher passwap.Hasher, prefixes []string, 
 	}
 }
 
+// decodeParams uses a mapstructure decoder from the Params map to dst.
+// The decoder fails when there are unused fields in dst.
+// It uses weak input typing, to allow conversion of env strings to ints.
 func (c *HasherConfig) decodeParams(dst any) error {
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		ErrorUnused: true,
-		ErrorUnset:  true,
-		Result:      dst,
+		ErrorUnused:      false,
+		ErrorUnset:       true,
+		WeaklyTypedInput: true,
+		Result:           dst,
 	})
 	if err != nil {
 		return err

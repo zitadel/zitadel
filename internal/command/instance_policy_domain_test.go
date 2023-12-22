@@ -9,13 +9,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
@@ -62,7 +61,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 				smtpSenderAddressMatchesInstanceDomain: true,
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -72,17 +71,12 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 					t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewDomainPolicyAddedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									true,
-									true,
-									true,
-								),
-							),
-						},
+						instance.NewDomainPolicyAddedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							true,
+							true,
+							true,
+						),
 					),
 				),
 			},
@@ -153,7 +147,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 				smtpSenderAddressMatchesInstanceDomain: true,
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -180,7 +174,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 				smtpSenderAddressMatchesInstanceDomain: true,
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -302,33 +296,21 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("INSTANCE",
-								newDefaultDomainPolicyChangedEvent(context.Background(), false, false, false),
-							),
-							eventFromEventPusherWithInstanceID("INSTANCE",
-								user.NewUsernameChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"user1",
-									"user1@org1.com",
-									false,
-									user.UsernameChangedEventWithPolicyChange(),
-								),
-							),
-							eventFromEventPusherWithInstanceID("INSTANCE",
-								user.NewUsernameChangedEvent(context.Background(),
-									&user.NewAggregate("user1", "org3").Aggregate,
-									"user1",
-									"user1@org3.com",
-									false,
-									user.UsernameChangedEventWithPolicyChange(),
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", user.NewRemoveUsernameUniqueConstraint("user1", "org1", true)),
-						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", user.NewAddUsernameUniqueConstraint("user1@org1.com", "org1", false)),
-						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", user.NewRemoveUsernameUniqueConstraint("user1", "org3", true)),
-						uniqueConstraintsFromEventConstraintWithInstanceID("INSTANCE", user.NewAddUsernameUniqueConstraint("user1@org3.com", "org3", false)),
+						newDefaultDomainPolicyChangedEvent(context.Background(), false, false, false),
+						user.NewUsernameChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"user1",
+							"user1@org1.com",
+							false,
+							user.UsernameChangedEventWithPolicyChange(),
+						),
+						user.NewUsernameChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org3").Aggregate,
+							"user1",
+							"user1@org3.com",
+							false,
+							user.UsernameChangedEventWithPolicyChange(),
+						),
 					),
 				),
 			},

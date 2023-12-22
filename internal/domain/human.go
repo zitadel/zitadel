@@ -5,9 +5,8 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Human struct {
@@ -59,7 +58,7 @@ func (f Gender) Specified() bool {
 
 func (u *Human) Normalize() error {
 	if u.Username == "" {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.User.Username.Empty")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.User.Username.Empty")
 	}
 	if err := u.Profile.Validate(); err != nil {
 		return err
@@ -77,7 +76,7 @@ func (u *Human) Normalize() error {
 
 func (u *Human) CheckDomainPolicy(policy *DomainPolicy) error {
 	if policy == nil {
-		return caos_errors.ThrowPreconditionFailed(nil, "DOMAIN-zSH7j", "Errors.Users.DomainPolicyNil")
+		return zerrors.ThrowPreconditionFailed(nil, "DOMAIN-zSH7j", "Errors.Users.DomainPolicyNil")
 	}
 	if !policy.UserLoginMustBeDomain && u.Profile != nil && u.Username == "" && u.Email != nil {
 		u.Username = string(u.EmailAddress)

@@ -8,11 +8,10 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_SetUserMetadata(t *testing.T) {
@@ -55,7 +54,7 @@ func TestCommandSide_SetUserMetadata(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -90,7 +89,7 @@ func TestCommandSide_SetUserMetadata(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -115,15 +114,11 @@ func TestCommandSide_SetUserMetadata(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewMetadataSetEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"key",
-									[]byte("value"),
-								),
-							),
-						},
+						user.NewMetadataSetEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key",
+							[]byte("value"),
+						),
 					),
 				),
 			},
@@ -203,7 +198,7 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -224,7 +219,7 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -260,7 +255,7 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -285,22 +280,16 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewMetadataSetEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"key",
-									[]byte("value"),
-								),
-							),
-							eventFromEventPusher(
-								user.NewMetadataSetEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"key1",
-									[]byte("value1"),
-								),
-							),
-						},
+						user.NewMetadataSetEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key",
+							[]byte("value"),
+						),
+						user.NewMetadataSetEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key1",
+							[]byte("value1"),
+						),
 					),
 				),
 			},
@@ -376,7 +365,7 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 				metadataKey: "key",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -393,7 +382,7 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 				metadataKey: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -427,7 +416,7 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 				metadataKey: "key",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -461,14 +450,10 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewMetadataRemovedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"key",
-								),
-							),
-						},
+						user.NewMetadataRemovedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key",
+						),
 					),
 				),
 			},
@@ -539,7 +524,7 @@ func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -557,7 +542,7 @@ func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 				metadataList: []string{"key", "key1"},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -599,7 +584,7 @@ func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 				metadataList: []string{"key", "key1"},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -648,7 +633,7 @@ func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 				metadataList: []string{""},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -689,20 +674,14 @@ func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewMetadataRemovedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"key",
-								),
-							),
-							eventFromEventPusher(
-								user.NewMetadataRemovedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"key1",
-								),
-							),
-						},
+						user.NewMetadataRemovedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key",
+						),
+						user.NewMetadataRemovedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key1",
+						),
 					),
 				),
 			},

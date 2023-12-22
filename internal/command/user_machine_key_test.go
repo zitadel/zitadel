@@ -5,18 +5,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_AddMachineKey(t *testing.T) {
@@ -60,7 +59,7 @@ func TestCommands_AddMachineKey(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -80,7 +79,7 @@ func TestCommands_AddMachineKey(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -100,7 +99,7 @@ func TestCommands_AddMachineKey(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -120,7 +119,7 @@ func TestCommands_AddMachineKey(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -141,17 +140,13 @@ func TestCommands_AddMachineKey(t *testing.T) {
 					),
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewMachineKeyAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"key1",
-									domain.AuthNKeyTypeJSON,
-									time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-									[]byte("public"),
-								),
-							),
-						},
+						user.NewMachineKeyAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key1",
+							domain.AuthNKeyTypeJSON,
+							time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
+							[]byte("public"),
+						),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "key1"),
@@ -194,17 +189,13 @@ func TestCommands_AddMachineKey(t *testing.T) {
 					),
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewMachineKeyAddedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-									"key1",
-									domain.AuthNKeyTypeJSON,
-									time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-									[]byte("public"),
-								),
-							),
-						},
+						user.NewMachineKeyAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"key1",
+							domain.AuthNKeyTypeJSON,
+							time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
+							[]byte("public"),
+						),
 					),
 				),
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),

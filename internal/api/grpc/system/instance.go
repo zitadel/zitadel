@@ -98,12 +98,12 @@ func (s *Server) ListIAMMembers(ctx context.Context, req *system_pb.ListIAMMembe
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.IAMMembers(ctx, queries, false)
+	res, err := s.query.IAMMembers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &system_pb.ListIAMMembersResponse{
-		Details: object.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: object.ToListDetails(res.Count, res.Sequence, res.LastRun),
 		//TODO: resource owner of user of the member instead of the membership resource owner
 		Result: member.MembersToPb("", res.Members),
 	}, nil
@@ -146,7 +146,7 @@ func (s *Server) ListDomains(ctx context.Context, req *system_pb.ListDomainsRequ
 	}
 	return &system_pb.ListDomainsResponse{
 		Result:  instance_grpc.DomainsToPb(domains.Domains),
-		Details: object.ToListDetails(domains.Count, domains.Sequence, domains.Timestamp),
+		Details: object.ToListDetails(domains.Count, domains.Sequence, domains.LastRun),
 	}, nil
 }
 

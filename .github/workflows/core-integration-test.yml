@@ -16,6 +16,10 @@ on:
 jobs:
   postgres:
     runs-on: ubuntu-latest
+    # TODO: use runner group as soon as integration tests run in parallel
+    # Currently it only consumes time and adds no value
+    # runs-on:
+    #   group: zitadel-public
     services:
       postgres:
         image: postgres
@@ -56,6 +60,7 @@ jobs:
         uses: actions/cache/restore@v3
         id: cache
         timeout-minutes: 1
+        continue-on-error: true
         name: restore previous results
         with:
           key: integration-test-postgres-${{ inputs.core_cache_key }}

@@ -1,17 +1,15 @@
 package model
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/zitadel/logging"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/iam/model"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -62,28 +60,28 @@ func IDPProviderViewsToModel(providers []*IDPProviderView) []*model.IDPProviderV
 	return result
 }
 
-func (i *IDPProviderView) AppendEvent(event *models.Event) (err error) {
-	i.Sequence = event.Sequence
-	i.ChangeDate = event.CreationDate
-	switch eventstore.EventType(event.Type) {
+func (i *IDPProviderView) AppendEvent(event eventstore.Event) (err error) {
+	i.Sequence = event.Sequence()
+	i.ChangeDate = event.CreatedAt()
+	switch event.Type() {
 	case instance.LoginPolicyIDPProviderAddedEventType,
 		org.LoginPolicyIDPProviderAddedEventType:
 		i.setRootData(event)
-		i.CreationDate = event.CreationDate
+		i.CreationDate = event.CreatedAt()
 		err = i.SetData(event)
 	}
 	return err
 }
 
-func (r *IDPProviderView) setRootData(event *models.Event) {
-	r.AggregateID = event.AggregateID
-	r.InstanceID = event.InstanceID
+func (r *IDPProviderView) setRootData(event eventstore.Event) {
+	r.AggregateID = event.Aggregate().ID
+	r.InstanceID = event.Aggregate().InstanceID
 }
 
-func (r *IDPProviderView) SetData(event *models.Event) error {
-	if err := json.Unmarshal(event.Data, r); err != nil {
+func (r *IDPProviderView) SetData(event eventstore.Event) error {
+	if err := event.Unmarshal(r); err != nil {
 		logging.New().WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")
+		return zerrors.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")
 	}
 	return nil
 }

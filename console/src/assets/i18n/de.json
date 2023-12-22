@@ -51,7 +51,7 @@
       "TITLE": "Bringe deine Instanz zum Laufen",
       "DESCRIPTION": "Diese Checkliste hilft bei der Einrichtung Ihrer Instanz und führt Sie durch die wichtigsten Schritte"
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Branding anpassen",
         "description": "Definiere Farben und Form des Login-UIs und uploade deine Logos und Icons.",
@@ -62,15 +62,20 @@
         "description": "Konfiguriere deinen Mailserver.",
         "action": "SMTP einrichten"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Erstelle ein Projekt",
         "description": "Erstelle dein erstes Projekt und definiere Rollen",
         "action": "Projekt erstellen"
       },
-      "project.application.added": {
-        "title": "Erstelle eine App",
-        "description": "Erstelle deine erste Web-, native, API oder SAML-applikation und konfiguriere den Authentification-flow.",
-        "action": "App erstellen"
+      "APPLICATION_CREATED": {
+        "title": "Registriere deine App",
+        "description": "Registriere deine erste Web-, native, API oder SAML-Applikation und konfiguriere den Authentification-flow.",
+        "action": "App registrieren"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Logge dich in deine App ein",
+        "description": "Integriere deine Applikation mit ZITADEL für die Authentifizierung und teste es, indem du dich mit deinem Admin-Benutzer einloggst.",
+        "action": "Einloggen"
       },
       "user.human.added": {
         "title": "Erfasse Benutzer",
@@ -95,7 +100,6 @@
     "EVENTS": "Events",
     "FAILEDEVENTS": "Fehlerhafte Events",
     "ORGANIZATION": "Organisation",
-    "DOMAINS": "Domänen",
     "PROJECT": "Projekte",
     "PROJECTOVERVIEW": "Übersicht",
     "PROJECTGRANTS": "Berechtigte Organisationen",
@@ -274,7 +278,7 @@
     "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
     "NUMBERERROR": "Muss eine Ziffer beinhalten.",
     "PWNOTEQUAL": "Die Passwörter stimmen nicht überein.",
-    "PHONE": "Die Telefonnummer muss mit 00 oder + starten."
+    "PHONE": "Die Telefonnummer muss mit + starten."
   },
   "USER": {
     "SETTINGS": {
@@ -486,7 +490,7 @@
       "TITLE": "Profil",
       "EMAIL": "E-Mail",
       "PHONE": "Telefonnummer",
-      "PHONE_HINT": "Verwenden Sie 00 oder das Symbol + gefolgt von der Landesvorwahl des Anrufers oder wählen Sie das Land aus der Dropdown-Liste aus und geben anschließend die Telefonnummer ein",
+      "PHONE_HINT": "Verwenden das Symbol + gefolgt von der Landesvorwahl des Anrufers oder wählen Sie das Land aus der Dropdown-Liste aus und geben anschließend die Telefonnummer ein",
       "USERNAME": "Benutzername",
       "CHANGEUSERNAME": "bearbeiten",
       "CHANGEUSERNAME_TITLE": "Benutzername ändern",
@@ -713,7 +717,6 @@
   },
   "METADATA": {
     "TITLE": "Metadaten",
-    "DESCRIPTION": "",
     "KEY": "Schlüssel",
     "VALUE": "Wert",
     "ADD": "Neues Element",
@@ -868,14 +871,16 @@
         },
         "SEQUENCE": {
           "LABEL": "Sequenz",
-          "CHECKBOX": "Nach Sequenz filtern",
-          "SORT": "Sortierung",
-          "ASC": "aufsteigend",
-          "DESC": "absteigend"
+          "CHECKBOX": "Nach Sequenz filtern"
         },
+        "SORT": "Sortierung",
+        "ASC": "Aufsteigend",
+        "DESC": "Absteigend",
         "CREATIONDATE": {
-          "LABEL": "Erstelldatum",
-          "CHECKBOX": "Nach Erstelldatum filtern"
+          "RADIO_FROM": "Von",
+          "RADIO_RANGE": "Zeitraum",
+          "LABEL_SINCE": "Seit",
+          "LABEL_UNTIL": "Bis"
         },
         "OTHER": "weiterer",
         "OTHERS": "weitere"
@@ -925,20 +930,22 @@
         "BTN": "Umbenennen"
       },
       "ORGDOMAIN": {
-        "TITLE": "Verifikation der Domain der Organisation",
-        "VERIFICATION": "Überprüfe den Besitz Deiner Domain, indem Du eine Bestätigungsdatei herunterlädst und unter der angegebenen URL speicherst, oder indem Du sie mit einem DNS-Eintrag verifizierst.",
-        "VERIFICATION_SKIP": "Du kannst die Überprüfung vorerst überspringen und Deine Organisation erstellen. Um Deine Organisation jedoch verwenden zu können, muss dieser Schritt abgeschlossen sein.",
-        "VERIFICATION_VALIDATION_DESC": "Die Tokens werden regelmässig überprüft, um sicherzustellen, dass Du weiterhin im Besitz der Domain bist.",
-        "VERIFICATION_NEWTOKEN_TITLE": "Neues Token anfordern",
-        "VERIFICATION_NEWTOKEN_DESC": "Wenn Du ein neues Token anfordern willst, klicke auf die gewünschte Methode. Wenn Du ein vorhandenes Token validieren möchtest, klicke auf \"Verifizieren\".",
-        "VERIFICATION_VALIDATION_ONGOING": "Ein Token zur Validierung wurde bereits angefragt. Klicke auf \"Verifizieren\", um dieses Token zu validieren.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Typ des Tokens:",
-        "VERIFICATION_SUCCESSFUL": "Domain erfolgreich validiert!",
-        "REQUESTNEWTOKEN": "Neues Token anfordern",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "TITLE": "Bestätigen Sie die Inhaberschaft von {{value}}",
+        "VERIFICATION": "Wir bieten Ihnen zwei Methoden zur manuellen Validierung Ihrer Domain:",
+        "VERIFICATION_HTML": "- HTTP. Hosten Sie eine temporäre Verifizierungsdatei auf Ihrer Website",
+        "VERIFICATION_DNS": "- DNS. Erstellen Sie einen DNS-Eintrag für den TXT-Eintrag",
+        "VERIFICATION_DNS_DESC": "Wenn Sie {{ value }} verwalten und Zugriff auf Ihre DNS-Einträge haben, können Sie einen neuen TXT-Eintrag mit den folgenden Werten erstellen:",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Verwenden Sie diesen Code für den Wert des TXT-Datensatzes:",
+        "VERIFICATION_HTTP_DESC": "Wenn Sie Zugriff auf das Hosting Ihrer Website haben, laden Sie einfach die Bestätigungsdatei herunter und laden Sie sie unter der angegebenen URL hoch",
+        "VERIFICATION_HTTP_URL_LABEL": "Erwartete URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Verifizierungsdatei:",
+        "VERIFICATION_SKIP": "Sie können die Verifizierung vorerst überspringen und mit der Erstellung Ihrer Organisation fortfahren, aber um Ihre Domain nutzen zu können, muss dieser Schritt abgeschlossen sein!",
+        "VERIFICATION_VALIDATION_DESC": "Löschen Sie den Bestätigungscode nicht, da ZITADEL die Inhaberschaft Ihrer Domain von Zeit zu Zeit erneut überprüft.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Fordern Sie ein neues Token an",
+        "VERIFICATION_VALIDATION_ONGOING": "Zur Verifizierung Ihrer Domain wurde die Methode {{ value }} ausgewählt. Klicken Sie auf die Schaltfläche, um eine Verifizierungsprüfung auszulösen oder den Verifizierungsprozess zurückzusetzen.",
+        "VERIFICATION_SUCCESSFUL": "Domain erfolgreich verifiziert!",
+        "RESETMETHOD": "Verifizierungsmethode zurücksetzen"
       },
       "DOWNLOAD_FILE": "Datei herunterladen",
       "SELECTORGTOOLTIP": "Diese Organisation auswählen",
@@ -953,7 +960,7 @@
     },
     "DOMAINS": {
       "NEW": "Domain hinzufügen",
-      "TITLE": "Domänen",
+      "TITLE": "Verifizierte Domains",
       "DESCRIPTION": "Konfiguriere die Domains, die für Domain discovery und als Suffix für die Benutzer verwendet werden können.",
       "SETPRIMARY": "Primäre Domain setzen",
       "DELETE": {
@@ -1015,14 +1022,17 @@
       "DESCRIPTION": "Diese Einstellungen erweitern bzw. überschreiben die Einstellungen Ihrer Instanz."
     },
     "LIST": {
-      "GENERAL": "Allgemein",
+      "LANGUAGES": "Sprachen",
       "LOGIN": "Loginverhalten und Sicherheit",
       "LOCKOUT": "Sperrmechanismen",
       "COMPLEXITY": "Passwordkomplexität",
       "NOTIFICATIONS": "Benachrichtigungseinstellungen",
+      "SMTP_PROVIDER": "SMTP-Anbieter",
+      "SMS_PROVIDER": "SMS / Telefon Anbieter",
       "NOTIFICATIONS_DESC": "SMTP und SMS Einstellungen",
       "MESSAGETEXTS": "Benachrichtigungstexte",
       "IDP": "Identitätsanbieter",
+      "VERIFIED_DOMAINS": "Verifizierte Domains",
       "DOMAIN": "Domain Einstellungen",
       "LOGINTEXTS": "Login Interface Texte",
       "BRANDING": "Branding",
@@ -1041,19 +1051,32 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Standardsprache",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски"
+    "LANGUAGES": {
+      "TITLE": "Spracheinstellungen",
+      "DEFAULT": "Standardsprache",
+      "ALLOWED": "Erlaubte Sprachen",
+      "NOT_ALLOWED": "Nicht erlaubte Sprachen",
+      "ALLOW_ALL": "Alle Sprachen erlauben",
+      "DISALLOW_ALL": "Alle Sprachen verbieten",
+      "SETASDEFAULT": "Als Standard setzen",
+      "DEFAULT_SAVED": "Standard Sprache gesetzt",
+      "ALLOWED_SAVED": "Erlaubte Sprachen gesetzt",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "SMTP Einstellungen",
@@ -1089,6 +1112,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio erfolgreich hinzugefügt.",
+        "UPDATED": "Twilio wurde erfolgreich aktualisiert.",
         "REMOVED": "Twilio entfernt",
         "CHANGETOKEN": "Token ändern",
         "SETTOKEN": "Token setzen",
@@ -1195,6 +1219,11 @@
         "ERROR": "Benutzer konnte nicht gefunden werden!",
         "PRIMARYBUTTON": "weiter",
         "SECONDARYBUTTON": "registrieren"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Automatischer Modus",
+        "THEME_MODE_LIGHT": "Nur heller Modus",
+        "THEME_MODE_DARK": "Nur dunkler Modus"
       }
     },
     "PWD_AGE": {
@@ -1246,8 +1275,10 @@
       "RESET_DESCRIPTION": "Sie sind im Begriff alle Standardwerte wiederherzustellen. Alle von Ihnen gesetzten Änderungen werden unwiderruflich gelöscht. Wollen Sie fortfahren?",
       "UNSAVED_TITLE": "Ohne speichern fortfahren?",
       "UNSAVED_DESCRIPTION": "Sie haben Änderungen vorgenommen ohne zu speichern. Möchten Sie jetzt speichern?",
-      "LOCALE": "Sprachcode",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Sie haben eine Sprache ausgewählt, die nicht erlaubt ist. Sie können weiterhin die Texte ändern. Wenn Sie jedoch möchten, dass Ihre Benutzer diese Sprache tatsächlich verwenden können, ändern Sie die Einschränkungen Ihrer Instanz.",
+      "LANGUAGES_NOT_ALLOWED": "Nicht erlaubt:",
+      "LANGUAGE": "Sprache",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1258,7 +1289,10 @@
         "zh": "简体中文",
         "bg": "Български",
         "pt": "Portuguese",
-        "mk": "Македонски"
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1355,7 +1389,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Adresse entspricht Instanzdomain",
       "ALLOWUSERNAMEPASSWORD": "Benutzername Passwort erlaubt",
       "ALLOWEXTERNALIDP": "Externer IDP erlaubt",
-      "ALLOWREGISTER": "Registrieren erlaubt",
+      "ALLOWREGISTERUSERS": "Benutzerregistrierung erlaubt",
+      "ALLOWREGISTERORGS": "Organisationsregistrierung erlaubt",
       "ALLOWUSERNAMEPASSWORD_DESC": "Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
       "ALLOWEXTERNALIDP_DESC": "Der Login wird für die darunter liegenden Identitätsanbieter erlaubt.",
       "ALLOWREGISTER_DESC": "Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",
@@ -1984,6 +2019,8 @@
       "CLIENTSECRET_DESCRIPTION": "Verwahre das Client Secret an einem sicheren Ort, da es nicht mehr angezeigt werden kann, sobald der Dialog geschlossen wird.",
       "REGENERATESECRET": "Client Secret neu generieren",
       "DEVMODE": "Entwicklermodus",
+      "DEVMODE_ENABLED": "Aktiviert",
+      "DEVMODE_DISABLED": "Deaktiviert",
       "DEVMODEDESC": "Bei eingeschaltetem Entwicklermodus werden die Weiterleitungs-URIs im OIDC-Flow nicht validiert.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Login Erfolgseite überspringen",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Erfolgseite nach dem Login für diese Native Applikation überspringen.",
@@ -2070,11 +2107,18 @@
         "DESCRIPTION": "SAML Applikationen"
       },
       "CONFIGSECTION": "SAML Konfiguration",
-      "URL": "Url der Metadaten-Datei",
-      "OR": "oder",
-      "XML": "Metadaten XML hochladen",
+      "CHOOSEMETADATASOURCE": "Stellen Sie Ihre SAML-Konfiguration mit einer der folgenden Optionen bereit:",
+      "METADATAOPT1": "Option 1: Geben Sie die URL an, unter der sich die Metadatendatei befindet",
+      "METADATAOPT2": "Option 2: Laden Sie eine Datei hoch, die Ihre XML-Metadaten enthält",
+      "METADATAOPT3": "Option 3: Erstellen Sie spontan eine minimale Metadatendatei mit ENTITYID und ACS-URL",
+      "UPLOAD": "XML-Datei hochladen",
       "METADATA": "Metadaten",
-      "METADATAFROMFILE": "Metadata aus Datei"
+      "METADATAFROMFILE": "Metadata aus Datei",
+      "CERTIFICATE": "SAML-Zertifikat",
+      "DOWNLOADCERT": "Laden Sie das SAML-Zertifikat herunter",
+      "CREATEMETADATA": "Create metadata",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {
@@ -2139,7 +2183,10 @@
     "zh": "简体中文",
     "bg": "Български",
     "pt": "Portuguese",
-    "mk": "Македонски"
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский",
+    "nl": "Nederlands"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

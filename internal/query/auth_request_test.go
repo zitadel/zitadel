@@ -16,8 +16,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestQueries_AuthRequestByID(t *testing.T) {
@@ -63,10 +63,10 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 				testNow,
 				"loginClient",
 				"clientID",
-				database.StringArray{"a", "b", "c"},
+				database.TextArray[string]{"a", "b", "c"},
 				"example.com",
-				database.EnumArray[domain.Prompt]{domain.PromptLogin, domain.PromptConsent},
-				database.StringArray{"en", "fi"},
+				database.Array[domain.Prompt]{domain.PromptLogin, domain.PromptConsent},
+				database.TextArray[string]{"en", "fi"},
 				"me@example.com",
 				int64(time.Minute),
 				"userID",
@@ -97,10 +97,10 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 				testNow,
 				"loginClient",
 				"clientID",
-				database.StringArray{"a", "b", "c"},
+				database.TextArray[string]{"a", "b", "c"},
 				"example.com",
-				database.EnumArray[domain.Prompt]{domain.PromptLogin, domain.PromptConsent},
-				database.StringArray{"en", "fi"},
+				database.Array[domain.Prompt]{domain.PromptLogin, domain.PromptConsent},
+				database.TextArray[string]{"en", "fi"},
 				sql.NullString{},
 				sql.NullInt64{},
 				sql.NullString{},
@@ -126,7 +126,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 				id:                "123",
 			},
 			expect:  mockQueryScanErr(expQuery, cols, nil, "123", "instanceID"),
-			wantErr: errors.ThrowNotFound(sql.ErrNoRows, "QUERY-Thee9", "Errors.AuthRequest.NotExisting"),
+			wantErr: zerrors.ThrowNotFound(sql.ErrNoRows, "QUERY-Thee9", "Errors.AuthRequest.NotExisting"),
 		},
 		{
 			name: "query error",
@@ -135,7 +135,7 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 				id:                "123",
 			},
 			expect:  mockQueryErr(expQuery, sql.ErrConnDone, "123", "instanceID"),
-			wantErr: errors.ThrowInternal(sql.ErrConnDone, "QUERY-Ou8ue", "Errors.Internal"),
+			wantErr: zerrors.ThrowInternal(sql.ErrConnDone, "QUERY-Ou8ue", "Errors.Internal"),
 		},
 		{
 			name: "wrong login client",
@@ -149,15 +149,15 @@ func TestQueries_AuthRequestByID(t *testing.T) {
 				testNow,
 				"wrongLoginClient",
 				"clientID",
-				database.StringArray{"a", "b", "c"},
+				database.TextArray[string]{"a", "b", "c"},
 				"example.com",
-				database.EnumArray[domain.Prompt]{domain.PromptLogin, domain.PromptConsent},
-				database.StringArray{"en", "fi"},
+				database.Array[domain.Prompt]{domain.PromptLogin, domain.PromptConsent},
+				database.TextArray[string]{"en", "fi"},
 				sql.NullString{},
 				sql.NullInt64{},
 				sql.NullString{},
 			}, "123", "instanceID"),
-			wantErr: errors.ThrowPermissionDeniedf(nil, "OIDCv2-aL0ag", "Errors.AuthRequest.WrongLoginClient"),
+			wantErr: zerrors.ThrowPermissionDeniedf(nil, "OIDCv2-aL0ag", "Errors.AuthRequest.WrongLoginClient"),
 		},
 	}
 	for _, tt := range tests {

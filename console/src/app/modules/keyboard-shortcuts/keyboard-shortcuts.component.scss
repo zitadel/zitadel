@@ -1,5 +1,3 @@
-@use '@angular/material' as mat;
-
 @mixin keyboard-shortcuts-theme($theme) {
   $primary: map-get($theme, primary);
   $background: map-get($theme, background);
@@ -7,9 +5,9 @@
   $text-color: map-get($foreground, text);
   $accent: map-get($theme, accent);
   $is-dark-theme: map-get($theme, is-dark);
-  $accent-color: mat.get-color-from-palette($primary, 500);
+  $accent-color: map-get($primary, 500);
   $back: map-get($background, background);
-  $card-background-color: mat.get-color-from-palette($background, cards);
+  $card-background-color: map-get($background, cards);
 
   .keyboard-shortcuts-group {
     $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));

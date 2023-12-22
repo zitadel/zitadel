@@ -59,6 +59,7 @@ func writeModelToLabelPolicy(wm *LabelPolicyWriteModel) *domain.LabelPolicy {
 		HideLoginNameSuffix: wm.HideLoginNameSuffix,
 		ErrorMsgPopup:       wm.ErrorMsgPopup,
 		DisableWatermark:    wm.DisableWatermark,
+		ThemeMode:           wm.ThemeMode,
 	}
 }
 
@@ -82,16 +83,6 @@ func writeModelToMailTemplatePolicy(wm *MailTemplateWriteModel) *domain.MailTemp
 	return &domain.MailTemplate{
 		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
 		Template:   wm.Template,
-	}
-}
-
-func writeModelToCustomText(wm *CustomTextWriteModel) *domain.CustomText {
-	return &domain.CustomText{
-		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
-		State:      wm.State,
-		Key:        wm.Key,
-		Language:   wm.Language,
-		Text:       wm.Text,
 	}
 }
 

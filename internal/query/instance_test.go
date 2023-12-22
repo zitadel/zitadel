@@ -13,7 +13,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"golang.org/x/text/language"
 
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -55,7 +55,8 @@ var (
 		` projections.instance_domains.creation_date,` +
 		` projections.instance_domains.change_date, ` +
 		` projections.instance_domains.sequence` +
-		` FROM (SELECT projections.instances.id, COUNT(*) OVER () FROM projections.instances) AS f` +
+		` FROM (SELECT DISTINCT projections.instances.id, COUNT(*) OVER () FROM projections.instances` +
+		` LEFT JOIN projections.instance_domains ON projections.instances.id = projections.instance_domains.instance_id) AS f` +
 		` LEFT JOIN projections.instances ON f.id = projections.instances.id` +
 		` LEFT JOIN projections.instance_domains ON f.id = projections.instance_domains.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`
@@ -103,7 +104,7 @@ func Test_InstancePrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true

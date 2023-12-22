@@ -2,11 +2,9 @@ package instance
 
 import (
 	"context"
-	"encoding/json"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -27,7 +25,7 @@ func NewSecurityPolicySetEvent(
 	changes []SecurityPolicyChanges,
 ) (*SecurityPolicySetEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-EWsf3", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "POLICY-EWsf3", "Errors.NoChangesFound")
 	}
 	event := &SecurityPolicySetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -59,21 +57,21 @@ func ChangeSecurityPolicyAllowedOrigins(allowedOrigins []string) func(event *Sec
 	}
 }
 
-func (e *SecurityPolicySetEvent) Data() interface{} {
+func (e *SecurityPolicySetEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SecurityPolicySetEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SecurityPolicySetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func SecurityPolicySetEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SecurityPolicySetEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	securityPolicyAdded := &SecurityPolicySetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, securityPolicyAdded)
+	err := event.Unmarshal(securityPolicyAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-soiwj", "unable to unmarshal oidc config added")
+		return nil, zerrors.ThrowInternal(err, "IAM-soiwj", "unable to unmarshal oidc config added")
 	}
 
 	return securityPolicyAdded, nil

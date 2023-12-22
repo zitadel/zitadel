@@ -1,8 +1,8 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, OnDestroy, ViewChild } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSort, Sort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { DisplayJsonDialogComponent } from 'src/app/modules/display-json-dialog/display-json-dialog.component';
 import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
@@ -176,13 +176,13 @@ export class EventsComponent implements OnDestroy {
     req.setEditorUserId(filterRequest.getEditorUserId());
     req.setResourceOwner(filterRequest.getResourceOwner());
     req.setSequence(filterRequest.getSequence());
-    req.setCreationDate(filterRequest.getCreationDate());
+    req.setRange(filterRequest.getRange());
+    req.setFrom(filterRequest.getFrom());
     const isAsc: boolean = filterRequest.getAsc();
     req.setAsc(isAsc);
     if (this.sortAsc !== isAsc) {
-      this.sort.sort({ id: 'sequence', start: isAsc ? 'asc' : 'desc', disableClear: true });
+      this.sort.sort({ id: 'creationDate', start: isAsc ? 'asc' : 'desc', disableClear: true });
     }
-
     this.loadEvents(req, true);
   }
 

@@ -3,7 +3,7 @@ package system
 import (
 	"strings"
 
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/authn"
@@ -79,7 +79,8 @@ func createInstancePbToAddHuman(req *system_pb.CreateInstanceRequest_Human, defa
 	// check if default username is email style or else append @<orgname>.<custom-domain>
 	// this way we have the same value as before changing `UserLoginMustBeDomain` to false
 	if !userLoginMustBeDomain && !strings.Contains(user.Username, "@") {
-		user.Username = user.Username + "@" + domain.NewIAMDomainName(org, externalDomain)
+		orgDomain, _ := domain.NewIAMDomainName(org, externalDomain)
+		user.Username = user.Username + "@" + orgDomain
 	}
 	if req.UserName != "" {
 		user.Username = req.UserName
@@ -185,7 +186,8 @@ func AddInstancePbToSetupInstance(req *system_pb.AddInstanceRequest, defaultInst
 	// check if default username is email style or else append @<orgname>.<custom-domain>
 	// this way we have the same value as before changing `UserLoginMustBeDomain` to false
 	if !instance.DomainPolicy.UserLoginMustBeDomain && !strings.Contains(instance.Org.Human.Username, "@") {
-		instance.Org.Human.Username = instance.Org.Human.Username + "@" + domain.NewIAMDomainName(instance.Org.Name, externalDomain)
+		orgDomain, _ := domain.NewIAMDomainName(instance.Org.Name, externalDomain)
+		instance.Org.Human.Username = instance.Org.Human.Username + "@" + orgDomain
 	}
 	if req.OwnerPassword != nil {
 		instance.Org.Human.Password = req.OwnerPassword.Password

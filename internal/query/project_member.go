@@ -9,9 +9,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -52,14 +52,6 @@ var (
 		name:  projection.ProjectMemberProjectIDCol,
 		table: projectMemberTable,
 	}
-	ProjectMemberOwnerRemoved = Column{
-		name:  projection.MemberOwnerRemoved,
-		table: orgMemberTable,
-	}
-	ProjectMemberOwnerRemovedUser = Column{
-		name:  projection.MemberUserOwnerRemoved,
-		table: orgMemberTable,
-	}
 )
 
 type ProjectMembersQuery struct {
@@ -73,27 +65,18 @@ func (q *ProjectMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 		Where(sq.Eq{ProjectMemberProjectID.identifier(): q.ProjectID})
 }
 
-func addProjectMemberWithoutOwnerRemoved(eq map[string]interface{}) {
-	eq[ProjectMemberOwnerRemoved.identifier()] = false
-	eq[ProjectMemberOwnerRemovedUser.identifier()] = false
-}
-
-func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQuery, withOwnerRemoved bool) (members *Members, err error) {
+func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQuery) (members *Members, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareProjectMembersQuery(ctx, q.client)
 	eq := sq.Eq{ProjectMemberInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		addProjectMemberWithoutOwnerRemoved(eq)
-		addLoginNameWithoutOwnerRemoved(eq)
-	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-T8CuT", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-T8CuT", "Errors.Query.InvalidRequest")
 	}
 
-	currentSequence, err := q.latestSequence(ctx, projectMemberTable)
+	currentSequence, err := q.latestState(ctx, projectMemberTable)
 	if err != nil {
 		return nil, err
 	}
@@ -103,10 +86,10 @@ func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQue
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-uh6pj", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-uh6pj", "Errors.Internal")
 	}
 
-	members.LatestSequence = currentSequence
+	members.State = currentSequence
 	return members, err
 }
 
@@ -192,7 +175,7 @@ func prepareProjectMembersQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-ZJ1Ii", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-ZJ1Ii", "Errors.Query.CloseRows")
 			}
 
 			return &Members{

@@ -9,9 +9,8 @@ describe('events', () => {
     cy.get('[data-e2e="event-type-cell"]').should('have.length', 20);
     cy.get('[data-e2e="open-filter-button"]').click();
     cy.get('[data-e2e="event-type-filter-checkbox"]').click();
-    cy.get('#mat-select-value-1').click();
-    cy.contains('mat-option', eventTypeEnglish).click();
-    cy.get('body').click();
+    cy.contains('mat-select', 'Descending').click();
+    cy.contains('mat-option', 'Ascending').click();
     cy.get('[data-e2e="filter-finish-button"]').click();
     cy.contains('[data-e2e="event-type-cell"]', eventTypeEnglish).should('have.length.at.least', 1);
   });

@@ -5,15 +5,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_CreateOTPSMSChallengeReturnCode(t *testing.T) {
@@ -39,7 +39,7 @@ func TestCommands_CreateOTPSMSChallengeReturnCode(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JKL3g", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-JKL3g", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -51,7 +51,7 @@ func TestCommands_CreateOTPSMSChallengeReturnCode(t *testing.T) {
 				),
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-BJ2g3", "Errors.User.MFA.OTP.NotReady"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-BJ2g3", "Errors.User.MFA.OTP.NotReady"),
 			},
 		},
 		{
@@ -140,7 +140,7 @@ func TestCommands_CreateOTPSMSChallenge(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JKL3g", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-JKL3g", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -152,7 +152,7 @@ func TestCommands_CreateOTPSMSChallenge(t *testing.T) {
 				),
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-BJ2g3", "Errors.User.MFA.OTP.NotReady"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-BJ2g3", "Errors.User.MFA.OTP.NotReady"),
 			},
 		},
 		{
@@ -244,7 +244,7 @@ func TestCommands_OTPSMSSent(t *testing.T) {
 				sessionID:     "sessionID",
 				resourceOwner: "instanceID",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-G3t31", "Errors.User.Code.NotFound"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-G3t31", "Errors.User.Code.NotFound"),
 		},
 		{
 			name: "challenged and sent",
@@ -265,9 +265,7 @@ func TestCommands_OTPSMSSent(t *testing.T) {
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							session.NewOTPSMSSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate),
-						),
+						session.NewOTPSMSSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate),
 					),
 				),
 			},
@@ -319,7 +317,7 @@ func TestCommands_CreateOTPEmailChallengeURLTemplate(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			res: res{
-				templateError: caos_errs.ThrowInvalidArgument(nil, "DOMAIN-ieYa7", "Errors.User.InvalidURLTemplate"),
+				templateError: zerrors.ThrowInvalidArgument(nil, "DOMAIN-ieYa7", "Errors.User.InvalidURLTemplate"),
 			},
 		},
 		{
@@ -331,7 +329,7 @@ func TestCommands_CreateOTPEmailChallengeURLTemplate(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JK3gp", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-JK3gp", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -346,7 +344,7 @@ func TestCommands_CreateOTPEmailChallengeURLTemplate(t *testing.T) {
 				),
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JKLJ3", "Errors.User.MFA.OTP.NotReady"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-JKLJ3", "Errors.User.MFA.OTP.NotReady"),
 			},
 		},
 		{
@@ -441,7 +439,7 @@ func TestCommands_CreateOTPEmailChallengeReturnCode(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JK3gp", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-JK3gp", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -453,7 +451,7 @@ func TestCommands_CreateOTPEmailChallengeReturnCode(t *testing.T) {
 				),
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JKLJ3", "Errors.User.MFA.OTP.NotReady"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-JKLJ3", "Errors.User.MFA.OTP.NotReady"),
 			},
 		},
 		{
@@ -542,7 +540,7 @@ func TestCommands_CreateOTPEmailChallenge(t *testing.T) {
 				eventstore: expectEventstore(),
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JK3gp", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-JK3gp", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -554,7 +552,7 @@ func TestCommands_CreateOTPEmailChallenge(t *testing.T) {
 				),
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-JKLJ3", "Errors.User.MFA.OTP.NotReady"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-JKLJ3", "Errors.User.MFA.OTP.NotReady"),
 			},
 		},
 		{
@@ -647,7 +645,7 @@ func TestCommands_OTPEmailSent(t *testing.T) {
 				sessionID:     "sessionID",
 				resourceOwner: "instanceID",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SLr02", "Errors.User.Code.NotFound"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SLr02", "Errors.User.Code.NotFound"),
 		},
 		{
 			name: "challenged and sent",
@@ -669,9 +667,7 @@ func TestCommands_OTPEmailSent(t *testing.T) {
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							session.NewOTPEmailSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate),
-						),
+						session.NewOTPEmailSentEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate),
 					),
 				),
 			},
@@ -724,7 +720,7 @@ func TestCheckOTPSMS(t *testing.T) {
 				code: "code",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-VDrh3", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-VDrh3", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -738,7 +734,7 @@ func TestCheckOTPSMS(t *testing.T) {
 				code: "code",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-SF3tv", "Errors.User.Code.NotFound"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SF3tv", "Errors.User.Code.NotFound"),
 			},
 		},
 		{
@@ -762,7 +758,7 @@ func TestCheckOTPSMS(t *testing.T) {
 				code: "code",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "CODE-QvUQ4P", "Errors.User.Code.Expired"),
+				err: zerrors.ThrowPreconditionFailed(nil, "CODE-QvUQ4P", "Errors.User.Code.Expired"),
 			},
 		},
 		{
@@ -852,7 +848,7 @@ func TestCheckOTPEmail(t *testing.T) {
 				code: "code",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-ejo2w", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-ejo2w", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -866,7 +862,7 @@ func TestCheckOTPEmail(t *testing.T) {
 				code: "code",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-zF3g3", "Errors.User.Code.NotFound"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-zF3g3", "Errors.User.Code.NotFound"),
 			},
 		},
 		{
@@ -890,7 +886,7 @@ func TestCheckOTPEmail(t *testing.T) {
 				code: "code",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "CODE-QvUQ4P", "Errors.User.Code.Expired"),
+				err: zerrors.ThrowPreconditionFailed(nil, "CODE-QvUQ4P", "Errors.User.Code.Expired"),
 			},
 		},
 		{

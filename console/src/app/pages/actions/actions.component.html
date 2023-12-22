@@ -4,7 +4,7 @@
     <p class="desc cnsl-secondary-text">{{ 'FLOWS.DESCRIPTION' | translate }}</p>
 
     <cnsl-info-section class="max-actions" *ngIf="maxActions"
-      >{{ 'FLOWS.ACTIONSMAX' | translate : { value: maxActions } }}
+      >{{ 'FLOWS.ACTIONSMAX' | translate: { value: maxActions } }}
     </cnsl-info-section>
 
     <ng-template cnslHasRole [hasRole]="['org.action.read']">
@@ -82,16 +82,12 @@
             </div>
           </cnsl-card>
 
-          <button
-            *ngIf="flow.type"
-            class="add-btn cnsl-action-button"
-            mat-raised-button
-            color="primary"
-            (click)="openAddTrigger(flow.type)"
-          >
-            <mat-icon>add</mat-icon>
-            <span>{{ 'FLOWS.ADDTRIGGER' | translate }}</span>
-            <span *ngIf="selection && selection.length">&nbsp;({{ selection.length }})</span>
+          <button *ngIf="flow.type" class="add-btn" mat-raised-button color="primary" (click)="openAddTrigger(flow.type)">
+            <div class="cnsl-action-button">
+              <mat-icon>add</mat-icon>
+              <span>{{ 'FLOWS.ADDTRIGGER' | translate }}</span>
+              <span *ngIf="selection && selection.length">&nbsp;({{ selection.length }})</span>
+            </div>
           </button>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { Component, Injector, Input, OnInit, Type } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { GetLockoutPolicyResponse as AdminGetPasswordLockoutPolicyResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { GetLockoutPolicyResponse as MgmtGetPasswordLockoutPolicyResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { LockoutPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
@@ -26,7 +26,11 @@ export class PasswordLockoutPolicyComponent implements OnInit {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public InfoSectionType: any = InfoSectionType;
 
-  constructor(private toast: ToastService, private injector: Injector, private dialog: MatDialog) {}
+  constructor(
+    private toast: ToastService,
+    private injector: Injector,
+    private dialog: MatDialog,
+  ) {}
 
   public ngOnInit(): void {
     switch (this.serviceType) {

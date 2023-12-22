@@ -5,11 +5,10 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestSMSProjection_reduces(t *testing.T) {
@@ -25,10 +24,11 @@ func TestSMSProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceSMSTwilioAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SMSConfigTwilioAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.SMSConfigTwilioAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"id": "id",
 						"sid": "sid",
 						"token": {
@@ -39,13 +39,12 @@ func TestSMSProjection_reduces(t *testing.T) {
 						},
 						"senderNumber": "sender-number"
 					}`),
-				), instance.SMSConfigTwilioAddedEventMapper),
+					), instance.SMSConfigTwilioAddedEventMapper),
 			},
 			reduce: (&smsConfigProjection{}).reduceSMSConfigTwilioAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -83,21 +82,21 @@ func TestSMSProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceSMSConfigTwilioChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SMSConfigTwilioChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.SMSConfigTwilioChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"id": "id",
 						"sid": "sid",
 						"senderNumber": "sender-number"
 					}`),
-				), instance.SMSConfigTwilioChangedEventMapper),
+					), instance.SMSConfigTwilioChangedEventMapper),
 			},
 			reduce: (&smsConfigProjection{}).reduceSMSConfigTwilioChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -125,10 +124,11 @@ func TestSMSProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceSMSConfigTwilioTokenChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SMSConfigTwilioTokenChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.SMSConfigTwilioTokenChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"id": "id",
 						"token": {
 							"cryptoType": 0,
@@ -137,13 +137,12 @@ func TestSMSProjection_reduces(t *testing.T) {
 							"crypted": "Y3J5cHRlZA=="
 						}
 					}`),
-				), instance.SMSConfigTwilioTokenChangedEventMapper),
+					), instance.SMSConfigTwilioTokenChangedEventMapper),
 			},
 			reduce: (&smsConfigProjection{}).reduceSMSConfigTwilioTokenChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -175,19 +174,19 @@ func TestSMSProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceSMSConfigActivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SMSConfigActivatedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.SMSConfigActivatedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"id": "id"
 					}`),
-				), instance.SMSConfigActivatedEventMapper),
+					), instance.SMSConfigActivatedEventMapper),
 			},
 			reduce: (&smsConfigProjection{}).reduceSMSConfigActivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -207,19 +206,19 @@ func TestSMSProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceSMSConfigDeactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SMSConfigDeactivatedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.SMSConfigDeactivatedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"id": "id"
 					}`),
-				), instance.SMSConfigDeactivatedEventMapper),
+					), instance.SMSConfigDeactivatedEventMapper),
 			},
 			reduce: (&smsConfigProjection{}).reduceSMSConfigDeactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -239,19 +238,19 @@ func TestSMSProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceSMSConfigRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.SMSConfigRemovedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.SMSConfigRemovedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"id": "id"
 					}`),
-				), instance.SMSConfigRemovedEventMapper),
+					), instance.SMSConfigRemovedEventMapper),
 			},
 			reduce: (&smsConfigProjection{}).reduceSMSConfigRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -268,17 +267,17 @@ func TestSMSProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(SMSColumnInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -296,7 +295,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			event := baseEvent(t)
 			got, err := tt.reduce(event)
-			if _, ok := err.(errors.InvalidArgument); !ok {
+			if ok := zerrors.IsErrorInvalidArgument(err); !ok {
 				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
 			}
 

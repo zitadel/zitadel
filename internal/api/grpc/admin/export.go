@@ -9,9 +9,9 @@ import (
 	authn_grpc "github.com/zitadel/zitadel/internal/api/grpc/authn"
 	text_grpc "github.com/zitadel/zitadel/internal/api/grpc/text"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	app_pb "github.com/zitadel/zitadel/pkg/grpc/app"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
@@ -325,7 +325,7 @@ func (s *Server) getIDPs(ctx context.Context, orgID string) (_ []*v1_pb.DataOIDC
 	for _, idp := range idps.IDPs {
 		if idp.OIDCIDP != nil {
 			clientSecret, err := s.query.GetOIDCIDPClientSecret(ctx, false, orgID, idp.ID, false)
-			if err != nil && !caos_errors.IsNotFound(err) {
+			if err != nil && !zerrors.IsNotFound(err) {
 				return nil, nil, err
 			}
 			oidcIdps = append(oidcIdps, &v1_pb.DataOIDCIDP{
@@ -549,7 +549,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
-	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{orgSearch}}, false)
+	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{orgSearch}})
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
@@ -590,7 +590,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 				ctx, pwspan := tracing.NewSpan(ctx)
 				encodedHash, err := s.query.GetHumanPassword(ctx, org, user.ID)
 				pwspan.EndWithError(err)
-				if err != nil && !caos_errors.IsNotFound(err) {
+				if err != nil && !zerrors.IsNotFound(err) {
 					return nil, nil, nil, nil, err
 				}
 				if err == nil && encodedHash != "" {
@@ -603,7 +603,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 				ctx, otpspan := tracing.NewSpan(ctx)
 				code, err := s.query.GetHumanOTPSecret(ctx, user.ID, org)
 				otpspan.EndWithError(err)
-				if err != nil && !caos_errors.IsNotFound(err) {
+				if err != nil && !zerrors.IsNotFound(err) {
 					return nil, nil, nil, nil, err
 				}
 				if err == nil && code != "" {
@@ -630,7 +630,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 				return nil, nil, nil, nil, err
 			}
 
-			keys, err := s.query.SearchAuthNKeysData(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{userIDQuery, orgIDQuery}}, false)
+			keys, err := s.query.SearchAuthNKeysData(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{userIDQuery, orgIDQuery}})
 			if err != nil {
 				return nil, nil, nil, nil, err
 			}
@@ -674,7 +674,7 @@ func (s *Server) getTriggerActions(ctx context.Context, org string, processedAct
 	triggerActions := make([]*management_pb.SetTriggerActionsRequest, 0)
 
 	for _, flowType := range flowTypes {
-		flow, err := s.query.GetFlow(ctx, flowType, org, false)
+		flow, err := s.query.GetFlow(ctx, flowType, org)
 		if err != nil {
 			return nil, err
 		}
@@ -731,7 +731,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 	if err != nil {
 		return nil, nil, nil, nil, nil, err
 	}
-	queriedProjects, err := s.query.SearchProjects(ctx, &query.ProjectSearchQueries{Queries: []query.SearchQuery{projectSearch}}, false)
+	queriedProjects, err := s.query.SearchProjects(ctx, &query.ProjectSearchQueries{Queries: []query.SearchQuery{projectSearch}})
 	if err != nil {
 		return nil, nil, nil, nil, nil, err
 	}
@@ -758,7 +758,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 			return nil, nil, nil, nil, nil, err
 		}
 
-		queriedProjectRoles, err := s.query.SearchProjectRoles(ctx, false, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectRoleSearch}}, false)
+		queriedProjectRoles, err := s.query.SearchProjectRoles(ctx, false, &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectRoleSearch}})
 		if err != nil {
 			return nil, nil, nil, nil, nil, err
 		}
@@ -836,7 +836,7 @@ func (s *Server) getProjectsAndApps(ctx context.Context, org string) ([]*v1_pb.D
 			if err != nil {
 				return nil, nil, nil, nil, nil, err
 			}
-			keys, err := s.query.SearchAuthNKeysData(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{appIDQuery, projectIDQuery, orgIDQuery}}, false)
+			keys, err := s.query.SearchAuthNKeysData(ctx, &query.AuthNKeySearchQueries{Queries: []query.SearchQuery{appIDQuery, projectIDQuery, orgIDQuery}})
 			if err != nil {
 				return nil, nil, nil, nil, nil, err
 			}
@@ -866,7 +866,7 @@ func (s *Server) getNecessaryProjectGrantMembersForOrg(ctx context.Context, org 
 				return nil, err
 			}
 
-			queriedProjectMembers, err := s.query.ProjectGrantMembers(ctx, &query.ProjectGrantMembersQuery{ProjectID: projectID, OrgID: org, GrantID: grantID, MembersQuery: query.MembersQuery{Queries: []query.SearchQuery{search}}}, false)
+			queriedProjectMembers, err := s.query.ProjectGrantMembers(ctx, &query.ProjectGrantMembersQuery{ProjectID: projectID, OrgID: org, GrantID: grantID, MembersQuery: query.MembersQuery{Queries: []query.SearchQuery{search}}})
 			if err != nil {
 				return nil, err
 			}
@@ -894,7 +894,7 @@ func (s *Server) getNecessaryProjectMembersForOrg(ctx context.Context, processed
 	projectMembers := make([]*management_pb.AddProjectMemberRequest, 0)
 
 	for _, projectID := range processedProjects {
-		queriedProjectMembers, err := s.query.ProjectMembers(ctx, &query.ProjectMembersQuery{ProjectID: projectID}, false)
+		queriedProjectMembers, err := s.query.ProjectMembers(ctx, &query.ProjectMembersQuery{ProjectID: projectID})
 		if err != nil {
 			return nil, err
 		}
@@ -915,7 +915,7 @@ func (s *Server) getNecessaryProjectMembersForOrg(ctx context.Context, processed
 }
 
 func (s *Server) getNecessaryOrgMembersForOrg(ctx context.Context, org string, processedUsers []string) ([]*management_pb.AddOrgMemberRequest, error) {
-	queriedOrgMembers, err := s.query.OrgMembers(ctx, &query.OrgMembersQuery{OrgID: org}, false)
+	queriedOrgMembers, err := s.query.OrgMembers(ctx, &query.OrgMembersQuery{OrgID: org})
 	if err != nil {
 		return nil, err
 	}
@@ -940,7 +940,7 @@ func (s *Server) getNecessaryProjectGrantsForOrg(ctx context.Context, org string
 	if err != nil {
 		return nil, err
 	}
-	queriedProjectGrants, err := s.query.SearchProjectGrants(ctx, &query.ProjectGrantSearchQueries{Queries: []query.SearchQuery{projectGrantSearchOrg}}, false)
+	queriedProjectGrants, err := s.query.SearchProjectGrants(ctx, &query.ProjectGrantSearchQueries{Queries: []query.SearchQuery{projectGrantSearchOrg}})
 	if err != nil {
 		return nil, err
 	}

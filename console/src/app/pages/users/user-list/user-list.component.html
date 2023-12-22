@@ -4,15 +4,15 @@
       <div class="users-title-row">
         <h1>{{ 'USER.PAGES.LIST' | translate }}</h1>
         <a mat-icon-button href="https://zitadel.com/docs/concepts/structure/users" rel="noreferrer" target="_blank">
-          <i class="las la-info-circle"></i>
+          <mat-icon class="icon">info_outline</mat-icon>
         </a>
       </div>
       <p class="user-list-sub cnsl-secondary-text">{{ 'USER.PAGES.DESCRIPTION' | translate }}</p>
 
       <cnsl-user-table
         [type]="Type.TYPE_HUMAN"
-        [canWrite]="!!(['user.write$'] | hasRole | async)"
-        [canDelete]="!!(['user.delete$'] | hasRole | async)"
+        [canWrite$]="['user.write$'] | hasRole"
+        [canDelete$]="['user.delete$'] | hasRole"
       >
       </cnsl-user-table>
     </ng-container>
@@ -23,8 +23,8 @@
 
       <cnsl-user-table
         [type]="Type.TYPE_MACHINE"
-        [canWrite]="!!(['user.write$'] | hasRole | async)"
-        [canDelete]="!!(['user.delete$'] | hasRole | async)"
+        [canWrite$]="['user.write$'] | hasRole"
+        [canDelete$]="['user.delete$'] | hasRole"
       >
       </cnsl-user-table>
     </ng-container>

@@ -5,17 +5,18 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/crewjam/saml/samlsp"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/client/rp"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/idp/providers/apple"
@@ -27,7 +28,10 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	"github.com/zitadel/zitadel/internal/idp/providers/saml"
+	"github.com/zitadel/zitadel/internal/idp/providers/saml/requesttracker"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -42,6 +46,9 @@ type externalIDPData struct {
 type externalIDPCallbackData struct {
 	State string `schema:"state"`
 	Code  string `schema:"code"`
+
+	RelayState string `schema:"RelayState"`
+	Method     string `schema:"Method"`
 
 	// Apple returns a user on first registration
 	User string `schema:"user"`
@@ -99,7 +106,7 @@ func (l *Login) handleExternalLoginStep(w http.ResponseWriter, r *http.Request, 
 			return
 		}
 	}
-	l.renderLogin(w, r, authReq, errors.ThrowInvalidArgument(nil, "VIEW-Fsj7f", "Errors.User.ExternalIDP.NotAllowed"))
+	l.renderLogin(w, r, authReq, zerrors.ThrowInvalidArgument(nil, "VIEW-Fsj7f", "Errors.User.ExternalIDP.NotAllowed"))
 }
 
 // handleExternalLogin is called when a user selects the idp on the login page
@@ -167,10 +174,12 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		provider, err = l.appleProvider(r.Context(), identityProvider)
 	case domain.IDPTypeLDAP:
 		provider, err = l.ldapProvider(r.Context(), identityProvider)
+	case domain.IDPTypeSAML:
+		provider, err = l.samlProvider(r.Context(), identityProvider)
 	case domain.IDPTypeUnspecified:
 		fallthrough
 	default:
-		l.renderLogin(w, r, authReq, errors.ThrowInvalidArgument(nil, "LOGIN-AShek", "Errors.ExternalIDP.IDPTypeNotImplemented"))
+		l.renderLogin(w, r, authReq, zerrors.ThrowInvalidArgument(nil, "LOGIN-AShek", "Errors.ExternalIDP.IDPTypeNotImplemented"))
 		return
 	}
 	if err != nil {
@@ -183,7 +192,17 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		l.renderLogin(w, r, authReq, err)
 		return
 	}
-	http.Redirect(w, r, session.GetAuthURL(), http.StatusFound)
+
+	content, redirect := session.GetAuth(r.Context())
+	if redirect {
+		http.Redirect(w, r, content, http.StatusFound)
+		return
+	}
+	_, err = w.Write([]byte(content))
+	if err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
 }
 
 // handleExternalLoginCallbackForm handles the callback from a IDP with form_post.
@@ -195,6 +214,7 @@ func (l *Login) handleExternalLoginCallbackForm(w http.ResponseWriter, r *http.R
 		l.renderLogin(w, r, nil, err)
 		return
 	}
+	r.Form.Add("Method", http.MethodPost)
 	http.Redirect(w, r, HandlerPrefix+EndpointExternalLoginCallback+"?"+r.Form.Encode(), 302)
 }
 
@@ -207,6 +227,15 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		l.renderLogin(w, r, nil, err)
 		return
 	}
+	if data.State == "" {
+		data.State = data.RelayState
+	}
+	// workaround because of CSRF on external identity provider flows
+	if data.Method == http.MethodPost {
+		r.Method = http.MethodPost
+		r.PostForm = r.Form
+	}
+
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID)
 	if err != nil {
@@ -284,12 +313,24 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			return
 		}
 		session = &apple.Session{Session: &openid.Session{Provider: provider.(*apple.Provider).Provider, Code: data.Code}, UserFormValue: data.User}
+	case domain.IDPTypeSAML:
+		provider, err = l.samlProvider(r.Context(), identityProvider)
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		sp, err := provider.(*saml.Provider).GetSP()
+		if err != nil {
+			l.externalAuthFailed(w, r, authReq, nil, nil, err)
+			return
+		}
+		session = &saml.Session{ServiceProvider: sp, RequestID: authReq.SAMLRequestID, Request: r}
 	case domain.IDPTypeJWT,
 		domain.IDPTypeLDAP,
 		domain.IDPTypeUnspecified:
 		fallthrough
 	default:
-		l.renderLogin(w, r, authReq, errors.ThrowInvalidArgument(nil, "LOGIN-SFefg", "Errors.ExternalIDP.IDPTypeNotImplemented"))
+		l.renderLogin(w, r, authReq, zerrors.ThrowInvalidArgument(nil, "LOGIN-SFefg", "Errors.ExternalIDP.IDPTypeNotImplemented"))
 		return
 	}
 
@@ -324,7 +365,7 @@ func (l *Login) migrateExternalUserID(r *http.Request, authReq *domain.AuthReque
 		// always reset to the mapped ID
 		externalUser.ExternalUserID = externalUserID
 		// but ignore the error if the user was just not found with the previousID
-		if errors.IsNotFound(err) {
+		if zerrors.IsNotFound(err) {
 			return false, nil
 		}
 		return false, err
@@ -341,7 +382,7 @@ func (l *Login) migrateExternalUserID(r *http.Request, authReq *domain.AuthReque
 	return previousIDMatched, l.command.MigrateUserIDP(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, externalUser.IDPConfigID, previousID, externalUserID)
 }
 
-// handleExternalUserAuthenticated maps the IDP user, checks for a corresponding externalID
+// handleExternalUserAuthenticated maps the IDP user, checks for a corresponding externalID and that the IDP is allowed
 func (l *Login) handleExternalUserAuthenticated(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -352,13 +393,18 @@ func (l *Login) handleExternalUserAuthenticated(
 	callback func(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest),
 ) {
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
+	// ensure the linked IDP is added to the login policy
+	if err := l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, provider.ID, authReq.AgentID); err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
 	// check and fill in local linked user
 	externalErr := l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r), false)
-	if externalErr != nil && !errors.IsNotFound(externalErr) {
+	if externalErr != nil && !zerrors.IsNotFound(externalErr) {
 		l.renderError(w, r, authReq, externalErr)
 		return
 	}
-	if externalErr != nil && errors.IsNotFound(externalErr) {
+	if externalErr != nil && zerrors.IsNotFound(externalErr) {
 		previousIDMatched, err := l.tryMigrateExternalUserID(r, session, authReq, externalUser)
 		if err != nil {
 			l.renderError(w, r, authReq, err)
@@ -382,7 +428,7 @@ func (l *Login) handleExternalUserAuthenticated(
 		return
 	}
 	// if action is done and no user linked then link or register
-	if errors.IsNotFound(externalErr) {
+	if zerrors.IsNotFound(externalErr) {
 		l.externalUserNotExisting(w, r, authReq, provider, externalUser, externalUserChange)
 		return
 	}
@@ -448,7 +494,7 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 // autoCreateExternalUser takes the externalUser and creates it automatically (without user interaction)
 func (l *Login) autoCreateExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	if len(authReq.LinkingUsers) == 0 {
-		l.renderError(w, r, authReq, errors.ThrowPreconditionFailed(nil, "LOGIN-asfg3", "Errors.ExternalIDP.NoExternalUserData"))
+		l.renderError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "LOGIN-asfg3", "Errors.ExternalIDP.NoExternalUserData"))
 		return
 	}
 
@@ -508,7 +554,7 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 
 	translator := l.getTranslator(r.Context(), authReq)
 	data := externalNotFoundOptionData{
-		baseData: l.getBaseData(r, authReq, "ExternalNotFound.Title", "ExternalNotFound.Description", errID, errMessage),
+		baseData: l.getBaseData(r, authReq, translator, "ExternalNotFound.Title", "ExternalNotFound.Description", errID, errMessage),
 		externalNotFoundOptionFormData: externalNotFoundOptionFormData{
 			externalRegisterFormData: externalRegisterFormData{
 				Email:     human.EmailAddress,
@@ -572,7 +618,7 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 	// if the user selects the linking button
 	if data.Link {
 		if !idpTemplate.IsLinkingAllowed {
-			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, errors.ThrowPreconditionFailed(nil, "LOGIN-AS3ff", "Errors.ExternalIDP.LinkingNotAllowed"))
+			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, zerrors.ThrowPreconditionFailed(nil, "LOGIN-AS3ff", "Errors.ExternalIDP.LinkingNotAllowed"))
 			return
 		}
 		l.renderLogin(w, r, authReq, nil)
@@ -580,7 +626,7 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 	}
 	// if the user selects the creation button
 	if !idpTemplate.IsCreationAllowed {
-		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, errors.ThrowPreconditionFailed(nil, "LOGIN-dsfd3", "Errors.ExternalIDP.CreationNotAllowed"))
+		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, zerrors.ThrowPreconditionFailed(nil, "LOGIN-dsfd3", "Errors.ExternalIDP.CreationNotAllowed"))
 		return
 	}
 	linkingUser := mapExternalNotFoundOptionFormDataToLoginUser(data)
@@ -636,12 +682,12 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 
 // updateExternalUser will update the existing user (email, phone, profile) with data provided by the IDP
 func (l *Login) updateExternalUser(ctx context.Context, authReq *domain.AuthRequest, externalUser *domain.ExternalUser) error {
-	user, err := l.query.GetUserByID(ctx, true, authReq.UserID, false)
+	user, err := l.query.GetUserByID(ctx, true, authReq.UserID)
 	if err != nil {
 		return err
 	}
 	if user.Human == nil {
-		return errors.ThrowPreconditionFailed(nil, "LOGIN-WLTce", "Errors.User.NotHuman")
+		return zerrors.ThrowPreconditionFailed(nil, "LOGIN-WLTce", "Errors.User.NotHuman")
 	}
 	err = l.updateExternalUserEmail(ctx, user, externalUser)
 	logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update email")
@@ -651,6 +697,9 @@ func (l *Login) updateExternalUser(ctx context.Context, authReq *domain.AuthRequ
 
 	err = l.updateExternalUserProfile(ctx, user, externalUser)
 	logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update profile")
+
+	err = l.updateExternalUsername(ctx, user, externalUser)
+	logging.WithFields("authReq", authReq.ID, "user", authReq.UserID).OnError(err).Error("unable to update external username")
 
 	return nil
 }
@@ -714,6 +763,36 @@ func (l *Login) updateExternalUserProfile(ctx context.Context, user *query.User,
 		Gender:            user.Human.Gender,
 	})
 	return err
+}
+
+func (l *Login) updateExternalUsername(ctx context.Context, user *query.User, externalUser *domain.ExternalUser) error {
+	externalIDQuery, err := query.NewIDPUserLinksExternalIDSearchQuery(externalUser.ExternalUserID)
+	if err != nil {
+		return err
+	}
+	idpIDQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(externalUser.IDPConfigID)
+	if err != nil {
+		return err
+	}
+	userIDQuery, err := query.NewIDPUserLinksUserIDSearchQuery(user.ID)
+	if err != nil {
+		return err
+	}
+	links, err := l.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{externalIDQuery, idpIDQuery, userIDQuery}}, false)
+	if err != nil || len(links.Links) == 0 {
+		return err
+	}
+	if links.Links[0].ProvidedUsername == externalUser.PreferredUsername {
+		return nil
+	}
+	return l.command.UpdateUserIDPLinkUsername(
+		setContext(ctx, user.ResourceOwner),
+		user.ID,
+		user.ResourceOwner,
+		externalUser.IDPConfigID,
+		externalUser.ExternalUserID,
+		externalUser.PreferredUsername,
+	)
 }
 
 func hasEmailChanged(user *query.User, externalUser *domain.ExternalUser) bool {
@@ -878,6 +957,49 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 		func() idp.User {
 			return oauth.NewUserMapper(identityProvider.OAuthIDPTemplate.IDAttribute)
 		},
+	)
+}
+
+func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTemplate) (*saml.Provider, error) {
+	key, err := crypto.Decrypt(identityProvider.SAMLIDPTemplate.Key, l.idpConfigAlg)
+	if err != nil {
+		return nil, err
+	}
+	opts := make([]saml.ProviderOpts, 0, 2)
+	if identityProvider.SAMLIDPTemplate.WithSignedRequest {
+		opts = append(opts, saml.WithSignedRequest())
+	}
+	if identityProvider.SAMLIDPTemplate.Binding != "" {
+		opts = append(opts, saml.WithBinding(identityProvider.SAMLIDPTemplate.Binding))
+	}
+	opts = append(opts,
+		saml.WithEntityID(http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), l.externalSecure)+"/idps/"+identityProvider.ID+"/saml/metadata"),
+		saml.WithCustomRequestTracker(
+			requesttracker.New(
+				func(ctx context.Context, authRequestID, samlRequestID string) error {
+					useragent, _ := http_mw.UserAgentIDFromCtx(ctx)
+					return l.authRepo.SaveSAMLRequestID(ctx, authRequestID, samlRequestID, useragent)
+				},
+				func(ctx context.Context, authRequestID string) (*samlsp.TrackedRequest, error) {
+					useragent, _ := http_mw.UserAgentIDFromCtx(ctx)
+					auhRequest, err := l.authRepo.AuthRequestByID(ctx, authRequestID, useragent)
+					if err != nil {
+						return nil, err
+					}
+					return &samlsp.TrackedRequest{
+						SAMLRequestID: auhRequest.SAMLRequestID,
+						Index:         authRequestID,
+					}, nil
+				},
+			),
+		))
+	return saml.New(
+		identityProvider.Name,
+		l.baseURL(ctx)+EndpointExternalLogin+"/",
+		identityProvider.SAMLIDPTemplate.Metadata,
+		identityProvider.SAMLIDPTemplate.Certificate,
+		key,
+		opts...,
 	)
 }
 
@@ -1089,8 +1211,9 @@ func mapExternalNotFoundOptionFormDataToLoginUser(formData *externalNotFoundOpti
 	}
 }
 
-func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domain.AuthRequest, identityProviderID string) []any {
-	params := []any{authReq.AgentID}
+func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domain.AuthRequest, identityProviderID string) []idp.Parameter {
+	params := make([]idp.Parameter, 1, 2)
+	params[0] = idp.UserAgentID(authReq.AgentID)
 
 	if authReq.UserID != "" && identityProviderID != "" {
 		links, err := l.getUserLinks(ctx, authReq.UserID, identityProviderID)
@@ -1099,25 +1222,19 @@ func (l *Login) sessionParamsFromAuthRequest(ctx context.Context, authReq *domai
 			return params
 		}
 		if len(links.Links) == 1 {
-			return append(params, keyAndValueToAuthURLOpt("login_hint", links.Links[0].ProvidedUsername))
+			return append(params, idp.LoginHintParam(links.Links[0].ProvidedUsername))
 		}
 	}
 	if authReq.UserName != "" {
-		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.UserName))
+		return append(params, idp.LoginHintParam(authReq.UserName))
 	}
 	if authReq.LoginName != "" {
-		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginName))
+		return append(params, idp.LoginHintParam(authReq.LoginName))
 	}
 	if authReq.LoginHint != "" {
-		return append(params, keyAndValueToAuthURLOpt("login_hint", authReq.LoginHint))
+		return append(params, idp.LoginHintParam(authReq.LoginHint))
 	}
 	return params
-}
-
-func keyAndValueToAuthURLOpt(key, value string) rp.AuthURLOpt {
-	return func() []oauth2.AuthCodeOption {
-		return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam(key, value)}
-	}
 }
 
 func (l *Login) getUserLinks(ctx context.Context, userID, idpID string) (*query.IDPUserLinks, error) {

@@ -4,14 +4,14 @@ import (
 	"database/sql"
 	"testing"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestUserProjection_reduces(t *testing.T) {
@@ -27,10 +27,11 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanAddedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanAddedType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "user-name",
 						"firstName": "first-name",
 						"lastName": "last-name",
@@ -41,17 +42,16 @@ func TestUserProjection_reduces(t *testing.T) {
 						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
-				), user.HumanAddedEventMapper),
+					), user.HumanAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.users8 (id, creation_date, change_date, resource_owner, instance_id, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users10 (id, creation_date, change_date, resource_owner, instance_id, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -65,7 +65,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users8_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.users10_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -80,7 +80,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users8_notifications (user_id, instance_id, last_email, last_phone, password_set) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.users10_notifications (user_id, instance_id, last_email, last_phone, password_set) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -96,10 +96,11 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1Added",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1AddedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserV1AddedType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "user-name",
 						"firstName": "first-name",
 						"lastName": "last-name",
@@ -110,17 +111,16 @@ func TestUserProjection_reduces(t *testing.T) {
 						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
-				), user.HumanAddedEventMapper),
+					), user.HumanAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.users8 (id, creation_date, change_date, resource_owner, instance_id, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users10 (id, creation_date, change_date, resource_owner, instance_id, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -134,7 +134,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users8_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.users10_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -149,7 +149,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users8_notifications (user_id, instance_id, last_email, last_phone, password_set) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.users10_notifications (user_id, instance_id, last_email, last_phone, password_set) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -165,26 +165,26 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanAdded NULLs",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanAddedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanAddedType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "user-name",
 						"firstName": "first-name",
 						"lastName": "last-name",
 						"email": "email@zitadel.com"
 					}`),
-				), user.HumanAddedEventMapper),
+					), user.HumanAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.users8 (id, creation_date, change_date, resource_owner, instance_id, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users10 (id, creation_date, change_date, resource_owner, instance_id, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -198,7 +198,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users8_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.users10_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -213,7 +213,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users8_notifications (user_id, instance_id, last_email, last_phone, password_set) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.users10_notifications (user_id, instance_id, last_email, last_phone, password_set) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -229,10 +229,11 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanRegistered",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanRegisteredType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanRegisteredType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "user-name",
 						"firstName": "first-name",
 						"lastName": "last-name",
@@ -243,17 +244,16 @@ func TestUserProjection_reduces(t *testing.T) {
 						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
-				), user.HumanRegisteredEventMapper),
+					), user.HumanRegisteredEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanRegistered,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.users8 (id, creation_date, change_date, resource_owner, instance_id, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users10 (id, creation_date, change_date, resource_owner, instance_id, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -267,7 +267,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users8_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.users10_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -282,7 +282,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users8_notifications (user_id, instance_id, last_email, last_phone, password_set) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.users10_notifications (user_id, instance_id, last_email, last_phone, password_set) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -298,10 +298,11 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1Registered",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1RegisteredType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserV1RegisteredType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "user-name",
 						"firstName": "first-name",
 						"lastName": "last-name",
@@ -312,17 +313,16 @@ func TestUserProjection_reduces(t *testing.T) {
 						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
-				), user.HumanRegisteredEventMapper),
+					), user.HumanRegisteredEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanRegistered,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.users8 (id, creation_date, change_date, resource_owner, instance_id, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users10 (id, creation_date, change_date, resource_owner, instance_id, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -336,7 +336,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users8_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.users10_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -351,7 +351,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users8_notifications (user_id, instance_id, last_email, last_phone, password_set) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.users10_notifications (user_id, instance_id, last_email, last_phone, password_set) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -367,26 +367,26 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanRegistered NULLs",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanRegisteredType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanRegisteredType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "user-name",
 						"firstName": "first-name",
 						"lastName": "last-name",
 						"email": "email@zitadel.com"
 					}`),
-				), user.HumanRegisteredEventMapper),
+					), user.HumanRegisteredEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanRegistered,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.users8 (id, creation_date, change_date, resource_owner, instance_id, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users10 (id, creation_date, change_date, resource_owner, instance_id, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -400,7 +400,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users8_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.users10_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -415,7 +415,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users8_notifications (user_id, instance_id, last_email, last_phone, password_set) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.users10_notifications (user_id, instance_id, last_email, last_phone, password_set) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -431,21 +431,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanInitCodeAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanInitialCodeAddedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanInitialCodeAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.HumanInitialCodeAddedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanInitialCodeAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanInitCodeAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET state = $1 WHERE (id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10 SET state = $1 WHERE (id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								domain.UserStateInitial,
 								"agg-id",
@@ -459,21 +459,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1InitCodeAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1InitialCodeAddedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanInitialCodeAddedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserV1InitialCodeAddedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanInitialCodeAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanInitCodeAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET state = $1 WHERE (id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10 SET state = $1 WHERE (id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								domain.UserStateInitial,
 								"agg-id",
@@ -487,21 +487,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanInitCodeSucceeded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanInitializedCheckSucceededType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanInitializedCheckSucceededEventMapper),
+				event: getEvent(
+					testEvent(
+						user.HumanInitializedCheckSucceededType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanInitializedCheckSucceededEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanInitCodeSucceeded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET state = $1 WHERE (id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10 SET state = $1 WHERE (id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								domain.UserStateActive,
 								"agg-id",
@@ -515,21 +515,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1InitCodeAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1InitializedCheckSucceededType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanInitializedCheckSucceededEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserV1InitializedCheckSucceededType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanInitializedCheckSucceededEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanInitCodeSucceeded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET state = $1 WHERE (id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10 SET state = $1 WHERE (id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								domain.UserStateActive,
 								"agg-id",
@@ -543,21 +543,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserLocked",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserLockedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.UserLockedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserLockedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.UserLockedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceUserLocked,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserStateLocked,
@@ -573,21 +573,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserUnlocked",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserUnlockedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.UserUnlockedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserUnlockedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.UserUnlockedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceUserUnlocked,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserStateActive,
@@ -603,21 +603,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserDeactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserDeactivatedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.UserDeactivatedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserDeactivatedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.UserDeactivatedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceUserDeactivated,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserStateInactive,
@@ -633,21 +633,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserReactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserReactivatedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.UserReactivatedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserReactivatedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.UserReactivatedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceUserReactivated,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserStateActive,
@@ -663,21 +663,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserRemovedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.UserRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserRemovedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.UserRemovedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.users8 WHERE (id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.users10 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -690,23 +690,23 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserUserNameChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserUserNameChangedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserUserNameChangedType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "username"
 					}`),
-				), user.UsernameChangedEventMapper),
+					), user.UsernameChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceUserNameChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, username, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, username, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								"username",
@@ -722,23 +722,23 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceDomainClaimed",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserDomainClaimedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserDomainClaimedType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "id@temporary.domain"
 					}`),
-				), user.DomainClaimedEventMapper),
+					), user.DomainClaimedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceDomainClaimed,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, username, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, username, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								"id@temporary.domain",
@@ -754,10 +754,11 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanProfileChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanProfileChangedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanProfileChangedType,
+						user.AggregateType,
+						[]byte(`{
 						"firstName": "first-name",
 						"lastName": "last-name",
 						"nickName": "nick-name",
@@ -765,17 +766,16 @@ func TestUserProjection_reduces(t *testing.T) {
 						"preferredLanguage": "ch-DE",
 						"gender": 3
 					}`),
-				), user.HumanProfileChangedEventMapper),
+					), user.HumanProfileChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanProfileChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -784,7 +784,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_humans SET (first_name, last_name, nick_name, display_name, preferred_language, gender) = ($1, $2, $3, $4, $5, $6) WHERE (user_id = $7) AND (instance_id = $8)",
+							expectedStmt: "UPDATE projections.users10_humans SET (first_name, last_name, nick_name, display_name, preferred_language, gender) = ($1, $2, $3, $4, $5, $6) WHERE (user_id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								"first-name",
 								"last-name",
@@ -803,10 +803,11 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1ProfileChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1ProfileChangedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserV1ProfileChangedType,
+						user.AggregateType,
+						[]byte(`{
 						"firstName": "first-name",
 						"lastName": "last-name",
 						"nickName": "nick-name",
@@ -814,17 +815,16 @@ func TestUserProjection_reduces(t *testing.T) {
 						"preferredLanguage": "ch-DE",
 						"gender": 3
 					}`),
-				), user.HumanProfileChangedEventMapper),
+					), user.HumanProfileChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanProfileChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -833,7 +833,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_humans SET (first_name, last_name, nick_name, display_name, preferred_language, gender) = ($1, $2, $3, $4, $5, $6) WHERE (user_id = $7) AND (instance_id = $8)",
+							expectedStmt: "UPDATE projections.users10_humans SET (first_name, last_name, nick_name, display_name, preferred_language, gender) = ($1, $2, $3, $4, $5, $6) WHERE (user_id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								"first-name",
 								"last-name",
@@ -852,23 +852,23 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanPhoneChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanPhoneChangedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanPhoneChangedType,
+						user.AggregateType,
+						[]byte(`{
 						"phone": "+41 00 000 00 00"
 						}`),
-				), user.HumanPhoneChangedEventMapper),
+					), user.HumanPhoneChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -877,7 +877,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								domain.PhoneNumber("+41 00 000 00 00"),
 								false,
@@ -886,7 +886,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_notifications SET last_phone = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10_notifications SET last_phone = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 								"agg-id",
@@ -900,23 +900,23 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1PhoneChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1PhoneChangedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserV1PhoneChangedType,
+						user.AggregateType,
+						[]byte(`{
 						"phone": "+41 00 000 00 00"
 						}`),
-				), user.HumanPhoneChangedEventMapper),
+					), user.HumanPhoneChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -925,7 +925,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								domain.PhoneNumber("+41 00 000 00 00"),
 								false,
@@ -934,7 +934,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_notifications SET last_phone = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10_notifications SET last_phone = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 								"agg-id",
@@ -948,21 +948,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanPhoneRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanPhoneRemovedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanPhoneRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.HumanPhoneRemovedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanPhoneRemovedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -971,7 +971,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								nil,
 								nil,
@@ -980,7 +980,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_notifications SET (last_phone, verified_phone) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10_notifications SET (last_phone, verified_phone) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								nil,
 								nil,
@@ -995,21 +995,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1PhoneRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1PhoneRemovedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanPhoneRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserV1PhoneRemovedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanPhoneRemovedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1018,7 +1018,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								nil,
 								nil,
@@ -1027,7 +1027,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_notifications SET (last_phone, verified_phone) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10_notifications SET (last_phone, verified_phone) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								nil,
 								nil,
@@ -1042,21 +1042,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanPhoneVerified",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanPhoneVerifiedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanPhoneVerifiedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.HumanPhoneVerifiedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanPhoneVerifiedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneVerified,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1065,7 +1065,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_humans SET is_phone_verified = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10_humans SET is_phone_verified = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"agg-id",
@@ -1073,7 +1073,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_notifications SET verified_phone = last_phone WHERE (user_id = $1) AND (instance_id = $2)",
+							expectedStmt: "UPDATE projections.users10_notifications SET verified_phone = last_phone WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -1086,21 +1086,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1PhoneVerified",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1PhoneVerifiedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanPhoneVerifiedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserV1PhoneVerifiedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanPhoneVerifiedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanPhoneVerified,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1109,7 +1109,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_humans SET is_phone_verified = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10_humans SET is_phone_verified = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"agg-id",
@@ -1117,7 +1117,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_notifications SET verified_phone = last_phone WHERE (user_id = $1) AND (instance_id = $2)",
+							expectedStmt: "UPDATE projections.users10_notifications SET verified_phone = last_phone WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -1130,23 +1130,23 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanEmailChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanEmailChangedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanEmailChangedType,
+						user.AggregateType,
+						[]byte(`{
 						"email": "email@zitadel.com"
 					}`),
-				), user.HumanEmailChangedEventMapper),
+					), user.HumanEmailChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanEmailChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1155,7 +1155,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_humans SET (email, is_email_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10_humans SET (email, is_email_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								domain.EmailAddress("email@zitadel.com"),
 								false,
@@ -1164,7 +1164,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_notifications SET last_email = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10_notifications SET last_email = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								&sql.NullString{String: "email@zitadel.com", Valid: true},
 								"agg-id",
@@ -1178,23 +1178,23 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1EmailChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1EmailChangedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.UserV1EmailChangedType,
+						user.AggregateType,
+						[]byte(`{
 						"email": "email@zitadel.com"
 					}`),
-				), user.HumanEmailChangedEventMapper),
+					), user.HumanEmailChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanEmailChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1203,7 +1203,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_humans SET (email, is_email_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10_humans SET (email, is_email_verified) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								domain.EmailAddress("email@zitadel.com"),
 								false,
@@ -1212,7 +1212,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_notifications SET last_email = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10_notifications SET last_email = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								&sql.NullString{String: "email@zitadel.com", Valid: true},
 								"agg-id",
@@ -1226,21 +1226,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanEmailVerified",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanEmailVerifiedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanEmailVerifiedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.HumanEmailVerifiedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanEmailVerifiedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanEmailVerified,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1249,7 +1249,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_humans SET is_email_verified = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10_humans SET is_email_verified = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"agg-id",
@@ -1257,7 +1257,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_notifications SET verified_email = last_email WHERE (user_id = $1) AND (instance_id = $2)",
+							expectedStmt: "UPDATE projections.users10_notifications SET verified_email = last_email WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -1270,21 +1270,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserV1EmailVerified",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserV1EmailVerifiedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanEmailVerifiedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserV1EmailVerifiedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanEmailVerifiedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanEmailVerified,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1293,7 +1293,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_humans SET is_email_verified = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10_humans SET is_email_verified = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"agg-id",
@@ -1301,7 +1301,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_notifications SET verified_email = last_email WHERE (user_id = $1) AND (instance_id = $2)",
+							expectedStmt: "UPDATE projections.users10_notifications SET verified_email = last_email WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -1314,23 +1314,23 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanAvatarAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanAvatarAddedType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.HumanAvatarAddedType,
+						user.AggregateType,
+						[]byte(`{
 						"storeKey": "users/agg-id/avatar"
 					}`),
-				), user.HumanAvatarAddedEventMapper),
+					), user.HumanAvatarAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanAvatarAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1339,7 +1339,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_humans SET avatar_key = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10_humans SET avatar_key = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"users/agg-id/avatar",
 								"agg-id",
@@ -1353,21 +1353,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceHumanAvatarRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.HumanAvatarRemovedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.HumanAvatarRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.HumanAvatarRemovedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.HumanAvatarRemovedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanAvatarRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1376,7 +1376,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_humans SET avatar_key = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10_humans SET avatar_key = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								nil,
 								"agg-id",
@@ -1390,24 +1390,24 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMachineAddedEvent no description",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineAddedEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.MachineAddedEventType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "username",
 						"name": "machine-name"
 					}`),
-				), user.MachineAddedEventMapper),
+					), user.MachineAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceMachineAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.users8 (id, creation_date, change_date, resource_owner, instance_id, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users10 (id, creation_date, change_date, resource_owner, instance_id, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -1421,7 +1421,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users8_machines (user_id, instance_id, name, description, access_token_type) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.users10_machines (user_id, instance_id, name, description, access_token_type) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -1437,25 +1437,25 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMachineAddedEvent",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineAddedEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.MachineAddedEventType,
+						user.AggregateType,
+						[]byte(`{
 						"username": "username",
 						"name": "machine-name",
 						"description": "description"
 					}`),
-				), user.MachineAddedEventMapper),
+					), user.MachineAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceMachineAdded,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.users8 (id, creation_date, change_date, resource_owner, instance_id, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users10 (id, creation_date, change_date, resource_owner, instance_id, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -1469,7 +1469,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users8_machines (user_id, instance_id, name, description, access_token_type) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.users10_machines (user_id, instance_id, name, description, access_token_type) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -1485,24 +1485,24 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMachineChangedEvent",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineChangedEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.MachineChangedEventType,
+						user.AggregateType,
+						[]byte(`{
 						"name": "machine-name",
 						"description": "description"
 					}`),
-				), user.MachineChangedEventMapper),
+					), user.MachineChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceMachineChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1511,7 +1511,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_machines SET (name, description) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10_machines SET (name, description) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								"machine-name",
 								"description",
@@ -1526,23 +1526,23 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMachineChangedEvent name",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineChangedEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.MachineChangedEventType,
+						user.AggregateType,
+						[]byte(`{
 						"name": "machine-name"
 					}`),
-				), user.MachineChangedEventMapper),
+					), user.MachineChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceMachineChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1551,7 +1551,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_machines SET name = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10_machines SET name = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"machine-name",
 								"agg-id",
@@ -1565,23 +1565,23 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMachineChangedEvent description",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineChangedEventType),
-					user.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						user.MachineChangedEventType,
+						user.AggregateType,
+						[]byte(`{
 						"description": "description"
 					}`),
-				), user.MachineChangedEventMapper),
+					), user.MachineChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceMachineChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1590,7 +1590,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_machines SET description = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10_machines SET description = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"description",
 								"agg-id",
@@ -1604,17 +1604,17 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMachineChangedEvent no values",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineChangedEventType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.MachineChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.MachineChangedEventType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.MachineChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceMachineChanged,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{},
 				},
@@ -1623,23 +1623,23 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "reduceMachineSecretSet",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineSecretSetType),
-					user.AggregateType,
-					[]byte(`{
-						"client_secret": {}
+				event: getEvent(
+					testEvent(
+						user.MachineSecretSetType,
+						user.AggregateType,
+						[]byte(`{
+							"clientSecret": {"CryptoType":1,"Algorithm":"bcrypt","Crypted":"deadbeef"}
 					}`),
-				), user.MachineSecretSetEventMapper),
+					), user.MachineSecretSetEventMapper),
 			},
 			reduce: (&userProjection{}).reduceMachineSecretSet,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1648,9 +1648,13 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_machines SET has_secret = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10_machines SET secret = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
-								true,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeHash,
+									Algorithm:  "bcrypt",
+									Crypted:    []byte{117, 230, 157, 109, 231, 159},
+								},
 								"agg-id",
 								"instance-id",
 							},
@@ -1660,23 +1664,23 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceMachineSecretSet",
+			name: "reduceMachineSecretRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.MachineSecretRemovedType),
-					user.AggregateType,
-					[]byte(`{}`),
-				), user.MachineSecretRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.MachineSecretRemovedType,
+						user.AggregateType,
+						[]byte(`{}`),
+					), user.MachineSecretRemovedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceMachineSecretRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.users8 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.users10 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1685,9 +1689,9 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users8_machines SET has_secret = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.users10_machines SET secret = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
-								false,
+								nil,
 								"agg-id",
 								"instance-id",
 							},
@@ -1700,20 +1704,20 @@ func TestUserProjection_reduces(t *testing.T) {
 			name:   "org reduceOwnerRemoved",
 			reduce: (&userProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.users8 WHERE (instance_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.users10 WHERE (instance_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"agg-id",
@@ -1726,21 +1730,21 @@ func TestUserProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(UserInstanceIDCol),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.users8 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.users10 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -1754,7 +1758,7 @@ func TestUserProjection_reduces(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			event := baseEvent(t)
 			got, err := tt.reduce(event)
-			if _, ok := err.(errors.InvalidArgument); !ok {
+			if ok := zerrors.IsErrorInvalidArgument(err); !ok {
 				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
 			}
 

@@ -196,4 +196,20 @@
       <span class="title">Active Directory / LDAP</span>
     </div>
   </a>
+
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'saml', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+        ? ['/org', 'provider', 'saml', 'create']
+        : []
+    "
+  >
+    <img class="idp-logo" src="./assets/images/idp/saml-icon.svg" alt="oauth" />
+    <div class="text-container">
+      <span class="title">SAML SP</span>
+    </div>
+  </a>
 </div>

@@ -7,14 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
@@ -64,7 +62,7 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 				supportEmail: "support@example.com",
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -74,18 +72,13 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 					t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewPrivacyPolicyAddedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									"TOSLink",
-									"PrivacyLink",
-									"HelpLink",
-									"support@example.com",
-								),
-							),
-						},
+						instance.NewPrivacyPolicyAddedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"TOSLink",
+							"PrivacyLink",
+							"HelpLink",
+							"support@example.com",
+						),
 					),
 				),
 			},
@@ -117,7 +110,7 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 				supportEmail: "wrong email",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -127,18 +120,13 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 					t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID(
-								"INSTANCE",
-								instance.NewPrivacyPolicyAddedEvent(context.Background(),
-									&instance.NewAggregate("INSTANCE").Aggregate,
-									"",
-									"",
-									"",
-									"",
-								),
-							),
-						},
+						instance.NewPrivacyPolicyAddedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"",
+							"",
+							"",
+							"",
+						),
 					),
 				),
 			},
@@ -211,7 +199,7 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -242,7 +230,7 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -262,7 +250,7 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -282,16 +270,12 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newDefaultPrivacyPolicyChangedEvent(context.Background(),
-									"TOSLinkChanged",
-									"PrivacyLinkChanged",
-									"HelpLinkChanged",
-									"support2@example.com",
-								),
-							),
-						},
+						newDefaultPrivacyPolicyChangedEvent(context.Background(),
+							"TOSLinkChanged",
+							"PrivacyLinkChanged",
+							"HelpLinkChanged",
+							"support2@example.com",
+						),
 					),
 				),
 			},
@@ -309,6 +293,7 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "INSTANCE",
 						ResourceOwner: "INSTANCE",
+						InstanceID:    "INSTANCE",
 					},
 					TOSLink:      "TOSLinkChanged",
 					PrivacyLink:  "PrivacyLinkChanged",

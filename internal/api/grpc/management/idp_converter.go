@@ -3,15 +3,18 @@ package management
 import (
 	"context"
 
+	"github.com/crewjam/saml"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	idp_grpc "github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
+	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
 
@@ -129,7 +132,7 @@ func idpQueryToModel(idpQuery *mgmt_pb.IDPQuery) (query.SearchQuery, error) {
 	case *mgmt_pb.IDPQuery_OwnerTypeQuery:
 		return query.NewIDPOwnerTypeSearchQuery(idp_grpc.IDPProviderTypeFromPb(q.OwnerTypeQuery.OwnerType))
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "MANAG-WtLPV", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "MANAG-WtLPV", "List.Query.Invalid")
 	}
 }
 
@@ -214,7 +217,7 @@ func providerQueryToQuery(idpQuery *mgmt_pb.ProviderQuery) (query.SearchQuery, e
 	case *mgmt_pb.ProviderQuery_OwnerTypeQuery:
 		return query.NewIDPTemplateOwnerTypeSearchQuery(idp_grpc.IDPProviderTypeFromPb(q.OwnerTypeQuery.OwnerType))
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ORG-Dr2aa", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-Dr2aa", "List.Query.Invalid")
 	}
 }
 
@@ -479,5 +482,42 @@ func updateAppleProviderToCommand(req *mgmt_pb.UpdateAppleProviderRequest) comma
 		PrivateKey: req.PrivateKey,
 		Scopes:     req.Scopes,
 		IDPOptions: idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func addSAMLProviderToCommand(req *mgmt_pb.AddSAMLProviderRequest) command.SAMLProvider {
+	return command.SAMLProvider{
+		Name:              req.Name,
+		Metadata:          req.GetMetadataXml(),
+		MetadataURL:       req.GetMetadataUrl(),
+		Binding:           bindingToCommand(req.Binding),
+		WithSignedRequest: req.WithSignedRequest,
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func updateSAMLProviderToCommand(req *mgmt_pb.UpdateSAMLProviderRequest) command.SAMLProvider {
+	return command.SAMLProvider{
+		Name:              req.Name,
+		Metadata:          req.GetMetadataXml(),
+		MetadataURL:       req.GetMetadataUrl(),
+		Binding:           bindingToCommand(req.Binding),
+		WithSignedRequest: req.WithSignedRequest,
+		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+	}
+}
+
+func bindingToCommand(binding idp_pb.SAMLBinding) string {
+	switch binding {
+	case idp_pb.SAMLBinding_SAML_BINDING_UNSPECIFIED:
+		return ""
+	case idp_pb.SAMLBinding_SAML_BINDING_POST:
+		return saml.HTTPPostBinding
+	case idp_pb.SAMLBinding_SAML_BINDING_REDIRECT:
+		return saml.HTTPRedirectBinding
+	case idp_pb.SAMLBinding_SAML_BINDING_ARTIFACT:
+		return saml.HTTPArtifactBinding
+	default:
+		return ""
 	}
 }

@@ -2,7 +2,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { MatLegacySlideToggleChange as MatSlideToggleChange } from '@angular/material/legacy-slide-toggle';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { Router } from '@angular/router';
 import {
   containsLowerCaseValidator,
@@ -20,7 +20,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { supportedLanguages } from 'src/app/utils/language';
+import { LanguagesService } from '../../services/languages.service';
 
 @Component({
   selector: 'cnsl-org-create',
@@ -46,7 +46,6 @@ export class OrgCreateComponent {
   public pwdForm?: UntypedFormGroup;
 
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
-  public languages: string[] = supportedLanguages;
 
   public policy?: PasswordComplexityPolicy.AsObject;
   public usePassword: boolean = false;
@@ -60,6 +59,7 @@ export class OrgCreateComponent {
     private _location: Location,
     private fb: UntypedFormBuilder,
     private mgmtService: ManagementService,
+    public langSvc: LanguagesService,
     breadcrumbService: BreadcrumbService,
   ) {
     const instanceBread = new Breadcrumb({
@@ -70,10 +70,6 @@ export class OrgCreateComponent {
 
     breadcrumbService.setBreadcrumb([instanceBread]);
     this.initForm();
-
-    this.adminService.getSupportedLanguages().then((supportedResp) => {
-      this.languages = supportedResp.languagesList;
-    });
   }
 
   public createSteps: number = 2;

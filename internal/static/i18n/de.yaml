@@ -28,8 +28,18 @@ Errors:
       RemoveFailed: Objekt konnte nicht gelöscht werden
   Limit:
     ExceedsDefault: Limit überschreitet default Limit
+  Limits:
+    NotFound: Limits konnten nicht gefunden werden
+    NoneSpecified: Keine Limits angegeben
+  Restrictions:
+    NoneSpecified: Keine Restriktionen angegeben
+    DefaultLanguageMustBeAllowed: Default Sprache muss erlaubt sein
   Language:
     NotParsed: Sprache konnte nicht gemapped werden
+    NotSupported: Sprache wird nicht unterstützt
+    NotAllowed: Sprache ist nicht erlaubt
+    Undefined: Sprache ist nicht definiert
+    Duplicate: Sprachen haben Duplikate
   OIDCSettings:
     NotFound: OIDC Konfiguration konnte nicht gefunden werden
     AlreadyExists: OIDC Konfiguration existiert bereits
@@ -48,6 +58,7 @@ Errors:
   Notification:
     NoDomain: Keine Domäne für Nachricht gefunden
   User:
+    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: Benutzer konnte nicht gefunden werden
     AlreadyExists: Benutzer existiert bereits
     NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
@@ -133,7 +144,7 @@ Errors:
     ExternalIDP:
       Invalid: Externer IDP ungültig
       IDPConfigNotExisting: IDP Provider ungültig für diese Organisation
-      NotAllowed: Externer IDP ist auf dieser Organisation nicht erlaubt.
+      NotAllowed: Externer IDP nicht erlaubt
       MinimumExternalIDPNeeded: Mindestens ein IDP muss hinzugefügt werden.
       AlreadyExists: External IDP ist bereits vergeben
       NotFound: Externer IDP nicht gefunden
@@ -182,6 +193,11 @@ Errors:
     DomainVerificationTypeInvalid: Verifikationstyp der Domäne ist ungültig
     DomainVerificationMissing: Verifikation der Domäne noch nicht erstellt
     DomainVerificationFailed: Verifikation der Domäne ist fehlgeschlagen
+    DomainVerificationTXTNotFound: Der TXT-Eintrag _zitadel-challenge wurde für Ihre Domain nicht gefunden. Überprüfen Sie, ob Sie ihn zu Ihrem DNS-Server hinzugefügt haben, oder warten Sie, bis der neue Eintrag verbreitet wird
+    DomainVerificationTXTNoMatch: Der TXT-Eintrag _zitadel-challenge wurde für Ihre Domain gefunden, enthält jedoch nicht den richtigen Token-Text. Überprüfen Sie, ob Sie das richtige Token zu Ihrem DNS-Server hinzugefügt haben, oder warten Sie, bis der neue Eintrag verbreitet wird
+    DomainVerificationHTTPNotFound: Das File der Challenge wurde unter der erwarteten URL nicht gefunden. Überprüfen Sie, ob Sie die Datei mit Leseberechtigungen an der richtigen Stelle hochgeladen haben
+    DomainVerificationHTTPNoMatch: Das File der Challenge wurde in der erwarteten URL gefunden, enthält jedoch nicht den richtigen Token-Text. Überprüfen Sie den Inhalt
+    DomainVerificationTimeout: There was a timeout querying the DNS server.
     PrimaryDomainNotDeletable: Primäre Domäne kann nicht gelöscht werden
     DomainNotFound: Domäne konnte nicht gefunden werden
     MemberIDMissing: Member ID fehlt
@@ -197,6 +213,7 @@ Errors:
     Domain:
       AlreadyExists: Domäne existiert bereits
       InvalidCharacter: Nur alphanumerische Zeichen, . und - sind für eine Domäne erlaubt
+      EmptyString: Ungültige nicht numerische und alphabetische Zeichen wurden durch Leerzeichen ersetzt und die resultierende Domäne ist eine leere Zeichenfolge
     IDP:
       InvalidSearchQuery: Ungültiger Suchparameter
       ClientIDMissing: ClientID fehlt
@@ -308,7 +325,7 @@ Errors:
       NotActive: Projekt Grant ist nicht aktiv
       NotInactive: Projekt Grant ist nicht inaktiv
   IAM:
-    NotFound: Instanz nicht gefunden
+    NotFound: Instanz nicht gefunden. Schau dir https://zitadel.com/docs/self-hosting/manage/custom-domain an
     Member:
       RolesNotChanged: Rollen wurden nicht verändert
     MemberInvalid: Member ist ungültig
@@ -415,9 +432,11 @@ Errors:
     AuditRetention: Änderungsverlauf ist ausserhalb der Audit Log Retention
   Token:
     NotFound: Token konnte nicht gefunden werden
+    Invalid: Token ist ungültig
   UserSession:
     NotFound: Benutzer Sitzung konnte nicht gefunden werden
   Key:
+    NotFound: Schlüssel nicht gefunden
     ExpireBeforeNow: Das Ablaufdatum liegt in der Vergangenheit
   Login:
     LoginPolicy:
@@ -481,12 +500,16 @@ Errors:
   Session:
     NotExisting: Session existiert nicht
     Terminated: Session bereits beendet
+    Expired: Session ist abgelaufen
+    PositiveLifetime: Session Lebensdauer darf nicht kleiner als 0 sein
     Token:
       Invalid: Session Token ist ungültig
     WebAuthN:
       NoChallenge: Sitzung ohne WebAuthN-Challenge
   Intent:
     IDPMissing: IDP ID fehlt im Request
+    IDPInvalid: IDP ungültig für die Anfrage
+    ResponseInvalid: IDP-Antwort ist ungültig
     SuccessURLMissing: Success URL fehlt im Request
     FailureURLMissing: Failure URL fehlt im Request
     StateMissing: State parameter fehlt im Request
@@ -505,6 +528,10 @@ Errors:
       Invalid: Token ist ungültig
       Expired: Token ist abgelaufen
     InvalidClient: Token wurde nicht für diesen Client ausgestellt
+  Feature:
+    NotExisting: Feature existiert nicht
+    TypeNotSupported: Feature Typ wird nicht unterstützt
+    InvalidValue: Ungültiger Wert für dieses Feature
 
 AggregateTypes:
   action: Action
@@ -515,12 +542,13 @@ AggregateTypes:
   user: Benutzer
   usergrant: Benutzerberechtigung
   quota: Kontingent
+  feature: Feature
 
 EventTypes:
   user:
     added: Benutzer hinzugefügt
     selfregistered: Benutzer hat sich selbst registriert
-    initialization: 
+    initialization:
       code:
         added: Initialisierungscode generiert
         sent: Initialisierungscode versendet
@@ -562,7 +590,7 @@ EventTypes:
       avatar:
         added: Avatar hinzugefügt
         removed: Avatar entfernt
-      initialization: 
+      initialization:
         code:
           added: Initialisierungscode generiert
           sent: Initialisierungscode versendet
@@ -1218,9 +1246,9 @@ Action:
   Flow:
     Type:
       Unspecified: Unspezifiziert
-      ExternalAuthentication:  Externe Authentifizierung
+      ExternalAuthentication: Externe Authentifizierung
       CustomiseToken: Token ergänzen
-      InternalAuthentication:  Interne Authentifizierung
+      InternalAuthentication: Interne Authentifizierung
       CustomizeSAMLResponse: SAMLResponse ergänzen
   TriggerType:
     Unspecified: Unspezifiziert

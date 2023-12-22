@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
 	"google.golang.org/grpc/codes"
@@ -49,7 +48,6 @@ func TestMain(m *testing.M) {
 // Get calls would return a Not Found error.
 func TestImport_and_Get(t *testing.T) {
 	const N = 100
-	var misses int
 
 	for i := 0; i < N; i++ {
 		firstName := strconv.Itoa(i)
@@ -57,14 +55,14 @@ func TestImport_and_Get(t *testing.T) {
 			// create unique names.
 			lastName := strconv.FormatInt(time.Now().Unix(), 10)
 			userName := strings.Join([]string{firstName, lastName}, "_")
-			email := strings.Join([]string{userName, "zitadel.com"}, "@")
+			email := strings.Join([]string{userName, "example.com"}, "@")
 
 			res, err := Client.ImportHumanUser(CTX, &management.ImportHumanUserRequest{
 				UserName: userName,
 				Profile: &management.ImportHumanUserRequest_Profile{
 					FirstName:         firstName,
 					LastName:          lastName,
-					PreferredLanguage: language.Afrikaans.String(),
+					PreferredLanguage: language.Japanese.String(),
 					Gender:            user.Gender_GENDER_DIVERSE,
 				},
 				Email: &management.ImportHumanUserRequest_Email{
@@ -76,18 +74,29 @@ func TestImport_and_Get(t *testing.T) {
 
 			_, err = Client.GetUserByID(CTX, &management.GetUserByIDRequest{Id: res.GetUserId()})
 
-			if s, ok := status.FromError(err); ok {
-				if s == nil {
-					return
-				}
-				if s.Code() == codes.NotFound {
-					t.Log(s)
-					misses++
-					return
-				}
+			s, ok := status.FromError(err)
+			if ok && s != nil && s.Code() == codes.NotFound {
+				t.Errorf("iteration %d: user with id %q not found", i, res.GetUserId())
 			}
 			require.NoError(t, err) // catch and fail on any other error
 		})
 	}
-	assert.Zerof(t, misses, "Not Found errors %d out of %d", misses, N)
+}
+
+func TestImport_UnparsablePreferredLanguage(t *testing.T) {
+	random := integration.RandString(5)
+	_, err := Client.ImportHumanUser(CTX, &management.ImportHumanUserRequest{
+		UserName: random,
+		Profile: &management.ImportHumanUserRequest_Profile{
+			FirstName:         random,
+			LastName:          random,
+			PreferredLanguage: "not valid",
+			Gender:            user.Gender_GENDER_DIVERSE,
+		},
+		Email: &management.ImportHumanUserRequest_Email{
+			Email:           random + "@example.com",
+			IsEmailVerified: true,
+		},
+	})
+	require.NoError(t, err)
 }

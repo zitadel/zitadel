@@ -1,7 +1,6 @@
 package initialise
 
 import (
-	"database/sql"
 	"embed"
 
 	"github.com/spf13/cobra"
@@ -9,6 +8,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
 var (
@@ -68,7 +68,7 @@ func InitAll(config *Config) {
 	logging.OnError(err).Fatal("unable to initialize ZITADEL")
 }
 
-func initialise(config database.Config, steps ...func(*sql.DB) error) error {
+func initialise(config database.Config, steps ...func(*database.DB) error) error {
 	logging.Info("initialization started")
 
 	err := ReadStmts(config.Type())
@@ -76,16 +76,16 @@ func initialise(config database.Config, steps ...func(*sql.DB) error) error {
 		return err
 	}
 
-	db, err := database.Connect(config, true)
+	db, err := database.Connect(config, true, dialect.DBPurposeQuery)
 	if err != nil {
 		return err
 	}
 	defer db.Close()
 
-	return Init(db.DB, steps...)
+	return Init(db, steps...)
 }
 
-func Init(db *sql.DB, steps ...func(*sql.DB) error) error {
+func Init(db *database.DB, steps ...func(*database.DB) error) error {
 	for _, step := range steps {
 		if err := step(db); err != nil {
 			return err

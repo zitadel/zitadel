@@ -1,11 +1,8 @@
 package settings
 
 import (
-	"encoding/json"
-
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -23,11 +20,11 @@ type DebugNotificationProviderAddedEvent struct {
 	Compact bool `json:"compact,omitempty"`
 }
 
-func (e *DebugNotificationProviderAddedEvent) Data() interface{} {
+func (e *DebugNotificationProviderAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *DebugNotificationProviderAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *DebugNotificationProviderAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -41,14 +38,14 @@ func NewDebugNotificationProviderAddedEvent(
 	}
 }
 
-func DebugNotificationProviderAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DebugNotificationProviderAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &DebugNotificationProviderAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "SET-f93ns", "unable to unmarshal debug notification added")
+		return nil, zerrors.ThrowInternal(err, "SET-f93ns", "unable to unmarshal debug notification added")
 	}
 
 	return e, nil
@@ -60,11 +57,11 @@ type DebugNotificationProviderChangedEvent struct {
 	Compact *bool `json:"compact,omitempty"`
 }
 
-func (e *DebugNotificationProviderChangedEvent) Data() interface{} {
+func (e *DebugNotificationProviderChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *DebugNotificationProviderChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *DebugNotificationProviderChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -73,7 +70,7 @@ func NewDebugNotificationProviderChangedEvent(
 	changes []DebugNotificationProviderChanges,
 ) (*DebugNotificationProviderChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "SET-hj90s", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "SET-hj90s", "Errors.NoChangesFound")
 	}
 	changeEvent := &DebugNotificationProviderChangedEvent{
 		BaseEvent: *base,
@@ -92,14 +89,14 @@ func ChangeCompact(compact bool) func(*DebugNotificationProviderChangedEvent) {
 	}
 }
 
-func DebugNotificationProviderChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DebugNotificationProviderChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &DebugNotificationProviderChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-ehssl", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-ehssl", "unable to unmarshal policy")
 	}
 
 	return e, nil
@@ -109,11 +106,11 @@ type DebugNotificationProviderRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *DebugNotificationProviderRemovedEvent) Data() interface{} {
+func (e *DebugNotificationProviderRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *DebugNotificationProviderRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *DebugNotificationProviderRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -123,7 +120,7 @@ func NewDebugNotificationProviderRemovedEvent(base *eventstore.BaseEvent) *Debug
 	}
 }
 
-func DebugNotificationProviderRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DebugNotificationProviderRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &DebugNotificationProviderRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

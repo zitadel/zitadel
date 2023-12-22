@@ -6,14 +6,17 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+// SetOrgLoginText only validates if the language is supported, not if it is allowed.
+// This enables setting texts before allowing a language
 func (c *Commands) SetOrgLoginText(ctx context.Context, resourceOwner string, loginText *domain.CustomLoginText) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-m29rF", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-m29rF", "Errors.ResourceOwnerMissing")
 	}
 	iamAgg := org.NewAggregate(resourceOwner)
 	events, existingLoginText, err := c.setOrgLoginText(ctx, &iamAgg.Aggregate, loginText)
@@ -32,10 +35,9 @@ func (c *Commands) SetOrgLoginText(ctx context.Context, resourceOwner string, lo
 }
 
 func (c *Commands) setOrgLoginText(ctx context.Context, orgAgg *eventstore.Aggregate, loginText *domain.CustomLoginText) ([]eventstore.Command, *OrgCustomLoginTextReadModel, error) {
-	if !loginText.IsValid() {
-		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "ORG-PPo2w", "Errors.CustomText.Invalid")
+	if err := loginText.IsValid(i18n.SupportedLanguages()); err != nil {
+		return nil, nil, err
 	}
-
 	existingLoginText, err := c.orgCustomLoginTextWriteModelByID(ctx, orgAgg.ID, loginText.Language)
 	if err != nil {
 		return nil, nil, err
@@ -46,17 +48,17 @@ func (c *Commands) setOrgLoginText(ctx context.Context, orgAgg *eventstore.Aggre
 
 func (c *Commands) RemoveOrgLoginTexts(ctx context.Context, resourceOwner string, lang language.Tag) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-1B8dw", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-1B8dw", "Errors.ResourceOwnerMissing")
 	}
 	if lang == language.Und {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-5ZZmo", "Errors.CustomText.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-5ZZmo", "Errors.CustomText.Invalid")
 	}
 	customText, err := c.orgCustomLoginTextWriteModelByID(ctx, resourceOwner, lang)
 	if err != nil {
 		return nil, err
 	}
 	if customText.State == domain.PolicyStateUnspecified || customText.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-9ru44", "Errors.CustomText.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "Org-9ru44", "Errors.CustomText.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&customText.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewCustomTextTemplateRemovedEvent(ctx, orgAgg, domain.LoginCustomText, lang))

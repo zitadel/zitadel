@@ -2,13 +2,10 @@ package project
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -22,15 +19,15 @@ var (
 	GrantRemovedType        = grantEventTypePrefix + "removed"
 )
 
-func NewAddProjectGrantUniqueConstraint(grantedOrgID, projectID string) *eventstore.EventUniqueConstraint {
+func NewAddProjectGrantUniqueConstraint(grantedOrgID, projectID string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueGrantType,
 		fmt.Sprintf("%s:%s", grantedOrgID, projectID),
 		"Errors.Project.Grant.AlreadyExists")
 }
 
-func NewRemoveProjectGrantUniqueConstraint(grantedOrgID, projectID string) *eventstore.EventUniqueConstraint {
-	return eventstore.NewRemoveEventUniqueConstraint(
+func NewRemoveProjectGrantUniqueConstraint(grantedOrgID, projectID string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
 		UniqueGrantType,
 		fmt.Sprintf("%s:%s", grantedOrgID, projectID))
 }
@@ -43,12 +40,12 @@ type GrantAddedEvent struct {
 	RoleKeys     []string `json:"roleKeys,omitempty"`
 }
 
-func (e *GrantAddedEvent) Data() interface{} {
+func (e *GrantAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GrantAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddProjectGrantUniqueConstraint(e.GrantedOrgID, e.Aggregate().ID)}
+func (e *GrantAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddProjectGrantUniqueConstraint(e.GrantedOrgID, e.Aggregate().ID)}
 }
 
 func NewGrantAddedEvent(
@@ -70,14 +67,14 @@ func NewGrantAddedEvent(
 	}
 }
 
-func GrantAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GrantAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GrantAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-mL0vs", "unable to unmarshal project grant")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-mL0vs", "unable to unmarshal project grant")
 	}
 
 	return e, nil
@@ -90,11 +87,11 @@ type GrantChangedEvent struct {
 	RoleKeys []string `json:"roleKeys,omitempty"`
 }
 
-func (e *GrantChangedEvent) Data() interface{} {
+func (e *GrantChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GrantChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GrantChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -115,14 +112,14 @@ func NewGrantChangedEvent(
 	}
 }
 
-func GrantChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GrantChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GrantChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-mL0vs", "unable to unmarshal project grant")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-mL0vs", "unable to unmarshal project grant")
 	}
 
 	return e, nil
@@ -135,11 +132,11 @@ type GrantCascadeChangedEvent struct {
 	RoleKeys []string `json:"roleKeys,omitempty"`
 }
 
-func (e *GrantCascadeChangedEvent) Data() interface{} {
+func (e *GrantCascadeChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GrantCascadeChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GrantCascadeChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -160,14 +157,14 @@ func NewGrantCascadeChangedEvent(
 	}
 }
 
-func GrantCascadeChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GrantCascadeChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GrantCascadeChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-9o0se", "unable to unmarshal project grant")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-9o0se", "unable to unmarshal project grant")
 	}
 
 	return e, nil
@@ -179,11 +176,11 @@ type GrantDeactivateEvent struct {
 	GrantID string `json:"grantId,omitempty"`
 }
 
-func (e *GrantDeactivateEvent) Data() interface{} {
+func (e *GrantDeactivateEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GrantDeactivateEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GrantDeactivateEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -202,14 +199,14 @@ func NewGrantDeactivateEvent(
 	}
 }
 
-func GrantDeactivateEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GrantDeactivateEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GrantDeactivateEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-9o0se", "unable to unmarshal project grant")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-9o0se", "unable to unmarshal project grant")
 	}
 
 	return e, nil
@@ -221,11 +218,11 @@ type GrantReactivatedEvent struct {
 	GrantID string `json:"grantId,omitempty"`
 }
 
-func (e *GrantReactivatedEvent) Data() interface{} {
+func (e *GrantReactivatedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GrantReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *GrantReactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -244,14 +241,14 @@ func NewGrantReactivatedEvent(
 	}
 }
 
-func GrantReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GrantReactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GrantReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-78f7D", "unable to unmarshal project grant")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-78f7D", "unable to unmarshal project grant")
 	}
 
 	return e, nil
@@ -264,12 +261,12 @@ type GrantRemovedEvent struct {
 	grantedOrgID string
 }
 
-func (e *GrantRemovedEvent) Data() interface{} {
+func (e *GrantRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *GrantRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveProjectGrantUniqueConstraint(e.grantedOrgID, e.Aggregate().ID)}
+func (e *GrantRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantUniqueConstraint(e.grantedOrgID, e.Aggregate().ID)}
 }
 
 func NewGrantRemovedEvent(
@@ -289,14 +286,14 @@ func NewGrantRemovedEvent(
 	}
 }
 
-func GrantRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GrantRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &GrantRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-28jM8", "unable to unmarshal project grant")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-28jM8", "unable to unmarshal project grant")
 	}
 
 	return e, nil

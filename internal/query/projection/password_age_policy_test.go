@@ -4,12 +4,11 @@ import (
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestPasswordAgeProjection_reduces(t *testing.T) {
@@ -25,20 +24,20 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.PasswordAgePolicyAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.PasswordAgePolicyAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"expireWarnDays": 10,
 						"maxAgeDays": 13
 }`),
-				), org.PasswordAgePolicyAddedEventMapper),
+					), org.PasswordAgePolicyAddedEventMapper),
 			},
 			reduce: (&passwordAgeProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -64,19 +63,19 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 			name:   "org reduceChanged",
 			reduce: (&passwordAgeProjection{}).reduceChanged,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.PasswordAgePolicyChangedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.PasswordAgePolicyChangedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"expireWarnDays": 10,
 						"maxAgeDays": 13
 		}`),
-				), org.PasswordAgePolicyChangedEventMapper),
+					), org.PasswordAgePolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -98,16 +97,16 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 			name:   "org reduceRemoved",
 			reduce: (&passwordAgeProjection{}).reduceRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.PasswordAgePolicyRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.PasswordAgePolicyRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.PasswordAgePolicyRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.PasswordAgePolicyRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -124,17 +123,17 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(AgePolicyInstanceIDCol),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -151,19 +150,19 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 			name:   "instance reduceAdded",
 			reduce: (&passwordAgeProjection{}).reduceAdded,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.PasswordAgePolicyAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.PasswordAgePolicyAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"expireWarnDays": 10,
 						"maxAgeDays": 13
 					}`),
-				), instance.PasswordAgePolicyAddedEventMapper),
+					), instance.PasswordAgePolicyAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -189,19 +188,19 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 			name:   "instance reduceChanged",
 			reduce: (&passwordAgeProjection{}).reduceChanged,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.PasswordAgePolicyChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.PasswordAgePolicyChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"expireWarnDays": 10,
 						"maxAgeDays": 13
 					}`),
-				), instance.PasswordAgePolicyChangedEventMapper),
+					), instance.PasswordAgePolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -223,16 +222,16 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&passwordAgeProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -251,7 +250,7 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			event := baseEvent(t)
 			got, err := tt.reduce(event)
-			if _, ok := err.(errors.InvalidArgument); !ok {
+			if ok := zerrors.IsErrorInvalidArgument(err); !ok {
 				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
 			}
 

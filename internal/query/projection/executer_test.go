@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type testExecuter struct {
@@ -25,8 +25,12 @@ type execution struct {
 type anyArg struct{}
 
 func (e *testExecuter) Exec(stmt string, args ...interface{}) (sql.Result, error) {
+	if stmt == "SAVEPOINT stmt_exec" || stmt == "RELEASE SAVEPOINT stmt_exec" {
+		return nil, nil
+	}
+
 	if e.execIdx >= len(e.executions) {
-		return nil, errors.ThrowInternal(nil, "PROJE-8TNoE", "too many executions")
+		return nil, zerrors.ThrowInternal(nil, "PROJE-8TNoE", "too many executions")
 	}
 	e.executions[e.execIdx].gottenArgs = args
 	e.executions[e.execIdx].gottenStmt = stmt

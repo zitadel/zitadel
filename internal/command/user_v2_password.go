@@ -6,8 +6,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // RequestPasswordReset generates a code
@@ -38,17 +38,17 @@ func (c *Commands) RequestPasswordResetReturnCode(ctx context.Context, userID st
 // urlTmpl allows changing the target URL that is used by the e-mail and should be a validated Go template, if used.
 func (c *Commands) requestPasswordReset(ctx context.Context, userID string, returnCode bool, urlTmpl string, notificationType domain.NotificationType) (_ *domain.ObjectDetails, plainCode *string, err error) {
 	if userID == "" {
-		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-SAFdda", "Errors.User.IDMissing")
+		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-SAFdda", "Errors.User.IDMissing")
 	}
 	model, err := c.getHumanWriteModelByID(ctx, userID, "")
 	if err != nil {
 		return nil, nil, err
 	}
 	if !model.UserState.Exists() {
-		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-SAF4f", "Errors.User.NotFound")
+		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-SAF4f", "Errors.User.NotFound")
 	}
 	if model.UserState == domain.UserStateInitial {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfe4g", "Errors.User.NotInitialised")
+		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfe4g", "Errors.User.NotInitialised")
 	}
 	if authz.GetCtxData(ctx).UserID != userID {
 		if err = c.checkPermission(ctx, domain.PermissionUserWrite, model.ResourceOwner, userID); err != nil {

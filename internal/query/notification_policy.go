@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -11,9 +11,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type NotificationPolicy struct {
@@ -81,7 +82,9 @@ func (q *Queries) NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx, err = projection.NotificationPolicyProjection.TriggerErr(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerNotificationPolicyProjection")
+		ctx, err = projection.NotificationPolicyProjection.Trigger(ctx, handler.WithAwaitRunning())
+		traceSpan.EndWithError(err)
 		if err != nil {
 			return nil, err
 		}
@@ -101,7 +104,7 @@ func (q *Queries) NotificationPolicyByOrg(ctx context.Context, shouldTriggerBulk
 		}).
 		OrderBy(NotificationPolicyColIsDefault.identifier()).Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Xuoapqm", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Xuoapqm", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -116,7 +119,9 @@ func (q *Queries) DefaultNotificationPolicy(ctx context.Context, shouldTriggerBu
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx, err = projection.NotificationPolicyProjection.TriggerErr(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerNotificationPolicyProjection")
+		ctx, err = projection.NotificationPolicyProjection.Trigger(ctx, handler.WithAwaitRunning())
+		traceSpan.EndWithError(err)
 		if err != nil {
 			return nil, err
 		}
@@ -130,7 +135,7 @@ func (q *Queries) DefaultNotificationPolicy(ctx context.Context, shouldTriggerBu
 		OrderBy(NotificationPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-xlqp209", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-xlqp209", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -166,10 +171,10 @@ func prepareNotificationPolicyQuery(ctx context.Context, db prepareDatabase) (sq
 				&policy.State,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-x0so2p", "Errors.NotificationPolicy.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-x0so2p", "Errors.NotificationPolicy.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-Zixoooq", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-Zixoooq", "Errors.Internal")
 			}
 			return policy, nil
 		}

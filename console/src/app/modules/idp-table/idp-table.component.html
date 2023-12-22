@@ -85,6 +85,10 @@
               <img class="idp-logo apple light" src="./assets/images/idp/apple.svg" alt="apple" />
               Apple
             </div>
+            <div class="idp-table-provider-type" *ngSwitchCase="ProviderType.PROVIDER_TYPE_SAML">
+              <img class="idp-logo" src="./assets/images/idp/saml-icon.svg" alt="saml" />
+              SAML SP
+            </div>
             <div class="idp-table-provider-type" *ngSwitchDefault>coming soon</div>
           </div>
         </td>
@@ -107,14 +111,14 @@
       <ng-container matColumnDef="creationDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.CREATIONDATE' | translate }}</th>
         <td class="pointer" mat-cell *matCellDef="let idp">
-          <span>{{ idp.details.creationDate | timestampToDate | localizedDate : 'dd. MMM, HH:mm' }}</span>
+          <span>{{ idp.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="changeDate">
         <th mat-header-cell *matHeaderCellDef>{{ 'IDP.CHANGEDATE' | translate }}</th>
         <td class="pointer" mat-cell *matCellDef="let idp">
-          <span>{{ idp.details.changeDate | timestampToDate | localizedDate : 'dd. MMM, HH:mm' }}</span>
+          <span>{{ idp.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
         </td>
       </ng-container>
 

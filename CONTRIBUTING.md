@@ -101,7 +101,8 @@ Please make sure you cover your changes with tests before marking a Pull Request
 - [ ] Integration tests against the gRPC server ensure that probable good and bad read and write permissions are tested.
 - [ ] Integration tests against the gRPC server ensure that the API is easily usable despite eventual consistency.
 - [ ] Integration tests against the gRPC server ensure that all probable login and registration flows are covered."
-- [ ] Integration tests ensure that certain commands send expected notifications.
+- [ ] Integration tests ensure that certain commands emit expected events that trigger notifications.
+- [ ] Integration tests ensure that certain events trigger expected notifications.
 
 ## Contribute
 
@@ -219,7 +220,7 @@ In order to run the integrations tests for the gRPC API, PostgreSQL and Cockroac
 
 ```bash
 export INTEGRATION_DB_FLAVOR="cockroach" ZITADEL_MASTERKEY="MasterkeyNeedsToHave32Characters"
-docker compose -f internal/integration/config/docker-compose.yaml up --wait ${INTEGRATION_DB_FLAVOR}
+docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait ${INTEGRATION_DB_FLAVOR}
 make core_integration_test
 docker compose -f internal/integration/config/docker-compose.yaml down
 ```

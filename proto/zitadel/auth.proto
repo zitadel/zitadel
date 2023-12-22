@@ -143,10 +143,10 @@ service AuthService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Supported Languages";
-            description: "The supported/default languages of the system will be returned by the language abbreviation."
+            description: "Use GetSupportedLanguages on the admin service instead."
+            deprecated: true;
             tags: "General";
         };
-
     }
 
     rpc GetMyUser(GetMyUserRequest) returns (GetMyUserResponse) {
@@ -996,7 +996,6 @@ message HealthzResponse {}
 //This is an empty request
 message GetSupportedLanguagesRequest {}
 
-//This is an empty response
 message GetSupportedLanguagesResponse {
     repeated string languages = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

@@ -1,14 +1,12 @@
 package model
 
 import (
-	"encoding/json"
-
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	iam_es_model "github.com/zitadel/zitadel/internal/iam/repository/eventsourcing/model"
 	org_model "github.com/zitadel/zitadel/internal/org/model"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Org struct {
@@ -34,7 +32,7 @@ func OrgToModel(org *Org) *org_model.Org {
 	return converted
 }
 
-func OrgFromEvents(org *Org, events ...*es_models.Event) (*Org, error) {
+func OrgFromEvents(org *Org, events ...eventstore.Event) (*Org, error) {
 	if org == nil {
 		org = new(Org)
 	}
@@ -42,7 +40,7 @@ func OrgFromEvents(org *Org, events ...*es_models.Event) (*Org, error) {
 	return org, org.AppendEvents(events...)
 }
 
-func (o *Org) AppendEvents(events ...*es_models.Event) error {
+func (o *Org) AppendEvents(events ...eventstore.Event) error {
 	for _, event := range events {
 		err := o.AppendEvent(event)
 		if err != nil {
@@ -52,8 +50,8 @@ func (o *Org) AppendEvents(events ...*es_models.Event) error {
 	return nil
 }
 
-func (o *Org) AppendEvent(event *es_models.Event) (err error) {
-	switch eventstore.EventType(event.Type) {
+func (o *Org) AppendEvent(event eventstore.Event) (err error) {
+	switch event.Type() {
 	case org.OrgAddedEventType:
 		err = o.SetData(event)
 		if err != nil {
@@ -92,10 +90,10 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 	return nil
 }
 
-func (o *Org) SetData(event *es_models.Event) error {
-	err := json.Unmarshal(event.Data, o)
+func (o *Org) SetData(event eventstore.Event) error {
+	err := event.Unmarshal(o)
 	if err != nil {
-		return errors.ThrowInternal(err, "EVENT-BpbQZ", "unable to unmarshal event")
+		return zerrors.ThrowInternal(err, "EVENT-BpbQZ", "unable to unmarshal event")
 	}
 	return nil
 }

@@ -1,12 +1,9 @@
 package idp
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type OIDCIDPAddedEvent struct {
@@ -46,22 +43,22 @@ func NewOIDCIDPAddedEvent(
 	}
 }
 
-func (e *OIDCIDPAddedEvent) Data() interface{} {
+func (e *OIDCIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OIDCIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OIDCIDPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func OIDCIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &OIDCIDPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-Et1dq", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-Et1dq", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -86,7 +83,7 @@ func NewOIDCIDPChangedEvent(
 	changes []OIDCIDPChanges,
 ) (*OIDCIDPChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDP-BH3dl", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-BH3dl", "Errors.NoChangesFound")
 	}
 	changedEvent := &OIDCIDPChangedEvent{
 		BaseEvent: *base,
@@ -142,22 +139,22 @@ func ChangeOIDCIsIDTokenMapping(idTokenMapping bool) func(*OIDCIDPChangedEvent) 
 	}
 }
 
-func (e *OIDCIDPChangedEvent) Data() interface{} {
+func (e *OIDCIDPChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OIDCIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OIDCIDPChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func OIDCIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &OIDCIDPChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-D3gjzh", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-D3gjzh", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -197,11 +194,11 @@ func (e *OIDCIDPMigratedAzureADEvent) Data() interface{} {
 	return e
 }
 
-func (e *OIDCIDPMigratedAzureADEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OIDCIDPMigratedAzureADEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func OIDCIDPMigratedAzureADEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCIDPMigratedAzureADEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := AzureADIDPAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -240,11 +237,11 @@ func (e *OIDCIDPMigratedGoogleEvent) Data() interface{} {
 	return e
 }
 
-func (e *OIDCIDPMigratedGoogleEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OIDCIDPMigratedGoogleEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func OIDCIDPMigratedGoogleEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCIDPMigratedGoogleEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := GoogleIDPAddedEventMapper(event)
 	if err != nil {
 		return nil, err

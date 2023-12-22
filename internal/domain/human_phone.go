@@ -6,8 +6,8 @@ import (
 	"github.com/ttacon/libphonenumber"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const defaultRegion = "CH"
@@ -16,11 +16,11 @@ type PhoneNumber string
 
 func (p PhoneNumber) Normalize() (PhoneNumber, error) {
 	if p == "" {
-		return p, caos_errs.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty")
+		return p, zerrors.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty")
 	}
 	phoneNr, err := libphonenumber.Parse(string(p), defaultRegion)
 	if err != nil {
-		return p, caos_errs.ThrowInvalidArgument(err, "PHONE-so0wa", "Errors.User.Phone.Invalid")
+		return p, zerrors.ThrowInvalidArgument(err, "PHONE-so0wa", "Errors.User.Phone.Invalid")
 	}
 	return PhoneNumber(libphonenumber.Format(phoneNr, libphonenumber.E164)), nil
 }
@@ -43,7 +43,7 @@ type PhoneCode struct {
 
 func (p *Phone) Normalize() error {
 	if p == nil {
-		return caos_errs.ThrowInvalidArgument(nil, "PHONE-YlbwO", "Errors.User.Phone.Empty")
+		return zerrors.ThrowInvalidArgument(nil, "PHONE-YlbwO", "Errors.User.Phone.Empty")
 	}
 	normalizedNumber, err := p.PhoneNumber.Normalize()
 	if err != nil {

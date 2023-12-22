@@ -26,7 +26,7 @@ func Test_verifyDB(t *testing.T) {
 			name: "doesn't exists, create fails",
 			args: args{
 				db: prepareDB(t,
-					expectExec("-- replace zitadel with the name of the database\nCREATE DATABASE IF NOT EXISTS zitadel", sql.ErrTxDone),
+					expectExec("-- replace zitadel with the name of the database\nCREATE DATABASE IF NOT EXISTS \"zitadel\"", sql.ErrTxDone),
 				),
 				database: "zitadel",
 			},
@@ -36,7 +36,7 @@ func Test_verifyDB(t *testing.T) {
 			name: "doesn't exists, create successful",
 			args: args{
 				db: prepareDB(t,
-					expectExec("-- replace zitadel with the name of the database\nCREATE DATABASE IF NOT EXISTS zitadel", nil),
+					expectExec("-- replace zitadel with the name of the database\nCREATE DATABASE IF NOT EXISTS \"zitadel\"", nil),
 				),
 				database: "zitadel",
 			},
@@ -46,7 +46,7 @@ func Test_verifyDB(t *testing.T) {
 			name: "already exists",
 			args: args{
 				db: prepareDB(t,
-					expectExec("-- replace zitadel with the name of the database\nCREATE DATABASE IF NOT EXISTS zitadel", nil),
+					expectExec("-- replace zitadel with the name of the database\nCREATE DATABASE IF NOT EXISTS \"zitadel\"", nil),
 				),
 				database: "zitadel",
 			},

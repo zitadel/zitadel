@@ -15,7 +15,8 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: 
+      group: zitadel-public
     steps:
       - 
         uses: actions/checkout@v3
@@ -40,6 +41,7 @@ jobs:
         uses: actions/cache/restore@v3
         id: cache
         timeout-minutes: 1
+        continue-on-error: true
         name: restore previous results
         with:
           key: unit-test-${{ inputs.core_cache_key }}

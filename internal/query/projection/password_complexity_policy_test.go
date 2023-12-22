@@ -4,12 +4,11 @@ import (
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestPasswordComplexityProjection_reduces(t *testing.T) {
@@ -25,23 +24,23 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.PasswordComplexityPolicyAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.PasswordComplexityPolicyAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 	"minLength": 10,
 	"hasLowercase": true,
 	"hasUppercase": true,
 	"HasNumber": true,
 	"HasSymbol": true
 }`),
-				), org.PasswordComplexityPolicyAddedEventMapper),
+					), org.PasswordComplexityPolicyAddedEventMapper),
 			},
 			reduce: (&passwordComplexityProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -70,22 +69,22 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			name:   "org reduceChanged",
 			reduce: (&passwordComplexityProjection{}).reduceChanged,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.PasswordComplexityPolicyChangedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.PasswordComplexityPolicyChangedEventType,
+						org.AggregateType,
+						[]byte(`{
 			"minLength": 11,
 			"hasLowercase": true,
 			"hasUppercase": true,
 			"HasNumber": true,
 			"HasSymbol": true
 		}`),
-				), org.PasswordComplexityPolicyChangedEventMapper),
+					), org.PasswordComplexityPolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -110,16 +109,16 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			name:   "org reduceRemoved",
 			reduce: (&passwordComplexityProjection{}).reduceRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.PasswordComplexityPolicyRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.PasswordComplexityPolicyRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.PasswordComplexityPolicyRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.PasswordComplexityPolicyRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -136,17 +135,17 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(ComplexityPolicyInstanceIDCol),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -163,22 +162,22 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			name:   "instance reduceAdded",
 			reduce: (&passwordComplexityProjection{}).reduceAdded,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.PasswordComplexityPolicyAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.PasswordComplexityPolicyAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 			"minLength": 10,
 			"hasLowercase": true,
 			"hasUppercase": true,
 			"HasNumber": true,
 			"HasSymbol": true
 					}`),
-				), instance.PasswordComplexityPolicyAddedEventMapper),
+					), instance.PasswordComplexityPolicyAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -207,22 +206,22 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			name:   "instance reduceChanged",
 			reduce: (&passwordComplexityProjection{}).reduceChanged,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.PasswordComplexityPolicyChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.PasswordComplexityPolicyChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 			"minLength": 10,
 			"hasLowercase": true,
 			"hasUppercase": true,
 			"HasNumber": true,
 			"HasSymbol": true
 					}`),
-				), instance.PasswordComplexityPolicyChangedEventMapper),
+					), instance.PasswordComplexityPolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -247,16 +246,16 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&passwordComplexityProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -275,7 +274,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			event := baseEvent(t)
 			got, err := tt.reduce(event)
-			if _, ok := err.(errors.InvalidArgument); !ok {
+			if ok := zerrors.IsErrorInvalidArgument(err); !ok {
 				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
 			}
 

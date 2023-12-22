@@ -2,9 +2,12 @@ package session
 
 import (
 	"context"
+	"net"
+	"net/http"
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
@@ -12,10 +15,15 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
+	objpb "github.com/zitadel/zitadel/pkg/grpc/object"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
+)
+
+var (
+	creationDate = time.Date(2023, 10, 10, 14, 15, 0, 0, time.UTC)
 )
 
 func Test_sessionsToPb(t *testing.T) {
@@ -23,7 +31,7 @@ func Test_sessionsToPb(t *testing.T) {
 	past := now.Add(-time.Hour)
 
 	sessions := []*query.Session{
-		{ // no factor
+		{ // no factor, with user agent and expiration
 			ID:            "999",
 			CreationDate:  now,
 			ChangeDate:    now,
@@ -32,6 +40,13 @@ func Test_sessionsToPb(t *testing.T) {
 			ResourceOwner: "me",
 			Creator:       "he",
 			Metadata:      map[string][]byte{"hello": []byte("world")},
+			UserAgent: domain.UserAgent{
+				FingerprintID: gu.Ptr("fingerprintID"),
+				Description:   gu.Ptr("description"),
+				IP:            net.IPv4(1, 2, 3, 4),
+				Header:        http.Header{"foo": []string{"foo", "bar"}},
+			},
+			Expiration: now,
 		},
 		{ // user factor
 			ID:            "999",
@@ -114,13 +129,22 @@ func Test_sessionsToPb(t *testing.T) {
 	}
 
 	want := []*session.Session{
-		{ // no factor
+		{ // no factor, with user agent and expiration
 			Id:           "999",
 			CreationDate: timestamppb.New(now),
 			ChangeDate:   timestamppb.New(now),
 			Sequence:     123,
 			Factors:      nil,
 			Metadata:     map[string][]byte{"hello": []byte("world")},
+			UserAgent: &session.UserAgent{
+				FingerprintId: gu.Ptr("fingerprintID"),
+				Description:   gu.Ptr("description"),
+				Ip:            gu.Ptr("1.2.3.4"),
+				Header: map[string]*session.UserAgent_HeaderValues{
+					"foo": {Values: []string{"foo", "bar"}},
+				},
+			},
+			ExpirationDate: timestamppb.New(now),
 		},
 		{ // user factor
 			Id:           "999",
@@ -134,6 +158,7 @@ func Test_sessionsToPb(t *testing.T) {
 					LoginName:      "donald",
 					DisplayName:    "donald duck",
 					OrganisationId: "org1",
+					OrganizationId: "org1",
 				},
 			},
 			Metadata: map[string][]byte{"hello": []byte("world")},
@@ -150,6 +175,7 @@ func Test_sessionsToPb(t *testing.T) {
 					LoginName:      "donald",
 					DisplayName:    "donald duck",
 					OrganisationId: "org1",
+					OrganizationId: "org1",
 				},
 				Password: &session.PasswordFactor{
 					VerifiedAt: timestamppb.New(past),
@@ -169,6 +195,7 @@ func Test_sessionsToPb(t *testing.T) {
 					LoginName:      "donald",
 					DisplayName:    "donald duck",
 					OrganisationId: "org1",
+					OrganizationId: "org1",
 				},
 				WebAuthN: &session.WebAuthNFactor{
 					VerifiedAt:   timestamppb.New(past),
@@ -189,6 +216,7 @@ func Test_sessionsToPb(t *testing.T) {
 					LoginName:      "donald",
 					DisplayName:    "donald duck",
 					OrganisationId: "org1",
+					OrganizationId: "org1",
 				},
 				Totp: &session.TOTPFactor{
 					VerifiedAt: timestamppb.New(past),
@@ -208,6 +236,71 @@ func Test_sessionsToPb(t *testing.T) {
 	}
 }
 
+func Test_userAgentToPb(t *testing.T) {
+	type args struct {
+		ua domain.UserAgent
+	}
+	tests := []struct {
+		name string
+		args args
+		want *session.UserAgent
+	}{
+		{
+			name: "empty",
+			args: args{domain.UserAgent{}},
+		},
+		{
+			name: "fingerprint id and description",
+			args: args{domain.UserAgent{
+				FingerprintID: gu.Ptr("fingerPrintID"),
+				Description:   gu.Ptr("description"),
+			}},
+			want: &session.UserAgent{
+				FingerprintId: gu.Ptr("fingerPrintID"),
+				Description:   gu.Ptr("description"),
+			},
+		},
+		{
+			name: "with ip",
+			args: args{domain.UserAgent{
+				FingerprintID: gu.Ptr("fingerPrintID"),
+				Description:   gu.Ptr("description"),
+				IP:            net.IPv4(1, 2, 3, 4),
+			}},
+			want: &session.UserAgent{
+				FingerprintId: gu.Ptr("fingerPrintID"),
+				Description:   gu.Ptr("description"),
+				Ip:            gu.Ptr("1.2.3.4"),
+			},
+		},
+		{
+			name: "with header",
+			args: args{domain.UserAgent{
+				FingerprintID: gu.Ptr("fingerPrintID"),
+				Description:   gu.Ptr("description"),
+				Header: http.Header{
+					"foo":   []string{"foo", "bar"},
+					"hello": []string{"world"},
+				},
+			}},
+			want: &session.UserAgent{
+				FingerprintId: gu.Ptr("fingerPrintID"),
+				Description:   gu.Ptr("description"),
+				Header: map[string]*session.UserAgent_HeaderValues{
+					"foo":   {Values: []string{"foo", "bar"}},
+					"hello": {Values: []string{"world"}},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := userAgentToPb(tt.args.ua)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func mustNewTextQuery(t testing.TB, column query.Column, value string, compare query.TextComparison) query.SearchQuery {
 	q, err := query.NewTextQuery(column, value, compare)
 	require.NoError(t, err)
@@ -220,11 +313,18 @@ func mustNewListQuery(t testing.TB, column query.Column, list []any, compare que
 	return q
 }
 
+func mustNewTimestampQuery(t testing.TB, column query.Column, ts time.Time, compare query.TimestampComparison) query.SearchQuery {
+	q, err := query.NewTimestampQuery(column, ts, compare)
+	require.NoError(t, err)
+	return q
+}
+
 func Test_listSessionsRequestToQuery(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		req *session.ListSessionsRequest
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -242,6 +342,26 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 					Offset: 0,
 					Limit:  0,
 					Asc:    false,
+				},
+				Queries: []query.SearchQuery{
+					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
+				},
+			},
+		},
+		{
+			name: "default request with sorting column",
+			args: args{
+				ctx: authz.NewMockContext("123", "456", "789"),
+				req: &session.ListSessionsRequest{
+					SortingColumn: session.SessionFieldName_SESSION_FIELD_NAME_CREATION_DATE,
+				},
+			},
+			want: &query.SessionsSearchQueries{
+				SearchRequest: query.SearchRequest{
+					Offset:        0,
+					Limit:         0,
+					SortingColumn: query.SessionColumnCreationDate,
+					Asc:           false,
 				},
 				Queries: []query.SearchQuery{
 					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
@@ -269,6 +389,17 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 								Ids: []string{"4", "5", "6"},
 							},
 						}},
+						{Query: &session.SearchQuery_UserIdQuery{
+							UserIdQuery: &session.UserIDQuery{
+								Id: "10",
+							},
+						}},
+						{Query: &session.SearchQuery_CreationDateQuery{
+							CreationDateQuery: &session.CreationDateQuery{
+								CreationDate: timestamppb.New(creationDate),
+								Method:       objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_GREATER,
+							},
+						}},
 					},
 				},
 			},
@@ -281,6 +412,8 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 				Queries: []query.SearchQuery{
 					mustNewListQuery(t, query.SessionColumnID, []interface{}{"1", "2", "3"}, query.ListIn),
 					mustNewListQuery(t, query.SessionColumnID, []interface{}{"4", "5", "6"}, query.ListIn),
+					mustNewTextQuery(t, query.SessionColumnUserID, "10", query.TextEquals),
+					mustNewTimestampQuery(t, query.SessionColumnCreationDate, creationDate, query.TimestampGreater),
 					mustNewTextQuery(t, query.SessionColumnCreator, "789", query.TextEquals),
 				},
 			},
@@ -305,7 +438,7 @@ func Test_listSessionsRequestToQuery(t *testing.T) {
 					},
 				},
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid"),
 		},
 	}
 	for _, tt := range tests {
@@ -345,7 +478,7 @@ func Test_sessionQueriesToQuery(t *testing.T) {
 					{Query: nil},
 				},
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid"),
 		},
 		{
 			name: "creator and sessions",
@@ -395,10 +528,10 @@ func Test_sessionQueryToQuery(t *testing.T) {
 			args: args{&session.SearchQuery{
 				Query: nil,
 			}},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid"),
 		},
 		{
-			name: "query",
+			name: "ids query",
 			args: args{&session.SearchQuery{
 				Query: &session.SearchQuery_IdsQuery{
 					IdsQuery: &session.IDsQuery{
@@ -408,6 +541,40 @@ func Test_sessionQueryToQuery(t *testing.T) {
 			}},
 			want: mustNewListQuery(t, query.SessionColumnID, []interface{}{"1", "2", "3"}, query.ListIn),
 		},
+		{
+			name: "user id query",
+			args: args{&session.SearchQuery{
+				Query: &session.SearchQuery_UserIdQuery{
+					UserIdQuery: &session.UserIDQuery{
+						Id: "10",
+					},
+				},
+			}},
+			want: mustNewTextQuery(t, query.SessionColumnUserID, "10", query.TextEquals),
+		},
+		{
+			name: "creation date query",
+			args: args{&session.SearchQuery{
+				Query: &session.SearchQuery_CreationDateQuery{
+					CreationDateQuery: &session.CreationDateQuery{
+						CreationDate: timestamppb.New(creationDate),
+						Method:       objpb.TimestampQueryMethod_TIMESTAMP_QUERY_METHOD_LESS,
+					},
+				},
+			}},
+			want: mustNewTimestampQuery(t, query.SessionColumnCreationDate, creationDate, query.TimestampLess),
+		},
+		{
+			name: "creation date query with default method",
+			args: args{&session.SearchQuery{
+				Query: &session.SearchQuery_CreationDateQuery{
+					CreationDateQuery: &session.CreationDateQuery{
+						CreationDate: timestamppb.New(creationDate),
+					},
+				},
+			}},
+			want: mustNewTimestampQuery(t, query.SessionColumnCreationDate, creationDate, query.TimestampEquals),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -416,12 +583,6 @@ func Test_sessionQueryToQuery(t *testing.T) {
 			assert.Equal(t, tt.want, got)
 		})
 	}
-}
-
-func mustUserLoginNamesSearchQuery(t testing.TB, value string) query.SearchQuery {
-	loginNameQuery, err := query.NewUserLoginNamesSearchQuery("bar")
-	require.NoError(t, err)
-	return loginNameQuery
 }
 
 func Test_userCheck(t *testing.T) {
@@ -455,14 +616,14 @@ func Test_userCheck(t *testing.T) {
 					LoginName: "bar",
 				},
 			}},
-			want: userSearchByLoginName{mustUserLoginNamesSearchQuery(t, "bar")},
+			want: userSearchByLoginName{"bar"},
 		},
 		{
 			name: "unimplemented error",
 			args: args{&session.CheckUser{
 				Search: nil,
 			}},
-			wantErr: caos_errs.ThrowUnimplementedf(nil, "SESSION-d3b4g0", "user search %T not implemented", nil),
+			wantErr: zerrors.ThrowUnimplementedf(nil, "SESSION-d3b4g0", "user search %T not implemented", nil),
 		},
 	}
 	for _, tt := range tests {
@@ -506,6 +667,76 @@ func Test_userVerificationRequirementToDomain(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.args.req.String(), func(t *testing.T) {
 			got := userVerificationRequirementToDomain(tt.args.req)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func Test_userAgentToCommand(t *testing.T) {
+	type args struct {
+		userAgent *session.UserAgent
+	}
+	tests := []struct {
+		name string
+		args args
+		want *domain.UserAgent
+	}{
+		{
+			name: "nil",
+			args: args{nil},
+			want: nil,
+		},
+		{
+			name: "all fields",
+			args: args{&session.UserAgent{
+				FingerprintId: gu.Ptr("fp1"),
+				Ip:            gu.Ptr("1.2.3.4"),
+				Description:   gu.Ptr("firefox"),
+				Header: map[string]*session.UserAgent_HeaderValues{
+					"hello": {
+						Values: []string{"foo", "bar"},
+					},
+				},
+			}},
+			want: &domain.UserAgent{
+				FingerprintID: gu.Ptr("fp1"),
+				IP:            net.ParseIP("1.2.3.4"),
+				Description:   gu.Ptr("firefox"),
+				Header: http.Header{
+					"hello": []string{"foo", "bar"},
+				},
+			},
+		},
+		{
+			name: "invalid ip",
+			args: args{&session.UserAgent{
+				FingerprintId: gu.Ptr("fp1"),
+				Ip:            gu.Ptr("oops"),
+				Description:   gu.Ptr("firefox"),
+				Header: map[string]*session.UserAgent_HeaderValues{
+					"hello": {
+						Values: []string{"foo", "bar"},
+					},
+				},
+			}},
+			want: &domain.UserAgent{
+				FingerprintID: gu.Ptr("fp1"),
+				IP:            nil,
+				Description:   gu.Ptr("firefox"),
+				Header: http.Header{
+					"hello": []string{"foo", "bar"},
+				},
+			},
+		},
+		{
+			name: "nil fields",
+			args: args{&session.UserAgent{}},
+			want: &domain.UserAgent{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := userAgentToCommand(tt.args.userAgent)
 			assert.Equal(t, tt.want, got)
 		})
 	}

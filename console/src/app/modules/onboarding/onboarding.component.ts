@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { AdminService } from 'src/app/services/admin.service';
 import { ThemeService } from 'src/app/services/theme.service';
-import { ONBOARDING_EVENTS } from 'src/app/utils/onboarding';
+import { ONBOARDING_MILESTONES } from 'src/app/utils/onboarding';
 
 @Component({
   selector: 'cnsl-onboarding',
@@ -9,9 +9,12 @@ import { ONBOARDING_EVENTS } from 'src/app/utils/onboarding';
   styleUrls: ['./onboarding.component.scss'],
 })
 export class OnboardingComponent {
-  public actions = this.adminService.progressEvents;
+  public actions = this.adminService.progressMilestones;
 
-  constructor(public adminService: AdminService, public themeService: ThemeService) {
-    this.adminService.loadEvents.next(ONBOARDING_EVENTS);
+  constructor(
+    public adminService: AdminService,
+    public themeService: ThemeService,
+  ) {
+    this.adminService.loadMilestones.next(ONBOARDING_MILESTONES);
   }
 }

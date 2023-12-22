@@ -6,30 +6,28 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
-	LoginNameTableAlias            = "login_names2"
+	// if the table name of the users or domains table is changed please update setup step 18
+	LoginNameTableAlias            = "login_names3"
 	LoginNameProjectionTable       = "projections." + LoginNameTableAlias
 	LoginNameUserProjectionTable   = LoginNameProjectionTable + "_" + loginNameUserSuffix
 	LoginNamePolicyProjectionTable = LoginNameProjectionTable + "_" + loginNamePolicySuffix
 	LoginNameDomainProjectionTable = LoginNameProjectionTable + "_" + loginNameDomainSuffix
 
-	LoginNameCol                   = "login_name"
-	LoginNameUserCol               = "user_id"
-	LoginNameIsPrimaryCol          = "is_primary"
-	LoginNameInstanceIDCol         = "instance_id"
-	LoginNameOwnerRemovedUserCol   = "user_owner_removed"
-	LoginNameOwnerRemovedPolicyCol = "policy_owner_removed"
-	LoginNameOwnerRemovedDomainCol = "domain_owner_removed"
+	LoginNameCol           = "login_name"
+	LoginNameUserCol       = "user_id"
+	LoginNameIsPrimaryCol  = "is_primary"
+	LoginNameInstanceIDCol = "instance_id"
 
 	usersAlias         = "users"
 	policyCustomAlias  = "policy_custom"
@@ -38,26 +36,26 @@ const (
 	domainsAlias       = "domains"
 	domainAlias        = "domain"
 
-	loginNameUserSuffix           = "users"
-	LoginNameUserIDCol            = "id"
-	LoginNameUserUserNameCol      = "user_name"
+	loginNameUserSuffix      = "users"
+	LoginNameUserIDCol       = "id"
+	LoginNameUserUserNameCol = "user_name"
+	// internal fields for faster search
+	loginNameUserUserNameLowerCol = "user_name_lower"
 	LoginNameUserResourceOwnerCol = "resource_owner"
 	LoginNameUserInstanceIDCol    = "instance_id"
-	LoginNameUserOwnerRemovedCol  = "owner_removed"
 
 	loginNameDomainSuffix           = "domains"
 	LoginNameDomainNameCol          = "name"
+	loginNameDomainNameLowerCol     = "name_lower"
 	LoginNameDomainIsPrimaryCol     = "is_primary"
 	LoginNameDomainResourceOwnerCol = "resource_owner"
 	LoginNameDomainInstanceIDCol    = "instance_id"
-	LoginNameDomainOwnerRemovedCol  = "owner_removed"
 
 	loginNamePolicySuffix             = "policies"
 	LoginNamePoliciesMustBeDomainCol  = "must_be_domain"
 	LoginNamePoliciesIsDefaultCol     = "is_default"
 	LoginNamePoliciesResourceOwnerCol = "resource_owner"
 	LoginNamePoliciesInstanceIDCol    = "instance_id"
-	LoginNamePoliciesOwnerRemovedCol  = "owner_removed"
 )
 
 var (
@@ -73,10 +71,6 @@ var (
 			coalesce(col(policyCustomAlias, LoginNamePoliciesMustBeDomainCol), col(policyDefaultAlias, LoginNamePoliciesMustBeDomainCol)),
 			LoginNamePoliciesMustBeDomainCol,
 		),
-		alias(col(usersAlias, LoginNameUserOwnerRemovedCol),
-			LoginNameOwnerRemovedUserCol),
-		alias(coalesce(col(policyCustomAlias, LoginNamePoliciesOwnerRemovedCol), "false"),
-			LoginNameOwnerRemovedPolicyCol),
 	).From(alias(LoginNameUserProjectionTable, usersAlias)).
 		LeftJoin(
 			leftJoin(LoginNamePolicyProjectionTable, policyCustomAlias,
@@ -101,10 +95,6 @@ var (
 		alias(col(domainsAlias, LoginNameDomainNameCol),
 			domainAlias),
 		col(domainsAlias, LoginNameDomainIsPrimaryCol),
-		col(policyUsersAlias, LoginNameOwnerRemovedUserCol),
-		col(policyUsersAlias, LoginNameOwnerRemovedPolicyCol),
-		alias(coalesce(col(domainsAlias, LoginNameDomainOwnerRemovedCol), "false"),
-			LoginNameOwnerRemovedDomainCol),
 	).FromSelect(policyUsers, policyUsersAlias).
 		LeftJoin(
 			leftJoin(LoginNameDomainProjectionTable, domainsAlias,
@@ -125,9 +115,6 @@ var (
 		alias(coalesce(LoginNameDomainIsPrimaryCol, "true"),
 			LoginNameIsPrimaryCol),
 		LoginNameInstanceIDCol,
-		LoginNameOwnerRemovedUserCol,
-		LoginNameOwnerRemovedPolicyCol,
-		LoginNameOwnerRemovedDomainCol,
 	).FromSelect(loginNamesTable, LoginNameTableAlias).MustSql()
 )
 
@@ -171,61 +158,87 @@ func whenThenElse(when, then, el string) string {
 	return "(CASE WHEN " + when + " THEN " + then + " ELSE " + el + " END)"
 }
 
-type loginNameProjection struct {
-	crdb.StatementHandler
+type loginNameProjection struct{}
+
+func newLoginNameProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(loginNameProjection))
 }
 
-func newLoginNameProjection(ctx context.Context, config crdb.StatementHandlerConfig) *loginNameProjection {
-	p := new(loginNameProjection)
-	config.ProjectionName = LoginNameProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewViewCheck(
+func (*loginNameProjection) Name() string {
+	return LoginNameProjectionTable
+}
+
+func (*loginNameProjection) Init() *old_handler.Check {
+	return handler.NewViewCheck(
 		viewStmt,
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(LoginNameUserIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(LoginNameUserUserNameCol, crdb.ColumnTypeText),
-			crdb.NewColumn(LoginNameUserResourceOwnerCol, crdb.ColumnTypeText),
-			crdb.NewColumn(LoginNameUserInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(LoginNameUserOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
-		},
-			crdb.NewPrimaryKey(LoginNameUserInstanceIDCol, LoginNameUserIDCol),
+		handler.NewSuffixedTable(
+			[]*handler.InitColumn{
+				handler.NewColumn(LoginNameUserIDCol, handler.ColumnTypeText),
+				handler.NewColumn(LoginNameUserUserNameCol, handler.ColumnTypeText),
+				// TODO: implement computed columns
+				// handler.NewComputedColumn(loginNameUserUserNameLowerCol, handler.ColumnTypeText),
+				handler.NewColumn(LoginNameUserResourceOwnerCol, handler.ColumnTypeText),
+				handler.NewColumn(LoginNameUserInstanceIDCol, handler.ColumnTypeText),
+			},
+			handler.NewPrimaryKey(LoginNameUserInstanceIDCol, LoginNameUserIDCol),
 			loginNameUserSuffix,
-			crdb.WithIndex(crdb.NewIndex("resource_owner", []string{LoginNameUserResourceOwnerCol})),
-			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{LoginNameUserOwnerRemovedCol})),
+			handler.WithIndex(handler.NewIndex("instance_user_name", []string{LoginNameUserInstanceIDCol, LoginNameUserUserNameCol},
+				handler.WithInclude(LoginNameUserResourceOwnerCol),
+			)),
+			handler.WithIndex(
+				handler.NewIndex("lnu_instance_ro_id", []string{LoginNameUserInstanceIDCol, LoginNameUserResourceOwnerCol, LoginNameUserIDCol},
+					handler.WithInclude(
+						LoginNameUserUserNameCol,
+					),
+				),
+			),
+			// TODO: uncomment the following line when login_names4 will be created
+			// handler.WithIndex(
+			// 	handler.NewIndex("search", []string{LoginNameUserInstanceIDCol, loginNameUserUserNameLowerCol},
+			// 		handler.WithInclude(LoginNameUserResourceOwnerCol),
+			// 	),
+			// ),
 		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(LoginNameDomainNameCol, crdb.ColumnTypeText),
-			crdb.NewColumn(LoginNameDomainIsPrimaryCol, crdb.ColumnTypeBool, crdb.Default(false)),
-			crdb.NewColumn(LoginNameDomainResourceOwnerCol, crdb.ColumnTypeText),
-			crdb.NewColumn(LoginNameDomainInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(LoginNameDomainOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
-		},
-			crdb.NewPrimaryKey(LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol, LoginNameDomainNameCol),
+		handler.NewSuffixedTable(
+			[]*handler.InitColumn{
+				handler.NewColumn(LoginNameDomainNameCol, handler.ColumnTypeText),
+				// TODO: implement computed columns
+				// handler.NewComputedColumn(loginNameDomainNameLowerCol, handler.ColumnTypeText),
+				handler.NewColumn(LoginNameDomainIsPrimaryCol, handler.ColumnTypeBool, handler.Default(false)),
+				handler.NewColumn(LoginNameDomainResourceOwnerCol, handler.ColumnTypeText),
+				handler.NewColumn(LoginNameDomainInstanceIDCol, handler.ColumnTypeText),
+			},
+			handler.NewPrimaryKey(LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol, LoginNameDomainNameCol),
 			loginNameDomainSuffix,
-			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{LoginNameDomainOwnerRemovedCol})),
+			// TODO: uncomment the following line when login_names4 will be created
+			// handler.WithIndex(
+			// 	handler.NewIndex("search", []string{LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol, loginNameDomainNameLowerCol}),
+			// ),
+			// handler.WithIndex(
+			// 	handler.NewIndex("search_result", []string{LoginNameDomainInstanceIDCol, LoginNameDomainResourceOwnerCol},
+			// 		handler.WithInclude(LoginNameDomainIsPrimaryCol),
+			// 	),
+			// ),
 		),
-		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(LoginNamePoliciesMustBeDomainCol, crdb.ColumnTypeBool),
-			crdb.NewColumn(LoginNamePoliciesIsDefaultCol, crdb.ColumnTypeBool),
-			crdb.NewColumn(LoginNamePoliciesResourceOwnerCol, crdb.ColumnTypeText),
-			crdb.NewColumn(LoginNamePoliciesInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(LoginNamePoliciesOwnerRemovedCol, crdb.ColumnTypeBool, crdb.Default(false)),
-		},
-			crdb.NewPrimaryKey(LoginNamePoliciesInstanceIDCol, LoginNamePoliciesResourceOwnerCol),
+		handler.NewSuffixedTable(
+			[]*handler.InitColumn{
+				handler.NewColumn(LoginNamePoliciesMustBeDomainCol, handler.ColumnTypeBool),
+				handler.NewColumn(LoginNamePoliciesIsDefaultCol, handler.ColumnTypeBool),
+				handler.NewColumn(LoginNamePoliciesResourceOwnerCol, handler.ColumnTypeText),
+				handler.NewColumn(LoginNamePoliciesInstanceIDCol, handler.ColumnTypeText),
+			},
+			handler.NewPrimaryKey(LoginNamePoliciesInstanceIDCol, LoginNamePoliciesResourceOwnerCol),
 			loginNamePolicySuffix,
-			crdb.WithIndex(crdb.NewIndex("is_default", []string{LoginNamePoliciesResourceOwnerCol, LoginNamePoliciesIsDefaultCol})),
-			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{LoginNamePoliciesOwnerRemovedCol})),
+			handler.WithIndex(handler.NewIndex("is_default", []string{LoginNamePoliciesResourceOwnerCol, LoginNamePoliciesIsDefaultCol})),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *loginNameProjection) reducers() []handler.AggregateReducer {
+func (p *loginNameProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  user.UserV1AddedType,
 					Reduce: p.reduceUserCreated,
@@ -265,7 +278,7 @@ func (p *loginNameProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.DomainPolicyAddedEventType,
 					Reduce: p.reduceOrgIAMPolicyAdded,
@@ -298,7 +311,7 @@ func (p *loginNameProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.DomainPolicyAddedEventType,
 					Reduce: p.reduceOrgIAMPolicyAdded,
@@ -327,10 +340,10 @@ func (p *loginNameProjection) reduceUserCreated(event eventstore.Event) (*handle
 	case *user.MachineAddedEvent:
 		userName = e.UserName
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ayo69", "reduce.wrong.event.type %v", []eventstore.EventType{user.UserV1AddedType, user.HumanAddedType, user.UserV1RegisteredType, user.HumanRegisteredType, user.MachineAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ayo69", "reduce.wrong.event.type %v", []eventstore.EventType{user.UserV1AddedType, user.HumanAddedType, user.UserV1RegisteredType, user.HumanRegisteredType, user.MachineAddedEventType})
 	}
 
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		event,
 		[]handler.Column{
 			handler.NewCol(LoginNameUserIDCol, event.Aggregate().ID),
@@ -338,33 +351,33 @@ func (p *loginNameProjection) reduceUserCreated(event eventstore.Event) (*handle
 			handler.NewCol(LoginNameUserResourceOwnerCol, event.Aggregate().ResourceOwner),
 			handler.NewCol(LoginNameUserInstanceIDCol, event.Aggregate().InstanceID),
 		},
-		crdb.WithTableSuffix(loginNameUserSuffix),
+		handler.WithTableSuffix(loginNameUserSuffix),
 	), nil
 }
 
 func (p *loginNameProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-QIe3C", "reduce.wrong.event.type %s", user.UserRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-QIe3C", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
 
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		event,
 		[]handler.Condition{
 			handler.NewCond(LoginNameUserIDCol, e.Aggregate().ID),
 			handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().InstanceID),
 		},
-		crdb.WithTableSuffix(loginNameUserSuffix),
+		handler.WithTableSuffix(loginNameUserSuffix),
 	), nil
 }
 
 func (p *loginNameProjection) reduceUserNameChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UsernameChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-QlwjC", "reduce.wrong.event.type %s", user.UserUserNameChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-QlwjC", "reduce.wrong.event.type %s", user.UserUserNameChangedType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		event,
 		[]handler.Column{
 			handler.NewCol(LoginNameUserUserNameCol, e.UserName),
@@ -373,17 +386,17 @@ func (p *loginNameProjection) reduceUserNameChanged(event eventstore.Event) (*ha
 			handler.NewCond(LoginNameUserIDCol, e.Aggregate().ID),
 			handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().InstanceID),
 		},
-		crdb.WithTableSuffix(loginNameUserSuffix),
+		handler.WithTableSuffix(loginNameUserSuffix),
 	), nil
 }
 
 func (p *loginNameProjection) reduceUserDomainClaimed(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.DomainClaimedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AQMBY", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-AQMBY", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
 	}
 
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		event,
 		[]handler.Column{
 			handler.NewCol(LoginNameUserUserNameCol, e.UserName),
@@ -392,7 +405,7 @@ func (p *loginNameProjection) reduceUserDomainClaimed(event eventstore.Event) (*
 			handler.NewCond(LoginNameUserIDCol, e.Aggregate().ID),
 			handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().InstanceID),
 		},
-		crdb.WithTableSuffix(loginNameUserSuffix),
+		handler.WithTableSuffix(loginNameUserSuffix),
 	), nil
 }
 
@@ -410,10 +423,10 @@ func (p *loginNameProjection) reduceOrgIAMPolicyAdded(event eventstore.Event) (*
 		policyEvent = &e.DomainPolicyAddedEvent
 		isDefault = true
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-yCV6S", "reduce.wrong.event.type %v", []eventstore.EventType{org.DomainPolicyAddedEventType, instance.DomainPolicyAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-yCV6S", "reduce.wrong.event.type %v", []eventstore.EventType{org.DomainPolicyAddedEventType, instance.DomainPolicyAddedEventType})
 	}
 
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		event,
 		[]handler.Column{
 			handler.NewCol(LoginNamePoliciesMustBeDomainCol, policyEvent.UserLoginMustBeDomain),
@@ -421,7 +434,7 @@ func (p *loginNameProjection) reduceOrgIAMPolicyAdded(event eventstore.Event) (*
 			handler.NewCol(LoginNamePoliciesResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
 			handler.NewCol(LoginNamePoliciesInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
-		crdb.WithTableSuffix(loginNamePolicySuffix),
+		handler.WithTableSuffix(loginNamePolicySuffix),
 	), nil
 }
 
@@ -434,14 +447,14 @@ func (p *loginNameProjection) reduceDomainPolicyChanged(event eventstore.Event) 
 	case *instance.DomainPolicyChangedEvent:
 		policyEvent = &e.DomainPolicyChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ArFDd", "reduce.wrong.event.type %v", []eventstore.EventType{org.DomainPolicyChangedEventType, instance.DomainPolicyChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ArFDd", "reduce.wrong.event.type %v", []eventstore.EventType{org.DomainPolicyChangedEventType, instance.DomainPolicyChangedEventType})
 	}
 
 	if policyEvent.UserLoginMustBeDomain == nil {
-		return crdb.NewNoOpStatement(event), nil
+		return handler.NewNoOpStatement(event), nil
 	}
 
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		event,
 		[]handler.Column{
 			handler.NewCol(LoginNamePoliciesMustBeDomainCol, *policyEvent.UserLoginMustBeDomain),
@@ -450,52 +463,52 @@ func (p *loginNameProjection) reduceDomainPolicyChanged(event eventstore.Event) 
 			handler.NewCond(LoginNamePoliciesResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
 			handler.NewCond(LoginNamePoliciesInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
-		crdb.WithTableSuffix(loginNamePolicySuffix),
+		handler.WithTableSuffix(loginNamePolicySuffix),
 	), nil
 }
 
 func (p *loginNameProjection) reduceDomainPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainPolicyRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ysEeB", "reduce.wrong.event.type %s", org.DomainPolicyRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ysEeB", "reduce.wrong.event.type %s", org.DomainPolicyRemovedEventType)
 	}
 
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		event,
 		[]handler.Condition{
 			handler.NewCond(LoginNamePoliciesResourceOwnerCol, e.Aggregate().ResourceOwner),
 			handler.NewCond(LoginNamePoliciesInstanceIDCol, e.Aggregate().InstanceID),
 		},
-		crdb.WithTableSuffix(loginNamePolicySuffix),
+		handler.WithTableSuffix(loginNamePolicySuffix),
 	), nil
 }
 
 func (p *loginNameProjection) reduceDomainVerified(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainVerifiedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-weGAh", "reduce.wrong.event.type %s", org.OrgDomainVerifiedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-weGAh", "reduce.wrong.event.type %s", org.OrgDomainVerifiedEventType)
 	}
 
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		event,
 		[]handler.Column{
 			handler.NewCol(LoginNameDomainNameCol, e.Domain),
 			handler.NewCol(LoginNameDomainResourceOwnerCol, e.Aggregate().ResourceOwner),
 			handler.NewCol(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
 		},
-		crdb.WithTableSuffix(loginNameDomainSuffix),
+		handler.WithTableSuffix(loginNameDomainSuffix),
 	), nil
 }
 
 func (p *loginNameProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainPrimarySetEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-eOXPN", "reduce.wrong.event.type %s", org.OrgDomainPrimarySetEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-eOXPN", "reduce.wrong.event.type %s", org.OrgDomainPrimarySetEventType)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		e,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(LoginNameDomainIsPrimaryCol, false),
 			},
@@ -504,9 +517,9 @@ func (p *loginNameProjection) reducePrimaryDomainSet(event eventstore.Event) (*h
 				handler.NewCond(LoginNameDomainIsPrimaryCol, true),
 				handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
 			},
-			crdb.WithTableSuffix(loginNameDomainSuffix),
+			handler.WithTableSuffix(loginNameDomainSuffix),
 		),
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(LoginNameDomainIsPrimaryCol, true),
 			},
@@ -515,7 +528,7 @@ func (p *loginNameProjection) reducePrimaryDomainSet(event eventstore.Event) (*h
 				handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ResourceOwner),
 				handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
 			},
-			crdb.WithTableSuffix(loginNameDomainSuffix),
+			handler.WithTableSuffix(loginNameDomainSuffix),
 		),
 	), nil
 }
@@ -523,45 +536,45 @@ func (p *loginNameProjection) reducePrimaryDomainSet(event eventstore.Event) (*h
 func (p *loginNameProjection) reduceDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-4RHYq", "reduce.wrong.event.type %s", org.OrgDomainRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-4RHYq", "reduce.wrong.event.type %s", org.OrgDomainRemovedEventType)
 	}
 
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		event,
 		[]handler.Condition{
 			handler.NewCond(LoginNameDomainNameCol, e.Domain),
 			handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ResourceOwner),
 			handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
 		},
-		crdb.WithTableSuffix(loginNameDomainSuffix),
+		handler.WithTableSuffix(loginNameDomainSuffix),
 	), nil
 }
 
 func (p *loginNameProjection) reduceInstanceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.InstanceRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ASeg3", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ASeg3", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		event,
-		crdb.AddDeleteStatement(
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().ID),
 			},
-			crdb.WithTableSuffix(loginNameDomainSuffix),
+			handler.WithTableSuffix(loginNameDomainSuffix),
 		),
-		crdb.AddDeleteStatement(
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(LoginNamePoliciesInstanceIDCol, e.Aggregate().ID),
 			},
-			crdb.WithTableSuffix(loginNamePolicySuffix),
+			handler.WithTableSuffix(loginNamePolicySuffix),
 		),
-		crdb.AddDeleteStatement(
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().ID),
 			},
-			crdb.WithTableSuffix(loginNameUserSuffix),
+			handler.WithTableSuffix(loginNameUserSuffix),
 		),
 	), nil
 }
@@ -569,31 +582,31 @@ func (p *loginNameProjection) reduceInstanceRemoved(event eventstore.Event) (*ha
 func (p *loginNameProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-px02mo", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-px02mo", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		event,
-		crdb.AddDeleteStatement(
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ID),
 			},
-			crdb.WithTableSuffix(loginNameDomainSuffix),
+			handler.WithTableSuffix(loginNameDomainSuffix),
 		),
-		crdb.AddDeleteStatement(
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(LoginNamePoliciesInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCond(LoginNamePoliciesResourceOwnerCol, e.Aggregate().ID),
 			},
-			crdb.WithTableSuffix(loginNamePolicySuffix),
+			handler.WithTableSuffix(loginNamePolicySuffix),
 		),
-		crdb.AddDeleteStatement(
+		handler.AddDeleteStatement(
 			[]handler.Condition{
 				handler.NewCond(LoginNameUserInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCond(LoginNameUserResourceOwnerCol, e.Aggregate().ID),
 			},
-			crdb.WithTableSuffix(loginNameUserSuffix),
+			handler.WithTableSuffix(loginNameUserSuffix),
 		),
 	), nil
 }

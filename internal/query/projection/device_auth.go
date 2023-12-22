@@ -3,159 +3,112 @@ package projection
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
-	DeviceAuthProjectionTable = "projections.device_authorizations"
+	DeviceAuthRequestProjectionTable = "projections.device_auth_requests"
 
-	DeviceAuthColumnID         = "id"
-	DeviceAuthColumnClientID   = "client_id"
-	DeviceAuthColumnDeviceCode = "device_code"
-	DeviceAuthColumnUserCode   = "user_code"
-	DeviceAuthColumnExpires    = "expires"
-	DeviceAuthColumnScopes     = "scopes"
-	DeviceAuthColumnState      = "state"
-	DeviceAuthColumnSubject    = "subject"
-
-	DeviceAuthColumnCreationDate = "creation_date"
-	DeviceAuthColumnChangeDate   = "change_date"
-	DeviceAuthColumnSequence     = "sequence"
-	DeviceAuthColumnInstanceID   = "instance_id"
+	DeviceAuthRequestColumnClientID     = "client_id"
+	DeviceAuthRequestColumnDeviceCode   = "device_code"
+	DeviceAuthRequestColumnUserCode     = "user_code"
+	DeviceAuthRequestColumnScopes       = "scopes"
+	DeviceAuthRequestColumnCreationDate = "creation_date"
+	DeviceAuthRequestColumnChangeDate   = "change_date"
+	DeviceAuthRequestColumnSequence     = "sequence"
+	DeviceAuthRequestColumnInstanceID   = "instance_id"
 )
 
-type deviceAuthProjection struct {
-	crdb.StatementHandler
+// deviceAuthRequestProjection holds device authorization requests
+// and makes them search-able by User Code.
+// In principle the projected data is only needed during user login.
+// Device Token logic uses the eventstore directly.
+type deviceAuthRequestProjection struct{}
+
+func newDeviceAuthProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(deviceAuthRequestProjection))
 }
 
-func newDeviceAuthProjection(ctx context.Context, config crdb.StatementHandlerConfig) *deviceAuthProjection {
-	p := new(deviceAuthProjection)
-	config.ProjectionName = DeviceAuthProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(DeviceAuthColumnID, crdb.ColumnTypeText),
-			crdb.NewColumn(DeviceAuthColumnClientID, crdb.ColumnTypeText),
-			crdb.NewColumn(DeviceAuthColumnDeviceCode, crdb.ColumnTypeText),
-			crdb.NewColumn(DeviceAuthColumnUserCode, crdb.ColumnTypeText),
-			crdb.NewColumn(DeviceAuthColumnExpires, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(DeviceAuthColumnScopes, crdb.ColumnTypeTextArray),
-			crdb.NewColumn(DeviceAuthColumnState, crdb.ColumnTypeEnum, crdb.Default(domain.DeviceAuthStateInitiated)),
-			crdb.NewColumn(DeviceAuthColumnSubject, crdb.ColumnTypeText, crdb.Default("")),
-			crdb.NewColumn(DeviceAuthColumnCreationDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(DeviceAuthColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(DeviceAuthColumnSequence, crdb.ColumnTypeInt64),
-			crdb.NewColumn(DeviceAuthColumnInstanceID, crdb.ColumnTypeText),
+func (*deviceAuthRequestProjection) Name() string {
+	return DeviceAuthRequestProjectionTable
+}
+
+func (*deviceAuthRequestProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(DeviceAuthRequestColumnClientID, handler.ColumnTypeText),
+			handler.NewColumn(DeviceAuthRequestColumnDeviceCode, handler.ColumnTypeText),
+			handler.NewColumn(DeviceAuthRequestColumnUserCode, handler.ColumnTypeText),
+			handler.NewColumn(DeviceAuthRequestColumnScopes, handler.ColumnTypeTextArray),
+			handler.NewColumn(DeviceAuthRequestColumnCreationDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(DeviceAuthRequestColumnChangeDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(DeviceAuthRequestColumnSequence, handler.ColumnTypeInt64),
+			handler.NewColumn(DeviceAuthRequestColumnInstanceID, handler.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(DeviceAuthColumnInstanceID, DeviceAuthColumnID),
-			crdb.WithIndex(crdb.NewIndex("user_code", []string{DeviceAuthColumnInstanceID, DeviceAuthColumnUserCode})),
-			crdb.WithIndex(crdb.NewIndex("device_code", []string{DeviceAuthColumnInstanceID, DeviceAuthColumnClientID, DeviceAuthColumnDeviceCode})),
+			handler.NewPrimaryKey(DeviceAuthRequestColumnInstanceID, DeviceAuthRequestColumnDeviceCode),
+			handler.WithIndex(handler.NewIndex("user_code", []string{DeviceAuthRequestColumnInstanceID, DeviceAuthRequestColumnUserCode})),
 		),
 	)
-
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *deviceAuthProjection) reducers() []handler.AggregateReducer {
+func (p *deviceAuthRequestProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: deviceauth.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  deviceauth.AddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
 					Event:  deviceauth.ApprovedEventType,
-					Reduce: p.reduceAppoved,
+					Reduce: p.reduceDoneEvents,
 				},
 				{
 					Event:  deviceauth.CanceledEventType,
-					Reduce: p.reduceCanceled,
-				},
-				{
-					Event:  deviceauth.RemovedEventType,
-					Reduce: p.reduceRemoved,
+					Reduce: p.reduceDoneEvents,
 				},
 			},
 		},
 	}
 }
 
-func (p *deviceAuthProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *deviceAuthRequestProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*deviceauth.AddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-chu6O", "reduce.wrong.event.type %T != %s", event, deviceauth.AddedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-chu6O", "reduce.wrong.event.type %T != %s", event, deviceauth.AddedEventType)
 	}
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(DeviceAuthColumnID, e.Aggregate().ID),
-			handler.NewCol(DeviceAuthColumnClientID, e.ClientID),
-			handler.NewCol(DeviceAuthColumnDeviceCode, e.DeviceCode),
-			handler.NewCol(DeviceAuthColumnUserCode, e.UserCode),
-			handler.NewCol(DeviceAuthColumnExpires, e.Expires),
-			handler.NewCol(DeviceAuthColumnScopes, e.Scopes),
-			handler.NewCol(DeviceAuthColumnCreationDate, e.CreationDate()),
-			handler.NewCol(DeviceAuthColumnChangeDate, e.CreationDate()),
-			handler.NewCol(DeviceAuthColumnSequence, e.Sequence()),
-			handler.NewCol(DeviceAuthColumnInstanceID, e.Aggregate().InstanceID),
+			handler.NewCol(DeviceAuthRequestColumnClientID, e.ClientID),
+			handler.NewCol(DeviceAuthRequestColumnDeviceCode, e.DeviceCode),
+			handler.NewCol(DeviceAuthRequestColumnUserCode, e.UserCode),
+			handler.NewCol(DeviceAuthRequestColumnScopes, e.Scopes),
+			handler.NewCol(DeviceAuthRequestColumnCreationDate, e.CreationDate()),
+			handler.NewCol(DeviceAuthRequestColumnChangeDate, e.CreationDate()),
+			handler.NewCol(DeviceAuthRequestColumnSequence, e.Sequence()),
+			handler.NewCol(DeviceAuthRequestColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
 }
 
-func (p *deviceAuthProjection) reduceAppoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*deviceauth.ApprovedEvent)
-	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-kei0A", "reduce.wrong.event.type %T != %s", event, deviceauth.ApprovedEventType)
-	}
-	return crdb.NewUpdateStatement(e,
-		[]handler.Column{
-			handler.NewCol(DeviceAuthColumnState, domain.DeviceAuthStateApproved),
-			handler.NewCol(DeviceAuthColumnSubject, e.Subject),
-			handler.NewCol(DeviceAuthColumnChangeDate, e.CreationDate()),
-			handler.NewCol(DeviceAuthColumnSequence, e.Sequence()),
-		},
-		[]handler.Condition{
-			handler.NewCond(DeviceAuthColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCond(DeviceAuthColumnID, e.Aggregate().ID),
-		},
-	), nil
-}
+// reduceDoneEvents removes the device auth request from the projection.
+func (p *deviceAuthRequestProjection) reduceDoneEvents(event eventstore.Event) (*handler.Statement, error) {
+	switch event.(type) {
+	case *deviceauth.ApprovedEvent, *deviceauth.CanceledEvent:
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(DeviceAuthRequestColumnInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(DeviceAuthRequestColumnDeviceCode, event.Aggregate().ID),
+			},
+		), nil
 
-func (p *deviceAuthProjection) reduceCanceled(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*deviceauth.CanceledEvent)
-	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-eeS8d", "reduce.wrong.event.type %T != %s", event, deviceauth.CanceledEventType)
+	default:
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-eeS8d", "reduce.wrong.event.type %T", event)
 	}
-	return crdb.NewUpdateStatement(e,
-		[]handler.Column{
-			handler.NewCol(DeviceAuthColumnState, e.Reason.State()),
-			handler.NewCol(DeviceAuthColumnChangeDate, e.CreationDate()),
-			handler.NewCol(DeviceAuthColumnSequence, e.Sequence()),
-		},
-		[]handler.Condition{
-			handler.NewCond(DeviceAuthColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCond(DeviceAuthColumnID, e.Aggregate().ID),
-		},
-	), nil
-}
-
-func (p *deviceAuthProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*deviceauth.RemovedEvent)
-	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AJi1u", "reduce.wrong.event.type %T != %s", event, deviceauth.RemovedEventType)
-	}
-	return crdb.NewDeleteStatement(e,
-		[]handler.Condition{
-			handler.NewCond(DeviceAuthColumnInstanceID, e.Aggregate().InstanceID),
-			handler.NewCond(DeviceAuthColumnID, e.Aggregate().ID),
-		},
-	), nil
 }

@@ -3,19 +3,24 @@ package database
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
+	"errors"
 	"reflect"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
 
 	_ "github.com/zitadel/zitadel/internal/database/cockroach"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	_ "github.com/zitadel/zitadel/internal/database/postgres"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Config struct {
-	Dialects  map[string]interface{} `mapstructure:",remain"`
-	connector dialect.Connector
+	Dialects                   map[string]interface{} `mapstructure:",remain"`
+	EventPushConnRatio         float64
+	ProjectionSpoolerConnRatio float64
+	connector                  dialect.Connector
 }
 
 func (c *Config) SetConnector(connector dialect.Connector) {
@@ -87,14 +92,32 @@ func (db *DB) QueryRowContext(ctx context.Context, scan func(row *sql.Row) error
 	return row.Err()
 }
 
-func Connect(config Config, useAdmin bool) (*DB, error) {
-	client, err := config.connector.Connect(useAdmin)
+func QueryJSONObject[T any](ctx context.Context, db *DB, query string, args ...any) (*T, error) {
+	var data []byte
+	err := db.QueryRowContext(ctx, func(row *sql.Row) error {
+		return row.Scan(&data)
+	}, query, args...)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "DATAB-Oath6", "Errors.Internal")
+	}
+	obj := new(T)
+	if err = json.Unmarshal(data, obj); err != nil {
+		return nil, zerrors.ThrowInternal(err, "DATAB-Vohs6", "Errors.Internal")
+	}
+	return obj, nil
+}
+
+func Connect(config Config, useAdmin bool, purpose dialect.DBPurpose) (*DB, error) {
+	client, err := config.connector.Connect(useAdmin, config.EventPushConnRatio, config.ProjectionSpoolerConnRatio, purpose)
 	if err != nil {
 		return nil, err
 	}
 
 	if err := client.Ping(); err != nil {
-		return nil, errors.ThrowPreconditionFailed(err, "DATAB-0pIWD", "Errors.Database.Connection.Failed")
+		return nil, zerrors.ThrowPreconditionFailed(err, "DATAB-0pIWD", "Errors.Database.Connection.Failed")
 	}
 
 	return &DB{
@@ -103,20 +126,20 @@ func Connect(config Config, useAdmin bool) (*DB, error) {
 	}, nil
 }
 
-func DecodeHook(from, to reflect.Value) (interface{}, error) {
+func DecodeHook(from, to reflect.Value) (_ interface{}, err error) {
 	if to.Type() != reflect.TypeOf(Config{}) {
 		return from.Interface(), nil
 	}
 
-	configuredDialects, ok := from.Interface().(map[string]interface{})
-	if !ok {
-		return from.Interface(), nil
+	config := new(Config)
+	if err = mapstructure.Decode(from.Interface(), config); err != nil {
+		return nil, err
 	}
 
-	configuredDialect := dialect.SelectByConfig(configuredDialects)
-	configs := make([]interface{}, 0, len(configuredDialects)-1)
+	configuredDialect := dialect.SelectByConfig(config.Dialects)
+	configs := make([]interface{}, 0, len(config.Dialects)-1)
 
-	for name, dialectConfig := range configuredDialects {
+	for name, dialectConfig := range config.Dialects {
 		if !configuredDialect.Matcher.MatchName(name) {
 			continue
 		}
@@ -124,12 +147,12 @@ func DecodeHook(from, to reflect.Value) (interface{}, error) {
 		configs = append(configs, dialectConfig)
 	}
 
-	connector, err := configuredDialect.Matcher.Decode(configs)
+	config.connector, err = configuredDialect.Matcher.Decode(configs)
 	if err != nil {
 		return nil, err
 	}
 
-	return Config{connector: connector}, nil
+	return config, nil
 }
 
 func (c Config) DatabaseName() string {

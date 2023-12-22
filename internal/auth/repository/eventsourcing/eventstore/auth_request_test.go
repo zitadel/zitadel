@@ -6,22 +6,22 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	cache "github.com/zitadel/zitadel/internal/auth_request/repository"
 	"github.com/zitadel/zitadel/internal/auth_request/repository/mock"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 	user_model "github.com/zitadel/zitadel/internal/user/model"
 	user_es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
 	user_view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
-	"github.com/zitadel/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -31,29 +31,29 @@ var (
 type mockViewNoUserSession struct{}
 
 func (m *mockViewNoUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
-	return nil, errors.ThrowNotFound(nil, "id", "user session not found")
+	return nil, zerrors.ThrowNotFound(nil, "id", "user session not found")
 }
 
 func (m *mockViewNoUserSession) UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error) {
 	return nil, nil
 }
 
-func (m *mockViewNoUserSession) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*repository.CurrentSequence, error) {
-	return &repository.CurrentSequence{}, nil
+func (m *mockViewNoUserSession) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*query.CurrentState, error) {
+	return &query.CurrentState{State: query.State{Sequence: 0}}, nil
 }
 
 type mockViewErrUserSession struct{}
 
 func (m *mockViewErrUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
-	return nil, errors.ThrowInternal(nil, "id", "internal error")
+	return nil, zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
 func (m *mockViewErrUserSession) UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error) {
-	return nil, errors.ThrowInternal(nil, "id", "internal error")
+	return nil, zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
-func (m *mockViewErrUserSession) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*repository.CurrentSequence, error) {
-	return &repository.CurrentSequence{}, nil
+func (m *mockViewErrUserSession) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*query.CurrentState, error) {
+	return &query.CurrentState{State: query.State{Sequence: 0}}, nil
 }
 
 type mockViewUserSession struct {
@@ -95,26 +95,29 @@ func (m *mockViewUserSession) UserSessionsByAgentID(string, string) ([]*user_vie
 	return sessions, nil
 }
 
-func (m *mockViewUserSession) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*repository.CurrentSequence, error) {
-	return &repository.CurrentSequence{}, nil
+func (m *mockViewUserSession) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*query.CurrentState, error) {
+	return &query.CurrentState{State: query.State{Sequence: 0}}, nil
 }
 
 type mockViewNoUser struct{}
 
 func (m *mockViewNoUser) UserByID(string, string) (*user_view_model.UserView, error) {
-	return nil, errors.ThrowNotFound(nil, "id", "user not found")
+	return nil, zerrors.ThrowNotFound(nil, "id", "user not found")
 }
 
 type mockEventUser struct {
-	Event *es_models.Event
+	Event eventstore.Event
 }
 
-func (m *mockEventUser) UserEventsByID(ctx context.Context, id string, sequence uint64, types []es_models.EventType) ([]*es_models.Event, error) {
-	events := make([]*es_models.Event, 0)
+func (m *mockEventUser) UserEventsByID(ctx context.Context, id string, changeDate time.Time, types []eventstore.EventType) ([]eventstore.Event, error) {
 	if m.Event != nil {
-		events = append(events, m.Event)
+		return []eventstore.Event{m.Event}, nil
 	}
-	return events, nil
+	return nil, nil
+}
+
+func (m *mockEventUser) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*query.CurrentState, error) {
+	return &query.CurrentState{State: query.State{Sequence: 0}}, nil
 }
 
 func (m *mockEventUser) BulkAddExternalIDPs(ctx context.Context, userID string, externalIDPs []*user_model.ExternalIDP) error {
@@ -123,12 +126,12 @@ func (m *mockEventUser) BulkAddExternalIDPs(ctx context.Context, userID string, 
 
 type mockEventErrUser struct{}
 
-func (m *mockEventErrUser) UserEventsByID(ctx context.Context, id string, sequence uint64, types []es_models.EventType) ([]*es_models.Event, error) {
-	return nil, errors.ThrowInternal(nil, "id", "internal error")
+func (m *mockEventErrUser) UserEventsByID(ctx context.Context, id string, changeDate time.Time, types []eventstore.EventType) ([]eventstore.Event, error) {
+	return nil, zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
 func (m *mockEventErrUser) BulkAddExternalIDPs(ctx context.Context, userID string, externalIDPs []*user_model.ExternalIDP) error {
-	return errors.ThrowInternal(nil, "id", "internal error")
+	return zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
 type mockViewUser struct {
@@ -223,11 +226,11 @@ func (m *mockViewOrg) OrgByPrimaryDomain(context.Context, string) (*query.Org, e
 type mockViewErrOrg struct{}
 
 func (m *mockViewErrOrg) OrgByID(context.Context, bool, string) (*query.Org, error) {
-	return nil, errors.ThrowInternal(nil, "id", "internal error")
+	return nil, zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
 func (m *mockViewErrOrg) OrgByPrimaryDomain(context.Context, string) (*query.Org, error) {
-	return nil, errors.ThrowInternal(nil, "id", "internal error")
+	return nil, zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
 type mockUserGrants struct {
@@ -235,7 +238,7 @@ type mockUserGrants struct {
 	userGrants int
 }
 
-func (m *mockUserGrants) ProjectByClientID(ctx context.Context, s string, _ bool) (*query.Project, error) {
+func (m *mockUserGrants) ProjectByClientID(ctx context.Context, s string) (*query.Project, error) {
 	return &query.Project{ProjectRoleCheck: m.roleCheck}, nil
 }
 
@@ -253,11 +256,11 @@ type mockProject struct {
 	resourceOwner string
 }
 
-func (m *mockProject) ProjectByClientID(ctx context.Context, s string, _ bool) (*query.Project, error) {
+func (m *mockProject) ProjectByClientID(ctx context.Context, s string) (*query.Project, error) {
 	return &query.Project{ResourceOwner: m.resourceOwner, HasProjectCheck: m.projectCheck}, nil
 }
 
-func (m *mockProject) SearchProjectGrants(ctx context.Context, queries *query.ProjectGrantSearchQueries, _ bool) (*query.ProjectGrants, error) {
+func (m *mockProject) SearchProjectGrants(ctx context.Context, queries *query.ProjectGrantSearchQueries) (*query.ProjectGrants, error) {
 	if m.hasProject {
 		mockProjectGrant := new(query.ProjectGrant)
 		return &query.ProjectGrants{ProjectGrants: []*query.ProjectGrant{mockProjectGrant}}, nil
@@ -269,11 +272,11 @@ type mockApp struct {
 	app *query.App
 }
 
-func (m *mockApp) AppByOIDCClientID(ctx context.Context, id string, _ bool) (*query.App, error) {
+func (m *mockApp) AppByOIDCClientID(ctx context.Context, id string) (*query.App, error) {
 	if m.app != nil {
 		return m.app, nil
 	}
-	return nil, errors.ThrowNotFound(nil, "ERROR", "error")
+	return nil, zerrors.ThrowNotFound(nil, "ERROR", "error")
 }
 
 type mockIDPUserLinks struct {
@@ -318,7 +321,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			fields{},
 			args{nil, false},
 			nil,
-			errors.IsErrorInvalidArgument,
+			zerrors.IsErrorInvalidArgument,
 		},
 		{
 			"prompt none and checkLoggedIn false, callback step",
@@ -383,7 +386,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}}, false},
 			nil,
-			errors.IsInternal,
+			zerrors.IsInternal,
 		},
 		{
 			"user not set, prompt select account, select account step",
@@ -663,7 +666,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			nil,
-			errors.IsNotFound,
+			zerrors.IsNotFound,
 		},
 		{
 			"user not active, precondition failed error",
@@ -672,7 +675,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_repo.AggregateType,
-						Type:          es_models.EventType(user_repo.UserDeactivatedType),
+						Typ:           user_repo.UserDeactivatedType,
 					},
 				},
 				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
@@ -685,7 +688,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			nil,
-			errors.IsPreconditionFailed,
+			zerrors.IsPreconditionFailed,
 		},
 		{
 			"user locked, precondition failed error",
@@ -694,7 +697,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userEventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_repo.AggregateType,
-						Type:          es_models.EventType(user_repo.UserLockedType),
+						Typ:           user_repo.UserLockedType,
 					},
 				},
 				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
@@ -706,7 +709,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			nil,
-			errors.IsPreconditionFailed,
+			zerrors.IsPreconditionFailed,
 		},
 		{
 			"org error, internal error",
@@ -722,7 +725,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			nil,
-			errors.IsInternal,
+			zerrors.IsInternal,
 		},
 		{
 			"org not active, precondition failed error",
@@ -738,7 +741,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			nil,
-			errors.IsPreconditionFailed,
+			zerrors.IsPreconditionFailed,
 		},
 		{
 			"usersession not found, new user session, password step",
@@ -776,7 +779,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			nil,
-			errors.IsInternal,
+			zerrors.IsInternal,
 		},
 		{
 			"user not initialized, init user step",
@@ -1713,7 +1716,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			nil,
 			false,
-			errors.IsPreconditionFailed,
+			zerrors.IsPreconditionFailed,
 		},
 		{
 			"not set up, no mfas configured, no prompt and true",
@@ -2070,7 +2073,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				user:         &user_model.UserView{ID: "id"},
 			},
 			nil,
-			errors.IsInternal,
+			zerrors.IsInternal,
 		},
 		{
 			"error user events, old view model state",
@@ -2099,7 +2102,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				eventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_repo.AggregateType,
-						Type:          es_models.EventType(user_repo.UserV1MFAOTPCheckSucceededType),
+						Typ:           user_repo.UserV1MFAOTPCheckSucceededType,
 						CreationDate:  testNow,
 					},
 				},
@@ -2122,7 +2125,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				eventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_repo.AggregateType,
-						Type:          es_models.EventType(user_repo.UserV1MFAOTPCheckSucceededType),
+						Typ:           user_repo.UserV1MFAOTPCheckSucceededType,
 						CreationDate:  testNow,
 						Data: func() []byte {
 							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "otherID"})
@@ -2149,7 +2152,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				eventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_repo.AggregateType,
-						Type:          es_models.EventType(user_repo.UserV1MFAOTPCheckSucceededType),
+						Typ:           user_repo.UserV1MFAOTPCheckSucceededType,
 						CreationDate:  testNow,
 						Data: func() []byte {
 							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
@@ -2176,12 +2179,12 @@ func Test_userSessionByIDs(t *testing.T) {
 				eventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_repo.AggregateType,
-						Type:          es_models.EventType(user_repo.UserRemovedType),
+						Typ:           user_repo.UserRemovedType,
 					},
 				},
 			},
 			nil,
-			errors.IsPreconditionFailed,
+			zerrors.IsPreconditionFailed,
 		},
 	}
 	for _, tt := range tests {
@@ -2217,7 +2220,7 @@ func Test_userByID(t *testing.T) {
 				eventProvider: &mockEventUser{},
 			},
 			nil,
-			errors.IsNotFound,
+			zerrors.IsNotFound,
 		},
 		{
 			"error user events, old view model state",
@@ -2243,14 +2246,7 @@ func Test_userByID(t *testing.T) {
 				viewProvider: &mockViewUser{
 					PasswordChangeRequired: true,
 				},
-				eventProvider: &mockEventUser{
-					&es_models.Event{
-						AggregateType: user_repo.AggregateType,
-						Type:          es_models.EventType(user_repo.UserV1PasswordChangedType),
-						CreationDate:  testNow,
-						Data:          nil,
-					},
-				},
+				eventProvider: &mockEventErrUser{},
 			},
 			&user_model.UserView{
 				State:    user_model.UserStateActive,
@@ -2272,7 +2268,7 @@ func Test_userByID(t *testing.T) {
 				eventProvider: &mockEventUser{
 					&es_models.Event{
 						AggregateType: user_repo.AggregateType,
-						Type:          es_models.EventType(user_repo.UserV1PasswordChangedType),
+						Typ:           user_repo.UserV1PasswordChangedType,
 						CreationDate:  testNow,
 						Data: func() []byte {
 							data, _ := json.Marshal(user_es_model.Password{ChangeRequired: false, Secret: &crypto.CryptoValue{}})

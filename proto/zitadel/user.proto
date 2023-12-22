@@ -185,7 +185,33 @@ message SearchQuery {
         TypeQuery type_query = 8;
         LoginNameQuery login_name_query = 9;
         InUserIDQuery in_user_ids_query = 10;
+        OrQuery or_query = 11;
+        AndQuery and_query = 12;
+        NotQuery not_query = 13;
     }
+}
+
+message OrQuery {
+    repeated SearchQuery queries = 1 [        
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {            
+            description: "the sub queries to 'OR'"
+        }
+    ];
+}
+message AndQuery {
+    repeated SearchQuery queries = 1 [        
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {            
+            description: "the sub queries to 'AND'"
+        }
+    ];
+}
+
+message NotQuery {
+    SearchQuery query = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {            
+            description: "the sub query to negate (NOT)"
+        }
+    ];
 }
 
 message InUserIDQuery {

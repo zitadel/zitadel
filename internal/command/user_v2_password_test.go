@@ -5,16 +5,16 @@ import (
 	"testing"
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/text/language"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_RequestPasswordReset(t *testing.T) {
@@ -42,7 +42,7 @@ func TestCommands_RequestPasswordReset(t *testing.T) {
 				ctx:    context.Background(),
 				userID: "",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-SAFdda", "Errors.User.IDMissing"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-SAFdda", "Errors.User.IDMissing"),
 		},
 		{
 			name: "user not existing",
@@ -55,7 +55,7 @@ func TestCommands_RequestPasswordReset(t *testing.T) {
 				ctx:    context.Background(),
 				userID: "userID",
 			},
-			wantErr: caos_errs.ThrowNotFound(nil, "COMMAND-SAF4f", "Errors.User.NotFound"),
+			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-SAF4f", "Errors.User.NotFound"),
 		},
 		{
 			name: "user not initialized",
@@ -78,7 +78,7 @@ func TestCommands_RequestPasswordReset(t *testing.T) {
 				ctx:    context.Background(),
 				userID: "userID",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfe4g", "Errors.User.NotInitialised"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfe4g", "Errors.User.NotInitialised"),
 		},
 		{
 			name: "missing permission",
@@ -98,7 +98,7 @@ func TestCommands_RequestPasswordReset(t *testing.T) {
 				ctx:    context.Background(),
 				userID: "userID",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 	}
 	for _, tt := range tests {
@@ -140,7 +140,7 @@ func TestCommands_RequestPasswordResetReturnCode(t *testing.T) {
 				ctx:    context.Background(),
 				userID: "",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-SAFdda", "Errors.User.IDMissing"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-SAFdda", "Errors.User.IDMissing"),
 		},
 		{
 			name: "user not existing",
@@ -153,7 +153,7 @@ func TestCommands_RequestPasswordResetReturnCode(t *testing.T) {
 				ctx:    context.Background(),
 				userID: "userID",
 			},
-			wantErr: caos_errs.ThrowNotFound(nil, "COMMAND-SAF4f", "Errors.User.NotFound"),
+			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-SAF4f", "Errors.User.NotFound"),
 		},
 		{
 			name: "user not initialized",
@@ -176,7 +176,7 @@ func TestCommands_RequestPasswordResetReturnCode(t *testing.T) {
 				ctx:    context.Background(),
 				userID: "userID",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfe4g", "Errors.User.NotInitialised"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfe4g", "Errors.User.NotInitialised"),
 		},
 		{
 			name: "missing permission",
@@ -196,7 +196,7 @@ func TestCommands_RequestPasswordResetReturnCode(t *testing.T) {
 				ctx:    context.Background(),
 				userID: "userID",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 	}
 	for _, tt := range tests {
@@ -240,7 +240,7 @@ func TestCommands_RequestPasswordResetURLTemplate(t *testing.T) {
 				userID:  "user1",
 				urlTmpl: "{{",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
 		},
 
 		{
@@ -252,7 +252,7 @@ func TestCommands_RequestPasswordResetURLTemplate(t *testing.T) {
 				ctx:    context.Background(),
 				userID: "",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-SAFdda", "Errors.User.IDMissing"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-SAFdda", "Errors.User.IDMissing"),
 		},
 		{
 			name: "user not existing",
@@ -265,7 +265,7 @@ func TestCommands_RequestPasswordResetURLTemplate(t *testing.T) {
 				ctx:    context.Background(),
 				userID: "userID",
 			},
-			wantErr: caos_errs.ThrowNotFound(nil, "COMMAND-SAF4f", "Errors.User.NotFound"),
+			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-SAF4f", "Errors.User.NotFound"),
 		},
 		{
 			name: "user not initialized",
@@ -288,7 +288,7 @@ func TestCommands_RequestPasswordResetURLTemplate(t *testing.T) {
 				ctx:    context.Background(),
 				userID: "userID",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfe4g", "Errors.User.NotInitialised"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfe4g", "Errors.User.NotInitialised"),
 		},
 		{
 			name: "missing permission",
@@ -308,7 +308,7 @@ func TestCommands_RequestPasswordResetURLTemplate(t *testing.T) {
 				ctx:    context.Background(),
 				userID: "userID",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 	}
 	for _, tt := range tests {
@@ -360,7 +360,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-SAFdda", "Errors.User.IDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-SAFdda", "Errors.User.IDMissing"),
 			},
 		},
 		{
@@ -375,7 +375,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				userID: "userID",
 			},
 			res: res{
-				err: caos_errs.ThrowNotFound(nil, "COMMAND-SAF4f", "Errors.User.NotFound"),
+				err: zerrors.ThrowNotFound(nil, "COMMAND-SAF4f", "Errors.User.NotFound"),
 			},
 		},
 		{
@@ -400,7 +400,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				userID: "userID",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfe4g", "Errors.User.NotInitialised"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfe4g", "Errors.User.NotInitialised"),
 			},
 		},
 		{
@@ -422,7 +422,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 				userID: "userID",
 			},
 			res: res{
-				err: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+				err: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 			},
 		},
 		{
@@ -437,19 +437,18 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							user.NewHumanPasswordCodeAddedEventV2(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("code"),
-								},
-								10*time.Minute,
-								domain.NotificationTypeEmail,
-								"",
-								false,
-							)),
+						user.NewHumanPasswordCodeAddedEventV2(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("code"),
+							},
+							10*time.Minute,
+							domain.NotificationTypeEmail,
+							"",
+							false,
+						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -478,19 +477,18 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							user.NewHumanPasswordCodeAddedEventV2(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("code"),
-								},
-								10*time.Minute,
-								domain.NotificationTypeEmail,
-								"https://example.com/password/changey?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
-								false,
-							)),
+						user.NewHumanPasswordCodeAddedEventV2(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("code"),
+							},
+							10*time.Minute,
+							domain.NotificationTypeEmail,
+							"https://example.com/password/changey?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+							false,
+						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -520,19 +518,18 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							user.NewHumanPasswordCodeAddedEventV2(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("code"),
-								},
-								10*time.Minute,
-								domain.NotificationTypeSms,
-								"https://example.com/password/changey?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
-								false,
-							)),
+						user.NewHumanPasswordCodeAddedEventV2(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("code"),
+							},
+							10*time.Minute,
+							domain.NotificationTypeSms,
+							"https://example.com/password/changey?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+							false,
+						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -563,19 +560,18 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							user.NewHumanPasswordCodeAddedEventV2(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("code"),
-								},
-								10*time.Minute,
-								domain.NotificationTypeEmail,
-								"",
-								true,
-							)),
+						user.NewHumanPasswordCodeAddedEventV2(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("code"),
+							},
+							10*time.Minute,
+							domain.NotificationTypeEmail,
+							"",
+							true,
+						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),

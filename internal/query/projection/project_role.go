@@ -3,17 +3,17 @@ package projection
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
-	ProjectRoleProjectionTable = "projections.project_roles3"
+	ProjectRoleProjectionTable = "projections.project_roles4"
 
 	ProjectRoleColumnProjectID     = "project_id"
 	ProjectRoleColumnKey           = "role_key"
@@ -24,43 +24,41 @@ const (
 	ProjectRoleColumnInstanceID    = "instance_id"
 	ProjectRoleColumnDisplayName   = "display_name"
 	ProjectRoleColumnGroupName     = "group_name"
-	ProjectRoleColumnOwnerRemoved  = "owner_removed"
 )
 
-type projectRoleProjection struct {
-	crdb.StatementHandler
+type projectRoleProjection struct{}
+
+func newProjectRoleProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(projectRoleProjection))
 }
 
-func newProjectRoleProjection(ctx context.Context, config crdb.StatementHandlerConfig) *projectRoleProjection {
-	p := new(projectRoleProjection)
-	config.ProjectionName = ProjectRoleProjectionTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(ProjectRoleColumnProjectID, crdb.ColumnTypeText),
-			crdb.NewColumn(ProjectRoleColumnKey, crdb.ColumnTypeText),
-			crdb.NewColumn(ProjectRoleColumnCreationDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(ProjectRoleColumnChangeDate, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(ProjectRoleColumnSequence, crdb.ColumnTypeInt64),
-			crdb.NewColumn(ProjectRoleColumnResourceOwner, crdb.ColumnTypeText),
-			crdb.NewColumn(ProjectRoleColumnInstanceID, crdb.ColumnTypeText),
-			crdb.NewColumn(ProjectRoleColumnDisplayName, crdb.ColumnTypeText),
-			crdb.NewColumn(ProjectRoleColumnGroupName, crdb.ColumnTypeText),
-			crdb.NewColumn(ProjectRoleColumnOwnerRemoved, crdb.ColumnTypeBool, crdb.Default(false)),
+func (*projectRoleProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(ProjectRoleColumnProjectID, handler.ColumnTypeText),
+			handler.NewColumn(ProjectRoleColumnKey, handler.ColumnTypeText),
+			handler.NewColumn(ProjectRoleColumnCreationDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(ProjectRoleColumnChangeDate, handler.ColumnTypeTimestamp),
+			handler.NewColumn(ProjectRoleColumnSequence, handler.ColumnTypeInt64),
+			handler.NewColumn(ProjectRoleColumnResourceOwner, handler.ColumnTypeText),
+			handler.NewColumn(ProjectRoleColumnInstanceID, handler.ColumnTypeText),
+			handler.NewColumn(ProjectRoleColumnDisplayName, handler.ColumnTypeText),
+			handler.NewColumn(ProjectRoleColumnGroupName, handler.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(ProjectRoleColumnInstanceID, ProjectRoleColumnProjectID, ProjectRoleColumnKey),
-			crdb.WithIndex(crdb.NewIndex("owner_removed", []string{ProjectRoleColumnOwnerRemoved})),
+			handler.NewPrimaryKey(ProjectRoleColumnInstanceID, ProjectRoleColumnProjectID, ProjectRoleColumnKey),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *projectRoleProjection) reducers() []handler.AggregateReducer {
+func (*projectRoleProjection) Name() string {
+	return ProjectRoleProjectionTable
+}
+
+func (p *projectRoleProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: project.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  project.RoleAddedType,
 					Reduce: p.reduceProjectRoleAdded,
@@ -81,7 +79,7 @@ func (p *projectRoleProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: p.reduceOwnerRemoved,
@@ -90,7 +88,7 @@ func (p *projectRoleProjection) reducers() []handler.AggregateReducer {
 		},
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceRemovedEventType,
 					Reduce: reduceInstanceRemovedHelper(ProjectRoleColumnInstanceID),
@@ -103,9 +101,9 @@ func (p *projectRoleProjection) reducers() []handler.AggregateReducer {
 func (p *projectRoleProjection) reduceProjectRoleAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-g92Fg", "reduce.wrong.event.type %s", project.RoleAddedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-g92Fg", "reduce.wrong.event.type %s", project.RoleAddedType)
 	}
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(ProjectRoleColumnKey, e.Key),
@@ -124,10 +122,10 @@ func (p *projectRoleProjection) reduceProjectRoleAdded(event eventstore.Event) (
 func (p *projectRoleProjection) reduceProjectRoleChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-sM0f", "reduce.wrong.event.type %s", project.GrantChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-sM0f", "reduce.wrong.event.type %s", project.GrantChangedType)
 	}
 	if e.DisplayName == nil && e.Group == nil {
-		return crdb.NewNoOpStatement(e), nil
+		return handler.NewNoOpStatement(e), nil
 	}
 	columns := make([]handler.Column, 0, 7)
 	columns = append(columns, handler.NewCol(ProjectRoleColumnChangeDate, e.CreationDate()),
@@ -138,7 +136,7 @@ func (p *projectRoleProjection) reduceProjectRoleChanged(event eventstore.Event)
 	if e.Group != nil {
 		columns = append(columns, handler.NewCol(ProjectRoleColumnGroupName, *e.Group))
 	}
-	return crdb.NewUpdateStatement(
+	return handler.NewUpdateStatement(
 		e,
 		columns,
 		[]handler.Condition{
@@ -152,9 +150,9 @@ func (p *projectRoleProjection) reduceProjectRoleChanged(event eventstore.Event)
 func (p *projectRoleProjection) reduceProjectRoleRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-L0fJf", "reduce.wrong.event.type %s", project.GrantRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-L0fJf", "reduce.wrong.event.type %s", project.GrantRemovedType)
 	}
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectRoleColumnKey, e.Key),
@@ -167,9 +165,9 @@ func (p *projectRoleProjection) reduceProjectRoleRemoved(event eventstore.Event)
 func (p *projectRoleProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-l0geG", "reduce.wrong.event.type %s", project.ProjectRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-l0geG", "reduce.wrong.event.type %s", project.ProjectRemovedType)
 	}
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectRoleColumnProjectID, e.Aggregate().ID),
@@ -181,10 +179,10 @@ func (p *projectRoleProjection) reduceProjectRemoved(event eventstore.Event) (*h
 func (p *projectRoleProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-3XrHY", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-3XrHY", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectRoleColumnInstanceID, e.Aggregate().InstanceID),

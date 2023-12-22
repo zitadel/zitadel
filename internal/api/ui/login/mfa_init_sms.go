@@ -29,7 +29,7 @@ type smsInitFormData struct {
 // It will also add a successful OTP SMS check to the auth request.
 // If there's no verified phone number, the potential last phone number will be used to render the registration page
 func (l *Login) handleRegisterOTPSMS(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
-	user, err := l.query.GetNotifyUserByID(r.Context(), true, authReq.UserID, false)
+	user, err := l.query.GetNotifyUserByID(r.Context(), true, authReq.UserID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -57,10 +57,11 @@ func (l *Login) renderRegisterSMS(w http.ResponseWriter, r *http.Request, authRe
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	data.baseData = l.getBaseData(r, authReq, "InitMFAOTP.Title", "InitMFAOTP.Description", errID, errMessage)
+	translator := l.getTranslator(r.Context(), authReq)
+	data.baseData = l.getBaseData(r, authReq, translator, "InitMFAOTP.Title", "InitMFAOTP.Description", errID, errMessage)
 	data.profileData = l.getProfileData(authReq)
 	data.MFAType = domain.MFATypeOTPSMS
-	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplMFASMSInit], data, nil)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplMFASMSInit], data, nil)
 }
 
 // handleRegisterSMSCheck handles form submissions of the SMS registration.
