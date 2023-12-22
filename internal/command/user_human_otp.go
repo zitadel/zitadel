@@ -78,7 +78,7 @@ func (c *Commands) createHumanTOTP(ctx context.Context, userID, resourceOwner st
 		logging.WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get org for loginname")
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-55M9f", "Errors.Org.NotFound")
 	}
-	orgPolicy, err := c.getOrgDomainPolicy(ctx, org.AggregateID)
+	orgPolicy, err := c.domainPolicyWriteModel(ctx, org.AggregateID)
 	if err != nil {
 		logging.WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get org policy for loginname")
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-8ugTs", "Errors.Org.DomainPolicy.NotFound")

@@ -133,6 +133,37 @@ message SetMetadataEntry {
   ];
 }
 
+message HumanUser {
+  string user_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  UserState state = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "current state of the user";
+    }
+  ];
+  string username = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"minnie-mouse\"";
+    }
+  ];
+  repeated string login_names = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"gigi@zitadel.com\", \"gigi@zitadel.zitadel.ch\"]";
+    }
+  ];
+  string preferred_login_name = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"gigi@zitadel.com\"";
+    }
+  ];
+  HumanProfile profile = 6;
+  HumanEmail email = 7;
+  HumanPhone phone = 8;
+}
+
 message User {
   string user_id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -171,12 +202,6 @@ message User {
       }
     ];
   }
-}
-
-message HumanUser {
-  HumanProfile profile = 1;
-  HumanEmail email = 2;
-  HumanPhone phone = 3;
 }
 
 message MachineUser {

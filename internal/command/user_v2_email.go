@@ -67,6 +67,14 @@ func (c *Commands) changeUserEmailWithCode(ctx context.Context, userID, resource
 // When the plain text code is returned, no notification e-mail will be send to the user.
 // urlTmpl allows changing the target URL that is used by the e-mail and should be a validated Go template, if used.
 func (c *Commands) changeUserEmailWithGenerator(ctx context.Context, userID, resourceOwner, email string, gen crypto.Generator, returnCode bool, urlTmpl string) (*domain.Email, error) {
+	cmd, err := c.changeUserEmailWithGeneratorEvents(ctx, userID, resourceOwner, email, gen, returnCode, urlTmpl)
+	if err != nil {
+		return nil, err
+	}
+	return cmd.Push(ctx)
+}
+
+func (c *Commands) changeUserEmailWithGeneratorEvents(ctx context.Context, userID, resourceOwner, email string, gen crypto.Generator, returnCode bool, urlTmpl string) (*UserEmailEvents, error) {
 	cmd, err := c.NewUserEmailEvents(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -82,7 +90,7 @@ func (c *Commands) changeUserEmailWithGenerator(ctx context.Context, userID, res
 	if err = cmd.AddGeneratedCode(ctx, gen, urlTmpl, returnCode); err != nil {
 		return nil, err
 	}
-	return cmd.Push(ctx)
+	return cmd, nil
 }
 
 func (c *Commands) VerifyUserEmail(ctx context.Context, userID, resourceOwner, code string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
@@ -167,16 +175,28 @@ func (c *UserEmailEvents) SetVerified(ctx context.Context) {
 // AddGeneratedCode generates a new encrypted code and sets it to the email address.
 // When returnCode a plain text of the code will be returned from Push.
 func (c *UserEmailEvents) AddGeneratedCode(ctx context.Context, gen crypto.Generator, urlTmpl string, returnCode bool) error {
-	value, plain, err := crypto.NewCode(gen)
+	cmd, code, err := generateCodeCommand(ctx, c.aggregate, gen, urlTmpl, returnCode)
 	if err != nil {
 		return err
 	}
-
-	c.events = append(c.events, user.NewHumanEmailCodeAddedEventV2(ctx, c.aggregate, value, gen.Expiry(), urlTmpl, returnCode))
+	c.events = append(c.events, cmd)
 	if returnCode {
-		c.plainCode = &plain
+		c.plainCode = &code
 	}
 	return nil
+}
+
+func generateCodeCommand(ctx context.Context, agg *eventstore.Aggregate, gen crypto.Generator, urlTmpl string, returnCode bool) (eventstore.Command, string, error) {
+	value, plain, err := crypto.NewCode(gen)
+	if err != nil {
+		return nil, "", err
+	}
+
+	cmd := user.NewHumanEmailCodeAddedEventV2(ctx, agg, value, gen.Expiry(), urlTmpl, returnCode)
+	if returnCode {
+		return cmd, plain, nil
+	}
+	return cmd, "", nil
 }
 
 func (c *UserEmailEvents) VerifyCode(ctx context.Context, code string, gen crypto.Generator) error {
