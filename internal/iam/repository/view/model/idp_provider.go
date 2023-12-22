@@ -5,11 +5,11 @@ import (
 
 	"github.com/zitadel/logging"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/iam/model"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -81,7 +81,7 @@ func (r *IDPProviderView) setRootData(event eventstore.Event) {
 func (r *IDPProviderView) SetData(event eventstore.Event) error {
 	if err := event.Unmarshal(r); err != nil {
 		logging.New().WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")
+		return zerrors.ThrowInternal(err, "MODEL-Hs8uf", "Could not unmarshal data")
 	}
 	return nil
 }

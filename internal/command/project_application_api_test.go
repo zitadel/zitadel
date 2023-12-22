@@ -9,12 +9,12 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestAddAPIConfig(t *testing.T) {
@@ -46,7 +46,7 @@ func TestAddAPIConfig(t *testing.T) {
 				name:  "name",
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-XHsKt", "Errors.Invalid.Argument"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "PROJE-XHsKt", "Errors.Invalid.Argument"),
 			},
 		},
 		{
@@ -58,7 +58,7 @@ func TestAddAPIConfig(t *testing.T) {
 				name:  "",
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-F7g21", "Errors.Invalid.Argument"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "PROJE-F7g21", "Errors.Invalid.Argument"),
 			},
 		},
 		{
@@ -75,7 +75,7 @@ func TestAddAPIConfig(t *testing.T) {
 					Filter(),
 			},
 			want: Want{
-				CreateErr: errors.ThrowNotFound(nil, "PROJE-Sf2gb", "Errors.Project.NotFound"),
+				CreateErr: zerrors.ThrowNotFound(nil, "PROJE-Sf2gb", "Errors.Project.NotFound"),
 			},
 		},
 		{
@@ -177,7 +177,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -200,7 +200,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -230,7 +230,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -408,7 +408,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -431,7 +431,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -454,7 +454,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -494,7 +494,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -613,7 +613,7 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -630,7 +630,7 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -648,7 +648,7 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{

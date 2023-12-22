@@ -7,13 +7,13 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_AddAction(t *testing.T) {
@@ -50,7 +50,7 @@ func TestCommands_AddAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -58,7 +58,7 @@ func TestCommands_AddAction(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectPushFailed(
-						errors.ThrowPreconditionFailed(nil, "id", "name already exists"),
+						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						action.NewAddedEvent(context.Background(),
 							&action.NewAggregate("id1", "org1").Aggregate,
 							"name",
@@ -79,7 +79,7 @@ func TestCommands_AddAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -168,7 +168,7 @@ func TestCommands_ChangeAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -190,7 +190,7 @@ func TestCommands_ChangeAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -222,7 +222,7 @@ func TestCommands_ChangeAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -241,7 +241,7 @@ func TestCommands_ChangeAction(t *testing.T) {
 						),
 					),
 					expectPushFailed(
-						errors.ThrowPreconditionFailed(nil, "id", "name already exists"),
+						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						func() *action.ChangedEvent {
 							event, _ := action.NewChangedEvent(context.Background(),
 								&action.NewAggregate("id1", "org1").Aggregate,
@@ -267,7 +267,7 @@ func TestCommands_ChangeAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -366,7 +366,7 @@ func TestCommands_DeactivateAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -382,7 +382,7 @@ func TestCommands_DeactivateAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -413,7 +413,7 @@ func TestCommands_DeactivateAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -499,7 +499,7 @@ func TestCommands_ReactivateAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -515,7 +515,7 @@ func TestCommands_ReactivateAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -541,7 +541,7 @@ func TestCommands_ReactivateAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -633,7 +633,7 @@ func TestCommands_DeleteAction(t *testing.T) {
 				resourceOwner: "",
 			},
 			res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -649,7 +649,7 @@ func TestCommands_DeleteAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{

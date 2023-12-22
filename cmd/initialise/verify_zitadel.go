@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
 func newZitadel() *cobra.Command {
@@ -75,7 +76,7 @@ func VerifyZitadel(db *database.DB, config database.Config) error {
 func verifyZitadel(config database.Config) error {
 	logging.WithFields("database", config.DatabaseName()).Info("verify zitadel")
 
-	db, err := database.Connect(config, false, false)
+	db, err := database.Connect(config, false, dialect.DBPurposeQuery)
 	if err != nil {
 		return err
 	}

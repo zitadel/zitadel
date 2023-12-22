@@ -11,9 +11,9 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	errz "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionRequest]) (resp *op.Response, err error) {
@@ -31,14 +31,14 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	clientChan := make(chan *instrospectionClientResult)
-	go s.instrospectionClientAuth(ctx, r.Data.ClientCredentials, clientChan)
+	clientChan := make(chan *introspectionClientResult)
+	go s.introspectionClientAuth(ctx, r.Data.ClientCredentials, clientChan)
 
 	tokenChan := make(chan *introspectionTokenResult)
 	go s.introspectionToken(ctx, r.Data.Token, tokenChan)
 
 	var (
-		client *instrospectionClientResult
+		client *introspectionClientResult
 		token  *introspectionTokenResult
 	)
 
@@ -116,13 +116,13 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 	return op.NewResponse(introspectionResp), nil
 }
 
-type instrospectionClientResult struct {
+type introspectionClientResult struct {
 	clientID  string
 	projectID string
 	err       error
 }
 
-func (s *Server) instrospectionClientAuth(ctx context.Context, cc *op.ClientCredentials, rc chan<- *instrospectionClientResult) {
+func (s *Server) introspectionClientAuth(ctx context.Context, cc *op.ClientCredentials, rc chan<- *introspectionClientResult) {
 	ctx, span := tracing.NewSpan(ctx)
 
 	clientID, projectID, err := func() (string, string, error) {
@@ -147,7 +147,7 @@ func (s *Server) instrospectionClientAuth(ctx context.Context, cc *op.ClientCred
 
 	span.EndWithError(err)
 
-	rc <- &instrospectionClientResult{
+	rc <- &introspectionClientResult{
 		clientID:  clientID,
 		projectID: projectID,
 		err:       err,
@@ -157,15 +157,11 @@ func (s *Server) instrospectionClientAuth(ctx context.Context, cc *op.ClientCred
 // clientFromCredentials parses the client ID early,
 // and makes a single query for the client for either auth methods.
 func (s *Server) clientFromCredentials(ctx context.Context, cc *op.ClientCredentials) (client *query.IntrospectionClient, err error) {
-	if cc.ClientAssertion != "" {
-		claims := new(oidc.JWTTokenRequest)
-		if _, err := oidc.ParseToken(cc.ClientAssertion, claims); err != nil {
-			return nil, oidc.ErrUnauthorizedClient().WithParent(err)
-		}
-		client, err = s.query.GetIntrospectionClientByID(ctx, claims.Issuer, true)
-	} else {
-		client, err = s.query.GetIntrospectionClientByID(ctx, cc.ClientID, false)
+	clientID, assertion, err := clientIDFromCredentials(cc)
+	if err != nil {
+		return nil, err
 	}
+	client, err = s.query.GetIntrospectionClientByID(ctx, clientID, assertion)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, oidc.ErrUnauthorizedClient().WithParent(err)
 	}
@@ -196,5 +192,5 @@ func validateIntrospectionAudience(audience []string, clientID, projectID string
 		return nil
 	}
 
-	return errz.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
+	return zerrors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
 }

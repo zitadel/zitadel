@@ -95,7 +95,7 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 
 	translator := l.getTranslator(r.Context(), authReq)
 	data := mailVerificationData{
-		baseData:    l.getBaseData(r, authReq, "EmailVerification.Title", "EmailVerification.Description", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, translator, "EmailVerification.Title", "EmailVerification.Description", errID, errMessage),
 		UserID:      userID,
 		profileData: l.getProfileData(authReq),
 	}
@@ -111,7 +111,7 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 func (l *Login) renderMailVerified(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
 	translator := l.getTranslator(r.Context(), authReq)
 	data := mailVerificationData{
-		baseData:    l.getBaseData(r, authReq, "EmailVerificationDone.Title", "EmailVerificationDone.Description", "", ""),
+		baseData:    l.getBaseData(r, authReq, translator, "EmailVerificationDone.Title", "EmailVerificationDone.Description", "", ""),
 		profileData: l.getProfileData(authReq),
 	}
 	if authReq == nil {

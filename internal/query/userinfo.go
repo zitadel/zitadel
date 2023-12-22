@@ -4,15 +4,15 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
-	"encoding/json"
+	"errors"
 	"sync"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // oidcUserInfoTriggerHandlers slice can only be created after zitadel
@@ -40,23 +40,17 @@ func (q *Queries) GetOIDCUserInfo(ctx context.Context, userID string, roleAudien
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	var data []byte
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		return row.Scan(&data)
-	},
-		oidcUserInfoQuery,
+	userInfo, err := database.QueryJSONObject[OIDCUserInfo](ctx, q.client, oidcUserInfoQuery,
 		userID, authz.GetInstance(ctx).InstanceID(), database.TextArray[string](roleAudience),
 	)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Oath6", "Errors.Internal")
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, zerrors.ThrowNotFound(err, "QUERY-Eey2a", "Errors.User.NotFound")
 	}
-
-	userInfo := new(OIDCUserInfo)
-	if err = json.Unmarshal(data, userInfo); err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Vohs6", "Errors.Internal")
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-Oath6", "Errors.Internal")
 	}
 	if userInfo.User == nil {
-		return nil, errors.ThrowNotFound(nil, "QUERY-ahs4S", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "QUERY-ahs4S", "Errors.User.NotFound")
 	}
 
 	return userInfo, nil

@@ -1,10 +1,10 @@
 package model
 
 import (
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type DomainPolicy struct {
@@ -34,7 +34,7 @@ func (p *DomainPolicy) Changes(changed *DomainPolicy) map[string]interface{} {
 func (p *DomainPolicy) SetData(event eventstore.Event) error {
 	err := event.Unmarshal(p)
 	if err != nil {
-		return errors.ThrowInternal(err, "EVENT-7JS9d", "unable to unmarshal data")
+		return zerrors.ThrowInternal(err, "EVENT-7JS9d", "unable to unmarshal data")
 	}
 	return nil
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"database/sql/driver"
-	errs "errors"
+	"errors"
 	"fmt"
 	"regexp"
 	"testing"
@@ -13,7 +13,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -203,7 +203,7 @@ func Test_OrgPrepares(t *testing.T) {
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.Is(err, sql.ErrConnDone) {
+					if !errors.Is(err, sql.ErrConnDone) {
 						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
 					}
 					return nil, true
@@ -221,7 +221,7 @@ func Test_OrgPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errors.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -268,7 +268,7 @@ func Test_OrgPrepares(t *testing.T) {
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.Is(err, sql.ErrConnDone) {
+					if !errors.Is(err, sql.ErrConnDone) {
 						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
 					}
 					return nil, true
@@ -286,7 +286,7 @@ func Test_OrgPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errors.IsInternal(err) {
+					if !zerrors.IsInternal(err) {
 						return fmt.Errorf("err should be zitadel.Internal got: %w", err), false
 					}
 					return nil, true
@@ -317,7 +317,7 @@ func Test_OrgPrepares(t *testing.T) {
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.Is(err, sql.ErrConnDone) {
+					if !errors.Is(err, sql.ErrConnDone) {
 						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
 					}
 					return nil, true
@@ -400,7 +400,7 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 			},
 			want: want{
 				isUnique: false,
-				err:      errors.IsErrorInvalidArgument,
+				err:      zerrors.IsErrorInvalidArgument,
 			},
 		},
 	}

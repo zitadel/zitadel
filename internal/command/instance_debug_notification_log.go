@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/channels/fs"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddDebugNotificationProviderLog(ctx context.Context, fileSystemProvider *fs.Config) (*domain.ObjectDetails, error) {
@@ -35,7 +35,7 @@ func (c *Commands) addDefaultDebugNotificationLog(ctx context.Context, instanceA
 		return nil, err
 	}
 	if addedWriteModel.State.Exists() {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "INSTANCE-3h0fs", "Errors.IAM.DebugNotificationProvider.AlreadyExists")
+		return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-3h0fs", "Errors.IAM.DebugNotificationProvider.AlreadyExists")
 	}
 
 	events := []eventstore.Command{
@@ -70,13 +70,13 @@ func (c *Commands) changeDefaultDebugNotificationProviderLog(ctx context.Context
 		return nil, err
 	}
 	if !existingProvider.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-2h0s3", "Errors.IAM.DebugNotificationProvider.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-2h0s3", "Errors.IAM.DebugNotificationProvider.NotFound")
 	}
 	changedEvent, hasChanged := existingProvider.NewChangedEvent(ctx,
 		instanceAgg,
 		fileSystemProvider.Compact)
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-fn9p3", "Errors.IAM.LoginPolicy.NotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-fn9p3", "Errors.IAM.LoginPolicy.NotChanged")
 	}
 	return changedEvent, nil
 }
@@ -89,7 +89,7 @@ func (c *Commands) RemoveDefaultNotificationLog(ctx context.Context) (*domain.Ob
 		return nil, err
 	}
 	if !existingProvider.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-39lse", "Errors.IAM.DebugNotificationProvider.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-39lse", "Errors.IAM.DebugNotificationProvider.NotFound")
 	}
 
 	events, err := c.eventstore.Push(ctx, instance.NewDebugNotificationProviderLogRemovedEvent(ctx, instanceAgg))

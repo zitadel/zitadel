@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"slices"
 	"strings"
 	"time"
 
@@ -9,43 +10,40 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
 type Client struct {
-	app                        *query.App
-	defaultLoginURL            string
-	defaultLoginURLV2          string
-	defaultAccessTokenLifetime time.Duration
-	defaultIdTokenLifetime     time.Duration
-	allowedScopes              []string
+	client            *query.OIDCClient
+	defaultLoginURL   string
+	defaultLoginURLV2 string
+	allowedScopes     []string
 }
 
-func ClientFromBusiness(app *query.App, defaultLoginURL, defaultLoginURLV2 string, defaultAccessTokenLifetime, defaultIdTokenLifetime time.Duration, allowedScopes []string) (op.Client, error) {
-	if app.OIDCConfig == nil {
-		return nil, errors.ThrowInvalidArgument(nil, "OIDC-d5bhD", "client is not a proper oidc application")
+func ClientFromBusiness(client *query.OIDCClient, defaultLoginURL, defaultLoginURLV2 string) op.Client {
+	allowedScopes := make([]string, len(client.ProjectRoleKeys))
+	for i, roleKey := range client.ProjectRoleKeys {
+		allowedScopes[i] = ScopeProjectRolePrefix + roleKey
 	}
+
 	return &Client{
-			app:                        app,
-			defaultLoginURL:            defaultLoginURL,
-			defaultLoginURLV2:          defaultLoginURLV2,
-			defaultAccessTokenLifetime: defaultAccessTokenLifetime,
-			defaultIdTokenLifetime:     defaultIdTokenLifetime,
-			allowedScopes:              allowedScopes},
-		nil
+		client:            client,
+		defaultLoginURL:   defaultLoginURL,
+		defaultLoginURLV2: defaultLoginURLV2,
+		allowedScopes:     allowedScopes,
+	}
 }
 
 func (c *Client) ApplicationType() op.ApplicationType {
-	return op.ApplicationType(c.app.OIDCConfig.AppType)
+	return op.ApplicationType(c.client.ApplicationType)
 }
 
 func (c *Client) AuthMethod() oidc.AuthMethod {
-	return authMethodToOIDC(c.app.OIDCConfig.AuthMethodType)
+	return authMethodToOIDC(c.client.AuthMethodType)
 }
 
 func (c *Client) GetID() string {
-	return c.app.OIDCConfig.ClientID
+	return c.client.ClientID
 }
 
 func (c *Client) LoginURL(id string) string {
@@ -56,28 +54,28 @@ func (c *Client) LoginURL(id string) string {
 }
 
 func (c *Client) RedirectURIs() []string {
-	return c.app.OIDCConfig.RedirectURIs
+	return c.client.RedirectURIs
 }
 
 func (c *Client) PostLogoutRedirectURIs() []string {
-	return c.app.OIDCConfig.PostLogoutRedirectURIs
+	return c.client.PostLogoutRedirectURIs
 }
 
 func (c *Client) ResponseTypes() []oidc.ResponseType {
-	return responseTypesToOIDC(c.app.OIDCConfig.ResponseTypes)
+	return responseTypesToOIDC(c.client.ResponseTypes)
 }
 
 func (c *Client) GrantTypes() []oidc.GrantType {
-	return grantTypesToOIDC(c.app.OIDCConfig.GrantTypes)
+	return grantTypesToOIDC(c.client.GrantTypes)
 }
 
 func (c *Client) DevMode() bool {
-	return c.app.OIDCConfig.IsDevMode
+	return c.client.IsDevMode
 }
 
 func (c *Client) RestrictAdditionalIdTokenScopes() func(scopes []string) []string {
 	return func(scopes []string) []string {
-		if c.app.OIDCConfig.AssertIDTokenRole {
+		if c.client.IDTokenRoleAssertion {
 			return scopes
 		}
 		return removeScopeWithPrefix(scopes, ScopeProjectRolePrefix)
@@ -86,7 +84,7 @@ func (c *Client) RestrictAdditionalIdTokenScopes() func(scopes []string) []strin
 
 func (c *Client) RestrictAdditionalAccessTokenScopes() func(scopes []string) []string {
 	return func(scopes []string) []string {
-		if c.app.OIDCConfig.AssertAccessTokenRole {
+		if c.client.AccessTokenRoleAssertion {
 			return scopes
 		}
 		return removeScopeWithPrefix(scopes, ScopeProjectRolePrefix)
@@ -94,15 +92,15 @@ func (c *Client) RestrictAdditionalAccessTokenScopes() func(scopes []string) []s
 }
 
 func (c *Client) AccessTokenLifetime() time.Duration {
-	return c.defaultAccessTokenLifetime //PLANNED: impl from real client
+	return c.client.Settings.AccessTokenLifetime
 }
 
 func (c *Client) IDTokenLifetime() time.Duration {
-	return c.defaultIdTokenLifetime //PLANNED: impl from real client
+	return c.client.Settings.IdTokenLifetime
 }
 
 func (c *Client) AccessTokenType() op.AccessTokenType {
-	return accessTokenTypeToOIDC(c.app.OIDCConfig.AccessTokenType)
+	return accessTokenTypeToOIDC(c.client.AccessTokenType)
 }
 
 func (c *Client) IsScopeAllowed(scope string) bool {
@@ -127,20 +125,15 @@ func (c *Client) IsScopeAllowed(scope string) bool {
 	if scope == ScopeProjectsRoles {
 		return true
 	}
-	for _, allowedScope := range c.allowedScopes {
-		if scope == allowedScope {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(c.allowedScopes, scope)
 }
 
 func (c *Client) ClockSkew() time.Duration {
-	return c.app.OIDCConfig.ClockSkew
+	return c.client.ClockSkew
 }
 
 func (c *Client) IDTokenUserinfoClaimsAssertion() bool {
-	return c.app.OIDCConfig.AssertIDTokenUserinfo
+	return c.client.IDTokenUserinfoAssertion
 }
 
 func accessTokenTypeToOIDC(tokenType domain.OIDCTokenType) op.AccessTokenType {
@@ -228,4 +221,15 @@ func removeScopeWithPrefix(scopes []string, scopePrefix ...string) []string {
 		}
 	}
 	return newScopeList
+}
+
+func clientIDFromCredentials(cc *op.ClientCredentials) (clientID string, assertion bool, err error) {
+	if cc.ClientAssertion != "" {
+		claims := new(oidc.JWTTokenRequest)
+		if _, err := oidc.ParseToken(cc.ClientAssertion, claims); err != nil {
+			return "", false, oidc.ErrInvalidClient().WithParent(err)
+		}
+		return claims.Issuer, true, nil
+	}
+	return cc.ClientID, false, nil
 }

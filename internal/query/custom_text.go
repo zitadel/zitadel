@@ -15,10 +15,11 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type CustomTexts struct {
@@ -101,7 +102,7 @@ func (q *Queries) CustomTextList(ctx context.Context, aggregateID, template, lan
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-M9gse", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-M9gse", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -109,7 +110,7 @@ func (q *Queries) CustomTextList(ctx context.Context, aggregateID, template, lan
 		return err
 	}, query, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-2j00f", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-2j00f", "Errors.Internal")
 	}
 
 	texts.State, err = q.latestState(ctx, projectsTable)
@@ -131,7 +132,7 @@ func (q *Queries) CustomTextListByTemplate(ctx context.Context, aggregateID, tem
 	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-M49fs", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-M49fs", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -139,7 +140,7 @@ func (q *Queries) CustomTextListByTemplate(ctx context.Context, aggregateID, tem
 		return err
 	}, query, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-3n9ge", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-3n9ge", "Errors.Internal")
 	}
 
 	texts.State, err = q.latestState(ctx, projectsTable)
@@ -156,7 +157,7 @@ func (q *Queries) GetDefaultLoginTexts(ctx context.Context, lang string) (_ *dom
 	}
 	loginText := new(domain.CustomLoginText)
 	if err := yaml.Unmarshal(contents, loginText); err != nil {
-		return nil, errors.ThrowInternal(err, "TEXT-M0p4s", "Errors.TranslationFile.ReadError")
+		return nil, zerrors.ThrowInternal(err, "TEXT-M0p4s", "Errors.TranslationFile.ReadError")
 	}
 	loginText.IsDefault = true
 	loginText.AggregateID = authz.GetInstance(ctx).InstanceID()
@@ -184,7 +185,7 @@ func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (_ *domain.Cus
 	}
 	loginTextMap := make(map[string]interface{})
 	if err := yaml.Unmarshal(contents, &loginTextMap); err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-m0Jf3", "Errors.TranslationFile.ReadError")
+		return nil, zerrors.ThrowInternal(err, "QUERY-m0Jf3", "Errors.TranslationFile.ReadError")
 	}
 	texts, err := q.CustomTextList(ctx, authz.GetInstance(ctx).InstanceID(), domain.LoginCustomText, lang, false)
 	if err != nil {
@@ -200,11 +201,11 @@ func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (_ *domain.Cus
 	}
 	jsonbody, err := json.Marshal(loginTextMap)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-0nJ3f", "Errors.TranslationFile.MergeError")
+		return nil, zerrors.ThrowInternal(err, "QUERY-0nJ3f", "Errors.TranslationFile.MergeError")
 	}
 	loginText := new(domain.CustomLoginText)
 	if err := json.Unmarshal(jsonbody, &loginText); err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-m93Jf", "Errors.TranslationFile.MergeError")
+		return nil, zerrors.ThrowInternal(err, "QUERY-m93Jf", "Errors.TranslationFile.MergeError")
 	}
 	loginText.AggregateID = authz.GetInstance(ctx).InstanceID()
 	loginText.IsDefault = true
@@ -217,9 +218,9 @@ func (q *Queries) readLoginTranslationFile(ctx context.Context, lang string) ([]
 	contents, ok := q.LoginTranslationFileContents[lang]
 	var err error
 	if !ok {
-		contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", lang))
-		if errors.IsNotFound(err) {
-			contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", authz.GetInstance(ctx).DefaultLanguage().String()))
+		contents, err = q.readTranslationFile(i18n.LOGIN, fmt.Sprintf("/i18n/%s.yaml", lang))
+		if zerrors.IsNotFound(err) {
+			contents, err = q.readTranslationFile(i18n.LOGIN, fmt.Sprintf("/i18n/%s.yaml", authz.GetInstance(ctx).DefaultLanguage().String()))
 		}
 		if err != nil {
 			return nil, err
@@ -267,7 +268,7 @@ func prepareCustomTextsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-3n9fs", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-3n9fs", "Errors.Query.CloseRows")
 			}
 
 			return &CustomTexts{

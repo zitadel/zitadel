@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"math"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -111,11 +112,19 @@ func (h *Handler) Start(ctx context.Context) {
 }
 
 func (h *Handler) schedule(ctx context.Context) {
-	// if there was no run before trigger instantly
-	t := time.NewTimer(0)
+	// if there was no run before trigger within half a second
+	start := randomizeStart(0, 0.5)
+	t := time.NewTimer(start)
 	didInitialize := h.didProjectionInitialize(ctx)
 	if didInitialize {
-		t.Reset(h.requeueEvery)
+		if !t.Stop() {
+			<-t.C
+		}
+		// if there was a trigger before, start the projection
+		// after a second (should generally be after the not initialized projections)
+		// and its configured `RequeueEvery`
+		reset := randomizeStart(1, h.requeueEvery.Seconds())
+		t.Reset(reset)
 	}
 
 	for {
@@ -155,6 +164,11 @@ func (h *Handler) schedule(ctx context.Context) {
 			t.Reset(h.requeueEvery)
 		}
 	}
+}
+
+func randomizeStart(min, maxSeconds float64) time.Duration {
+	d := min + rand.Float64()*(maxSeconds-min)
+	return time.Duration(d*1000) * time.Millisecond
 }
 
 func (h *Handler) subscribe(ctx context.Context) {
@@ -213,7 +227,7 @@ func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]str
 		AwaitOpenTransactions().
 		AllowTimeTravel().
 		ExcludedInstanceID("")
-	if didInitialize {
+	if didInitialize && h.handleActiveInstances > 0 {
 		query = query.
 			CreationDateAfter(h.now().Add(-1 * h.handleActiveInstances))
 	}
@@ -257,24 +271,36 @@ func (h *Handler) Trigger(ctx context.Context, opts ...triggerOpt) (_ context.Co
 // lockInstances tries to lock the instance.
 // If the instance is already locked from another process no cancel function is returned
 // the instance can be skipped then
-// If the instance is locked, an unlock deferable function is returned
+// If the instance is locked, an unlock deferrable function is returned
 func (h *Handler) lockInstance(ctx context.Context, config *triggerConfig) func() {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 
-	// Check that the instance has a mutex to lock
-	instanceMu, _ := h.triggeredInstancesSync.LoadOrStore(instanceID, new(sync.Mutex))
-	unlock := func() {
-		instanceMu.(*sync.Mutex).Unlock()
-	}
-	if !instanceMu.(*sync.Mutex).TryLock() {
-		instanceMu.(*sync.Mutex).Lock()
-		if config.awaitRunning {
-			return unlock
+	// Check that the instance has a lock
+	instanceLock, _ := h.triggeredInstancesSync.LoadOrStore(instanceID, make(chan bool, 1))
+
+	// in case we don't want to wait for a running trigger / lock (e.g. spooler),
+	// we can directly return if we cannot lock
+	if !config.awaitRunning {
+		select {
+		case instanceLock.(chan bool) <- true:
+			return func() {
+				<-instanceLock.(chan bool)
+			}
+		default:
+			return nil
 		}
-		defer unlock()
+	}
+
+	// in case we want to wait for a running trigger / lock (e.g. query),
+	// we try to lock as long as the context is not cancelled
+	select {
+	case instanceLock.(chan bool) <- true:
+		return func() {
+			<-instanceLock.(chan bool)
+		}
+	case <-ctx.Done():
 		return nil
 	}
-	return unlock
 }
 
 func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (additionalIteration bool, err error) {
@@ -319,7 +345,11 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 
 	var statements []*Statement
 	statements, additionalIteration, err = h.generateStatements(ctx, tx, currentState)
-	if err != nil || len(statements) == 0 {
+	if err != nil {
+		return additionalIteration, err
+	}
+	if len(statements) == 0 {
+		err = h.setState(tx, currentState)
 		return additionalIteration, err
 	}
 
@@ -329,6 +359,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	}
 
 	currentState.position = statements[lastProcessedIndex].Position
+	currentState.offset = statements[lastProcessedIndex].offset
 	currentState.aggregateID = statements[lastProcessedIndex].AggregateID
 	currentState.aggregateType = statements[lastProcessedIndex].AggregateType
 	currentState.sequence = statements[lastProcessedIndex].Sequence
@@ -353,37 +384,44 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return nil, false, err
 	}
 	eventAmount := len(events)
-	events = skipPreviouslyReduced(events, currentState)
-
-	if len(events) == 0 {
-		h.updateLastUpdated(ctx, tx, currentState)
-		return nil, false, nil
-	}
 
 	statements, err := h.eventsToStatements(tx, events, currentState)
-	if len(statements) == 0 {
+	if err != nil || len(statements) == 0 {
 		return nil, false, err
 	}
 
+	idx := skipPreviouslyReduced(statements, currentState)
+	if idx+1 == len(statements) {
+		currentState.position = statements[len(statements)-1].Position
+		currentState.offset = statements[len(statements)-1].offset
+		currentState.aggregateID = statements[len(statements)-1].AggregateID
+		currentState.aggregateType = statements[len(statements)-1].AggregateType
+		currentState.sequence = statements[len(statements)-1].Sequence
+		currentState.eventTimestamp = statements[len(statements)-1].CreationDate
+
+		return nil, false, nil
+	}
+	statements = statements[idx+1:]
+
 	additionalIteration = eventAmount == int(h.bulkLimit)
 	if len(statements) < len(events) {
-		// retry imediatly if statements failed
+		// retry immediately if statements failed
 		additionalIteration = true
 	}
 
 	return statements, additionalIteration, nil
 }
 
-func skipPreviouslyReduced(events []eventstore.Event, currentState *state) []eventstore.Event {
-	for i, event := range events {
-		if event.Position() == currentState.position &&
-			event.Aggregate().ID == currentState.aggregateID &&
-			event.Aggregate().Type == currentState.aggregateType &&
-			event.Sequence() == currentState.sequence {
-			return events[i+1:]
+func skipPreviouslyReduced(statements []*Statement, currentState *state) int {
+	for i, statement := range statements {
+		if statement.Position == currentState.position &&
+			statement.AggregateID == currentState.aggregateID &&
+			statement.AggregateType == currentState.aggregateType &&
+			statement.Sequence == currentState.sequence {
+			return i
 		}
 	}
-	return events
+	return -1
 }
 
 func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, currentState *state, statements []*Statement) (lastProcessedIndex int, err error) {
@@ -422,7 +460,7 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, currentState
 	if err = statement.Execute(tx, h.projection.Name()); err != nil {
 		h.log().WithError(err).Error("statement execution failed")
 
-		shouldContinue = h.handleFailedStmt(tx, currentState, failureFromStatement(statement, err))
+		shouldContinue = h.handleFailedStmt(tx, failureFromStatement(statement, err))
 		if shouldContinue {
 			return nil
 		}
@@ -442,7 +480,11 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		InstanceID(currentState.instanceID)
 
 	if currentState.position > 0 {
+		// decrease position by 10 because builder.PositionAfter filters for position > and we need position >=
 		builder = builder.PositionAfter(math.Float64frombits(math.Float64bits(currentState.position) - 10))
+		if currentState.offset > 0 {
+			builder = builder.Offset(currentState.offset)
+		}
 	}
 
 	for aggregateType, eventTypes := range h.eventTypes {
@@ -457,7 +499,7 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 	return builder
 }
 
-// ProjectionName returns the name of the unlying projection.
+// ProjectionName returns the name of the underlying projection.
 func (h *Handler) ProjectionName() string {
 	return h.projection.Name()
 }

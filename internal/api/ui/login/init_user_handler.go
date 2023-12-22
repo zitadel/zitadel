@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -72,7 +72,7 @@ func (l *Login) handleInitUserCheck(w http.ResponseWriter, r *http.Request) {
 
 func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *initUserFormData, err error) {
 	if data.Password != data.PasswordConfirm {
-		err := caos_errs.ThrowInvalidArgument(nil, "VIEW-fsdfd", "Errors.User.Password.ConfirmationWrong")
+		err := zerrors.ThrowInvalidArgument(nil, "VIEW-fsdfd", "Errors.User.Password.ConfirmationWrong")
 		l.renderInitUser(w, r, authReq, data.UserID, data.LoginName, data.Code, data.PasswordSet, err)
 		return
 	}
@@ -118,7 +118,7 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 
 	translator := l.getTranslator(r.Context(), authReq)
 	data := initUserData{
-		baseData:    l.getBaseData(r, authReq, "InitUser.Title", "InitUser.Description", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, translator, "InitUser.Title", "InitUser.Description", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		Code:        code,
@@ -155,8 +155,8 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 }
 
 func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
-	data := l.getUserData(r, authReq, "InitUserDone.Title", "InitUserDone.Description", "", "")
 	translator := l.getTranslator(r.Context(), authReq)
+	data := l.getUserData(r, authReq, translator, "InitUserDone.Title", "InitUserDone.Description", "", "")
 	if authReq == nil {
 		l.customTexts(r.Context(), translator, orgID)
 	}

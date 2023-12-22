@@ -26,6 +26,14 @@ core_static:
 	go generate internal/notification/statik/generate.go
 	go generate internal/statik/generate.go
 
+.PHONY: core_generate_all
+core_generate_all:
+	go install github.com/dmarkham/enumer@v1.5.9
+	go install github.com/rakyll/statik@v0.1.7
+	go install go.uber.org/mock/mockgen@v0.3.0
+	go install golang.org/x/tools/cmd/stringer@v0.15.0
+	go generate ./...
+
 .PHONY: core_assets
 core_assets:
 	mkdir -p docs/apis/assets
@@ -95,12 +103,12 @@ core_unit_test:
 core_integration_setup:
 	go build -o zitadel main.go
 	./zitadel init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
-	./zitadel setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
+	./zitadel setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml --steps internal/integration/config/zitadel.yaml --steps internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 	$(RM) zitadel
 
 .PHONY: core_integration_test
 core_integration_test: core_integration_setup
-	go test -tags=integration -race -p 1 -v -coverprofile=profile.cov -coverpkg=./internal/...,./cmd/... ./internal/integration ./internal/api/grpc/...  ./internal/notification/handlers/... ./internal/api/oidc/...
+	go test -tags=integration -race -p 1 -coverprofile=profile.cov -coverpkg=./internal/...,./cmd/... ./internal/integration ./internal/api/grpc/...  ./internal/notification/handlers/... ./internal/api/oidc/...
 
 .PHONY: console_lint
 console_lint:

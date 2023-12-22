@@ -1,9 +1,6 @@
--- deallocate q;
--- prepare q (text, text, text[]) as
-
 with usr as (
 	select u.id, u.creation_date, u.change_date, u.sequence, u.state, u.resource_owner, u.username, n.login_name as preferred_login_name
-	from projections.users9 u
+	from projections.users10 u
 	left join projections.login_names3 n on u.id = n.user_id and u.instance_id = n.instance_id
 	where u.id = $1
 	and u.instance_id = $2
@@ -11,8 +8,8 @@ with usr as (
 ),
 human as (
 	select $1 as user_id, row_to_json(r) as human from (
-		select first_name, last_name, nick_name, display_name, avatar_key, email, is_email_verified, phone, is_phone_verified
-		from projections.users9_humans
+		select first_name, last_name, nick_name, display_name, avatar_key, preferred_language, gender, email, is_email_verified, phone, is_phone_verified
+		from projections.users10_humans
 		where user_id = $1
 		and instance_id = $2
 	) r
@@ -20,7 +17,7 @@ human as (
 machine as (
 	select $1 as user_id, row_to_json(r) as machine from (
 		select name, description
-		from projections.users9_machines
+		from projections.users10_machines
 		where user_id = $1
 		and instance_id = $2
 	) r
@@ -56,7 +53,7 @@ orgs as (
 -- find the user's org
 user_org as (
 	select row_to_json(r) as organization from (
-		select name, primary_domain
+		select o.id, o.name, o.primary_domain
 		from orgs o
 		join usr u on o.id = u.resource_owner
 	) r
@@ -88,5 +85,3 @@ select json_build_object(
 	'metadata', (select metadata from metadata),
 	'user_grants', (select grants from grants)
 );
-
--- execute q('231965491734773762','230690539048009730', '{"236645808328409090","240762134579904514"}')

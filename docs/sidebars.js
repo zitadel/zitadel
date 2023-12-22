@@ -15,6 +15,7 @@ module.exports = {
             "examples/login/react",
             "examples/login/flutter",
             "examples/login/nextjs",
+            "examples/login/go",
           ],
           collapsed: true,
         },
@@ -94,6 +95,7 @@ module.exports = {
             "guides/manage/customize/branding",
             "guides/manage/customize/texts",
             "guides/manage/customize/behavior",
+            "guides/manage/customize/restrictions",
           ],
         },
         {

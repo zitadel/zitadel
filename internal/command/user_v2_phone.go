@@ -8,9 +8,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // ChangeUserPhone sets a user's phone number, generates a code
@@ -113,7 +113,7 @@ type UserPhoneEvents struct {
 // If a model cannot be found, or it's state is invalid and error is returned.
 func (c *Commands) NewUserPhoneEvents(ctx context.Context, userID, resourceOwner string) (*UserPhoneEvents, error) {
 	if userID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-xP292j", "Errors.User.Phone.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-xP292j", "Errors.User.Phone.IDMissing")
 	}
 
 	model, err := c.phoneWriteModelByID(ctx, userID, resourceOwner)
@@ -121,10 +121,10 @@ func (c *Commands) NewUserPhoneEvents(ctx context.Context, userID, resourceOwner
 		return nil, err
 	}
 	if model.UserState == domain.UserStateUnspecified || model.UserState == domain.UserStateDeleted {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-ieJ2e", "Errors.User.Phone.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-ieJ2e", "Errors.User.Phone.NotFound")
 	}
 	if model.UserState == domain.UserStateInitial {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-uz0Uu", "Errors.User.NotInitialised")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-uz0Uu", "Errors.User.NotInitialised")
 	}
 	return &UserPhoneEvents{
 		eventstore: c.eventstore,
@@ -142,7 +142,7 @@ func (c *UserPhoneEvents) Change(ctx context.Context, phone domain.PhoneNumber) 
 	}
 	event, hasChanged := c.model.NewChangedEvent(ctx, c.aggregate, phone)
 	if !hasChanged {
-		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Phone.NotChanged")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Phone.NotChanged")
 	}
 	c.events = append(c.events, event)
 	return nil
@@ -170,7 +170,7 @@ func (c *UserPhoneEvents) AddGeneratedCode(ctx context.Context, gen crypto.Gener
 
 func (c *UserPhoneEvents) VerifyCode(ctx context.Context, code string, gen crypto.Generator) error {
 	if code == "" {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty")
 	}
 
 	err := crypto.VerifyCode(c.model.CodeCreationDate, c.model.CodeExpiry, c.model.Code, code, gen)
@@ -180,7 +180,7 @@ func (c *UserPhoneEvents) VerifyCode(ctx context.Context, code string, gen crypt
 	}
 	_, err = c.eventstore.Push(ctx, user.NewHumanPhoneVerificationFailedEvent(ctx, c.aggregate))
 	logging.WithFields("id", "COMMAND-Zoo6b", "userID", c.aggregate.ID).OnError(err).Error("NewHumanPhoneVerificationFailedEvent push failed")
-	return caos_errs.ThrowInvalidArgument(err, "COMMAND-eis9R", "Errors.User.Code.Invalid")
+	return zerrors.ThrowInvalidArgument(err, "COMMAND-eis9R", "Errors.User.Code.Invalid")
 }
 
 // Push all events to the eventstore and Reduce them into the Model.

@@ -7,17 +7,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/zitadel/passwap"
+	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_SetOneTimePassword(t *testing.T) {
@@ -55,7 +55,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -72,7 +72,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -114,7 +114,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
 				},
 			},
 		},
@@ -278,7 +278,6 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 		code          string
 		resourceOwner string
 		password      string
-		agentID       string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -302,7 +301,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -318,7 +317,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -336,7 +335,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 				password:      "password",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -370,7 +369,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 				password:      "string",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -418,7 +417,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 				password:      "password",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -505,7 +504,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				userEncryption:     tt.fields.userEncryption,
 			}
-			got, err := r.SetPasswordWithVerifyCode(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.code, tt.args.password, tt.args.agentID)
+			got, err := r.SetPasswordWithVerifyCode(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.code, tt.args.password)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -529,7 +528,6 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 		resourceOwner string
 		oldPassword   string
 		newPassword   string
-		agentID       string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -553,7 +551,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 			},
 			expect: []expect{},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -567,7 +565,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 			},
 			expect: []expect{},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -581,7 +579,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 			},
 			expect: []expect{},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -598,7 +596,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				expectFilter(),
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -632,7 +630,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				),
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -675,21 +673,9 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 							false,
 							"")),
 				),
-				expectFilter(
-					eventFromEventPusher(
-						org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-							1,
-							false,
-							false,
-							false,
-							false,
-						),
-					),
-				),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -766,7 +752,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				eventstore:         eventstoreExpect(t, tt.expect...),
 				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
-			got, err := r.ChangePassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.oldPassword, tt.args.newPassword, tt.args.agentID)
+			got, err := r.ChangePassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.oldPassword, tt.args.newPassword)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -813,7 +799,7 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -830,7 +816,7 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -879,7 +865,7 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -988,7 +974,7 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1005,7 +991,7 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1101,7 +1087,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1117,7 +1103,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1136,7 +1122,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				password:      "password",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1177,7 +1163,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				password:      "password",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1219,7 +1205,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				password:      "password",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1281,7 +1267,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				password:      "password",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1339,7 +1325,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1423,7 +1409,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				lockoutPolicy: &domain.LockoutPolicy{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1513,7 +1499,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1760,7 +1746,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1893,17 +1879,17 @@ func Test_convertPasswapErr(t *testing.T) {
 		{
 			name:    "mismatch",
 			args:    args{passwap.ErrPasswordMismatch},
-			wantErr: caos_errs.ThrowInvalidArgument(passwap.ErrPasswordMismatch, "COMMAND-3M0fs", "Errors.User.Password.Invalid"),
+			wantErr: zerrors.ThrowInvalidArgument(passwap.ErrPasswordMismatch, "COMMAND-3M0fs", "Errors.User.Password.Invalid"),
 		},
 		{
 			name:    "no change",
 			args:    args{passwap.ErrPasswordNoChange},
-			wantErr: caos_errs.ThrowPreconditionFailed(passwap.ErrPasswordNoChange, "COMMAND-Aesh5", "Errors.User.Password.NotChanged"),
+			wantErr: zerrors.ThrowPreconditionFailed(passwap.ErrPasswordNoChange, "COMMAND-Aesh5", "Errors.User.Password.NotChanged"),
 		},
 		{
 			name:    "other",
 			args:    args{io.ErrClosedPipe},
-			wantErr: caos_errs.ThrowInternal(io.ErrClosedPipe, "COMMAND-CahN2", "Errors.Internal"),
+			wantErr: zerrors.ThrowInternal(io.ErrClosedPipe, "COMMAND-CahN2", "Errors.Internal"),
 		},
 	}
 	for _, tt := range tests {

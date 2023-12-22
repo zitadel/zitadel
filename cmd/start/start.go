@@ -58,10 +58,12 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	cryptoDB "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
@@ -93,7 +95,6 @@ Requirements:
 			if err != nil {
 				return err
 			}
-
 			return startZitadel(config, masterKey, server)
 		},
 	}
@@ -123,16 +124,22 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 
 	ctx := context.Background()
 
-	zitadelDBClient, err := database.Connect(config.Database, false, false)
+	i18n.MustLoadSupportedLanguagesFromDir()
+
+	queryDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeQuery)
 	if err != nil {
-		return fmt.Errorf("cannot start client for projection: %w", err)
+		return fmt.Errorf("cannot start DB client for queries: %w", err)
 	}
-	esPusherDBClient, err := database.Connect(config.Database, false, true)
+	esPusherDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeEventPusher)
 	if err != nil {
-		return fmt.Errorf("cannot start client for projection: %w", err)
+		return fmt.Errorf("cannot start client for event store pusher: %w", err)
+	}
+	projectionDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeProjectionSpooler)
+	if err != nil {
+		return fmt.Errorf("cannot start client for projection spooler: %w", err)
 	}
 
-	keyStorage, err := cryptoDB.NewKeyStorage(zitadelDBClient, masterKey)
+	keyStorage, err := cryptoDB.NewKeyStorage(queryDBClient, masterKey)
 	if err != nil {
 		return fmt.Errorf("cannot start key storage: %w", err)
 	}
@@ -142,7 +149,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	}
 
 	config.Eventstore.Pusher = new_es.NewEventstore(esPusherDBClient)
-	config.Eventstore.Querier = old_es.NewCRDB(zitadelDBClient)
+	config.Eventstore.Querier = old_es.NewCRDB(queryDBClient)
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
@@ -150,7 +157,8 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	queries, err := query.StartQueries(
 		ctx,
 		eventstoreClient,
-		zitadelDBClient,
+		queryDBClient,
+		projectionDBClient,
 		config.Projections,
 		config.SystemDefaults,
 		keys.IDPConfig,
@@ -171,7 +179,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		return fmt.Errorf("cannot start queries: %w", err)
 	}
 
-	authZRepo, err := authz.Start(queries, eventstoreClient, zitadelDBClient, keys.OIDC, config.ExternalSecure)
+	authZRepo, err := authz.Start(queries, eventstoreClient, queryDBClient, keys.OIDC, config.ExternalSecure)
 	if err != nil {
 		return fmt.Errorf("error starting authz repo: %w", err)
 	}
@@ -179,7 +187,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		return internal_authz.CheckPermission(ctx, authZRepo, config.InternalAuthZ.RolePermissionMappings, permission, orgID, resourceID)
 	}
 
-	storage, err := config.AssetStorage.NewStorage(zitadelDBClient.DB)
+	storage, err := config.AssetStorage.NewStorage(queryDBClient.DB)
 	if err != nil {
 		return fmt.Errorf("cannot start asset storage client: %w", err)
 	}
@@ -215,13 +223,14 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
 	}
+	defer commands.Close(ctx) // wait for background jobs
 
 	clock := clockpkg.New()
 	actionsExecutionStdoutEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, &logstore.EmitterConfig{Enabled: config.LogStore.Execution.Stdout.Enabled}, stdout.NewStdoutEmitter[*record.ExecutionLog]())
 	if err != nil {
 		return err
 	}
-	actionsExecutionDBEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, config.Quotas.Execution, execution.NewDatabaseLogStorage(zitadelDBClient, commands, queries))
+	actionsExecutionDBEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, config.Quotas.Execution, execution.NewDatabaseLogStorage(queryDBClient, commands, queries))
 	if err != nil {
 		return err
 	}
@@ -260,7 +269,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		commands,
 		queries,
 		eventstoreClient,
-		zitadelDBClient,
+		queryDBClient,
 		config,
 		storage,
 		authZRepo,
@@ -277,7 +286,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	if server != nil {
 		server <- &Server{
 			Config:     config,
-			DB:         zitadelDBClient,
+			DB:         queryDBClient,
 			KeyStorage: keyStorage,
 			Keys:       keys,
 			Eventstore: eventstoreClient,
@@ -319,8 +328,6 @@ func startAPIs(
 	oidcPrefixes := []string{"/.well-known/openid-configuration", "/oidc/v1", "/oauth/v2"}
 	// always set the origin in the context if available in the http headers, no matter for what protocol
 	router.Use(middleware.OriginHandler)
-	// adds used HTTPPathPattern and RequestMethod to context
-	router.Use(middleware.ActivityHandler)
 	systemTokenVerifier, err := internal_authz.StartSystemTokenVerifierFromConfig(http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
 	if err != nil {
 		return err

@@ -29,6 +29,7 @@ type PermissionCheck func(ctx context.Context, permission, orgID, resourceID str
 const (
 	PermissionUserWrite     = "user.write"
 	PermissionUserRead      = "user.read"
+	PermissionUserDelete    = "user.delete"
 	PermissionSessionWrite  = "session.write"
 	PermissionSessionDelete = "session.delete"
 )

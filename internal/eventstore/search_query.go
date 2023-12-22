@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // SearchQueryBuilder represents the builder for your filter
@@ -14,6 +14,7 @@ import (
 type SearchQueryBuilder struct {
 	columns               Columns
 	limit                 uint64
+	offset                uint32
 	desc                  bool
 	resourceOwner         string
 	instanceID            *string
@@ -35,6 +36,10 @@ func (b *SearchQueryBuilder) GetColumns() Columns {
 
 func (b *SearchQueryBuilder) GetLimit() uint64 {
 	return b.limit
+}
+
+func (b *SearchQueryBuilder) GetOffset() uint32 {
+	return b.offset
 }
 
 func (b *SearchQueryBuilder) GetDesc() bool {
@@ -136,7 +141,7 @@ const (
 
 func (c Columns) Validate() error {
 	if c <= 0 || c >= columnsCount {
-		return errors.ThrowPreconditionFailed(nil, "REPOS-x8R35", "column out of range")
+		return zerrors.ThrowPreconditionFailed(nil, "REPOS-x8R35", "column out of range")
 	}
 	return nil
 }
@@ -149,25 +154,46 @@ func NewSearchQueryBuilder(columns Columns) *SearchQueryBuilder {
 	}
 }
 
-func (builder *SearchQueryBuilder) Matches(event Event, existingLen int) (matches bool) {
-	if builder.limit > 0 && uint64(existingLen) >= builder.limit {
+func (builder *SearchQueryBuilder) Matches(commands ...Command) []Command {
+	matches := make([]Command, 0, len(commands))
+	for i, command := range commands {
+		if builder.limit > 0 && builder.limit <= uint64(len(matches)) {
+			break
+		}
+		if builder.offset > 0 && uint32(i) < builder.offset {
+			continue
+		}
+
+		if builder.matchCommand(command) {
+			matches = append(matches, command)
+		}
+	}
+
+	return matches
+}
+
+type sequencer interface {
+	Sequence() uint64
+}
+
+func (builder *SearchQueryBuilder) matchCommand(command Command) bool {
+	if builder.resourceOwner != "" && command.Aggregate().ResourceOwner != builder.resourceOwner {
 		return false
 	}
-	if builder.resourceOwner != "" && event.Aggregate().ResourceOwner != builder.resourceOwner {
+	if command.Aggregate().InstanceID != "" && builder.instanceID != nil && *builder.instanceID != "" && command.Aggregate().InstanceID != *builder.instanceID {
 		return false
 	}
-	if event.Aggregate().InstanceID != "" && builder.instanceID != nil && *builder.instanceID != "" && event.Aggregate().InstanceID != *builder.instanceID {
-		return false
-	}
-	if builder.eventSequenceGreater > 0 && event.Sequence() <= builder.eventSequenceGreater {
-		return false
+	if seq, ok := command.(sequencer); ok {
+		if builder.eventSequenceGreater > 0 && seq.Sequence() <= builder.eventSequenceGreater {
+			return false
+		}
 	}
 
 	if len(builder.queries) == 0 {
 		return true
 	}
 	for _, query := range builder.queries {
-		if query.matches(event) {
+		if query.matches(command) {
 			return true
 		}
 	}
@@ -183,6 +209,12 @@ func (builder *SearchQueryBuilder) Columns(columns Columns) *SearchQueryBuilder 
 // Limit defines how many events are returned maximally.
 func (builder *SearchQueryBuilder) Limit(limit uint64) *SearchQueryBuilder {
 	builder.limit = limit
+	return builder
+}
+
+// Limit defines how many events are returned maximally.
+func (builder *SearchQueryBuilder) Offset(offset uint32) *SearchQueryBuilder {
+	builder.offset = offset
 	return builder
 }
 
@@ -317,14 +349,14 @@ func (query *SearchQuery) Builder() *SearchQueryBuilder {
 	return query.builder
 }
 
-func (query *SearchQuery) matches(event Event) bool {
-	if ok := isAggreagteTypes(event.Aggregate(), query.aggregateTypes...); len(query.aggregateTypes) > 0 && !ok {
+func (query *SearchQuery) matches(command Command) bool {
+	if ok := isAggregateTypes(command.Aggregate(), query.aggregateTypes...); len(query.aggregateTypes) > 0 && !ok {
 		return false
 	}
-	if ok := isAggregateIDs(event.Aggregate(), query.aggregateIDs...); len(query.aggregateIDs) > 0 && !ok {
+	if ok := isAggregateIDs(command.Aggregate(), query.aggregateIDs...); len(query.aggregateIDs) > 0 && !ok {
 		return false
 	}
-	if ok := isEventTypes(event, query.eventTypes...); len(query.eventTypes) > 0 && !ok {
+	if ok := isEventTypes(command, query.eventTypes...); len(query.eventTypes) > 0 && !ok {
 		return false
 	}
 	return true

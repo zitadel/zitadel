@@ -61,18 +61,21 @@ func MustNewConfig(v *viper.Viper) *Config {
 }
 
 type Steps struct {
-	s1ProjectionTable     *ProjectionTable
-	s2AssetsTable         *AssetTable
-	FirstInstance         *FirstInstance
-	s5LastFailed          *LastFailed
-	s6OwnerRemoveColumns  *OwnerRemoveColumns
-	s7LogstoreTables      *LogstoreTables
-	s8AuthTokens          *AuthTokenIndexes
-	CorrectCreationDate   *CorrectCreationDate
-	s12AddOTPColumns      *AddOTPColumns
-	s13FixQuotaProjection *FixQuotaConstraints
-	s14NewEventsTable     *NewEventsTable
-	s15CurrentStates      *CurrentProjectionState
+	s1ProjectionTable               *ProjectionTable
+	s2AssetsTable                   *AssetTable
+	FirstInstance                   *FirstInstance
+	s5LastFailed                    *LastFailed
+	s6OwnerRemoveColumns            *OwnerRemoveColumns
+	s7LogstoreTables                *LogstoreTables
+	s8AuthTokens                    *AuthTokenIndexes
+	CorrectCreationDate             *CorrectCreationDate
+	s12AddOTPColumns                *AddOTPColumns
+	s13FixQuotaProjection           *FixQuotaConstraints
+	s14NewEventsTable               *NewEventsTable
+	s15CurrentStates                *CurrentProjectionState
+	s16UniqueConstraintsLower       *UniqueConstraintToLower
+	s17AddOffsetToUniqueConstraints *AddOffsetToCurrentStates
+	s18AddLowerFieldsToLoginNames   *AddLowerFieldsToLoginNames
 }
 
 type encryptionKeyConfig struct {

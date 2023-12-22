@@ -3,9 +3,9 @@ package project
 import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	proj_model "github.com/zitadel/zitadel/internal/project/model"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	proj_pb "github.com/zitadel/zitadel/pkg/grpc/project"
 )
 
@@ -75,7 +75,7 @@ func ProjectQueryToModel(apiQuery *proj_pb.ProjectQuery) (query.SearchQuery, err
 	case *proj_pb.ProjectQuery_ProjectResourceOwnerQuery:
 		return query.NewProjectResourceOwnerSearchQuery(q.ProjectResourceOwnerQuery.ResourceOwner)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
 	}
 }
 
@@ -139,7 +139,7 @@ func GrantedProjectQueryToModel(query *proj_pb.ProjectQuery) (*proj_model.Projec
 	case *proj_pb.ProjectQuery_NameQuery:
 		return GrantedProjectQueryNameToModel(q.NameQuery), nil
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ORG-Ags42", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-Ags42", "List.Query.Invalid")
 	}
 }
 
@@ -169,7 +169,7 @@ func RoleQueryToModel(apiQuery *proj_pb.RoleQuery) (query.SearchQuery, error) {
 	case *proj_pb.RoleQuery_DisplayNameQuery:
 		return query.NewProjectRoleDisplayNameSearchQuery(object.TextMethodToQuery(q.DisplayNameQuery.Method), q.DisplayNameQuery.DisplayName)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-fms0e", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-fms0e", "List.Query.Invalid")
 	}
 }
 

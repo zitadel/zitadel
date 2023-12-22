@@ -14,7 +14,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database/mock"
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestHandler_lockState(t *testing.T) {
@@ -80,7 +80,7 @@ func TestHandler_lockState(t *testing.T) {
 				instanceID: "instance",
 			},
 			isErr: func(t *testing.T, err error) {
-				if !errors.Is(err, errs.ThrowInternal(nil, "V2-lpiK0", "")) {
+				if !errors.Is(err, zerrors.ThrowInternal(nil, "V2-lpiK0", "")) {
 					t.Errorf("unexpected error: want internal (V2lpiK0), got: %v", err)
 				}
 			},
@@ -195,7 +195,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 				},
 			},
 			isErr: func(t *testing.T, err error) {
-				if !errors.Is(err, errs.ThrowInternal(nil, "V2-FGEKi", "")) {
+				if !errors.Is(err, zerrors.ThrowInternal(nil, "V2-FGEKi", "")) {
 					t.Errorf("unexpected error, want: %v, got %v", sql.ErrTxDone, err)
 				}
 			},
@@ -217,6 +217,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 							uint64(42),
 							mock.AnyType[time.Time]{},
 							float64(42),
+							uint16(0),
 						),
 						mock.WithExecRowsAffected(1),
 					),
@@ -388,7 +389,7 @@ func TestHandler_currentState(t *testing.T) {
 							"projection",
 						),
 						mock.WithQueryResult(
-							[]string{"aggregate_id", "aggregate_type", "event_sequence", "event_date", "position"},
+							[]string{"aggregate_id", "aggregate_type", "event_sequence", "event_date", "position", "offset"},
 							[][]driver.Value{
 								{
 									"aggregate id",
@@ -396,6 +397,7 @@ func TestHandler_currentState(t *testing.T) {
 									int64(42),
 									testTime,
 									float64(42),
+									uint16(10),
 								},
 							},
 						),
@@ -413,6 +415,7 @@ func TestHandler_currentState(t *testing.T) {
 					aggregateType:  "aggregate type",
 					aggregateID:    "aggregate id",
 					sequence:       42,
+					offset:         10,
 				},
 			},
 		},

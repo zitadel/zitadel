@@ -4,8 +4,8 @@ import (
 	"database/sql"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // SearchQuery defines the which and how data are queried
@@ -17,6 +17,7 @@ type SearchQuery struct {
 	AllowTimeTravel       bool
 	AwaitOpenTransactions bool
 	Limit                 uint64
+	Offset                uint32
 	Desc                  bool
 
 	InstanceID        *Filter
@@ -98,16 +99,16 @@ func NewFilter(field Field, value interface{}, operation Operation) *Filter {
 // Validate checks if the fields of the filter have valid values
 func (f *Filter) Validate() error {
 	if f == nil {
-		return errors.ThrowPreconditionFailed(nil, "REPO-z6KcG", "filter is nil")
+		return zerrors.ThrowPreconditionFailed(nil, "REPO-z6KcG", "filter is nil")
 	}
 	if f.Field <= 0 || f.Field >= fieldCount {
-		return errors.ThrowPreconditionFailed(nil, "REPO-zw62U", "field not definded")
+		return zerrors.ThrowPreconditionFailed(nil, "REPO-zw62U", "field not definded")
 	}
 	if f.Value == nil {
-		return errors.ThrowPreconditionFailed(nil, "REPO-GJ9ct", "no value definded")
+		return zerrors.ThrowPreconditionFailed(nil, "REPO-GJ9ct", "no value definded")
 	}
 	if f.Operation <= 0 || f.Operation >= operationCount {
-		return errors.ThrowPreconditionFailed(nil, "REPO-RrQTy", "operation not definded")
+		return zerrors.ThrowPreconditionFailed(nil, "REPO-RrQTy", "operation not definded")
 	}
 	return nil
 }
@@ -115,18 +116,18 @@ func (f *Filter) Validate() error {
 func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, error) {
 	if builder == nil ||
 		builder.GetColumns().Validate() != nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "builder invalid")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "builder invalid")
 	}
 
 	query := &SearchQuery{
 		Columns:               builder.GetColumns(),
 		Limit:                 builder.GetLimit(),
+		Offset:                builder.GetOffset(),
 		Desc:                  builder.GetDesc(),
 		Tx:                    builder.GetTx(),
 		AllowTimeTravel:       builder.GetAllowTimeTravel(),
 		AwaitOpenTransactions: builder.GetAwaitOpenTransactions(),
-		// Queries:               make([]*Filter, 0, 7),
-		SubQueries: make([][]*Filter, len(builder.GetQueries())),
+		SubQueries:            make([][]*Filter, len(builder.GetQueries())),
 	}
 
 	for _, f := range []func(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter{

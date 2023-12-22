@@ -1,70 +1,86 @@
 <h2>{{ 'POLICY.MESSAGE_TEXTS.TITLE' | translate }}</h2>
 <p class="cnsl-secondary-text">{{ 'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate }}</p>
+<cnsl-info-section class="locked" *ngIf="langSvc.isNotAllowed(language) | async" [type]="InfoSectionType.WARN">
+  {{ 'POLICY.LOGIN_TEXTS.ACTIVE_LANGUAGE_NOT_ALLOWED' | translate }}</cnsl-info-section
+>
 
 <div *ngIf="loading" class="spinner-wr">
   <mat-spinner diameter="30" color="primary"></mat-spinner>
 </div>
 
-<div class="message-texts-top-actions">
-  <cnsl-form-field class="type">
-    <cnsl-label>{{ 'POLICY.MESSAGE_TEXTS.TYPE' | translate }}</cnsl-label>
-    <mat-select [(ngModel)]="currentType" name="currentSubMap" (selectionChange)="changedCurrentType()">
-      <mat-option *ngFor="let type of MESSAGETYPES | keyvalue" [value]="type.value">
-        {{ 'POLICY.MESSAGE_TEXTS.TYPES.' + type.value | translate }}
-      </mat-option>
-    </mat-select>
-  </cnsl-form-field>
+<div *ngIf="allowed$ | async">
+  <div class="message-texts-top-actions">
+    <cnsl-form-field class="type">
+      <cnsl-label>{{ 'POLICY.MESSAGE_TEXTS.TYPE' | translate }}</cnsl-label>
+      <mat-select [(ngModel)]="currentType" name="currentSubMap" (selectionChange)="changedCurrentType()">
+        <mat-option *ngFor="let type of MESSAGETYPES | keyvalue" [value]="type.value">
+          {{ 'POLICY.MESSAGE_TEXTS.TYPES.' + type.value | translate }}
+        </mat-option>
+      </mat-select>
+    </cnsl-form-field>
+    <cnsl-form-field class="language">
+      <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.LANGUAGE' | translate }}</cnsl-label>
+      <mat-select [(ngModel)]="language" (selectionChange)="changeLocale($event)" name="language">
+        <mat-option *ngFor="let lang of langSvc.allowed$ | async" [value]="lang">
+          <div class="centerline">
+            <span
+              >{{ lang }}
+              <span class="lighter cnsl-secondary-text"
+                >|&nbsp;{{ 'POLICY.LOGIN_TEXTS.LANGUAGES.' + lang | translate }}</span
+              ></span
+            >
+          </div>
+        </mat-option>
+        <mat-optgroup [label]="'POLICY.LOGIN_TEXTS.LANGUAGES_NOT_ALLOWED' | translate" *ngIf="langSvc.restricted$ | async">
+          <mat-option *ngFor="let lang of langSvc.notAllowed$ | async" [value]="lang">
+            <div class="centerline">
+              <span
+                >{{ lang }}
+                <span class="lighter cnsl-secondary-text"
+                  >|&nbsp;{{ 'POLICY.LOGIN_TEXTS.LANGUAGES.' + lang | translate }}</span
+                ></span
+              >
+            </div>
+          </mat-option>
+        </mat-optgroup>
+      </mat-select>
+    </cnsl-form-field>
+  </div>
 
-  <cnsl-form-field class="language">
-    <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.LOCALE' | translate }}</cnsl-label>
-    <mat-select [(ngModel)]="locale" name="locale" (selectionChange)="changeLocale($event)">
-      <mat-option *ngFor="let loc of LOCALES" [value]="loc">
-        <div class="centerline">
-          <span
-            >{{ loc }}
-            <span class="lighter cnsl-secondary-text"
-              >|&nbsp;{{ 'POLICY.LOGIN_TEXTS.LOCALES.' + loc | translate }}</span
-            ></span
-          >
-        </div>
-      </mat-option>
-    </mat-select>
-  </cnsl-form-field>
-</div>
+  <div class="message-text-content">
+    <cnsl-edit-text
+      [chips]="chips[currentType]"
+      [disabled]="(canWrite$ | async) === false"
+      label="one"
+      [default$]="getDefaultMessageTextMap$"
+      [current$]="getCustomMessageTextMap$"
+      (changedValues)="updateCurrentValues($event)"
+    ></cnsl-edit-text>
+  </div>
 
-<div class="message-text-content">
-  <cnsl-edit-text
-    [chips]="chips[currentType]"
-    [disabled]="(canWrite$ | async) === false"
-    label="one"
-    [default$]="getDefaultMessageTextMap$"
-    [current$]="getCustomMessageTextMap$"
-    (changedValues)="updateCurrentValues($event)"
-  ></cnsl-edit-text>
-</div>
-
-<div class="message-text-actions">
-  <button
-    class="reset-button"
-    *ngIf="(getCustomMessageTextMap$ | async) && (getCustomMessageTextMap$ | async)?.['isDefault'] === false"
-    [disabled]="(canWrite$ | async) === false"
-    (click)="resetDefault()"
-    color="message-text-warn"
-    type="submit"
-    mat-stroked-button
-  >
-    <div class="cnsl-action-button">
-      <i class="las la-history"></i><span>{{ 'ACTIONS.RESETDEFAULT' | translate }}</span>
-    </div>
-  </button>
-  <button
-    class="save-button"
-    [disabled]="!updateRequest || (canWrite$ | async) === false"
-    (click)="saveCurrentMessage()"
-    color="primary"
-    type="submit"
-    mat-raised-button
-  >
-    {{ 'ACTIONS.SAVE' | translate }}
-  </button>
+  <div class="message-text-actions">
+    <button
+      class="reset-button"
+      *ngIf="(getCustomMessageTextMap$ | async) && (getCustomMessageTextMap$ | async)?.['isDefault'] === false"
+      [disabled]="(canWrite$ | async) === false"
+      (click)="resetDefault()"
+      color="message-text-warn"
+      type="submit"
+      mat-stroked-button
+    >
+      <div class="cnsl-action-button">
+        <i class="las la-history"></i><span>{{ 'ACTIONS.RESETDEFAULT' | translate }}</span>
+      </div>
+    </button>
+    <button
+      class="save-button"
+      [disabled]="!updateRequest || (canWrite$ | async) === false"
+      (click)="saveCurrentMessage()"
+      color="primary"
+      type="submit"
+      mat-raised-button
+    >
+      {{ 'ACTIONS.SAVE' | translate }}
+    </button>
+  </div>
 </div>

@@ -5,9 +5,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddSMSConfigTwilio(ctx context.Context, instanceID string, config *twilio.Config) (string, *domain.ObjectDetails, error) {
@@ -48,14 +48,14 @@ func (c *Commands) AddSMSConfigTwilio(ctx context.Context, instanceID string, co
 
 func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, instanceID, id string, config *twilio.Config) (*domain.ObjectDetails, error) {
 	if id == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "SMS-e9jwf", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "SMS-e9jwf", "Errors.IDMissing")
 	}
 	smsConfigWriteModel, err := c.getSMSConfig(ctx, instanceID, id)
 	if err != nil {
 		return nil, err
 	}
 	if !smsConfigWriteModel.State.Exists() || smsConfigWriteModel.Twilio == nil {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2m9fw", "Errors.SMSConfig.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-2m9fw", "Errors.SMSConfig.NotFound")
 	}
 	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
 
@@ -69,7 +69,7 @@ func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, instanceID, id str
 		return nil, err
 	}
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-jf9wk", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-jf9wk", "Errors.NoChangesFound")
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
@@ -88,7 +88,7 @@ func (c *Commands) ChangeSMSConfigTwilioToken(ctx context.Context, instanceID, i
 		return nil, err
 	}
 	if !smsConfigWriteModel.State.Exists() || smsConfigWriteModel.Twilio == nil {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-fj9wf", "Errors.SMSConfig.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-fj9wf", "Errors.SMSConfig.NotFound")
 	}
 	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
 	newtoken, err := crypto.Encrypt([]byte(token), c.smsEncryption)
@@ -112,7 +112,7 @@ func (c *Commands) ChangeSMSConfigTwilioToken(ctx context.Context, instanceID, i
 
 func (c *Commands) ActivateSMSConfig(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "SMS-dn93n", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "SMS-dn93n", "Errors.IDMissing")
 	}
 	smsConfigWriteModel, err := c.getSMSConfig(ctx, instanceID, id)
 	if err != nil {
@@ -120,10 +120,10 @@ func (c *Commands) ActivateSMSConfig(ctx context.Context, instanceID, id string)
 	}
 
 	if !smsConfigWriteModel.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-sn9we", "Errors.SMSConfig.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-sn9we", "Errors.SMSConfig.NotFound")
 	}
 	if smsConfigWriteModel.State == domain.SMSConfigStateActive {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-sn9we", "Errors.SMSConfig.AlreadyActive")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-sn9we", "Errors.SMSConfig.AlreadyActive")
 	}
 	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigTwilioActivatedEvent(
@@ -142,17 +142,17 @@ func (c *Commands) ActivateSMSConfig(ctx context.Context, instanceID, id string)
 
 func (c *Commands) DeactivateSMSConfig(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "SMS-frkwf", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "SMS-frkwf", "Errors.IDMissing")
 	}
 	smsConfigWriteModel, err := c.getSMSConfig(ctx, instanceID, id)
 	if err != nil {
 		return nil, err
 	}
 	if !smsConfigWriteModel.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-s39Kg", "Errors.SMSConfig.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-s39Kg", "Errors.SMSConfig.NotFound")
 	}
 	if smsConfigWriteModel.State == domain.SMSConfigStateInactive {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-dm9e3", "Errors.SMSConfig.AlreadyDeactivated")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-dm9e3", "Errors.SMSConfig.AlreadyDeactivated")
 	}
 
 	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
@@ -172,14 +172,14 @@ func (c *Commands) DeactivateSMSConfig(ctx context.Context, instanceID, id strin
 
 func (c *Commands) RemoveSMSConfig(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "SMS-3j9fs", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "SMS-3j9fs", "Errors.IDMissing")
 	}
 	smsConfigWriteModel, err := c.getSMSConfig(ctx, instanceID, id)
 	if err != nil {
 		return nil, err
 	}
 	if !smsConfigWriteModel.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-sn9we", "Errors.SMSConfig.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-sn9we", "Errors.SMSConfig.NotFound")
 	}
 
 	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)

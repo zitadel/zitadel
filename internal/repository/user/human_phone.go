@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -52,7 +52,7 @@ func HumanPhoneChangedEventMapper(event eventstore.Event) (eventstore.Event, err
 	}
 	err := event.Unmarshal(phoneChangedEvent)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-5M0pd", "unable to unmarshal human phone changed")
+		return nil, zerrors.ThrowInternal(err, "USER-5M0pd", "unable to unmarshal human phone changed")
 	}
 
 	return phoneChangedEvent, nil
@@ -200,7 +200,7 @@ func HumanPhoneCodeAddedEventMapper(event eventstore.Event) (eventstore.Event, e
 	}
 	err := event.Unmarshal(codeAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-6Ms9d", "unable to unmarshal human phone code added")
+		return nil, zerrors.ThrowInternal(err, "USER-6Ms9d", "unable to unmarshal human phone code added")
 	}
 
 	return codeAdded, nil

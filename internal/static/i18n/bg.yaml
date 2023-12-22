@@ -31,8 +31,15 @@ Errors:
   Limits:
     NotFound: Лимитът не е намерен
     NoneSpecified: Не са посочени лимити
+  Restrictions:
+    NoneSpecified: Не са посочени ограничения
+    DefaultLanguageMustBeAllowed: Езикът по подразбиране трябва да бъде разрешен
   Language:
     NotParsed: Езикът не можа да бъде анализиран синтактично
+    NotSupported: Езикът не се поддържа
+    NotAllowed: Езикът не е разрешен
+    Undefined: Езикът е неопределен
+    Duplicate: Езиците имат дубликати
   OIDCSettings:
     NotFound: Конфигурацията на OIDC не е намерена
     AlreadyExists: OIDC конфигурацията вече съществува
@@ -139,7 +146,7 @@ Errors:
     ExternalIDP:
       Invalid: Невалиден външен IDP
       IDPConfigNotExisting: Невалиден доставчик на IDP за тази организация
-      NotAllowed: Външен IDP не е разрешен в тази организация
+      NotAllowed: Външен IDP не е разрешен
       MinimumExternalIDPNeeded: Трябва да се добави поне един IDP
       AlreadyExists: Външен IDP вече е зает
       NotFound: Външен IDP не е намерен

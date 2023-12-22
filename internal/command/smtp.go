@@ -9,10 +9,10 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.Config) (*domain.ObjectDetails, error) {
@@ -58,7 +58,7 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string
 		return nil, err
 	}
 	if smtpConfigWriteModel.State != domain.SMTPConfigStateActive {
-		return nil, errors.ThrowNotFound(nil, "COMMAND-3n9ls", "Errors.SMTPConfig.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3n9ls", "Errors.SMTPConfig.NotFound")
 	}
 	var smtpPassword *crypto.CryptoValue
 	if password != "" {
@@ -102,14 +102,14 @@ func (c *Commands) RemoveSMTPConfig(ctx context.Context) (*domain.ObjectDetails,
 func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, replyTo, hostAndPort, user string, password []byte, tls bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if from = strings.TrimSpace(from); from == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-mruNY", "Errors.Invalid.Argument")
+			return nil, zerrors.ThrowInvalidArgument(nil, "INST-mruNY", "Errors.Invalid.Argument")
 		}
 
 		replyTo = strings.TrimSpace(replyTo)
 
 		hostAndPort = strings.TrimSpace(hostAndPort)
 		if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-9JdRe", "Errors.Invalid.Argument")
+			return nil, zerrors.ThrowInvalidArgument(nil, "INST-9JdRe", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			fromSplitted := strings.Split(from, "@")
@@ -119,7 +119,7 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, reply
 				return nil, err
 			}
 			if writeModel.State == domain.SMTPConfigStateActive {
-				return nil, errors.ThrowAlreadyExists(nil, "INST-W3VS2", "Errors.SMTPConfig.AlreadyExists")
+				return nil, zerrors.ThrowAlreadyExists(nil, "INST-W3VS2", "Errors.SMTPConfig.AlreadyExists")
 			}
 			err = checkSenderAddress(writeModel)
 			if err != nil {
@@ -152,13 +152,13 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, reply
 func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, replyTo, hostAndPort, user string, tls bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if from = strings.TrimSpace(from); from == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-ASv2d", "Errors.Invalid.Argument")
+			return nil, zerrors.ThrowInvalidArgument(nil, "INST-ASv2d", "Errors.Invalid.Argument")
 		}
 
 		replyTo = strings.TrimSpace(replyTo)
 		hostAndPort = strings.TrimSpace(hostAndPort)
 		if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
-			return nil, errors.ThrowInvalidArgument(nil, "INST-Kv875", "Errors.Invalid.Argument")
+			return nil, zerrors.ThrowInvalidArgument(nil, "INST-Kv875", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			fromSplitted := strings.Split(from, "@")
@@ -168,7 +168,7 @@ func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, re
 				return nil, err
 			}
 			if writeModel.State != domain.SMTPConfigStateActive {
-				return nil, errors.ThrowNotFound(nil, "INST-Svq1a", "Errors.SMTPConfig.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "INST-Svq1a", "Errors.SMTPConfig.NotFound")
 			}
 			err = checkSenderAddress(writeModel)
 			if err != nil {
@@ -188,7 +188,7 @@ func (c *Commands) prepareChangeSMTPConfig(a *instance.Aggregate, from, name, re
 				return nil, err
 			}
 			if !hasChanged {
-				return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-m0o3f", "Errors.NoChangesFound")
+				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-m0o3f", "Errors.NoChangesFound")
 			}
 			return []eventstore.Command{
 				changedEvent,
@@ -205,7 +205,7 @@ func (c *Commands) prepareRemoveSMTPConfig(a *instance.Aggregate) preparation.Va
 				return nil, err
 			}
 			if writeModel.State != domain.SMTPConfigStateActive {
-				return nil, errors.ThrowNotFound(nil, "INST-Sfefg", "Errors.SMTPConfig.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "INST-Sfefg", "Errors.SMTPConfig.NotFound")
 			}
 			return []eventstore.Command{
 				instance.NewSMTPConfigRemovedEvent(ctx, &a.Aggregate),
@@ -219,7 +219,7 @@ func checkSenderAddress(writeModel *InstanceSMTPConfigWriteModel) error {
 		return nil
 	}
 	if !writeModel.domainState.Exists() {
-		return errors.ThrowInvalidArgument(nil, "INST-83nl8", "Errors.SMTPConfig.SenderAdressNotCustomDomain")
+		return zerrors.ThrowInvalidArgument(nil, "INST-83nl8", "Errors.SMTPConfig.SenderAdressNotCustomDomain")
 	}
 	return nil
 }

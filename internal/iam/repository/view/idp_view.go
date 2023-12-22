@@ -4,10 +4,10 @@ import (
 	"github.com/jinzhu/gorm"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 	"github.com/zitadel/zitadel/internal/iam/repository/view/model"
 	"github.com/zitadel/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func IDPByID(db *gorm.DB, table, idpID, instanceID string) (*model.IDPConfigView, error) {
@@ -17,8 +17,8 @@ func IDPByID(db *gorm.DB, table, idpID, instanceID string) (*model.IDPConfigView
 	ownerRemovedQuery := &model.IDPConfigSearchQuery{Key: iam_model.IDPConfigSearchKeyOwnerRemoved, Value: false, Method: domain.SearchMethodEquals}
 	query := repository.PrepareGetByQuery(table, idpIDQuery, instanceIDQuery, ownerRemovedQuery)
 	err := query(db, idp)
-	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Ahq2s", "Errors.IDP.NotExisting")
+	if zerrors.IsNotFound(err) {
+		return nil, zerrors.ThrowNotFound(nil, "VIEW-Ahq2s", "Errors.IDP.NotExisting")
 	}
 	return idp, err
 }
