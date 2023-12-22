@@ -68,7 +68,6 @@ func (*userGrantProjection) Init() *old_handler.Check {
 		},
 			handler.NewPrimaryKey(UserGrantInstanceID, UserGrantID),
 			handler.WithIndex(handler.NewIndex("user_id", []string{UserGrantUserID})),
-			handler.WithIndex(handler.NewIndex("project_id", []string{UserGrantProjectID})),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{UserGrantResourceOwner})),
 		),
 	)

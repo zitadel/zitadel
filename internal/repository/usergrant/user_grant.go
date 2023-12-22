@@ -13,7 +13,6 @@ const (
 	UniqueUserGrant             = "user_grant"
 	userGrantEventTypePrefix    = eventstore.EventType("user.grant.")
 	UserGrantAddedType          = userGrantEventTypePrefix + "added"
-	UserGrantAddedV2Type        = UserGrantAddedType + ".v2"
 	UserGrantChangedType        = userGrantEventTypePrefix + "changed"
 	UserGrantCascadeChangedType = userGrantEventTypePrefix + "cascade.changed"
 	UserGrantRemovedType        = userGrantEventTypePrefix + "removed"
