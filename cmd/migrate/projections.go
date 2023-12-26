@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -233,24 +234,64 @@ func projections(
 
 	admin_handler.Register(ctx, config.Admin.Spooler, adminView, staticStorage)
 
+	instances := make(chan string, config.Projections.ConcurrentInstances)
+	failedInstances := make(chan string)
+	wg := sync.WaitGroup{}
+	wg.Add(int(config.Projections.ConcurrentInstances))
+
+	for i := 0; i < int(config.Projections.ConcurrentInstances); i++ {
+		go execProjections(ctx, instances, failedInstances, &wg)
+	}
+
 	for _, instance := range queryInstanceIDs(ctx, client) {
-		logging.WithFields("instance", instance).Info("projections")
-		ctx = internal_authz.WithInstanceID(ctx, instance)
+		instances <- instance
+	}
+	close(instances)
+	wg.Wait()
 
-		err = projection.ProjectInstance(ctx)
-		logging.OnError(err).Fatal("trigger failed")
-
-		err = admin_handler.ProjectInstance(ctx)
-		logging.OnError(err).Fatal("trigger admin handler failed")
-
-		err = auth_handler.ProjectInstance(ctx)
-		logging.OnError(err).Fatal("trigger auth handler failed")
-
-		err = notification.ProjectInstance(ctx)
-		logging.OnError(err).Fatal("trigger notification failed")
+	close(failedInstances)
+	for instance := range failedInstances {
+		logging.WithFields("instance", instance).Error("projection failed")
 	}
 
 	logging.WithFields("took", time.Since(start)).Info("projections executed")
+}
+
+func execProjections(ctx context.Context, instances <-chan string, failedInstances chan<- string, wg *sync.WaitGroup) {
+	for instance := range instances {
+		logging.WithFields("instance", instance).Info("start projections")
+		ctx = internal_authz.WithInstanceID(ctx, instance)
+
+		err := projection.ProjectInstance(ctx)
+		if err != nil {
+			logging.WithFields("instance", instance).OnError(err).Info("trigger failed")
+			failedInstances <- instance
+			continue
+		}
+
+		err = admin_handler.ProjectInstance(ctx)
+		if err != nil {
+			logging.WithFields("instance", instance).OnError(err).Info("trigger admin handler failed")
+			failedInstances <- instance
+			continue
+		}
+
+		err = auth_handler.ProjectInstance(ctx)
+		if err != nil {
+			logging.WithFields("instance", instance).OnError(err).Info("trigger auth handler failed")
+			failedInstances <- instance
+			continue
+		}
+
+		err = notification.ProjectInstance(ctx)
+		if err != nil {
+			logging.WithFields("instance", instance).OnError(err).Info("trigger notification failed")
+			failedInstances <- instance
+			continue
+		}
+		logging.WithFields("instance", instance).Info("projections done")
+	}
+	wg.Done()
 }
 
 func registerMappers(es *eventstore.Eventstore) {
