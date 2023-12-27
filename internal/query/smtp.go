@@ -92,8 +92,8 @@ var (
 		name:  projection.SMTPConfigColumnState,
 		table: smtpConfigsTable,
 	}
-	SMTPConfigColumnProviderType = Column{
-		name:  projection.SMTPConfigColumnProviderType,
+	SMTPConfigColumnDescription = Column{
+		name:  projection.SMTPConfigColumnDescription,
 		table: smtpConfigsTable,
 	}
 )
@@ -113,7 +113,7 @@ type SMTPConfig struct {
 	Password       *crypto.CryptoValue
 	ID             string
 	State          domain.SMTPConfigState
-	ProviderType   uint32
+	Description    string
 }
 
 func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (config *SMTPConfig, err error) {
@@ -176,7 +176,7 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			SMTPConfigColumnSMTPPassword.identifier(),
 			SMTPConfigColumnID.identifier(),
 			SMTPConfigColumnState.identifier(),
-			SMTPConfigColumnProviderType.identifier()).
+			SMTPConfigColumnDescription.identifier()).
 			From(smtpConfigsTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SMTPConfig, error) {
@@ -196,7 +196,7 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				&password,
 				&config.ID,
 				&config.State,
-				&config.ProviderType,
+				&config.Description,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
@@ -225,7 +225,7 @@ func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			SMTPConfigColumnSMTPPassword.identifier(),
 			SMTPConfigColumnID.identifier(),
 			SMTPConfigColumnState.identifier(),
-			SMTPConfigColumnProviderType.identifier(),
+			SMTPConfigColumnDescription.identifier(),
 			countColumn.identifier()).
 			From(smtpConfigsTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
@@ -248,7 +248,7 @@ func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 					&config.Password,
 					&config.ID,
 					&config.State,
-					&config.ProviderType,
+					&config.Description,
 					&configs.Count,
 				)
 				if err != nil {

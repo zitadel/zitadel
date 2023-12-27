@@ -20,7 +20,7 @@
       {{
         !id
           ? ('SMTP.CREATE.STEPS.CREATE_DESC_TITLE' | translate: { value: providerDefaultSetting.name | titlecase })
-          : ('SMTP.CREATE.STEPS.CURRENT_DESC_TITLE' | translate: { value: providerDefaultSetting.name | titlecase })
+          : ('SMTP.CREATE.STEPS.CURRENT_DESC_TITLE' | translate )
       }}
     </h2>
   </div>
@@ -47,6 +47,11 @@
               {{ region.key }}
             </mat-option>
           </mat-select>
+        </cnsl-form-field>
+
+        <cnsl-form-field class="smtp-form-field" label="Description">
+          <cnsl-label>{{ 'SETTING.SMTP.DESCRIPTION' | translate }}</cnsl-label>
+          <input cnslInput name="description" formControlName="description" placeholder="description" />
         </cnsl-form-field>
 
         <cnsl-form-field class="smtp-form-field" label="Host And Port">

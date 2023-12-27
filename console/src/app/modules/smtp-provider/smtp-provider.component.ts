@@ -86,6 +86,7 @@ export class SMTPProviderComponent {
       }
 
       this.firstFormGroup = this.fb.group({
+        description: [this.providerDefaultSetting.name],
         tls: [{ value: this.providerDefaultSetting.requiredTls, disabled: this.providerDefaultSetting.requiredTls }],
         region: [''],
         hostAndPort: [
@@ -151,6 +152,7 @@ export class SMTPProviderComponent {
         if (data.smtpConfig) {
           this.hasSMTPConfig = true;
           this.firstFormGroup.patchValue({
+            ['description']: data.smtpConfig.description,
             ['tls']: data.smtpConfig.tls,
             ['hostAndPort']: data.smtpConfig.host,
             ['user']: data.smtpConfig.user,
@@ -174,6 +176,7 @@ export class SMTPProviderComponent {
     if (this.hasSMTPConfig) {
       const req = new UpdateSMTPConfigRequest();
       req.setId(this.id);
+      req.setDescription(this.description?.value || '');
       req.setTls(this.tls?.value ?? false);
 
       if (this.hostAndPort && this.hostAndPort.value) {
@@ -194,10 +197,10 @@ export class SMTPProviderComponent {
       if (this.replyToAddress && this.replyToAddress.value) {
         req.setReplyToAddress(this.replyToAddress.value);
       }
-      req.setProviderType(this.providerDefaultSetting.type);
       return this.service.updateSMTPConfig(req);
     } else {
       const req = new AddSMTPConfigRequest();
+      req.setDescription(this.description?.value ?? '');
       req.setHost(this.hostAndPort?.value ?? '');
       req.setSenderAddress(this.senderAddress?.value ?? '');
       req.setSenderName(this.senderName?.value ?? '');
@@ -205,7 +208,6 @@ export class SMTPProviderComponent {
       req.setTls(this.tls?.value ?? false);
       req.setUser(this.user?.value ?? '');
       req.setPassword(this.password?.value ?? '');
-      req.setProviderType(this.providerDefaultSetting.type);
       return this.service.addSMTPConfig(req);
     }
   }
@@ -219,8 +221,19 @@ export class SMTPProviderComponent {
         }, 2000);
       })
       .catch((error: unknown) => {
-        this.toast.showError(error);
+        if (`${error}`.includes('No changes')) {
+          this.toast.showInfo('SETTING.SMTP.NOCHANGES', true);
+          setTimeout(() => {
+            this.close();
+          }, 2000);
+        } else {
+          this.toast.showError(error);
+        }
       });
+  }
+
+  public get description(): AbstractControl | null {
+    return this.firstFormGroup.get('description');
   }
 
   public get tls(): AbstractControl | null {

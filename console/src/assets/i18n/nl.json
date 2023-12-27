@@ -1067,6 +1067,7 @@
     },
     "SMTP": {
       "TITLE": "SMTP Instellingen",
+      "DESCRIPTION": "Beschrijving",
       "SENDERADDRESS": "Afzender Email Adres",
       "SENDERNAME": "Afzender Naam",
       "REPLYTOADDRESS": "Antwoord-naar Adres",
@@ -1077,6 +1078,7 @@
       "PASSWORDSET": "SMTP Wachtwoord is succesvol ingesteld.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "Succesvol opgeslagen!",
+      "NOCHANGES": "Geen veranderingen!",
       "REQUIREDWARN": "Om notificaties te kunnen versturen vanaf uw domein, moet u uw SMTP-gegevens invoeren."
     },
     "SMS": {
@@ -1925,6 +1927,48 @@
     "PASSWORDLESSTYPE": {
       "0": "Niet toegestaan",
       "1": "Toegestaan"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "SMTP-provider",
+      "DESCRIPTION": "Dit zijn de SMTP-providers voor uw Zitadel-instantie. Activeer degene die u wilt gebruiken om meldingen naar uw gebruikers te sturen.",
+      "EMPTY": "Geen SMTP-provider beschikbaar",
+      "ACTIVATED": "Geactiveerd",
+      "ACTIVATE": "Aanbieder activeren",
+      "DEACTIVATE": "Aanbieder deactiveren",
+      "TYPE": "Type",
+      "DIALOG": {
+        "ACTIVATED": "SMTP-configuratie is geactiveerd",
+        "ACTIVATE_WARN_TITLE": "Activeer SMTP-configuratie",
+        "ACTIVATE_WARN_DESCRIPTION": "U staat op het punt een SMTP-configuratie te activeren. Eerst deactiveren we de huidige actieve provider en activeren vervolgens deze configuratie. Weet je het zeker?",
+        "DEACTIVATE_WARN_TITLE": "Deactiveer SMTP-configuratie",
+        "DEACTIVATE_WARN_DESCRIPTION": "U staat op het punt een SMTP-configuratie te deactiveren. Weet je het zeker?",
+        "DEACTIVATED": "SMTP-configuratie is gedeactiveerd",
+        "DELETE_TITLE": "SMTP-configuratie verwijderen",
+        "DELETE_DESCRIPTION": "U staat op het punt een configuratie te verwijderen. Bevestig deze actie door de naam van de afzender te typen",
+        "DELETED": "SMTP-configuratie is verwijderd",
+        "SENDER": "Typ {{ value }} om deze SMTP-configuratie te verwijderen."
+      }
+    },
+    "CREATE": {
+      "TITLE": "SMTP-provider toevoegen",
+      "DESCRIPTION": "Selecteer één of meer van de volgende aanbieders.",
+      "STEPS": {
+        "TITLE": "Voeg {{ value }} SMTP-provider toe",
+        "CREATE_DESC_TITLE": "Voer stap voor stap uw {{ value }} SMTP-instellingen in",
+        "CURRENT_DESC_TITLE": "Dit zijn uw SMTP-instellingen",
+        "PROVIDER_SETTINGS": "SMTP-providerinstellingen",
+        "SENDER_SETTINGS": "Afzenderinstellingen",
+        "TEST_SETTINGS": "SMTP-instellingen testen"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "SMTP-providerinstellingen"
+    },
+    "EMPTY": "Geen SMTP-provider beschikbaar",
+    "STEPS": {
+      "SENDGRID": {}
     }
   },
   "APP": {

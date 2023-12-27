@@ -13,6 +13,7 @@ type IAMSMTPConfigWriteModel struct {
 	eventstore.WriteModel
 
 	ID             string
+	Description    string
 	TLS            bool
 	Host           string
 	User           string
@@ -21,7 +22,6 @@ type IAMSMTPConfigWriteModel struct {
 	SenderName     string
 	ReplyToAddress string
 	State          domain.SMTPConfigState
-	ProviderType   uint32
 
 	domain                                 string
 	domainState                            domain.InstanceDomainState
@@ -124,14 +124,16 @@ func (wm *IAMSMTPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id string, tls bool, fromAddress, fromName, replyToAddress, smtpHost, smtpUser string, smtpPassword *crypto.CryptoValue, providerType uint32) (*instance.SMTPConfigChangedEvent, bool, error) {
+func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id, description string, tls bool, fromAddress, fromName, replyToAddress, smtpHost, smtpUser string, smtpPassword *crypto.CryptoValue) (*instance.SMTPConfigChangedEvent, bool, error) {
 	changes := make([]instance.SMTPConfigChanges, 0)
 	var err error
 
 	if wm.ID != id {
 		changes = append(changes, instance.ChangeSMTPConfigID(id))
 	}
-
+	if wm.Description != description {
+		changes = append(changes, instance.ChangeSMTPConfigDescription(description))
+	}
 	if wm.TLS != tls {
 		changes = append(changes, instance.ChangeSMTPConfigTLS(tls))
 	}
@@ -153,9 +155,6 @@ func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregat
 	if smtpPassword != nil {
 		changes = append(changes, instance.ChangeSMTPConfigSMTPPassword(smtpPassword))
 	}
-	if wm.ProviderType != providerType {
-		changes = append(changes, instance.ChangeSMTPConfigProviderType(providerType))
-	}
 	if len(changes) == 0 {
 		return nil, false, nil
 	}
@@ -167,6 +166,7 @@ func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregat
 }
 
 func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigAddedEvent(e *instance.SMTPConfigAddedEvent) {
+	wm.Description = e.Description
 	wm.TLS = e.TLS
 	wm.Host = e.Host
 	wm.User = e.User
@@ -174,11 +174,13 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigAddedEvent(e *instance.SMTPCo
 	wm.SenderAddress = e.SenderAddress
 	wm.SenderName = e.SenderName
 	wm.ReplyToAddress = e.ReplyToAddress
-	wm.ProviderType = e.ProviderType
 	wm.State = domain.SMTPConfigStateInactive
 }
 
 func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigChangedEvent(e *instance.SMTPConfigChangedEvent) {
+	if e.Description != nil {
+		wm.Description = *e.Description
+	}
 	if e.TLS != nil {
 		wm.TLS = *e.TLS
 	}
@@ -200,12 +202,10 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigChangedEvent(e *instance.SMTP
 	if e.ReplyToAddress != nil {
 		wm.ReplyToAddress = *e.ReplyToAddress
 	}
-	if e.ProviderType != nil {
-		wm.ProviderType = *e.ProviderType
-	}
 }
 
 func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigRemovedEvent(e *instance.SMTPConfigRemovedEvent) {
+	wm.Description = ""
 	wm.TLS = false
 	wm.SenderName = ""
 	wm.SenderAddress = ""
@@ -213,6 +213,5 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigRemovedEvent(e *instance.SMTP
 	wm.Host = ""
 	wm.User = ""
 	wm.Password = nil
-	wm.ProviderType = 0
 	wm.State = domain.SMTPConfigStateRemoved
 }

@@ -1,20 +1,19 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { SMTPProviderType } from 'src/app/proto/generated/zitadel/settings_pb';
 import { SMTPProviderComponent } from './smtp-provider.component';
 
-const typeMap = {
-  [SMTPProviderType.SMTP_PROVIDER_TYPE_AMAZONSES]: { path: 'aws-ses', component: SMTPProviderComponent },
-  [SMTPProviderType.SMTP_PROVIDER_TYPE_GENERIC]: { path: 'generic', component: SMTPProviderComponent },
-  [SMTPProviderType.SMTP_PROVIDER_TYPE_GOOGLE]: { path: 'google', component: SMTPProviderComponent },
-  [SMTPProviderType.SMTP_PROVIDER_TYPE_MAILGUN]: { path: 'mailgun', component: SMTPProviderComponent },
-  [SMTPProviderType.SMTP_PROVIDER_TYPE_POSTMARK]: { path: 'postmark', component: SMTPProviderComponent },
-  [SMTPProviderType.SMTP_PROVIDER_TYPE_SENDGRID]: { path: 'sendgrid', component: SMTPProviderComponent },
-  [SMTPProviderType.SMTP_PROVIDER_TYPE_MAILJET]: { path: 'mailjet', component: SMTPProviderComponent },
-};
+const types = [
+  { path: 'aws-ses', component: SMTPProviderComponent },
+  { path: 'generic', component: SMTPProviderComponent },
+  { path: 'google', component: SMTPProviderComponent },
+  { path: 'mailgun', component: SMTPProviderComponent },
+  { path: 'postmark', component: SMTPProviderComponent },
+  { path: 'sendgrid', component: SMTPProviderComponent },
+  { path: 'mailjet', component: SMTPProviderComponent },
+];
 
-const routes: Routes = Object.entries(typeMap).map(([key, value]) => {
+const routes: Routes = types.map((value) => {
   return {
     path: value.path,
     children: [
@@ -22,12 +21,13 @@ const routes: Routes = Object.entries(typeMap).map(([key, value]) => {
         path: 'create',
         component: value.component,
       },
-      {
-        path: ':id',
-        component: value.component,
-      },
     ],
   };
+});
+
+routes.push({
+  path: ':id',
+  component: SMTPProviderComponent,
 });
 
 @NgModule({

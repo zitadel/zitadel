@@ -22,6 +22,7 @@ type SMTPConfigAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ID             string              `json:"id,omitempty"`
+	Description    string              `json:"description,omitempty"`
 	SenderAddress  string              `json:"senderAddress,omitempty"`
 	SenderName     string              `json:"senderName,omitempty"`
 	ReplyToAddress string              `json:"replyToAddress,omitempty"`
@@ -29,13 +30,12 @@ type SMTPConfigAddedEvent struct {
 	Host           string              `json:"host,omitempty"`
 	User           string              `json:"user,omitempty"`
 	Password       *crypto.CryptoValue `json:"password,omitempty"`
-	ProviderType   uint32              `json:"providerType,omitempty"`
 }
 
 func NewSMTPConfigAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	id string,
+	id, description string,
 	tls bool,
 	senderAddress,
 	senderName,
@@ -43,7 +43,6 @@ func NewSMTPConfigAddedEvent(
 	host,
 	user string,
 	password *crypto.CryptoValue,
-	providerType uint32,
 ) *SMTPConfigAddedEvent {
 	return &SMTPConfigAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -52,6 +51,7 @@ func NewSMTPConfigAddedEvent(
 			SMTPConfigAddedEventType,
 		),
 		ID:             id,
+		Description:    description,
 		TLS:            tls,
 		SenderAddress:  senderAddress,
 		SenderName:     senderName,
@@ -59,7 +59,6 @@ func NewSMTPConfigAddedEvent(
 		Host:           host,
 		User:           user,
 		Password:       password,
-		ProviderType:   providerType,
 	}
 }
 
@@ -86,6 +85,7 @@ func SMTPConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error
 type SMTPConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	ID                   string              `json:"id,omitempty"`
+	Description          *string             `json:"description,omitempty"`
 	FromAddress          *string             `json:"senderAddress,omitempty"`
 	FromName             *string             `json:"senderName,omitempty"`
 	ReplyToAddress       *string             `json:"replyToAddress,omitempty"`
@@ -93,7 +93,6 @@ type SMTPConfigChangedEvent struct {
 	Host                 *string             `json:"host,omitempty"`
 	User                 *string             `json:"user,omitempty"`
 	Password             *crypto.CryptoValue `json:"password,omitempty"`
-	ProviderType         *uint32             `json:"providerType,omitempty"`
 }
 
 func (e *SMTPConfigChangedEvent) Payload() interface{} {
@@ -135,6 +134,12 @@ func ChangeSMTPConfigID(id string) func(event *SMTPConfigChangedEvent) {
 	}
 }
 
+func ChangeSMTPConfigDescription(description string) func(event *SMTPConfigChangedEvent) {
+	return func(e *SMTPConfigChangedEvent) {
+		e.Description = &description
+	}
+}
+
 func ChangeSMTPConfigTLS(tls bool) func(event *SMTPConfigChangedEvent) {
 	return func(e *SMTPConfigChangedEvent) {
 		e.TLS = &tls
@@ -168,12 +173,6 @@ func ChangeSMTPConfigSMTPHost(smtpHost string) func(event *SMTPConfigChangedEven
 func ChangeSMTPConfigSMTPUser(smtpUser string) func(event *SMTPConfigChangedEvent) {
 	return func(e *SMTPConfigChangedEvent) {
 		e.User = &smtpUser
-	}
-}
-
-func ChangeSMTPConfigProviderType(providerType uint32) func(event *SMTPConfigChangedEvent) {
-	return func(e *SMTPConfigChangedEvent) {
-		e.ProviderType = &providerType
 	}
 }
 

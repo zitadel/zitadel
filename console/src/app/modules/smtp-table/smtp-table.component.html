@@ -31,24 +31,10 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="providerType">
-        <th mat-header-cell *matHeaderCellDef>{{ 'SMTP.LIST.TYPE' | translate }}</th>
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>{{ 'SETTING.SMTP.DESCRIPTION' | translate }}</th>
         <td class="pointer" mat-cell *matCellDef="let config">
-          <div class="smtp-table-provider-type" *ngIf="getProviderDetails(config.providerType)?.name !== 'generic'">
-            <img
-              class="smtp-logo"
-              src="{{ getProviderDetails(config.providerType)?.image }}"
-              alt="{{ getProviderDetails(config.providerType)?.name }}"
-            />
-            {{ getProviderDetails(config.providerType)?.name | titlecase }}
-          </div>
-
-          <div class="smtp-table-provider-type" *ngIf="getProviderDetails(config.providerType)?.name === 'generic'">
-            <div class="smtp-icon">
-              <mat-icon class="icon" svgIcon="mdi_smtp" />
-            </div>
-            {{ getProviderDetails(config.providerType)?.name | titlecase }}
-          </div>
+          <span>{{ config?.description }}</span>
         </td>
       </ng-container>
 
@@ -73,13 +59,6 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'SETTING.SMTP.SENDERADDRESS' | translate }}</th>
         <td class="pointer" mat-cell *matCellDef="let config">
           <span>{{ config?.senderAddress }}</span>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="senderName">
-        <th mat-header-cell *matHeaderCellDef>{{ 'SETTING.SMTP.SENDERNAME' | translate }}</th>
-        <td class="pointer" mat-cell *matCellDef="let config">
-          <span>{{ config?.senderName }}</span>
         </td>
       </ng-container>
 

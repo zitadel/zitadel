@@ -29,10 +29,8 @@ const (
 	SMTPConfigColumnSMTPPassword   = "password"
 	SMTPConfigColumnID             = "id"
 	SMTPConfigColumnState          = "state"
-	SMTPConfigColumnProviderType   = "provider_type"
+	SMTPConfigColumnDescription    = "description"
 )
-
-const SMTP_PROVIDER_TYPE_GENERIC = 7
 
 type smtpConfigProjection struct{}
 
@@ -47,7 +45,7 @@ func (*smtpConfigProjection) Name() string {
 func (*smtpConfigProjection) Init() *old_handler.Check {
 	return handler.NewTableCheck(
 		handler.NewTable([]*handler.InitColumn{
-			handler.NewColumn(SMTPConfigColumnID, handler.ColumnTypeText),
+			handler.NewColumn(SMTPConfigColumnID, handler.ColumnTypeText, handler.Default("migrated")),
 			handler.NewColumn(SMTPConfigColumnAggregateID, handler.ColumnTypeText),
 			handler.NewColumn(SMTPConfigColumnCreationDate, handler.ColumnTypeTimestamp),
 			handler.NewColumn(SMTPConfigColumnChangeDate, handler.ColumnTypeTimestamp),
@@ -62,7 +60,7 @@ func (*smtpConfigProjection) Init() *old_handler.Check {
 			handler.NewColumn(SMTPConfigColumnSMTPUser, handler.ColumnTypeText),
 			handler.NewColumn(SMTPConfigColumnSMTPPassword, handler.ColumnTypeJSONB, handler.Nullable()),
 			handler.NewColumn(SMTPConfigColumnState, handler.ColumnTypeEnum),
-			handler.NewColumn(SMTPConfigColumnProviderType, handler.ColumnTypeEnum, handler.Default(SMTP_PROVIDER_TYPE_GENERIC)),
+			handler.NewColumn(SMTPConfigColumnDescription, handler.ColumnTypeText),
 		},
 			handler.NewPrimaryKey(SMTPConfigColumnInstanceID, SMTPConfigColumnID),
 		),
@@ -130,7 +128,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 			handler.NewCol(SMTPConfigColumnSMTPUser, e.User),
 			handler.NewCol(SMTPConfigColumnSMTPPassword, e.Password),
 			handler.NewCol(SMTPConfigColumnState, domain.SMTPConfigStateInactive),
-			handler.NewCol(SMTPConfigColumnProviderType, e.ProviderType),
+			handler.NewCol(SMTPConfigColumnDescription, e.Description),
 		},
 	), nil
 }
@@ -165,8 +163,8 @@ func (p *smtpConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 	if e.Password != nil {
 		columns = append(columns, handler.NewCol(SMTPConfigColumnSMTPPassword, *e.Password))
 	}
-	if e.ProviderType != nil {
-		columns = append(columns, handler.NewCol(SMTPConfigColumnProviderType, *e.ProviderType))
+	if e.Description != nil {
+		columns = append(columns, handler.NewCol(SMTPConfigColumnDescription, *e.Description))
 	}
 	return handler.NewUpdateStatement(
 		e,

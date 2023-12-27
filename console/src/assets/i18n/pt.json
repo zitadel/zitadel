@@ -1068,6 +1068,7 @@
     },
     "SMTP": {
       "TITLE": "Configurações SMTP",
+      "DESCRIPTION": "Descrição",
       "SENDERADDRESS": "Endereço de e-mail do remetente",
       "SENDERNAME": "Nome do remetente",
       "REPLYTOADDRESS": "Endereço Reply-To",
@@ -1078,6 +1079,7 @@
       "PASSWORDSET": "Senha do SMTP definida com sucesso.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "Salvo com sucesso!",
+      "NOCHANGES": "Sem alterações!",
       "REQUIREDWARN": "Para enviar notificações do seu domínio, você precisa inserir seus dados SMTP."
     },
     "SMS": {
@@ -1902,6 +1904,48 @@
     "PASSWORDLESSTYPE": {
       "0": "Não permitido",
       "1": "Permitido"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "Provedor SMTP",
+      "DESCRIPTION": "Estes são os provedores SMTP para sua instância Zitadel. Ative aquele que deseja usar para enviar notificações aos seus usuários.",
+      "EMPTY": "Nenhum provedor SMTP disponível",
+      "ACTIVATED": "Ativado",
+      "ACTIVATE": "Ativar provedor",
+      "DEACTIVATE": "Desativar provedor",
+      "TYPE": "Tipo",
+      "DIALOG": {
+        "ACTIVATED": "A configuração SMTP foi ativada",
+        "ACTIVATE_WARN_TITLE": "Ativar configuração SMTP",
+        "ACTIVATE_WARN_DESCRIPTION": "Você está prestes a ativar uma configuração SMTP. Primeiro, desativaremos o provedor ativo atual e depois ativaremos esta configuração. Tem certeza?",
+        "DEACTIVATE_WARN_TITLE": "Desativar configuração SMTP",
+        "DEACTIVATE_WARN_DESCRIPTION": "Você está prestes a desativar uma configuração SMTP. Tem certeza?",
+        "DEACTIVATED": "A configuração SMTP foi desativada",
+        "DELETE_TITLE": "Excluir configuração SMTP",
+        "DELETE_DESCRIPTION": "Você está prestes a excluir uma configuração. Confirme esta ação digitando o nome do remetente",
+        "DELETED": "A configuração SMTP foi excluída",
+        "SENDER": "Digite {{ value }} para excluir esta configuração SMTP."
+      }
+    },
+    "CREATE": {
+      "TITLE": "Adicionar provedor SMTP",
+      "DESCRIPTION": "Selecione um ou mais dos seguintes fornecedores.",
+      "STEPS": {
+        "TITLE": "Adicionar {{ value }} provedor SMTP",
+        "CREATE_DESC_TITLE": "Insira suas configurações SMTP de {{ value }} passo a passo",
+        "CURRENT_DESC_TITLE": "Estas são suas configurações de SMTP",
+        "PROVIDER_SETTINGS": "Configurações do provedor SMTP",
+        "SENDER_SETTINGS": "Configurações do remetente",
+        "TEST_SETTINGS": "Testar configurações de SMTP"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Configurações do provedor SMTP"
+    },
+    "EMPTY": "Nenhum provedor SMTP disponível",
+    "STEPS": {
+      "SENDGRID": {}
     }
   },
   "APP": {

@@ -1066,6 +1066,7 @@
     },
     "SMTP": {
       "TITLE": "SMTP 设置",
+      "DESCRIPTION": "描述",
       "SENDERADDRESS": "发件人地址",
       "SENDERNAME": "发件人名称",
       "REPLYTOADDRESS": "Reply-to 地址",
@@ -1076,6 +1077,7 @@
       "PASSWORDSET": "SMTP 密码设置成功。",
       "TLS": "使用安全传输层 (TLS)",
       "SAVED": "保存成功！",
+      "NOCHANGES": "没有变化！",
       "REQUIREDWARN": "要从您的域发送通知，您必须输入您的 SMTP 数据。"
     },
     "SMS": {
@@ -1906,6 +1908,48 @@
     "PASSWORDLESSTYPE": {
       "0": "不允许",
       "1": "允许"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "SMTP 提供商",
+      "DESCRIPTION": "这些是您的 Zitadel 实例的 SMTP 提供商。激活您想要用来向用户发送通知的通知。",
+      "EMPTY": "没有可用的 SMTP 提供商",
+      "ACTIVATED": "活性",
+      "ACTIVATE": "激活提供商",
+      "DEACTIVATE": "停用提供商",
+      "TYPE": "类型",
+      "DIALOG": {
+        "ACTIVATED": "SMTP 配置已激活",
+        "ACTIVATE_WARN_TITLE": "激活 SMTP 配置",
+        "ACTIVATE_WARN_DESCRIPTION": "您即将激活 SMTP 配置。首先，我们将停用当前活动的提供程序，然后激活此配置。你确定吗？",
+        "DEACTIVATE_WARN_TITLE": "停用 SMTP 配置",
+        "DEACTIVATE_WARN_DESCRIPTION": "您即将停用 SMTP 配置。你确定吗？",
+        "DEACTIVATED": "SMTP 配置已停用",
+        "DELETE_TITLE": "删除 SMTP 配置",
+        "DELETE_DESCRIPTION": "您将要删除一个配置。输入发件人姓名确认此操作",
+        "DELETED": "SMTP 配置已被删除",
+        "SENDER": "输入 {{ value }}，删除此 SMTP 配置。"
+      }
+    },
+    "CREATE": {
+      "TITLE": "添加 SMTP 提供商",
+      "DESCRIPTION": "选择以下一个或多个提供商。",
+      "STEPS": {
+        "TITLE": "添加 {{ value }} SMTP 提供商",
+        "CREATE_DESC_TITLE": "逐步输入您的 {{ value }} SMTP 设置",
+        "CURRENT_DESC_TITLE": "这些是您的 SMTP 设置",
+        "PROVIDER_SETTINGS": "SMTP 提供商设置",
+        "SENDER_SETTINGS": "发件人设置",
+        "TEST_SETTINGS": "测试 SMTP 设置"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "SMTP 提供商设置"
+    },
+    "EMPTY": "没有可用的 SMTP 提供商",
+    "STEPS": {
+      "SENDGRID": {}
     }
   },
   "APP": {

@@ -1067,6 +1067,7 @@
     },
     "SMTP": {
       "TITLE": "Nastavení SMTP",
+      "DESCRIPTION": "Popis",
       "SENDERADDRESS": "E-mailová adresa odesílatele",
       "SENDERNAME": "Jméno odesílatele",
       "REPLYTOADDRESS": "Adresa pro odpovědi",
@@ -1077,6 +1078,7 @@
       "PASSWORDSET": "SMTP heslo bylo úspěšně nastaveno.",
       "TLS": "Zabezpečení transportní vrstvy (TLS)",
       "SAVED": "Úspěšně uloženo!",
+      "NOCHANGES": "Žádné změny!",
       "REQUIREDWARN": "Pro odesílání oznámení z vaší domény musíte zadat vaše SMTP údaje."
     },
     "SMS": {
@@ -1915,6 +1917,48 @@
     "PASSWORDLESSTYPE": {
       "0": "Nepovoleno",
       "1": "Povoleno"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "Poskytovatel SMTP",
+      "DESCRIPTION": "Toto jsou poskytovatelé SMTP pro vaši instanci Zitadel. Aktivujte ten, který chcete používat k odesílání upozornění svým uživatelům.",
+      "EMPTY": "Není k dispozici žádný poskytovatel SMTP",
+      "ACTIVATED": "Aktivováno",
+      "ACTIVATE": "Aktivujte poskytovatele",
+      "DEACTIVATE": "Deaktivovat poskytovatele",
+      "TYPE": "Typ",
+      "DIALOG": {
+        "ACTIVATED": "Konfigurace SMTP byla aktivována",
+        "ACTIVATE_WARN_TITLE": "Aktivujte konfiguraci SMTP",
+        "ACTIVATE_WARN_DESCRIPTION": "Chystáte se aktivovat konfiguraci SMTP. Nejprve deaktivujeme aktuálního aktivního poskytovatele a poté aktivujeme tuto konfiguraci. Jsi si jistá?",
+        "DEACTIVATE_WARN_TITLE": "Deaktivujte konfiguraci SMTP",
+        "DEACTIVATE_WARN_DESCRIPTION": "Chystáte se deaktivovat konfiguraci SMTP. Jsi si jistá?",
+        "DEACTIVATED": "Konfigurace SMTP byla deaktivována",
+        "DELETE_TITLE": "Smazat konfiguraci SMTP",
+        "DELETE_DESCRIPTION": "Chystáte se smazat konfiguraci. Potvrďte tuto akci zadáním jména odesílatele",
+        "DELETED": "Konfigurace SMTP byla smazána",
+        "SENDER": "Chcete-li smazat tuto konfiguraci SMTP, zadejte {{ value }}."
+      }
+    },
+    "CREATE": {
+      "TITLE": "Přidat poskytovatele SMTP",
+      "DESCRIPTION": "Vyberte jednoho nebo více z následujících poskytovatelů.",
+      "STEPS": {
+        "TITLE": "Přidejte {{ value }} poskytovatele SMTP",
+        "CREATE_DESC_TITLE": "Krok za krokem zadejte nastavení SMTP {{ value }}",
+        "CURRENT_DESC_TITLE": "Toto jsou vaše nastavení SMTP",
+        "PROVIDER_SETTINGS": "Nastavení poskytovatele SMTP",
+        "SENDER_SETTINGS": "Nastavení odesílatele",
+        "TEST_SETTINGS": "Otestujte nastavení SMTP"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Nastavení poskytovatele SMTP"
+    },
+    "EMPTY": "Není k dispozici žádný poskytovatel SMTP",
+    "STEPS": {
+      "SENDGRID": {}
     }
   },
   "APP": {

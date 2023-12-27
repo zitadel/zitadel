@@ -1067,6 +1067,7 @@
     },
     "SMTP": {
       "TITLE": "SMTP設定",
+      "DESCRIPTION": "説明",
       "SENDERADDRESS": "送信者のメールアドレス",
       "SENDERNAME": "送信者名",
       "REPLYTOADDRESS": "返信先アドレス",
@@ -1077,6 +1078,7 @@
       "PASSWORDSET": "SMTPパスワードは正常に設定されました。",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "正常に保存されました！",
+      "NOCHANGES": "変更はありません!",
       "REQUIREDWARN": "ドメインから通知を送信するには、SMTP情報を入力する必要があります。"
     },
     "SMS": {
@@ -1898,6 +1900,48 @@
     "PASSWORDLESSTYPE": {
       "0": "無効",
       "1": "有効"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "SMTPプロバイダー",
+      "DESCRIPTION": "これらは、Zitadel インスタンスの SMTP プロバイダーです。ユーザーに通知を送信するために使用するものをアクティブにします。",
+      "EMPTY": "使用可能な SMTP プロバイダーがありません",
+      "ACTIVATED": "アクティブ化された",
+      "ACTIVATE": "プロバイダーをアクティブ化する",
+      "DEACTIVATE": "プロバイダーを非アクティブ化する",
+      "TYPE": "タイプ",
+      "DIALOG": {
+        "ACTIVATED": "SMTP設定が有効化されました",
+        "ACTIVATE_WARN_TITLE": "SMTP設定を有効にする",
+        "ACTIVATE_WARN_DESCRIPTION": "SMTP 構成をアクティブにしようとしています。まず、現在アクティブなプロバイダーを非アクティブ化してから、この構成をアクティブ化します。本気ですか？",
+        "DEACTIVATE_WARN_TITLE": "SMTP設定を無効にする",
+        "DEACTIVATE_WARN_DESCRIPTION": "SMTP 構成を非アクティブ化しようとしています。本気ですか？",
+        "DEACTIVATED": "SMTP設定が無効化されました",
+        "DELETE_TITLE": "SMTP設定を削除する",
+        "DELETE_DESCRIPTION": "構成を削除しようとしています。送信者名を入力してこのアクションを確認します",
+        "DELETED": "SMTP設定が削除されました",
+        "SENDER": "この SMTP 構成を削除するには、「{{ value }}」と入力します。"
+      }
+    },
+    "CREATE": {
+      "TITLE": "SMTPプロバイダーの追加",
+      "DESCRIPTION": "次のプロバイダーから 1 つ以上を選択します。",
+      "STEPS": {
+        "TITLE": "{{ value }} SMTP プロバイダーを追加",
+        "CREATE_DESC_TITLE": "{{ value }} SMTP 設定をステップごとに入力します",
+        "CURRENT_DESC_TITLE": "これらは SMTP 設定です",
+        "PROVIDER_SETTINGS": "SMTPプロバイダーの設定",
+        "SENDER_SETTINGS": "送信者の設定",
+        "TEST_SETTINGS": "SMTP設定をテストする"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "SMTPプロバイダーの設定"
+    },
+    "EMPTY": "使用可能な SMTP プロバイダーがありません",
+    "STEPS": {
+      "SENDGRID": {}
     }
   },
   "APP": {

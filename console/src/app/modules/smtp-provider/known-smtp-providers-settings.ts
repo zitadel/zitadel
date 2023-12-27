@@ -1,5 +1,3 @@
-import { SMTPProviderType } from 'src/app/proto/generated/zitadel/settings_pb';
-
 export interface AmazonRegionsEndpoints {
   'US East (Ohio)': string;
   'US East (N. Virginia)': string;
@@ -56,7 +54,6 @@ export interface ProviderDefaultSettings {
     placeholder: string;
   };
   image?: string;
-  type: SMTPProviderType;
   routerLinkElement: string;
 }
 
@@ -69,7 +66,6 @@ export const AmazonSESDefaultSettings: ProviderDefaultSettings = {
   user: { value: '', placeholder: 'your Amazon SES credentials for this region' },
   password: { value: '', placeholder: 'your Amazon SES credentials for this region' },
   image: './assets/images/smtp/aws-ses.svg',
-  type: SMTPProviderType.SMTP_PROVIDER_TYPE_AMAZONSES,
   routerLinkElement: 'aws-ses',
 };
 
@@ -82,7 +78,6 @@ export const GoogleDefaultSettings: ProviderDefaultSettings = {
   user: { value: '', placeholder: 'your complete Google Workspace email address' },
   password: { value: '', placeholder: 'your complete Google Workspace password' },
   image: './assets/images/smtp/google.png',
-  type: SMTPProviderType.SMTP_PROVIDER_TYPE_GOOGLE,
   routerLinkElement: 'google',
 };
 
@@ -95,7 +90,6 @@ export const MailgunDefaultSettings: ProviderDefaultSettings = {
   user: { value: '', placeholder: 'postmaster@YOURDOMAIN' },
   password: { value: '', placeholder: 'Your mailgun smtp password' },
   image: './assets/images/smtp/mailgun.svg',
-  type: SMTPProviderType.SMTP_PROVIDER_TYPE_MAILGUN,
   routerLinkElement: 'mailgun',
 };
 
@@ -108,7 +102,6 @@ export const MailjetDefaultSettings: ProviderDefaultSettings = {
   user: { value: '', placeholder: 'Your Mailjet API key' },
   password: { value: '', placeholder: 'Your Mailjet Secret key' },
   image: './assets/images/smtp/mailjet.svg',
-  type: SMTPProviderType.SMTP_PROVIDER_TYPE_MAILJET,
   routerLinkElement: 'mailjet',
 };
 
@@ -121,7 +114,6 @@ export const PostmarkDefaultSettings: ProviderDefaultSettings = {
   user: { value: '', placeholder: 'Your Server API token' },
   password: { value: '', placeholder: 'Your Server API token' },
   image: './assets/images/smtp/postmark.png',
-  type: SMTPProviderType.SMTP_PROVIDER_TYPE_POSTMARK,
   routerLinkElement: 'postmark',
 };
 
@@ -134,7 +126,6 @@ export const SendgridDefaultSettings: ProviderDefaultSettings = {
   user: { value: 'apikey', placeholder: '' },
   password: { value: '', placeholder: ' Your SendGrid API Key' },
   image: './assets/images/smtp/sendgrid.png',
-  type: SMTPProviderType.SMTP_PROVIDER_TYPE_SENDGRID,
   routerLinkElement: 'sendgrid',
 };
 
@@ -143,7 +134,6 @@ export const GenericDefaultSettings: ProviderDefaultSettings = {
   requiredTls: false,
   user: { value: '', placeholder: 'your SMTP user' },
   password: { value: '', placeholder: 'your SMTP password' },
-  type: SMTPProviderType.SMTP_PROVIDER_TYPE_GENERIC,
   routerLinkElement: 'generic',
 };
 

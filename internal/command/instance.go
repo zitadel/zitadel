@@ -406,6 +406,7 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 	*validations = append(*validations,
 		commands.prepareAddSMTPConfig(
 			instanceAgg,
+			smtpConfig.Description,
 			smtpConfig.From,
 			smtpConfig.FromName,
 			smtpConfig.ReplyToAddress,
@@ -413,7 +414,6 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 			smtpConfig.SMTP.User,
 			[]byte(smtpConfig.SMTP.Password),
 			smtpConfig.Tls,
-			smtpConfig.SMTP.ProviderType,
 		),
 	)
 }

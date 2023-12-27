@@ -28,7 +28,7 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config 
 	}
 	fromSplitted := strings.Split(from, "@")
 	senderDomain := fromSplitted[len(fromSplitted)-1]
-
+	description := strings.TrimSpace(config.Description)
 	replyTo := strings.TrimSpace(config.ReplyToAddress)
 	hostAndPort := strings.TrimSpace(config.SMTP.Host)
 
@@ -59,6 +59,7 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config 
 		ctx,
 		iamAgg,
 		id,
+		description,
 		config.Tls,
 		config.From,
 		config.FromName,
@@ -66,7 +67,6 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config 
 		hostAndPort,
 		config.SMTP.User,
 		smtpPassword,
-		config.SMTP.ProviderType,
 	))
 	if err != nil {
 		return "", nil, err
@@ -90,7 +90,7 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id s
 	}
 	fromSplitted := strings.Split(from, "@")
 	senderDomain := fromSplitted[len(fromSplitted)-1]
-
+	description := strings.TrimSpace(config.Description)
 	replyTo := strings.TrimSpace(config.ReplyToAddress)
 	hostAndPort := strings.TrimSpace(config.SMTP.Host)
 	if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
@@ -126,6 +126,7 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id s
 		ctx,
 		iamAgg,
 		id,
+		description,
 		config.Tls,
 		from,
 		config.FromName,
@@ -133,7 +134,6 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id s
 		hostAndPort,
 		config.SMTP.User,
 		smtpPassword,
-		config.SMTP.ProviderType,
 	)
 	if err != nil {
 		return nil, err
@@ -306,7 +306,7 @@ func (c *Commands) getSMTPConfig(ctx context.Context, instanceID, id, domain str
 }
 
 // TODO: SetUpInstance still uses this and would be removed as soon as deprecated PrepareCommands is removed
-func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, replyTo, hostAndPort, user string, password []byte, tls bool, providerType uint32) preparation.Validation {
+func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, description, from, name, replyTo, hostAndPort, user string, password []byte, tls bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 
 		if from = strings.TrimSpace(from); from == "" {
@@ -350,6 +350,7 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, reply
 					ctx,
 					&a.Aggregate,
 					id,
+					description,
 					tls,
 					from,
 					name,
@@ -357,7 +358,6 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, from, name, reply
 					hostAndPort,
 					user,
 					smtpPassword,
-					providerType,
 				),
 			}, nil
 		}, nil

@@ -19,6 +19,7 @@ var (
 		` projections.smtp_configs2.change_date,` +
 		` projections.smtp_configs2.resource_owner,` +
 		` projections.smtp_configs2.sequence,` +
+		` projections.smtp_configs2.description` +
 		` projections.smtp_configs2.tls,` +
 		` projections.smtp_configs2.sender_address,` +
 		` projections.smtp_configs2.sender_name,` +
@@ -28,7 +29,6 @@ var (
 		` projections.smtp_configs2.password,` +
 		` projections.smtp_configs2.id,` +
 		` projections.smtp_configs2.state,` +
-		` projections.smtp_configs2.provider_type` +
 		` FROM projections.smtp_configs2` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	prepareSMTPConfigCols = []string{
@@ -37,6 +37,7 @@ var (
 		"change_date",
 		"resource_owner",
 		"sequence",
+		"description",
 		"tls",
 		"sender_address",
 		"sender_name",
@@ -46,7 +47,6 @@ var (
 		"smtp_password",
 		"id",
 		"state",
-		"provider_type",
 	}
 )
 
@@ -92,6 +92,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 						testNow,
 						"ro",
 						uint64(20211108),
+						"test",
 						true,
 						"sender",
 						"name",
@@ -101,7 +102,6 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 						&crypto.CryptoValue{},
 						"2232323",
 						domain.SMTPConfigStateActive,
-						1,
 					},
 				),
 			},
@@ -111,6 +111,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 				ChangeDate:     testNow,
 				ResourceOwner:  "ro",
 				Sequence:       20211108,
+				Description:    "test",
 				TLS:            true,
 				SenderAddress:  "sender",
 				SenderName:     "name",
@@ -120,7 +121,6 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 				Password:       &crypto.CryptoValue{},
 				ID:             "2232323",
 				State:          domain.SMTPConfigStateActive,
-				ProviderType:   1,
 			},
 		},
 		{

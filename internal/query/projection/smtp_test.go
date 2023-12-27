@@ -28,13 +28,13 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						instance.SMTPConfigChangedEventType,
 						instance.AggregateType,
 						[]byte(`{
+						"description": "test",
 						"tls": true,
 						"senderAddress": "sender",
 						"senderName": "name",
 						"replyToAddress": "reply-to",
 						"host": "host",
 						"user": "user",
-						"providerType": 2,
 						"id": "44444",
 						"aggregate_id": "agg-id",
 						"instance_id": "instance-id"						
@@ -53,13 +53,13 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
+								"test",
 								true,
 								"sender",
 								"name",
 								"reply-to",
 								"host",
 								"user",
-								uint32(2),
 								"44444",
 								"agg-id",
 								"instance-id",
@@ -77,6 +77,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						instance.SMTPConfigAddedEventType,
 						instance.AggregateType,
 						[]byte(`{
+						"description": "test",
 						"tls": true,
 						"senderAddress": "sender",
 						"senderName": "name",
@@ -90,7 +91,6 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						},
 						"id": "id",
 						"state": 1,
-						"providerType": 1
 					}`),
 					), instance.SMTPConfigAddedEventMapper),
 			},
@@ -101,7 +101,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.smtp_configs2 (aggregate_id, creation_date, change_date, resource_owner, instance_id, sequence, id, tls, sender_address, sender_name, reply_to_address, host, username, password, state, provider_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)",
+							expectedStmt: "INSERT INTO projections.smtp_configs2 (aggregate_id, creation_date, change_date, resource_owner, instance_id, sequence, id, description, tls, sender_address, sender_name, reply_to_address, host, username, password, state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -110,6 +110,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 								"instance-id",
 								uint64(15),
 								"id",
+								"test",
 								true,
 								"sender",
 								"name",

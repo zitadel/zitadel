@@ -3,7 +3,7 @@ import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/cor
 import { Router, RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { SMTPConfigState, SMTPProviderType } from 'src/app/proto/generated/zitadel/settings_pb';
+import { SMTPConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
 import { ListQuery } from 'src/app/proto/generated/zitadel/object_pb';
 import { LoginPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -16,7 +16,6 @@ import { SMTPConfig } from 'src/app/proto/generated/zitadel/settings_pb';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
-import { SMTPKnownProviders } from '../smtp-provider/known-smtp-providers-settings';
 
 @Component({
   selector: 'cnsl-smtp-table',
@@ -31,8 +30,7 @@ export class SMTPTableComponent implements OnInit {
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
-  public SMTPProviderType: any = SMTPProviderType;
-  public displayedColumns: string[] = ['activated', 'providerType', 'tls', 'host', 'senderAddress', 'senderName', 'actions'];
+  public displayedColumns: string[] = ['activated', 'description', 'tls', 'host', 'senderAddress', 'actions'];
   @Output() public changedSelection: EventEmitter<Array<SMTPConfig.AsObject>> = new EventEmitter();
 
   public loginPolicy!: LoginPolicy.AsObject;
@@ -183,7 +181,7 @@ export class SMTPTableComponent implements OnInit {
   }
 
   public routerLinkForRow(row: SMTPConfig.AsObject): any {
-    return ['/instance', 'smtpprovider', this.getProviderDetails(row.providerType)?.routerLinkElement, row.id];
+    return ['/instance', 'smtpprovider', row.id];
   }
 
   public get displayedColumnsWithActions(): string[] {
@@ -192,9 +190,5 @@ export class SMTPTableComponent implements OnInit {
 
   public navigateToProvider(row: SMTPConfig.AsObject) {
     this.router.navigate(this.routerLinkForRow(row));
-  }
-
-  public getProviderDetails(providerType: SMTPProviderType) {
-    return SMTPKnownProviders.find((provider) => provider.type === providerType);
   }
 }

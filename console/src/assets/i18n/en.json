@@ -1067,7 +1067,7 @@
     },
     "SMTP": {
       "TITLE": "SMTP Provider",
-      "DESCRIPTION": "",
+      "DESCRIPTION": "Description",
       "SENDERADDRESS": "Sender Email Address",
       "SENDERNAME": "Sender Name",
       "REPLYTOADDRESS": "Reply-to Address",
@@ -1078,6 +1078,7 @@
       "PASSWORDSET": "SMTP Password was set successfully.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "Saved successfully!",
+      "NOCHANGES": "No changes!",
       "REQUIREDWARN": "To send notifications from your domain, you have to enter your SMTP data."
     },
     "SMS": {
@@ -1956,7 +1957,7 @@
       "STEPS": {
         "TITLE": "Add {{ value }} SMTP Provider",
         "CREATE_DESC_TITLE": "Enter your {{ value }} SMTP settings step by step",
-        "CURRENT_DESC_TITLE": "These are your {{ value }} SMTP settings",
+        "CURRENT_DESC_TITLE": "These are your SMTP settings",
         "PROVIDER_SETTINGS": "SMTP Provider Settings",
         "SENDER_SETTINGS": "Sender Settings",
         "TEST_SETTINGS": "Test SMTP Settings"
