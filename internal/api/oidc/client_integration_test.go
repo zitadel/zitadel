@@ -59,7 +59,7 @@ func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
 func TestServer_Introspect(t *testing.T) {
 	project, err := Tester.CreateProject(CTX)
 	require.NoError(t, err)
-	app, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
+	app, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
 	require.NoError(t, err)
 	api, err := Tester.CreateAPIClient(CTX, project.GetId())
 	require.NoError(t, err)
@@ -158,7 +158,7 @@ func TestServer_VerifyClient(t *testing.T) {
 
 	inactiveClient, err := Tester.CreateOIDCInactivateClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
 	require.NoError(t, err)
-	nativeClient, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
+	nativeClient, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
 	require.NoError(t, err)
 	basicWebClient, err := Tester.CreateOIDCWebClientBasic(CTX, redirectURI, logoutRedirectURI, project.GetId())
 	require.NoError(t, err)
