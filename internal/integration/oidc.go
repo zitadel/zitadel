@@ -119,11 +119,19 @@ func (s *Tester) CreateProject(ctx context.Context) (*management.AddProjectRespo
 	})
 }
 
-func (s *Tester) CreateAPIClient(ctx context.Context, projectID string) (*management.AddAPIAppResponse, error) {
+func (s *Tester) CreateAPIClientJWT(ctx context.Context, projectID string) (*management.AddAPIAppResponse, error) {
 	return s.Client.Mgmt.AddAPIApp(ctx, &management.AddAPIAppRequest{
 		ProjectId:      projectID,
 		Name:           fmt.Sprintf("api-%d", time.Now().UnixNano()),
 		AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
+	})
+}
+
+func (s *Tester) CreateAPIClientBasic(ctx context.Context, projectID string) (*management.AddAPIAppResponse, error) {
+	return s.Client.Mgmt.AddAPIApp(ctx, &management.AddAPIAppRequest{
+		ProjectId:      projectID,
+		Name:           fmt.Sprintf("api-%d", time.Now().UnixNano()),
+		AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
 	})
 }
 
@@ -207,12 +215,16 @@ func (c *loginRoundTripper) RoundTrip(req *http.Request) (*http.Response, error)
 	return c.RoundTripper.RoundTrip(req)
 }
 
-func (s *Tester) CreateResourceServer(ctx context.Context, keyFileData []byte) (rs.ResourceServer, error) {
+func (s *Tester) CreateResourceServerJWTProfile(ctx context.Context, keyFileData []byte) (rs.ResourceServer, error) {
 	keyFile, err := client.ConfigFromKeyFileData(keyFileData)
 	if err != nil {
 		return nil, err
 	}
 	return rs.NewResourceServerJWTProfile(ctx, s.OIDCIssuer(), keyFile.ClientID, keyFile.KeyID, []byte(keyFile.Key))
+}
+
+func (s *Tester) CreateResourceServerClientCredentials(ctx context.Context, clientID, clientSecret string) (rs.ResourceServer, error) {
+	return rs.NewResourceServerClientCredentials(ctx, s.OIDCIssuer(), clientID, clientSecret)
 }
 
 func GetRequest(url string, headers map[string]string) (*http.Request, error) {
