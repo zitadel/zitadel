@@ -9,16 +9,16 @@ sidebar_label: Onboard customers and Users
 When building your own application, one of the first questions you have to face, is how do my customers onboard to my application.
 This guide will show you the built-in solution you have, within ZITADEL and how you can use ZITADEL when you have more advanced needs.
 
-### Onboarding Process for B2B Customers
+## Onboarding Process for B2B Customers
 
 When you want to build an onboarding process for your business customers you have to go through the following steps:
 1. Create an organization: The organization represents the customer or a team
 2. Create the first administrator user: This user is the account for your customer, which should be able to configure settings such as SSO, MFA, etc.
-3. Give the user the correct permission to be able to configure settings, create users and assign roles to users
+3. Give the user the correct permission to be able to configure settings, create users and assign roles to users in ZITADEL
 
 ZITADEL does have multiple possibilities on how to achieve that process.
 
-#### Built-in register organization form
+### Built-in register organization form
 
 A basic form that allows a customer to enter an organization name and a user account is hosted on the follwing URL:
 {custom-domain}/ui/login/register/org
@@ -29,7 +29,151 @@ You can read more about the managers, roles and their meanings [here](/docs/guid
 
 <img src="/docs/img/guides/solution-scenarios/register-organization.png" alt="Register Organization Form"/>
 
+#### Disable built-in register organization form
 If you do not want to allow users to register organizations with this form, you can disable it with the following request:
 [Restrict the instance features](/docs/apis/resources/admin/admin-service-set-restrictions)
 
-## Build your own form
+Disabling the form makes sense, if your administrators manage new customers themselves or if you build your own form.
+
+### Build your own form with setup organization request
+
+If the built-in register form doesn't fulfill your needs we recommend building your own form.
+
+The administration API of ZITADEL, allows you to setup a new organization with a first administrator user.
+The setup organization requests, has the possibility to specify an organization with its name and a domain.
+You can directly send a human user with all the needed information like the profile, email, password. etc.
+This request allows you only to setup a user with password authentication at the moment.
+By specifying the roles you can define, which permission the user should have within ZITADEL.
+Per default the user will automatically get "ORG_OWNER".
+
+<img src="/docs/img/guides/solution-scenarios/register-team-graphic.png" alt="Setup Organiation with Admin User Graphic"/>
+
+#### Example Request
+
+```bash
+curl -L -X POST 'https://$CUSTOM-DOMAIN/admin/v1/orgs/_setup' \
+-H 'Content-Type: application/json' \
+-H 'Accept: application/json' \
+-H 'Authorization: Bearer <TOKEN>' \
+--data-raw '{
+  "org": {
+    "name": "Organisation C",
+    "domain": "org-c.com"
+  },
+  "human": {
+    "userName": "gigi-giraffe",
+    "profile": {
+      "firstName": "Gigi",
+      "lastName": "Giraffe",
+      "nickName": "gigi-giraffe",
+      "displayName": "Gigi Giraffe",
+      "preferredLanguage": "en",
+      "gender": "GENDER_UNSPECIFIED"
+    },
+    "email": {
+      "email": "gigi@zitadel.com",
+      "isEmailVerified": true
+    },
+    "phone": {
+      "phone": "+41 71 000 00 00",
+      "isPhoneVerified": true
+    },
+    "password": "my_53cr3t-P4$$w0rd"
+  },
+  "roles": [
+    "string"
+  ]
+}'
+```
+
+Detailed description of [Setup Organization](/docs/apis/resources/admin/admin-service-set-up-org#setup-organization)
+
+If you need to add custom data to either the organization or the user you can use the metadata.
+Metadata is a key value construct that allows you to store any additional information to the ressources.
+The set organization metadata request allows you to add one key value pair to an organization:
+[Set Organization Metadata](/docs/apis/resources/mgmt/management-service-set-org-metadata)
+If you have more than one field, you can use the bulk add request:
+[Bulk Set Organization Metadata](/docs/apis/resources/mgmt/management-service-bulk-set-org-metadata)
+
+The same requests also exist on the user ressource:
+[Set User Metadata](/docs/apis/resources/mgmt/management-service-set-user-metadata)
+[Bulk Set User Metadata](/docs/apis/resources/mgmt/management-service-bulk-set-user-metadata)
+
+## Onboarding Process for End Users
+
+End Users have three different possibilities on how to login with ZITADEL.
+1. Local Account with Username, Password, MFA, Passkey, etc
+2. Social Login like Google, Apple, Github, etc
+3. External Identity Provider hosted/managed by Organization like Azure AD, LDAP, Okta etc
+
+You can either use the hosted login of ZITADEL to let users register themselves, or you can build your own UI and use the existing APIs.
+
+### Built-in register form
+
+#### Local User Registration
+
+To allow users to register themselves, you have to enable the "register allowed" in the login behaviour settings.
+You will now see the register button on the login screen.
+
+<img src="/docs/img/guides/solution-scenarios/register-end-user.png" alt="Register End User"/>
+
+If nothing else is specified, a user will be registered to the default organization.
+<img src="/docs/img/guides/solution-scenarios/default-organization.png" alt="Default Organization"/>
+
+You can specify another organization, by sending the organization scope in the authorization requests.
+By sending the scope below the settings of the specified organization will be triggered and only users of the said organization will be able to authenticate.
+The users will be registered to the given organization.
+```
+urn:zitadel:iam:org:id:{id}
+```
+
+If the user chooses to register a local account, the register form will be shown.
+All the mandatory fields like given name, family name, e-mail and password have to be filled.
+With the built-in form, currently only password authentication can be configured in the first place.
+
+<img src="/docs/img/guides/solution-scenarios/register-local-user.png" alt="Register local user"/>
+
+#### Registration with Social Login
+
+To allow your users to register with social logins you have to configure the needed external identity providers.
+If you only need the social logins for your end users and you want to have them all in the organization, we recommend using the default organization for those users.
+In that case you can configure the identity providers on the default organization.
+If you want to have the social logins on different organizations you can configure the default on the instance, and enable it on the needed orgnaizations.
+
+Please follow the configuration guides for the needed providers: [Let Users Login with Preferred Identity Provider in ZITADEL](/docs/guides/integrate/identity-providers)
+
+The configured providers will be shown on the first login screen or when the users click on the registration button, they will be able to choose between local account or the social login.
+
+<img src="/docs/img/guides/solution-scenarios/register-end-user.png" alt="Register End User"/>
+
+#### Registration with Organization External Identity Provider
+
+If your business customer already have an identity provider, and you want to allow SSO for them, you can configure their providers directly for their organization.
+Configure the needed provider such as Azure AD or OKTA.
+
+Please follow the configuration guides for the needed providers: [Let Users Login with Preferred Identity Provider in ZITADEL](/docs/guides/integrate/identity-providers)
+
+Per default the login ui of the default organization is shown.
+To allow users of a specific organization to register with their IDP (e.g Azure AD) you have to options.
+
+1. Identify organization with organization scope
+
+By sending the organization scope in the authorization request to ZITADEL the specified organization will directly be triggerd.
+The configured settings of that organization such as IDPs will directly be shown.
+If only one IDP is configure and local accounts are disabled the user will directly be redirected to the external provider.
+```
+urn:zitadel:iam:org:id:{id}
+```
+
+2. Domain Discovery
+
+When domain discovery is enabled, ZITADEL is able to identify the entered domain of a user and match it to a specific organization.
+If you want to know more about domain discovery and how to set it up please read the following guide:
+[Domain Discovery in ZITADEL](/docs/guides/solution-scenarios/domain-discovery)
+
+
+
+## Additional Information
+
+If you want to know more about the multi-tenancy possibilities of ZITADEL, read the following blog post:
+[Multi-Tenancy and Delegated Access Management with Organizations](https://zitadel.com/blog/multi-tenancy-with-organizations)
