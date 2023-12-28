@@ -171,9 +171,24 @@ When domain discovery is enabled, ZITADEL is able to identify the entered domain
 If you want to know more about domain discovery and how to set it up please read the following guide:
 [Domain Discovery in ZITADEL](/docs/guides/solution-scenarios/domain-discovery)
 
+### Build your own registration form
 
+ZITADEL allows you to build your own registration form and login UI.
+The registration process highly depends on your needs.
 
-## Additional Information
+We do have a guide series on how to build your own login ui, which also includes the registration of different authentication methods, such as:
+- Password authentication
+- Multifactor
+- Passkeys
+- External Login Providers
+
+You can find all the guides here: [Build your own login UI](https://zitadel.com/docs/guides/integrate/login-ui)
+
+The create user request also allows you to add metadata (key, value) to the user.
+This gives you the possibility to collect additional data from your users during the registration process and store it directly to the user in ZITADEL.
+We recommend storing business relevant data in the database of your application, and only authentication and authorization relevant data in ZITADEL to follow the separation of concern pattern.
+
+#### Registration with Organization External Identity Provider
 
 If you want to know more about the multi-tenancy possibilities of ZITADEL, read the following blog post:
 [Multi-Tenancy and Delegated Access Management with Organizations](https://zitadel.com/blog/multi-tenancy-with-organizations)
