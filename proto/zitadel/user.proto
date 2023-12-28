@@ -776,6 +776,21 @@ message UserGrant {
             description: "type of the user (human / machine)"
         }
     ];
+    string granted_org_id = 20 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+    string granted_org_name = 21 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\"";
+        }
+    ];
+    string granted_org_domain = 22 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"zitadel.cloud\"";
+        }
+    ];
 }
 
 enum UserGrantState {
