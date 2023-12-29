@@ -114,3 +114,14 @@ Projections:
   # turn off scheduler during operation
   RequeueEvery: 0s
   ConcurrentInstances: 7
+  BulkLimit: 1000
+
+Auth:
+  Spooler:
+    TransactionDuration: 0s #ZITADEL_AUTH_SPOOLER_TRANSACTIONDURATION
+    BulkLimit: 1000 #ZITADEL_AUTH_SPOOLER_BULKLIMIT
+
+Admin:
+  Spooler:
+    TransactionDuration: 0s #ZITADEL_AUTH_SPOOLER_TRANSACTIONDURATION
+    BulkLimit: 1000 #ZITADEL_AUTH_SPOOLER_BULKLIMIT
