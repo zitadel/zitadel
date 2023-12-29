@@ -169,7 +169,7 @@
               <i class="las la-trash"></i>
             </button>
 
-            <button menuActions mat-menu-item [routerLink]="['/users', grant.userId]">
+            <button menuActions mat-menu-item (click)="test(grant)">
               {{ 'ACTIONS.TABLE.SHOWUSER' | translate: { value: grant.displayName } }}
             </button>
           </cnsl-table-actions>

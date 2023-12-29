@@ -351,12 +351,17 @@ func prepareUserGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 
 			UserGrantProjectID.identifier(),
 			ProjectColumnName.identifier(),
+
+			GrantedOrgColumnId.identifier(),
+			GrantedOrgColumnName.identifier(),
+			GrantedOrgColumnDomain.identifier(),
 		).
 			From(userGrantTable.identifier()).
 			LeftJoin(join(UserIDCol, UserGrantUserID)).
 			LeftJoin(join(HumanUserIDCol, UserGrantUserID)).
 			LeftJoin(join(OrgColumnID, UserGrantResourceOwner)).
 			LeftJoin(join(ProjectColumnID, UserGrantProjectID)).
+			LeftJoin(join(GrantedOrgColumnId, UserResourceOwnerCol)).
 			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID) + db.Timetravel(call.Took(ctx))).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
@@ -379,6 +384,10 @@ func prepareUserGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 				orgDomain sql.NullString
 
 				projectName sql.NullString
+
+				grantedOrgID     sql.NullString
+				grantedOrgName   sql.NullString
+				grantedOrgDomain sql.NullString
 			)
 
 			err := row.Scan(
@@ -407,6 +416,10 @@ func prepareUserGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 
 				&g.ProjectID,
 				&projectName,
+
+				&grantedOrgID,
+				&grantedOrgName,
+				&grantedOrgDomain,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
@@ -427,7 +440,9 @@ func prepareUserGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			g.OrgName = orgName.String
 			g.OrgPrimaryDomain = orgDomain.String
 			g.ProjectName = projectName.String
-
+			g.GrantedOrgID = grantedOrgID.String
+			g.GrantedOrgName = grantedOrgName.String
+			g.GrantedOrgDomain = grantedOrgDomain.String
 			return g, nil
 		}
 }
