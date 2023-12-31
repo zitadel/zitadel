@@ -1,7 +1,7 @@
 module.exports = {
   branches: [
-    { name: "next" },
-    { name: "next-rc", prerelease: "rc" },
+    // { name: "next" },
+    // { name: "next-rc", prerelease: "rc" },
     { name: "v2.42.x", range: "2.42.x", channel: "2.42.x" },
   ],
   plugins: [
