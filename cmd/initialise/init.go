@@ -38,7 +38,7 @@ func New() *cobra.Command {
 		Long: `Sets up the minimum requirements to start ZITADEL.
 
 Prerequisites:
-- cockroachdb
+- cockroachDB
 
 The user provided by flags needs privileges to
 - create the database if it does not exist
