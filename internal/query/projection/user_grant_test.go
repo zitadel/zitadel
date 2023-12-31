@@ -345,7 +345,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 						usergrant.UserGrantReactivatedType,
 						usergrant.AggregateType,
 						nil,
-					), usergrant.UserGrantDeactivatedEventMapper),
+					), usergrant.UserGrantReactivatedEventMapper),
 			},
 			reduce: (&userGrantProjection{}).reduceReactivated,
 			want: wantReduce{
