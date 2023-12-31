@@ -51,4 +51,4 @@ jobs:
     -
       name: print output
       run: |
-        echo $GITHUB_OUTPUT
+        cat $GITHUB_OUTPUT
