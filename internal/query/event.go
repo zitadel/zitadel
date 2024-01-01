@@ -44,11 +44,11 @@ func (q *Queries) SearchEvents(ctx context.Context, query *eventstore.SearchQuer
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	auditLogRetention := q.defaultAuditLogRetention
-	instanceLimits, err := q.Limits(ctx, authz.GetInstance(ctx).InstanceID())
+	ctx, instanceLimits := q.limitsLoader.Load(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil && !zerrors.IsNotFound(err) {
 		return nil, err
 	}
-	if instanceLimits != nil && instanceLimits.AuditLogRetention != nil {
+	if instanceLimits.AuditLogRetention != nil {
 		auditLogRetention = *instanceLimits.AuditLogRetention
 	}
 	if auditLogRetention != 0 {

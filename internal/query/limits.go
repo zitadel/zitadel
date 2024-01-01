@@ -4,12 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/api/limits"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -49,19 +49,13 @@ var (
 		name:  projection.LimitsColumnAuditLogRetention,
 		table: limitSettingsTable,
 	}
+	LimitsColumnBlock = Column{
+		name:  projection.LimitsColumnBlock,
+		table: limitSettingsTable,
+	}
 )
 
-type Limits struct {
-	AggregateID   string
-	CreationDate  time.Time
-	ChangeDate    time.Time
-	ResourceOwner string
-	Sequence      uint64
-
-	AuditLogRetention *time.Duration
-}
-
-func (q *Queries) Limits(ctx context.Context, resourceOwner string) (limits *Limits, err error) {
+func (q *Queries) Limits(ctx context.Context, resourceOwner string) (limits *limits.Limits, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -81,7 +75,7 @@ func (q *Queries) Limits(ctx context.Context, resourceOwner string) (limits *Lim
 	return limits, err
 }
 
-func prepareLimitsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*Limits, error)) {
+func prepareLimitsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*limits.Limits, error)) {
 	return sq.Select(
 			LimitsColumnAggregateID.identifier(),
 			LimitsColumnCreationDate.identifier(),
@@ -89,13 +83,15 @@ func prepareLimitsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 			LimitsColumnResourceOwner.identifier(),
 			LimitsColumnSequence.identifier(),
 			LimitsColumnAuditLogRetention.identifier(),
+			LimitsColumnBlock.identifier(),
 		).
 			From(limitSettingsTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Limits, error) {
+		func(row *sql.Row) (*limits.Limits, error) {
 			var (
-				limits            = new(Limits)
+				limits            = new(limits.Limits)
 				auditLogRetention database.NullDuration
+				block             sql.NullBool
 			)
 			err := row.Scan(
 				&limits.AggregateID,
@@ -104,6 +100,7 @@ func prepareLimitsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 				&limits.ResourceOwner,
 				&limits.Sequence,
 				&auditLogRetention,
+				&block,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
@@ -113,6 +110,9 @@ func prepareLimitsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 			}
 			if auditLogRetention.Valid {
 				limits.AuditLogRetention = &auditLogRetention.Duration
+			}
+			if block.Valid {
+				limits.Block = &block.Bool
 			}
 			return limits, nil
 		}

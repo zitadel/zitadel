@@ -116,7 +116,8 @@ func Start(config Config, externalSecure bool, issuer op.IssuerFromRequest, call
 			http.Error(w, fmt.Sprintf("unable to template instance management url for console: %v", err), http.StatusInternalServerError)
 			return
 		}
-		exhausted := limitingAccessInterceptor.Limit(ctx)
+		ctx, exhausted := limitingAccessInterceptor.Limit(ctx)
+		r = r.WithContext(ctx)
 		environmentJSON, err := createEnvironmentJSON(url, issuer(r), instance.ConsoleClientID(), customerPortal, instanceMgmtURL, exhausted)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("unable to marshal env for console: %v", err), http.StatusInternalServerError)

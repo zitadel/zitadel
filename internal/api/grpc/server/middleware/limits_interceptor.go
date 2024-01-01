@@ -7,22 +7,20 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/limits"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func QuotaExhaustedInterceptor(svc *logstore.Service[*record.AccessLog], ignoreService ...string) grpc.UnaryServerInterceptor {
+func LimitsInterceptor(logstoreSvc *logstore.Service[*record.AccessLog], limitsLoader *limits.Loader, ignoreService ...string) grpc.UnaryServerInterceptor {
 	for idx, service := range ignoreService {
 		if !strings.HasPrefix(service, "/") {
 			ignoreService[idx] = "/" + service
 		}
 	}
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (_ interface{}, err error) {
-		if !svc.Enabled() {
-			return handler(ctx, req)
-		}
 		interceptorCtx, span := tracing.NewServerInterceptorSpan(ctx)
 		defer func() { span.EndWithError(err) }()
 
@@ -39,9 +37,17 @@ func QuotaExhaustedInterceptor(svc *logstore.Service[*record.AccessLog], ignoreS
 				return handler(ctx, req)
 			}
 		}
-
+		// If there is a hard limit on the instance, we block immediately.
 		instance := authz.GetInstance(ctx)
-		remaining := svc.Limit(interceptorCtx, instance.InstanceID())
+		ctx, l := limitsLoader.Load(ctx, instance.InstanceID())
+		if l.Block != nil && *l.Block {
+			return nil, zerrors.ThrowResourceExhausted(nil, "LIMITS-molsj", "Limits.Instance.Blocked")
+		}
+		// If there is no hard limit, we check for a quota
+		if !logstoreSvc.Enabled() {
+			return handler(ctx, req)
+		}
+		remaining := logstoreSvc.Limit(interceptorCtx, instance.InstanceID())
 		if remaining != nil && *remaining == 0 {
 			return nil, zerrors.ThrowResourceExhausted(nil, "QUOTA-vjAy8", "Quota.Access.Exhausted")
 		}

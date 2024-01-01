@@ -12,5 +12,8 @@ func instanceLimitsPbToCommand(req *system.SetLimitsRequest) *command.SetLimits 
 	if req.AuditLogRetention != nil {
 		setLimits.AuditLogRetention = gu.Ptr(req.AuditLogRetention.AsDuration())
 	}
+	if block := req.GetBlock(); block != nil {
+		setLimits.Block = gu.Ptr(block.GetValue())
+	}
 	return setLimits
 }

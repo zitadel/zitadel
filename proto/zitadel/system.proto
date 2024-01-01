@@ -13,6 +13,7 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
+import "google/protobuf/wrappers.proto";
 
 package zitadel.system.v1;
 
@@ -769,7 +770,13 @@ message SetLimitsRequest {
       description: "auditLogRetention limits the number of events that can be queried via the events API by their age. A value of '0s' means that all events are available. If this value is set, it overwrites the system default.";
     }
   ];
+  google.protobuf.BoolValue block = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "if block is true, requests are responded with a resource exhausted error code.";
+    }
+  ];
 }
+
 
 message SetLimitsResponse {
   zitadel.v1.ObjectDetails details = 1;

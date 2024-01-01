@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/api/limits"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
@@ -51,6 +52,7 @@ func New(
 	authZ internal_authz.Config,
 	tlsConfig *tls.Config, http2HostName, http1HostName string,
 	accessInterceptor *http_mw.AccessInterceptor,
+	limitsLoader *limits.Loader,
 ) (_ *API, err error) {
 	api := &API{
 		port:              port,
@@ -62,7 +64,7 @@ func New(
 		accessInterceptor: accessInterceptor,
 	}
 
-	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig, accessInterceptor.AccessService())
+	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig, accessInterceptor.AccessService(), limitsLoader)
 	api.grpcGateway, err = server.CreateGateway(ctx, port, http1HostName, accessInterceptor, tlsConfig)
 	if err != nil {
 		return nil, err

@@ -13,16 +13,18 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/limits"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type AccessInterceptor struct {
-	svc           *logstore.Service[*record.AccessLog]
+	logstoreSvc   *logstore.Service[*record.AccessLog]
 	cookieHandler *http_utils.CookieHandler
 	limitConfig   *AccessConfig
 	storeOnly     bool
+	limitsLoader  *limits.Loader
 }
 
 type AccessConfig struct {
@@ -33,17 +35,18 @@ type AccessConfig struct {
 // NewAccessInterceptor intercepts all requests and stores them to the logstore.
 // If storeOnly is false, it also checks if requests are exhausted.
 // If requests are exhausted, it also returns http.StatusTooManyRequests and sets a cookie
-func NewAccessInterceptor(svc *logstore.Service[*record.AccessLog], cookieHandler *http_utils.CookieHandler, cookieConfig *AccessConfig) *AccessInterceptor {
+func NewAccessInterceptor(svc *logstore.Service[*record.AccessLog], limitsLoader *limits.Loader, cookieHandler *http_utils.CookieHandler, cookieConfig *AccessConfig) *AccessInterceptor {
 	return &AccessInterceptor{
-		svc:           svc,
+		logstoreSvc:   svc,
 		cookieHandler: cookieHandler,
 		limitConfig:   cookieConfig,
+		limitsLoader:  limitsLoader,
 	}
 }
 
 func (a *AccessInterceptor) WithoutLimiting() *AccessInterceptor {
 	return &AccessInterceptor{
-		svc:           a.svc,
+		logstoreSvc:   a.logstoreSvc,
 		cookieHandler: a.cookieHandler,
 		limitConfig:   a.limitConfig,
 		storeOnly:     true,
@@ -51,16 +54,23 @@ func (a *AccessInterceptor) WithoutLimiting() *AccessInterceptor {
 }
 
 func (a *AccessInterceptor) AccessService() *logstore.Service[*record.AccessLog] {
-	return a.svc
+	return a.logstoreSvc
 }
 
-func (a *AccessInterceptor) Limit(ctx context.Context) bool {
-	if !a.svc.Enabled() || a.storeOnly {
-		return false
+func (a *AccessInterceptor) Limit(ctx context.Context) (context.Context, bool) {
+	if a.storeOnly {
+		return ctx, false
 	}
-	instance := authz.GetInstance(ctx)
-	remaining := a.svc.Limit(ctx, instance.InstanceID())
-	return remaining != nil && *remaining <= 0
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	ctx, l := a.limitsLoader.Load(ctx, instanceID)
+	if l.Block != nil && *l.Block {
+		return ctx, true
+	}
+	if !a.logstoreSvc.Enabled() {
+		return ctx, false
+	}
+	remaining := a.logstoreSvc.Limit(ctx, instanceID)
+	return ctx, remaining != nil && *remaining <= 0
 }
 
 func (a *AccessInterceptor) SetExhaustedCookie(writer http.ResponseWriter, request *http.Request) {
@@ -91,7 +101,7 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 
 func (a *AccessInterceptor) handle(ignoredPathPrefixes ...string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
-		if !a.svc.Enabled() {
+		if !a.logstoreSvc.Enabled() {
 			return next
 		}
 		return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
@@ -107,7 +117,8 @@ func (a *AccessInterceptor) handle(ignoredPathPrefixes ...string) func(http.Hand
 				a.writeLog(tracingCtx, wrappedWriter, writer, request, true)
 				return
 			}
-			limited := a.Limit(tracingCtx)
+			ctx, limited := a.Limit(tracingCtx)
+			request = request.WithContext(ctx)
 			checkSpan.End()
 			if limited {
 				a.SetExhaustedCookie(wrappedWriter, request)
@@ -125,6 +136,9 @@ func (a *AccessInterceptor) handle(ignoredPathPrefixes ...string) func(http.Hand
 }
 
 func (a *AccessInterceptor) writeLog(ctx context.Context, wrappedWriter *statusRecorder, writer http.ResponseWriter, request *http.Request, notCountable bool) {
+	if !a.logstoreSvc.Enabled() {
+		return
+	}
 	ctx, writeSpan := tracing.NewNamedSpan(ctx, "writeAccess")
 	defer writeSpan.End()
 	requestURL := request.RequestURI
@@ -133,7 +147,7 @@ func (a *AccessInterceptor) writeLog(ctx context.Context, wrappedWriter *statusR
 		logging.WithError(err).WithField("url", requestURL).Warning("failed to unescape request url")
 	}
 	instance := authz.GetInstance(ctx)
-	a.svc.Handle(ctx, &record.AccessLog{
+	a.logstoreSvc.Handle(ctx, &record.AccessLog{
 		LogDate:         time.Now(),
 		Protocol:        record.HTTP,
 		RequestURL:      unescapedURL,

@@ -11,6 +11,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	limits_loader "github.com/zitadel/zitadel/internal/api/limits"
 	sd "github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
@@ -53,6 +54,7 @@ type Queries struct {
 	zitadelRoles                        []authz.RoleMapping
 	multifactors                        domain.MultifactorConfigs
 	defaultAuditLogRetention            time.Duration
+	limitsLoader                        *limits_loader.Loader
 }
 
 func StartQueries(
