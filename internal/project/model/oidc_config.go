@@ -1,17 +1,11 @@
 package model
 
 import (
-	"fmt"
-	"strings"
 	"time"
-
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/id"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type OIDCConfig struct {
@@ -97,49 +91,6 @@ type Token struct {
 	Scopes     []string
 }
 
-func (c *OIDCConfig) IsValid() bool {
-	grantTypes := c.getRequiredGrantTypes()
-	for _, grantType := range grantTypes {
-		ok := containsOIDCGrantType(c.GrantTypes, grantType)
-		if !ok {
-			return false
-		}
-	}
-	return true
-}
-
-// ClientID random_number@projectname (eg. 495894098234@zitadel)
-func (c *OIDCConfig) GenerateNewClientID(idGenerator id.Generator, project *Project) error {
-	rndID, err := idGenerator.Next()
-	if err != nil {
-		return err
-	}
-
-	c.ClientID = fmt.Sprintf("%v@%v", rndID, strings.ReplaceAll(strings.ToLower(project.Name), " ", "_"))
-	return nil
-}
-
-func (c *OIDCConfig) GenerateClientSecretIfNeeded(generator crypto.Generator) (string, error) {
-	if c.AuthMethodType == OIDCAuthMethodTypeBasic || c.AuthMethodType == OIDCAuthMethodTypePost {
-		return c.GenerateNewClientSecret(generator)
-	}
-	return "", nil
-}
-
-func (c *OIDCConfig) GenerateNewClientSecret(generator crypto.Generator) (string, error) {
-	cryptoValue, stringSecret, err := crypto.NewCode(generator)
-	if err != nil {
-		logging.Log("MODEL-UpnTI").OnError(err).Error("unable to create client secret")
-		return "", zerrors.ThrowInternal(err, "MODEL-gH2Wl", "Errors.Project.CouldNotGenerateClientSecret")
-	}
-	c.ClientSecret = cryptoValue
-	return stringSecret, nil
-}
-
-func (c *OIDCConfig) FillCompliance() {
-	c.Compliance = GetOIDCCompliance(c.OIDCVersion, c.ApplicationType, c.GrantTypes, c.ResponseTypes, c.AuthMethodType, c.RedirectUris)
-}
-
 func GetOIDCCompliance(version OIDCVersion, appType OIDCApplicationType, grantTypes []OIDCGrantType, responseTypes []OIDCResponseType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
 	switch version {
 	case OIDCVersionV1:
@@ -154,30 +105,4 @@ func GetOIDCCompliance(version OIDCVersion, appType OIDCApplicationType, grantTy
 		}
 	}
 	return nil
-}
-
-func (c *OIDCConfig) getRequiredGrantTypes() []OIDCGrantType {
-	grantTypes := make([]OIDCGrantType, 0)
-	implicit := false
-	for _, r := range c.ResponseTypes {
-		switch r {
-		case OIDCResponseTypeCode:
-			grantTypes = append(grantTypes, OIDCGrantTypeAuthorizationCode)
-		case OIDCResponseTypeIDToken, OIDCResponseTypeIDTokenToken:
-			if !implicit {
-				implicit = true
-				grantTypes = append(grantTypes, OIDCGrantTypeImplicit)
-			}
-		}
-	}
-	return grantTypes
-}
-
-func containsOIDCGrantType(grantTypes []OIDCGrantType, grantType OIDCGrantType) bool {
-	for _, gt := range grantTypes {
-		if gt == grantType {
-			return true
-		}
-	}
-	return false
 }
