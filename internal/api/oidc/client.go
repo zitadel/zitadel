@@ -232,11 +232,7 @@ func (o *OPStorage) ClientCredentialsTokenRequest(ctx context.Context, clientID 
 }
 
 func (o *OPStorage) ClientCredentials(ctx context.Context, clientID, clientSecret string) (op.Client, error) {
-	loginname, err := query.NewUserLoginNamesSearchQuery(clientID)
-	if err != nil {
-		return nil, err
-	}
-	user, err := o.query.GetUser(ctx, false, loginname)
+	user, err := o.query.GetUserByLoginName(ctx, false, clientID)
 	if err != nil {
 		return nil, err
 	}
