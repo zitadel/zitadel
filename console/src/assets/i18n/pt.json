@@ -268,8 +268,8 @@
       "DESCRIPTION": "Clique no botão abaixo para fazer login novamente."
     },
     "EXHAUSTED": {
-      "TITLE": "Sua cota para solicitações autenticadas está esgotada.",
-      "DESCRIPTION": "Remova ou aumente o limite de cota para esta instância ZITADEL."
+      "TITLE": "Sua instância está bloqueada.",
+      "DESCRIPTION": "Peça ao administrador da sua instância ZITADEL para atualizar a assinatura."
     },
     "INVALID_FORMAT": "O formato é inválido.",
     "NOTANEMAIL": "O valor fornecido não é um endereço de e-mail.",

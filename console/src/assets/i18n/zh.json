@@ -267,8 +267,8 @@
       "DESCRIPTION": "点击下方按钮再次登录。"
     },
     "EXHAUSTED": {
-      "TITLE": "你的认证请求配额已用完.",
-      "DESCRIPTION": "删除或增加这个ZITADEL实例的限制。"
+      "TITLE": "您的实例已被阻止。",
+      "DESCRIPTION": "请联系您的 ZITADEL 实例管理员以更新订阅。"
     },
     "INVALID_FORMAT": "格式是无效的。",
     "NOTANEMAIL": "给定的值不是合法电子邮件地址。",

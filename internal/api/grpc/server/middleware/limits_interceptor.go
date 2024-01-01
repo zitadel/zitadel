@@ -41,7 +41,7 @@ func LimitsInterceptor(logstoreSvc *logstore.Service[*record.AccessLog], limitsL
 		instance := authz.GetInstance(ctx)
 		ctx, l := limitsLoader.Load(ctx, instance.InstanceID())
 		if l.Block != nil && *l.Block {
-			return nil, zerrors.ThrowResourceExhausted(nil, "LIMITS-molsj", "Limits.Instance.Blocked")
+			return nil, zerrors.ThrowResourceExhausted(nil, "LIMITS-molsj", "Errors.Limits.Instance.Blocked")
 		}
 		// If there is no hard limit, we check for a quota
 		if !logstoreSvc.Enabled() {

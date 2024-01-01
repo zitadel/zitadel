@@ -268,8 +268,8 @@
       "DESCRIPTION": "Haz clic en el botón más abajo para iniciar sesión otra vez."
     },
     "EXHAUSTED": {
-      "TITLE": "Su cuota de solicitudes autenticadas se ha agotado.",
-      "DESCRIPTION": "Borrar o aumentar el límite de esta instancia de ZITADEL."
+      "TITLE": "Tu instancia está bloqueada.",
+      "DESCRIPTION": "Pide a tu administrador de instancia de ZITADEL que actualice la suscripción."
     },
     "INVALID_FORMAT": "El formato no es valido.",
     "NOTANEMAIL": "El valor proporcionado no es una dirección de email.",

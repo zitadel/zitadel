@@ -268,8 +268,8 @@
       "DESCRIPTION": "Klik op de knop hieronder om opnieuw in te loggen."
     },
     "EXHAUSTED": {
-      "TITLE": "Uw quotum voor geauthenticeerde aanvragen is opgebruikt.",
-      "DESCRIPTION": "Verwijder of verhoog het quotumlimiet voor deze ZITADEL-instantie."
+      "TITLE": "Uw instantie is geblokkeerd.",
+      "DESCRIPTION": "Vraag uw ZITADEL instantiebeheerder om het abonnement bij te werken."
     },
     "INVALID_FORMAT": "De opmaak is ongeldig.",
     "NOTANEMAIL": "De opgegeven waarde is geen e-mailadres.",

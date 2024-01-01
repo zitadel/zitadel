@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Лимиты не найдены
     NoneSpecified: Не указаны лимиты
+    Instance:
+      Blocked: Экземпляр заблокирован
   Restrictions:
     NoneSpecified: Не указаны ограничения
     DefaultLanguageMustBeAllowed: Язык по умолчанию должен быть разрешен
