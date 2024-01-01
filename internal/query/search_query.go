@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
@@ -276,6 +277,19 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery,
 	if col.isZero() {
 		return nil, ErrMissingColumn
 	}
+	// escape the like wildcards
+	//nolint:exhaustive
+	switch compare {
+	case TextEqualsIgnoreCase,
+		TextStartsWith,
+		TextStartsWithIgnoreCase,
+		TextEndsWith,
+		TextEndsWithIgnoreCase,
+		TextContains,
+		TextContainsIgnoreCase:
+		value = database.EscapeLikeWildcards(value)
+	}
+
 	return &TextQuery{
 		Column:  col,
 		Text:    value,
@@ -345,32 +359,6 @@ const (
 
 	textCompareMax
 )
-
-// Deprecated: Use TextComparison, will be removed as soon as all calls are changed to query
-func TextComparisonFromMethod(m domain.SearchMethod) TextComparison {
-	switch m {
-	case domain.SearchMethodEquals:
-		return TextEquals
-	case domain.SearchMethodEqualsIgnoreCase:
-		return TextEqualsIgnoreCase
-	case domain.SearchMethodStartsWith:
-		return TextStartsWith
-	case domain.SearchMethodStartsWithIgnoreCase:
-		return TextStartsWithIgnoreCase
-	case domain.SearchMethodContains:
-		return TextContains
-	case domain.SearchMethodContainsIgnoreCase:
-		return TextContainsIgnoreCase
-	case domain.SearchMethodEndsWith:
-		return TextEndsWith
-	case domain.SearchMethodEndsWithIgnoreCase:
-		return TextEndsWithIgnoreCase
-	case domain.SearchMethodListContains:
-		return TextListContains
-	default:
-		return textCompareMax
-	}
-}
 
 type NumberQuery struct {
 	Column  Column
