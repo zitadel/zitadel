@@ -66,12 +66,6 @@ func (p IDPProvider) IsValid() bool {
 	return p.IDPConfigID != ""
 }
 
-// DisplayName returns the name or a default
-// to be used when always a name must be displayed (e.g. login)
-func (p IDPProvider) DisplayName() string {
-	return IDPName(p.Name, p.IDPType)
-}
-
 type PasswordlessType int32
 
 const (
@@ -87,8 +81,4 @@ func (f PasswordlessType) Valid() bool {
 
 func (p *LoginPolicy) HasSecondFactors() bool {
 	return len(p.SecondFactors) > 0
-}
-
-func (p *LoginPolicy) HasMultiFactors() bool {
-	return len(p.MultiFactors) > 0
 }
