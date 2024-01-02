@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
-	errs "errors"
+	"errors"
 	"strings"
 	"time"
 
@@ -13,11 +13,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Users struct {
@@ -92,7 +93,7 @@ type Phone struct {
 type Machine struct {
 	Name            string               `json:"name,omitempty"`
 	Description     string               `json:"description,omitempty"`
-	HasSecret       bool                 `json:"has_secret,omitempty"`
+	Secret          *crypto.CryptoValue  `json:"secret,omitempty"`
 	AccessTokenType domain.OIDCTokenType `json:"access_token_type,omitempty"`
 }
 
@@ -271,8 +272,8 @@ var (
 		name:  projection.MachineDescriptionCol,
 		table: machineTable,
 	}
-	MachineHasSecretCol = Column{
-		name:  projection.MachineHasSecretCol,
+	MachineSecretCol = Column{
+		name:  projection.MachineSecretCol,
 		table: machineTable,
 	}
 	MachineAccessTokenTypeCol = Column{
@@ -391,7 +392,7 @@ func (q *Queries) GetUser(ctx context.Context, shouldTriggerBulk bool, queries .
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Dnhr2", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Dnhr2", "Errors.Query.SQLStatment")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -415,7 +416,7 @@ func (q *Queries) GetHumanProfile(ctx context.Context, userID string, queries ..
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatment")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -439,7 +440,7 @@ func (q *Queries) GetHumanEmail(ctx context.Context, userID string, queries ...S
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-BHhj3", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-BHhj3", "Errors.Query.SQLStatment")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -463,7 +464,7 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, queries ...S
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatment")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -549,7 +550,7 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, queri
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Err3g", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Err3g", "Errors.Query.SQLStatment")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -568,7 +569,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries) (
 	stmt, args, err := queries.toQuery(query).Where(eq).
 		ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatment")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -576,7 +577,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries) (
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-AG4gs", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-AG4gs", "Errors.Internal")
 	}
 
 	users.State, err = q.latestState(ctx, userTable)
@@ -616,7 +617,7 @@ func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwn
 	eq := sq.Eq{UserInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID()}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return false, errors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatment")
+		return false, zerrors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatment")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -790,7 +791,7 @@ func scanUser(row *sql.Row) (*User, error) {
 	machineID := sql.NullString{}
 	name := sql.NullString{}
 	description := sql.NullString{}
-	hasSecret := sql.NullBool{}
+	var secret *crypto.CryptoValue
 	accessTokenType := sql.NullInt32{}
 
 	err := row.Scan(
@@ -819,16 +820,16 @@ func scanUser(row *sql.Row) (*User, error) {
 		&machineID,
 		&name,
 		&description,
-		&hasSecret,
+		&secret,
 		&accessTokenType,
 		&count,
 	)
 
 	if err != nil || count != 1 {
-		if errs.Is(err, sql.ErrNoRows) || count != 1 {
-			return nil, errors.ThrowNotFound(err, "QUERY-Dfbg2", "Errors.User.NotFound")
+		if errors.Is(err, sql.ErrNoRows) || count != 1 {
+			return nil, zerrors.ThrowNotFound(err, "QUERY-Dfbg2", "Errors.User.NotFound")
 		}
-		return nil, errors.ThrowInternal(err, "QUERY-Bgah2", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Bgah2", "Errors.Internal")
 	}
 
 	u.PreferredLoginName = preferredLoginName.String
@@ -851,7 +852,7 @@ func scanUser(row *sql.Row) (*User, error) {
 		u.Machine = &Machine{
 			Name:            name.String,
 			Description:     description.String,
-			HasSecret:       hasSecret.Bool,
+			Secret:          secret,
 			AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
 		}
 	}
@@ -893,7 +894,7 @@ func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
-			MachineHasSecretCol.identifier(),
+			MachineSecretCol.identifier(),
 			MachineAccessTokenTypeCol.identifier(),
 			countColumn.identifier(),
 		).
@@ -909,6 +910,7 @@ func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 				userPreferredLoginNameInstanceIDCol.identifier()+" = "+UserInstanceIDCol.identifier()+db.Timetravel(call.Took(ctx)),
 				preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
+
 		scanUser
 }
 
@@ -957,13 +959,13 @@ func prepareProfileQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&avatarKey,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-HNhb3", "Errors.User.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-HNhb3", "Errors.User.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-Rfheq", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-Rfheq", "Errors.Internal")
 			}
 			if !humanID.Valid {
-				return nil, errors.ThrowPreconditionFailed(nil, "QUERY-WLTce", "Errors.User.NotHuman")
+				return nil, zerrors.ThrowPreconditionFailed(nil, "QUERY-WLTce", "Errors.User.NotHuman")
 			}
 
 			p.FirstName = firstName.String
@@ -1009,13 +1011,13 @@ func prepareEmailQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 				&isEmailVerified,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-Hms2s", "Errors.User.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-Hms2s", "Errors.User.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-Nu42d", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-Nu42d", "Errors.Internal")
 			}
 			if !humanID.Valid {
-				return nil, errors.ThrowPreconditionFailed(nil, "QUERY-pt7HY", "Errors.User.NotHuman")
+				return nil, zerrors.ThrowPreconditionFailed(nil, "QUERY-pt7HY", "Errors.User.NotHuman")
 			}
 
 			e.Email = domain.EmailAddress(email.String)
@@ -1056,13 +1058,13 @@ func preparePhoneQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 				&isPhoneVerified,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-DAvb3", "Errors.User.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-DAvb3", "Errors.User.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-Bmf2h", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-Bmf2h", "Errors.Internal")
 			}
 			if !humanID.Valid {
-				return nil, errors.ThrowPreconditionFailed(nil, "QUERY-hliQl", "Errors.User.NotHuman")
+				return nil, zerrors.ThrowPreconditionFailed(nil, "QUERY-hliQl", "Errors.User.NotHuman")
 			}
 
 			e.Phone = phone.String
@@ -1174,14 +1176,14 @@ func scanNotifyUser(row *sql.Row) (*NotifyUser, error) {
 	)
 
 	if err != nil || count != 1 {
-		if errs.Is(err, sql.ErrNoRows) || count != 1 {
-			return nil, errors.ThrowNotFound(err, "QUERY-Dgqd2", "Errors.User.NotFound")
+		if errors.Is(err, sql.ErrNoRows) || count != 1 {
+			return nil, zerrors.ThrowNotFound(err, "QUERY-Dgqd2", "Errors.User.NotFound")
 		}
-		return nil, errors.ThrowInternal(err, "QUERY-Dbwsg", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Dbwsg", "Errors.Internal")
 	}
 
 	if !notifyUserID.Valid {
-		return nil, errors.ThrowPreconditionFailed(nil, "QUERY-Sfw3f", "Errors.User.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "QUERY-Sfw3f", "Errors.User.NotFound")
 	}
 
 	u.LoginNames = loginNames
@@ -1234,10 +1236,10 @@ func prepareUserUniqueQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				&isEmailVerified,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
+				if errors.Is(err, sql.ErrNoRows) {
 					return true, nil
 				}
-				return false, errors.ThrowInternal(err, "QUERY-Cxces", "Errors.Internal")
+				return false, zerrors.ThrowInternal(err, "QUERY-Cxces", "Errors.Internal")
 			}
 			return !userID.Valid, nil
 		}
@@ -1278,7 +1280,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
-			MachineHasSecretCol.identifier(),
+			MachineSecretCol.identifier(),
 			MachineAccessTokenTypeCol.identifier(),
 			countColumn.identifier()).
 			From(userTable.identifier()).
@@ -1317,7 +1319,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 				machineID := sql.NullString{}
 				name := sql.NullString{}
 				description := sql.NullString{}
-				hasSecret := sql.NullBool{}
+				secret := new(crypto.CryptoValue)
 				accessTokenType := sql.NullInt32{}
 
 				err := rows.Scan(
@@ -1346,7 +1348,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 					&machineID,
 					&name,
 					&description,
-					&hasSecret,
+					secret,
 					&accessTokenType,
 					&count,
 				)
@@ -1377,7 +1379,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 					u.Machine = &Machine{
 						Name:            name.String,
 						Description:     description.String,
-						HasSecret:       hasSecret.Bool,
+						Secret:          secret,
 						AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
 					}
 				}
@@ -1386,7 +1388,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-frhbd", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-frhbd", "Errors.Query.CloseRows")
 			}
 
 			return &Users{

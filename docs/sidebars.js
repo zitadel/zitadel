@@ -15,6 +15,7 @@ module.exports = {
             "examples/login/react",
             "examples/login/flutter",
             "examples/login/nextjs",
+            "examples/login/go",
           ],
           collapsed: true,
         },

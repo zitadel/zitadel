@@ -33,8 +33,13 @@ Errors:
     NoneSpecified: No se especificaron límites
   Restrictions:
     NoneSpecified: No se especificaron restricciones
+    DefaultLanguageMustBeAllowed: El idioma por defecto debe estar permitido
   Language:
     NotParsed: No pude analizar el idioma
+    NotSupported: El idioma no está soportado
+    NotAllowed: El idioma no está permitido
+    Undefined: El idioma no está definido
+    Duplicate: Idiomas duplicados
   OIDCSettings:
     NotFound: Configuración OIDC no encontrada
     AlreadyExists: La configuración OIDC ya existe
@@ -139,7 +144,7 @@ Errors:
     ExternalIDP:
       Invalid: IDP externo no válido
       IDPConfigNotExisting: Proveedor IDP no válido para esta organización
-      NotAllowed: IDP externo no permitido para esta organización
+      NotAllowed: IDP externo no permitido
       MinimumExternalIDPNeeded: Al menos de añadirse un IDP
       AlreadyExists: IDP externo ya cogido
       NotFound: IDP no encontrado

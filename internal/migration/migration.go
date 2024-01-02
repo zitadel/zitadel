@@ -2,13 +2,13 @@ package migration
 
 import (
 	"context"
-	errs "errors"
+	"errors"
 	"time"
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -21,7 +21,7 @@ const (
 )
 
 var (
-	errMigrationAlreadyStarted = errs.New("already started")
+	errMigrationAlreadyStarted = errors.New("already started")
 )
 
 type Migration interface {
@@ -90,7 +90,7 @@ func LatestStep(ctx context.Context, es *eventstore.Eventstore) (*SetupStep, err
 	}
 	step, ok := events[0].(*SetupStep)
 	if !ok {
-		return nil, errors.ThrowInternal(nil, "MIGRA-hppLM", "setup step is malformed")
+		return nil, zerrors.ThrowInternal(nil, "MIGRA-hppLM", "setup step is malformed")
 	}
 	return step, nil
 }
@@ -111,7 +111,7 @@ func (m *cancelMigration) String() string {
 	return m.name
 }
 
-var errCancelStep = errors.ThrowError(nil, "MIGRA-zo86K", "migration canceled manually")
+var errCancelStep = zerrors.ThrowError(nil, "MIGRA-zo86K", "migration canceled manually")
 
 func CancelStep(ctx context.Context, es *eventstore.Eventstore, step *SetupStep) error {
 	_, err := es.Push(ctx, setupDoneCmd(ctx, &cancelMigration{name: step.Name}, errCancelStep))
@@ -125,11 +125,11 @@ func checkExec(ctx context.Context, es *eventstore.Eventstore, migration Migrati
 	for {
 		select {
 		case <-ctx.Done():
-			return false, errors.ThrowInternal(nil, "MIGR-as3f7", "Errors.Internal")
+			return false, zerrors.ThrowInternal(nil, "MIGR-as3f7", "Errors.Internal")
 		case <-timer.C:
 			should, err := shouldExec(ctx, es, migration)
 			if err != nil {
-				if !errs.Is(err, errMigrationAlreadyStarted) {
+				if !errors.Is(err, errMigrationAlreadyStarted) {
 					return false, err
 				}
 				logging.WithFields("migration step", migration.String()).
@@ -159,7 +159,7 @@ func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migrat
 	for _, event := range events {
 		e, ok := event.(*SetupStep)
 		if !ok {
-			return false, errors.ThrowInternal(nil, "MIGRA-IJY3D", "Errors.Internal")
+			return false, zerrors.ThrowInternal(nil, "MIGRA-IJY3D", "Errors.Internal")
 		}
 
 		if e.Name != migration.String() {

@@ -4,13 +4,13 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -113,7 +113,7 @@ func (p *projectProjection) Reducers() []handler.AggregateReducer {
 func (p *projectProjection) reduceProjectAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-l000S", "reduce.wrong.event.type %s", project.ProjectAddedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-l000S", "reduce.wrong.event.type %s", project.ProjectAddedType)
 	}
 	return handler.NewCreateStatement(
 		e,
@@ -137,7 +137,7 @@ func (p *projectProjection) reduceProjectAdded(event eventstore.Event) (*handler
 func (p *projectProjection) reduceProjectChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectChangeEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-s00Fs", "reduce.wrong.event.type %s", project.ProjectChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-s00Fs", "reduce.wrong.event.type %s", project.ProjectChangedType)
 	}
 	if e.Name == nil && e.HasProjectCheck == nil && e.ProjectRoleAssertion == nil && e.ProjectRoleCheck == nil && e.PrivateLabelingSetting == nil {
 		return handler.NewNoOpStatement(e), nil
@@ -174,7 +174,7 @@ func (p *projectProjection) reduceProjectChanged(event eventstore.Event) (*handl
 func (p *projectProjection) reduceProjectDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectDeactivatedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-LLp0f", "reduce.wrong.event.type %s", project.ProjectDeactivatedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-LLp0f", "reduce.wrong.event.type %s", project.ProjectDeactivatedType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -193,7 +193,7 @@ func (p *projectProjection) reduceProjectDeactivated(event eventstore.Event) (*h
 func (p *projectProjection) reduceProjectReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectReactivatedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-9J98f", "reduce.wrong.event.type %s", project.ProjectReactivatedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9J98f", "reduce.wrong.event.type %s", project.ProjectReactivatedType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -212,7 +212,7 @@ func (p *projectProjection) reduceProjectReactivated(event eventstore.Event) (*h
 func (p *projectProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-5N9fs", "reduce.wrong.event.type %s", project.ProjectRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-5N9fs", "reduce.wrong.event.type %s", project.ProjectRemovedType)
 	}
 	return handler.NewDeleteStatement(
 		e,
@@ -226,7 +226,7 @@ func (p *projectProjection) reduceProjectRemoved(event eventstore.Event) (*handl
 func (p *projectProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-sbgru", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-sbgru", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
 	return handler.NewDeleteStatement(

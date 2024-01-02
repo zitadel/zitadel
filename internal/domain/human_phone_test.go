@@ -3,7 +3,7 @@ package domain
 import (
 	"testing"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestFormatPhoneNumber(t *testing.T) {
@@ -23,7 +23,7 @@ func TestFormatPhoneNumber(t *testing.T) {
 					PhoneNumber: "PhoneNumber",
 				},
 			},
-			errFunc: caos_errs.IsErrorInvalidArgument,
+			errFunc: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "format phone 071...",

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type humanWebAuthNTokens struct {
@@ -51,7 +51,7 @@ func (c *Commands) CreateWebAuthNChallenge(userVerification domain.UserVerificat
 			return err
 		}
 		if err = json.Unmarshal(webAuthNLogin.CredentialAssertionData, dst); err != nil {
-			return caos_errs.ThrowInternal(err, "COMMAND-Yah6A", "Errors.Internal")
+			return zerrors.ThrowInternal(err, "COMMAND-Yah6A", "Errors.Internal")
 		}
 
 		cmd.WebAuthNChallenged(ctx, webAuthNLogin.Challenge, webAuthNLogin.AllowedCredentialIDs, webAuthNLogin.UserVerification, rpid)
@@ -63,11 +63,11 @@ func (c *Commands) CheckWebAuthN(credentialAssertionData json.Marshaler) Session
 	return func(ctx context.Context, cmd *SessionCommands) error {
 		credentialAssertionData, err := json.Marshal(credentialAssertionData)
 		if err != nil {
-			return caos_errs.ThrowInternal(err, "COMMAND-ohG2o", "Errors.Internal")
+			return zerrors.ThrowInternal(err, "COMMAND-ohG2o", "Errors.Internal")
 		}
 		challenge := cmd.sessionWriteModel.WebAuthNChallenge
 		if challenge == nil {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Ioqu5", "Errors.Session.WebAuthN.NoChallenge")
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Ioqu5", "Errors.Session.WebAuthN.NoChallenge")
 		}
 		webAuthNTokens, err := cmd.getHumanWebAuthNTokens(ctx, challenge.UserVerification)
 		if err != nil {
@@ -81,7 +81,7 @@ func (c *Commands) CheckWebAuthN(credentialAssertionData json.Marshaler) Session
 		}
 		_, token := domain.GetTokenByKeyID(webAuthNTokens.tokens, credential.ID)
 		if token == nil {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Aej7i", "Errors.User.WebAuthN.NotFound")
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Aej7i", "Errors.User.WebAuthN.NotFound")
 		}
 		cmd.WebAuthNChecked(ctx, cmd.now(), token.WebAuthNTokenID, credential.Authenticator.SignCount, credential.Flags.UserVerified)
 		return nil

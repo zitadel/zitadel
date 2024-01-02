@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -81,7 +81,7 @@ func HumanRefreshTokenAddedEventMapper(event eventstore.Event) (eventstore.Event
 	}
 	err := event.Unmarshal(refreshTokenAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-DGr14", "unable to unmarshal refresh token added")
+		return nil, zerrors.ThrowInternal(err, "USER-DGr14", "unable to unmarshal refresh token added")
 	}
 
 	return refreshTokenAdded, nil
@@ -132,7 +132,7 @@ func HumanRefreshTokenRenewedEventEventMapper(event eventstore.Event) (eventstor
 	}
 	err := event.Unmarshal(tokenAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-GBt21", "unable to unmarshal refresh token renewed")
+		return nil, zerrors.ThrowInternal(err, "USER-GBt21", "unable to unmarshal refresh token renewed")
 	}
 
 	return tokenAdded, nil
@@ -177,7 +177,7 @@ func HumanRefreshTokenRemovedEventEventMapper(event eventstore.Event) (eventstor
 	}
 	err := event.Unmarshal(tokenAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-Dggs2", "unable to unmarshal refresh token removed")
+		return nil, zerrors.ThrowInternal(err, "USER-Dggs2", "unable to unmarshal refresh token removed")
 	}
 
 	return tokenAdded, nil

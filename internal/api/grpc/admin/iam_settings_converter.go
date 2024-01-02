@@ -7,9 +7,9 @@ import (
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	settings_pb "github.com/zitadel/zitadel/pkg/grpc/settings"
 )
@@ -47,7 +47,7 @@ func SecretGeneratorQueryToModel(apiQuery *settings_pb.SecretGeneratorQuery) (qu
 		domainType := SecretGeneratorTypeToDomain(q.TypeQuery.GeneratorType)
 		return query.NewSecretGeneratorTypeSearchQuery(int32(domainType))
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ORG-fm9es", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-fm9es", "List.Query.Invalid")
 	}
 }
 

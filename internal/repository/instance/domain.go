@@ -3,8 +3,8 @@ package instance
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -61,7 +61,7 @@ func DomainAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(domainAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "INSTANCE-3noij", "unable to unmarshal instance domain added")
+		return nil, zerrors.ThrowInternal(err, "INSTANCE-3noij", "unable to unmarshal instance domain added")
 	}
 
 	return domainAdded, nil
@@ -98,7 +98,7 @@ func DomainPrimarySetEventMapper(event eventstore.Event) (eventstore.Event, erro
 	}
 	err := event.Unmarshal(domainAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "INSTANCE-29jöF", "unable to unmarshal instance domain added")
+		return nil, zerrors.ThrowInternal(err, "INSTANCE-29jöF", "unable to unmarshal instance domain added")
 	}
 
 	return domainAdded, nil
@@ -135,7 +135,7 @@ func DomainRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 	}
 	err := event.Unmarshal(domainRemoved)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "INSTANCE-BngB2", "unable to unmarshal instance domain removed")
+		return nil, zerrors.ThrowInternal(err, "INSTANCE-BngB2", "unable to unmarshal instance domain removed")
 	}
 
 	return domainRemoved, nil

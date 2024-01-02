@@ -24,8 +24,6 @@ WITH login_names AS (
         (p.is_default IS TRUE AND p.instance_id = $2)
         OR (p.instance_id = $2 AND p.resource_owner = u.resource_owner)
       )
-      AND 
-        u.id = $1
     ORDER BY is_default
     LIMIT 1
   ) p ON TRUE
@@ -34,6 +32,9 @@ WITH login_names AS (
     ON 
       u.instance_id = d.instance_id
       AND u.resource_owner = d.resource_owner
+  WHERE
+    u.instance_id = $2
+    AND u.id = $1
 )
 SELECT 
   u.id
@@ -61,14 +62,14 @@ SELECT
   , n.verified_phone
   , n.password_set
   , count(*) OVER ()
-FROM projections.users9 u
+FROM projections.users10 u
 LEFT JOIN
-  projections.users9_humans h
+  projections.users10_humans h
   ON
     u.id = h.user_id
     AND u.instance_id = h.instance_id
 LEFT JOIN
-  projections.users9_notifications n
+  projections.users10_notifications n
   ON
     u.id = n.user_id
     AND u.instance_id = n.instance_id

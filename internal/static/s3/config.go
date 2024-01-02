@@ -7,9 +7,8 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 
-	"github.com/zitadel/zitadel/internal/errors"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Config struct {
@@ -29,7 +28,7 @@ func (c *Config) NewStorage() (static.Storage, error) {
 		Region: c.Location,
 	})
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "MINIO-2n9fs", "Errors.Assets.Store.NotInitialized")
+		return nil, zerrors.ThrowInternal(err, "MINIO-2n9fs", "Errors.Assets.Store.NotInitialized")
 	}
 	return &Minio{
 		Client:       minioClient,
@@ -42,11 +41,11 @@ func (c *Config) NewStorage() (static.Storage, error) {
 func NewStorage(_ *sql.DB, rawConfig map[string]interface{}) (static.Storage, error) {
 	configData, err := json.Marshal(rawConfig)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "MINIO-Ef2f2", "could not map config")
+		return nil, zerrors.ThrowInternal(err, "MINIO-Ef2f2", "could not map config")
 	}
 	c := new(Config)
 	if err := json.Unmarshal(configData, c); err != nil {
-		return nil, errors.ThrowInternal(err, "MINIO-GB4nw", "could not map config")
+		return nil, zerrors.ThrowInternal(err, "MINIO-GB4nw", "could not map config")
 	}
 	return c.NewStorage()
 }

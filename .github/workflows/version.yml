@@ -47,4 +47,4 @@ jobs:
       name: output
       id: output
       run:
-        if [[ ! -z "${{ steps.semantic.outputs.new_release_version }}" ]]; then echo "VERSION=v${{ steps.semantic.outputs.new_release_version }}" >> "$GITHUB_OUTPUT"; else echo "VERSION=" >> "$GITHUB_OUTPUT";fi
+        if [[ ! -z "${{ steps.semantic.outputs.new_release_version }}" ]]; then echo "VERSION=v${{ steps.semantic.outputs.new_release_version }}" >> "$GITHUB_OUTPUT"; else echo "VERSION=${{ github.sha }}" >> "$GITHUB_OUTPUT";fi

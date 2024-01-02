@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
-	errs "errors"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -14,10 +14,10 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type State struct {
@@ -68,7 +68,7 @@ func (q *Queries) SearchCurrentStates(ctx context.Context, queries *CurrentState
 	query, scan := prepareCurrentStateQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-MmFef", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-MmFef", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -76,7 +76,7 @@ func (q *Queries) SearchCurrentStates(ctx context.Context, queries *CurrentState
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-22H8f", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-22H8f", "Errors.Internal")
 	}
 
 	return currentStates, nil
@@ -97,7 +97,7 @@ func (q *Queries) latestState(ctx context.Context, projections ...table) (state 
 		OrderBy(CurrentStateColEventDate.identifier() + " DESC").
 		ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-5CfX9", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-5CfX9", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -111,7 +111,7 @@ func (q *Queries) latestState(ctx context.Context, projections ...table) (state 
 func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName string) (err error) {
 	tx, err := q.client.Begin()
 	if err != nil {
-		return errors.ThrowInternal(err, "QUERY-9iOpr", "Errors.RemoveFailed")
+		return zerrors.ThrowInternal(err, "QUERY-9iOpr", "Errors.RemoveFailed")
 	}
 	defer func() {
 		if err != nil {
@@ -120,7 +120,7 @@ func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName strin
 			return
 		}
 		if commitErr := tx.Commit(); commitErr != nil {
-			err = errors.ThrowInternal(commitErr, "QUERY-JGD0l", "Errors.Internal")
+			err = zerrors.ThrowInternal(commitErr, "QUERY-JGD0l", "Errors.Internal")
 		}
 	}()
 
@@ -139,7 +139,7 @@ func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName strin
 	}
 	err = tx.Commit()
 	if err != nil {
-		return errors.ThrowInternal(err, "QUERY-Sfvsc", "Errors.Internal")
+		return zerrors.ThrowInternal(err, "QUERY-Sfvsc", "Errors.Internal")
 	}
 	return nil
 }
@@ -153,11 +153,11 @@ func (q *Queries) checkAndLock(tx *sql.Tx, projectionName string) (name string, 
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return "", errors.ThrowInternal(err, "QUERY-UJTUy", "Errors.Internal")
+		return "", zerrors.ThrowInternal(err, "QUERY-UJTUy", "Errors.Internal")
 	}
 	row := tx.QueryRow(stmt, args...)
 	if err := row.Scan(&name); err != nil || name == "" {
-		return "", errors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
+		return "", zerrors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
 	}
 	return name, nil
 }
@@ -165,7 +165,7 @@ func (q *Queries) checkAndLock(tx *sql.Tx, projectionName string) (name string, 
 func tablesForReset(ctx context.Context, tx *sql.Tx, projectionName string) (tables []string, err error) {
 	names := strings.Split(projectionName, ".")
 	if len(names) != 2 {
-		return nil, errors.ThrowInvalidArgument(nil, "QUERY-wk1jr", "Errors.InvalidArgument")
+		return nil, zerrors.ThrowInvalidArgument(nil, "QUERY-wk1jr", "Errors.InvalidArgument")
 	}
 	schema := names[0]
 	tablePrefix := names[1]
@@ -181,19 +181,19 @@ func tablesForReset(ctx context.Context, tx *sql.Tx, projectionName string) (tab
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-ASff2", "Errors.ProjectionName.Invalid")
+		return nil, zerrors.ThrowInternal(err, "QUERY-ASff2", "Errors.ProjectionName.Invalid")
 	}
 
 	rows, err := tx.QueryContext(ctx, tablesQuery, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Dgfw", "Errors.ProjectionName.Invalid")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Dgfw", "Errors.ProjectionName.Invalid")
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var tableName string
 		if err := rows.Scan(&tableName); err != nil {
-			return nil, errors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
+			return nil, zerrors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
 		}
 		tables = append(tables, schema+"."+tableName)
 	}
@@ -209,7 +209,7 @@ func reset(ctx context.Context, tx *sql.Tx, tables []string, projectionName stri
 	for _, tableName := range tables {
 		_, err := tx.Exec(fmt.Sprintf("TRUNCATE %s cascade", tableName))
 		if err != nil {
-			return errors.ThrowInternal(err, "QUERY-3n92f", "Errors.RemoveFailed")
+			return zerrors.ThrowInternal(err, "QUERY-3n92f", "Errors.RemoveFailed")
 		}
 	}
 	update, args, err := sq.Update(currentStateTable.identifier()).
@@ -220,11 +220,11 @@ func reset(ctx context.Context, tx *sql.Tx, tables []string, projectionName stri
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return errors.ThrowInternal(err, "QUERY-Ff3tw", "Errors.RemoveFailed")
+		return zerrors.ThrowInternal(err, "QUERY-Ff3tw", "Errors.RemoveFailed")
 	}
 	_, err = tx.Exec(update, args...)
 	if err != nil {
-		return errors.ThrowInternal(err, "QUERY-NFiws", "Errors.RemoveFailed")
+		return zerrors.ThrowInternal(err, "QUERY-NFiws", "Errors.RemoveFailed")
 	}
 	return nil
 }
@@ -247,8 +247,8 @@ func prepareLatestState(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 				&position,
 				&lastUpdated,
 			)
-			if err != nil && !errs.Is(err, sql.ErrNoRows) {
-				return nil, errors.ThrowInternal(err, "QUERY-aAZ1D", "Errors.Internal")
+			if err != nil && !errors.Is(err, sql.ErrNoRows) {
+				return nil, zerrors.ThrowInternal(err, "QUERY-aAZ1D", "Errors.Internal")
 			}
 			return &State{
 				EventCreatedAt: creationDate.Time,
@@ -307,7 +307,7 @@ func prepareCurrentStateQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-jbJ77", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-jbJ77", "Errors.Query.CloseRows")
 			}
 
 			return &CurrentStates{

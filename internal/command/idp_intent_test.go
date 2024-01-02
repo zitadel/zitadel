@@ -16,7 +16,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	z_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
@@ -29,6 +28,7 @@ import (
 	rep_idp "github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_CreateIntent(t *testing.T) {
@@ -58,7 +58,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 			"error no id generator",
 			fields{
 				eventstore:  eventstoreExpect(t),
-				idGenerator: mock.NewIDGeneratorExpectError(t, z_errors.ThrowInternal(nil, "", "error id")),
+				idGenerator: mock.NewIDGeneratorExpectError(t, zerrors.ThrowInternal(nil, "", "error id")),
 			},
 			args{
 				ctx:        authz.SetCtxData(context.Background(), authz.CtxData{OrgID: "ro"}),
@@ -67,7 +67,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 				failureURL: "https://failure.url",
 			},
 			res{
-				err: z_errors.ThrowInternal(nil, "", "error id"),
+				err: zerrors.ThrowInternal(nil, "", "error id"),
 			},
 		},
 		{
@@ -83,7 +83,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 				failureURL: "https://failure.url",
 			},
 			res{
-				err: z_errors.ThrowInvalidArgument(nil, "COMMAND-x8j2bk", "Errors.Intent.IDPMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-x8j2bk", "Errors.Intent.IDPMissing"),
 			},
 		},
 		{
@@ -99,7 +99,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 				failureURL: "https://failure.url",
 			},
 			res{
-				err: z_errors.ThrowInvalidArgument(nil, "COMMAND-x8j3bk", "Errors.Intent.SuccessURLMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-x8j3bk", "Errors.Intent.SuccessURLMissing"),
 			},
 		},
 		{
@@ -115,7 +115,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 				failureURL: ":",
 			},
 			res{
-				err: z_errors.ThrowInvalidArgument(nil, "COMMAND-x8j4bk", "Errors.Intent.FailureURLMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-x8j4bk", "Errors.Intent.FailureURLMissing"),
 			},
 		},
 		{
@@ -135,7 +135,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 				failureURL: "https://failure.url",
 			},
 			res{
-				err: z_errors.ThrowPreconditionFailed(nil, "COMMAND-39n221fs", "Errors.IDPConfig.NotExisting"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-39n221fs", "Errors.IDPConfig.NotExisting"),
 			},
 		},
 		{
@@ -249,7 +249,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 				callbackURL: "url",
 			},
 			res{
-				err: z_errors.ThrowPreconditionFailed(nil, "", ""),
+				err: zerrors.ThrowPreconditionFailed(nil, "", ""),
 			},
 		},
 		{
@@ -293,7 +293,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 				callbackURL: "url",
 			},
 			res{
-				err: z_errors.ThrowInternal(nil, "COMMAND-xw921211", "Errors.IDPConfig.NotExisting"),
+				err: zerrors.ThrowInternal(nil, "COMMAND-xw921211", "Errors.IDPConfig.NotExisting"),
 			},
 		},
 		{
@@ -620,7 +620,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 			fields{
 				idpConfigEncryption: func() crypto.EncryptionAlgorithm {
 					m := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
-					m.EXPECT().Encrypt(gomock.Any()).Return(nil, z_errors.ThrowInternal(nil, "id", "encryption failed"))
+					m.EXPECT().Encrypt(gomock.Any()).Return(nil, zerrors.ThrowInternal(nil, "id", "encryption failed"))
 					return m
 				}(),
 			},
@@ -629,7 +629,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 				writeModel: NewIDPIntentWriteModel("id", "ro"),
 			},
 			res{
-				err: z_errors.ThrowInternal(nil, "id", "encryption failed"),
+				err: zerrors.ThrowInternal(nil, "id", "encryption failed"),
 			},
 		},
 		{
@@ -640,7 +640,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 					m.EXPECT().Encrypt(gomock.Any()).DoAndReturn(func(value []byte) ([]byte, error) {
 						return value, nil
 					})
-					m.EXPECT().Encrypt(gomock.Any()).Return(nil, z_errors.ThrowInternal(nil, "id", "encryption failed"))
+					m.EXPECT().Encrypt(gomock.Any()).Return(nil, zerrors.ThrowInternal(nil, "id", "encryption failed"))
 					return m
 				}(),
 			},
@@ -656,7 +656,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 				},
 			},
 			res{
-				err: z_errors.ThrowInternal(nil, "id", "encryption failed"),
+				err: zerrors.ThrowInternal(nil, "id", "encryption failed"),
 			},
 		},
 		{
@@ -749,7 +749,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 			fields{
 				idpConfigEncryption: func() crypto.EncryptionAlgorithm {
 					m := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
-					m.EXPECT().Encrypt(gomock.Any()).Return(nil, z_errors.ThrowInternal(nil, "id", "encryption failed"))
+					m.EXPECT().Encrypt(gomock.Any()).Return(nil, zerrors.ThrowInternal(nil, "id", "encryption failed"))
 					return m
 				}(),
 			},
@@ -758,7 +758,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 				writeModel: NewIDPIntentWriteModel("id", "ro"),
 			},
 			res{
-				err: z_errors.ThrowInternal(nil, "id", "encryption failed"),
+				err: zerrors.ThrowInternal(nil, "id", "encryption failed"),
 			},
 		},
 		{
@@ -930,7 +930,7 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 			fields{
 				idpConfigEncryption: func() crypto.EncryptionAlgorithm {
 					m := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
-					m.EXPECT().Encrypt(gomock.Any()).Return(nil, z_errors.ThrowInternal(nil, "id", "encryption failed"))
+					m.EXPECT().Encrypt(gomock.Any()).Return(nil, zerrors.ThrowInternal(nil, "id", "encryption failed"))
 					return m
 				}(),
 			},
@@ -939,7 +939,7 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 				writeModel: NewIDPIntentWriteModel("id", "ro"),
 			},
 			res{
-				err: z_errors.ThrowInternal(nil, "id", "encryption failed"),
+				err: zerrors.ThrowInternal(nil, "id", "encryption failed"),
 			},
 		},
 		{
@@ -1089,14 +1089,14 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 				},
 				func() crypto.EncryptionAlgorithm {
 					m := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
-					m.EXPECT().Encrypt(gomock.Any()).Return(nil, z_errors.ThrowInternal(nil, "id", "encryption failed"))
+					m.EXPECT().Encrypt(gomock.Any()).Return(nil, zerrors.ThrowInternal(nil, "id", "encryption failed"))
 					return m
 				}(),
 			},
 			res{
 				accessToken: nil,
 				idToken:     "",
-				err:         z_errors.ThrowInternal(nil, "id", "encryption failed"),
+				err:         zerrors.ThrowInternal(nil, "id", "encryption failed"),
 			},
 		},
 		{

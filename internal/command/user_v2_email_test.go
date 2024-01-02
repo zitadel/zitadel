@@ -13,11 +13,11 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_ChangeUserEmail(t *testing.T) {
@@ -74,7 +74,7 @@ func TestCommands_ChangeUserEmail(t *testing.T) {
 				resourceOwner: "org1",
 				email:         "",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "missing email",
@@ -114,7 +114,7 @@ func TestCommands_ChangeUserEmail(t *testing.T) {
 				resourceOwner: "org1",
 				email:         "",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty"),
 		},
 		{
 			name: "not changed",
@@ -154,7 +154,7 @@ func TestCommands_ChangeUserEmail(t *testing.T) {
 				resourceOwner: "org1",
 				email:         "email@test.ch",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Email.NotChanged"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Email.NotChanged"),
 		},
 	}
 	for _, tt := range tests {
@@ -198,7 +198,7 @@ func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 				email:         "email-changed@test.ch",
 				urlTmpl:       "{{",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
 		},
 		{
 			name: "permission missing",
@@ -239,7 +239,7 @@ func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 				email:         "email@test.ch",
 				urlTmpl:       "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "not changed",
@@ -280,7 +280,7 @@ func TestCommands_ChangeUserEmailURLTemplate(t *testing.T) {
 				email:         "email@test.ch",
 				urlTmpl:       "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Email.NotChanged"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Email.NotChanged"),
 		},
 	}
 	for _, tt := range tests {
@@ -350,7 +350,7 @@ func TestCommands_ChangeUserEmailReturnCode(t *testing.T) {
 				resourceOwner: "org1",
 				email:         "email@test.ch",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "missing email",
@@ -390,7 +390,7 @@ func TestCommands_ChangeUserEmailReturnCode(t *testing.T) {
 				resourceOwner: "org1",
 				email:         "",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty"),
 		},
 	}
 	for _, tt := range tests {
@@ -434,7 +434,7 @@ func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 				resourceOwner: "org1",
 				email:         "email@test.ch",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing"),
 		},
 		{
 			name: "missing permission",
@@ -465,7 +465,7 @@ func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 				resourceOwner: "org1",
 				email:         "email-changed@test.ch",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "missing email",
@@ -496,7 +496,7 @@ func TestCommands_ChangeUserEmailVerified(t *testing.T) {
 				resourceOwner: "org1",
 				email:         "",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty"),
 		},
 		{
 			name: "email changed",
@@ -590,7 +590,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 				returnCode:    false,
 				urlTmpl:       "",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing"),
 		},
 		{
 			name: "missing permission",
@@ -623,7 +623,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 				returnCode:    false,
 				urlTmpl:       "",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "missing email",
@@ -656,7 +656,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 				returnCode:    false,
 				urlTmpl:       "",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "EMAIL-spblu", "Errors.User.Email.Empty"),
 		},
 		{
 			name: "not changed",
@@ -689,7 +689,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 				returnCode:    false,
 				urlTmpl:       "",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Email.NotChanged"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Email.NotChanged"),
 		},
 		{
 			name: "email changed",
@@ -913,7 +913,7 @@ func TestCommands_VerifyUserEmail(t *testing.T) {
 				resourceOwner: "org1",
 				code:          "a",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing"),
 		},
 		{
 			name: "missing code",
@@ -952,7 +952,7 @@ func TestCommands_VerifyUserEmail(t *testing.T) {
 				resourceOwner: "org1",
 				code:          "",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty"),
 		},
 		{
 			name: "wrong code",
@@ -1009,7 +1009,7 @@ func TestCommands_VerifyUserEmail(t *testing.T) {
 				resourceOwner: "org1",
 				code:          "wrong",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-eis9R", "Errors.User.Code.Invalid"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-eis9R", "Errors.User.Code.Invalid"),
 		},
 	}
 	for _, tt := range tests {
@@ -1050,7 +1050,7 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 				resourceOwner: "org1",
 				code:          "a",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing"),
 		},
 		{
 			name: "missing code",
@@ -1080,7 +1080,7 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 				resourceOwner: "org1",
 				code:          "",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty"),
 		},
 		{
 			name: "good code",
@@ -1128,7 +1128,7 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 				resourceOwner: "org1",
 				code:          "wrong",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-eis9R", "Errors.User.Code.Invalid"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-eis9R", "Errors.User.Code.Invalid"),
 		},
 		{
 			name: "wrong code",
@@ -1216,7 +1216,7 @@ func TestCommands_NewUserEmailEvents(t *testing.T) {
 				userID:        "",
 				resourceOwner: "org1",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-0Gzs3", "Errors.User.Email.IDMissing"),
 		},
 		{
 			name: "not found",
@@ -1227,7 +1227,7 @@ func TestCommands_NewUserEmailEvents(t *testing.T) {
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
-			wantErr: caos_errs.ThrowNotFound(nil, "COMMAND-ieJ2e", "Errors.User.Email.NotFound"),
+			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-ieJ2e", "Errors.User.Email.NotFound"),
 		},
 		{
 			name: "user not initialized",
@@ -1262,7 +1262,7 @@ func TestCommands_NewUserEmailEvents(t *testing.T) {
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-uz0Uu", "Errors.User.NotInitialised"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-uz0Uu", "Errors.User.NotInitialised"),
 		},
 	}
 	for _, tt := range tests {

@@ -10,12 +10,12 @@ import (
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type RefreshTokenRepo struct {
@@ -35,7 +35,7 @@ func (r *RefreshTokenRepo) RefreshTokenByToken(ctx context.Context, refreshToken
 		return nil, err
 	}
 	if tokenView.Token != token {
-		return nil, errors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.User.RefreshToken.Invalid")
+		return nil, zerrors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.User.RefreshToken.Invalid")
 	}
 	return tokenView, nil
 }
@@ -51,10 +51,10 @@ func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, tokenID, userID
 		Errorf("could not get current sequence for RefreshTokenByID")
 
 	tokenView, viewErr := r.View.RefreshTokenByID(tokenID, instanceID)
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
+	if viewErr != nil && !zerrors.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
-	if errors.IsNotFound(viewErr) {
+	if zerrors.IsNotFound(viewErr) {
 		tokenView = new(model.RefreshTokenView)
 		tokenView.ID = tokenID
 		tokenView.UserID = userID
@@ -65,8 +65,8 @@ func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, tokenID, userID
 	}
 
 	events, esErr := r.getUserEvents(ctx, userID, tokenView.InstanceID, tokenView.ChangeDate, tokenView.GetRelevantEventTypes())
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-BHB52", "Errors.User.RefreshToken.Invalid")
+	if zerrors.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, zerrors.ThrowNotFound(nil, "EVENT-BHB52", "Errors.User.RefreshToken.Invalid")
 	}
 
 	if esErr != nil {
@@ -81,7 +81,7 @@ func (r *RefreshTokenRepo) RefreshTokenByID(ctx context.Context, tokenID, userID
 		}
 	}
 	if !tokenView.Expiration.After(time.Now()) {
-		return nil, errors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.User.RefreshToken.Invalid")
+		return nil, zerrors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.User.RefreshToken.Invalid")
 	}
 	return model.RefreshTokenViewToModel(tokenView), nil
 }

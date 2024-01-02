@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type MachineKey struct {
@@ -38,7 +38,7 @@ func (key *MachineKey) Detail() ([]byte, error) {
 	if key.Type == AuthNKeyTypeJSON {
 		return key.MarshalJSON()
 	}
-	return nil, errors.ThrowPreconditionFailed(nil, "KEY-dsg52", "Errors.Internal")
+	return nil, zerrors.ThrowPreconditionFailed(nil, "KEY-dsg52", "Errors.Internal")
 }
 
 func (key *MachineKey) MarshalJSON() ([]byte, error) {

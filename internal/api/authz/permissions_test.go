@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func equalStringArray(a, b []string) bool {
@@ -61,7 +61,7 @@ func Test_GetUserPermissions(t *testing.T) {
 				},
 			},
 			wantErr: true,
-			errFunc: caos_errs.IsUnauthenticated,
+			errFunc: zerrors.IsUnauthenticated,
 			result:  []string{"project.read"},
 		},
 		{
@@ -563,7 +563,7 @@ func Test_CheckUserResourcePermissions(t *testing.T) {
 				t.Errorf("shouldn't get err: %v ", err)
 			}
 
-			if tt.wantErr && !caos_errs.IsPermissionDenied(err) {
+			if tt.wantErr && !zerrors.IsPermissionDenied(err) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 		})

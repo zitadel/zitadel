@@ -33,8 +33,13 @@ Errors:
     NoneSpecified: Nebyly určeny žádné limity
   Restrictions:
     NoneSpecified: Nebyla určena žádná omezení
+    DefaultLanguageMustBeAllowed: Výchozí jazyk musí být povolen
   Language:
     NotParsed: Jazyk nelze určit
+    NotSupported: Jazyk není podporován
+    NotAllowed: Jazyk není povolen
+    Undefined: Jazyk není definován
+    Duplicate: Jazyky mají duplikáty
   OIDCSettings:
     NotFound: Konfigurace OIDC nebyla nalezena
     AlreadyExists: Konfigurace OIDC již existuje
@@ -138,7 +143,7 @@ Errors:
     ExternalIDP:
       Invalid: Externí IDP je neplatné
       IDPConfigNotExisting: Konfigurace poskytovatele IDP je pro tuto organizaci neplatná
-      NotAllowed: Externí IDP není v této organizaci povoleno
+      NotAllowed: Externí IDP není povolen
       MinimumExternalIDPNeeded: Musí být přidán alespoň jeden IDP
       AlreadyExists: Externí IDP již obsazeno
       NotFound: Externí IDP nenalezeno

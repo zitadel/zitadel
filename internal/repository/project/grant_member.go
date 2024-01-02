@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/member"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -73,7 +73,7 @@ func GrantMemberAddedEventMapper(event eventstore.Event) (eventstore.Event, erro
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-9f0sf", "unable to unmarshal label policy")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-9f0sf", "unable to unmarshal label policy")
 	}
 
 	return e, nil
@@ -121,7 +121,7 @@ func GrantMemberChangedEventMapper(event eventstore.Event) (eventstore.Event, er
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-39fi8", "unable to unmarshal label policy")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-39fi8", "unable to unmarshal label policy")
 	}
 
 	return e, nil
@@ -166,7 +166,7 @@ func GrantMemberRemovedEventMapper(event eventstore.Event) (eventstore.Event, er
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-173fM", "unable to unmarshal label policy")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-173fM", "unable to unmarshal label policy")
 	}
 
 	return e, nil
@@ -211,7 +211,7 @@ func GrantMemberCascadeRemovedEventMapper(event eventstore.Event) (eventstore.Ev
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "PROJECT-3kfs3", "unable to unmarshal label policy")
+		return nil, zerrors.ThrowInternal(err, "PROJECT-3kfs3", "unable to unmarshal label policy")
 	}
 
 	return e, nil

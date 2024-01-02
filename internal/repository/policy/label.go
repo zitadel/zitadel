@@ -2,9 +2,9 @@ package policy
 
 import (
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/asset"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -95,7 +95,7 @@ func LabelPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, erro
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-puqv4", "unable to unmarshal label policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-puqv4", "unable to unmarshal label policy")
 	}
 
 	return e, nil
@@ -131,7 +131,7 @@ func NewLabelPolicyChangedEvent(
 	changes []LabelPolicyChanges,
 ) (*LabelPolicyChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-Asfd3", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "POLICY-Asfd3", "Errors.NoChangesFound")
 	}
 	changeEvent := &LabelPolicyChangedEvent{
 		BaseEvent: *base,
@@ -223,7 +223,7 @@ func LabelPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, er
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-qhfFb", "unable to unmarshal label policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-qhfFb", "unable to unmarshal label policy")
 	}
 
 	return e, nil

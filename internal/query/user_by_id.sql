@@ -23,8 +23,6 @@ WITH login_names AS (SELECT
         (p.is_default IS TRUE AND p.instance_id = $2)
         OR (p.instance_id = $2 AND p.resource_owner = u.resource_owner)
       )
-      AND 
-        u.id = $1
     ORDER BY is_default
     LIMIT 1
   ) p ON TRUE
@@ -33,6 +31,9 @@ WITH login_names AS (SELECT
     ON 
       u.instance_id = d.instance_id
       AND u.resource_owner = d.resource_owner
+  WHERE
+    u.instance_id = $2
+    AND u.id = $1
 )
 SELECT 
   u.id
@@ -60,17 +61,17 @@ SELECT
   , m.user_id
   , m.name
   , m.description
-  , m.has_secret
+  , m.secret
   , m.access_token_type
   , count(*) OVER ()
-FROM projections.users9 u
+FROM projections.users10 u
 LEFT JOIN
-  projections.users9_humans h
+  projections.users10_humans h
   ON
     u.id = h.user_id
     AND u.instance_id = h.instance_id
 LEFT JOIN
-  projections.users9_machines m
+  projections.users10_machines m
   ON
     u.id = m.user_id
     AND u.instance_id = m.instance_id

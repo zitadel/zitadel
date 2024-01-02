@@ -1,8 +1,8 @@
 package policy
 
 import (
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -46,7 +46,7 @@ func PasswordAgePolicyAddedEventMapper(event eventstore.Event) (eventstore.Event
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-T3mGp", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-T3mGp", "unable to unmarshal policy")
 	}
 
 	return e, nil
@@ -72,7 +72,7 @@ func NewPasswordAgePolicyChangedEvent(
 	changes []PasswordAgePolicyChanges,
 ) (*PasswordAgePolicyChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-DAgt5", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "POLICY-DAgt5", "Errors.NoChangesFound")
 	}
 	changeEvent := &PasswordAgePolicyChangedEvent{
 		BaseEvent: *base,
@@ -104,7 +104,7 @@ func PasswordAgePolicyChangedEventMapper(event eventstore.Event) (eventstore.Eve
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-PqaVq", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-PqaVq", "unable to unmarshal policy")
 	}
 
 	return e, nil

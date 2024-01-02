@@ -7,9 +7,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 )
@@ -126,7 +126,7 @@ func idpQueryToModel(idpQuery *admin_pb.IDPQuery) (query.SearchQuery, error) {
 	case *admin_pb.IDPQuery_IdpIdQuery:
 		return query.NewIDPIDSearchQuery(q.IdpIdQuery.Id)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ADMIN-VmqQu", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ADMIN-VmqQu", "List.Query.Invalid")
 	}
 }
 
@@ -200,7 +200,7 @@ func providerQueryToQuery(idpQuery *admin_pb.ProviderQuery) (query.SearchQuery, 
 	case *admin_pb.ProviderQuery_IdpIdQuery:
 		return query.NewIDPTemplateIDSearchQuery(q.IdpIdQuery.Id)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ADMIN-Dr2aa", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ADMIN-Dr2aa", "List.Query.Invalid")
 	}
 }
 

@@ -2,8 +2,8 @@ package flow
 
 import (
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -51,7 +51,7 @@ func TriggerActionsSetEventMapper(event eventstore.Event) (eventstore.Event, err
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "FLOW-4n8vs", "unable to unmarshal trigger actions")
+		return nil, zerrors.ThrowInternal(err, "FLOW-4n8vs", "unable to unmarshal trigger actions")
 	}
 
 	return e, nil
@@ -92,7 +92,7 @@ func TriggerActionsCascadeRemovedEventMapper(event eventstore.Event) (eventstore
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "FLOW-4n8vs", "unable to unmarshal trigger actions")
+		return nil, zerrors.ThrowInternal(err, "FLOW-4n8vs", "unable to unmarshal trigger actions")
 	}
 
 	return e, nil
@@ -129,7 +129,7 @@ func FlowClearedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "FLOW-BHfg2", "unable to unmarshal flow cleared")
+		return nil, zerrors.ThrowInternal(err, "FLOW-BHfg2", "unable to unmarshal flow cleared")
 	}
 
 	return e, nil

@@ -10,10 +10,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
 	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 )
@@ -132,30 +131,7 @@ func idpQueryToModel(idpQuery *mgmt_pb.IDPQuery) (query.SearchQuery, error) {
 	case *mgmt_pb.IDPQuery_OwnerTypeQuery:
 		return query.NewIDPOwnerTypeSearchQuery(idp_grpc.IDPProviderTypeFromPb(q.OwnerTypeQuery.OwnerType))
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "MANAG-WtLPV", "List.Query.Invalid")
-	}
-}
-
-func idpProviderViewsToDomain(idps []*iam_model.IDPProviderView) []*domain.IDPProvider {
-	idpProvider := make([]*domain.IDPProvider, len(idps))
-	for i, idp := range idps {
-		idpProvider[i] = &domain.IDPProvider{
-			ObjectRoot: models.ObjectRoot{
-				AggregateID: idp.AggregateID,
-			},
-			IDPConfigID: idp.IDPConfigID,
-			Type:        idpConfigTypeToDomain(idp.IDPProviderType),
-		}
-	}
-	return idpProvider
-}
-
-func idpConfigTypeToDomain(idpType iam_model.IDPProviderType) domain.IdentityProviderType {
-	switch idpType {
-	case iam_model.IDPProviderTypeOrg:
-		return domain.IdentityProviderTypeOrg
-	default:
-		return domain.IdentityProviderTypeSystem
+		return nil, zerrors.ThrowInvalidArgument(nil, "MANAG-WtLPV", "List.Query.Invalid")
 	}
 }
 
@@ -217,7 +193,7 @@ func providerQueryToQuery(idpQuery *mgmt_pb.ProviderQuery) (query.SearchQuery, e
 	case *mgmt_pb.ProviderQuery_OwnerTypeQuery:
 		return query.NewIDPTemplateOwnerTypeSearchQuery(idp_grpc.IDPProviderTypeFromPb(q.OwnerTypeQuery.OwnerType))
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ORG-Dr2aa", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-Dr2aa", "List.Query.Invalid")
 	}
 }
 

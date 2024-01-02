@@ -2,15 +2,15 @@ package smtp
 
 import (
 	"crypto/tls"
+	"errors"
 	"net"
 	"net/smtp"
 
-	"github.com/pkg/errors"
 	"github.com/zitadel/logging"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/notification/channels"
 	"github.com/zitadel/zitadel/internal/notification/messages"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var _ channels.NotificationChannel = (*Email)(nil)
@@ -41,22 +41,22 @@ func (email *Email) HandleMessage(message channels.Message) error {
 	defer email.smtpClient.Close()
 	emailMsg, ok := message.(*messages.Email)
 	if !ok {
-		return caos_errs.ThrowInternal(nil, "EMAIL-s8JLs", "message is not EmailMessage")
+		return zerrors.ThrowInternal(nil, "EMAIL-s8JLs", "message is not EmailMessage")
 	}
 
 	if emailMsg.Content == "" || emailMsg.Subject == "" || len(emailMsg.Recipients) == 0 {
-		return caos_errs.ThrowInternalf(nil, "EMAIL-zGemZ", "subject, recipients and content must be set but got subject %s, recipients length %d and content length %d", emailMsg.Subject, len(emailMsg.Recipients), len(emailMsg.Content))
+		return zerrors.ThrowInternalf(nil, "EMAIL-zGemZ", "subject, recipients and content must be set but got subject %s, recipients length %d and content length %d", emailMsg.Subject, len(emailMsg.Recipients), len(emailMsg.Content))
 	}
 	emailMsg.SenderEmail = email.senderAddress
 	emailMsg.SenderName = email.senderName
 	emailMsg.ReplyToAddress = email.replyToAddress
 	// To && From
 	if err := email.smtpClient.Mail(emailMsg.SenderEmail); err != nil {
-		return caos_errs.ThrowInternalf(err, "EMAIL-s3is3", "could not set sender: %v", emailMsg.SenderEmail)
+		return zerrors.ThrowInternalf(err, "EMAIL-s3is3", "could not set sender: %v", emailMsg.SenderEmail)
 	}
 	for _, recp := range append(append(emailMsg.Recipients, emailMsg.CC...), emailMsg.BCC...) {
 		if err := email.smtpClient.Rcpt(recp); err != nil {
-			return caos_errs.ThrowInternalf(err, "EMAIL-s4is4", "could not set recipient: %v", recp)
+			return zerrors.ThrowInternalf(err, "EMAIL-s4is4", "could not set recipient: %v", recp)
 		}
 	}
 
@@ -87,7 +87,7 @@ func (email *Email) HandleMessage(message channels.Message) error {
 func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err error) {
 	host, _, err := net.SplitHostPort(smtpConfig.Host)
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "EMAIL-spR56", "could not split host and port for connect to smtp")
+		return nil, zerrors.ThrowInternal(err, "EMAIL-spR56", "could not split host and port for connect to smtp")
 	}
 
 	if !tlsRequired {
@@ -109,7 +109,7 @@ func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err
 func (smtpConfig SMTP) getSMPTClient() (*smtp.Client, error) {
 	client, err := smtp.Dial(smtpConfig.Host)
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "EMAIL-skwos", "could not make smtp dial")
+		return nil, zerrors.ThrowInternal(err, "EMAIL-skwos", "could not make smtp dial")
 	}
 	return client, nil
 }
@@ -123,12 +123,12 @@ func (smtpConfig SMTP) getSMPTClientWithTls(host string) (*smtp.Client, error) {
 	}
 
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "EMAIL-sl39s", "could not make tls dial")
+		return nil, zerrors.ThrowInternal(err, "EMAIL-sl39s", "could not make tls dial")
 	}
 
 	client, err := smtp.NewClient(conn, host)
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "EMAIL-skwi4", "could not create smtp client")
+		return nil, zerrors.ThrowInternal(err, "EMAIL-skwi4", "could not create smtp client")
 	}
 	return client, err
 }
@@ -142,7 +142,7 @@ func (smtpConfig SMTP) getSMPTClientWithStartTls(host string) (*smtp.Client, err
 	if err := client.StartTLS(&tls.Config{
 		ServerName: host,
 	}); err != nil {
-		return nil, caos_errs.ThrowInternal(err, "EMAIL-guvsQ", "could not start tls")
+		return nil, zerrors.ThrowInternal(err, "EMAIL-guvsQ", "could not start tls")
 	}
 	return client, nil
 }
@@ -157,7 +157,7 @@ func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {
 	}
 	err := client.Auth(auth)
 	if err != nil {
-		return caos_errs.ThrowInternalf(err, "EMAIL-s9kfs", "could not add smtp auth for user %s", smtpConfig.User)
+		return zerrors.ThrowInternalf(err, "EMAIL-s9kfs", "could not add smtp auth for user %s", smtpConfig.User)
 	}
 	return nil
 }

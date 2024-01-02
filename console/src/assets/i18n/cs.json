@@ -872,14 +872,16 @@
         },
         "SEQUENCE": {
           "LABEL": "Sekvence",
-          "CHECKBOX": "Filtrovat podle Sekvence",
-          "SORT": "Třídění",
-          "ASC": "Vzestupně",
-          "DESC": "Sestupně"
+          "CHECKBOX": "Filtrovat podle Sekvence"
         },
+        "SORT": "Třídění",
+        "ASC": "Vzestupně",
+        "DESC": "Sestupně",
         "CREATIONDATE": {
-          "LABEL": "Datum vytvoření",
-          "CHECKBOX": "Filtrovat podle Datumu vytvoření"
+          "RADIO_FROM": "Od",
+          "RADIO_RANGE": "Rozsah",
+          "LABEL_SINCE": "Od",
+          "LABEL_UNTIL": "Do"
         },
         "OTHER": "jiný",
         "OTHERS": "jiné"
@@ -929,20 +931,22 @@
         "BTN": "Přejmenovat"
       },
       "ORGDOMAIN": {
-        "TITLE": "Ověření vlastnictví domény organizace",
-        "VERIFICATION": "Pro ověření vlastnictví vaší domény je potřeba stáhnout ověřovací soubor a nahrát jej na uvedené URL níže, nebo umístit záznam TXT Record DNS pro uvedené URL. Pro dokončení klikněte na tlačítko a proveďte ověření.",
-        "VERIFICATION_SKIP": "Ověření můžete nyní přeskočit a pokračovat ve vytváření vaší organizace, ale pro používání vaší organizace je třeba tento krok dokončit!",
-        "VERIFICATION_VALIDATION_DESC": "Tokeny jsou pravidelně kontrolovány, aby bylo zajištěno, že jste stále vlastníkem domény.",
-        "VERIFICATION_NEWTOKEN_TITLE": "Požádat o nový token",
-        "VERIFICATION_NEWTOKEN_DESC": "Pokud si přejete požádat o nový token, vyberte preferovanou metodu. Pokud chcete ověřit stávající token, klikněte na tlačítko výše.",
-        "VERIFICATION_VALIDATION_ONGOING": "Token pro ověření byl již požadován. Klikněte na tlačítko a spusťte ověřovací kontrolu.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Typ tokenu:",
+        "TITLE": "Ověřte vlastnictví {{value}}",
+        "VERIFICATION": "Nabízíme vám dva způsoby ručního ověření domény:",
+        "VERIFICATION_HTML": "- HTTP. Hostujte na svém webu dočasný ověřovací soubor",
+        "VERIFICATION_DNS": "- DNS. Vytvořte záznam DNS záznamu TXT",
+        "VERIFICATION_DNS_DESC": "Pokud spravujete {{ value }} a máte přístup ke svým záznamům DNS, můžete vytvořit nový záznam TXT s následujícími hodnotami:",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Pro hodnotu TXT záznamu použijte tento kód:",
+        "VERIFICATION_HTTP_DESC": "Pokud máte přístup k hostování svých webových stránek, jednoduše si stáhněte ověřovací soubor a nahrajte jej na uvedenou adresu URL",
+        "VERIFICATION_HTTP_URL_LABEL": "Očekávaná adresa URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Ověřovací soubor:",
+        "VERIFICATION_SKIP": "Ověření můžete zatím přeskočit a pokračovat ve vytváření organizace, ale abyste mohli používat svou doménu, musíte tento krok dokončit!",
+        "VERIFICATION_VALIDATION_DESC": "Nemažte ověřovací kód, protože ZITADEL čas od času znovu zkontroluje vlastnictví vaší domény.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Vyžádejte si nový token",
+        "VERIFICATION_VALIDATION_ONGOING": "Pro ověření vaší domény byla vybrána metoda {{ value }}. Kliknutím na tlačítko spustíte kontrolu ověření nebo resetujete proces ověření.",
         "VERIFICATION_SUCCESSFUL": "Doména byla úspěšně ověřena!",
-        "REQUESTNEWTOKEN": "Požadovat nový token",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "RESETMETHOD": "Resetovat metodu ověření"
       },
       "DOWNLOAD_FILE": "Stáhnout soubor",
       "SELECTORGTOOLTIP": "Vybrat tuto organizaci.",
@@ -1019,7 +1023,7 @@
       "DESCRIPTION": "Tato nastavení rozšiřují a přepisují nastavení vaší instance."
     },
     "LIST": {
-      "GENERAL": "Obecné",
+      "LANGUAGES": "Jazyky",
       "LOGIN": "Chování při přihlášení a bezpečnost",
       "LOCKOUT": "Blokování",
       "COMPLEXITY": "Složitost hesla",
@@ -1048,22 +1052,32 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Výchozí jazyk",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Nastavení jazyka",
+      "DEFAULT": "Výchozí jazyk",
+      "ALLOWED": "Povolené jazyky",
+      "NOT_ALLOWED": "Nepovolené jazyky",
+      "ALLOW_ALL": "Povolit všechny jazyky",
+      "DISALLOW_ALL": "Zakázat všechny jazyky",
+      "SETASDEFAULT": "Nastavit jako výchozí",
+      "DEFAULT_SAVED": "Výchozí jazyk byl úspěšně nastaven.",
+      "ALLOWED_SAVED": "Povolené jazyky byly úspěšně nastaveny.",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "Nastavení SMTP",
@@ -1262,8 +1276,10 @@
       "RESET_DESCRIPTION": "Chystáte se obnovit všechny výchozí hodnoty. Všechny vaše změny budou trvale smazány. Opravdu chcete pokračovat?",
       "UNSAVED_TITLE": "Pokračovat bez uložení?",
       "UNSAVED_DESCRIPTION": "Provedli jste změny bez uložení. Chcete je nyní uložit?",
-      "LOCALE": "Kód jazyka",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Vybrali jste jazyk, který není povolen. Můžete pokračovat v úpravách textů. Ale pokud chcete, aby vaši uživatelé mohli tento jazyk skutečně používat, změňte omezení vašich instancí.",
+      "LANGUAGES_NOT_ALLOWED": "Nepovolené jazyky:",
+      "LANGUAGE": "Jazyk",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1375,6 +1391,8 @@
       "ALLOWUSERNAMEPASSWORD": "Povoleno uživatelské jméno a heslo",
       "ALLOWEXTERNALIDP": "Povoleno externí IDP",
       "ALLOWREGISTER": "Registrace povolena",
+      "ALLOWREGISTERUSERS": "Registrace uživatelů povolena",
+      "ALLOWREGISTERORGS": "Registrace organizací povolena",
       "ALLOWUSERNAMEPASSWORD_DESC": "Je povoleno klasické přihlášení s uživatelským jménem a heslem.",
       "ALLOWEXTERNALIDP_DESC": "Přihlášení je povoleno pro níže uvedené poskytovatele identity.",
       "ALLOWREGISTER_DESC": "Pokud je možnost vybrána, objeví se při přihlášení další krok pro registraci uživatele.",

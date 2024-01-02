@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -11,9 +11,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type DebugNotificationProvider struct {
@@ -87,7 +87,7 @@ func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID str
 		}).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-f9jSf", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-f9jSf", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -122,10 +122,10 @@ func prepareDebugNotificationProviderQuery(ctx context.Context, db prepareDataba
 				&p.Compact,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-s9ujf", "Errors.NotificationProvider.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-s9ujf", "Errors.NotificationProvider.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-2liu0", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-2liu0", "Errors.Internal")
 			}
 			return p, nil
 		}

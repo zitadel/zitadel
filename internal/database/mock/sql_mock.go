@@ -53,6 +53,15 @@ func ExpectBegin(err error) expectation {
 	}
 }
 
+func ExpectCommit(err error) expectation {
+	return func(m sqlmock.Sqlmock) {
+		e := m.ExpectCommit()
+		if err != nil {
+			e.WillReturnError(err)
+		}
+	}
+}
+
 type ExecOpt func(e *sqlmock.ExpectedExec) *sqlmock.ExpectedExec
 
 func WithExecArgs(args ...driver.Value) ExecOpt {

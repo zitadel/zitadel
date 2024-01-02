@@ -230,13 +230,29 @@ service AdminService {
         };
 
         option (zitadel.v1.auth_option) = {
-            permission: "iam.read";
+            permission: "authenticated";
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "General";
             summary: "Supported Languages";
             description: "The supported/default languages of the system will be returned by the language abbreviation."
+        };
+    }
+
+    rpc GetAllowedLanguages(GetAllowedLanguagesRequest) returns (GetAllowedLanguagesResponse) {
+        option (google.api.http) = {
+            get: "/languages/allowed";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            summary: "Allowed Languages";
+            description: "If the languages are restricted, only those are returned. Else, all supported languages are returned."
+            tags: "Restrictions";
         };
     }
 
@@ -3843,7 +3859,7 @@ service AdminService {
             responses: {
                 key: "200";
                 value: {
-                    description: "The status 200 is also returned if no restrictions were ever set. In this case, all feature restrictions have zero values.";
+                    description: "The status 200 is also returned if no restrictions were ever set. In this case, all feature restrictions are undefined.";
                 };
             };
         };
@@ -3861,6 +3877,17 @@ message HealthzResponse {}
 message GetSupportedLanguagesRequest {}
 
 message GetSupportedLanguagesResponse {
+    repeated string languages = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"en\", \"de\", \"it\"]"
+        }
+    ];
+}
+
+//This is an empty request
+message GetAllowedLanguagesRequest {}
+
+message GetAllowedLanguagesResponse {
     repeated string languages = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "[\"en\", \"de\", \"it\"]"
@@ -7945,11 +7972,35 @@ message ListEventsRequest {
         }
     ];
     google.protobuf.Timestamp creation_date = 9 [
+        deprecated = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"2019-04-01T08:45:00.000000Z\"";
-            description: "If asc is false, the events returned are older than creation_date. If asc is true, the events returned are younger than creation_date. If creation_date is not set the field is ignored.";
+            description: "Use from instead.";
         }
     ];
+    message creation_date_range {
+        google.protobuf.Timestamp since = 1 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"2019-04-01T08:45:00.000000Z\"";
+                description: "The events returned are younger than the UTC since date";
+            }
+        ];
+        google.protobuf.Timestamp until = 2 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"2019-04-01T08:45:00.000000Z\"";
+                description: "The events returned are older than the UTC until date.";
+            }
+        ];
+    }
+    oneof creation_date_filter {
+        creation_date_range range = 10;
+        google.protobuf.Timestamp from = 11 [
+            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+                example: "\"2019-04-01T08:45:00.000000Z\"";
+                description: "If asc is false, the events returned are older than the UTC from date. If asc is true, the events returned are younger than from.";
+            }
+        ];
+    }
 }
 
 message ListEventsResponse {
@@ -7994,6 +8045,20 @@ message SetRestrictionsRequest {
             description: "defines if ZITADEL should expose the endpoint /ui/login/register/org. If it is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
         }
     ];
+    optional SelectLanguages allowed_languages = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "restricts the allowed languages. If allowed_languages is undefined, the allowed languages are not changed.";
+        }
+    ];
+}
+
+// We have to wrap the languages list into a message so we can serialize empty lists.
+message SelectLanguages {
+    repeated string list = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which languages to select. An empty list means all languages are selected.";
+        }
+    ];
 }
 
 message SetRestrictionsResponse {
@@ -8007,6 +8072,11 @@ message GetRestrictionsResponse {
     bool disallow_public_org_registration = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines if ZITADEL should expose the endpoint /ui/login/register/org. If it is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
+        }
+    ];
+    repeated string allowed_languages = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines the allowed languages. If allowed_languages has one or more entries, only these languages are allowed. If it has no entries, all supported languages are allowed";
         }
     ];
 }

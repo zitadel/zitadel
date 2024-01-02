@@ -6,19 +6,19 @@ import (
 	"github.com/zitadel/saml/pkg/provider/xml"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddSAMLApplication(ctx context.Context, application *domain.SAMLApp, resourceOwner string) (_ *domain.SAMLApp, err error) {
 	if application == nil || application.AggregateID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-35Fn0", "Errors.Project.App.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-35Fn0", "Errors.Project.App.Invalid")
 	}
 
 	_, err = c.getProjectByID(ctx, application.AggregateID, resourceOwner)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "PROJECT-3p9ss", "Errors.Project.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(err, "PROJECT-3p9ss", "Errors.Project.NotFound")
 	}
 
 	addedApplication := NewSAMLApplicationWriteModel(application.AggregateID, resourceOwner)
@@ -43,24 +43,24 @@ func (c *Commands) AddSAMLApplication(ctx context.Context, application *domain.S
 func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstore.Aggregate, samlApp *domain.SAMLApp) (events []eventstore.Command, err error) {
 
 	if samlApp.AppName == "" || !samlApp.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-1n9df", "Errors.Project.App.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-1n9df", "Errors.Project.App.Invalid")
 	}
 
 	if samlApp.Metadata == nil && samlApp.MetadataURL == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "SAML-podix9", "Errors.Project.App.SAMLMetadataMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "SAML-podix9", "Errors.Project.App.SAMLMetadataMissing")
 	}
 
 	if samlApp.MetadataURL != "" {
 		data, err := xml.ReadMetadataFromURL(c.httpClient, samlApp.MetadataURL)
 		if err != nil {
-			return nil, caos_errs.ThrowInvalidArgument(err, "SAML-wmqlo1", "Errors.Project.App.SAMLMetadataMissing")
+			return nil, zerrors.ThrowInvalidArgument(err, "SAML-wmqlo1", "Errors.Project.App.SAMLMetadataMissing")
 		}
 		samlApp.Metadata = data
 	}
 
 	entity, err := xml.ParseMetadataXmlIntoStruct(samlApp.Metadata)
 	if err != nil {
-		return nil, caos_errs.ThrowInvalidArgument(err, "SAML-bquso", "Errors.Project.App.SAMLMetadataFormat")
+		return nil, zerrors.ThrowInvalidArgument(err, "SAML-bquso", "Errors.Project.App.SAMLMetadataFormat")
 	}
 
 	samlApp.AppID, err = c.idGenerator.Next()
@@ -82,7 +82,7 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 
 func (c *Commands) ChangeSAMLApplication(ctx context.Context, samlApp *domain.SAMLApp, resourceOwner string) (*domain.SAMLApp, error) {
 	if !samlApp.IsValid() || samlApp.AppID == "" || samlApp.AggregateID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5n9fs", "Errors.Project.App.SAMLConfigInvalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-5n9fs", "Errors.Project.App.SAMLConfigInvalid")
 	}
 
 	existingSAML, err := c.getSAMLAppWriteModel(ctx, samlApp.AggregateID, samlApp.AppID, resourceOwner)
@@ -90,24 +90,24 @@ func (c *Commands) ChangeSAMLApplication(ctx context.Context, samlApp *domain.SA
 		return nil, err
 	}
 	if existingSAML.State == domain.AppStateUnspecified || existingSAML.State == domain.AppStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2n8uU", "Errors.Project.App.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-2n8uU", "Errors.Project.App.NotExisting")
 	}
 	if !existingSAML.IsSAML() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-GBr35", "Errors.Project.App.IsNotSAML")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-GBr35", "Errors.Project.App.IsNotSAML")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingSAML.WriteModel)
 
 	if samlApp.MetadataURL != "" {
 		data, err := xml.ReadMetadataFromURL(c.httpClient, samlApp.MetadataURL)
 		if err != nil {
-			return nil, caos_errs.ThrowInvalidArgument(err, "SAML-J3kg3", "Errors.Project.App.SAMLMetadataMissing")
+			return nil, zerrors.ThrowInvalidArgument(err, "SAML-J3kg3", "Errors.Project.App.SAMLMetadataMissing")
 		}
 		samlApp.Metadata = data
 	}
 
 	entity, err := xml.ParseMetadataXmlIntoStruct(samlApp.Metadata)
 	if err != nil {
-		return nil, caos_errs.ThrowInvalidArgument(err, "SAML-3fk2b", "Errors.Project.App.SAMLMetadataFormat")
+		return nil, zerrors.ThrowInvalidArgument(err, "SAML-3fk2b", "Errors.Project.App.SAMLMetadataFormat")
 	}
 
 	changedEvent, hasChanged, err := existingSAML.NewChangedEvent(
@@ -121,7 +121,7 @@ func (c *Commands) ChangeSAMLApplication(ctx context.Context, samlApp *domain.SA
 		return nil, err
 	}
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1m88i", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-1m88i", "Errors.NoChangesFound")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)

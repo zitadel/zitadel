@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -12,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -25,6 +27,12 @@ type Server struct {
 	query   *query.Queries
 	command *command.Commands
 	keySet  *keySetCache
+
+	defaultLoginURL            string
+	defaultLoginURLV2          string
+	defaultLogoutURLV2         string
+	defaultAccessTokenLifetime time.Duration
+	defaultIdTokenLifetime     time.Duration
 
 	fallbackLogger      *slog.Logger
 	hashAlg             crypto.HashAlgorithm
@@ -103,8 +111,15 @@ func (s *Server) Ready(ctx context.Context, r *op.Request[struct{}]) (_ *op.Resp
 func (s *Server) Discovery(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-
-	return op.NewResponse(s.createDiscoveryConfig(ctx)), nil
+	restrictions, err := s.query.GetInstanceRestrictions(ctx)
+	if err != nil {
+		return nil, err
+	}
+	allowedLanguages := restrictions.AllowedLanguages
+	if len(allowedLanguages) == 0 {
+		allowedLanguages = i18n.SupportedLanguages()
+	}
+	return op.NewResponse(s.createDiscoveryConfig(ctx, allowedLanguages)), nil
 }
 
 func (s *Server) Keys(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
@@ -133,13 +148,6 @@ func (s *Server) DeviceAuthorization(ctx context.Context, r *op.ClientRequest[oi
 	defer func() { span.EndWithError(err) }()
 
 	return s.LegacyServer.DeviceAuthorization(ctx, r)
-}
-
-func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCredentials]) (_ op.Client, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.VerifyClient(ctx, r)
 }
 
 func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.AccessTokenRequest]) (_ *op.Response, err error) {
@@ -205,7 +213,7 @@ func (s *Server) EndSession(ctx context.Context, r *op.Request[oidc.EndSessionRe
 	return s.LegacyServer.EndSession(ctx, r)
 }
 
-func (s *Server) createDiscoveryConfig(ctx context.Context) *oidc.DiscoveryConfiguration {
+func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales oidc.Locales) *oidc.DiscoveryConfiguration {
 	issuer := op.IssuerFromContext(ctx)
 	return &oidc.DiscoveryConfiguration{
 		Issuer:                                     issuer,
@@ -231,7 +239,7 @@ func (s *Server) createDiscoveryConfig(ctx context.Context) *oidc.DiscoveryConfi
 		RevocationEndpointAuthMethodsSupported:             op.AuthMethodsRevocationEndpoint(s.Provider()),
 		ClaimsSupported:                                    op.SupportedClaims(s.Provider()),
 		CodeChallengeMethodsSupported:                      op.CodeChallengeMethods(s.Provider()),
-		UILocalesSupported:                                 s.Provider().SupportedUILocales(),
+		UILocalesSupported:                                 supportedUILocales,
 		RequestParameterSupported:                          s.Provider().RequestObjectSupported(),
 	}
 }

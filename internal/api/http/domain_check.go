@@ -7,7 +7,7 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type CheckType int
@@ -27,30 +27,30 @@ func ValidateDomain(domain, token, verifier string, checkType CheckType) error {
 	case CheckTypeDNS:
 		return ValidateDomainDNS(domain, verifier)
 	default:
-		return errors.ThrowInvalidArgument(nil, "HTTP-Iqd11", "Errors.Internal")
+		return zerrors.ThrowInvalidArgument(nil, "HTTP-Iqd11", "Errors.Internal")
 	}
 }
 
 func ValidateDomainHTTP(domain, token, verifier string) error {
 	resp, err := http.Get(tokenUrlHTTP(domain, token))
 	if err != nil {
-		return errors.ThrowInternal(err, "HTTP-BH42h", "Errors.Internal")
+		return zerrors.ThrowInternal(err, "HTTP-BH42h", "Errors.Internal")
 	}
 	if resp.StatusCode != 200 {
 		if resp.StatusCode == 404 {
-			return errors.ThrowNotFound(err, "ORG-F4zhw", "Errors.Org.DomainVerificationHTTPNotFound")
+			return zerrors.ThrowNotFound(err, "ORG-F4zhw", "Errors.Org.DomainVerificationHTTPNotFound")
 		}
-		return errors.ThrowInternal(err, "HTTP-G2zsw", "Errors.Internal")
+		return zerrors.ThrowInternal(err, "HTTP-G2zsw", "Errors.Internal")
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return errors.ThrowInternal(err, "HTTP-HB432", "Errors.Internal")
+		return zerrors.ThrowInternal(err, "HTTP-HB432", "Errors.Internal")
 	}
 	if string(body) == verifier {
 		return nil
 	}
-	return errors.ThrowNotFound(err, "ORG-GH422", "Errors.Org.DomainVerificationHTTPNoMatch")
+	return zerrors.ThrowNotFound(err, "ORG-GH422", "Errors.Org.DomainVerificationHTTPNoMatch")
 }
 
 func ValidateDomainDNS(domain, verifier string) error {
@@ -59,13 +59,13 @@ func ValidateDomainDNS(domain, verifier string) error {
 		var dnsError *net.DNSError
 		if errorsAs.As(err, &dnsError) {
 			if dnsError.IsNotFound {
-				return errors.ThrowNotFound(err, "ORG-G241f", "Errors.Org.DomainVerificationTXTNotFound")
+				return zerrors.ThrowNotFound(err, "ORG-G241f", "Errors.Org.DomainVerificationTXTNotFound")
 			}
 			if dnsError.IsTimeout {
-				return errors.ThrowNotFound(err, "ORG-K563l", "Errors.Org.DomainVerificationTimeout")
+				return zerrors.ThrowNotFound(err, "ORG-K563l", "Errors.Org.DomainVerificationTimeout")
 			}
 		}
-		return errors.ThrowInternal(err, "HTTP-Hwsw2", "Errors.Internal")
+		return zerrors.ThrowInternal(err, "HTTP-Hwsw2", "Errors.Internal")
 	}
 
 	for _, record := range txtRecords {
@@ -73,7 +73,7 @@ func ValidateDomainDNS(domain, verifier string) error {
 			return nil
 		}
 	}
-	return errors.ThrowNotFound(err, "ORG-G28if", "Errors.Org.DomainVerificationTXTNoMatch")
+	return zerrors.ThrowNotFound(err, "ORG-G28if", "Errors.Org.DomainVerificationTXTNoMatch")
 }
 
 func TokenUrl(domain, token string, checkType CheckType) (string, error) {
@@ -83,7 +83,7 @@ func TokenUrl(domain, token string, checkType CheckType) (string, error) {
 	case CheckTypeDNS:
 		return tokenUrlDNS(domain), nil
 	default:
-		return "", errors.ThrowInvalidArgument(nil, "HTTP-Iqd11", "")
+		return "", zerrors.ThrowInvalidArgument(nil, "HTTP-Iqd11", "")
 	}
 }
 

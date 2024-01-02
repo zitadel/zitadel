@@ -63,6 +63,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
@@ -94,7 +95,6 @@ Requirements:
 			if err != nil {
 				return err
 			}
-
 			return startZitadel(config, masterKey, server)
 		},
 	}
@@ -123,6 +123,8 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	showBasicInformation(config)
 
 	ctx := context.Background()
+
+	i18n.MustLoadSupportedLanguagesFromDir()
 
 	queryDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeQuery)
 	if err != nil {
@@ -221,6 +223,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
 	}
+	defer commands.Close(ctx) // wait for background jobs
 
 	clock := clockpkg.New()
 	actionsExecutionStdoutEmitter, err := logstore.NewEmitter[*record.ExecutionLog](ctx, clock, &logstore.EmitterConfig{Enabled: config.LogStore.Execution.Stdout.Enabled}, stdout.NewStdoutEmitter[*record.ExecutionLog]())

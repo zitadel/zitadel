@@ -4,13 +4,13 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -103,7 +103,7 @@ func (p *personalAccessTokenProjection) Reducers() []handler.AggregateReducer {
 func (p *personalAccessTokenProjection) reducePersonalAccessTokenAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.PersonalAccessTokenAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DVgf7", "reduce.wrong.event.type %s", user.PersonalAccessTokenAddedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-DVgf7", "reduce.wrong.event.type %s", user.PersonalAccessTokenAddedType)
 	}
 	return handler.NewCreateStatement(
 		e,
@@ -124,7 +124,7 @@ func (p *personalAccessTokenProjection) reducePersonalAccessTokenAdded(event eve
 func (p *personalAccessTokenProjection) reducePersonalAccessTokenRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.PersonalAccessTokenRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-g7u3F", "reduce.wrong.event.type %s", user.PersonalAccessTokenRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-g7u3F", "reduce.wrong.event.type %s", user.PersonalAccessTokenRemovedType)
 	}
 	return handler.NewDeleteStatement(
 		e,
@@ -138,7 +138,7 @@ func (p *personalAccessTokenProjection) reducePersonalAccessTokenRemoved(event e
 func (p *personalAccessTokenProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dff3h", "reduce.wrong.event.type %s", user.UserRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Dff3h", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
 	return handler.NewDeleteStatement(
 		e,
@@ -152,7 +152,7 @@ func (p *personalAccessTokenProjection) reduceUserRemoved(event eventstore.Event
 func (p *personalAccessTokenProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-zQVhl", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-zQVhl", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
 	return handler.NewDeleteStatement(

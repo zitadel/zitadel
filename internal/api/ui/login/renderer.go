@@ -16,12 +16,12 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/notification/templates"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/renderer"
 	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -39,7 +39,7 @@ type LanguageData struct {
 	Lang string
 }
 
-func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage static.Storage, cookieName string) *Renderer {
+func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName string) *Renderer {
 	r := &Renderer{
 		pathPrefix:    pathPrefix,
 		staticStorage: staticStorage,
@@ -238,7 +238,6 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 	}
 	var err error
 	r.Renderer, err = renderer.NewRenderer(
-		staticDir,
 		tmplMapping, funcs,
 		cookieName,
 	)
@@ -248,7 +247,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 
 func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	if authReq == nil {
-		l.renderInternalError(w, r, nil, caos_errs.ThrowInvalidArgument(nil, "LOGIN-Df3f2", "Errors.AuthRequest.NotFound"))
+		l.renderInternalError(w, r, nil, zerrors.ThrowInvalidArgument(nil, "LOGIN-Df3f2", "Errors.AuthRequest.NotFound"))
 		return
 	}
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
@@ -257,7 +256,7 @@ func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		return
 	}
 	if len(authReq.PossibleSteps) == 0 {
-		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-9sdp4", "no possible steps"))
+		l.renderInternalError(w, r, authReq, zerrors.ThrowInternal(nil, "APP-9sdp4", "no possible steps"))
 		return
 	}
 	l.chooseNextStep(w, r, authReq, 0, nil)
@@ -269,7 +268,7 @@ func (l *Login) renderError(w http.ResponseWriter, r *http.Request, authReq *dom
 		return
 	}
 	if authReq == nil || len(authReq.PossibleSteps) == 0 {
-		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(err, "APP-OVOiT", "no possible steps"))
+		l.renderInternalError(w, r, authReq, zerrors.ThrowInternal(err, "APP-OVOiT", "no possible steps"))
 		return
 	}
 	l.chooseNextStep(w, r, authReq, 0, err)
@@ -324,11 +323,11 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	case *domain.ExternalLoginStep:
 		l.handleExternalLoginStep(w, r, authReq, step.SelectedIDPConfigID)
 	case *domain.GrantRequiredStep:
-		l.renderInternalError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-asb43", "Errors.User.GrantRequired"))
+		l.renderInternalError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "APP-asb43", "Errors.User.GrantRequired"))
 	case *domain.ProjectRequiredStep:
-		l.renderInternalError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-m92d", "Errors.User.ProjectRequired"))
+		l.renderInternalError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "APP-m92d", "Errors.User.ProjectRequired"))
 	default:
-		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
+		l.renderInternalError(w, r, authReq, zerrors.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}
 }
 
@@ -343,13 +342,14 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 
 		_, msg = l.getErrorMessage(r, err)
 	}
-	data := l.getBaseData(r, authReq, "Errors.Internal", "", "Internal", msg)
-	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplError], data, nil)
+	translator := l.getTranslator(r.Context(), authReq)
+	data := l.getBaseData(r, authReq, translator, "Errors.Internal", "", "Internal", msg)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplError], data, nil)
 }
 
-func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, titleI18nKey string, descriptionI18nKey string, errType, errMessage string) userData {
+func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, translator *i18n.Translator, titleI18nKey string, descriptionI18nKey string, errType, errMessage string) userData {
 	userData := userData{
-		baseData:    l.getBaseData(r, authReq, titleI18nKey, descriptionI18nKey, errType, errMessage),
+		baseData:    l.getBaseData(r, authReq, translator, titleI18nKey, descriptionI18nKey, errType, errMessage),
 		profileData: l.getProfileData(authReq),
 	}
 	if authReq != nil && authReq.LinkingUsers != nil {
@@ -358,9 +358,7 @@ func (l *Login) getUserData(r *http.Request, authReq *domain.AuthRequest, titleI
 	return userData
 }
 
-func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, titleI18nKey string, descriptionI18nKey string, errType, errMessage string) baseData {
-	translator := l.getTranslator(r.Context(), authReq)
-
+func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, translator *i18n.Translator, titleI18nKey string, descriptionI18nKey string, errType, errMessage string) baseData {
 	title := ""
 	if titleI18nKey != "" {
 		title = translator.LocalizeWithoutArgs(titleI18nKey)
@@ -418,7 +416,11 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, titleI
 }
 
 func (l *Login) getTranslator(ctx context.Context, authReq *domain.AuthRequest) *i18n.Translator {
-	translator, err := l.renderer.NewTranslator(ctx)
+	restrictions, err := l.query.GetInstanceRestrictions(ctx)
+	if err != nil {
+		logging.OnError(err).Warn("cannot load instance restrictions to retrieve allowed languages for creating the translator")
+	}
+	translator, err := l.renderer.NewTranslator(ctx, restrictions.AllowedLanguages)
 	logging.OnError(err).Warn("cannot load translator")
 	if authReq != nil {
 		l.addLoginTranslations(translator, authReq.DefaultTranslations)
@@ -468,7 +470,7 @@ func (l *Login) setLinksOnBaseData(baseData baseData, privacyPolicy *domain.Priv
 }
 
 func (l *Login) getErrorMessage(r *http.Request, err error) (errID, errMsg string) {
-	caosErr := new(caos_errs.CaosError)
+	caosErr := new(zerrors.ZitadelError)
 	if errors.As(err, &caosErr) {
 		localized := l.renderer.LocalizeFromRequest(l.getTranslator(r.Context(), nil), r, caosErr.Message, nil)
 		return caosErr.ID, localized

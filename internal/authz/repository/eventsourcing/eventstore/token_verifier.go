@@ -18,13 +18,13 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type TokenVerifierRepo struct {
@@ -53,10 +53,10 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 		Errorf("could not get current sequence for token check")
 
 	token, viewErr := repo.View.TokenByIDs(tokenID, userID, instanceID)
-	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
+	if viewErr != nil && !zerrors.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
-	if caos_errs.IsNotFound(viewErr) {
+	if zerrors.IsNotFound(viewErr) {
 		token = new(model.TokenView)
 		token.ID = tokenID
 		token.UserID = userID
@@ -66,8 +66,8 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 	}
 
 	events, esErr := repo.getUserEvents(ctx, userID, instanceID, token.ChangeDate, token.GetRelevantEventTypes())
-	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
+	if zerrors.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, zerrors.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
 	}
 
 	if esErr != nil {
@@ -82,7 +82,7 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 		}
 	}
 	if !token.Expiration.After(time.Now().UTC()) || token.Deactivated {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.Token.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.Token.NotFound")
 	}
 	return model.TokenViewToModel(token), nil
 }
@@ -93,7 +93,7 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 
 	tokenID, subject, ok := repo.getTokenIDAndSubject(ctx, tokenString)
 	if !ok {
-		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-Reb32", "invalid token")
+		return "", "", "", "", "", zerrors.ThrowUnauthenticated(nil, "APP-Reb32", "invalid token")
 	}
 	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
 		userID, clientID, resourceOwner, err = repo.verifyAccessTokenV2(ctx, tokenID, verifierClientID, projectID)
@@ -114,10 +114,10 @@ func (repo *TokenVerifierRepo) verifyAccessTokenV1(ctx context.Context, tokenID,
 	token, err := repo.tokenByID(ctx, tokenID, subject)
 	tokenSpan.EndWithError(err)
 	if err != nil {
-		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-BxUSiL", "invalid token")
+		return "", "", "", "", "", zerrors.ThrowUnauthenticated(err, "APP-BxUSiL", "invalid token")
 	}
 	if !token.Expiration.After(time.Now().UTC()) {
-		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-k9KS0", "invalid token")
+		return "", "", "", "", "", zerrors.ThrowUnauthenticated(err, "APP-k9KS0", "invalid token")
 	}
 	if token.IsPAT {
 		return token.UserID, "", "", "", token.ResourceOwner, nil
@@ -154,7 +154,7 @@ func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID
 		return "", "", "", err
 	}
 	if !session.Expiration.IsZero() && session.Expiration.Before(time.Now()) {
-		return "", "", "", caos_errs.ThrowPermissionDenied(nil, "AUTHZ-EGDo3", "session expired")
+		return "", "", "", zerrors.ThrowPermissionDenied(nil, "AUTHZ-EGDo3", "session expired")
 	}
 	if err = repo.checkAuthentication(ctx, authMethodsFromSession(session), session.UserFactor.UserID); err != nil {
 		return "", "", "", err
@@ -166,7 +166,7 @@ func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID
 // It will also check if there was a multi factor authentication, if either MFA is forced by the login policy or if the user has set up any
 func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMethods []domain.UserAuthMethodType, userID string) error {
 	if len(authMethods) == 0 {
-		return caos_errs.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "authentication required")
+		return zerrors.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "authentication required")
 	}
 	if domain.HasMFA(authMethods) {
 		return nil
@@ -176,7 +176,7 @@ func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMeth
 		return err
 	}
 	if domain.RequiresMFA(forceMFA, forceMFALocalOnly, hasIDPAuthentication(authMethods)) || domain.HasMFA(availableAuthMethods) {
-		return caos_errs.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "mfa required")
+		return zerrors.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "mfa required")
 	}
 	return nil
 }
@@ -288,11 +288,11 @@ func (repo *TokenVerifierRepo) jwtTokenVerifier(ctx context.Context) *op.AccessT
 func (repo *TokenVerifierRepo) decryptAccessToken(token string) (string, error) {
 	tokenData, err := base64.RawURLEncoding.DecodeString(token)
 	if err != nil {
-		return "", caos_errs.ThrowUnauthenticated(nil, "APP-ASdgg", "invalid token")
+		return "", zerrors.ThrowUnauthenticated(nil, "APP-ASdgg", "invalid token")
 	}
 	tokenIDSubject, err := repo.TokenVerificationKey.DecryptString(tokenData, repo.TokenVerificationKey.EncryptionKeyID())
 	if err != nil {
-		return "", caos_errs.ThrowUnauthenticated(nil, "APP-8EF0zZ", "invalid token")
+		return "", zerrors.ThrowUnauthenticated(nil, "APP-8EF0zZ", "invalid token")
 	}
 	return tokenIDSubject, nil
 }
@@ -303,7 +303,7 @@ func verifyAudience(audience []string, verifierClientID, projectID string) error
 			return nil
 		}
 	}
-	return caos_errs.ThrowUnauthenticated(nil, "APP-Zxfako", "invalid audience")
+	return zerrors.ThrowUnauthenticated(nil, "APP-Zxfako", "invalid audience")
 }
 
 type openIDKeySet struct {

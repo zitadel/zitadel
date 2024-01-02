@@ -6,14 +6,17 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+// SetOrgMessageText only validates if the language is supported, not if it is allowed.
+// This enables setting texts before allowing a language
 func (c *Commands) SetOrgMessageText(ctx context.Context, resourceOwner string, messageText *domain.CustomMessageText) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "ORG-2biiR", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-2biiR", "Errors.ResourceOwnerMissing")
 	}
 	orgAgg := org.NewAggregate(resourceOwner)
 	events, existingMessageText, err := c.setOrgMessageText(ctx, &orgAgg.Aggregate, messageText)
@@ -32,10 +35,9 @@ func (c *Commands) SetOrgMessageText(ctx context.Context, resourceOwner string, 
 }
 
 func (c *Commands) setOrgMessageText(ctx context.Context, orgAgg *eventstore.Aggregate, message *domain.CustomMessageText) ([]eventstore.Command, *OrgCustomMessageTextReadModel, error) {
-	if !message.IsValid() {
-		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "ORG-2jfsf", "Errors.CustomText.Invalid")
+	if err := message.IsValid(i18n.SupportedLanguages()); err != nil {
+		return nil, nil, err
 	}
-
 	existingMessageText, err := c.orgCustomMessageTextWriteModelByID(ctx, orgAgg.ID, message.MessageTextType, message.Language)
 	if err != nil {
 		return nil, nil, err
@@ -95,17 +97,17 @@ func (c *Commands) setOrgMessageText(ctx context.Context, orgAgg *eventstore.Agg
 
 func (c *Commands) RemoveOrgMessageTexts(ctx context.Context, resourceOwner, messageTextType string, lang language.Tag) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-3mfsf", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-3mfsf", "Errors.ResourceOwnerMissing")
 	}
 	if messageTextType == "" || lang == language.Und {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-j59f", "Errors.CustomMessageText.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-j59f", "Errors.CustomMessageText.Invalid")
 	}
 	customText, err := c.orgCustomMessageTextWriteModelByID(ctx, resourceOwner, messageTextType, lang)
 	if err != nil {
 		return nil, err
 	}
 	if customText.State == domain.PolicyStateUnspecified || customText.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-3b8Jf", "Errors.CustomMessageText.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "Org-3b8Jf", "Errors.CustomMessageText.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&customText.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewCustomTextTemplateRemovedEvent(ctx, orgAgg, messageTextType, lang))

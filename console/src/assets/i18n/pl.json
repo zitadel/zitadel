@@ -871,14 +871,16 @@
         },
         "SEQUENCE": {
           "LABEL": "Sekwencja",
-          "CHECKBOX": "Filtruj według sekwencji",
-          "SORT": "Sortowanie",
-          "ASC": "Rosnące",
-          "DESC": "Malejące"
+          "CHECKBOX": "Filtruj według sekwencji"
         },
+        "SORT": "Sortowanie",
+        "ASC": "Rosnące",
+        "DESC": "Malejące",
         "CREATIONDATE": {
-          "LABEL": "Data utworzenia",
-          "CHECKBOX": "Filtruj według daty utworzenia"
+          "RADIO_FROM": "Od",
+          "RADIO_RANGE": "Zakres",
+          "LABEL_SINCE": "Od",
+          "LABEL_UNTIL": "Do"
         },
         "OTHER": "inne",
         "OTHERS": "inni"
@@ -928,20 +930,22 @@
         "BTN": "Zmień nazwę"
       },
       "ORGDOMAIN": {
-        "TITLE": "Weryfikacja własności domeny organizacji",
-        "VERIFICATION": "Aby zweryfikować własność swojej domeny, musisz pobrać plik weryfikacyjny i przesłać go na podany poniżej adres URL lub dodać rekord TXT DNS dla podanego adresu URL. Aby zakończyć, kliknij przycisk weryfikuj.",
-        "VERIFICATION_SKIP": "Możesz teraz pominąć weryfikację i kontynuować tworzenie swojej organizacji, ale aby korzystać z organizacji, ta krok musi zostać ukończony!",
-        "VERIFICATION_VALIDATION_DESC": "Tokeny są regularnie sprawdzane, aby upewnić się, że nadal jesteś właścicielem domeny.",
-        "VERIFICATION_NEWTOKEN_TITLE": "Prośba o nowy token",
-        "VERIFICATION_NEWTOKEN_DESC": "Jeśli chcesz poprosić o nowy token, wybierz preferowany sposób. Jeśli chcesz zwalidować trwający token, kliknij powyższy przycisk.",
-        "VERIFICATION_VALIDATION_ONGOING": "Token weryfikacyjny został już zażądany. Kliknij przycisk, aby uruchomić sprawdzenie weryfikacyjne.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Typ tokenu:",
-        "VERIFICATION_SUCCESSFUL": "Domena zweryfikowana pomyślnie!",
-        "REQUESTNEWTOKEN": "Poproś o nowy token",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "TITLE": "Zweryfikuj własność {{value}}",
+        "VERIFICATION": "Oferujemy dwie metody ręcznej weryfikacji domeny:",
+        "VERIFICATION_HTML": "-HTTP. Umieść tymczasowy plik weryfikacyjny w swojej witrynie",
+        "VERIFICATION_DNS": "-DNS. Utwórz wpis DNS rekordu TXT",
+        "VERIFICATION_DNS_DESC": "Jeśli zarządzasz wartością {{ value }} i masz dostęp do swoich rekordów DNS, możesz utworzyć nowy rekord TXT z następującymi wartościami:",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Użyj tego kodu dla wartości rekordu TXT:",
+        "VERIFICATION_HTTP_DESC": "Jeśli masz dostęp do hostingu swojej witryny, po prostu pobierz plik weryfikacyjny i prześlij go pod podanym adresem URL",
+        "VERIFICATION_HTTP_URL_LABEL": "Oczekiwany adres URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Plik weryfikacyjny:",
+        "VERIFICATION_SKIP": "Możesz na razie pominąć weryfikację i kontynuować tworzenie organizacji, jednak aby móc korzystać z domeny, ten krok musi zostać ukończony!",
+        "VERIFICATION_VALIDATION_DESC": "Nie usuwaj kodu weryfikacyjnego, ponieważ ZITADEL będzie od czasu do czasu ponownie sprawdzał własność Twojej domeny.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Poproś o nowy token",
+        "VERIFICATION_VALIDATION_ONGOING": "Wybrano metodę {{ value }} do weryfikacji Twojej domeny. Kliknij przycisk, aby uruchomić kontrolę weryfikacyjną lub zresetować proces weryfikacji.",
+        "VERIFICATION_SUCCESSFUL": "Domena pomyślnie zweryfikowana!",
+        "RESETMETHOD": "Zresetuj metodę weryfikacji"
       },
       "DOWNLOAD_FILE": "Pobierz plik",
       "SELECTORGTOOLTIP": "Wybierz tę organizację.",
@@ -1018,7 +1022,7 @@
       "DESCRIPTION": "Te ustawienia rozszerzają i nadpisują ustawienia instancji."
     },
     "LIST": {
-      "GENERAL": "Ogólne",
+      "LANGUAGES": "Języki",
       "LOGIN": "Zachowanie logowania i bezpieczeństwo",
       "LOCKOUT": "Blokada",
       "COMPLEXITY": "Złożoność hasła",
@@ -1047,22 +1051,32 @@
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Domyślny język",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски",
-      "cs": "Čeština",
-      "ru": "Русский",
-      "nl": "Nederlands"
+    "LANGUAGES": {
+      "TITLE": "Ustawienia językowe",
+      "DEFAULT": "Domyślny język",
+      "ALLOWED": "Dozwolone języki",
+      "NOT_ALLOWED": "Niedozwolone języki",
+      "ALLOW_ALL": "Zezwól na wszystkie języki",
+      "DISALLOW_ALL": "Zabroń wszystkich języków",
+      "SETASDEFAULT": "Ustaw jako domyślny język",
+      "DEFAULT_SAVED": "Domyślny język zapisany",
+      "ALLOWED_SAVED": "Dozwolone języki zapisane",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "Ustawienia SMTP",
@@ -1261,8 +1275,10 @@
       "RESET_DESCRIPTION": "Masz zamiar przywrócić domyślne linki dla TOS i polityki prywatności. Czy na pewno chcesz kontynuować?",
       "UNSAVED_TITLE": "Kontynuuj bez zapisywania?",
       "UNSAVED_DESCRIPTION": "Wprowadziłeś zmiany bez zapisywania. Czy chcesz zapisać teraz?",
-      "LOCALE": "Kod Języka",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Wybrałeś język, który nie jest dozwolony. Możesz kontynuować modyfikowanie tekstów. Ale jeśli chcesz, aby twoi użytkownicy mogli faktycznie używać tego języka, zmień ograniczenia swoich instancji.",
+      "LANGUAGES_NOT_ALLOWED": "Niedozwolone:",
+      "LANGUAGE": "Język",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1373,7 +1389,8 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "Adres nadawcy SMTP pasuje do domeny instancji",
       "ALLOWUSERNAMEPASSWORD": "Zezwól na użycie nazwy użytkownika i hasła",
       "ALLOWEXTERNALIDP": "Zezwól na zewnętrznego dostawcę tożsamości",
-      "ALLOWREGISTER": "Zezwól na rejestrację",
+      "ALLOWREGISTERUSERS": "Zezwól na rejestrację użytkowników",
+      "ALLOWREGISTERORGS": "Zezwól na rejestrację organizacji",
       "ALLOWUSERNAMEPASSWORD_DESC": "Zwykłe logowanie za pomocą nazwy użytkownika i hasła jest dozwolone.",
       "ALLOWEXTERNALIDP_DESC": "Logowanie jest dozwolone dla dostawców tożsamości podstawowych",
       "ALLOWREGISTER_DESC": "Jeśli ta opcja jest zaznaczona, pojawi się dodatkowy krok rejestracji użytkownika w procesie logowania.",

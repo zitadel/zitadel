@@ -9,9 +9,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
@@ -33,18 +33,52 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "invalid custom login text, error",
+			name: "empty custom login text, success",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
+					expectPush(),
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				config: &domain.CustomLoginText{
+					Language: AllowedLanguage,
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "undefined language, error",
+			fields: fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args: args{
+				ctx:    authz.WithInstanceID(context.Background(), "INSTANCE"),
 				config: &domain.CustomLoginText{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "unsupported language, error",
+			fields: fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				config: &domain.CustomLoginText{
+					Language: UnsupportedLanguage,
+				},
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{

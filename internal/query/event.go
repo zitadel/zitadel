@@ -6,9 +6,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Event struct {
@@ -45,7 +45,7 @@ func (q *Queries) SearchEvents(ctx context.Context, query *eventstore.SearchQuer
 	defer func() { span.EndWithError(err) }()
 	auditLogRetention := q.defaultAuditLogRetention
 	instanceLimits, err := q.Limits(ctx, authz.GetInstance(ctx).InstanceID())
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return nil, err
 	}
 	if instanceLimits != nil && instanceLimits.AuditLogRetention != nil {

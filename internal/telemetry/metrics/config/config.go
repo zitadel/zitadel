@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics/otel"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Config struct {
@@ -19,7 +19,7 @@ var meter = map[string]func(map[string]interface{}) error{
 func (c *Config) NewMeter() error {
 	t, ok := meter[c.Type]
 	if !ok {
-		return errors.ThrowInternalf(nil, "METER-Dfqsx", "config type %s not supported", c.Type)
+		return zerrors.ThrowInternalf(nil, "METER-Dfqsx", "config type %s not supported", c.Type)
 	}
 
 	return t(c.Config)
