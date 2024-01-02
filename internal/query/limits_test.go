@@ -11,17 +11,19 @@ import (
 
 	"github.com/muhlemmer/gu"
 
+	"github.com/zitadel/zitadel/internal/api/limits"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
-	expectedLimitsQuery = regexp.QuoteMeta("SELECT projections.limits.aggregate_id," +
-		" projections.limits.creation_date," +
-		" projections.limits.change_date," +
-		" projections.limits.resource_owner," +
-		" projections.limits.sequence," +
-		" projections.limits.audit_log_retention" +
-		" FROM projections.limits" +
+	expectedLimitsQuery = regexp.QuoteMeta("SELECT projections.limits2.aggregate_id," +
+		" projections.limits2.creation_date," +
+		" projections.limits2.change_date," +
+		" projections.limits2.resource_owner," +
+		" projections.limits2.sequence," +
+		" projections.limits2.audit_log_retention," +
+		" projections.limits2.block" +
+		" FROM projections.limits2" +
 		" AS OF SYSTEM TIME '-1 ms'",
 	)
 
@@ -32,6 +34,7 @@ var (
 		"resource_owner",
 		"sequence",
 		"audit_log_retention",
+		"block",
 	}
 )
 
@@ -62,7 +65,7 @@ func Test_LimitsPrepare(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: (*Limits)(nil),
+			object: (*limits.Limits)(nil),
 		},
 		{
 			name:    "prepareLimitsQuery",
@@ -78,16 +81,18 @@ func Test_LimitsPrepare(t *testing.T) {
 						"instance1",
 						0,
 						intervalDriverValue(t, time.Hour),
+						true,
 					},
 				),
 			},
-			object: &Limits{
+			object: &limits.Limits{
 				AggregateID:       "limits1",
 				CreationDate:      testNow,
 				ChangeDate:        testNow,
 				ResourceOwner:     "instance1",
 				Sequence:          0,
 				AuditLogRetention: gu.Ptr(time.Hour),
+				Block:             gu.Ptr(true),
 			},
 		},
 		{
@@ -105,7 +110,7 @@ func Test_LimitsPrepare(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: (*Limits)(nil),
+			object: (*limits.Limits)(nil),
 		},
 	}
 	for _, tt := range tests {
