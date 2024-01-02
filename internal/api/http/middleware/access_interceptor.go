@@ -101,9 +101,6 @@ func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 
 func (a *AccessInterceptor) handle(ignoredPathPrefixes ...string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
-		if !a.logstoreSvc.Enabled() {
-			return next
-		}
 		return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 			ctx := request.Context()
 			tracingCtx, checkSpan := tracing.NewNamedSpan(ctx, "checkAccessQuota")
@@ -122,7 +119,12 @@ func (a *AccessInterceptor) handle(ignoredPathPrefixes ...string) func(http.Hand
 			checkSpan.End()
 			if limited {
 				a.SetExhaustedCookie(wrappedWriter, request)
-				http.Error(wrappedWriter, "quota for authenticated requests is exhausted", http.StatusTooManyRequests)
+				if strings.HasPrefix(request.RequestURI, "/ui/login") {
+					// The console guides the user when the cookie is set
+					http.Redirect(wrappedWriter, request, "/ui/console", http.StatusPermanentRedirect)
+				} else {
+					http.Error(wrappedWriter, "quota for authenticated requests is exhausted", http.StatusTooManyRequests)
+				}
 			}
 			if !limited && !a.storeOnly {
 				a.DeleteExhaustedCookie(wrappedWriter)

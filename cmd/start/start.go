@@ -459,7 +459,7 @@ func startAPIs(
 		provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler,
 		instanceInterceptor.Handler,
 		assetsCache.Handler,
-		limitingAccessInterceptor.WithoutLimiting().Handle,
+		limitingAccessInterceptor.Handle,
 		keys.User,
 		keys.IDPConfig,
 		keys.CSRFCookieKey,
