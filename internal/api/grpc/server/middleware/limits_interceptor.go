@@ -49,7 +49,7 @@ func LimitsInterceptor(logstoreSvc *logstore.Service[*record.AccessLog], limitsL
 		}
 		remaining := logstoreSvc.Limit(interceptorCtx, instance.InstanceID())
 		if remaining != nil && *remaining == 0 {
-			return nil, zerrors.ThrowResourceExhausted(nil, "QUOTA-vjAy8", "Quota.Access.Exhausted")
+			return nil, zerrors.ThrowResourceExhausted(nil, "QUOTA-vjAy8", "Errors.Quota.Access.Exhausted")
 		}
 		span.End()
 		return handler(ctx, req)
