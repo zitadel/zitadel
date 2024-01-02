@@ -6,6 +6,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
@@ -195,7 +196,7 @@ func NewInTextQuery(col Column, values []string) (*InTextQuery, error) {
 	}, nil
 }
 
-type TextQuery struct {
+type textQuery struct {
 	Column  Column
 	Text    string
 	Compare TextComparison
@@ -209,21 +210,38 @@ var (
 	ErrEmptyValues     = errors.New("values array must not be empty")
 )
 
-func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery, error) {
+func NewTextQuery(col Column, value string, compare TextComparison) (*textQuery, error) {
 	if compare < 0 || compare >= textCompareMax {
 		return nil, ErrInvalidCompare
 	}
 	if col.isZero() {
 		return nil, ErrMissingColumn
 	}
-	return &TextQuery{
+	// handle the comparisons which use (i)like and therefore need to escape potential wildcards in the value
+	switch compare {
+	case TextEqualsIgnoreCase,
+		TextStartsWith,
+		TextStartsWithIgnoreCase,
+		TextEndsWith,
+		TextEndsWithIgnoreCase,
+		TextContains,
+		TextContainsIgnoreCase:
+		value = database.EscapeLikeWildcards(value)
+	case TextEquals,
+		TextListContains,
+		TextNotEquals,
+		textCompareMax:
+		// do nothing
+	}
+
+	return &textQuery{
 		Column:  col,
 		Text:    value,
 		Compare: compare,
 	}, nil
 }
 
-func (q *TextQuery) Col() Column {
+func (q *textQuery) Col() Column {
 	return q.Column
 }
 
@@ -236,11 +254,11 @@ func (s *InTextQuery) comp() sq.Sqlizer {
 	return sq.Eq{s.Column.identifier(): s.Values}
 }
 
-func (q *TextQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *textQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
 }
 
-func (s *TextQuery) comp() sq.Sqlizer {
+func (s *textQuery) comp() sq.Sqlizer {
 	switch s.Compare {
 	case TextEquals:
 		return sq.Eq{s.Column.identifier(): s.Text}
@@ -280,32 +298,6 @@ const (
 
 	textCompareMax
 )
-
-// Deprecated: Use TextComparison, will be removed as soon as all calls are changed to query
-func TextComparisonFromMethod(m domain.SearchMethod) TextComparison {
-	switch m {
-	case domain.SearchMethodEquals:
-		return TextEquals
-	case domain.SearchMethodEqualsIgnoreCase:
-		return TextEqualsIgnoreCase
-	case domain.SearchMethodStartsWith:
-		return TextStartsWith
-	case domain.SearchMethodStartsWithIgnoreCase:
-		return TextStartsWithIgnoreCase
-	case domain.SearchMethodContains:
-		return TextContains
-	case domain.SearchMethodContainsIgnoreCase:
-		return TextContainsIgnoreCase
-	case domain.SearchMethodEndsWith:
-		return TextEndsWith
-	case domain.SearchMethodEndsWithIgnoreCase:
-		return TextEndsWithIgnoreCase
-	case domain.SearchMethodListContains:
-		return TextListContains
-	default:
-		return textCompareMax
-	}
-}
 
 type NumberQuery struct {
 	Column  Column
