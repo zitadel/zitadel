@@ -277,8 +277,7 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*textQuery,
 	if col.isZero() {
 		return nil, ErrMissingColumn
 	}
-	// escape the like wildcards
-	//nolint:exhaustive
+	// handle the comparisons which use (i)like and therefore need to escape potential wildcards in the value
 	switch compare {
 	case TextEqualsIgnoreCase,
 		TextStartsWith,
@@ -288,6 +287,11 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*textQuery,
 		TextContains,
 		TextContainsIgnoreCase:
 		value = database.EscapeLikeWildcards(value)
+	case TextEquals,
+		TextListContains,
+		TextNotEquals,
+		textCompareMax:
+		// do nothing
 	}
 
 	return &textQuery{
