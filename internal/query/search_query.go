@@ -256,7 +256,7 @@ func NewInTextQuery(col Column, values []string) (*InTextQuery, error) {
 	}, nil
 }
 
-type TextQuery struct {
+type textQuery struct {
 	Column  Column
 	Text    string
 	Compare TextComparison
@@ -270,7 +270,7 @@ var (
 	ErrEmptyValues     = errors.New("values array must not be empty")
 )
 
-func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery, error) {
+func NewTextQuery(col Column, value string, compare TextComparison) (*textQuery, error) {
 	if compare < 0 || compare >= textCompareMax {
 		return nil, ErrInvalidCompare
 	}
@@ -290,14 +290,14 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery,
 		value = database.EscapeLikeWildcards(value)
 	}
 
-	return &TextQuery{
+	return &textQuery{
 		Column:  col,
 		Text:    value,
 		Compare: compare,
 	}, nil
 }
 
-func (q *TextQuery) Col() Column {
+func (q *textQuery) Col() Column {
 	return q.Column
 }
 
@@ -310,11 +310,11 @@ func (q *InTextQuery) comp() sq.Sqlizer {
 	return sq.Eq{q.Column.identifier(): q.Values}
 }
 
-func (q *TextQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *textQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
 }
 
-func (q *TextQuery) comp() sq.Sqlizer {
+func (q *textQuery) comp() sq.Sqlizer {
 	switch q.Compare {
 	case TextEquals:
 		return sq.Eq{q.Column.identifier(): q.Text}
