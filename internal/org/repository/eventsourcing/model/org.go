@@ -97,13 +97,3 @@ func (o *Org) SetData(event eventstore.Event) error {
 	}
 	return nil
 }
-
-func (o *Org) Changes(changed *Org) map[string]interface{} {
-	changes := make(map[string]interface{}, 2)
-
-	if changed.Name != "" && changed.Name != o.Name {
-		changes["name"] = changed.Name
-	}
-
-	return changes
-}

@@ -6,7 +6,6 @@ import (
 
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
-	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/idp"
@@ -255,40 +254,6 @@ func IDPProviderTypeFromPb(typ idp_pb.IDPOwnerType) domain.IdentityProviderType 
 	}
 }
 
-func IDPProviderTypeModelFromPb(typ idp_pb.IDPOwnerType) iam_model.IDPProviderType {
-	switch typ {
-	case idp_pb.IDPOwnerType_IDP_OWNER_TYPE_ORG:
-		return iam_model.IDPProviderTypeOrg
-	case idp_pb.IDPOwnerType_IDP_OWNER_TYPE_SYSTEM:
-		return iam_model.IDPProviderTypeSystem
-	default:
-		return iam_model.IDPProviderTypeOrg
-	}
-}
-
-func IDPIDQueryToModel(query *idp_pb.IDPIDQuery) *iam_model.IDPConfigSearchQuery {
-	return &iam_model.IDPConfigSearchQuery{
-		Key:    iam_model.IDPConfigSearchKeyIdpConfigID,
-		Method: domain.SearchMethodEquals,
-		Value:  query.Id,
-	}
-}
-
-func IDPNameQueryToModel(query *idp_pb.IDPNameQuery) *iam_model.IDPConfigSearchQuery {
-	return &iam_model.IDPConfigSearchQuery{
-		Key:    iam_model.IDPConfigSearchKeyName,
-		Method: obj_grpc.TextMethodToModel(query.Method),
-		Value:  query.Name,
-	}
-}
-
-func IDPOwnerTypeQueryToModel(query *idp_pb.IDPOwnerTypeQuery) *iam_model.IDPConfigSearchQuery {
-	return &iam_model.IDPConfigSearchQuery{
-		Key:    iam_model.IDPConfigSearchKeyIdpProviderType,
-		Method: domain.SearchMethodEquals,
-		Value:  IDPProviderTypeModelFromPb(query.OwnerType),
-	}
-}
 func ownerTypeToPB(typ domain.IdentityProviderType) idp_pb.IDPOwnerType {
 	switch typ {
 	case domain.IdentityProviderTypeOrg:
