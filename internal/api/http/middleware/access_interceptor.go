@@ -35,7 +35,7 @@ type AccessConfig struct {
 
 // NewAccessInterceptor intercepts all requests and stores them to the logstore.
 // If storeOnly is false, it also checks if requests are exhausted.
-// If requests are exhausted, it also returns http.StatusTooManyRequests and sets a cookie
+// If requests are exhausted, it also returns http.StatusTooManyRequests or a redirect to the given path and sets a cookie
 func NewAccessInterceptor(svc *logstore.Service[*record.AccessLog], limitsLoader *limits.Loader, cookieHandler *http_utils.CookieHandler, cookieConfig *AccessConfig) *AccessInterceptor {
 	return &AccessInterceptor{
 		logstoreSvc:   svc,
@@ -50,6 +50,7 @@ func (a *AccessInterceptor) WithoutLimiting() *AccessInterceptor {
 		logstoreSvc:   a.logstoreSvc,
 		cookieHandler: a.cookieHandler,
 		limitConfig:   a.limitConfig,
+		limitsLoader:  a.limitsLoader,
 		storeOnly:     true,
 		redirect:      a.redirect,
 	}
@@ -60,6 +61,7 @@ func (a *AccessInterceptor) WithRedirect(redirect string) *AccessInterceptor {
 		logstoreSvc:   a.logstoreSvc,
 		cookieHandler: a.cookieHandler,
 		limitConfig:   a.limitConfig,
+		limitsLoader:  a.limitsLoader,
 		storeOnly:     a.storeOnly,
 		redirect:      redirect,
 	}
