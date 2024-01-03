@@ -155,16 +155,6 @@ func (a *AccessInterceptor) handle(publicAuthPathPrefixes ...string) func(http.H
 	}
 }
 
-func (a *AccessInterceptor) manageCookie(limit bool, handler http.Handler, writer http.ResponseWriter, request *http.Request) {
-	if limit {
-		a.SetExhaustedCookie(writer, request)
-	}
-	if !limit {
-		a.DeleteExhaustedCookie(writer)
-	}
-	handler.ServeHTTP(writer, request)
-}
-
 func (a *AccessInterceptor) writeLog(ctx context.Context, wrappedWriter *statusRecorder, writer http.ResponseWriter, request *http.Request, notCountable bool) {
 	if !a.logstoreSvc.Enabled() {
 		return
