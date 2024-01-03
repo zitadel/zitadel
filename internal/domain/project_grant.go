@@ -11,11 +11,6 @@ type ProjectGrant struct {
 	RoleKeys     []string
 }
 
-type ProjectGrantIDs struct {
-	ProjectID string
-	GrantID   string
-}
-
 type ProjectGrantState int32
 
 const (

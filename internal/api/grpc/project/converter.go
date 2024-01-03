@@ -3,7 +3,6 @@ package project
 import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
-	proj_model "github.com/zitadel/zitadel/internal/project/model"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	proj_pb "github.com/zitadel/zitadel/pkg/grpc/project"
@@ -109,45 +108,6 @@ func privateLabelingSettingToPb(setting domain.PrivateLabelingSetting) proj_pb.P
 		return proj_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY
 	default:
 		return proj_pb.PrivateLabelingSetting_PRIVATE_LABELING_SETTING_UNSPECIFIED
-	}
-}
-
-func grantedProjectStateToPb(state proj_model.ProjectState) proj_pb.ProjectGrantState {
-	switch state {
-	case proj_model.ProjectStateActive:
-		return proj_pb.ProjectGrantState_PROJECT_GRANT_STATE_ACTIVE
-	case proj_model.ProjectStateInactive:
-		return proj_pb.ProjectGrantState_PROJECT_GRANT_STATE_INACTIVE
-	default:
-		return proj_pb.ProjectGrantState_PROJECT_GRANT_STATE_UNSPECIFIED
-	}
-}
-
-func GrantedProjectQueriesToModel(queries []*proj_pb.ProjectQuery) (_ []*proj_model.ProjectGrantViewSearchQuery, err error) {
-	q := make([]*proj_model.ProjectGrantViewSearchQuery, len(queries))
-	for i, query := range queries {
-		q[i], err = GrantedProjectQueryToModel(query)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return q, nil
-}
-
-func GrantedProjectQueryToModel(query *proj_pb.ProjectQuery) (*proj_model.ProjectGrantViewSearchQuery, error) {
-	switch q := query.Query.(type) {
-	case *proj_pb.ProjectQuery_NameQuery:
-		return GrantedProjectQueryNameToModel(q.NameQuery), nil
-	default:
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-Ags42", "List.Query.Invalid")
-	}
-}
-
-func GrantedProjectQueryNameToModel(query *proj_pb.ProjectNameQuery) *proj_model.ProjectGrantViewSearchQuery {
-	return &proj_model.ProjectGrantViewSearchQuery{
-		Key:    proj_model.GrantedProjectSearchKeyName,
-		Method: object.TextMethodToModel(query.Method),
-		Value:  query.Name,
 	}
 }
 
