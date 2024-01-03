@@ -443,14 +443,14 @@ func startAPIs(
 		return fmt.Errorf("unable to start console: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(console.HandlerPrefix, c)
-
+	consolePath := console.HandlerPrefix + "/"
 	l, err := login.CreateLogin(
 		config.Login,
 		commands,
 		queries,
 		authRepo,
 		store,
-		console.HandlerPrefix+"/",
+		consolePath,
 		oidcServer.AuthCallbackURL(),
 		provider.AuthCallbackURL(samlProvider),
 		config.ExternalSecure,
@@ -459,7 +459,7 @@ func startAPIs(
 		provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler,
 		instanceInterceptor.Handler,
 		assetsCache.Handler,
-		limitingAccessInterceptor.Handle,
+		limitingAccessInterceptor.WithRedirect(consolePath).Handle,
 		keys.User,
 		keys.IDPConfig,
 		keys.CSRFCookieKey,

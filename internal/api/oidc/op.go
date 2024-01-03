@@ -146,14 +146,14 @@ func NewServer(
 		instanceHandler,
 		userAgentCookie,
 		http_utils.CopyHeadersToContext,
-		accessHandler.HandleIgnorePathPrefixes(ignoredQuotaLimitEndpoint(config.CustomEndpoints)),
+		accessHandler.HandleWithPublicAuthPathPrefixes(publicAuthPathPrefixes(config.CustomEndpoints)),
 		middleware.ActivityHandler,
 	))
 
 	return server, nil
 }
 
-func ignoredQuotaLimitEndpoint(endpoints *EndpointConfig) []string {
+func publicAuthPathPrefixes(endpoints *EndpointConfig) []string {
 	authURL := op.DefaultEndpoints.Authorization.Relative()
 	keysURL := op.DefaultEndpoints.JwksURI.Relative()
 	if endpoints == nil {

@@ -23,8 +23,9 @@ type AccessInterceptor struct {
 	logstoreSvc   *logstore.Service[*record.AccessLog]
 	cookieHandler *http_utils.CookieHandler
 	limitConfig   *AccessConfig
-	storeOnly     bool
 	limitsLoader  *limits.Loader
+	storeOnly     bool
+	redirect      string
 }
 
 type AccessConfig struct {
@@ -50,6 +51,17 @@ func (a *AccessInterceptor) WithoutLimiting() *AccessInterceptor {
 		cookieHandler: a.cookieHandler,
 		limitConfig:   a.limitConfig,
 		storeOnly:     true,
+		redirect:      a.redirect,
+	}
+}
+
+func (a *AccessInterceptor) WithRedirect(redirect string) *AccessInterceptor {
+	return &AccessInterceptor{
+		logstoreSvc:   a.logstoreSvc,
+		cookieHandler: a.cookieHandler,
+		limitConfig:   a.limitConfig,
+		storeOnly:     a.storeOnly,
+		redirect:      redirect,
 	}
 }
 
@@ -57,20 +69,41 @@ func (a *AccessInterceptor) AccessService() *logstore.Service[*record.AccessLog]
 	return a.logstoreSvc
 }
 
-func (a *AccessInterceptor) Limit(ctx context.Context) (context.Context, bool) {
+func (a *AccessInterceptor) Limit(w http.ResponseWriter, r *http.Request, publicAuthPathPrefixes ...string) (*http.Request, bool) {
 	if a.storeOnly {
-		return ctx, false
+		return r, false
 	}
+	ctx := r.Context()
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	ctx, l := a.limitsLoader.Load(ctx, instanceID)
-	if l.Block != nil && *l.Block {
-		return ctx, true
+	newCtx, instanceLimits := a.limitsLoader.Load(ctx, instanceID)
+	newR := r.WithContext(newCtx)
+	var deleteCookie bool
+	defer func() {
+		if deleteCookie {
+			a.DeleteExhaustedCookie(w)
+		}
+	}()
+	if instanceLimits.Block != nil {
+		if *instanceLimits.Block {
+			a.SetExhaustedCookie(w, r)
+			return newR, true
+		}
+		deleteCookie = true
 	}
-	if !a.logstoreSvc.Enabled() {
-		return ctx, false
+	for _, ignoredPathPrefix := range publicAuthPathPrefixes {
+		if strings.HasPrefix(r.RequestURI, ignoredPathPrefix) {
+			return newR, false
+		}
 	}
 	remaining := a.logstoreSvc.Limit(ctx, instanceID)
-	return ctx, remaining != nil && *remaining <= 0
+	if remaining != nil {
+		if remaining != nil && *remaining > 0 {
+			a.SetExhaustedCookie(w, r)
+			return newR, true
+		}
+		deleteCookie = true
+	}
+	return newR, false
 }
 
 func (a *AccessInterceptor) SetExhaustedCookie(writer http.ResponseWriter, request *http.Request) {
@@ -91,50 +124,45 @@ func (a *AccessInterceptor) DeleteExhaustedCookie(writer http.ResponseWriter) {
 	a.cookieHandler.DeleteCookie(writer, a.limitConfig.ExhaustedCookieKey)
 }
 
-func (a *AccessInterceptor) HandleIgnorePathPrefixes(ignoredPathPrefixes []string) func(next http.Handler) http.Handler {
-	return a.handle(ignoredPathPrefixes...)
+func (a *AccessInterceptor) HandleWithPublicAuthPathPrefixes(publicPathPrefixes []string) func(next http.Handler) http.Handler {
+	return a.handle(publicPathPrefixes...)
 }
 
 func (a *AccessInterceptor) Handle(next http.Handler) http.Handler {
 	return a.handle()(next)
 }
 
-func (a *AccessInterceptor) handle(ignoredPathPrefixes ...string) func(http.Handler) http.Handler {
+func (a *AccessInterceptor) handle(publicAuthPathPrefixes ...string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 			ctx := request.Context()
 			tracingCtx, checkSpan := tracing.NewNamedSpan(ctx, "checkAccessQuota")
 			wrappedWriter := &statusRecorder{ResponseWriter: writer, status: 0}
-			for _, ignoredPathPrefix := range ignoredPathPrefixes {
-				if !strings.HasPrefix(request.RequestURI, ignoredPathPrefix) {
-					continue
-				}
-				checkSpan.End()
-				next.ServeHTTP(wrappedWriter, request)
-				a.writeLog(tracingCtx, wrappedWriter, writer, request, true)
-				return
-			}
-			ctx, limited := a.Limit(tracingCtx)
-			request = request.WithContext(ctx)
+			r, limited := a.Limit(wrappedWriter, request.WithContext(tracingCtx), publicAuthPathPrefixes...)
 			checkSpan.End()
 			if limited {
-				a.SetExhaustedCookie(wrappedWriter, request)
-				if strings.HasPrefix(request.RequestURI, "/ui/login") {
+				if a.redirect != "" {
 					// The console guides the user when the cookie is set
-					http.Redirect(wrappedWriter, request, "/ui/console", http.StatusPermanentRedirect)
+					http.Redirect(wrappedWriter, request, a.redirect, http.StatusPermanentRedirect)
 				} else {
-					http.Error(wrappedWriter, "quota for authenticated requests is exhausted", http.StatusTooManyRequests)
+					http.Error(wrappedWriter, "Your ZITADEL instance is blocked.", http.StatusTooManyRequests)
 				}
-			}
-			if !limited && !a.storeOnly {
-				a.DeleteExhaustedCookie(wrappedWriter)
-			}
-			if !limited {
-				next.ServeHTTP(wrappedWriter, request)
+			} else {
+				next.ServeHTTP(wrappedWriter, r)
 			}
 			a.writeLog(tracingCtx, wrappedWriter, writer, request, a.storeOnly)
 		})
 	}
+}
+
+func (a *AccessInterceptor) manageCookie(limit bool, handler http.Handler, writer http.ResponseWriter, request *http.Request) {
+	if limit {
+		a.SetExhaustedCookie(writer, request)
+	}
+	if !limit {
+		a.DeleteExhaustedCookie(writer)
+	}
+	handler.ServeHTTP(writer, request)
 }
 
 func (a *AccessInterceptor) writeLog(ctx context.Context, wrappedWriter *statusRecorder, writer http.ResponseWriter, request *http.Request, notCountable bool) {

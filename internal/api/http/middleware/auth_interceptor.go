@@ -59,6 +59,7 @@ func authorize(r *http.Request, verifier authz.APITokenVerifier, authConfig auth
 
 	authToken := http_util.GetAuthorization(r)
 	if authToken == "" {
+		// TODO: Shouldn't we have a translating interceptor?
 		return nil, errors.New("auth header missing")
 	}
 
