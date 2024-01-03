@@ -8,5 +8,4 @@ import (
 
 type UserSessionRepository interface {
 	GetMyUserSessions(ctx context.Context) ([]*model.UserSessionView, error)
-	ActiveUserSessionCount() int64
 }

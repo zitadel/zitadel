@@ -95,36 +95,42 @@ func SetQuery(query *gorm.DB, key ColumnKey, value interface{}, method domain.Se
 		if !ok {
 			return nil, zerrors.ThrowInvalidArgument(nil, "VIEW-SLj7s", "Starts with only possible for strings")
 		}
+		valueText = database.EscapeLikeWildcards(valueText)
 		query = query.Where(column+" LIKE ?", valueText+"%")
 	case domain.SearchMethodStartsWithIgnoreCase:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, zerrors.ThrowInvalidArgument(nil, "VIEW-eidus", "Starts with ignore case only possible for strings")
 		}
+		valueText = database.EscapeLikeWildcards(valueText)
 		query = query.Where("LOWER("+column+") LIKE LOWER(?)", valueText+"%")
 	case domain.SearchMethodEndsWith:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, zerrors.ThrowInvalidArgument(nil, "VIEW-Hswd3", "Ends with only possible for strings")
 		}
+		valueText = database.EscapeLikeWildcards(valueText)
 		query = query.Where(column+" LIKE ?", "%"+valueText)
 	case domain.SearchMethodEndsWithIgnoreCase:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, zerrors.ThrowInvalidArgument(nil, "VIEW-dAG31", "Ends with ignore case only possible for strings")
 		}
+		valueText = database.EscapeLikeWildcards(valueText)
 		query = query.Where("LOWER("+column+") LIKE LOWER(?)", "%"+valueText)
 	case domain.SearchMethodContains:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, zerrors.ThrowInvalidArgument(nil, "VIEW-3ids", "Contains with only possible for strings")
 		}
+		valueText = database.EscapeLikeWildcards(valueText)
 		query = query.Where(column+" LIKE ?", "%"+valueText+"%")
 	case domain.SearchMethodContainsIgnoreCase:
 		valueText, ok := value.(string)
 		if !ok {
 			return nil, zerrors.ThrowInvalidArgument(nil, "VIEW-eid73", "Contains with ignore case only possible for strings")
 		}
+		valueText = database.EscapeLikeWildcards(valueText)
 		query = query.Where("LOWER("+column+") LIKE LOWER(?)", "%"+valueText+"%")
 	case domain.SearchMethodNotEquals:
 		query = query.Where(""+column+" <> ?", value)

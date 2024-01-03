@@ -83,11 +83,3 @@ func (f LabelPolicy) IsValid() error {
 	}
 	return nil
 }
-
-func (f LabelPolicyState) Valid() bool {
-	return f >= 0 && f < labelPolicyStateCount
-}
-
-func (s LabelPolicyState) Exists() bool {
-	return s != LabelPolicyStateUnspecified && s != LabelPolicyStateRemoved
-}
