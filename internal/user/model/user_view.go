@@ -7,7 +7,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -229,20 +228,6 @@ func (u *UserView) IsPasswordlessReady() bool {
 		}
 	}
 	return false
-}
-
-func (u *UserView) HasRequiredOrgMFALevel(policy *iam_model.LoginPolicyView) bool {
-	if !policy.ForceMFA {
-		return true
-	}
-	switch u.MFAMaxSetUp {
-	case domain.MFALevelSecondFactor:
-		return policy.HasSecondFactors()
-	case domain.MFALevelMultiFactor:
-		return policy.HasMultiFactors()
-	default:
-		return false
-	}
 }
 
 func (u *UserView) GetProfile() (*Profile, error) {

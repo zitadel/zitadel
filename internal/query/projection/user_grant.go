@@ -285,7 +285,7 @@ func (p *userGrantProjection) reduceDeactivated(event eventstore.Event) (*handle
 }
 
 func (p *userGrantProjection) reduceReactivated(event eventstore.Event) (*handler.Statement, error) {
-	if _, ok := event.(*usergrant.UserGrantDeactivatedEvent); !ok {
+	if _, ok := event.(*usergrant.UserGrantReactivatedEvent); !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-DGsKh", "reduce.wrong.event.type %s", usergrant.UserGrantReactivatedType)
 	}
 

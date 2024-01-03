@@ -59,48 +59,118 @@ func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
 func TestServer_Introspect(t *testing.T) {
 	project, err := Tester.CreateProject(CTX)
 	require.NoError(t, err)
-	app, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
-	require.NoError(t, err)
-	api, err := Tester.CreateAPIClient(CTX, project.GetId())
-	require.NoError(t, err)
-	keyResp, err := Tester.Client.Mgmt.AddAppKey(CTX, &management.AddAppKeyRequest{
-		ProjectId:      project.GetId(),
-		AppId:          api.GetAppId(),
-		Type:           authn.KeyType_KEY_TYPE_JSON,
-		ExpirationDate: nil,
-	})
-	require.NoError(t, err)
-	resourceServer, err := Tester.CreateResourceServer(CTX, keyResp.GetKeyDetails())
+	app, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
 	require.NoError(t, err)
 
-	scope := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess, oidc_api.ScopeResourceOwner}
-	authRequestID := createAuthRequest(t, app.GetClientId(), redirectURI, scope...)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
-	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
-		AuthRequestId: authRequestID,
-		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
-			Session: &oidc_pb.Session{
-				SessionId:    sessionID,
-				SessionToken: sessionToken,
+	wantAudience := []string{app.GetClientId(), project.GetId()}
+
+	tests := []struct {
+		name    string
+		api     func(*testing.T) (apiID string, resourceServer rs.ResourceServer)
+		wantErr bool
+	}{
+		{
+			name: "client assertion",
+			api: func(t *testing.T) (string, rs.ResourceServer) {
+				api, err := Tester.CreateAPIClientJWT(CTX, project.GetId())
+				require.NoError(t, err)
+				keyResp, err := Tester.Client.Mgmt.AddAppKey(CTX, &management.AddAppKeyRequest{
+					ProjectId:      project.GetId(),
+					AppId:          api.GetAppId(),
+					Type:           authn.KeyType_KEY_TYPE_JSON,
+					ExpirationDate: nil,
+				})
+				require.NoError(t, err)
+				resourceServer, err := Tester.CreateResourceServerJWTProfile(CTX, keyResp.GetKeyDetails())
+				require.NoError(t, err)
+				return api.GetClientId(), resourceServer
 			},
 		},
-	})
-	require.NoError(t, err)
+		{
+			name: "client credentials",
+			api: func(t *testing.T) (string, rs.ResourceServer) {
+				api, err := Tester.CreateAPIClientBasic(CTX, project.GetId())
+				require.NoError(t, err)
+				resourceServer, err := Tester.CreateResourceServerClientCredentials(CTX, api.GetClientId(), api.GetClientSecret())
+				require.NoError(t, err)
+				return api.GetClientId(), resourceServer
+			},
+		},
+		{
+			name: "client invalid id, error",
+			api: func(t *testing.T) (string, rs.ResourceServer) {
+				api, err := Tester.CreateAPIClientBasic(CTX, project.GetId())
+				require.NoError(t, err)
+				resourceServer, err := Tester.CreateResourceServerClientCredentials(CTX, "xxxxx", api.GetClientSecret())
+				require.NoError(t, err)
+				return api.GetClientId(), resourceServer
+			},
+			wantErr: true,
+		},
+		{
+			name: "client invalid secret, error",
+			api: func(t *testing.T) (string, rs.ResourceServer) {
+				api, err := Tester.CreateAPIClientBasic(CTX, project.GetId())
+				require.NoError(t, err)
+				resourceServer, err := Tester.CreateResourceServerClientCredentials(CTX, api.GetClientId(), "xxxxx")
+				require.NoError(t, err)
+				return api.GetClientId(), resourceServer
+			},
+			wantErr: true,
+		},
+		{
+			name: "client credentials on jwt client, error",
+			api: func(t *testing.T) (string, rs.ResourceServer) {
+				api, err := Tester.CreateAPIClientJWT(CTX, project.GetId())
+				require.NoError(t, err)
+				resourceServer, err := Tester.CreateResourceServerClientCredentials(CTX, api.GetClientId(), "xxxxx")
+				require.NoError(t, err)
+				return api.GetClientId(), resourceServer
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			apiID, resourceServer := tt.api(t)
+			// wantAudience grows for every API we add to the project.
+			wantAudience = append(wantAudience, apiID)
 
-	// code exchange
-	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, app.GetClientId(), code)
-	require.NoError(t, err)
-	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+			scope := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess, oidc_api.ScopeResourceOwner}
+			authRequestID := createAuthRequest(t, app.GetClientId(), redirectURI, scope...)
+			sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
+			linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+				AuthRequestId: authRequestID,
+				CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionID,
+						SessionToken: sessionToken,
+					},
+				},
+			})
+			require.NoError(t, err)
 
-	// test actual introspection
-	introspection, err := rs.Introspect[*oidc.IntrospectionResponse](context.Background(), resourceServer, tokens.AccessToken)
-	require.NoError(t, err)
-	assertIntrospection(t, introspection,
-		Tester.OIDCIssuer(), app.GetClientId(),
-		scope, []string{app.GetClientId(), api.GetClientId(), project.GetId()},
-		tokens.Expiry, tokens.Expiry.Add(-12*time.Hour))
+			// code exchange
+			code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+			tokens, err := exchangeTokens(t, app.GetClientId(), code)
+			require.NoError(t, err)
+			assertTokens(t, tokens, true)
+			assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+
+			// test actual introspection
+			introspection, err := rs.Introspect[*oidc.IntrospectionResponse](context.Background(), resourceServer, tokens.AccessToken)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+			assertIntrospection(t, introspection,
+				Tester.OIDCIssuer(), app.GetClientId(),
+				scope, wantAudience,
+				tokens.Expiry, tokens.Expiry.Add(-12*time.Hour))
+		})
+	}
 }
 
 func assertUserinfo(t *testing.T, userinfo *oidc.UserInfo) {
@@ -158,7 +228,7 @@ func TestServer_VerifyClient(t *testing.T) {
 
 	inactiveClient, err := Tester.CreateOIDCInactivateClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
 	require.NoError(t, err)
-	nativeClient, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
+	nativeClient, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
 	require.NoError(t, err)
 	basicWebClient, err := Tester.CreateOIDCWebClientBasic(CTX, redirectURI, logoutRedirectURI, project.GetId())
 	require.NoError(t, err)

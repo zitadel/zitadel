@@ -38,7 +38,7 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-6m9gs", "Errors.User.UsernameNotChanged")
 	}
 
-	domainPolicy, err := c.getOrgDomainPolicy(ctx, orgID)
+	domainPolicy, err := c.domainPolicyWriteModel(ctx, orgID)
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-38fnu", "Errors.Org.DomainPolicy.NotExisting")
 	}
@@ -196,7 +196,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-m9od", "Errors.User.NotFound")
 	}
 
-	domainPolicy, err := c.getOrgDomainPolicy(ctx, existingUser.ResourceOwner)
+	domainPolicy, err := c.domainPolicyWriteModel(ctx, existingUser.ResourceOwner)
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.DomainPolicy.NotExisting")
 	}
@@ -330,7 +330,7 @@ func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events
 	changedUserGrant := NewUserWriteModel(userID, existingUser.ResourceOwner)
 	userAgg := UserAggregateFromWriteModel(&changedUserGrant.WriteModel)
 
-	domainPolicy, err := c.getOrgDomainPolicy(ctx, existingUser.ResourceOwner)
+	domainPolicy, err := c.domainPolicyWriteModel(ctx, existingUser.ResourceOwner)
 	if err != nil {
 		return nil, nil, err
 	}

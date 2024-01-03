@@ -13,7 +13,6 @@ const (
 	AddedEventType                         = eventTypePrefix + "added"
 	ApprovedEventType                      = eventTypePrefix + "approved"
 	CanceledEventType                      = eventTypePrefix + "canceled"
-	RemovedEventType                       = eventTypePrefix + "removed"
 )
 
 type AddedEvent struct {
@@ -36,7 +35,7 @@ func (e *AddedEvent) Payload() any {
 }
 
 func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return NewAddUniqueConstraints(e.ClientID, e.DeviceCode, e.UserCode)
+	return NewAddUniqueConstraints(e.DeviceCode, e.UserCode)
 }
 
 func NewAddedEvent(
@@ -58,7 +57,9 @@ func NewAddedEvent(
 type ApprovedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	Subject string
+	Subject         string
+	UserAuthMethods []domain.UserAuthMethodType
+	AuthTime        time.Time
 }
 
 func (e *ApprovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -77,12 +78,16 @@ func NewApprovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	subject string,
+	userAuthMethods []domain.UserAuthMethodType,
+	authTime time.Time,
 ) *ApprovedEvent {
 	return &ApprovedEvent{
 		eventstore.NewBaseEventForPush(
 			ctx, aggregate, ApprovedEventType,
 		),
 		subject,
+		userAuthMethods,
+		authTime,
 	}
 }
 
@@ -106,37 +111,4 @@ func (e *CanceledEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 
 func NewCanceledEvent(ctx context.Context, aggregate *eventstore.Aggregate, reason domain.DeviceAuthCanceled) *CanceledEvent {
 	return &CanceledEvent{eventstore.NewBaseEventForPush(ctx, aggregate, CanceledEventType), reason}
-}
-
-type RemovedEvent struct {
-	*eventstore.BaseEvent `json:"-"`
-
-	ClientID   string
-	DeviceCode string
-	UserCode   string
-}
-
-func (e *RemovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
-	e.BaseEvent = b
-}
-
-func (e *RemovedEvent) Payload() any {
-	return e
-}
-
-func (e *RemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return NewRemoveUniqueConstraints(e.ClientID, e.DeviceCode, e.UserCode)
-}
-
-func NewRemovedEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-	clientID, deviceCode, userCode string,
-) *RemovedEvent {
-	return &RemovedEvent{
-		eventstore.NewBaseEventForPush(
-			ctx, aggregate, RemovedEventType,
-		),
-		clientID, deviceCode, userCode,
-	}
 }

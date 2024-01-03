@@ -278,7 +278,6 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 		code          string
 		resourceOwner string
 		password      string
-		agentID       string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -505,7 +504,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				userEncryption:     tt.fields.userEncryption,
 			}
-			got, err := r.SetPasswordWithVerifyCode(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.code, tt.args.password, tt.args.agentID)
+			got, err := r.SetPasswordWithVerifyCode(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.code, tt.args.password)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -529,7 +528,6 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 		resourceOwner string
 		oldPassword   string
 		newPassword   string
-		agentID       string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -675,18 +673,6 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 							false,
 							"")),
 				),
-				expectFilter(
-					eventFromEventPusher(
-						org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-							1,
-							false,
-							false,
-							false,
-							false,
-						),
-					),
-				),
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -766,7 +752,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				eventstore:         eventstoreExpect(t, tt.expect...),
 				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
-			got, err := r.ChangePassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.oldPassword, tt.args.newPassword, tt.args.agentID)
+			got, err := r.ChangePassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.oldPassword, tt.args.newPassword)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

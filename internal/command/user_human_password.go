@@ -34,7 +34,7 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password stri
 	return c.setPassword(ctx, wm, password, oneTime)
 }
 
-func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID, code, password, userAgentID string) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID, code, password string) (objectDetails *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -61,8 +61,10 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID,
 	return c.setPassword(ctx, wm, password, false)
 }
 
-func (c *Commands) setPassword(ctx context.Context, wm *HumanPasswordWriteModel, password string, changeRequired bool) (objectDetails *domain.ObjectDetails, err error) {
-	command, err := c.setPasswordCommand(ctx, wm, password, changeRequired)
+// setEncodedPassword add change event from already encoded password to HumanPasswordWriteModel and return the necessary object details for response
+func (c *Commands) setEncodedPassword(ctx context.Context, wm *HumanPasswordWriteModel, password string, changeRequired bool) (objectDetails *domain.ObjectDetails, err error) {
+	agg := user.NewAggregate(wm.AggregateID, wm.ResourceOwner)
+	command, err := c.setPasswordCommand(ctx, &agg.Aggregate, wm.UserState, password, changeRequired, true)
 	if err != nil {
 		return nil, err
 	}
@@ -73,20 +75,39 @@ func (c *Commands) setPassword(ctx context.Context, wm *HumanPasswordWriteModel,
 	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
 
-func (c *Commands) setPasswordCommand(ctx context.Context, wm *HumanPasswordWriteModel, password string, changeRequired bool) (_ eventstore.Command, err error) {
-	if err = c.canUpdatePassword(ctx, password, wm); err != nil {
+// setPassword add change event to HumanPasswordWriteModel and return the necessary object details for response
+func (c *Commands) setPassword(ctx context.Context, wm *HumanPasswordWriteModel, password string, changeRequired bool) (objectDetails *domain.ObjectDetails, err error) {
+	agg := user.NewAggregate(wm.AggregateID, wm.ResourceOwner)
+	command, err := c.setPasswordCommand(ctx, &agg.Aggregate, wm.UserState, password, changeRequired, false)
+	if err != nil {
 		return nil, err
 	}
-	ctx, span := tracing.NewNamedSpan(ctx, "passwap.Hash")
-	encoded, err := c.userPasswordHasher.Hash(password)
-	span.EndWithError(err)
-	if err = convertPasswapErr(err); err != nil {
+	err = c.pushAppendAndReduce(ctx, wm, command)
+	if err != nil {
 		return nil, err
 	}
-	return user.NewHumanPasswordChangedEvent(ctx, UserAggregateFromWriteModel(&wm.WriteModel), encoded, changeRequired, ""), nil
+	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
 
-func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword, userAgentID string) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) setPasswordCommand(ctx context.Context, agg *eventstore.Aggregate, userState domain.UserState, password string, changeRequired, encoded bool) (_ eventstore.Command, err error) {
+	if err = c.canUpdatePassword(ctx, password, agg.ResourceOwner, userState); err != nil {
+		return nil, err
+	}
+
+	if !encoded {
+		ctx, span := tracing.NewNamedSpan(ctx, "passwap.Hash")
+		encodedPassword, err := c.userPasswordHasher.Hash(password)
+		span.EndWithError(err)
+		if err = convertPasswapErr(err); err != nil {
+			return nil, err
+		}
+		return user.NewHumanPasswordChangedEvent(ctx, agg, encodedPassword, changeRequired, ""), nil
+	}
+	return user.NewHumanPasswordChangedEvent(ctx, agg, password, changeRequired, ""), nil
+}
+
+// ChangePassword change password of existing user
+func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword string) (objectDetails *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -100,38 +121,39 @@ func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPasswor
 	if err != nil {
 		return nil, err
 	}
-	if wm.EncodedHash == "" {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Fds3s", "Errors.User.Password.Empty")
-	}
-	if err = c.canUpdatePassword(ctx, newPassword, wm); err != nil {
-		return nil, err
-	}
 
-	ctx, spanPasswap := tracing.NewNamedSpan(ctx, "passwap.VerifyAndUpdate")
-	updated, err := c.userPasswordHasher.VerifyAndUpdate(wm.EncodedHash, oldPassword, newPassword)
-	spanPasswap.EndWithError(err)
-	if err = convertPasswapErr(err); err != nil {
-		return nil, err
-	}
-	err = c.pushAppendAndReduce(ctx, wm,
-		user.NewHumanPasswordChangedEvent(ctx, UserAggregateFromWriteModel(&wm.WriteModel), updated, false, userAgentID))
+	newPasswordHash, err := c.verifyAndUpdatePassword(ctx, wm.EncodedHash, oldPassword, newPassword)
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToObjectDetails(&wm.WriteModel), nil
+	return c.setEncodedPassword(ctx, wm, newPasswordHash, false)
 }
 
-func (c *Commands) canUpdatePassword(ctx context.Context, newPassword string, wm *HumanPasswordWriteModel) (err error) {
+// verifyAndUpdatePassword verify if the old password is correct with the encoded hash and
+// returns the hash of the new password if so
+func (c *Commands) verifyAndUpdatePassword(ctx context.Context, encodedHash, oldPassword, newPassword string) (string, error) {
+	if encodedHash == "" {
+		return "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-Fds3s", "Errors.User.Password.NotSet")
+	}
+
+	_, spanPasswap := tracing.NewNamedSpan(ctx, "passwap.Verify")
+	updated, err := c.userPasswordHasher.VerifyAndUpdate(encodedHash, oldPassword, newPassword)
+	spanPasswap.EndWithError(err)
+	return updated, convertPasswapErr(err)
+}
+
+// canUpdatePassword checks uf the given password can be used to be the password of a user
+func (c *Commands) canUpdatePassword(ctx context.Context, newPassword string, resourceOwner string, state domain.UserState) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if wm.UserState == domain.UserStateUnspecified || wm.UserState == domain.UserStateDeleted {
+	if !isUserStateExists(state) {
 		return zerrors.ThrowNotFound(nil, "COMMAND-G8dh3", "Errors.User.Password.NotFound")
 	}
-	if wm.UserState == domain.UserStateInitial {
+	if state == domain.UserStateInitial {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-M9dse", "Errors.User.NotInitialised")
 	}
-	policy, err := c.getOrgPasswordComplexityPolicy(ctx, wm.ResourceOwner)
+	policy, err := c.getOrgPasswordComplexityPolicy(ctx, resourceOwner)
 	if err != nil {
 		return err
 	}
@@ -142,6 +164,7 @@ func (c *Commands) canUpdatePassword(ctx context.Context, newPassword string, wm
 	return nil
 }
 
+// RequestSetPassword generate and send out new code to change password for a specific user
 func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner string, notifyType domain.NotificationType, passwordVerificationCode crypto.Generator) (objectDetails *domain.ObjectDetails, err error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-M00oL", "Errors.User.UserIDMissing")
@@ -151,7 +174,7 @@ func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner
 	if err != nil {
 		return nil, err
 	}
-	if existingHuman.UserState == domain.UserStateUnspecified || existingHuman.UserState == domain.UserStateDeleted {
+	if !isUserStateExists(existingHuman.UserState) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Hj9ds", "Errors.User.NotFound")
 	}
 	if existingHuman.UserState == domain.UserStateInitial {
@@ -173,6 +196,7 @@ func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner
 	return writeModelToObjectDetails(&existingHuman.WriteModel), nil
 }
 
+// PasswordCodeSent notification send with code to change password
 func (c *Commands) PasswordCodeSent(ctx context.Context, orgID, userID string) (err error) {
 	if userID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-meEfe", "Errors.User.UserIDMissing")
@@ -190,6 +214,7 @@ func (c *Commands) PasswordCodeSent(ctx context.Context, orgID, userID string) (
 	return err
 }
 
+// PasswordChangeSent notification sent that user changed his password
 func (c *Commands) PasswordChangeSent(ctx context.Context, orgID, userID string) (err error) {
 	if userID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-pqlm2n", "Errors.User.UserIDMissing")
@@ -207,6 +232,7 @@ func (c *Commands) PasswordChangeSent(ctx context.Context, orgID, userID string)
 	return err
 }
 
+// HumanCheckPassword check password for user with additional informations from authRequest
 func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, password string, authRequest *domain.AuthRequest, lockoutPolicy *domain.LockoutPolicy) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -230,13 +256,13 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 	if err != nil {
 		return err
 	}
-	if wm.UserState == domain.UserStateUnspecified || wm.UserState == domain.UserStateDeleted {
+
+	if !isUserStateExists(wm.UserState) {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.NotFound")
 	}
 	if wm.UserState == domain.UserStateLocked {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-JLK35", "Errors.User.Locked")
 	}
-
 	if wm.EncodedHash == "" {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-3nJ4t", "Errors.User.Password.NotSet")
 	}

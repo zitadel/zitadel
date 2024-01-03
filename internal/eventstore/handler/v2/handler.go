@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"math"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -111,11 +112,19 @@ func (h *Handler) Start(ctx context.Context) {
 }
 
 func (h *Handler) schedule(ctx context.Context) {
-	// if there was no run before trigger instantly
-	t := time.NewTimer(0)
+	// if there was no run before trigger within half a second
+	start := randomizeStart(0, 0.5)
+	t := time.NewTimer(start)
 	didInitialize := h.didProjectionInitialize(ctx)
 	if didInitialize {
-		t.Reset(h.requeueEvery)
+		if !t.Stop() {
+			<-t.C
+		}
+		// if there was a trigger before, start the projection
+		// after a second (should generally be after the not initialized projections)
+		// and its configured `RequeueEvery`
+		reset := randomizeStart(1, h.requeueEvery.Seconds())
+		t.Reset(reset)
 	}
 
 	for {
@@ -155,6 +164,11 @@ func (h *Handler) schedule(ctx context.Context) {
 			t.Reset(h.requeueEvery)
 		}
 	}
+}
+
+func randomizeStart(min, maxSeconds float64) time.Duration {
+	d := min + rand.Float64()*(maxSeconds-min)
+	return time.Duration(d*1000) * time.Millisecond
 }
 
 func (h *Handler) subscribe(ctx context.Context) {
@@ -213,7 +227,7 @@ func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]str
 		AwaitOpenTransactions().
 		AllowTimeTravel().
 		ExcludedInstanceID("")
-	if didInitialize {
+	if didInitialize && h.handleActiveInstances > 0 {
 		query = query.
 			CreationDateAfter(h.now().Add(-1 * h.handleActiveInstances))
 	}

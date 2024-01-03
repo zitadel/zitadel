@@ -4,8 +4,6 @@ import (
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/domain"
-
-	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 )
 
 const (
@@ -26,8 +24,7 @@ func (l *Login) handleChangePassword(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	_, err = l.command.ChangePassword(setContext(r.Context(), authReq.UserOrgID), authReq.UserOrgID, authReq.UserID, data.OldPassword, data.NewPassword, userAgentID)
+	_, err = l.command.ChangePassword(setContext(r.Context(), authReq.UserOrgID), authReq.UserOrgID, authReq.UserID, data.OldPassword, data.NewPassword)
 	if err != nil {
 		l.renderChangePassword(w, r, authReq, err)
 		return
