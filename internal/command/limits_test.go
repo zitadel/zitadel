@@ -71,7 +71,7 @@ func TestLimits_SetLimits(t *testing.T) {
 			},
 		},
 		{
-			name: "update limits, ok",
+			name: "update limits audit log retention, ok",
 			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
 				return eventstoreExpect(
 						t,
@@ -108,6 +108,53 @@ func TestLimits_SetLimits(t *testing.T) {
 				resourceOwner: "instance1",
 				setLimits: &SetLimits{
 					AuditLogRetention: gu.Ptr(time.Hour),
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "instance1",
+				},
+			},
+		},
+		{
+			name: "update limits unblock, ok",
+			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+				return eventstoreExpect(
+						t,
+						expectFilter(
+							eventFromEventPusher(
+								limits.NewSetEvent(
+									eventstore.NewBaseEventForPush(
+										context.Background(),
+										&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
+										limits.SetEventType,
+									),
+									limits.ChangeAuditLogRetention(gu.Ptr(time.Minute)),
+									limits.ChangeBlock(gu.Ptr(true)),
+								),
+							),
+						),
+						expectPush(
+							eventFromEventPusherWithInstanceID(
+								"instance1",
+								limits.NewSetEvent(
+									eventstore.NewBaseEventForPush(
+										context.Background(),
+										&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
+										limits.SetEventType,
+									),
+									limits.ChangeBlock(gu.Ptr(false)),
+								),
+							),
+						),
+					),
+					nil
+			},
+			args: args{
+				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
+				resourceOwner: "instance1",
+				setLimits: &SetLimits{
+					Block: gu.Ptr(false),
 				},
 			},
 			res: res{
