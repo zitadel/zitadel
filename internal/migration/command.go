@@ -38,15 +38,15 @@ func setupDoneCmd(ctx context.Context, migration Migration, err error) eventstor
 		typ = repeatableDoneType
 		lastRun = repeatable
 	}
-	if err != nil {
-		typ = failedType
-	}
 
 	s := &SetupStep{
 		migration: migration,
 		Name:      migration.String(),
-		Error:     err.Error(),
 		LastRun:   lastRun,
+	}
+	if err != nil {
+		typ = failedType
+		s.Error = err.Error()
 	}
 
 	s.BaseEvent = *eventstore.NewBaseEventForPush(
