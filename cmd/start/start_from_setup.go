@@ -35,7 +35,7 @@ Requirements:
 
 			startConfig := MustNewConfig(viper.GetViper())
 
-			err = startZitadel(startConfig, masterKey, server)
+			err = startZitadel(cmd.Context(), startConfig, masterKey, server)
 			logging.OnError(err).Fatal("unable to start zitadel")
 		},
 	}
