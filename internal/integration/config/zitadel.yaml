@@ -26,14 +26,6 @@ LogStore:
     Stdout:
       Enabled: true
 
-Quotas:
-  Access:
-    Enabled: true
-    ExhaustedCookieKey: "zitadel.quota.limiting"
-    ExhaustedCookieMaxAge: "60s"
-  Execution:
-    Enabled: true
-
 Projections:
   HandleActiveInstances: 60s
   Customizations:
