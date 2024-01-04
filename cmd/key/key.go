@@ -74,7 +74,7 @@ new -f keys.yaml key2=anotherkey`,
 			if err != nil {
 				return err
 			}
-			return storage.CreateKeys(keys...)
+			return storage.CreateKeys(cmd.Context(), keys...)
 		},
 	}
 	cmd.PersistentFlags().StringP(flagKeyFile, "f", "", "path to keys file")
