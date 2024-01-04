@@ -454,7 +454,10 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, currentState
 	}
 	var shouldContinue bool
 	defer func() {
-		_, err = tx.Exec("RELEASE SAVEPOINT exec")
+		_, errSave := tx.Exec("RELEASE SAVEPOINT exec")
+		if err == nil {
+			err = errSave
+		}
 	}()
 
 	if err = statement.Execute(tx, h.projection.Name()); err != nil {
