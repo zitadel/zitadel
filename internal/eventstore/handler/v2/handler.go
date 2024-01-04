@@ -313,7 +313,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		return false, err
 	}
 	defer func() {
-		if err != nil {
+		if err != nil && !errors.Is(err, &executionError{}) {
 			rollbackErr := tx.Rollback()
 			h.log().OnError(rollbackErr).Debug("unable to rollback tx")
 			return
@@ -454,7 +454,7 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, currentState
 			return nil
 		}
 
-		return err
+		return &executionError{parent: err}
 	}
 
 	return nil
