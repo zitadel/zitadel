@@ -16,8 +16,8 @@
       serviceType === PolicyComponentServiceType.ADMIN
         ? 'iam.policy.write'
         : serviceType === PolicyComponentServiceType.MGMT
-        ? 'policy.write'
-        : ''
+          ? 'policy.write'
+          : ''
     ]
       | hasRole
       | async) === false
@@ -38,8 +38,8 @@
           serviceType === PolicyComponentServiceType.ADMIN
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
-            ? 'policy.write'
-            : ''
+              ? 'policy.write'
+              : ''
         ]
           | hasRole
           | async) === false
@@ -88,8 +88,8 @@
           serviceType === PolicyComponentServiceType.ADMIN
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
-            ? 'policy.write'
-            : ''
+              ? 'policy.write'
+              : ''
         ]
           | hasRole
           | async) === false
@@ -110,8 +110,8 @@
           serviceType === PolicyComponentServiceType.ADMIN
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
-            ? 'policy.write'
-            : ''
+              ? 'policy.write'
+              : ''
         ]
           | hasRole
           | async) === false
@@ -133,8 +133,8 @@
         serviceType === PolicyComponentServiceType.ADMIN
           ? 'iam.policy.write'
           : serviceType === PolicyComponentServiceType.MGMT
-          ? 'policy.write'
-          : ''
+            ? 'policy.write'
+            : ''
       ]
         | hasRole
         | async) === false
