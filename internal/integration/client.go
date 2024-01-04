@@ -19,6 +19,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
@@ -31,6 +32,7 @@ import (
 	organisation "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
+	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
@@ -129,6 +131,17 @@ func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse
 				ReturnCode: &user.ReturnPhoneVerificationCode{},
 			},
 		},
+	})
+	logging.OnError(err).Fatal("create human user")
+	return resp
+}
+
+func (s *Tester) CreateMachineUser(ctx context.Context) *mgmt.AddMachineUserResponse {
+	resp, err := s.Client.Mgmt.AddMachineUser(ctx, &mgmt.AddMachineUserRequest{
+		UserName:        fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
+		Name:            "Mickey",
+		Description:     "Mickey Mouse",
+		AccessTokenType: user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER,
 	})
 	logging.OnError(err).Fatal("create human user")
 	return resp
@@ -405,4 +418,30 @@ func (s *Tester) CreatePasswordSession(t *testing.T, ctx context.Context, userID
 	require.NoError(t, err)
 	return createResp.GetSessionId(), createResp.GetSessionToken(),
 		createResp.GetDetails().GetChangeDate().AsTime(), createResp.GetDetails().GetChangeDate().AsTime()
+}
+
+func (s *Tester) CreateProjectUserGrant(t *testing.T, ctx context.Context, projectID, userID string) string {
+	resp, err := s.Client.Mgmt.AddUserGrant(ctx, &mgmt.AddUserGrantRequest{
+		UserId:    userID,
+		ProjectId: projectID,
+	})
+	require.NoError(t, err)
+	return resp.GetUserGrantId()
+}
+
+func (s *Tester) CreateOrgMembership(t *testing.T, ctx context.Context, userID string) {
+	_, err := s.Client.Mgmt.AddOrgMember(ctx, &mgmt.AddOrgMemberRequest{
+		UserId: userID,
+		Roles:  []string{domain.RoleOrgOwner},
+	})
+	require.NoError(t, err)
+}
+
+func (s *Tester) CreateProjectMembership(t *testing.T, ctx context.Context, projectID, userID string) {
+	_, err := s.Client.Mgmt.AddProjectMember(ctx, &mgmt.AddProjectMemberRequest{
+		ProjectId: projectID,
+		UserId:    userID,
+		Roles:     []string{domain.RoleProjectOwner},
+	})
+	require.NoError(t, err)
 }

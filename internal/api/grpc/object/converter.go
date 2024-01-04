@@ -97,29 +97,6 @@ func ToListDetails(
 	return details
 }
 
-func TextMethodToModel(method object_pb.TextQueryMethod) domain.SearchMethod {
-	switch method {
-	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS:
-		return domain.SearchMethodEquals
-	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE:
-		return domain.SearchMethodEqualsIgnoreCase
-	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH:
-		return domain.SearchMethodStartsWith
-	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE:
-		return domain.SearchMethodStartsWithIgnoreCase
-	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS:
-		return domain.SearchMethodContains
-	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE:
-		return domain.SearchMethodContainsIgnoreCase
-	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH:
-		return domain.SearchMethodEndsWith
-	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
-		return domain.SearchMethodEndsWithIgnoreCase
-	default:
-		return -1
-	}
-}
-
 func TextMethodToQuery(method object_pb.TextQueryMethod) query.TextComparison {
 	switch method {
 	case object_pb.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS:

@@ -76,6 +76,7 @@ type Steps struct {
 	s16UniqueConstraintsLower       *UniqueConstraintToLower
 	s17AddOffsetToUniqueConstraints *AddOffsetToCurrentStates
 	s18AddLowerFieldsToLoginNames   *AddLowerFieldsToLoginNames
+	s19AddCurrentStatesIndex        *AddCurrentSequencesIndex
 }
 
 type encryptionKeyConfig struct {

@@ -27,6 +27,18 @@ message SetHumanEmail {
   }
 }
 
+message HumanEmail {
+  string email = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"mini@mouse.com\"";
+    }
+  ];
+  bool is_verified = 2;
+}
+
+
 message SendEmailVerificationCode {
   optional string url_template = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},

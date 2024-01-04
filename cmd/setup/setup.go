@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/tls"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
@@ -67,26 +68,28 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 
 	i18n.MustLoadSupportedLanguagesFromDir()
 
-	zitadelDBClient, err := database.Connect(config.Database, false, false)
+	queryDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeQuery)
 	logging.OnError(err).Fatal("unable to connect to database")
-	esPusherDBClient, err := database.Connect(config.Database, false, true)
+	esPusherDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeEventPusher)
+	logging.OnError(err).Fatal("unable to connect to database")
+	projectionDBClient, err := database.Connect(config.Database, false, dialect.DBPurposeProjectionSpooler)
 	logging.OnError(err).Fatal("unable to connect to database")
 
-	config.Eventstore.Querier = old_es.NewCRDB(zitadelDBClient)
+	config.Eventstore.Querier = old_es.NewCRDB(queryDBClient)
 	config.Eventstore.Pusher = new_es.NewEventstore(esPusherDBClient)
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 	logging.OnError(err).Fatal("unable to start eventstore")
 	migration.RegisterMappers(eventstoreClient)
 
-	steps.s1ProjectionTable = &ProjectionTable{dbClient: zitadelDBClient.DB}
-	steps.s2AssetsTable = &AssetTable{dbClient: zitadelDBClient.DB}
+	steps.s1ProjectionTable = &ProjectionTable{dbClient: queryDBClient.DB}
+	steps.s2AssetsTable = &AssetTable{dbClient: queryDBClient.DB}
 
 	steps.FirstInstance.instanceSetup = config.DefaultInstance
 	steps.FirstInstance.userEncryptionKey = config.EncryptionKeys.User
 	steps.FirstInstance.smtpEncryptionKey = config.EncryptionKeys.SMTP
 	steps.FirstInstance.oidcEncryptionKey = config.EncryptionKeys.OIDC
 	steps.FirstInstance.masterKey = masterKey
-	steps.FirstInstance.db = zitadelDBClient
+	steps.FirstInstance.db = queryDBClient
 	steps.FirstInstance.es = eventstoreClient
 	steps.FirstInstance.defaults = config.SystemDefaults
 	steps.FirstInstance.zitadelRoles = config.InternalAuthZ.RolePermissionMappings
@@ -94,20 +97,21 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.FirstInstance.externalSecure = config.ExternalSecure
 	steps.FirstInstance.externalPort = config.ExternalPort
 
-	steps.s5LastFailed = &LastFailed{dbClient: zitadelDBClient.DB}
-	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: zitadelDBClient.DB}
-	steps.s7LogstoreTables = &LogstoreTables{dbClient: zitadelDBClient.DB, username: config.Database.Username(), dbType: config.Database.Type()}
-	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: zitadelDBClient}
+	steps.s5LastFailed = &LastFailed{dbClient: queryDBClient.DB}
+	steps.s6OwnerRemoveColumns = &OwnerRemoveColumns{dbClient: queryDBClient.DB}
+	steps.s7LogstoreTables = &LogstoreTables{dbClient: queryDBClient.DB, username: config.Database.Username(), dbType: config.Database.Type()}
+	steps.s8AuthTokens = &AuthTokenIndexes{dbClient: queryDBClient}
 	steps.CorrectCreationDate.dbClient = esPusherDBClient
-	steps.s12AddOTPColumns = &AddOTPColumns{dbClient: zitadelDBClient}
-	steps.s13FixQuotaProjection = &FixQuotaConstraints{dbClient: zitadelDBClient}
+	steps.s12AddOTPColumns = &AddOTPColumns{dbClient: queryDBClient}
+	steps.s13FixQuotaProjection = &FixQuotaConstraints{dbClient: queryDBClient}
 	steps.s14NewEventsTable = &NewEventsTable{dbClient: esPusherDBClient}
-	steps.s15CurrentStates = &CurrentProjectionState{dbClient: zitadelDBClient}
-	steps.s16UniqueConstraintsLower = &UniqueConstraintToLower{dbClient: zitadelDBClient}
-	steps.s17AddOffsetToUniqueConstraints = &AddOffsetToCurrentStates{dbClient: zitadelDBClient}
-	steps.s18AddLowerFieldsToLoginNames = &AddLowerFieldsToLoginNames{dbClient: zitadelDBClient}
+	steps.s15CurrentStates = &CurrentProjectionState{dbClient: queryDBClient}
+	steps.s16UniqueConstraintsLower = &UniqueConstraintToLower{dbClient: queryDBClient}
+	steps.s17AddOffsetToUniqueConstraints = &AddOffsetToCurrentStates{dbClient: queryDBClient}
+	steps.s18AddLowerFieldsToLoginNames = &AddLowerFieldsToLoginNames{dbClient: queryDBClient}
+	steps.s19AddCurrentStatesIndex = &AddCurrentSequencesIndex{dbClient: queryDBClient}
 
-	err = projection.Create(ctx, zitadelDBClient, eventstoreClient, config.Projections, nil, nil, nil)
+	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
 
 	repeatableSteps := []migration.RepeatableMigration{
@@ -150,6 +154,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.WithFields("name", steps.s16UniqueConstraintsLower.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s17AddOffsetToUniqueConstraints)
 	logging.WithFields("name", steps.s17AddOffsetToUniqueConstraints.String()).OnError(err).Fatal("migration failed")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s19AddCurrentStatesIndex)
+	logging.WithFields("name", steps.s19AddCurrentStatesIndex.String()).OnError(err).Fatal("migration failed")
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)

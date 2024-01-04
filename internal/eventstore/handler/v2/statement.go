@@ -65,7 +65,7 @@ type Statement struct {
 	CreationDate  time.Time
 	InstanceID    string
 
-	offset uint64
+	offset uint32
 
 	Execute Exec
 }

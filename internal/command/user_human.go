@@ -127,6 +127,7 @@ func (m *AddMetadataEntry) Valid() error {
 	return nil
 }
 
+// Deprecated: use commands.AddUserHuman
 func (c *Commands) AddHuman(ctx context.Context, resourceOwner string, human *AddHuman, allowInitMail bool) (err error) {
 	if resourceOwner == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMA-5Ky74", "Errors.Internal")
@@ -180,7 +181,7 @@ func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *crypto
 				return nil, err
 			}
 
-			if err = userValidateDomain(ctx, a, human.Username, domainPolicy.UserLoginMustBeDomain, filter); err != nil {
+			if err = c.userValidateDomain(ctx, a.ResourceOwner, human.Username, domainPolicy.UserLoginMustBeDomain); err != nil {
 				return nil, err
 			}
 
@@ -310,6 +311,7 @@ func (c *Commands) addHumanCommandPhone(ctx context.Context, filter preparation.
 	return append(cmds, user.NewHumanPhoneCodeAddedEventV2(ctx, &a.Aggregate, phoneCode.Crypted, phoneCode.Expiry, human.Phone.ReturnCode)), nil
 }
 
+// Deprecated: use commands.NewUserHumanWriteModel, to remove deprecated eventstore.Filter
 func (c *Commands) addHumanCommandCheckID(ctx context.Context, filter preparation.FilterToQueryReducer, human *AddHuman, orgID string) (err error) {
 	if human.ID == "" {
 		human.ID, err = c.idGenerator.Next()
@@ -347,7 +349,7 @@ func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQue
 	return nil
 }
 
-func userValidateDomain(ctx context.Context, a *user.Aggregate, username string, mustBeDomain bool, filter preparation.FilterToQueryReducer) error {
+func (c *Commands) userValidateDomain(ctx context.Context, resourceOwner string, username string, mustBeDomain bool) error {
 	if mustBeDomain {
 		return nil
 	}
@@ -357,17 +359,12 @@ func userValidateDomain(ctx context.Context, a *user.Aggregate, username string,
 		return nil
 	}
 
-	domainCheck := NewOrgDomainVerifiedWriteModel(username[index+1:])
-	events, err := filter(ctx, domainCheck.Query())
+	domainCheck, err := c.orgDomainVerifiedWriteModel(ctx, username[index+1:])
 	if err != nil {
 		return err
 	}
-	domainCheck.AppendEvents(events...)
-	if err = domainCheck.Reduce(); err != nil {
-		return err
-	}
 
-	if domainCheck.Verified && domainCheck.ResourceOwner != a.ResourceOwner {
+	if domainCheck.Verified && domainCheck.ResourceOwner != resourceOwner {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
 	}
 
@@ -411,6 +408,7 @@ func (h *AddHuman) shouldAddInitCode() bool {
 			h.Password == ""
 }
 
+// Deprecated: use commands.AddUserHuman
 func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, links []*domain.UserIDPLink, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator crypto.Generator) (_ *domain.Human, passwordlessCode *domain.PasswordlessInitCode, err error) {
 	if orgID == "" {
 		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-5N8fs", "Errors.ResourceOwnerMissing")
@@ -459,6 +457,7 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 	return writeModelToHuman(addedHuman), passwordlessCode, nil
 }
 
+// Deprecated: use commands.AddUserHuman
 func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, orgMemberRoles []string, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator crypto.Generator) (*domain.Human, error) {
 	if orgID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-GEdf2", "Errors.ResourceOwnerMissing")

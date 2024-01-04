@@ -320,13 +320,17 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		}
 	}()
 
+	txCtx := ctx
 	if h.txDuration > 0 {
 		var cancel func()
 		ctx, cancel = context.WithTimeout(ctx, h.txDuration)
 		defer cancel()
+		// add 100ms to store current state if iteration takes too long
+		txCtx, cancel = context.WithTimeout(ctx, h.txDuration+100*time.Millisecond)
+		defer cancel()
 	}
 
-	tx, err := h.client.Begin()
+	tx, err := h.client.BeginTx(txCtx, nil)
 	if err != nil {
 		return false, err
 	}
@@ -458,7 +462,10 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, currentState
 	}
 	var shouldContinue bool
 	defer func() {
-		_, err = tx.Exec("RELEASE SAVEPOINT exec")
+		_, errSave := tx.Exec("RELEASE SAVEPOINT exec")
+		if err == nil {
+			err = errSave
+		}
 	}()
 
 	if err = statement.Execute(tx, h.projection.Name()); err != nil {

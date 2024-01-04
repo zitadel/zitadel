@@ -100,7 +100,7 @@ func (l *Login) handleDeviceAuthUserCode(w http.ResponseWriter, r *http.Request)
 		l.renderDeviceAuthUserCode(w, r, err)
 		return
 	}
-	deviceAuth, err := l.query.DeviceAuthByUserCode(ctx, userCode)
+	deviceAuthReq, err := l.query.DeviceAuthRequestByUserCode(ctx, userCode)
 	if err != nil {
 		l.renderDeviceAuthUserCode(w, r, err)
 		return
@@ -113,14 +113,9 @@ func (l *Login) handleDeviceAuthUserCode(w http.ResponseWriter, r *http.Request)
 	authRequest, err := l.authRepo.CreateAuthRequest(ctx, &domain.AuthRequest{
 		CreationDate:  time.Now(),
 		AgentID:       userAgentID,
-		ApplicationID: deviceAuth.ClientID,
+		ApplicationID: deviceAuthReq.ClientID,
 		InstanceID:    authz.GetInstance(ctx).InstanceID(),
-		Request: &domain.AuthRequestDevice{
-			ID:         deviceAuth.AggregateID,
-			DeviceCode: deviceAuth.DeviceCode,
-			UserCode:   deviceAuth.UserCode,
-			Scopes:     deviceAuth.Scopes,
-		},
+		Request:       deviceAuthReq,
 	})
 	if err != nil {
 		l.renderDeviceAuthUserCode(w, r, err)
@@ -168,9 +163,9 @@ func (l *Login) handleDeviceAuthAction(w http.ResponseWriter, r *http.Request) {
 	action := mux.Vars(r)["action"]
 	switch action {
 	case deviceAuthAllowed:
-		_, err = l.command.ApproveDeviceAuth(r.Context(), authDev.ID, authReq.UserID)
+		_, err = l.command.ApproveDeviceAuth(r.Context(), authDev.DeviceCode, authReq.UserID, authReq.UserAuthMethodTypes(), authReq.AuthTime)
 	case deviceAuthDenied:
-		_, err = l.command.CancelDeviceAuth(r.Context(), authDev.ID, domain.DeviceAuthCanceledDenied)
+		_, err = l.command.CancelDeviceAuth(r.Context(), authDev.DeviceCode, domain.DeviceAuthCanceledDenied)
 	default:
 		l.renderDeviceAuthAction(w, r, authReq, authDev.Scopes)
 		return

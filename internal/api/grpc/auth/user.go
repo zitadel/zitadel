@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/org"
 	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -273,41 +272,6 @@ func ListMyProjectOrgsRequestToQuery(req *auth_pb.ListMyProjectOrgsRequest) (*qu
 		},
 		Queries: queries,
 	}, nil
-}
-
-func membershipToDomain(memberships []*query.Membership) []*domain.UserMembership {
-	result := make([]*domain.UserMembership, len(memberships))
-	for i, membership := range memberships {
-		typ, displayName, aggID, objID := MemberTypeToDomain(membership)
-		result[i] = &domain.UserMembership{
-			UserID:        membership.UserID,
-			MemberType:    typ,
-			AggregateID:   aggID,
-			ObjectID:      objID,
-			Roles:         membership.Roles,
-			DisplayName:   displayName,
-			CreationDate:  membership.CreationDate,
-			ChangeDate:    membership.ChangeDate,
-			ResourceOwner: membership.ResourceOwner,
-			//TODO: implement
-			// ResourceOwnerName: membership.ResourceOwnerName,
-			Sequence: membership.Sequence,
-		}
-	}
-	return result
-}
-
-func MemberTypeToDomain(m *query.Membership) (_ domain.MemberType, displayName, aggID, objID string) {
-	if m.Org != nil {
-		return domain.MemberTypeOrganisation, m.Org.Name, m.Org.OrgID, ""
-	} else if m.IAM != nil {
-		return domain.MemberTypeIam, m.IAM.Name, m.IAM.IAMID, ""
-	} else if m.Project != nil {
-		return domain.MemberTypeProject, m.Project.Name, m.Project.ProjectID, ""
-	} else if m.ProjectGrant != nil {
-		return domain.MemberTypeProjectGrant, m.ProjectGrant.ProjectName, m.ProjectGrant.ProjectID, m.ProjectGrant.GrantID
-	}
-	return domain.MemberTypeUnspecified, "", "", ""
 }
 
 func cascadingMemberships(memberships []*query.Membership) []*command.CascadingMembership {
