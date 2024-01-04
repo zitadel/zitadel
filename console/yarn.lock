@@ -6269,10 +6269,10 @@ humanize-ms@^1.2.1:
   dependencies:
     ms "^2.0.0"
 
-i18n-iso-countries@^7.6.0:
-  version "7.6.0"
-  resolved "https://registry.npmjs.org/i18n-iso-countries/-/i18n-iso-countries-7.6.0.tgz"
-  integrity sha512-HPKjOUKS0BkjiY4ayrsuFbu7Ock++pXLs+FAOYl4WfTL5L0ploEH68fiRAP6Zev5g/jvMFt54KcPGJcb942wbg==
+i18n-iso-countries@^7.7.0:
+  version "7.7.0"
+  resolved "https://registry.yarnpkg.com/i18n-iso-countries/-/i18n-iso-countries-7.7.0.tgz#33a0974d6ffbe864fb853325de3afb4717c54b52"
+  integrity sha512-07zMatrSsR1Z+cnxW//7s14Xf4v5g6U6ORHPaH8+Ox4uPqV+y46Uq78veYV8H1DKTr76EfdjSeaTxHpnaYq+bw==
   dependencies:
     diacritics "1.3.0"
 
