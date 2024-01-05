@@ -76,16 +76,6 @@ func (s *StepStates) lastByState(stepState StepState) (step *Step) {
 	return step
 }
 
-func (s *StepStates) byState(name string) (step *Step) {
-	for _, state := range s.Steps {
-		if state.Name != name {
-			continue
-		}
-		return state
-	}
-	return nil
-}
-
 type StepState int32
 
 const (

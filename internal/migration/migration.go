@@ -36,8 +36,7 @@ type errCheckerMigration interface {
 
 type RepeatableMigration interface {
 	Migration
-	SetLastExecution(lastRun map[string]interface{})
-	Check() bool
+	Check(lastRun map[string]interface{}) bool
 }
 
 func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration) (err error) {
@@ -51,7 +50,6 @@ func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration
 		continueOnErr = errChecker.ContinueOnErr
 	}
 
-	// if should, err := checkExec(ctx, es, migration); !should || err != nil {
 	should, err := checkExec(ctx, es, migration)
 	if err != nil && !continueOnErr(err) {
 		return err
@@ -109,7 +107,7 @@ func (m *cancelMigration) String() string {
 var errCancelStep = zerrors.ThrowError(nil, "MIGRA-zo86K", "migration canceled manually")
 
 func CancelStep(ctx context.Context, es *eventstore.Eventstore, step *SetupStep) error {
-	_, err := es.Push(ctx, setupDoneCmd(ctx, &cancelMigration{name: step.Name}, nil))
+	_, err := es.Push(ctx, setupDoneCmd(ctx, &cancelMigration{name: step.Name}, errCancelStep))
 	return err
 }
 
@@ -147,17 +145,17 @@ func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migrat
 	if step == nil {
 		return true, nil
 	}
-	if step.state == StepDone {
-		return false, nil
+	if step.state == StepFailed {
+		return true, nil
 	}
-
 	if step.state == StepStarted {
 		return false, errMigrationAlreadyStarted
 	}
 
 	repeatable, ok := migration.(RepeatableMigration)
 	if !ok {
-		return true, nil
+		return step.state != StepDone, nil
 	}
-	return repeatable.Check(), nil
+	lastRun, _ := step.LastRun.(map[string]interface{})
+	return repeatable.Check(lastRun), nil
 }

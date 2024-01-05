@@ -13,9 +13,9 @@ import (
 type SetupStep struct {
 	eventstore.BaseEvent `json:"-"`
 	migration            Migration
-	Name                 string      `json:"name"`
-	Error                string      `json:"error,omitempty"`
-	LastRun              interface{} `json:"lastRun,omitempty"`
+	Name                 string `json:"name"`
+	Error                any    `json:"error,omitempty"`
+	LastRun              any    `json:"lastRun,omitempty"`
 }
 
 func setupStartedCmd(ctx context.Context, migration Migration) eventstore.Command {
