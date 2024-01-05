@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
+
 	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
@@ -123,12 +124,15 @@ func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecu
 				return
 			}
 			sameSiteMode := csrf.SameSiteLaxMode
-			if len(authz.GetInstance(r.Context()).SecurityPolicyAllowedOrigins()) > 0 {
+			secureOnly := externalSecure
+			instance := authz.GetInstance(r.Context())
+			if len(instance.SecurityPolicyAllowedOrigins()) > 0 {
 				sameSiteMode = csrf.SameSiteNoneMode
+				secureOnly = externalSecure || instance.RequestedDomain() == "localhost"
 			}
 			csrf.Protect(csrfCookieKey,
-				csrf.Secure(externalSecure),
-				csrf.CookieName(http_utils.SetCookiePrefix(cookieName, "", path, externalSecure)),
+				csrf.Secure(secureOnly),
+				csrf.CookieName(http_utils.SetCookiePrefix(cookieName, externalSecure, http_utils.PrefixHost)),
 				csrf.Path(path),
 				csrf.ErrorHandler(errorHandler),
 				csrf.SameSite(sameSiteMode),
