@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 
 	sq "github.com/Masterminds/squirrel"
@@ -98,7 +99,7 @@ func (d *database) ReadKey(id string) (_ *crypto.Key, err error) {
 	}, nil
 }
 
-func (d *database) CreateKeys(keys ...*crypto.Key) error {
+func (d *database) CreateKeys(ctx context.Context, keys ...*crypto.Key) error {
 	insert := sq.Insert(EncryptionKeysTable).
 		Columns(encryptionKeysIDCol, encryptionKeysKeyCol).PlaceholderFormat(sq.Dollar)
 	for _, key := range keys {
@@ -112,7 +113,7 @@ func (d *database) CreateKeys(keys ...*crypto.Key) error {
 	if err != nil {
 		return zerrors.ThrowInternal(err, "", "unable to insert new keys")
 	}
-	tx, err := d.client.Begin()
+	tx, err := d.client.BeginTx(ctx, nil)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "", "unable to insert new keys")
 	}
