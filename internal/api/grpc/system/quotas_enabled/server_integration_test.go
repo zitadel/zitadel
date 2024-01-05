@@ -28,10 +28,6 @@ func TestMain(m *testing.M) {
 Quotas:
   Access:
     Enabled: true
-    ExhaustedCookieKey: "zitadel.quota.limiting"
-    ExhaustedCookieMaxAge: "60s"
-  Execution:
-    Enabled: true
 `)
 		defer Tester.Done()
 		SystemCTX = Tester.WithAuthorization(ctx, integration.SystemUser)
