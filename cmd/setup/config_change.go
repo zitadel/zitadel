@@ -20,14 +20,11 @@ type externalConfigChange struct {
 	defaults              systemdefaults.SystemDefaults
 }
 
-func (mig *externalConfigChange) SetLastExecution(lastRun map[string]interface{}) {
+func (mig *externalConfigChange) Check(lastRun map[string]interface{}) bool {
 	mig.currentExternalDomain, _ = lastRun["externalDomain"].(string)
 	externalPort, _ := lastRun["externalPort"].(float64)
 	mig.currentExternalPort = uint16(externalPort)
 	mig.currentExternalSecure, _ = lastRun["externalSecure"].(bool)
-}
-
-func (mig *externalConfigChange) Check() bool {
 	return mig.currentExternalSecure != mig.ExternalSecure ||
 		mig.currentExternalPort != mig.ExternalPort ||
 		mig.currentExternalDomain != mig.ExternalDomain
