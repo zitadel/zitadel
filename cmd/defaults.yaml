@@ -830,8 +830,8 @@ DefaultInstance:
     # A value of "0s" means that all events are available.
     # If this value is set, it overwrites the system default unless it is not reset via the admin API.
     AuditLogRetention: # ZITADEL_DEFAULTINSTANCE_LIMITS_AUDITLOGRETENTION
-    # If Block is true, authenticated requests and authentication itself are blocked.
-    # You can only manage ZITADEL via the system API.
+    # If Block is true, all requests except to /ui/console or the system API are blocked and /ui/login is redirected to /ui/console.
+    # /ui/console shows a message that the instance is blocked with a link to Console.InstanceManagementURL
     Block: # ZITADEL_DEFAULTINSTANCE_LIMITS_BLOCK
   Restrictions:
     # DisallowPublicOrgRegistration defines if ZITADEL should expose the endpoint /ui/login/register/org
@@ -865,8 +865,8 @@ DefaultInstance:
 #        ResetInterval: 720h # 30 days
 #        # Amount defines the number of units for this quota
 #        Amount: 25000
-#        # Limit defines whether ZITADEL should block further usage when the configured amount is used.
-#        # If you not only want to block authenticated requests but also authentication itself, consider using Limits.Block.
+#        # Limit defines whether ZITADEL should block further authenticated requests when the configured amount is used.
+#        # If you not only want to block authenticated requests but also authentication itself, consider using the system APIs SetLimits method.
 #        Limit: false
 #        # Notifications are emitted by ZITADEL when certain quota percentages are reached
 #        Notifications:
