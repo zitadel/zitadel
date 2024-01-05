@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	es_old "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	es_v3 "github.com/zitadel/zitadel/internal/eventstore/v3"
@@ -41,11 +42,11 @@ Migrate only copies events2 and unique constraints`,
 }
 
 func copyEventstore(ctx context.Context, config *Migration) {
-	sourceClient, err := database.Connect(config.Source, false, false)
+	sourceClient, err := database.Connect(config.Source, false, dialect.DBPurposeQuery)
 	logging.OnError(err).Fatal("unable to connect to source database")
 	defer sourceClient.Close()
 
-	destClient, err := database.Connect(config.Destination, false, true)
+	destClient, err := database.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
 	logging.OnError(err).Fatal("unable to connect to destination database")
 	defer destClient.Close()
 

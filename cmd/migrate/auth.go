@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
 func authCmd() *cobra.Command {
@@ -33,11 +34,11 @@ Migrations only copies auth requests`,
 }
 
 func copyAuth(ctx context.Context, config *Migration) {
-	sourceClient, err := database.Connect(config.Source, false, false)
+	sourceClient, err := database.Connect(config.Source, false, dialect.DBPurposeQuery)
 	logging.OnError(err).Fatal("unable to connect to source database")
 	defer sourceClient.Close()
 
-	destClient, err := database.Connect(config.Destination, false, true)
+	destClient, err := database.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
 	logging.OnError(err).Fatal("unable to connect to destination database")
 	defer destClient.Close()
 

@@ -29,6 +29,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	crypto_db "github.com/zitadel/zitadel/internal/crypto/database"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
@@ -117,20 +118,20 @@ func projections(
 ) {
 	start := time.Now()
 
-	client, err := database.Connect(config.Destination, false, false)
+	client, err := database.Connect(config.Destination, false, dialect.DBPurposeQuery)
 	logging.OnError(err).Fatal("unable to connect to database")
 
 	keyStorage, err := crypto_db.NewKeyStorage(client, masterKey)
 	logging.OnError(err).Fatal("cannot start key storage")
 
-	keys, err := ensureEncryptionKeys(config.EncryptionKeys, keyStorage)
+	keys, err := ensureEncryptionKeys(ctx, config.EncryptionKeys, keyStorage)
 	logging.OnError(err).Fatal("unable to read encryption keys")
 
 	staticStorage, err := config.AssetStorage.NewStorage(client.DB)
 	logging.OnError(err).Fatal("unable create static storage")
 
 	config.Eventstore.Querier = old_es.NewCRDB(client)
-	esPusherDBClient, err := database.Connect(config.Destination, false, true)
+	esPusherDBClient, err := database.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
 	logging.OnError(err).Fatal("unable to connect eventstore push client")
 	config.Eventstore.Pusher = new_es.NewEventstore(esPusherDBClient)
 	es := eventstore.NewEventstore(config.Eventstore)
@@ -140,6 +141,7 @@ func projections(
 	queries, err := query.StartQueries(
 		ctx,
 		es,
+		client,
 		client,
 		config.Projections,
 		config.SystemDefaults,
