@@ -74,7 +74,7 @@ func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration
 	return pushErr
 }
 
-func LastStruckStep(ctx context.Context, es *eventstore.Eventstore) (*SetupStep, error) {
+func LastStuckStep(ctx context.Context, es *eventstore.Eventstore) (*SetupStep, error) {
 	var states StepStates
 	err := es.FilterToQueryReducer(ctx, &states)
 	if err != nil {
