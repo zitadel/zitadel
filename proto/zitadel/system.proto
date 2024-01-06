@@ -459,6 +459,41 @@ service SystemService {
     };
   }
 
+  // Sets many instance level limits
+  rpc BulkSetLimits(BulkSetLimitsRequest) returns (BulkSetLimitsResponse) {
+    option (google.api.http) = {
+      put: "/instances/limits/_bulk"
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "system.limits.write";
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Usage Control", "Limits"];
+      responses: {
+        key: "200";
+        value: {
+          description: "Instance limits set";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "At least one limit must be specified for each instance";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+
+
+
   // Resets instance level limits
   rpc ResetLimits(ResetLimitsRequest) returns (ResetLimitsResponse) {
     option (google.api.http) = {
@@ -780,6 +815,14 @@ message SetLimitsRequest {
 
 message SetLimitsResponse {
   zitadel.v1.ObjectDetails details = 1;
+}
+
+message BulkSetLimitsRequest {
+  repeated SetLimitsRequest limits = 1;
+}
+
+message BulkSetLimitsResponse {
+  repeated zitadel.v1.ObjectDetails details = 1;
 }
 
 message ResetLimitsRequest {

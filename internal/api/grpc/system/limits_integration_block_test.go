@@ -7,7 +7,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	"io"
@@ -24,170 +26,121 @@ import (
 
 func TestServer_Limits_Block(t *testing.T) {
 	domain, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
-	type test struct {
-		name     string
-		testHttp func(tt assert.TestingT) (req *http.Request, err error, assertResponse func(response *http.Response, withBlocking bool))
-		testGrpc func(tt assert.TestingT, withBlocking bool)
-	}
-	tests := []test{{
-		name: "public API",
-		testGrpc: func(tt assert.TestingT, withBlocking bool) {
-			_, err := Tester.Client.Admin.Healthz(CTX, &admin.HealthzRequest{})
-			assertGrpcError(tt, err, withBlocking)
-		},
-		testHttp: func(tt assert.TestingT) (*http.Request, error, func(*http.Response, bool)) {
-			req, err := http.NewRequestWithContext(
-				CTX,
-				"GET",
-				fmt.Sprintf("http://%s/admin/v1/healthz", net.JoinHostPort(domain, "8080")),
-				nil,
-			)
-			return req, err, func(response *http.Response, withBlocking bool) {
-				assertLimitResponse(tt, response, withBlocking)
-				assertSetLimitingCookie(tt, response, withBlocking)
-			}
-		},
-	}, {
-		name: "mutating API",
-		testGrpc: func(tt assert.TestingT, withBlocking bool) {
-			randomGrpcIdpName := randomString("idp-grpc", 5)
-			_, err := Tester.Client.Admin.AddGitHubProvider(iamOwnerCtx, &admin.AddGitHubProviderRequest{
-				Name:         randomGrpcIdpName,
-				ClientId:     "client-id",
-				ClientSecret: "client-secret",
-			})
-			assertGrpcError(tt, err, withBlocking)
-			//nolint:contextcheck
-			idpExists := idpExistsCondition(tt, instanceID, randomGrpcIdpName)
-			if withBlocking {
-				// We ensure that the idp really is not created
-				assert.Neverf(tt, idpExists, 5*time.Second, 1*time.Second, "idp should never be created")
-			} else {
-				assert.Eventuallyf(tt, idpExists, 5*time.Second, 1*time.Second, "idp should be created")
-			}
-		},
-		testHttp: func(tt assert.TestingT) (*http.Request, error, func(*http.Response, bool)) {
-			randomHttpIdpName := randomString("idp-http", 5)
-			req, err := http.NewRequestWithContext(
-				CTX,
-				"POST",
-				fmt.Sprintf("http://%s/admin/v1/idps/github", net.JoinHostPort(domain, "8080")),
-				strings.NewReader(`{
+	tests := []*test{
+		publicAPIBlockingTest(domain),
+		{
+			name: "mutating API",
+			testGrpc: func(tt assert.TestingT, expectBlocked bool) {
+				randomGrpcIdpName := randomString("idp-grpc", 5)
+				_, err := Tester.Client.Admin.AddGitHubProvider(iamOwnerCtx, &admin.AddGitHubProviderRequest{
+					Name:         randomGrpcIdpName,
+					ClientId:     "client-id",
+					ClientSecret: "client-secret",
+				})
+				assertGrpcError(tt, err, expectBlocked)
+				//nolint:contextcheck
+				idpExists := idpExistsCondition(tt, instanceID, randomGrpcIdpName)
+				if expectBlocked {
+					// We ensure that the idp really is not created
+					assert.Neverf(tt, idpExists, 5*time.Second, 1*time.Second, "idp should never be created")
+				} else {
+					assert.Eventuallyf(tt, idpExists, 5*time.Second, 1*time.Second, "idp should be created")
+				}
+			},
+			testHttp: func(tt assert.TestingT) (*http.Request, error, func(assert.TestingT, *http.Response, bool)) {
+				randomHttpIdpName := randomString("idp-http", 5)
+				req, err := http.NewRequestWithContext(
+					CTX,
+					"POST",
+					fmt.Sprintf("http://%s/admin/v1/idps/github", net.JoinHostPort(domain, "8080")),
+					strings.NewReader(`{
 	"name": "`+randomHttpIdpName+`",
 	"clientId": "client-id",
 	"clientSecret": "client-secret"
 }`),
-			)
-			if err != nil {
-				return nil, err, nil
-			}
-			req.Header.Set("Authorization", Tester.BearerToken(iamOwnerCtx))
-			return req, nil, func(response *http.Response, withBlocking bool) {
-				assertLimitResponse(tt, response, withBlocking)
-				assertSetLimitingCookie(tt, response, withBlocking)
-			}
-		},
-	}, {
-		name: "discovery",
-		testHttp: func(tt assert.TestingT) (*http.Request, error, func(*http.Response, bool)) {
-			req, err := http.NewRequestWithContext(
-				CTX,
-				"GET",
-				fmt.Sprintf("http://%s/.well-known/openid-configuration", net.JoinHostPort(domain, "8080")),
-				nil,
-			)
-			return req, err, func(response *http.Response, withBlocking bool) {
-				assertLimitResponse(tt, response, withBlocking)
-				assertSetLimitingCookie(tt, response, withBlocking)
-			}
-		},
-	}, {
-		name: "login",
-		testHttp: func(tt assert.TestingT) (*http.Request, error, func(*http.Response, bool)) {
-			req, err := http.NewRequestWithContext(
-				CTX,
-				"GET",
-				fmt.Sprintf("http://%s/ui/login/login/externalidp/callback", net.JoinHostPort(domain, "8080")),
-				nil,
-			)
-			return req, err, func(response *http.Response, withBlocking bool) {
-				// the login paths should return a redirect if the instance is blocked
-				if withBlocking {
-					assert.GreaterOrEqual(tt, response.StatusCode, http.StatusMultipleChoices)
-					assert.LessOrEqual(tt, response.StatusCode, http.StatusPermanentRedirect)
-				} else {
-					assertLimitResponse(tt, response, false)
+				)
+				if err != nil {
+					return nil, err, nil
 				}
-				assertSetLimitingCookie(tt, response, withBlocking)
-			}
-		},
-	}, {
-		name: "console",
-		testHttp: func(tt assert.TestingT) (*http.Request, error, func(*http.Response, bool)) {
-			req, err := http.NewRequestWithContext(
-				CTX,
-				"GET",
-				fmt.Sprintf("http://%s/ui/console/", net.JoinHostPort(domain, "8080")),
-				nil,
-			)
-			return req, err, func(response *http.Response, withBlocking bool) {
-				// the console is not blocked so we can render a link to an instance management portal.
-				// A CDN can cache these assets easily
-				// We also don't care about a cookie because the environment.json already takes care of that.
-				assertLimitResponse(tt, response, false)
-			}
-		},
-	}, {
-		name: "environment.json",
-		testHttp: func(tt assert.TestingT) (*http.Request, error, func(*http.Response, bool)) {
-			req, err := http.NewRequestWithContext(
-				CTX,
-				"GET",
-				fmt.Sprintf("http://%s/ui/console/assets/environment.json", net.JoinHostPort(domain, "8080")),
-				nil,
-			)
-			return req, err, func(response *http.Response, withBlocking bool) {
-				// the environment.json should always return successfully
-				assertLimitResponse(tt, response, false)
-				assertSetLimitingCookie(tt, response, withBlocking)
-				body, err := io.ReadAll(response.Body)
-				assert.NoError(tt, err)
-				var compFunc assert.ComparisonAssertionFunc = assert.NotContains
-				if withBlocking {
-					compFunc = assert.Contains
+				req.Header.Set("Authorization", Tester.BearerToken(iamOwnerCtx))
+				return req, nil, func(ttt assert.TestingT, response *http.Response, expectBlocked bool) {
+					assertLimitResponse(ttt, response, expectBlocked)
+					assertSetLimitingCookie(ttt, response, expectBlocked)
 				}
-				compFunc(tt, string(body), `"exhausted":true`)
-			}
-		},
-	}}
-	runTest := func(t *testing.T, tt test, withBlocking bool, isFirst bool) {
-		req, err, assertResponse := tt.testHttp(t)
-		require.NoError(t, err)
-		testHTTP := func() {
-			resp, err := (&http.Client{
-				// Don't follow redirects
-				CheckRedirect: func(req *http.Request, via []*http.Request) error {
-					return http.ErrUseLastResponse
-				},
-			}).Do(req)
-			defer func() {
-				require.NoError(t, resp.Body.Close())
-			}()
-			require.NoError(t, err)
-			assertResponse(resp, withBlocking)
-		}
-		if isFirst {
-			// limits are eventually consistent, so we need to wait for the blocking to be set on the first test
-			assert.EventuallyWithT(t, func(c *assert.CollectT) {
-				testHTTP()
-			}, 5*time.Second, time.Second, "wait for blocking to be set")
-		} else {
-			testHTTP()
-		}
-		if tt.testGrpc != nil {
-			tt.testGrpc(t, withBlocking)
-		}
-	}
+			},
+		}, {
+			name: "discovery",
+			testHttp: func(tt assert.TestingT) (*http.Request, error, func(assert.TestingT, *http.Response, bool)) {
+				req, err := http.NewRequestWithContext(
+					CTX,
+					"GET",
+					fmt.Sprintf("http://%s/.well-known/openid-configuration", net.JoinHostPort(domain, "8080")),
+					nil,
+				)
+				return req, err, func(ttt assert.TestingT, response *http.Response, expectBlocked bool) {
+					assertLimitResponse(ttt, response, expectBlocked)
+					assertSetLimitingCookie(ttt, response, expectBlocked)
+				}
+			},
+		}, {
+			name: "login",
+			testHttp: func(tt assert.TestingT) (*http.Request, error, func(assert.TestingT, *http.Response, bool)) {
+				req, err := http.NewRequestWithContext(
+					CTX,
+					"GET",
+					fmt.Sprintf("http://%s/ui/login/login/externalidp/callback", net.JoinHostPort(domain, "8080")),
+					nil,
+				)
+				return req, err, func(ttt assert.TestingT, response *http.Response, expectBlocked bool) {
+					// the login paths should return a redirect if the instance is blocked
+					if expectBlocked {
+						assert.GreaterOrEqual(ttt, response.StatusCode, http.StatusMultipleChoices)
+						assert.LessOrEqual(ttt, response.StatusCode, http.StatusPermanentRedirect)
+					} else {
+						assertLimitResponse(ttt, response, false)
+					}
+					assertSetLimitingCookie(ttt, response, expectBlocked)
+				}
+			},
+		}, {
+			name: "console",
+			testHttp: func(tt assert.TestingT) (*http.Request, error, func(assert.TestingT, *http.Response, bool)) {
+				req, err := http.NewRequestWithContext(
+					CTX,
+					"GET",
+					fmt.Sprintf("http://%s/ui/console/", net.JoinHostPort(domain, "8080")),
+					nil,
+				)
+				return req, err, func(ttt assert.TestingT, response *http.Response, expectBlocked bool) {
+					// the console is not blocked so we can render a link to an instance management portal.
+					// A CDN can cache these assets easily
+					// We also don't care about a cookie because the environment.json already takes care of that.
+					assertLimitResponse(ttt, response, false)
+				}
+			},
+		}, {
+			name: "environment.json",
+			testHttp: func(tt assert.TestingT) (*http.Request, error, func(assert.TestingT, *http.Response, bool)) {
+				req, err := http.NewRequestWithContext(
+					CTX,
+					"GET",
+					fmt.Sprintf("http://%s/ui/console/assets/environment.json", net.JoinHostPort(domain, "8080")),
+					nil,
+				)
+				return req, err, func(ttt assert.TestingT, response *http.Response, expectBlocked bool) {
+					// the environment.json should always return successfully
+					assertLimitResponse(ttt, response, false)
+					assertSetLimitingCookie(ttt, response, expectBlocked)
+					body, err := io.ReadAll(response.Body)
+					assert.NoError(ttt, err)
+					var compFunc assert.ComparisonAssertionFunc = assert.NotContains
+					if expectBlocked {
+						compFunc = assert.Contains
+					}
+					compFunc(ttt, string(body), `"exhausted":true`)
+				}
+			},
+		}}
 	_, err := Tester.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
 		InstanceId: instanceID,
 		Block:      wrapperspb.Bool(true),
@@ -197,7 +150,7 @@ func TestServer_Limits_Block(t *testing.T) {
 		var isFirst bool
 		t.Run(tt.name+" with blocking", func(t *testing.T) {
 			isFirst = isFirst || !t.Skipped()
-			runTest(t, tt, true, isFirst)
+			testBlockingAPI(t, tt, true, isFirst)
 		})
 	}
 	_, err = Tester.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
@@ -209,8 +162,70 @@ func TestServer_Limits_Block(t *testing.T) {
 		var isFirst bool
 		t.Run(tt.name+" without blocking", func(t *testing.T) {
 			isFirst = isFirst || !t.Skipped()
-			runTest(t, tt, false, isFirst)
+			testBlockingAPI(t, tt, false, isFirst)
 		})
+	}
+}
+
+type test struct {
+	name     string
+	testHttp func(t assert.TestingT) (req *http.Request, err error, assertResponse func(t assert.TestingT, response *http.Response, expectBlocked bool))
+	testGrpc func(t assert.TestingT, expectBlocked bool)
+}
+
+func testBlockingAPI(t *testing.T, tt *test, expectBlocked bool, isFirst bool) {
+	req, err, assertResponse := tt.testHttp(t)
+	require.NoError(t, err)
+	testHTTP := func(tt assert.TestingT) {
+		resp, err := (&http.Client{
+			// Don't follow redirects
+			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				return http.ErrUseLastResponse
+			},
+		}).Do(req)
+		defer func() {
+			require.NoError(t, resp.Body.Close())
+		}()
+		require.NoError(t, err)
+		assertResponse(t, resp, expectBlocked)
+	}
+	if isFirst {
+		// limits are eventually consistent, so we need to wait for the blocking to be set on the first test
+		assert.EventuallyWithT(t, func(c *assert.CollectT) {
+			testHTTP(c)
+		}, 15*time.Second, time.Second, "wait for blocking to be set")
+	} else {
+		testHTTP(t)
+	}
+	if tt.testGrpc != nil {
+		tt.testGrpc(t, expectBlocked)
+	}
+}
+
+func publicAPIBlockingTest(domain string) *test {
+	return &test{
+		name: "public API",
+		testGrpc: func(tt assert.TestingT, expectBlocked bool) {
+			conn, err := grpc.DialContext(CTX, net.JoinHostPort(domain, "8080"),
+				grpc.WithBlock(),
+				grpc.WithTransportCredentials(insecure.NewCredentials()),
+			)
+			assert.NoError(tt, err)
+			_, err = admin.NewAdminServiceClient(conn).Healthz(CTX, &admin.HealthzRequest{})
+			assertGrpcError(tt, err, expectBlocked)
+		},
+		testHttp: func(tt assert.TestingT) (*http.Request, error, func(assert.TestingT, *http.Response, bool)) {
+			req, err := http.NewRequestWithContext(
+				CTX,
+				"GET",
+				fmt.Sprintf("http://%s/admin/v1/healthz", net.JoinHostPort(domain, "8080")),
+				nil,
+			)
+			return req, err, func(ttt assert.TestingT, response *http.Response, expectBlocked bool) {
+				assertLimitResponse(ttt, response, expectBlocked)
+				assertSetLimitingCookie(ttt, response, expectBlocked)
+			}
+		},
 	}
 }
 
