@@ -9,7 +9,7 @@ The usage control features are currently limited to the instance level only.
 
 ## Block Instances
 
-You can block an instance using the [system API](/category/apis/resources/system/instances).
+You can block an instance using the [system API](/category/apis/resources/system/limits).
 
 Most requests to a blocked instance are rejected with the HTTP status 429 or the gRPC status 8.
 However, requests to the [system API](/category/apis/resources/system) are still allowed.
