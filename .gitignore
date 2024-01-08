@@ -76,6 +76,7 @@ migrations/cockroach/migrate_cloud.go
 !/.artifacts/zitadel
 /zitadel
 node_modules/
+.kreya
 
 go.work
 go.work.sum

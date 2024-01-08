@@ -95,7 +95,7 @@ Requirements:
 			if err != nil {
 				return err
 			}
-			return startZitadel(config, masterKey, server)
+			return startZitadel(cmd.Context(), config, masterKey, server)
 		},
 	}
 
@@ -119,10 +119,8 @@ type Server struct {
 	Shutdown   chan<- os.Signal
 }
 
-func startZitadel(config *Config, masterKey string, server chan<- *Server) error {
+func startZitadel(ctx context.Context, config *Config, masterKey string, server chan<- *Server) error {
 	showBasicInformation(config)
-
-	ctx := context.Background()
 
 	i18n.MustLoadSupportedLanguagesFromDir()
 
@@ -143,7 +141,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	if err != nil {
 		return fmt.Errorf("cannot start key storage: %w", err)
 	}
-	keys, err := ensureEncryptionKeys(config.EncryptionKeys, keyStorage)
+	keys, err := ensureEncryptionKeys(ctx, config.EncryptionKeys, keyStorage)
 	if err != nil {
 		return err
 	}
