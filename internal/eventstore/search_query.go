@@ -17,7 +17,9 @@ type SearchQueryBuilder struct {
 	offset                uint32
 	desc                  bool
 	resourceOwner         string
+	resourceOwners        []string
 	instanceID            *string
+	instanceIDs           []string
 	excludedInstanceIDs   []string
 	editorUser            string
 	queries               []*SearchQuery
@@ -50,8 +52,16 @@ func (b *SearchQueryBuilder) GetResourceOwner() string {
 	return b.resourceOwner
 }
 
+func (b *SearchQueryBuilder) GetResourceOwners() []string {
+	return b.resourceOwners
+}
+
 func (b *SearchQueryBuilder) GetInstanceID() *string {
 	return b.instanceID
+}
+
+func (b *SearchQueryBuilder) GetInstanceIDs() []string {
+	return b.instanceIDs
 }
 
 func (b *SearchQueryBuilder) GetEditorUser() string {
@@ -96,7 +106,7 @@ func (q SearchQueryBuilder) GetCreationDateBefore() time.Time {
 
 // ensureInstanceID makes sure that the instance id is always set
 func (b *SearchQueryBuilder) ensureInstanceID(ctx context.Context) {
-	if b.instanceID == nil && authz.GetInstance(ctx).InstanceID() != "" {
+	if b.instanceID == nil && b.instanceIDs == nil && authz.GetInstance(ctx).InstanceID() != "" {
 		b.InstanceID(authz.GetInstance(ctx).InstanceID())
 	}
 }
@@ -218,15 +228,27 @@ func (builder *SearchQueryBuilder) Offset(offset uint32) *SearchQueryBuilder {
 	return builder
 }
 
-// ResourceOwner defines the resource owner (org) of the events
+// ResourceOwner defines the resource owner (org or instance) of the events
 func (builder *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQueryBuilder {
 	builder.resourceOwner = resourceOwner
+	return builder
+}
+
+// ResourceOwners defines the resource owners (org or instance) of the events
+func (builder *SearchQueryBuilder) ResourceOwners(resourceOwners []string) *SearchQueryBuilder {
+	builder.resourceOwners = resourceOwners
 	return builder
 }
 
 // InstanceID defines the instanceID (system) of the events
 func (builder *SearchQueryBuilder) InstanceID(instanceID string) *SearchQueryBuilder {
 	builder.instanceID = &instanceID
+	return builder
+}
+
+// InstanceIDs defines the instanceIDs (system) of the events
+func (builder *SearchQueryBuilder) InstanceIDs(instanceIDs []string) *SearchQueryBuilder {
+	builder.instanceIDs = instanceIDs
 	return builder
 }
 

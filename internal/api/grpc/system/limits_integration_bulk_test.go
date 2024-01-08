@@ -50,7 +50,7 @@ func TestServer_Limits_Bulk(t *testing.T) {
 		}},
 	})
 	require.NoError(t, err)
-	details := resp.GetDetails()
+	details := resp.GetTargetDetails()
 	require.Len(t, details, len)
 	t.Run("the first instance is blocked", func(t *testing.T) {
 		require.Equal(t, instances[0].id, details[0].GetResourceOwner(), "resource owner must be instance id")

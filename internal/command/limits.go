@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -28,18 +29,7 @@ func (c *Commands) SetLimits(
 	if err != nil {
 		return nil, err
 	}
-	aggregateId := wm.AggregateID
-	if aggregateId == "" {
-		aggregateId, err = c.idGenerator.Next()
-		if err != nil {
-			return nil, err
-		}
-	}
-	createCmds, err := c.SetLimitsCommand(limits.NewAggregate(aggregateId, instanceId, resourceOwner), wm, setLimits)()
-	if err != nil {
-		return nil, err
-	}
-	cmds, err := createCmds(ctx, nil)
+	cmds, err := c.setLimitsCommands(ctx, wm, setLimits)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +43,84 @@ func (c *Commands) SetLimits(
 			return nil, err
 		}
 	}
-	return writeModelToObjectDetails(&wm.WriteModel), nil
+	return writeModelToObjectDetails(&wm.WriteModel), err
+}
+
+type SetLimitsBulk struct {
+	InstanceID, ResourceOwner string
+	SetLimits
+}
+
+func (c *Commands) SetLimitsBulk(
+	ctx context.Context,
+	bulk []*SetLimitsBulk,
+) (bulkDetails *domain.ObjectDetails, targetsDetails []*domain.ObjectDetails, err error) {
+	bulkWm, err := c.getBulkLimitsWriteModel(ctx, bulk)
+	if err != nil {
+		return nil, nil, err
+	}
+	cmds := make([]eventstore.Command, 0)
+	for _, t := range bulk {
+		instanceWM, ok := bulkWm.writeModels[t.InstanceID]
+		if !ok {
+			return nil, nil, zerrors.ThrowInternal(nil, "COMMAND-5HWA9", "Errors.Limits.NotFound")
+		}
+		targetWM, ok := instanceWM[t.ResourceOwner]
+		if !ok {
+			return nil, nil, zerrors.ThrowInternal(nil, "COMMAND-Z3rYg", "Errors.Limits.NotFound")
+		}
+		targetCMDs, setErr := c.setLimitsCommands(ctx, targetWM, &t.SetLimits)
+		err = errors.Join(err, setErr)
+		cmds = append(cmds, targetCMDs...)
+	}
+	if err != nil {
+		return nil, nil, err
+	}
+	if len(cmds) > 0 {
+		events, err := c.eventstore.Push(ctx, cmds...)
+		if err != nil {
+			return nil, nil, err
+		}
+		err = AppendAndReduce(bulkWm, events...)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+	targetDetails := make([]*domain.ObjectDetails, len(bulk))
+	for i, t := range bulk {
+		targetDetails[i] = writeModelToObjectDetails(&bulkWm.writeModels[t.InstanceID][t.ResourceOwner].WriteModel)
+	}
+	return writeModelToObjectDetails(&bulkWm.WriteModel), targetDetails, err
+}
+
+func (c *Commands) setLimitsCommands(ctx context.Context, wm *limitsWriteModel, setLimits *SetLimits) (cmds []eventstore.Command, err error) {
+	aggregateId := wm.AggregateID
+	if aggregateId == "" {
+		aggregateId, err = c.idGenerator.Next()
+		if err != nil {
+			return nil, err
+		}
+	}
+	aggregate := limits.NewAggregate(aggregateId, wm.InstanceID, wm.ResourceOwner)
+	createCmds, err := c.SetLimitsCommand(aggregate, wm, setLimits)()
+	if err != nil {
+		return nil, err
+	}
+	cmds, err = createCmds(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	if len(cmds) > 0 {
+		events, err := c.eventstore.Push(ctx, cmds...)
+		if err != nil {
+			return nil, err
+		}
+		err = AppendAndReduce(wm, events...)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return cmds, err
 }
 
 func (c *Commands) ResetLimits(ctx context.Context, resourceOwner string) (*domain.ObjectDetails, error) {
@@ -80,6 +147,14 @@ func (c *Commands) ResetLimits(ctx context.Context, resourceOwner string) (*doma
 
 func (c *Commands) getLimitsWriteModel(ctx context.Context, instanceId, resourceOwner string) (*limitsWriteModel, error) {
 	wm := newLimitsWriteModel(instanceId, resourceOwner)
+	return wm, c.eventstore.FilterToQueryReducer(ctx, wm)
+}
+
+func (c *Commands) getBulkLimitsWriteModel(ctx context.Context, target []*SetLimitsBulk) (*limitsBulkWriteModel, error) {
+	wm := newLimitsBulkWriteModel()
+	for _, t := range target {
+		wm.addWriteModel(t.InstanceID, t.ResourceOwner)
+	}
 	return wm, c.eventstore.FilterToQueryReducer(ctx, wm)
 }
 

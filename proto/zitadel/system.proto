@@ -822,7 +822,8 @@ message BulkSetLimitsRequest {
 }
 
 message BulkSetLimitsResponse {
-  repeated zitadel.v1.ObjectDetails details = 1;
+  zitadel.v1.ObjectDetails details = 1;
+  repeated zitadel.v1.ObjectDetails target_details = 2;
 }
 
 message ResetLimitsRequest {

@@ -53,6 +53,7 @@ func (wm *limitsWriteModel) Reduce() error {
 		case *limits.ResetEvent:
 			wm.rollingAggregateID = ""
 			wm.auditLogRetention = nil
+			wm.block = nil
 		}
 	}
 	if err := wm.WriteModel.Reduce(); err != nil {
