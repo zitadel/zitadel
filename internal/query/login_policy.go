@@ -210,7 +210,7 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 func (q *Queries) addLinksToLoginPolicy(ctx context.Context, policy *LoginPolicy) error {
 	links, err := q.IDPLoginPolicyLinks(ctx, policy.OrgID, &IDPLoginPolicyLinksSearchQuery{}, false)
 	if err != nil {
-		return zerrors.ThrowInternal(err, "QUERY-aa4Ve", "Errors.Internal")
+		return errors.ThrowInternal(err, "QUERY-aa4Ve", "Errors.Internal")
 	}
 	policy.IDPLinks = append(policy.IDPLinks, links.Links...)
 	return nil
