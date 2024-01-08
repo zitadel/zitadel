@@ -389,6 +389,166 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "list user in emails, ok",
+			args: args{
+				IamCTX,
+				1,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, org string, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
+					infos := make([]userAttr, len(usernames))
+					for i, username := range usernames {
+						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
+						infos[i] = userAttr{resp.GetUserId(), username}
+					}
+					request.Queries = append(request.Queries, InUserEmailsQuery(usernames))
+					return infos, nil
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									Phone:      "+41791234567",
+									IsVerified: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "list user in emails multiple, ok",
+			args: args{
+				IamCTX,
+				3,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, org string, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
+					infos := make([]userAttr, len(usernames))
+					for i, username := range usernames {
+						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
+						infos[i] = userAttr{resp.GetUserId(), username}
+					}
+					request.Queries = append(request.Queries, InUserEmailsQuery(usernames))
+					return infos, nil
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 3,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									Phone:      "+41791234567",
+									IsVerified: true,
+								},
+							},
+						},
+					}, {
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									Phone:      "+41791234567",
+									IsVerified: true,
+								},
+							},
+						},
+					}, {
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									Phone:      "+41791234567",
+									IsVerified: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "list user in emails no found, ok",
+			args: args{
+				IamCTX,
+				3,
+				&user.ListUsersRequest{Queries: []*user.SearchQuery{
+					InUserEmailsQuery([]string{"notfound"}),
+				},
+				},
+				func(ctx context.Context, org string, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
+					return []userAttr{}, nil
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result:        []*user.User{},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -445,6 +605,15 @@ func InUserIDsQuery(ids []string) *user.SearchQuery {
 	return &user.SearchQuery{Query: &user.SearchQuery_InUserIdsQuery{
 		InUserIdsQuery: &user.InUserIDQuery{
 			UserIds: ids,
+		},
+	},
+	}
+}
+
+func InUserEmailsQuery(emails []string) *user.SearchQuery {
+	return &user.SearchQuery{Query: &user.SearchQuery_InUserEmailsQuery{
+		InUserEmailsQuery: &user.InUserEmailsQuery{
+			UserEmails: emails,
 		},
 	},
 	}

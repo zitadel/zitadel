@@ -28,6 +28,7 @@ message SearchQuery {
         OrQuery or_query = 11;
         AndQuery and_query = 12;
         NotQuery not_query = 13;
+        InUserEmailsQuery in_user_emails_query = 14;
     }
 }
 
@@ -186,6 +187,15 @@ message TypeQuery {
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "the type of the user";
+        }
+    ];
+}
+
+message InUserEmailsQuery {
+    repeated string user_emails = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the emails of the users to include"
+            example: "[\"test@example.com\",\"test@example.org\"]";
         }
     ];
 }

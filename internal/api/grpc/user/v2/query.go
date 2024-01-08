@@ -251,6 +251,8 @@ func UserQueryToQuery(query *user.SearchQuery, level uint8) (query.SearchQuery, 
 		return AndQueryToQuery(q.AndQuery, level)
 	case *user.SearchQuery_NotQuery:
 		return NotQueryToQuery(q.NotQuery, level)
+	case *user.SearchQuery_InUserEmailsQuery:
+		return InUserEmailsQueryToQuery(q.InUserEmailsQuery)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}
@@ -319,4 +321,8 @@ func NotQueryToQuery(q *user.NotQuery, level uint8) (query.SearchQuery, error) {
 		return nil, err
 	}
 	return query.NewUserNotSearchQuery(mappedQuery)
+}
+
+func InUserEmailsQueryToQuery(q *user.InUserEmailsQuery) (query.SearchQuery, error) {
+	return query.NewUserInUserEmailsSearchQuery(q.UserEmails)
 }
