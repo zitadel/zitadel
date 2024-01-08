@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"reflect"
+	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
@@ -84,6 +85,7 @@ func (db *DB) QueryRowContext(ctx context.Context, scan func(row *sql.Row) error
 	}()
 
 	row := tx.QueryRowContext(ctx, query, args...)
+	logging.OnError(row.Err()).Error("unexpected query error")
 
 	err = scan(row)
 	if err != nil {
@@ -169,4 +171,10 @@ func (c Config) Password() string {
 
 func (c Config) Type() string {
 	return c.connector.Type()
+}
+
+func EscapeLikeWildcards(value string) string {
+	value = strings.ReplaceAll(value, "%", "\\%")
+	value = strings.ReplaceAll(value, "_", "\\_")
+	return value
 }

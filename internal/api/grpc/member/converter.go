@@ -9,13 +9,6 @@ import (
 	member_pb "github.com/zitadel/zitadel/pkg/grpc/member"
 )
 
-func MemberToDomain(member *member_pb.Member) *domain.Member {
-	return &domain.Member{
-		UserID: member.UserId,
-		Roles:  member.Roles,
-	}
-}
-
 func MembersToPb(assetAPIPrefix string, members []*query.Member) []*member_pb.Member {
 	m := make([]*member_pb.Member, len(members))
 	for i, member := range members {

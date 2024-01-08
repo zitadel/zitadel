@@ -32,22 +32,3 @@ const (
 	AppTypeSAML
 	AppTypeAPI
 )
-
-func (a *Application) IsValid(includeConfig bool) bool {
-	if a.Name == "" || a.AggregateID == "" {
-		return false
-	}
-	if !includeConfig {
-		return true
-	}
-	if a.Type == AppTypeOIDC && !a.OIDCConfig.IsValid() {
-		return false
-	}
-	if a.Type == AppTypeAPI && !a.APIConfig.IsValid() {
-		return false
-	}
-	if a.Type == AppTypeSAML && !a.SAMLConfig.IsValid() {
-		return false
-	}
-	return true
-}
