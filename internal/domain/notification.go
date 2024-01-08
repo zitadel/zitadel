@@ -9,10 +9,6 @@ const (
 	notificationCount
 )
 
-func (f NotificationType) Valid() bool {
-	return f >= 0 && f < notificationCount
-}
-
 type NotificationProviderState int32
 
 const (

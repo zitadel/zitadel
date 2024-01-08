@@ -26,7 +26,7 @@ func latestSequences(ctx context.Context, tx *sql.Tx, commands []eventstore.Comm
 	sequences := commandsToSequences(ctx, commands)
 
 	conditions, args := sequencesToSql(sequences)
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf(latestSequencesStmt, strings.Join(conditions, " OR ")), args...)
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf(latestSequencesStmt, strings.Join(conditions, " UNION ALL ")), args...)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "V3-5jU5z", "Errors.Internal")
 	}
@@ -92,7 +92,7 @@ func sequencesToSql(sequences []*latestSequence) (conditions []string, args []an
 	conditions = make([]string, len(sequences))
 
 	for i, sequence := range sequences {
-		conditions[i] = fmt.Sprintf("(instance_id = $%d AND aggregate_type = $%d AND aggregate_id = $%d)",
+		conditions[i] = fmt.Sprintf(`(SELECT instance_id, aggregate_type, aggregate_id, "sequence" FROM eventstore.events2 WHERE instance_id = $%d AND aggregate_type = $%d AND aggregate_id = $%d ORDER BY "sequence" DESC LIMIT 1)`,
 			i*argsPerCondition+1,
 			i*argsPerCondition+2,
 			i*argsPerCondition+3,

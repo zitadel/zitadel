@@ -30,6 +30,12 @@ WITH found_users AS (
       u.instance_id = d.instance_id
       AND u.resource_owner = d.resource_owner
       AND CASE WHEN p.must_be_domain THEN d.name_lower = $2 ELSE TRUE END
+  WHERE 
+    u.instance_id = $4
+    AND u.user_name_lower IN (
+      $1, 
+      $3
+    )
 ),
 login_names AS (SELECT 
   fu.id user_id
