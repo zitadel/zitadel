@@ -1,9 +1,9 @@
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { SidenavSetting } from '../sidenav/sidenav.component';
 
-export const GENERAL: SidenavSetting = {
-  id: 'general',
-  i18nKey: 'SETTINGS.LIST.GENERAL',
+export const LANGUAGES: SidenavSetting = {
+  id: 'languages',
+  i18nKey: 'SETTINGS.LIST.LANGUAGES',
   requiredRoles: {
     [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
   },

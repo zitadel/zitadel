@@ -3,12 +3,10 @@ package query
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"regexp"
 	"sync"
 	"time"
 
-	"github.com/rakyll/statik/fs"
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
@@ -22,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
+	"github.com/zitadel/zitadel/internal/repository/deviceauth"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
@@ -47,8 +46,6 @@ type Queries struct {
 	checkPermission        domain.PermissionCheck
 
 	DefaultLanguage                     language.Tag
-	LoginDir                            http.FileSystem
-	NotificationDir                     http.FileSystem
 	mutex                               sync.Mutex
 	LoginTranslationFileContents        map[string][]byte
 	NotificationTranslationFileContents map[string][]byte
@@ -61,7 +58,7 @@ type Queries struct {
 func StartQueries(
 	ctx context.Context,
 	es *eventstore.Eventstore,
-	sqlClient *database.DB,
+	querySqlClient, projectionSqlClient *database.DB,
 	projections projection.Config,
 	defaults sd.SystemDefaults,
 	idpConfigEncryption, otpEncryption, keyEncryptionAlgorithm, certEncryptionAlgorithm crypto.EncryptionAlgorithm,
@@ -71,22 +68,10 @@ func StartQueries(
 	defaultAuditLogRetention time.Duration,
 	systemAPIUsers map[string]*authz.SystemAPIUser,
 ) (repo *Queries, err error) {
-	statikLoginFS, err := fs.NewWithNamespace("login")
-	if err != nil {
-		return nil, fmt.Errorf("unable to start login statik dir")
-	}
-
-	statikNotificationFS, err := fs.NewWithNamespace("notification")
-	if err != nil {
-		return nil, fmt.Errorf("unable to start notification statik dir")
-	}
-
 	repo = &Queries{
 		eventstore:                          es,
-		client:                              sqlClient,
+		client:                              querySqlClient,
 		DefaultLanguage:                     language.Und,
-		LoginDir:                            statikLoginFS,
-		NotificationDir:                     statikNotificationFS,
 		LoginTranslationFileContents:        make(map[string][]byte),
 		NotificationTranslationFileContents: make(map[string][]byte),
 		zitadelRoles:                        zitadelRoles,
@@ -115,10 +100,11 @@ func StartQueries(
 	quota.RegisterEventMappers(repo.eventstore)
 	limits.RegisterEventMappers(repo.eventstore)
 	restrictions.RegisterEventMappers(repo.eventstore)
+	deviceauth.RegisterEventMappers(repo.eventstore)
 
 	repo.checkPermission = permissionCheck(repo)
 
-	err = projection.Create(ctx, sqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm, systemAPIUsers)
+	err = projection.Create(ctx, projectionSqlClient, es, projections, keyEncryptionAlgorithm, certEncryptionAlgorithm, systemAPIUsers)
 	if err != nil {
 		return nil, err
 	}

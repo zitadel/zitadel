@@ -106,8 +106,8 @@
     {{template "error-message" .}}
 
     <div class="lgn-actions">
-        <a class="lgn-stroked-button" href="{{ loginNameChangeUrl .AuthReqID }}">
-            {{t "RegistrationUser.BackButtonText"}}
+        <a class="lgn-icon-button lgn-left-action" id="back" href="{{ loginNameChangeUrl .AuthReqID }}" formnovalidate>
+            <i class="lgn-icon-arrow-left-solid"></i>
         </a>
         <span class="fill-space"></span>
         <button class="lgn-raised-button lgn-primary" id="register-button" type="submit">{{t "RegistrationUser.NextButtonText"}}</button>

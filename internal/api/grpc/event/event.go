@@ -4,8 +4,8 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	eventpb "github.com/zitadel/zitadel/pkg/grpc/event"
 	"github.com/zitadel/zitadel/pkg/grpc/message"
 )
@@ -28,7 +28,7 @@ func EventToPb(event *query.Event) (response *eventpb.Event, err error) {
 	if len(event.Payload) > 0 {
 		payload = new(structpb.Struct)
 		if err := payload.UnmarshalJSON(event.Payload); err != nil {
-			return nil, errors.ThrowInternal(err, "ADMIN-eaimD", "Errors.Internal")
+			return nil, zerrors.ThrowInternal(err, "ADMIN-eaimD", "Errors.Internal")
 		}
 	}
 	return &eventpb.Event{

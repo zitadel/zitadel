@@ -19,7 +19,7 @@ func (s *Server) GetUserGrantByID(ctx context.Context, req *mgmt_pb.GetUserGrant
 	if err != nil {
 		return nil, err
 	}
-	grant, err := s.query.UserGrant(ctx, true, false, idQuery, ownerQuery)
+	grant, err := s.query.UserGrant(ctx, true, idQuery, ownerQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (s *Server) ListUserGrants(ctx context.Context, req *mgmt_pb.ListUserGrantR
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.UserGrants(ctx, queries, false, false)
+	res, err := s.query.UserGrants(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}

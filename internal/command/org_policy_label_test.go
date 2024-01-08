@@ -9,13 +9,13 @@ import (
 	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/static/mock"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddLabelPolicy(t *testing.T) {
@@ -52,7 +52,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -99,7 +99,7 @@ func TestCommandSide_AddLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -220,7 +220,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -241,7 +241,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -289,7 +289,7 @@ func TestCommandSide_ChangeLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -422,7 +422,7 @@ func TestCommandSide_ActivateLabelPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -438,7 +438,7 @@ func TestCommandSide_ActivateLabelPolicy(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -523,7 +523,7 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -539,7 +539,7 @@ func TestCommandSide_RemoveLabelPolicy(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -637,7 +637,7 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -661,7 +661,7 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -704,7 +704,7 @@ func TestCommandSide_AddLogoLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -811,7 +811,7 @@ func TestCommandSide_RemoveLogoLabelPolicy(t *testing.T) {
 				storageKey: "key",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -828,7 +828,7 @@ func TestCommandSide_RemoveLogoLabelPolicy(t *testing.T) {
 				storageKey: "key",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -942,7 +942,7 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -966,7 +966,7 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1009,7 +1009,7 @@ func TestCommandSide_AddIconLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -1115,7 +1115,7 @@ func TestCommandSide_RemoveIconLabelPolicy(t *testing.T) {
 				orgID: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1131,7 +1131,7 @@ func TestCommandSide_RemoveIconLabelPolicy(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1244,7 +1244,7 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1268,7 +1268,7 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1311,7 +1311,7 @@ func TestCommandSide_AddLogoDarkLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -1418,7 +1418,7 @@ func TestCommandSide_RemoveLogoDarkLabelPolicy(t *testing.T) {
 				storageKey: "key",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1435,7 +1435,7 @@ func TestCommandSide_RemoveLogoDarkLabelPolicy(t *testing.T) {
 				storageKey: "key",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1549,7 +1549,7 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1573,7 +1573,7 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1616,7 +1616,7 @@ func TestCommandSide_AddIconDarkLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -1721,7 +1721,7 @@ func TestCommandSide_RemoveIconDarkLabelPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1737,7 +1737,7 @@ func TestCommandSide_RemoveIconDarkLabelPolicy(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1849,7 +1849,7 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1865,7 +1865,7 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1908,7 +1908,7 @@ func TestCommandSide_AddFontLabelPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -2013,7 +2013,7 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -2029,7 +2029,7 @@ func TestCommandSide_RemoveFontLabelPolicy(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{

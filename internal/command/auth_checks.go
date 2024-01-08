@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func checkExplicitProjectPermission(ctx context.Context, grantID, projectID string) error {
@@ -19,7 +19,7 @@ func checkExplicitProjectPermission(ctx context.Context, grantID, projectID stri
 	if listContainsID(ids, projectID) {
 		return nil
 	}
-	return caos_errors.ThrowPermissionDenied(nil, "EVENT-Shu7e", "Errors.UserGrant.NoPermissionForProject")
+	return zerrors.ThrowPermissionDenied(nil, "EVENT-Shu7e", "Errors.UserGrant.NoPermissionForProject")
 }
 
 func listContainsID(ids []string, id string) bool {

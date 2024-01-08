@@ -18,13 +18,13 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestSessionCommands_getHumanWriteModel(t *testing.T) {
@@ -51,7 +51,7 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 			},
 			res: res{
 				want: nil,
-				err:  caos_errs.ThrowPreconditionFailed(nil, "COMMAND-eeR2e", "Errors.User.UserIDMissing"),
+				err:  zerrors.ThrowPreconditionFailed(nil, "COMMAND-eeR2e", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -95,7 +95,7 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 			},
 			res: res{
 				want: nil,
-				err:  caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.User.NotFound"),
+				err:  zerrors.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.User.NotFound"),
 			},
 		},
 		{
@@ -168,14 +168,14 @@ func TestCommands_CreateSession(t *testing.T) {
 		{
 			"id generator fails",
 			fields{
-				idGenerator: mock.NewIDGeneratorExpectError(t, caos_errs.ThrowInternal(nil, "id", "generator failed")),
+				idGenerator: mock.NewIDGeneratorExpectError(t, zerrors.ThrowInternal(nil, "id", "generator failed")),
 			},
 			args{
 				ctx: context.Background(),
 			},
 			[]expect{},
 			res{
-				err: caos_errs.ThrowInternal(nil, "id", "generator failed"),
+				err: zerrors.ThrowInternal(nil, "id", "generator failed"),
 			},
 		},
 		{
@@ -187,10 +187,10 @@ func TestCommands_CreateSession(t *testing.T) {
 				ctx: context.Background(),
 			},
 			[]expect{
-				expectFilterError(caos_errs.ThrowInternal(nil, "id", "filter failed")),
+				expectFilterError(zerrors.ThrowInternal(nil, "id", "filter failed")),
 			},
 			res{
-				err: caos_errs.ThrowInternal(nil, "id", "filter failed"),
+				err: zerrors.ThrowInternal(nil, "id", "filter failed"),
 			},
 		},
 		{
@@ -217,7 +217,7 @@ func TestCommands_CreateSession(t *testing.T) {
 				expectFilter(),
 			},
 			res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.PositiveLifetime"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.PositiveLifetime"),
 			},
 		},
 		{
@@ -309,14 +309,14 @@ func TestCommands_UpdateSession(t *testing.T) {
 			"eventstore failed",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilterError(caos_errs.ThrowInternal(nil, "id", "filter failed")),
+					expectFilterError(zerrors.ThrowInternal(nil, "id", "filter failed")),
 				),
 			},
 			args{
 				ctx: context.Background(),
 			},
 			res{
-				err: caos_errs.ThrowInternal(nil, "id", "filter failed"),
+				err: zerrors.ThrowInternal(nil, "id", "filter failed"),
 			},
 		},
 		{
@@ -347,7 +347,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 				sessionToken: "invalid",
 			},
 			res{
-				err: caos_errs.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid"),
+				err: zerrors.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid"),
 			},
 		},
 		{
@@ -450,7 +450,7 @@ func TestCommands_updateSession(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Hewfq", "Errors.Session.Terminated"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Hewfq", "Errors.Session.Terminated"),
 			},
 		},
 		{
@@ -464,13 +464,13 @@ func TestCommands_updateSession(t *testing.T) {
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
 						func(ctx context.Context, cmd *SessionCommands) error {
-							return caos_errs.ThrowInternal(nil, "id", "check failed")
+							return zerrors.ThrowInternal(nil, "id", "check failed")
 						},
 					},
 				},
 			},
 			res{
-				err: caos_errs.ThrowInternal(nil, "id", "check failed"),
+				err: zerrors.ThrowInternal(nil, "id", "check failed"),
 			},
 		},
 		{
@@ -487,11 +487,9 @@ func TestCommands_updateSession(t *testing.T) {
 			},
 			res{
 				want: &SessionChanged{
-					ObjectDetails: &domain.ObjectDetails{
-						ResourceOwner: "instance1",
-					},
-					ID:       "sessionID",
-					NewToken: "",
+					ObjectDetails: &domain.ObjectDetails{},
+					ID:            "sessionID",
+					NewToken:      "",
 				},
 			},
 		},
@@ -518,7 +516,7 @@ func TestCommands_updateSession(t *testing.T) {
 				lifetime: -10 * time.Minute,
 			},
 			res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.PositiveLifetime"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.PositiveLifetime"),
 			},
 		},
 		{
@@ -662,7 +660,7 @@ func TestCommands_updateSession(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4bw", "Errors.Intent.NotSucceeded"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Df4bw", "Errors.Intent.NotSucceeded"),
 			},
 		},
 		{
@@ -711,7 +709,7 @@ func TestCommands_updateSession(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser"),
 			},
 		},
 		{
@@ -743,7 +741,7 @@ func TestCommands_updateSession(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errs.ThrowPermissionDenied(nil, "CRYPTO-CRYPTO", "Errors.Intent.InvalidToken"),
+				err: zerrors.ThrowPermissionDenied(nil, "CRYPTO-CRYPTO", "Errors.Intent.InvalidToken"),
 			},
 		},
 		{
@@ -859,7 +857,7 @@ func TestCheckTOTP(t *testing.T) {
 				},
 				eventstore: expectEventstore(),
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Neil7", "Errors.User.UserIDMissing"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Neil7", "Errors.User.UserIDMissing"),
 		},
 		{
 			name: "filter error",
@@ -893,7 +891,7 @@ func TestCheckTOTP(t *testing.T) {
 					),
 				),
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-eej1U", "Errors.User.MFA.OTP.NotReady"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-eej1U", "Errors.User.MFA.OTP.NotReady"),
 		},
 		{
 			name: "otp verify error",
@@ -915,7 +913,7 @@ func TestCheckTOTP(t *testing.T) {
 					),
 				),
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.MFA.OTP.InvalidCode"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.MFA.OTP.InvalidCode"),
 		},
 		{
 			name: "ok",
@@ -982,14 +980,14 @@ func TestCommands_TerminateSession(t *testing.T) {
 			"eventstore failed",
 			fields{
 				eventstore: expectEventstore(
-					expectFilterError(caos_errs.ThrowInternal(nil, "id", "filter failed")),
+					expectFilterError(zerrors.ThrowInternal(nil, "id", "filter failed")),
 				),
 			},
 			args{
 				ctx: context.Background(),
 			},
 			res{
-				err: caos_errs.ThrowInternal(nil, "id", "filter failed"),
+				err: zerrors.ThrowInternal(nil, "id", "filter failed"),
 			},
 		},
 		{
@@ -1020,7 +1018,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 				sessionToken: "invalid",
 			},
 			res{
-				err: caos_errs.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid"),
+				err: zerrors.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid"),
 			},
 		},
 		{
@@ -1051,7 +1049,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 				sessionToken: "",
 			},
 			res{
-				err: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+				err: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 			},
 		},
 		{
@@ -1112,7 +1110,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 						),
 					),
 					expectPushFailed(
-						caos_errs.ThrowInternal(nil, "id", "pushed failed"),
+						zerrors.ThrowInternal(nil, "id", "pushed failed"),
 						session.NewTerminateEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate),
 					),
 				),
@@ -1126,7 +1124,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 				sessionToken: "token",
 			},
 			res{
-				err: caos_errs.ThrowInternal(nil, "id", "pushed failed"),
+				err: zerrors.ThrowInternal(nil, "id", "pushed failed"),
 			},
 		},
 		{
@@ -1233,6 +1231,52 @@ func TestCommands_TerminateSession(t *testing.T) {
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 								"tokenID"),
 						),
+					),
+					expectPush(
+						session.NewTerminateEvent(authz.NewMockContext("instance1", "org1", "admin1"), &session.NewAggregate("sessionID", "instance1").Aggregate),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx:          authz.NewMockContext("instance1", "org1", "admin1"),
+				sessionID:    "sessionID",
+				sessionToken: "",
+			},
+			res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "instance1",
+				},
+			},
+		},
+		{
+			"terminate session owned by org with permission",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							),
+						),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org2").Aggregate,
+								"userID", "", testNow),
+						),
+						eventFromEventPusher(
+							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org2").Aggregate,
+								"tokenID"),
+						),
+					),
+					expectFilter(
+						user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+							"username", "firstname", "lastname", "nickname", "displayname", language.English, domain.GenderUnspecified, "email", false),
 					),
 					expectPush(
 						session.NewTerminateEvent(authz.NewMockContext("instance1", "org1", "admin1"), &session.NewAggregate("sessionID", "instance1").Aggregate),

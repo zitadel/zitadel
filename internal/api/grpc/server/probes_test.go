@@ -7,7 +7,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestValidator_Healthz(t *testing.T) {
@@ -66,7 +66,7 @@ func TestValidator_Ready(t *testing.T) {
 			"unready error",
 			fields{validations: map[string]ValidationFunction{
 				"error": func(_ context.Context) error {
-					return errors.ThrowInternal(nil, "id", "message")
+					return zerrors.ThrowInternal(nil, "id", "message")
 				},
 			}},
 			res{
@@ -137,13 +137,13 @@ func Test_validate(t *testing.T) {
 						return nil
 					},
 					"error": func(_ context.Context) error {
-						return errors.ThrowInternal(nil, "id", "message")
+						return zerrors.ThrowInternal(nil, "id", "message")
 					},
 				},
 			},
 			res{
 				map[string]any{
-					"error": errors.ThrowInternal(nil, "id", "message"),
+					"error": zerrors.ThrowInternal(nil, "id", "message"),
 				},
 			},
 		},

@@ -5,7 +5,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func emptyMockHandler(_ context.Context, req interface{}) (interface{}, error) {
@@ -13,7 +13,7 @@ func emptyMockHandler(_ context.Context, req interface{}) (interface{}, error) {
 }
 
 func errorMockHandler(_ context.Context, req interface{}) (interface{}, error) {
-	return nil, errors.ThrowInternal(nil, "test", "error")
+	return nil, zerrors.ThrowInternal(nil, "test", "error")
 }
 
 type mockReq struct{}

@@ -91,7 +91,7 @@
           <cnsl-form-field>
             <cnsl-label>{{ 'USER.PROFILE.PREFERRED_LANGUAGE' | translate }}</cnsl-label>
             <mat-select formControlName="preferredLanguage">
-              <mat-option *ngFor="let language of languages" [value]="language">
+              <mat-option *ngFor="let language of langSvc.supported$ | async" [value]="language">
                 {{ 'LANGUAGES.' + language | translate }}
               </mat-option>
             </mat-select>

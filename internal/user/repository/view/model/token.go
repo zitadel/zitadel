@@ -6,10 +6,10 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -133,7 +133,7 @@ func (t *TokenView) setRootData(event eventstore.Event) {
 func (t *TokenView) setData(event eventstore.Event) error {
 	if err := event.Unmarshal(t); err != nil {
 		logging.Log("EVEN-3Gm9s").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-5Gms9", "could not unmarshal event")
+		return zerrors.ThrowInternal(err, "MODEL-5Gms9", "could not unmarshal event")
 	}
 	return nil
 }
@@ -142,7 +142,7 @@ func agentIDFromSession(event eventstore.Event) (string, error) {
 	session := make(map[string]interface{})
 	if err := event.Unmarshal(&session); err != nil {
 		logging.Log("EVEN-Ghgt3").WithError(err).Error("could not unmarshal event data")
-		return "", caos_errs.ThrowInternal(nil, "MODEL-GBf32", "could not unmarshal data")
+		return "", zerrors.ThrowInternal(nil, "MODEL-GBf32", "could not unmarshal data")
 	}
 	return session["userAgentID"].(string), nil
 }
@@ -201,7 +201,7 @@ func eventToMap(event eventstore.Event) (map[string]interface{}, error) {
 	m := make(map[string]interface{})
 	if err := event.Unmarshal(&m); err != nil {
 		logging.Log("EVEN-Dbffe").WithError(err).Error("could not unmarshal event data")
-		return nil, caos_errs.ThrowInternal(nil, "MODEL-SDAfw", "could not unmarshal data")
+		return nil, zerrors.ThrowInternal(nil, "MODEL-SDAfw", "could not unmarshal data")
 	}
 	return m, nil
 }

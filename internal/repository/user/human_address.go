@@ -3,8 +3,8 @@ package user
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -36,7 +36,7 @@ func NewAddressChangedEvent(
 	changes []AddressChanges,
 ) (*HumanAddressChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "USER-3n8fs", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "USER-3n8fs", "Errors.NoChangesFound")
 	}
 	changeEvent := &HumanAddressChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -89,7 +89,7 @@ func HumanAddressChangedEventMapper(event eventstore.Event) (eventstore.Event, e
 	}
 	err := event.Unmarshal(addressChanged)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-5M0pd", "unable to unmarshal human address changed")
+		return nil, zerrors.ThrowInternal(err, "USER-5M0pd", "unable to unmarshal human address changed")
 	}
 
 	return addressChanged, nil

@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"context"
-	"net/http"
-
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -15,7 +13,7 @@ import (
 type Queries interface {
 	ActiveLabelPolicyByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (*query.LabelPolicy, error)
 	MailTemplateByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (*query.MailTemplate, error)
-	GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string, queries ...query.SearchQuery) (*query.NotifyUser, error)
+	GetNotifyUserByID(ctx context.Context, shouldTriggered bool, userID string) (*query.NotifyUser, error)
 	CustomTextListByTemplate(ctx context.Context, aggregateID, template string, withOwnerRemoved bool) (*query.CustomTexts, error)
 	SearchInstanceDomains(ctx context.Context, queries *query.InstanceDomainSearchQueries) (*query.InstanceDomains, error)
 	SessionByID(ctx context.Context, shouldTriggerBulk bool, id, sessionToken string) (*query.Session, error)
@@ -25,6 +23,7 @@ type Queries interface {
 	SMSProviderConfig(ctx context.Context, queries ...query.SearchQuery) (*query.SMSConfig, error)
 	SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (*query.SMTPConfig, error)
 	GetDefaultLanguage(ctx context.Context) language.Tag
+	GetInstanceRestrictions(ctx context.Context) (restrictions query.Restrictions, err error)
 }
 
 type NotificationQueries struct {
@@ -37,7 +36,6 @@ type NotificationQueries struct {
 	UserDataCrypto     crypto.EncryptionAlgorithm
 	SMTPPasswordCrypto crypto.EncryptionAlgorithm
 	SMSTokenCrypto     crypto.EncryptionAlgorithm
-	statikDir          http.FileSystem
 }
 
 func NewNotificationQueries(
@@ -50,7 +48,6 @@ func NewNotificationQueries(
 	userDataCrypto crypto.EncryptionAlgorithm,
 	smtpPasswordCrypto crypto.EncryptionAlgorithm,
 	smsTokenCrypto crypto.EncryptionAlgorithm,
-	statikDir http.FileSystem,
 ) *NotificationQueries {
 	return &NotificationQueries{
 		Queries:            baseQueries,
@@ -62,6 +59,5 @@ func NewNotificationQueries(
 		UserDataCrypto:     userDataCrypto,
 		SMTPPasswordCrypto: smtpPasswordCrypto,
 		SMSTokenCrypto:     smsTokenCrypto,
-		statikDir:          statikDir,
 	}
 }

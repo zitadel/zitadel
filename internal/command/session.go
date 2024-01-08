@@ -7,15 +7,16 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type SessionCommand func(ctx context.Context, cmd *SessionCommands) error
@@ -58,7 +59,7 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 func CheckUser(id string, resourceOwner string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) error {
 		if cmd.sessionWriteModel.UserID != "" && id != "" && cmd.sessionWriteModel.UserID != id {
-			return caos_errs.ThrowInvalidArgument(nil, "", "user change not possible")
+			return zerrors.ThrowInvalidArgument(nil, "", "user change not possible")
 		}
 		return cmd.UserChecked(ctx, id, resourceOwner, cmd.now())
 	}
@@ -68,7 +69,7 @@ func CheckUser(id string, resourceOwner string) SessionCommand {
 func CheckPassword(password string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) error {
 		if cmd.sessionWriteModel.UserID == "" {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfw3f", "Errors.User.UserIDMissing")
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfw3f", "Errors.User.UserIDMissing")
 		}
 		cmd.passwordWriteModel = NewHumanPasswordWriteModel(cmd.sessionWriteModel.UserID, "")
 		err := cmd.eventstore.FilterToQueryReducer(ctx, cmd.passwordWriteModel)
@@ -76,18 +77,18 @@ func CheckPassword(password string) SessionCommand {
 			return err
 		}
 		if cmd.passwordWriteModel.UserState == domain.UserStateUnspecified || cmd.passwordWriteModel.UserState == domain.UserStateDeleted {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.User.NotFound")
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.User.NotFound")
 		}
 
 		if cmd.passwordWriteModel.EncodedHash == "" {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-WEf3t", "Errors.User.Password.NotSet")
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-WEf3t", "Errors.User.Password.NotSet")
 		}
 		ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
 		updated, err := cmd.hasher.Verify(cmd.passwordWriteModel.EncodedHash, password)
 		spanPasswordComparison.EndWithError(err)
 		if err != nil {
 			//TODO: maybe we want to reset the session in the future https://github.com/zitadel/zitadel/issues/5807
-			return caos_errs.ThrowInvalidArgument(err, "COMMAND-SAF3g", "Errors.User.Password.Invalid")
+			return zerrors.ThrowInvalidArgument(err, "COMMAND-SAF3g", "Errors.User.Password.Invalid")
 		}
 		if updated != "" {
 			cmd.eventCommands = append(cmd.eventCommands, user.NewHumanPasswordHashUpdatedEvent(ctx, UserAggregateFromWriteModel(&cmd.passwordWriteModel.WriteModel), updated))
@@ -102,7 +103,7 @@ func CheckPassword(password string) SessionCommand {
 func CheckIntent(intentID, token string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) error {
 		if cmd.sessionWriteModel.UserID == "" {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Sfw3r", "Errors.User.UserIDMissing")
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfw3r", "Errors.User.UserIDMissing")
 		}
 		if err := crypto.CheckToken(cmd.intentAlg, token, intentID); err != nil {
 			return err
@@ -113,11 +114,11 @@ func CheckIntent(intentID, token string) SessionCommand {
 			return err
 		}
 		if cmd.intentWriteModel.State != domain.IDPIntentStateSucceeded {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4bw", "Errors.Intent.NotSucceeded")
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Df4bw", "Errors.Intent.NotSucceeded")
 		}
 		if cmd.intentWriteModel.UserID != "" {
 			if cmd.intentWriteModel.UserID != cmd.sessionWriteModel.UserID {
-				return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser")
+				return zerrors.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser")
 			}
 		} else {
 			linkWriteModel := NewUserIDPLinkWriteModel(cmd.sessionWriteModel.UserID, cmd.intentWriteModel.IDPID, cmd.intentWriteModel.IDPUserID, cmd.intentWriteModel.ResourceOwner)
@@ -126,7 +127,7 @@ func CheckIntent(intentID, token string) SessionCommand {
 				return err
 			}
 			if linkWriteModel.State != domain.UserIDPLinkStateActive {
-				return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser")
+				return zerrors.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser")
 			}
 		}
 		cmd.IntentChecked(ctx, cmd.now())
@@ -137,7 +138,7 @@ func CheckIntent(intentID, token string) SessionCommand {
 func CheckTOTP(code string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) (err error) {
 		if cmd.sessionWriteModel.UserID == "" {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Neil7", "Errors.User.UserIDMissing")
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Neil7", "Errors.User.UserIDMissing")
 		}
 		cmd.totpWriteModel = NewHumanTOTPWriteModel(cmd.sessionWriteModel.UserID, "")
 		err = cmd.eventstore.FilterToQueryReducer(ctx, cmd.totpWriteModel)
@@ -145,7 +146,7 @@ func CheckTOTP(code string) SessionCommand {
 			return err
 		}
 		if cmd.totpWriteModel.State != domain.MFAStateReady {
-			return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-eej1U", "Errors.User.MFA.OTP.NotReady")
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-eej1U", "Errors.User.MFA.OTP.NotReady")
 		}
 		err = domain.VerifyTOTP(code, cmd.totpWriteModel.Secret, cmd.totpAlg)
 		if err != nil {
@@ -226,6 +227,8 @@ func (s *SessionCommands) OTPEmailChecked(ctx context.Context, checkedAt time.Ti
 }
 
 func (s *SessionCommands) SetToken(ctx context.Context, tokenID string) {
+	// trigger activity log for session for user
+	activity.Trigger(ctx, s.sessionWriteModel.UserResourceOwner, s.sessionWriteModel.UserID, activity.SessionAPI)
 	s.eventCommands = append(s.eventCommands, session.NewTokenSetEvent(ctx, s.sessionWriteModel.aggregate, tokenID))
 }
 
@@ -255,7 +258,7 @@ func (s *SessionCommands) ChangeMetadata(ctx context.Context, metadata map[strin
 
 func (s *SessionCommands) SetLifetime(ctx context.Context, lifetime time.Duration) error {
 	if lifetime < 0 {
-		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.PositiveLifetime")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-asEG4", "Errors.Session.PositiveLifetime")
 	}
 	if lifetime == 0 {
 		return nil
@@ -266,7 +269,7 @@ func (s *SessionCommands) SetLifetime(ctx context.Context, lifetime time.Duratio
 
 func (s *SessionCommands) gethumanWriteModel(ctx context.Context) (*HumanWriteModel, error) {
 	if s.sessionWriteModel.UserID == "" {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-eeR2e", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-eeR2e", "Errors.User.UserIDMissing")
 	}
 	humanWriteModel := NewHumanWriteModel(s.sessionWriteModel.UserID, s.sessionWriteModel.UserResourceOwner)
 	err := s.eventstore.FilterToQueryReducer(ctx, humanWriteModel)
@@ -274,7 +277,7 @@ func (s *SessionCommands) gethumanWriteModel(ctx context.Context) (*HumanWriteMo
 		return nil, err
 	}
 	if humanWriteModel.UserState != domain.UserStateActive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.User.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.User.NotFound")
 	}
 	return humanWriteModel, nil
 }
@@ -397,7 +400,27 @@ func (c *Commands) checkSessionTerminationPermission(ctx context.Context, model 
 	if model.UserID != "" && model.UserID == authz.GetCtxData(ctx).UserID {
 		return nil
 	}
-	return c.checkPermission(ctx, domain.PermissionSessionDelete, model.UserResourceOwner, model.UserID)
+	userResourceOwner, err := c.sessionUserResourceOwner(ctx, model)
+	if err != nil {
+		return err
+	}
+	return c.checkPermission(ctx, domain.PermissionSessionDelete, userResourceOwner, model.UserID)
+}
+
+// sessionUserResourceOwner will return the resourceOwner of the session form the [SessionWriteModel] or by additionally calling the eventstore,
+// because before 2.42.0, the resourceOwner of a session used to be the organisation of the creator.
+// Further the (checked) users organisation id was not stored.
+// To be able to check the permission, we need to get the user's resourceOwner in this case.
+func (c *Commands) sessionUserResourceOwner(ctx context.Context, model *SessionWriteModel) (string, error) {
+	if model.UserID == "" || model.UserResourceOwner != "" {
+		return model.UserResourceOwner, nil
+	}
+	r := NewResourceOwnerModel(authz.GetInstance(ctx).InstanceID(), user.AggregateType, model.UserID)
+	err := c.eventstore.FilterToQueryReducer(ctx, r)
+	if err != nil {
+		return "", err
+	}
+	return r.resourceOwner, nil
 }
 
 func sessionTokenCreator(idGenerator id.Generator, sessionAlg crypto.EncryptionAlgorithm) func(sessionID string) (id string, token string, err error) {

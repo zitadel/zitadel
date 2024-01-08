@@ -8,9 +8,9 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_SetCustomMessageText(t *testing.T) {
@@ -35,24 +35,59 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 		{
 			name: "no resource owner, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: eventstoreExpect(t),
 			},
 			args: args{
 				ctx:    context.Background(),
 				config: &domain.CustomMessageText{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
-			name: "invalid custom text, error",
+			name: "empty message type, error",
+			fields: fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				config: &domain.CustomMessageText{
+					Language: AllowedLanguage,
+				},
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "empty custom message text, success",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
+					expectPush(),
 				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				config: &domain.CustomMessageText{
+					MessageTextType: "Some type", // TODO: check the type!
+					Language:        AllowedLanguage,
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "undefined language, error",
+			fields: fields{
+				eventstore: eventstoreExpect(t),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -60,7 +95,23 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 				config:        &domain.CustomMessageText{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "unsupported language, error",
+			fields: fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				config: &domain.CustomMessageText{
+					Language: UnsupportedLanguage,
+				},
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -345,7 +396,7 @@ func TestCommandSide_RemoveCustomMessageText(t *testing.T) {
 				lang:         language.English,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -361,7 +412,7 @@ func TestCommandSide_RemoveCustomMessageText(t *testing.T) {
 				lang:          language.English,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -377,7 +428,7 @@ func TestCommandSide_RemoveCustomMessageText(t *testing.T) {
 				mailTextType:  "Template",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -464,6 +515,43 @@ func TestCommandSide_RemoveCustomMessageText(t *testing.T) {
 				resourceOwner: "org1",
 				mailTextType:  "Template",
 				lang:          language.English,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "remove unsupported language ok, especially because we never validated whether a language is supported in previous ZITADEL versions",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"Template",
+								domain.MessageGreeting,
+								"Greeting",
+								UnsupportedLanguage,
+							),
+						),
+					),
+					expectPush(
+						org.NewCustomTextTemplateRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"Template",
+							UnsupportedLanguage,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				resourceOwner: "org1",
+				mailTextType:  "Template",
+				lang:          UnsupportedLanguage,
 			},
 			res: res{
 				want: &domain.ObjectDetails{

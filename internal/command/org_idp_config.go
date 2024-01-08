@@ -5,10 +5,10 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	org_repo "github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) ImportIDPConfig(ctx context.Context, config *domain.IDPConfig, idpConfigID, resourceOwner string) (*domain.IDPConfig, error) {
@@ -17,17 +17,17 @@ func (c *Commands) ImportIDPConfig(ctx context.Context, config *domain.IDPConfig
 		return nil, err
 	}
 	if existingIDP.State != domain.IDPConfigStateRemoved && existingIDP.State != domain.IDPConfigStateUnspecified {
-		return nil, errors.ThrowNotFound(nil, "Org-1J8fs", "Errors.Org.IDPConfig.AlreadyExisting")
+		return nil, zerrors.ThrowNotFound(nil, "Org-1J8fs", "Errors.Org.IDPConfig.AlreadyExisting")
 	}
 	return c.addIDPConfig(ctx, config, idpConfigID, resourceOwner)
 }
 
 func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, resourceOwner string) (*domain.IDPConfig, error) {
 	if resourceOwner == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "Org-0j8gs", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-0j8gs", "Errors.ResourceOwnerMissing")
 	}
 	if config.OIDCConfig == nil && config.JWTConfig == nil {
-		return nil, errors.ThrowInvalidArgument(nil, "Org-eUpQU", "Errors.idp.config.notset")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-eUpQU", "Errors.idp.config.notset")
 	}
 	idpConfigID, err := c.idGenerator.Next()
 	if err != nil {
@@ -94,14 +94,14 @@ func (c *Commands) addIDPConfig(ctx context.Context, config *domain.IDPConfig, i
 
 func (c *Commands) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig, resourceOwner string) (*domain.IDPConfig, error) {
 	if resourceOwner == "" {
-		return nil, errors.ThrowInvalidArgument(nil, "Org-Gh8ds", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-Gh8ds", "Errors.ResourceOwnerMissing")
 	}
 	existingIDP, err := c.orgIDPConfigWriteModelByID(ctx, config.IDPConfigID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
-		return nil, errors.ThrowNotFound(nil, "Org-1J9fs", "Errors.Org.IDPConfig.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "Org-1J9fs", "Errors.Org.IDPConfig.NotExisting")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
@@ -114,7 +114,7 @@ func (c *Commands) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig
 		config.AutoRegister)
 
 	if !hasChanged {
-		return nil, errors.ThrowPreconditionFailed(nil, "Org-jf9w", "Errors.Org.IDPConfig.NotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "Org-jf9w", "Errors.Org.IDPConfig.NotChanged")
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
@@ -133,7 +133,7 @@ func (c *Commands) DeactivateIDPConfig(ctx context.Context, idpID, orgID string)
 		return nil, err
 	}
 	if existingIDP.State != domain.IDPConfigStateActive {
-		return nil, errors.ThrowPreconditionFailed(nil, "Org-BBmd0", "Errors.Org.IDPConfig.NotActive")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "Org-BBmd0", "Errors.Org.IDPConfig.NotActive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org_repo.NewIDPConfigDeactivatedEvent(ctx, orgAgg, idpID))
@@ -153,7 +153,7 @@ func (c *Commands) ReactivateIDPConfig(ctx context.Context, idpID, orgID string)
 		return nil, err
 	}
 	if existingIDP.State != domain.IDPConfigStateInactive {
-		return nil, errors.ThrowPreconditionFailed(nil, "Org-5Mo0d", "Errors.Org.IDPConfig.NotInactive")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "Org-5Mo0d", "Errors.Org.IDPConfig.NotInactive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org_repo.NewIDPConfigReactivatedEvent(ctx, orgAgg, idpID))
@@ -189,7 +189,7 @@ func (c *Commands) RemoveIDPConfig(ctx context.Context, idpID, orgID string, cas
 
 func (c *Commands) removeIDPConfig(ctx context.Context, existingIDP *OrgIDPConfigWriteModel, cascadeRemoveProvider bool, cascadeExternalIDPs ...*domain.UserIDPLink) ([]eventstore.Command, error) {
 	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
-		return nil, errors.ThrowNotFound(nil, "Org-Yx9vd", "Errors.Org.IDPConfig.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "Org-Yx9vd", "Errors.Org.IDPConfig.NotExisting")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
@@ -210,7 +210,7 @@ func (c *Commands) getOrgIDPConfigByID(ctx context.Context, idpID, orgID string)
 		return nil, err
 	}
 	if !config.State.Exists() {
-		return nil, errors.ThrowNotFound(nil, "ORG-2m90f", "Errors.Org.IDPConfig.NotExisting")
+		return nil, zerrors.ThrowNotFound(nil, "ORG-2m90f", "Errors.Org.IDPConfig.NotExisting")
 	}
 	return writeModelToIDPConfig(&config.IDPConfigWriteModel), nil
 }

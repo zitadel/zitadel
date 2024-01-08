@@ -2,8 +2,8 @@ package idp
 
 import (
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type GitLabIDPAddedEvent struct {
@@ -52,7 +52,7 @@ func GitLabIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error)
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-KLewio", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-KLewio", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -75,7 +75,7 @@ func NewGitLabIDPChangedEvent(
 	changes []GitLabIDPChanges,
 ) (*GitLabIDPChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDP-K2gje", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-K2gje", "Errors.NoChangesFound")
 	}
 	changedEvent := &GitLabIDPChangedEvent{
 		BaseEvent: *base,
@@ -134,7 +134,7 @@ func GitLabIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, erro
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-Sfhjk", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-Sfhjk", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -189,7 +189,7 @@ func GitLabSelfHostedIDPAddedEventMapper(event eventstore.Event) (eventstore.Eve
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-S1efv", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-S1efv", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -213,7 +213,7 @@ func NewGitLabSelfHostedIDPChangedEvent(
 	changes []GitLabSelfHostedIDPChanges,
 ) (*GitLabSelfHostedIDPChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDP-Dghj6", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-Dghj6", "Errors.NoChangesFound")
 	}
 	changedEvent := &GitLabSelfHostedIDPChangedEvent{
 		BaseEvent: *base,
@@ -278,7 +278,7 @@ func GitLabSelfHostedIDPChangedEventMapper(event eventstore.Event) (eventstore.E
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-SFrhj", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-SFrhj", "unable to unmarshal event")
 	}
 
 	return e, nil

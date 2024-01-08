@@ -6,8 +6,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -190,7 +190,7 @@ func OIDCConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDC-BFd15", "unable to unmarshal oidc config")
+		return nil, zerrors.ThrowInternal(err, "OIDC-BFd15", "unable to unmarshal oidc config")
 	}
 
 	return e, nil
@@ -232,7 +232,7 @@ func NewOIDCConfigChangedEvent(
 	changes []OIDCConfigChanges,
 ) (*OIDCConfigChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-i8idç", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-i8idç", "Errors.NoChangesFound")
 	}
 
 	changeEvent := &OIDCConfigChangedEvent{
@@ -348,7 +348,7 @@ func OIDCConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, err
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDC-BFd15", "unable to unmarshal oidc config")
+		return nil, zerrors.ThrowInternal(err, "OIDC-BFd15", "unable to unmarshal oidc config")
 	}
 
 	return e, nil
@@ -393,7 +393,7 @@ func OIDCConfigSecretChangedEventMapper(event eventstore.Event) (eventstore.Even
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDC-M893d", "unable to unmarshal oidc config")
+		return nil, zerrors.ThrowInternal(err, "OIDC-M893d", "unable to unmarshal oidc config")
 	}
 
 	return e, nil
@@ -435,7 +435,7 @@ func OIDCConfigSecretCheckSucceededEventMapper(event eventstore.Event) (eventsto
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDC-837gV", "unable to unmarshal oidc config")
+		return nil, zerrors.ThrowInternal(err, "OIDC-837gV", "unable to unmarshal oidc config")
 	}
 
 	return e, nil
@@ -477,7 +477,7 @@ func OIDCConfigSecretCheckFailedEventMapper(event eventstore.Event) (eventstore.
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "OIDC-987g%", "unable to unmarshal oidc config")
+		return nil, zerrors.ThrowInternal(err, "OIDC-987g%", "unable to unmarshal oidc config")
 	}
 
 	return e, nil

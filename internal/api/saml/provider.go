@@ -65,6 +65,7 @@ func NewProvider(
 			userAgentCookie,
 			accessHandler.HandleIgnorePathPrefixes(ignoredQuotaLimitEndpoint(conf.ProviderConfig)),
 			http_utils.CopyHeadersToContext,
+			middleware.ActivityHandler,
 		),
 		provider.WithCustomTimeFormat("2006-01-02T15:04:05.999Z"),
 	}

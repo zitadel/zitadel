@@ -5,17 +5,17 @@ import (
 	"database/sql"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
-	UserTable        = "projections.users9"
+	UserTable        = "projections.users10"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
 	UserNotifyTable  = UserTable + "_" + UserNotifySuffix
@@ -57,7 +57,7 @@ const (
 	MachineUserInstanceIDCol  = "instance_id"
 	MachineNameCol            = "name"
 	MachineDescriptionCol     = "description"
-	MachineHasSecretCol       = "has_secret"
+	MachineSecretCol          = "secret"
 	MachineAccessTokenTypeCol = "access_token_type"
 
 	// notify
@@ -122,7 +122,7 @@ func (*userProjection) Init() *old_handler.Check {
 			handler.NewColumn(MachineUserInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(MachineNameCol, handler.ColumnTypeText),
 			handler.NewColumn(MachineDescriptionCol, handler.ColumnTypeText, handler.Nullable()),
-			handler.NewColumn(MachineHasSecretCol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(MachineSecretCol, handler.ColumnTypeJSONB, handler.Nullable()),
 			handler.NewColumn(MachineAccessTokenTypeCol, handler.ColumnTypeEnum, handler.Default(0)),
 		},
 			handler.NewPrimaryKey(MachineUserInstanceIDCol, MachineUserIDCol),
@@ -312,7 +312,7 @@ func (p *userProjection) Reducers() []handler.AggregateReducer {
 func (p *userProjection) reduceHumanAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Ebynp", "reduce.wrong.event.type %s", user.HumanAddedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ebynp", "reduce.wrong.event.type %s", user.HumanAddedType)
 	}
 	return handler.NewMultiStatement(
 		e,
@@ -360,7 +360,7 @@ func (p *userProjection) reduceHumanAdded(event eventstore.Event) (*handler.Stat
 func (p *userProjection) reduceHumanRegistered(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanRegisteredEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-xE53M", "reduce.wrong.event.type %s", user.HumanRegisteredType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xE53M", "reduce.wrong.event.type %s", user.HumanRegisteredType)
 	}
 	return handler.NewMultiStatement(
 		e,
@@ -408,7 +408,7 @@ func (p *userProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 func (p *userProjection) reduceHumanInitCodeAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanInitialCodeAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dvgws", "reduce.wrong.event.type %s", user.HumanInitialCodeAddedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Dvgws", "reduce.wrong.event.type %s", user.HumanInitialCodeAddedType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -425,7 +425,7 @@ func (p *userProjection) reduceHumanInitCodeAdded(event eventstore.Event) (*hand
 func (p *userProjection) reduceHumanInitCodeSucceeded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanInitializedCheckSucceededEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dfvwq", "reduce.wrong.event.type %s", user.HumanInitializedCheckSucceededType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Dfvwq", "reduce.wrong.event.type %s", user.HumanInitializedCheckSucceededType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -442,7 +442,7 @@ func (p *userProjection) reduceHumanInitCodeSucceeded(event eventstore.Event) (*
 func (p *userProjection) reduceUserLocked(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserLockedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-exyBF", "reduce.wrong.event.type %s", user.UserLockedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-exyBF", "reduce.wrong.event.type %s", user.UserLockedType)
 	}
 
 	return handler.NewUpdateStatement(
@@ -462,7 +462,7 @@ func (p *userProjection) reduceUserLocked(event eventstore.Event) (*handler.Stat
 func (p *userProjection) reduceUserUnlocked(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserUnlockedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-JIyRl", "reduce.wrong.event.type %s", user.UserUnlockedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-JIyRl", "reduce.wrong.event.type %s", user.UserUnlockedType)
 	}
 
 	return handler.NewUpdateStatement(
@@ -482,7 +482,7 @@ func (p *userProjection) reduceUserUnlocked(event eventstore.Event) (*handler.St
 func (p *userProjection) reduceUserDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserDeactivatedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-6BNjj", "reduce.wrong.event.type %s", user.UserDeactivatedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-6BNjj", "reduce.wrong.event.type %s", user.UserDeactivatedType)
 	}
 
 	return handler.NewUpdateStatement(
@@ -502,7 +502,7 @@ func (p *userProjection) reduceUserDeactivated(event eventstore.Event) (*handler
 func (p *userProjection) reduceUserReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserReactivatedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-IoF6j", "reduce.wrong.event.type %s", user.UserReactivatedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-IoF6j", "reduce.wrong.event.type %s", user.UserReactivatedType)
 	}
 
 	return handler.NewUpdateStatement(
@@ -522,7 +522,7 @@ func (p *userProjection) reduceUserReactivated(event eventstore.Event) (*handler
 func (p *userProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-BQB2t", "reduce.wrong.event.type %s", user.UserRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-BQB2t", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
 
 	return handler.NewDeleteStatement(
@@ -537,7 +537,7 @@ func (p *userProjection) reduceUserRemoved(event eventstore.Event) (*handler.Sta
 func (p *userProjection) reduceUserNameChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UsernameChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-QNKyV", "reduce.wrong.event.type %s", user.UserUserNameChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-QNKyV", "reduce.wrong.event.type %s", user.UserUserNameChangedType)
 	}
 
 	return handler.NewUpdateStatement(
@@ -557,7 +557,7 @@ func (p *userProjection) reduceUserNameChanged(event eventstore.Event) (*handler
 func (p *userProjection) reduceDomainClaimed(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.DomainClaimedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ASwf3", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ASwf3", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
 	}
 
 	return handler.NewUpdateStatement(
@@ -577,7 +577,7 @@ func (p *userProjection) reduceDomainClaimed(event eventstore.Event) (*handler.S
 func (p *userProjection) reduceHumanProfileChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanProfileChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-769v4", "reduce.wrong.event.type %s", user.HumanProfileChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-769v4", "reduce.wrong.event.type %s", user.HumanProfileChangedType)
 	}
 	cols := make([]handler.Column, 0, 6)
 	if e.FirstName != "" {
@@ -630,7 +630,7 @@ func (p *userProjection) reduceHumanProfileChanged(event eventstore.Event) (*han
 func (p *userProjection) reduceHumanPhoneChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanPhoneChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-xOGIA", "reduce.wrong.event.type %s", user.HumanPhoneChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xOGIA", "reduce.wrong.event.type %s", user.HumanPhoneChangedType)
 	}
 
 	return handler.NewMultiStatement(
@@ -672,7 +672,7 @@ func (p *userProjection) reduceHumanPhoneChanged(event eventstore.Event) (*handl
 func (p *userProjection) reduceHumanPhoneRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanPhoneRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-JI4S1", "reduce.wrong.event.type %s", user.HumanPhoneRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-JI4S1", "reduce.wrong.event.type %s", user.HumanPhoneRemovedType)
 	}
 
 	return handler.NewMultiStatement(
@@ -715,7 +715,7 @@ func (p *userProjection) reduceHumanPhoneRemoved(event eventstore.Event) (*handl
 func (p *userProjection) reduceHumanPhoneVerified(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanPhoneVerifiedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-LBnqG", "reduce.wrong.event.type %s", user.HumanPhoneVerifiedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-LBnqG", "reduce.wrong.event.type %s", user.HumanPhoneVerifiedType)
 	}
 
 	return handler.NewMultiStatement(
@@ -756,7 +756,7 @@ func (p *userProjection) reduceHumanPhoneVerified(event eventstore.Event) (*hand
 func (p *userProjection) reduceHumanEmailChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanEmailChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-KwiHa", "reduce.wrong.event.type %s", user.HumanEmailChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-KwiHa", "reduce.wrong.event.type %s", user.HumanEmailChangedType)
 	}
 
 	return handler.NewMultiStatement(
@@ -798,7 +798,7 @@ func (p *userProjection) reduceHumanEmailChanged(event eventstore.Event) (*handl
 func (p *userProjection) reduceHumanEmailVerified(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanEmailVerifiedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-JzcDq", "reduce.wrong.event.type %s", user.HumanEmailVerifiedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-JzcDq", "reduce.wrong.event.type %s", user.HumanEmailVerifiedType)
 	}
 
 	return handler.NewMultiStatement(
@@ -839,7 +839,7 @@ func (p *userProjection) reduceHumanEmailVerified(event eventstore.Event) (*hand
 func (p *userProjection) reduceHumanAvatarAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanAvatarAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-eDEdt", "reduce.wrong.event.type %s", user.HumanAvatarAddedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-eDEdt", "reduce.wrong.event.type %s", user.HumanAvatarAddedType)
 	}
 
 	return handler.NewMultiStatement(
@@ -870,7 +870,7 @@ func (p *userProjection) reduceHumanAvatarAdded(event eventstore.Event) (*handle
 func (p *userProjection) reduceHumanAvatarRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanAvatarRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-KhETX", "reduce.wrong.event.type %s", user.HumanAvatarRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-KhETX", "reduce.wrong.event.type %s", user.HumanAvatarRemovedType)
 	}
 
 	return handler.NewMultiStatement(
@@ -901,7 +901,7 @@ func (p *userProjection) reduceHumanAvatarRemoved(event eventstore.Event) (*hand
 func (p *userProjection) reduceHumanPasswordChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanPasswordChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-jqXUY", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-jqXUY", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
 	}
 
 	return handler.NewUpdateStatement(
@@ -920,7 +920,7 @@ func (p *userProjection) reduceHumanPasswordChanged(event eventstore.Event) (*ha
 func (p *userProjection) reduceMachineSecretSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.MachineSecretSetEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x0p1n1i", "reduce.wrong.event.type %s", user.MachineSecretSetType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x0p1n1i", "reduce.wrong.event.type %s", user.MachineSecretSetType)
 	}
 	return handler.NewMultiStatement(
 		e,
@@ -936,7 +936,7 @@ func (p *userProjection) reduceMachineSecretSet(event eventstore.Event) (*handle
 		),
 		handler.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(MachineHasSecretCol, true),
+				handler.NewCol(MachineSecretCol, e.ClientSecret),
 			},
 			[]handler.Condition{
 				handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
@@ -950,7 +950,7 @@ func (p *userProjection) reduceMachineSecretSet(event eventstore.Event) (*handle
 func (p *userProjection) reduceMachineSecretRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.MachineSecretRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-x0p6n1i", "reduce.wrong.event.type %s", user.MachineSecretRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-x0p6n1i", "reduce.wrong.event.type %s", user.MachineSecretRemovedType)
 	}
 
 	return handler.NewMultiStatement(
@@ -967,7 +967,7 @@ func (p *userProjection) reduceMachineSecretRemoved(event eventstore.Event) (*ha
 		),
 		handler.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(MachineHasSecretCol, false),
+				handler.NewCol(MachineSecretCol, nil),
 			},
 			[]handler.Condition{
 				handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
@@ -981,7 +981,7 @@ func (p *userProjection) reduceMachineSecretRemoved(event eventstore.Event) (*ha
 func (p *userProjection) reduceMachineAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.MachineAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-q7ier", "reduce.wrong.event.type %s", user.MachineAddedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-q7ier", "reduce.wrong.event.type %s", user.MachineAddedEventType)
 	}
 
 	return handler.NewMultiStatement(
@@ -1015,7 +1015,7 @@ func (p *userProjection) reduceMachineAdded(event eventstore.Event) (*handler.St
 func (p *userProjection) reduceMachineChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.MachineChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.MachineChangedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-qYHvj", "reduce.wrong.event.type %s", user.MachineChangedEventType)
 	}
 
 	cols := make([]handler.Column, 0, 2)
@@ -1059,7 +1059,7 @@ func (p *userProjection) reduceMachineChanged(event eventstore.Event) (*handler.
 func (p *userProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-NCsdV", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-NCsdV", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
 	return handler.NewDeleteStatement(

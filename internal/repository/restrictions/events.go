@@ -2,6 +2,7 @@ package restrictions
 
 import (
 	"github.com/muhlemmer/gu"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -13,8 +14,9 @@ const (
 
 // SetEvent describes that restrictions are added or modified and contains only changed properties
 type SetEvent struct {
-	*eventstore.BaseEvent          `json:"-"`
-	DisallowPublicOrgRegistrations *bool `json:"disallowPublicOrgRegistrations,omitempty"`
+	*eventstore.BaseEvent         `json:"-"`
+	DisallowPublicOrgRegistration *bool           `json:"disallowPublicOrgRegistration,omitempty"`
+	AllowedLanguages              *[]language.Tag `json:"allowedLanguages,omitempty"`
 }
 
 func (e *SetEvent) Payload() any {
@@ -44,9 +46,15 @@ func NewSetEvent(
 
 type RestrictionsChange func(*SetEvent)
 
-func ChangePublicOrgRegistrations(disallow bool) RestrictionsChange {
+func ChangeDisallowPublicOrgRegistration(disallow bool) RestrictionsChange {
 	return func(e *SetEvent) {
-		e.DisallowPublicOrgRegistrations = gu.Ptr(disallow)
+		e.DisallowPublicOrgRegistration = gu.Ptr(disallow)
+	}
+}
+
+func ChangeAllowedLanguages(allowedLanguages []language.Tag) RestrictionsChange {
+	return func(e *SetEvent) {
+		e.AllowedLanguages = &allowedLanguages
 	}
 }
 

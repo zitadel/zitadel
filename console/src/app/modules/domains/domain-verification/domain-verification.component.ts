@@ -26,6 +26,7 @@ export class DomainVerificationComponent {
 
   public validating: boolean = false;
   public InfoSectionType: any = InfoSectionType;
+  public dnsChallenge = '_zitadel-challenge';
 
   constructor(
     private toast: ToastService,

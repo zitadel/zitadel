@@ -10,10 +10,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddInstanceDomain(t *testing.T) {
@@ -47,7 +47,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 				domain: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -62,7 +62,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 				domain: "hodor's-org.localhost",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -77,7 +77,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 				domain: "bücher.ch",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -92,7 +92,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 				domain: "🦒.ch",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -116,7 +116,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 				domain: "domain.ch",
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -239,7 +239,7 @@ func TestCommandSide_SetPrimaryInstanceDomain(t *testing.T) {
 				domain: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -255,7 +255,7 @@ func TestCommandSide_SetPrimaryInstanceDomain(t *testing.T) {
 				domain: "domain.ch",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -341,7 +341,7 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 				domain: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -357,7 +357,7 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 				domain: "domain.ch",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -414,7 +414,7 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 				domain: "domain.ch",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 	}

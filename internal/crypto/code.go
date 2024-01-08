@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -126,7 +126,7 @@ func VerifyCode(creationDate time.Time, expiry time.Duration, cryptoCode *Crypto
 
 func VerifyCodeWithAlgorithm(creationDate time.Time, expiry time.Duration, cryptoCode *CryptoValue, verificationCode string, algorithm Crypto) error {
 	if IsCodeExpired(creationDate, expiry) {
-		return errors.ThrowPreconditionFailed(nil, "CODE-QvUQ4P", "Errors.User.Code.Expired")
+		return zerrors.ThrowPreconditionFailed(nil, "CODE-QvUQ4P", "Errors.User.Code.Expired")
 	}
 	switch alg := algorithm.(type) {
 	case EncryptionAlgorithm:
@@ -134,7 +134,7 @@ func VerifyCodeWithAlgorithm(creationDate time.Time, expiry time.Duration, crypt
 	case HashAlgorithm:
 		return verifyHashedCode(cryptoCode, verificationCode, alg)
 	}
-	return errors.ThrowInvalidArgument(nil, "CODE-fW2gNa", "Errors.User.Code.GeneratorAlgNotSupported")
+	return zerrors.ThrowInvalidArgument(nil, "CODE-fW2gNa", "Errors.User.Code.GeneratorAlgNotSupported")
 }
 
 func GenerateRandomString(length uint, chars []rune) (string, error) {
@@ -161,7 +161,7 @@ func GenerateRandomString(length uint, chars []rune) (string, error) {
 
 func verifyEncryptedCode(cryptoCode *CryptoValue, verificationCode string, alg EncryptionAlgorithm) error {
 	if cryptoCode == nil {
-		return errors.ThrowInvalidArgument(nil, "CRYPT-aqrFV", "Errors.User.Code.CryptoCodeNil")
+		return zerrors.ThrowInvalidArgument(nil, "CRYPT-aqrFV", "Errors.User.Code.CryptoCodeNil")
 	}
 	code, err := DecryptString(cryptoCode, alg)
 	if err != nil {
@@ -169,14 +169,14 @@ func verifyEncryptedCode(cryptoCode *CryptoValue, verificationCode string, alg E
 	}
 
 	if code != verificationCode {
-		return errors.ThrowInvalidArgument(nil, "CODE-woT0xc", "Errors.User.Code.Invalid")
+		return zerrors.ThrowInvalidArgument(nil, "CODE-woT0xc", "Errors.User.Code.Invalid")
 	}
 	return nil
 }
 
 func verifyHashedCode(cryptoCode *CryptoValue, verificationCode string, alg HashAlgorithm) error {
 	if cryptoCode == nil {
-		return errors.ThrowInvalidArgument(nil, "CRYPT-2q3r", "cryptoCode must not be nil")
+		return zerrors.ThrowInvalidArgument(nil, "CRYPT-2q3r", "cryptoCode must not be nil")
 	}
 	return CompareHash(cryptoCode, []byte(verificationCode), alg)
 }

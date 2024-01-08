@@ -4,6 +4,7 @@ package system_test
 
 import (
 	"context"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"math/rand"
 	"sync"
 	"testing"
@@ -20,9 +21,10 @@ import (
 )
 
 func TestServer_Limits_AuditLogRetention(t *testing.T) {
-	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(CTX, SystemCTX)
+	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
 	userID, projectID, appID, projectGrantID := seedObjects(iamOwnerCtx, t)
 	beforeTime := time.Now()
+	farPast := timestamppb.New(beforeTime.Add(-10 * time.Hour).UTC())
 	zeroCounts := &eventCounts{}
 	seededCount := requireEventually(t, iamOwnerCtx, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
 		counts.assertAll(t, c, "seeded events are > 0", assert.Greater, zeroCounts)
@@ -36,10 +38,22 @@ func TestServer_Limits_AuditLogRetention(t *testing.T) {
 		AuditLogRetention: durationpb.New(time.Now().Sub(beforeTime)),
 	})
 	require.NoError(t, err)
+	var limitedCounts *eventCounts
 	requireEventually(t, iamOwnerCtx, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
 		counts.assertAll(t, c, "limited events < added events", assert.Less, addedCount)
 		counts.assertAll(t, c, "limited events > 0", assert.Greater, zeroCounts)
+		limitedCounts = counts
 	}, "wait for limited event assertions to pass")
+	listedEvents, err := Tester.Client.Admin.ListEvents(iamOwnerCtx, &admin.ListEventsRequest{CreationDateFilter: &admin.ListEventsRequest_From{
+		From: farPast,
+	}})
+	require.NoError(t, err)
+	assert.LessOrEqual(t, len(listedEvents.GetEvents()), limitedCounts.all, "ListEvents with from query older than retention doesn't return more events")
+	listedEvents, err = Tester.Client.Admin.ListEvents(iamOwnerCtx, &admin.ListEventsRequest{CreationDateFilter: &admin.ListEventsRequest_Range{Range: &admin.ListEventsRequestCreationDateRange{
+		Since: farPast,
+	}}})
+	require.NoError(t, err)
+	assert.LessOrEqual(t, len(listedEvents.GetEvents()), limitedCounts.all, "ListEvents with since query older than retention doesn't return more events")
 	_, err = Tester.Client.System.ResetLimits(SystemCTX, &system.ResetLimitsRequest{
 		InstanceId: instanceID,
 	})

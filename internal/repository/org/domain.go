@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -64,7 +64,7 @@ func DomainAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(orgDomainAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ORG-GBr52", "unable to unmarshal org domain added")
+		return nil, zerrors.ThrowInternal(err, "ORG-GBr52", "unable to unmarshal org domain added")
 	}
 
 	return orgDomainAdded, nil
@@ -110,7 +110,7 @@ func DomainVerificationAddedEventMapper(event eventstore.Event) (eventstore.Even
 	}
 	err := event.Unmarshal(orgDomainVerificationAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ORG-NRN32", "unable to unmarshal org domain verification added")
+		return nil, zerrors.ThrowInternal(err, "ORG-NRN32", "unable to unmarshal org domain verification added")
 	}
 
 	return orgDomainVerificationAdded, nil
@@ -147,7 +147,7 @@ func DomainVerificationFailedEventMapper(event eventstore.Event) (eventstore.Eve
 	}
 	err := event.Unmarshal(orgDomainVerificationFailed)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ORG-Bhm37", "unable to unmarshal org domain verification failed")
+		return nil, zerrors.ThrowInternal(err, "ORG-Bhm37", "unable to unmarshal org domain verification failed")
 	}
 
 	return orgDomainVerificationFailed, nil
@@ -184,7 +184,7 @@ func DomainVerifiedEventMapper(event eventstore.Event) (eventstore.Event, error)
 	}
 	err := event.Unmarshal(orgDomainVerified)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ORG-BFSwt", "unable to unmarshal org domain verified")
+		return nil, zerrors.ThrowInternal(err, "ORG-BFSwt", "unable to unmarshal org domain verified")
 	}
 
 	return orgDomainVerified, nil
@@ -221,7 +221,7 @@ func DomainPrimarySetEventMapper(event eventstore.Event) (eventstore.Event, erro
 	}
 	err := event.Unmarshal(orgDomainPrimarySet)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ORG-N5787", "unable to unmarshal org domain primary set")
+		return nil, zerrors.ThrowInternal(err, "ORG-N5787", "unable to unmarshal org domain primary set")
 	}
 
 	return orgDomainPrimarySet, nil
@@ -263,7 +263,7 @@ func DomainRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 	}
 	err := event.Unmarshal(orgDomainRemoved)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ORG-BngB2", "unable to unmarshal org domain removed")
+		return nil, zerrors.ThrowInternal(err, "ORG-BngB2", "unable to unmarshal org domain removed")
 	}
 
 	return orgDomainRemoved, nil

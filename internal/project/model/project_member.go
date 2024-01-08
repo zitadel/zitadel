@@ -8,11 +8,3 @@ type ProjectMember struct {
 	UserID string
 	Roles  []string
 }
-
-func NewProjectMember(projectID, userID string) *ProjectMember {
-	return &ProjectMember{ObjectRoot: es_models.ObjectRoot{AggregateID: projectID}, UserID: userID}
-}
-
-func (p *ProjectMember) IsValid() bool {
-	return p.AggregateID != "" && p.UserID != "" && len(p.Roles) != 0
-}

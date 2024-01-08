@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const anAPIRole = "AN_API_ROLE"
@@ -43,7 +43,7 @@ var (
 		return "user1", "", "", "", "org1", nil
 	})
 	accessTokenNOK = authz.AccessTokenVerifierFunc(func(ctx context.Context, token string) (userID string, clientID string, agentID string, prefLan string, resourceOwner string, err error) {
-		return "", "", "", "", "", zitadel_errors.ThrowUnauthenticated(nil, "TEST-fQHDI", "unauthenticaded")
+		return "", "", "", "", "", zerrors.ThrowUnauthenticated(nil, "TEST-fQHDI", "unauthenticaded")
 	})
 	systemTokenNOK = authz.SystemTokenVerifierFunc(func(ctx context.Context, token string, orgID string) (memberships authz.Memberships, userID string, err error) {
 		return nil, "", errors.New("system token error")

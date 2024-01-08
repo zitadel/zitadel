@@ -46,8 +46,8 @@ export class ProjectMembersDataSource extends DataSource<Member.AsObject> {
       projectType === ProjectType.PROJECTTYPE_OWNED
         ? this.service.listProjectMembers(projectId, pageSize, offset)
         : projectType === ProjectType.PROJECTTYPE_GRANTED && grantId
-        ? this.service.listProjectGrantMembers(projectId, grantId, pageSize, offset)
-        : undefined;
+          ? this.service.listProjectGrantMembers(projectId, grantId, pageSize, offset)
+          : undefined;
     if (promise) {
       from(promise)
         .pipe(

@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Password struct {
@@ -35,7 +35,7 @@ func (p *Password) HashPasswordIfExisting(policy *PasswordComplexityPolicy, hash
 		return nil
 	}
 	if policy == nil {
-		return caos_errs.ThrowPreconditionFailed(nil, "DOMAIN-s8ifS", "Errors.User.PasswordComplexityPolicy.NotFound")
+		return zerrors.ThrowPreconditionFailed(nil, "DOMAIN-s8ifS", "Errors.User.PasswordComplexityPolicy.NotFound")
 	}
 	if err := policy.Check(p.SecretString); err != nil {
 		return err

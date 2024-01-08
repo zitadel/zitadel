@@ -1,13 +1,12 @@
 package login
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -39,8 +38,12 @@ type registerOrgData struct {
 }
 
 func (l *Login) handleRegisterOrg(w http.ResponseWriter, r *http.Request) {
-	disallowed, err := l.publicOrgRegistrationIsDisallowed(r.Context())
-	if disallowed || err != nil {
+	restrictions, err := l.query.GetInstanceRestrictions(r.Context())
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+	if restrictions.DisallowPublicOrgRegistration {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -54,8 +57,12 @@ func (l *Login) handleRegisterOrg(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
-	disallowed, err := l.publicOrgRegistrationIsDisallowed(r.Context())
-	if disallowed || err != nil {
+	restrictions, err := l.query.GetInstanceRestrictions(r.Context())
+	if err != nil {
+		l.renderError(w, r, nil, err)
+		return
+	}
+	if restrictions.DisallowPublicOrgRegistration {
 		w.WriteHeader(http.StatusConflict)
 		return
 	}
@@ -66,7 +73,7 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if data.Password != data.Password2 {
-		err := caos_errs.ThrowInvalidArgument(nil, "VIEW-KaGue", "Errors.User.Password.ConfirmationWrong")
+		err := zerrors.ThrowInvalidArgument(nil, "VIEW-KaGue", "Errors.User.Password.ConfirmationWrong")
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
 	}
@@ -99,7 +106,7 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 	}
 	translator := l.getTranslator(r.Context(), authRequest)
 	data := registerOrgData{
-		baseData:            l.getBaseData(r, authRequest, "RegistrationOrg.Title", "RegistrationOrg.Description", errID, errMessage),
+		baseData:            l.getBaseData(r, authRequest, translator, "RegistrationOrg.Title", "RegistrationOrg.Description", errID, errMessage),
 		registerOrgFormData: *formData,
 	}
 	pwPolicy := l.getPasswordComplexityPolicy(r, "0")
@@ -128,11 +135,6 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 		l.customTexts(r.Context(), translator, "")
 	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegisterOrg], data, nil)
-}
-
-func (l *Login) publicOrgRegistrationIsDisallowed(ctx context.Context) (bool, error) {
-	restrictions, err := l.query.GetInstanceRestrictions(ctx)
-	return restrictions.DisallowPublicOrgRegistration, err
 }
 
 func (d registerOrgFormData) toUserDomain() *domain.Human {

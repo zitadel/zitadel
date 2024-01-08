@@ -1,14 +1,13 @@
 package view
 
 import (
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/view/repository"
-
 	"github.com/jinzhu/gorm"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/domain"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func UserByID(db *gorm.DB, table, userID, instanceID string) (*model.UserView, error) {
@@ -30,91 +29,8 @@ func UserByID(db *gorm.DB, table, userID, instanceID string) (*model.UserView, e
 	}
 	query := repository.PrepareGetByQuery(table, userIDQuery, instanceIDQuery, ownerRemovedQuery)
 	err := query(db, user)
-	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-sj8Sw", "Errors.User.NotFound")
-	}
-	user.SetEmptyUserType()
-	return user, err
-}
-
-func UserByUserName(db *gorm.DB, table, userName, instanceID string) (*model.UserView, error) {
-	user := new(model.UserView)
-	userNameQuery := &model.UserSearchQuery{
-		Key:    usr_model.UserSearchKeyUserName,
-		Method: domain.SearchMethodEquals,
-		Value:  userName,
-	}
-	instanceIDQuery := &model.UserSearchQuery{
-		Key:    usr_model.UserSearchKeyInstanceID,
-		Method: domain.SearchMethodEquals,
-		Value:  instanceID,
-	}
-	ownerRemovedQuery := &model.UserSearchQuery{
-		Key:    usr_model.UserSearchOwnerRemoved,
-		Method: domain.SearchMethodEquals,
-		Value:  false,
-	}
-	query := repository.PrepareGetByQuery(table, userNameQuery, instanceIDQuery, ownerRemovedQuery)
-	err := query(db, user)
-	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Lso9s", "Errors.User.NotFound")
-	}
-	user.SetEmptyUserType()
-	return user, err
-}
-
-func UserByLoginName(db *gorm.DB, table, loginName, instanceID string) (*model.UserView, error) {
-	user := new(model.UserView)
-	loginNameQuery := &model.UserSearchQuery{
-		Key:    usr_model.UserSearchKeyLoginNames,
-		Method: domain.SearchMethodListContains,
-		Value:  loginName,
-	}
-	instanceIDQuery := &model.UserSearchQuery{
-		Key:    usr_model.UserSearchKeyInstanceID,
-		Method: domain.SearchMethodEquals,
-		Value:  instanceID,
-	}
-	ownerRemovedQuery := &model.UserSearchQuery{
-		Key:    usr_model.UserSearchOwnerRemoved,
-		Method: domain.SearchMethodEquals,
-		Value:  false,
-	}
-	query := repository.PrepareGetByQuery(table, loginNameQuery, instanceIDQuery, ownerRemovedQuery)
-	err := query(db, user)
-	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-AD4qs", "Errors.User.NotFound")
-	}
-	user.SetEmptyUserType()
-	return user, err
-}
-
-func UserByLoginNameAndResourceOwner(db *gorm.DB, table, loginName, resourceOwner, instanceID string) (*model.UserView, error) {
-	user := new(model.UserView)
-	loginNameQuery := &model.UserSearchQuery{
-		Key:    usr_model.UserSearchKeyLoginNames,
-		Method: domain.SearchMethodListContains,
-		Value:  loginName,
-	}
-	resourceOwnerQuery := &model.UserSearchQuery{
-		Key:    usr_model.UserSearchKeyResourceOwner,
-		Method: domain.SearchMethodEquals,
-		Value:  resourceOwner,
-	}
-	instanceIDQuery := &model.UserSearchQuery{
-		Key:    usr_model.UserSearchKeyInstanceID,
-		Method: domain.SearchMethodEquals,
-		Value:  instanceID,
-	}
-	ownerRemovedQuery := &model.UserSearchQuery{
-		Key:    usr_model.UserSearchOwnerRemoved,
-		Method: domain.SearchMethodEquals,
-		Value:  false,
-	}
-	query := repository.PrepareGetByQuery(table, loginNameQuery, resourceOwnerQuery, instanceIDQuery, ownerRemovedQuery)
-	err := query(db, user)
-	if caos_errs.IsNotFound(err) {
-		return nil, caos_errs.ThrowNotFound(nil, "VIEW-AD4qs", "Errors.User.NotFoundOnOrg")
+	if zerrors.IsNotFound(err) {
+		return nil, zerrors.ThrowNotFound(nil, "VIEW-sj8Sw", "Errors.User.NotFound")
 	}
 	user.SetEmptyUserType()
 	return user, err

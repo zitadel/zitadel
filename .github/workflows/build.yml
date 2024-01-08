@@ -91,7 +91,7 @@ jobs:
       pull-requests: write
     needs:
       [version, core-unit-test, core-integration-test, lint, container, e2e]
-    if: ${{ needs.version.outputs.published == 'true' && github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
     with:
