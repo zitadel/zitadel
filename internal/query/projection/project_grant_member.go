@@ -125,11 +125,7 @@ func (p *projectGrantMemberProjection) reduceAdded(event eventstore.Event) (*han
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-0EBQf", "reduce.wrong.event.type %s", project.GrantMemberAddedType)
 	}
 	ctx := setMemberContext(e.Aggregate())
-	userOwner, err := getResourceOwnerOfUser(ctx, p.es, e.Aggregate().InstanceID, e.UserID)
-	if err != nil {
-		return nil, err
-	}
-	grantedOrg, err := getGrantedOrgOfGrantedProject(ctx, p.es, e.Aggregate().InstanceID, e.Aggregate().ID, e.GrantID)
+	userOwner, _, grantedOrg, err := getResourceOwners(ctx, p.es, e.Aggregate().InstanceID, e.UserID, e.Aggregate().ID, e.GrantID)
 	if err != nil {
 		return nil, err
 	}

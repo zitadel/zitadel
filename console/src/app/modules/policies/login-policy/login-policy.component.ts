@@ -142,8 +142,8 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
         this.serviceType === PolicyComponentServiceType.ADMIN
           ? ['iam.policy.write']
           : this.serviceType === PolicyComponentServiceType.MGMT
-          ? ['policy.write']
-          : [],
+            ? ['policy.write']
+            : [],
       )
       .pipe(take(1))
       .subscribe((allowed) => {
