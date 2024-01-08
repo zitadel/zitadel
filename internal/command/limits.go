@@ -90,7 +90,9 @@ func (c *Commands) SetLimitsBulk(
 	for i, t := range bulk {
 		targetDetails[i] = writeModelToObjectDetails(&bulkWm.writeModels[t.InstanceID][t.ResourceOwner].WriteModel)
 	}
-	return writeModelToObjectDetails(&bulkWm.WriteModel), targetDetails, err
+	details := writeModelToObjectDetails(&bulkWm.WriteModel)
+	details.ResourceOwner = ""
+	return details, targetDetails, err
 }
 
 func (c *Commands) setLimitsCommands(ctx context.Context, wm *limitsWriteModel, setLimits *SetLimits) (cmds []eventstore.Command, err error) {
@@ -107,19 +109,6 @@ func (c *Commands) setLimitsCommands(ctx context.Context, wm *limitsWriteModel, 
 		return nil, err
 	}
 	cmds, err = createCmds(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-	if len(cmds) > 0 {
-		events, err := c.eventstore.Push(ctx, cmds...)
-		if err != nil {
-			return nil, err
-		}
-		err = AppendAndReduce(wm, events...)
-		if err != nil {
-			return nil, err
-		}
-	}
 	return cmds, err
 }
 
