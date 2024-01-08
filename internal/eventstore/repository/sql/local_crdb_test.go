@@ -1,6 +1,7 @@
 package sql
 
 import (
+	"context"
 	"database/sql"
 	"os"
 	"testing"
@@ -60,7 +61,7 @@ func initDB(db *database.DB) error {
 		return err
 	}
 
-	err = initialise.VerifyZitadel(db, *config)
+	err = initialise.VerifyZitadel(context.Background(), db, *config)
 	if err != nil {
 		return err
 	}

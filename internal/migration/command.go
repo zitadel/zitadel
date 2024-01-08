@@ -2,7 +2,6 @@ package migration
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/service"
@@ -14,24 +13,9 @@ import (
 type SetupStep struct {
 	eventstore.BaseEvent `json:"-"`
 	migration            Migration
-	Name                 string      `json:"name"`
-	Error                error       `json:"error,omitempty"`
-	LastRun              interface{} `json:"lastRun,omitempty"`
-}
-
-func (s *SetupStep) UnmarshalJSON(data []byte) error {
-	fields := struct {
-		Name    string                 `json:"name,"`
-		Error   *zerrors.ZitadelError  `json:"error"`
-		LastRun map[string]interface{} `json:"lastRun,omitempty"`
-	}{}
-	if err := json.Unmarshal(data, &fields); err != nil {
-		return err
-	}
-	s.Name = fields.Name
-	s.Error = fields.Error
-	s.LastRun = fields.LastRun
-	return nil
+	Name                 string `json:"name"`
+	Error                any    `json:"error,omitempty"`
+	LastRun              any    `json:"lastRun,omitempty"`
 }
 
 func setupStartedCmd(ctx context.Context, migration Migration) eventstore.Command {
@@ -54,15 +38,15 @@ func setupDoneCmd(ctx context.Context, migration Migration, err error) eventstor
 		typ = repeatableDoneType
 		lastRun = repeatable
 	}
-	if err != nil {
-		typ = failedType
-	}
 
 	s := &SetupStep{
 		migration: migration,
 		Name:      migration.String(),
-		Error:     err,
 		LastRun:   lastRun,
+	}
+	if err != nil {
+		typ = failedType
+		s.Error = err.Error()
 	}
 
 	s.BaseEvent = *eventstore.NewBaseEventForPush(
