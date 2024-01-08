@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/jinzhu/gorm"
@@ -152,6 +153,307 @@ func TestPrepareSearchQuery(t *testing.T) {
 			}
 
 			tt.db.close()
+		})
+	}
+}
+
+func TestSetQuery(t *testing.T) {
+	query := mockDB(t).db.Select("test_field").Table("test_table")
+	exprPrefix := `(SELECT test_field FROM "test_table"  WHERE `
+	type args struct {
+		key    ColumnKey
+		value  interface{}
+		method domain.SearchMethod
+	}
+	type want struct {
+		isErr func(t *testing.T, got error)
+		query *gorm.SqlExpr
+	}
+	tests := []struct {
+		name string
+		args args
+		want want
+	}{
+		{
+			name: "contains",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "asdf",
+				method: domain.SearchMethodContains,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(test LIKE ?))", "%asdf%"),
+			},
+		},
+		{
+			name: "contains _ wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "as_df",
+				method: domain.SearchMethodContains,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(test LIKE ?))", "%as\\_df%"),
+			},
+		},
+		{
+			name: "contains % wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "as%df",
+				method: domain.SearchMethodContains,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(test LIKE ?))", "%as\\%df%"),
+			},
+		},
+		{
+			name: "contains % wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "a_s%d_f",
+				method: domain.SearchMethodContains,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(test LIKE ?))", "%a\\_s\\%d\\_f%"),
+			},
+		},
+		{
+			name: "starts with",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "asdf",
+				method: domain.SearchMethodStartsWith,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(test LIKE ?))", "asdf%"),
+			},
+		},
+		{
+			name: "starts with _ wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "as_df",
+				method: domain.SearchMethodStartsWith,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(test LIKE ?))", "as\\_df%"),
+			},
+		},
+		{
+			name: "starts with % wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "as%df",
+				method: domain.SearchMethodStartsWith,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(test LIKE ?))", "as\\%df%"),
+			},
+		},
+		{
+			name: "starts with % wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "a_s%d_f",
+				method: domain.SearchMethodStartsWith,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(test LIKE ?))", "a\\_s\\%d\\_f%"),
+			},
+		},
+		{
+			name: "ends with",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "asdf",
+				method: domain.SearchMethodEndsWith,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(test LIKE ?))", "%asdf"),
+			},
+		},
+		{
+			name: "ends with _ wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "as_df",
+				method: domain.SearchMethodEndsWith,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(test LIKE ?))", "%as\\_df"),
+			},
+		},
+		{
+			name: "ends with % wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "as%df",
+				method: domain.SearchMethodEndsWith,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(test LIKE ?))", "%as\\%df"),
+			},
+		},
+		{
+			name: "ends with % wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "a_s%d_f",
+				method: domain.SearchMethodEndsWith,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(test LIKE ?))", "%a\\_s\\%d\\_f"),
+			},
+		},
+		{
+			name: "starts with ignore case",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "asdf",
+				method: domain.SearchMethodStartsWithIgnoreCase,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(LOWER(test) LIKE LOWER(?)))", "asdf%"),
+			},
+		},
+		{
+			name: "starts with ignore case _ wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "as_df",
+				method: domain.SearchMethodStartsWithIgnoreCase,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(LOWER(test) LIKE LOWER(?)))", "as\\_df%"),
+			},
+		},
+		{
+			name: "starts with ignore case % wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "as%df",
+				method: domain.SearchMethodStartsWithIgnoreCase,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(LOWER(test) LIKE LOWER(?)))", "as\\%df%"),
+			},
+		},
+		{
+			name: "starts with ignore case % wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "a_s%d_f",
+				method: domain.SearchMethodStartsWithIgnoreCase,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(LOWER(test) LIKE LOWER(?)))", "a\\_s\\%d\\_f%"),
+			},
+		},
+		{
+			name: "ends with ignore case",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "asdf",
+				method: domain.SearchMethodEndsWithIgnoreCase,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(LOWER(test) LIKE LOWER(?)))", "%asdf"),
+			},
+		},
+		{
+			name: "ends with ignore case _ wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "as_df",
+				method: domain.SearchMethodEndsWithIgnoreCase,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(LOWER(test) LIKE LOWER(?)))", "%as\\_df"),
+			},
+		},
+		{
+			name: "ends with ignore case % wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "as%df",
+				method: domain.SearchMethodEndsWithIgnoreCase,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(LOWER(test) LIKE LOWER(?)))", "%as\\%df"),
+			},
+		},
+		{
+			name: "ends with ignore case % wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "a_s%d_f",
+				method: domain.SearchMethodEndsWithIgnoreCase,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(LOWER(test) LIKE LOWER(?)))", "%a\\_s\\%d\\_f"),
+			},
+		},
+		{
+			name: "contains ignore case",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "asdf",
+				method: domain.SearchMethodContainsIgnoreCase,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(LOWER(test) LIKE LOWER(?)))", "%asdf%"),
+			},
+		},
+		{
+			name: "contains ignore case _ wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "as_df",
+				method: domain.SearchMethodContainsIgnoreCase,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(LOWER(test) LIKE LOWER(?)))", "%as\\_df%"),
+			},
+		},
+		{
+			name: "contains ignore case % wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "as%df",
+				method: domain.SearchMethodContainsIgnoreCase,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(LOWER(test) LIKE LOWER(?)))", "%as\\%df%"),
+			},
+		},
+		{
+			name: "contains ignore case % wildcard",
+			args: args{
+				key:    TestSearchKey_TEST,
+				value:  "a_s%d_f",
+				method: domain.SearchMethodContainsIgnoreCase,
+			},
+			want: want{
+				query: gorm.Expr(exprPrefix+"(LOWER(test) LIKE LOWER(?)))", "%a\\_s\\%d\\_f%"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		if tt.want.isErr == nil {
+			tt.want.isErr = func(t *testing.T, got error) {
+				if got == nil {
+					return
+				}
+				t.Errorf("no error expected got: %v", got)
+			}
+		}
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := SetQuery(query, tt.args.key, tt.args.value, tt.args.method)
+			tt.want.isErr(t, err)
+			if !reflect.DeepEqual(got.SubQuery(), tt.want.query) {
+				t.Errorf("unexpected query: \nwant: %v\n got: %v", *tt.want.query, *got.SubQuery())
+			}
 		})
 	}
 }

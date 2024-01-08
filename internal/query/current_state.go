@@ -109,7 +109,7 @@ func (q *Queries) latestState(ctx context.Context, projections ...table) (state 
 }
 
 func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName string) (err error) {
-	tx, err := q.client.Begin()
+	tx, err := q.client.BeginTx(ctx, nil)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "QUERY-9iOpr", "Errors.RemoveFailed")
 	}

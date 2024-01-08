@@ -88,7 +88,7 @@ func initDB(db *database.DB) error {
 	if err != nil {
 		return err
 	}
-	err = initialise.VerifyZitadel(db, *config)
+	err = initialise.VerifyZitadel(context.Background(), db, *config)
 	if err != nil {
 		return err
 	}
