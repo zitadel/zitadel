@@ -29,7 +29,7 @@ Requirements:
 			masterKey, err := key.MasterKey(cmd)
 			logging.OnError(err).Panic("No master key provided")
 
-			initialise.InitAll(initialise.MustNewConfig(viper.GetViper()))
+			initialise.InitAll(cmd.Context(), initialise.MustNewConfig(viper.GetViper()))
 
 			setupConfig := setup.MustNewConfig(viper.GetViper())
 			setupSteps := setup.MustNewSteps(viper.New())
@@ -37,7 +37,7 @@ Requirements:
 
 			startConfig := MustNewConfig(viper.GetViper())
 
-			err = startZitadel(startConfig, masterKey, server)
+			err = startZitadel(cmd.Context(), startConfig, masterKey, server)
 			logging.OnError(err).Fatal("unable to start zitadel")
 		},
 	}

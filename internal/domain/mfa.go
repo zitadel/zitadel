@@ -13,10 +13,6 @@ const (
 	stateCount
 )
 
-func (f MFAState) Valid() bool {
-	return f >= 0 && f < stateCount
-}
-
 type MultifactorConfigs struct {
 	OTP OTPConfig
 }

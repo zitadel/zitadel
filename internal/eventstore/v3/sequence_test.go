@@ -247,7 +247,7 @@ func Test_sequencesToSql(t *testing.T) {
 				},
 			},
 			wantConditions: []string{
-				"(instance_id = $1 AND aggregate_type = $2 AND aggregate_id = $3)",
+				`(SELECT instance_id, aggregate_type, aggregate_id, "sequence" FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND aggregate_id = $3 ORDER BY "sequence" DESC LIMIT 1)`,
 			},
 			wantArgs: []any{
 				"instance",
@@ -266,8 +266,8 @@ func Test_sequencesToSql(t *testing.T) {
 				},
 			},
 			wantConditions: []string{
-				"(instance_id = $1 AND aggregate_type = $2 AND aggregate_id = $3)",
-				"(instance_id = $4 AND aggregate_type = $5 AND aggregate_id = $6)",
+				`(SELECT instance_id, aggregate_type, aggregate_id, "sequence" FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 AND aggregate_id = $3 ORDER BY "sequence" DESC LIMIT 1)`,
+				`(SELECT instance_id, aggregate_type, aggregate_id, "sequence" FROM eventstore.events2 WHERE instance_id = $4 AND aggregate_type = $5 AND aggregate_id = $6 ORDER BY "sequence" DESC LIMIT 1)`,
 			},
 			wantArgs: []any{
 				"instance",
