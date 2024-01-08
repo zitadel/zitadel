@@ -69,8 +69,8 @@ export class ProviderSamlSpComponent {
         this.serviceType === PolicyComponentServiceType.ADMIN
           ? ['iam.idp.write']
           : this.serviceType === PolicyComponentServiceType.MGMT
-          ? ['org.idp.write']
-          : [],
+            ? ['org.idp.write']
+            : [],
       )
       .pipe(take(1))
       .subscribe((allowed) => {
