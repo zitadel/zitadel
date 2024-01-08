@@ -134,8 +134,8 @@ export class LoginTextsComponent implements OnInit, OnDestroy {
     this.serviceType === PolicyComponentServiceType.ADMIN
       ? 'iam.policy.write'
       : this.serviceType === PolicyComponentServiceType.MGMT
-      ? 'policy.write'
-      : '',
+        ? 'policy.write'
+        : '',
   ]);
   constructor(
     private authService: GrpcAuthService,
