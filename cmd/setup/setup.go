@@ -126,6 +126,10 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 			es:      eventstoreClient,
 			Version: build.Version(),
 		},
+		&runProjections{
+			es:      eventstoreClient,
+			Version: build.Version(),
+		},
 	}
 
 	err = migration.Migrate(ctx, eventstoreClient, steps.s14NewEventsTable)

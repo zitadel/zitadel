@@ -76,6 +76,7 @@ var (
 type projection interface {
 	Start(ctx context.Context)
 	Init(ctx context.Context) error
+	Trigger(ctx context.Context, opts ...handler.TriggerOpt) (_ context.Context, err error)
 }
 
 var (

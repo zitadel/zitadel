@@ -238,15 +238,15 @@ type triggerConfig struct {
 	awaitRunning bool
 }
 
-type triggerOpt func(conf *triggerConfig)
+type TriggerOpt func(conf *triggerConfig)
 
-func WithAwaitRunning() triggerOpt {
+func WithAwaitRunning() TriggerOpt {
 	return func(conf *triggerConfig) {
 		conf.awaitRunning = true
 	}
 }
 
-func (h *Handler) Trigger(ctx context.Context, opts ...triggerOpt) (_ context.Context, err error) {
+func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Context, err error) {
 	config := new(triggerConfig)
 	for _, opt := range opts {
 		opt(config)

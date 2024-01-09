@@ -38,6 +38,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 	}
 
 	auth_handler.Register(ctx, conf.Spooler, view, queries)
+	auth_handler.Start(ctx)
 
 	authReq := cache.Start(dbClient)
 
