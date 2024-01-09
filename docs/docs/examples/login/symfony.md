@@ -12,9 +12,9 @@ By the end of this guide, your application will have login functionality with ba
 
 ## Set up application and obtain keys
 
-![Create app in console](/img/angular/app-create.png)
-![Configure app authentication method in console](/img/angular/app-auth-method.png)
-![Configure app redirects console](/img/angular/app-redirects.png)
+![Create app in console](/img/symfony/app-create.png)
+![Configure app authentication method in console](/img/symfony/app-auth-method.png)
+![Configure app redirects console](/img/symfony/app-redirects.png)
 
 
 ## Symfony setup
