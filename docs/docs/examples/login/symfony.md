@@ -6,16 +6,66 @@ sidebar_label: Symfony
 This integration guide demonstrates the recommended way to incorporate ZITADEL into your Symfony PHP application. 
 It explains how to enable user login in your application and how to fetch data from the user info endpoint.
 
-By the end of this guide, your application will have login functionality with basic role mapping and will be able to access the current user's profile.
+By the end of this guide, your application will have login functionality with basic role mapping, access the current user's profile and a user list accessible by admins.
 
 > This documentation references our [example](https://github.com/zitadel/example-symfony-oidc) on GitHub.
 
-## Set up application and obtain keys
+## ZITADEL setup
+
+Before we can start building our application, we have to do a few configuration steps in ZITADEL Console.
+
+### Project roles
+
+The Example expects [user roles](guides/integrate/retrieve-user-roles) to be returned after login.
+Symfony uses `ROLE_USER` format.
+The application will take care of upper-casing and prefixing for us.
+Inside ZITADEL you can user regular lower-case role names without prefix if you prefer.
+
+> Symfony automatically assigns `ROLE_USER` to any authenticated user.
+
+In your project settings make sure the "Assert Roles On Authentication" is enabled.
+
+![Project settings in console](/img/symfony/project-settings.png)
+
+In the project Role tab, add 2 special roles:
+
+ - `admin`: Assigned to users that need access to the user list.
+ - `foo`: Random role for display purposes
+
+A `user` role is not required. This role is assumed by default for any authenticated user in Symfony.
+
+![Project roles in console](/img/symfony/project-roles.png)
+
+Finally we can assign the roles to users in the project's authorizations tab.
+
+![Project authorizations in console](/img/symfony/project-authorizations.png)
+
+### Set up application and obtain secrets
+
+Next you will need to provide some information about your app.
+
+In your Project, add a new application at the top of the page.
+Select Web application type and continue.
+We use [Authorization Code](/apis/openidoauth/grant-types#authorization-code)for our Symfony application.
 
 ![Create app in console](/img/symfony/app-create.png)
+
+Select `CODE` in the next step. This makes sure you still get a secret. Note that the secret never gets exposed on the browser and is therefore kept in a confidential environment. Safe the generated 
+
 ![Configure app authentication method in console](/img/symfony/app-auth-method.png)
+
+With the Redirect URIs field, you tell ZITADEL where it is allowed to redirect users to after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
+
+For the example application we are writing use:
+
+- `http://localhost:8000/login_check` as Redirect URI
+- `http://localhost:8000/logout` as post-logout URI.
+
 ![Configure app redirects console](/img/symfony/app-redirects.png)
 
+After the final step you are presented with a client ID and secret.
+Copy and paste them to a safe location for later use by the application.
+The secret will not be displayed again, but you can regenerate one if you loose it.
 
 ## Symfony setup
 
@@ -90,6 +140,20 @@ php bin/console make:entity
 
  Field length [255]:
  > 255
+
+ Can this field be null in the database (nullable) (yes/no) [no]:
+ > yes
+
+ updated: src/Entity/User.php
+
+ Add another property? Enter the property name (or press <return> to stop adding fields):
+ > full_name
+
+ Field type (enter ? to see all types) [string]:
+ > string
+
+ Field length [255]:
+ > 
 
  Can this field be null in the database (nullable) (yes/no) [no]:
  > yes
@@ -311,8 +375,24 @@ https://github.com/zitadel/example-symfony-oidc/blob/main/config/routes.yaml#L6-
 
 ### Run
 
-Now we can use a local Symfony server to test the application.
+You can use a local Symfony server to test the application.
 
 ```bash
 symfony server:start --no-tls
 ```
+
+Visit http://localhost:8000 and click around.
+When you go to profile you will be redirected to login your user on ZITADEL.
+After login you should see some profile data of the current user.
+Upon clicking logout you are redirected to the homepage.
+Now you can click "users" and login with an account that has the admin role.
+
+## Completion
+
+Congratulations! You have successfully integrated your Symfony application with ZITADEL!
+
+If you get stuck, consider checking out our [example](https://github.com/zitadel/example-symfony-oidc) application. This application includes all the functionalities mentioned in this quick-start. You can start by cloning the repository and defining a `.env.local` with your settings. If you face issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/example-symfony-oidc/issues).
+
+### What's next?
+
+Now that you have enabled authentication, it's time for you to add more authorizations to your application using ZITADEL APIs. To do this, you can refer to the [docs](/apis/introduction) or check out the ZITADEL Console code on [GitHub](https://github.com/zitadel/zitadel) which uses gRPC and OpenAPI to access data.
