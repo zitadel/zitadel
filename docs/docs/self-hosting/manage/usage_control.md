@@ -12,7 +12,7 @@ The usage control features are currently limited to the instance level only.
 You can block an instance using the [system API](/category/apis/resources/system/limits).
 
 Most requests to a blocked instance are rejected with the HTTP status 429 or the gRPC status 8.
-However, requests to the [system API](/category/apis/resources/system) are still allowed.
+However, requests to the [system API](/apis/introduction#system) are still allowed.
 Requests to paths with the prefix /ui/login return a Permanent Redirect to /ui/console, where the user is guided to InstanceManagementURL.
 Blocked HTTP requests additionally set a cookie to make it easy to block traffic before it reaches your ZITADEL runtime, for example with a WAF rule.
 
@@ -127,7 +127,7 @@ DefaultInstance:
 
 ### Exhausted Authenticated Requests
 
-If a quota is configured to limit requests and the quotas amount is exhausted, all further authenticated requests are blocked except requests to the System API.
+If a quota is configured to limit requests and the quotas amount is exhausted, all further authenticated requests are blocked except requests to the [system API](/apis/introduction#system).
 Also, a cookie is set, to make it easier to block further traffic before it reaches your ZITADEL runtime, for example with a WAF rule.
 The console is still served, but it only shows a dialog that says that the instance is blocked with a link to *InstanceManagementURL*.
 
