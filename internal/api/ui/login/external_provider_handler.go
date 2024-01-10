@@ -270,7 +270,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			l.externalAuthFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &azuread.Session{Session: &oauth.Session{Provider: provider.(*azuread.Provider).Provider, Code: data.Code}}
+		session = &azuread.Session{Provider: provider.(*azuread.Provider), Code: data.Code}
 	case domain.IDPTypeGitHub:
 		provider, err = l.githubProvider(r.Context(), identityProvider)
 		if err != nil {
@@ -1132,7 +1132,7 @@ func tokens(session idp.Session) *oidc.Tokens[*oidc.IDTokenClaims] {
 	case *oauth.Session:
 		return s.Tokens
 	case *azuread.Session:
-		return s.Tokens
+		return s.Tokens()
 	case *apple.Session:
 		return s.Tokens
 	}
