@@ -17,9 +17,6 @@ const (
 func (v *View) UserSessionByIDs(agentID, userID, instanceID string) (*model.UserSessionView, error) {
 	return view.UserSessionByIDs(v.Db, userSessionTable, agentID, userID, instanceID)
 }
-func (v *View) UserSessionByIDsTx(agentID, userID, instanceID string) (*model.UserSessionView, error) {
-	return view.UserSessionByIDs(v.Db, userSessionTable, agentID, userID, instanceID)
-}
 
 func (v *View) UserSessionsByUserID(userID, instanceID string) ([]*model.UserSessionView, error) {
 	return view.UserSessionsByUserID(v.Db, userSessionTable, userID, instanceID)
