@@ -29,6 +29,7 @@ func PrepareGetByQuery(table string, queries ...SearchQuery) func(db *gorm.DB, r
 			if err := tx.Commit().Error; err != nil {
 				logging.OnError(err).Info("commit failed")
 			}
+			tx.RollbackUnlessCommitted()
 		}()
 
 		err := tx.Take(res).Error
@@ -47,6 +48,7 @@ func PrepareBulkSave(table string) func(db *gorm.DB, objects ...interface{}) err
 	return func(db *gorm.DB, objects ...interface{}) error {
 		db = db.Table(table)
 		db = db.Begin()
+		defer db.RollbackUnlessCommitted()
 		if err := db.Error; err != nil {
 			return caos_errs.ThrowInternal(err, "REPOS-Fl0Is", "unable to begin")
 		}
