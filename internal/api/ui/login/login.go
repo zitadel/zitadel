@@ -123,11 +123,16 @@ func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecu
 				handler.ServeHTTP(w, r)
 				return
 			}
+			// by default we use SameSite Lax and the externalSecure (TLS) for the secure flag
 			sameSiteMode := csrf.SameSiteLaxMode
 			secureOnly := externalSecure
 			instance := authz.GetInstance(r.Context())
+			// in case of `allow iframe`...
 			if len(instance.SecurityPolicyAllowedOrigins()) > 0 {
+				// ... we need to change to SameSite none ...
 				sameSiteMode = csrf.SameSiteNoneMode
+				// ... and since SameSite none requires the secure flag, we'll set it for TLS and for localhost
+				// (regardless of the TLS / externalSecure settings)
 				secureOnly = externalSecure || instance.RequestedDomain() == "localhost"
 			}
 			csrf.Protect(csrfCookieKey,

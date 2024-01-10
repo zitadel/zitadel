@@ -140,6 +140,8 @@ remove the X-Frame-Options header and change the SameSite to `None`.
 
 :::note
 Please note, that SameSite None requires the cookie to be flagged `secure`, which means it must be sent over TLS (HTTPS) or localhost.
+This also means that domain other than localhost must use TLS for this option to work.
+This is due to browser restrictions: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#none
 :::
 
 ### Disable Multi-factor (MFA) Prompt
