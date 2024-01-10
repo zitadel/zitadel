@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 )
 
-// Session extends the [oauth.Session] to extend it with the [idp.SessionSupportsMigration] functionality
+// Session extends the [oauth.Session] to be able to handle the id_token and to implement the [idp.SessionSupportsMigration] functionality
 type Session struct {
 	*Provider
 	Code string
@@ -20,6 +20,7 @@ type Session struct {
 	OAuthSession *oauth.Session
 }
 
+// GetAuth implements the [idp.Provider] interface by calling the wrapped [oauth.Session].
 func (s *Session) GetAuth(ctx context.Context) (content string, redirect bool) {
 	return s.oauth().GetAuth(ctx)
 }
@@ -41,12 +42,16 @@ func (s *Session) RetrievePreviousID() (string, error) {
 // FetchUser implements the [idp.Session] interface.
 // It will execute an OAuth 2.0 code exchange if needed to retrieve the access token,
 // call the specified userEndpoint and map the received information into an [idp.User].
+// In case of a specific TenantID as [TenantType] it will additionally extract the id_token and validate it.
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	user, err = s.oauth().FetchUser(ctx)
 	if err != nil {
 		return nil, err
 	}
-	// since azure will sign the
+	// since azure will sign the id_token always with the issuer of the application it might differ from
+	// the issuer the auth and token were based on, e.g. when allowing all account types to login,
+	// then the auth endpoint must be `https://login.microsoftonline.com/common/oauth2/v2.0/authorize`
+	// even though the issuer would be like `https://login.microsoftonline.com/d8cdd43f-fd94-4576-8deb-f3bfea72dc2e/v2.0`
 	if s.Provider.tenant == CommonTenant ||
 		s.Provider.tenant == OrganizationsTenant ||
 		s.Provider.tenant == ConsumersTenant {
@@ -65,6 +70,11 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	return user, nil
 }
 
+// Tokens returns the [oidc.Tokens] of the underlying [oauth.Session].
+func (s *Session) Tokens() *oidc.Tokens[*oidc.IDTokenClaims] {
+	return s.oauth().Tokens
+}
+
 func (s *Session) oauth() *oauth.Session {
 	if s.OAuthSession != nil {
 		return s.OAuthSession
@@ -74,8 +84,4 @@ func (s *Session) oauth() *oauth.Session {
 		Provider: s.Provider.Provider,
 	}
 	return s.OAuthSession
-}
-
-func (s *Session) Tokens() *oidc.Tokens[*oidc.IDTokenClaims] {
-	return s.oauth().Tokens
 }

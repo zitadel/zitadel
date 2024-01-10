@@ -52,10 +52,12 @@ type Provider struct {
 	options       []oauth.ProviderOpts
 }
 
+// issuer returns the OIDC issuer based on the [TenantType]
 func (p *Provider) issuer() string {
 	return fmt.Sprintf(issuerTemplate, p.tenant)
 }
 
+// keysEndpoint returns the OIDC jwks_url based on the [TenantType]
 func (p *Provider) keysEndpoint() string {
 	return fmt.Sprintf(keysURLTemplate, p.tenant)
 }
