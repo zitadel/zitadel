@@ -118,6 +118,22 @@ func PutUserSessions(db *gorm.DB, table string, sessions ...*model.UserSessionVi
 	return save(db, s...)
 }
 
+func UpdateUserSessionsByUser(db *gorm.DB, table string, instanceID, userID string, attributes map[repository.ColumnKey]any) error {
+	update := repository.PrepareUpdate(
+		table,
+		attributes,
+		repository.Key{
+			Key:   model.UserSessionSearchKey(usr_model.UserSessionSearchKeyInstanceID),
+			Value: instanceID,
+		},
+		repository.Key{
+			Key:   model.UserSessionSearchKey(usr_model.UserSessionSearchKeyUserID),
+			Value: userID,
+		},
+	)
+	return update(db)
+}
+
 func DeleteUserSessions(db *gorm.DB, table, userID, instanceID string) error {
 	delete := repository.PrepareDeleteByKeys(table,
 		repository.Key{Key: model.UserSessionSearchKey(usr_model.UserSessionSearchKeyUserID), Value: userID},

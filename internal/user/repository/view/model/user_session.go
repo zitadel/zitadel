@@ -190,14 +190,6 @@ func (v *UserSessionView) AppendEvent(event eventstore.Event) error {
 	case user.UserIDPLinkRemovedType, user.UserIDPLinkCascadeRemovedType:
 		v.ExternalLoginVerification = time.Time{}
 		v.SelectedIDPConfigID = ""
-	case user.HumanAvatarAddedType:
-		key, err := avatarKeyFromEvent(event)
-		if err != nil {
-			return err
-		}
-		v.AvatarKey = key
-	case user.HumanAvatarRemovedType:
-		v.AvatarKey = ""
 	}
 	return nil
 }

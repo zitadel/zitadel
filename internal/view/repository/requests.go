@@ -100,17 +100,27 @@ func PrepareDeleteByKey(table string, key ColumnKey, id interface{}) func(db *go
 	}
 }
 
-func PrepareUpdateByKeys(table string, column ColumnKey, value interface{}, keys ...Key) func(db *gorm.DB) error {
+func PrepareUpdateByKeys(table string, column ColumnKey, value interface{}, clauses ...Key) func(db *gorm.DB) error {
+	return PrepareUpdate(table,
+		map[ColumnKey]any{
+			column: value,
+		},
+		clauses...)
+}
+
+func PrepareUpdate(table string, attributes map[ColumnKey]any, clauses ...Key) func(db *gorm.DB) error {
+	attrs := make(map[string]any, len(attributes))
+	for column, value := range attributes {
+		attrs[column.ToColumnName()] = value
+	}
 	return func(db *gorm.DB) error {
-		for _, key := range keys {
+		for _, key := range clauses {
 			db = db.Table(table).
 				Where(fmt.Sprintf("%s = ?", key.Key.ToColumnName()), key.Value)
 		}
-		err := db.
-			Update(column.ToColumnName(), value).
-			Error
+		err := db.Update(attrs).Error
 		if err != nil {
-			return zerrors.ThrowInternal(err, "VIEW-ps099xj", "could not update object")
+			return zerrors.ThrowInternal(err, "VIEW-6KL2z", "could not update object")
 		}
 		return nil
 	}

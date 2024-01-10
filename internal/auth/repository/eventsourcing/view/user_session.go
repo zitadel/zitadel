@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -40,6 +41,10 @@ func (v *View) PutUserSession(userSession *model.UserSessionView) error {
 
 func (v *View) PutUserSessions(userSession []*model.UserSessionView) error {
 	return view.PutUserSessions(v.Db, userSessionTable, userSession...)
+}
+
+func (v *View) UpdateUserSessions(instanceID, userID string, attributes map[repository.ColumnKey]any) error {
+	return view.UpdateUserSessionsByUser(v.Db, userSessionTable, instanceID, userID, attributes)
 }
 
 func (v *View) DeleteUserSessions(userID, instanceID string) error {

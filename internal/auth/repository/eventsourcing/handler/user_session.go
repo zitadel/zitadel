@@ -129,10 +129,6 @@ func (s *UserSession) Reducers() []handler.AggregateReducer {
 					Reduce: s.Reduce,
 				},
 				{
-					Event:  user.UserV1ProfileChangedType,
-					Reduce: s.Reduce,
-				},
-				{
 					Event:  user.UserLockedType,
 					Reduce: s.Reduce,
 				},
@@ -146,26 +142,6 @@ func (s *UserSession) Reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  user.HumanMFAOTPRemovedType,
-					Reduce: s.Reduce,
-				},
-				{
-					Event:  user.HumanProfileChangedType,
-					Reduce: s.Reduce,
-				},
-				{
-					Event:  user.HumanAvatarAddedType,
-					Reduce: s.Reduce,
-				},
-				{
-					Event:  user.HumanAvatarRemovedType,
-					Reduce: s.Reduce,
-				},
-				{
-					Event:  user.UserDomainClaimedType,
-					Reduce: s.Reduce,
-				},
-				{
-					Event:  user.UserUserNameChangedType,
 					Reduce: s.Reduce,
 				},
 				{
@@ -193,10 +169,6 @@ func (s *UserSession) Reducers() []handler.AggregateReducer {
 		{
 			Aggregate: org.AggregateType,
 			EventReducers: []handler.EventReducer{
-				{
-					Event:  org.OrgDomainPrimarySetEventType,
-					Reduce: s.Reduce,
-				},
 				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: s.Reduce,
@@ -254,18 +226,12 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 				}
 			}
 			return u.updateSession(session, event)
+		case user.UserLockedType,
+			user.UserDeactivatedType:
 		case user.UserV1PasswordChangedType,
 			user.UserV1MFAOTPRemovedType,
-			user.UserV1ProfileChangedType,
-			user.UserLockedType,
-			user.UserDeactivatedType,
 			user.HumanPasswordChangedType,
 			user.HumanMFAOTPRemovedType,
-			user.HumanProfileChangedType,
-			user.HumanAvatarAddedType,
-			user.HumanAvatarRemovedType,
-			user.UserDomainClaimedType,
-			user.UserUserNameChangedType,
 			user.UserIDPLinkRemovedType,
 			user.UserIDPLinkCascadeRemovedType,
 			user.HumanPasswordlessTokenRemovedType,
@@ -281,8 +247,6 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 				return err
 			}
 			return nil
-		case org.OrgDomainPrimarySetEventType:
-			return u.fillLoginNamesOnOrgUsers(event)
 		case user.UserRemovedType:
 			return u.view.DeleteUserSessions(event.Aggregate().ID, event.Aggregate().InstanceID)
 		case instance.InstanceRemovedEventType:
@@ -324,88 +288,5 @@ func (u *UserSession) updateSession(session *view_model.UserSessionView, event e
 	if err := session.AppendEvent(event); err != nil {
 		return err
 	}
-	if err := u.fillUserInfo(session, u.view.UserByID); err != nil {
-		return err
-	}
-	if err := u.view.PutUserSession(session); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (u *UserSession) fillUserInfo(session *view_model.UserSessionView, getUserByID func(userID, instanceID string) (*view_model.UserView, error)) error {
-	user, err := getUserByID(session.UserID, session.InstanceID)
-	if err != nil {
-		return err
-	}
-	session.UserName = user.UserName
-	session.LoginName = user.PreferredLoginName
-	session.DisplayName = user.DisplayName
-	session.AvatarKey = user.AvatarKey
-	return nil
-}
-
-func (u *UserSession) fillLoginNamesOnOrgUsers(event eventstore.Event) error {
-	sessions, err := u.view.UserSessionsByOrgID(event.Aggregate().ResourceOwner, event.Aggregate().InstanceID)
-	if err != nil {
-		return err
-	}
-	if len(sessions) == 0 {
-		return nil
-	}
-	userLoginMustBeDomain, primaryDomain, err := u.loginNameInformation(context.Background(), event.Aggregate().ResourceOwner, event.Aggregate().InstanceID)
-	if err != nil {
-		return err
-	}
-	if !userLoginMustBeDomain {
-		return nil
-	}
-	for _, session := range sessions {
-		session.LoginName = session.UserName + "@" + primaryDomain
-	}
-	return u.view.PutUserSessions(sessions)
-}
-
-func (u *UserSession) loginNameInformation(ctx context.Context, orgID string, instanceID string) (userLoginMustBeDomain bool, primaryDomain string, err error) {
-	org, err := u.getOrgByID(ctx, orgID, instanceID)
-	if err != nil {
-		return false, "", err
-	}
-	primaryDomain, err = org.GetPrimaryDomain()
-	if err != nil {
-		return false, "", err
-	}
-	if org.DomainPolicy != nil {
-		return org.DomainPolicy.UserLoginMustBeDomain, primaryDomain, nil
-	}
-	policy, err := u.queries.DefaultDomainPolicy(authz.WithInstanceID(ctx, org.InstanceID))
-	if err != nil {
-		return false, "", err
-	}
-	return policy.UserLoginMustBeDomain, primaryDomain, nil
-}
-
-func (u *UserSession) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_model.Org, error) {
-	query, err := org_view.OrgByIDQuery(orgID, instanceID, 0)
-	if err != nil {
-		return nil, err
-	}
-
-	esOrg := &org_es_model.Org{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: orgID,
-		},
-	}
-	events, err := u.es.Filter(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	if err = esOrg.AppendEvents(events...); err != nil {
-		return nil, err
-	}
-
-	if esOrg.Sequence == 0 {
-		return nil, zerrors.ThrowNotFound(nil, "EVENT-3m9vs", "Errors.Org.NotFound")
-	}
-	return org_es_model.OrgToModel(esOrg), nil
+	return u.view.PutUserSession(session)
 }
