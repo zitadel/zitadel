@@ -57,6 +57,7 @@ func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, r
 			if err := query.Commit().Error; err != nil {
 				logging.OnError(err).Info("commit failed")
 			}
+			query.RollbackUnlessCommitted()
 		}()
 
 		query = query.Count(&count)
