@@ -137,6 +137,8 @@ func (u *Users) RemoveNoPermission(ctx context.Context, permissionCheck domain.P
 		u.Users = removeUser(u.Users, removeIndex-removed)
 		removed++
 	}
+	// reset count as some users could be removed
+	u.SearchResponse.Count = uint64(len(u.Users))
 }
 
 func removeUser(slice []*User, s int) []*User {

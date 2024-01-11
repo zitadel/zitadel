@@ -162,7 +162,7 @@ type userAttr struct {
 
 func TestServer_ListUsers(t *testing.T) {
 	orgResp := Tester.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
-	//userResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listusers.com", time.Now().UnixNano()))
+	userResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listusers.com", time.Now().UnixNano()))
 	type args struct {
 		ctx   context.Context
 		count int
@@ -175,7 +175,6 @@ func TestServer_ListUsers(t *testing.T) {
 		want    *user.ListUsersResponse
 		wantErr bool
 	}{
-		/* commented as permission don't work as expected
 		{
 			name: "list user by id, no permission",
 			args: args{
@@ -196,7 +195,6 @@ func TestServer_ListUsers(t *testing.T) {
 				Result:        []*user.User{},
 			},
 		},
-		*/
 		{
 			name: "list user by id, ok",
 			args: args{
