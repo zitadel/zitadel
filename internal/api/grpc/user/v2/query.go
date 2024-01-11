@@ -31,12 +31,12 @@ func (s *Server) GetUserByID(ctx context.Context, req *user.GetUserByIDRequest) 
 			EventDate:     resp.ChangeDate,
 			ResourceOwner: resp.ResourceOwner,
 		}),
-		User: UserToPb(resp, s.assetAPIPrefix(ctx)),
+		User: userToPb(resp, s.assetAPIPrefix(ctx)),
 	}, nil
 }
 
 func (s *Server) ListUsers(ctx context.Context, req *user.ListUsersRequest) (*user.ListUsersResponse, error) {
-	queries, err := ListUsersRequestToModel(req)
+	queries, err := listUsersRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
@@ -54,37 +54,37 @@ func (s *Server) ListUsers(ctx context.Context, req *user.ListUsersRequest) (*us
 func UsersToPb(users []*query.User, assetPrefix string) []*user.User {
 	u := make([]*user.User, len(users))
 	for i, user := range users {
-		u[i] = UserToPb(user, assetPrefix)
+		u[i] = userToPb(user, assetPrefix)
 	}
 	return u
 }
 
-func UserToPb(userQ *query.User, assetPrefix string) *user.User {
+func userToPb(userQ *query.User, assetPrefix string) *user.User {
 	return &user.User{
 		UserId:             userQ.ID,
-		State:              UserStateToPb(userQ.State),
+		State:              userStateToPb(userQ.State),
 		Username:           userQ.Username,
 		LoginNames:         userQ.LoginNames,
 		PreferredLoginName: userQ.PreferredLoginName,
-		Type:               UserTypeToPb(userQ, assetPrefix),
+		Type:               userTypeToPb(userQ, assetPrefix),
 	}
 }
 
-func UserTypeToPb(userQ *query.User, assetPrefix string) user.UserType {
+func userTypeToPb(userQ *query.User, assetPrefix string) user.UserType {
 	if userQ.Human != nil {
 		return &user.User_Human{
-			Human: HumanToPb(userQ.Human, assetPrefix, userQ.ResourceOwner),
+			Human: humanToPb(userQ.Human, assetPrefix, userQ.ResourceOwner),
 		}
 	}
 	if userQ.Machine != nil {
 		return &user.User_Machine{
-			Machine: MachineToPb(userQ.Machine),
+			Machine: machineToPb(userQ.Machine),
 		}
 	}
 	return nil
 }
 
-func HumanToPb(userQ *query.Human, assetPrefix, owner string) *user.HumanUser {
+func humanToPb(userQ *query.Human, assetPrefix, owner string) *user.HumanUser {
 	return &user.HumanUser{
 		Profile: &user.HumanProfile{
 			GivenName:         userQ.FirstName,
@@ -92,7 +92,7 @@ func HumanToPb(userQ *query.Human, assetPrefix, owner string) *user.HumanUser {
 			NickName:          gu.Ptr(userQ.NickName),
 			DisplayName:       gu.Ptr(userQ.DisplayName),
 			PreferredLanguage: gu.Ptr(userQ.PreferredLanguage.String()),
-			Gender:            gu.Ptr(GenderToPb(userQ.Gender)),
+			Gender:            gu.Ptr(genderToPb(userQ.Gender)),
 			AvatarUrl:         domain.AvatarURL(assetPrefix, owner, userQ.AvatarKey),
 		},
 		Email: &user.HumanEmail{
@@ -106,16 +106,16 @@ func HumanToPb(userQ *query.Human, assetPrefix, owner string) *user.HumanUser {
 	}
 }
 
-func MachineToPb(userQ *query.Machine) *user.MachineUser {
+func machineToPb(userQ *query.Machine) *user.MachineUser {
 	return &user.MachineUser{
 		Name:            userQ.Name,
 		Description:     userQ.Description,
 		HasSecret:       userQ.Secret != nil,
-		AccessTokenType: AccessTokenTypeToPb(userQ.AccessTokenType),
+		AccessTokenType: accessTokenTypeToPb(userQ.AccessTokenType),
 	}
 }
 
-func UserStateToPb(state domain.UserState) user.UserState {
+func userStateToPb(state domain.UserState) user.UserState {
 	switch state {
 	case domain.UserStateActive:
 		return user.UserState_USER_STATE_ACTIVE
@@ -136,7 +136,7 @@ func UserStateToPb(state domain.UserState) user.UserState {
 	}
 }
 
-func GenderToPb(gender domain.Gender) user.Gender {
+func genderToPb(gender domain.Gender) user.Gender {
 	switch gender {
 	case domain.GenderDiverse:
 		return user.Gender_GENDER_DIVERSE
@@ -151,7 +151,7 @@ func GenderToPb(gender domain.Gender) user.Gender {
 	}
 }
 
-func AccessTokenTypeToPb(accessTokenType domain.OIDCTokenType) user.AccessTokenType {
+func accessTokenTypeToPb(accessTokenType domain.OIDCTokenType) user.AccessTokenType {
 	switch accessTokenType {
 	case domain.OIDCTokenTypeBearer:
 		return user.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER
@@ -162,9 +162,9 @@ func AccessTokenTypeToPb(accessTokenType domain.OIDCTokenType) user.AccessTokenT
 	}
 }
 
-func ListUsersRequestToModel(req *user.ListUsersRequest) (*query.UserSearchQueries, error) {
+func listUsersRequestToModel(req *user.ListUsersRequest) (*query.UserSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToQuery(req.Query)
-	queries, err := UserQueriesToQuery(req.Queries, 0 /*start from level 0*/)
+	queries, err := userQueriesToQuery(req.Queries, 0 /*start from level 0*/)
 	if err != nil {
 		return nil, err
 	}
@@ -173,13 +173,13 @@ func ListUsersRequestToModel(req *user.ListUsersRequest) (*query.UserSearchQueri
 			Offset:        offset,
 			Limit:         limit,
 			Asc:           asc,
-			SortingColumn: UserFieldNameToSortingColumn(req.SortingColumn),
+			SortingColumn: userFieldNameToSortingColumn(req.SortingColumn),
 		},
 		Queries: queries,
 	}, nil
 }
 
-func UserFieldNameToSortingColumn(field user.UserFieldName) query.Column {
+func userFieldNameToSortingColumn(field user.UserFieldName) query.Column {
 	switch field {
 	case user.UserFieldName_USER_FIELD_NAME_EMAIL:
 		return query.HumanEmailCol
@@ -206,10 +206,10 @@ func UserFieldNameToSortingColumn(field user.UserFieldName) query.Column {
 	}
 }
 
-func UserQueriesToQuery(queries []*user.SearchQuery, level uint8) (_ []query.SearchQuery, err error) {
+func userQueriesToQuery(queries []*user.SearchQuery, level uint8) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
-		q[i], err = UserQueryToQuery(query, level)
+		q[i], err = userQueryToQuery(query, level)
 		if err != nil {
 			return nil, err
 		}
@@ -217,112 +217,112 @@ func UserQueriesToQuery(queries []*user.SearchQuery, level uint8) (_ []query.Sea
 	return q, nil
 }
 
-func UserQueryToQuery(query *user.SearchQuery, level uint8) (query.SearchQuery, error) {
+func userQueryToQuery(query *user.SearchQuery, level uint8) (query.SearchQuery, error) {
 	if level > 20 {
 		// can't go deeper than 20 levels of nesting.
 		return nil, zerrors.ThrowInvalidArgument(nil, "USER-zsQ97", "Errors.User.TooManyNestingLevels")
 	}
 	switch q := query.Query.(type) {
 	case *user.SearchQuery_UserNameQuery:
-		return UserNameQueryToQuery(q.UserNameQuery)
+		return userNameQueryToQuery(q.UserNameQuery)
 	case *user.SearchQuery_FirstNameQuery:
-		return FirstNameQueryToQuery(q.FirstNameQuery)
+		return firstNameQueryToQuery(q.FirstNameQuery)
 	case *user.SearchQuery_LastNameQuery:
-		return LastNameQueryToQuery(q.LastNameQuery)
+		return lastNameQueryToQuery(q.LastNameQuery)
 	case *user.SearchQuery_NickNameQuery:
-		return NickNameQueryToQuery(q.NickNameQuery)
+		return nickNameQueryToQuery(q.NickNameQuery)
 	case *user.SearchQuery_DisplayNameQuery:
-		return DisplayNameQueryToQuery(q.DisplayNameQuery)
+		return displayNameQueryToQuery(q.DisplayNameQuery)
 	case *user.SearchQuery_EmailQuery:
-		return EmailQueryToQuery(q.EmailQuery)
+		return emailQueryToQuery(q.EmailQuery)
 	case *user.SearchQuery_StateQuery:
-		return StateQueryToQuery(q.StateQuery)
+		return stateQueryToQuery(q.StateQuery)
 	case *user.SearchQuery_TypeQuery:
-		return TypeQueryToQuery(q.TypeQuery)
+		return typeQueryToQuery(q.TypeQuery)
 	case *user.SearchQuery_LoginNameQuery:
-		return LoginNameQueryToQuery(q.LoginNameQuery)
+		return loginNameQueryToQuery(q.LoginNameQuery)
 	case *user.SearchQuery_ResourceOwner:
-		return ResourceOwnerQueryToQuery(q.ResourceOwner)
+		return resourceOwnerQueryToQuery(q.ResourceOwner)
 	case *user.SearchQuery_InUserIdsQuery:
-		return InUserIdsQueryToQuery(q.InUserIdsQuery)
+		return inUserIdsQueryToQuery(q.InUserIdsQuery)
 	case *user.SearchQuery_OrQuery:
-		return OrQueryToQuery(q.OrQuery, level)
+		return orQueryToQuery(q.OrQuery, level)
 	case *user.SearchQuery_AndQuery:
-		return AndQueryToQuery(q.AndQuery, level)
+		return andQueryToQuery(q.AndQuery, level)
 	case *user.SearchQuery_NotQuery:
-		return NotQueryToQuery(q.NotQuery, level)
+		return notQueryToQuery(q.NotQuery, level)
 	case *user.SearchQuery_InUserEmailsQuery:
-		return InUserEmailsQueryToQuery(q.InUserEmailsQuery)
+		return inUserEmailsQueryToQuery(q.InUserEmailsQuery)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}
 }
 
-func UserNameQueryToQuery(q *user.UserNameQuery) (query.SearchQuery, error) {
+func userNameQueryToQuery(q *user.UserNameQuery) (query.SearchQuery, error) {
 	return query.NewUserUsernameSearchQuery(q.UserName, object.TextMethodToQuery(q.Method))
 }
 
-func FirstNameQueryToQuery(q *user.FirstNameQuery) (query.SearchQuery, error) {
+func firstNameQueryToQuery(q *user.FirstNameQuery) (query.SearchQuery, error) {
 	return query.NewUserFirstNameSearchQuery(q.FirstName, object.TextMethodToQuery(q.Method))
 }
 
-func LastNameQueryToQuery(q *user.LastNameQuery) (query.SearchQuery, error) {
+func lastNameQueryToQuery(q *user.LastNameQuery) (query.SearchQuery, error) {
 	return query.NewUserLastNameSearchQuery(q.LastName, object.TextMethodToQuery(q.Method))
 }
 
-func NickNameQueryToQuery(q *user.NickNameQuery) (query.SearchQuery, error) {
+func nickNameQueryToQuery(q *user.NickNameQuery) (query.SearchQuery, error) {
 	return query.NewUserNickNameSearchQuery(q.NickName, object.TextMethodToQuery(q.Method))
 }
 
-func DisplayNameQueryToQuery(q *user.DisplayNameQuery) (query.SearchQuery, error) {
+func displayNameQueryToQuery(q *user.DisplayNameQuery) (query.SearchQuery, error) {
 	return query.NewUserDisplayNameSearchQuery(q.DisplayName, object.TextMethodToQuery(q.Method))
 }
 
-func EmailQueryToQuery(q *user.EmailQuery) (query.SearchQuery, error) {
+func emailQueryToQuery(q *user.EmailQuery) (query.SearchQuery, error) {
 	return query.NewUserEmailSearchQuery(q.EmailAddress, object.TextMethodToQuery(q.Method))
 }
 
-func StateQueryToQuery(q *user.StateQuery) (query.SearchQuery, error) {
+func stateQueryToQuery(q *user.StateQuery) (query.SearchQuery, error) {
 	return query.NewUserStateSearchQuery(int32(q.State))
 }
 
-func TypeQueryToQuery(q *user.TypeQuery) (query.SearchQuery, error) {
+func typeQueryToQuery(q *user.TypeQuery) (query.SearchQuery, error) {
 	return query.NewUserTypeSearchQuery(int32(q.Type))
 }
 
-func LoginNameQueryToQuery(q *user.LoginNameQuery) (query.SearchQuery, error) {
+func loginNameQueryToQuery(q *user.LoginNameQuery) (query.SearchQuery, error) {
 	return query.NewUserLoginNameExistsQuery(q.LoginName, object.TextMethodToQuery(q.Method))
 }
 
-func ResourceOwnerQueryToQuery(q *user.ResourceOwnerQuery) (query.SearchQuery, error) {
+func resourceOwnerQueryToQuery(q *user.ResourceOwnerQuery) (query.SearchQuery, error) {
 	return query.NewUserResourceOwnerSearchQuery(q.OrgID, query.TextEquals)
 }
 
-func InUserIdsQueryToQuery(q *user.InUserIDQuery) (query.SearchQuery, error) {
+func inUserIdsQueryToQuery(q *user.InUserIDQuery) (query.SearchQuery, error) {
 	return query.NewUserInUserIdsSearchQuery(q.UserIds)
 }
-func OrQueryToQuery(q *user.OrQuery, level uint8) (query.SearchQuery, error) {
-	mappedQueries, err := UserQueriesToQuery(q.Queries, level+1)
+func orQueryToQuery(q *user.OrQuery, level uint8) (query.SearchQuery, error) {
+	mappedQueries, err := userQueriesToQuery(q.Queries, level+1)
 	if err != nil {
 		return nil, err
 	}
 	return query.NewUserOrSearchQuery(mappedQueries)
 }
-func AndQueryToQuery(q *user.AndQuery, level uint8) (query.SearchQuery, error) {
-	mappedQueries, err := UserQueriesToQuery(q.Queries, level+1)
+func andQueryToQuery(q *user.AndQuery, level uint8) (query.SearchQuery, error) {
+	mappedQueries, err := userQueriesToQuery(q.Queries, level+1)
 	if err != nil {
 		return nil, err
 	}
 	return query.NewUserAndSearchQuery(mappedQueries)
 }
-func NotQueryToQuery(q *user.NotQuery, level uint8) (query.SearchQuery, error) {
-	mappedQuery, err := UserQueryToQuery(q.Query, level+1)
+func notQueryToQuery(q *user.NotQuery, level uint8) (query.SearchQuery, error) {
+	mappedQuery, err := userQueryToQuery(q.Query, level+1)
 	if err != nil {
 		return nil, err
 	}
 	return query.NewUserNotSearchQuery(mappedQuery)
 }
 
-func InUserEmailsQueryToQuery(q *user.InUserEmailsQuery) (query.SearchQuery, error) {
+func inUserEmailsQueryToQuery(q *user.InUserEmailsQuery) (query.SearchQuery, error) {
 	return query.NewUserInUserEmailsSearchQuery(q.UserEmails)
 }
