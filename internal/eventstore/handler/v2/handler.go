@@ -145,6 +145,7 @@ func (h *Handler) schedule(ctx context.Context) {
 				_, err = h.Trigger(instanceCtx)
 				instanceFailed = instanceFailed || err != nil
 				h.log().WithField("instance", instance).OnError(err).Info("scheduled trigger failed")
+				time.Sleep(h.retryFailedAfter)
 				// retry if trigger failed
 				for ; err != nil; _, err = h.Trigger(instanceCtx) {
 					time.Sleep(h.retryFailedAfter)
@@ -336,7 +337,10 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 			h.log().OnError(rollbackErr).Debug("unable to rollback tx")
 			return
 		}
-		err = tx.Commit()
+		commitErr := tx.Commit()
+		if err == nil {
+			err = commitErr
+		}
 	}()
 
 	currentState, err := h.currentState(ctx, tx, config)
