@@ -11,8 +11,9 @@ module.exports = {
           type: "category",
           label: "Frontend",
           items: [
-            "examples/login/angular",
             "examples/login/react",
+            "examples/login/vue",
+            "examples/login/angular",
             "examples/login/flutter",
             "examples/login/nextjs",
             "examples/login/go",

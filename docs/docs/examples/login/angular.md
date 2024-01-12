@@ -17,7 +17,7 @@ You'll need to provide some information about your app. We recommend creating a 
 Select the **User Agent** application type and continue.
 We recommend that you use [Proof Key for Code Exchange (PKCE)](/apis/openidoauth/grant-types#proof-key-for-code-exchange) for all SPA applications.
 
-![Create app in console](/img/angular/app-create.png)
+![Create app in console](/img/app-ua/app-create.png)
 
 
 ### Redirect URIs
