@@ -1,7 +1,6 @@
 ---
 title: ZITADEL with Flutter
 sidebar_label: Flutter
-
 ---
 
 This guide demonstrates how you integrate **ZITADEL** into a Flutter app. It refers to our example on [GitHub](https://github.com/zitadel/zitadel_flutter)
@@ -68,15 +67,12 @@ Basically, there are two major points in this specification:
 2. It does not allow third party apps to open the browser for the login process,
    the app must open the login page within the embedded browser view
 
-First install [http](https://pub.dev/packages/http) a library for making HTTP calls,
-then [`flutter_web_auth_2`](https://pub.dev/packages/flutter_web_auth_2) and a secure storage to store the auth / refresh tokens [flutter_secure_storage](https://pub.dev/packages/flutter_secure_storage).
+First install [oidc](https://pub.dev/packages/oidc) and OIDC Store implementation for package:oidc [oidc_default_store](https://pub.dev/packages/oidc_default_store).
 
 To install run:
 
 ```bash
-flutter pub add http
-flutter pub add flutter_web_auth_2
-flutter pub add flutter_secure_storage
+flutter pub add oidc oidc_default_store
 ```
 
 #### Setup for Android
@@ -97,41 +93,30 @@ To reduce the commented default code, we will modify the `main.dart` file.
 First, the `MyApp` class: it remains a stateless widget:
 
 ```dart reference
-https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L14-L28
+https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L45-L79
 ```
 
 Second, the `MyHomePage` class will remain a stateful widget with
 its title, we don't change any code here.
 
 ```dart reference
-https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L30-L37
+https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L81-88
 ```
 
 What we'll change now, is the `_MyHomePageState` class to enable
-authentication via ZITADEL and remove the counter button of the starter application. We'll show the username of the authenticated user.
+authentication via ZITADEL and remove the counter button of the starter application.
 
-We define the needed elements for our state:
-
-```dart
-var _busy = false;
-var _authenticated = false;
-var _username = '';
-final storage = const FlutterSecureStorage();
-```
-
-Then the builder method, which does show the login button if you're not
-authenticated, a loading bar if the login process is going on and
-your name if you are authenticated:
+We'll show the username of the authenticated user.
 
 ```dart reference
-https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L119-L159
+https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L174-L197
 ```
 
 And finally the `_authenticate` method which calls the authorization endpoint,
 then fetches the user info and stores the tokens into the secure storage.
 
 ```dart reference
-https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L45-L117
+https://github.com/zitadel/zitadel_flutter/blob/main/lib/main.dart#L115-L132
 ```
 
 Note that we have to use our http redirect URL for web applications or otherwise use our custom scheme for Android and iOS devices.
@@ -147,19 +132,19 @@ https://github.com/zitadel/zitadel_flutter/blob/main/web/auth.html
 Now, you can run your application for iOS and Android devices with
 
 ```bash
-flutter run
+flutter run --dart-define zitadel_url=[zitadel-url] --dart-define zitadel_client_id=[zitadel-client-id]
 ```
 
 or by directly selecting your device
 
 ```bash
-flutter run -d iphone
+ flutter run -d iphone --dart-define zitadel_url=[zitadel-url] --dart-define zitadel_client_id=[zitadel-client-id]
 ```
 
 For Web make sure you run the application on your fixed port such that it matches your redirect URI in your ZITADEL application. We used 4444 as port before so the command would look like this:
 
 ```bash
-flutter run -d chrome --web-port=4444
+flutter run -d chrome --web-port=4444 --dart-define zitadel_url=[zitadel-url] --dart-define zitadel_client_id=[zitadel-client-id]
 ```
 
 Our Android and iOS Application opens ZITADEL's login within a custom tab, on Web a new tab is opened.
