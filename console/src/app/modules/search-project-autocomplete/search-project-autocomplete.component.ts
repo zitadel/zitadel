@@ -167,8 +167,8 @@ export class SearchProjectAutocompleteComponent implements OnInit, OnDestroy {
     const type = (p as Project.AsObject).id
       ? ProjectType.PROJECTTYPE_OWNED
       : (p as GrantedProject.AsObject).projectId
-      ? ProjectType.PROJECTTYPE_GRANTED
-      : ProjectType.PROJECTTYPE_OWNED;
+        ? ProjectType.PROJECTTYPE_GRANTED
+        : ProjectType.PROJECTTYPE_OWNED;
 
     this.selectionChanged.emit({
       project: p,
