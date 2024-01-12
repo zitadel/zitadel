@@ -106,7 +106,7 @@ func (q SearchQueryBuilder) GetCreationDateBefore() time.Time {
 
 // ensureInstanceID makes sure that the instance id is always set
 func (b *SearchQueryBuilder) ensureInstanceID(ctx context.Context) {
-	if b.instanceID == nil && b.instanceIDs == nil && authz.GetInstance(ctx).InstanceID() != "" {
+	if b.instanceID == nil && len(b.instanceIDs) == 0 && authz.GetInstance(ctx).InstanceID() != "" {
 		b.InstanceID(authz.GetInstance(ctx).InstanceID())
 	}
 }
