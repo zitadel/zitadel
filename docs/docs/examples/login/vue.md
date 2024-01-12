@@ -22,7 +22,7 @@ Navigate to your project, then add a new application at the top of the page.
 Select the **User Agent** application type and continue.
 We recommend that you use [Proof Key for Code Exchange (PKCE)](/apis/openidoauth/grant-types#proof-key-for-code-exchange) for all single page applications.
 
-![Create app in console](/img/app-ua/app-create.png)
+![Create app in console](/img/vue/app-create.png)
 
 ### Redirect URIs
 
@@ -41,7 +41,15 @@ Continue and create the application.
 After successful creation of the app, make sure you tick the checkbox to enable refresh tokens.
 Also copy the client ID, as you will need it to configure your Vue client.
 
-![Tick refresh token checkbox](/img/app-ua/tick-refresh-token.png)
+![Tick refresh token checkbox](/img/vue/tick-refresh-token.png)
+
+## Create a project role "admin" and assign it to your user
+
+Also note the projects resource ID, as you will need it to configure your Vue client.
+
+![Create project role "admin"](/img/vue/project-role.png)
+
+![Assign the "admin" role to your user](/img/vue/project-authz.png)
 
 ## Vue setup
 
