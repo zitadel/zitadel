@@ -1,5 +1,6 @@
 package query
 
+/*
 import (
 	"context"
 	"database/sql"
@@ -46,11 +47,11 @@ var (
 		table: limitSettingsTable,
 	}
 	LimitsColumnAuditLogRetention = Column{
-		name:  projection.LimitsColumnAuditLogRetention,
+		name:  projection.InstanceColumnAuditLogRetention,
 		table: limitSettingsTable,
 	}
 	LimitsColumnBlock = Column{
-		name:  projection.LimitsColumnBlock,
+		name:  projection.InstanceColumnBlock,
 		table: limitSettingsTable,
 	}
 )
@@ -117,3 +118,4 @@ func prepareLimitsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 			return limits, nil
 		}
 }
+*/

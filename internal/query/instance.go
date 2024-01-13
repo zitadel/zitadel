@@ -69,6 +69,14 @@ var (
 		name:  projection.InstanceColumnDefaultLanguage,
 		table: instanceTable,
 	}
+	InstanceColumnAuditLogRetention = Column{
+		name:  projection.InstanceColumnAuditLogRetention,
+		table: instanceTable,
+	}
+	InstanceColumnBlock = Column{
+		name:  projection.InstanceColumnBlock,
+		table: instanceTable,
+	}
 )
 
 type Instance struct {
@@ -78,14 +86,16 @@ type Instance struct {
 	Sequence     uint64
 	Name         string
 
-	DefaultOrgID string
-	IAMProjectID string
-	ConsoleID    string
-	ConsoleAppID string
-	DefaultLang  language.Tag
-	Domains      []*InstanceDomain
-	host         string
-	csp          csp
+	DefaultOrgID      string
+	IAMProjectID      string
+	ConsoleID         string
+	ConsoleAppID      string
+	DefaultLang       language.Tag
+	Domains           []*InstanceDomain
+	host              string
+	csp               csp
+	block             *bool
+	auditLogRetention *time.Duration
 }
 
 type csp struct {
@@ -135,6 +145,14 @@ func (i *Instance) SecurityPolicyAllowedOrigins() []string {
 		return nil
 	}
 	return i.csp.allowedOrigins
+}
+
+func (i *Instance) Block() *bool {
+	return i.block
+}
+
+func (i *Instance) AuditLogRetention() *time.Duration {
+	return i.auditLogRetention
 }
 
 type InstanceSearchQueries struct {
@@ -256,12 +274,18 @@ func prepareInstanceQuery(ctx context.Context, db prepareDatabase, host string) 
 			InstanceColumnConsoleID.identifier(),
 			InstanceColumnConsoleAppID.identifier(),
 			InstanceColumnDefaultLanguage.identifier(),
+			InstanceColumnAuditLogRetention.identifier(),
+			InstanceColumnBlock.identifier(),
 		).
 			From(instanceTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Instance, error) {
-			instance := &Instance{host: host}
-			lang := ""
+			var (
+				instance          = &Instance{host: host}
+				lang              = ""
+				auditLogRetention database.NullDuration
+				block             sql.NullBool
+			)
 			err := row.Scan(
 				&instance.ID,
 				&instance.CreationDate,
@@ -272,12 +296,20 @@ func prepareInstanceQuery(ctx context.Context, db prepareDatabase, host string) 
 				&instance.ConsoleID,
 				&instance.ConsoleAppID,
 				&lang,
+				&auditLogRetention,
+				&block,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
 					return nil, zerrors.ThrowNotFound(err, "QUERY-5m09s", "Errors.IAM.NotFound")
 				}
 				return nil, zerrors.ThrowInternal(err, "QUERY-3j9sf", "Errors.Internal")
+			}
+			if auditLogRetention.Valid {
+				instance.auditLogRetention = &auditLogRetention.Duration
+			}
+			if block.Valid {
+				instance.block = &block.Bool
 			}
 			instance.DefaultLang = language.Make(lang)
 			return instance, nil

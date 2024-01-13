@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Event struct {
@@ -44,12 +43,8 @@ func (q *Queries) SearchEvents(ctx context.Context, query *eventstore.SearchQuer
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	auditLogRetention := q.defaultAuditLogRetention
-	ctx, instanceLimits := q.limitsLoader.Load(ctx, authz.GetInstance(ctx).InstanceID())
-	if err != nil && !zerrors.IsNotFound(err) {
-		return nil, err
-	}
-	if instanceLimits.AuditLogRetention != nil {
-		auditLogRetention = *instanceLimits.AuditLogRetention
+	if instanceAuditLogRetention := authz.GetInstance(ctx).AuditLogRetention(); instanceAuditLogRetention != nil {
+		auditLogRetention = *instanceAuditLogRetention
 	}
 	if auditLogRetention != 0 {
 		query = filterAuditLogRetention(ctx, auditLogRetention, query)

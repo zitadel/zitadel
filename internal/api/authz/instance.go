@@ -2,6 +2,7 @@ package authz
 
 import (
 	"context"
+	"time"
 
 	"golang.org/x/text/language"
 )
@@ -20,6 +21,8 @@ type Instance interface {
 	DefaultLanguage() language.Tag
 	DefaultOrganisationID() string
 	SecurityPolicyAllowedOrigins() []string
+	Block() *bool
+	AuditLogRetention() *time.Duration
 }
 
 type InstanceVerifier interface {
@@ -34,6 +37,14 @@ type instance struct {
 	appID     string
 	clientID  string
 	orgID     string
+}
+
+func (i *instance) Block() *bool {
+	return nil
+}
+
+func (i *instance) AuditLogRetention() *time.Duration {
+	return nil
 }
 
 func (i *instance) InstanceID() string {

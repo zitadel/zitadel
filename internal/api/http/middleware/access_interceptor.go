@@ -13,7 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/api/limits"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -23,7 +22,6 @@ type AccessInterceptor struct {
 	logstoreSvc   *logstore.Service[*record.AccessLog]
 	cookieHandler *http_utils.CookieHandler
 	limitConfig   *AccessConfig
-	limitsLoader  *limits.Loader
 	storeOnly     bool
 	redirect      string
 }
@@ -36,12 +34,11 @@ type AccessConfig struct {
 // NewAccessInterceptor intercepts all requests and stores them to the logstore.
 // If storeOnly is false, it also checks if requests are exhausted.
 // If requests are exhausted, it also returns http.StatusTooManyRequests or a redirect to the given path and sets a cookie
-func NewAccessInterceptor(svc *logstore.Service[*record.AccessLog], limitsLoader *limits.Loader, cookieHandler *http_utils.CookieHandler, cookieConfig *AccessConfig) *AccessInterceptor {
+func NewAccessInterceptor(svc *logstore.Service[*record.AccessLog], cookieHandler *http_utils.CookieHandler, cookieConfig *AccessConfig) *AccessInterceptor {
 	return &AccessInterceptor{
 		logstoreSvc:   svc,
 		cookieHandler: cookieHandler,
 		limitConfig:   cookieConfig,
-		limitsLoader:  limitsLoader,
 	}
 }
 
@@ -50,7 +47,6 @@ func (a *AccessInterceptor) WithoutLimiting() *AccessInterceptor {
 		logstoreSvc:   a.logstoreSvc,
 		cookieHandler: a.cookieHandler,
 		limitConfig:   a.limitConfig,
-		limitsLoader:  a.limitsLoader,
 		storeOnly:     true,
 		redirect:      a.redirect,
 	}
@@ -61,7 +57,6 @@ func (a *AccessInterceptor) WithRedirect(redirect string) *AccessInterceptor {
 		logstoreSvc:   a.logstoreSvc,
 		cookieHandler: a.cookieHandler,
 		limitConfig:   a.limitConfig,
-		limitsLoader:  a.limitsLoader,
 		storeOnly:     a.storeOnly,
 		redirect:      redirect,
 	}
@@ -71,41 +66,39 @@ func (a *AccessInterceptor) AccessService() *logstore.Service[*record.AccessLog]
 	return a.logstoreSvc
 }
 
-func (a *AccessInterceptor) Limit(w http.ResponseWriter, r *http.Request, publicAuthPathPrefixes ...string) (*http.Request, bool) {
+func (a *AccessInterceptor) Limit(w http.ResponseWriter, r *http.Request, publicAuthPathPrefixes ...string) bool {
 	if a.storeOnly {
-		return r, false
+		return false
 	}
 	ctx := r.Context()
-	instanceID := authz.GetInstance(ctx).InstanceID()
-	newCtx, instanceLimits := a.limitsLoader.Load(ctx, instanceID)
-	newR := r.WithContext(newCtx)
+	instance := authz.GetInstance(ctx)
 	var deleteCookie bool
 	defer func() {
 		if deleteCookie {
 			a.DeleteExhaustedCookie(w)
 		}
 	}()
-	if instanceLimits.Block != nil {
-		if *instanceLimits.Block {
+	if block := instance.Block(); block != nil {
+		if *block {
 			a.SetExhaustedCookie(w, r)
-			return newR, true
+			return true
 		}
 		deleteCookie = true
 	}
 	for _, ignoredPathPrefix := range publicAuthPathPrefixes {
 		if strings.HasPrefix(r.RequestURI, ignoredPathPrefix) {
-			return newR, false
+			return false
 		}
 	}
-	remaining := a.logstoreSvc.Limit(ctx, instanceID)
+	remaining := a.logstoreSvc.Limit(ctx, instance.InstanceID())
 	if remaining != nil {
 		if remaining != nil && *remaining > 0 {
 			a.SetExhaustedCookie(w, r)
-			return newR, true
+			return true
 		}
 		deleteCookie = true
 	}
-	return newR, false
+	return false
 }
 
 func (a *AccessInterceptor) SetExhaustedCookie(writer http.ResponseWriter, request *http.Request) {
@@ -140,7 +133,7 @@ func (a *AccessInterceptor) handle(publicAuthPathPrefixes ...string) func(http.H
 			ctx := request.Context()
 			tracingCtx, checkSpan := tracing.NewNamedSpan(ctx, "checkAccessQuota")
 			wrappedWriter := &statusRecorder{ResponseWriter: writer, status: 0}
-			r, limited := a.Limit(wrappedWriter, request.WithContext(tracingCtx), publicAuthPathPrefixes...)
+			limited := a.Limit(wrappedWriter, request.WithContext(tracingCtx), publicAuthPathPrefixes...)
 			checkSpan.End()
 			if limited {
 				if a.redirect != "" {
@@ -150,7 +143,7 @@ func (a *AccessInterceptor) handle(publicAuthPathPrefixes ...string) func(http.H
 					http.Error(wrappedWriter, "Your ZITADEL instance is blocked.", http.StatusTooManyRequests)
 				}
 			} else {
-				next.ServeHTTP(wrappedWriter, r)
+				next.ServeHTTP(wrappedWriter, request)
 			}
 			a.writeLog(tracingCtx, wrappedWriter, writer, request, a.storeOnly)
 		})

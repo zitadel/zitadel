@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
-	"github.com/zitadel/zitadel/internal/api/limits"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/query"
@@ -42,7 +41,6 @@ func CreateServer(
 	hostHeaderName string,
 	tlsConfig *tls.Config,
 	accessSvc *logstore.Service[*record.AccessLog],
-	limitsLoader *limits.Loader,
 ) *grpc.Server {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
 	serverOptions := []grpc.ServerOption{
@@ -55,9 +53,9 @@ func CreateServer(
 				middleware.InstanceInterceptor(queries, hostHeaderName, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
 				middleware.AccessStorageInterceptor(accessSvc),
 				middleware.ErrorHandler(),
-				middleware.TranslationHandler(),
-				middleware.LimitsInterceptor(limitsLoader, system_pb.SystemService_ServiceDesc.ServiceName),
+				middleware.LimitsInterceptor(system_pb.SystemService_ServiceDesc.ServiceName),
 				middleware.AuthorizationInterceptor(verifier, authConfig),
+				middleware.TranslationHandler(),
 				middleware.QuotaExhaustedInterceptor(accessSvc, system_pb.SystemService_ServiceDesc.ServiceName),
 				middleware.ValidationHandler(),
 				middleware.ServiceHandler(),

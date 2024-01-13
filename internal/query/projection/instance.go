@@ -2,6 +2,7 @@ package projection
 
 import (
 	"context"
+	"github.com/zitadel/zitadel/internal/repository/limits"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -13,16 +14,18 @@ import (
 const (
 	InstanceProjectionTable = "projections.instances"
 
-	InstanceColumnID              = "id"
-	InstanceColumnName            = "name"
-	InstanceColumnChangeDate      = "change_date"
-	InstanceColumnCreationDate    = "creation_date"
-	InstanceColumnDefaultOrgID    = "default_org_id"
-	InstanceColumnProjectID       = "iam_project_id"
-	InstanceColumnConsoleID       = "console_client_id"
-	InstanceColumnConsoleAppID    = "console_app_id"
-	InstanceColumnSequence        = "sequence"
-	InstanceColumnDefaultLanguage = "default_language"
+	InstanceColumnID                = "id"
+	InstanceColumnName              = "name"
+	InstanceColumnChangeDate        = "change_date"
+	InstanceColumnCreationDate      = "creation_date"
+	InstanceColumnDefaultOrgID      = "default_org_id"
+	InstanceColumnProjectID         = "iam_project_id"
+	InstanceColumnConsoleID         = "console_client_id"
+	InstanceColumnConsoleAppID      = "console_app_id"
+	InstanceColumnSequence          = "sequence"
+	InstanceColumnDefaultLanguage   = "default_language"
+	InstanceColumnAuditLogRetention = "audit_log_retention"
+	InstanceColumnBlock             = "block"
 )
 
 type instanceProjection struct{}
@@ -48,6 +51,8 @@ func (*instanceProjection) Init() *old_handler.Check {
 			handler.NewColumn(InstanceColumnConsoleAppID, handler.ColumnTypeText, handler.Default("")),
 			handler.NewColumn(InstanceColumnSequence, handler.ColumnTypeInt64),
 			handler.NewColumn(InstanceColumnDefaultLanguage, handler.ColumnTypeText, handler.Default("")),
+			handler.NewColumn(InstanceColumnAuditLogRetention, handler.ColumnTypeInterval, handler.Nullable()),
+			handler.NewColumn(InstanceColumnBlock, handler.ColumnTypeBool, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(InstanceColumnID),
 		),
@@ -86,6 +91,19 @@ func (p *instanceProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  instance.DefaultLanguageSetEventType,
 					Reduce: p.reduceDefaultLanguageSet,
+				},
+			},
+		},
+		{
+			Aggregate: limits.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  limits.SetEventType,
+					Reduce: p.reduceLimitsSet,
+				},
+				{
+					Event:  limits.ResetEventType,
+					Reduce: p.reduceLimitsReset,
 				},
 			},
 		},
@@ -208,6 +226,49 @@ func (p *instanceProjection) reduceDefaultLanguageSet(event eventstore.Event) (*
 			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
 			handler.NewCol(InstanceColumnSequence, e.Sequence()),
 			handler.NewCol(InstanceColumnDefaultLanguage, e.Language.String()),
+		},
+		[]handler.Condition{
+			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *instanceProjection) reduceLimitsSet(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*limits.SetEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	updateCols := []handler.Column{
+		handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
+		handler.NewCol(InstanceColumnSequence, e.Sequence()),
+	}
+	if e.AuditLogRetention != nil {
+		updateCols = append(updateCols, handler.NewCol(InstanceColumnAuditLogRetention, *e.AuditLogRetention))
+	}
+	if e.Block != nil {
+		updateCols = append(updateCols, handler.NewCol(InstanceColumnBlock, *e.Block))
+	}
+	return handler.NewUpdateStatement(
+		e,
+		updateCols,
+		[]handler.Condition{
+			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
+		},
+	), nil
+}
+
+func (p *instanceProjection) reduceLimitsReset(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*limits.ResetEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	return handler.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(InstanceColumnChangeDate, e.CreationDate()),
+			handler.NewCol(InstanceColumnSequence, e.Sequence()),
+			handler.NewCol(InstanceColumnAuditLogRetention, nil),
+			handler.NewCol(InstanceColumnBlock, nil),
 		},
 		[]handler.Condition{
 			handler.NewCond(InstanceColumnID, e.Aggregate().InstanceID),
