@@ -238,7 +238,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 	type fields func(*testing.T) (*eventstore.Eventstore, id.Generator)
 	type args struct {
 		ctx           context.Context
-		setLimitsBulk []*SetLimitsBulk
+		setLimitsBulk []*SetInstanceLimitsBulk
 	}
 	type res struct {
 		want       *domain.ObjectDetails
@@ -275,7 +275,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
-				setLimitsBulk: []*SetLimitsBulk{{
+				setLimitsBulk: []*SetInstanceLimitsBulk{{
 					InstanceID:    "instance1",
 					ResourceOwner: "owner1",
 					SetLimits: SetLimits{
@@ -325,7 +325,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
-				setLimitsBulk: []*SetLimitsBulk{{
+				setLimitsBulk: []*SetInstanceLimitsBulk{{
 					InstanceID:    "instance1",
 					ResourceOwner: "owner1",
 					SetLimits: SetLimits{
@@ -376,7 +376,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
-				setLimitsBulk: []*SetLimitsBulk{{
+				setLimitsBulk: []*SetInstanceLimitsBulk{{
 					InstanceID:    "instance1",
 					ResourceOwner: "owner1",
 					SetLimits: SetLimits{
@@ -432,7 +432,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
-				setLimitsBulk: []*SetLimitsBulk{{
+				setLimitsBulk: []*SetInstanceLimitsBulk{{
 					InstanceID:    "instance1",
 					ResourceOwner: "owner1",
 					SetLimits: SetLimits{
@@ -573,7 +573,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				setLimitsBulk: []*SetLimitsBulk{{
+				setLimitsBulk: []*SetInstanceLimitsBulk{{
 					InstanceID:    "instance0",
 					ResourceOwner: "owner0",
 					SetLimits: SetLimits{
@@ -633,7 +633,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := new(Commands)
 			r.eventstore, r.idGenerator = tt.fields(t)
-			gotDetails, gotTargetDetails, err := r.SetLimitsBulk(tt.args.ctx, tt.args.setLimitsBulk)
+			gotDetails, gotTargetDetails, err := r.SetInstanceLimitsBulk(tt.args.ctx, tt.args.setLimitsBulk)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

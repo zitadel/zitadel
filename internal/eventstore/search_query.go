@@ -17,7 +17,6 @@ type SearchQueryBuilder struct {
 	offset                uint32
 	desc                  bool
 	resourceOwner         string
-	resourceOwners        []string
 	instanceID            *string
 	instanceIDs           []string
 	excludedInstanceIDs   []string
@@ -50,10 +49,6 @@ func (b *SearchQueryBuilder) GetDesc() bool {
 
 func (b *SearchQueryBuilder) GetResourceOwner() string {
 	return b.resourceOwner
-}
-
-func (b *SearchQueryBuilder) GetResourceOwners() []string {
-	return b.resourceOwners
 }
 
 func (b *SearchQueryBuilder) GetInstanceID() *string {
@@ -231,12 +226,6 @@ func (builder *SearchQueryBuilder) Offset(offset uint32) *SearchQueryBuilder {
 // ResourceOwner defines the resource owner (org or instance) of the events
 func (builder *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQueryBuilder {
 	builder.resourceOwner = resourceOwner
-	return builder
-}
-
-// ResourceOwners defines the resource owners (org or instance) of the events
-func (builder *SearchQueryBuilder) ResourceOwners(resourceOwners []string) *SearchQueryBuilder {
-	builder.resourceOwners = resourceOwners
 	return builder
 }
 

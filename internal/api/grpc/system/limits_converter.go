@@ -18,14 +18,13 @@ func setInstanceLimitsPbToCommand(req *system.SetLimitsRequest) *command.SetLimi
 	return setLimits
 }
 
-func bulkSetInstanceLimitsPbToCommand(req *system.BulkSetLimitsRequest) []*command.SetLimitsBulk {
-	cmds := make([]*command.SetLimitsBulk, len(req.Limits))
+func bulkSetInstanceLimitsPbToCommand(req *system.BulkSetLimitsRequest) []*command.SetInstanceLimitsBulk {
+	cmds := make([]*command.SetInstanceLimitsBulk, len(req.Limits))
 	for i := range req.Limits {
 		setLimitsReq := req.Limits[i]
-		cmds[i] = &command.SetLimitsBulk{
-			InstanceID:    setLimitsReq.GetInstanceId(),
-			ResourceOwner: setLimitsReq.GetInstanceId(),
-			SetLimits:     *setInstanceLimitsPbToCommand(req.Limits[i]),
+		cmds[i] = &command.SetInstanceLimitsBulk{
+			InstanceID: setLimitsReq.GetInstanceId(),
+			SetLimits:  *setInstanceLimitsPbToCommand(req.Limits[i]),
 		}
 	}
 	return cmds

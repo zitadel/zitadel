@@ -19,7 +19,7 @@ func (s *Server) SetLimits(ctx context.Context, req *system.SetLimitsRequest) (*
 }
 
 func (s *Server) BulkSetLimits(ctx context.Context, req *system.BulkSetLimitsRequest) (*system.BulkSetLimitsResponse, error) {
-	details, targetDetails, err := s.command.SetLimitsBulk(ctx, bulkSetInstanceLimitsPbToCommand(req))
+	details, targetDetails, err := s.command.SetInstanceLimitsBulk(ctx, bulkSetInstanceLimitsPbToCommand(req))
 	if err != nil {
 		return nil, err
 	}

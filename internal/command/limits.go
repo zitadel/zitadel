@@ -46,28 +46,24 @@ func (c *Commands) SetLimits(
 	return writeModelToObjectDetails(&wm.WriteModel), err
 }
 
-type SetLimitsBulk struct {
-	InstanceID, ResourceOwner string
+type SetInstanceLimitsBulk struct {
+	InstanceID string
 	SetLimits
 }
 
-func (c *Commands) SetLimitsBulk(
+func (c *Commands) SetInstanceLimitsBulk(
 	ctx context.Context,
-	bulk []*SetLimitsBulk,
+	bulk []*SetInstanceLimitsBulk,
 ) (bulkDetails *domain.ObjectDetails, targetsDetails []*domain.ObjectDetails, err error) {
-	bulkWm, err := c.getBulkLimitsWriteModel(ctx, bulk)
+	bulkWm, err := c.getBulkInstanceLimitsWriteModel(ctx, bulk)
 	if err != nil {
 		return nil, nil, err
 	}
 	cmds := make([]eventstore.Command, 0)
 	for _, t := range bulk {
-		instanceWM, ok := bulkWm.writeModels[t.InstanceID]
+		targetWM, ok := bulkWm.writeModels[t.InstanceID]
 		if !ok {
 			return nil, nil, zerrors.ThrowInternal(nil, "COMMAND-5HWA9", "Errors.Limits.NotFound")
-		}
-		targetWM, ok := instanceWM[t.ResourceOwner]
-		if !ok {
-			return nil, nil, zerrors.ThrowInternal(nil, "COMMAND-Z3rYg", "Errors.Limits.NotFound")
 		}
 		targetCMDs, setErr := c.setLimitsCommands(ctx, targetWM, &t.SetLimits)
 		err = errors.Join(err, setErr)
@@ -88,7 +84,7 @@ func (c *Commands) SetLimitsBulk(
 	}
 	targetDetails := make([]*domain.ObjectDetails, len(bulk))
 	for i, t := range bulk {
-		targetDetails[i] = writeModelToObjectDetails(&bulkWm.writeModels[t.InstanceID][t.ResourceOwner].WriteModel)
+		targetDetails[i] = writeModelToObjectDetails(&bulkWm.writeModels[t.InstanceID].WriteModel)
 	}
 	details := writeModelToObjectDetails(&bulkWm.WriteModel)
 	details.ResourceOwner = ""
@@ -139,10 +135,10 @@ func (c *Commands) getLimitsWriteModel(ctx context.Context, instanceId, resource
 	return wm, c.eventstore.FilterToQueryReducer(ctx, wm)
 }
 
-func (c *Commands) getBulkLimitsWriteModel(ctx context.Context, target []*SetLimitsBulk) (*limitsBulkWriteModel, error) {
+func (c *Commands) getBulkInstanceLimitsWriteModel(ctx context.Context, target []*SetInstanceLimitsBulk) (*limitsBulkWriteModel, error) {
 	wm := newLimitsBulkWriteModel()
 	for _, t := range target {
-		wm.addWriteModel(t.InstanceID, t.ResourceOwner)
+		wm.addWriteModel(t.InstanceID)
 	}
 	return wm, c.eventstore.FilterToQueryReducer(ctx, wm)
 }

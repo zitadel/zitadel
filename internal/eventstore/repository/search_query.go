@@ -138,7 +138,6 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 		excludedInstanceIDFilter,
 		editorUserFilter,
 		resourceOwnerFilter,
-		resourceOwnersFilter,
 		positionAfterFilter,
 		eventSequenceGreaterFilter,
 		creationDateAfterFilter,
@@ -216,14 +215,6 @@ func resourceOwnerFilter(builder *eventstore.SearchQueryBuilder, query *SearchQu
 	}
 	query.Owner = NewFilter(FieldResourceOwner, builder.GetResourceOwner(), OperationEquals)
 	return query.Owner
-}
-
-func resourceOwnersFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {
-	if builder.GetResourceOwners() == nil {
-		return nil
-	}
-	query.Owners = NewFilter(FieldResourceOwner, builder.GetResourceOwners(), OperationIn)
-	return query.Owners
 }
 
 func editorUserFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {
