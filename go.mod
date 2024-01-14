@@ -60,7 +60,7 @@ require (
 	github.com/superseriousbusiness/exifremove v0.0.0-20210330092427-6acd27eac203
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/zitadel/logging v0.5.0
-	github.com/zitadel/oidc/v3 v3.5.0
+	github.com/zitadel/oidc/v3 v3.8.1
 	github.com/zitadel/passwap v0.4.0
 	github.com/zitadel/saml v0.1.3
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.46.0
@@ -74,7 +74,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.20.0
 	go.opentelemetry.io/otel/trace v1.21.0
 	go.uber.org/mock v0.3.0
-	golang.org/x/crypto v0.16.0
+	golang.org/x/crypto v0.17.0
 	golang.org/x/exp v0.0.0-20231108232855-2478ac86f678
 	golang.org/x/net v0.19.0
 	golang.org/x/oauth2 v0.15.0
@@ -90,7 +90,7 @@ require (
 require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.44.0 // indirect
 	github.com/crewjam/httperr v0.2.0 // indirect
-	github.com/go-chi/chi/v5 v5.0.10 // indirect
+	github.com/go-chi/chi/v5 v5.0.11 // indirect
 	github.com/go-logr/logr v1.3.0 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
@@ -155,7 +155,7 @@ require (
 	github.com/golang/geo v0.0.0-20230421003525-6adc56603217 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/uuid v1.4.0
+	github.com/google/uuid v1.5.0
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
 	github.com/gorilla/handlers v1.5.2 // indirect

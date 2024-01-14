@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"reflect"
+	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
@@ -17,9 +18,10 @@ import (
 )
 
 type Config struct {
-	Dialects           map[string]interface{} `mapstructure:",remain"`
-	EventPushConnRatio float32
-	connector          dialect.Connector
+	Dialects                   map[string]interface{} `mapstructure:",remain"`
+	EventPushConnRatio         float64
+	ProjectionSpoolerConnRatio float64
+	connector                  dialect.Connector
 }
 
 func (c *Config) SetConnector(connector dialect.Connector) {
@@ -83,6 +85,7 @@ func (db *DB) QueryRowContext(ctx context.Context, scan func(row *sql.Row) error
 	}()
 
 	row := tx.QueryRowContext(ctx, query, args...)
+	logging.OnError(row.Err()).Error("unexpected query error")
 
 	err = scan(row)
 	if err != nil {
@@ -109,18 +112,8 @@ func QueryJSONObject[T any](ctx context.Context, db *DB, query string, args ...a
 	return obj, nil
 }
 
-const (
-	zitadelAppName          = "zitadel"
-	EventstorePusherAppName = "zitadel_es_pusher"
-)
-
-func Connect(config Config, useAdmin, isEventPusher bool) (*DB, error) {
-	appName := zitadelAppName
-	if isEventPusher {
-		appName = EventstorePusherAppName
-	}
-
-	client, err := config.connector.Connect(useAdmin, isEventPusher, config.EventPushConnRatio, appName)
+func Connect(config Config, useAdmin bool, purpose dialect.DBPurpose) (*DB, error) {
+	client, err := config.connector.Connect(useAdmin, config.EventPushConnRatio, config.ProjectionSpoolerConnRatio, purpose)
 	if err != nil {
 		return nil, err
 	}
@@ -178,4 +171,10 @@ func (c Config) Password() string {
 
 func (c Config) Type() string {
 	return c.connector.Type()
+}
+
+func EscapeLikeWildcards(value string) string {
+	value = strings.ReplaceAll(value, "%", "\\%")
+	value = strings.ReplaceAll(value, "_", "\\_")
+	return value
 }

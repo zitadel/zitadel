@@ -13,10 +13,10 @@ func _() {
 	_ = x[DeviceAuthStateApproved-2]
 	_ = x[DeviceAuthStateDenied-3]
 	_ = x[DeviceAuthStateExpired-4]
-	_ = x[DeviceAuthStateRemoved-5]
+	_ = x[deviceAuthStateCount-5]
 }
 
-const _DeviceAuthState_name = "undefinedinitiatedapproveddeniedexpiredremoved"
+const _DeviceAuthState_name = "undefinedinitiatedapproveddeniedexpiredinvalid"
 
 var _DeviceAuthState_index = [...]uint8{0, 9, 18, 26, 32, 39, 46}
 

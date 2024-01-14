@@ -17,7 +17,7 @@ type SearchQuery struct {
 	AllowTimeTravel       bool
 	AwaitOpenTransactions bool
 	Limit                 uint64
-	Offset                uint16
+	Offset                uint32
 	Desc                  bool
 
 	InstanceID        *Filter

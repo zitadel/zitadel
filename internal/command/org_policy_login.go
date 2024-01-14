@@ -178,7 +178,7 @@ func (c *Commands) AddIDPToLoginPolicy(ctx context.Context, resourceOwner string
 	return writeModelToIDPProvider(&idpModel.IdentityProviderWriteModel), nil
 }
 
-func (c *Commands) RemoveIDPFromLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.UserIDPLink) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveIDPFromLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "Org-M0fs9", "Errors.ResourceOwnerMissing")
 	}
@@ -203,7 +203,7 @@ func (c *Commands) RemoveIDPFromLoginPolicy(ctx context.Context, resourceOwner s
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
-	events := c.removeIDPFromLoginPolicy(ctx, orgAgg, idpProvider.IDPConfigID, false, cascadeExternalIDPs...)
+	events := c.removeIDPFromLoginPolicy(ctx, orgAgg, idpProvider.IDPConfigID, false)
 
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {

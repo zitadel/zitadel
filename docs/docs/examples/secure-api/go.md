@@ -72,7 +72,7 @@ go run main.go --domain <your domain> --key <path>
 This could look like:
 
 ```bash
-go run main.go --domain https://my-domain.zitadel.cloud --key ./api.json
+go run main.go --domain my-domain.zitadel.cloud --key ./api.json
 ```
 
 After you get a successful log:

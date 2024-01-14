@@ -270,7 +270,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			l.externalAuthFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &azuread.Session{Session: &oauth.Session{Provider: provider.(*azuread.Provider).Provider, Code: data.Code}}
+		session = &azuread.Session{Provider: provider.(*azuread.Provider), Code: data.Code}
 	case domain.IDPTypeGitHub:
 		provider, err = l.githubProvider(r.Context(), identityProvider)
 		if err != nil {
@@ -382,7 +382,7 @@ func (l *Login) migrateExternalUserID(r *http.Request, authReq *domain.AuthReque
 	return previousIDMatched, l.command.MigrateUserIDP(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, externalUser.IDPConfigID, previousID, externalUserID)
 }
 
-// handleExternalUserAuthenticated maps the IDP user, checks for a corresponding externalID
+// handleExternalUserAuthenticated maps the IDP user, checks for a corresponding externalID and that the IDP is allowed
 func (l *Login) handleExternalUserAuthenticated(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -393,6 +393,11 @@ func (l *Login) handleExternalUserAuthenticated(
 	callback func(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest),
 ) {
 	externalUser := mapIDPUserToExternalUser(user, provider.ID)
+	// ensure the linked IDP is added to the login policy
+	if err := l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, provider.ID, authReq.AgentID); err != nil {
+		l.renderError(w, r, authReq, err)
+		return
+	}
 	// check and fill in local linked user
 	externalErr := l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, authReq.AgentID, externalUser, domain.BrowserInfoFromRequest(r), false)
 	if externalErr != nil && !zerrors.IsNotFound(externalErr) {
@@ -1127,7 +1132,7 @@ func tokens(session idp.Session) *oidc.Tokens[*oidc.IDTokenClaims] {
 	case *oauth.Session:
 		return s.Tokens
 	case *azuread.Session:
-		return s.Tokens
+		return s.Tokens()
 	case *apple.Session:
 		return s.Tokens
 	}

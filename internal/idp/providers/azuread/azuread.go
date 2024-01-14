@@ -13,8 +13,10 @@ import (
 )
 
 const (
+	issuerTemplate   string = "https://login.microsoftonline.com/%s/v2.0"
 	authURLTemplate  string = "https://login.microsoftonline.com/%s/oauth2/v2.0/authorize"
 	tokenURLTemplate string = "https://login.microsoftonline.com/%s/oauth2/v2.0/token"
+	keysURLTemplate  string = "https://login.microsoftonline.com/%s/discovery/v2.0/keys"
 	userURL          string = "https://graph.microsoft.com/v1.0/me"
 	userinfoEndpoint string = "https://graph.microsoft.com/oidc/userinfo"
 
@@ -48,6 +50,16 @@ type Provider struct {
 	tenant        TenantType
 	emailVerified bool
 	options       []oauth.ProviderOpts
+}
+
+// issuer returns the OIDC issuer based on the [TenantType]
+func (p *Provider) issuer() string {
+	return fmt.Sprintf(issuerTemplate, p.tenant)
+}
+
+// keysEndpoint returns the OIDC jwks_url based on the [TenantType]
+func (p *Provider) keysEndpoint() string {
+	return fmt.Sprintf(keysURLTemplate, p.tenant)
 }
 
 type ProviderOptions func(*Provider)

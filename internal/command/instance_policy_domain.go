@@ -44,7 +44,7 @@ func (c *Commands) ChangeDefaultDomainPolicy(ctx context.Context, userLoginMustB
 }
 
 func (c *Commands) getDefaultDomainPolicy(ctx context.Context) (*domain.DomainPolicy, error) {
-	policyWriteModel, err := c.defaultDomainPolicyWriteModelByID(ctx)
+	policyWriteModel, err := c.instanceDomainPolicyWriteModel(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (c *Commands) getDefaultDomainPolicy(ctx context.Context) (*domain.DomainPo
 	return policy, nil
 }
 
-func (c *Commands) defaultDomainPolicyWriteModelByID(ctx context.Context) (policy *InstanceDomainPolicyWriteModel, err error) {
+func (c *Commands) instanceDomainPolicyWriteModel(ctx context.Context) (policy *InstanceDomainPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
