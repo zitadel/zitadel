@@ -106,7 +106,9 @@ See [User Constraints](https://zitadel.com/docs/concepts/structure/users#constra
 We will use the User Info `sub` claim as unique "display" name for the user. `sub` equals the unique User ID from ZITADEL.
 This creates a User Repository and Entity that implements the `UserInterface`:
 
-> You can skip this step if you already have an existing User object in your project.
+:::info
+You can skip this step, if you already have an existing User object in your project.
+:::
 
 ```bash
 php bin/console make:user
