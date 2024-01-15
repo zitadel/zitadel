@@ -11,7 +11,7 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
-func OriginMiddleware(fallBackToHttps bool) mux.MiddlewareFunc {
+func WithOrigin(fallBackToHttps bool) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			origin := composeOrigin(r, fallBackToHttps)
