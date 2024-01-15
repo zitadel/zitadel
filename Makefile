@@ -31,7 +31,7 @@ core_generate_all:
 	go install github.com/dmarkham/enumer@v1.5.9 		# https://pkg.go.dev/github.com/dmarkham/enumer?tab=versions
 	go install github.com/rakyll/statik@v0.1.7			# https://pkg.go.dev/github.com/rakyll/statik?tab=versions
 	go install go.uber.org/mock/mockgen@v0.4.0			# https://pkg.go.dev/go.uber.org/mock/mockgen?tab=versions
-	go install golang.org/x/tools/cmd/stringer@v0.1t.0	# https://pkg.go.dev/golang.org/x/tools/cmd/stringer?tab=versions
+	go install golang.org/x/tools/cmd/stringer@v0.17.0	# https://pkg.go.dev/golang.org/x/tools/cmd/stringer?tab=versions
 	go generate ./...
 
 .PHONY: core_assets
