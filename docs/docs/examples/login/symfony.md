@@ -69,7 +69,7 @@ After the final step you are presented with a client ID and secret.
 Copy and paste them to a safe location for later use by the application.
 The secret will not be displayed again, but you can regenerate one if you loose it.
 
-## Symfony setup
+## Setup new Symfony application
 
 Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your Symfony client.
 The example is build on a [generated Symfony web app](https://symfony.com/doc/current/setup.html#creating-symfony-applications), using the following command:
