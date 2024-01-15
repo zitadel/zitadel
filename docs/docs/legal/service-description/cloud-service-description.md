@@ -51,6 +51,7 @@ The following regions will be available when using our cloud service. This list 
 - **Global**: All available cloud regions offered by our cloud provider
 - **Switzerland**: Exclusively on Swiss region
 - **US-1**: Exclusively on US-1 (Iowa) region
+- **EU-1**: Exclusively on EU-1 (Germany) region
 - **GDPR safe countries**: Hosting location is within any of the EU member states and [Adequate Countries](https://ec.europa.eu/info/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en) as recognized by the European Commission under the GDPR
 
 ## Backup
