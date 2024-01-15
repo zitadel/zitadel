@@ -36,7 +36,7 @@ A `user` role is not required. This role is assumed by default for any authentic
 
 ![Project roles in console](/img/symfony/project-roles.png)
 
-Finally we can assign the roles to users in the project's authorizations tab.
+Finally, we can assign the roles to users in the project's authorizations tab.
 
 ![Project authorizations in console](/img/symfony/project-authorizations.png)
 
