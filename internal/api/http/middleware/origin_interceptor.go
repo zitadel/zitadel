@@ -39,10 +39,9 @@ func composeOrigin(r *http.Request, fallBackToHttps bool) string {
 		host = r.Header.Get("X-Forwarded-Host")
 	}
 	if proto == "" {
+		proto = "http"
 		if fallBackToHttps {
 			proto = "https"
-		} else {
-			proto = "http"
 		}
 	}
 	if host == "" {
