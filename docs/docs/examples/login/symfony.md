@@ -85,7 +85,8 @@ cd my_project_directory
 
 :::info
 The remainder of this guide assumes a Symfony project which already includes all web app bundles, such as security, routing and ORM.
-> If you are using this guide against an existing project you must make sure the required bundles are installed using the `composer require` command.
+If you are using this guide against an existing project you must make sure the required bundles are installed using the `composer require` command.
+:::
 
 ### Install Symfony dependencies
 
