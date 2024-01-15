@@ -151,8 +151,8 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
         this.serviceType === PolicyComponentServiceType.ADMIN
           ? ['iam.policy.write']
           : this.serviceType === PolicyComponentServiceType.MGMT
-          ? ['policy.write']
-          : [],
+            ? ['policy.write']
+            : [],
       )
       .pipe(take(1))
       .subscribe((allowed) => {
@@ -296,7 +296,7 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
   public savePolicy(): void {
     if (this.lifetimeForm.invalid) {
       // Display error message
-      this.toast.showError(Error('Form contains invalid value(s).'));
+      this.toast.showError('POLICY.LOGIN_POLICY.LIFETIME_INVALID', false, true);
       return;
     }
 
