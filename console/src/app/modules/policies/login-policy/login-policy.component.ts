@@ -25,6 +25,15 @@ import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { LoginMethodComponentType } from './factor-table/factor-table.component';
 import { catchError, map, takeUntil } from 'rxjs/operators';
+import { error } from 'console';
+
+const minValueValidator = (minValue: number) => (control: AbstractControl) => {
+  const value = control.value;
+  if (value !== null && value < minValue) {
+    return { minValue: true, message: `Minimum value allowed is ${minValue}.` };
+  }
+  return null;
+};
 
 @Component({
   selector: 'cnsl-login-policy',
@@ -48,11 +57,11 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
   public InfoSectionType: any = InfoSectionType;
   public PasswordlessType: any = PasswordlessType;
   public lifetimeForm: UntypedFormGroup = this.fb.group({
-    passwordCheckLifetime: [{ disabled: true }, [requiredValidator]],
-    externalLoginCheckLifetime: [{ disabled: true }, [requiredValidator]],
-    mfaInitSkipLifetime: [{ disabled: true }, [requiredValidator]],
-    secondFactorCheckLifetime: [{ disabled: true }, [requiredValidator]],
-    multiFactorCheckLifetime: [{ disabled: true }, [requiredValidator]],
+    passwordCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(1)]],
+    externalLoginCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(1)]],
+    mfaInitSkipLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(0)]],
+    secondFactorCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(1)]],
+    multiFactorCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(1)]],
   });
   private destroy$: Subject<void> = new Subject();
 
@@ -285,6 +294,12 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
   }
 
   public savePolicy(): void {
+    if (this.lifetimeForm.invalid) {
+      // Display error message
+      this.toast.showError('POLICY.LOGIN_POLICY.LIFETIME_INVALID', false, true);
+      return;
+    }
+
     this.updateData()
       .then(() => {
         this.toast.showInfo('POLICY.LOGIN_POLICY.SAVED', true);
