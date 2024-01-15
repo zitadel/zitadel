@@ -1,6 +1,8 @@
 package start
 
 import (
+	"context"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -34,8 +36,8 @@ type encryptionKeys struct {
 	OIDCKey            []byte
 }
 
-func ensureEncryptionKeys(keyConfig *encryptionKeyConfig, keyStorage crypto.KeyStorage) (keys *encryptionKeys, err error) {
-	if err := verifyDefaultKeys(keyStorage); err != nil {
+func ensureEncryptionKeys(ctx context.Context, keyConfig *encryptionKeyConfig, keyStorage crypto.KeyStorage) (keys *encryptionKeys, err error) {
+	if err := verifyDefaultKeys(ctx, keyStorage); err != nil {
 		return nil, err
 	}
 	keys = new(encryptionKeys)
@@ -89,7 +91,7 @@ func ensureEncryptionKeys(keyConfig *encryptionKeyConfig, keyStorage crypto.KeyS
 	return keys, nil
 }
 
-func verifyDefaultKeys(keyStorage crypto.KeyStorage) (err error) {
+func verifyDefaultKeys(ctx context.Context, keyStorage crypto.KeyStorage) (err error) {
 	keys := make([]*crypto.Key, 0, len(defaultKeyIDs))
 	for _, keyID := range defaultKeyIDs {
 		_, err := crypto.LoadKey(keyID, keyStorage)
@@ -105,7 +107,7 @@ func verifyDefaultKeys(keyStorage crypto.KeyStorage) (err error) {
 	if len(keys) == 0 {
 		return nil
 	}
-	if err := keyStorage.CreateKeys(keys...); err != nil {
+	if err := keyStorage.CreateKeys(ctx, keys...); err != nil {
 		return zerrors.ThrowInternal(err, "START-aGBq2", "cannot create default keys")
 	}
 	return nil
