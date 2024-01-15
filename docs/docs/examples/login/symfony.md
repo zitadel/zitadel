@@ -320,7 +320,7 @@ https://github.com/zitadel/example-symfony-oidc/blob/main/templates/profile.html
 
 #### User list
 
-The user list controller displays all users from the database that were created during OIDC login.
+The user list controller displays all users from the database, that were created during OIDC login.
 Only users with an admin role will have access to this page.
 
 ```php reference
