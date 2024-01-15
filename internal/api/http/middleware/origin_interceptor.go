@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/muhlemmer/httpforwarded"
 	"github.com/zitadel/logging"
 
