@@ -1249,6 +1249,7 @@
       "DESCRIPTIONCREATEMGMT": "用户可以从以下可用的身份提供者中进行选择。注意：您可为系统设置提供者也可以仅为您的组织单独设置提供者。",
       "ADVANCED": "高级设置",
       "LIFETIMEDURATIONS": "登录状态有效期",
+      "LIFETIME_INVALID": "表单包含无效值。",
       "SAVED": "保存成功！"
     },
     "PRIVACY_POLICY": {
