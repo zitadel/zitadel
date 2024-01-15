@@ -69,7 +69,6 @@ var (
 	AuthRequestProjection               *handler.Handler
 	MilestoneProjection                 *handler.Handler
 	QuotaProjection                     *quotaProjection
-	LimitsProjection                    *handler.Handler
 	RestrictionsProjection              *handler.Handler
 )
 
@@ -247,7 +246,6 @@ func newProjectionsList() {
 		AuthRequestProjection,
 		MilestoneProjection,
 		QuotaProjection.handler,
-		LimitsProjection,
 		RestrictionsProjection,
 	}
 }
