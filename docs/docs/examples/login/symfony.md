@@ -74,7 +74,9 @@ The secret will not be displayed again, but you can regenerate one if you loose 
 Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your Symfony client.
 The example is build on a [generated Symfony web app](https://symfony.com/doc/current/setup.html#creating-symfony-applications), using the following command:
 
-> Skip this step if you are connecting ZITADEL to an existing application.
+:::info
+Skip this step if you are connecting ZITADEL to an existing application.
+:::
 
 ```bash
 symfony new my_project_directory --version="7.0.*" --webapp
