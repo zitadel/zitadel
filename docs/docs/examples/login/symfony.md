@@ -8,7 +8,9 @@ It explains how to enable user login in your application and how to fetch data f
 
 By the end of this guide, your application will have login functionality with basic role mapping, access the current user's profile and a user list accessible by admins.
 
-> This documentation references our [example](https://github.com/zitadel/example-symfony-oidc) on GitHub.
+:::info
+This documentation references our [example](https://github.com/zitadel/example-symfony-oidc) on GitHub.
+:::
 
 ## ZITADEL setup
 
