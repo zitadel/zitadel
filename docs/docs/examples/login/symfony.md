@@ -333,7 +333,9 @@ https://github.com/zitadel/example-symfony-oidc/blob/main/templates/user_list.ht
 
 ## Configure and run the application
 
-> Never store and commit secrets in a `.env` file. Use a `env.local` file instead and make sure the file is in `.gitignore`.
+:::warning
+Never store and commit secrets in a `.env` file. Use a `env.local` file instead and make sure the file is in `.gitignore`.
+:::
 
 ### Database
 
