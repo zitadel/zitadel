@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
 
 	"github.com/muhlemmer/httpforwarded"
@@ -10,19 +11,21 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
-func OriginHandler(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		origin := composeOrigin(r)
-		if !http_util.IsOrigin(origin) {
-			logging.Debugf("extracted origin is not valid: %s", origin)
-			next.ServeHTTP(w, r)
-			return
-		}
-		next.ServeHTTP(w, r.WithContext(http_util.WithComposedOrigin(r.Context(), origin)))
-	})
+func OriginMiddleware(fallBackToHttps bool) mux.MiddlewareFunc {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			origin := composeOrigin(r, fallBackToHttps)
+			if !http_util.IsOrigin(origin) {
+				logging.Debugf("extracted origin is not valid: %s", origin)
+				next.ServeHTTP(w, r)
+				return
+			}
+			next.ServeHTTP(w, r.WithContext(http_util.WithComposedOrigin(r.Context(), origin)))
+		})
+	}
 }
 
-func composeOrigin(r *http.Request) string {
+func composeOrigin(r *http.Request, fallBackToHttps bool) string {
 	var proto, host string
 	fwd, fwdErr := httpforwarded.ParseFromRequest(r)
 	if fwdErr == nil {
@@ -36,10 +39,10 @@ func composeOrigin(r *http.Request) string {
 		host = r.Header.Get("X-Forwarded-Host")
 	}
 	if proto == "" {
-		if r.TLS == nil {
-			proto = "http"
-		} else {
+		if fallBackToHttps {
 			proto = "https"
+		} else {
+			proto = "http"
 		}
 	}
 	if host == "" {
