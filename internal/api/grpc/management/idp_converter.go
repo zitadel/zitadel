@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	iam_model "github.com/zitadel/zitadel/internal/iam/model"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp"
@@ -133,29 +132,6 @@ func idpQueryToModel(idpQuery *mgmt_pb.IDPQuery) (query.SearchQuery, error) {
 		return query.NewIDPOwnerTypeSearchQuery(idp_grpc.IDPProviderTypeFromPb(q.OwnerTypeQuery.OwnerType))
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "MANAG-WtLPV", "List.Query.Invalid")
-	}
-}
-
-func idpProviderViewsToDomain(idps []*iam_model.IDPProviderView) []*domain.IDPProvider {
-	idpProvider := make([]*domain.IDPProvider, len(idps))
-	for i, idp := range idps {
-		idpProvider[i] = &domain.IDPProvider{
-			ObjectRoot: models.ObjectRoot{
-				AggregateID: idp.AggregateID,
-			},
-			IDPConfigID: idp.IDPConfigID,
-			Type:        idpConfigTypeToDomain(idp.IDPProviderType),
-		}
-	}
-	return idpProvider
-}
-
-func idpConfigTypeToDomain(idpType iam_model.IDPProviderType) domain.IdentityProviderType {
-	switch idpType {
-	case iam_model.IDPProviderTypeOrg:
-		return domain.IdentityProviderTypeOrg
-	default:
-		return domain.IdentityProviderTypeSystem
 	}
 }
 

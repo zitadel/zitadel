@@ -56,9 +56,6 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 							"email1",
 							true,
 						),
-					},
-				).appendFilterResponse(
-					[]eventstore.Event{
 						project.NewGrantAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "org2").Aggregate,
 							"grant", "org3", []string{},

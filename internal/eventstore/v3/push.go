@@ -19,7 +19,7 @@ import (
 )
 
 func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
-	tx, err := es.client.Begin()
+	tx, err := es.client.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
 	}

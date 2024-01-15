@@ -656,6 +656,9 @@ func NewUserNotSearchQuery(value SearchQuery) (SearchQuery, error) {
 func NewUserInUserIdsSearchQuery(values []string) (SearchQuery, error) {
 	return NewInTextQuery(UserIDCol, values)
 }
+func NewUserInUserEmailsSearchQuery(values []string) (SearchQuery, error) {
+	return NewInTextQuery(HumanEmailCol, values)
+}
 
 func NewUserResourceOwnerSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
 	return NewTextQuery(UserResourceOwnerCol, value, comparison)

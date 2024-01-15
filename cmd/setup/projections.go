@@ -8,18 +8,14 @@ import (
 )
 
 type projectionTables struct {
-	es             *eventstore.Eventstore
-	currentVersion string
+	es *eventstore.Eventstore
 
 	Version string `json:"version"`
 }
 
-func (mig *projectionTables) SetLastExecution(lastRun map[string]interface{}) {
-	mig.currentVersion, _ = lastRun["version"].(string)
-}
-
-func (mig *projectionTables) Check() bool {
-	return mig.currentVersion != mig.Version
+func (mig *projectionTables) Check(lastRun map[string]interface{}) bool {
+	currentVersion, _ := lastRun["version"].(string)
+	return currentVersion != mig.Version
 }
 
 func (mig *projectionTables) Execute(ctx context.Context) error {
