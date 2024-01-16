@@ -16,7 +16,8 @@ module.exports = {
             "examples/login/flutter",
             "examples/login/nextjs",
             "examples/login/go",
-            "examples/login/symfony"
+            "examples/login/symfony",
+            "examples/login/java-spring",
           ],
           collapsed: true,
         },
@@ -28,6 +29,7 @@ module.exports = {
             "examples/secure-api/python-flask",
             "examples/secure-api/dot-net",
             "examples/secure-api/nodejs-nestjs",
+            "examples/secure-api/java-spring",
           ],
           collapsed: true,
         },
