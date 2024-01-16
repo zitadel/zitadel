@@ -8,8 +8,10 @@ OAuth 2 Token Introspection.
 
 At the end of the guide you should have an API with a protected endpoint.
 
-> This documentation references our [example](https://github.com/zitadel/zitadel-java) on GitHub.
-> You can either create your own application or directly run the example by providing the necessary arguments.
+:::info
+This documentation references our [example](https://github.com/zitadel/zitadel-java) on GitHub.
+You can either create your own application or directly run the example by providing the necessary arguments.
+:::
 
 ## Set up application
 
@@ -39,7 +41,7 @@ To be able to take the most out of ZITADELs RBAC, we first need to create a Cust
 customize the introspection behaviour and map the role claims (`urn:zitadel:iam:org:project:roles`)
 into Spring Security `authiorities`, which can be used later on to determine the granted permissions.
 
-So in your application, create a 'support/zitadel' package and in there the `CustomAuthorityOpaqueTokenIntrospector.java`:
+So in your application, create a `support/zitadel` package and in there the `CustomAuthorityOpaqueTokenIntrospector.java`:
 
 ```java reference
 https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/api/src/main/java/demo/app/support/zitadel/CustomAuthorityOpaqueTokenIntrospector.java
