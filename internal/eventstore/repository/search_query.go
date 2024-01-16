@@ -25,7 +25,6 @@ type SearchQuery struct {
 	ExcludedInstances *Filter
 	Creator           *Filter
 	Owner             *Filter
-	Owners            *Filter
 	Position          *Filter
 	Sequence          *Filter
 	CreatedAfter      *Filter
