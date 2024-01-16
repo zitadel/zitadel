@@ -799,7 +799,7 @@ message RemoveQuotaResponse {
 }
 
 message SetLimitsRequest {
-  string instance_id = 1 [(validate.rules).string = {len: 18}];
+  string instance_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
   google.protobuf.Duration audit_log_retention = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "auditLogRetention limits the number of events that can be queried via the events API by their age. A value of '0s' means that all events are available. If this value is set, it overwrites the system default.";
