@@ -1252,6 +1252,7 @@
       "DESCRIPTIONCREATEMGMT": "Os usuários podem escolher entre os provedores de identidade disponíveis abaixo. Observação: você também pode usar provedores definidos pelo sistema e provedores definidos apenas para sua organização.",
       "ADVANCED": "Avançado",
       "LIFETIMEDURATIONS": "Duração do login",
+      "LIFETIME_INVALID": "O formulário contém valores inválidos.",
       "SAVED": "Salvo com sucesso!"
     },
     "PRIVACY_POLICY": {

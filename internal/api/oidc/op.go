@@ -139,16 +139,18 @@ func NewServer(
 		assetAPIPrefix:             assets.AssetAPI(externalSecure),
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
-	server.Handler = op.RegisterLegacyServer(server, op.WithHTTPMiddleware(
-		middleware.MetricsHandler(metricTypes),
-		middleware.TelemetryHandler(),
-		middleware.NoCacheInterceptor().Handler,
-		instanceHandler,
-		userAgentCookie,
-		http_utils.CopyHeadersToContext,
-		accessHandler.HandleIgnorePathPrefixes(ignoredQuotaLimitEndpoint(config.CustomEndpoints)),
-		middleware.ActivityHandler,
-	))
+	server.Handler = op.RegisterLegacyServer(server,
+		op.WithFallbackLogger(fallbackLogger),
+		op.WithHTTPMiddleware(
+			middleware.MetricsHandler(metricTypes),
+			middleware.TelemetryHandler(),
+			middleware.NoCacheInterceptor().Handler,
+			instanceHandler,
+			userAgentCookie,
+			http_utils.CopyHeadersToContext,
+			accessHandler.HandleIgnorePathPrefixes(ignoredQuotaLimitEndpoint(config.CustomEndpoints)),
+			middleware.ActivityHandler,
+		))
 
 	return server, nil
 }
