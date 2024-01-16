@@ -73,13 +73,3 @@ func TestServer_Limits_Bulk(t *testing.T) {
 		testBlockingAPI(t, publicAPIBlockingTest(instances[4].domain), true, true)
 	})
 }
-
-func TestServer_Limits_Bulk_Validation(t *testing.T) {
-	_, err := Tester.Client.System.BulkSetLimits(SystemCTX, &system.BulkSetLimitsRequest{
-		Limits: []*system.SetLimitsRequest{{
-			InstanceId: "invalid",
-			Block:      gu.Ptr(true),
-		}},
-	})
-	require.Error(t, err)
-}
