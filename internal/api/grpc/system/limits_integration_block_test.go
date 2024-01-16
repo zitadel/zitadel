@@ -4,14 +4,6 @@ package system_test
 
 import (
 	"fmt"
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/pkg/grpc/admin"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 	"io"
 	"net"
 	"net/http"
@@ -19,8 +11,18 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/durationpb"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
@@ -143,7 +145,13 @@ func TestServer_Limits_Block(t *testing.T) {
 		}}
 	_, err := Tester.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
 		InstanceId: instanceID,
-		Block:      wrapperspb.Bool(true),
+		Block:      gu.Ptr(true),
+	})
+	require.NoError(t, err)
+	// The following call ensures that an undefined bool is not deserialized to false
+	_, err = Tester.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
+		InstanceId:        instanceID,
+		AuditLogRetention: durationpb.New(time.Hour),
 	})
 	require.NoError(t, err)
 	for _, tt := range tests {
@@ -155,7 +163,7 @@ func TestServer_Limits_Block(t *testing.T) {
 	}
 	_, err = Tester.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
 		InstanceId: instanceID,
-		Block:      wrapperspb.Bool(false),
+		Block:      gu.Ptr(false),
 	})
 	require.NoError(t, err)
 	for _, tt := range tests {

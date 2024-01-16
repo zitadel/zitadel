@@ -3,12 +3,12 @@
 package system_test
 
 import (
-	"github.com/zitadel/zitadel/internal/integration"
 	"testing"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 
+	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
@@ -34,19 +34,19 @@ func TestServer_Limits_Bulk(t *testing.T) {
 	resp, err := Tester.Client.System.BulkSetLimits(SystemCTX, &system.BulkSetLimitsRequest{
 		Limits: []*system.SetLimitsRequest{{
 			InstanceId: instances[0].id,
-			Block:      wrapperspb.Bool(true),
+			Block:      gu.Ptr(true),
 		}, {
 			InstanceId: instances[1].id,
-			Block:      wrapperspb.Bool(false),
+			Block:      gu.Ptr(false),
 		}, {
 			InstanceId: instances[2].id,
-			Block:      wrapperspb.Bool(true),
+			Block:      gu.Ptr(true),
 		}, {
 			InstanceId: instances[3].id,
-			Block:      wrapperspb.Bool(false),
+			Block:      gu.Ptr(false),
 		}, {
 			InstanceId: instances[4].id,
-			Block:      wrapperspb.Bool(true),
+			Block:      gu.Ptr(true),
 		}},
 	})
 	require.NoError(t, err)
@@ -78,7 +78,7 @@ func TestServer_Limits_Bulk_Validation(t *testing.T) {
 	_, err := Tester.Client.System.BulkSetLimits(SystemCTX, &system.BulkSetLimitsRequest{
 		Limits: []*system.SetLimitsRequest{{
 			InstanceId: "invalid",
-			Block:      wrapperspb.Bool(true),
+			Block:      gu.Ptr(true),
 		}},
 	})
 	require.Error(t, err)
