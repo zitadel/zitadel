@@ -21,7 +21,12 @@
         </cnsl-form-field>
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.SAML.METADATAXML' | translate }}</cnsl-label>
-          <input cnslInput formControlName="metadataXml" />
+          <textarea
+            cnslInput
+            formControlName="metadataXml"
+            placeholder="base64 encoded metadata xml"
+            class="metadata-xml"
+          ></textarea>
         </cnsl-form-field>
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.SAML.METADATAURL' | translate }}</cnsl-label>
@@ -29,7 +34,7 @@
         </cnsl-form-field>
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.SAML.BINDING' | translate }}</cnsl-label>
-          <mat-select formControlName="binding">
+          <mat-select formControlName="binding" [compareWith]="compareBinding">
             <mat-option *ngFor="let binding of bindingValues" [value]="binding">{{ binding }}</mat-option>
           </mat-select>
         </cnsl-form-field>
