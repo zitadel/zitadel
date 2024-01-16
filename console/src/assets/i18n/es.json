@@ -1252,6 +1252,7 @@
       "DESCRIPTIONCREATEMGMT": "Los usuarios pueden elegir entre los siguientes proveedores de identidad. Nota: Puedes usar los proveedores integrados en el sistema así como sólo los proveedores configurados para tu organización.",
       "ADVANCED": "Avanzado",
       "LIFETIMEDURATIONS": "Tiempos de vida de los inicios de sesión",
+      "LIFETIME_INVALID": "El formulario contiene valores no válidos.",
       "SAVED": "¡Guardado con éxito!"
     },
     "PRIVACY_POLICY": {

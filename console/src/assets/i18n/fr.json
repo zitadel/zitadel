@@ -1250,6 +1250,7 @@
       "DESCRIPTIONCREATEMGMT": "Les utilisateurs peuvent choisir parmi les fournisseurs d'identité disponibles ci-dessous. Note",
       "ADVANCED": "Avancé",
       "LIFETIMEDURATIONS": "Durée de vie des connexions",
+      "LIFETIME_INVALID": "Le formulaire contient des valeurs non valides.",
       "SAVED": "Enregistré avec succès !"
     },
     "PRIVACY_POLICY": {

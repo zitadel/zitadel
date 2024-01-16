@@ -1251,6 +1251,7 @@
       "DESCRIPTIONCREATEMGMT": "Gebruikers kunnen kiezen uit de beschikbare identiteitsproviders hieronder. Opmerking: U kunt systeem ingestelde providers gebruiken evenals providers die alleen voor uw organisatie zijn ingesteld.",
       "ADVANCED": "Geavanceerd",
       "LIFETIMEDURATIONS": "Login Levensduur",
+      "LIFETIME_INVALID": "Formulier bevat ongeldige waarde(n).",
       "SAVED": "Succesvol opgeslagen!"
     },
     "PRIVACY_POLICY": {
