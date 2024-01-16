@@ -12,17 +12,13 @@ import (
 var (
 	tlsMode *string
 
-	portFlag           = "port"
-	externalDomainFlag = "externalDomain"
-	externalPortFlag   = "externalPort"
-
 	startFlagSet = &pflag.FlagSet{}
 )
 
 func init() {
-	startFlagSet.Uint16(portFlag, 0, "port to run ZITADEL on")
-	startFlagSet.String(externalDomainFlag, "", "domain ZITADEL will be exposed on")
-	startFlagSet.String(externalPortFlag, "", "port ZITADEL will be exposed on")
+	startFlagSet.Uint16("port", 0, "port to run ZITADEL on")
+	startFlagSet.String("externalDomain", "", "domain ZITADEL will be exposed on")
+	startFlagSet.String("externalPort", "", "port ZITADEL will be exposed on")
 }
 
 func startFlags(cmd *cobra.Command) {
