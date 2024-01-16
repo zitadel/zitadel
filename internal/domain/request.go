@@ -59,7 +59,7 @@ func (a *AuthRequestSAML) IsValid() bool {
 }
 
 type AuthRequestDevice struct {
-	ID         string
+	ClientID   string
 	DeviceCode string
 	UserCode   string
 	Scopes     []string
@@ -70,5 +70,5 @@ func (*AuthRequestDevice) Type() AuthRequestType {
 }
 
 func (a *AuthRequestDevice) IsValid() bool {
-	return a.DeviceCode != "" && a.UserCode != "" && len(a.Scopes) > 0
+	return a.DeviceCode != "" && a.UserCode != ""
 }

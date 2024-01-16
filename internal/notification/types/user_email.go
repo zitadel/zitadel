@@ -4,10 +4,10 @@ import (
 	"context"
 	"html"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/notification/messages"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func generateEmail(
@@ -34,7 +34,7 @@ func generateEmail(
 		return err
 	}
 	if emailChannels == nil || emailChannels.Len() == 0 {
-		return errors.ThrowPreconditionFailed(nil, "MAIL-83nof", "Errors.Notification.Channels.NotPresent")
+		return zerrors.ThrowPreconditionFailed(nil, "MAIL-83nof", "Errors.Notification.Channels.NotPresent")
 	}
 	return emailChannels.HandleMessage(message)
 }

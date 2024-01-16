@@ -9,10 +9,6 @@ const (
 	identityProviderCount
 )
 
-func (f IdentityProviderType) Valid() bool {
-	return f >= 0 && f < identityProviderCount
-}
-
 type IdentityProviderState int32
 
 const (
@@ -22,7 +18,3 @@ const (
 
 	idpProviderState
 )
-
-func (s IdentityProviderState) Valid() bool {
-	return s >= 0 && s < idpProviderState
-}

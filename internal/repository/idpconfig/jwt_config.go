@@ -2,8 +2,7 @@ package idpconfig
 
 import (
 	"github.com/zitadel/zitadel/internal/eventstore"
-
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -54,7 +53,7 @@ func JWTConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error)
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "JWT-m0fwf", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "JWT-m0fwf", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -85,7 +84,7 @@ func NewJWTConfigChangedEvent(
 	changes []JWTConfigChanges,
 ) (*JWTConfigChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDPCONFIG-fn93s", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDPCONFIG-fn93s", "Errors.NoChangesFound")
 	}
 	changeEvent := &JWTConfigChangedEvent{
 		BaseEvent:   *base,
@@ -130,7 +129,7 @@ func JWTConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, erro
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "JWT-fk3fs", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "JWT-fk3fs", "unable to unmarshal event")
 	}
 
 	return e, nil

@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type cryptoCodeFunc func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.Crypto) (*CryptoCode, error)
@@ -61,7 +61,7 @@ func secretGenerator(ctx context.Context, filter preparation.FilterToQueryReduce
 	case crypto.EncryptionAlgorithm:
 		return crypto.NewEncryptionGenerator(*config, a), config, nil
 	default:
-		return nil, nil, errors.ThrowInternalf(nil, "COMMA-RreV6", "Errors.Internal unsupported crypto algorithm type %T", a)
+		return nil, nil, zerrors.ThrowInternalf(nil, "COMMA-RreV6", "Errors.Internal unsupported crypto algorithm type %T", a)
 	}
 }
 

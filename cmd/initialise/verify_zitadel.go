@@ -1,6 +1,7 @@
 package initialise
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
 func newZitadel() *cobra.Command {
@@ -22,13 +24,13 @@ Prereqesits:
 `,
 		Run: func(cmd *cobra.Command, args []string) {
 			config := MustNewConfig(viper.GetViper())
-			err := verifyZitadel(config.Database)
+			err := verifyZitadel(cmd.Context(), config.Database)
 			logging.OnError(err).Fatal("unable to init zitadel")
 		},
 	}
 }
 
-func VerifyZitadel(db *database.DB, config database.Config) error {
+func VerifyZitadel(ctx context.Context, db *database.DB, config database.Config) error {
 	err := ReadStmts(config.Type())
 	if err != nil {
 		return err
@@ -40,7 +42,7 @@ func VerifyZitadel(db *database.DB, config database.Config) error {
 	}
 
 	logging.WithFields().Info("verify encryption keys")
-	if err := createEncryptionKeys(db); err != nil {
+	if err := createEncryptionKeys(ctx, db); err != nil {
 		return err
 	}
 
@@ -55,7 +57,7 @@ func VerifyZitadel(db *database.DB, config database.Config) error {
 	}
 
 	logging.WithFields().Info("verify events tables")
-	if err := createEvents(db); err != nil {
+	if err := createEvents(ctx, db); err != nil {
 		return err
 	}
 
@@ -72,23 +74,23 @@ func VerifyZitadel(db *database.DB, config database.Config) error {
 	return nil
 }
 
-func verifyZitadel(config database.Config) error {
+func verifyZitadel(ctx context.Context, config database.Config) error {
 	logging.WithFields("database", config.DatabaseName()).Info("verify zitadel")
 
-	db, err := database.Connect(config, false, false)
+	db, err := database.Connect(config, false, dialect.DBPurposeQuery)
 	if err != nil {
 		return err
 	}
 
-	if err := VerifyZitadel(db, config); err != nil {
+	if err := VerifyZitadel(ctx, db, config); err != nil {
 		return err
 	}
 
 	return db.Close()
 }
 
-func createEncryptionKeys(db *database.DB) error {
-	tx, err := db.Begin()
+func createEncryptionKeys(ctx context.Context, db *database.DB) error {
+	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -100,8 +102,8 @@ func createEncryptionKeys(db *database.DB) error {
 	return tx.Commit()
 }
 
-func createEvents(db *database.DB) (err error) {
-	tx, err := db.Begin()
+func createEvents(ctx context.Context, db *database.DB) (err error) {
+	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}

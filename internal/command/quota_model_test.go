@@ -9,11 +9,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestQuotaWriteModel_NewChanges(t *testing.T) {
@@ -277,7 +277,7 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 			idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "notification1", "notification2"),
 		},
 		wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-			return zitadel_errors.IsErrorInvalidArgument(err)
+			return zerrors.IsErrorInvalidArgument(err)
 		},
 	}, {
 		name: "deduplicate existing notifications",

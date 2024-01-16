@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) SetOrgMetadata(ctx context.Context, orgID string, metadata *domain.Metadata) (_ *domain.Metadata, err error) {
@@ -34,7 +34,7 @@ func (c *Commands) SetOrgMetadata(ctx context.Context, orgID string, metadata *d
 
 func (c *Commands) BulkSetOrgMetadata(ctx context.Context, orgID string, metadatas ...*domain.Metadata) (_ *domain.ObjectDetails, err error) {
 	if len(metadatas) == 0 {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "META-9mm2d", "Errors.Metadata.NoData")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "META-9mm2d", "Errors.Metadata.NoData")
 	}
 	err = c.checkOrgExists(ctx, orgID)
 	if err != nil {
@@ -66,7 +66,7 @@ func (c *Commands) BulkSetOrgMetadata(ctx context.Context, orgID string, metadat
 
 func (c *Commands) setOrgMetadata(ctx context.Context, orgAgg *eventstore.Aggregate, metadata *domain.Metadata) (command eventstore.Command, err error) {
 	if !metadata.IsValid() {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "META-2ml0f", "Errors.Metadata.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "META-2ml0f", "Errors.Metadata.Invalid")
 	}
 	return org.NewMetadataSetEvent(
 		ctx,
@@ -78,7 +78,7 @@ func (c *Commands) setOrgMetadata(ctx context.Context, orgAgg *eventstore.Aggreg
 
 func (c *Commands) RemoveOrgMetadata(ctx context.Context, orgID, metadataKey string) (_ *domain.ObjectDetails, err error) {
 	if metadataKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "META-2n0f1", "Errors.Metadata.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "META-2n0f1", "Errors.Metadata.Invalid")
 	}
 	err = c.checkOrgExists(ctx, orgID)
 	if err != nil {
@@ -89,7 +89,7 @@ func (c *Commands) RemoveOrgMetadata(ctx context.Context, orgID, metadataKey str
 		return nil, err
 	}
 	if !removeMetadata.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "META-mcnw3", "Errors.Metadata.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "META-mcnw3", "Errors.Metadata.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&removeMetadata.WriteModel)
 	event, err := c.removeOrgMetadata(ctx, orgAgg, metadataKey)
@@ -110,7 +110,7 @@ func (c *Commands) RemoveOrgMetadata(ctx context.Context, orgID, metadataKey str
 
 func (c *Commands) BulkRemoveOrgMetadata(ctx context.Context, orgID string, metadataKeys ...string) (_ *domain.ObjectDetails, err error) {
 	if len(metadataKeys) == 0 {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "META-9mw2d", "Errors.Metadata.NoData")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "META-9mw2d", "Errors.Metadata.NoData")
 	}
 	err = c.checkOrgExists(ctx, orgID)
 	if err != nil {
@@ -125,10 +125,10 @@ func (c *Commands) BulkRemoveOrgMetadata(ctx context.Context, orgID string, meta
 	orgAgg := OrgAggregateFromWriteModel(&removeMetadata.WriteModel)
 	for i, key := range metadataKeys {
 		if key == "" {
-			return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-m19ds", "Errors.Metadata.Invalid")
+			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-m19ds", "Errors.Metadata.Invalid")
 		}
 		if _, found := removeMetadata.metadataList[key]; !found {
-			return nil, caos_errs.ThrowNotFound(nil, "META-2npds", "Errors.Metadata.KeyNotExisting")
+			return nil, zerrors.ThrowNotFound(nil, "META-2npds", "Errors.Metadata.KeyNotExisting")
 		}
 		event, err := c.removeOrgMetadata(ctx, orgAgg, key)
 		if err != nil {

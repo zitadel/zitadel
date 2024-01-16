@@ -1,8 +1,8 @@
-import { Component, Injector, Input, OnInit, Type } from '@angular/core';
+import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
-import { take } from 'rxjs';
+import { firstValueFrom, forkJoin, from, Observable, of, Subject, take } from 'rxjs';
 import {
   GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
   UpdateLoginPolicyRequest,
@@ -24,19 +24,30 @@ import { InfoSectionType } from '../../info-section/info-section.component';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { LoginMethodComponentType } from './factor-table/factor-table.component';
+import { catchError, map, takeUntil } from 'rxjs/operators';
+import { error } from 'console';
+
+const minValueValidator = (minValue: number) => (control: AbstractControl) => {
+  const value = control.value;
+  if (value !== null && value < minValue) {
+    return { minValue: true, message: `Minimum value allowed is ${minValue}.` };
+  }
+  return null;
+};
 
 @Component({
   selector: 'cnsl-login-policy',
   templateUrl: './login-policy.component.html',
   styleUrls: ['./login-policy.component.scss'],
 })
-export class LoginPolicyComponent implements OnInit {
+export class LoginPolicyComponent implements OnInit, OnDestroy {
   public LoginMethodComponentType: any = LoginMethodComponentType;
   public passwordlessTypes: Array<PasswordlessType> = [
     PasswordlessType.PASSWORDLESS_TYPE_NOT_ALLOWED,
     PasswordlessType.PASSWORDLESS_TYPE_ALLOWED,
   ];
   public loginData?: LoginPolicy.AsObject;
+  public allowOrgRegistration: boolean = false;
 
   public service!: ManagementService | AdminService;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
@@ -46,12 +57,14 @@ export class LoginPolicyComponent implements OnInit {
   public InfoSectionType: any = InfoSectionType;
   public PasswordlessType: any = PasswordlessType;
   public lifetimeForm: UntypedFormGroup = this.fb.group({
-    passwordCheckLifetime: [{ disabled: true }, [requiredValidator]],
-    externalLoginCheckLifetime: [{ disabled: true }, [requiredValidator]],
-    mfaInitSkipLifetime: [{ disabled: true }, [requiredValidator]],
-    secondFactorCheckLifetime: [{ disabled: true }, [requiredValidator]],
-    multiFactorCheckLifetime: [{ disabled: true }, [requiredValidator]],
+    passwordCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(1)]],
+    externalLoginCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(1)]],
+    mfaInitSkipLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(0)]],
+    secondFactorCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(1)]],
+    multiFactorCheckLifetime: [{ disabled: true }, [requiredValidator, minValueValidator(1)]],
   });
+  private destroy$: Subject<void> = new Subject();
+
   constructor(
     private toast: ToastService,
     private injector: Injector,
@@ -60,43 +73,59 @@ export class LoginPolicyComponent implements OnInit {
     private dialog: MatDialog,
   ) {}
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   public fetchData(): void {
-    this.getData()
-      .then((resp) => {
-        if (resp.policy) {
-          this.loginData = resp.policy;
-          this.loading = false;
+    const data$ = forkJoin([
+      this.serviceType === PolicyComponentServiceType.ADMIN
+        ? from((this.service as AdminService).getRestrictions()).pipe(
+            map(({ disallowPublicOrgRegistration }) => disallowPublicOrgRegistration),
+          )
+        : of(true),
+      from(this.getData()),
+    ]);
 
-          this.passwordCheckLifetime?.setValue(
-            this.loginData.passwordCheckLifetime?.seconds ? this.loginData.passwordCheckLifetime?.seconds / 60 / 60 : 0,
-          );
-
-          this.externalLoginCheckLifetime?.setValue(
-            this.loginData.externalLoginCheckLifetime?.seconds
-              ? this.loginData.externalLoginCheckLifetime?.seconds / 60 / 60
-              : 0,
-          );
-
-          this.mfaInitSkipLifetime?.setValue(
-            this.loginData.mfaInitSkipLifetime?.seconds ? this.loginData.mfaInitSkipLifetime?.seconds / 60 / 60 : 0,
-          );
-
-          this.secondFactorCheckLifetime?.setValue(
-            this.loginData.secondFactorCheckLifetime?.seconds
-              ? this.loginData.secondFactorCheckLifetime?.seconds / 60 / 60
-              : 0,
-          );
-
-          this.multiFactorCheckLifetime?.setValue(
-            this.loginData.multiFactorCheckLifetime?.seconds
-              ? this.loginData.multiFactorCheckLifetime?.seconds / 60 / 60
-              : 0,
-          );
+    const sub = data$.pipe(takeUntil(this.destroy$)).subscribe({
+      next: ([disallowPublicOrgRegistration, resp]) => {
+        this.allowOrgRegistration = !disallowPublicOrgRegistration;
+        if (!resp.policy) {
+          return;
         }
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+        this.loginData = resp.policy;
+        this.loading = false;
+
+        this.passwordCheckLifetime?.setValue(
+          this.loginData.passwordCheckLifetime?.seconds ? this.loginData.passwordCheckLifetime?.seconds / 60 / 60 : 0,
+        );
+
+        this.externalLoginCheckLifetime?.setValue(
+          this.loginData.externalLoginCheckLifetime?.seconds
+            ? this.loginData.externalLoginCheckLifetime?.seconds / 60 / 60
+            : 0,
+        );
+
+        this.mfaInitSkipLifetime?.setValue(
+          this.loginData.mfaInitSkipLifetime?.seconds ? this.loginData.mfaInitSkipLifetime?.seconds / 60 / 60 : 0,
+        );
+
+        this.secondFactorCheckLifetime?.setValue(
+          this.loginData.secondFactorCheckLifetime?.seconds
+            ? this.loginData.secondFactorCheckLifetime?.seconds / 60 / 60
+            : 0,
+        );
+
+        this.multiFactorCheckLifetime?.setValue(
+          this.loginData.multiFactorCheckLifetime?.seconds ? this.loginData.multiFactorCheckLifetime?.seconds / 60 / 60 : 0,
+        );
+      },
+      error: this.toast.showError,
+      complete: () => {
+        sub.unsubscribe();
+      },
+    });
   }
 
   public ngOnInit(): void {
@@ -122,8 +151,8 @@ export class LoginPolicyComponent implements OnInit {
         this.serviceType === PolicyComponentServiceType.ADMIN
           ? ['iam.policy.write']
           : this.serviceType === PolicyComponentServiceType.MGMT
-          ? ['policy.write']
-          : [],
+            ? ['policy.write']
+            : [],
       )
       .pipe(take(1))
       .subscribe((allowed) => {
@@ -142,7 +171,9 @@ export class LoginPolicyComponent implements OnInit {
     }
   }
 
-  private async updateData(): Promise<UpdateLoginPolicyResponse.AsObject> {
+  private async updateData(): Promise<any> {
+    const calls: Observable<any>[] = [];
+
     if (this.loginData) {
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
@@ -179,7 +210,8 @@ export class LoginPolicyComponent implements OnInit {
             mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
             mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 
-            return (this.service as ManagementService).addCustomLoginPolicy(mgmtreq);
+            calls.push(from((this.service as ManagementService).addCustomLoginPolicy(mgmtreq)));
+            break;
           } else {
             const mgmtreq = new UpdateCustomLoginPolicyRequest();
             mgmtreq.setAllowExternalIdp(this.loginData.allowExternalIdp);
@@ -211,7 +243,8 @@ export class LoginPolicyComponent implements OnInit {
             mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
             mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 
-            return (this.service as ManagementService).updateCustomLoginPolicy(mgmtreq);
+            calls.push(from((this.service as ManagementService).updateCustomLoginPolicy(mgmtreq)));
+            break;
           }
         case PolicyComponentServiceType.ADMIN:
           const adminreq = new UpdateLoginPolicyRequest();
@@ -243,14 +276,30 @@ export class LoginPolicyComponent implements OnInit {
           adminreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
           adminreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 
-          return (this.service as AdminService).updateLoginPolicy(adminreq);
+          calls.push(from((this.service as AdminService).setRestrictions(!this.allowOrgRegistration)));
+          calls.push(from((this.service as AdminService).updateLoginPolicy(adminreq)));
+          break;
       }
     } else {
-      return Promise.reject();
+      calls.push(from(Promise.reject()));
     }
+    return firstValueFrom(
+      forkJoin(calls).pipe(
+        catchError((error, caught) => {
+          // We just ignore the policy not changed error!
+          return (error as { message: string }).message.includes('INSTANCE-5M9vdd') ? of(true) : caught;
+        }),
+      ),
+    );
   }
 
   public savePolicy(): void {
+    if (this.lifetimeForm.invalid) {
+      // Display error message
+      this.toast.showError('POLICY.LOGIN_POLICY.LIFETIME_INVALID', false, true);
+      return;
+    }
+
     this.updateData()
       .then(() => {
         this.toast.showInfo('POLICY.LOGIN_POLICY.SAVED', true);

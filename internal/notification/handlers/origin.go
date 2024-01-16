@@ -8,9 +8,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type OriginEvent interface {
@@ -44,7 +44,7 @@ func (n *NotificationQueries) Origin(ctx context.Context, e eventstore.Event) (c
 		return ctx, err
 	}
 	if len(domains.Domains) < 1 {
-		return ctx, errors.ThrowInternal(nil, "NOTIF-Ef3r1", "Errors.Notification.NoDomain")
+		return ctx, zerrors.ThrowInternal(nil, "NOTIF-Ef3r1", "Errors.Notification.NoDomain")
 	}
 	return enrichCtx(
 		ctx,

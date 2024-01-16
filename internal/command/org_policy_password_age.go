@@ -4,13 +4,13 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddPasswordAgePolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
 	if resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M9fsd", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-M9fsd", "Errors.ResourceOwnerMissing")
 	}
 	addedPolicy := NewOrgPasswordAgePolicyWriteModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
@@ -18,7 +18,7 @@ func (c *Commands) AddPasswordAgePolicy(ctx context.Context, resourceOwner strin
 		return nil, err
 	}
 	if addedPolicy.State == domain.PolicyStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-Lk0dS", "Errors.Org.PasswordAgePolicy.AlreadyExists")
+		return nil, zerrors.ThrowAlreadyExists(nil, "ORG-Lk0dS", "Errors.Org.PasswordAgePolicy.AlreadyExists")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
@@ -35,7 +35,7 @@ func (c *Commands) AddPasswordAgePolicy(ctx context.Context, resourceOwner strin
 
 func (c *Commands) ChangePasswordAgePolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordAgePolicy) (*domain.PasswordAgePolicy, error) {
 	if resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-57tGs", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-57tGs", "Errors.ResourceOwnerMissing")
 	}
 	existingPolicy := NewOrgPasswordAgePolicyWriteModel(resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
@@ -43,13 +43,13 @@ func (c *Commands) ChangePasswordAgePolicy(ctx context.Context, resourceOwner st
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "ORG-0oPew", "Errors.Org.PasswordAgePolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "ORG-0oPew", "Errors.Org.PasswordAgePolicy.NotFound")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PasswordAgePolicyWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.ExpireWarnDays, policy.MaxAgeDays)
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-dsgjR", "Errors.ORg.LabelPolicy.NotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "Org-dsgjR", "Errors.ORg.LabelPolicy.NotChanged")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
@@ -65,7 +65,7 @@ func (c *Commands) ChangePasswordAgePolicy(ctx context.Context, resourceOwner st
 
 func (c *Commands) RemovePasswordAgePolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M58wd", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-M58wd", "Errors.ResourceOwnerMissing")
 	}
 	existingPolicy := NewOrgPasswordAgePolicyWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingPolicy)
@@ -73,7 +73,7 @@ func (c *Commands) RemovePasswordAgePolicy(ctx context.Context, orgID string) (*
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "ORG-Dgs1g", "Errors.Org.PasswordAgePolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "ORG-Dgs1g", "Errors.Org.PasswordAgePolicy.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewPasswordAgePolicyRemovedEvent(ctx, orgAgg))

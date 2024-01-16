@@ -21,11 +21,11 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var _ provider.EntityStorage = &Storage{}
@@ -60,7 +60,7 @@ func (p *Storage) GetEntityByID(ctx context.Context, entityID string) (*servicep
 		return nil, err
 	}
 	if app.State != domain.AppStateActive {
-		return nil, errors.ThrowPreconditionFailed(nil, "SAML-sdaGg", "app is not active")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "SAML-sdaGg", "app is not active")
 	}
 	return serviceprovider.NewServiceProvider(
 		app.ID,
@@ -77,7 +77,7 @@ func (p *Storage) GetEntityIDByAppID(ctx context.Context, appID string) (string,
 		return "", err
 	}
 	if app.State != domain.AppStateActive {
-		return "", errors.ThrowPreconditionFailed(nil, "SAML-sdaGg", "app is not active")
+		return "", zerrors.ThrowPreconditionFailed(nil, "SAML-sdaGg", "app is not active")
 	}
 	return app.SAMLConfig.EntityID, nil
 }
@@ -103,7 +103,7 @@ func (p *Storage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequest
 	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
-		return nil, errors.ThrowPreconditionFailed(nil, "SAML-sd436", "no user agent id")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "SAML-sd436", "no user agent id")
 	}
 
 	authRequest := CreateAuthRequestToBusiness(ctx, req, acsUrl, protocolBinding, applicationID, relayState, userAgentID)
@@ -121,7 +121,7 @@ func (p *Storage) AuthRequestByID(ctx context.Context, id string) (_ models.Auth
 	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
-		return nil, errors.ThrowPreconditionFailed(nil, "SAML-D3g21", "no user agent id")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "SAML-D3g21", "no user agent id")
 	}
 	resp, err := p.repo.AuthRequestByIDCheckLoggedIn(ctx, id, userAgentID)
 	if err != nil {
@@ -159,11 +159,7 @@ func (p *Storage) SetUserinfoWithLoginName(ctx context.Context, userinfo models.
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	loginNameSQ, err := query.NewUserLoginNamesSearchQuery(loginName)
-	if err != nil {
-		return err
-	}
-	user, err := p.query.GetUser(ctx, true, loginNameSQ)
+	user, err := p.query.GetUserByLoginName(ctx, true, loginName)
 	if err != nil {
 		return err
 	}
@@ -332,7 +328,7 @@ func (p *Storage) getGrants(ctx context.Context, userID, applicationID string) (
 			projectQuery,
 			userIDQuery,
 		},
-	}, true, false)
+	}, true)
 }
 
 type customAttribute struct {

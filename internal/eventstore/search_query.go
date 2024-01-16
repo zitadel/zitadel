@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // SearchQueryBuilder represents the builder for your filter
@@ -14,7 +14,7 @@ import (
 type SearchQueryBuilder struct {
 	columns               Columns
 	limit                 uint64
-	offset                uint16
+	offset                uint32
 	desc                  bool
 	resourceOwner         string
 	instanceID            *string
@@ -38,7 +38,7 @@ func (b *SearchQueryBuilder) GetLimit() uint64 {
 	return b.limit
 }
 
-func (b *SearchQueryBuilder) GetOffset() uint16 {
+func (b *SearchQueryBuilder) GetOffset() uint32 {
 	return b.offset
 }
 
@@ -141,7 +141,7 @@ const (
 
 func (c Columns) Validate() error {
 	if c <= 0 || c >= columnsCount {
-		return errors.ThrowPreconditionFailed(nil, "REPOS-x8R35", "column out of range")
+		return zerrors.ThrowPreconditionFailed(nil, "REPOS-x8R35", "column out of range")
 	}
 	return nil
 }
@@ -160,7 +160,7 @@ func (builder *SearchQueryBuilder) Matches(commands ...Command) []Command {
 		if builder.limit > 0 && builder.limit <= uint64(len(matches)) {
 			break
 		}
-		if builder.offset > 0 && uint16(i) < builder.offset {
+		if builder.offset > 0 && uint32(i) < builder.offset {
 			continue
 		}
 
@@ -213,7 +213,7 @@ func (builder *SearchQueryBuilder) Limit(limit uint64) *SearchQueryBuilder {
 }
 
 // Limit defines how many events are returned maximally.
-func (builder *SearchQueryBuilder) Offset(offset uint16) *SearchQueryBuilder {
+func (builder *SearchQueryBuilder) Offset(offset uint32) *SearchQueryBuilder {
 	builder.offset = offset
 	return builder
 }

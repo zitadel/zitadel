@@ -3,15 +3,15 @@ package database
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"fmt"
 	"io"
 	"time"
 
 	"github.com/Masterminds/squirrel"
 
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var _ static.Storage = (*crdbStorage)(nil)
@@ -40,7 +40,7 @@ func NewStorage(client *sql.DB, _ map[string]interface{}) (static.Storage, error
 func (c *crdbStorage) PutObject(ctx context.Context, instanceID, location, resourceOwner, name, contentType string, objectType static.ObjectType, object io.Reader, objectSize int64) (*static.Asset, error) {
 	data, err := io.ReadAll(object)
 	if err != nil {
-		return nil, caos_errors.ThrowInternal(err, "DATAB-Dfwvq", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "DATAB-Dfwvq", "Errors.Internal")
 	}
 	stmt, args, err := squirrel.Insert(assetsTable).
 		Columns(AssetColInstanceID, AssetColResourceOwner, AssetColName, AssetColType, AssetColContentType, AssetColData, AssetColUpdatedAt).
@@ -52,13 +52,13 @@ func (c *crdbStorage) PutObject(ctx context.Context, instanceID, location, resou
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
-		return nil, caos_errors.ThrowInternal(err, "DATAB-32DG1", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "DATAB-32DG1", "Errors.Internal")
 	}
 	var hash string
 	var updatedAt time.Time
 	err = c.client.QueryRowContext(ctx, stmt, args...).Scan(&hash, &updatedAt)
 	if err != nil {
-		return nil, caos_errors.ThrowInternal(err, "DATAB-D2g2q", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "DATAB-D2g2q", "Errors.Internal")
 	}
 	return &static.Asset{
 		InstanceID:   instanceID,
@@ -82,7 +82,7 @@ func (c *crdbStorage) GetObject(ctx context.Context, instanceID, resourceOwner, 
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
-		return nil, nil, caos_errors.ThrowInternal(err, "DATAB-GE3hz", "Errors.Internal")
+		return nil, nil, zerrors.ThrowInternal(err, "DATAB-GE3hz", "Errors.Internal")
 	}
 	var data []byte
 	asset := &static.Asset{
@@ -98,10 +98,10 @@ func (c *crdbStorage) GetObject(ctx context.Context, instanceID, resourceOwner, 
 			&asset.LastModified,
 		)
 	if err != nil {
-		if errs.Is(err, sql.ErrNoRows) {
-			return nil, nil, caos_errors.ThrowNotFound(err, "DATAB-pCP8P", "Errors.Assets.Object.NotFound")
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil, zerrors.ThrowNotFound(err, "DATAB-pCP8P", "Errors.Assets.Object.NotFound")
 		}
-		return nil, nil, caos_errors.ThrowInternal(err, "DATAB-Sfgb3", "Errors.Assets.Object.GetFailed")
+		return nil, nil, zerrors.ThrowInternal(err, "DATAB-Sfgb3", "Errors.Assets.Object.GetFailed")
 	}
 	asset.Size = int64(len(data))
 	return data,
@@ -122,7 +122,7 @@ func (c *crdbStorage) GetObjectInfo(ctx context.Context, instanceID, resourceOwn
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
-		return nil, caos_errors.ThrowInternal(err, "DATAB-rggt2", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "DATAB-rggt2", "Errors.Internal")
 	}
 	asset := &static.Asset{
 		InstanceID:    instanceID,
@@ -138,7 +138,7 @@ func (c *crdbStorage) GetObjectInfo(ctx context.Context, instanceID, resourceOwn
 			&asset.LastModified,
 		)
 	if err != nil {
-		return nil, caos_errors.ThrowInternal(err, "DATAB-Dbh2s", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "DATAB-Dbh2s", "Errors.Internal")
 	}
 	return asset, nil
 }
@@ -153,11 +153,11 @@ func (c *crdbStorage) RemoveObject(ctx context.Context, instanceID, resourceOwne
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
-		return caos_errors.ThrowInternal(err, "DATAB-Sgvwq", "Errors.Internal")
+		return zerrors.ThrowInternal(err, "DATAB-Sgvwq", "Errors.Internal")
 	}
 	_, err = c.client.ExecContext(ctx, stmt, args...)
 	if err != nil {
-		return caos_errors.ThrowInternal(err, "DATAB-RHNgf", "Errors.Assets.Object.RemoveFailed")
+		return zerrors.ThrowInternal(err, "DATAB-RHNgf", "Errors.Assets.Object.RemoveFailed")
 	}
 	return nil
 }
@@ -172,11 +172,11 @@ func (c *crdbStorage) RemoveObjects(ctx context.Context, instanceID, resourceOwn
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
-		return caos_errors.ThrowInternal(err, "DATAB-Sfgeq", "Errors.Internal")
+		return zerrors.ThrowInternal(err, "DATAB-Sfgeq", "Errors.Internal")
 	}
 	_, err = c.client.ExecContext(ctx, stmt, args...)
 	if err != nil {
-		return caos_errors.ThrowInternal(err, "DATAB-Efgt2", "Errors.Assets.Object.RemoveFailed")
+		return zerrors.ThrowInternal(err, "DATAB-Efgt2", "Errors.Assets.Object.RemoveFailed")
 	}
 	return nil
 }
@@ -189,11 +189,11 @@ func (c *crdbStorage) RemoveInstanceObjects(ctx context.Context, instanceID stri
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
-		return caos_errors.ThrowInternal(err, "DATAB-Sfgeq", "Errors.Internal")
+		return zerrors.ThrowInternal(err, "DATAB-Sfgeq", "Errors.Internal")
 	}
 	_, err = c.client.ExecContext(ctx, stmt, args...)
 	if err != nil {
-		return caos_errors.ThrowInternal(err, "DATAB-Efgt2", "Errors.Assets.Object.RemoveFailed")
+		return zerrors.ThrowInternal(err, "DATAB-Efgt2", "Errors.Assets.Object.RemoveFailed")
 	}
 	return nil
 }

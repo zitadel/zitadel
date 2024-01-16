@@ -88,10 +88,17 @@ HTTP1HostHeader: "host" # ZITADEL_HTTP1HOSTHEADER
 WebAuthNName: ZITADEL # ZITADEL_WEBAUTHN_NAME
 
 Database:
-  # This setting defines the ratio of how many connections defined below
-  # are used to push events. ZITADEL manages two database connection pools
-  # one to push events and one for the remaining queries. 
+  # ZITADEL manages three database connection pools.
+  # The *ConnRatio settings define the ratio of how many connections from
+  # MaxOpenConns and MaxIdleConns are used to push events and spool projections.
+  # Remaining connection are used for queries (search).
+  # Values may not be negative and the sum of the ratios must always be less than 1.
+  # For example this defaults define 40 MaxOpenConns overall.
+  # - 40*0.2=8 connections are allocated to the event pusher;
+  # - 40*0.2=8 connections are allocated to the projection spooler;
+  # - 40-(8+8)=24 connections are remaining for queries;
   EventPushConnRatio: 0.2 # ZITADEL_DATABASE_COCKROACH_EVENTPUSHCONNRATIO
+  ProjectionSpoolerConnRatio: 0.2 # ZITADEL_DATABASE_COCKROACH_PROJECTIONSPOOLERCONNRATIO
   # CockroachDB is the default database of ZITADEL
   cockroach:
     Host: localhost # ZITADEL_DATABASE_COCKROACH_HOST
@@ -205,8 +212,8 @@ Projections:
   BulkLimit: 200 # ZITADEL_PROJECTIONS_BULKLIMIT
   # Only instances are projected, for which at least a projection-relevant event exists within the timeframe
   # from HandleActiveInstances duration in the past until the projection's current time
-  # Defaults to twice the RequeueEvery duration
-  HandleActiveInstances: 120s # ZITADEL_PROJECTIONS_HANDLEACTIVEINSTANCES
+  # If set to 0 (default), every instance is always considered active
+  HandleActiveInstances: 0s # ZITADEL_PROJECTIONS_HANDLEACTIVEINSTANCES
   # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
     Projects:
@@ -229,8 +236,8 @@ Projections:
       # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
       # An instance is active, as long as there are projected events on the instance, that are not older than the HandleActiveInstances duration.
       # Delivery guarantee requirements are higher for quota webhooks
-      # Defaults to 45 days
-      HandleActiveInstances: 1080h # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_HANDLEACTIVEINSTANCES
+      # If set to 0 (default), every instance is always considered active
+      HandleActiveInstances: 0s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_HANDLEACTIVEINSTANCES
       # As quota notification projections don't result in database statements, retries don't have an effect
       MaxFailureCount: 10 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_MAXFAILURECOUNT
       # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the db too much.
@@ -244,8 +251,8 @@ Projections:
       # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
       # An instance is active, as long as there are projected events on the instance, that are not older than the HandleActiveInstances duration.
       # Telemetry delivery guarantee requirements are a bit higher than normal data projections, as they are not interactively retryable.
-      # Defaults to 15 days
-      HandleActiveInstances: 360h # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_HANDLEACTIVEINSTANCES
+      # If set to 0 (default), every instance is always considered active
+      HandleActiveInstances: 0s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_HANDLEACTIVEINSTANCES
       # As sending telemetry data doesn't result in database statements, retries don't have any effects
       MaxFailureCount: 0 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_MAXFAILURECOUNT
       # Telemetry data synchronization is not time critical. Setting RequeueEvery to 55 minutes doesn't annoy the database too much.
@@ -263,8 +270,8 @@ Auth:
     FailureCountUntilSkip: 5 #ZITADEL_AUTH_SPOOLER_FAILURECOUNTUNTILSKIP
     # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
     # from HandleActiveInstances duration in the past until the projections current time
-    # Defaults to twice the RequeueEvery duration
-    HandleActiveInstances: 120s #ZITADEL_AUTH_SPOOLER_HANDLEACTIVEINSTANCES
+    # If set to 0 (default), every instance is always considered active
+    HandleActiveInstances: 0s #ZITADEL_AUTH_SPOOLER_HANDLEACTIVEINSTANCES
 
 Admin:
   # See Projections.BulkLimit
@@ -278,8 +285,8 @@ Admin:
     FailureCountUntilSkip: 5
     # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
     # from HandleActiveInstances duration in the past until the projections current time
-    # Defaults to twice the RequeueEvery duration
-    HandleActiveInstances: 120s
+    # If set to 0 (default), every instance is always considered active
+    HandleActiveInstances: 0s
 
 UserAgentCookie:
   Name: zitadel.useragent # ZITADEL_USERAGENTCOOKIE_NAME
@@ -366,17 +373,6 @@ Console:
     # 168h is 7 days, one week
     SharedMaxAge: 168h # ZITADEL_CONSOLE_LONGCACHE_SHAREDMAXAGE
   InstanceManagementURL: "" # ZITADEL_CONSOLE_INSTANCEMANAGEMENTURL
-
-Notification:
-  Repository:
-    Spooler:
-      # See Projections.TransactionDuration
-      TransactionDuration: 10s #ZITADEL_NOTIFICATION_REPOSITORY_SPOOLER_TRANSACTIONDURATION
-      # See Projections.BulkLimit
-      BulkLimit: 200 #ZITADEL_NOTIFICATION_REPOSITORY_SPOOLER_BULKLIMIT
-      # See Projections.MaxFailureCount
-      FailureCountUntilSkip: 5 #ZITADEL_NOTIFICATION_REPOSITORY_SPOOLER_FAILURECOUNTUNTILSKIP
-      Handlers:
 
 EncryptionKeys:
   DomainVerification:
@@ -725,11 +721,11 @@ DefaultInstance:
       Host: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_HOST
       User: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_USER
       Password: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_PASSWORD
-    TLS: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_SSL
+    TLS: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_TLS
     # If the host of the sender is different from ExternalDomain set DefaultInstance.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain to false
-    From: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_FROM
-    FromName: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_FROMNAME
-    ReplyToAddress: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_REPLYTOADDRESS
+    From: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_FROM
+    FromName: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_FROMNAME
+    ReplyToAddress: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_REPLYTOADDRESS
   MessageTexts:
     - MessageTextType: InitCode
       Language: de

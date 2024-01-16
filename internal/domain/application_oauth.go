@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type oAuthApplication interface {
@@ -17,7 +17,7 @@ type oAuthApplication interface {
 	requiresClientSecret() bool
 }
 
-//ClientID random_number@projectname (eg. 495894098234@zitadel)
+// ClientID random_number@projectname (eg. 495894098234@zitadel)
 func SetNewClientID(a oAuthApplication, idGenerator id.Generator, project *Project) error {
 	clientID, err := NewClientID(idGenerator, project.Name)
 	if err != nil {
@@ -53,7 +53,7 @@ func NewClientSecret(generator crypto.Generator) (*crypto.CryptoValue, string, e
 	cryptoValue, stringSecret, err := crypto.NewCode(generator)
 	if err != nil {
 		logging.Log("MODEL-UpnTI").OnError(err).Error("unable to create client secret")
-		return nil, "", errors.ThrowInternal(err, "MODEL-gH2Wl", "Errors.Project.CouldNotGenerateClientSecret")
+		return nil, "", zerrors.ThrowInternal(err, "MODEL-gH2Wl", "Errors.Project.CouldNotGenerateClientSecret")
 	}
 	return cryptoValue, stringSecret, nil
 }

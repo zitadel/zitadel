@@ -13,9 +13,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type instanceInterceptor struct {
@@ -55,7 +55,7 @@ func (a *instanceInterceptor) handleInstance(w http.ResponseWriter, r *http.Requ
 	}
 	ctx, err := setInstance(r, a.verifier, a.headerName)
 	if err != nil {
-		caosErr := new(caos_errors.NotFoundError)
+		caosErr := new(zerrors.NotFoundError)
 		if errors.As(err, &caosErr) {
 			caosErr.Message = a.translator.LocalizeFromRequest(r, caosErr.GetMessage(), nil)
 		}
@@ -74,7 +74,7 @@ func setInstance(r *http.Request, verifier authz.InstanceVerifier, headerName st
 
 	host, err := HostFromRequest(r, headerName)
 	if err != nil {
-		return nil, caos_errors.ThrowNotFound(err, "INST-zWq7X", "Errors.Instance.NotFound")
+		return nil, zerrors.ThrowNotFound(err, "INST-zWq7X", "Errors.Instance.NotFound")
 	}
 
 	instance, err := verifier.InstanceByHost(authCtx, host)

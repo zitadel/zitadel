@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Email struct {
@@ -51,7 +51,7 @@ func (a *Email) setData(event *es_models.Event) error {
 	a.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-dlo9s").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-sl9xw", "could not unmarshal event")
+		return zerrors.ThrowInternal(err, "MODEL-sl9xw", "could not unmarshal event")
 	}
 	return nil
 }
@@ -61,7 +61,7 @@ func (a *EmailCode) SetData(event *es_models.Event) error {
 	a.CreationDate = event.CreationDate
 	if err := json.Unmarshal(event.Data, a); err != nil {
 		logging.Log("EVEN-lo9s").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-s8uws", "could not unmarshal event")
+		return zerrors.ThrowInternal(err, "MODEL-s8uws", "could not unmarshal event")
 	}
 	return nil
 }

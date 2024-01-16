@@ -11,8 +11,8 @@ import (
 	"github.com/jackc/pgconn"
 	"github.com/zitadel/logging"
 
-	errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -61,7 +61,7 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventst
 			if constraint := constraintFromErr(err, deleteConstraints); constraint != nil {
 				errMessage = constraint.ErrorMessage
 			}
-			return errs.ThrowInternal(err, "V3-C8l3V", errMessage)
+			return zerrors.ThrowInternal(err, "V3-C8l3V", errMessage)
 		}
 	}
 	if len(addPlaceholders) > 0 {
@@ -72,7 +72,7 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventst
 			if constraint := constraintFromErr(err, addConstraints); constraint != nil {
 				errMessage = constraint.ErrorMessage
 			}
-			return errs.ThrowAlreadyExists(err, "V3-DKcYh", errMessage)
+			return zerrors.ThrowAlreadyExists(err, "V3-DKcYh", errMessage)
 		}
 	}
 	return nil

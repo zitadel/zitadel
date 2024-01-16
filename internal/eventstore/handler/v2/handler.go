@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"math"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -111,11 +112,19 @@ func (h *Handler) Start(ctx context.Context) {
 }
 
 func (h *Handler) schedule(ctx context.Context) {
-	// if there was no run before trigger instantly
-	t := time.NewTimer(0)
+	// if there was no run before trigger within half a second
+	start := randomizeStart(0, 0.5)
+	t := time.NewTimer(start)
 	didInitialize := h.didProjectionInitialize(ctx)
 	if didInitialize {
-		t.Reset(h.requeueEvery)
+		if !t.Stop() {
+			<-t.C
+		}
+		// if there was a trigger before, start the projection
+		// after a second (should generally be after the not initialized projections)
+		// and its configured `RequeueEvery`
+		reset := randomizeStart(1, h.requeueEvery.Seconds())
+		t.Reset(reset)
 	}
 
 	for {
@@ -136,6 +145,7 @@ func (h *Handler) schedule(ctx context.Context) {
 				_, err = h.Trigger(instanceCtx)
 				instanceFailed = instanceFailed || err != nil
 				h.log().WithField("instance", instance).OnError(err).Info("scheduled trigger failed")
+				time.Sleep(h.retryFailedAfter)
 				// retry if trigger failed
 				for ; err != nil; _, err = h.Trigger(instanceCtx) {
 					time.Sleep(h.retryFailedAfter)
@@ -155,6 +165,11 @@ func (h *Handler) schedule(ctx context.Context) {
 			t.Reset(h.requeueEvery)
 		}
 	}
+}
+
+func randomizeStart(min, maxSeconds float64) time.Duration {
+	d := min + rand.Float64()*(maxSeconds-min)
+	return time.Duration(d*1000) * time.Millisecond
 }
 
 func (h *Handler) subscribe(ctx context.Context) {
@@ -213,7 +228,7 @@ func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]str
 		AwaitOpenTransactions().
 		AllowTimeTravel().
 		ExcludedInstanceID("")
-	if didInitialize {
+	if didInitialize && h.handleActiveInstances > 0 {
 		query = query.
 			CreationDateAfter(h.now().Add(-1 * h.handleActiveInstances))
 	}
@@ -302,23 +317,30 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		}
 	}()
 
+	txCtx := ctx
 	if h.txDuration > 0 {
 		var cancel func()
 		ctx, cancel = context.WithTimeout(ctx, h.txDuration)
 		defer cancel()
+		// add 100ms to store current state if iteration takes too long
+		txCtx, cancel = context.WithTimeout(ctx, h.txDuration+100*time.Millisecond)
+		defer cancel()
 	}
 
-	tx, err := h.client.Begin()
+	tx, err := h.client.BeginTx(txCtx, nil)
 	if err != nil {
 		return false, err
 	}
 	defer func() {
-		if err != nil {
+		if err != nil && !errors.Is(err, &executionError{}) {
 			rollbackErr := tx.Rollback()
 			h.log().OnError(rollbackErr).Debug("unable to rollback tx")
 			return
 		}
-		err = tx.Commit()
+		commitErr := tx.Commit()
+		if err == nil {
+			err = commitErr
+		}
 	}()
 
 	currentState, err := h.currentState(ctx, tx, config)
@@ -440,7 +462,10 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, currentState
 	}
 	var shouldContinue bool
 	defer func() {
-		_, err = tx.Exec("RELEASE SAVEPOINT exec")
+		_, errSave := tx.Exec("RELEASE SAVEPOINT exec")
+		if err == nil {
+			err = errSave
+		}
 	}()
 
 	if err = statement.Execute(tx, h.projection.Name()); err != nil {
@@ -451,7 +476,7 @@ func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, currentState
 			return nil
 		}
 
-		return err
+		return &executionError{parent: err}
 	}
 
 	return nil

@@ -13,12 +13,12 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
@@ -54,7 +54,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D32ef", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-D32ef", ""))
 				},
 			},
 		},
@@ -72,7 +72,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dbgzf", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Dbgzf", ""))
 				},
 			},
 		},
@@ -91,7 +91,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DF4ga", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-DF4ga", ""))
 				},
 			},
 		},
@@ -111,7 +111,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-B23bs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-B23bs", ""))
 				},
 			},
 		},
@@ -132,7 +132,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D2gj8", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-D2gj8", ""))
 				},
 			},
 		},
@@ -154,7 +154,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Fb8jk", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Fb8jk", ""))
 				},
 			},
 		},
@@ -177,7 +177,7 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdf3f", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sdf3f", ""))
 				},
 			},
 		},
@@ -337,7 +337,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAffg", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SAffg", ""))
 				},
 			},
 		},
@@ -353,7 +353,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Sf3gh", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Sf3gh", ""))
 				},
 			},
 		},
@@ -371,7 +371,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SHJ3ui", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SHJ3ui", ""))
 				},
 			},
 		},
@@ -390,7 +390,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SVrgh", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SVrgh", ""))
 				},
 			},
 		},
@@ -410,7 +410,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DJKeio", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-DJKeio", ""))
 				},
 			},
 		},
@@ -431,7 +431,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-ILSJi", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-ILSJi", ""))
 				},
 			},
 		},
@@ -453,7 +453,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-JKD3h", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-JKD3h", ""))
 				},
 			},
 		},
@@ -477,7 +477,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -657,7 +657,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Sgtj5", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Sgtj5", ""))
 				},
 			},
 		},
@@ -675,7 +675,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Hz6zj", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Hz6zj", ""))
 				},
 			},
 		},
@@ -694,7 +694,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-fb5jm", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-fb5jm", ""))
 				},
 			},
 		},
@@ -714,7 +714,7 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Sfdf4", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Sfdf4", ""))
 				},
 			},
 		},
@@ -865,7 +865,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAfd3", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SAfd3", ""))
 				},
 			},
 		},
@@ -881,7 +881,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dvf4f", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Dvf4f", ""))
 				},
 			},
 		},
@@ -899,7 +899,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-BDfr3", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-BDfr3", ""))
 				},
 			},
 		},
@@ -918,7 +918,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Db3bs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Db3bs", ""))
 				},
 			},
 		},
@@ -939,7 +939,7 @@ func TestCommandSide_UpdateInstanceGenericOIDCIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1107,7 +1107,7 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdf3g", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sdf3g", ""))
 				},
 			},
 		},
@@ -1124,7 +1124,7 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Fhbr2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Fhbr2", ""))
 				},
 			},
 		},
@@ -1142,7 +1142,7 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dzh3g", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Dzh3g", ""))
 				},
 			},
 		},
@@ -1163,7 +1163,7 @@ func TestCommandSide_MigrateInstanceGenericOIDCToAzureADProvider(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1348,7 +1348,7 @@ func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D3fvs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-D3fvs", ""))
 				},
 			},
 		},
@@ -1365,7 +1365,7 @@ func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-W2vqs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-W2vqs", ""))
 				},
 			},
 		},
@@ -1385,7 +1385,7 @@ func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1558,7 +1558,7 @@ func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdf3g", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sdf3g", ""))
 				},
 			},
 		},
@@ -1576,7 +1576,7 @@ func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Fhbr2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Fhbr2", ""))
 				},
 			},
 		},
@@ -1595,7 +1595,7 @@ func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dzh3g", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Dzh3g", ""))
 				},
 			},
 		},
@@ -1745,7 +1745,7 @@ func TestCommandSide_UpdateInstanceAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAgh2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SAgh2", ""))
 				},
 			},
 		},
@@ -1761,7 +1761,7 @@ func TestCommandSide_UpdateInstanceAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-fh3h1", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-fh3h1", ""))
 				},
 			},
 		},
@@ -1779,7 +1779,7 @@ func TestCommandSide_UpdateInstanceAzureADIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-dmitg", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-dmitg", ""))
 				},
 			},
 		},
@@ -1799,7 +1799,7 @@ func TestCommandSide_UpdateInstanceAzureADIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1967,7 +1967,7 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Jdsgf", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Jdsgf", ""))
 				},
 			},
 		},
@@ -1985,7 +1985,7 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-dsgz3", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-dsgz3", ""))
 				},
 			},
 		},
@@ -2128,7 +2128,7 @@ func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdf4h", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sdf4h", ""))
 				},
 			},
 		},
@@ -2144,7 +2144,7 @@ func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-fdh5z", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-fdh5z", ""))
 				},
 			},
 		},
@@ -2163,7 +2163,7 @@ func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -2322,7 +2322,7 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dg4td", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Dg4td", ""))
 				},
 			},
 		},
@@ -2340,7 +2340,7 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-dgj53", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-dgj53", ""))
 				},
 			},
 		},
@@ -2359,7 +2359,7 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Ghjjs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Ghjjs", ""))
 				},
 			},
 		},
@@ -2379,7 +2379,7 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sani2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sani2", ""))
 				},
 			},
 		},
@@ -2400,7 +2400,7 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-agj42", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-agj42", ""))
 				},
 			},
 		},
@@ -2422,7 +2422,7 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sd5hn", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sd5hn", ""))
 				},
 			},
 		},
@@ -2578,7 +2578,7 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdfh3", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sdfh3", ""))
 				},
 			},
 		},
@@ -2594,7 +2594,7 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-shj42", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-shj42", ""))
 				},
 			},
 		},
@@ -2612,7 +2612,7 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdh73", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sdh73", ""))
 				},
 			},
 		},
@@ -2631,7 +2631,7 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-acx2w", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-acx2w", ""))
 				},
 			},
 		},
@@ -2651,7 +2651,7 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-dgj6q", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-dgj6q", ""))
 				},
 			},
 		},
@@ -2672,7 +2672,7 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-ybj62", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-ybj62", ""))
 				},
 			},
 		},
@@ -2695,7 +2695,7 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -2870,7 +2870,7 @@ func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-adsg2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-adsg2", ""))
 				},
 			},
 		},
@@ -2888,7 +2888,7 @@ func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GD1j2", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-GD1j2", ""))
 				},
 			},
 		},
@@ -3030,7 +3030,7 @@ func TestCommandSide_UpdateInstanceGitLabIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-HJK91", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-HJK91", ""))
 				},
 			},
 		},
@@ -3046,7 +3046,7 @@ func TestCommandSide_UpdateInstanceGitLabIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D12t6", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-D12t6", ""))
 				},
 			},
 		},
@@ -3065,7 +3065,7 @@ func TestCommandSide_UpdateInstanceGitLabIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -3222,7 +3222,7 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-jw4ZT", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-jw4ZT", ""))
 				},
 			},
 		},
@@ -3240,7 +3240,7 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-AST4S", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-AST4S", ""))
 				},
 			},
 		},
@@ -3259,7 +3259,7 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DBZHJ", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-DBZHJ", ""))
 				},
 			},
 		},
@@ -3279,7 +3279,7 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SDGJ4", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SDGJ4", ""))
 				},
 			},
 		},
@@ -3427,7 +3427,7 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAFG4", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SAFG4", ""))
 				},
 			},
 		},
@@ -3443,7 +3443,7 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DG4H", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-DG4H", ""))
 				},
 			},
 		},
@@ -3461,7 +3461,7 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SD4eb", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SD4eb", ""))
 				},
 			},
 		},
@@ -3480,7 +3480,7 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GHWE3", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-GHWE3", ""))
 				},
 			},
 		},
@@ -3501,7 +3501,7 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -3666,7 +3666,7 @@ func TestCommandSide_AddInstanceGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-D3fvs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-D3fvs", ""))
 				},
 			},
 		},
@@ -3684,7 +3684,7 @@ func TestCommandSide_AddInstanceGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-W2vqs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-W2vqs", ""))
 				},
 			},
 		},
@@ -3826,7 +3826,7 @@ func TestCommandSide_UpdateInstanceGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-S32t1", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-S32t1", ""))
 				},
 			},
 		},
@@ -3842,7 +3842,7 @@ func TestCommandSide_UpdateInstanceGoogleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-ds432", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-ds432", ""))
 				},
 			},
 		},
@@ -3861,7 +3861,7 @@ func TestCommandSide_UpdateInstanceGoogleIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -4018,7 +4018,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAfdd", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SAfdd", ""))
 				},
 			},
 		},
@@ -4036,7 +4036,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sv31s", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sv31s", ""))
 				},
 			},
 		},
@@ -4055,7 +4055,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-sdgf4", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-sdgf4", ""))
 				},
 			},
 		},
@@ -4075,7 +4075,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-AEG2w", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-AEG2w", ""))
 				},
 			},
 		},
@@ -4096,7 +4096,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAD5n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SAD5n", ""))
 				},
 			},
 		},
@@ -4118,7 +4118,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAx905n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SAx905n", ""))
 				},
 			},
 		},
@@ -4141,7 +4141,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-S1x905n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-S1x905n", ""))
 				},
 			},
 		},
@@ -4165,7 +4165,7 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-aAx905n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-aAx905n", ""))
 				},
 			},
 		},
@@ -4365,7 +4365,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Dgdbs", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Dgdbs", ""))
 				},
 			},
 		},
@@ -4381,7 +4381,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Sffgd", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Sffgd", ""))
 				},
 			},
 		},
@@ -4399,7 +4399,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-vb3ss", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-vb3ss", ""))
 				},
 			},
 		},
@@ -4418,7 +4418,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-hbere", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-hbere", ""))
 				},
 			},
 		},
@@ -4438,7 +4438,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-DG45z", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-DG45z", ""))
 				},
 			},
 		},
@@ -4459,7 +4459,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SAx945n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SAx945n", ""))
 				},
 			},
 		},
@@ -4481,7 +4481,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-S1x605n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-S1x605n", ""))
 				},
 			},
 		},
@@ -4504,7 +4504,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-aAx901n", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-aAx901n", ""))
 				},
 			},
 		},
@@ -4531,7 +4531,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowNotFound(nil, "INST-ASF3F", ""))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "INST-ASF3F", ""))
 				},
 			},
 		},
@@ -4755,7 +4755,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-jkn3w", "Errors.IDP.ClientIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-jkn3w", "Errors.IDP.ClientIDMissing"))
 				},
 			},
 		},
@@ -4773,7 +4773,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Ffg32", "Errors.IDP.TeamIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Ffg32", "Errors.IDP.TeamIDMissing"))
 				},
 			},
 		},
@@ -4792,7 +4792,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GDjm5", "Errors.IDP.KeyIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-GDjm5", "Errors.IDP.KeyIDMissing"))
 				},
 			},
 		},
@@ -4812,7 +4812,7 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.IDP.PrivateKeyMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-GVD4n", "Errors.IDP.PrivateKeyMissing"))
 				},
 			},
 		},
@@ -4962,7 +4962,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-FRHBH", "Errors.IDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-FRHBH", "Errors.IDMissing"))
 				},
 			},
 		},
@@ -4978,7 +4978,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SFm4l", "Errors.IDP.ClientIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SFm4l", "Errors.IDP.ClientIDMissing"))
 				},
 			},
 		},
@@ -4996,7 +4996,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-SG34t", "Errors.IDP.TeamIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-SG34t", "Errors.IDP.TeamIDMissing"))
 				},
 			},
 		},
@@ -5015,7 +5015,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-Gh4z2", "Errors.IDP.KeyIDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-Gh4z2", "Errors.IDP.KeyIDMissing"))
 				},
 			},
 		},
@@ -5036,7 +5036,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -5204,7 +5204,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-o07zjotgnd", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-o07zjotgnd", ""))
 				},
 			},
 		},
@@ -5222,7 +5222,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-3bi3esi16t", "Errors.Invalid.Argument"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-3bi3esi16t", "Errors.Invalid.Argument"))
 				},
 			},
 		},
@@ -5372,7 +5372,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-7o3rq1owpm", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-7o3rq1owpm", ""))
 				},
 			},
 		},
@@ -5388,7 +5388,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-q2s9rak7o9", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-q2s9rak7o9", ""))
 				},
 			},
 		},
@@ -5406,7 +5406,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-iw1rxnf4sf", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-iw1rxnf4sf", ""))
 				},
 			},
 		},
@@ -5426,7 +5426,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -5582,7 +5582,7 @@ func TestCommandSide_RegenerateInstanceSAMLProviderCertificate(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, caos_errors.ThrowInvalidArgument(nil, "INST-7de108gqya", ""))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "INST-7de108gqya", ""))
 				},
 			},
 		},
@@ -5598,7 +5598,7 @@ func TestCommandSide_RegenerateInstanceSAMLProviderCertificate(t *testing.T) {
 				id:  "id1",
 			},
 			res: res{
-				err: caos_errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{

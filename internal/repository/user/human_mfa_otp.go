@@ -6,8 +6,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -68,7 +68,7 @@ func HumanOTPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 	}
 	err := event.Unmarshal(otpAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-Ns9df", "unable to unmarshal human otp added")
+		return nil, zerrors.ThrowInternal(err, "USER-Ns9df", "unable to unmarshal human otp added")
 	}
 	return otpAdded, nil
 }
@@ -172,7 +172,7 @@ func HumanOTPCheckSucceededEventMapper(event eventstore.Event) (eventstore.Event
 	}
 	err := event.Unmarshal(otpAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-Ns9df", "unable to unmarshal human otp check succeeded")
+		return nil, zerrors.ThrowInternal(err, "USER-Ns9df", "unable to unmarshal human otp check succeeded")
 	}
 	return otpAdded, nil
 }
@@ -211,7 +211,7 @@ func HumanOTPCheckFailedEventMapper(event eventstore.Event) (eventstore.Event, e
 	}
 	err := event.Unmarshal(otpAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-Ns9df", "unable to unmarshal human otp check failed")
+		return nil, zerrors.ThrowInternal(err, "USER-Ns9df", "unable to unmarshal human otp check failed")
 	}
 	return otpAdded, nil
 }

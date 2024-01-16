@@ -10,8 +10,8 @@
         type === PolicyComponentServiceType.ADMIN
           ? setting.iamWithRole
           : type === PolicyComponentServiceType.MGMT
-          ? setting.orgWithRole
-          : []
+            ? setting.orgWithRole
+            : []
       "
     >
       <div class="p-item card" @policy data-e2e="policy-card">
@@ -35,8 +35,8 @@
               type === PolicyComponentServiceType.ADMIN
                 ? setting.iamRouterLink
                 : type === PolicyComponentServiceType.MGMT
-                ? setting.orgRouterLink
-                : null
+                  ? setting.orgRouterLink
+                  : null
             "
             [queryParams]="setting.queryParams"
             mat-stroked-button

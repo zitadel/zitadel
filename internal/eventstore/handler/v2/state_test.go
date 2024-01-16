@@ -14,7 +14,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database/mock"
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestHandler_lockState(t *testing.T) {
@@ -80,7 +80,7 @@ func TestHandler_lockState(t *testing.T) {
 				instanceID: "instance",
 			},
 			isErr: func(t *testing.T, err error) {
-				if !errors.Is(err, errs.ThrowInternal(nil, "V2-lpiK0", "")) {
+				if !errors.Is(err, zerrors.ThrowInternal(nil, "V2-lpiK0", "")) {
 					t.Errorf("unexpected error: want internal (V2lpiK0), got: %v", err)
 				}
 			},
@@ -121,7 +121,7 @@ func TestHandler_lockState(t *testing.T) {
 				projection: tt.fields.projection,
 			}
 
-			tx, err := tt.fields.mock.DB.Begin()
+			tx, err := tt.fields.mock.DB.BeginTx(context.Background(), nil)
 			if err != nil {
 				t.Fatalf("unable to begin transaction: %v", err)
 			}
@@ -195,7 +195,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 				},
 			},
 			isErr: func(t *testing.T, err error) {
-				if !errors.Is(err, errs.ThrowInternal(nil, "V2-FGEKi", "")) {
+				if !errors.Is(err, zerrors.ThrowInternal(nil, "V2-FGEKi", "")) {
 					t.Errorf("unexpected error, want: %v, got %v", sql.ErrTxDone, err)
 				}
 			},
@@ -244,7 +244,7 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 			}
 		}
 		t.Run(tt.name, func(t *testing.T) {
-			tx, err := tt.fields.mock.DB.Begin()
+			tx, err := tt.fields.mock.DB.BeginTx(context.Background(), nil)
 			if err != nil {
 				t.Fatalf("unable to begin transaction: %v", err)
 			}
@@ -433,7 +433,7 @@ func TestHandler_currentState(t *testing.T) {
 				projection: tt.fields.projection,
 			}
 
-			tx, err := tt.fields.mock.DB.Begin()
+			tx, err := tt.fields.mock.DB.BeginTx(context.Background(), nil)
 			if err != nil {
 				t.Fatalf("unable to begin transaction: %v", err)
 			}

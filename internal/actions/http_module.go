@@ -13,7 +13,7 @@ import (
 	"github.com/dop251/goja"
 	"github.com/zitadel/logging"
 
-	z_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func WithHTTP(ctx context.Context) Option {
@@ -66,7 +66,7 @@ func (c *HTTP) fetchConfigFromArg(arg *goja.Object, config *fetchConfig) (err er
 			}
 			config.Body = bytes.NewReader(body)
 		default:
-			return z_errs.ThrowInvalidArgument(nil, "ACTIO-OfUeA", "key is invalid")
+			return zerrors.ThrowInvalidArgument(nil, "ACTIO-OfUeA", "key is invalid")
 		}
 	}
 	return nil
@@ -177,7 +177,7 @@ func (*transport) RoundTrip(req *http.Request) (*http.Response, error) {
 		return http.DefaultTransport.RoundTrip(req)
 	}
 	if isHostBlocked(httpConfig.DenyList, req.URL) {
-		return nil, z_errs.ThrowInvalidArgument(nil, "ACTIO-N72d0", "host is denied")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ACTIO-N72d0", "host is denied")
 	}
 	return http.DefaultTransport.RoundTrip(req)
 }

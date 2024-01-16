@@ -4,13 +4,13 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -125,7 +125,7 @@ func (p *messageTextProjection) reduceAdded(event eventstore.Event) (*handler.St
 	case *instance.CustomTextSetEvent:
 		templateEvent = e.CustomTextSetEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-2n90r", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextSetEventType, instance.CustomTextSetEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-2n90r", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextSetEventType, instance.CustomTextSetEventType})
 	}
 	if !isMessageTemplate(templateEvent.Template) {
 		return handler.NewNoOpStatement(event), nil
@@ -182,7 +182,7 @@ func (p *messageTextProjection) reduceRemoved(event eventstore.Event) (*handler.
 	case *instance.CustomTextRemovedEvent:
 		templateEvent = e.CustomTextRemovedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-fm0ge", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextRemovedEventType, instance.CustomTextRemovedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-fm0ge", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextRemovedEventType, instance.CustomTextRemovedEventType})
 	}
 	if !isMessageTemplate(templateEvent.Template) {
 		return handler.NewNoOpStatement(event), nil
@@ -232,7 +232,7 @@ func (p *messageTextProjection) reduceTemplateRemoved(event eventstore.Event) (*
 	case *instance.CustomTextTemplateRemovedEvent:
 		templateEvent = e.CustomTextTemplateRemovedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-2n9rs", "reduce.wrong.event.type %s", org.CustomTextTemplateRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-2n9rs", "reduce.wrong.event.type %s", org.CustomTextTemplateRemovedEventType)
 	}
 	if !isMessageTemplate(templateEvent.Template) {
 		return handler.NewNoOpStatement(event), nil
@@ -251,7 +251,7 @@ func (p *messageTextProjection) reduceTemplateRemoved(event eventstore.Event) (*
 func (p *messageTextProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-mLsQw", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-mLsQw", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
 	return handler.NewDeleteStatement(

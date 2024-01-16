@@ -16,9 +16,10 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -124,11 +125,11 @@ type CRDB struct {
 func NewCRDB(client *database.DB) *CRDB {
 	switch client.Type() {
 	case "cockroach":
-		awaitOpenTransactionsV1 = " AND creation_date::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = '" + database.EventstorePusherAppName + "')"
-		awaitOpenTransactionsV2 = ` AND hlc_to_timestamp("position") < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = '` + database.EventstorePusherAppName + `')`
+		awaitOpenTransactionsV1 = " AND creation_date::TIMESTAMP < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = '" + dialect.EventstorePusherAppName + "')"
+		awaitOpenTransactionsV2 = ` AND hlc_to_timestamp("position") < (SELECT COALESCE(MIN(start), NOW())::TIMESTAMP FROM crdb_internal.cluster_transactions where application_name = '` + dialect.EventstorePusherAppName + `')`
 	case "postgres":
-		awaitOpenTransactionsV1 = ` AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = '` + database.EventstorePusherAppName + `' AND state <> 'idle')`
-		awaitOpenTransactionsV2 = ` AND "position" < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = '` + database.EventstorePusherAppName + `' AND state <> 'idle')`
+		awaitOpenTransactionsV1 = ` AND EXTRACT(EPOCH FROM created_at) < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = '` + dialect.EventstorePusherAppName + `' AND state <> 'idle')`
+		awaitOpenTransactionsV2 = ` AND "position" < (SELECT COALESCE(EXTRACT(EPOCH FROM min(xact_start)), EXTRACT(EPOCH FROM now())) FROM pg_stat_activity WHERE datname = current_database() AND application_name = '` + dialect.EventstorePusherAppName + `' AND state <> 'idle')`
 	}
 
 	return &CRDB{client}
@@ -189,7 +190,7 @@ func (db *CRDB) Push(ctx context.Context, commands ...eventstore.Command) (event
 					"eventType", e.Type(),
 					"instanceID", e.Aggregate().InstanceID,
 				).WithError(err).Debug("query failed")
-				return caos_errs.ThrowInternal(err, "SQL-SBP37", "unable to create event")
+				return zerrors.ThrowInternal(err, "SQL-SBP37", "unable to create event")
 			}
 
 			uniqueConstraints = append(uniqueConstraints, command.UniqueConstraints()...)
@@ -198,8 +199,8 @@ func (db *CRDB) Push(ctx context.Context, commands ...eventstore.Command) (event
 
 		return db.handleUniqueConstraints(ctx, tx, uniqueConstraints...)
 	})
-	if err != nil && !errors.Is(err, &caos_errs.CaosError{}) {
-		err = caos_errs.ThrowInternal(err, "SQL-DjgtG", "unable to store events")
+	if err != nil && !errors.Is(err, &zerrors.ZitadelError{}) {
+		err = zerrors.ThrowInternal(err, "SQL-DjgtG", "unable to store events")
 	}
 
 	return events, err
@@ -222,10 +223,10 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("insert unique constraint failed")
 
 				if db.isUniqueViolationError(err) {
-					return caos_errs.ThrowAlreadyExists(err, "SQL-wHcEq", uniqueConstraint.ErrorMessage)
+					return zerrors.ThrowAlreadyExists(err, "SQL-wHcEq", uniqueConstraint.ErrorMessage)
 				}
 
-				return caos_errs.ThrowInternal(err, "SQL-dM9ds", "unable to create unique constraint")
+				return zerrors.ThrowInternal(err, "SQL-dM9ds", "unable to create unique constraint")
 			}
 		case eventstore.UniqueConstraintRemove:
 			_, err := tx.ExecContext(ctx, uniqueDelete, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField, authz.GetInstance(ctx).InstanceID())
@@ -233,14 +234,14 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 				logging.WithFields(
 					"unique_type", uniqueConstraint.UniqueType,
 					"unique_field", uniqueConstraint.UniqueField).WithError(err).Info("delete unique constraint failed")
-				return caos_errs.ThrowInternal(err, "SQL-6n88i", "unable to remove unique constraint")
+				return zerrors.ThrowInternal(err, "SQL-6n88i", "unable to remove unique constraint")
 			}
 		case eventstore.UniqueConstraintInstanceRemove:
 			_, err := tx.ExecContext(ctx, uniqueDeleteInstance, authz.GetInstance(ctx).InstanceID())
 			if err != nil {
 				logging.WithFields(
 					"instance_id", authz.GetInstance(ctx).InstanceID()).WithError(err).Info("delete instance unique constraints failed")
-				return caos_errs.ThrowInternal(err, "SQL-6n88i", "unable to remove unique constraints of instance")
+				return zerrors.ThrowInternal(err, "SQL-6n88i", "unable to remove unique constraints of instance")
 			}
 		}
 	}

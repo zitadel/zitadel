@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -14,10 +14,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type LoginPolicy struct {
@@ -194,33 +194,26 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 			},
 		}).Limit(1).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
-		policy, err = q.scanAndAddLinksToLoginPolicy(ctx, rows, scan)
+		policy, err = scan(rows)
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SWgr3", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-SWgr3", "Errors.Internal")
 	}
-	return policy, nil
+	return policy, q.addLinksToLoginPolicy(ctx, policy)
 }
 
-func (q *Queries) scanAndAddLinksToLoginPolicy(ctx context.Context, rows *sql.Rows, scan func(*sql.Rows) (*LoginPolicy, error)) (*LoginPolicy, error) {
-	policy, err := scan(rows)
-	if err != nil {
-		return nil, err
-	}
-
+func (q *Queries) addLinksToLoginPolicy(ctx context.Context, policy *LoginPolicy) error {
 	links, err := q.IDPLoginPolicyLinks(ctx, policy.OrgID, &IDPLoginPolicyLinksSearchQuery{}, false)
 	if err != nil {
-		return nil, err
+		return zerrors.ThrowInternal(err, "QUERY-aa4Ve", "Errors.Internal")
 	}
-	for _, link := range links.Links {
-		policy.IDPLinks = append(policy.IDPLinks, link)
-	}
-	return policy, nil
+	policy.IDPLinks = append(policy.IDPLinks, links.Links...)
+	return nil
 }
 
 func (q *Queries) DefaultLoginPolicy(ctx context.Context) (policy *LoginPolicy, err error) {
@@ -233,17 +226,17 @@ func (q *Queries) DefaultLoginPolicy(ctx context.Context) (policy *LoginPolicy, 
 		LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-t4TBK", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-t4TBK", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
-		policy, err = q.scanAndAddLinksToLoginPolicy(ctx, rows, scan)
+		policy, err = scan(rows)
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SArt2", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-SArt2", "Errors.Internal")
 	}
-	return policy, nil
+	return policy, q.addLinksToLoginPolicy(ctx, policy)
 }
 
 func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (factors *SecondFactors, err error) {
@@ -268,7 +261,7 @@ func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (factors
 		OrderBy(LoginPolicyColumnIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-scVHo", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -292,7 +285,7 @@ func (q *Queries) DefaultSecondFactors(ctx context.Context) (factors *SecondFact
 		LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-CZ2Nv", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-CZ2Nv", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -328,7 +321,7 @@ func (q *Queries) MultiFactorsByOrg(ctx context.Context, orgID string) (factors 
 		OrderBy(LoginPolicyColumnIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-B4o7h", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-B4o7h", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -352,7 +345,7 @@ func (q *Queries) DefaultMultiFactors(ctx context.Context) (factors *MultiFactor
 		LoginPolicyColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-WxYjr", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-WxYjr", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -425,11 +418,11 @@ func prepareLoginPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Select
 					&p.MultiFactorCheckLifetime,
 				)
 				if err != nil {
-					return nil, errors.ThrowInternal(err, "QUERY-YcC53", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(err, "QUERY-YcC53", "Errors.Internal")
 				}
 			}
 			if p.OrgID == "" {
-				return nil, errors.ThrowNotFound(nil, "QUERY-QsUBJ", "Errors.LoginPolicy.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "QUERY-QsUBJ", "Errors.LoginPolicy.NotFound")
 			}
 			p.DefaultRedirectURI = defaultRedirectURI.String
 			return p, nil
@@ -447,10 +440,10 @@ func prepareLoginPolicy2FAsQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&p.Factors,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-yPqIZ", "Errors.LoginPolicy.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-yPqIZ", "Errors.LoginPolicy.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-Mr6H3", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-Mr6H3", "Errors.Internal")
 			}
 
 			p.Count = uint64(len(p.Factors))
@@ -469,10 +462,10 @@ func prepareLoginPolicyMFAsQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&p.Factors,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-yPqIZ", "Errors.LoginPolicy.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-yPqIZ", "Errors.LoginPolicy.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-Mr6H3", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-Mr6H3", "Errors.Internal")
 			}
 
 			p.Count = uint64(len(p.Factors))
