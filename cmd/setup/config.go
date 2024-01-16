@@ -78,7 +78,6 @@ type Steps struct {
 	s18AddLowerFieldsToLoginNames   *AddLowerFieldsToLoginNames
 	s19AddCurrentStatesIndex        *AddCurrentSequencesIndex
 	s20AddByUserSessionIndex        *AddByUserIndexToSession
-	s21AddLimitFieldsToInstances    *AddLimitFieldsToInstances
 }
 
 type encryptionKeyConfig struct {

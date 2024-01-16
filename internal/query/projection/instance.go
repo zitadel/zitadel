@@ -248,9 +248,6 @@ func (p *instanceProjection) reduceLimitsSet(event eventstore.Event) (*handler.S
 	if e.Block != nil {
 		updateCols = append(updateCols, handler.NewCol(InstanceColumnBlock, *e.Block))
 	}
-	if len(updateCols) == 0 {
-		return nil, nil
-	}
 	return handler.NewUpdateStatement(
 		e,
 		updateCols,

@@ -111,7 +111,6 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s18AddLowerFieldsToLoginNames = &AddLowerFieldsToLoginNames{dbClient: queryDBClient}
 	steps.s19AddCurrentStatesIndex = &AddCurrentSequencesIndex{dbClient: queryDBClient}
 	steps.s20AddByUserSessionIndex = &AddByUserIndexToSession{dbClient: queryDBClient}
-	steps.s21AddLimitFieldsToInstances = &AddLimitFieldsToInstances{dbClient: queryDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -166,11 +165,9 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 		logging.OnError(err).Fatalf("unable to migrate repeatable step: %s", repeatableStep.String())
 	}
 
-	// These steps are executed after the repeatable steps because they add fields to tables
+	// This step is executed after the repeatable steps because it adds fields to the login_names3 projection
 	err = migration.Migrate(ctx, eventstoreClient, steps.s18AddLowerFieldsToLoginNames)
 	logging.WithFields("name", steps.s18AddLowerFieldsToLoginNames.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s21AddLimitFieldsToInstances)
-	logging.WithFields("name", steps.s21AddLimitFieldsToInstances.String()).OnError(err).Fatal("migration failed")
 }
 
 func readStmt(fs embed.FS, folder, typ, filename string) (string, error) {
