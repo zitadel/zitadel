@@ -138,7 +138,7 @@ func (a *AccessInterceptor) handle(publicAuthPathPrefixes ...string) func(http.H
 			if limited {
 				if a.redirect != "" {
 					// The console guides the user when the cookie is set
-					http.Redirect(wrappedWriter, request, a.redirect, http.StatusPermanentRedirect)
+					http.Redirect(wrappedWriter, request, a.redirect, http.StatusFound)
 				} else {
 					http.Error(wrappedWriter, "Your ZITADEL instance is blocked.", http.StatusTooManyRequests)
 				}

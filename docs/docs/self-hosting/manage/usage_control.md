@@ -11,9 +11,9 @@ The usage control features are currently limited to the instance level only.
 
 You can block an instance using the [system API](/category/apis/resources/system/limits).
 
-Most requests to a blocked instance are rejected with the HTTP status 429 or the gRPC status 8.
+Most requests to a blocked instance are rejected with the HTTP status *429 Too Many Requests* or the gRPC status *8 Resource Exhausted*.
 However, requests to the [system API](/apis/introduction#system) are still allowed.
-Requests to paths with the prefix /ui/login return a Permanent Redirect to /ui/console, where the user is guided to InstanceManagementURL.
+Requests to paths with the prefix */ui/login* return a redirect with HTTP status *302 Found* to */ui/console*, where the user is guided to *InstanceManagementURL*.
 Blocked HTTP requests additionally set a cookie to make it easy to block traffic before it reaches your ZITADEL runtime, for example with a WAF rule.
 
 You can block new instances by default using the *DefaultInstance.Limits.Block* runtime configuration.

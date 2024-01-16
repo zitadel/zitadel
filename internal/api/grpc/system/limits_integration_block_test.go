@@ -96,8 +96,7 @@ func TestServer_Limits_Block(t *testing.T) {
 				return req, err, func(ttt assert.TestingT, response *http.Response, expectBlocked bool) {
 					// the login paths should return a redirect if the instance is blocked
 					if expectBlocked {
-						assert.GreaterOrEqual(ttt, response.StatusCode, http.StatusMultipleChoices)
-						assert.LessOrEqual(ttt, response.StatusCode, http.StatusPermanentRedirect)
+						assert.Equal(ttt, http.StatusFound, response.StatusCode)
 					} else {
 						assertLimitResponse(ttt, response, false)
 					}
