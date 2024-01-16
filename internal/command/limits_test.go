@@ -47,7 +47,7 @@ func TestLimits_SetLimits(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("limits1", "instance1", "owner1").Aggregate,
+										&limits.NewAggregate("limits1", "instance1").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeAuditLogRetention(gu.Ptr(time.Hour)),
@@ -80,7 +80,7 @@ func TestLimits_SetLimits(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("limits1", "instance1", "owner1").Aggregate,
+										&limits.NewAggregate("limits1", "instance1").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeAuditLogRetention(gu.Ptr(time.Minute)),
@@ -93,7 +93,7 @@ func TestLimits_SetLimits(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("limits1", "instance1", "owner1").Aggregate,
+										&limits.NewAggregate("limits1", "instance1").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeAuditLogRetention(gu.Ptr(time.Hour)),
@@ -105,14 +105,14 @@ func TestLimits_SetLimits(t *testing.T) {
 			},
 			args: args{
 				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
-				resourceOwner: "owner1",
+				resourceOwner: "instance1",
 				setLimits: &SetLimits{
 					AuditLogRetention: gu.Ptr(time.Hour),
 				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "owner1",
+					ResourceOwner: "instance1",
 				},
 			},
 		},
@@ -126,7 +126,7 @@ func TestLimits_SetLimits(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("limits1", "instance1", "owner1").Aggregate,
+										&limits.NewAggregate("limits1", "instance1").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeAuditLogRetention(gu.Ptr(time.Minute)),
@@ -140,7 +140,7 @@ func TestLimits_SetLimits(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("limits1", "instance1", "owner1").Aggregate,
+										&limits.NewAggregate("limits1", "instance1").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeBlock(gu.Ptr(false)),
@@ -152,14 +152,14 @@ func TestLimits_SetLimits(t *testing.T) {
 			},
 			args: args{
 				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
-				resourceOwner: "owner1",
+				resourceOwner: "instance1",
 				setLimits: &SetLimits{
 					Block: gu.Ptr(false),
 				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "owner1",
+					ResourceOwner: "instance1",
 				},
 			},
 		},
@@ -173,7 +173,7 @@ func TestLimits_SetLimits(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("limits1", "instance1", "owner1").Aggregate,
+										&limits.NewAggregate("limits1", "instance1").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeAuditLogRetention(gu.Ptr(time.Hour)),
@@ -182,7 +182,7 @@ func TestLimits_SetLimits(t *testing.T) {
 							eventFromEventPusher(
 								limits.NewResetEvent(
 									context.Background(),
-									&limits.NewAggregate("limits1", "instance1", "owner1").Aggregate,
+									&limits.NewAggregate("limits1", "instance1").Aggregate,
 								),
 							),
 						),
@@ -192,7 +192,7 @@ func TestLimits_SetLimits(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("limits2", "instance1", "owner1").Aggregate,
+										&limits.NewAggregate("limits2", "instance1").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeAuditLogRetention(gu.Ptr(time.Hour)),
@@ -204,14 +204,14 @@ func TestLimits_SetLimits(t *testing.T) {
 			},
 			args: args{
 				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
-				resourceOwner: "owner1",
+				resourceOwner: "instance1",
 				setLimits: &SetLimits{
 					AuditLogRetention: gu.Ptr(time.Hour),
 				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "owner1",
+					ResourceOwner: "instance1",
 				},
 			},
 		},
@@ -263,7 +263,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("limits1", "instance1", "owner1").Aggregate,
+										&limits.NewAggregate("limits1", "instance1").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeAuditLogRetention(gu.Ptr(time.Hour)),
@@ -276,8 +276,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setLimitsBulk: []*SetInstanceLimitsBulk{{
-					InstanceID:    "instance1",
-					ResourceOwner: "owner1",
+					InstanceID: "instance1",
 					SetLimits: SetLimits{
 						AuditLogRetention: gu.Ptr(time.Hour),
 					},
@@ -286,7 +285,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 			res: res{
 				want: &domain.ObjectDetails{},
 				wantTarget: []*domain.ObjectDetails{{
-					ResourceOwner: "owner1",
+					ResourceOwner: "instance1",
 				}},
 			},
 		},
@@ -300,7 +299,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("limits1", "instance1", "owner1").Aggregate,
+										&limits.NewAggregate("limits1", "instance1").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeAuditLogRetention(gu.Ptr(time.Minute)),
@@ -313,7 +312,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("limits1", "instance1", "owner1").Aggregate,
+										&limits.NewAggregate("limits1", "instance1").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeAuditLogRetention(gu.Ptr(time.Hour)),
@@ -326,8 +325,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setLimitsBulk: []*SetInstanceLimitsBulk{{
-					InstanceID:    "instance1",
-					ResourceOwner: "owner1",
+					InstanceID: "instance1",
 					SetLimits: SetLimits{
 						AuditLogRetention: gu.Ptr(time.Hour),
 					},
@@ -336,7 +334,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 			res: res{
 				want: &domain.ObjectDetails{},
 				wantTarget: []*domain.ObjectDetails{{
-					ResourceOwner: "owner1",
+					ResourceOwner: "instance1",
 				}},
 			},
 		},
@@ -350,7 +348,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("limits1", "instance1", "owner1").Aggregate,
+										&limits.NewAggregate("limits1", "instance1").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeAuditLogRetention(gu.Ptr(time.Minute)),
@@ -364,7 +362,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("limits1", "instance1", "owner1").Aggregate,
+										&limits.NewAggregate("limits1", "instance1").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeBlock(gu.Ptr(false)),
@@ -377,8 +375,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setLimitsBulk: []*SetInstanceLimitsBulk{{
-					InstanceID:    "instance1",
-					ResourceOwner: "owner1",
+					InstanceID: "instance1",
 					SetLimits: SetLimits{
 						Block: gu.Ptr(false),
 					},
@@ -387,7 +384,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 			res: res{
 				want: &domain.ObjectDetails{},
 				wantTarget: []*domain.ObjectDetails{{
-					ResourceOwner: "owner1",
+					ResourceOwner: "instance1",
 				}},
 			},
 		},
@@ -401,7 +398,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("limits1", "instance1", "owner1").Aggregate,
+										&limits.NewAggregate("limits1", "instance1").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeAuditLogRetention(gu.Ptr(time.Hour)),
@@ -410,7 +407,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 							eventFromEventPusher(
 								limits.NewResetEvent(
 									context.Background(),
-									&limits.NewAggregate("limits1", "instance1", "owner1").Aggregate,
+									&limits.NewAggregate("limits1", "instance1").Aggregate,
 								),
 							),
 						),
@@ -420,7 +417,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("limits2", "instance1", "owner1").Aggregate,
+										&limits.NewAggregate("limits2", "instance1").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeAuditLogRetention(gu.Ptr(time.Hour)),
@@ -433,8 +430,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setLimitsBulk: []*SetInstanceLimitsBulk{{
-					InstanceID:    "instance1",
-					ResourceOwner: "owner1",
+					InstanceID: "instance1",
 					SetLimits: SetLimits{
 						AuditLogRetention: gu.Ptr(time.Hour),
 					},
@@ -444,7 +440,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 			res: res{
 				want: &domain.ObjectDetails{},
 				wantTarget: []*domain.ObjectDetails{{
-					ResourceOwner: "owner1",
+					ResourceOwner: "instance1",
 				}},
 			},
 		},
@@ -458,17 +454,17 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("blocked-1-1", "instance1", "owner1").Aggregate,
+										&limits.NewAggregate("add-block", "instance1").Aggregate,
 										limits.SetEventType,
 									),
-									limits.ChangeBlock(gu.Ptr(true)),
+									limits.ChangeAuditLogRetention(gu.Ptr(time.Hour)),
 								),
 							),
 							eventFromEventPusher(
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("unblocked-1-2", "instance1", "owner2").Aggregate,
+										&limits.NewAggregate("switch-to-block", "instance2").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeBlock(gu.Ptr(false)),
@@ -478,7 +474,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("blocked-2-1", "instance2", "owner1").Aggregate,
+										&limits.NewAggregate("already-blocked", "instance3").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeBlock(gu.Ptr(true)),
@@ -488,7 +484,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("blocked-3-1", "instance3", "owner1").Aggregate,
+										&limits.NewAggregate("unblock", "instance4").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeBlock(gu.Ptr(true)),
@@ -498,7 +494,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("reset-4-1", "instance4", "owner1").Aggregate,
+										&limits.NewAggregate("relimit", "instance5").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeBlock(gu.Ptr(true)),
@@ -507,7 +503,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 							eventFromEventPusher(
 								limits.NewResetEvent(
 									context.Background(),
-									&limits.NewAggregate("reset-4-1", "instance4", "owner1").Aggregate,
+									&limits.NewAggregate("relimit", "instance5").Aggregate,
 								),
 							),
 						),
@@ -517,7 +513,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("create-limits-1", "instance0", "owner0").Aggregate,
+										&limits.NewAggregate("create-limits", "instance0").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeBlock(gu.Ptr(true)),
@@ -528,18 +524,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("blocked-1-1", "instance1", "owner1").Aggregate,
-										limits.SetEventType,
-									),
-									limits.ChangeBlock(gu.Ptr(false)),
-								),
-							),
-							eventFromEventPusherWithInstanceID(
-								"instance1",
-								limits.NewSetEvent(
-									eventstore.NewBaseEventForPush(
-										context.Background(),
-										&limits.NewAggregate("unblocked-1-2", "instance1", "owner2").Aggregate,
+										&limits.NewAggregate("add-block", "instance1").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeBlock(gu.Ptr(true)),
@@ -550,10 +535,10 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("blocked-2-1", "instance2", "owner1").Aggregate,
+										&limits.NewAggregate("switch-to-block", "instance2").Aggregate,
 										limits.SetEventType,
 									),
-									limits.ChangeBlock(gu.Ptr(false)),
+									limits.ChangeBlock(gu.Ptr(true)),
 								),
 							),
 							eventFromEventPusherWithInstanceID(
@@ -561,7 +546,18 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 								limits.NewSetEvent(
 									eventstore.NewBaseEventForPush(
 										context.Background(),
-										&limits.NewAggregate("reset-4-1", "instance4", "owner1").Aggregate,
+										&limits.NewAggregate("unblock", "instance4").Aggregate,
+										limits.SetEventType,
+									),
+									limits.ChangeBlock(gu.Ptr(false)),
+								),
+							),
+							eventFromEventPusherWithInstanceID(
+								"instance5",
+								limits.NewSetEvent(
+									eventstore.NewBaseEventForPush(
+										context.Background(),
+										&limits.NewAggregate("relimit", "instance5").Aggregate,
 										limits.SetEventType,
 									),
 									limits.ChangeBlock(gu.Ptr(true)),
@@ -569,43 +565,37 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 							),
 						),
 					),
-					id_mock.NewIDGeneratorExpectIDs(t, "create-limits-1", "reset-4-1")
+					id_mock.NewIDGeneratorExpectIDs(t, "create-limits", "relimit")
 			},
 			args: args{
 				ctx: context.Background(),
 				setLimitsBulk: []*SetInstanceLimitsBulk{{
-					InstanceID:    "instance0",
-					ResourceOwner: "owner0",
+					InstanceID: "instance0",
 					SetLimits: SetLimits{
 						Block: gu.Ptr(true),
 					},
 				}, {
-					InstanceID:    "instance1",
-					ResourceOwner: "owner1",
+					InstanceID: "instance1",
+					SetLimits: SetLimits{
+						Block: gu.Ptr(true),
+					},
+				}, {
+					InstanceID: "instance2",
+					SetLimits: SetLimits{
+						Block: gu.Ptr(true),
+					},
+				}, {
+					InstanceID: "instance3",
+					SetLimits: SetLimits{
+						Block: gu.Ptr(true),
+					},
+				}, {
+					InstanceID: "instance4",
 					SetLimits: SetLimits{
 						Block: gu.Ptr(false),
 					},
 				}, {
-					InstanceID:    "instance1",
-					ResourceOwner: "owner2",
-					SetLimits: SetLimits{
-						Block: gu.Ptr(true),
-					},
-				}, {
-					InstanceID:    "instance2",
-					ResourceOwner: "owner1",
-					SetLimits: SetLimits{
-						Block: gu.Ptr(false),
-					},
-				}, {
-					InstanceID:    "instance3",
-					ResourceOwner: "owner1",
-					SetLimits: SetLimits{
-						Block: gu.Ptr(true),
-					},
-				}, {
-					InstanceID:    "instance4",
-					ResourceOwner: "owner1",
+					InstanceID: "instance5",
 					SetLimits: SetLimits{
 						Block: gu.Ptr(true),
 					},
@@ -614,17 +604,17 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 			res: res{
 				want: &domain.ObjectDetails{},
 				wantTarget: []*domain.ObjectDetails{{
-					ResourceOwner: "owner0",
+					ResourceOwner: "instance0",
 				}, {
-					ResourceOwner: "owner1",
+					ResourceOwner: "instance1",
 				}, {
-					ResourceOwner: "owner2",
+					ResourceOwner: "instance2",
 				}, {
-					ResourceOwner: "owner1",
+					ResourceOwner: "instance3",
 				}, {
-					ResourceOwner: "owner1",
+					ResourceOwner: "instance4",
 				}, {
-					ResourceOwner: "owner1",
+					ResourceOwner: "instance5",
 				}},
 			},
 		},
@@ -692,7 +682,7 @@ func TestLimits_ResetLimits(t *testing.T) {
 							limits.NewSetEvent(
 								eventstore.NewBaseEventForPush(
 									context.Background(),
-									&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
+									&limits.NewAggregate("limits1", "instance1").Aggregate,
 									limits.SetEventType,
 								),
 								limits.ChangeAuditLogRetention(gu.Ptr(time.Hour)),
@@ -700,7 +690,7 @@ func TestLimits_ResetLimits(t *testing.T) {
 						),
 						eventFromEventPusher(
 							limits.NewResetEvent(context.Background(),
-								&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
+								&limits.NewAggregate("limits1", "instance1").Aggregate,
 							),
 						),
 					),
@@ -726,7 +716,7 @@ func TestLimits_ResetLimits(t *testing.T) {
 							limits.NewSetEvent(
 								eventstore.NewBaseEventForPush(
 									context.Background(),
-									&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
+									&limits.NewAggregate("limits1", "instance1").Aggregate,
 									limits.SetEventType,
 								),
 								limits.ChangeAuditLogRetention(gu.Ptr(time.Hour)),
@@ -737,7 +727,7 @@ func TestLimits_ResetLimits(t *testing.T) {
 						eventFromEventPusherWithInstanceID(
 							"instance1",
 							limits.NewResetEvent(context.Background(),
-								&limits.NewAggregate("limits1", "instance1", "instance1").Aggregate,
+								&limits.NewAggregate("limits1", "instance1").Aggregate,
 							),
 						),
 					),

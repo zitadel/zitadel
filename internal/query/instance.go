@@ -29,6 +29,10 @@ var (
 		name:          projection.InstanceProjectionTable,
 		instanceIDCol: projection.InstanceColumnID,
 	}
+	limitsTable = table{
+		name:          projection.LimitsProjectionTable,
+		instanceIDCol: projection.LimitsColumnInstanceID,
+	}
 	InstanceColumnID = Column{
 		name:  projection.InstanceColumnID,
 		table: instanceTable,
@@ -69,13 +73,17 @@ var (
 		name:  projection.InstanceColumnDefaultLanguage,
 		table: instanceTable,
 	}
-	InstanceColumnAuditLogRetention = Column{
-		name:  projection.InstanceColumnAuditLogRetention,
-		table: instanceTable,
+	LimitsColumnInstanceID = Column{
+		name:  projection.LimitsColumnInstanceID,
+		table: limitsTable,
 	}
-	InstanceColumnBlock = Column{
-		name:  projection.InstanceColumnBlock,
-		table: instanceTable,
+	LimitsColumnAuditLogRetention = Column{
+		name:  projection.LimitsColumnAuditLogRetention,
+		table: limitsTable,
+	}
+	LimitsColumnBlock = Column{
+		name:  projection.LimitsColumnBlock,
+		table: limitsTable,
 	}
 )
 
@@ -274,17 +282,13 @@ func prepareInstanceQuery(ctx context.Context, db prepareDatabase, host string) 
 			InstanceColumnConsoleID.identifier(),
 			InstanceColumnConsoleAppID.identifier(),
 			InstanceColumnDefaultLanguage.identifier(),
-			InstanceColumnAuditLogRetention.identifier(),
-			InstanceColumnBlock.identifier(),
 		).
 			From(instanceTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Instance, error) {
 			var (
-				instance          = &Instance{host: host}
-				lang              = ""
-				auditLogRetention database.NullDuration
-				block             sql.NullBool
+				instance = &Instance{host: host}
+				lang     = ""
 			)
 			err := row.Scan(
 				&instance.ID,
@@ -296,20 +300,12 @@ func prepareInstanceQuery(ctx context.Context, db prepareDatabase, host string) 
 				&instance.ConsoleID,
 				&instance.ConsoleAppID,
 				&lang,
-				&auditLogRetention,
-				&block,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
 					return nil, zerrors.ThrowNotFound(err, "QUERY-5m09s", "Errors.IAM.NotFound")
 				}
 				return nil, zerrors.ThrowInternal(err, "QUERY-3j9sf", "Errors.Internal")
-			}
-			if auditLogRetention.Valid {
-				instance.auditLogRetention = &auditLogRetention.Duration
-			}
-			if block.Valid {
-				instance.block = &block.Bool
 			}
 			instance.DefaultLang = language.Make(lang)
 			return instance, nil
@@ -523,10 +519,13 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 			InstanceDomainSequenceCol.identifier(),
 			SecurityPolicyColumnEnabled.identifier(),
 			SecurityPolicyColumnAllowedOrigins.identifier(),
+			LimitsColumnAuditLogRetention.identifier(),
+			LimitsColumnBlock.identifier(),
 		).
 			From(instanceTable.identifier()).
 			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
-			LeftJoin(join(SecurityPolicyColumnInstanceID, InstanceColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(SecurityPolicyColumnInstanceID, InstanceColumnID)).
+			LeftJoin(join(LimitsColumnInstanceID, InstanceColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Instance, error) {
 			instance := &Instance{
@@ -543,6 +542,8 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 					creationDate          sql.NullTime
 					sequence              sql.NullInt64
 					securityPolicyEnabled sql.NullBool
+					auditLogRetention     database.NullDuration
+					block                 sql.NullBool
 				)
 				err := rows.Scan(
 					&instance.ID,
@@ -563,6 +564,8 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 					&sequence,
 					&securityPolicyEnabled,
 					&instance.csp.allowedOrigins,
+					&auditLogRetention,
+					&block,
 				)
 				if err != nil {
 					return nil, zerrors.ThrowInternal(err, "QUERY-d3fas", "Errors.Internal")
@@ -579,6 +582,12 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 					IsGenerated:  isGenerated.Bool,
 					InstanceID:   instance.ID,
 				})
+				if auditLogRetention.Valid {
+					instance.auditLogRetention = &auditLogRetention.Duration
+				}
+				if block.Valid {
+					instance.block = &block.Bool
+				}
 				instance.csp.enabled = securityPolicyEnabled.Bool
 			}
 			if instance.ID == "" {

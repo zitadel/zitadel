@@ -99,7 +99,7 @@ func (c *Commands) setLimitsCommands(ctx context.Context, wm *limitsWriteModel, 
 			return nil, err
 		}
 	}
-	aggregate := limits.NewAggregate(aggregateId, wm.InstanceID, wm.ResourceOwner)
+	aggregate := limits.NewAggregate(aggregateId, wm.InstanceID)
 	createCmds, err := c.SetLimitsCommand(aggregate, wm, setLimits)()
 	if err != nil {
 		return nil, err
@@ -117,7 +117,7 @@ func (c *Commands) ResetLimits(ctx context.Context, resourceOwner string) (*doma
 	if wm.AggregateID == "" {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-9JToT", "Errors.Limits.NotFound")
 	}
-	aggregate := limits.NewAggregate(wm.AggregateID, instanceId, resourceOwner)
+	aggregate := limits.NewAggregate(wm.AggregateID, instanceId)
 	events := []eventstore.Command{limits.NewResetEvent(ctx, &aggregate.Aggregate)}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
