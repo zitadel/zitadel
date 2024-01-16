@@ -1,0 +1,21 @@
+{
+  "extends": [
+    "//"
+  ],
+  "pipeline": {
+    "generate": {
+      "outputs": [
+        "src/proto/**"
+      ],
+      "cache": true
+    },
+    "build": {
+      "outputs": [
+        "dist/**"
+      ],
+      "dependsOn": [
+        "generate"
+      ]
+    }
+  }
+}

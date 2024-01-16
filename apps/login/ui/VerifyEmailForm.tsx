@@ -28,7 +28,9 @@ export default function VerifyEmailForm({ userId, code, submit }: Props) {
 
   useEffect(() => {
     if (submit && code && userId) {
-      submitCode({ code });
+      // When we navigate to this page, we always want to be redirected if submit is true and the parameters are valid.
+      // For programmatic verification, the /verifyemail API should be used.
+      submitCodeAndContinue({ code });
     }
   }, []);
 
@@ -40,7 +42,7 @@ export default function VerifyEmailForm({ userId, code, submit }: Props) {
 
   async function submitCode(values: Inputs) {
     setLoading(true);
-    const res = await fetch("/verifyemail", {
+    const res = await fetch("/api/verifyemail", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -53,19 +55,18 @@ export default function VerifyEmailForm({ userId, code, submit }: Props) {
 
     const response = await res.json();
 
+    setLoading(false);
     if (!res.ok) {
-      setLoading(false);
       setError(response.details);
       return Promise.reject(response);
     } else {
-      setLoading(false);
       return response;
     }
   }
 
   async function resendCode() {
     setLoading(true);
-    const res = await fetch("/resendverifyemail", {
+    const res = await fetch("/api/resendverifyemail", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -86,7 +87,7 @@ export default function VerifyEmailForm({ userId, code, submit }: Props) {
 
   function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
     return submitCode(value).then((resp: any) => {
-      return router.push(`/username`);
+      return router.push(`/loginname`);
     });
   }
 

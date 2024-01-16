@@ -44,6 +44,8 @@ Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
 
 - `pnpm generate` - Build proto stubs for server and client package
 - `pnpm build` - Build all packages and the login app
+- `pnpm test` - Test all packages and the login app
+- `pnpm test:watch` - Rerun tests on file change
 - `pnpm dev` - Develop all packages and the login app
 - `pnpm lint` - Lint all packages
 - `pnpm changeset` - Generate a changeset

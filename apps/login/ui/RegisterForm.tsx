@@ -48,7 +48,7 @@ export default function RegisterForm({
 
   async function submitRegister(values: Inputs) {
     setLoading(true);
-    const res = await fetch("/registeruser", {
+    const res = await fetch("/api/registeruser", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

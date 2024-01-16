@@ -1,7 +1,7 @@
-import { CallOptions, ClientMiddlewareCall, Metadata } from "nice-grpc";
+import { CallOptions, ClientMiddleware, ClientMiddlewareCall, Metadata } from "nice-grpc";
 
-export const authMiddleware = (token: string) =>
-  async function* <Request, Response>(
+export function authMiddleware (token: string): ClientMiddleware {
+  return async function* <Request, Response>(
     call: ClientMiddlewareCall<Request, Response>,
     options: CallOptions
   ) {
@@ -12,6 +12,7 @@ export const authMiddleware = (token: string) =>
 
     return yield* call.next(call.request, options);
   };
+}
 
 export const orgMetadata = (orgId: string) =>
   new Metadata({ "x-zitadel-orgid": orgId });

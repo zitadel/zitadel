@@ -9,7 +9,7 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName } = searchParams;
+  const { loginName, promptPasswordless, authRequestId, alt } = searchParams;
   const sessionFactors = await loadSession(loginName);
 
   async function loadSession(loginName?: string) {
@@ -38,13 +38,18 @@ export default async function Page({
 
       {sessionFactors && (
         <UserAvatar
-          loginName={loginName ?? sessionFactors.factors?.user?.loginName ?? ""}
+          loginName={loginName ?? sessionFactors.factors?.user?.loginName}
           displayName={sessionFactors.factors?.user?.displayName}
           showDropdown
         ></UserAvatar>
       )}
 
-      <PasswordForm loginName={loginName} />
+      <PasswordForm
+        loginName={loginName}
+        authRequestId={authRequestId}
+        promptPasswordless={promptPasswordless === "true"}
+        isAlternative={alt === "true"}
+      />
     </div>
   );
 }

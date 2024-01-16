@@ -2,6 +2,7 @@ import clsx from "clsx";
 import React, {
   ButtonHTMLAttributes,
   DetailedHTMLProps,
+  ReactNode,
   forwardRef,
 } from "react";
 
@@ -65,16 +66,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ...props
     },
     ref
-  ) => {
-    return (
-      <button
-        type="button"
-        ref={ref}
-        className={`${getButtonClasses(size, variant, color)} ${className}`}
-        {...props}
-      >
-        {children}
-      </button>
-    );
-  }
+  ) => (
+    <button
+      type="button"
+      ref={ref}
+      className={`${getButtonClasses(size, variant, color)} ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  )
 );

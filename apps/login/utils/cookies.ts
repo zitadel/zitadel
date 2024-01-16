@@ -7,6 +7,7 @@ export type SessionCookie = {
   token: string;
   loginName: string;
   changeDate: string;
+  authRequestId?: string; // if its linked to an OIDC flow
 };
 
 function setSessionHttpOnlyCookie(sessions: SessionCookie[]) {
@@ -19,6 +20,7 @@ function setSessionHttpOnlyCookie(sessions: SessionCookie[]) {
     path: "/",
   });
 }
+
 export async function addSessionToCookie(session: SessionCookie): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -37,7 +39,7 @@ export async function addSessionToCookie(session: SessionCookie): Promise<any> {
     currentSessions = [...currentSessions, session];
   }
 
-  setSessionHttpOnlyCookie(currentSessions);
+  return setSessionHttpOnlyCookie(currentSessions);
 }
 
 export async function updateSessionCookie(
@@ -52,9 +54,12 @@ export async function updateSessionCookie(
     : [session];
 
   const foundIndex = sessions.findIndex((session) => session.id === id);
-  sessions[foundIndex] = session;
-
-  return setSessionHttpOnlyCookie(sessions);
+  if (foundIndex > -1) {
+    sessions[foundIndex] = session;
+    return setSessionHttpOnlyCookie(sessions);
+  } else {
+    throw "updateSessionCookie: session id now found";
+  }
 }
 
 export async function removeSessionFromCookie(
@@ -88,17 +93,67 @@ export async function getMostRecentSessionCookie(): Promise<any> {
 
     return latest;
   } else {
+    return Promise.reject("no session cookie found");
+  }
+}
+
+export async function getSessionCookieById(id: string): Promise<SessionCookie> {
+  const cookiesList = cookies();
+  const stringifiedCookie = cookiesList.get("sessions");
+
+  if (stringifiedCookie?.value) {
+    const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
+
+    const found = sessions.find((s) => s.id === id);
+    if (found) {
+      return found;
+    } else {
+      return Promise.reject();
+    }
+  } else {
     return Promise.reject();
   }
 }
 
-export async function getAllSessionIds(): Promise<any> {
+export async function getSessionCookieByLoginName(
+  loginName: string
+): Promise<SessionCookie> {
+  const cookiesList = cookies();
+  const stringifiedCookie = cookiesList.get("sessions");
+
+  if (stringifiedCookie?.value) {
+    const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
+
+    const found = sessions.find((s) => s.loginName === loginName);
+    if (found) {
+      return found;
+    } else {
+      return Promise.reject("no cookie found with loginName: " + loginName);
+    }
+  } else {
+    return Promise.reject("no session cookie found");
+  }
+}
+
+export async function getAllSessionCookieIds(): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
     return sessions.map((session) => session.id);
+  } else {
+    return [];
+  }
+}
+
+export async function getAllSessions(): Promise<SessionCookie[]> {
+  const cookiesList = cookies();
+  const stringifiedCookie = cookiesList.get("sessions");
+
+  if (stringifiedCookie?.value) {
+    const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
+    return sessions;
   } else {
     return [];
   }
@@ -117,7 +172,6 @@ export async function getMostRecentCookieWithLoginname(
 
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
-
     const filtered = sessions.filter((cookie) => {
       return !!loginName ? cookie.loginName === loginName : true;
     });
@@ -135,10 +189,10 @@ export async function getMostRecentCookieWithLoginname(
     if (latest) {
       return latest;
     } else {
-      return Promise.reject();
+      return Promise.reject("Could not get the context or retrieve a session");
     }
   } else {
-    return Promise.reject();
+    return Promise.reject("Could not read session cookie");
   }
 }
 

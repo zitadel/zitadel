@@ -1,10 +1,19 @@
-import { getSession, server } from "#/lib/zitadel";
+import { createCallback, getSession, server } from "#/lib/zitadel";
 import UserAvatar from "#/ui/UserAvatar";
 import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
+import { redirect } from "next/navigation";
 
-async function loadSession(loginName: string) {
+async function loadSession(loginName: string, authRequestId?: string) {
   const recent = await getMostRecentCookieWithLoginname(`${loginName}`);
 
+  if (authRequestId) {
+    return createCallback(server, {
+      authRequestId,
+      session: { sessionId: recent.id, sessionToken: recent.token },
+    }).then(({ callbackUrl }) => {
+      return redirect(callbackUrl);
+    });
+  }
   return getSession(server, recent.id, recent.token).then((response) => {
     if (response?.session) {
       return response.session;
@@ -13,8 +22,8 @@ async function loadSession(loginName: string) {
 }
 
 export default async function Page({ searchParams }: { searchParams: any }) {
-  const { loginName } = searchParams;
-  const sessionFactors = await loadSession(loginName);
+  const { loginName, authRequestId } = searchParams;
+  const sessionFactors = await loadSession(loginName, authRequestId);
 
   return (
     <div className="flex flex-col items-center space-y-4">

@@ -10,20 +10,28 @@
     "dist/**"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts",
-    "dev": "tsup src/index.ts --format esm,cjs --watch --dts",
+    "generate": "buf generate https://github.com/zitadel/zitadel.git --path ./proto/zitadel",
+    "build": "tsup --dts",
+    "test": "pnpm test:unit",
+    "test:watch": "pnpm test:unit:watch",
+    "test:unit": "jest",
+    "test:unit:watch": "jest --watch",
+    "dev": "tsup --watch --dts",
     "lint": "eslint \"src/**/*.ts*\"",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "generate": "buf generate https://github.com/zitadel/zitadel.git --path ./proto/zitadel"
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf src/proto"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.14.0",
+    "@types/jest": "^29.5.1",
     "@zitadel/tsconfig": "workspace:*",
     "eslint": "^7.32.0",
     "eslint-config-zitadel": "workspace:*",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.1",
     "ts-proto": "^1.139.0",
     "tsup": "^5.10.1",
-    "typescript": "^4.5.3"
+    "typescript": "^4.9.3"
   },
   "publishConfig": {
     "access": "public"

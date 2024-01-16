@@ -49,15 +49,18 @@ docker compose --file ./acceptance/docker-compose.yaml pull
 
 # Run ZITADEL and configure ./apps/login/.env.local
 docker compose --file ./acceptance/docker-compose.yaml run setup
+
+# Configure your shell to use the environment variables written to ./apps/login/.env.acceptance
+export $(cat ./apps/login/.env.acceptance | xargs)
 ```
 
 ### Developing Against Your ZITADEL Cloud Instance
 
-Create the file ./apps/login/.env.local with the following content:
+Configure your shell by exporting the following environment variables:
 ```sh
-ZITADEL_API_URL=<your cloud instance URL here>
-ZITADEL_ORG_ID=<your service accounts organization id here>
-ZITADEL_SERVICE_USER_TOKEN=<your service account personal access token here>
+export ZITADEL_API_URL=<your cloud instance URL here>
+export ZITADEL_ORG_ID=<your service accounts organization id here>
+export ZITADEL_SERVICE_USER_TOKEN=<your service account personal access token here>
 ```
 
 ### Setting up local environment
@@ -74,5 +77,21 @@ pnpm dev
 ```
 
 The application is now available at `http://localhost:3000`
+
+### Testing
+
+You can execute the following commands `pnpm test` for a single test run or `pnpm test:watch` in the following directories:
+
+- apps/login
+- packages/zitadel-client
+- packages/zitadel-server
+- packages/zitadel-react
+- packages/zitadel-next
+- The projects root directory: all tests in the project are executed
+
+In apps/login, these commands also spin up the application and a ZITADEL gRPC API mock server to run integration tests using [Cypress](https://www.cypress.io/) against them.
+If you want to run the integration tests standalone against an environment of your choice, navigate to ./apps/login, [configure your shell as you like](# Developing Against Your ZITADEL Cloud Instance) and run `pnpm test:integration:run` or `pnpm test:integration:open`.
+Then you need to lifecycle the mock process using the command `pnpm mock` or the more fine grained commands `pnpm mock:build`, `pnpm mock:build:nocache`, `pnpm mock:run` and `pnpm mock:destroy`.
+
 
 That's it! 🎉

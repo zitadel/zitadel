@@ -1,14 +1,12 @@
-import { Session } from "#/../../packages/zitadel-server/dist";
+import { Session } from "@zitadel/server";
 import { listSessions, server } from "#/lib/zitadel";
-import Alert from "#/ui/Alert";
-import { Avatar } from "#/ui/Avatar";
-import { getAllSessionIds } from "#/utils/cookies";
-import { UserPlusIcon, XCircleIcon } from "@heroicons/react/24/outline";
-import moment from "moment";
+import { getAllSessionCookieIds } from "#/utils/cookies";
+import { UserPlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import SessionsList from "#/ui/SessionsList";
 
 async function loadSessions(): Promise<Session[]> {
-  const ids = await getAllSessionIds();
+  const ids = await getAllSessionCookieIds();
 
   if (ids && ids.length) {
     const response = await listSessions(
@@ -22,8 +20,14 @@ async function loadSessions(): Promise<Session[]> {
   }
 }
 
-export default async function Page() {
-  const sessions = await loadSessions();
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Record<string | number | symbol, string | undefined>;
+}) {
+  const authRequestId = searchParams?.authRequestId;
+
+  let sessions = await loadSessions();
 
   return (
     <div className="flex flex-col items-center space-y-4">
@@ -31,66 +35,8 @@ export default async function Page() {
       <p className="ztdl-p mb-6 block">Use your ZITADEL Account</p>
 
       <div className="flex flex-col w-full space-y-2">
-        {sessions ? (
-          sessions
-            .filter((session) => session?.factors?.user?.loginName)
-            .map((session, index) => {
-              const validPassword = session?.factors?.password?.verifiedAt;
-              return (
-                <Link
-                  key={"session-" + index}
-                  href={
-                    validPassword
-                      ? `/signedin?` +
-                        new URLSearchParams({
-                          loginName: session.factors?.user?.loginName as string,
-                        })
-                      : `/password?` +
-                        new URLSearchParams({
-                          loginName: session.factors?.user?.loginName as string,
-                        })
-                  }
-                  className="group flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light hover:shadow-lg dark:hover:bg-white/10 py-2 px-4 rounded-md transition-all"
-                >
-                  <div className="pr-4">
-                    <Avatar
-                      size="small"
-                      loginName={session.factors?.user?.loginName as string}
-                      name={session.factors?.user?.displayName ?? ""}
-                    />
-                  </div>
-
-                  <div className="flex flex-col">
-                    <span className="">
-                      {session.factors?.user?.displayName}
-                    </span>
-                    <span className="text-xs opacity-80">
-                      {session.factors?.user?.loginName}
-                    </span>
-                    {validPassword && (
-                      <span className="text-xs opacity-80">
-                        {moment(new Date(validPassword)).fromNow()}
-                      </span>
-                    )}
-                  </div>
-
-                  <span className="flex-grow"></span>
-                  <div className="relative flex flex-row items-center">
-                    {validPassword ? (
-                      <div className="absolute h-2 w-2 bg-green-500 rounded-full mx-2 transform right-0 group-hover:right-6 transition-all"></div>
-                    ) : (
-                      <div className="absolute h-2 w-2 bg-red-500 rounded-full mx-2 transform right-0 group-hover:right-6 transition-all"></div>
-                    )}
-
-                    <XCircleIcon className="hidden group-hover:block h-5 w-5 transition-all opacity-50 hover:opacity-100" />
-                  </div>
-                </Link>
-              );
-            })
-        ) : (
-          <Alert>No Sessions available!</Alert>
-        )}
-        <Link href="/username">
+        <SessionsList sessions={sessions} authRequestId={authRequestId} />
+        <Link href="/loginname">
           <div className="flex flex-row items-center py-3 px-4 hover:bg-black/10 dark:hover:bg-white/10 rounded-md transition-all">
             <div className="w-8 h-8 mr-4 flex flex-row justify-center items-center rounded-full bg-black/5 dark:bg-white/5">
               <UserPlusIcon className="h-5 w-5" />
