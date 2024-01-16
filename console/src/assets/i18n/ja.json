@@ -1247,6 +1247,7 @@
       "DESCRIPTIONCREATEMGMT": "ユーザーは、以下の利用可能なIDプロバイダーから選択できます。注：システムセットプロバイダーと、組織用に設定されたプロバイダーのみを使用できます。",
       "ADVANCED": "高度",
       "LIFETIMEDURATIONS": "ログインライフタイム",
+      "LIFETIME_INVALID": "フォームに無効な値が含まれています。",
       "SAVED": "正常に保存されました！"
     },
     "PRIVACY_POLICY": {

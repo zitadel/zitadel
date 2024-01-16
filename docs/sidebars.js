@@ -16,6 +16,7 @@ module.exports = {
             "examples/login/flutter",
             "examples/login/nextjs",
             "examples/login/go",
+            "examples/login/symfony",
             "examples/login/java-spring",
           ],
           collapsed: true,
