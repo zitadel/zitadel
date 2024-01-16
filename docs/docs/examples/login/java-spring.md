@@ -58,7 +58,7 @@ into Spring Security `authiorities`, which can be used later on to determine the
 So in your application, create a 'support/zitadel' package and in there the `ZitadelGrantedAuthoritiesMapper.java`:
 
 ```java reference
-https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/web/src/main/java/demo/support/zitadel/ZitadelGrantedAuthoritiesMapper.java
+https://github.com/zitadel/zitadel-java/blob/main/web/src/main/java/demo/support/zitadel/ZitadelGrantedAuthoritiesMapper.java
 ```
 
 The following two classes will provide you the possibility to access and use the user's token for requests to another API, e.g. the Spring Boot API example.
@@ -66,11 +66,11 @@ The following two classes will provide you the possibility to access and use the
 Directly create them in the `support` package.
 
 ```java reference
-https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/web/src/main/java/demo/support/TokenAccessor.java
+https://github.com/zitadel/zitadel-java/blob/main/web/src/main/java/demo/support/TokenAccessor.java
 ```
 
 ```java reference
-https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/web/src/main/java/demo/support/AccessTokenInterceptor.java
+https://github.com/zitadel/zitadel-java/blob/main/web/src/main/java/demo/support/AccessTokenInterceptor.java
 ```
 
 ### Application server configuration
@@ -80,20 +80,20 @@ As we have now our support classes, we can now create and configure the applicat
 In a new `config` package, create first the `WebClientConfig.java`, which will provide a RestTemplate using the previously created AccessTokenInterceptor:
 
 ```java reference
-https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/web/src/main/java/demo/config/WebClientConfig.java
+https://github.com/zitadel/zitadel-java/blob/main/web/src/main/java/demo/config/WebClientConfig.java
 ```
 
 Additionally also create the `WebSecurityConfig.java` in the same package. This class will take care of the authentication, redirecting the user to the login,
 mapping the claims (using the ZitadelGrantedAuthoritiesMapper) and also provide the possibility for logout:
 
 ```java reference
-https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/web/src/main/java/demo/config/WebSecurityConfig.java
+https://github.com/zitadel/zitadel-java/blob/main/web/src/main/java/demo/config/WebSecurityConfig.java
 ```
 
 For the authentication (and the server in general) to work, the application needs some configuration, so please provide the following to your `application.yml` (resources folder):
 
 ```yaml reference
-https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/web/src/main/resources/application.yml
+https://github.com/zitadel/zitadel-java/blob/main/web/src/main/resources/application.yml
 ```
 
 Note that both the `issuer-uri` as well as the `client-id` are only placeholders. You can either change them in here using the values provided by ZITADEL
@@ -109,7 +109,7 @@ Now create three HTML files in the new `templates` folder and copy the content o
 The home page will display the Userinfo from the authentication context and the granted roles / Spring security authorities.
 
 ```html reference
-https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/web/src/main/resources/templates/index.html
+https://github.com/zitadel/zitadel-java/blob/main/web/src/main/resources/templates/index.html
 ```
 
 **fragments.html**
@@ -117,7 +117,7 @@ https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/web/src/mai
 The navigation to switch between the home and tasks page and allows the user to logout.
 
 ```html reference
-https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/web/src/main/resources/templates/fragments.html
+https://github.com/zitadel/zitadel-java/blob/main/web/src/main/resources/templates/fragments.html
 ```
 
 **tasks.html**
@@ -125,7 +125,7 @@ https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/web/src/mai
 The tasks page allows to interact with the Spring Boot API example and display / add new tasks.
 
 ```html reference
-https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/web/src/main/resources/templates/tasks.html
+https://github.com/zitadel/zitadel-java/blob/main/web/src/main/resources/templates/tasks.html
 ```
 
 **UiController**
@@ -133,7 +133,7 @@ https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/web/src/mai
 To serve these pages and handler their actions, you finally need a `UiController.java`:
 
 ```java reference
-https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/web/src/main/java/demo/web/UiController.java
+https://github.com/zitadel/zitadel-java/blob/main/web/src/main/java/demo/web/UiController.java
 ```
 
 ### Start your application

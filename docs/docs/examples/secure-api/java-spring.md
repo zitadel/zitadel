@@ -44,7 +44,7 @@ into Spring Security `authiorities`, which can be used later on to determine the
 So in your application, create a `support/zitadel` package and in there the `CustomAuthorityOpaqueTokenIntrospector.java`:
 
 ```java reference
-https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/api/src/main/java/demo/app/support/zitadel/CustomAuthorityOpaqueTokenIntrospector.java
+https://github.com/zitadel/zitadel-java/blob/main/api/src/main/java/demo/app/support/zitadel/CustomAuthorityOpaqueTokenIntrospector.java
 ```
 
 ### Application server configuration
@@ -56,13 +56,13 @@ This class will take care of the authorization by require the calls on `/api/tas
 It will also use the just created CustomAuthorityOpaqueTokenIntrospector for the introspection call:
 
 ```java reference
-https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/api/src/main/java/demo/app/config/WebSecurityConfig.java
+https://github.com/zitadel/zitadel-java/blob/main/api/src/main/java/demo/app/config/WebSecurityConfig.java
 ```
 
 For the authorization (and the server in general) to work, the application needs some configuration, so please provide the following to your `application.yml` (resources folder):
 
 ```yaml reference
-https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/api/src/main/resources/application.yml
+https://github.com/zitadel/zitadel-java/blob/main/api/src/main/resources/application.yml
 ```
 
 Note that the `introspection-uri`, `client-id` and `client-secret` are only placeholders. You can either change them in here using the values provided by ZITADEL
@@ -80,7 +80,7 @@ If authorization is required, the token must not be expired and the API has to b
 For tests we will use a Personal Access Token or the [Java Spring web example](../login/java-spring).
 
 ```java reference
-https://github.com/zitadel/zitadel-java/blob/update/java/spring-boot/api/src/main/java/demo/app/api/ExampleController.java
+https://github.com/zitadel/zitadel-java/blob/main/api/src/main/java/demo/app/api/ExampleController.java
 ```
 
 ## Test API
