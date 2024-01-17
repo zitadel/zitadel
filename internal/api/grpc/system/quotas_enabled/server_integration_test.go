@@ -1,6 +1,6 @@
 //go:build integration
 
-package handlers_test
+package quotas_enabled_test
 
 import (
 	"context"
@@ -12,9 +12,10 @@ import (
 )
 
 var (
-	CTX       context.Context
-	SystemCTX context.Context
-	Tester    *integration.Tester
+	CTX         context.Context
+	SystemCTX   context.Context
+	IAMOwnerCTX context.Context
+	Tester      *integration.Tester
 )
 
 func TestMain(m *testing.M) {
@@ -29,8 +30,8 @@ Quotas:
     Enabled: true
 `)
 		defer Tester.Done()
-
 		SystemCTX = Tester.WithAuthorization(ctx, integration.SystemUser)
+		IAMOwnerCTX = Tester.WithAuthorization(ctx, integration.IAMOwner)
 		return m.Run()
 	}())
 }

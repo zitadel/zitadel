@@ -268,8 +268,8 @@
       "DESCRIPTION": "Click the button below to log in again."
     },
     "EXHAUSTED": {
-      "TITLE": "Your quota for authenticated requests is exhausted.",
-      "DESCRIPTION": "Remove or increase the quota limit for this ZITADEL instance."
+      "TITLE": "Your instance is blocked.",
+      "DESCRIPTION": "Ask your ZITADEL instance administrator to update the subscription."
     },
     "INVALID_FORMAT": "The formatting is invalid.",
     "NOTANEMAIL": "The given value is not an e-mail address.",
