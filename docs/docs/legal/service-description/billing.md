@@ -32,7 +32,7 @@ Service users that authenticate or access the management API are counted against
 
 ### Active external identity providers
 
-To calculate the monthly amount we take maximum activated external identity providers on each day over a given month.
+To calculate the monthly amount we take the sum of activated external identity providers over all instances on each day and calculate the average over a given month, rounded up to the next integer.
 Excluded are configured identity providers that are not activated.
 
 ### Action minutes
