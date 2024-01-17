@@ -57,10 +57,10 @@ Now that you have configured your web application on the ZITADEL side, you can p
 
 ### Install Vue dependencies
 
-npm install --save @zitadel/vue
 To conveniently connect with ZITADEL, you can install the [@zitadel/vue NPM package](https://www.npmjs.com/package/@zitadel/vue). Run the following command:
 
 ```bash
+npm install --save @zitadel/vue
 ```
 
 ### Create and configure the auth service
