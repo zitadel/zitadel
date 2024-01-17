@@ -107,9 +107,9 @@ func (c *Commands) setLimitsCommands(ctx context.Context, wm *limitsWriteModel, 
 	return cmds, err
 }
 
-func (c *Commands) ResetLimits(ctx context.Context, resourceOwner string) (*domain.ObjectDetails, error) {
+func (c *Commands) ResetLimits(ctx context.Context) (*domain.ObjectDetails, error) {
 	instanceId := authz.GetInstance(ctx).InstanceID()
-	wm, err := c.getLimitsWriteModel(ctx, instanceId, resourceOwner)
+	wm, err := c.getLimitsWriteModel(ctx, instanceId)
 	if err != nil {
 		return nil, err
 	}

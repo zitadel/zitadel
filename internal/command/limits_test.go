@@ -64,7 +64,7 @@ func TestLimits_SetLimits(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "owner1",
+					ResourceOwner: "instance1",
 				},
 			},
 		},
@@ -636,8 +636,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 func TestLimits_ResetLimits(t *testing.T) {
 	type fields func(*testing.T) *eventstore.Eventstore
 	type args struct {
-		ctx           context.Context
-		resourceOwner string
+		ctx context.Context
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -658,8 +657,7 @@ func TestLimits_ResetLimits(t *testing.T) {
 				)
 			},
 			args: args{
-				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
-				resourceOwner: "instance1",
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 			},
 			res: res{
 				err: func(err error) bool {
@@ -692,8 +690,7 @@ func TestLimits_ResetLimits(t *testing.T) {
 				)
 			},
 			args: args{
-				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
-				resourceOwner: "instance1",
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 			},
 			res: res{
 				err: func(err error) bool {
@@ -729,8 +726,7 @@ func TestLimits_ResetLimits(t *testing.T) {
 				)
 			},
 			args: args{
-				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
-				resourceOwner: "instance1",
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -744,7 +740,7 @@ func TestLimits_ResetLimits(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields(t),
 			}
-			got, err := r.ResetLimits(tt.args.ctx, tt.args.resourceOwner)
+			got, err := r.ResetLimits(tt.args.ctx)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

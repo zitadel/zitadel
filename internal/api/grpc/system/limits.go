@@ -33,8 +33,8 @@ func (s *Server) BulkSetLimits(ctx context.Context, req *system.BulkSetLimitsReq
 	return resp, nil
 }
 
-func (s *Server) ResetLimits(ctx context.Context, req *system.ResetLimitsRequest) (*system.ResetLimitsResponse, error) {
-	details, err := s.command.ResetLimits(ctx, req.GetInstanceId())
+func (s *Server) ResetLimits(ctx context.Context, _ *system.ResetLimitsRequest) (*system.ResetLimitsResponse, error) {
+	details, err := s.command.ResetLimits(ctx)
 	if err != nil {
 		return nil, err
 	}
