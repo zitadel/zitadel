@@ -268,8 +268,8 @@
       "DESCRIPTION": "Klikněte na tlačítko níže pro opětovné přihlášení."
     },
     "EXHAUSTED": {
-      "TITLE": "Vyčerpali jste kvótu pro autentizované požadavky.",
-      "DESCRIPTION": "Odstraňte nebo zvyšte limit kvóty pro tuto instanci ZITADEL."
+      "TITLE": "Vaše instance je blokována.",
+      "DESCRIPTION": "Požádejte svého správce instance ZITADEL, aby aktualizoval předplatné."
     },
     "INVALID_FORMAT": "Formát je neplatný.",
     "NOTANEMAIL": "Zadaná hodnota není e-mailová adresa.",

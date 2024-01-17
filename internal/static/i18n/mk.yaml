@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Лимитот не е пронајден
     NoneSpecified: Не се наведени лимити
+    Instance:
+      Blocked: Инстанцата е блокирана
   Restrictions:
     NoneSpecified: Не се наведени ограничувања
     DefaultLanguageMustBeAllowed: Стандардниот јазик мора да биде дозволен

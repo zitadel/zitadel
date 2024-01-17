@@ -19,7 +19,7 @@ func newZitadel() *cobra.Command {
 		Short: "initialize ZITADEL internals",
 		Long: `initialize ZITADEL internals.
 
-Prereqesits:
+Prerequisites:
 - cockroachDB or postgreSQL with user and database
 `,
 		Run: func(cmd *cobra.Command, args []string) {

@@ -29,6 +29,10 @@ var (
 		name:          projection.InstanceProjectionTable,
 		instanceIDCol: projection.InstanceColumnID,
 	}
+	limitsTable = table{
+		name:          projection.LimitsProjectionTable,
+		instanceIDCol: projection.LimitsColumnInstanceID,
+	}
 	InstanceColumnID = Column{
 		name:  projection.InstanceColumnID,
 		table: instanceTable,
@@ -69,6 +73,18 @@ var (
 		name:  projection.InstanceColumnDefaultLanguage,
 		table: instanceTable,
 	}
+	LimitsColumnInstanceID = Column{
+		name:  projection.LimitsColumnInstanceID,
+		table: limitsTable,
+	}
+	LimitsColumnAuditLogRetention = Column{
+		name:  projection.LimitsColumnAuditLogRetention,
+		table: limitsTable,
+	}
+	LimitsColumnBlock = Column{
+		name:  projection.LimitsColumnBlock,
+		table: limitsTable,
+	}
 )
 
 type Instance struct {
@@ -78,14 +94,16 @@ type Instance struct {
 	Sequence     uint64
 	Name         string
 
-	DefaultOrgID string
-	IAMProjectID string
-	ConsoleID    string
-	ConsoleAppID string
-	DefaultLang  language.Tag
-	Domains      []*InstanceDomain
-	host         string
-	csp          csp
+	DefaultOrgID      string
+	IAMProjectID      string
+	ConsoleID         string
+	ConsoleAppID      string
+	DefaultLang       language.Tag
+	Domains           []*InstanceDomain
+	host              string
+	csp               csp
+	block             *bool
+	auditLogRetention *time.Duration
 }
 
 type csp struct {
@@ -135,6 +153,14 @@ func (i *Instance) SecurityPolicyAllowedOrigins() []string {
 		return nil
 	}
 	return i.csp.allowedOrigins
+}
+
+func (i *Instance) Block() *bool {
+	return i.block
+}
+
+func (i *Instance) AuditLogRetention() *time.Duration {
+	return i.auditLogRetention
 }
 
 type InstanceSearchQueries struct {
@@ -260,8 +286,10 @@ func prepareInstanceQuery(ctx context.Context, db prepareDatabase, host string) 
 			From(instanceTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Instance, error) {
-			instance := &Instance{host: host}
-			lang := ""
+			var (
+				instance = &Instance{host: host}
+				lang     = ""
+			)
 			err := row.Scan(
 				&instance.ID,
 				&instance.CreationDate,
@@ -491,10 +519,13 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 			InstanceDomainSequenceCol.identifier(),
 			SecurityPolicyColumnEnabled.identifier(),
 			SecurityPolicyColumnAllowedOrigins.identifier(),
+			LimitsColumnAuditLogRetention.identifier(),
+			LimitsColumnBlock.identifier(),
 		).
 			From(instanceTable.identifier()).
 			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
-			LeftJoin(join(SecurityPolicyColumnInstanceID, InstanceColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(SecurityPolicyColumnInstanceID, InstanceColumnID)).
+			LeftJoin(join(LimitsColumnInstanceID, InstanceColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Instance, error) {
 			instance := &Instance{
@@ -511,6 +542,8 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 					creationDate          sql.NullTime
 					sequence              sql.NullInt64
 					securityPolicyEnabled sql.NullBool
+					auditLogRetention     database.NullDuration
+					block                 sql.NullBool
 				)
 				err := rows.Scan(
 					&instance.ID,
@@ -531,6 +564,8 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 					&sequence,
 					&securityPolicyEnabled,
 					&instance.csp.allowedOrigins,
+					&auditLogRetention,
+					&block,
 				)
 				if err != nil {
 					return nil, zerrors.ThrowInternal(err, "QUERY-d3fas", "Errors.Internal")
@@ -547,6 +582,12 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 					IsGenerated:  isGenerated.Bool,
 					InstanceID:   instance.ID,
 				})
+				if auditLogRetention.Valid {
+					instance.auditLogRetention = &auditLogRetention.Duration
+				}
+				if block.Valid {
+					instance.block = &block.Bool
+				}
 				instance.csp.enabled = securityPolicyEnabled.Bool
 			}
 			if instance.ID == "" {
