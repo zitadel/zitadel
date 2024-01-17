@@ -29,6 +29,7 @@ import (
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
+	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	organisation "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
@@ -129,6 +130,63 @@ func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse
 			Phone: "+41791234567",
 			Verification: &user.SetHumanPhone_ReturnCode{
 				ReturnCode: &user.ReturnPhoneVerificationCode{},
+			},
+		},
+	})
+	logging.OnError(err).Fatal("create human user")
+	return resp
+}
+
+func (s *Tester) CreateOrganization(ctx context.Context, name, adminEmail string) *org.AddOrganizationResponse {
+	resp, err := s.Client.OrgV2.AddOrganization(ctx, &org.AddOrganizationRequest{
+		Name: name,
+		Admins: []*org.AddOrganizationRequest_Admin{
+			{
+				UserType: &org.AddOrganizationRequest_Admin_Human{
+					Human: &user.AddHumanUserRequest{
+						Profile: &user.SetHumanProfile{
+							GivenName:  "firstname",
+							FamilyName: "lastname",
+						},
+						Email: &user.SetHumanEmail{
+							Email: adminEmail,
+							Verification: &user.SetHumanEmail_ReturnCode{
+								ReturnCode: &user.ReturnEmailVerificationCode{},
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+	logging.OnError(err).Fatal("create org")
+	return resp
+}
+
+func (s *Tester) CreateHumanUserVerified(ctx context.Context, org, email string) *user.AddHumanUserResponse {
+	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user.AddHumanUserRequest{
+		Organization: &object.Organization{
+			Org: &object.Organization_OrgId{
+				OrgId: org,
+			},
+		},
+		Profile: &user.SetHumanProfile{
+			GivenName:         "Mickey",
+			FamilyName:        "Mouse",
+			NickName:          gu.Ptr("Mickey"),
+			PreferredLanguage: gu.Ptr("nl"),
+			Gender:            gu.Ptr(user.Gender_GENDER_MALE),
+		},
+		Email: &user.SetHumanEmail{
+			Email: email,
+			Verification: &user.SetHumanEmail_IsVerified{
+				IsVerified: true,
+			},
+		},
+		Phone: &user.SetHumanPhone{
+			Phone: "+41791234567",
+			Verification: &user.SetHumanPhone_IsVerified{
+				IsVerified: true,
 			},
 		},
 	})

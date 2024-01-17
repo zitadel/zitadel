@@ -752,7 +752,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	queries = append(queries, userIDQuery)
 	grants, err := o.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: queries,
-	}, true, false)
+	}, true)
 	if err != nil {
 		return nil, nil, err
 	}

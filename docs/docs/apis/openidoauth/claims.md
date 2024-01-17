@@ -68,7 +68,30 @@ Please check below the matrix for an overview where which scope is asserted.
 
 ## Custom Claims
 
+Custom claims are being inserted into user tokens in addition to the standard claims.
+Your app can use custom claims to handle more complex scenarios, such as restricting access based on these claims.
+
 You can add custom claims using the [complement token flow](/docs/apis/actions/complement-token) of the [actions feature](/docs/apis/actions/introduction).
+
+Multiple examples of Actions that result in custom claims can be found in our [Marketplace for ZITADEL Actions](https://github.com/zitadel/actions).
+
+### Static values as custom claim
+
+```javascript reference
+https://github.com/zitadel/actions/blob/de69b56f6d0463817953b59a52ffd6afc6a366fb/examples/add_claim.js#L9-L11
+```
+
+### Metadata as custom claim
+
+```javascript reference
+https://github.com/zitadel/actions/blob/main/examples/add_metadata.js#L9-L15
+```
+
+### Format roles claims
+
+```javascript reference
+https://github.com/zitadel/actions/blob/main/examples/custom_roles.js#L20-L33
+```
 
 ## Reserved Claims
 
