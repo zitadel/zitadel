@@ -5,6 +5,7 @@ package user_test
 import (
 	"context"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 
@@ -122,25 +123,20 @@ func TestServer_GetUserByID(t *testing.T) {
 			username := fmt.Sprintf("%d@mouse.com", time.Now().UnixNano())
 			err := tt.args.dep(tt.args.ctx, username, tt.args.req)
 			require.NoError(t, err)
-
-			var got *user.GetUserByIDResponse
-			for {
-				got, err = Client.GetUserByID(tt.args.ctx, tt.args.req)
-				if err == nil || (tt.wantErr && err != nil) {
-					break
-				}
-				select {
-				case <-CTX.Done():
-					t.Fatal(CTX.Err(), err)
-				case <-time.After(time.Second):
-					t.Log("retrying GetUserByID")
-					continue
-				}
+			retryDuration := time.Minute
+			if ctxDeadline, ok := CTX.Deadline(); ok {
+				retryDuration = time.Until(ctxDeadline)
 			}
-			if tt.wantErr {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, getErr := Client.GetUserByID(tt.args.ctx, tt.args.req)
+				assertErr := assert.NoError
+				if tt.wantErr {
+					assertErr = assert.Error
+				}
+				assertErr(ttt, getErr)
+				if getErr != nil {
+					return
+				}
 				tt.want.User.UserId = tt.args.req.GetUserId()
 				tt.want.User.Username = username
 				tt.want.User.PreferredLoginName = username
@@ -148,9 +144,9 @@ func TestServer_GetUserByID(t *testing.T) {
 				if human := tt.want.User.GetHuman(); human != nil {
 					human.Email.Email = username
 				}
-				require.Equal(t, tt.want.User, got.User)
+				assert.Equal(ttt, tt.want.User, got.User)
 				integration.AssertDetails(t, tt.want, got)
-			}
+			}, retryDuration, time.Second)
 		})
 	}
 }
@@ -556,30 +552,24 @@ func TestServer_ListUsers(t *testing.T) {
 			}
 			infos, err := tt.args.dep(tt.args.ctx, orgResp.OrganizationId, usernames, tt.args.req)
 			require.NoError(t, err)
-
-			var got *user.ListUsersResponse
-			for {
-				got, err = Client.ListUsers(tt.args.ctx, tt.args.req)
-				if err == nil || (tt.wantErr && err != nil) {
-					break
-				}
-				select {
-				case <-CTX.Done():
-					t.Fatal(tt.args.ctx.Err(), err)
-				case <-time.After(time.Second):
-					t.Log("retrying ListUsers")
-					continue
-				}
+			retryDuration := time.Minute
+			if ctxDeadline, ok := CTX.Deadline(); ok {
+				retryDuration = time.Until(ctxDeadline)
 			}
-			if tt.wantErr {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, listErr := Client.ListUsers(tt.args.ctx, tt.args.req)
+				assertErr := assert.NoError
+				if tt.wantErr {
+					assertErr = assert.Error
+				}
+				assertErr(ttt, listErr)
+				if listErr != nil {
+					return
+				}
 				// always only give back dependency infos which are required for the response
-				require.Len(t, tt.want.Result, len(infos))
+				assert.Len(ttt, tt.want.Result, len(infos))
 				// always first check length, otherwise its failed anyway
-				require.Len(t, got.Result, len(tt.want.Result))
+				assert.Len(ttt, got.Result, len(tt.want.Result))
 				// fill in userid and username as it is generated
 				for i := range infos {
 					tt.want.Result[i].UserId = infos[i].UserID
@@ -591,10 +581,10 @@ func TestServer_ListUsers(t *testing.T) {
 					}
 				}
 				for i := range tt.want.Result {
-					require.Contains(t, got.Result, tt.want.Result[i])
+					assert.Contains(ttt, got.Result, tt.want.Result[i])
 				}
 				integration.AssertListDetails(t, tt.want, got)
-			}
+			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user result")
 		})
 	}
 }
