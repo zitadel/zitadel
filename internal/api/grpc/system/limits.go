@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) SetLimits(ctx context.Context, req *system.SetLimitsRequest) (*system.SetLimitsResponse, error) {
-	details, err := s.command.SetLimits(ctx, req.GetInstanceId(), setInstanceLimitsPbToCommand(req))
+	details, err := s.command.SetLimits(ctx, setInstanceLimitsPbToCommand(req))
 	if err != nil {
 		return nil, err
 	}

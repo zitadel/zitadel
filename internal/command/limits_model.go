@@ -15,11 +15,11 @@ type limitsWriteModel struct {
 }
 
 // newLimitsWriteModel aggregateId is filled by reducing unit matching events
-func newLimitsWriteModel(instanceId, resourceOwner string) *limitsWriteModel {
+func newLimitsWriteModel(instanceId string) *limitsWriteModel {
 	return &limitsWriteModel{
 		WriteModel: eventstore.WriteModel{
 			InstanceID:    instanceId,
-			ResourceOwner: resourceOwner,
+			ResourceOwner: instanceId,
 		},
 	}
 }

@@ -21,11 +21,10 @@ type SetLimits struct {
 // SetLimits creates new limits or updates existing limits.
 func (c *Commands) SetLimits(
 	ctx context.Context,
-	resourceOwner string,
 	setLimits *SetLimits,
 ) (*domain.ObjectDetails, error) {
 	instanceId := authz.GetInstance(ctx).InstanceID()
-	wm, err := c.getLimitsWriteModel(ctx, instanceId, resourceOwner)
+	wm, err := c.getLimitsWriteModel(ctx, instanceId)
 	if err != nil {
 		return nil, err
 	}
@@ -130,8 +129,8 @@ func (c *Commands) ResetLimits(ctx context.Context, resourceOwner string) (*doma
 	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
 
-func (c *Commands) getLimitsWriteModel(ctx context.Context, instanceId, resourceOwner string) (*limitsWriteModel, error) {
-	wm := newLimitsWriteModel(instanceId, resourceOwner)
+func (c *Commands) getLimitsWriteModel(ctx context.Context, instanceId string) (*limitsWriteModel, error) {
+	wm := newLimitsWriteModel(instanceId)
 	return wm, c.eventstore.FilterToQueryReducer(ctx, wm)
 }
 

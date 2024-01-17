@@ -21,9 +21,8 @@ import (
 func TestLimits_SetLimits(t *testing.T) {
 	type fields func(*testing.T) (*eventstore.Eventstore, id.Generator)
 	type args struct {
-		ctx           context.Context
-		resourceOwner string
-		setLimits     *SetLimits
+		ctx       context.Context
+		setLimits *SetLimits
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -58,8 +57,7 @@ func TestLimits_SetLimits(t *testing.T) {
 					id_mock.NewIDGeneratorExpectIDs(t, "limits1")
 			},
 			args: args{
-				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
-				resourceOwner: "owner1",
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setLimits: &SetLimits{
 					AuditLogRetention: gu.Ptr(time.Hour),
 				},
@@ -104,8 +102,7 @@ func TestLimits_SetLimits(t *testing.T) {
 					nil
 			},
 			args: args{
-				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
-				resourceOwner: "instance1",
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setLimits: &SetLimits{
 					AuditLogRetention: gu.Ptr(time.Hour),
 				},
@@ -151,8 +148,7 @@ func TestLimits_SetLimits(t *testing.T) {
 					nil
 			},
 			args: args{
-				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
-				resourceOwner: "instance1",
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setLimits: &SetLimits{
 					Block: gu.Ptr(false),
 				},
@@ -203,8 +199,7 @@ func TestLimits_SetLimits(t *testing.T) {
 					id_mock.NewIDGeneratorExpectIDs(t, "limits2")
 			},
 			args: args{
-				ctx:           authz.WithInstanceID(context.Background(), "instance1"),
-				resourceOwner: "instance1",
+				ctx: authz.WithInstanceID(context.Background(), "instance1"),
 				setLimits: &SetLimits{
 					AuditLogRetention: gu.Ptr(time.Hour),
 				},
@@ -220,7 +215,7 @@ func TestLimits_SetLimits(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := new(Commands)
 			r.eventstore, r.idGenerator = tt.fields(t)
-			got, err := r.SetLimits(tt.args.ctx, tt.args.resourceOwner, tt.args.setLimits)
+			got, err := r.SetLimits(tt.args.ctx, tt.args.setLimits)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

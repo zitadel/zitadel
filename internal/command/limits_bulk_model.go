@@ -21,7 +21,7 @@ func newLimitsBulkWriteModel() *limitsBulkWriteModel {
 
 func (wm *limitsBulkWriteModel) addWriteModel(instanceID string) {
 	if _, ok := wm.writeModels[instanceID]; !ok {
-		wm.writeModels[instanceID] = newLimitsWriteModel(instanceID, instanceID)
+		wm.writeModels[instanceID] = newLimitsWriteModel(instanceID)
 	}
 	wm.filterInstanceIDs = append(wm.filterInstanceIDs, instanceID)
 }
