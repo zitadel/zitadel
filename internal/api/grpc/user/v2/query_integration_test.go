@@ -144,7 +144,7 @@ func TestServer_GetUserByID(t *testing.T) {
 				if human := tt.want.User.GetHuman(); human != nil {
 					human.Email.Email = username
 				}
-				require.Equal(t, tt.want.User, got.User)
+				assert.Equal(ttt, tt.want.User, got.User)
 				integration.AssertDetails(t, tt.want, got)
 			}, retryDuration, time.Second)
 		})
@@ -567,9 +567,9 @@ func TestServer_ListUsers(t *testing.T) {
 					return
 				}
 				// always only give back dependency infos which are required for the response
-				assert.Len(t, tt.want.Result, len(infos))
+				assert.Len(ttt, tt.want.Result, len(infos))
 				// always first check length, otherwise its failed anyway
-				assert.Len(t, got.Result, len(tt.want.Result))
+				assert.Len(ttt, got.Result, len(tt.want.Result))
 				// fill in userid and username as it is generated
 				for i := range infos {
 					tt.want.Result[i].UserId = infos[i].UserID
@@ -581,7 +581,7 @@ func TestServer_ListUsers(t *testing.T) {
 					}
 				}
 				for i := range tt.want.Result {
-					assert.Contains(t, got.Result, tt.want.Result[i])
+					assert.Contains(ttt, got.Result, tt.want.Result[i])
 				}
 				integration.AssertListDetails(t, tt.want, got)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user result")
