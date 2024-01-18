@@ -19,7 +19,7 @@ type state struct {
 	aggregateType  eventstore.AggregateType
 	aggregateID    string
 	sequence       uint64
-	offset         uint16
+	offset         uint32
 }
 
 var (
@@ -46,7 +46,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, config *triggerC
 		sequence      = new(sql.NullInt64)
 		timestamp     = new(sql.NullTime)
 		position      = new(sql.NullFloat64)
-		offset        = new(sql.NullInt16)
+		offset        = new(sql.NullInt64)
 	)
 
 	stateQuery := currentStateStmt
@@ -76,7 +76,8 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, config *triggerC
 	currentState.sequence = uint64(sequence.Int64)
 	currentState.eventTimestamp = timestamp.Time
 	currentState.position = position.Float64
-	currentState.offset = uint16(offset.Int16)
+	// psql does not provide unsigned numbers so we work around it
+	currentState.offset = uint32(offset.Int64)
 	return currentState, nil
 }
 

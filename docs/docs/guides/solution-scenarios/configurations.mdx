@@ -105,7 +105,7 @@ Go to the "Advanced" section, per default login with phone number should be allo
 ## Embedding ZITADEL in an iFrame
 
 To maximise the security during login and in the Console UI, ZITADEL follows security best practices by setting a
-Content-Security-Policy (CSP) and X-Frame-Options:
+Content-Security-Policy (CSP), X-Frame-Options and cookies with SameSite Lax:
 
 ```
 Content-Security-Policy: frame-ancestors 'none'
@@ -136,7 +136,13 @@ This will change the CSP to the following:
 Content-Security-Policy: frame-ancestors https://custom-domain.com
 ```
 
-and remove the X-Frame-Options header.
+remove the X-Frame-Options header and change the SameSite to `None`.
+
+:::note
+Please note, that SameSite None requires the cookie to be flagged `secure`, which means it must be sent over TLS (HTTPS) or localhost.
+This also means that domains other than localhost must use TLS for this option to work.
+This is due to browser restrictions: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#none
+:::
 
 ### Disable Multi-factor (MFA) Prompt
 

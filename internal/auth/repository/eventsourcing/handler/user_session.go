@@ -296,11 +296,24 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 }
 
 func (u *UserSession) appendEventOnSessions(sessions []*view_model.UserSessionView, event eventstore.Event) error {
+	users := make(map[string]*view_model.UserView)
+	usersByID := func(userID, instanceID string) (user *view_model.UserView, err error) {
+		user, ok := users[userID+"-"+instanceID]
+		if ok {
+			return user, nil
+		}
+		users[userID+"-"+instanceID], err = u.view.UserByID(userID, instanceID)
+		if err != nil {
+			return nil, err
+		}
+
+		return users[userID+"-"+instanceID], nil
+	}
 	for _, session := range sessions {
 		if err := session.AppendEvent(event); err != nil {
 			return err
 		}
-		if err := u.fillUserInfo(session); err != nil {
+		if err := u.fillUserInfo(session, usersByID); err != nil {
 			return err
 		}
 	}
@@ -311,7 +324,7 @@ func (u *UserSession) updateSession(session *view_model.UserSessionView, event e
 	if err := session.AppendEvent(event); err != nil {
 		return err
 	}
-	if err := u.fillUserInfo(session); err != nil {
+	if err := u.fillUserInfo(session, u.view.UserByID); err != nil {
 		return err
 	}
 	if err := u.view.PutUserSession(session); err != nil {
@@ -320,8 +333,8 @@ func (u *UserSession) updateSession(session *view_model.UserSessionView, event e
 	return nil
 }
 
-func (u *UserSession) fillUserInfo(session *view_model.UserSessionView) error {
-	user, err := u.view.UserByID(session.UserID, session.InstanceID)
+func (u *UserSession) fillUserInfo(session *view_model.UserSessionView, getUserByID func(userID, instanceID string) (*view_model.UserView, error)) error {
+	user, err := getUserByID(session.UserID, session.InstanceID)
 	if err != nil {
 		return err
 	}

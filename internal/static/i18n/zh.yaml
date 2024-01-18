@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: 未找到限制
     NoneSpecified: 未指定限制
+    Instance:
+      Blocked: 实例被阻止
   Restrictions:
     NoneSpecified: 未指定限制
     DefaultLanguageMustBeAllowed: 默认语言必须被允许

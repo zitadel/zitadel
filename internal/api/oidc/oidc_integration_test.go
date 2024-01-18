@@ -71,7 +71,7 @@ func Test_ZITADEL_API_missing_audience_scope(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -107,7 +107,7 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("%s %s", tokens.TokenType, tokens.AccessToken))
@@ -134,7 +134,7 @@ func Test_ZITADEL_API_missing_mfa(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPassword, startTime, changeTime)
 
@@ -162,7 +162,41 @@ func Test_ZITADEL_API_success(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
+	require.NoError(t, err)
+	assertTokens(t, tokens, false)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+
+	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("%s %s", tokens.TokenType, tokens.AccessToken))
+
+	myUserResp, err := Tester.Client.Auth.GetMyUser(ctx, &auth.GetMyUserRequest{})
+	require.NoError(t, err)
+	require.Equal(t, User.GetUserId(), myUserResp.GetUser().GetId())
+}
+
+func Test_ZITADEL_API_glob_redirects(t *testing.T) {
+	const redirectURI = "https://my-org-1yfnjl2xj-my-app.vercel.app/api/auth/callback/zitadel"
+	clientID := createClientWithOpts(t, clientOpts{
+		redirectURI: "https://my-org-*-my-app.vercel.app/api/auth/callback/zitadel",
+		logoutURI:   "https://my-org-*-my-app.vercel.app/",
+		devMode:     true,
+	})
+	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, zitadelAudienceScope)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+		AuthRequestId: authRequestID,
+		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// code exchange
+	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -191,7 +225,7 @@ func Test_ZITADEL_API_inactive_access_token(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -233,7 +267,7 @@ func Test_ZITADEL_API_terminated_session(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -257,9 +291,23 @@ func Test_ZITADEL_API_terminated_session(t *testing.T) {
 }
 
 func createClient(t testing.TB) string {
+	return createClientWithOpts(t, clientOpts{
+		redirectURI: redirectURI,
+		logoutURI:   logoutRedirectURI,
+		devMode:     false,
+	})
+}
+
+type clientOpts struct {
+	redirectURI string
+	logoutURI   string
+	devMode     bool
+}
+
+func createClientWithOpts(t testing.TB, opts clientOpts) string {
 	project, err := Tester.CreateProject(CTX)
 	require.NoError(t, err)
-	app, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId())
+	app, err := Tester.CreateOIDCNativeClient(CTX, opts.redirectURI, opts.logoutURI, project.GetId(), opts.devMode)
 	require.NoError(t, err)
 	return app.GetClientId()
 }

@@ -28,7 +28,10 @@ const (
 
 func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	headers, _ := http_utils.HeadersFromCtx(ctx)
 	if loginClient := headers.Get(LoginClientHeader); loginClient != "" {
@@ -102,7 +105,7 @@ func (o *OPStorage) audienceFromProjectID(ctx context.Context, projectID string)
 	if err != nil {
 		return nil, err
 	}
-	appIDs, err := o.query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	appIDs, err := o.query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, true)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +115,10 @@ func (o *OPStorage) audienceFromProjectID(ctx context.Context, projectID string)
 
 func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	if strings.HasPrefix(id, command.IDPrefixV2) {
 		req, err := o.command.GetCurrentAuthRequest(ctx, id)
@@ -135,7 +141,10 @@ func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRe
 
 func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (_ op.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	plainCode, err := o.decryptGrant(code)
 	if err != nil {
@@ -166,7 +175,10 @@ func (o *OPStorage) decryptGrant(grant string) (string, error) {
 
 func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	if strings.HasPrefix(id, command.IDPrefixV2) {
 		return o.command.AddAuthRequestCode(ctx, id, code)
@@ -181,14 +193,20 @@ func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err erro
 
 func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	return o.repo.DeleteAuthRequest(ctx, id)
 }
 
 func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) (_ string, _ time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	var userAgentID, applicationID, userOrgID string
 	switch authReq := req.(type) {
@@ -200,6 +218,8 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 		// trigger activity log for authentication for user
 		activity.Trigger(ctx, "", authReq.CurrentAuthRequest.UserID, activity.OIDCAccessToken)
 		return o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.GetID())
+	case op.IDTokenRequest:
+		applicationID = authReq.GetClientID()
 	}
 
 	accessTokenLifetime, _, _, _, err := o.getOIDCSettings(ctx)
@@ -219,7 +239,10 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 
 func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.TokenRequest, refreshToken string) (_, _ string, _ time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	// handle V2 request directly
 	switch tokenReq := req.(type) {
@@ -263,20 +286,24 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 }
 
 func getInfoFromRequest(req op.TokenRequest) (string, string, string, time.Time, []string) {
-	authReq, ok := req.(*AuthRequest)
-	if ok {
-		return authReq.AgentID, authReq.ApplicationID, authReq.UserOrgID, authReq.AuthTime, authReq.GetAMR()
+	switch r := req.(type) {
+	case *AuthRequest:
+		return r.AgentID, r.ApplicationID, r.UserOrgID, r.AuthTime, r.GetAMR()
+	case *RefreshTokenRequest:
+		return r.UserAgentID, r.ClientID, "", r.AuthTime, r.AuthMethodsReferences
+	case op.IDTokenRequest:
+		return "", r.GetClientID(), "", r.GetAuthTime(), r.GetAMR()
+	default:
+		return "", "", "", time.Time{}, nil
 	}
-	refreshReq, ok := req.(*RefreshTokenRequest)
-	if ok {
-		return refreshReq.UserAgentID, refreshReq.ClientID, "", refreshReq.AuthTime, refreshReq.AuthMethodsReferences
-	}
-	return "", "", "", time.Time{}, nil
 }
 
 func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken string) (_ op.RefreshTokenRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	plainToken, err := o.decryptGrant(refreshToken)
 	if err != nil {
@@ -304,7 +331,10 @@ func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken
 
 func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		logging.Error("no user agent id")
@@ -328,7 +358,10 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 
 func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionRequest *op.EndSessionRequest) (redirectURI string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	// check for the login client header
 	// and if not provided, terminate the session using the V1 method
@@ -405,6 +438,12 @@ func (o *OPStorage) revokeTokenV1(ctx context.Context, token, userID, clientID s
 }
 
 func (o *OPStorage) GetRefreshTokenInfo(ctx context.Context, clientID string, token string) (userID string, tokenID string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
+
 	plainToken, err := o.decryptGrant(token)
 	if err != nil {
 		return "", "", op.ErrInvalidRefreshToken

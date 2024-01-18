@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: 制限が見つかりません
     NoneSpecified: 制限が指定されていません
+    Instance:
+      Blocked: インスタンスはブロックされています
   Restrictions:
     NoneSpecified: 制限が指定されていません
     DefaultLanguageMustBeAllowed: デフォルト言語は許可されている必要があります

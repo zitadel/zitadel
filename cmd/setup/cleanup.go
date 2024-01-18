@@ -42,10 +42,10 @@ func Cleanup(config *Config) {
 	es := eventstore.NewEventstore(config.Eventstore)
 	migration.RegisterMappers(es)
 
-	step, err := migration.LatestStep(ctx, es)
+	step, err := migration.LastStuckStep(ctx, es)
 	logging.OnError(err).Fatal("unable to query latest migration")
 
-	if step.BaseEvent.EventType != migration.StartedType {
+	if step == nil {
 		logging.Info("there is no stuck migration please run `zitadel setup`")
 		return
 	}

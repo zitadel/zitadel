@@ -136,6 +136,20 @@ func (c *Client) IDTokenUserinfoClaimsAssertion() bool {
 	return c.client.IDTokenUserinfoAssertion
 }
 
+func (c *Client) RedirectURIGlobs() []string {
+	if c.DevMode() {
+		return c.RedirectURIs()
+	}
+	return nil
+}
+
+func (c *Client) PostLogoutRedirectURIGlobs() []string {
+	if c.DevMode() {
+		return c.PostLogoutRedirectURIs()
+	}
+	return nil
+}
+
 func accessTokenTypeToOIDC(tokenType domain.OIDCTokenType) op.AccessTokenType {
 	switch tokenType {
 	case domain.OIDCTokenTypeBearer:

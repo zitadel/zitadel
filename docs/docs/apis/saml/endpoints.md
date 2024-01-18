@@ -58,3 +58,12 @@ response will contain a StatusCode include a message which provides more informa
 
 **Link to
 spec** [Assertions and Protocols for the OASIS Security Assertion Markup Language (SAML) V2.0 – Errata Composite](https://www.oasis-open.org/committees/download.php/35711/sstc-saml-core-errata-2.0-wd-06-diff.pdf)
+
+## Custom attributes
+
+Custom attributes are being inserted into SAML response if not already present.
+Your app can use custom claims to handle more complex scenarios, such as restricting access based on these claims.
+
+You can add custom attributes using the [complement SAMLresponse](/docs/apis/actions/customize-samlresponse) of the [actions feature](/docs/apis/actions/introduction).
+
+Examples of Actions that result in custom attributes can be found in our [Marketplace for ZITADEL Actions](https://github.com/zitadel/actions).
