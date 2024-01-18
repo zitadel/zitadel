@@ -71,6 +71,11 @@ First task will be inviting a team member.
 
 We are now switching to the view of your customers administrator user.
 
+:::note
+The following actions can also be configured by an Instance Administrator for their customer.
+To show how you can use the self-management possibilities it is shown from the Customers Administrator.
+:::
+
 The Administrator user got an initialization E-Mail when the user got created.
 With the link in the email the admin will be able to setup a password and optionally some multi-factors.
 
@@ -80,10 +85,51 @@ To invite a team member the admin has to repeat the steps you did before.
 1. [Create User](./b2b#create-user)
 2. [Add role "ORG_OWNER" to the user](./b2b#create-user#add-administrator-role-to-user)
 
+### Setup Single-Sign-On (SSO)
+
+Your next step is to configure SSO so your users can authenticate with an existing user into ZITADEL.
+
+First go to the Login Behaviour and Security Settings.
+Make sure that the "External IDP allowed" is enabled.
+This setting does generally allow users to authenticate with an external provider.
+
+1. Go to the Settings Page
+2. Navigate to Identity Providers
+   You might see already a list of activated providers here. If so, this is because some default providers are configured on the ZITADEL instances.
+3. Configure the identity provider you need.
+   Follow our detailed configuration description of the different providers we have: [Configure the needed identity provider](/docs/guides/integrate/identity-providers)
+
+#### Auto-register users with SSO
+
+Let's assume you have configured Google as an identity provider, and you want to allow all your employees to login with the corresponding user without having to register.
+This does need some specific configuration on your provider.
+
+1. Go to the detail page of your configured identity provider (In this example Google)
+2. Enable "Automatic creation" in the optional settings. Optionally if you want to update the user information in ZITADEL, when they have changed in the Azure AD additionally enable "Automatic update"
+3. Enable the "Account creation allowed" if it is not already
+4. If you also want to allow users to link to an existing account, if they already have an account in ZITADEL, enable "Account linking allowed"
+
+:::note
+It is only possible to automatically create accounts, that send all the required information to register a new user.
+If your provider does not send all the required fields that ZITADEL needs to create a user, make sure to fill them in the background with an Action.
+[Example for prefilling user data automatically](/docs/guides/integrate/additional-information#autmatically-prefill-user-data)
+:::
+
+#### Login with your user
+
+Last step is that your user can login to ZITADEL and use the SSO account.
+
+import OrgLoginDescription from "./_org_login_description.mdx";
+
+<OrgLoginDescription name="OrgLodinDescription" />
+
+Your user is now ready to login with SSO.
+<img src="/docs/img/guides/solution-scenarios/user-login-with-external-idp.png" alt="User Login with SSO"/>
+
 
 ## Built-in register organization form
 
-A basic form that allows a customer to enter an organization name and a user account is hosted on the follwing URL:
+A basic form that allows a customer to enter an organization name and a user account is hosted on the following URL:
 {custom-domain}/ui/login/register/org
 
 When a user registers through this form, an organization and a user are created.
