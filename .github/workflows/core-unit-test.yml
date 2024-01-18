@@ -12,6 +12,9 @@ on:
       core_cache_path:
         required: true
         type: string
+      crdb_version:
+        required: false
+        type: string
 
 jobs:
   test:
@@ -50,7 +53,7 @@ jobs:
       - 
         name: test
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        run: make core_unit_test
+        run: export ZITADEL_CRDB_VERSION="${{ inputs.crdb_version }}" && make core_unit_test
       - 
         name: publish coverage
         uses: codecov/codecov-action@v3.1.4
