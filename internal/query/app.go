@@ -476,9 +476,16 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, wit
 	return apps, err
 }
 
-func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries) (ids []string, err error) {
+func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries, shouldTriggerBulk bool) (ids []string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerAppProjection")
+		ctx, err = projection.AppProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
+	}
 
 	query, scan := prepareClientIDsQuery(ctx, q.client)
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
