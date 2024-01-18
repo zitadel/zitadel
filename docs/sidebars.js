@@ -370,7 +370,23 @@ module.exports = {
         "guides/solution-scenarios/configurations",
         "guides/solution-scenarios/frontend-calling-backend-API",
         "guides/solution-scenarios/device-authorization",
-        "guides/solution-scenarios/onboarding",
+        {
+          type: "category",
+          label: "Onboarding Customers and Users",
+          link: {
+            type: "generated-index",
+            title: "Onboarding Customers and Users",
+            slug: "/guides/solution-scenarios/onboarding",
+            description:
+                "When building your own application, one of the first questions you have to face, is 'How do my customers onboard to my application?'\n" +
+                "This guide will show you the built-in solution you have, within ZITADEL and how you can use ZITADEL when you have more advanced needs.",
+          },
+          collapsed: true,
+          items: [
+            "guides/solution-scenarios/onboarding/b2b",
+            "guides/solution-scenarios/onboarding/end-users",
+          ],
+        }
       ],
     },
     {
