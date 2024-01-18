@@ -126,8 +126,11 @@ import OrgLoginDescription from "./_org_login_description.mdx";
 Your user is now ready to login with SSO.
 <img src="/docs/img/guides/solution-scenarios/user-login-with-external-idp.png" alt="User Login with SSO"/>
 
+## Automated onboarding for your customers
 
-## Built-in register organization form
+If you want to start automating the process of onboard your customers the following sections give you some guidance.
+
+### Built-in register organization form
 
 A basic form that allows a customer to enter an organization name and a user account is hosted on the following URL:
 {custom-domain}/ui/login/register/org
@@ -138,13 +141,13 @@ You can read more about the managers, roles and their meanings [here](/docs/guid
 
 <img src="/docs/img/guides/solution-scenarios/register-organization.png" alt="Register Organization Form"/>
 
-### Disable built-in register organization form
+#### Disable built-in register organization form
 If you do not want to allow users to register organizations with this form, you can disable it with the following request:
 [Restrict the instance features](/docs/apis/resources/admin/admin-service-set-restrictions)
 
 Disabling the form makes sense, if your administrators manage new customers themselves or if you build your own form.
 
-## Build your own form with setup organization request
+### Build your own form with setup organization request
 
 If the built-in register form doesn't fulfill your needs we recommend building your own form.
 
@@ -157,7 +160,7 @@ Per default the user will automatically get "ORG_OWNER".
 
 <img src="/docs/img/guides/solution-scenarios/register-team-graphic.png" alt="Setup Organiation with Admin User Graphic"/>
 
-### Example Request
+#### Example Request
 
 ```bash
 curl -L -X POST 'https://$CUSTOM-DOMAIN/admin/v1/orgs/_setup' \
