@@ -51,7 +51,7 @@ func TestOPStorage_CreateAccessToken_code(t *testing.T) {
 
 	// test code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -69,7 +69,7 @@ func TestOPStorage_CreateAccessToken_code(t *testing.T) {
 	require.Error(t, err)
 
 	// exchange with a used code must fail
-	_, err = exchangeTokens(t, clientID, code)
+	_, err = exchangeTokens(t, clientID, code, redirectURI)
 	require.Error(t, err)
 }
 
@@ -140,7 +140,7 @@ func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
 
 	// test code exchange (expect refresh token to be returned)
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -165,7 +165,7 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -201,7 +201,7 @@ func TestOPStorage_RevokeToken_access_token(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -244,7 +244,7 @@ func TestOPStorage_RevokeToken_access_token_invalid_token_hint_type(t *testing.T
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -281,7 +281,7 @@ func TestOPStorage_RevokeToken_refresh_token(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -324,7 +324,7 @@ func TestOPStorage_RevokeToken_refresh_token_invalid_token_type_hint(t *testing.
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -359,7 +359,7 @@ func TestOPStorage_RevokeToken_invalid_client(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -391,7 +391,7 @@ func TestOPStorage_TerminateSession(t *testing.T) {
 
 	// test code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -428,7 +428,7 @@ func TestOPStorage_TerminateSession_refresh_grant(t *testing.T) {
 
 	// test code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -472,7 +472,7 @@ func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
 
 	// test code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -497,7 +497,7 @@ func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
 	require.Error(t, err)
 }
 
-func exchangeTokens(t testing.TB, clientID, code string) (*oidc.Tokens[*oidc.IDTokenClaims], error) {
+func exchangeTokens(t testing.TB, clientID, code, redirectURI string) (*oidc.Tokens[*oidc.IDTokenClaims], error) {
 	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
 
