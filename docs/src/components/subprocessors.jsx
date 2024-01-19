@@ -22,13 +22,6 @@ export function SubProcessorTable() {
       enduserdata: "Yes (transit)"
     },
     {
-      entity: "Cockroach Labs, Inc.",
-      purpose: "Managed database services: Dedicated CockroachDB clusters on Google Cloud",
-      hosting: "Region designated by Customer",
-      country: country_list.us,
-      enduserdata: "Yes (at rest)"
-    },
-    {
       entity: "Datadog, Inc.",
       purpose: "Infrastructure monitoring, log analytics, and alerting",
       hosting: country_list.eu,
