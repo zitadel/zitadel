@@ -150,15 +150,6 @@ const routes: Routes = [
     },
   },
   {
-    path: 'settings',
-    loadChildren: () => import('./pages/instance-settings/instance-settings.module'),
-    canActivate: [AuthGuard, RoleGuard],
-    data: {
-      roles: ['iam.read', 'iam.policy.read'],
-      requiresAll: true,
-    },
-  },
-  {
     path: 'org-settings',
     loadChildren: () => import('./pages/org-settings/org-settings.module'),
     canActivate: [AuthGuard, RoleGuard],

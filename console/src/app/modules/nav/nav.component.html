@@ -71,18 +71,6 @@
                 </a>
 
                 <a
-                  class="nav-item"
-                  [routerLinkActiveOptions]="{ exact: false }"
-                  [routerLinkActive]="['active']"
-                  [routerLink]="['/settings']"
-                  *ngIf="['iam.read', 'iam.policy.read'] | hasRole: true | async"
-                >
-                  <div class="c_label">
-                    <span> {{ 'MENU.SETTINGS' | translate }} </span>
-                  </div>
-                </a>
-
-                <a
                   *ngIf="customerPortalLink$ | async as customerPortalLink"
                   class="nav-item external-link"
                   [href]="customerPortalLink"
@@ -183,7 +171,7 @@
                     [routerLinkActive]="['active']"
                     [routerLinkActiveOptions]="{ exact: false }"
                     [routerLink]="['/org-settings']"
-                    *ngIf="['policy.read'] | hasRole | async"
+                    *ngIf="(['policy.read'] | hasRole | async) && ((authService.cachedOrgs | async)?.length ?? 1) > 1"
                   >
                     <span class="label">{{ 'MENU.SETTINGS' | translate }}</span>
                   </a>
