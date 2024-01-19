@@ -491,6 +491,24 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, user *query.User, userGra
 					return object.UserGrantsFromQuery(c, userGrants)
 				}),
 			),
+			actions.SetFields("org",
+				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
+					return func(goja.FunctionCall) goja.Value {
+						metadata, err := o.query.SearchOrgMetadata(
+							ctx,
+							true,
+							user.ResourceOwner,
+							&query.OrgMetadataSearchQueries{},
+							false,
+						)
+						if err != nil {
+							logging.WithError(err).Info("unable to get org metadata in action")
+							panic(err)
+						}
+						return object.OrgMetadataListFromQuery(c, metadata)
+					}
+				}),
+			),
 		),
 	)
 
@@ -688,6 +706,24 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userG
 				}),
 				actions.SetFields("grants", func(c *actions.FieldConfig) interface{} {
 					return object.UserGrantsFromQuery(c, userGrants)
+				}),
+			),
+			actions.SetFields("org",
+				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
+					return func(goja.FunctionCall) goja.Value {
+						metadata, err := o.query.SearchOrgMetadata(
+							ctx,
+							true,
+							user.ResourceOwner,
+							&query.OrgMetadataSearchQueries{},
+							false,
+						)
+						if err != nil {
+							logging.WithError(err).Info("unable to get org metadata in action")
+							panic(err)
+						}
+						return object.OrgMetadataListFromQuery(c, metadata)
+					}
 				}),
 			),
 		),
