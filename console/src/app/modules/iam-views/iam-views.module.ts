@@ -18,13 +18,11 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
-import { IamViewsRoutingModule } from './iam-views-routing.module';
 import { IamViewsComponent } from './iam-views.component';
 
 @NgModule({
   declarations: [IamViewsComponent],
   imports: [
-    IamViewsRoutingModule,
     CommonModule,
     TableActionsModule,
     MatIconModule,
@@ -44,6 +42,6 @@ import { IamViewsComponent } from './iam-views.component';
     MatTableModule,
     MatSortModule,
   ],
-  exports: [],
+  exports: [IamViewsComponent],
 })
 export default class IamViewsModule {}

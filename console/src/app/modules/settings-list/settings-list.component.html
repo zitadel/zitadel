@@ -57,4 +57,13 @@
   <ng-container *ngIf="currentSetting === 'languages' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-language-settings></cnsl-language-settings>
   </ng-container>
+  <ng-container *ngIf="currentSetting === 'views' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-iam-views></cnsl-iam-views>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'events' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-events></cnsl-events>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'failedevents' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-iam-failed-events></cnsl-iam-failed-events>
+  </ng-container>
 </cnsl-sidenav>

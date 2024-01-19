@@ -33,6 +33,33 @@ export const SECURITY: SidenavSetting = {
   },
 };
 
+export const VIEWS: SidenavSetting = {
+  id: 'views',
+  i18nKey: 'SETTINGS.LIST.VIEWS',
+  groupI18nKey: 'SETTINGS.GROUPS.STORAGE',
+  requiredRoles: {
+    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+  },
+};
+
+export const FAILEDEVENTS: SidenavSetting = {
+  id: 'failedevents',
+  i18nKey: 'SETTINGS.LIST.FAILEDEVENTS',
+  groupI18nKey: 'SETTINGS.GROUPS.STORAGE',
+  requiredRoles: {
+    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+  },
+};
+
+export const EVENTS: SidenavSetting = {
+  id: 'events',
+  i18nKey: 'SETTINGS.LIST.EVENTS',
+  groupI18nKey: 'SETTINGS.GROUPS.STORAGE',
+  requiredRoles: {
+    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+  },
+};
+
 export const LOGIN: SidenavSetting = {
   id: 'login',
   i18nKey: 'SETTINGS.LIST.LOGIN',

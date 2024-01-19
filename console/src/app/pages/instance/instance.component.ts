@@ -28,6 +28,9 @@ import {
   SECURITY,
   SMS_PROVIDER,
   SMTP_PROVIDER,
+  VIEWS,
+  FAILEDEVENTS,
+  EVENTS,
 } from '../../modules/settings-list/settings';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -63,6 +66,10 @@ export class InstanceComponent {
     BRANDING,
     MESSAGETEXTS,
     LOGINTEXTS,
+    // storage
+    VIEWS,
+    EVENTS,
+    FAILEDEVENTS,
     // others
     PRIVACYPOLICY,
     LANGUAGES,

@@ -7,12 +7,13 @@
         *ngIf="
           breadc[breadc.length - 1] &&
           !breadc[breadc.length - 1].hideNav &&
-          breadc[breadc.length - 1].type !== BreadcrumbType.AUTHUSER
+          breadc[breadc.length - 1].type !== BreadcrumbType.AUTHUSER &&
+          breadc[breadc.length - 1].type !== BreadcrumbType.INSTANCE
         "
         [ngSwitch]="breadc[0].type"
       >
         <div class="nav-row" @navrow>
-          <ng-container *ngSwitchCase="BreadcrumbType.INSTANCE">
+          <!-- <ng-container *ngSwitchCase="BreadcrumbType.INSTANCE">
             <div class="nav-row-abs" @navroworg>
               <ng-template cnslHasRole [hasRole]="['iam.read']">
                 <a
@@ -86,7 +87,7 @@
 
               <template [ngTemplateOutlet]="shortcutKeyRef"></template>
             </div>
-          </ng-container>
+          </ng-container> -->
 
           <ng-container *ngSwitchCase="BreadcrumbType.ORG">
             <div class="nav-row-abs" @navrowproject>

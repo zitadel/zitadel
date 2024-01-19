@@ -24,6 +24,9 @@ import { SecretGeneratorModule } from '../policies/secret-generator/secret-gener
 import { SecurityPolicyModule } from '../policies/security-policy/security-policy.module';
 import { SidenavModule } from '../sidenav/sidenav.module';
 import { SettingsListComponent } from './settings-list.component';
+import FailedEventsModule from '../failed-events/failed-events.module';
+import IamViewsModule from '../iam-views/iam-views.module';
+import EventsModule from '../events/events.module';
 
 @NgModule({
   declarations: [SettingsListComponent],
@@ -51,6 +54,9 @@ import { SettingsListComponent } from './settings-list.component';
     NotificationSMSProviderModule,
     OIDCConfigurationModule,
     SecretGeneratorModule,
+    FailedEventsModule,
+    IamViewsModule,
+    EventsModule,
   ],
   exports: [SettingsListComponent],
 })

@@ -26,13 +26,11 @@ import { DisplayJsonDialogModule } from 'src/app/modules/display-json-dialog/dis
 import { FilterEventsModule } from 'src/app/modules/filter-events/filter-events.module';
 import { ToObjectPipeModule } from 'src/app/pipes/to-object/to-object.module';
 import { ToPayloadPipeModule } from 'src/app/pipes/to-payload/to-payload.module';
-import { EventsRoutingModule } from './events-routing.module';
 import { EventsComponent } from './events.component';
 
 @NgModule({
   declarations: [EventsComponent],
   imports: [
-    EventsRoutingModule,
     CommonModule,
     TableActionsModule,
     MatIconModule,
@@ -60,6 +58,6 @@ import { EventsComponent } from './events.component';
     MatSortModule,
     OverlayModule,
   ],
-  exports: [],
+  exports: [EventsComponent],
 })
-export default class IamViewsModule {}
+export default class EventsModule {}
