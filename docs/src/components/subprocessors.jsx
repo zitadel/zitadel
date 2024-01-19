@@ -119,14 +119,7 @@ export function SubProcessorTable() {
       hosting: undefined,
       country: country_list.nl,
       enduserdata: false
-    },
-    {
-      entity: "Clickhouse, Inc.",
-      purpose: "Data warehouse services",
-      hosting: country_list.us,
-      country: country_list.us,
-      enduserdata: false
-    },
+    }
   ]
 
   return (
