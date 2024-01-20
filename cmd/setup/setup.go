@@ -12,6 +12,8 @@ import (
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/tls"
+	admin_handler "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/handler"
+	auth_handler "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/handler"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -19,6 +21,7 @@ import (
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/migration"
+	notify_handler "github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
 )
 
@@ -165,6 +168,27 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)
 		logging.OnError(err).Fatalf("unable to migrate repeatable step: %s", repeatableStep.String())
 	}
+
+	for _, p := range projection.Projections() {
+		err = migration.Migrate(ctx, eventstoreClient, p)
+		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")
+	}
+
+	for _, p := range admin_handler.Projections() {
+		err = migration.Migrate(ctx, eventstoreClient, p)
+		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")
+	}
+
+	for _, p := range auth_handler.Projections() {
+		err = migration.Migrate(ctx, eventstoreClient, p)
+		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")
+	}
+
+	for _, p := range 	notify_handler.() {
+		err = migration.Migrate(ctx, eventstoreClient, p)
+		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")
+	}
+
 
 	// This step is executed after the repeatable steps because it adds fields to the login_names3 projection
 	err = migration.Migrate(ctx, eventstoreClient, steps.s18AddLowerFieldsToLoginNames)

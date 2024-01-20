@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/migration"
 )
 
 const (
@@ -77,6 +78,7 @@ type projection interface {
 	Start(ctx context.Context)
 	Init(ctx context.Context) error
 	Trigger(ctx context.Context, opts ...handler.TriggerOpt) (_ context.Context, err error)
+	migration.Migration
 }
 
 var (
@@ -148,6 +150,10 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	RestrictionsProjection = newRestrictionsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["restrictions"]))
 	newProjectionsList()
 	return nil
+}
+
+func Projections() []projection {
+	return projections
 }
 
 func Init(ctx context.Context) error {

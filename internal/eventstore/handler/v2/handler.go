@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/migration"
 	"github.com/zitadel/zitadel/internal/repository/pseudo"
 )
 
@@ -56,6 +57,24 @@ type Handler struct {
 	triggeredInstancesSync sync.Map
 
 	triggerWithoutEvents Reduce
+}
+
+var _ migration.Migration = (*Handler)(nil)
+
+// Execute implements migration.Migration.
+func (h *Handler) Execute(ctx context.Context) error {
+	instanceIDs, err := h.queryInstances(ctx)
+	if err != nil {
+		return err
+	}
+
+	h.triggerInstances(ctx, instanceIDs)
+	return nil
+}
+
+// String implements migration.Migration.
+func (h *Handler) String() string {
+	return h.ProjectionName()
 }
 
 // nowFunc makes [time.Now] mockable
@@ -112,20 +131,9 @@ func (h *Handler) Start(ctx context.Context) {
 }
 
 func (h *Handler) schedule(ctx context.Context) {
-	// if there was no run before trigger within half a second
-	start := randomizeStart(0, 0.5)
-	t := time.NewTimer(start)
-	didInitialize := h.didProjectionInitialize(ctx)
-	if didInitialize {
-		if !t.Stop() {
-			<-t.C
-		}
-		// if there was a trigger before, start the projection
-		// after a second (should generally be after the not initialized projections)
-		// and its configured `RequeueEvery`
-		reset := randomizeStart(1, h.requeueEvery.Seconds())
-		t.Reset(reset)
-	}
+	//  start the projection and its configured `RequeueEvery`
+	reset := randomizeStart(0, h.requeueEvery.Seconds())
+	t := time.NewTimer(reset)
 
 	for {
 		select {
@@ -133,35 +141,29 @@ func (h *Handler) schedule(ctx context.Context) {
 			t.Stop()
 			return
 		case <-t.C:
-			instances, err := h.queryInstances(ctx, didInitialize)
+			instances, err := h.queryInstances(ctx)
 			h.log().OnError(err).Debug("unable to query instances")
 
-			var instanceFailed bool
-			scheduledCtx := call.WithTimestamp(ctx)
-			for _, instance := range instances {
-				instanceCtx := authz.WithInstanceID(scheduledCtx, instance)
-
-				// simple implementation of do while
-				_, err = h.Trigger(instanceCtx)
-				instanceFailed = instanceFailed || err != nil
-				h.log().WithField("instance", instance).OnError(err).Info("scheduled trigger failed")
-				// retry if trigger failed
-				for ; err != nil; _, err = h.Trigger(instanceCtx) {
-					time.Sleep(h.retryFailedAfter)
-					instanceFailed = instanceFailed || err != nil
-					h.log().WithField("instance", instance).OnError(err).Info("scheduled trigger failed")
-					if err == nil {
-						break
-					}
-				}
-			}
-
-			if !didInitialize && !instanceFailed {
-				err = h.setSucceededOnce(ctx)
-				h.log().OnError(err).Debug("unable to set succeeded once")
-				didInitialize = err == nil
-			}
+			h.triggerInstances(call.WithTimestamp(ctx), instances)
 			t.Reset(h.requeueEvery)
+		}
+	}
+}
+
+func (h *Handler) triggerInstances(ctx context.Context, instances []string) {
+	for _, instance := range instances {
+		instanceCtx := authz.WithInstanceID(ctx, instance)
+
+		// simple implementation of do while
+		_, err := h.Trigger(instanceCtx)
+		h.log().WithField("instance", instance).OnError(err).Debug("trigger failed")
+		// retry if trigger failed
+		for ; err != nil; _, err = h.Trigger(instanceCtx) {
+			time.Sleep(h.retryFailedAfter)
+			h.log().WithField("instance", instance).OnError(err).Debug("trigger failed")
+			if err == nil {
+				break
+			}
 		}
 	}
 }
@@ -222,16 +224,16 @@ func checkAdditionalEvents(eventQueue chan eventstore.Event, event eventstore.Ev
 	}
 }
 
-func (h *Handler) queryInstances(ctx context.Context, didInitialize bool) ([]string, error) {
+func (h *Handler) queryInstances(ctx context.Context) ([]string, error) {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).
 		AwaitOpenTransactions().
 		AllowTimeTravel().
 		ExcludedInstanceID("")
-	if didInitialize && h.handleActiveInstances > 0 {
+	if h.handleActiveInstances > 0 {
 		query = query.
 			CreationDateAfter(h.now().Add(-1 * h.handleActiveInstances))
 	}
-	return h.es.InstanceIDs(ctx, h.requeueEvery, !didInitialize, query)
+	return h.es.InstanceIDs(ctx, h.requeueEvery, false, query)
 }
 
 type triggerConfig struct {
@@ -260,7 +262,7 @@ func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Co
 
 	for i := 0; ; i++ {
 		additionalIteration, err := h.processEvents(ctx, config)
-		h.log().OnError(err).Warn("process events failed")
+		h.log().OnError(err).Info("process events failed")
 		h.log().WithField("iteration", i).Debug("trigger iteration")
 		if !additionalIteration || err != nil {
 			return call.ResetTimestamp(ctx), err
