@@ -315,11 +315,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     };
 
     // Check if user has permissions for that org before changing active org
-    if (
-      this.myOrgs.find((org) => {
-        org.id === grant.grantedOrgId;
-      })
-    ) {
+    if (this.myOrgs.find((org) => org.id === grant.grantedOrgId)) {
       this.authService.setActiveOrg(org);
       this.router.navigate(['/users', grant.userId]);
     } else {
