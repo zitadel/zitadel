@@ -2231,7 +2231,8 @@
     "TOAST": {
       "UPDATED": "Autorização atualizada.",
       "REMOVED": "Autorização removida",
-      "BULKREMOVED": "Autorizações removidas."
+      "BULKREMOVED": "Autorizações removidas.",
+      "CANTSHOWINFO": "Você não pode visitar o perfil deste usuário porque não é membro da organização à qual esse usuário pertence"
     },
     "DIALOG": {
       "DELETE_TITLE": "Excluir autorização",

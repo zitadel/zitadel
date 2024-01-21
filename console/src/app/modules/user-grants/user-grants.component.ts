@@ -69,6 +69,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   @Input() public type: Type | undefined = undefined;
 
   public filterOpen: boolean = false;
+  public myOrgs: Array<Org.AsObject> = [];
   constructor(
     private authService: GrpcAuthService,
     private userService: ManagementService,
@@ -116,6 +117,9 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     this.loadGrantsPage(this.type);
+    this.authService.listMyProjectOrgs(undefined, 0).then((orgs) => {
+      this.myOrgs = orgs.resultList;
+    });
   }
 
   public ngAfterViewInit(): void {
@@ -302,14 +306,24 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
   }
 
-  public test(grant: UserGrant.AsObject) {
+  public showUser(grant: UserGrant.AsObject) {
     const org: Org.AsObject = {
       id: grant.grantedOrgId,
       name: grant.grantedOrgName,
       state: OrgState.ORG_STATE_ACTIVE,
       primaryDomain: grant.grantedOrgDomain,
     };
-    this.authService.setActiveOrg(org);
-    this.router.navigate(['/users', grant.userId]);
+
+    // Check if user has permissions for that org before changing active org
+    if (
+      this.myOrgs.find((org) => {
+        org.id === grant.grantedOrgId;
+      })
+    ) {
+      this.authService.setActiveOrg(org);
+      this.router.navigate(['/users', grant.userId]);
+    } else {
+      this.toast.showInfo('GRANTS.TOAST.CANTSHOWINFO', true);
+    }
   }
 }
