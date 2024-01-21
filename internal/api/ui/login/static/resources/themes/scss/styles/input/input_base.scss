@@ -34,6 +34,11 @@ $lgn-input-placeholder-font-size: 14px !default;
     animation-duration: 50000s;
     animation-name: onautofillstart;
   }
+
+  &:-webkit-autofill {
+    animation-duration: 50000s;
+    animation-name: onautofillstart;
+  }
 }
 
 @keyframes onautofillstart {
