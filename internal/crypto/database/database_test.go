@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -395,7 +396,7 @@ func Test_database_CreateKeys(t *testing.T) {
 				masterKey: tt.fields.masterKey,
 				encrypt:   tt.fields.encrypt,
 			}
-			err := d.CreateKeys(tt.args.keys...)
+			err := d.CreateKeys(context.Background(), tt.args.keys...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			} else if tt.res.err != nil && !tt.res.err(err) {

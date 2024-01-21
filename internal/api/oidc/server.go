@@ -110,10 +110,13 @@ func (s *Server) Ready(ctx context.Context, r *op.Request[struct{}]) (_ *op.Resp
 
 func (s *Server) Discovery(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 	restrictions, err := s.query.GetInstanceRestrictions(ctx)
 	if err != nil {
-		return nil, err
+		return nil, op.NewStatusError(oidc.ErrServerError().WithParent(err).WithDescription("internal server error"), http.StatusInternalServerError)
 	}
 	allowedLanguages := restrictions.AllowedLanguages
 	if len(allowedLanguages) == 0 {

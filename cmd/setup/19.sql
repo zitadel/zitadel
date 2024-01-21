@@ -1,0 +1,1 @@
+CREATE INDEX CONCURRENTLY IF NOT EXISTS events2_current_sequence ON eventstore.events2 ("sequence" DESC, aggregate_id, aggregate_type, instance_id);

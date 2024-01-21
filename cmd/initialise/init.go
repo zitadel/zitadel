@@ -1,6 +1,7 @@
 package initialise
 
 import (
+	"context"
 	"embed"
 
 	"github.com/spf13/cobra"
@@ -38,7 +39,7 @@ func New() *cobra.Command {
 		Long: `Sets up the minimum requirements to start ZITADEL.
 
 Prerequisites:
-- cockroachdb
+- cockroachDB
 
 The user provided by flags needs privileges to
 - create the database if it does not exist
@@ -48,7 +49,7 @@ The user provided by flags needs privileges to
 		Run: func(cmd *cobra.Command, args []string) {
 			config := MustNewConfig(viper.GetViper())
 
-			InitAll(config)
+			InitAll(cmd.Context(), config)
 		},
 	}
 
@@ -56,7 +57,7 @@ The user provided by flags needs privileges to
 	return cmd
 }
 
-func InitAll(config *Config) {
+func InitAll(ctx context.Context, config *Config) {
 	err := initialise(config.Database,
 		VerifyUser(config.Database.Username(), config.Database.Password()),
 		VerifyDatabase(config.Database.DatabaseName()),
@@ -64,7 +65,7 @@ func InitAll(config *Config) {
 	)
 	logging.OnError(err).Fatal("unable to initialize the database")
 
-	err = verifyZitadel(config.Database)
+	err = verifyZitadel(ctx, config.Database)
 	logging.OnError(err).Fatal("unable to initialize ZITADEL")
 }
 

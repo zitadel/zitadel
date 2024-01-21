@@ -267,8 +267,8 @@
       "DESCRIPTION": "Kliknij przycisk poniżej, aby ponownie się zalogować."
     },
     "EXHAUSTED": {
-      "TITLE": "Twój limit uwierzytelnionych wniosków został wyczerpany.",
-      "DESCRIPTION": "Usuń lub zwiększ limit dla tej instancji ZITADEL."
+      "TITLE": "Twoja instancja jest zablokowana.",
+      "DESCRIPTION": "Poproś administratora swojej instancji ZITADEL o aktualizację subskrypcji."
     },
     "INVALID_FORMAT": "Format jest nieprawidłowy.",
     "NOTANEMAIL": "Podana wartość nie jest adresem e-mail.",
@@ -1250,6 +1250,7 @@
       "DESCRIPTIONCREATEMGMT": "Użytkownicy mogą wybrać z dostępnych poniżej dostawców tożsamości. Uwaga: Możesz korzystać z dostawców ustawionych przez system lub tylko dla twojej organizacji.",
       "ADVANCED": "Zaawansowane",
       "LIFETIMEDURATIONS": "Czasy trwania logowania",
+      "LIFETIME_INVALID": "Formularz zawiera nieprawidłowe wartości.",
       "SAVED": "Pomyślnie zapisano!"
     },
     "PRIVACY_POLICY": {

@@ -27,10 +27,12 @@ import (
 )
 
 var (
-	CTX    context.Context
-	ErrCTX context.Context
-	Tester *integration.Tester
-	Client user.UserServiceClient
+	CTX     context.Context
+	IamCTX  context.Context
+	UserCTX context.Context
+	ErrCTX  context.Context
+	Tester  *integration.Tester
+	Client  user.UserServiceClient
 )
 
 func TestMain(m *testing.M) {
@@ -41,6 +43,8 @@ func TestMain(m *testing.M) {
 		Tester = integration.NewTester(ctx)
 		defer Tester.Done()
 
+		UserCTX = Tester.WithAuthorization(ctx, integration.Login)
+		IamCTX = Tester.WithAuthorization(ctx, integration.IAMOwner)
 		CTX, ErrCTX = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
 		Client = Tester.Client.UserV2
 		return m.Run()

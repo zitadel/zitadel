@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limites non trouvée
     NoneSpecified: Aucune limite spécifiée
+    Instance:
+      Blocked: Instance bloquée
   Restrictions:
     NoneSpecified: Aucune restriction spécifiée
     DefaultLanguageMustBeAllowed: La langue par défaut doit être autorisée

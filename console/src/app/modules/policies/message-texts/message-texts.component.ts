@@ -552,8 +552,8 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
     this.serviceType === PolicyComponentServiceType.ADMIN
       ? 'iam.policy.write'
       : this.serviceType === PolicyComponentServiceType.MGMT
-      ? 'policy.write'
-      : '',
+        ? 'policy.write'
+        : '',
   ]);
 
   constructor(

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -14,6 +15,26 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+var _ error = (*executionError)(nil)
+
+type executionError struct {
+	parent error
+}
+
+// Error implements error.
+func (s *executionError) Error() string {
+	return fmt.Sprintf("statement failed: %v", s.parent)
+}
+
+func (s *executionError) Is(err error) bool {
+	_, ok := err.(*executionError)
+	return ok
+}
+
+func (s *executionError) Unwrap() error {
+	return s.parent
+}
 
 func (h *Handler) eventsToStatements(tx *sql.Tx, events []eventstore.Event, currentState *state) (statements []*Statement, err error) {
 	statements = make([]*Statement, 0, len(events))
