@@ -16,7 +16,7 @@ export function SubProcessorTable() {
   const processors = [
     {
       entity: "Google LLC",
-      purpose: "Cloud infrastructure provider (Google Cloud), business applications and collaboration (Workspace), Data warehouse services, Content delivery network, DDoS and bot prevention",
+      purpose: "Cloud infrastructure provider (Google Cloud), business applications and collaboration (Workspace), Data warehouse services, Content delivery network,  DDoS and bot prevention",
       hosting: "Region designated by Customer, United States",
       country: country_list.us,
       enduserdata: "Yes (transit)"
@@ -119,7 +119,14 @@ export function SubProcessorTable() {
       hosting: undefined,
       country: country_list.nl,
       enduserdata: false
-    }
+    },
+    {
+      entity: "HubSpot Inc.",
+      purpose: "Customer and sales management, Marketing automation, Support requests",
+      hosting: country_list.eu,
+      country: country_list.us,
+      enduserdata: false
+    },
   ]
 
   return (
