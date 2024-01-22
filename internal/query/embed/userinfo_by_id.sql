@@ -34,7 +34,7 @@ metadata as (
 -- get all user grants, needed for the orgs query
 user_grants as (
 	select id, grant_id, state, creation_date, change_date, sequence, user_id, roles, resource_owner, project_id
-	from projections.user_grants3
+	from projections.user_grants4
 	where user_id = $1
 	and instance_id = $2
 	and project_id = any($3)

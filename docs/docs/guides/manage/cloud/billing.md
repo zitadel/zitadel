@@ -13,10 +13,11 @@ At the moment we provide only "Credit Card" payment
 
 Once a payment method is configured, it can be selected directly in the instance creation process.
 
-## Customer 
+## Customer
 
 To be able to create correct billings we will need some customer information from you.
 This includes the following fields:
+
 - Name
 - Country
 - Email address
@@ -25,13 +26,22 @@ This includes the following fields:
 - Postal Code
 - City
 
+## Tax ID
+
+If available, enter your tax ID type and VAT number.
+The tax ID will be shown on the invoice.
+
+:::info Reverse Charge
+When you enter the tax ID we will automatically calculate taxability.
+Depending on your billing address we will mark the invoice as reverse charge.
+:::
+
 ## Update Billing Information
 
 You will only need to add billing information if your instance is in the paid tier. There are two options on how to add your billing info.
 
 2. Go to the billing menu and add a new payment method. You will be able to choose the added method, when upgrading the instance to the paid tier.
 3. Add the billing information directly during the upgrade process.
-
 
 ## Invoices
 

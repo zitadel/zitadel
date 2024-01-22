@@ -1,6 +1,6 @@
 import { Component, Injector, Type } from '@angular/core';
 import { Location } from '@angular/common';
-import { Options, Provider } from '../../../proto/generated/zitadel/idp_pb';
+import { Options, Provider, SAMLBinding } from '../../../proto/generated/zitadel/idp_pb';
 import { AbstractControl, FormGroup, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 import { ManagementService } from '../../../services/mgmt.service';
@@ -10,7 +10,7 @@ import { GrpcAuthService } from '../../../services/grpc-auth.service';
 import { take } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from '../../../services/breadcrumb.service';
-import { requiredValidator } from '../../form-field/validators/validators';
+import { atLeastOneIsFilled, requiredValidator } from '../../form-field/validators/validators';
 import {
   AddSAMLProviderRequest as AdminAddSAMLProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -21,7 +21,6 @@ import {
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
   UpdateSAMLProviderRequest as MgmtUpdateSAMLProviderRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import * as zitadel_idp_pb from '../../../proto/generated/zitadel/idp_pb';
 
 @Component({
   selector: 'cnsl-provider-saml-sp',
@@ -38,7 +37,7 @@ export class ProviderSamlSpComponent {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
 
-  bindingValues: string[] = Object.keys(zitadel_idp_pb.SAMLBinding);
+  bindingValues: string[] = Object.keys(SAMLBinding);
 
   constructor(
     private _location: Location,
@@ -54,13 +53,16 @@ export class ProviderSamlSpComponent {
   }
 
   private _initializeForm(): void {
-    this.form = new UntypedFormGroup({
-      name: new UntypedFormControl('', [requiredValidator]),
-      metadataXml: new UntypedFormControl('', [requiredValidator]),
-      metadataUrl: new UntypedFormControl('', [requiredValidator]),
-      binding: new UntypedFormControl(this.bindingValues[0], [requiredValidator]),
-      withSignedRequest: new UntypedFormControl(true, [requiredValidator]),
-    });
+    this.form = new UntypedFormGroup(
+      {
+        name: new UntypedFormControl('', [requiredValidator]),
+        metadataXml: new UntypedFormControl('', []),
+        metadataUrl: new UntypedFormControl('', []),
+        binding: new UntypedFormControl(this.bindingValues[0], [requiredValidator]),
+        withSignedRequest: new UntypedFormControl(true, [requiredValidator]),
+      },
+      atLeastOneIsFilled('metadataXml', 'metadataUrl'),
+    );
   }
 
   private _checkFormPermissions(): void {
@@ -69,8 +71,8 @@ export class ProviderSamlSpComponent {
         this.serviceType === PolicyComponentServiceType.ADMIN
           ? ['iam.idp.write']
           : this.serviceType === PolicyComponentServiceType.MGMT
-          ? ['org.idp.write']
-          : [],
+            ? ['org.idp.write']
+            : [],
       )
       .pipe(take(1))
       .subscribe((allowed) => {
@@ -121,18 +123,23 @@ export class ProviderSamlSpComponent {
         this.serviceType === PolicyComponentServiceType.MGMT
           ? new MgmtUpdateSAMLProviderRequest()
           : new AdminUpdateSAMLProviderRequest();
+
       req.setId(this.provider.id);
       req.setName(this.name?.value);
-      req.setMetadataUrl(this.metadataUrl?.value);
-      req.setMetadataXml(this.metadataXml?.value);
+      if (this.metadataXml?.value) {
+        req.setMetadataXml(this.metadataXml?.value);
+      } else {
+        req.setMetadataUrl(this.metadataUrl?.value);
+      }
+      req.setWithSignedRequest(this.withSignedRequest?.value);
       // @ts-ignore
-      req.setBinding(zitadel_idp_pb.SAMLBinding[`${this.biding?.value}`]);
+      req.setBinding(SAMLBinding[this.binding?.value]);
       req.setProviderOptions(this.options);
 
       this.loading = true;
       this.service
         .updateSAMLProvider(req)
-        .then((idp) => {
+        .then(() => {
           setTimeout(() => {
             this.loading = false;
             this.close();
@@ -151,16 +158,19 @@ export class ProviderSamlSpComponent {
         ? new MgmtAddSAMLProviderRequest()
         : new AdminAddSAMLProviderRequest();
     req.setName(this.name?.value);
-    req.setMetadataUrl(this.metadataUrl?.value);
-    req.setMetadataXml(this.metadataXml?.value);
+    if (this.metadataXml?.value) {
+      req.setMetadataXml(this.metadataXml?.value);
+    } else {
+      req.setMetadataUrl(this.metadataUrl?.value);
+    }
     req.setProviderOptions(this.options);
     // @ts-ignore
-    req.setBinding(zitadel_idp_pb.SAMLBinding[`${this.biding?.value}`]);
+    req.setBinding(SAMLBinding[this.binding?.value]);
     req.setWithSignedRequest(this.withSignedRequest?.value);
     this.loading = true;
     this.service
       .addSAMLProvider(req)
-      .then((idp) => {
+      .then(() => {
         setTimeout(() => {
           this.loading = false;
           this.close();
@@ -187,9 +197,9 @@ export class ProviderSamlSpComponent {
       .then((resp) => {
         this.provider = resp.idp;
         this.loading = false;
+        this.name?.setValue(this.provider?.name);
         if (this.provider?.config?.saml) {
           this.form.patchValue(this.provider.config.saml);
-          this.name?.setValue(this.provider.name);
         }
       })
       .catch((error) => {
@@ -200,6 +210,13 @@ export class ProviderSamlSpComponent {
 
   close(): void {
     this._location.back();
+  }
+
+  compareBinding(value: string, index: number) {
+    if (value) {
+      return value === Object.keys(SAMLBinding)[index];
+    }
+    return false;
   }
 
   private get name(): AbstractControl | null {
@@ -214,7 +231,7 @@ export class ProviderSamlSpComponent {
     return this.form.get('metadataUrl');
   }
 
-  private get biding(): AbstractControl | null {
+  private get binding(): AbstractControl | null {
     return this.form.get('binding');
   }
 

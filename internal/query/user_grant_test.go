@@ -15,14 +15,14 @@ import (
 
 var (
 	userGrantStmt = regexp.QuoteMeta(
-		"SELECT projections.user_grants3.id" +
-			", projections.user_grants3.creation_date" +
-			", projections.user_grants3.change_date" +
-			", projections.user_grants3.sequence" +
-			", projections.user_grants3.grant_id" +
-			", projections.user_grants3.roles" +
-			", projections.user_grants3.state" +
-			", projections.user_grants3.user_id" +
+		"SELECT projections.user_grants4.id" +
+			", projections.user_grants4.creation_date" +
+			", projections.user_grants4.change_date" +
+			", projections.user_grants4.sequence" +
+			", projections.user_grants4.grant_id" +
+			", projections.user_grants4.roles" +
+			", projections.user_grants4.state" +
+			", projections.user_grants4.user_id" +
 			", projections.users10.username" +
 			", projections.users10.type" +
 			", projections.users10.resource_owner" +
@@ -32,17 +32,17 @@ var (
 			", projections.users10_humans.display_name" +
 			", projections.users10_humans.avatar_key" +
 			", projections.login_names3.login_name" +
-			", projections.user_grants3.resource_owner" +
+			", projections.user_grants4.resource_owner" +
 			", projections.orgs1.name" +
 			", projections.orgs1.primary_domain" +
-			", projections.user_grants3.project_id" +
+			", projections.user_grants4.project_id" +
 			", projections.projects4.name" +
-			" FROM projections.user_grants3" +
-			" LEFT JOIN projections.users10 ON projections.user_grants3.user_id = projections.users10.id AND projections.user_grants3.instance_id = projections.users10.instance_id" +
-			" LEFT JOIN projections.users10_humans ON projections.user_grants3.user_id = projections.users10_humans.user_id AND projections.user_grants3.instance_id = projections.users10_humans.instance_id" +
-			" LEFT JOIN projections.orgs1 ON projections.user_grants3.resource_owner = projections.orgs1.id AND projections.user_grants3.instance_id = projections.orgs1.instance_id" +
-			" LEFT JOIN projections.projects4 ON projections.user_grants3.project_id = projections.projects4.id AND projections.user_grants3.instance_id = projections.projects4.instance_id" +
-			" LEFT JOIN projections.login_names3 ON projections.user_grants3.user_id = projections.login_names3.user_id AND projections.user_grants3.instance_id = projections.login_names3.instance_id" +
+			" FROM projections.user_grants4" +
+			" LEFT JOIN projections.users10 ON projections.user_grants4.user_id = projections.users10.id AND projections.user_grants4.instance_id = projections.users10.instance_id" +
+			" LEFT JOIN projections.users10_humans ON projections.user_grants4.user_id = projections.users10_humans.user_id AND projections.user_grants4.instance_id = projections.users10_humans.instance_id" +
+			" LEFT JOIN projections.orgs1 ON projections.user_grants4.resource_owner = projections.orgs1.id AND projections.user_grants4.instance_id = projections.orgs1.instance_id" +
+			" LEFT JOIN projections.projects4 ON projections.user_grants4.project_id = projections.projects4.id AND projections.user_grants4.instance_id = projections.projects4.instance_id" +
+			" LEFT JOIN projections.login_names3 ON projections.user_grants4.user_id = projections.login_names3.user_id AND projections.user_grants4.instance_id = projections.login_names3.instance_id" +
 			` AS OF SYSTEM TIME '-1 ms' ` +
 			" WHERE projections.login_names3.is_primary = $1")
 	userGrantCols = []string{
@@ -70,14 +70,14 @@ var (
 		"name", //project name
 	}
 	userGrantsStmt = regexp.QuoteMeta(
-		"SELECT projections.user_grants3.id" +
-			", projections.user_grants3.creation_date" +
-			", projections.user_grants3.change_date" +
-			", projections.user_grants3.sequence" +
-			", projections.user_grants3.grant_id" +
-			", projections.user_grants3.roles" +
-			", projections.user_grants3.state" +
-			", projections.user_grants3.user_id" +
+		"SELECT projections.user_grants4.id" +
+			", projections.user_grants4.creation_date" +
+			", projections.user_grants4.change_date" +
+			", projections.user_grants4.sequence" +
+			", projections.user_grants4.grant_id" +
+			", projections.user_grants4.roles" +
+			", projections.user_grants4.state" +
+			", projections.user_grants4.user_id" +
 			", projections.users10.username" +
 			", projections.users10.type" +
 			", projections.users10.resource_owner" +
@@ -87,18 +87,18 @@ var (
 			", projections.users10_humans.display_name" +
 			", projections.users10_humans.avatar_key" +
 			", projections.login_names3.login_name" +
-			", projections.user_grants3.resource_owner" +
+			", projections.user_grants4.resource_owner" +
 			", projections.orgs1.name" +
 			", projections.orgs1.primary_domain" +
-			", projections.user_grants3.project_id" +
+			", projections.user_grants4.project_id" +
 			", projections.projects4.name" +
 			", COUNT(*) OVER ()" +
-			" FROM projections.user_grants3" +
-			" LEFT JOIN projections.users10 ON projections.user_grants3.user_id = projections.users10.id AND projections.user_grants3.instance_id = projections.users10.instance_id" +
-			" LEFT JOIN projections.users10_humans ON projections.user_grants3.user_id = projections.users10_humans.user_id AND projections.user_grants3.instance_id = projections.users10_humans.instance_id" +
-			" LEFT JOIN projections.orgs1 ON projections.user_grants3.resource_owner = projections.orgs1.id AND projections.user_grants3.instance_id = projections.orgs1.instance_id" +
-			" LEFT JOIN projections.projects4 ON projections.user_grants3.project_id = projections.projects4.id AND projections.user_grants3.instance_id = projections.projects4.instance_id" +
-			" LEFT JOIN projections.login_names3 ON projections.user_grants3.user_id = projections.login_names3.user_id AND projections.user_grants3.instance_id = projections.login_names3.instance_id" +
+			" FROM projections.user_grants4" +
+			" LEFT JOIN projections.users10 ON projections.user_grants4.user_id = projections.users10.id AND projections.user_grants4.instance_id = projections.users10.instance_id" +
+			" LEFT JOIN projections.users10_humans ON projections.user_grants4.user_id = projections.users10_humans.user_id AND projections.user_grants4.instance_id = projections.users10_humans.instance_id" +
+			" LEFT JOIN projections.orgs1 ON projections.user_grants4.resource_owner = projections.orgs1.id AND projections.user_grants4.instance_id = projections.orgs1.instance_id" +
+			" LEFT JOIN projections.projects4 ON projections.user_grants4.project_id = projections.projects4.id AND projections.user_grants4.instance_id = projections.projects4.instance_id" +
+			" LEFT JOIN projections.login_names3 ON projections.user_grants4.user_id = projections.login_names3.user_id AND projections.user_grants4.instance_id = projections.login_names3.instance_id" +
 			` AS OF SYSTEM TIME '-1 ms' ` +
 			" WHERE projections.login_names3.is_primary = $1")
 	userGrantsCols = append(
