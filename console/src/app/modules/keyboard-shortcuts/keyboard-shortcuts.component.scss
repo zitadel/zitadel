@@ -99,6 +99,9 @@
   margin-top: 1rem;
   button {
     border-radius: 0.5rem;
+    .mat-mdc-button-persistent-ripple {
+      border-style: none !important;
+    }
   }
 
   .fill-space {
