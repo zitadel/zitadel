@@ -1033,7 +1033,10 @@
       "PRIVACYPOLICY": "Политика за бедност",
       "OIDC": "Живот и изтичане на OIDC Token",
       "SECRETS": "Тайна поява",
-      "SECURITY": "Настройки на сигурността"
+      "SECURITY": "Настройки на сигурността",
+      "EVENTS": "Събития",
+      "FAILEDEVENTS": "Неуспешни събития",
+      "VIEWS": "Изгледи"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Известия",
@@ -1041,7 +1044,8 @@
       "DOMAIN": "Домейн",
       "TEXTS": "Текстове и езици",
       "APPEARANCE": "Външен вид",
-      "OTHER": "други"
+      "OTHER": "други",
+      "STORAGE": "Storage"
     }
   },
   "SETTING": {

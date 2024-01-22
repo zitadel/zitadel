@@ -1039,7 +1039,10 @@
       "PRIVACYPOLICY": "Polityka prywatności",
       "OIDC": "Czas trwania tokenów OIDC i wygaśnięcie",
       "SECRETS": "Wygląd sekretów",
-      "SECURITY": "Ustawienia bezpieczeństwa"
+      "SECURITY": "Ustawienia bezpieczeństwa",
+      "EVENTS": "Zdarzenia",
+      "FAILEDEVENTS": "Nieudane Zdarzenia",
+      "VIEWS": "Widoki"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Powiadomienia",
@@ -1047,7 +1050,8 @@
       "DOMAIN": "Domena",
       "TEXTS": "Teksty i języki",
       "APPEARANCE": "Wygląd",
-      "OTHER": "Inne"
+      "OTHER": "Inne",
+      "STORAGE": "składowanie"
     }
   },
   "SETTING": {

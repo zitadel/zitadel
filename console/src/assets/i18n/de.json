@@ -1039,7 +1039,10 @@
       "PRIVACYPOLICY": "Datenschutzrichtlinie",
       "OIDC": "OIDC Token Lifetime und Expiration",
       "SECRETS": "Secret Generator",
-      "SECURITY": "Sicherheitseinstellungen"
+      "SECURITY": "Sicherheitseinstellungen",
+      "EVENTS": "Events",
+      "FAILEDEVENTS": "Fehlerhafte Events",
+      "VIEWS": "Views"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Benachrichtigungen",
@@ -1047,7 +1050,8 @@
       "DOMAIN": "Domain",
       "TEXTS": "Texte und Sprachen",
       "APPEARANCE": "Erscheinungsbild",
-      "OTHER": "Anderes"
+      "OTHER": "Anderes",
+      "STORAGE": "Speicher"
     }
   },
   "SETTING": {

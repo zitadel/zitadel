@@ -1040,7 +1040,10 @@
       "PRIVACYPOLICY": "プライバシーポリシー",
       "OIDC": "OIDCトークンのライフタイムと有効期限",
       "SECRETS": "シークレット設定",
-      "SECURITY": "セキュリティ設定"
+      "SECURITY": "セキュリティ設定",
+      "EVENTS": "イベント",
+      "FAILEDEVENTS": "失敗したイベント",
+      "VIEWS": "ビュー"
     },
     "GROUPS": {
       "NOTIFICATIONS": "通知",
@@ -1048,7 +1051,8 @@
       "DOMAIN": "ドメイン",
       "TEXTS": "テキストと言語",
       "APPEARANCE": "設定",
-      "OTHER": "その他"
+      "OTHER": "その他",
+      "STORAGE": "ストレージ"
     }
   },
   "SETTING": {

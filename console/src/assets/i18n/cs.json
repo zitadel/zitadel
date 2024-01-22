@@ -1040,7 +1040,10 @@
       "PRIVACYPOLICY": "Zásady ochrany osobních údajů",
       "OIDC": "Životnost a expirace OIDC tokenu",
       "SECRETS": "Generátor tajemství",
-      "SECURITY": "Bezpečnostní nastavení"
+      "SECURITY": "Bezpečnostní nastavení",
+      "EVENTS": "Události",
+      "FAILEDEVENTS": "Selhané události",
+      "VIEWS": "Pohledy"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Oznámení",
@@ -1048,7 +1051,8 @@
       "DOMAIN": "Doména",
       "TEXTS": "Texty a jazyky",
       "APPEARANCE": "Vzhled",
-      "OTHER": "Ostatní"
+      "OTHER": "Ostatní",
+      "STORAGE": "Data"
     }
   },
   "SETTING": {

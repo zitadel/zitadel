@@ -1039,7 +1039,10 @@
       "PRIVACYPOLICY": "隐私政策",
       "OIDC": "OIDC 令牌有效期和过期时间",
       "SECRETS": "验证码外观",
-      "SECURITY": "安全设置"
+      "SECURITY": "安全设置",
+      "EVENTS": "活动",
+      "FAILEDEVENTS": "失败事件",
+      "VIEWS": "数据表"
     },
     "GROUPS": {
       "NOTIFICATIONS": "通知",
@@ -1047,7 +1050,8 @@
       "DOMAIN": "域名",
       "TEXTS": "文本和语言",
       "APPEARANCE": "外观",
-      "OTHER": "其他"
+      "OTHER": "其他",
+      "STORAGE": "贮存"
     }
   },
   "SETTING": {

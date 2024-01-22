@@ -1040,7 +1040,10 @@
       "PRIVACYPOLICY": "Privacy Policy",
       "OIDC": "OIDC Token lifetime and expiration",
       "SECRETS": "Secret Generator",
-      "SECURITY": "Security settings"
+      "SECURITY": "Security settings",
+      "EVENTS": "Events",
+      "FAILEDEVENTS": "Failed Events",
+      "VIEWS": "Views"
     },
     "GROUPS": {
       "NOTIFICATIONS": "Notifications",
@@ -1048,7 +1051,8 @@
       "DOMAIN": "Domain",
       "TEXTS": "Texts and Languages",
       "APPEARANCE": "Appearance",
-      "OTHER": "Other"
+      "OTHER": "Other",
+      "STORAGE": "Storage"
     }
   },
   "SETTING": {
