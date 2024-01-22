@@ -9,16 +9,23 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/cmd/encryption"
+	"github.com/zitadel/zitadel/internal/actions"
+	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/api/ui/login"
+	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	static_config "github.com/zitadel/zitadel/internal/static/config"
 )
 
 type Config struct {
@@ -29,11 +36,20 @@ type Config struct {
 	ExternalPort    uint16
 	ExternalSecure  bool
 	Log             *logging.Config
-	EncryptionKeys  *encryptionKeyConfig
+	EncryptionKeys  *encryption.EncryptionKeyConfig
 	DefaultInstance command.InstanceSetup
 	Machine         *id.Config
 	Projections     projection.Config
 	Eventstore      *eventstore.Config
+
+	InitProjections bool
+	AssetStorage    static_config.AssetStorageConfig
+	Auth            auth_es.Config
+	Admin           admin_es.Config
+	OIDC            oidc.Config
+	Login           login.Config
+	WebAuthNName    string
+	Telemetry       *handlers.TelemetryPusherConfig
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
@@ -48,6 +64,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			database.DecodeHook,
 			hook.EnumHookFunc(domain.FeatureString),
 			hook.EnumHookFunc(authz.MemberTypeString),
+			actions.HTTPConfigDecodeHook,
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")
@@ -77,12 +94,6 @@ type Steps struct {
 	s17AddOffsetToUniqueConstraints *AddOffsetToCurrentStates
 	s18AddLowerFieldsToLoginNames   *AddLowerFieldsToLoginNames
 	s19AddCurrentStatesIndex        *AddCurrentSequencesIndex
-}
-
-type encryptionKeyConfig struct {
-	User *crypto.KeyConfig
-	SMTP *crypto.KeyConfig
-	OIDC *crypto.KeyConfig
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

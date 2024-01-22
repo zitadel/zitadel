@@ -1323,3 +1323,5 @@ InternalAuthZ:
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
+
+InitProjections: false

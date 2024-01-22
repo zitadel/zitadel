@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
@@ -22,7 +23,6 @@ import (
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/network"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -59,7 +59,7 @@ type Config struct {
 	AssetStorage      static_config.AssetStorageConfig
 	InternalAuthZ     internal_authz.Config
 	SystemDefaults    systemdefaults.SystemDefaults
-	EncryptionKeys    *encryptionKeyConfig
+	EncryptionKeys    *encryption.EncryptionKeyConfig
 	DefaultInstance   command.InstanceSetup
 	AuditLogRetention time.Duration
 	SystemAPIUsers    SystemAPIUsers
@@ -112,19 +112,6 @@ func MustNewConfig(v *viper.Viper) *Config {
 	actions.SetHTTPConfig(&config.Actions.HTTP)
 
 	return config
-}
-
-type encryptionKeyConfig struct {
-	DomainVerification   *crypto.KeyConfig
-	IDPConfig            *crypto.KeyConfig
-	OIDC                 *crypto.KeyConfig
-	SAML                 *crypto.KeyConfig
-	OTP                  *crypto.KeyConfig
-	SMS                  *crypto.KeyConfig
-	SMTP                 *crypto.KeyConfig
-	User                 *crypto.KeyConfig
-	CSRFCookieKeyID      string
-	UserAgentCookieKeyID string
 }
 
 type SystemAPIUsers map[string]*internal_authz.SystemAPIUser
