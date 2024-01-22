@@ -19,7 +19,7 @@ export function SubProcessorTable() {
       purpose: "Cloud infrastructure provider (Google Cloud), business applications and collaboration (Workspace), Data warehouse services, Content delivery network,  DDoS and bot prevention",
       hosting: "Region designated by Customer, United States",
       country: country_list.us,
-      enduserdata: "Yes (transit)"
+      enduserdata: "Yes"
     },
     {
       entity: "Datadog, Inc.",
