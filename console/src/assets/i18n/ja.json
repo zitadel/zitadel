@@ -268,8 +268,8 @@
       "DESCRIPTION": "下のボタンをクリックして、もう一度ログインする。"
     },
     "EXHAUSTED": {
-      "TITLE": "認証されたリクエストのクォータを使い果たしました",
-      "DESCRIPTION": "このZITADELインスタンスの制限を削除または増加させる"
+      "TITLE": "あなたのインスタンスはブロックされています。",
+      "DESCRIPTION": "ZITADELインスタンス管理者にサブスクリプションの更新を依頼してください。"
     },
     "INVALID_FORMAT": "不正なフォーマットです",
     "NOTANEMAIL": "入力された値がメールアドレスではありません。",
@@ -1251,6 +1251,7 @@
       "DESCRIPTIONCREATEMGMT": "ユーザーは、以下の利用可能なIDプロバイダーから選択できます。注：システムセットプロバイダーと、組織用に設定されたプロバイダーのみを使用できます。",
       "ADVANCED": "高度",
       "LIFETIMEDURATIONS": "ログインライフタイム",
+      "LIFETIME_INVALID": "フォームに無効な値が含まれています。",
       "SAVED": "正常に保存されました！"
     },
     "PRIVACY_POLICY": {

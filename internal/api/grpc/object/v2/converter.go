@@ -47,3 +47,26 @@ func ResourceOwnerFromReq(ctx context.Context, req *object.RequestContext) strin
 	}
 	return authz.GetCtxData(ctx).OrgID
 }
+
+func TextMethodToQuery(method object.TextQueryMethod) query.TextComparison {
+	switch method {
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS:
+		return query.TextEquals
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE:
+		return query.TextEqualsIgnoreCase
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH:
+		return query.TextStartsWith
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_STARTS_WITH_IGNORE_CASE:
+		return query.TextStartsWithIgnoreCase
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS:
+		return query.TextContains
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE:
+		return query.TextContainsIgnoreCase
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH:
+		return query.TextEndsWith
+	case object.TextQueryMethod_TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE:
+		return query.TextEndsWithIgnoreCase
+	default:
+		return -1
+	}
+}

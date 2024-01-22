@@ -325,7 +325,7 @@ func startAPIs(
 	}
 	oidcPrefixes := []string{"/.well-known/openid-configuration", "/oidc/v1", "/oauth/v2"}
 	// always set the origin in the context if available in the http headers, no matter for what protocol
-	router.Use(middleware.OriginHandler)
+	router.Use(middleware.WithOrigin(config.ExternalSecure))
 	systemTokenVerifier, err := internal_authz.StartSystemTokenVerifierFromConfig(http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
 	if err != nil {
 		return err
@@ -384,10 +384,10 @@ func startAPIs(
 	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, keys.User, config.ExternalSecure), tlsConfig); err != nil {
 		return err
 	}
-	if err := apis.RegisterService(ctx, user_v2.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(config.ExternalSecure), idp.SAMLRootURL(config.ExternalSecure))); err != nil {
+	if err := apis.RegisterService(ctx, user_v2.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(config.ExternalSecure), idp.SAMLRootURL(config.ExternalSecure), assets.AssetAPI(config.ExternalSecure), permissionCheck)); err != nil {
 		return err
 	}
-	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries, permissionCheck)); err != nil {
+	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries)); err != nil {
 		return err
 	}
 
@@ -439,14 +439,14 @@ func startAPIs(
 		return fmt.Errorf("unable to start console: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(console.HandlerPrefix, c)
-
+	consolePath := console.HandlerPrefix + "/"
 	l, err := login.CreateLogin(
 		config.Login,
 		commands,
 		queries,
 		authRepo,
 		store,
-		console.HandlerPrefix+"/",
+		consolePath,
 		oidcServer.AuthCallbackURL(),
 		provider.AuthCallbackURL(samlProvider),
 		config.ExternalSecure,
@@ -455,7 +455,7 @@ func startAPIs(
 		provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler,
 		instanceInterceptor.Handler,
 		assetsCache.Handler,
-		limitingAccessInterceptor.WithoutLimiting().Handle,
+		limitingAccessInterceptor.WithRedirect(consolePath).Handle,
 		keys.User,
 		keys.IDPConfig,
 		keys.CSRFCookieKey,

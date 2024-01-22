@@ -21,6 +21,7 @@ type SearchQuery struct {
 	Desc                  bool
 
 	InstanceID        *Filter
+	InstanceIDs       *Filter
 	ExcludedInstances *Filter
 	Creator           *Filter
 	Owner             *Filter
@@ -132,6 +133,7 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 
 	for _, f := range []func(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter{
 		instanceIDFilter,
+		instanceIDsFilter,
 		excludedInstanceIDFilter,
 		editorUserFilter,
 		resourceOwnerFilter,
@@ -228,6 +230,14 @@ func instanceIDFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery
 	}
 	query.InstanceID = NewFilter(FieldInstanceID, *builder.GetInstanceID(), OperationEquals)
 	return query.InstanceID
+}
+
+func instanceIDsFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {
+	if builder.GetInstanceIDs() == nil {
+		return nil
+	}
+	query.InstanceIDs = NewFilter(FieldInstanceID, builder.GetInstanceIDs(), OperationIn)
+	return query.InstanceIDs
 }
 
 func positionAfterFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {

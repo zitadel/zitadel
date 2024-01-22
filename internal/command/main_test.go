@@ -203,6 +203,14 @@ func GetMockSecretGenerator(t *testing.T) crypto.Generator {
 
 type mockInstance struct{}
 
+func (m *mockInstance) Block() *bool {
+	panic("shouldn't be called here")
+}
+
+func (m *mockInstance) AuditLogRetention() *time.Duration {
+	panic("shouldn't be called here")
+}
+
 func (m *mockInstance) InstanceID() string {
 	return "INSTANCE"
 }

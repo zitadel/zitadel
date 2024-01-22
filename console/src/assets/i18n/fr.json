@@ -267,8 +267,8 @@
       "DESCRIPTION": "Cliquez sur le bouton ci-dessous pour vous reconnecter."
     },
     "EXHAUSTED": {
-      "TITLE": "Ton quota de demandes authentifiées est épuisé.",
-      "DESCRIPTION": "Supprimez ou augmentez la limite de cette instance ZITADEL."
+      "TITLE": "Votre instance est bloquée.",
+      "DESCRIPTION": "Demandez à votre administrateur d'instance ZITADEL de mettre à jour l'abonnement."
     },
     "INVALID_FORMAT": "Le format n'est pas valide",
     "NOTANEMAIL": "La valeur donnée n'est pas une adresse e-mail",
@@ -1254,6 +1254,7 @@
       "DESCRIPTIONCREATEMGMT": "Les utilisateurs peuvent choisir parmi les fournisseurs d'identité disponibles ci-dessous. Note",
       "ADVANCED": "Avancé",
       "LIFETIMEDURATIONS": "Durée de vie des connexions",
+      "LIFETIME_INVALID": "Le formulaire contient des valeurs non valides.",
       "SAVED": "Enregistré avec succès !"
     },
     "PRIVACY_POLICY": {
