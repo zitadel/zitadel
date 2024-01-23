@@ -71,7 +71,7 @@ func (h *Handler) Execute(ctx context.Context, startedEvent eventstore.Event) er
 		return err
 	}
 
-	h.triggerInstances(ctx, instanceIDs, WithMaxCreatedAt(startedEvent.CreatedAt()))
+	h.triggerInstances(ctx, instanceIDs, WithMaxPosition(startedEvent.Position()))
 	return nil
 }
 
@@ -288,7 +288,7 @@ func (h *Handler) activeInstances(ctx context.Context) ([]string, error) {
 
 type triggerConfig struct {
 	awaitRunning bool
-	maxCreatedAt time.Time
+	maxPosition  float64
 }
 
 type TriggerOpt func(conf *triggerConfig)
@@ -299,9 +299,9 @@ func WithAwaitRunning() TriggerOpt {
 	}
 }
 
-func WithMaxCreatedAt(createdAt time.Time) TriggerOpt {
+func WithMaxPosition(position float64) TriggerOpt {
 	return func(conf *triggerConfig) {
-		conf.maxCreatedAt = createdAt
+		conf.maxPosition = position
 	}
 }
 
@@ -409,7 +409,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		return additionalIteration, err
 	}
 	// stop execution if currentState.eventTimestamp >= config.maxCreatedAt
-	if !config.maxCreatedAt.IsZero() && !currentState.eventTimestamp.Before(config.maxCreatedAt) {
+	if config.maxPosition != 0 && currentState.position >= config.maxPosition {
 		return false, nil
 	}
 
