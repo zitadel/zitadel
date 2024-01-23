@@ -111,7 +111,10 @@ func (k *keySetCache) getKey(ctx context.Context, keyID string) (_ *jose.JSONWeb
 // VerifySignature implements the oidc.KeySet interface.
 func (k *keySetCache) VerifySignature(ctx context.Context, jws *jose.JSONWebSignature) (_ []byte, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	if len(jws.Signatures) != 1 {
 		return nil, zerrors.ThrowInvalidArgument(nil, "OIDC-Gid9s", "Errors.Token.Invalid")

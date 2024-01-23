@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limity nebyly nalezeny
     NoneSpecified: Nebyly určeny žádné limity
+    Instance:
+      Blocked: Instance je blokována
   Restrictions:
     NoneSpecified: Nebyla určena žádná omezení
     DefaultLanguageMustBeAllowed: Výchozí jazyk musí být povolen

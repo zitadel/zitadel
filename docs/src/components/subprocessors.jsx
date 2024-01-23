@@ -16,17 +16,10 @@ export function SubProcessorTable() {
   const processors = [
     {
       entity: "Google LLC",
-      purpose: "Cloud infrastructure provider (Google Cloud), business applications and collaboration (Workspace), Data warehouse services, Content delivery network, DDoS and bot prevention",
+      purpose: "Cloud infrastructure provider (Google Cloud), business applications and collaboration (Workspace), Data warehouse services, Content delivery network,  DDoS and bot prevention",
       hosting: "Region designated by Customer, United States",
       country: country_list.us,
-      enduserdata: "Yes (transit)"
-    },
-    {
-      entity: "Cockroach Labs, Inc.",
-      purpose: "Managed database services: Dedicated CockroachDB clusters on Google Cloud",
-      hosting: "Region designated by Customer",
-      country: country_list.us,
-      enduserdata: "Yes (at rest)"
+      enduserdata: "Yes"
     },
     {
       entity: "Datadog, Inc.",
@@ -128,9 +121,9 @@ export function SubProcessorTable() {
       enduserdata: false
     },
     {
-      entity: "Clickhouse, Inc.",
-      purpose: "Data warehouse services",
-      hosting: country_list.us,
+      entity: "HubSpot Inc.",
+      purpose: "Customer and sales management, Marketing automation, Support requests",
+      hosting: country_list.eu,
       country: country_list.us,
       enduserdata: false
     },

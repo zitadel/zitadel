@@ -160,6 +160,7 @@ func (h *Handler) triggerInstances(ctx context.Context, instances []string, trig
 		// simple implementation of do while
 		_, err := h.Trigger(instanceCtx, triggerOpts...)
 		h.log().WithField("instance", instance).OnError(err).Debug("trigger failed")
+		time.Sleep(h.retryFailedAfter)
 		// retry if trigger failed
 		for ; err != nil; _, err = h.Trigger(instanceCtx, triggerOpts...) {
 			time.Sleep(h.retryFailedAfter)
@@ -394,7 +395,10 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 			h.log().OnError(rollbackErr).Debug("unable to rollback tx")
 			return
 		}
-		err = tx.Commit()
+		commitErr := tx.Commit()
+		if err == nil {
+			err = commitErr
+		}
 	}()
 
 	currentState, err := h.currentState(ctx, tx, config)

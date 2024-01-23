@@ -90,7 +90,9 @@ type Steps struct {
 	s17AddOffsetToUniqueConstraints *AddOffsetToCurrentStates
 	s18AddLowerFieldsToLoginNames   *AddLowerFieldsToLoginNames
 	s19AddCurrentStatesIndex        *AddCurrentSequencesIndex
-	s20ActiveInstancesIndex         *ActiveInstanceEvents
+	s20AddByUserSessionIndex        *AddByUserIndexToSession
+	s21AddBlockFieldToLimits        *AddBlockFieldToLimits
+	s22ActiveInstancesIndex         *ActiveInstanceEvents
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

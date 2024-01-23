@@ -10,18 +10,18 @@ import (
 
 var (
 	//go:embed 20.sql
-	activeInstanceEvents string
+	addByUserIndexToSession string
 )
 
-type ActiveInstanceEvents struct {
+type AddByUserIndexToSession struct {
 	dbClient *database.DB
 }
 
-func (mig *ActiveInstanceEvents) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, activeInstanceEvents)
+func (mig *AddByUserIndexToSession) Execute(ctx context.Context, _ eventstore.Event) error {
+	_, err := mig.dbClient.ExecContext(ctx, addByUserIndexToSession)
 	return err
 }
 
-func (mig *ActiveInstanceEvents) String() string {
-	return "20_active_instance_events_index"
+func (mig *AddByUserIndexToSession) String() string {
+	return "20_add_by_user_index_on_session"
 }

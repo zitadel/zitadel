@@ -209,32 +209,9 @@ var (
 		name:  projection.UserGrantState,
 		table: userGrantTable,
 	}
-	UserGrantOwnerRemoved = Column{
-		name:  projection.UserGrantOwnerRemoved,
-		table: userGrantTable,
-	}
-	UserGrantUserOwnerRemoved = Column{
-		name:  projection.UserGrantUserOwnerRemoved,
-		table: userGrantTable,
-	}
-	UserGrantProjectOwnerRemoved = Column{
-		name:  projection.UserGrantProjectOwnerRemoved,
-		table: userGrantTable,
-	}
-	UserGrantGrantGrantedOrgRemoved = Column{
-		name:  projection.UserGrantGrantedOrgRemoved,
-		table: userGrantTable,
-	}
 )
 
-func addUserGrantWithoutOwnerRemoved(eq map[string]interface{}) {
-	eq[UserGrantOwnerRemoved.identifier()] = false
-	eq[UserGrantUserOwnerRemoved.identifier()] = false
-	eq[UserGrantProjectOwnerRemoved.identifier()] = false
-	eq[UserGrantGrantGrantedOrgRemoved.identifier()] = false
-}
-
-func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwnerRemoved bool, queries ...SearchQuery) (grant *UserGrant, err error) {
+func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, queries ...SearchQuery) (grant *UserGrant, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -250,9 +227,6 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwn
 		query = q.toQuery(query)
 	}
 	eq := sq.Eq{UserGrantInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		addUserGrantWithoutOwnerRemoved(eq)
-	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-Fa1KW", "Errors.Query.SQLStatement")
@@ -265,7 +239,7 @@ func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, withOwn
 	return grant, err
 }
 
-func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, shouldTriggerBulk, withOwnerRemoved bool) (grants *UserGrants, err error) {
+func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, shouldTriggerBulk bool) (grants *UserGrants, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -278,9 +252,6 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries, sh
 
 	query, scan := prepareUserGrantsQuery(ctx, q.client)
 	eq := sq.Eq{UserGrantInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		addUserGrantWithoutOwnerRemoved(eq)
-	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-wXnQR", "Errors.Query.SQLStatement")

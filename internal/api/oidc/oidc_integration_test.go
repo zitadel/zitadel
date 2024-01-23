@@ -71,7 +71,7 @@ func Test_ZITADEL_API_missing_audience_scope(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -107,7 +107,7 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("%s %s", tokens.TokenType, tokens.AccessToken))
@@ -134,7 +134,7 @@ func Test_ZITADEL_API_missing_mfa(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPassword, startTime, changeTime)
 
@@ -162,7 +162,7 @@ func Test_ZITADEL_API_success(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -196,7 +196,7 @@ func Test_ZITADEL_API_glob_redirects(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -225,7 +225,7 @@ func Test_ZITADEL_API_inactive_access_token(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
@@ -267,7 +267,7 @@ func Test_ZITADEL_API_terminated_session(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
