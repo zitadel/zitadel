@@ -3,6 +3,9 @@ title: ZITADEL with Django Python
 sidebar_label: Django
 ---
 
+import SetupPython from '../imports/_setup_python.mdx';
+import SetupDjango from '../imports/_setup_django.mdx';
+
 This integration guide demonstrates the recommended way to incorporate ZITADEL into your Django Python application.
 It explains how to enable user login in your application and how to incorporate the ZITADEL users into the existing AuthenticationBackend.
 
@@ -71,16 +74,21 @@ The secret will not be displayed again, but you can regenerate one if you loose 
 
 ## Setup new Django application
 
-Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your Django client.
-The used base is the "Writing your first Django app"-app from the Django documentation under [https://docs.djangoproject.com/en/5.0/intro/](https://docs.djangoproject.com/en/5.0/intro/), which has documented additional parts in to use [mozilla-django-oidc](https://github.com/mozilla/mozilla-django-oidc) to integrate ZITADEL as AuthenticationBackend.
+### Setup Python
+
+<SetupPython/>
+
+### Setup Django
+
+<SetupDjango/>
 
 :::info
 Skip this step if you are connecting ZITADEL to an existing application.
 :::
 
-### Install Django depencies
+### Install dependencies
 
-To connect with ZITADEL through OpenID connect, you need to install a OIDC depencency, we will use the [mozilla-django-oidc](https://github.com/mozilla/mozilla-django-oidc). Run the following command:
+To connect with ZITADEL through OpenID connect, you need to install a OIDC dependency, we will use the [mozilla-django-oidc](https://github.com/mozilla/mozilla-django-oidc). Run the following command:
 
 ```bash
 python -m pip install mozilla-django-oidc
@@ -197,6 +205,85 @@ urlpatterns = [
 
 :::warning
 Never store and commit secrets in the settings.py file
+:::
+
+### Authentication and authorization
+
+To check the authentication and authorization the views in the polls application are extended with decorators:
+```python
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
+from django.views import generic
+
+from django.http import HttpResponseRedirect
+from .models import Choice, Question
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+
+
+class IndexView(generic.ListView):
+    template_name = "polls/index.html"
+    context_object_name = "latest_question_list"
+
+    def get_queryset(self):
+        """
+        Return the last five published questions (not including those set to be
+        published in the future).
+        """
+        return Question.objects.filter(pub_date__lte=timezone.now()).order_by(
+            "-pub_date"
+        )[:5]
+
+
+@method_decorator(login_required, name="dispatch")
+class DetailView(generic.DetailView):
+    model = Question
+    template_name = "polls/detail.html"
+
+    def get_queryset(self):
+        """
+        Excludes any questions that aren't published yet.
+        """
+        return Question.objects.filter(pub_date__lte=timezone.now())
+
+
+@method_decorator(staff_member_required, name="dispatch")
+class ResultsView(generic.DetailView):
+    model = Question
+    template_name = "polls/results.html"
+
+
+def vote(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    try:
+        selected_choice = question.choice_set.get(pk=request.POST["choice"])
+    except (KeyError, Choice.DoesNotExist):
+        # Redisplay the question voting form.
+        return render(
+            request,
+            "polls/detail.html",
+            {
+                "question": question,
+                "error_message": "You didn't select a choice.",
+            },
+        )
+    else:
+        selected_choice.votes += 1
+        selected_choice.save()
+        # Always return an HttpResponseRedirect after successfully dealing
+        # with POST data. This prevents data from being posted twice if a
+        # user hits the Back button.
+        return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+```
+
+- @method_decorator(login_required, name="dispatch"): means that the user has to be logged in Django, which only happens if you have one of the 3 roles("admin", "staff" or "user")
+- @method_decorator(staff_member_required, name="dispatch"): means you have to have at least a staff user ("admin" or "staff")
+- "/admin/": all admin sides are only accessible if you have a superuser with the role "admin"
+
+:::info
+Additional permission checks could be done with "permission_required" from "django.contrib.auth.decorators" also described in the [Django documentation](https://docs.djangoproject.com/en/5.0/topics/auth/customizing/#custom-permissions).
 :::
 
 ### DB
