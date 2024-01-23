@@ -5,6 +5,7 @@ import (
 	"embed"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
@@ -17,7 +18,7 @@ type AuthTokenIndexes struct {
 	dbClient *database.DB
 }
 
-func (mig *AuthTokenIndexes) Execute(ctx context.Context) error {
+func (mig *AuthTokenIndexes) Execute(ctx context.Context, _ eventstore.Event) error {
 	stmt, err := readStmt(tokenIndexes08, "08", mig.dbClient.Type(), "08.sql")
 	if err != nil {
 		return err

@@ -132,7 +132,6 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 
 	for _, f := range []func(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter{
 		instanceIDFilter,
-		excludedInstanceIDFilter,
 		editorUserFilter,
 		resourceOwnerFilter,
 		positionAfterFilter,
@@ -180,14 +179,6 @@ func eventSequenceGreaterFilter(builder *eventstore.SearchQueryBuilder, query *S
 	}
 	query.Sequence = NewFilter(FieldSequence, builder.GetEventSequenceGreater(), sortOrder)
 	return query.Sequence
-}
-
-func excludedInstanceIDFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {
-	if len(builder.GetExcludedInstanceIDs()) == 0 {
-		return nil
-	}
-	query.ExcludedInstances = NewFilter(FieldInstanceID, database.TextArray[string](builder.GetExcludedInstanceIDs()), OperationNotIn)
-	return query.ExcludedInstances
 }
 
 func creationDateAfterFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {

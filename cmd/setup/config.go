@@ -11,11 +11,9 @@ import (
 
 	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/internal/actions"
-	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
-	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
@@ -44,8 +42,6 @@ type Config struct {
 
 	InitProjections bool
 	AssetStorage    static_config.AssetStorageConfig
-	Auth            auth_es.Config
-	Admin           admin_es.Config
 	OIDC            oidc.Config
 	Login           login.Config
 	WebAuthNName    string
@@ -94,6 +90,7 @@ type Steps struct {
 	s17AddOffsetToUniqueConstraints *AddOffsetToCurrentStates
 	s18AddLowerFieldsToLoginNames   *AddLowerFieldsToLoginNames
 	s19AddCurrentStatesIndex        *AddCurrentSequencesIndex
+	s20ActiveInstancesIndex         *ActiveInstanceEvents
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

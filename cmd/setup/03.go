@@ -41,7 +41,7 @@ type FirstInstance struct {
 	domain            string
 }
 
-func (mig *FirstInstance) Execute(ctx context.Context) error {
+func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error {
 	keyStorage, err := crypto_db.NewKeyStorage(mig.db, mig.masterKey)
 	if err != nil {
 		return fmt.Errorf("cannot start key storage: %w", err)

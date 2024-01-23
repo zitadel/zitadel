@@ -1324,4 +1324,5 @@ InternalAuthZ:
         - "user.grant.read"
         - "user.membership.read"
 
-InitProjections: false
+# If a new projections is introduced it is prefilled if variable is true
+InitProjections: false # ZITADEL_INITPROJECTIONS

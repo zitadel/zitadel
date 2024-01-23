@@ -5,6 +5,7 @@ import (
 	"embed"
 	_ "embed"
 	"net/http"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -88,8 +89,8 @@ Requirements:
 
 func Flags(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringArrayVar(&stepFiles, "steps", nil, "paths to step files to overwrite default steps")
-	cmd.PersistentFlags().Bool("init-projections", viper.GetBool("init-projections"), "initializes projections after they are created")
-	err := viper.BindPFlag("InitProjections", cmd.PersistentFlags().Lookup("init-projections"))
+	cmd.Flags().Bool("init-projections", viper.GetBool("init-projections"), "initializes projections after they are created")
+	err := viper.BindPFlag("InitProjections", cmd.Flags().Lookup("init-projections"))
 	logging.OnError(err).Fatal("unable to bind \"init-projections\" flag")
 	key.AddMasterKeyFlag(cmd)
 	tls.AddTLSModeFlag(cmd)
@@ -143,6 +144,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s17AddOffsetToUniqueConstraints = &AddOffsetToCurrentStates{dbClient: queryDBClient}
 	steps.s18AddLowerFieldsToLoginNames = &AddLowerFieldsToLoginNames{dbClient: queryDBClient}
 	steps.s19AddCurrentStatesIndex = &AddCurrentSequencesIndex{dbClient: queryDBClient}
+	steps.s20ActiveInstancesIndex = &ActiveInstanceEvents{dbClient: queryDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -189,6 +191,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.WithFields("name", steps.s17AddOffsetToUniqueConstraints.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s19AddCurrentStatesIndex)
 	logging.WithFields("name", steps.s19AddCurrentStatesIndex.String()).OnError(err).Fatal("migration failed")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s20ActiveInstancesIndex)
+	logging.WithFields("name", steps.s20ActiveInstancesIndex.String()).OnError(err).Fatal("migration failed")
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)
@@ -250,7 +254,11 @@ func initProjections(
 		ctx,
 		queryDBClient,
 		eventstoreClient,
-		config.Projections,
+		projection.Config{
+			RetryFailedAfter: 100 * time.Millisecond,
+			MaxFailureCount:  2,
+			BulkLimit:        1000,
+		},
 		keys.OIDC,
 		keys.SAML,
 		nil, // system users are only used for milestone checks
@@ -266,10 +274,13 @@ func initProjections(
 
 	adminView, err := admin_view.StartView(queryDBClient)
 	logging.OnError(err).Fatal("unable to start admin view")
-	config.Admin.Spooler.Eventstore = eventstoreClient
-	config.Admin.Spooler.Client = queryDBClient
 	admin_handler.Register(ctx,
-		config.Admin.Spooler,
+		admin_handler.Config{
+			Client:                queryDBClient,
+			Eventstore:            eventstoreClient,
+			BulkLimit:             1000,
+			FailureCountUntilSkip: 2,
+		},
 		adminView,
 		staticStorage,
 	)
@@ -302,12 +313,15 @@ func initProjections(
 	)
 	logging.OnError(err).Fatal("unable to start queries")
 
-	config.Auth.Spooler.Eventstore = eventstoreClient
-	config.Auth.Spooler.Client = queryDBClient
 	authView, err := auth_view.StartView(queryDBClient, keys.OIDC, queries, eventstoreClient)
 	logging.OnError(err).Fatal("unable to start admin view")
 	auth_handler.Register(ctx,
-		config.Auth.Spooler,
+		auth_handler.Config{
+			Client:                queryDBClient,
+			Eventstore:            eventstoreClient,
+			BulkLimit:             1000,
+			FailureCountUntilSkip: 2,
+		},
 		authView,
 		queries,
 	)

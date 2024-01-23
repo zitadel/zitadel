@@ -6,6 +6,7 @@ import (
 	"errors"
 	"math"
 	"math/rand"
+	"slices"
 	"sync"
 	"time"
 
@@ -16,11 +17,13 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/migration"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/pseudo"
 )
 
 type EventStore interface {
 	InstanceIDs(ctx context.Context, maxAge time.Duration, forceLoad bool, query *eventstore.SearchQueryBuilder) ([]string, error)
+	FilterToQueryReducer(ctx context.Context, reducer eventstore.QueryReducer) error
 	Filter(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error)
 	Push(ctx context.Context, cmds ...eventstore.Command) ([]eventstore.Event, error)
 }
@@ -62,13 +65,13 @@ type Handler struct {
 var _ migration.Migration = (*Handler)(nil)
 
 // Execute implements migration.Migration.
-func (h *Handler) Execute(ctx context.Context) error {
-	instanceIDs, err := h.queryInstances(ctx)
+func (h *Handler) Execute(ctx context.Context, startedEvent eventstore.Event) error {
+	instanceIDs, err := h.activeInstances(ctx)
 	if err != nil {
 		return err
 	}
 
-	h.triggerInstances(ctx, instanceIDs)
+	h.triggerInstances(ctx, instanceIDs, WithMaxCreatedAt(startedEvent.CreatedAt()))
 	return nil
 }
 
@@ -150,15 +153,15 @@ func (h *Handler) schedule(ctx context.Context) {
 	}
 }
 
-func (h *Handler) triggerInstances(ctx context.Context, instances []string) {
+func (h *Handler) triggerInstances(ctx context.Context, instances []string, triggerOpts ...TriggerOpt) {
 	for _, instance := range instances {
 		instanceCtx := authz.WithInstanceID(ctx, instance)
 
 		// simple implementation of do while
-		_, err := h.Trigger(instanceCtx)
+		_, err := h.Trigger(instanceCtx, triggerOpts...)
 		h.log().WithField("instance", instance).OnError(err).Debug("trigger failed")
 		// retry if trigger failed
-		for ; err != nil; _, err = h.Trigger(instanceCtx) {
+		for ; err != nil; _, err = h.Trigger(instanceCtx, triggerOpts...) {
 			time.Sleep(h.retryFailedAfter)
 			h.log().WithField("instance", instance).OnError(err).Debug("trigger failed")
 			if err == nil {
@@ -224,20 +227,67 @@ func checkAdditionalEvents(eventQueue chan eventstore.Event, event eventstore.Ev
 	}
 }
 
+type activeInstances []string
+
+// AppendEvents implements eventstore.QueryReducer.
+func (ai *activeInstances) AppendEvents(events ...eventstore.Event) {
+	for _, event := range events {
+		switch event.Type() {
+		case instance.InstanceAddedEventType:
+			*ai = append(*ai, event.Aggregate().InstanceID)
+		case instance.InstanceRemovedEventType:
+			slices.DeleteFunc(*ai, func(s string) bool {
+				return s == event.Aggregate().InstanceID
+			})
+		}
+	}
+}
+
+// Query implements eventstore.QueryReducer.
+func (*activeInstances) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(instance.AggregateType).
+		EventTypes(
+			instance.InstanceAddedEventType,
+			instance.InstanceRemovedEventType,
+		).
+		Builder()
+}
+
+// Reduce implements eventstore.QueryReducer.
+// reduce is not used as events are reduced during AppendEvents
+func (*activeInstances) Reduce() error {
+	return nil
+}
+
+var _ eventstore.QueryReducer = (*activeInstances)(nil)
+
 func (h *Handler) queryInstances(ctx context.Context) ([]string, error) {
+	if h.handleActiveInstances == 0 {
+		return h.activeInstances(ctx)
+	}
+
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).
 		AwaitOpenTransactions().
 		AllowTimeTravel().
-		ExcludedInstanceID("")
-	if h.handleActiveInstances > 0 {
-		query = query.
-			CreationDateAfter(h.now().Add(-1 * h.handleActiveInstances))
-	}
+		CreationDateAfter(h.now().Add(-1 * h.handleActiveInstances))
+
 	return h.es.InstanceIDs(ctx, h.requeueEvery, false, query)
+}
+
+func (h *Handler) activeInstances(ctx context.Context) ([]string, error) {
+	ai := activeInstances{}
+	if err := h.es.FilterToQueryReducer(ctx, &ai); err != nil {
+		return nil, err
+	}
+
+	return ai, nil
 }
 
 type triggerConfig struct {
 	awaitRunning bool
+	maxCreatedAt time.Time
 }
 
 type TriggerOpt func(conf *triggerConfig)
@@ -245,6 +295,12 @@ type TriggerOpt func(conf *triggerConfig)
 func WithAwaitRunning() TriggerOpt {
 	return func(conf *triggerConfig) {
 		conf.awaitRunning = true
+	}
+}
+
+func WithMaxCreatedAt(createdAt time.Time) TriggerOpt {
+	return func(conf *triggerConfig) {
+		conf.maxCreatedAt = createdAt
 	}
 }
 
@@ -347,6 +403,10 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 			return false, nil
 		}
 		return additionalIteration, err
+	}
+	// stop execution if currentState.eventTimestamp >= config.maxCreatedAt
+	if !config.maxCreatedAt.IsZero() && !currentState.eventTimestamp.Before(config.maxCreatedAt) {
+		return false, nil
 	}
 
 	var statements []*Statement
