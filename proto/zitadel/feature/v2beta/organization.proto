@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package zitadel.feature.v2beta;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta;feature";
+
+message OrganizationFeatures {
+
+}

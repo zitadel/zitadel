@@ -332,6 +332,8 @@ OIDC:
       Path: /oauth/v2/device_authorization # ZITADEL_OIDC_CUSTOMENDPOINTS_DEVICEAUTH_PATH
   DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
   DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
+  
+  # DEPRECATED: use the feature API and DefaultInstance settings.
   Features:
     # Wheter projection triggers are used in the new Introspection implementation.
     TriggerIntrospectionProjections: false
@@ -825,6 +827,8 @@ DefaultInstance:
       ButtonText: Login
   Features:
     - FeatureLoginDefaultOrg: true
+    - OIDCTriggerIntrospectionProjections: false
+    - OIDCLegacyIntrospection: false
   Limits:
     # AuditLogRetention limits the number of events that can be queried via the events API by their age.
     # A value of "0s" means that all events are available.
