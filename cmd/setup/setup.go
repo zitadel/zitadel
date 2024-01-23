@@ -35,21 +35,6 @@ import (
 	notify_handler "github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
-	"github.com/zitadel/zitadel/internal/repository/action"
-	"github.com/zitadel/zitadel/internal/repository/authrequest"
-	"github.com/zitadel/zitadel/internal/repository/deviceauth"
-	"github.com/zitadel/zitadel/internal/repository/idpintent"
-	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/keypair"
-	"github.com/zitadel/zitadel/internal/repository/limits"
-	"github.com/zitadel/zitadel/internal/repository/oidcsession"
-	"github.com/zitadel/zitadel/internal/repository/org"
-	"github.com/zitadel/zitadel/internal/repository/project"
-	"github.com/zitadel/zitadel/internal/repository/quota"
-	"github.com/zitadel/zitadel/internal/repository/restrictions"
-	"github.com/zitadel/zitadel/internal/repository/session"
-	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
-	"github.com/zitadel/zitadel/internal/repository/usergrant"
 	"github.com/zitadel/zitadel/internal/webauthn"
 )
 
@@ -100,6 +85,9 @@ func Flags(cmd *cobra.Command) {
 func Setup(config *Config, steps *Steps, masterKey string) {
 	ctx := context.Background()
 	logging.Info("setup started")
+	if config.InitProjections {
+		logging.Info("init-projections is beta")
+	}
 
 	i18n.MustLoadSupportedLanguagesFromDir()
 
@@ -114,7 +102,6 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	config.Eventstore.Pusher = new_es.NewEventstore(esPusherDBClient)
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 	logging.OnError(err).Fatal("unable to start eventstore")
-	migration.RegisterMappers(eventstoreClient)
 
 	steps.s1ProjectionTable = &ProjectionTable{dbClient: queryDBClient.DB}
 	steps.s2AssetsTable = &AssetTable{dbClient: queryDBClient.DB}
@@ -235,22 +222,6 @@ func initProjections(
 	masterKey string,
 	config *Config,
 ) {
-	iam_repo.RegisterEventMappers(eventstoreClient)
-	usr_repo.RegisterEventMappers(eventstoreClient)
-	org.RegisterEventMappers(eventstoreClient)
-	project.RegisterEventMappers(eventstoreClient)
-	action.RegisterEventMappers(eventstoreClient)
-	keypair.RegisterEventMappers(eventstoreClient)
-	usergrant.RegisterEventMappers(eventstoreClient)
-	session.RegisterEventMappers(eventstoreClient)
-	idpintent.RegisterEventMappers(eventstoreClient)
-	authrequest.RegisterEventMappers(eventstoreClient)
-	oidcsession.RegisterEventMappers(eventstoreClient)
-	quota.RegisterEventMappers(eventstoreClient)
-	limits.RegisterEventMappers(eventstoreClient)
-	restrictions.RegisterEventMappers(eventstoreClient)
-	deviceauth.RegisterEventMappers(eventstoreClient)
-
 	keyStorage, err := cryptoDB.NewKeyStorage(queryDBClient, masterKey)
 	logging.OnError(err).Fatal("unable to start key storage")
 

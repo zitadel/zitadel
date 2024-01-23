@@ -9,6 +9,13 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+func init() {
+	eventstore.RegisterFilterEventMapper(aggregateType, StartedType, SetupMapper)
+	eventstore.RegisterFilterEventMapper(aggregateType, doneType, SetupMapper)
+	eventstore.RegisterFilterEventMapper(aggregateType, failedType, SetupMapper)
+	eventstore.RegisterFilterEventMapper(aggregateType, repeatableDoneType, SetupMapper)
+}
+
 // SetupStep is the command pushed on the eventstore
 type SetupStep struct {
 	eventstore.BaseEvent `json:"-"`
@@ -77,13 +84,6 @@ func (s *SetupStep) UniqueConstraints() []*eventstore.UniqueConstraint {
 			eventstore.NewAddGlobalUniqueConstraint("migration_done", s.migration.String(), "Errors.Step.Done.AlreadyExists"),
 		}
 	}
-}
-
-func RegisterMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(aggregateType, StartedType, SetupMapper)
-	es.RegisterFilterEventMapper(aggregateType, doneType, SetupMapper)
-	es.RegisterFilterEventMapper(aggregateType, failedType, SetupMapper)
-	es.RegisterFilterEventMapper(aggregateType, repeatableDoneType, SetupMapper)
 }
 
 func SetupMapper(event eventstore.Event) (eventstore.Event, error) {
