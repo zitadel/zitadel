@@ -70,6 +70,9 @@ Requirements:
 			err := tls.ModeFromFlag(cmd)
 			logging.OnError(err).Fatal("invalid tlsMode")
 
+			err = viper.BindPFlag("InitProjections", cmd.Flags().Lookup("init-projections"))
+			logging.OnError(err).Fatal("unable to bind \"init-projections\" flag")
+
 			config := MustNewConfig(viper.GetViper())
 			steps := MustNewSteps(viper.New())
 
@@ -89,9 +92,7 @@ Requirements:
 
 func Flags(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringArrayVar(&stepFiles, "steps", nil, "paths to step files to overwrite default steps")
-	cmd.Flags().Bool("init-projections", viper.GetBool("init-projections"), "initializes projections after they are created")
-	err := viper.BindPFlag("InitProjections", cmd.Flags().Lookup("init-projections"))
-	logging.OnError(err).Fatal("unable to bind \"init-projections\" flag")
+	cmd.Flags().Bool("init-projections", viper.GetBool("InitProjections"), "initializes projections after they are created")
 	key.AddMasterKeyFlag(cmd)
 	tls.AddTLSModeFlag(cmd)
 }
