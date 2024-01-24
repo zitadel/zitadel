@@ -5,7 +5,6 @@ import (
 	"embed"
 	_ "embed"
 	"net/http"
-	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -55,7 +54,7 @@ Requirements:
 			err := tls.ModeFromFlag(cmd)
 			logging.OnError(err).Fatal("invalid tlsMode")
 
-			err = viper.BindPFlag("InitProjections", cmd.Flags().Lookup("init-projections"))
+			err = BindInitProjections(cmd)
 			logging.OnError(err).Fatal("unable to bind \"init-projections\" flag")
 
 			config := MustNewConfig(viper.GetViper())
@@ -82,12 +81,13 @@ func Flags(cmd *cobra.Command) {
 	tls.AddTLSModeFlag(cmd)
 }
 
+func BindInitProjections(cmd *cobra.Command) error {
+	return viper.BindPFlag("InitProjections.Enabled", cmd.Flags().Lookup("init-projections"))
+}
+
 func Setup(config *Config, steps *Steps, masterKey string) {
 	ctx := context.Background()
 	logging.Info("setup started")
-	if config.InitProjections {
-		logging.Info("init-projections is beta")
-	}
 
 	i18n.MustLoadSupportedLanguagesFromDir()
 
@@ -191,7 +191,14 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 		logging.OnError(err).Fatalf("unable to migrate repeatable step: %s", repeatableStep.String())
 	}
 
-	if config.InitProjections {
+	// These steps are executed after the repeatable steps because they add fields projections
+	err = migration.Migrate(ctx, eventstoreClient, steps.s18AddLowerFieldsToLoginNames)
+	logging.WithFields("name", steps.s18AddLowerFieldsToLoginNames.String()).OnError(err).Fatal("migration failed")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s21AddBlockFieldToLimits)
+	logging.WithFields("name", steps.s21AddBlockFieldToLimits.String()).OnError(err).Fatal("migration failed")
+
+	// projection initialization must be done last, since the steps above might add required columns to the projections
+	if config.InitProjections.Enabled {
 		initProjections(
 			ctx,
 			eventstoreClient,
@@ -201,12 +208,6 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 			config,
 		)
 	}
-
-	// These steps are executed after the repeatable steps because they add fields projections
-	err = migration.Migrate(ctx, eventstoreClient, steps.s18AddLowerFieldsToLoginNames)
-	logging.WithFields("name", steps.s18AddLowerFieldsToLoginNames.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s21AddBlockFieldToLimits)
-	logging.WithFields("name", steps.s21AddBlockFieldToLimits.String()).OnError(err).Fatal("migration failed")
 }
 
 func readStmt(fs embed.FS, folder, typ, filename string) (string, error) {
@@ -222,6 +223,8 @@ func initProjections(
 	masterKey string,
 	config *Config,
 ) {
+	logging.Info("init-projections is currently in beta")
+
 	keyStorage, err := cryptoDB.NewKeyStorage(queryDBClient, masterKey)
 	logging.OnError(err).Fatal("unable to start key storage")
 
@@ -233,13 +236,13 @@ func initProjections(
 		queryDBClient,
 		eventstoreClient,
 		projection.Config{
-			RetryFailedAfter: 100 * time.Millisecond,
-			MaxFailureCount:  2,
-			BulkLimit:        1000,
+			RetryFailedAfter: config.InitProjections.RetryFailedAfter,
+			MaxFailureCount:  config.InitProjections.MaxFailureCount,
+			BulkLimit:        config.InitProjections.BulkLimit,
 		},
 		keys.OIDC,
 		keys.SAML,
-		nil, // system users are only used for milestone checks
+		config.SystemAPIUsers,
 	)
 	logging.OnError(err).Fatal("unable to start projections")
 	for _, p := range projection.Projections() {
@@ -256,8 +259,8 @@ func initProjections(
 		admin_handler.Config{
 			Client:                queryDBClient,
 			Eventstore:            eventstoreClient,
-			BulkLimit:             1000,
-			FailureCountUntilSkip: 2,
+			BulkLimit:             config.InitProjections.BulkLimit,
+			FailureCountUntilSkip: uint64(config.InitProjections.MaxFailureCount),
 		},
 		adminView,
 		staticStorage,
@@ -297,8 +300,8 @@ func initProjections(
 		auth_handler.Config{
 			Client:                queryDBClient,
 			Eventstore:            eventstoreClient,
-			BulkLimit:             1000,
-			FailureCountUntilSkip: 2,
+			BulkLimit:             config.InitProjections.BulkLimit,
+			FailureCountUntilSkip: uint64(config.InitProjections.MaxFailureCount),
 		},
 		authView,
 		queries,

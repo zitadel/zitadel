@@ -1,8 +1,6 @@
 package start
 
 import (
-	"encoding/json"
-	"reflect"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -10,6 +8,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/encryption"
+	"github.com/zitadel/zitadel/cmd/systemapi"
 	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
@@ -62,7 +61,7 @@ type Config struct {
 	EncryptionKeys    *encryption.EncryptionKeyConfig
 	DefaultInstance   command.InstanceSetup
 	AuditLogRetention time.Duration
-	SystemAPIUsers    SystemAPIUsers
+	SystemAPIUsers    systemapi.Users
 	CustomerPortal    string
 	Machine           *id.Config
 	Actions           *actions.Config
@@ -92,7 +91,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
 			actions.HTTPConfigDecodeHook,
-			systemAPIUsersDecodeHook,
+			systemapi.UsersDecodeHook,
 			hook.EnumHookFunc(domain.FeatureString),
 			hook.EnumHookFunc(internal_authz.MemberTypeString),
 		)),
@@ -112,23 +111,4 @@ func MustNewConfig(v *viper.Viper) *Config {
 	actions.SetHTTPConfig(&config.Actions.HTTP)
 
 	return config
-}
-
-type SystemAPIUsers map[string]*internal_authz.SystemAPIUser
-
-func systemAPIUsersDecodeHook(from, to reflect.Value) (any, error) {
-	if to.Type() != reflect.TypeOf(SystemAPIUsers{}) {
-		return from.Interface(), nil
-	}
-
-	data, ok := from.Interface().(string)
-	if !ok {
-		return from.Interface(), nil
-	}
-	users := make(SystemAPIUsers)
-	err := json.Unmarshal([]byte(data), &users)
-	if err != nil {
-		return nil, err
-	}
-	return users, nil
 }

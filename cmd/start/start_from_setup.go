@@ -29,7 +29,7 @@ Requirements:
 			masterKey, err := key.MasterKey(cmd)
 			logging.OnError(err).Panic("No master key provided")
 
-			err = viper.BindPFlag("InitProjections", cmd.Flags().Lookup("init-projections"))
+			err = setup.BindInitProjections(cmd)
 			logging.OnError(err).Fatal("unable to bind \"init-projections\" flag")
 
 			setupConfig := setup.MustNewConfig(viper.GetViper())
