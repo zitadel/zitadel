@@ -13,11 +13,11 @@ import (
 
 const (
 	StartedType        = eventstore.EventType("system.migration.started")
-	doneType           = eventstore.EventType("system.migration.done")
+	DoneType           = eventstore.EventType("system.migration.done")
 	failedType         = eventstore.EventType("system.migration.failed")
 	repeatableDoneType = eventstore.EventType("system.migration.repeatable.done")
-	aggregateType      = eventstore.AggregateType("system")
-	aggregateID        = "SYSTEM"
+	SystemAggregate    = eventstore.AggregateType("system")
+	SystemAggregateID  = "SYSTEM"
 )
 
 var (

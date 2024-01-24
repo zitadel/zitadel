@@ -10,10 +10,10 @@ import (
 )
 
 func init() {
-	eventstore.RegisterFilterEventMapper(aggregateType, StartedType, SetupMapper)
-	eventstore.RegisterFilterEventMapper(aggregateType, doneType, SetupMapper)
-	eventstore.RegisterFilterEventMapper(aggregateType, failedType, SetupMapper)
-	eventstore.RegisterFilterEventMapper(aggregateType, repeatableDoneType, SetupMapper)
+	eventstore.RegisterFilterEventMapper(SystemAggregate, StartedType, SetupMapper)
+	eventstore.RegisterFilterEventMapper(SystemAggregate, DoneType, SetupMapper)
+	eventstore.RegisterFilterEventMapper(SystemAggregate, failedType, SetupMapper)
+	eventstore.RegisterFilterEventMapper(SystemAggregate, repeatableDoneType, SetupMapper)
 }
 
 // SetupStep is the command pushed on the eventstore
@@ -30,7 +30,7 @@ func setupStartedCmd(ctx context.Context, migration Migration) eventstore.Comman
 	return &SetupStep{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			eventstore.NewAggregate(ctx, aggregateID, aggregateType, "v1"),
+			eventstore.NewAggregate(ctx, SystemAggregateID, SystemAggregate, "v1"),
 			StartedType),
 		migration: migration,
 		Name:      migration.String(),
@@ -39,7 +39,7 @@ func setupStartedCmd(ctx context.Context, migration Migration) eventstore.Comman
 
 func setupDoneCmd(ctx context.Context, migration Migration, err error) eventstore.Command {
 	ctx = authz.SetCtxData(service.WithService(ctx, "system"), authz.CtxData{UserID: "system", OrgID: "SYSTEM", ResourceOwner: "SYSTEM"})
-	typ := doneType
+	typ := DoneType
 	var lastRun interface{}
 	if repeatable, ok := migration.(RepeatableMigration); ok {
 		typ = repeatableDoneType
@@ -58,7 +58,7 @@ func setupDoneCmd(ctx context.Context, migration Migration, err error) eventstor
 
 	s.BaseEvent = *eventstore.NewBaseEventForPush(
 		ctx,
-		eventstore.NewAggregate(ctx, aggregateID, aggregateType, "v1"),
+		eventstore.NewAggregate(ctx, SystemAggregateID, SystemAggregate, "v1"),
 		typ)
 
 	return s

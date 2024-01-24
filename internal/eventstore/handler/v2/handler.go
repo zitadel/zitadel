@@ -146,9 +146,53 @@ func (h *Handler) Start(ctx context.Context) {
 	go h.subscribe(ctx)
 }
 
+type checkInit struct {
+	didInit        bool
+	projectionName string
+}
+
+// AppendEvents implements eventstore.QueryReducer.
+func (ci *checkInit) AppendEvents(...eventstore.Event) {
+	ci.didInit = true
+}
+
+// Query implements eventstore.QueryReducer.
+func (ci *checkInit) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		Limit(1).
+		InstanceID("").
+		AddQuery().
+		AggregateTypes(migration.SystemAggregate).
+		AggregateIDs(migration.SystemAggregateID).
+		EventTypes(migration.DoneType).
+		EventData(map[string]interface{}{
+			"name": ci.projectionName,
+		}).
+		Builder()
+}
+
+// Reduce implements eventstore.QueryReducer.
+func (*checkInit) Reduce() error {
+	return nil
+}
+
+var _ eventstore.QueryReducer = (*checkInit)(nil)
+
+func (h *Handler) didInitialize(ctx context.Context) bool {
+	var initiated checkInit
+	err := h.es.FilterToQueryReducer(ctx, &initiated)
+	if err != nil {
+		return false
+	}
+	return initiated.didInit
+}
+
 func (h *Handler) schedule(ctx context.Context) {
 	//  start the projection and its configured `RequeueEvery`
 	reset := randomizeStart(0, h.requeueEvery.Seconds())
+	if !h.didInitialize(ctx) {
+		reset = randomizeStart(0, 0.5)
+	}
 	t := time.NewTimer(reset)
 
 	for {
