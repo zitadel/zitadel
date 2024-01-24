@@ -179,7 +179,9 @@ func (*checkInit) Reduce() error {
 var _ eventstore.QueryReducer = (*checkInit)(nil)
 
 func (h *Handler) didInitialize(ctx context.Context) bool {
-	var initiated checkInit
+	initiated := checkInit{
+		projectionName: h.ProjectionName(),
+	}
 	err := h.es.FilterToQueryReducer(ctx, &initiated)
 	if err != nil {
 		return false
