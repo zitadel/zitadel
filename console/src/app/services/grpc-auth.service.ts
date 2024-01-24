@@ -371,6 +371,11 @@ export class GrpcAuthService {
     return this.grpcService.auth.listMyAuthFactors(new ListMyAuthFactorsRequest(), null).then((resp) => resp.toObject());
   }
 
+  public async revalidateOrgs() {
+    const orgs = (await this.listMyProjectOrgs()).resultList;
+    this.cachedOrgs.next(orgs);
+  }
+
   public listMyProjectOrgs(
     limit?: number,
     offset?: number,
