@@ -232,12 +232,19 @@ pre code {
 }
 
 h1 {
-  font-size: 2.2rem;
+  font-size: 3rem;
 }
 
 h2 {
-  font-size: 1.8rem;
+  font-size: 2.5rem;
+  margin-top: 2.5rem;
 }
+
+h3 {
+  font-size: 2rem;
+  margin-top: 2.5rem;
+}
+
 
 .navbar__brand {
   height: 40px;
