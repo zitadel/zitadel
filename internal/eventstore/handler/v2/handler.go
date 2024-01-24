@@ -12,6 +12,8 @@ import (
 
 	"github.com/jackc/pgconn"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
@@ -66,12 +68,23 @@ var _ migration.Migration = (*Handler)(nil)
 
 // Execute implements migration.Migration.
 func (h *Handler) Execute(ctx context.Context, startedEvent eventstore.Event) error {
+	start := time.Now()
+	logging.WithFields("projection", h.ProjectionName()).Info("projection starts prefilling")
+	logTicker := time.NewTicker(30 * time.Second)
+	go func() {
+		for range logTicker.C {
+			logging.WithFields("projection", h.ProjectionName()).Info("projection is prefilling")
+		}
+	}()
+
 	instanceIDs, err := h.existingInstances(ctx)
 	if err != nil {
 		return err
 	}
 
 	h.triggerInstances(ctx, instanceIDs, WithMaxPosition(startedEvent.Position()))
+	logTicker.Stop()
+	logging.WithFields("projection", h.ProjectionName(), "took", time.Since(start)).Info("projections ended prefilling")
 	return nil
 }
 
