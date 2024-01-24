@@ -76,7 +76,7 @@ Requirements:
 
 func Flags(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringArrayVar(&stepFiles, "steps", nil, "paths to step files to overwrite default steps")
-	cmd.Flags().Bool("init-projections", viper.GetBool("InitProjections"), "initializes projections after they are created")
+	cmd.Flags().Bool("init-projections", viper.GetBool("InitProjections"), "beta feature: initializes projections after they are created, allows smooth start as projections are up to date")
 	key.AddMasterKeyFlag(cmd)
 	tls.AddTLSModeFlag(cmd)
 }
