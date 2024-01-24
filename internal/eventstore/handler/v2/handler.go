@@ -66,7 +66,7 @@ var _ migration.Migration = (*Handler)(nil)
 
 // Execute implements migration.Migration.
 func (h *Handler) Execute(ctx context.Context, startedEvent eventstore.Event) error {
-	instanceIDs, err := h.activeInstances(ctx)
+	instanceIDs, err := h.existingInstances(ctx)
 	if err != nil {
 		return err
 	}
@@ -228,10 +228,10 @@ func checkAdditionalEvents(eventQueue chan eventstore.Event, event eventstore.Ev
 	}
 }
 
-type activeInstances []string
+type existingInstances []string
 
 // AppendEvents implements eventstore.QueryReducer.
-func (ai *activeInstances) AppendEvents(events ...eventstore.Event) {
+func (ai *existingInstances) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch event.Type() {
 		case instance.InstanceAddedEventType:
@@ -245,7 +245,7 @@ func (ai *activeInstances) AppendEvents(events ...eventstore.Event) {
 }
 
 // Query implements eventstore.QueryReducer.
-func (*activeInstances) Query() *eventstore.SearchQueryBuilder {
+func (*existingInstances) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
 		AggregateTypes(instance.AggregateType).
@@ -258,15 +258,15 @@ func (*activeInstances) Query() *eventstore.SearchQueryBuilder {
 
 // Reduce implements eventstore.QueryReducer.
 // reduce is not used as events are reduced during AppendEvents
-func (*activeInstances) Reduce() error {
+func (*existingInstances) Reduce() error {
 	return nil
 }
 
-var _ eventstore.QueryReducer = (*activeInstances)(nil)
+var _ eventstore.QueryReducer = (*existingInstances)(nil)
 
 func (h *Handler) queryInstances(ctx context.Context) ([]string, error) {
 	if h.handleActiveInstances == 0 {
-		return h.activeInstances(ctx)
+		return h.existingInstances(ctx)
 	}
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).
@@ -277,8 +277,8 @@ func (h *Handler) queryInstances(ctx context.Context) ([]string, error) {
 	return h.es.InstanceIDs(ctx, h.requeueEvery, false, query)
 }
 
-func (h *Handler) activeInstances(ctx context.Context) ([]string, error) {
-	ai := activeInstances{}
+func (h *Handler) existingInstances(ctx context.Context) ([]string, error) {
+	ai := existingInstances{}
 	if err := h.es.FilterToQueryReducer(ctx, &ai); err != nil {
 		return nil, err
 	}
