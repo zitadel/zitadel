@@ -1,0 +1,174 @@
+---
+title: Impersonation for embedded SDK with ZITADEL
+sidebar_label: Embedded SDK
+---
+
+Through conversations with our users we encountered a use case that requires to embed an SDK in an existing mobile application and making secure calls to a backend API to store and query additional information.
+Examples of such cases:
+
+- You create a software that enhances existing banking (mobile) applications by providing additional services to the bank's customers. Your service requires integration with the mobile banking application of many banks. Data must be shared securely with a backend API to provide your services, e.g. user profile, analyzing expenditures, calculating portfolio returns, etc.
+- You create software that enables health insurances to provide additional services to their customers. Your service requires integration with the mobile application of many insurances and healthcare providers. Data must be shared securely with a backend API to provide your services, e.g. user profile, fitness data, user uploads
+
+A simple solution would be use a service account's secret in the mobile application to communicate with your backend.
+We consider saving a long-lived secrets in the mobile application unsafe, as this is a public client and the credentials could be leaked.
+
+In this solution scenario guide we describe a solution that uses impersonation of users and is considered best practice in our view, balancing security and integration effort.
+We will also highlight some [alternative approaches](#alternative-approaches).
+
+:::warning Draft guide with missing features
+
+Be aware that there are some missing features that do not allow you to configure this scenario in ZITADEL.
+At the moment this guide is only a draft to validate the idea.
+
+See also the following discussions
+
+- https://github.com/zitadel/zitadel/discussions/6006
+- https://github.com/zitadel/zitadel/discussions/5895
+
+Session API:
+
+- Impersonation/Delegation functionality
+- [Return AT/IDT/JWT](ttps://github.com/zitadel/zitadel/issues/6700)
+
+[Session Check Token Provider](https://github.com/zitadel/zitadel/issues/6701):
+
+- Call user_info endpoint (public)
+- Call introspect endpoint (with credentials)
+- Discover issuer in token (or just iterate like KC)
+
+Configuration:
+
+- opaque tokens: issuer must be submitted
+- Issuer whitelisting
+- Limit permissions of a client to only allow token exchange
+
+:::warning
+
+## Solution architecture
+
+Your SDK needs to have access to the application's user access token for this solution to work.
+This solution is on of multiple [alternative approaches](#alternative-approaches), in the mentioned precondition is too strict.
+The solution is considered best practice, however, in our view balancing security and effort of integration.
+
+![Solution Architecture](/img/guides/solution-scenarios/solution-scenario-embedded-sdk.svg)
+
+### Components
+
+Your customer has a **Customer Mobile App** that is being used by their **End Users**.
+**End Users** authenticate via the **Customer IDP**.
+The **Customer Mobile App** stores the **App Access Token** created by the **Customer IDP** after successful authentication of an **End User**.
+
+**Provider SDK** is embedded into the **Customer Mobile App** and being managed by you (the Provider).
+The **Provider SDK** can make requests to **SDK Backend API** and **Other Service API** over the internet.
+Calling either of the services requires a valid access token, but for **Other Service API** it needs to be an **Backend Access Token** issued by the Providers' IDP, **ZITADEL**.
+
+### Sequence
+
+1. End user wants to sign into their account on the Customer Mobile App
+2. The Customer Mobile App redirects to the Customer IDP. This is typically done via an embedded browser or by an IDP specific mechanism.
+3. The Customer IDP returns an access token which is accessible by the Customer Mobile App. Note that this is somewhat a simplification of the actual OpenID Connect flow.
+4. At this point the Provider SDK wants to communicate securely with the Provider backend services. The Provider SDK thus accesses the App Access Token
+5. The Provider SDK sends an "authentication request" to the SDK Backend API along with the App Access Token and any contextual information that might be required (eg, for opaque tokens the issuer url)
+6. The SDK Backend API sends an impersonation request to ZITADEL. This requests contains the End User's App Access Token.
+7. ZITADEL tries to validate the App Access Token with the Customer IDP. The Customer IDP must be on a configured allowlist and is discovered either by the contents of the Access Token or via the additional request parameters. ZITADEL uses the Customer IDP's public user_info endpoint to validate the token and retrieve the user profile.
+8. ZITADEL then returns a short-lived Backend Access Token to the SDK Backend API.
+9. The SDK Backend API returns the Backend Access Token as successful response to the request issued in Step 5
+10. Now the Provider SDK is in possession of a short-lived access token that can be used to call either the SDK Backend API directly, and any other service registered with ZITADEL, such as Other Service API. Additionally Provider SDK (or a proxy-backend) can get user permissions from ZITADEL.
+
+### Considerations
+
+- You should limit permissions of the client application (SDK Backend API) to only allow token exchange to reduce the attack surface
+- You could instruct ZITADEL to use the introspection endpoint to validate tokens instead of the public userinfo_endpoint. The introspection endpoint requires ZITADEL to authenticate with Customer IDP. Consequently this means that ZITADEL must be pre-registered as application on the Customer IDP. This would increase the security slightly, but makes the setup generally more complicated
+  
+## Benefits
+
+In some cases this solution might seem like a lot of effort.
+And you might wonder why is ZITADEL needed at all and why you shouldn't just send the info straight to an endpoint?
+The following benefits can be gained by using this solution for embedding an SDK.
+In the section [alternative approaches](#alternative-approaches) we discuss potential other solutions briefly.
+
+### Short-lived secret
+
+One of the major benefits with this solution is that you don't store long-lived secrets, such as service user credentials, on a public client.
+Instead you can adhere to OpenID Connect / OAuth 2.0 best practices using short-lived access tokens, even in combination with refresh tokens.
+With that you reduce the impact of accidental exposure of secrets significantly.
+
+### Token revocation
+
+As mentioned, you can use [short-lived secrets](#short-lived-secret) in form of access tokens.
+One major benefit with this solution is that you are able to revoke tokens, for example in cases where the user logged out of the Customer Mobile App or in cases where some security concerns where raised and the user needs to get a new access token.
+When using opaque tokens instead of JWT tokens, you can control the expiration and revocation of tokens even further, as the clients have to request all user information from ZITADEL directly.
+
+### Audit trail
+
+With the impersonation pattern all requests are made transparently in the context of the user.
+ZITADEL provides you with a complete audit trail of access and events that are associated to the user.
+
+### Using multiple services
+
+Given you have multiple endpoints and services that should be accessible by your customers' end-users, then you need to implement some kind of single-sign-on pattern for your services.
+ZITADEL will act as central IDP where all your applications are registered.
+You exchanged the App Access Token for an Backend Access Token that was issues by ZITADEL, so that you can make requests from your SDK to your applications using the Backend Access Token.
+Your applications can then validate that access token directly with ZITADEL and request additional information such as user profile and permissions.
+
+### User permissions
+
+In case you want to give users permission or roles, you need a service to manage and provide that information.
+ZITADEL can provide you with the required role management and self-service in multi-tenancy scenarios to give permissions to users.
+You could, for example, assign roles in ZITADEL automatically based on the end-user's attributes and then use these roles in your applications / backend services.
+
+## Implementation
+
+:::warning Draft guide
+see disclaimer above; this is just the outline of the guide for now
+:::
+
+### Configuration
+
+- Create client application (API)
+- Enable token exchange
+- Add Customer IDP (separate instance) to allowlist
+- Limit permissions to token exchange
+
+### Create users
+
+- Create user on the fly if the user does not exist
+- Add basic roles to the user with Action
+
+### Impersonate users
+
+- request to impersonate token
+- validate token with Customer IDP
+- return access token as JWT
+
+## Alternative approaches
+
+The outlined solution might not work in every case.
+Specifically when you don't have access to the App Access Token or the Customer Mobile App uses a very proprietary authentication, then you might need to use an alternative approach.
+
+### Service accounts
+
+In this solution you would authenticate requests from your SDK to your backend by using service users.
+Given you have created a service user in ZITADEL, then you need to store the service user secret (privately signed JWT, client credential, or personal access token) in your SDK.
+The SDK will then use the secret to [authenticate the service user](/docs/guides/integrate/serviceusers) and send an valid access token along the requests to your backend services.
+Your backend services then can validate the access token with ZITADEL.
+
+It is not safe to include service account secrets into your SDK, since Native/Mobile Apps are considered public clients [unable to maintain confidentiality](/docs/guides/integrate/oauth-recommended-flows#different-client-profiles) of their credentials.
+You need to evaluate the risks and benefits of this approach thoroughly.
+
+### Create a session from user context
+
+If you don't have access to the App Access Token, you could create directly a session in ZITADEL to get an access token.
+You could take the user context to create a new user in ZITADEL and request a session only based on the username without further authentication.
+
+This approach is less secure, because the trust is not between Customer IDP and ZITADEL but instead between SDK and Customer Mobile App.
+
+### Backend service customer-side
+
+In this approach, you would deploy the SDK Backend API on customer side.
+The SDK Backend API can validate the App Access Token with Customer IDP.
+SDK Backend API can securely hold service account secrets to authenticate with your backend services.
+
+You could use an impersonation pattern as described in this guide or directly communicate through the service account with your APIs.
+
+This pattern would slightly increase the security over other approaches, but raises the number of secrets handled and the complexity of integration.
