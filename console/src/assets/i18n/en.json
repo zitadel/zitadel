@@ -2255,7 +2255,8 @@
     "TOAST": {
       "UPDATED": "Authorization updated.",
       "REMOVED": "Authorization removed",
-      "BULKREMOVED": "Authorizations removed."
+      "BULKREMOVED": "Authorizations removed.",
+      "CANTSHOWINFO": "You cannot visit this user's profile as you are not a member of the organization where this user belongs to"
     },
     "DIALOG": {
       "DELETE_TITLE": "Delete authorization",
