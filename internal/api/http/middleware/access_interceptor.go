@@ -93,10 +93,11 @@ func (a *AccessInterceptor) Limit(w http.ResponseWriter, r *http.Request, public
 	remaining := a.logstoreSvc.Limit(ctx, instance.InstanceID())
 	if remaining != nil {
 		if remaining != nil && *remaining > 0 {
-			a.SetExhaustedCookie(w, r)
-			return true
+			deleteCookie = true
+			return false
 		}
-		deleteCookie = true
+		a.SetExhaustedCookie(w, r)
+		return true
 	}
 	return false
 }

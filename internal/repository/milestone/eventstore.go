@@ -4,6 +4,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-func RegisterEventMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(AggregateType, PushedEventType, PushedEventMapper)
+func init() {
+	eventstore.RegisterFilterEventMapper(AggregateType, PushedEventType, PushedEventMapper)
 }
