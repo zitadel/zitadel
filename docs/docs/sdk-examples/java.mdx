@@ -22,7 +22,7 @@ sidebar_label: Java Spring Boot
 - [Example Web App with Spring Security](https://github.com/zitadel/zitadel-java/web)
 - [Example API App with Spring Security](https://github.com/zitadel/zitadel-java/api)
 - [Web APP Step-By-Step Guide](/docs/examples/login/java-spring)
-- [API APP Step-By-Step Guide](/docs/examples/secur-api/java-spring)
+- [API APP Step-By-Step Guide](/docs/examples/secure-api/java-spring)
 
 ### Java SDK
 
@@ -73,8 +73,31 @@ What does the API Application Example include:
 
 ### Step-By-Step Guide
 
-The [Step-By-Step Guide](/docs/examples/login/vue) leads you through the whole process from configuring the right application in ZITADEL to a ready application with integrated login or authentication checks.
+For Java Spring we do have two different Step-By-Step Guides.
+One to create your web application with integrated login and one to create your API with permission checks for calling users.
+The guides lead you through the whole process from configuring the right application in ZITADEL to a ready application with integrated login or authentication checks.
 
 #### Web Application Guide
 
+After completing the Step-By-Step Guide you will have:
+1. Example Web Application with integrated ZITADEL Login
+2. Example page accessible by authenticated user showing retrieved user information
+3. Example page accessible by authenticated user showing task list
+   - Task list can be read by authenticated user
+   - New tasks can be created by user with admin role
+4. Logout
+5. Correct setup for your application in ZITADEL
+
+[API APP Step-By-Step Guide](/docs/examples/secure-api/java-spring)
+![Profile Page](/img/java-spring/app-profile.png)
+
 #### API Application Guide
+
+After completing the Step-By-Step Guide you will have:
+1. Example REST API checking tokens against ZITADEL with OAuth2
+2. Public Endpoint accessible by any user
+3. Public Endpoint accessible by authenticated user
+4. Public Endpoint accessible by user with role 'admin'
+5. Correct setup for your application in ZITADEL
+
+[API APP Step-By-Step Guide](/docs/examples/secure-api/java-spring)
