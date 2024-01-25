@@ -518,6 +518,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 	}
 
 	lastProcessedIndex, err := h.executeStatements(ctx, tx, currentState, statements)
+	h.log().OnError(err).WithField("lastProcessedIndex", lastProcessedIndex).Debug("execution of statements failed")
 	if lastProcessedIndex < 0 {
 		return false, err
 	}
