@@ -92,6 +92,11 @@ func (h *Handler) Execute(ctx context.Context, startedEvent eventstore.Event) er
 	if workerCount == 0 {
 		workerCount = 1
 	}
+	// spawn less workers if not all workers needed
+	if workerCount > len(instanceIDs) {
+		workerCount = len(instanceIDs)
+	}
+
 	instances := make(chan string, workerCount)
 	var wg sync.WaitGroup
 	wg.Add(workerCount)

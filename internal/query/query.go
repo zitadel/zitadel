@@ -52,6 +52,7 @@ func StartQueries(
 	permissionCheck func(q *Queries) domain.PermissionCheck,
 	defaultAuditLogRetention time.Duration,
 	systemAPIUsers map[string]*authz.SystemAPIUser,
+	startProjections bool,
 ) (repo *Queries, err error) {
 	repo = &Queries{
 		eventstore:                          es,
@@ -78,7 +79,9 @@ func StartQueries(
 	if err != nil {
 		return nil, err
 	}
-	projection.Start(ctx)
+	if startProjections {
+		projection.Start(ctx)
+	}
 
 	return repo, nil
 }

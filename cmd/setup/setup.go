@@ -291,6 +291,7 @@ func initProjections(
 		},
 		0,   // not needed for projections
 		nil, // not needed for projections
+		false,
 	)
 	logging.OnError(err).Fatal("unable to start queries")
 
