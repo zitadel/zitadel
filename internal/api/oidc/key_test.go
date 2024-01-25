@@ -66,100 +66,100 @@ var (
 			seq:    3,
 			expiry: clock.Now().Add(10 * time.Hour),
 		},
+		"exp1": {
+			id:     "key2",
+			alg:    "alg",
+			use:    domain.KeyUsageSigning,
+			seq:    4,
+			expiry: clock.Now().Add(-time.Hour),
+		},
 	}
 )
 
-func queryKeyDB(_ context.Context, keyID string, current time.Time) (query.PublicKey, error) {
+func queryKeyDB(_ context.Context, keyID string) (query.PublicKey, error) {
 	if key, ok := keyDB[keyID]; ok {
 		return key, nil
 	}
 	return nil, errors.New("not found")
 }
 
-func Test_keySetCache(t *testing.T) {
+func Test_publicKeyCache(t *testing.T) {
 	background, cancel := context.WithCancel(
 		clockwork.AddToContext(context.Background(), clock),
 	)
 	defer cancel()
 
-	// create an empty keySet with a purge go routine, runs every Hour
-	keySet := newKeySet(background, time.Hour, queryKeyDB)
+	// create an empty cache with a purge go routine, runs every minute.
+	// keys are cached for at least 1 Hour after last use.
+	cache := newPublicKeyCache(background, time.Hour, queryKeyDB)
 	ctx := authz.NewMockContext("instanceID", "orgID", "userID")
 
 	// query error
-	_, err := keySet.getKey(ctx, "key9")
+	_, err := cache.getKey(ctx, "key9")
 	require.Error(t, err)
 
-	want := &jose.JSONWebKey{
-		KeyID:     "key1",
-		Algorithm: "alg",
-		Use:       domain.KeyUsageSigning.String(),
-	}
-
 	// get key first time, populate the cache
-	got, err := keySet.getKey(ctx, "key1")
+	got, err := cache.getKey(ctx, "key1")
 	require.NoError(t, err)
-	assert.Equal(t, want, got)
+	require.NotNil(t, got)
+	assert.Equal(t, keyDB["key1"], got.PublicKey)
 
 	// move time forward
-	clock.Advance(5 * time.Minute)
+	clock.Advance(15 * time.Minute)
 	time.Sleep(time.Millisecond)
 
 	// key should still be in cache
-	keySet.mtx.RLock()
-	_, ok := keySet.instanceKeys["instanceID"]["key1"]
+	cache.mtx.RLock()
+	_, ok := cache.instanceKeys["instanceID"]["key1"]
 	require.True(t, ok)
-	keySet.mtx.RUnlock()
-
-	// the key is expired, should error
-	_, err = keySet.getKey(ctx, "key1")
-	require.Error(t, err)
-
-	want = &jose.JSONWebKey{
-		KeyID:     "key2",
-		Algorithm: "alg",
-		Use:       domain.KeyUsageSigning.String(),
-	}
-
-	// get the second key from DB
-	got, err = keySet.getKey(ctx, "key2")
-	require.NoError(t, err)
-	assert.Equal(t, want, got)
+	cache.mtx.RUnlock()
 
 	// move time forward
-	clock.Advance(time.Hour)
+	clock.Advance(50 * time.Minute)
 	time.Sleep(time.Millisecond)
 
-	// first key shoud be purged, second still present
-	keySet.mtx.RLock()
-	_, ok = keySet.instanceKeys["instanceID"]["key1"]
-	require.False(t, ok)
-	_, ok = keySet.instanceKeys["instanceID"]["key2"]
-	require.True(t, ok)
-	keySet.mtx.RUnlock()
-
-	// get the second key from cache
-	got, err = keySet.getKey(ctx, "key2")
+	// get the second key from DB
+	got, err = cache.getKey(ctx, "key2")
 	require.NoError(t, err)
-	assert.Equal(t, want, got)
+	require.NotNil(t, got)
+	assert.Equal(t, keyDB["key2"], got.PublicKey)
 
 	// move time forward
-	clock.Advance(10 * time.Hour)
+	clock.Advance(15 * time.Minute)
+	time.Sleep(time.Millisecond)
+
+	// first key should be purged, second still present
+	cache.mtx.RLock()
+	_, ok = cache.instanceKeys["instanceID"]["key1"]
+	require.False(t, ok)
+	_, ok = cache.instanceKeys["instanceID"]["key2"]
+	require.True(t, ok)
+	cache.mtx.RUnlock()
+
+	// get the second key from cache
+	got, err = cache.getKey(ctx, "key2")
+	require.NoError(t, err)
+	require.NotNil(t, got)
+	assert.Equal(t, keyDB["key2"], got.PublicKey)
+
+	// move time forward
+	clock.Advance(2 * time.Hour)
 	time.Sleep(time.Millisecond)
 
 	// now the cache should be empty
-	keySet.mtx.RLock()
-	assert.Empty(t, keySet.instanceKeys)
-	keySet.mtx.RUnlock()
+	cache.mtx.RLock()
+	assert.Empty(t, cache.instanceKeys)
+	cache.mtx.RUnlock()
 }
 
-func Test_keySetCache_VerifySignature(t *testing.T) {
+func Test_oidcKeySet_VerifySignature(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	k := newKeySet(ctx, time.Second, queryKeyDB)
+	cache := newPublicKeyCache(ctx, time.Second, queryKeyDB)
 
 	tests := []struct {
 		name string
+		opts []keySetOption
 		jws  *jose.JSONWebSignature
 	}{
 		{
@@ -186,9 +186,33 @@ func Test_keySetCache_VerifySignature(t *testing.T) {
 				}},
 			},
 		},
+		{
+			name: "expired, no check",
+			jws: &jose.JSONWebSignature{
+				Signatures: []jose.Signature{{
+					Header: jose.Header{
+						KeyID: "exp1",
+					},
+				}},
+			},
+		},
+		{
+			name: "expired, with check",
+			jws: &jose.JSONWebSignature{
+				Signatures: []jose.Signature{{
+					Header: jose.Header{
+						KeyID: "exp1",
+					},
+				}},
+			},
+			opts: []keySetOption{
+				withKeyExpiryCheck(true),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			k := newOidcKeySet(cache, tt.opts...)
 			_, err := k.VerifySignature(ctx, tt.jws)
 			require.Error(t, err)
 		})
