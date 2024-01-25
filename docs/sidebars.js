@@ -61,9 +61,45 @@ module.exports = {
       },
       items: [
         "sdk-examples/angular",
+        "sdk-examples/flutter",
         "sdk-examples/java",
         "sdk-examples/symfony",
         "sdk-examples/vue",
+        {
+          type: "link",
+          label: "Dart",
+          href: "https://github.com/smartive/zitadel-dart",
+        },
+        {
+          type: "link",
+          label: "Elixir",
+          href: "https://github.com/maennchen/zitadel_api",
+        },
+        {
+          type: "link",
+          label: "NextAuth",
+          href: "https://next-auth.js.org/providers/zitadel",
+        },
+        {
+          type: "link",
+              label: "NodeJs",
+            href: "https://www.npmjs.com/package/@zitadel/node",
+        },
+        {
+          type: "link",
+          label: ".Net",
+          href: "https://github.com/smartive/zitadel-net",
+        },
+        {
+          type: "link",
+          label: "Passport Js",
+          href: "https://github.com/buehler/node-passport-zitadel",
+        },
+        {
+          type: "link",
+          label: "Rust",
+          href: "https://github.com/smartive/zitadel-rust",
+        },
       ],
     },
     {

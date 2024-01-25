@@ -1,0 +1,82 @@
+---
+title: Go
+sidebar_label: Go
+---
+
+<table>
+    <tr>
+        <td width="100px">
+            <img width="100px" src="/docs/img/tech/go.svg" alt="go logo"/>
+        </td>
+        <td>
+            <a href="https://go.dev/" target="_blank">Go</a> is an open-source, compiled programming language that is known for its simplicity, efficiency, and concurrency capabilities.
+            Get started integrating authentication to your Go Application by checking out our <a href="https://github.com/zitadel/zitadel-go" target="_blank">zitadel-go</a> SDK.
+        </td>
+    </tr>
+</table>
+
+
+### Links
+- [Example App Repository](https://github.com/zitadel/zitadel-go)
+- [Go SDK](https://github.com/zitadel/zitadel-go)
+- [Web APP Step-By-Step Guide](/docs/examples/login/go)
+- [API APP Step-By-Step Guide](/docs/examples/secure-api/go)
+
+### Go SDK
+
+???
+
+### Go Examples
+
+You can find different examples for building your go application in the following package of the repository:
+[zitadel-go/example](https://github.com/zitadel/zitadel-go/tree/next/example)
+
+#### Web Application Example
+
+What does the Web Application Example include:
+- Home Page with Login Button
+- Authenticating user with OIDC PKCE Flow
+- Public Page: Accessible without authentication
+- Private Page: Shows user information of authenticated user, only accessible after login
+- Administrator Page: Only accessible after login and with specific administrator role for the application
+- Logout
+
+[Example Web App](https://github.com/zitadel/zitadel-go/tree/next/example/app)
+
+#### API Application Example
+
+What does the API Application Example include:
+- REST API Application secured with Spring Security and OAuth2
+- Public Endpoint: Accessible without authentication
+- Private Endpoint: Accessible with a token
+- Administrator Endpoint: Accessible with a token of a user with admin role
+
+[https://github.com/zitadel/zitadel-go/tree/next/example/api/http)
+
+### Step-By-Step Guide
+
+For Go we do have two different Step-By-Step Guides.
+One to create your web application with integrated login and one to create your API with permission checks for calling users.
+The guides lead you through the whole process from configuring the right application in ZITADEL to a ready application with integrated login or authentication checks.
+
+#### Web Application Guide
+
+After completing the Step-By-Step Guide you will have:
+1. Example Web Application with integrated ZITADEL Login
+2. Example page accessible by authenticated user showing retrieved user information
+4. Logout
+5. Correct setup for your application in ZITADEL
+
+[API APP Step-By-Step Guide](/docs/examples/secure-api/java-spring)
+![Profile Page](/img/java-spring/app-profile.png)
+
+#### API Application Guide
+
+After completing the Step-By-Step Guide you will have:
+1. Example REST API checking tokens against ZITADEL with OAuth2
+2. Public Endpoint accessible by any user
+3. Public Endpoint accessible by authenticated user
+4. Public Endpoint accessible by user with role 'admin'
+5. Correct setup for your application in ZITADEL
+
+[API APP Step-By-Step Guide](/docs/examples/secure-api/java-spring)
