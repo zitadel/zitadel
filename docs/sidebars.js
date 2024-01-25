@@ -45,7 +45,7 @@ module.exports = {
         },
       ],
     },
-    "examples/sdks",
+    //"examples/sdks",
     {
       type: "category",
       label: "Examples & SDKs",
