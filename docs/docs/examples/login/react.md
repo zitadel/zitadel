@@ -1,6 +1,6 @@
 ---
-title: ZITADEL with Vue
-sidebar_label: Vue
+title: ZITADEL with React
+sidebar_label: React
 ---
 
 This integration guide demonstrates the recommended way to incorporate ZITADEL into your React application.
@@ -36,12 +36,9 @@ Configure a redirect URIs to _http:/<span></span>/localhost:5173/auth/signinwin/
 
 Continue and create the application.
 
-### Refresh Token and Client ID
+### Copy Client ID
 
-After successful creation of the app, make sure you tick the checkbox to enable refresh tokens.
-Also copy the client ID, as you will need it to configure your React client.
-
-![Tick refresh token checkbox](/img/react/tick-refresh-token.png)
+After successful creation of the app, make sure copy the client ID, as you will need it to configure your React client.
 
 ## Create a project role "admin" and assign it to your user
 
@@ -53,14 +50,14 @@ Also note the projects resource ID, as you will need it to configure your React 
 
 ## React setup
 
-Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your Vue client.
+Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your React client.
 
 ### Install React dependencies
 
 To conveniently connect with ZITADEL, you can install the [@zitadel/react NPM package](https://www.npmjs.com/package/@zitadel/react). Run the following command:
 
 ```bash
-npm install --save @zitadel/react
+yarn add @zitadel/react
 ```
 
 ### Create and configure the auth service
@@ -80,9 +77,9 @@ https://github.com/zitadel/zitadel-react/blob/main/lib/src/zitadelAuth.ts
 https://github.com/zitadel/zitadel-react/blob/main/src/App.tsx
 ```
 
-### Add three new views to your application
+### Add two new components to your application
 
-The restricted admin view will only be shown if the user is authenticated and has the role "admin" in the apps project in ZITADEL.
+The logged in user will only be shown if the user is authenticated and has the role "admin" in the apps project in ZITADEL.
 
 ```ts reference
 https://github.com/zitadel/zitadel-vue/blob/main/src/views/Admin.vue
@@ -125,5 +122,5 @@ If you face issues, contact us or [raise an issue on GitHub](https://github.com/
 Now that you have enabled authentication, you are ready to call add authorization to your application using ZITADEL APIs.
 To do this, [refer to the API docs](/apis/introduction) or check out [the ZITADEL Console code on GitHub](https://github.com/zitadel/zitadel) which uses gRPC to access data.
 
-For more information on how to create an Vue application, you can refer to [Vue](https://vuejs.org/guide/quick-start.html).
-If you want to learn more about the libraries wrapped by [@zitadel/vue](https://www.npmjs.com/package/@zitadel/vue), [read the docs for vue-oidc-client](https://github.com/soukoku/vue-oidc-client/wiki/V1-Docs).
+For more information on how to create an Vue application, you can refer to [Create React App](https://github.com/facebook/create-react-app).
+If you want to learn more about the libraries wrapped by [@zitadel/react](https://www.npmjs.com/package/@zitadel/react), read the docs for [oidc-client-ts](https://github.com/authts/oidc-client-ts).
