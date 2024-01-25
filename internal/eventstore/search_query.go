@@ -18,7 +18,6 @@ type SearchQueryBuilder struct {
 	desc                  bool
 	resourceOwner         string
 	instanceID            *string
-	excludedInstanceIDs   []string
 	editorUser            string
 	queries               []*SearchQuery
 	tx                    *sql.Tx
@@ -76,10 +75,6 @@ func (b SearchQueryBuilder) GetPositionAfter() float64 {
 
 func (b SearchQueryBuilder) GetAwaitOpenTransactions() bool {
 	return b.awaitOpenTransactions
-}
-
-func (q SearchQueryBuilder) GetExcludedInstanceIDs() []string {
-	return q.excludedInstanceIDs
 }
 
 func (q SearchQueryBuilder) GetEventSequenceGreater() uint64 {
@@ -275,12 +270,6 @@ func (builder *SearchQueryBuilder) AwaitOpenTransactions() *SearchQueryBuilder {
 // SequenceGreater filters for events with sequence greater the requested sequence
 func (builder *SearchQueryBuilder) SequenceGreater(sequence uint64) *SearchQueryBuilder {
 	builder.eventSequenceGreater = sequence
-	return builder
-}
-
-// ExcludedInstanceID filters for events not having the given instanceIDs
-func (builder *SearchQueryBuilder) ExcludedInstanceID(instanceIDs ...string) *SearchQueryBuilder {
-	builder.excludedInstanceIDs = instanceIDs
 	return builder
 }
 

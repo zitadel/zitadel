@@ -57,3 +57,6 @@ SystemAPIUsers:
             - "SYSTEM_OWNER"
             - "IAM_OWNER"
             - "ORG_OWNER"
+
+InitProjections:
+  Enabled: true

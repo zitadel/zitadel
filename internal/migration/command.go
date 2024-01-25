@@ -10,6 +10,13 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+func init() {
+	eventstore.RegisterFilterEventMapper(SystemAggregate, StartedType, SetupMapper)
+	eventstore.RegisterFilterEventMapper(SystemAggregate, DoneType, SetupMapper)
+	eventstore.RegisterFilterEventMapper(SystemAggregate, failedType, SetupMapper)
+	eventstore.RegisterFilterEventMapper(SystemAggregate, repeatableDoneType, SetupMapper)
+}
+
 // SetupStep is the command pushed on the eventstore
 type SetupStep struct {
 	eventstore.BaseEvent `json:"-"`
@@ -39,7 +46,7 @@ func setupStartedCmd(ctx context.Context, migration Migration) eventstore.Comman
 	return &SetupStep{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
-			eventstore.NewAggregate(ctx, aggregateID, aggregateType, "v1"),
+			eventstore.NewAggregate(ctx, SystemAggregateID, SystemAggregate, "v1"),
 			StartedType),
 		migration: migration,
 		Name:      migration.String(),
@@ -48,7 +55,7 @@ func setupStartedCmd(ctx context.Context, migration Migration) eventstore.Comman
 
 func setupDoneCmd(ctx context.Context, migration Migration, err error) eventstore.Command {
 	ctx = authz.SetCtxData(service.WithService(ctx, "system"), authz.CtxData{UserID: "system", OrgID: "SYSTEM", ResourceOwner: "SYSTEM"})
-	typ := doneType
+	typ := DoneType
 	var lastRun interface{}
 	if repeatable, ok := migration.(RepeatableMigration); ok {
 		typ = repeatableDoneType
@@ -67,7 +74,7 @@ func setupDoneCmd(ctx context.Context, migration Migration, err error) eventstor
 
 	s.BaseEvent = *eventstore.NewBaseEventForPush(
 		ctx,
-		eventstore.NewAggregate(ctx, aggregateID, aggregateType, "v1"),
+		eventstore.NewAggregate(ctx, SystemAggregateID, SystemAggregate, "v1"),
 		typ)
 
 	return s
@@ -93,13 +100,6 @@ func (s *SetupStep) UniqueConstraints() []*eventstore.UniqueConstraint {
 			eventstore.NewAddGlobalUniqueConstraint("migration_done", s.migration.String(), "Errors.Step.Done.AlreadyExists"),
 		}
 	}
-}
-
-func RegisterMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(aggregateType, StartedType, SetupMapper)
-	es.RegisterFilterEventMapper(aggregateType, doneType, SetupMapper)
-	es.RegisterFilterEventMapper(aggregateType, failedType, SetupMapper)
-	es.RegisterFilterEventMapper(aggregateType, repeatableDoneType, SetupMapper)
 }
 
 func SetupMapper(event eventstore.Event) (eventstore.Event, error) {
