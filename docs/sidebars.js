@@ -60,7 +60,8 @@ module.exports = {
             "The SDKs and Integration depend on the framework and language you are using.",
       },
       items: [
-        "sdk-examples/vue"
+        "sdk-examples/vue",
+        "sdk-examples/java"
       ],
     },
     {
