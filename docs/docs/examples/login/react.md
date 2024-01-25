@@ -31,7 +31,7 @@ The post logout redirect sends your users back to a public route on your applica
 
 :::tip
 If you are following along with the [example](https://github.com/zitadel/zitadel-react), set the dev mode switch to `true`.
-Configure a redirect URIs to _http:/<span></span>/localhost:5173/auth/signinwin/zitadel_ and a post redirect URI to _http:/<span></span>/localhost:5173/_.
+Configure a redirect URIs to \http://localhost:3000/callback and a post redirect URI to \http://localhost:3000/.
 :::
 
 Continue and create the application.
@@ -67,10 +67,6 @@ You can overwrite all the defaults with the aguments you pass to `createZitadelA
 
 Export the object returned from `createZitadelAuth()`
 
-```ts reference
-https://github.com/zitadel/zitadel-react/blob/main/lib/src/zitadelAuth.ts
-```
-
 ### Initialize User Manager
 
 ```ts reference
@@ -79,43 +75,31 @@ https://github.com/zitadel/zitadel-react/blob/main/src/App.tsx
 
 ### Add two new components to your application
 
-The logged in user will only be shown if the user is authenticated and has the role "admin" in the apps project in ZITADEL.
+First add the component which prompts the user to login
 
 ```ts reference
-https://github.com/zitadel/zitadel-vue/blob/main/src/views/Admin.vue
+https://github.com/zitadel/zitadel-react/blob/main/src/components/Login.tsx
 ```
 
-The restricted login view is shown to all authenticated users.
-It prints all the information it gets from the token and from the user info endpoint.
+Then create the component for the page where the users is redirected to.
+It loads the user info endpoint once the code flow completes and prints all the information.
 
 ```ts reference
-https://github.com/zitadel/zitadel-vue/blob/main/src/views/Login.vue
+https://github.com/zitadel/zitadel-react/blob/main/src/components/Callback.tsx
 ```
 
-The public no access view is shown to authenticated users who navigate to a page they don't have access to based on their roles.
-
-```ts reference
-https://github.com/zitadel/zitadel-vue/blob/main/src/views/NoAccess.vue
-```
-
-### Add protected routes to your new pages as well as a Signout link
-
-Note that we conditionally render the admin view or the no access view based on the user's roles.
-
-```ts reference
-https://github.com/zitadel/zitadel-vue/blob/main/src/router/index.ts
-```
+You can now read out a users role to show protected areas of the application.
 
 ## Completion
 
-Congratulations! You have successfully integrated your Vue application with ZITADEL!
+Congratulations! You have successfully integrated your React application with ZITADEL!
 
-If you get stuck, consider checking out the [ZITADEL Vue example application](https://github.com/zitadel/zitadel-vue).
+If you get stuck, consider checking out the [ZITADEL React example application](https://github.com/zitadel/zitadel-react).
 This application includes all the functionalities mentioned in this quickstart.
-You can start by cloning the repository and change the arguments to createZITADELAuth so they fit your requirements.
-If you face issues, contact us or [raise an issue on GitHub](https://github.com/zitadel/zitadel-vue/issues).
+You can start by cloning the repository and change the arguments to `createZitadelAuth` so they fit your requirements.
+If you face issues, contact us or [raise an issue on GitHub](https://github.com/zitadel/zitadel-react/issues).
 
-![App in console](/img/vue/app-screen.png)
+![App in console](/img/react/app-screen.png)
 
 ### What's next?
 
