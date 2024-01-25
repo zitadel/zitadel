@@ -25,6 +25,7 @@ import (
 	"golang.org/x/net/http2/h2c"
 
 	"github.com/zitadel/zitadel/cmd/build"
+	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/key"
 	cmd_tls "github.com/zitadel/zitadel/cmd/tls"
 	"github.com/zitadel/zitadel/feature"
@@ -107,7 +108,7 @@ type Server struct {
 	Config     *Config
 	DB         *database.DB
 	KeyStorage crypto.KeyStorage
-	Keys       *encryptionKeys
+	Keys       *encryption.EncryptionKeys
 	Eventstore *eventstore.Eventstore
 	Queries    *query.Queries
 	AuthzRepo  authz_repo.Repository
@@ -138,7 +139,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	if err != nil {
 		return fmt.Errorf("cannot start key storage: %w", err)
 	}
-	keys, err := ensureEncryptionKeys(ctx, config.EncryptionKeys, keyStorage)
+	keys, err := encryption.EnsureEncryptionKeys(ctx, config.EncryptionKeys, keyStorage)
 	if err != nil {
 		return err
 	}
@@ -169,6 +170,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		},
 		config.AuditLogRetention,
 		config.SystemAPIUsers,
+		true,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
@@ -232,7 +234,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	actionsLogstoreSvc := logstore.New(queries, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	notification.Start(
+	notification.Register(
 		ctx,
 		config.Projections.Customizations["notifications"],
 		config.Projections.Customizations["notificationsquotas"],
@@ -250,6 +252,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.SMTP,
 		keys.SMS,
 	)
+	notification.Start(ctx)
 
 	router := mux.NewRouter()
 	tlsConfig, err := config.TLS.Config()
@@ -309,7 +312,7 @@ func startAPIs(
 	config *Config,
 	store static.Storage,
 	authZRepo authz_repo.Repository,
-	keys *encryptionKeys,
+	keys *encryption.EncryptionKeys,
 	permissionCheck domain.PermissionCheck,
 ) error {
 	repo := struct {

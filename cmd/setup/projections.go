@@ -22,7 +22,7 @@ func (mig *projectionTables) Check() bool {
 	return mig.currentVersion != mig.Version
 }
 
-func (mig *projectionTables) Execute(ctx context.Context) error {
+func (mig *projectionTables) Execute(ctx context.Context, _ eventstore.Event) error {
 	return projection.Init(ctx)
 }
 

@@ -139,12 +139,11 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			es := &Eventstore{
-				eventInterceptors: tt.fields.eventMapper,
-			}
-			es = es.RegisterFilterEventMapper("test", tt.args.eventType, tt.args.mapper)
-			if len(es.eventInterceptors) != tt.res.mapperCount {
-				t.Errorf("unexpected mapper count: want %d, got %d", tt.res.mapperCount, len(es.eventInterceptors))
+
+			eventInterceptors = tt.fields.eventMapper
+			RegisterFilterEventMapper("test", tt.args.eventType, tt.args.mapper)
+			if len(eventInterceptors) != tt.res.mapperCount {
+				t.Errorf("unexpected mapper count: want %d, got %d", tt.res.mapperCount, len(eventInterceptors))
 				return
 			}
 
@@ -152,7 +151,7 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 				return
 			}
 
-			mapper := es.eventInterceptors[tt.args.eventType]
+			mapper := eventInterceptors[tt.args.eventType]
 			event, err := mapper.eventMapper(nil)
 			if err != nil {
 				t.Errorf("unexpected error %v", err)
@@ -694,15 +693,15 @@ func TestEventstore_Push(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			eventInterceptors = map[EventType]eventTypeInterceptors{}
 			es := &Eventstore{
-				pusher:            tt.fields.pusher,
-				eventInterceptors: map[EventType]eventTypeInterceptors{},
+				pusher: tt.fields.pusher,
 			}
 			for eventType, mapper := range tt.fields.eventMapper {
-				es = es.RegisterFilterEventMapper("test", eventType, mapper)
+				RegisterFilterEventMapper("test", eventType, mapper)
 			}
-			if len(es.eventInterceptors) != len(tt.fields.eventMapper) {
-				t.Errorf("register event mapper failed expected mapper amount: %d, got: %d", len(tt.fields.eventMapper), len(es.eventInterceptors))
+			if len(eventInterceptors) != len(tt.fields.eventMapper) {
+				t.Errorf("register event mapper failed expected mapper amount: %d, got: %d", len(tt.fields.eventMapper), len(eventInterceptors))
 				t.FailNow()
 			}
 
@@ -825,16 +824,16 @@ func TestEventstore_FilterEvents(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			eventInterceptors = map[EventType]eventTypeInterceptors{}
 			es := &Eventstore{
-				querier:           tt.fields.repo,
-				eventInterceptors: map[EventType]eventTypeInterceptors{},
+				querier: tt.fields.repo,
 			}
 
 			for eventType, mapper := range tt.fields.eventMapper {
-				es = es.RegisterFilterEventMapper("test", eventType, mapper)
+				RegisterFilterEventMapper("test", eventType, mapper)
 			}
-			if len(es.eventInterceptors) != len(tt.fields.eventMapper) {
-				t.Errorf("register event mapper failed expected mapper amount: %d, got: %d", len(tt.fields.eventMapper), len(es.eventInterceptors))
+			if len(eventInterceptors) != len(tt.fields.eventMapper) {
+				t.Errorf("register event mapper failed expected mapper amount: %d, got: %d", len(tt.fields.eventMapper), len(eventInterceptors))
 				t.FailNow()
 			}
 
@@ -1130,14 +1129,13 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			es := &Eventstore{
-				querier:           tt.fields.repo,
-				eventInterceptors: map[EventType]eventTypeInterceptors{},
+				querier: tt.fields.repo,
 			}
 			for eventType, mapper := range tt.fields.eventMapper {
-				es = es.RegisterFilterEventMapper("test", eventType, mapper)
+				RegisterFilterEventMapper("test", eventType, mapper)
 			}
-			if len(es.eventInterceptors) != len(tt.fields.eventMapper) {
-				t.Errorf("register event mapper failed expected mapper amount: %d, got: %d", len(tt.fields.eventMapper), len(es.eventInterceptors))
+			if len(eventInterceptors) != len(tt.fields.eventMapper) {
+				t.Errorf("register event mapper failed expected mapper amount: %d, got: %d", len(tt.fields.eventMapper), len(eventInterceptors))
 				t.FailNow()
 			}
 
@@ -1246,14 +1244,12 @@ func TestEventstore_mapEvents(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			es := &Eventstore{
-				eventInterceptors: map[EventType]eventTypeInterceptors{},
-			}
+			es := &Eventstore{}
 			for eventType, mapper := range tt.fields.eventMapper {
-				es = es.RegisterFilterEventMapper("test", eventType, mapper)
+				RegisterFilterEventMapper("test", eventType, mapper)
 			}
-			if len(es.eventInterceptors) != len(tt.fields.eventMapper) {
-				t.Errorf("register event mapper failed expected mapper amount: %d, got: %d", len(tt.fields.eventMapper), len(es.eventInterceptors))
+			if len(eventInterceptors) != len(tt.fields.eventMapper) {
+				t.Errorf("register event mapper failed expected mapper amount: %d, got: %d", len(tt.fields.eventMapper), len(eventInterceptors))
 				t.FailNow()
 			}
 

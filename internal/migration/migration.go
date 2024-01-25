@@ -13,11 +13,11 @@ import (
 
 const (
 	StartedType        = eventstore.EventType("system.migration.started")
-	doneType           = eventstore.EventType("system.migration.done")
+	DoneType           = eventstore.EventType("system.migration.done")
 	failedType         = eventstore.EventType("system.migration.failed")
 	repeatableDoneType = eventstore.EventType("system.migration.repeatable.done")
-	aggregateType      = eventstore.AggregateType("system")
-	aggregateID        = "SYSTEM"
+	SystemAggregate    = eventstore.AggregateType("system")
+	SystemAggregateID  = "SYSTEM"
 )
 
 var (
@@ -26,7 +26,7 @@ var (
 
 type Migration interface {
 	String() string
-	Execute(context.Context) error
+	Execute(ctx context.Context, startedEvent eventstore.Event) error
 }
 
 type errCheckerMigration interface {
@@ -60,12 +60,13 @@ func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration
 		return nil
 	}
 
-	if _, err = es.Push(ctx, setupStartedCmd(ctx, migration)); err != nil && !continueOnErr(err) {
+	startedEvent, err := es.Push(ctx, setupStartedCmd(ctx, migration))
+	if err != nil && !continueOnErr(err) {
 		return err
 	}
 
 	logging.WithFields("name", migration.String()).Info("starting migration")
-	err = migration.Execute(ctx)
+	err = migration.Execute(ctx, startedEvent[0])
 	logging.WithFields("name", migration.String()).OnError(err).Error("migration failed")
 
 	_, pushErr := es.Push(ctx, setupDoneCmd(ctx, migration, err))
@@ -81,9 +82,9 @@ func LatestStep(ctx context.Context, es *eventstore.Eventstore) (*SetupStep, err
 		OrderDesc().
 		Limit(1).
 		AddQuery().
-		AggregateTypes(aggregateType).
-		AggregateIDs(aggregateID).
-		EventTypes(StartedType, doneType, repeatableDoneType, failedType).
+		AggregateTypes(SystemAggregate).
+		AggregateIDs(SystemAggregateID).
+		EventTypes(StartedType, DoneType, repeatableDoneType, failedType).
 		Builder())
 	if err != nil {
 		return nil, err
@@ -102,7 +103,7 @@ type cancelMigration struct {
 }
 
 // Execute implements Migration
-func (*cancelMigration) Execute(context.Context) error {
+func (*cancelMigration) Execute(context.Context, eventstore.Event) error {
 	return nil
 }
 
@@ -147,9 +148,9 @@ func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migrat
 		OrderAsc().
 		InstanceID("").
 		AddQuery().
-		AggregateTypes(aggregateType).
-		AggregateIDs(aggregateID).
-		EventTypes(StartedType, doneType, repeatableDoneType, failedType).
+		AggregateTypes(SystemAggregate).
+		AggregateIDs(SystemAggregateID).
+		EventTypes(StartedType, DoneType, repeatableDoneType, failedType).
 		Builder())
 	if err != nil {
 		return false, err
@@ -169,7 +170,7 @@ func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migrat
 		switch event.Type() {
 		case StartedType, failedType:
 			isStarted = !isStarted
-		case doneType,
+		case DoneType,
 			repeatableDoneType:
 			repeatable, ok := migration.(RepeatableMigration)
 			if !ok {

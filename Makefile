@@ -52,10 +52,10 @@ endif
 
 .PHONY: core_grpc_dependencies
 core_grpc_dependencies:
-	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.31 
-	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3 
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.18.1 
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.18.1 
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.31
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.18.1
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.18.1
 	go install github.com/envoyproxy/protoc-gen-validate@v1.0.2
 	go install github.com/bufbuild/buf/cmd/buf@v1.27.2
 
@@ -103,7 +103,7 @@ core_unit_test:
 core_integration_setup:
 	go build -o zitadel main.go
 	./zitadel init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
-	./zitadel setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
+	./zitadel setup --masterkeyFromEnv --init-projections --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 	$(RM) zitadel
 
 .PHONY: core_integration_test

@@ -1,4 +1,4 @@
-package start
+package encryption
 
 import (
 	"context"
@@ -22,7 +22,20 @@ var (
 	}
 )
 
-type encryptionKeys struct {
+type EncryptionKeyConfig struct {
+	DomainVerification   *crypto.KeyConfig
+	IDPConfig            *crypto.KeyConfig
+	OIDC                 *crypto.KeyConfig
+	SAML                 *crypto.KeyConfig
+	OTP                  *crypto.KeyConfig
+	SMS                  *crypto.KeyConfig
+	SMTP                 *crypto.KeyConfig
+	User                 *crypto.KeyConfig
+	CSRFCookieKeyID      string
+	UserAgentCookieKeyID string
+}
+
+type EncryptionKeys struct {
 	DomainVerification crypto.EncryptionAlgorithm
 	IDPConfig          crypto.EncryptionAlgorithm
 	OIDC               crypto.EncryptionAlgorithm
@@ -36,11 +49,11 @@ type encryptionKeys struct {
 	OIDCKey            []byte
 }
 
-func ensureEncryptionKeys(ctx context.Context, keyConfig *encryptionKeyConfig, keyStorage crypto.KeyStorage) (keys *encryptionKeys, err error) {
-	if err := verifyDefaultKeys(ctx, keyStorage); err != nil {
+func EnsureEncryptionKeys(ctx context.Context, keyConfig *EncryptionKeyConfig, keyStorage crypto.KeyStorage) (keys *EncryptionKeys, err error) {
+	if err := VerifyDefaultKeys(ctx, keyStorage); err != nil {
 		return nil, err
 	}
-	keys = new(encryptionKeys)
+	keys = new(EncryptionKeys)
 	keys.DomainVerification, err = crypto.NewAESCrypto(keyConfig.DomainVerification, keyStorage)
 	if err != nil {
 		return nil, err
@@ -91,7 +104,7 @@ func ensureEncryptionKeys(ctx context.Context, keyConfig *encryptionKeyConfig, k
 	return keys, nil
 }
 
-func verifyDefaultKeys(ctx context.Context, keyStorage crypto.KeyStorage) (err error) {
+func VerifyDefaultKeys(ctx context.Context, keyStorage crypto.KeyStorage) (err error) {
 	keys := make([]*crypto.Key, 0, len(defaultKeyIDs))
 	for _, keyID := range defaultKeyIDs {
 		_, err := crypto.LoadKey(keyID, keyStorage)
