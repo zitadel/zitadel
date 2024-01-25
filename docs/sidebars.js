@@ -60,11 +60,13 @@ module.exports = {
             "The SDKs and Integration depend on the framework and language you are using.",
       },
       items: [
+        "sdk-examples/angular",
+        "sdk-examples/java",
+        "sdk-examples/symfony",
         "sdk-examples/vue",
-        "sdk-examples/java"
       ],
     },
-    /*{
+    {
       type: "category",
       label: "Example Applications",
       items: [
@@ -81,7 +83,7 @@ module.exports = {
         },
       ],
       collapsed: true,
-    },*/
+    },
     {
       type: "category",
       label: "Manage",
