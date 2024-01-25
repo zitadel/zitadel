@@ -76,6 +76,7 @@ var (
 type projection interface {
 	Start(ctx context.Context)
 	Init(ctx context.Context) error
+	Trigger(ctx context.Context, opts ...handler.TriggerOpt) (_ context.Context, err error)
 }
 
 var (
@@ -162,6 +163,16 @@ func Start(ctx context.Context) {
 	for _, projection := range projections {
 		projection.Start(ctx)
 	}
+}
+
+func ProjectInstance(ctx context.Context) error {
+	for _, projection := range projections {
+		_, err := projection.Trigger(ctx)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func ApplyCustomConfig(customConfig CustomConfig) handler.Config {

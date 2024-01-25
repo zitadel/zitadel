@@ -171,7 +171,7 @@ func BytesToPrivateKey(priv []byte) (*rsa.PrivateKey, error) {
 var ErrEmpty = errors.New("cannot decode, empty data")
 
 func BytesToPublicKey(pub []byte) (*rsa.PublicKey, error) {
-	if pub == nil {
+	if len(pub) == 0 {
 		return nil, ErrEmpty
 	}
 	block, _ := pem.Decode(pub)

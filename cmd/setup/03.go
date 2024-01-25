@@ -26,6 +26,8 @@ type FirstInstance struct {
 	PatPath         string
 	Features        map[domain.Feature]any
 
+	Skip bool
+
 	instanceSetup     command.InstanceSetup
 	userEncryptionKey *crypto.KeyConfig
 	smtpEncryptionKey *crypto.KeyConfig
@@ -42,6 +44,9 @@ type FirstInstance struct {
 }
 
 func (mig *FirstInstance) Execute(ctx context.Context) error {
+	if mig.Skip {
+		return nil
+	}
 	keyStorage, err := crypto_db.NewKeyStorage(mig.db, mig.masterKey)
 	if err != nil {
 		return fmt.Errorf("cannot start key storage: %w", err)

@@ -236,7 +236,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	actionsLogstoreSvc := logstore.New(queries, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	notification.Start(
+	notification.Register(
 		ctx,
 		config.Projections.Customizations["notifications"],
 		config.Projections.Customizations["notificationsquotas"],
@@ -254,6 +254,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 		keys.SMTP,
 		keys.SMS,
 	)
+	notification.Start(ctx)
 
 	router := mux.NewRouter()
 	tlsConfig, err := config.TLS.Config()

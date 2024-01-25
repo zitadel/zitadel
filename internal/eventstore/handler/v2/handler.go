@@ -112,6 +112,10 @@ func (h *Handler) Start(ctx context.Context) {
 }
 
 func (h *Handler) schedule(ctx context.Context) {
+	if h.requeueEvery <= 0 {
+		h.log().Info("schedule skipped")
+		return
+	}
 	// if there was no run before trigger within half a second
 	start := randomizeStart(0, 0.5)
 	t := time.NewTimer(start)
@@ -239,15 +243,15 @@ type triggerConfig struct {
 	awaitRunning bool
 }
 
-type triggerOpt func(conf *triggerConfig)
+type TriggerOpt func(conf *triggerConfig)
 
-func WithAwaitRunning() triggerOpt {
+func WithAwaitRunning() TriggerOpt {
 	return func(conf *triggerConfig) {
 		conf.awaitRunning = true
 	}
 }
 
-func (h *Handler) Trigger(ctx context.Context, opts ...triggerOpt) (_ context.Context, err error) {
+func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Context, err error) {
 	config := new(triggerConfig)
 	for _, opt := range opts {
 		opt(config)
