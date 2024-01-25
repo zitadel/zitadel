@@ -19,9 +19,9 @@ ZITADEL does have multiple possibilities to achieve that process.
 
 ## Onboard customers through the ZITADEL Management Console
 
-Each ZITADEL instance does automatically bring a management console with it. This can be used to manage all your resources through a UI.
+Each ZITADEL instance does automatically bring a management console with it. The [console](/docs/guides/manage/console/overview) can be used to manage all your resources through a UI.
 You can access it by calling the following URL: $CUSTOM-DOMAIN/ui/
-Make sure to authenticate with a user with permissions on an instance level such as "INSTANCE_OWNER"
+Make sure that your admins have a [Manager role](/docs/guides/manage/console/managers) with permissions on an instance level such as "INSTANCE_OWNER"
 
 ### Create a customer
 
@@ -44,7 +44,7 @@ Click on the newly created organization in the list and you will switch your con
 
 ### Add First Administrator
 
-You now want to create the first user for your customer and ensure the user has enough permissions to self-manage the needed configuration.
+Create the first user for your customer and ensure the user has enough permissions to self-manage the needed configuration.
 
 #### Create User
 
@@ -52,9 +52,9 @@ import CreateUser from '/docs/guides/manage/console/_create-user.mdx';
 
 <CreateUser/>
 
-#### Add Administrator Role to User
+#### Add Manager Role to User
 
-Now you need to give the right administrator role to your user. In this case we want to give "ORG_OWNER".
+Now you need to give the right manager role to your user. In this case we want to give "ORG_OWNER".
 If you do want to know more about the roles check out the [ZITADEL Managers Guide with the Role List](/docs/guides/manage/console/managers)
 
 Go to the detail page of the organization and select the "+" button in the top right corner, where you already see a list of existing managers.
@@ -69,14 +69,14 @@ import AddManager from "/docs/guides/manage/console/_add_manager.mdx";
 The first user of your customer is now ready to authenticate and manage resources in ZITADEL.
 First task will be inviting a team member.
 
-We are now switching to the view of your customers administrator user.
+We are now switching to the view of your customer's administrator user.
 
 :::note
 The following actions can also be configured by an Instance Administrator for their customer.
-To show how you can use the self-management possibilities it is shown from the Customers Administrator.
+To show how you can use the self-management possibilities it is shown from the customer's administrator.
 :::
 
-The Administrator user got an initialization E-Mail when the user got created.
+The Administrator user received an initialization e-mail after the user was created.
 With the link in the email the admin will be able to setup a password and optionally some multi-factors.
 
 As the administrator only has permission for its own organization the ZITADEL Console UI does look slightly different.
@@ -101,7 +101,7 @@ This setting does generally allow users to authenticate with an external provide
 
 #### Auto-register users with SSO
 
-Let's assume you have configured Google as an identity provider, and you want to allow all your employees to login with the corresponding user without having to register.
+Let's assume you have configured AzureAD as an identity provider, and you want to allow all your employees to login with the corresponding user without having to register.
 This does need some specific configuration on your provider.
 
 1. Go to the detail page of your configured identity provider (In this example AzureAD)
