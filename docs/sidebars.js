@@ -64,7 +64,7 @@ module.exports = {
         "sdk-examples/java"
       ],
     },
-    {
+    /*{
       type: "category",
       label: "Example Applications",
       items: [
@@ -81,7 +81,7 @@ module.exports = {
         },
       ],
       collapsed: true,
-    },
+    },*/
     {
       type: "category",
       label: "Manage",
