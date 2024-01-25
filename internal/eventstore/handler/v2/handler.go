@@ -82,10 +82,40 @@ func (h *Handler) Execute(ctx context.Context, startedEvent eventstore.Event) er
 		return err
 	}
 
-	h.triggerInstances(ctx, instanceIDs, WithMaxPosition(startedEvent.Position()))
+	// default amount of workers is 10
+	workerCount := 10
+
+	if h.client.DB.Stats().MaxOpenConnections > 0 {
+		workerCount = h.client.DB.Stats().MaxOpenConnections / 4
+	}
+	// ensure that at least one worker is active
+	if workerCount == 0 {
+		workerCount = 1
+	}
+	instances := make(chan string, workerCount)
+	var wg sync.WaitGroup
+	wg.Add(workerCount)
+	for i := 0; i < workerCount; i++ {
+		go h.executeInstances(ctx, instances, startedEvent, &wg)
+	}
+
+	for _, instance := range instanceIDs {
+		instances <- instance
+	}
+
+	close(instances)
+	wg.Wait()
+
 	logTicker.Stop()
 	logging.WithFields("projection", h.ProjectionName(), "took", time.Since(start)).Info("projections ended prefilling")
 	return nil
+}
+
+func (h *Handler) executeInstances(ctx context.Context, instances <-chan string, startedEvent eventstore.Event, wg *sync.WaitGroup) {
+	for instance := range instances {
+		h.triggerInstances(ctx, []string{instance}, WithMaxPosition(startedEvent.Position()))
+	}
+	wg.Done()
 }
 
 // String implements migration.Migration.
