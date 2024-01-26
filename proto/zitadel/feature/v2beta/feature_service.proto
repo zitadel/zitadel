@@ -3,19 +3,13 @@ syntax = "proto3";
 package zitadel.feature.v2beta;
 
 import "google/api/annotations.proto";
-import "google/api/field_behavior.proto";
-import "google/protobuf/duration.proto";
-import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
-import "validate/validate.proto";
-
-import "zitadel/object/v2beta/object.proto";
-import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 import "zitadel/feature/v2beta/system.proto";
 import "zitadel/feature/v2beta/instance.proto";
 import "zitadel/feature/v2beta/organization.proto";
 import "zitadel/feature/v2beta/user.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta;feature";
 
@@ -97,7 +91,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   responses: {
     key: "404";
     value: {
-      description: "Returned when the resource does not exist.";
+      description: "Returned when the resource has no feature flag settings and inheritance from the parent is disabled.";
       schema: {
         json_schema: {
           ref: "#/definitions/rpcStatus";
@@ -434,174 +428,4 @@ service FeatureService {
       };
     };
   }
-}
-
-message SetSystemFeaturesRequest{
-  SystemFeatures features = 1 [
-    (validate.rules).message.required = true
-  ];
-}
-
-message SetSystemFeaturesResponse {
-  zitadel.object.v2beta.Details details = 1;
-}
-
-message ResetSystemFeaturesRequest {}
-
-message ResetSystemFeaturesResponse {
-  zitadel.object.v2beta.Details details = 1;
-}
-
-message GetSystemFeaturesRequest {}
-
-message GetSystemFeaturesResponse {
-  zitadel.object.v2beta.Details details = 1;
-  SystemFeatures features = 2;
-}
-
-message SetInstanceFeaturesRequest{
-  string instance_id = 1[
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      example: "\"69629023906488334\"";
-    }
-  ];
-  InstanceFeatures features = 2 [
-    (validate.rules).message.required = true
-  ];
-}
-
-message SetInstanceFeaturesResponse {
-  zitadel.object.v2beta.Details details = 1;
-}
-
-message ResetInstanceFeaturesRequest {
-  string instance_id = 1[
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      example: "\"69629023906488334\"";
-    }
-  ];
-}
-
-message ResetInstanceFeaturesResponse {
-  zitadel.object.v2beta.Details details = 1;
-}
-
-message GetInstanceFeaturesRequest {
-  string instance_id = 1[
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      example: "\"69629023906488334\"";
-    }
-  ];
-}
-
-message GetInstanceFeaturesResponse {
-  zitadel.object.v2beta.Details details = 1;
-  InstanceFeatures features = 2;
-}
-
-message SetOrganizationFeaturesRequest {
-  string organization_id = 1[
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      example: "\"69629023906488334\"";
-    }
-  ];
-  OrganizationFeatures features = 2 [
-    (validate.rules).message.required = true
-  ];
-}
-
-message SetOrganizationFeaturesResponse {
-  zitadel.object.v2beta.Details details = 1;
-}
-
-message ResetOrganizationFeaturesRequest {
-  string organization_id = 1[
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      example: "\"69629023906488334\"";
-    }
-  ];
-}
-
-message ResetOrganizationFeaturesResponse {
-  zitadel.object.v2beta.Details details = 1;
-}
-
-message GetOrganizationFeaturesRequest {
-  string organization_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      example: "\"69629023906488334\"";
-    }
-  ];
-} 
-
-message GetOrganizationFeaturesResponse {
-  zitadel.object.v2beta.Details details = 1;
-  OrganizationFeatures features = 2;
-}
-
-message SetUserFeatureRequest {
-  string user_id = 1[
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      example: "\"69629023906488334\"";
-    }
-  ];
-  UserFeatures features = 2 [
-    (validate.rules).message.required = true
-  ];
-}
-
-message SetUserFeaturesResponse {
-  zitadel.object.v2beta.Details details = 1;
-}
-
-message ResetUserFeaturesRequest {
-  string user_id = 1[
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      example: "\"69629023906488334\"";
-    }
-  ];
-}
-
-message ResetUserFeaturesResponse {
-  zitadel.object.v2beta.Details details = 1;
-}
-
-message GetUserFeaturesRequest {
-  string user_id = 1[
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      example: "\"69629023906488334\"";
-    }
-  ];
-}
-
-message GetUserFeaturesResponse {
-  zitadel.object.v2beta.Details details = 1;
-  UserFeatures features = 2;
 }
