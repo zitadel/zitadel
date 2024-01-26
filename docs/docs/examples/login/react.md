@@ -48,6 +48,8 @@ Also note the projects resource ID, as you will need it to configure your React 
 
 ![Assign the "admin" role to your user](/img/react/project-authz.png)
 
+If you want to read your users roles from user info endpoint, make sure to enable the checkbox in your project.
+
 ## React setup
 
 Now that you have configured your web application on the ZITADEL side, you can proceed with the integration of your React client.
