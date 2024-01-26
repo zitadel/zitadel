@@ -38,7 +38,7 @@ export const VIEWS: SidenavSetting = {
   i18nKey: 'SETTINGS.LIST.VIEWS',
   groupI18nKey: 'SETTINGS.GROUPS.STORAGE',
   requiredRoles: {
-    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+    [PolicyComponentServiceType.ADMIN]: ['iam.read'],
   },
 };
 
