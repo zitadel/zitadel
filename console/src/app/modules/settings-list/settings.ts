@@ -56,7 +56,7 @@ export const EVENTS: SidenavSetting = {
   i18nKey: 'SETTINGS.LIST.EVENTS',
   groupI18nKey: 'SETTINGS.GROUPS.STORAGE',
   requiredRoles: {
-    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+    [PolicyComponentServiceType.ADMIN]: ['events.read'],
   },
 };
 
