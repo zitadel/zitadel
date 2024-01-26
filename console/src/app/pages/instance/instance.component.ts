@@ -31,6 +31,7 @@ import {
   VIEWS,
   FAILEDEVENTS,
   EVENTS,
+  ORGANIZATIONS,
 } from '../../modules/settings-list/settings';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -51,6 +52,7 @@ export class InstanceComponent {
 
   public id: string = '';
   public defaultSettingsList: SidenavSetting[] = [
+    ORGANIZATIONS,
     // notifications
     // { showWarn: true, ...NOTIFICATIONS },
     NOTIFICATIONS,

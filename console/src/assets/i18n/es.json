@@ -1024,6 +1024,7 @@
       "DESCRIPTION": "Estas configuraciones amplían y sobrescriben tus configuraciones de instancia."
     },
     "LIST": {
+      "ORGS": "Organizaciones",
       "LANGUAGES": "Idiomas",
       "LOGIN": "Comportamiento del inicio de sesión y de la seguridad",
       "LOCKOUT": "Bloqueo",
@@ -1047,6 +1048,7 @@
       "VIEWS": "Vistas"
     },
     "GROUPS": {
+      "GENERAL": "General",
       "NOTIFICATIONS": "Notificaciones",
       "LOGIN": "Inicio de sesión y acceso",
       "DOMAIN": "Dominio",

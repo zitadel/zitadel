@@ -1023,6 +1023,7 @@
       "DESCRIPTION": "Deze instellingen breiden uw instantie instellingen uit en overschrijven deze."
     },
     "LIST": {
+      "ORGS": "Organisaties",
       "LANGUAGES": "Talen",
       "LOGIN": "Login Gedrag en Beveiliging",
       "LOCKOUT": "Lockout",
@@ -1046,6 +1047,7 @@
       "VIEWS": "Weergaves"
     },
     "GROUPS": {
+      "GENERAL": "Algemeen",
       "NOTIFICATIONS": "Notificaties",
       "LOGIN": "Login en Toegang",
       "DOMAIN": "Domein",

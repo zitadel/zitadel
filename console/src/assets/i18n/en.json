@@ -1023,6 +1023,7 @@
       "DESCRIPTION": "These settings extend and overwrite your instance settings."
     },
     "LIST": {
+      "ORGS": "Organizations",
       "LANGUAGES": "Languages",
       "LOGIN": "Login Behavior and Security",
       "LOCKOUT": "Lockout",
@@ -1046,6 +1047,7 @@
       "VIEWS": "Views"
     },
     "GROUPS": {
+      "GENERAL": "General Information",
       "NOTIFICATIONS": "Notifications",
       "LOGIN": "Login and Access",
       "DOMAIN": "Domain",

@@ -1023,6 +1023,7 @@
       "DESCRIPTION": "これらの設定は、インスタンス設定を拡張・上書きします。"
     },
     "LIST": {
+      "ORGS": "組織",
       "LANGUAGES": "一般設定",
       "LOGIN": "ログイン動作とセキュリティ",
       "LOCKOUT": "ロックアウト",
@@ -1046,6 +1047,7 @@
       "VIEWS": "ビュー"
     },
     "GROUPS": {
+      "GENERAL": "一般",
       "NOTIFICATIONS": "通知",
       "LOGIN": "ログインとアクセス",
       "DOMAIN": "ドメイン",

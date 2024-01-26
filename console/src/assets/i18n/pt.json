@@ -1024,6 +1024,7 @@
       "DESCRIPTION": "Essas configurações estendem e sobrescrevem as configurações da sua instância."
     },
     "LIST": {
+      "ORGS": "Organizações",
       "LANGUAGES": "Idiomas",
       "LOGIN": "Comportamento de Login e Segurança",
       "LOCKOUT": "Bloqueio",
@@ -1047,6 +1048,7 @@
       "VIEWS": "Visualizações"
     },
     "GROUPS": {
+      "GENERAL": "Geral",
       "NOTIFICATIONS": "Notificações",
       "LOGIN": "Login e Acesso",
       "DOMAIN": "Domínio",

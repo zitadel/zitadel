@@ -6,6 +6,12 @@
   [settingsList]="settingsList"
   queryParam="id"
 >
+  <ng-container *ngIf="currentSetting === 'organizations'">
+    <h2>{{ 'ORG.PAGES.LIST' | translate }}</h2>
+    <p class="org-desc cnsl-secondary-text">{{ 'ORG.PAGES.LISTDESCRIPTION' | translate }}</p>
+
+    <cnsl-org-table></cnsl-org-table>
+  </ng-container>
   <ng-container *ngIf="currentSetting === 'complexity'">
     <cnsl-password-complexity-policy [serviceType]="serviceType"></cnsl-password-complexity-policy>
   </ng-container>
