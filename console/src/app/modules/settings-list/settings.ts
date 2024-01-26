@@ -47,7 +47,7 @@ export const FAILEDEVENTS: SidenavSetting = {
   i18nKey: 'SETTINGS.LIST.FAILEDEVENTS',
   groupI18nKey: 'SETTINGS.GROUPS.STORAGE',
   requiredRoles: {
-    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+    [PolicyComponentServiceType.ADMIN]: ['iam.read'],
   },
 };
 
