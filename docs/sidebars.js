@@ -19,6 +19,11 @@ module.exports = {
             "examples/login/go",
             "examples/login/symfony",
             "examples/login/java-spring",
+            {
+              type: "link",
+              label: ".Net",
+              href: "https://github.com/smartive/zitadel-net",
+            },
           ],
           collapsed: true,
         },
@@ -28,7 +33,11 @@ module.exports = {
           items: [
             "examples/secure-api/go",
             "examples/secure-api/python-flask",
-            "examples/secure-api/dot-net",
+            {
+              type: "link",
+              label: ".Net",
+              href: "https://github.com/smartive/zitadel-net",
+            },
             "examples/secure-api/nodejs-nestjs",
             "examples/secure-api/java-spring",
           ],
