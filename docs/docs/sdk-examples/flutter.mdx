@@ -15,27 +15,32 @@ sidebar_label: Flutter
     </tr>
 </table>
 
-### Links
-- [Flutter Example Application Repository](https://pub.dev/packages/oidc)
+### Resources
+- [Flutter Example Application Repository](https://github.com/zitadel/zitadel_flutter)
 - [Step-By-Step Guide](/docs/examples/login/flutter) to create your Flutter App with ZITADEL Login
 - [Dart Client Library for ZITADEL](https://github.com/smartive/zitadel-dart)
 
-### SDK
+### Flutter SDK
 
-ZITADEL doesn't provide a Flutter SDK to build the login part of your app.
-We recommend using a OIDC Library such as [package:oidc](https://pub.dev/packages/oidc).
+ZITADEL doesn't provide a specific Flutter SDK for authentication in your Web/Mobile App.
+You can use any OIDC Library such as [package:oidc](https://pub.dev/packages/oidc).
+For Mobile Apps we recommend [Flutter AppAuth](https://pub.dev/packages/flutter_appauth).
 
-Check out our [Example Application](/docs/sdk-examples/flutter#example-application)
+Check out our [Example Application](/docs/sdk-examples/flutter#example-application).
+
+Additionally, you can use [smartive/zitadel-dart](https://github.com/smartive/zitadel-dart) for user and resource management.
+- Manage Resources through ZITADEL APIs
+  - Authenticate Service User
+  - Generated gRPC Clients for integrating ZITADEL API
+  - User, Organization, Project, etc. Management
 
 :::note
-For a ZITADEL Dart client library which includes the complied and generated gRPC service clients for the ZITADEL API check out: [smartive/zitadel-dart](https://github.com/smartive/zitadel-dart)
-
 This library is built by our community.
 :::
 
 ### Example Application
 
-The [zitadel-vue](https://github.com/zitadel/zitadel-vue) repository also includes an Example Application ready to start and show how a Vue application looks like with integrated ZITADEL Login.
+The [zitadel-flutter](https://github.com/zitadel/zitadel_flutter) repository includes an Example Application ready to start and show how an Flutter application looks like with integrated ZITADEL Login.
 
 What does the Example include:
 - Home Page with Login Button

@@ -62,7 +62,11 @@ module.exports = {
       items: [
         "sdk-examples/angular",
         "sdk-examples/flutter",
+        "sdk-examples/go",
         "sdk-examples/java",
+        "sdk-examples/nestjs",
+        "sdk-examples/nextjs",
+        "sdk-examples/python",
         "sdk-examples/symfony",
         "sdk-examples/vue",
         {
@@ -82,7 +86,7 @@ module.exports = {
         },
         {
           type: "link",
-              label: "NodeJs",
+              label: "Node.js",
             href: "https://www.npmjs.com/package/@zitadel/node",
         },
         {
@@ -92,7 +96,7 @@ module.exports = {
         },
         {
           type: "link",
-          label: "Passport Js",
+          label: "Passport.js",
           href: "https://github.com/buehler/node-passport-zitadel",
         },
         {
