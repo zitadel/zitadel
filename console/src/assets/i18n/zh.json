@@ -2240,7 +2240,8 @@
     "TOAST": {
       "UPDATED": "授权已更新。",
       "REMOVED": "已移除授权。",
-      "BULKREMOVED": "已移除授权。"
+      "BULKREMOVED": "已移除授权。",
+      "CANTSHOWINFO": "您无法访问该用户的个人资料，因为您不是该用户所属组织的成员"
     },
     "DIALOG": {
       "DELETE_TITLE": "删除授权",

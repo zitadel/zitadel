@@ -2250,7 +2250,8 @@
     "TOAST": {
       "UPDATED": "Autorizace aktualizována.",
       "REMOVED": "Autorizace odebrána",
-      "BULKREMOVED": "Autorizace odebrány."
+      "BULKREMOVED": "Autorizace odebrány.",
+      "CANTSHOWINFO": "Nemůžete navštívit profil tohoto uživatele, protože nejste členem organizace, do které tento uživatel patří"
     },
     "DIALOG": {
       "DELETE_TITLE": "Smazat autorizaci",
