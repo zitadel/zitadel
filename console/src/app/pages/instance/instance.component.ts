@@ -34,6 +34,7 @@ import {
 } from '../../modules/settings-list/settings';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { EnvironmentService } from 'src/app/services/environment.service';
 @Component({
   selector: 'cnsl-instance',
   templateUrl: './instance.component.html',
@@ -79,6 +80,7 @@ export class InstanceComponent {
   ];
 
   public settingsList: Observable<SidenavSetting[]> = of([]);
+  public customerPortalLink$ = this.envService.env.pipe(map((env) => env.customer_portal));
 
   private destroy$: Subject<void> = new Subject();
   constructor(
@@ -88,6 +90,7 @@ export class InstanceComponent {
     breadcrumbService: BreadcrumbService,
     private router: Router,
     private authService: GrpcAuthService,
+    private envService: EnvironmentService,
     activatedRoute: ActivatedRoute,
   ) {
     this.loadMembers();

@@ -7,20 +7,34 @@
   [hasContributors]="true"
   stateTooltip="{{ 'INSTANCE.STATE.' + instance?.state | translate }}"
 >
-  <cnsl-contributors
-    topContributors
-    [totalResult]="totalMemberResult"
-    [loading]="loading$ | async"
-    [membersSubject]="membersSubject"
-    title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
-    description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
-    (addClicked)="openAddMember()"
-    (showDetailClicked)="showDetail()"
-    (refreshClicked)="loadMembers()"
-    [disabled]="(['iam.member.write'] | hasRole | async) === false"
-  >
-  </cnsl-contributors>
-
+  <div topContributors class="instance-action-wrapper">
+    <a
+      mat-raised-button
+      color="primary"
+      *ngIf="customerPortalLink$ | async as customerPortalLink"
+      class="portal-link external-link"
+      [href]="customerPortalLink"
+      target="_blank"
+      rel="noreferrer"
+    >
+      <div class="cnsl-action-button">
+        <span class="portal-span">{{ 'MENU.CUSTOMERPORTAL' | translate }}</span>
+        <i class="las la-external-link-alt"></i>
+      </div>
+    </a>
+    <cnsl-contributors
+      [totalResult]="totalMemberResult"
+      [loading]="loading$ | async"
+      [membersSubject]="membersSubject"
+      title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+      description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
+      (addClicked)="openAddMember()"
+      (showDetailClicked)="showDetail()"
+      (refreshClicked)="loadMembers()"
+      [disabled]="(['iam.member.write'] | hasRole | async) === false"
+    >
+    </cnsl-contributors>
+  </div>
   <cnsl-info-row topContent *ngIf="instance" [instance]="instance"></cnsl-info-row>
 </cnsl-top-view>
 
