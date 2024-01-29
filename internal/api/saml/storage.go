@@ -249,6 +249,24 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 					return object.UserGrantsFromQuery(c, userGrants)
 				}),
 			),
+			actions.SetFields("org",
+				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
+					return func(goja.FunctionCall) goja.Value {
+						metadata, err := p.query.SearchOrgMetadata(
+							ctx,
+							true,
+							user.ResourceOwner,
+							&query.OrgMetadataSearchQueries{},
+							false,
+						)
+						if err != nil {
+							logging.WithError(err).Info("unable to get org metadata in action")
+							panic(err)
+						}
+						return object.OrgMetadataListFromQuery(c, metadata)
+					}
+				}),
+			),
 		),
 	)
 
