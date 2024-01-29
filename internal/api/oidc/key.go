@@ -178,7 +178,7 @@ type keySetOption func(*oidcKeySet)
 
 // withKeyExpiryCheck forces VerifySignature to check the expiry of the public key.
 // Note that public key expiry is not part of the standard,
-// but is currently established behavior or zitadel.
+// but is currently established behavior of zitadel.
 // We might want to remove this check in the future.
 func withKeyExpiryCheck(check bool) keySetOption {
 	return func(k *oidcKeySet) {

@@ -399,7 +399,7 @@ func (wm *PublicKeyReadModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (q *Queries) GetActivePublicKeyByID(ctx context.Context, keyID string) (_ PublicKey, err error) {
+func (q *Queries) GetPublicKeyByID(ctx context.Context, keyID string) (_ PublicKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

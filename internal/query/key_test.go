@@ -269,7 +269,7 @@ MZbmlCoBru+rC8ITlTX/0V1ZcsSbL8tYWhthyu9x6yjo1bH85wiVI4gs0MhU8f2a
 -----END PUBLIC KEY-----
 `
 
-func TestQueries_GetActivePublicKeyByID(t *testing.T) {
+func TestQueries_GetPublicKeyByID(t *testing.T) {
 	now := time.Now()
 	future := now.Add(time.Hour)
 
@@ -438,7 +438,7 @@ func TestQueries_GetActivePublicKeyByID(t *testing.T) {
 				q.keyEncryptionAlgorithm = tt.encryption(t)
 			}
 			ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
-			key, err := q.GetActivePublicKeyByID(ctx, "keyID")
+			key, err := q.GetPublicKeyByID(ctx, "keyID")
 			if tt.wantErr != nil {
 				require.ErrorIs(t, err, tt.wantErr)
 				return
