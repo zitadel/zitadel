@@ -29,10 +29,10 @@ type UserSessionView struct {
 	State                        int32     `json:"-" gorm:"column:state"`
 	UserAgentID                  string    `json:"userAgentID" gorm:"column:user_agent_id;primary_key"`
 	UserID                       string    `json:"userID" gorm:"column:user_id;primary_key"`
-	UserName                     string    `json:"-" gorm:"column:user_name"`
-	LoginName                    string    `json:"-" gorm:"column:login_name"`
-	DisplayName                  string    `json:"-" gorm:"column:user_display_name"`
-	AvatarKey                    string    `json:"-" gorm:"column:avatar_key"`
+	UserName                     string    `json:"-" gorm:"-"`
+	LoginName                    string    `json:"-" gorm:"-"`
+	DisplayName                  string    `json:"-" gorm:"-"`
+	AvatarKey                    string    `json:"-" gorm:"-"`
 	SelectedIDPConfigID          string    `json:"selectedIDPConfigID" gorm:"column:selected_idp_config_id"`
 	PasswordVerification         time.Time `json:"-" gorm:"column:password_verification"`
 	PasswordlessVerification     time.Time `json:"-" gorm:"column:passwordless_verification"`
@@ -242,7 +242,5 @@ func (v *UserSessionView) EventTypes() []eventstore.EventType {
 		user.UserDeactivatedType,
 		user.UserIDPLinkRemovedType,
 		user.UserIDPLinkCascadeRemovedType,
-		user.HumanAvatarAddedType,
-		user.HumanAvatarRemovedType,
 	}
 }
