@@ -51,7 +51,7 @@ Next you will need to provide some information about your app.
 
 In your Project, add a new application at the top of the page.
 Select Web application type and continue.
-We use [Authorization Code](/apis/openidoauth/grant-types#authorization-code)for our Symfony application.
+We use [Authorization Code](/apis/openidoauth/grant-types#authorization-code)for our Django application.
 
 ![Create app in console](/img/django/app-create.png)
 
@@ -82,7 +82,7 @@ The secret will not be displayed again, but you can regenerate one if you loose 
 
 <SetupDjango/>
 
-The used base is the "Writing your first Django app"-app from the Django documentation under [https://docs.djangoproject.com/en/5.0/intro/](https://docs.djangoproject.com/en/5.0/intro/),
+The used base is the "Writing your first Django app" from the Django documentation under [https://docs.djangoproject.com/en/5.0/intro/](https://docs.djangoproject.com/en/5.0/intro/),
 which has documented additional parts in to use [mozilla-django-oidc](https://github.com/mozilla/mozilla-django-oidc) to integrate ZITADEL as AuthenticationBackend.
 
 :::info
@@ -119,19 +119,61 @@ AUTHENTICATION_BACKENDS = (
     "mysite.backend.PermissionBackend",
 )
 
-ZITADEL_PROJECT = "ID of the project you created the application in ZITADEL" 
+from dotenv import load_dotenv
+import os
+import requests
+
+
+def discover_oidc(discovery_url: str) -> dict:
+    """
+    Performs OpenID Connect discovery to retrieve the provider configuration.
+    """
+    response = requests.get(discovery_url)
+    if response.status_code != 200:
+        raise ValueError("Failed to retrieve provider configuration.")
+
+    provider_config = response.json()
+
+    # Extract endpoint URLs from provider configuration
+    return {
+        "authorization_endpoint": provider_config["authorization_endpoint"],
+        "token_endpoint": provider_config["token_endpoint"],
+        "userinfo_endpoint": provider_config["userinfo_endpoint"],
+        "jwks_uri": provider_config["jwks_uri"],
+    }
+
+load_dotenv()
+
+ZITADEL_PROJECT = os.environ.get("ZITADEL_PROJECT")
+OIDC_RP_CLIENT_ID = os.environ.get("OIDC_RP_CLIENT_ID")
+OIDC_RP_CLIENT_SECRET = os.environ.get("OIDC_RP_CLIENT_SECRET")
+OIDC_OP_BASE_URL = os.environ.get("OIDC_OP_BASE_URL")
+
+OIDC_RP_SIGN_ALGO = "RS256"
+OIDC_RP_SCOPES = "openid email phone profile"
+OIDC_OP_DISCOVERY_ENDPOINT = OIDC_OP_BASE_URL + "/.well-known/openid-configuration"
+
+# Discover OpenID Connect endpoints
+discovery_info = discover_oidc(OIDC_OP_DISCOVERY_ENDPOINT)
+OIDC_OP_AUTHORIZATION_ENDPOINT = discovery_info["authorization_endpoint"]
+OIDC_OP_TOKEN_ENDPOINT = discovery_info["token_endpoint"]
+OIDC_OP_USER_ENDPOINT = discovery_info["userinfo_endpoint"]
+OIDC_OP_JWKS_ENDPOINT = discovery_info["jwks_uri"]
+
+# URL to redirect after login
+LOGIN_REDIRECT_URL = "http://localhost:8000/"
+# URL to redirect after logout
+LOGOUT_REDIRECT_URL = "http://localhost:8000/"
+# URL to login
+LOGIN_URL = "http://localhost:8000/oidc/authenticate/"
+```
+
+and create a ".env"-file in the root folder with the configuration:
+```bash
+ZITADEL_PROJECT = "ID of the project you created the application in ZITADEL"
 OIDC_RP_CLIENT_ID = "ClientID provided by the created application in ZITADEL"
 OIDC_RP_CLIENT_SECRET = "ClientSecret provided by the created application in ZITADEL"
-OIDC_RP_SIGN_ALGO = "RS256"
-
-OIDC_OP_JWKS_ENDPOINT = "https://example.zitadel.cloud/oauth/v2/keys"
-OIDC_OP_AUTHORIZATION_ENDPOINT = "https://example.zitadel.cloud/oauth/v2/authorize"
-OIDC_OP_TOKEN_ENDPOINT = "https://example.zitadel.cloud/oauth/v2/token"
-OIDC_OP_USER_ENDPOINT = "https://example.zitadel.cloud/oidc/v1/userinfo"
-
-LOGIN_REDIRECT_URL = "http://localhost:8000"
-LOGOUT_REDIRECT_URL = "http://localhost:8000"
-LOGIN_URL = "http://localhost:8000/oidc/authenticate/"
+OIDC_OP_BASE_URL = "https://example.zitadel.cloud"
 ```
 
 ### AuthenticationBackend definition
@@ -156,25 +198,39 @@ class PermissionBackend(OIDCAuthenticationBackend):
         )
 
         if "admin" in claims[permClaim].keys():
-            return self.UserModel.objects.create_user(
+            user = self.UserModel.objects.create_user(
                 username, email=email, is_superuser=True, is_staff=True
             )
+            user.first_name = claims.get("given_name")
+            user.last_name = claims.get("family_name")
+            user.save()
+            return user
         elif "staff" in claims[permClaim].keys():
-            return self.UserModel.objects.create_user(
+            user = self.UserModel.objects.create_user(
                 username, email=email, is_staff=True
             )
+            user.first_name = claims.get("given_name")
+            user.last_name = claims.get("family_name")
+            user.save()
+            return user
         elif "user" in claims[permClaim].keys():
-            return self.UserModel.objects.create_user(username, email=email)
+            user = self.UserModel.objects.create_user(username, email=email)
+            user.first_name = claims.get("given_name")
+            user.last_name = claims.get("family_name")
+            user.save()
+            return user
         else:
             return self.UserModel.objects.none()
 
     def update_user(self, user, claims):
+        user.first_name = claims.get("given_name")
+        user.last_name = claims.get("family_name")
         permClaim = (
             "urn:zitadel:iam:org:project:"
             + self.get_settings("ZITADEL_PROJECT")
             + ":roles"
         )
-        
+
         if "admin" in claims[permClaim].keys():
             user.is_superuser = True
             user.is_staff = True
@@ -184,6 +240,7 @@ class PermissionBackend(OIDCAuthenticationBackend):
         elif "user" in claims[permClaim].keys():
             user.is_superuser = False
             user.is_staff = False
+        user.save()
         return user
 
 ```
@@ -207,7 +264,7 @@ urlpatterns = [
 ## Configure and run the application
 
 :::warning
-Never store and commit secrets in the settings.py file
+Never store and commit secrets in the ".env" or settings.py file
 :::
 
 ### Authentication and authorization
@@ -309,7 +366,7 @@ Visit http://localhost:8000/polls or http://localhost:8000/admin and click aroun
 
 ## Completion
 
-Congratulations! You have successfully integrated your Symfony application with ZITADEL!
+Congratulations! You have successfully integrated your Python Django application with ZITADEL!
 
 If you get stuck, consider checking out our [example](https://github.com/zitadel/example-python-django-oidc) application. This application includes all the functionalities mentioned in this quick-start. You can start by cloning the repository and defining the settings in the settings.py. If you face issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/example-python-django-oidc/issues).
 

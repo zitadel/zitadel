@@ -74,10 +74,21 @@ python -m pip install authlib
 There is info needed for the introspection calls, which we put into the settings.py:
 
 ```python
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+ZITADEL_INTROSPECTION_URL = os.environ.get("ZITADEL_INTROSPECTION_URL")
+ZITADEL_DOMAIN = os.environ.get("ZITADEL_DOMAIN")
+API_PRIVATE_KEY_FILE_PATH = os.environ.get("API_PRIVATE_KEY_FILE_PATH")
+ALGORITHM = 'RS256'
+```
+
+and create a ".env"-file in the root folder with the configuration:
+```bash
 ZITADEL_INTROSPECTION_URL = 'https://example.zitadel.cloud/oauth/v2/introspect'
 ZITADEL_DOMAIN = 'https://example.zitadel.cloud'
-API_PRIVATE_KEY_FILE_PATH = 'Path to the API-key-file'
-ALGORITHM = 'RS256'
+API_PRIVATE_KEY_FILE_PATH = '/tmp/example/250719519163548111.json'
 ```
 
 ### Validator definition
