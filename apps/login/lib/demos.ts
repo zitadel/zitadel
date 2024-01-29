@@ -16,22 +16,12 @@ export const demos: { name: string; items: Item[] }[] = [
       {
         name: "Loginname",
         slug: "loginname",
-        description: "The entrypoint of the application",
-      },
-      {
-        name: "Password",
-        slug: "password",
-        description: "The page to request a users password",
+        description: "Start the loginflow with loginname",
       },
       {
         name: "Accounts",
         slug: "accounts",
         description: "List active and inactive sessions",
-      },
-      {
-        name: "Passkey Registration",
-        slug: "passkey/add",
-        description: "The page to add a users passkey device",
       },
     ],
   },
@@ -41,17 +31,12 @@ export const demos: { name: string; items: Item[] }[] = [
       {
         name: "Register",
         slug: "register",
-        description: "Create your ZITADEL account",
+        description: "Add a user with password or passkey",
       },
       {
         name: "IDP Register",
         slug: "register/idp",
-        description: "Register with an Identity Provider",
-      },
-      {
-        name: "Verify email",
-        slug: "verify",
-        description: "Verify your account with an email code",
+        description: "Add a user from an external identity provider",
       },
     ],
   },

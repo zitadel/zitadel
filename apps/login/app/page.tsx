@@ -36,6 +36,15 @@ export default function Page() {
           );
         })}
       </div>
+
+      <div className="flex flex-col">
+        <div className="mb-5 text-xs font-semibold uppercase tracking-wider text-gray-500">
+          Deploy your own on Vercel
+        </div>
+        <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Ftypescript&env=ZITADEL_API_URL,ZITADEL_SERVICE_USER_ID,ZITADEL_SERVICE_USER_TOKEN&envDescription=Setup%20a%20service%20account%20with%20IAM_OWNER%20membership%20on%20your%20instance%20and%20provide%20its%20id%20and%20personal%20access%20token.&project-name=zitadel-login&repository-name=zitadel-login">
+          <img src="https://vercel.com/button" alt="Deploy with Vercel" />
+        </a>
+      </div>
     </div>
   );
 }
