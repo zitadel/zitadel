@@ -17,6 +17,8 @@ This trigger is called before attributes are set in the SAMLResponse.
     - `user`
       - `getMetadata()` [*metadataResult*](./objects#metadata-result)
       - `grants` [*UserGrantList*](./objects#user-grant-list)
+    - `org`
+      - `getMetadata()` [*metadataResult*](./objects#metadata-result)
 - `api`  
   The second parameter contains the following fields:
   - `v1`
