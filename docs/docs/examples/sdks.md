@@ -9,16 +9,17 @@ Management for resources.
 
 ## ZITADEL SDKs
 
-| Language / Framework | Link Github                                                   | User Authentication                                       | Manage resources | Notes       |
-|----------------------|---------------------------------------------------------------|-----------------------------------------------------------|------------------|-------------|
-| .NET                 | [zitadel-net](https://github.com/smartive/zitadel-net)        | ✔️                                                        | ✔️               | `community` |
-| Elixir               | [zitadel_api](https://github.com/jshmrtn/zitadel_api)         | ✔️                                                        | ✔️               | `community` |
-| Go                   | [zitadel-go](https://github.com/zitadel/zitadel-go)           | 🚧 [WIP](https://github.com/zitadel/zitadel-go/tree/next) | ✔️               | `official`  |
-| JVM                  | 🚧 [WIP](https://github.com/zitadel/zitadel/discussions/3650) | ❓                                                         | ❓                | TBD         |
-| Python               | 🚧 [WIP](https://github.com/zitadel/zitadel/issues/3675)      | ❓                                                         | ❓                | TBD         |
-| NodeJS               | [@zitadel/node](https://www.npmjs.com/package/@zitadel/node)  | ❌                                                         | ✔️               | `community` |
-| Dart                 | [zitadel-dart](https://github.com/smartive/zitadel-dart)      | ❌                                                         | ✔️               | `community` |
-| Rust                 | [zitadel-rust](https://github.com/smartive/zitadel-rust)      | ✔️                                                        | ✔️               | `community` |
+| Language / Framework | Link Github                                                   | User Authentication                                       | Manage resources | Notes             |
+|----------------------|---------------------------------------------------------------|-----------------------------------------------------------|------------------|-------------------|
+| Go                   | [zitadel-go](https://github.com/zitadel/zitadel-go)           | 🚧 [WIP](https://github.com/zitadel/zitadel-go/tree/next) | ✔️               | `official`        |
+| Vue                  | [zitadel-vue](https://github.com/zitadel/zitadel-vue)         | ✔️                                                        | ❌                | `official`        |
+| .NET                 | [zitadel-net](https://github.com/smartive/zitadel-net)        | ✔️                                                        | ✔️               | `community`       |
+| Elixir               | [zitadel_api](https://github.com/jshmrtn/zitadel_api)         | ✔️                                                        | ✔️               | `community`       |
+| NodeJS               | [@zitadel/node](https://www.npmjs.com/package/@zitadel/node)  | ❌                                                         | ✔️               | `community`       |
+| Dart                 | [zitadel-dart](https://github.com/smartive/zitadel-dart)      | ❌                                                         | ✔️               | `community`       |
+| Rust                 | [zitadel-rust](https://github.com/smartive/zitadel-rust)      | ✔️                                                        | ✔️               | `community`       |
+| JVM                  | 🚧 [WIP](https://github.com/zitadel/zitadel/discussions/3650) | ❓                                                         | ❓                | TBD               |
+| Python               | 🚧 [WIP](https://github.com/zitadel/zitadel/issues/3675)      | ❓                                                         | ❓                | TBD               |
 
 ## Missing SDK
 

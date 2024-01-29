@@ -830,6 +830,9 @@ DefaultInstance:
     # A value of "0s" means that all events are available.
     # If this value is set, it overwrites the system default unless it is not reset via the admin API.
     AuditLogRetention: # ZITADEL_DEFAULTINSTANCE_LIMITS_AUDITLOGRETENTION
+    # If Block is true, all requests except to /ui/console or the system API are blocked and /ui/login is redirected to /ui/console.
+    # /ui/console shows a message that the instance is blocked with a link to Console.InstanceManagementURL
+    Block: # ZITADEL_DEFAULTINSTANCE_LIMITS_BLOCK
   Restrictions:
     # DisallowPublicOrgRegistration defines if ZITADEL should expose the endpoint /ui/login/register/org
     # If it is true, the endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.
@@ -862,7 +865,8 @@ DefaultInstance:
 #        ResetInterval: 720h # 30 days
 #        # Amount defines the number of units for this quota
 #        Amount: 25000
-#        # Limit defines whether ZITADEL should block further usage when the configured amount is used
+#        # Limit defines whether ZITADEL should block further authenticated requests when the configured amount is used.
+#        # If you not only want to block authenticated requests but also authentication itself, consider using the system APIs SetLimits method.
 #        Limit: false
 #        # Notifications are emitted by ZITADEL when certain quota percentages are reached
 #        Notifications:
@@ -1323,3 +1327,12 @@ InternalAuthZ:
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
+
+# If a new projection is introduced it will be prefilled during the setup process (if enabled)
+# This can prevent serving outdated data after a version upgrade, but might require a longer setup / upgrade process:
+# https://zitadel.com/docs/self-hosting/manage/updating_scaling
+InitProjections:
+  Enabled: false # ZITADEL_INITPROJECTIONS_ENABLED
+  RetryFailedAfter: 100ms # ZITADEL_INITPROJECTIONS_RETRYFAILEDAFTER
+  MaxFailureCount: 2 # ZITADEL_INITPROJECTIONS_MAXFAILURECOUNT
+  BulkLimit: 1000 # ZITADEL_INITPROJECTIONS_BULKLIMIT
