@@ -23,11 +23,6 @@ export const demos: { name: string; items: Item[] }[] = [
         slug: "accounts",
         description: "List active and inactive sessions",
       },
-      {
-        name: "Passkey Registration",
-        slug: "passkey/add",
-        description: "The page to add a users passkey device",
-      },
     ],
   },
   {
