@@ -85,7 +85,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Система",
+    "INSTANCE": "настройки по умолчанию",
     "DASHBOARD": "Главная",
     "PERSONAL_INFO": "Персональная информация",
     "DOCUMENTATION": "Документация",

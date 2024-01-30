@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instanz",
+    "INSTANCE": "Standardeinstellungen",
     "DASHBOARD": "Startseite",
     "PERSONAL_INFO": "Persönliche Informationen",
     "DOCUMENTATION": "Dokumentation",

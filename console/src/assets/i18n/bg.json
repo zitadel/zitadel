@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Инстанция",
+    "INSTANCE": "настройките по подразбиране",
     "DASHBOARD": "Табло",
     "PERSONAL_INFO": "Лична информация",
     "DOCUMENTATION": "Документация",

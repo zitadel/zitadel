@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instance",
+    "INSTANCE": "Default settings",
     "DASHBOARD": "Home",
     "PERSONAL_INFO": "Personal Information",
     "DOCUMENTATION": "Documentation",

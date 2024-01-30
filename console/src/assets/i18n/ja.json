@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "インスタンス",
+    "INSTANCE": "デフォルトの設定",
     "DASHBOARD": "ホーム",
     "PERSONAL_INFO": "個人情報",
     "DOCUMENTATION": "ドキュメント",

@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instance",
+    "INSTANCE": "Výchozí nastavení",
     "DASHBOARD": "Domů",
     "PERSONAL_INFO": "Osobní informace",
     "DOCUMENTATION": "Dokumentace",

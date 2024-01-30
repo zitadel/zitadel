@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "实例",
+    "INSTANCE": "默认设置",
     "DASHBOARD": "首页",
     "PERSONAL_INFO": "个人信息",
     "DOCUMENTATION": "文档",
