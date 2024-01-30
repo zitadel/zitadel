@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limieten niet gevonden
     NoneSpecified: Geen limieten gespecificeerd
+    Instance:
+      Blocked: Instantie is geblokkeerd
   Restrictions:
     NoneSpecified: Geen beperkingen gespecificeerd
     DefaultLanguageMustBeAllowed: De standaardtaal moet worden toegestaan

@@ -25,6 +25,7 @@ import (
 	"golang.org/x/net/http2/h2c"
 
 	"github.com/zitadel/zitadel/cmd/build"
+	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/key"
 	cmd_tls "github.com/zitadel/zitadel/cmd/tls"
 	"github.com/zitadel/zitadel/feature"
@@ -95,7 +96,7 @@ Requirements:
 			if err != nil {
 				return err
 			}
-			return startZitadel(config, masterKey, server)
+			return startZitadel(cmd.Context(), config, masterKey, server)
 		},
 	}
 
@@ -108,7 +109,7 @@ type Server struct {
 	Config     *Config
 	DB         *database.DB
 	KeyStorage crypto.KeyStorage
-	Keys       *encryptionKeys
+	Keys       *encryption.EncryptionKeys
 	Eventstore *eventstore.Eventstore
 	Queries    *query.Queries
 	AuthzRepo  authz_repo.Repository
@@ -119,10 +120,8 @@ type Server struct {
 	Shutdown   chan<- os.Signal
 }
 
-func startZitadel(config *Config, masterKey string, server chan<- *Server) error {
+func startZitadel(ctx context.Context, config *Config, masterKey string, server chan<- *Server) error {
 	showBasicInformation(config)
-
-	ctx := context.Background()
 
 	i18n.MustLoadSupportedLanguagesFromDir()
 
@@ -143,7 +142,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	if err != nil {
 		return fmt.Errorf("cannot start key storage: %w", err)
 	}
-	keys, err := ensureEncryptionKeys(config.EncryptionKeys, keyStorage)
+	keys, err := encryption.EnsureEncryptionKeys(ctx, config.EncryptionKeys, keyStorage)
 	if err != nil {
 		return err
 	}
@@ -174,6 +173,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		},
 		config.AuditLogRetention,
 		config.SystemAPIUsers,
+		true,
 	)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
@@ -238,7 +238,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 	actionsLogstoreSvc := logstore.New(queries, actionsExecutionDBEmitter, actionsExecutionStdoutEmitter)
 	actions.SetLogstoreService(actionsLogstoreSvc)
 
-	notification.Start(
+	notification.Register(
 		ctx,
 		config.Projections.Customizations["notifications"],
 		config.Projections.Customizations["notificationsquotas"],
@@ -256,6 +256,7 @@ func startZitadel(config *Config, masterKey string, server chan<- *Server) error
 		keys.SMTP,
 		keys.SMS,
 	)
+	notification.Start(ctx)
 
 	router := mux.NewRouter()
 	tlsConfig, err := config.TLS.Config()
@@ -315,7 +316,7 @@ func startAPIs(
 	config *Config,
 	store static.Storage,
 	authZRepo authz_repo.Repository,
-	keys *encryptionKeys,
+	keys *encryption.EncryptionKeys,
 	permissionCheck domain.PermissionCheck,
 ) error {
 	repo := struct {
@@ -327,7 +328,7 @@ func startAPIs(
 	}
 	oidcPrefixes := []string{"/.well-known/openid-configuration", "/oidc/v1", "/oauth/v2"}
 	// always set the origin in the context if available in the http headers, no matter for what protocol
-	router.Use(middleware.OriginHandler)
+	router.Use(middleware.WithOrigin(config.ExternalSecure))
 	systemTokenVerifier, err := internal_authz.StartSystemTokenVerifierFromConfig(http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
 	if err != nil {
 		return err
@@ -386,10 +387,10 @@ func startAPIs(
 	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, keys.User, config.ExternalSecure), tlsConfig); err != nil {
 		return err
 	}
-	if err := apis.RegisterService(ctx, user_v2.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(config.ExternalSecure), idp.SAMLRootURL(config.ExternalSecure))); err != nil {
+	if err := apis.RegisterService(ctx, user_v2.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(config.ExternalSecure), idp.SAMLRootURL(config.ExternalSecure), assets.AssetAPI(config.ExternalSecure), permissionCheck)); err != nil {
 		return err
 	}
-	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries, permissionCheck)); err != nil {
+	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries)); err != nil {
 		return err
 	}
 
@@ -441,14 +442,14 @@ func startAPIs(
 		return fmt.Errorf("unable to start console: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(console.HandlerPrefix, c)
-
+	consolePath := console.HandlerPrefix + "/"
 	l, err := login.CreateLogin(
 		config.Login,
 		commands,
 		queries,
 		authRepo,
 		store,
-		console.HandlerPrefix+"/",
+		consolePath,
 		oidcServer.AuthCallbackURL(),
 		provider.AuthCallbackURL(samlProvider),
 		config.ExternalSecure,
@@ -457,7 +458,7 @@ func startAPIs(
 		provider.NewIssuerInterceptor(samlProvider.IssuerFromRequest).Handler,
 		instanceInterceptor.Handler,
 		assetsCache.Handler,
-		limitingAccessInterceptor.WithoutLimiting().Handle,
+		limitingAccessInterceptor.WithRedirect(consolePath).Handle,
 		keys.User,
 		keys.IDPConfig,
 		keys.CSRFCookieKey,

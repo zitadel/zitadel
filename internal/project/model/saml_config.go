@@ -10,7 +10,3 @@ type SAMLConfig struct {
 	Metadata    []byte
 	MetadataURL string
 }
-
-func (c *SAMLConfig) IsValid() bool {
-	return !(c.Metadata == nil && c.MetadataURL == "")
-}

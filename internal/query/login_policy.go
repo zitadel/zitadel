@@ -198,29 +198,22 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
-		policy, err = q.scanAndAddLinksToLoginPolicy(ctx, rows, scan)
+		policy, err = scan(rows)
 		return err
 	}, stmt, args...)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-SWgr3", "Errors.Internal")
 	}
-	return policy, nil
+	return policy, q.addLinksToLoginPolicy(ctx, policy)
 }
 
-func (q *Queries) scanAndAddLinksToLoginPolicy(ctx context.Context, rows *sql.Rows, scan func(*sql.Rows) (*LoginPolicy, error)) (*LoginPolicy, error) {
-	policy, err := scan(rows)
-	if err != nil {
-		return nil, err
-	}
-
+func (q *Queries) addLinksToLoginPolicy(ctx context.Context, policy *LoginPolicy) error {
 	links, err := q.IDPLoginPolicyLinks(ctx, policy.OrgID, &IDPLoginPolicyLinksSearchQuery{}, false)
 	if err != nil {
-		return nil, err
+		return zerrors.ThrowInternal(err, "QUERY-aa4Ve", "Errors.Internal")
 	}
-	for _, link := range links.Links {
-		policy.IDPLinks = append(policy.IDPLinks, link)
-	}
-	return policy, nil
+	policy.IDPLinks = append(policy.IDPLinks, links.Links...)
+	return nil
 }
 
 func (q *Queries) DefaultLoginPolicy(ctx context.Context) (policy *LoginPolicy, err error) {
@@ -237,13 +230,13 @@ func (q *Queries) DefaultLoginPolicy(ctx context.Context) (policy *LoginPolicy, 
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
-		policy, err = q.scanAndAddLinksToLoginPolicy(ctx, rows, scan)
+		policy, err = scan(rows)
 		return err
 	}, stmt, args...)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-SArt2", "Errors.Internal")
 	}
-	return policy, nil
+	return policy, q.addLinksToLoginPolicy(ctx, policy)
 }
 
 func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (factors *SecondFactors, err error) {

@@ -8,10 +8,10 @@
           ? 4
           : 3
         : appType?.value?.createType === AppCreateType.API
-        ? 3
-        : appType?.value?.createType === AppCreateType.SAML
-        ? 3
-        : 0
+          ? 3
+          : appType?.value?.createType === AppCreateType.SAML
+            ? 3
+            : 0
       : 0
   "
   [currentCreateStep]="currentCreateStep"

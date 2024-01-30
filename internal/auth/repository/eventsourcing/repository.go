@@ -38,6 +38,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 	}
 
 	auth_handler.Register(ctx, conf.Spooler, view, queries)
+	auth_handler.Start(ctx)
 
 	authReq := cache.Start(dbClient)
 
@@ -117,7 +118,7 @@ func (q queryViewWrapper) UserGrantsByProjectAndUserID(ctx context.Context, proj
 		return nil, err
 	}
 	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID, userGrantProjectID}}
-	grants, err := q.Queries.UserGrants(ctx, queries, true, false)
+	grants, err := q.Queries.UserGrants(ctx, queries, true)
 	if err != nil {
 		return nil, err
 	}
