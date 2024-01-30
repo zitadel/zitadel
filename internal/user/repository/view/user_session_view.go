@@ -1,14 +1,13 @@
 package view
 
 import (
-	"context"
 	"database/sql"
 	_ "embed"
 	"errors"
 
 	"github.com/jinzhu/gorm"
-	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/database"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
 	"github.com/zitadel/zitadel/internal/view/repository"
@@ -21,48 +20,29 @@ var userSessionByIDQuery string
 //go:embed user_sessions_by_user_agent.sql
 var userSessionsByUserAgentQuery string
 
-func UserSessionByIDs(db *gorm.DB, agentID, userID, instanceID string) (*model.UserSessionView, error) {
-	tx, err := db.DB().BeginTx(context.Background(), &sql.TxOptions{ReadOnly: true})
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		if err := tx.Commit(); err != nil {
-			logging.WithError(err).Info("commit failed")
-			err = tx.Rollback()
-			logging.OnError(err).Info("rollback failed")
-		}
-	}()
-	row := tx.QueryRow(
+func UserSessionByIDs(db *database.DB, agentID, userID, instanceID string) (userSession *model.UserSessionView, err error) {
+	err = db.QueryRow(
+		func(row *sql.Row) error {
+			userSession, err = scanUserSession(row)
+			return err
+		},
 		userSessionByIDQuery,
 		agentID,
 		userID,
 		instanceID,
 	)
-	userSession, err := scanUserSession(row)
 	return userSession, err
 }
-func UserSessionsByAgentID(db *gorm.DB, agentID, instanceID string) ([]*model.UserSessionView, error) {
-	tx, err := db.DB().BeginTx(context.Background(), &sql.TxOptions{ReadOnly: true})
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		if err := tx.Commit(); err != nil {
-			logging.WithError(err).Info("commit failed")
-			err = tx.Rollback()
-			logging.OnError(err).Info("rollback failed")
-		}
-	}()
-	rows, err := tx.Query(
+func UserSessionsByAgentID(db *database.DB, agentID, instanceID string) (userSessions []*model.UserSessionView, err error) {
+	err = db.Query(
+		func(rows *sql.Rows) error {
+			userSessions, err = scanUserSessions(rows)
+			return err
+		},
 		userSessionsByUserAgentQuery,
-		instanceID,
 		agentID,
+		instanceID,
 	)
-	if err != nil {
-		return nil, err
-	}
-	userSessions, err := scanUserSessions(rows)
 	return userSessions, err
 }
 

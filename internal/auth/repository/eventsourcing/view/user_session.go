@@ -15,11 +15,11 @@ const (
 )
 
 func (v *View) UserSessionByIDs(agentID, userID, instanceID string) (*model.UserSessionView, error) {
-	return view.UserSessionByIDs(v.Db, agentID, userID, instanceID)
+	return view.UserSessionByIDs(v.client, agentID, userID, instanceID)
 }
 
 func (v *View) UserSessionsByAgentID(agentID, instanceID string) ([]*model.UserSessionView, error) {
-	return view.UserSessionsByAgentID(v.Db, agentID, instanceID)
+	return view.UserSessionsByAgentID(v.client, agentID, instanceID)
 }
 
 func (v *View) PutUserSession(userSession *model.UserSessionView) error {

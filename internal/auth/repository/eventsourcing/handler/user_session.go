@@ -238,6 +238,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			[]handler.Condition{
 				handler.NewCond("instance_id", event.Aggregate().InstanceID),
 				handler.NewCond("user_id", event.Aggregate().ID),
+				handler.Not(handler.NewCond("state", domain.UserSessionStateTerminated)),
 			},
 		), nil
 	case user.UserV1PasswordChangedType,
@@ -254,6 +255,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 				handler.NewCond("instance_id", event.Aggregate().InstanceID),
 				handler.NewCond("user_id", event.Aggregate().ID),
 				handler.Not(handler.NewCond("user_agent_id", userAgent)),
+				handler.Not(handler.NewCond("state", domain.UserSessionStateTerminated)),
 			},
 		), nil
 	case user.UserV1MFAOTPRemovedType,
@@ -266,6 +268,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			[]handler.Condition{
 				handler.NewCond("instance_id", event.Aggregate().InstanceID),
 				handler.NewCond("user_id", event.Aggregate().ID),
+				handler.Not(handler.NewCond("state", domain.UserSessionStateTerminated)),
 			},
 		), nil
 	case user.UserIDPLinkRemovedType,
@@ -278,6 +281,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			[]handler.Condition{
 				handler.NewCond("instance_id", event.Aggregate().InstanceID),
 				handler.NewCond("user_id", event.Aggregate().ID),
+				handler.Not(handler.NewCond("selected_idp_config_id", "")),
 			},
 		), nil
 	case user.HumanPasswordlessTokenRemovedType:
@@ -289,6 +293,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			[]handler.Condition{
 				handler.NewCond("instance_id", event.Aggregate().InstanceID),
 				handler.NewCond("user_id", event.Aggregate().ID),
+				handler.Not(handler.NewCond("state", domain.UserSessionStateTerminated)),
 			},
 		), nil
 	case user.UserRemovedType:
