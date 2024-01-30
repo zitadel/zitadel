@@ -48,16 +48,6 @@ module.exports = {
     {
       type: "category",
       label: "Examples & SDKs",
-      link: {
-        type: "generated-index",
-        title: "Overview",
-        slug: "sdk-examples/overview",
-        description:
-            "You can integrate ZITADEL quickly into your application and be up and running within minutes.\n" +
-            "To achieve your goals as fast as possible, we provide you with SDKs, Example Repositories and Guides.\n" +
-            "\n" +
-            "The SDKs and Integration depend on the framework and language you are using.",
-      },
       items: [
         "sdk-examples/introduction",
         "sdk-examples/angular",

@@ -93,11 +93,11 @@ Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
 
 ### Example applications
 
-Clone one of our [example applications](https://zitadel.com/docs/examples/introduction#clone-a-sample-project) or deploy them directly to Vercel.
+Clone one of our [example applications](https://zitadel.com/docs/sdk-examples/introduction) or deploy them directly to Vercel.
 
 ### SDKs
 
-Use our [SDKs](https://zitadel.com/docs/examples/sdks) for your favorite language and framework.
+Use our [SDKs](https://zitadel.com/docs/sdk-examples/introduction) for your favorite language and framework.
 
 ## Why choose ZITADEL
 
