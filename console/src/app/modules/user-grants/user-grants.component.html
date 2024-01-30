@@ -109,7 +109,7 @@
       <ng-container matColumnDef="org">
         <th mat-header-cell *matHeaderCellDef>{{ 'PROJECT.GRANT.ORG' | translate }}</th>
         <td mat-cell *matCellDef="let grant">
-          {{ grant.orgName }}
+          {{ grant.grantedOrgName }}
         </td>
       </ng-container>
 
@@ -169,7 +169,7 @@
               <i class="las la-trash"></i>
             </button>
 
-            <button menuActions mat-menu-item [routerLink]="['/users', grant.userId]">
+            <button menuActions mat-menu-item (click)="showUser(grant)">
               {{ 'ACTIONS.TABLE.SHOWUSER' | translate: { value: grant.displayName } }}
             </button>
           </cnsl-table-actions>

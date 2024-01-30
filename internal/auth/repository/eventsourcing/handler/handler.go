@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	query2 "github.com/zitadel/zitadel/internal/query"
 )
@@ -26,28 +27,40 @@ type ConfigOverwrites struct {
 	MinimumCycleDuration time.Duration
 }
 
+var projections []*handler.Handler
+
 func Register(ctx context.Context, configs Config, view *view.View, queries *query2.Queries) {
-	newUser(ctx,
+	projections = append(projections, newUser(ctx,
 		configs.overwrite("User"),
 		view,
 		queries,
-	).Start(ctx)
+	))
 
-	newUserSession(ctx,
+	projections = append(projections, newUserSession(ctx,
 		configs.overwrite("UserSession"),
 		view,
 		queries,
-	).Start(ctx)
+	))
 
-	newToken(ctx,
+	projections = append(projections, newToken(ctx,
 		configs.overwrite("Token"),
 		view,
-	).Start(ctx)
+	))
 
-	newRefreshToken(ctx,
+	projections = append(projections, newRefreshToken(ctx,
 		configs.overwrite("RefreshToken"),
 		view,
-	).Start(ctx)
+	))
+}
+
+func Start(ctx context.Context) {
+	for _, projection := range projections {
+		projection.Start(ctx)
+	}
+}
+
+func Projections() []*handler2.Handler {
+	return projections
 }
 
 func (config Config) overwrite(viewModel string) handler2.Config {

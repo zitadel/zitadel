@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	handler2 "github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/static"
 )
@@ -26,16 +27,28 @@ type ConfigOverwrites struct {
 	MinimumCycleDuration time.Duration
 }
 
+var projections []*handler.Handler
+
 func Register(ctx context.Context, config Config, view *view.View, static static.Storage) {
 	if static == nil {
 		return
 	}
 
-	newStyling(ctx,
+	projections = append(projections, newStyling(ctx,
 		config.overwrite("Styling"),
 		static,
 		view,
-	).Start(ctx)
+	))
+}
+
+func Start(ctx context.Context) {
+	for _, projection := range projections {
+		projection.Start(ctx)
+	}
+}
+
+func Projections() []*handler2.Handler {
+	return projections
 }
 
 func (config Config) overwrite(viewModel string) handler2.Config {
