@@ -92,6 +92,14 @@ https://github.com/zitadel/zitadel-react/blob/main/src/components/Callback.tsx
 
 You can now read out a users role to show protected areas of the application.
 
+### Run
+
+Finally you can start your application by running:
+
+```
+yarn start
+```
+
 ## Completion
 
 Congratulations! You have successfully integrated your React application with ZITADEL!
