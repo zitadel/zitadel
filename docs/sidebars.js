@@ -45,7 +45,6 @@ module.exports = {
         },
       ],
     },
-    //"examples/sdks",
     {
       type: "category",
       label: "Examples & SDKs",
@@ -107,24 +106,6 @@ module.exports = {
           href: "https://github.com/smartive/zitadel-rust",
         },
       ],
-    },
-    {
-      type: "category",
-      label: "Example Applications",
-      items: [
-        "examples/introduction",
-        {
-          type: "link",
-          label: "Frontend", // The link label
-          href: "/examples/introduction#frontend", // The internal path
-        },
-        {
-          type: "link",
-          label: "Backend", // The link label
-          href: "/examples/introduction#backend", // The internal path
-        },
-      ],
-      collapsed: true,
     },
     {
       type: "category",
