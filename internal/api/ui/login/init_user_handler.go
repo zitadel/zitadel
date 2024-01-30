@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -85,7 +86,8 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 		l.renderInitUser(w, r, authReq, data.UserID, data.LoginName, "", data.PasswordSet, err)
 		return
 	}
-	err = l.command.HumanVerifyInitCode(setContext(r.Context(), userOrgID), data.UserID, userOrgID, data.Code, data.Password, initCodeGenerator)
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	err = l.command.HumanVerifyInitCode(setContext(r.Context(), userOrgID), data.UserID, userOrgID, data.Code, data.Password, userAgentID, initCodeGenerator)
 	if err != nil {
 		l.renderInitUser(w, r, authReq, data.UserID, data.LoginName, "", data.PasswordSet, err)
 		return
