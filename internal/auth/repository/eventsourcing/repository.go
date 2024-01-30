@@ -3,7 +3,6 @@ package eventsourcing
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	auth_handler "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/handler"
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
@@ -76,7 +75,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 			ProjectProvider:           queryView,
 			ApplicationProvider:       queries,
 			CustomTextProvider:        queries,
-			FeatureCheck:              feature.NewCheck(esV2),
 			IdGenerator:               id.SonyFlakeGenerator(),
 		},
 		eventstore.TokenRepo{

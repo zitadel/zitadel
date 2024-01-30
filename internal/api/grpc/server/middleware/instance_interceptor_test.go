@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
+	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/api/authz"
 )
 
@@ -207,4 +208,8 @@ func (m *mockInstance) RequestedHost() string {
 
 func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 	return nil
+}
+
+func (m *mockInstance) Features() feature.Instance {
+	return feature.Instance{}
 }

@@ -12,6 +12,7 @@ import (
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -20,7 +21,7 @@ import (
 	action_repo "github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
-	"github.com/zitadel/zitadel/internal/repository/feature"
+	feature_repo "github.com/zitadel/zitadel/internal/repository/feature"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
 	key_repo "github.com/zitadel/zitadel/internal/repository/keypair"
@@ -63,7 +64,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	quota_repo.RegisterEventMappers(es)
 	limits.RegisterEventMappers(es)
 	restrictions.RegisterEventMappers(es)
-	feature.RegisterEventMappers(es)
+	feature_repo.RegisterEventMappers(es)
 	deviceauth.RegisterEventMappers(es)
 	return es
 }
@@ -245,6 +246,10 @@ func (m *mockInstance) RequestedHost() string {
 
 func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 	return nil
+}
+
+func (m *mockInstance) Features() feature.Instance {
+	return feature.Instance{}
 }
 
 func newMockPermissionCheckAllowed() domain.PermissionCheck {

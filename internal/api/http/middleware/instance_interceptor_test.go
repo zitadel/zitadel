@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
 )
@@ -342,4 +343,8 @@ func (m *mockInstance) RequestedHost() string {
 
 func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 	return nil
+}
+
+func (m *mockInstance) Features() feature.Instance {
+	return feature.Instance{}
 }

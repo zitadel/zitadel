@@ -27,7 +27,6 @@ import (
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/key"
 	cmd_tls "github.com/zitadel/zitadel/cmd/tls"
-	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/api"
@@ -459,7 +458,6 @@ func startAPIs(
 		keys.User,
 		keys.IDPConfig,
 		keys.CSRFCookieKey,
-		feature.NewCheck(eventstore),
 	)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)

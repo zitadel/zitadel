@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
@@ -104,6 +105,7 @@ type Instance struct {
 	csp               csp
 	block             *bool
 	auditLogRetention *time.Duration
+	features          feature.Instance
 }
 
 type csp struct {
@@ -161,6 +163,10 @@ func (i *Instance) Block() *bool {
 
 func (i *Instance) AuditLogRetention() *time.Duration {
 	return i.auditLogRetention
+}
+
+func (i *Instance) Features() feature.Instance {
+	return i.features
 }
 
 type InstanceSearchQueries struct {
@@ -525,7 +531,7 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 			From(instanceTable.identifier()).
 			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
 			LeftJoin(join(SecurityPolicyColumnInstanceID, InstanceColumnID)).
-			LeftJoin(join(LimitsColumnInstanceID, InstanceColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(LimitsColumnInstanceID, InstanceColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Instance, error) {
 			instance := &Instance{
