@@ -73,22 +73,23 @@ python -m pip install authlib
 
 There is info needed for the introspection calls, which we put into the settings.py:
 
-```python
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-ZITADEL_INTROSPECTION_URL = os.environ.get("ZITADEL_INTROSPECTION_URL")
-ZITADEL_DOMAIN = os.environ.get("ZITADEL_DOMAIN")
-API_PRIVATE_KEY_FILE_PATH = os.environ.get("API_PRIVATE_KEY_FILE_PATH")
-ALGORITHM = 'RS256'
+```python reference
+https://github.com/zitadel/example-python-django-oauth/blob/main/mysite/settings.py#L127-L132
 ```
 
-and create a ".env"-file in the root folder with the configuration:
+and create a ".env"-file in the root folder with the configuration as an example:
+```bash
+ZITADEL_INTROSPECTION_URL = 'URL to the introspection endpoint to verify the provided token'
+ZITADEL_DOMAIN = 'Domain used as audience in the token verification'
+API_PRIVATE_KEY_FILE_PATH = 'Path to the key.json created in ZITADEL'
+```
+
+I should look something like this:
+
 ```bash
 ZITADEL_INTROSPECTION_URL = 'https://example.zitadel.cloud/oauth/v2/introspect'
 ZITADEL_DOMAIN = 'https://example.zitadel.cloud'
-API_PRIVATE_KEY_FILE_PATH = '/tmp/example/250719519163548111.json'
+API_PRIVATE_KEY_FILE_PATH = '/tmp/example/250719519163548112.json'
 ```
 
 ### Validator definition
@@ -96,157 +97,24 @@ API_PRIVATE_KEY_FILE_PATH = '/tmp/example/250719519163548111.json'
 To validate the tokens, we need a validator which can be called in the event of API-calls:
 
 validator.py:
-```python
-import time
-import json
-from authlib.jose import jwt
-from typing import Dict
 
-from authlib.oauth2.rfc7662 import IntrospectTokenValidator
-import requests
-from . import settings
-
-API_PRIVATE_KEY_FILE = {}
-
-
-class ValidatorError(Exception):
-    def __init__(self, error: Dict[str, str], status_code: int):
-        super().__init__()
-        self.error = error
-        self.status_code = status_code
-
-
-class ZitadelIntrospectTokenValidator(IntrospectTokenValidator):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.load_api_private_key(settings.API_PRIVATE_KEY_FILE_PATH)
-
-    @staticmethod
-    def load_api_private_key(file_path):
-        with open(file_path, "r") as f:
-            data = json.load(f)
-            API_PRIVATE_KEY_FILE["client_id"] = data["clientId"]
-            API_PRIVATE_KEY_FILE["key_id"] = data["keyId"]
-            API_PRIVATE_KEY_FILE["private_key"] = data["key"]
-
-    def introspect_token(self, token_string):
-        # Create JWT for client assertion
-        payload = {
-            "iss": API_PRIVATE_KEY_FILE["client_id"],
-            "sub": API_PRIVATE_KEY_FILE["client_id"],
-            "aud": settings.ZITADEL_DOMAIN,
-            "exp": int(time.time()) + 60 * 60,  # Expires in 1 hour
-            "iat": int(time.time()),
-        }
-        header = {"alg": settings.ALGORITHM, "kid": API_PRIVATE_KEY_FILE["key_id"]}
-        jwt_token = jwt.encode(
-            header,
-            payload,
-            API_PRIVATE_KEY_FILE["private_key"],
-        )
-
-        # Send introspection request
-        headers = {"Content-Type": "application/x-www-form-urlencoded"}
-        data = {
-            "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
-            "client_assertion": jwt_token,
-            "token": token_string,
-        }
-        response = requests.post(
-            settings.ZITADEL_INTROSPECTION_URL, headers=headers, data=data
-        )
-        response.raise_for_status()
-        token_data = response.json()
-        print(f"Token data from introspection: {token_data}")
-        return token_data
-
-    def match_token_scopes(self, token, or_scopes):
-        if or_scopes is None:
-            return True
-        scopes = token.get("scope", "").split()
-        for and_scopes in or_scopes:
-            if all(key in scopes for key in and_scopes.split()):
-                return True
-        return False
-
-    def validate_token(self, token, scopes, request):
-        print(f"Token: {token}\n")
-        now = int(time.time())
-        if not token:
-            raise ValidatorError(
-                {"code": "invalid_token_revoked", "description": "Token was revoked."},
-                401,
-            )
-        if not token.get("active"):
-            raise ValidatorError(
-                {"code": "invalid_token_inactive", "description": "Token is inactive."},
-                401,
-            )
-        if token["exp"] < now:
-            raise ValidatorError(
-                {"code": "invalid_token_expired", "description": "Token has expired."},
-                401,
-            )
-        if not self.match_token_scopes(token, scopes):
-            raise ValidatorError(
-                {
-                    "code": "insufficient_scope",
-                    "description": f"Token has insufficient scope. Route requires: {scopes}",
-                },
-                401,
-            )
-
-    def __call__(self, token_string, scopes, request):
-        token = self.introspect_token(token_string)
-        self.validate_token(token, scopes, request)
-        return token
-
+```python reference
+https://github.com/zitadel/example-python-django-oauth/blob/main/mysite/validator.py
 ```
-
 
 ### Requests and URLs
 
 We define 3 different endpoints which differ in terms of requirements.
 views.py:
-```python
-from authlib.integrations.django_oauth2 import ResourceProtector
-from django.http import JsonResponse
-from . import validator
 
-require_auth = ResourceProtector()
-require_auth.register_token_validator(validator.ZitadelIntrospectTokenValidator())
-
-
-def public(request):
-    """No access token required to access this route
-    """
-    response = "Hello from a public endpoint! You don't need to be authenticated to see this."
-    return JsonResponse(dict(message=response))
-
-
-@require_auth(None)
-def private(request):
-    """A valid access token is required to access this route
-    """
-    response = "Hello from a private endpoint! You need to be authenticated to see this."
-    return JsonResponse(dict(message=response))
-
-
-@require_auth("read:messages")
-def private_scoped(request):
-    """A valid access token and an appropriate scope are required to access this route
-    """
-    response = "Hello from a private endpoint! You need to be authenticated and have a scope of read:messages to see this."
-    return JsonResponse(dict(message=response))
+```python reference
+https://github.com/zitadel/example-python-django-oauth/blob/main/mysite/views.py
 ```
 
 To handle endpoints the urls have to be added to the urls.py:
-```python
-urlpatterns = [
-    path('api/public', views.public),
-    path('api/private', views.private),
-    path('api/private-scoped', views.private_scoped)
-]
+
+```python reference
+https://github.com/zitadel/example-python-django-oauth/blob/main/mysite/urls.py
 ```
 
 ### DB
