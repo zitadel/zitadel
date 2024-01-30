@@ -1,14 +1,20 @@
 .tile {
+  margin: 0.5rem;
   border-radius: 0.5rem;
   display: inline-block;
   flex-direction: column;
-  min-width: 50px;
+  min-width: 200px;
   max-width: 200px;
   background: var(--card-background);
-  padding: 1rem;
+  padding: 0.5rem;
+  text-align: center;
   text-decoration: none;
   transition: all 0.2 ease-in-out;
   border: 1px solid var(--card-border);
+}
+
+.tile h4 {
+  margin-top: 0.5rem;
 }
 
 .tile:hover {
@@ -23,53 +29,12 @@
   color: var(--ifm-font-color-base);
 }
 
-.tileimg {
-  height: 100px;
+.tile .tileimg {
+  height: 60px;
   background-size: cover;
   object-fit: contain;
   background-position: center;
-  padding: 0.5rem 0;
   pointer-events: none;
   box-shadow: none !important;
-}
-
-.fillspace {
-  flex: 1;
-}
-
-.bottom {
-  display: flex;
-  align-items: center;
-}
-
-.bottomicon {
-  width: 24px;
-  margin-right: 0.5rem;
-  color: var(--ifm-font-color-base);
-}
-
-.bottomspan {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ifm-font-color-base);
-  text-transform: uppercase;
   margin: 0;
-}
-
-.cardWrapper {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-gap: 1rem;
-}
-
-@media (min-width: 769px) {
-  .cardWrapper {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (min-width: 1180px) {
-  .cardWrapper {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
 }

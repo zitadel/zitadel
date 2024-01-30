@@ -5,7 +5,7 @@ export function Tile({title, imageSource, link, external}) {
     return (
         <div className={styles.tile}>
             <a href={link}>
-                <h3>{title}</h3>
+                <h4>{title}</h4>
                 <img
                     className={styles.tileimg}
                     src={imageSource}
