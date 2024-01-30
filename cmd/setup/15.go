@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
@@ -19,7 +20,7 @@ type CurrentProjectionState struct {
 	dbClient *database.DB
 }
 
-func (mig *CurrentProjectionState) Execute(ctx context.Context) error {
+func (mig *CurrentProjectionState) Execute(ctx context.Context, _ eventstore.Event) error {
 	migrations, err := currentProjectionState.ReadDir("15/" + mig.dbClient.Type())
 	if err != nil {
 		return err

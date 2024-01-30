@@ -2256,7 +2256,8 @@
     "TOAST": {
       "UPDATED": "Autorisatie bijgewerkt.",
       "REMOVED": "Autorisatie verwijderd",
-      "BULKREMOVED": "Autorisaties verwijderd."
+      "BULKREMOVED": "Autorisaties verwijderd.",
+      "CANTSHOWINFO": "U kunt het profiel van deze gebruiker niet bezoeken omdat u geen lid bent van de organisatie waartoe deze gebruiker behoort"
     },
     "DIALOG": {
       "DELETE_TITLE": "Verwijder autorisatie",
