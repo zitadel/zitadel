@@ -1,6 +1,6 @@
 .tile {
   border-radius: 0.5rem;
-  display: flex;
+  display: inline-block;
   flex-direction: column;
   min-width: 50px;
   max-width: 200px;
