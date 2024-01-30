@@ -6,7 +6,7 @@ export const ORGANIZATIONS: SidenavSetting = {
   i18nKey: 'SETTINGS.LIST.ORGS',
   groupI18nKey: 'SETTINGS.GROUPS.GENERAL',
   requiredRoles: {
-    [PolicyComponentServiceType.ADMIN]: ['org.read'],
+    [PolicyComponentServiceType.ADMIN]: ['iam.read'],
   },
 };
 
