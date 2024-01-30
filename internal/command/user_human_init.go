@@ -50,7 +50,7 @@ func (c *Commands) ResendInitialMail(ctx context.Context, userID string, email d
 	return writeModelToObjectDetails(&existingCode.WriteModel), nil
 }
 
-func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwner, code, password string, initCodeGenerator crypto.Generator) error {
+func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwner, code, password, userAgentID string, initCodeGenerator crypto.Generator) error {
 	if userID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-mkM9f", "Errors.User.UserIDMissing")
 	}
@@ -80,9 +80,7 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 		commands = append(commands, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
 	}
 	if password != "" {
-		passwordWriteModel := NewHumanPasswordWriteModel(userID, existingCode.ResourceOwner)
-		passwordWriteModel.UserState = domain.UserStateActive
-		passwordCommand, err := c.setPasswordCommand(ctx, passwordWriteModel, password, false)
+		passwordCommand, err := c.setPasswordCommand(ctx, userAgg, domain.UserStateActive, password, userAgentID, false, false)
 		if err != nil {
 			return err
 		}

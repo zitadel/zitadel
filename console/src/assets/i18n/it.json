@@ -226,6 +226,7 @@
     "EMAIL": "Email",
     "USERNAME": "User Name",
     "ORGNAME": "Nome organizzazione",
+    "PRIMARYDOMAIN": "Dominio primario",
     "PROJECTNAME": "Nome del progetto",
     "RESOURCEOWNER": "Resource Owner",
     "METHODS": {
@@ -266,8 +267,8 @@
       "DESCRIPTION": "Clicca il pulsante per richiedere una nuova sessione."
     },
     "EXHAUSTED": {
-      "TITLE": "La quota di richieste autenticate è esaurita.",
-      "DESCRIPTION": "Cancellare o aumentare il limite per questa istanza ZITADEL."
+      "TITLE": "La tua istanza è bloccata.",
+      "DESCRIPTION": "Chiedi all'amministratore dell'istanza ZITADEL di aggiornare l'abbonamento."
     },
     "INVALID_FORMAT": "Il formato non è valido.",
     "NOTANEMAIL": "Il valore dato non \u00e8 un indirizzo e-mail.",
@@ -1250,6 +1251,7 @@
       "DESCRIPTIONCREATEMGMT": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto. Nota: puoi usare i provider impostati nel sistema e quelli impostati della tua organizzazione.",
       "ADVANCED": "Impostazioni avanzate",
       "LIFETIMEDURATIONS": "Login Lifetimes",
+      "LIFETIME_INVALID": "Login Lifetimes non sono validi",
       "SAVED": "Salvato con successo!"
     },
     "PRIVACY_POLICY": {
@@ -2236,7 +2238,8 @@
     "TOAST": {
       "UPDATED": "Autorizzazione aggiornata.",
       "REMOVED": "Autorizzazione rimossa con successo.",
-      "BULKREMOVED": "Autorizzazioni rimossi con successo."
+      "BULKREMOVED": "Autorizzazioni rimossi con successo.",
+      "CANTSHOWINFO": "Non puoi visitare il profilo di questo utente poiché non sei un membro dell'organizzazione a cui appartiene questo utente"
     },
     "DIALOG": {
       "DELETE_TITLE": "Elima autorizzazione",

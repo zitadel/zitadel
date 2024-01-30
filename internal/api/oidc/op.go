@@ -43,6 +43,7 @@ type Config struct {
 	DefaultLoginURLV2                 string
 	DefaultLogoutURLV2                string
 	Features                          Features
+	PublicKeyCacheMaxAge              time.Duration
 }
 
 type EndpointConfig struct {
@@ -104,12 +105,16 @@ func NewServer(
 		return nil, zerrors.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
 	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections, externalSecure)
-	var options []op.Option
+	keyCache := newPublicKeyCache(context.TODO(), config.PublicKeyCacheMaxAge, query.GetPublicKeyByID)
+	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
+	idTokenHintKeySet := newOidcKeySet(keyCache)
+
+	options := []op.Option{
+		op.WithAccessTokenKeySet(accessTokenKeySet),
+		op.WithIDTokenHintKeySet(idTokenHintKeySet),
+	}
 	if !externalSecure {
 		options = append(options, op.WithAllowInsecure())
-	}
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "OIDC-D3gq1", "cannot create options: %w")
 	}
 	provider, err := op.NewProvider(
 		opConfig,
@@ -127,7 +132,8 @@ func NewServer(
 		repo:                       repo,
 		query:                      query,
 		command:                    command,
-		keySet:                     newKeySet(context.TODO(), time.Hour, query.GetActivePublicKeyByID),
+		accessTokenKeySet:          accessTokenKeySet,
+		idTokenHintKeySet:          idTokenHintKeySet,
 		defaultLoginURL:            fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
 		defaultLoginURLV2:          config.DefaultLoginURLV2,
 		defaultLogoutURLV2:         config.DefaultLogoutURLV2,
@@ -139,21 +145,23 @@ func NewServer(
 		assetAPIPrefix:             assets.AssetAPI(externalSecure),
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
-	server.Handler = op.RegisterLegacyServer(server, op.WithHTTPMiddleware(
-		middleware.MetricsHandler(metricTypes),
-		middleware.TelemetryHandler(),
-		middleware.NoCacheInterceptor().Handler,
-		instanceHandler,
-		userAgentCookie,
-		http_utils.CopyHeadersToContext,
-		accessHandler.HandleIgnorePathPrefixes(ignoredQuotaLimitEndpoint(config.CustomEndpoints)),
-		middleware.ActivityHandler,
-	))
+	server.Handler = op.RegisterLegacyServer(server,
+		op.WithFallbackLogger(fallbackLogger),
+		op.WithHTTPMiddleware(
+			middleware.MetricsHandler(metricTypes),
+			middleware.TelemetryHandler(),
+			middleware.NoCacheInterceptor().Handler,
+			instanceHandler,
+			userAgentCookie,
+			http_utils.CopyHeadersToContext,
+			accessHandler.HandleWithPublicAuthPathPrefixes(publicAuthPathPrefixes(config.CustomEndpoints)),
+			middleware.ActivityHandler,
+		))
 
 	return server, nil
 }
 
-func ignoredQuotaLimitEndpoint(endpoints *EndpointConfig) []string {
+func publicAuthPathPrefixes(endpoints *EndpointConfig) []string {
 	authURL := op.DefaultEndpoints.Authorization.Relative()
 	keysURL := op.DefaultEndpoints.JwksURI.Relative()
 	if endpoints == nil {

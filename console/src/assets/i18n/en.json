@@ -228,6 +228,7 @@
     "EMAIL": "Email",
     "USERNAME": "User Name",
     "ORGNAME": "Organization Name",
+    "PRIMARYDOMAIN": "Primary Domain",
     "PROJECTNAME": "Project Name",
     "RESOURCEOWNER": "Resource Owner",
     "METHODS": {
@@ -268,8 +269,8 @@
       "DESCRIPTION": "Click the button below to log in again."
     },
     "EXHAUSTED": {
-      "TITLE": "Your quota for authenticated requests is exhausted.",
-      "DESCRIPTION": "Remove or increase the quota limit for this ZITADEL instance."
+      "TITLE": "Your instance is blocked.",
+      "DESCRIPTION": "Ask your ZITADEL instance administrator to update the subscription."
     },
     "INVALID_FORMAT": "The formatting is invalid.",
     "NOTANEMAIL": "The given value is not an e-mail address.",
@@ -1251,6 +1252,7 @@
       "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organization only.",
       "ADVANCED": "Advanced",
       "LIFETIMEDURATIONS": "Login Lifetimes",
+      "LIFETIME_INVALID": "Form contains invalid value(s).",
       "SAVED": "Saved successfully!"
     },
     "PRIVACY_POLICY": {
@@ -2254,7 +2256,8 @@
     "TOAST": {
       "UPDATED": "Authorization updated.",
       "REMOVED": "Authorization removed",
-      "BULKREMOVED": "Authorizations removed."
+      "BULKREMOVED": "Authorizations removed.",
+      "CANTSHOWINFO": "You cannot visit this user's profile as you are not a member of the organization where this user belongs to"
     },
     "DIALOG": {
       "DELETE_TITLE": "Delete authorization",

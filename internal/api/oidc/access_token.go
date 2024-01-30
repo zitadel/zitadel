@@ -27,20 +27,22 @@ type accessToken struct {
 	isPAT           bool
 }
 
+var ErrInvalidTokenFormat = errors.New("invalid token format")
+
 func (s *Server) verifyAccessToken(ctx context.Context, tkn string) (*accessToken, error) {
 	var tokenID, subject string
 
 	if tokenIDSubject, err := s.Provider().Crypto().Decrypt(tkn); err == nil {
 		split := strings.Split(tokenIDSubject, ":")
 		if len(split) != 2 {
-			return nil, errors.New("invalid token format")
+			return nil, zerrors.ThrowPermissionDenied(ErrInvalidTokenFormat, "OIDC-rei1O", "token is not valid or has expired")
 		}
 		tokenID, subject = split[0], split[1]
 	} else {
-		verifier := op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), s.keySet)
+		verifier := op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), s.accessTokenKeySet)
 		claims, err := op.VerifyAccessToken[*oidc.AccessTokenClaims](ctx, tkn, verifier)
 		if err != nil {
-			return nil, err
+			return nil, zerrors.ThrowPermissionDenied(err, "OIDC-Eib8e", "token is not valid or has expired")
 		}
 		tokenID, subject = claims.JWTID, claims.Subject
 	}

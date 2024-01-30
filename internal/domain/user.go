@@ -1,10 +1,5 @@
 package domain
 
-type User interface {
-	GetUsername() string
-	GetState() UserState
-}
-
 type UserState int32
 
 const (
@@ -18,10 +13,6 @@ const (
 
 	userStateCount
 )
-
-func (f UserState) Valid() bool {
-	return f >= 0 && f < userStateCount
-}
 
 func (s UserState) Exists() bool {
 	return s != UserStateUnspecified && s != UserStateDeleted
@@ -40,10 +31,6 @@ const (
 	userTypeCount
 )
 
-func (f UserType) Valid() bool {
-	return f >= 0 && f < userTypeCount
-}
-
 type UserAuthMethodType int32
 
 const (
@@ -57,10 +44,6 @@ const (
 	UserAuthMethodTypeOTPEmail
 	userAuthMethodTypeCount
 )
-
-func (f UserAuthMethodType) Valid() bool {
-	return f >= 0 && f < userAuthMethodTypeCount
-}
 
 // HasMFA checks whether the user authenticated with multiple auth factors.
 // This can either be true if the list contains a [UserAuthMethodType] which by itself is MFA (e.g. [UserAuthMethodTypePasswordless])

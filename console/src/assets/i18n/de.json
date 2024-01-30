@@ -227,6 +227,7 @@
     "EMAIL": "Email",
     "USERNAME": "Nutzername",
     "ORGNAME": "Organisationsname",
+    "PRIMARYDOMAIN": "Primäre Domäne",
     "PROJECTNAME": "Projektname",
     "RESOURCEOWNER": "Ressourcenbesitzer",
     "METHODS": {
@@ -267,8 +268,8 @@
       "DESCRIPTION": "Klicke auf \"Einloggen\", um Dich erneut anzumelden."
     },
     "EXHAUSTED": {
-      "TITLE": "Dein Kontingent an authentifizierten Anfragen is erschöpft.",
-      "DESCRIPTION": "Lösche oder erhöhe die Grenze für diese ZITADEL Instanz."
+      "TITLE": "Deine Instanz ist blockiert.",
+      "DESCRIPTION": "Bitte kontaktiere den Administrator deiner ZITADEL Instanz."
     },
     "INVALID_FORMAT": "Das Format is ungültig.",
     "NOTANEMAIL": "Der eingegebene Wert ist keine E-Mail Adresse.",
@@ -1250,6 +1251,7 @@
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
       "ADVANCED": "Erweitert",
       "LIFETIMEDURATIONS": "Login Lifetimes",
+      "LIFETIME_INVALID": "Login Lifetimes sind ungültig.",
       "SAVED": "Erfolgreich gespeichert."
     },
     "PRIVACY_POLICY": {
@@ -2235,7 +2237,8 @@
     "TOAST": {
       "UPDATED": "Berechtigung geändert.",
       "REMOVED": "Berechtigung entfernt.",
-      "BULKREMOVED": "Berechtigungen entfernt."
+      "BULKREMOVED": "Berechtigungen entfernt.",
+      "CANTSHOWINFO": "Sie können das Profil dieses Benutzers nicht besuchen, da Sie kein Mitglied der Organisation sind, zu der dieser Benutzer gehört"
     },
     "DIALOG": {
       "DELETE_TITLE": "Authorisierung löschen",

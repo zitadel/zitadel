@@ -13,11 +13,11 @@ import (
 
 const (
 	StartedType        = eventstore.EventType("system.migration.started")
-	doneType           = eventstore.EventType("system.migration.done")
+	DoneType           = eventstore.EventType("system.migration.done")
 	failedType         = eventstore.EventType("system.migration.failed")
 	repeatableDoneType = eventstore.EventType("system.migration.repeatable.done")
-	aggregateType      = eventstore.AggregateType("system")
-	aggregateID        = "SYSTEM"
+	SystemAggregate    = eventstore.AggregateType("system")
+	SystemAggregateID  = "SYSTEM"
 )
 
 var (
@@ -26,7 +26,7 @@ var (
 
 type Migration interface {
 	String() string
-	Execute(context.Context) error
+	Execute(ctx context.Context, startedEvent eventstore.Event) error
 }
 
 type errCheckerMigration interface {
@@ -36,8 +36,7 @@ type errCheckerMigration interface {
 
 type RepeatableMigration interface {
 	Migration
-	SetLastExecution(lastRun map[string]interface{})
-	Check() bool
+	Check(lastRun map[string]interface{}) bool
 }
 
 func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration) (err error) {
@@ -51,7 +50,6 @@ func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration
 		continueOnErr = errChecker.ContinueOnErr
 	}
 
-	// if should, err := checkExec(ctx, es, migration); !should || err != nil {
 	should, err := checkExec(ctx, es, migration)
 	if err != nil && !continueOnErr(err) {
 		return err
@@ -60,12 +58,13 @@ func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration
 		return nil
 	}
 
-	if _, err = es.Push(ctx, setupStartedCmd(ctx, migration)); err != nil && !continueOnErr(err) {
+	startedEvent, err := es.Push(ctx, setupStartedCmd(ctx, migration))
+	if err != nil && !continueOnErr(err) {
 		return err
 	}
 
 	logging.WithFields("name", migration.String()).Info("starting migration")
-	err = migration.Execute(ctx)
+	err = migration.Execute(ctx, startedEvent[0])
 	logging.WithFields("name", migration.String()).OnError(err).Error("migration failed")
 
 	_, pushErr := es.Push(ctx, setupDoneCmd(ctx, migration, err))
@@ -76,23 +75,18 @@ func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration
 	return pushErr
 }
 
-func LatestStep(ctx context.Context, es *eventstore.Eventstore) (*SetupStep, error) {
-	events, err := es.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		OrderDesc().
-		Limit(1).
-		AddQuery().
-		AggregateTypes(aggregateType).
-		AggregateIDs(aggregateID).
-		EventTypes(StartedType, doneType, repeatableDoneType, failedType).
-		Builder())
+func LastStuckStep(ctx context.Context, es *eventstore.Eventstore) (*SetupStep, error) {
+	var states StepStates
+	err := es.FilterToQueryReducer(ctx, &states)
 	if err != nil {
 		return nil, err
 	}
-	step, ok := events[0].(*SetupStep)
-	if !ok {
-		return nil, zerrors.ThrowInternal(nil, "MIGRA-hppLM", "setup step is malformed")
+	step := states.lastByState(StepStarted)
+	if step == nil {
+		return nil, nil
 	}
-	return step, nil
+
+	return step.SetupStep, nil
 }
 
 var _ Migration = (*cancelMigration)(nil)
@@ -102,7 +96,7 @@ type cancelMigration struct {
 }
 
 // Execute implements Migration
-func (*cancelMigration) Execute(context.Context) error {
+func (*cancelMigration) Execute(context.Context, eventstore.Event) error {
 	return nil
 }
 
@@ -143,49 +137,26 @@ func checkExec(ctx context.Context, es *eventstore.Eventstore, migration Migrati
 }
 
 func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migration) (should bool, err error) {
-	events, err := es.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		OrderAsc().
-		InstanceID("").
-		AddQuery().
-		AggregateTypes(aggregateType).
-		AggregateIDs(aggregateID).
-		EventTypes(StartedType, doneType, repeatableDoneType, failedType).
-		Builder())
+	var states StepStates
+	err = es.FilterToQueryReducer(ctx, &states)
 	if err != nil {
 		return false, err
 	}
-
-	var isStarted bool
-	for _, event := range events {
-		e, ok := event.(*SetupStep)
-		if !ok {
-			return false, zerrors.ThrowInternal(nil, "MIGRA-IJY3D", "Errors.Internal")
-		}
-
-		if e.Name != migration.String() {
-			continue
-		}
-
-		switch event.Type() {
-		case StartedType, failedType:
-			isStarted = !isStarted
-		case doneType,
-			repeatableDoneType:
-			repeatable, ok := migration.(RepeatableMigration)
-			if !ok {
-				return false, nil
-			}
-			isStarted = false
-			repeatable.SetLastExecution(e.LastRun.(map[string]interface{}))
-		}
-	}
-
-	if isStarted {
-		return false, errMigrationAlreadyStarted
-	}
-	repeatable, ok := migration.(RepeatableMigration)
-	if !ok {
+	step := states.byName(migration.String())
+	if step == nil {
 		return true, nil
 	}
-	return repeatable.Check(), nil
+	if step.state == StepFailed {
+		return true, nil
+	}
+	if step.state == StepStarted {
+		return false, errMigrationAlreadyStarted
+	}
+
+	repeatable, ok := migration.(RepeatableMigration)
+	if !ok {
+		return step.state != StepDone, nil
+	}
+	lastRun, _ := step.LastRun.(map[string]interface{})
+	return repeatable.Check(lastRun), nil
 }

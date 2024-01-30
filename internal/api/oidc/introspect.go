@@ -18,7 +18,10 @@ import (
 
 func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionRequest]) (resp *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	if s.features.LegacyIntrospection {
 		return s.LegacyServer.Introspect(ctx, r)
@@ -72,7 +75,7 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		return nil, err
 	}
 
-	// remaining errors shoudn't be returned to the client,
+	// remaining errors shouldn't be returned to the client,
 	// so we catch errors here, log them and return the response
 	// with active: false
 	defer func() {
@@ -122,6 +125,8 @@ type introspectionClientResult struct {
 	err       error
 }
 
+var errNoClientSecret = errors.New("client has no configured secret")
+
 func (s *Server) introspectionClientAuth(ctx context.Context, cc *op.ClientCredentials, rc chan<- *introspectionClientResult) {
 	ctx, span := tracing.NewSpan(ctx)
 
@@ -136,13 +141,16 @@ func (s *Server) introspectionClientAuth(ctx context.Context, cc *op.ClientCrede
 			if _, err := op.VerifyJWTAssertion(ctx, cc.ClientAssertion, verifier); err != nil {
 				return "", "", oidc.ErrUnauthorizedClient().WithParent(err)
 			}
-		} else {
+			return client.ClientID, client.ProjectID, nil
+
+		}
+		if client.ClientSecret != nil {
 			if err := crypto.CompareHash(client.ClientSecret, []byte(cc.ClientSecret), s.hashAlg); err != nil {
 				return "", "", oidc.ErrUnauthorizedClient().WithParent(err)
 			}
+			return client.ClientID, client.ProjectID, nil
 		}
-
-		return client.ClientID, client.ProjectID, nil
+		return "", "", oidc.ErrUnauthorizedClient().WithParent(errNoClientSecret)
 	}()
 
 	span.EndWithError(err)

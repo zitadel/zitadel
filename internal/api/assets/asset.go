@@ -94,7 +94,6 @@ func NewHandler(commands *command.Commands, verifier authz.APITokenVerifier, aut
 	router := mux.NewRouter()
 	csp := http_mw.SecurityHeaders(&http_mw.DefaultSCP, nil)
 	router.Use(callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor, csp)
-	router.Use(callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor)
 	RegisterRoutes(router, h)
 	router.PathPrefix("/{owner}").Methods("GET").HandlerFunc(DownloadHandleFunc(h, h.GetFile()))
 	return http_util.CopyHeadersToContext(http_mw.CORSInterceptor(router))

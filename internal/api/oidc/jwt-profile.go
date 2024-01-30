@@ -7,10 +7,17 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (o *OPStorage) JWTProfileTokenType(ctx context.Context, request op.TokenRequest) (op.AccessTokenType, error) {
+func (o *OPStorage) JWTProfileTokenType(ctx context.Context, request op.TokenRequest) (_ op.AccessTokenType, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
+
 	mapJWTProfileScopesToAudience(ctx, request)
 	user, err := o.query.GetUserByID(ctx, false, request.GetSubject())
 	if err != nil {

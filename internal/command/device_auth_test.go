@@ -8,29 +8,24 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_AddDeviceAuth(t *testing.T) {
 	ctx := authz.WithInstanceID(context.Background(), "instance1")
-	idErr := errors.New("idErr")
 	pushErr := errors.New("pushErr")
 	now := time.Now()
 
-	unique := deviceauth.NewAddUniqueConstraints("client_id", "123", "456")
+	unique := deviceauth.NewAddUniqueConstraints("123", "456")
 	require.Len(t, unique, 2)
 
 	type fields struct {
-		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
+		eventstore *eventstore.Eventstore
 	}
 	type args struct {
 		ctx        context.Context
@@ -44,42 +39,20 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 		name        string
 		fields      fields
 		args        args
-		wantID      string
 		wantDetails *domain.ObjectDetails
 		wantErr     error
 	}{
-		{
-			name: "idGenerator error",
-			fields: fields{
-				eventstore: eventstoreExpect(t),
-				idGenerator: func() id.Generator {
-					m := id_mock.NewMockGenerator(gomock.NewController(t))
-					m.EXPECT().Next().Return("", idErr)
-					return m
-				}(),
-			},
-			args: args{
-				ctx:        ctx,
-				clientID:   "client_id",
-				deviceCode: "123",
-				userCode:   "456",
-				expires:    now,
-				scopes:     []string{"a", "b", "c"},
-			},
-			wantErr: idErr,
-		},
 		{
 			name: "success",
 			fields: fields{
 				eventstore: eventstoreExpect(t, expectPush(
 					deviceauth.NewAddedEvent(
 						ctx,
-						deviceauth.NewAggregate("1999", "instance1"),
+						deviceauth.NewAggregate("123", "instance1"),
 						"client_id", "123", "456", now,
 						[]string{"a", "b", "c"},
 					),
 				)),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "1999"),
 			},
 			args: args{
 				ctx:        authz.WithInstanceID(context.Background(), "instance1"),
@@ -89,7 +62,6 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 				expires:    now,
 				scopes:     []string{"a", "b", "c"},
 			},
-			wantID: "1999",
 			wantDetails: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
 			},
@@ -100,12 +72,11 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 				eventstore: eventstoreExpect(t, expectPushFailed(pushErr,
 					deviceauth.NewAddedEvent(
 						ctx,
-						deviceauth.NewAggregate("1999", "instance1"),
+						deviceauth.NewAggregate("123", "instance1"),
 						"client_id", "123", "456", now,
 						[]string{"a", "b", "c"},
 					)),
 				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "1999"),
 			},
 			args: args{
 				ctx:        authz.WithInstanceID(context.Background(), "instance1"),
@@ -121,12 +92,10 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
+				eventstore: tt.fields.eventstore,
 			}
-			gotID, gotDetails, err := c.AddDeviceAuth(tt.args.ctx, tt.args.clientID, tt.args.deviceCode, tt.args.userCode, tt.args.expires, tt.args.scopes)
+			gotDetails, err := c.AddDeviceAuth(tt.args.ctx, tt.args.clientID, tt.args.deviceCode, tt.args.userCode, tt.args.expires, tt.args.scopes)
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.wantID, gotID)
 			assert.Equal(t, tt.wantDetails, gotDetails)
 		})
 	}
@@ -141,9 +110,11 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx     context.Context
-		id      string
-		subject string
+		ctx         context.Context
+		id          string
+		subject     string
+		authMethods []domain.UserAuthMethodType
+		authTime    time.Time
 	}
 	tests := []struct {
 		name        string
@@ -156,26 +127,14 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 			name: "not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(
-						eventFromEventPusherWithInstanceID("instance1",
-							deviceauth.NewAddedEvent(
-								ctx,
-								deviceauth.NewAggregate("1999", "instance1"),
-								"client_id", "123", "456", now,
-								[]string{"a", "b", "c"},
-							),
-						),
-						eventFromEventPusherWithInstanceID("instance1",
-							deviceauth.NewRemovedEvent(
-								ctx,
-								deviceauth.NewAggregate("1999", "instance1"),
-								"client_id", "123", "456",
-							),
-						),
-					),
+					expectFilter(),
 				),
 			},
-			args:    args{ctx, "1999", "subj"},
+			args: args{
+				ctx, "123", "subj",
+				[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				time.Unix(123, 456),
+			},
 			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-Hief9", "Errors.DeviceAuth.NotFound"),
 		},
 		{
@@ -186,19 +145,25 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 						"instance1",
 						deviceauth.NewAddedEvent(
 							ctx,
-							deviceauth.NewAggregate("1999", "instance1"),
+							deviceauth.NewAggregate("123", "instance1"),
 							"client_id", "123", "456", now,
 							[]string{"a", "b", "c"},
 						),
 					)),
 					expectPushFailed(pushErr,
 						deviceauth.NewApprovedEvent(
-							ctx, deviceauth.NewAggregate("1999", "instance1"), "subj",
+							ctx, deviceauth.NewAggregate("123", "instance1"), "subj",
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+							time.Unix(123, 456),
 						),
 					),
 				),
 			},
-			args:    args{ctx, "1999", "subj"},
+			args: args{
+				ctx, "123", "subj",
+				[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				time.Unix(123, 456),
+			},
 			wantErr: pushErr,
 		},
 		{
@@ -209,19 +174,25 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 						"instance1",
 						deviceauth.NewAddedEvent(
 							ctx,
-							deviceauth.NewAggregate("1999", "instance1"),
+							deviceauth.NewAggregate("123", "instance1"),
 							"client_id", "123", "456", now,
 							[]string{"a", "b", "c"},
 						),
 					)),
 					expectPush(
 						deviceauth.NewApprovedEvent(
-							ctx, deviceauth.NewAggregate("1999", "instance1"), "subj",
+							ctx, deviceauth.NewAggregate("123", "instance1"), "subj",
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+							time.Unix(123, 456),
 						),
 					),
 				),
 			},
-			args: args{ctx, "1999", "subj"},
+			args: args{
+				ctx, "123", "subj",
+				[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				time.Unix(123, 456),
+			},
 			wantDetails: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
 			},
@@ -232,7 +203,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			gotDetails, err := c.ApproveDeviceAuth(tt.args.ctx, tt.args.id, tt.args.subject)
+			gotDetails, err := c.ApproveDeviceAuth(tt.args.ctx, tt.args.id, tt.args.subject, tt.args.authMethods, tt.args.authTime)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, gotDetails, tt.wantDetails)
 		})
@@ -263,26 +234,10 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 			name: "not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(
-						eventFromEventPusherWithInstanceID("instance1",
-							deviceauth.NewAddedEvent(
-								ctx,
-								deviceauth.NewAggregate("1999", "instance1"),
-								"client_id", "123", "456", now,
-								[]string{"a", "b", "c"},
-							),
-						),
-						eventFromEventPusherWithInstanceID("instance1",
-							deviceauth.NewRemovedEvent(
-								ctx,
-								deviceauth.NewAggregate("1999", "instance1"),
-								"client_id", "123", "456",
-							),
-						),
-					),
+					expectFilter(),
 				),
 			},
-			args:    args{ctx, "1999", domain.DeviceAuthCanceledDenied},
+			args:    args{ctx, "123", domain.DeviceAuthCanceledDenied},
 			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-gee5A", "Errors.DeviceAuth.NotFound"),
 		},
 		{
@@ -293,20 +248,20 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 						"instance1",
 						deviceauth.NewAddedEvent(
 							ctx,
-							deviceauth.NewAggregate("1999", "instance1"),
+							deviceauth.NewAggregate("123", "instance1"),
 							"client_id", "123", "456", now,
 							[]string{"a", "b", "c"},
 						),
 					)),
 					expectPushFailed(pushErr,
 						deviceauth.NewCanceledEvent(
-							ctx, deviceauth.NewAggregate("1999", "instance1"),
+							ctx, deviceauth.NewAggregate("123", "instance1"),
 							domain.DeviceAuthCanceledDenied,
 						),
 					),
 				),
 			},
-			args:    args{ctx, "1999", domain.DeviceAuthCanceledDenied},
+			args:    args{ctx, "123", domain.DeviceAuthCanceledDenied},
 			wantErr: pushErr,
 		},
 		{
@@ -317,20 +272,20 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 						"instance1",
 						deviceauth.NewAddedEvent(
 							ctx,
-							deviceauth.NewAggregate("1999", "instance1"),
+							deviceauth.NewAggregate("123", "instance1"),
 							"client_id", "123", "456", now,
 							[]string{"a", "b", "c"},
 						),
 					)),
 					expectPush(
 						deviceauth.NewCanceledEvent(
-							ctx, deviceauth.NewAggregate("1999", "instance1"),
+							ctx, deviceauth.NewAggregate("123", "instance1"),
 							domain.DeviceAuthCanceledDenied,
 						),
 					),
 				),
 			},
-			args: args{ctx, "1999", domain.DeviceAuthCanceledDenied},
+			args: args{ctx, "123", domain.DeviceAuthCanceledDenied},
 			wantDetails: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
 			},
@@ -343,20 +298,20 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 						"instance1",
 						deviceauth.NewAddedEvent(
 							ctx,
-							deviceauth.NewAggregate("1999", "instance1"),
+							deviceauth.NewAggregate("123", "instance1"),
 							"client_id", "123", "456", now,
 							[]string{"a", "b", "c"},
 						),
 					)),
 					expectPush(
 						deviceauth.NewCanceledEvent(
-							ctx, deviceauth.NewAggregate("1999", "instance1"),
+							ctx, deviceauth.NewAggregate("123", "instance1"),
 							domain.DeviceAuthCanceledExpired,
 						),
 					),
 				),
 			},
-			args: args{ctx, "1999", domain.DeviceAuthCanceledExpired},
+			args: args{ctx, "123", domain.DeviceAuthCanceledExpired},
 			wantDetails: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
 			},
@@ -368,91 +323,6 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 				eventstore: tt.fields.eventstore,
 			}
 			gotDetails, err := c.CancelDeviceAuth(tt.args.ctx, tt.args.id, tt.args.reason)
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, gotDetails, tt.wantDetails)
-		})
-	}
-}
-
-func TestCommands_RemoveDeviceAuth(t *testing.T) {
-	ctx := authz.WithInstanceID(context.Background(), "instance1")
-	now := time.Now()
-	pushErr := errors.New("pushErr")
-
-	unique := deviceauth.NewRemoveUniqueConstraints("client_id", "123", "456")
-	require.Len(t, unique, 2)
-
-	type fields struct {
-		eventstore *eventstore.Eventstore
-	}
-	type args struct {
-		ctx context.Context
-		id  string
-	}
-	tests := []struct {
-		name        string
-		fields      fields
-		args        args
-		wantDetails *domain.ObjectDetails
-		wantErr     error
-	}{
-		{
-			name: "push error",
-			fields: fields{
-				eventstore: eventstoreExpect(t,
-					expectFilter(eventFromEventPusherWithInstanceID(
-						"instance1",
-						deviceauth.NewAddedEvent(
-							ctx,
-							deviceauth.NewAggregate("1999", "instance1"),
-							"client_id", "123", "456", now,
-							[]string{"a", "b", "c"},
-						),
-					)),
-					expectPushFailed(pushErr,
-						deviceauth.NewRemovedEvent(
-							ctx, deviceauth.NewAggregate("1999", "instance1"),
-							"client_id", "123", "456",
-						),
-					),
-				),
-			},
-			args:    args{ctx, "1999"},
-			wantErr: pushErr,
-		},
-		{
-			name: "success",
-			fields: fields{
-				eventstore: eventstoreExpect(t,
-					expectFilter(eventFromEventPusherWithInstanceID(
-						"instance1",
-						deviceauth.NewAddedEvent(
-							ctx,
-							deviceauth.NewAggregate("1999", "instance1"),
-							"client_id", "123", "456", now,
-							[]string{"a", "b", "c"},
-						),
-					)),
-					expectPush(
-						deviceauth.NewRemovedEvent(
-							ctx, deviceauth.NewAggregate("1999", "instance1"),
-							"client_id", "123", "456",
-						),
-					),
-				),
-			},
-			args: args{ctx, "1999"},
-			wantDetails: &domain.ObjectDetails{
-				ResourceOwner: "instance1",
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &Commands{
-				eventstore: tt.fields.eventstore,
-			}
-			gotDetails, err := c.RemoveDeviceAuth(tt.args.ctx, tt.args.id)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, gotDetails, tt.wantDetails)
 		})

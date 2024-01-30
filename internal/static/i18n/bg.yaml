@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Лимитът не е намерен
     NoneSpecified: Не са посочени лимити
+    Instance:
+      Blocked: Инстанцията е блокирана
   Restrictions:
     NoneSpecified: Не са посочени ограничения
     DefaultLanguageMustBeAllowed: Езикът по подразбиране трябва да бъде разрешен
@@ -146,7 +148,7 @@ Errors:
     ExternalIDP:
       Invalid: Невалиден външен IDP
       IDPConfigNotExisting: Невалиден доставчик на IDP за тази организация
-      NotAllowed: Външен IDP не е разрешен в тази организация
+      NotAllowed: Външен IDP не е разрешен
       MinimumExternalIDPNeeded: Трябва да се добави поне един IDP
       AlreadyExists: Външен IDP вече е зает
       NotFound: Външен IDP не е намерен

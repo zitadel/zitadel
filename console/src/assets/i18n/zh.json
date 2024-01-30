@@ -227,6 +227,7 @@
     "EMAIL": "邮箱",
     "USERNAME": "用户名",
     "ORGNAME": "组织名称",
+    "PRIMARYDOMAIN": "主域",
     "PROJECTNAME": "项目名称",
     "RESOURCEOWNER": "资源所有者",
     "METHODS": {
@@ -267,8 +268,8 @@
       "DESCRIPTION": "点击下方按钮再次登录。"
     },
     "EXHAUSTED": {
-      "TITLE": "你的认证请求配额已用完.",
-      "DESCRIPTION": "删除或增加这个ZITADEL实例的限制。"
+      "TITLE": "您的实例已被阻止。",
+      "DESCRIPTION": "请联系您的 ZITADEL 实例管理员以更新订阅。"
     },
     "INVALID_FORMAT": "格式是无效的。",
     "NOTANEMAIL": "给定的值不是合法电子邮件地址。",
@@ -1249,6 +1250,7 @@
       "DESCRIPTIONCREATEMGMT": "用户可以从以下可用的身份提供者中进行选择。注意：您可为系统设置提供者也可以仅为您的组织单独设置提供者。",
       "ADVANCED": "高级设置",
       "LIFETIMEDURATIONS": "登录状态有效期",
+      "LIFETIME_INVALID": "表单包含无效值。",
       "SAVED": "保存成功！"
     },
     "PRIVACY_POLICY": {
@@ -2235,7 +2237,8 @@
     "TOAST": {
       "UPDATED": "授权已更新。",
       "REMOVED": "已移除授权。",
-      "BULKREMOVED": "已移除授权。"
+      "BULKREMOVED": "已移除授权。",
+      "CANTSHOWINFO": "您无法访问该用户的个人资料，因为您不是该用户所属组织的成员"
     },
     "DIALOG": {
       "DELETE_TITLE": "删除授权",
