@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -71,7 +72,8 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *dom
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
 	}
-	_, err := l.command.SetPasswordWithVerifyCode(setContext(r.Context(), userOrg), userOrg, data.UserID, data.Code, data.Password)
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	_, err := l.command.SetPasswordWithVerifyCode(setContext(r.Context(), userOrg), userOrg, data.UserID, data.Code, data.Password, userAgentID)
 	if err != nil {
 		l.renderInitPassword(w, r, authReq, data.UserID, "", err)
 		return
