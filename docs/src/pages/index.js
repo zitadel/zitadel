@@ -104,7 +104,7 @@ const features = [
     title: "Get Started",
     darkImageUrl: "/docs/img/index/Quickstarts-dark.svg",
     lightImageUrl: "img/index/Quickstarts-light.svg",
-    link: "/docs/sdl-examples/introduction",
+    link: "/docs/sdk-examples/introduction",
     description: (
       <>
         Learn how to integrate your applications and build secure workflows and
