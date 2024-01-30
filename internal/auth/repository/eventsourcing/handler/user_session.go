@@ -2,17 +2,13 @@ package handler
 
 import (
 	"context"
+	"time"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	org_model "github.com/zitadel/zitadel/internal/org/model"
-	org_es_model "github.com/zitadel/zitadel/internal/org/repository/eventsourcing/model"
-	org_view "github.com/zitadel/zitadel/internal/org/repository/view"
 	query2 "github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -129,10 +125,6 @@ func (s *UserSession) Reducers() []handler.AggregateReducer {
 					Reduce: s.Reduce,
 				},
 				{
-					Event:  user.UserV1ProfileChangedType,
-					Reduce: s.Reduce,
-				},
-				{
 					Event:  user.UserLockedType,
 					Reduce: s.Reduce,
 				},
@@ -146,26 +138,6 @@ func (s *UserSession) Reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  user.HumanMFAOTPRemovedType,
-					Reduce: s.Reduce,
-				},
-				{
-					Event:  user.HumanProfileChangedType,
-					Reduce: s.Reduce,
-				},
-				{
-					Event:  user.HumanAvatarAddedType,
-					Reduce: s.Reduce,
-				},
-				{
-					Event:  user.HumanAvatarRemovedType,
-					Reduce: s.Reduce,
-				},
-				{
-					Event:  user.UserDomainClaimedType,
-					Reduce: s.Reduce,
-				},
-				{
-					Event:  user.UserUserNameChangedType,
 					Reduce: s.Reduce,
 				},
 				{
@@ -194,10 +166,6 @@ func (s *UserSession) Reducers() []handler.AggregateReducer {
 			Aggregate: org.AggregateType,
 			EventReducers: []handler.EventReducer{
 				{
-					Event:  org.OrgDomainPrimarySetEventType,
-					Reduce: s.Reduce,
-				},
-				{
 					Event:  org.OrgRemovedEventType,
 					Reduce: s.Reduce,
 				},
@@ -216,25 +184,24 @@ func (s *UserSession) Reducers() []handler.AggregateReducer {
 }
 
 func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err error) {
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		var session *view_model.UserSessionView
-		switch event.Type() {
-		case user.UserV1PasswordCheckSucceededType,
-			user.UserV1PasswordCheckFailedType,
-			user.UserV1MFAOTPCheckSucceededType,
-			user.UserV1MFAOTPCheckFailedType,
-			user.UserV1SignedOutType,
-			user.HumanPasswordCheckSucceededType,
-			user.HumanPasswordCheckFailedType,
-			user.UserIDPLoginCheckSucceededType,
-			user.HumanMFAOTPCheckSucceededType,
-			user.HumanMFAOTPCheckFailedType,
-			user.HumanU2FTokenCheckSucceededType,
-			user.HumanU2FTokenCheckFailedType,
-			user.HumanPasswordlessTokenCheckSucceededType,
-			user.HumanPasswordlessTokenCheckFailedType,
-			user.HumanSignedOutType:
-
+	switch event.Type() {
+	case user.UserV1PasswordCheckSucceededType,
+		user.UserV1PasswordCheckFailedType,
+		user.UserV1MFAOTPCheckSucceededType,
+		user.UserV1MFAOTPCheckFailedType,
+		user.UserV1SignedOutType,
+		user.HumanPasswordCheckSucceededType,
+		user.HumanPasswordCheckFailedType,
+		user.UserIDPLoginCheckSucceededType,
+		user.HumanMFAOTPCheckSucceededType,
+		user.HumanMFAOTPCheckFailedType,
+		user.HumanU2FTokenCheckSucceededType,
+		user.HumanU2FTokenCheckFailedType,
+		user.HumanPasswordlessTokenCheckSucceededType,
+		user.HumanPasswordlessTokenCheckFailedType,
+		user.HumanSignedOutType:
+		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+			var session *view_model.UserSessionView
 			eventData, err := view_model.UserSessionFromEvent(event)
 			if err != nil {
 				return err
@@ -254,158 +221,103 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 				}
 			}
 			return u.updateSession(session, event)
-		case user.UserV1PasswordChangedType,
-			user.UserV1MFAOTPRemovedType,
-			user.UserV1ProfileChangedType,
-			user.UserLockedType,
-			user.UserDeactivatedType,
-			user.HumanPasswordChangedType,
-			user.HumanMFAOTPRemovedType,
-			user.HumanProfileChangedType,
-			user.HumanAvatarAddedType,
-			user.HumanAvatarRemovedType,
-			user.UserDomainClaimedType,
-			user.UserUserNameChangedType,
-			user.UserIDPLinkRemovedType,
-			user.UserIDPLinkCascadeRemovedType,
-			user.HumanPasswordlessTokenRemovedType,
-			user.HumanU2FTokenRemovedType:
-			sessions, err := u.view.UserSessionsByUserID(event.Aggregate().ID, event.Aggregate().InstanceID)
-			if err != nil || len(sessions) == 0 {
-				return err
-			}
-			if err = u.appendEventOnSessions(sessions, event); err != nil {
-				return err
-			}
-			if err = u.view.PutUserSessions(sessions); err != nil {
-				return err
-			}
-			return nil
-		case org.OrgDomainPrimarySetEventType:
-			return u.fillLoginNamesOnOrgUsers(event)
-		case user.UserRemovedType:
-			return u.view.DeleteUserSessions(event.Aggregate().ID, event.Aggregate().InstanceID)
-		case instance.InstanceRemovedEventType:
-			return u.view.DeleteInstanceUserSessions(event.Aggregate().InstanceID)
-		case org.OrgRemovedEventType:
-			return u.view.DeleteOrgUserSessions(event)
-		default:
-			return nil
-		}
-	}), nil
-}
-
-func (u *UserSession) appendEventOnSessions(sessions []*view_model.UserSessionView, event eventstore.Event) error {
-	users := make(map[string]*view_model.UserView)
-	usersByID := func(userID, instanceID string) (user *view_model.UserView, err error) {
-		user, ok := users[userID+"-"+instanceID]
-		if ok {
-			return user, nil
-		}
-		users[userID+"-"+instanceID], err = u.view.UserByID(userID, instanceID)
+		}), nil
+	case user.UserLockedType,
+		user.UserDeactivatedType:
+		return handler.NewUpdateStatement(event,
+			[]handler.Column{
+				handler.NewCol("passwordless_verification", time.Time{}),
+				handler.NewCol("password_verification", time.Time{}),
+				handler.NewCol("second_factor_verification", time.Time{}),
+				handler.NewCol("second_factor_verification_type", domain.MFALevelNotSetUp),
+				handler.NewCol("multi_factor_verification", time.Time{}),
+				handler.NewCol("multi_factor_verification_type", domain.MFALevelNotSetUp),
+				handler.NewCol("external_login_verification", time.Time{}),
+				handler.NewCol("state", domain.UserSessionStateTerminated),
+			},
+			[]handler.Condition{
+				handler.NewCond("instance_id", event.Aggregate().InstanceID),
+				handler.NewCond("user_id", event.Aggregate().ID),
+				handler.Not(handler.NewCond("state", domain.UserSessionStateTerminated)),
+			},
+		), nil
+	case user.UserV1PasswordChangedType,
+		user.HumanPasswordChangedType:
+		userAgent, err := agentIDFromSession(event)
 		if err != nil {
 			return nil, err
 		}
-
-		return users[userID+"-"+instanceID], nil
+		return handler.NewUpdateStatement(event,
+			[]handler.Column{
+				handler.NewCol("password_verification", time.Time{}),
+			},
+			[]handler.Condition{
+				handler.NewCond("instance_id", event.Aggregate().InstanceID),
+				handler.NewCond("user_id", event.Aggregate().ID),
+				handler.Not(handler.NewCond("user_agent_id", userAgent)),
+				handler.Not(handler.NewCond("state", domain.UserSessionStateTerminated)),
+			},
+		), nil
+	case user.UserV1MFAOTPRemovedType,
+		user.HumanMFAOTPRemovedType,
+		user.HumanU2FTokenRemovedType:
+		return handler.NewUpdateStatement(event,
+			[]handler.Column{
+				handler.NewCol("second_factor_verification", time.Time{}),
+			},
+			[]handler.Condition{
+				handler.NewCond("instance_id", event.Aggregate().InstanceID),
+				handler.NewCond("user_id", event.Aggregate().ID),
+				handler.Not(handler.NewCond("state", domain.UserSessionStateTerminated)),
+			},
+		), nil
+	case user.UserIDPLinkRemovedType,
+		user.UserIDPLinkCascadeRemovedType:
+		return handler.NewUpdateStatement(event,
+			[]handler.Column{
+				handler.NewCol("external_login_verification", time.Time{}),
+				handler.NewCol("selected_idp_config_id", ""),
+			},
+			[]handler.Condition{
+				handler.NewCond("instance_id", event.Aggregate().InstanceID),
+				handler.NewCond("user_id", event.Aggregate().ID),
+				handler.Not(handler.NewCond("selected_idp_config_id", "")),
+			},
+		), nil
+	case user.HumanPasswordlessTokenRemovedType:
+		return handler.NewUpdateStatement(event,
+			[]handler.Column{
+				handler.NewCol("passwordless_verification", time.Time{}),
+				handler.NewCol("multi_factor_verification", time.Time{}),
+			},
+			[]handler.Condition{
+				handler.NewCond("instance_id", event.Aggregate().InstanceID),
+				handler.NewCond("user_id", event.Aggregate().ID),
+				handler.Not(handler.NewCond("state", domain.UserSessionStateTerminated)),
+			},
+		), nil
+	case user.UserRemovedType:
+		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+			return u.view.DeleteUserSessions(event.Aggregate().ID, event.Aggregate().InstanceID)
+		}), nil
+	case instance.InstanceRemovedEventType:
+		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+			return u.view.DeleteInstanceUserSessions(event.Aggregate().InstanceID)
+		}), nil
+	case org.OrgRemovedEventType:
+		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+			return u.view.DeleteOrgUserSessions(event)
+		}), nil
+	default:
+		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+			return nil
+		}), nil
 	}
-	for _, session := range sessions {
-		if err := session.AppendEvent(event); err != nil {
-			return err
-		}
-		if err := u.fillUserInfo(session, usersByID); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func (u *UserSession) updateSession(session *view_model.UserSessionView, event eventstore.Event) error {
 	if err := session.AppendEvent(event); err != nil {
 		return err
 	}
-	if err := u.fillUserInfo(session, u.view.UserByID); err != nil {
-		return err
-	}
-	if err := u.view.PutUserSession(session); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (u *UserSession) fillUserInfo(session *view_model.UserSessionView, getUserByID func(userID, instanceID string) (*view_model.UserView, error)) error {
-	user, err := getUserByID(session.UserID, session.InstanceID)
-	if err != nil {
-		return err
-	}
-	session.UserName = user.UserName
-	session.LoginName = user.PreferredLoginName
-	session.DisplayName = user.DisplayName
-	session.AvatarKey = user.AvatarKey
-	return nil
-}
-
-func (u *UserSession) fillLoginNamesOnOrgUsers(event eventstore.Event) error {
-	sessions, err := u.view.UserSessionsByOrgID(event.Aggregate().ResourceOwner, event.Aggregate().InstanceID)
-	if err != nil {
-		return err
-	}
-	if len(sessions) == 0 {
-		return nil
-	}
-	userLoginMustBeDomain, primaryDomain, err := u.loginNameInformation(context.Background(), event.Aggregate().ResourceOwner, event.Aggregate().InstanceID)
-	if err != nil {
-		return err
-	}
-	if !userLoginMustBeDomain {
-		return nil
-	}
-	for _, session := range sessions {
-		session.LoginName = session.UserName + "@" + primaryDomain
-	}
-	return u.view.PutUserSessions(sessions)
-}
-
-func (u *UserSession) loginNameInformation(ctx context.Context, orgID string, instanceID string) (userLoginMustBeDomain bool, primaryDomain string, err error) {
-	org, err := u.getOrgByID(ctx, orgID, instanceID)
-	if err != nil {
-		return false, "", err
-	}
-	primaryDomain, err = org.GetPrimaryDomain()
-	if err != nil {
-		return false, "", err
-	}
-	if org.DomainPolicy != nil {
-		return org.DomainPolicy.UserLoginMustBeDomain, primaryDomain, nil
-	}
-	policy, err := u.queries.DefaultDomainPolicy(authz.WithInstanceID(ctx, org.InstanceID))
-	if err != nil {
-		return false, "", err
-	}
-	return policy.UserLoginMustBeDomain, primaryDomain, nil
-}
-
-func (u *UserSession) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_model.Org, error) {
-	query, err := org_view.OrgByIDQuery(orgID, instanceID, 0)
-	if err != nil {
-		return nil, err
-	}
-
-	esOrg := &org_es_model.Org{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: orgID,
-		},
-	}
-	events, err := u.es.Filter(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	if err = esOrg.AppendEvents(events...); err != nil {
-		return nil, err
-	}
-
-	if esOrg.Sequence == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-3m9vs", "Errors.Org.NotFound")
-	}
-	return org_es_model.OrgToModel(esOrg), nil
+	return u.view.PutUserSession(session)
 }
