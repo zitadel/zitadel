@@ -68,6 +68,7 @@ module.exports = {
         "sdk-examples/nestjs",
         "sdk-examples/nextjs",
         "sdk-examples/python",
+        "sdk-examples/react",
         "sdk-examples/symfony",
         "sdk-examples/vue",
         {
