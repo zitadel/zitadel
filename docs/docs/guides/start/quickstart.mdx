@@ -327,7 +327,7 @@ The code needed to run this project can be found [here](https://github.com/zitad
 
 ```
   const config: ZitadelConfig = {
-    issuer: "[YOUR-INSTANCE-URL]",
+    authority: "[YOUR-INSTANCE-URL]",
     client_id: "[YOUR-CLIENT-ID]",
   };
 
@@ -339,58 +339,14 @@ The App.tsx file is the root component of the React app that initializes the OID
 
 - Importing the necessary libraries and components from the dependencies, including the `@zitadel/react` library and the Login and Callback components.
 - Initializing a new `zitadel` instance with the OIDC configuration values. The `zitadel` instance manages the OIDC flow and stores the user's session information.
-- Defining two functions: `authorize` and `clearAuth`. The `authorize` function initiates the OIDC flow when the user clicks the `login` button, while the `clearAuth` function ends the user's session when the user clicks the `logout` button.
-- Defining two state variables: `authenticated` and `userInfo`. The authenticated variable is a boolean that indicates whether the user is authenticated or not, while the `userInfo` variable stores the user's information when they are authenticated.
-- Using the `useEffect` hook to retrieve the user's session information from the `UserManager` instance and updating the `authenticated` and `userInfo` state variables accordingly.
+- Defining two functions: `authorize` and `signout`. The `authorize` function initiates the OIDC flow when the user clicks the `login` button, while the `signout` function ends the user's session when the user clicks the `logout` button.
+- Defining state variable: `authenticated`. The authenticated variable is a boolean that indicates whether the user is authenticated or not.
+- Using the `useEffect` hook to retrieve the user's session information from the `UserManager` instance and updating the `authenticated` state variable accordingly.
 - Defining the routes for the app using the `react-router-dom` library, including the `/` and `/callback` routes for the login and callback pages, respectively. The `Login` and `Callback` components handle the login and callback processes, respectively.
 
-2. Create a folder named components in the src directory. Create two files named Login.js and Callback.js.
+The provided config extends the `UserManagerSettings` of the `oidc-client-ts` library. Take a look at some of the available configuration options:
 
-3. Paste the following code to Login.tsx.
-
-[src/components/Login.tsx](https://github.com/zitadel/zitadel-react/blob/main/src/components/Login.tsx)
-
-```
-import { Navigate } from "react-router-dom";
-
-type Props = {
-  handleLogin: () => void;
-  authenticated: boolean | null;
-};
-const Login = ({ authenticated, handleLogin }: Props) => {
-  return (
-    <div>
-      {authenticated === null && <div>Loading...</div>}
-      {authenticated === false && (
-        <div>
-          <h1>Welcome!</h1>
-          <button
-            onClick={() => {
-              // Perform the authorization request, including the code challenge
-              handleLogin();
-            }}
-          >
-            Login
-          </button>
-        </div>
-      )}
-      {authenticated && <Navigate to="/callback" />}
-    </div>
-  );
-};
-
-export default Login;
-```
-
-The `/` route corresponds to the login page, which is rendered by the Login component. The Login(Login.tsx) component is a functional component that displays the login button and calls the `handleLogin` function (which corresponds to the `authorize` function defined in the App component) when the button is clicked. This initiates the OIDC flow by redirecting the user to the authorization endpoint.
-
-4. Paste the following code to Callback.js.
-
-[src/components/Callback.tsx](https://github.com/zitadel/zitadel-react/blob/main/src/components/Callback.tsx)
-
-The `/callback` route corresponds to the callback page, which is rendered by the Callback(Callback.tsx) component. The Callback component is also a functional component that handles the callback from the authorization server after the user logs in. It retrieves the authorization code from the URL, exchanges it for an access token and id token, and retrieves the user's information from the userinfo endpoint. It also sets the `authenticated` and `userInfo` state variables in the App(App.tsx) component and displays the `logout` button. When the `logout` button is clicked, the `clearAuth` function is called and the user's session is ended. The `clearAuth` function is defined in the App component and is called with no arguments. It initiates the end session flow by redirecting the user to the end session endpoint.
-
-- issuer (the URL of your instance ending with /).
+- authority (the URL of your instance ending with /).
 - client\*id (the unique identifier for the client application).
 - redirect_uri (the URL to redirect to after the authorization flow is complete)
 - post_logout_redirect_uri (the URL to redirect to after the user logs out)
@@ -398,13 +354,35 @@ The `/callback` route corresponds to the callback page, which is rendered by the
 - project_resource_id (To add a ZITADEL project scope. `urn:zitadel:iam:org:project:id:[projectId]:aud` and `urn:zitadel:iam:org:projects:roles` [scopes](https://zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes).)
 - prompt ([the OIDC prompt parameter](http://localhost:3000/docs/apis/openidoauth/endpoints#additional-parameters))
 
+2. Create a folder named components in the src directory. Create two files named Login.js and Callback.js.
+
+3. Paste the following code to Login.tsx.
+
+```ts reference
+https://github.com/zitadel/zitadel-react/blob/main/src/components/Login.tsx
+```
+
+The `/` route corresponds to the login page, which is rendered by the Login component. The Login(Login.tsx) component is a functional component that displays the login button and calls the `handleLogin` function (which corresponds to the `authorize` function defined in the App component) when the button is clicked. This initiates the OIDC flow by redirecting the user to the authorization endpoint.
+
+4. Paste the following code to Callback.js.
+
+```ts reference
+https://github.com/zitadel/zitadel-react/blob/main/src/components/Callback.tsx
+```
+
+The `/callback` route corresponds to the callback page, which is rendered by the Callback (Callback.tsx) component.
+The Callback component is also a functional component that handles the callback from the authorization server after the user logs in.
+It retrieves the authorization code from the URL, exchanges it for an access token and id token, and retrieves the user's information from the userinfo endpoint.
+It also sets the `authenticated` state variable in the App (App.tsx) component and displays the `logout` button.
+When the `logout` button is clicked, the `clearAuth` function is called and the user's session is ended. The `clearAuth` function is defined in the App component and is called with no arguments. It initiates the end session flow by redirecting the user to the end session endpoint.
+
 Note that the @zitadel/react library automatically handles the generation of the code verifier and code challenge when the user clicks on the login button, eliminating the need for the application to manually generate and include these values in the requests.
 
 In the PKCE flow, the code verifier is a random string generated by the client application, and the code challenge is a transformed version of the code verifier using the SHA-256 hashing algorithm.
 
-6.  Now you can think about styling your application. Edit the `index.css` and `App.css` to apply CSS styling to the pages.
+5. Now you can think about styling your application. Edit the `index.css` and `App.css` to apply CSS styling to the pages.
 
-### 4. Running the application
+### 3. Running the application
 
 1. Run `yarn start` to start the development server.
 2. Open your browser and navigate to `http://localhost:3000/` to view the app.
