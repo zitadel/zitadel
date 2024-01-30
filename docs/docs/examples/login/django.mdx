@@ -103,69 +103,37 @@ python -m pip install mozilla-django-oidc
 
 To use the mozilla-django-oidc as AuthenticationBackend, there are several things to add to the settings.py, as described in the [documentation "Add settings to settings.py"](https://mozilla-django-oidc.readthedocs.io/en/stable/installation.html#add-settings-to-settings-py):
 
+Add INSTALLED_APPS:
+
 ```python
 INSTALLED_APPS = [
     ...
     "mozilla_django_oidc",  # Load after auth
     ...
 ]
+```
 
+Add MIDDLEWARE:
+
+```python
 MIDDLEWARE = [
     #...
     "mozilla_django_oidc.middleware.SessionRefresh",
 ]
+```
 
+Add AUTHENTICATION_BACKENDS:
+
+```python
 AUTHENTICATION_BACKENDS = (
     "mysite.backend.PermissionBackend",
 )
+```
 
-from dotenv import load_dotenv
-import os
-import requests
+Add configuration:
 
-
-def discover_oidc(discovery_url: str) -> dict:
-    """
-    Performs OpenID Connect discovery to retrieve the provider configuration.
-    """
-    response = requests.get(discovery_url)
-    if response.status_code != 200:
-        raise ValueError("Failed to retrieve provider configuration.")
-
-    provider_config = response.json()
-
-    # Extract endpoint URLs from provider configuration
-    return {
-        "authorization_endpoint": provider_config["authorization_endpoint"],
-        "token_endpoint": provider_config["token_endpoint"],
-        "userinfo_endpoint": provider_config["userinfo_endpoint"],
-        "jwks_uri": provider_config["jwks_uri"],
-    }
-
-load_dotenv()
-
-ZITADEL_PROJECT = os.environ.get("ZITADEL_PROJECT")
-OIDC_RP_CLIENT_ID = os.environ.get("OIDC_RP_CLIENT_ID")
-OIDC_RP_CLIENT_SECRET = os.environ.get("OIDC_RP_CLIENT_SECRET")
-OIDC_OP_BASE_URL = os.environ.get("OIDC_OP_BASE_URL")
-
-OIDC_RP_SIGN_ALGO = "RS256"
-OIDC_RP_SCOPES = "openid email phone profile"
-OIDC_OP_DISCOVERY_ENDPOINT = OIDC_OP_BASE_URL + "/.well-known/openid-configuration"
-
-# Discover OpenID Connect endpoints
-discovery_info = discover_oidc(OIDC_OP_DISCOVERY_ENDPOINT)
-OIDC_OP_AUTHORIZATION_ENDPOINT = discovery_info["authorization_endpoint"]
-OIDC_OP_TOKEN_ENDPOINT = discovery_info["token_endpoint"]
-OIDC_OP_USER_ENDPOINT = discovery_info["userinfo_endpoint"]
-OIDC_OP_JWKS_ENDPOINT = discovery_info["jwks_uri"]
-
-# URL to redirect after login
-LOGIN_REDIRECT_URL = "http://localhost:8000/"
-# URL to redirect after logout
-LOGOUT_REDIRECT_URL = "http://localhost:8000/"
-# URL to login
-LOGIN_URL = "http://localhost:8000/oidc/authenticate/"
+```python reference
+https://github.com/zitadel/example-python-django-oidc/blob/main/mysite/settings.py#L130-L174
 ```
 
 and create a ".env"-file in the root folder with the configuration:
@@ -181,68 +149,8 @@ OIDC_OP_BASE_URL = "https://example.zitadel.cloud"
 To create and update the users regarding the roles given in the authentications in ZITADEL a Subclass of OIDCAuthenticationBackend has to be created:
 
 backend.py
-```
-from mozilla_django_oidc.auth import OIDCAuthenticationBackend
-from django.contrib.auth.models import Permission, User
-from django.contrib import admin
-
-
-class PermissionBackend(OIDCAuthenticationBackend):
-    def create_user(self, claims):
-        email = claims.get("email")
-        username = self.get_username(claims)
-        permClaim = (
-            "urn:zitadel:iam:org:project:"
-            + self.get_settings("ZITADEL_PROJECT")
-            + ":roles"
-        )
-
-        if "admin" in claims[permClaim].keys():
-            user = self.UserModel.objects.create_user(
-                username, email=email, is_superuser=True, is_staff=True
-            )
-            user.first_name = claims.get("given_name")
-            user.last_name = claims.get("family_name")
-            user.save()
-            return user
-        elif "staff" in claims[permClaim].keys():
-            user = self.UserModel.objects.create_user(
-                username, email=email, is_staff=True
-            )
-            user.first_name = claims.get("given_name")
-            user.last_name = claims.get("family_name")
-            user.save()
-            return user
-        elif "user" in claims[permClaim].keys():
-            user = self.UserModel.objects.create_user(username, email=email)
-            user.first_name = claims.get("given_name")
-            user.last_name = claims.get("family_name")
-            user.save()
-            return user
-        else:
-            return self.UserModel.objects.none()
-
-    def update_user(self, user, claims):
-        user.first_name = claims.get("given_name")
-        user.last_name = claims.get("family_name")
-        permClaim = (
-            "urn:zitadel:iam:org:project:"
-            + self.get_settings("ZITADEL_PROJECT")
-            + ":roles"
-        )
-
-        if "admin" in claims[permClaim].keys():
-            user.is_superuser = True
-            user.is_staff = True
-        elif "staff" in claims[permClaim].keys():
-            user.is_superuser = False
-            user.is_staff = True
-        elif "user" in claims[permClaim].keys():
-            user.is_superuser = False
-            user.is_staff = False
-        user.save()
-        return user
-
+```python reference
+https://github.com/zitadel/example-python-django-oidc/blob/main/mysite/backend.py
 ```
 
 Which handles the users differently depending on if there are roles associated to:
@@ -261,6 +169,11 @@ urlpatterns = [
 ]
 ```
 
+So it should like something like this:
+```python reference
+https://github.com/zitadel/example-python-django-oidc/blob/main/mysite/urls.py#L21-L28
+```
+
 ## Configure and run the application
 
 :::warning
@@ -270,77 +183,14 @@ Never store and commit secrets in the ".env" or settings.py file
 ### Authentication and authorization
 
 To check the authentication and authorization the views in the polls application are extended with decorators:
-```python
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
-from django.views import generic
 
-from django.http import HttpResponseRedirect
-from .models import Choice, Question
-from django.utils import timezone
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
-from django.contrib.admin.views.decorators import staff_member_required
-
-
-class IndexView(generic.ListView):
-    template_name = "polls/index.html"
-    context_object_name = "latest_question_list"
-
-    def get_queryset(self):
-        """
-        Return the last five published questions (not including those set to be
-        published in the future).
-        """
-        return Question.objects.filter(pub_date__lte=timezone.now()).order_by(
-            "-pub_date"
-        )[:5]
-
-
-@method_decorator(login_required, name="dispatch")
-class DetailView(generic.DetailView):
-    model = Question
-    template_name = "polls/detail.html"
-
-    def get_queryset(self):
-        """
-        Excludes any questions that aren't published yet.
-        """
-        return Question.objects.filter(pub_date__lte=timezone.now())
-
-
-@method_decorator(staff_member_required, name="dispatch")
-class ResultsView(generic.DetailView):
-    model = Question
-    template_name = "polls/results.html"
-
-
-def vote(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    try:
-        selected_choice = question.choice_set.get(pk=request.POST["choice"])
-    except (KeyError, Choice.DoesNotExist):
-        # Redisplay the question voting form.
-        return render(
-            request,
-            "polls/detail.html",
-            {
-                "question": question,
-                "error_message": "You didn't select a choice.",
-            },
-        )
-    else:
-        selected_choice.votes += 1
-        selected_choice.save()
-        # Always return an HttpResponseRedirect after successfully dealing
-        # with POST data. This prevents data from being posted twice if a
-        # user hits the Back button.
-        return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+```python reference
+https://github.com/zitadel/example-python-django-oidc/blob/main/mysite/views.py
 ```
 
-- @method_decorator(login_required, name="dispatch"): means that the user has to be logged in Django, which only happens if you have one of the 3 roles("admin", "staff" or "user")
-- @method_decorator(staff_member_required, name="dispatch"): means you have to have at least a staff user ("admin" or "staff")
-- "/admin/": all admin sides are only accessible if you have a superuser with the role "admin"
+- `@method_decorator(login_required, name="dispatch")`: means that the user has to be logged in Django, which only happens if you have one of the 3 roles("admin", "staff" or "user")
+- `@method_decorator(staff_member_required, name="dispatch")`: means you have to have at least a staff user ("admin" or "staff")
+- `/admin/`: all admin sides are only accessible if you have a superuser with the role "admin"
 
 :::info
 Additional permission checks could be done with "permission_required" from "django.contrib.auth.decorators" also described in the [Django documentation](https://docs.djangoproject.com/en/5.0/topics/auth/customizing/#custom-permissions).
