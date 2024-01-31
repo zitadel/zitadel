@@ -4,13 +4,24 @@ sidebar_label: Instances
 ---
 
 The ZITADEL Customer Portal is used to manage all your different ZITADEL instances.
-You can also manage your subscriptions, billing, newsletters and support requests.
+Instances are containers for your organizations, users and projects.
+A recommended setup could look like the following:
+1. Instance: "Dev Environment"
+2. Instance: "Test Environment"
+3. Instance: "Prod Environment"
+
+In the free subscription model you have one instance included.
+To be able to add more instances please upgrade to "ZITADEL Pro".
 
 ## Overview
 
-The overview shows all the instances that are registered for a specific customer.
-You can directly see what kind of subscription the instance has and in which data region it is stored.
-With a click on a instance row you get to the detail of the chosen instance.
+The overview shows all the instances that are registered for your customer.
+You can directly see the custom domain and data region.
+With a click on an instance you get to the detail of the chosen instance.
+
+
+![Instance Overview](/img/manuals/portal/customer_portal_instance_overview.png)
+
 
 ## New instance
 
