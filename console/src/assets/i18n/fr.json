@@ -227,6 +227,7 @@
     "EMAIL": "Courriel",
     "USERNAME": "Nom de l'utilisateur",
     "ORGNAME": "Nom de l'organisation",
+    "PRIMARYDOMAIN": "Domaine principal",
     "PROJECTNAME": "Nom du projet",
     "RESOURCEOWNER": "Propriétaire des ressources",
     "METHODS": {
