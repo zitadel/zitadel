@@ -227,6 +227,7 @@
     "EMAIL": "Email",
     "USERNAME": "Nazwa Użytkownika",
     "ORGNAME": "Nazwa Organizacji",
+    "PRIMARYDOMAIN": "Domena podstawowa",
     "PROJECTNAME": "Nazwa Projektu",
     "RESOURCEOWNER": "Właściciel Zasobu",
     "METHODS": {
