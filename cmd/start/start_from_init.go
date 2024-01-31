@@ -31,6 +31,9 @@ Requirements:
 
 			initialise.InitAll(cmd.Context(), initialise.MustNewConfig(viper.GetViper()))
 
+			err = setup.BindInitProjections(cmd)
+			logging.OnError(err).Fatal("unable to bind \"init-projections\" flag")
+
 			setupConfig := setup.MustNewConfig(viper.GetViper())
 			setupSteps := setup.MustNewSteps(viper.New())
 			setup.Setup(setupConfig, setupSteps, masterKey)

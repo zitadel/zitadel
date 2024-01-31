@@ -48,6 +48,10 @@ type UserGrant struct {
 
 	ProjectID   string `json:"project_id,omitempty"`
 	ProjectName string `json:"project_name,omitempty"`
+
+	GrantedOrgID     string `json:"granted_org_id,omitempty"`
+	GrantedOrgName   string `json:"granted_org_name,omitempty"`
+	GrantedOrgDomain string `json:"granted_org_domain,omitempty"`
 }
 
 type UserGrants struct {
@@ -209,6 +213,23 @@ var (
 		name:  projection.UserGrantState,
 		table: userGrantTable,
 	}
+	GrantedOrgsTable = table{
+		name:          projection.OrgProjectionTable,
+		alias:         "granted_orgs",
+		instanceIDCol: projection.OrgColumnInstanceID,
+	}
+	GrantedOrgColumnId = Column{
+		name:  projection.OrgColumnID,
+		table: GrantedOrgsTable,
+	}
+	GrantedOrgColumnName = Column{
+		name:  projection.OrgColumnName,
+		table: GrantedOrgsTable,
+	}
+	GrantedOrgColumnDomain = Column{
+		name:  projection.OrgColumnDomain,
+		table: GrantedOrgsTable,
+	}
 )
 
 func (q *Queries) UserGrant(ctx context.Context, shouldTriggerBulk bool, queries ...SearchQuery) (grant *UserGrant, err error) {
@@ -301,12 +322,17 @@ func prepareUserGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 
 			UserGrantProjectID.identifier(),
 			ProjectColumnName.identifier(),
+
+			GrantedOrgColumnId.identifier(),
+			GrantedOrgColumnName.identifier(),
+			GrantedOrgColumnDomain.identifier(),
 		).
 			From(userGrantTable.identifier()).
 			LeftJoin(join(UserIDCol, UserGrantUserID)).
 			LeftJoin(join(HumanUserIDCol, UserGrantUserID)).
 			LeftJoin(join(OrgColumnID, UserGrantResourceOwner)).
 			LeftJoin(join(ProjectColumnID, UserGrantProjectID)).
+			LeftJoin(join(GrantedOrgColumnId, UserResourceOwnerCol)).
 			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID) + db.Timetravel(call.Took(ctx))).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
@@ -329,6 +355,10 @@ func prepareUserGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 				orgDomain sql.NullString
 
 				projectName sql.NullString
+
+				grantedOrgID     sql.NullString
+				grantedOrgName   sql.NullString
+				grantedOrgDomain sql.NullString
 			)
 
 			err := row.Scan(
@@ -357,6 +387,10 @@ func prepareUserGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 
 				&g.ProjectID,
 				&projectName,
+
+				&grantedOrgID,
+				&grantedOrgName,
+				&grantedOrgDomain,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
@@ -377,7 +411,9 @@ func prepareUserGrantQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			g.OrgName = orgName.String
 			g.OrgPrimaryDomain = orgDomain.String
 			g.ProjectName = projectName.String
-
+			g.GrantedOrgID = grantedOrgID.String
+			g.GrantedOrgName = grantedOrgName.String
+			g.GrantedOrgDomain = grantedOrgDomain.String
 			return g, nil
 		}
 }
@@ -410,6 +446,10 @@ func prepareUserGrantsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			UserGrantProjectID.identifier(),
 			ProjectColumnName.identifier(),
 
+			GrantedOrgColumnId.identifier(),
+			GrantedOrgColumnName.identifier(),
+			GrantedOrgColumnDomain.identifier(),
+
 			countColumn.identifier(),
 		).
 			From(userGrantTable.identifier()).
@@ -417,6 +457,7 @@ func prepareUserGrantsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			LeftJoin(join(HumanUserIDCol, UserGrantUserID)).
 			LeftJoin(join(OrgColumnID, UserGrantResourceOwner)).
 			LeftJoin(join(ProjectColumnID, UserGrantProjectID)).
+			LeftJoin(join(GrantedOrgColumnId, UserResourceOwnerCol)).
 			LeftJoin(join(LoginNameUserIDCol, UserGrantUserID) + db.Timetravel(call.Took(ctx))).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
@@ -440,6 +481,10 @@ func prepareUserGrantsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 
 					orgName   sql.NullString
 					orgDomain sql.NullString
+
+					grantedOrgID     sql.NullString
+					grantedOrgName   sql.NullString
+					grantedOrgDomain sql.NullString
 
 					projectName sql.NullString
 				)
@@ -471,6 +516,10 @@ func prepareUserGrantsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 					&g.ProjectID,
 					&projectName,
 
+					&grantedOrgID,
+					&grantedOrgName,
+					&grantedOrgDomain,
+
 					&count,
 				)
 				if err != nil {
@@ -489,6 +538,9 @@ func prepareUserGrantsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				g.OrgName = orgName.String
 				g.OrgPrimaryDomain = orgDomain.String
 				g.ProjectName = projectName.String
+				g.GrantedOrgID = grantedOrgID.String
+				g.GrantedOrgName = grantedOrgName.String
+				g.GrantedOrgDomain = grantedOrgDomain.String
 
 				userGrants = append(userGrants, g)
 			}

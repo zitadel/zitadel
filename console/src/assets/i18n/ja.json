@@ -228,6 +228,7 @@
     "EMAIL": "Eメール",
     "USERNAME": "ユーザー名",
     "ORGNAME": "組織名",
+    "PRIMARYDOMAIN": "プライマリドメイン",
     "PROJECTNAME": "プロジェクト名",
     "RESOURCEOWNER": "リソース所有者",
     "METHODS": {
@@ -2228,7 +2229,8 @@
     "TOAST": {
       "UPDATED": "認可が更新されました。",
       "REMOVED": "認可が削除されました",
-      "BULKREMOVED": "認可が削除されました。"
+      "BULKREMOVED": "認可が削除されました。",
+      "CANTSHOWINFO": "このユーザーが所属する組織のメンバーではないため、このユーザーのプロフィールにアクセスできません"
     },
     "DIALOG": {
       "DELETE_TITLE": "認可の削除",

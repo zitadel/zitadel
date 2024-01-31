@@ -27,7 +27,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	ts, err := testserver.NewTestServer()
+	ts, err := testserver.NewTestServer(testserver.CustomVersionOpt(os.Getenv("ZITADEL_CRDB_VERSION")))
 	if err != nil {
 		logging.WithFields("error", err).Fatal("unable to start db")
 	}

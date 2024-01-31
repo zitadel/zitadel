@@ -399,7 +399,7 @@ func (wm *PublicKeyReadModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (q *Queries) GetActivePublicKeyByID(ctx context.Context, keyID string, current time.Time) (_ PublicKey, err error) {
+func (q *Queries) GetPublicKeyByID(ctx context.Context, keyID string) (_ PublicKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -409,9 +409,6 @@ func (q *Queries) GetActivePublicKeyByID(ctx context.Context, keyID string, curr
 	}
 	if model.Algorithm == "" || model.Key == nil {
 		return nil, zerrors.ThrowNotFound(err, "QUERY-Ahf7x", "Errors.Key.NotFound")
-	}
-	if model.Expiry.Before(current) {
-		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-ciF4k", "Errors.Key.ExpireBeforeNow")
 	}
 	keyValue, err := crypto.Decrypt(model.Key, q.keyEncryptionAlgorithm)
 	if err != nil {

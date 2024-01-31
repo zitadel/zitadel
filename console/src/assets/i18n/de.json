@@ -227,6 +227,7 @@
     "EMAIL": "Email",
     "USERNAME": "Nutzername",
     "ORGNAME": "Organisationsname",
+    "PRIMARYDOMAIN": "Primäre Domäne",
     "PROJECTNAME": "Projektname",
     "RESOURCEOWNER": "Ressourcenbesitzer",
     "METHODS": {
@@ -2236,7 +2237,8 @@
     "TOAST": {
       "UPDATED": "Berechtigung geändert.",
       "REMOVED": "Berechtigung entfernt.",
-      "BULKREMOVED": "Berechtigungen entfernt."
+      "BULKREMOVED": "Berechtigungen entfernt.",
+      "CANTSHOWINFO": "Sie können das Profil dieses Benutzers nicht besuchen, da Sie kein Mitglied der Organisation sind, zu der dieser Benutzer gehört"
     },
     "DIALOG": {
       "DELETE_TITLE": "Authorisierung löschen",
