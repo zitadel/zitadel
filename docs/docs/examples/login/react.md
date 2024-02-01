@@ -77,7 +77,7 @@ https://github.com/zitadel/zitadel-react/blob/main/src/App.tsx
 
 ### Add two new components to your application
 
-First add the component which prompts the user to login
+First, add the component which prompts the user to login.
 
 ```ts reference
 https://github.com/zitadel/zitadel-react/blob/main/src/components/Login.tsx
