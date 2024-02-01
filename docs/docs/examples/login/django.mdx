@@ -5,6 +5,7 @@ sidebar_label: Django
 
 import SetupPython from '../imports/_setup_python.mdx';
 import SetupDjango from '../imports/_setup_django.mdx';
+import SetupDotenv from '../imports/_setup_dotenv.mdx';
 
 This integration guide demonstrates the recommended way to incorporate ZITADEL into your Django Python application.
 It explains how to enable user login in your application and how to incorporate the ZITADEL users into the existing AuthenticationBackend.
@@ -100,6 +101,8 @@ python -m pip install mozilla-django-oidc
 ## Define the Django app
 
 ### Create the settings.py to include mozilla-django-oidc
+
+<SetupDotenv/>
 
 To use the mozilla-django-oidc as AuthenticationBackend, there are several things to add to the settings.py, as described in the [documentation "Add settings to settings.py"](https://mozilla-django-oidc.readthedocs.io/en/stable/installation.html#add-settings-to-settings-py):
 

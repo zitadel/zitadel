@@ -8,6 +8,7 @@ import ServiceuserJWT from '../imports/_serviceuser_jwt.mdx';
 import ServiceuserRole from '../imports/_serviceuser_role.mdx';
 import SetupPython from '../imports/_setup_python.mdx';
 import SetupDjango from '../imports/_setup_django.mdx';
+import SetupDotenv from '../imports/_setup_dotenv.mdx';
 
 This integration guide demonstrates the recommended way to incorporate ZITADEL into your Django Python application.
 It explains how to check the token validity in the API and how to check for permissions.
@@ -71,6 +72,8 @@ python -m pip install authlib
 
 ### Add to the settings.py to include ZITADEL info
 
+<SetupDotenv/>
+
 There is info needed for the introspection calls, which we put into the settings.py:
 
 ```python reference
@@ -94,7 +97,13 @@ API_PRIVATE_KEY_FILE_PATH = '/tmp/example/250719519163548112.json'
 
 ### Validator definition
 
-To validate the tokens, we need a validator which can be called in the event of API-calls:
+To validate the tokens, we need a validator which can be called in the event of API-calls.
+
+Install requests so the HTTP requests can be created:
+
+```bash
+python -m pip install requests
+```
 
 validator.py:
 
