@@ -53,31 +53,39 @@ And the following from the Serviceuser:
 
 <SetupPython/>
 
-### Setup Django
-
-<SetupDjango/>
-
-:::info
-Skip this step if you are connecting ZITADEL to an existing application.
-:::
-
 ### Install dependencies
 
-To connect with ZITADEL through OAuth, we will use the [Authlib](https://pypi.org/project/Authlib/). Run the following command:
+For this example we need the following dependencies:
+- `django`: to create an API with django
+- `python-dotenv`: to use environment variables in the configuration
+- `authlib`: client-side OAuth functionality
+- `requests`: HTTP requests for the introspection
+
+
+For the dependencies we need a requirements.txt-file with the following content:
+
+```python reference
+https://github.com/zitadel/example-python-django-oauth/blob/main/requirements.txt
+```
+
+Then install all dependencies with:
 ```bash
-python -m pip install authlib
+python -m pip install -U requirements.txt
+```
+
+Then in your folder of choice, call the following command to create a Django base:
+```bash
+django-admin startproject myapi .
 ```
 
 ## Define the Django API
 
 ### Add to the settings.py to include ZITADEL info
 
-<SetupDotenv/>
-
 There is info needed for the introspection calls, which we put into the settings.py:
 
 ```python reference
-https://github.com/zitadel/example-python-django-oauth/blob/main/mysite/settings.py#L127-L132
+https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/settings.py#L125-L133
 ```
 
 and create a ".env"-file in the root folder with the configuration as an example:
@@ -99,16 +107,10 @@ API_PRIVATE_KEY_FILE_PATH = '/tmp/example/250719519163548112.json'
 
 To validate the tokens, we need a validator which can be called in the event of API-calls.
 
-Install requests so the HTTP requests can be created:
-
-```bash
-python -m pip install requests
-```
-
 validator.py:
 
 ```python reference
-https://github.com/zitadel/example-python-django-oauth/blob/main/mysite/validator.py
+https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/validator.py
 ```
 
 ### Requests and URLs
@@ -117,13 +119,13 @@ We define 3 different endpoints which differ in terms of requirements.
 views.py:
 
 ```python reference
-https://github.com/zitadel/example-python-django-oauth/blob/main/mysite/views.py
+https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/views.py
 ```
 
 To handle endpoints the urls have to be added to the urls.py:
 
 ```python reference
-https://github.com/zitadel/example-python-django-oauth/blob/main/mysite/urls.py
+https://github.com/zitadel/example-python-django-oauth/blob/main/myapi/urls.py
 ```
 
 ### DB
@@ -144,6 +146,7 @@ python manage.py runserver
 
 ### Call the API
 
+To call the API you need an access token, which is then verified by ZITADEL.
 Please follow [this guide here](https://zitadel.com/docs/guides/integrate/private-key-jwt#get-an-access-token), ignoring the first step as we already have the `.json`-key-file from the serviceaccount.
 
 Optionally set the token as an environment variable:
@@ -151,7 +154,7 @@ Optionally set the token as an environment variable:
 export TOKEN='MtjHodGy4zxKylDOhg6kW90WeEQs2q...'
 ```
 
-With the access token you can then do the following calls:
+With the access token, you can then do the following calls:
 ```
 curl -H "Authorization: Bearer $TOKEN" -X GET http://localhost:8000/api/public
 curl -H "Authorization: Bearer $TOKEN" -X GET http://localhost:8000/api/private
