@@ -69,7 +69,7 @@ You can overwrite all the defaults with the aguments you pass to `createZitadelA
 
 Export the object returned from `createZitadelAuth()`
 
-### Initialize User Manager
+### Initialize user manager
 
 ```ts reference
 https://github.com/zitadel/zitadel-react/blob/main/src/App.tsx
