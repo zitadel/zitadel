@@ -94,7 +94,7 @@ You can now read a user's role to show protected areas of the application.
 
 ### Run
 
-Finally you can start your application by running:
+Finally, you can start your application by running the following:
 
 ```
 yarn start
