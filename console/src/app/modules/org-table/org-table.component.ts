@@ -88,7 +88,7 @@ export class OrgTableComponent {
       }
 
     return from(
-      this.authService.listMyProjectOrgs(request.limit, request.offset, request.queries, sortingField, this.sort?.direction),
+      this.adminService.listOrgs(request.limit, request.offset, request.queries, sortingField, this.sort?.direction),
     ).pipe(
       map((resp) => {
         this.timestamp = resp.details?.viewTimestamp;

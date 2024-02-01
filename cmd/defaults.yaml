@@ -337,6 +337,7 @@ OIDC:
     TriggerIntrospectionProjections: false
     # Allows fallback to the Legacy Introspection implementation
     LegacyIntrospection: false
+  PublicKeyCacheMaxAge: 24h # ZITADEL_OIDC_PUBLICKEYCACHEMAXAGE
 
 SAML:
   ProviderConfig:
