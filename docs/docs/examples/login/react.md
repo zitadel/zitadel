@@ -90,7 +90,7 @@ It loads the user info endpoint once the code flow completes and prints all the 
 https://github.com/zitadel/zitadel-react/blob/main/src/components/Callback.tsx
 ```
 
-You can now read out a users role to show protected areas of the application.
+You can now read a user's role to show protected areas of the application.
 
 ### Run
 
