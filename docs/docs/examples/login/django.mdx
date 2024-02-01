@@ -31,7 +31,7 @@ In your project settings make sure the "Assert Roles On Authentication" is enabl
 
 ![Project settings in console](/img/django/project-settings.png)
 
-In the project Role tab, add 2 special roles:
+In the project Role tab, add 3 special roles:
 
 - `admin`
 - `staff`
@@ -51,11 +51,11 @@ Next you will need to provide some information about your app.
 
 In your Project, add a new application at the top of the page.
 Select Web application type and continue.
-We use [Authorization Code](/apis/openidoauth/grant-types#authorization-code)for our Django application.
+We use [Authorization Code](/apis/openidoauth/grant-types#authorization-code) for our Django application.
 
 ![Create app in console](/img/django/app-create.png)
 
-Select `CODE` in the next step. This makes sure you still get a secret. Note that the secret never gets exposed on the browser and is therefore kept in a confidential environment. Safe the generated
+Select `CODE` in the next step. This makes sure you still get a secret. Note that the secret never gets exposed on the browser and is therefore kept in a confidential environment. Safe the generated secret for later use.
 
 ![Configure app authentication method in console](/img/django/app-auth-method.png)
 
@@ -148,7 +148,6 @@ OIDC_OP_BASE_URL = "https://example.zitadel.cloud"
 
 To create and update the users regarding the roles given in the authentications in ZITADEL a Subclass of OIDCAuthenticationBackend has to be created:
 
-backend.py
 ```python reference
 https://github.com/zitadel/example-python-django-oidc/blob/main/mysite/backend.py
 ```
