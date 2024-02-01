@@ -83,7 +83,7 @@ First, add the component which prompts the user to login.
 https://github.com/zitadel/zitadel-react/blob/main/src/components/Login.tsx
 ```
 
-Then create the component for the page where the users is redirected to.
+Then create the component for the page where the users will be redirected.
 It loads the user info endpoint once the code flow completes and prints all the information.
 
 ```ts reference
