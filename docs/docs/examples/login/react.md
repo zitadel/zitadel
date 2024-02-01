@@ -106,7 +106,7 @@ Congratulations! You have successfully integrated your React application with ZI
 
 If you get stuck, consider checking out the [ZITADEL React example application](https://github.com/zitadel/zitadel-react).
 This application includes all the functionalities mentioned in this quickstart.
-You can start by cloning the repository and change the arguments to `createZitadelAuth` so they fit your requirements.
+You can start by cloning the repository and changing the arguments to `createZitadelAuth` to fit your requirements.
 If you face issues, contact us or [raise an issue on GitHub](https://github.com/zitadel/zitadel-react/issues).
 
 ![App in console](/img/react/app-screen.png)
