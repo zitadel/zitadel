@@ -79,9 +79,23 @@ The secret will not be displayed again, but you can regenerate one if you loose 
 
 <SetupPython/>
 
-### Setup Django
+### Install dependencies
 
-<SetupDjango/>
+For this example we need the following dependencies:
+- `django`: to create an API with django
+- `python-dotenv`: to use environment variables in the configuration
+- `mozilla-django-oidc`: client-side OIDC functionality
+
+For the dependencies we need a requirements.txt-file with the following content:
+
+```python reference
+https://github.com/zitadel/example-python-django-oidc/blob/main/requirements.txt
+```
+
+Then install all dependencies with:
+```bash
+python -m pip install -U requirements.txt
+```
 
 The used base is the "Writing your first Django app" from the Django documentation under [https://docs.djangoproject.com/en/5.0/intro/](https://docs.djangoproject.com/en/5.0/intro/),
 which has documented additional parts in to use [mozilla-django-oidc](https://github.com/mozilla/mozilla-django-oidc) to integrate ZITADEL as AuthenticationBackend.
@@ -90,19 +104,9 @@ which has documented additional parts in to use [mozilla-django-oidc](https://gi
 Skip this step if you are connecting ZITADEL to an existing application.
 :::
 
-### Install dependencies
-
-To connect with ZITADEL through OpenID connect, you need to install a OIDC dependency, we will use the [mozilla-django-oidc](https://github.com/mozilla/mozilla-django-oidc). Run the following command:
-
-```bash
-python -m pip install mozilla-django-oidc
-```
-
 ## Define the Django app
 
 ### Create the settings.py to include mozilla-django-oidc
-
-<SetupDotenv/>
 
 To use the mozilla-django-oidc as AuthenticationBackend, there are several things to add to the settings.py, as described in the [documentation "Add settings to settings.py"](https://mozilla-django-oidc.readthedocs.io/en/stable/installation.html#add-settings-to-settings-py):
 
@@ -140,10 +144,20 @@ https://github.com/zitadel/example-python-django-oidc/blob/main/mysite/settings.
 ```
 
 and create a ".env"-file in the root folder with the configuration:
+
 ```bash
 ZITADEL_PROJECT = "ID of the project you created the application in ZITADEL"
 OIDC_RP_CLIENT_ID = "ClientID provided by the created application in ZITADEL"
 OIDC_RP_CLIENT_SECRET = "ClientSecret provided by the created application in ZITADEL"
+OIDC_OP_BASE_URL = "Base URL to the ZITADEL instance"
+```
+
+which should then look something like this:
+
+```bash
+ZITADEL_PROJECT = "249703732336418457"
+OIDC_RP_CLIENT_ID = "249703852243222581@python"
+OIDC_RP_CLIENT_SECRET = "Zy3OOHaMBTj2sfamW77Vak5BeQ3nEpOf7suPKTnJKaScMh0lPJqUeDOZmgL3bds0"
 OIDC_OP_BASE_URL = "https://example.zitadel.cloud"
 ```
 
