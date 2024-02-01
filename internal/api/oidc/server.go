@@ -23,10 +23,11 @@ type Server struct {
 	*op.LegacyServer
 	features Features
 
-	repo    repository.Repository
-	query   *query.Queries
-	command *command.Commands
-	keySet  *keySetCache
+	repo              repository.Repository
+	query             *query.Queries
+	command           *command.Commands
+	accessTokenKeySet *oidcKeySet
+	idTokenHintKeySet *oidcKeySet
 
 	defaultLoginURL            string
 	defaultLoginURLV2          string

@@ -19,6 +19,11 @@ module.exports = {
             "examples/login/go",
             "examples/login/symfony",
             "examples/login/java-spring",
+            {
+              type: "link",
+              label: ".Net",
+              href: "https://github.com/smartive/zitadel-net",
+            },
           ],
           collapsed: true,
         },
@@ -28,7 +33,11 @@ module.exports = {
           items: [
             "examples/secure-api/go",
             "examples/secure-api/python-flask",
-            "examples/secure-api/dot-net",
+            {
+              type: "link",
+              label: ".Net",
+              href: "https://github.com/smartive/zitadel-net",
+            },
             "examples/secure-api/nodejs-nestjs",
             "examples/secure-api/java-spring",
           ],
@@ -248,6 +257,7 @@ module.exports = {
             "guides/integrate/identity-providers/migrate",
             "guides/integrate/identity-providers/okta",
             "guides/integrate/identity-providers/keycloak",
+            "guides/integrate/identity-providers/additional-information",
           ],
         },
         {
@@ -370,6 +380,23 @@ module.exports = {
         "guides/solution-scenarios/configurations",
         "guides/solution-scenarios/frontend-calling-backend-API",
         "guides/solution-scenarios/device-authorization",
+        {
+          type: "category",
+          label: "Onboarding Customers and Users",
+          link: {
+            type: "generated-index",
+            title: "Onboarding Customers and Users",
+            slug: "/guides/solution-scenarios/onboarding",
+            description:
+                "When building your own application, one of the first questions you have to face, is 'How do my customers onboard to my application?'\n" +
+                "This guide will show you the built-in solution you have, within ZITADEL and how you can use ZITADEL when you have more advanced needs.",
+          },
+          collapsed: true,
+          items: [
+            "guides/solution-scenarios/onboarding/b2b",
+            "guides/solution-scenarios/onboarding/end-users",
+          ],
+        }
       ],
     },
     {
