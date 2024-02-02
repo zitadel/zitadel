@@ -199,7 +199,7 @@ func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Inst
 	defer func() { span.EndWithError(err) }()
 
 	domain := strings.Split(host, ":")[0] //remove possible port
-	instance, scan := scanAuthzInstance(q.defaultFeatures.ToInstance(), host, domain)
+	instance, scan := scanAuthzInstance(q.defaultFeatures, host, domain)
 	err = q.client.QueryRowContext(ctx, scan, instanceByDomainQuery, host)
 	return instance, err
 }
@@ -208,7 +208,7 @@ func (q *Queries) InstanceByID(ctx context.Context) (_ authz.Instance, err error
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	instance, scan := scanAuthzInstance(q.defaultFeatures.ToInstance(), "", "")
+	instance, scan := scanAuthzInstance(q.defaultFeatures, "", "")
 	err = q.client.QueryRowContext(ctx, scan, instanceByIDQuery, authz.GetInstance(ctx).InstanceID())
 	return instance, err
 }
@@ -419,7 +419,7 @@ type authzInstance struct {
 	csp               csp
 	block             *bool
 	auditLogRetention *time.Duration
-	features          *feature.Instance
+	features          feature.Features
 }
 
 type csp struct {
@@ -474,11 +474,11 @@ func (i *authzInstance) AuditLogRetention() *time.Duration {
 	return i.auditLogRetention
 }
 
-func (i *authzInstance) Features() *feature.Instance {
+func (i *authzInstance) Features() feature.Features {
 	return i.features
 }
 
-func scanAuthzInstance(defaultFeatures *feature.Instance, host, domain string) (*authzInstance, func(row *sql.Row) error) {
+func scanAuthzInstance(defaultFeatures feature.Features, host, domain string) (*authzInstance, func(row *sql.Row) error) {
 	instance := &authzInstance{
 		host:     host,
 		domain:   domain,

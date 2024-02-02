@@ -1,24 +1,7 @@
 package feature
 
-type Defaults struct {
-	FeatureA bool
-}
-
-func (d *Defaults) ToInstance() *Instance {
-	return &Instance{
-		FeatureA: d.FeatureA,
-	}
-}
-
-type System struct {
-}
-
-type Instance struct {
-	FeatureA bool `json:"feature_a,omitempty"`
-}
-
-type Organization struct {
-}
-
-type User struct {
+type Features struct {
+	LoginDefaultOrg                 bool `json:"login_default_org,omitempty"`
+	TriggerIntrospectionProjections bool `json:"trigger_introspection_projections,omitempty"`
+	LegacyIntrospection             bool `json:"legacy_introspection,omitempty"`
 }

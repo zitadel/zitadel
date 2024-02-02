@@ -210,6 +210,6 @@ func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 	return nil
 }
 
-func (m *mockInstance) Features() *feature.Instance {
-	return &feature.Instance{}
+func (m *mockInstance) Features() feature.Features {
+	return feature.Features{}
 }

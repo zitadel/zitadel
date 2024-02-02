@@ -25,7 +25,7 @@ type Instance interface {
 	SecurityPolicyAllowedOrigins() []string
 	Block() *bool
 	AuditLogRetention() *time.Duration
-	Features() *feature.Instance
+	Features() feature.Features
 }
 
 type InstanceVerifier interface {
@@ -86,8 +86,8 @@ func (i *instance) SecurityPolicyAllowedOrigins() []string {
 	return nil
 }
 
-func (i *instance) Features() *feature.Instance {
-	return &feature.Instance{}
+func (i *instance) Features() feature.Features {
+	return feature.Features{}
 }
 
 func GetInstance(ctx context.Context) Instance {
