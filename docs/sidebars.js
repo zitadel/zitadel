@@ -19,6 +19,7 @@ module.exports = {
             "examples/login/go",
             "examples/login/symfony",
             "examples/login/java-spring",
+            "examples/login/python-django",
             {
               type: "link",
               label: ".Net",
@@ -33,6 +34,7 @@ module.exports = {
           items: [
             "examples/secure-api/go",
             "examples/secure-api/python-flask",
+            "examples/secure-api/python-django",
             {
               type: "link",
               label: ".Net",
@@ -56,7 +58,8 @@ module.exports = {
         "sdk-examples/java",
         "sdk-examples/nestjs",
         "sdk-examples/nextjs",
-        "sdk-examples/python",
+        "sdk-examples/python-flask",
+        "sdk-examples/python-django",
         "sdk-examples/react",
         "sdk-examples/symfony",
         "sdk-examples/vue",
