@@ -228,6 +228,7 @@
     "EMAIL": "E-mail",
     "USERNAME": "Gebruikersnaam",
     "ORGNAME": "Organisatienaam",
+    "PRIMARYDOMAIN": "Primair domein",
     "PROJECTNAME": "Projectnaam",
     "RESOURCEOWNER": "Eigenaar van de bron",
     "METHODS": {

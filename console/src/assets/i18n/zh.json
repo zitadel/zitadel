@@ -227,6 +227,7 @@
     "EMAIL": "邮箱",
     "USERNAME": "用户名",
     "ORGNAME": "组织名称",
+    "PRIMARYDOMAIN": "主域",
     "PROJECTNAME": "项目名称",
     "RESOURCEOWNER": "资源所有者",
     "METHODS": {

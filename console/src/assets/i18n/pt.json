@@ -228,6 +228,7 @@
     "EMAIL": "E-mail",
     "USERNAME": "Nome de Usuário",
     "ORGNAME": "Nome da Organização",
+    "PRIMARYDOMAIN": "Domínio primário",
     "PROJECTNAME": "Nome do Projeto",
     "RESOURCEOWNER": "Proprietário do Recurso",
     "METHODS": {

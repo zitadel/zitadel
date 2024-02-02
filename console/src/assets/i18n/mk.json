@@ -228,6 +228,7 @@
     "EMAIL": "Е-пошта",
     "USERNAME": "Корисничко име",
     "ORGNAME": "Име на организацијата",
+    "PRIMARYDOMAIN": "Примарен домен",
     "PROJECTNAME": "Име на проектот",
     "RESOURCEOWNER": "Сопственик на ресурсот",
     "METHODS": {
