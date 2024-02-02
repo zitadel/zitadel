@@ -38,7 +38,7 @@ func AssertDetails[D DetailsMsg](t testing.TB, expected, actual D) {
 	assert.NotZero(t, gotDetails.GetSequence())
 
 	gotCD := gotDetails.GetChangeDate().AsTime()
-	now := time.Now()
+	now := time.Now().UTC()
 	assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
 	assert.Equal(t, wantDetails.GetResourceOwner(), gotDetails.GetResourceOwner())
@@ -52,7 +52,7 @@ func AssertListDetails[D ListDetailsMsg](t testing.TB, expected, actual D) {
 	}
 
 	gotCD := gotDetails.GetTimestamp().AsTime()
-	now := time.Now()
+	now := time.Now().UTC()
 	assert.WithinRange(t, gotCD, now.Add(-time.Minute), now.Add(time.Minute))
 
 	assert.Equal(t, wantDetails.GetTotalResult(), gotDetails.GetTotalResult())

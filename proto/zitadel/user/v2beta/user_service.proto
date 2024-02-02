@@ -148,6 +148,7 @@ service UserService {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
+        org_field: "organization"
       }
       http_response: {
         success_code: 200
