@@ -1,0 +1,42 @@
+name: Add new issues to product management project
+
+on:
+  issues:
+    types:
+      - opened
+  pull_request_target:
+    types:
+      - opened
+
+jobs:
+  add-to-project:
+    name: Add issue and community pr to project
+    runs-on: ubuntu-latest
+    steps:
+      - name: add issue
+        uses: actions/add-to-project@v0.5.0
+        if: ${{ github.event_name == 'issues' }}
+        with:
+          # You can target a repository in a different organization
+          # to the issue
+          project-url: https://github.com/orgs/zitadel/projects/2
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+      - uses: tspascoal/get-user-teams-membership@v3
+        id: checkUserMember
+        with:
+         username: ${{ github.actor }}
+         GITHUB_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
+      - name: add pr
+        uses: actions/add-to-project@v0.5.0
+        if: ${{ github.event_name == 'pull_request_target' && !contains(steps.checkUserMember.outputs.teams, 'engineers') && github.actor != 'app/dependabot'}}
+        with:
+          # You can target a repository in a different organization
+          # to the issue
+          project-url: https://github.com/orgs/zitadel/projects/2
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+      - uses: actions-ecosystem/action-add-labels@v1.1.0
+        if: ${{ github.event_name == 'pull_request_target' && !contains(steps.checkUserMember.outputs.teams, 'staff') && github.actor != 'app/dependabot'}}
+        with:
+          github_token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          labels: |
+            os-contribution
