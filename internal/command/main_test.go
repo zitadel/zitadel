@@ -12,12 +12,12 @@ import (
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
+	"github.com/zitadel/zitadel/internal/feature"
 	action_repo "github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
@@ -248,8 +248,8 @@ func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 	return nil
 }
 
-func (m *mockInstance) Features() feature.Instance {
-	return feature.Instance{}
+func (m *mockInstance) Features() *feature.Instance {
+	return &feature.Instance{}
 }
 
 func newMockPermissionCheckAllowed() domain.PermissionCheck {

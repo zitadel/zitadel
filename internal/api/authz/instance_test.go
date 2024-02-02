@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/zitadel/zitadel/feature"
+	"github.com/zitadel/zitadel/internal/feature"
 	"golang.org/x/text/language"
 )
 
@@ -114,6 +114,6 @@ func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 	return nil
 }
 
-func (m *mockInstance) Features() feature.Instance {
-	return feature.Instance{}
+func (m *mockInstance) Features() *feature.Instance {
+	return &feature.Instance{}
 }
