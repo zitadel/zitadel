@@ -21,8 +21,6 @@ jobs:
           # to the issue
           project-url: https://github.com/orgs/zitadel/projects/2
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
-          labeled: OKR
-          label-operator: NOT
       - uses: tspascoal/get-user-teams-membership@v3
         id: checkUserMember
         with:
