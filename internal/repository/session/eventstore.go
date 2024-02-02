@@ -2,22 +2,22 @@ package session
 
 import "github.com/zitadel/zitadel/internal/eventstore"
 
-func RegisterEventMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(AggregateType, AddedType, AddedEventMapper).
-		RegisterFilterEventMapper(AggregateType, UserCheckedType, UserCheckedEventMapper).
-		RegisterFilterEventMapper(AggregateType, PasswordCheckedType, PasswordCheckedEventMapper).
-		RegisterFilterEventMapper(AggregateType, IntentCheckedType, IntentCheckedEventMapper).
-		RegisterFilterEventMapper(AggregateType, WebAuthNChallengedType, eventstore.GenericEventMapper[WebAuthNChallengedEvent]).
-		RegisterFilterEventMapper(AggregateType, WebAuthNCheckedType, eventstore.GenericEventMapper[WebAuthNCheckedEvent]).
-		RegisterFilterEventMapper(AggregateType, TOTPCheckedType, eventstore.GenericEventMapper[TOTPCheckedEvent]).
-		RegisterFilterEventMapper(AggregateType, OTPSMSChallengedType, eventstore.GenericEventMapper[OTPSMSChallengedEvent]).
-		RegisterFilterEventMapper(AggregateType, OTPSMSSentType, eventstore.GenericEventMapper[OTPSMSSentEvent]).
-		RegisterFilterEventMapper(AggregateType, OTPSMSCheckedType, eventstore.GenericEventMapper[OTPSMSCheckedEvent]).
-		RegisterFilterEventMapper(AggregateType, OTPEmailChallengedType, eventstore.GenericEventMapper[OTPEmailChallengedEvent]).
-		RegisterFilterEventMapper(AggregateType, OTPEmailSentType, eventstore.GenericEventMapper[OTPEmailSentEvent]).
-		RegisterFilterEventMapper(AggregateType, OTPEmailCheckedType, eventstore.GenericEventMapper[OTPEmailCheckedEvent]).
-		RegisterFilterEventMapper(AggregateType, TokenSetType, TokenSetEventMapper).
-		RegisterFilterEventMapper(AggregateType, MetadataSetType, MetadataSetEventMapper).
-		RegisterFilterEventMapper(AggregateType, LifetimeSetType, eventstore.GenericEventMapper[LifetimeSetEvent]).
-		RegisterFilterEventMapper(AggregateType, TerminateType, TerminateEventMapper)
+func init() {
+	eventstore.RegisterFilterEventMapper(AggregateType, AddedType, AddedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, UserCheckedType, UserCheckedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, PasswordCheckedType, PasswordCheckedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, IntentCheckedType, IntentCheckedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, WebAuthNChallengedType, eventstore.GenericEventMapper[WebAuthNChallengedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, WebAuthNCheckedType, eventstore.GenericEventMapper[WebAuthNCheckedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, TOTPCheckedType, eventstore.GenericEventMapper[TOTPCheckedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, OTPSMSChallengedType, eventstore.GenericEventMapper[OTPSMSChallengedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, OTPSMSSentType, eventstore.GenericEventMapper[OTPSMSSentEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, OTPSMSCheckedType, eventstore.GenericEventMapper[OTPSMSCheckedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, OTPEmailChallengedType, eventstore.GenericEventMapper[OTPEmailChallengedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, OTPEmailSentType, eventstore.GenericEventMapper[OTPEmailSentEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, OTPEmailCheckedType, eventstore.GenericEventMapper[OTPEmailCheckedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, TokenSetType, TokenSetEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, MetadataSetType, MetadataSetEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, LifetimeSetType, eventstore.GenericEventMapper[LifetimeSetEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, TerminateType, TerminateEventMapper)
 }

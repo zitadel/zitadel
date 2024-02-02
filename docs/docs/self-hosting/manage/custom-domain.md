@@ -48,7 +48,7 @@ Check out the [reverse proxy configuration examples](/self-hosting/manage/revers
 ## Organization Domains
 
 Note that by default, you cannot access ZITADEL at an organizations domain.
-Organization level domains [are intended for routing users by their login methods to their correct organization](http://localhost:3000/docs/guides/solution-scenarios/domain-discovery).
+Organization level domains [are intended for routing users by their login methods to their correct organization](/guides/solution-scenarios/domain-discovery).
 
 However, if you want to access ZITADEL at an organization domain, [you can add additional domains using the System API](/apis/resources/system/system-service-add-domain#adds-a-domain-to-an-instance).
 Be aware that you won't automatically have the organizations context when you access ZITADEL like this.

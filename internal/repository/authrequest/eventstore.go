@@ -2,11 +2,11 @@ package authrequest
 
 import "github.com/zitadel/zitadel/internal/eventstore"
 
-func RegisterEventMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(AggregateType, AddedType, AddedEventMapper).
-		RegisterFilterEventMapper(AggregateType, SessionLinkedType, SessionLinkedEventMapper).
-		RegisterFilterEventMapper(AggregateType, CodeAddedType, CodeAddedEventMapper).
-		RegisterFilterEventMapper(AggregateType, CodeExchangedType, CodeExchangedEventMapper).
-		RegisterFilterEventMapper(AggregateType, FailedType, FailedEventMapper).
-		RegisterFilterEventMapper(AggregateType, SucceededType, SucceededEventMapper)
+func init() {
+	eventstore.RegisterFilterEventMapper(AggregateType, AddedType, AddedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, SessionLinkedType, SessionLinkedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, CodeAddedType, CodeAddedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, CodeExchangedType, CodeExchangedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, FailedType, FailedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, SucceededType, SucceededEventMapper)
 }
