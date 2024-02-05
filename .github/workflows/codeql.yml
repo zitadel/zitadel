@@ -15,6 +15,7 @@ on:
     paths-ignore:
     - 'docs/**'
 
+
 jobs:
   CodeQL-Build:
     runs-on: ubuntu-latest
