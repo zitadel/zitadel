@@ -14,9 +14,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
-	z_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type querier interface {
@@ -62,7 +62,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	query, rowScanner := prepareColumns(criteria, q.Columns, useV1)
 	where, values := prepareConditions(criteria, q, useV1)
 	if where == "" || query == "" {
-		return z_errors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
+		return zerrors.ThrowInvalidArgument(nil, "SQL-rWeBw", "invalid query factory")
 	}
 	if q.Tx == nil {
 		if travel := prepareTimeTravel(ctx, criteria, q.AllowTimeTravel); travel != "" {
@@ -89,6 +89,11 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		query += " LIMIT ?"
 	}
 
+	if q.Offset > 0 {
+		values = append(values, q.Offset)
+		query += " OFFSET ?"
+	}
+
 	query = criteria.placeholder(query)
 
 	var contextQuerier interface {
@@ -111,7 +116,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		}, query, values...)
 	if err != nil {
 		logging.New().WithError(err).Info("query failed")
-		return z_errors.ThrowInternal(err, "SQL-KyeAx", "unable to filter events")
+		return zerrors.ThrowInternal(err, "SQL-KyeAx", "unable to filter events")
 	}
 
 	return nil
@@ -141,25 +146,25 @@ func prepareTimeTravel(ctx context.Context, criteria querier, allow bool) string
 func maxSequenceScanner(row scan, dest interface{}) (err error) {
 	position, ok := dest.(*sql.NullFloat64)
 	if !ok {
-		return z_errors.ThrowInvalidArgumentf(nil, "SQL-NBjA9", "type must be sql.NullInt64 got: %T", dest)
+		return zerrors.ThrowInvalidArgumentf(nil, "SQL-NBjA9", "type must be sql.NullInt64 got: %T", dest)
 	}
 	err = row(position)
 	if err == nil || errors.Is(err, sql.ErrNoRows) {
 		return nil
 	}
-	return z_errors.ThrowInternal(err, "SQL-bN5xg", "something went wrong")
+	return zerrors.ThrowInternal(err, "SQL-bN5xg", "something went wrong")
 }
 
 func instanceIDsScanner(scanner scan, dest interface{}) (err error) {
 	ids, ok := dest.(*[]string)
 	if !ok {
-		return z_errors.ThrowInvalidArgument(nil, "SQL-Begh2", "type must be an array of string")
+		return zerrors.ThrowInvalidArgument(nil, "SQL-Begh2", "type must be an array of string")
 	}
 	var id string
 	err = scanner(&id)
 	if err != nil {
 		logging.WithError(err).Warn("unable to scan row")
-		return z_errors.ThrowInternal(err, "SQL-DEFGe", "unable to scan row")
+		return zerrors.ThrowInternal(err, "SQL-DEFGe", "unable to scan row")
 	}
 	*ids = append(*ids, id)
 
@@ -170,7 +175,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 	return func(scanner scan, dest interface{}) (err error) {
 		reduce, ok := dest.(eventstore.Reducer)
 		if !ok {
-			return z_errors.ThrowInvalidArgumentf(nil, "SQL-4GP6F", "events scanner: invalid type %T", dest)
+			return zerrors.ThrowInvalidArgumentf(nil, "SQL-4GP6F", "events scanner: invalid type %T", dest)
 		}
 		event := new(repository.Event)
 		position := new(sql.NullFloat64)
@@ -208,7 +213,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 
 		if err != nil {
 			logging.New().WithError(err).Warn("unable to scan row")
-			return z_errors.ThrowInternal(err, "SQL-M0dsf", "unable to scan row")
+			return zerrors.ThrowInternal(err, "SQL-M0dsf", "unable to scan row")
 		}
 		event.Pos = position.Float64
 		return reduce(event)

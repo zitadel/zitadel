@@ -2,8 +2,8 @@ package user
 
 import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
@@ -30,7 +30,7 @@ func MembershipQueryToQuery(req *user_pb.MembershipQuery) (query.SearchQuery, er
 	case *user_pb.MembershipQuery_IamQuery:
 		return query.NewMembershipIsIAMQuery()
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "USER-dsg3z", "Errors.List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-dsg3z", "Errors.List.Query.Invalid")
 	}
 }
 

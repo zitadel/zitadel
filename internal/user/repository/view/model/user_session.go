@@ -6,11 +6,11 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/user/model"
 	es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -23,16 +23,20 @@ const (
 )
 
 type UserSessionView struct {
-	CreationDate                 time.Time `json:"-" gorm:"column:creation_date"`
-	ChangeDate                   time.Time `json:"-" gorm:"column:change_date"`
-	ResourceOwner                string    `json:"-" gorm:"column:resource_owner"`
-	State                        int32     `json:"-" gorm:"column:state"`
-	UserAgentID                  string    `json:"userAgentID" gorm:"column:user_agent_id;primary_key"`
-	UserID                       string    `json:"userID" gorm:"column:user_id;primary_key"`
-	UserName                     string    `json:"-" gorm:"column:user_name"`
-	LoginName                    string    `json:"-" gorm:"column:login_name"`
-	DisplayName                  string    `json:"-" gorm:"column:user_display_name"`
-	AvatarKey                    string    `json:"-" gorm:"column:avatar_key"`
+	CreationDate  time.Time `json:"-" gorm:"column:creation_date"`
+	ChangeDate    time.Time `json:"-" gorm:"column:change_date"`
+	ResourceOwner string    `json:"-" gorm:"column:resource_owner"`
+	State         int32     `json:"-" gorm:"column:state"`
+	UserAgentID   string    `json:"userAgentID" gorm:"column:user_agent_id;primary_key"`
+	UserID        string    `json:"userID" gorm:"column:user_id;primary_key"`
+	// As of https://github.com/zitadel/zitadel/pull/7199 the following 4 attributes
+	// are not projected in the user session handler anymore
+	// and are therefore annotated with a `gorm:"-"`.
+	// They will be read from the corresponding projection directly.
+	UserName                     string    `json:"-" gorm:"-"`
+	LoginName                    string    `json:"-" gorm:"-"`
+	DisplayName                  string    `json:"-" gorm:"-"`
+	AvatarKey                    string    `json:"-" gorm:"-"`
 	SelectedIDPConfigID          string    `json:"selectedIDPConfigID" gorm:"column:selected_idp_config_id"`
 	PasswordVerification         time.Time `json:"-" gorm:"column:password_verification"`
 	PasswordlessVerification     time.Time `json:"-" gorm:"column:passwordless_verification"`
@@ -49,7 +53,7 @@ func UserSessionFromEvent(event eventstore.Event) (*UserSessionView, error) {
 	v := new(UserSessionView)
 	if err := event.Unmarshal(v); err != nil {
 		logging.Log("EVEN-lso9e").WithError(err).Error("could not unmarshal event data")
-		return nil, caos_errs.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
+		return nil, zerrors.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
 	}
 	return v, nil
 }
@@ -190,14 +194,6 @@ func (v *UserSessionView) AppendEvent(event eventstore.Event) error {
 	case user.UserIDPLinkRemovedType, user.UserIDPLinkCascadeRemovedType:
 		v.ExternalLoginVerification = time.Time{}
 		v.SelectedIDPConfigID = ""
-	case user.HumanAvatarAddedType:
-		key, err := avatarKeyFromEvent(event)
-		if err != nil {
-			return err
-		}
-		v.AvatarKey = key
-	case user.HumanAvatarRemovedType:
-		v.AvatarKey = ""
 	}
 	return nil
 }
@@ -206,15 +202,6 @@ func (v *UserSessionView) setSecondFactorVerification(verificationTime time.Time
 	v.SecondFactorVerification = verificationTime
 	v.SecondFactorVerificationType = int32(mfaType)
 	v.State = int32(domain.UserSessionStateActive)
-}
-
-func avatarKeyFromEvent(event eventstore.Event) (string, error) {
-	data := make(map[string]string)
-	if err := event.Unmarshal(&data); err != nil {
-		logging.Log("EVEN-Sfew2").WithError(err).Error("could not unmarshal event data")
-		return "", caos_errs.ThrowInternal(err, "MODEL-SFw2q", "could not unmarshal event")
-	}
-	return data["storeKey"], nil
 }
 
 func (v *UserSessionView) EventTypes() []eventstore.EventType {
@@ -250,7 +237,5 @@ func (v *UserSessionView) EventTypes() []eventstore.EventType {
 		user.UserDeactivatedType,
 		user.UserIDPLinkRemovedType,
 		user.UserIDPLinkCascadeRemovedType,
-		user.HumanAvatarAddedType,
-		user.HumanAvatarRemovedType,
 	}
 }

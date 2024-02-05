@@ -20,6 +20,7 @@ func Start(ctx context.Context, conf Config, static static.Storage, dbClient *da
 	}
 
 	admin_handler.Register(ctx, conf.Spooler, view, static)
+	admin_handler.Start(ctx)
 
 	return nil
 }

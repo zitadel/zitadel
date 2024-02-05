@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -92,7 +92,7 @@ func AddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(added)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "AUTHR-DG4gn", "unable to unmarshal auth request added")
+		return nil, zerrors.ThrowInternal(err, "AUTHR-DG4gn", "unable to unmarshal auth request added")
 	}
 
 	return added, nil
@@ -141,7 +141,7 @@ func SessionLinkedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 	}
 	err := event.Unmarshal(added)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "AUTHR-Sfe3w", "unable to unmarshal auth request session linked")
+		return nil, zerrors.ThrowInternal(err, "AUTHR-Sfe3w", "unable to unmarshal auth request session linked")
 	}
 
 	return added, nil
@@ -182,7 +182,7 @@ func FailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(added)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "AUTHR-Sfe3w", "unable to unmarshal auth request session linked")
+		return nil, zerrors.ThrowInternal(err, "AUTHR-Sfe3w", "unable to unmarshal auth request session linked")
 	}
 
 	return added, nil
@@ -218,7 +218,7 @@ func CodeAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(added)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "AUTHR-Sfe3w", "unable to unmarshal auth request code added")
+		return nil, zerrors.ThrowInternal(err, "AUTHR-Sfe3w", "unable to unmarshal auth request code added")
 	}
 
 	return added, nil

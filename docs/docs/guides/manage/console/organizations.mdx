@@ -39,7 +39,7 @@ At the moment the username only allows e-mail formatted input. (This will be cha
 
 ### User Loginname must contain orgdomain
 
-If this behaviour is not suitable for you, ZITADEL has the option to suffix the usernames with the organization domain.
+If this behavior is not suitable for you, ZITADEL has the option to suffix the usernames with the organization domain.
 This setting is called **User Loginname must contain orgdomain** and is part of your [Domain settings](./instance-settings#domain-settings).
 
 Those loginnames consist of the format `{username}@{domainname}.{zitadeldomain}`.
@@ -77,7 +77,21 @@ You can also disable domain verification with DNS challenge in the [instance set
 1. Browse to your organization settings
 2. Select the menu entry **Verified domains**
 3. To start the domain verification click the domain name and a dialog will appear, where you can choose between DNS or HTTP challenge methods.
-4. For example, create a TXT record with your DNS provider for the used domain and click verify. ZITADEL will then proceed and check your DNS.
+
+<img
+  width="400px"
+  src="/docs/img/console_verify_domain.png"
+  alt="Select Organization"
+/>
+
+4. For example, create a TXT record with your DNS provider for the used domain and click verify. ZITADEL will then proceed and check your DNS. Here are some useful links explaining how you can add TXT records for popular domain providers:
+
+- [Cloudflare](https://www.zoho.com/mail/help/adminconsole/cloudflare.html#alink1)
+- [Squarespace](https://support.squarespace.com/hc/en-us/articles/205812388-Domain-verification-with-a-TXT-Record-alternative-method-)
+- [Name.com](https://www.name.com/support/articles/115004972547-adding-a-txt-record)
+- [EasyDNS](https://kb.easydns.com/knowledge/how-to-make-a-dns-entry/)
+- [DNS Made Easy](https://support.dnsmadeeasy.com/support/solutions/articles/47001001376-create-a-txt-record)
+
 5. When the verification is successful you have the option to activate the domain by clicking **Set as primary**
 
 :::caution
@@ -91,7 +105,7 @@ Those settings are the same as on your instance.
 
 > Note: that the following links, redirect to instance settings to omit redundancy.
 
-- [**Login Behaviour and Access**](./instance-settings#login-behaviour-and-access): Multifactor Authentication Options and Enforcement, Define whether Passwordless authentication methods are allowed or not, Set Login Lifetimes and advanced behavour for the login interface.
+- [**Login Behavior and Access**](./instance-settings#login-behaviour-and-access): Multifactor Authentication Options and Enforcement, Define whether Passwordless authentication methods are allowed or not, Set Login Lifetimes and advanced behavour for the login interface.
 - [**Identity Providers**](./instance-settings#identity-providers): Define IDPs which are available for all organizations
 - [**Password Complexity**](./instance-settings#password-complexity): Requirements for Passwords ex. Symbols, Numbers, min length and more.
 - [**Lockout**](./instance-settings#lockout): Set the maximum attempts a user can try to enter the password. When the number is exceeded, the user gets locked out and has to be unlocked.
@@ -104,7 +118,7 @@ Those settings are the same as on your instance.
 
 If you need custom branding on a organization (for example in a B2B scenario, where organizations are allowed to use their custom design), navigate back to the home page, choose your organization in the header above, navigate to the organization settings and set the custom design here.
 
-The behaviour of the login page, applyling custom design, is then defined on your projects detail page. Read more about it [here](./projects#branding)
+The behavior of the login page, applying custom design, is then defined on your projects detail page. Read more about it [here](./projects#branding)
 
 ## Show Organization Login
 

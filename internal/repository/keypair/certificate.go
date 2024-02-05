@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -52,7 +52,7 @@ func AddedCertificateEventMapper(event eventstore.Event) (eventstore.Event, erro
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "KEY-4n9vs", "unable to unmarshal certificate added")
+		return nil, zerrors.ThrowInternal(err, "KEY-4n9vs", "unable to unmarshal certificate added")
 	}
 
 	return e, nil

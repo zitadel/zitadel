@@ -6,10 +6,10 @@ import (
 	"slices"
 	"time"
 
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type quotaWriteModel struct {
@@ -168,12 +168,12 @@ func (q QuotaNotifications) newSetEventNotifications(idGenerator id.Generator) (
 func sortSetEventNotifications(notifications []*quota.SetEventNotification) (err error) {
 	slices.SortFunc(notifications, func(i, j *quota.SetEventNotification) int {
 		if i == nil || j == nil {
-			err = zitadel_errors.ThrowInternal(errors.New("sorting slices of *quota.SetEventNotification with nil pointers is not supported"), "QUOTA-8YXPk", "Errors.Internal")
+			err = zerrors.ThrowInternal(errors.New("sorting slices of *quota.SetEventNotification with nil pointers is not supported"), "QUOTA-8YXPk", "Errors.Internal")
 			return 0
 		}
 		if i.Percent == j.Percent && i.CallURL == j.CallURL && i.Repeat == j.Repeat {
 			// TODO: translate
-			err = zitadel_errors.ThrowInternal(fmt.Errorf("%+v", i), "QUOTA-Pty2n", "Errors.Quota.Notifications.Duplicate")
+			err = zerrors.ThrowInternal(fmt.Errorf("%+v", i), "QUOTA-Pty2n", "Errors.Quota.Notifications.Duplicate")
 			return 0
 		}
 		if i.Percent < j.Percent ||

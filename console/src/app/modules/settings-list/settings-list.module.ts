@@ -7,7 +7,7 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { CardModule } from '../card/card.module';
 import DomainsModule from '../domains/domains.module';
 import { DomainPolicyModule } from '../policies/domain-policy/domain-policy.module';
-import { GeneralSettingsModule } from '../policies/general-settings/general-settings.module';
+import { LanguageSettingsModule } from '../policies/language-settings/language-settings.module';
 import { IdpSettingsModule } from '../policies/idp-settings/idp-settings.module';
 import { LoginPolicyModule } from '../policies/login-policy/login-policy.module';
 import { LoginTextsPolicyModule } from '../policies/login-texts/login-texts.module';
@@ -36,7 +36,7 @@ import { SettingsListComponent } from './settings-list.component';
     PasswordComplexityPolicyModule,
     PasswordLockoutPolicyModule,
     PrivateLabelingPolicyModule,
-    GeneralSettingsModule,
+    LanguageSettingsModule,
     NotificationPolicyModule,
     IdpSettingsModule,
     PrivacyPolicyModule,

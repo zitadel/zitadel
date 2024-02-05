@@ -6,7 +6,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -15,10 +14,11 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
-	UserGrantProjectionTable = "projections.user_grants3"
+	UserGrantProjectionTable = "projections.user_grants4"
 
 	UserGrantID                   = "id"
 	UserGrantCreationDate         = "creation_date"
@@ -29,15 +29,11 @@ const (
 	UserGrantInstanceID           = "instance_id"
 	UserGrantUserID               = "user_id"
 	UserGrantResourceOwnerUser    = "resource_owner_user"
-	UserGrantUserOwnerRemoved     = "user_owner_removed"
 	UserGrantProjectID            = "project_id"
 	UserGrantResourceOwnerProject = "resource_owner_project"
-	UserGrantProjectOwnerRemoved  = "project_owner_removed"
 	UserGrantGrantID              = "grant_id"
 	UserGrantGrantedOrg           = "granted_org"
-	UserGrantGrantedOrgRemoved    = "granted_org_removed"
 	UserGrantRoles                = "roles"
-	UserGrantOwnerRemoved         = "owner_removed"
 )
 
 type userGrantProjection struct {
@@ -64,23 +60,15 @@ func (*userGrantProjection) Init() *old_handler.Check {
 			handler.NewColumn(UserGrantInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(UserGrantUserID, handler.ColumnTypeText),
 			handler.NewColumn(UserGrantResourceOwnerUser, handler.ColumnTypeText),
-			handler.NewColumn(UserGrantUserOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(UserGrantProjectID, handler.ColumnTypeText),
 			handler.NewColumn(UserGrantResourceOwnerProject, handler.ColumnTypeText),
-			handler.NewColumn(UserGrantProjectOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(UserGrantGrantID, handler.ColumnTypeText),
 			handler.NewColumn(UserGrantGrantedOrg, handler.ColumnTypeText),
-			handler.NewColumn(UserGrantGrantedOrgRemoved, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(UserGrantRoles, handler.ColumnTypeTextArray, handler.Nullable()),
-			handler.NewColumn(UserGrantOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(UserGrantInstanceID, UserGrantID),
 			handler.WithIndex(handler.NewIndex("user_id", []string{UserGrantUserID})),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{UserGrantResourceOwner})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{UserGrantOwnerRemoved})),
-			handler.WithIndex(handler.NewIndex("user_owner_removed", []string{UserGrantUserOwnerRemoved})),
-			handler.WithIndex(handler.NewIndex("project_owner_removed", []string{UserGrantProjectOwnerRemoved})),
-			handler.WithIndex(handler.NewIndex("granted_org_removed", []string{UserGrantGrantedOrgRemoved})),
 		),
 	)
 }
@@ -178,27 +166,13 @@ func (p *userGrantProjection) Reducers() []handler.AggregateReducer {
 func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*usergrant.UserGrantAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-MQHVB", "reduce.wrong.event.type %s", usergrant.UserGrantAddedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-MQHVB", "reduce.wrong.event.type %s", usergrant.UserGrantAddedType)
 	}
 
 	ctx := setUserGrantContext(e.Aggregate())
-	userOwner, err := getResourceOwnerOfUser(ctx, p.es, e.Aggregate().InstanceID, e.UserID)
+	userOwner, projectOwner, grantOwner, err := getResourceOwners(ctx, p.es, e.Aggregate().InstanceID, e.UserID, e.ProjectID, e.ProjectGrantID)
 	if err != nil {
 		return nil, err
-	}
-
-	projectOwner := ""
-	grantOwner := ""
-	if e.ProjectGrantID != "" {
-		grantOwner, err = getGrantedOrgOfGrantedProject(ctx, p.es, e.Aggregate().InstanceID, e.ProjectID, e.ProjectGrantID)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		projectOwner, err = getResourceOwnerOfProject(ctx, p.es, e.Aggregate().InstanceID, e.ProjectID)
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	return handler.NewCreateStatement(
@@ -231,7 +205,7 @@ func (p *userGrantProjection) reduceChanged(event eventstore.Event) (*handler.St
 	case *usergrant.UserGrantCascadeChangedEvent:
 		roles = e.RoleKeys
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-hOr1E", "reduce.wrong.event.type %v", []eventstore.EventType{usergrant.UserGrantChangedType, usergrant.UserGrantCascadeChangedType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-hOr1E", "reduce.wrong.event.type %v", []eventstore.EventType{usergrant.UserGrantChangedType, usergrant.UserGrantCascadeChangedType})
 	}
 
 	return handler.NewUpdateStatement(
@@ -253,7 +227,7 @@ func (p *userGrantProjection) reduceRemoved(event eventstore.Event) (*handler.St
 	case *usergrant.UserGrantRemovedEvent, *usergrant.UserGrantCascadeRemovedEvent:
 		// ok
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-7OBEC", "reduce.wrong.event.type %v", []eventstore.EventType{usergrant.UserGrantRemovedType, usergrant.UserGrantCascadeRemovedType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-7OBEC", "reduce.wrong.event.type %v", []eventstore.EventType{usergrant.UserGrantRemovedType, usergrant.UserGrantCascadeRemovedType})
 	}
 
 	return handler.NewDeleteStatement(
@@ -267,7 +241,7 @@ func (p *userGrantProjection) reduceRemoved(event eventstore.Event) (*handler.St
 
 func (p *userGrantProjection) reduceDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	if _, ok := event.(*usergrant.UserGrantDeactivatedEvent); !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-oP7Gm", "reduce.wrong.event.type %s", usergrant.UserGrantDeactivatedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-oP7Gm", "reduce.wrong.event.type %s", usergrant.UserGrantDeactivatedType)
 	}
 
 	return handler.NewUpdateStatement(
@@ -285,8 +259,8 @@ func (p *userGrantProjection) reduceDeactivated(event eventstore.Event) (*handle
 }
 
 func (p *userGrantProjection) reduceReactivated(event eventstore.Event) (*handler.Statement, error) {
-	if _, ok := event.(*usergrant.UserGrantDeactivatedEvent); !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-DGsKh", "reduce.wrong.event.type %s", usergrant.UserGrantReactivatedType)
+	if _, ok := event.(*usergrant.UserGrantReactivatedEvent); !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-DGsKh", "reduce.wrong.event.type %s", usergrant.UserGrantReactivatedType)
 	}
 
 	return handler.NewUpdateStatement(
@@ -305,7 +279,7 @@ func (p *userGrantProjection) reduceReactivated(event eventstore.Event) (*handle
 
 func (p *userGrantProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	if _, ok := event.(*user.UserRemovedEvent); !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Bner2a", "reduce.wrong.event.type %s", user.UserRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Bner2a", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
 
 	return handler.NewDeleteStatement(
@@ -319,7 +293,7 @@ func (p *userGrantProjection) reduceUserRemoved(event eventstore.Event) (*handle
 
 func (p *userGrantProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	if _, ok := event.(*project.ProjectRemovedEvent); !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Bne2a", "reduce.wrong.event.type %s", project.ProjectRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Bne2a", "reduce.wrong.event.type %s", project.ProjectRemovedType)
 	}
 
 	return handler.NewDeleteStatement(
@@ -334,7 +308,7 @@ func (p *userGrantProjection) reduceProjectRemoved(event eventstore.Event) (*han
 func (p *userGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-dGr2a", "reduce.wrong.event.type %s", project.GrantRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-dGr2a", "reduce.wrong.event.type %s", project.GrantRemovedType)
 	}
 
 	return handler.NewDeleteStatement(
@@ -349,7 +323,7 @@ func (p *userGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) 
 func (p *userGrantProjection) reduceRoleRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-dswg2", "reduce.wrong.event.type %s", project.RoleRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-dswg2", "reduce.wrong.event.type %s", project.RoleRemovedType)
 	}
 
 	return handler.NewUpdateStatement(
@@ -375,7 +349,7 @@ func (p *userGrantProjection) reduceProjectGrantChanged(event eventstore.Event) 
 		grantID = e.GrantID
 		keys = e.RoleKeys
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Fh3gw", "reduce.wrong.event.type %v", []eventstore.EventType{project.GrantChangedType, project.GrantCascadeChangedType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Fh3gw", "reduce.wrong.event.type %v", []eventstore.EventType{project.GrantChangedType, project.GrantCascadeChangedType})
 	}
 
 	return handler.NewUpdateStatement(
@@ -393,7 +367,7 @@ func (p *userGrantProjection) reduceProjectGrantChanged(event eventstore.Event) 
 func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-jpIvp", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-jpIvp", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
 	return handler.NewMultiStatement(
@@ -425,74 +399,60 @@ func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 	), nil
 }
 
-func getResourceOwnerOfUser(ctx context.Context, es handler.EventStore, instanceID, aggID string) (string, error) {
-	events, err := es.Filter(
-		ctx,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-			AwaitOpenTransactions().
-			InstanceID(instanceID).
-			AddQuery().
-			AggregateTypes(user.AggregateType).
-			AggregateIDs(aggID).
-			EventTypes(user.HumanRegisteredType, user.HumanAddedType, user.MachineAddedEventType).
-			Builder(),
-	)
-	if err != nil {
-		return "", err
-	}
-	if len(events) != 1 {
-		return "", errors.ThrowNotFound(nil, "PROJ-0I92sp", "Errors.User.NotFound")
-	}
-	return events[0].Aggregate().ResourceOwner, nil
+func getUserResourceOwner(ctx context.Context, es handler.EventStore, instanceID, userID string) (string, error) {
+	userRO, _, _, err := getResourceOwners(ctx, es, instanceID, userID, "", "")
+	return userRO, err
 }
 
-func getResourceOwnerOfProject(ctx context.Context, es handler.EventStore, instanceID, aggID string) (string, error) {
-	events, err := es.Filter(
-		ctx,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-			AwaitOpenTransactions().
-			InstanceID(instanceID).
-			AddQuery().
-			AggregateTypes(project.AggregateType).
-			AggregateIDs(aggID).
-			EventTypes(project.ProjectAddedType).
-			Builder(),
-	)
-	if err != nil {
-		return "", err
-	}
-	if len(events) != 1 {
-		return "", errors.ThrowNotFound(nil, "PROJ-0I91sp", "Errors.Project.NotFound")
-	}
-	return events[0].Aggregate().ResourceOwner, nil
-}
+func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, userID, projectID, grantID string) (userRO string, projectRO string, grantedOrg string, err error) {
+	eventCount := 1
+	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
+		InstanceID(instanceID).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(userID).
+		EventTypes(user.HumanRegisteredType, user.HumanAddedType, user.MachineAddedEventType)
 
-func getGrantedOrgOfGrantedProject(ctx context.Context, es handler.EventStore, instanceID, projectID, grantID string) (string, error) {
-	events, err := es.Filter(
-		ctx,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-			AwaitOpenTransactions().
-			InstanceID(instanceID).
-			AddQuery().
+	// if it's a project grant then we only need the resourceowner for the projectgrant, else the project
+	if grantID != "" {
+		eventCount++
+		builder = builder.Or().
 			AggregateTypes(project.AggregateType).
 			AggregateIDs(projectID).
 			EventTypes(project.GrantAddedType).
 			EventData(map[string]interface{}{
 				"grantId": grantID,
-			}).
-			Builder(),
+			})
+	} else if projectID != "" {
+		eventCount++
+		builder = builder.Or().
+			AggregateTypes(project.AggregateType).
+			AggregateIDs(projectID).
+			EventTypes(project.ProjectAddedType)
+	}
+
+	events, err := es.Filter(
+		ctx,
+		builder.Builder(),
 	)
 	if err != nil {
-		return "", err
+		return "", "", "", err
 	}
-	if len(events) != 1 {
-		return "", errors.ThrowNotFound(nil, "PROJ-MoaSpw", "Errors.Grant.NotFound")
+	if len(events) != eventCount {
+		return "", "", "", zerrors.ThrowNotFound(nil, "PROJ-0I91sp", "Errors.NotFound")
 	}
-	grantAddedEvent, ok := events[0].(*project.GrantAddedEvent)
-	if !ok {
-		return "", errors.ThrowNotFound(nil, "PROJ-P0s2o0", "Errors.Grant.NotFound")
+	for _, event := range events {
+		switch e := event.(type) {
+		case *project.GrantAddedEvent:
+			grantedOrg = e.GrantedOrgID
+		case *project.ProjectAddedEvent:
+			projectRO = e.Aggregate().ResourceOwner
+		case *user.HumanRegisteredEvent, *user.HumanAddedEvent, *user.MachineAddedEvent:
+			userRO = e.Aggregate().ResourceOwner
+		}
 	}
-	return grantAddedEvent.GrantedOrgID, nil
+	return userRO, projectRO, grantedOrg, nil
 }
 
 func setUserGrantContext(aggregate *eventstore.Aggregate) context.Context {

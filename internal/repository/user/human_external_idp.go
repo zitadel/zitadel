@@ -3,8 +3,8 @@ package user
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -12,10 +12,11 @@ const (
 	UserIDPLinkEventPrefix = humanEventPrefix + "externalidp."
 	idpLoginEventPrefix    = humanEventPrefix + "externallogin."
 
-	UserIDPLinkAddedType          = UserIDPLinkEventPrefix + "added"
-	UserIDPLinkRemovedType        = UserIDPLinkEventPrefix + "removed"
-	UserIDPLinkCascadeRemovedType = UserIDPLinkEventPrefix + "cascade.removed"
-	UserIDPExternalIDMigratedType = UserIDPLinkEventPrefix + "id.migrated"
+	UserIDPLinkAddedType               = UserIDPLinkEventPrefix + "added"
+	UserIDPLinkRemovedType             = UserIDPLinkEventPrefix + "removed"
+	UserIDPLinkCascadeRemovedType      = UserIDPLinkEventPrefix + "cascade.removed"
+	UserIDPExternalIDMigratedType      = UserIDPLinkEventPrefix + "id.migrated"
+	UserIDPExternalUsernameChangedType = UserIDPLinkEventPrefix + "username.changed"
 
 	UserIDPLoginCheckSucceededType = idpLoginEventPrefix + "check.succeeded"
 )
@@ -75,7 +76,7 @@ func UserIDPLinkAddedEventMapper(event eventstore.Event) (eventstore.Event, erro
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-6M9sd", "unable to unmarshal user external idp added")
+		return nil, zerrors.ThrowInternal(err, "USER-6M9sd", "unable to unmarshal user external idp added")
 	}
 
 	return e, nil
@@ -120,7 +121,7 @@ func UserIDPLinkRemovedEventMapper(event eventstore.Event) (eventstore.Event, er
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-eAWoT", "unable to unmarshal user external idp removed")
+		return nil, zerrors.ThrowInternal(err, "USER-eAWoT", "unable to unmarshal user external idp removed")
 	}
 
 	return e, nil
@@ -165,7 +166,7 @@ func UserIDPLinkCascadeRemovedEventMapper(event eventstore.Event) (eventstore.Ev
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-dKGqO", "unable to unmarshal user external idp cascade removed")
+		return nil, zerrors.ThrowInternal(err, "USER-dKGqO", "unable to unmarshal user external idp cascade removed")
 	}
 
 	return e, nil
@@ -205,7 +206,7 @@ func UserIDPCheckSucceededEventMapper(event eventstore.Event) (eventstore.Event,
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-oikSS", "unable to unmarshal user external idp check succeeded")
+		return nil, zerrors.ThrowInternal(err, "USER-oikSS", "unable to unmarshal user external idp check succeeded")
 	}
 
 	return e, nil
@@ -246,5 +247,43 @@ func NewUserIDPExternalIDMigratedEvent(
 		IDPConfigID: idpConfigID,
 		PreviousID:  previousID,
 		NewID:       newID,
+	}
+}
+
+type UserIDPExternalUsernameEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	IDPConfigID          string `json:"idpConfigId"`
+	ExternalUserID       string `json:"userId"`
+	ExternalUsername     string `json:"username"`
+}
+
+func (e *UserIDPExternalUsernameEvent) Payload() interface{} {
+	return e
+}
+
+func (e *UserIDPExternalUsernameEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *UserIDPExternalUsernameEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = *event
+}
+
+func NewUserIDPExternalUsernameEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	idpConfigID,
+	externalUserID,
+	externalUsername string,
+) *UserIDPExternalUsernameEvent {
+	return &UserIDPExternalUsernameEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			UserIDPExternalUsernameChangedType,
+		),
+		IDPConfigID:      idpConfigID,
+		ExternalUserID:   externalUserID,
+		ExternalUsername: externalUsername,
 	}
 }

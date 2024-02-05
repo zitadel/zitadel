@@ -5,9 +5,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/idp"
@@ -23,7 +23,7 @@ func TestProvider_BeginAuth(t *testing.T) {
 		encryptionAlg func(t *testing.T) crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		params []any
+		params []idp.Parameter
 	}
 	type want struct {
 		session idp.Session
@@ -56,28 +56,6 @@ func TestProvider_BeginAuth(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid userAgentID error",
-			fields: fields{
-				issuer:       "https://jwt.com",
-				jwtEndpoint:  "https://auth.com/jwt",
-				keysEndpoint: "https://jwt.com/keys",
-				headerName:   "jwt-header",
-				encryptionAlg: func(t *testing.T) crypto.EncryptionAlgorithm {
-					return crypto.CreateMockEncryptionAlg(gomock.NewController(t))
-				},
-			},
-			args: args{
-				params: []any{
-					0,
-				},
-			},
-			want: want{
-				err: func(err error) bool {
-					return errors.Is(err, ErrMissingUserAgentID)
-				},
-			},
-		},
-		{
 			name: "successful auth",
 			fields: fields{
 				issuer:       "https://jwt.com",
@@ -89,8 +67,8 @@ func TestProvider_BeginAuth(t *testing.T) {
 				},
 			},
 			args: args{
-				params: []any{
-					"agent",
+				params: []idp.Parameter{
+					idp.UserAgentID("agent"),
 				},
 			},
 			want: want{

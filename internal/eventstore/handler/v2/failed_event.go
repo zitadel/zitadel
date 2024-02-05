@@ -5,8 +5,8 @@ import (
 	_ "embed"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -47,7 +47,7 @@ func failureFromStatement(statement *Statement, err error) *failure {
 	}
 }
 
-func (h *Handler) handleFailedStmt(tx *sql.Tx, currentState *state, f *failure) (shouldContinue bool) {
+func (h *Handler) handleFailedStmt(tx *sql.Tx, f *failure) (shouldContinue bool) {
 	failureCount, err := h.failureCount(tx, f)
 	if err != nil {
 		h.logFailure(f).WithError(err).Warn("unable to get failure count")
@@ -69,10 +69,10 @@ func (h *Handler) failureCount(tx *sql.Tx, f *failure) (count uint8, err error) 
 		f.sequence,
 	)
 	if err = row.Err(); err != nil {
-		return 0, errors.ThrowInternal(err, "CRDB-Unnex", "unable to update failure count")
+		return 0, zerrors.ThrowInternal(err, "CRDB-Unnex", "unable to update failure count")
 	}
 	if err = row.Scan(&count); err != nil {
-		return 0, errors.ThrowInternal(err, "CRDB-RwSMV", "unable to scan count")
+		return 0, zerrors.ThrowInternal(err, "CRDB-RwSMV", "unable to scan count")
 	}
 	return count, nil
 }
@@ -89,7 +89,7 @@ func (h *Handler) setFailureCount(tx *sql.Tx, count uint8, f *failure) error {
 		f.err.Error(),
 	)
 	if err != nil {
-		return errors.ThrowInternal(err, "CRDB-4Ht4x", "set failure count failed")
+		return zerrors.ThrowInternal(err, "CRDB-4Ht4x", "set failure count failed")
 	}
 	return nil
 }

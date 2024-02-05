@@ -6,7 +6,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -44,12 +43,8 @@ func (q *Queries) SearchEvents(ctx context.Context, query *eventstore.SearchQuer
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	auditLogRetention := q.defaultAuditLogRetention
-	instanceLimits, err := q.Limits(ctx, authz.GetInstance(ctx).InstanceID())
-	if err != nil && !errors.IsNotFound(err) {
-		return nil, err
-	}
-	if instanceLimits != nil && instanceLimits.AuditLogRetention != nil {
-		auditLogRetention = *instanceLimits.AuditLogRetention
+	if instanceAuditLogRetention := authz.GetInstance(ctx).AuditLogRetention(); instanceAuditLogRetention != nil {
+		auditLogRetention = *instanceAuditLogRetention
 	}
 	if auditLogRetention != 0 {
 		query = filterAuditLogRetention(ctx, auditLogRetention, query)
@@ -120,7 +115,7 @@ func (q *Queries) convertEvent(ctx context.Context, event eventstore.Event, user
 }
 
 func (q *Queries) editorUserByID(ctx context.Context, userID string) *EventEditor {
-	user, err := q.GetUserByID(ctx, false, userID, false)
+	user, err := q.GetUserByID(ctx, false, userID)
 	if err != nil {
 		return &EventEditor{ID: userID}
 	}

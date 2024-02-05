@@ -8,12 +8,12 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddDomainPolicy(t *testing.T) {
@@ -51,7 +51,7 @@ func TestCommandSide_AddDomainPolicy(t *testing.T) {
 				smtpSenderAddressMatchesInstanceDomain: true,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -79,7 +79,7 @@ func TestCommandSide_AddDomainPolicy(t *testing.T) {
 				smtpSenderAddressMatchesInstanceDomain: true,
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -288,7 +288,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 				smtpSenderAddressMatchesInstanceDomain: true,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -307,7 +307,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 				smtpSenderAddressMatchesInstanceDomain: true,
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -335,7 +335,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 				smtpSenderAddressMatchesInstanceDomain: true,
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -496,7 +496,7 @@ func TestCommandSide_RemoveDomainPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -512,7 +512,7 @@ func TestCommandSide_RemoveDomainPolicy(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{

@@ -21,7 +21,7 @@ func (l *Login) renderChangeUsername(w http.ResponseWriter, r *http.Request, aut
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	translator := l.getTranslator(r.Context(), authReq)
-	data := l.getUserData(r, authReq, "UsernameChange.Title", "UsernameChange.Description", errID, errMessage)
+	data := l.getUserData(r, authReq, translator, "UsernameChange.Title", "UsernameChange.Description", errID, errMessage)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplChangeUsername], data, nil)
 }
 
@@ -43,6 +43,6 @@ func (l *Login) handleChangeUsername(w http.ResponseWriter, r *http.Request) {
 func (l *Login) renderChangeUsernameDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	var errType, errMessage string
 	translator := l.getTranslator(r.Context(), authReq)
-	data := l.getUserData(r, authReq, "UsernameChangeDone.Title", "UsernameChangeDone.Description", errType, errMessage)
+	data := l.getUserData(r, authReq, translator, "UsernameChangeDone.Title", "UsernameChangeDone.Description", errType, errMessage)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplChangeUsernameDone], data, nil)
 }

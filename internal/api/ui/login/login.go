@@ -2,14 +2,12 @@ package login
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
-	"github.com/rakyll/statik/fs"
 
 	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -93,17 +91,12 @@ func CreateLogin(config Config,
 		userCodeAlg:         userCodeAlg,
 		featureCheck:        featureCheck,
 	}
-	statikFS, err := fs.NewWithNamespace("login")
-	if err != nil {
-		return nil, fmt.Errorf("unable to create filesystem: %w", err)
-	}
-
 	csrfInterceptor := createCSRFInterceptor(config.CSRFCookieName, csrfCookieKey, externalSecure, login.csrfErrorHandler())
 	cacheInterceptor := createCacheInterceptor(config.Cache.MaxAge, config.Cache.SharedMaxAge, assetCache)
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
 
-	login.router = CreateRouter(login, statikFS, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), oidcInstanceHandler, samlInstanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor, accessHandler)
-	login.renderer = CreateRenderer(HandlerPrefix, statikFS, staticStorage, config.LanguageCookieName)
+	login.router = CreateRouter(login, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), oidcInstanceHandler, samlInstanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor, accessHandler)
+	login.renderer = CreateRenderer(HandlerPrefix, staticStorage, config.LanguageCookieName)
 	login.parser = form.NewParser()
 	return login, nil
 }
@@ -130,11 +123,24 @@ func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecu
 				handler.ServeHTTP(w, r)
 				return
 			}
+			// by default we use SameSite Lax and the externalSecure (TLS) for the secure flag
+			sameSiteMode := csrf.SameSiteLaxMode
+			secureOnly := externalSecure
+			instance := authz.GetInstance(r.Context())
+			// in case of `allow iframe`...
+			if len(instance.SecurityPolicyAllowedOrigins()) > 0 {
+				// ... we need to change to SameSite none ...
+				sameSiteMode = csrf.SameSiteNoneMode
+				// ... and since SameSite none requires the secure flag, we'll set it for TLS and for localhost
+				// (regardless of the TLS / externalSecure settings)
+				secureOnly = externalSecure || instance.RequestedDomain() == "localhost"
+			}
 			csrf.Protect(csrfCookieKey,
-				csrf.Secure(externalSecure),
-				csrf.CookieName(http_utils.SetCookiePrefix(cookieName, "", path, externalSecure)),
+				csrf.Secure(secureOnly),
+				csrf.CookieName(http_utils.SetCookiePrefix(cookieName, externalSecure, http_utils.PrefixHost)),
 				csrf.Path(path),
 				csrf.ErrorHandler(errorHandler),
+				csrf.SameSite(sameSiteMode),
 			)(handler).ServeHTTP(w, r)
 		})
 	}
@@ -169,7 +175,7 @@ func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string
 	if err != nil {
 		return nil, err
 	}
-	users, err := l.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{loginName}}, false)
+	users, err := l.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{loginName}})
 	if err != nil {
 		return nil, err
 	}

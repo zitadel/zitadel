@@ -3,8 +3,8 @@ package policy
 import (
 	"fmt"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -80,7 +80,7 @@ func MailTextAddedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-5m9if", "unable to unmarshal mail text policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-5m9if", "unable to unmarshal mail text policy")
 	}
 
 	return e, nil
@@ -114,7 +114,7 @@ func NewMailTextChangedEvent(
 	changes []MailTextChanges,
 ) (*MailTextChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-m9osd", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "POLICY-m9osd", "Errors.NoChangesFound")
 	}
 	changeEvent := &MailTextChangedEvent{
 		BaseEvent:    *base,
@@ -172,7 +172,7 @@ func MailTextChangedEventMapper(event eventstore.Event) (eventstore.Event, error
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-bn88u", "unable to unmarshal mail text policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-bn88u", "unable to unmarshal mail text policy")
 	}
 
 	return e, nil

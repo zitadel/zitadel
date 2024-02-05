@@ -31,8 +31,17 @@ Errors:
   Limits:
     NotFound: Limits not found
     NoneSpecified: No limits specified
+    Instance:
+      Blocked: Instance is blocked
+  Restrictions:
+    NoneSpecified: No restrictions specified
+    DefaultLanguageMustBeAllowed: The default language must be allowed
   Language:
     NotParsed: Could not parse language
+    NotSupported: Language is not supported
+    NotAllowed: Language is not allowed
+    Undefined: Language is undefined
+    Duplicate: Languages have duplicates
   OIDCSettings:
     NotFound: OIDC Configuration not found
     AlreadyExists: OIDC configuration already exists
@@ -137,7 +146,7 @@ Errors:
     ExternalIDP:
       Invalid: External IDP invalid
       IDPConfigNotExisting: IDP provider invalid for this organization
-      NotAllowed: External IDP not allowed on this organization
+      NotAllowed: External IDP not allowed
       MinimumExternalIDPNeeded: At least one IDP must be added
       AlreadyExists: External IDP already taken
       NotFound: External IDP not found
@@ -429,6 +438,7 @@ Errors:
   UserSession:
     NotFound: UserSession not found
   Key:
+    NotFound: Key not found
     ExpireBeforeNow: The expiration date is in the past
   Login:
     LoginPolicy:

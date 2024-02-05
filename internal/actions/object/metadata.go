@@ -12,6 +12,28 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
+func OrgMetadataListFromQuery(c *actions.FieldConfig, orgMetadata *query.OrgMetadataList) goja.Value {
+	result := &metadataList{
+		Count:     orgMetadata.Count,
+		Sequence:  orgMetadata.Sequence,
+		Timestamp: orgMetadata.LastRun,
+		Metadata:  make([]*metadata, len(orgMetadata.Metadata)),
+	}
+
+	for i, md := range orgMetadata.Metadata {
+		result.Metadata[i] = &metadata{
+			CreationDate:  md.CreationDate,
+			ChangeDate:    md.ChangeDate,
+			ResourceOwner: md.ResourceOwner,
+			Sequence:      md.Sequence,
+			Key:           md.Key,
+			Value:         metadataByteArrayToValue(md.Value, c.Runtime),
+		}
+	}
+
+	return c.Runtime.ToValue(result)
+}
+
 func UserMetadataListFromQuery(c *actions.FieldConfig, metadata *query.UserMetadataList) goja.Value {
 	result := &userMetadataList{
 		Count:     metadata.Count,
@@ -21,6 +43,27 @@ func UserMetadataListFromQuery(c *actions.FieldConfig, metadata *query.UserMetad
 	}
 
 	for i, md := range metadata.Metadata {
+		result.Metadata[i] = &userMetadata{
+			CreationDate:  md.CreationDate,
+			ChangeDate:    md.ChangeDate,
+			ResourceOwner: md.ResourceOwner,
+			Sequence:      md.Sequence,
+			Key:           md.Key,
+			Value:         metadataByteArrayToValue(md.Value, c.Runtime),
+		}
+	}
+
+	return c.Runtime.ToValue(result)
+}
+
+func UserMetadataListFromSlice(c *actions.FieldConfig, metadata []query.UserMetadata) goja.Value {
+	result := &userMetadataList{
+		// Count was the only field ever queried from the DB in the old implementation,
+		// so Sequence and LastRun are omitted.
+		Count:    uint64(len(metadata)),
+		Metadata: make([]*userMetadata, len(metadata)),
+	}
+	for i, md := range metadata {
 		result.Metadata[i] = &userMetadata{
 			CreationDate:  md.CreationDate,
 			ChangeDate:    md.ChangeDate,
@@ -50,6 +93,22 @@ func metadataByteArrayToValue(val []byte, runtime *goja.Runtime) goja.Value {
 		panic(err)
 	}
 	return runtime.ToValue(value)
+}
+
+type metadataList struct {
+	Count     uint64
+	Sequence  uint64
+	Timestamp time.Time
+	Metadata  []*metadata
+}
+
+type metadata struct {
+	CreationDate  time.Time
+	ChangeDate    time.Time
+	ResourceOwner string
+	Sequence      uint64
+	Key           string
+	Value         goja.Value
 }
 
 type userMetadataList struct {

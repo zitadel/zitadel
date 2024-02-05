@@ -3,8 +3,8 @@ package domain
 import (
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Profile struct {
@@ -22,13 +22,13 @@ type Profile struct {
 
 func (p *Profile) Validate() error {
 	if p == nil {
-		return errors.ThrowInvalidArgument(nil, "PROFILE-GPY3p", "Errors.User.Profile.Empty")
+		return zerrors.ThrowInvalidArgument(nil, "PROFILE-GPY3p", "Errors.User.Profile.Empty")
 	}
 	if p.FirstName == "" {
-		return errors.ThrowInvalidArgument(nil, "PROFILE-RF5z2", "Errors.User.Profile.FirstNameEmpty")
+		return zerrors.ThrowInvalidArgument(nil, "PROFILE-RF5z2", "Errors.User.Profile.FirstNameEmpty")
 	}
 	if p.LastName == "" {
-		return errors.ThrowInvalidArgument(nil, "PROFILE-DSUkN", "Errors.User.Profile.LastNameEmpty")
+		return zerrors.ThrowInvalidArgument(nil, "PROFILE-DSUkN", "Errors.User.Profile.LastNameEmpty")
 	}
 	return nil
 }

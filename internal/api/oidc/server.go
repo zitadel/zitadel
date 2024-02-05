@@ -3,17 +3,42 @@ package oidc
 import (
 	"context"
 	"net/http"
+	"time"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
+	"golang.org/x/exp/slog"
 
+	"github.com/zitadel/zitadel/internal/auth/repository"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/i18n"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type Server struct {
 	http.Handler
 	*op.LegacyServer
+	features Features
+
+	repo              repository.Repository
+	query             *query.Queries
+	command           *command.Commands
+	accessTokenKeySet *oidcKeySet
+	idTokenHintKeySet *oidcKeySet
+
+	defaultLoginURL            string
+	defaultLoginURLV2          string
+	defaultLogoutURLV2         string
+	defaultAccessTokenLifetime time.Duration
+	defaultIdTokenLifetime     time.Duration
+
+	fallbackLogger      *slog.Logger
+	hashAlg             crypto.HashAlgorithm
 	signingKeyAlgorithm string
+	assetAPIPrefix      func(ctx context.Context) string
 }
 
 func endpoints(endpointConfig *EndpointConfig) op.Endpoints {
@@ -59,6 +84,13 @@ func endpoints(endpointConfig *EndpointConfig) op.Endpoints {
 	return endpoints
 }
 
+func (s *Server) getLogger(ctx context.Context) *slog.Logger {
+	if logger, ok := logging.FromContext(ctx); ok {
+		return logger
+	}
+	return s.fallbackLogger
+}
+
 func (s *Server) IssuerFromRequest(r *http.Request) string {
 	return s.Provider().IssuerFromRequest(r)
 }
@@ -79,9 +111,19 @@ func (s *Server) Ready(ctx context.Context, r *op.Request[struct{}]) (_ *op.Resp
 
 func (s *Server) Discovery(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return op.NewResponse(s.createDiscoveryConfig(ctx)), nil
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
+	restrictions, err := s.query.GetInstanceRestrictions(ctx)
+	if err != nil {
+		return nil, op.NewStatusError(oidc.ErrServerError().WithParent(err).WithDescription("internal server error"), http.StatusInternalServerError)
+	}
+	allowedLanguages := restrictions.AllowedLanguages
+	if len(allowedLanguages) == 0 {
+		allowedLanguages = i18n.SupportedLanguages()
+	}
+	return op.NewResponse(s.createDiscoveryConfig(ctx, allowedLanguages)), nil
 }
 
 func (s *Server) Keys(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
@@ -110,13 +152,6 @@ func (s *Server) DeviceAuthorization(ctx context.Context, r *op.ClientRequest[oi
 	defer func() { span.EndWithError(err) }()
 
 	return s.LegacyServer.DeviceAuthorization(ctx, r)
-}
-
-func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCredentials]) (_ op.Client, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.VerifyClient(ctx, r)
 }
 
 func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.AccessTokenRequest]) (_ *op.Response, err error) {
@@ -161,13 +196,6 @@ func (s *Server) DeviceToken(ctx context.Context, r *op.ClientRequest[oidc.Devic
 	return s.LegacyServer.DeviceToken(ctx, r)
 }
 
-func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionRequest]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.Introspect(ctx, r)
-}
-
 func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoRequest]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -189,7 +217,7 @@ func (s *Server) EndSession(ctx context.Context, r *op.Request[oidc.EndSessionRe
 	return s.LegacyServer.EndSession(ctx, r)
 }
 
-func (s *Server) createDiscoveryConfig(ctx context.Context) *oidc.DiscoveryConfiguration {
+func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales oidc.Locales) *oidc.DiscoveryConfiguration {
 	issuer := op.IssuerFromContext(ctx)
 	return &oidc.DiscoveryConfiguration{
 		Issuer:                                     issuer,
@@ -215,7 +243,7 @@ func (s *Server) createDiscoveryConfig(ctx context.Context) *oidc.DiscoveryConfi
 		RevocationEndpointAuthMethodsSupported:             op.AuthMethodsRevocationEndpoint(s.Provider()),
 		ClaimsSupported:                                    op.SupportedClaims(s.Provider()),
 		CodeChallengeMethodsSupported:                      op.CodeChallengeMethods(s.Provider()),
-		UILocalesSupported:                                 s.Provider().SupportedUILocales(),
+		UILocalesSupported:                                 supportedUILocales,
 		RequestParameterSupported:                          s.Provider().RequestObjectSupported(),
 	}
 }

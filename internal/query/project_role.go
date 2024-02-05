@@ -11,10 +11,10 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -58,10 +58,6 @@ var (
 		name:  projection.ProjectRoleColumnGroupName,
 		table: projectRolesTable,
 	}
-	ProjectRoleColumnOwnerRemoved = Column{
-		name:  projection.ProjectRoleColumnOwnerRemoved,
-		table: projectRolesTable,
-	}
 )
 
 type ProjectRoles struct {
@@ -86,7 +82,7 @@ type ProjectRoleSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool, queries *ProjectRoleSearchQueries, withOwnerRemoved bool) (roles *ProjectRoles, err error) {
+func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool, queries *ProjectRoleSearchQueries) (roles *ProjectRoles, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -98,14 +94,11 @@ func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool
 	}
 
 	eq := sq.Eq{ProjectRoleColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		eq[ProjectRoleColumnOwnerRemoved.identifier()] = false
-	}
 
 	query, scan := prepareProjectRolesQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -113,17 +106,17 @@ func (q *Queries) SearchProjectRoles(ctx context.Context, shouldTriggerBulk bool
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-5Ngd9", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-5Ngd9", "Errors.Internal")
 	}
 	roles.State, err = q.latestState(ctx, projectRolesTable)
 	return roles, err
 }
 
-func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grantedOrg string, queries *ProjectRoleSearchQueries, withOwnerRemoved bool) (roles *ProjectRoles, err error) {
+func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grantedOrg string, queries *ProjectRoleSearchQueries) (roles *ProjectRoles, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	grant, err := q.ProjectGrantByIDAndGrantedOrg(ctx, grantID, grantedOrg, withOwnerRemoved)
+	grant, err := q.ProjectGrantByIDAndGrantedOrg(ctx, grantID, grantedOrg)
 	if err != nil {
 		return nil, err
 	}
@@ -133,14 +126,11 @@ func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grante
 	}
 
 	eq := sq.Eq{ProjectRoleColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		eq[ProjectRoleColumnOwnerRemoved.identifier()] = false
-	}
 
 	query, scan := prepareProjectRolesQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -148,7 +138,7 @@ func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grante
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-5Ngd9", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-5Ngd9", "Errors.Internal")
 	}
 
 	roles.State, err = q.latestState(ctx, projectRolesTable)
@@ -254,7 +244,7 @@ func prepareProjectRolesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-ML0Fs", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-ML0Fs", "Errors.Query.CloseRows")
 			}
 
 			return &ProjectRoles{

@@ -63,8 +63,9 @@ func NewProvider(
 			middleware.NoCacheInterceptor().Handler,
 			instanceHandler,
 			userAgentCookie,
-			accessHandler.HandleIgnorePathPrefixes(ignoredQuotaLimitEndpoint(conf.ProviderConfig)),
+			accessHandler.HandleWithPublicAuthPathPrefixes(publicAuthPathPrefixes(conf.ProviderConfig)),
 			http_utils.CopyHeadersToContext,
+			middleware.ActivityHandler,
 		),
 		provider.WithCustomTimeFormat("2006-01-02T15:04:05.999Z"),
 	}
@@ -101,7 +102,7 @@ func newStorage(
 	}, nil
 }
 
-func ignoredQuotaLimitEndpoint(config *provider.Config) []string {
+func publicAuthPathPrefixes(config *provider.Config) []string {
 	metadataEndpoint := HandlerPrefix + provider.DefaultMetadataEndpoint
 	certificateEndpoint := HandlerPrefix + provider.DefaultCertificateEndpoint
 	ssoEndpoint := HandlerPrefix + provider.DefaultSingleSignOnEndpoint

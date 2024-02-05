@@ -9,8 +9,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -128,7 +128,7 @@ func HumanAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(humanAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-vGlhy", "unable to unmarshal human added")
+		return nil, zerrors.ThrowInternal(err, "USER-vGlhy", "unable to unmarshal human added")
 	}
 
 	return humanAdded, nil
@@ -233,7 +233,7 @@ func HumanRegisteredEventMapper(event eventstore.Event) (eventstore.Event, error
 	}
 	err := event.Unmarshal(humanRegistered)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-3Vm9s", "unable to unmarshal human registered")
+		return nil, zerrors.ThrowInternal(err, "USER-3Vm9s", "unable to unmarshal human registered")
 	}
 
 	return humanRegistered, nil
@@ -282,7 +282,7 @@ func HumanInitialCodeAddedEventMapper(event eventstore.Event) (eventstore.Event,
 	}
 	err := event.Unmarshal(humanRegistered)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-bM9se", "unable to unmarshal human initial code added")
+		return nil, zerrors.ThrowInternal(err, "USER-bM9se", "unable to unmarshal human initial code added")
 	}
 
 	return humanRegistered, nil
@@ -407,7 +407,7 @@ func HumanSignedOutEventMapper(event eventstore.Event) (eventstore.Event, error)
 	}
 	err := event.Unmarshal(signedOut)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-WFS3g", "unable to unmarshal human signed out")
+		return nil, zerrors.ThrowInternal(err, "USER-WFS3g", "unable to unmarshal human signed out")
 	}
 
 	return signedOut, nil

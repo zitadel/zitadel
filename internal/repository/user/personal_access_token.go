@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -55,7 +55,7 @@ func PersonalAccessTokenAddedEventMapper(event eventstore.Event) (eventstore.Eve
 	}
 	err := event.Unmarshal(tokenAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-Dbges", "unable to unmarshal token added")
+		return nil, zerrors.ThrowInternal(err, "USER-Dbges", "unable to unmarshal token added")
 	}
 
 	return tokenAdded, nil
@@ -96,7 +96,7 @@ func PersonalAccessTokenRemovedEventMapper(event eventstore.Event) (eventstore.E
 	}
 	err := event.Unmarshal(tokenRemoved)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-Dbneg", "unable to unmarshal token removed")
+		return nil, zerrors.ThrowInternal(err, "USER-Dbneg", "unable to unmarshal token removed")
 	}
 
 	return tokenRemoved, nil

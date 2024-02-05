@@ -4,9 +4,9 @@ title: Complement Token Flow
 
 This flow is executed during the creation of tokens and token introspection.
 
-## Pre Userinfo creation
+## Pre Userinfo creation (id_token / userinfo / introspection endpoint)
 
-This trigger is called before userinfo are set in the token or response.
+This trigger is called before userinfo are set in the id_token or userinfo and introspection endpoint response.
 
 ### Parameters of Pre Userinfo creation
 
@@ -18,6 +18,8 @@ This trigger is called before userinfo are set in the token or response.
     - `user`
       - `getMetadata()` [*metadataResult*](./objects#metadata-result)
       - `grants` [*UserGrantList*](./objects#user-grant-list)
+    - `org`
+      - `getMetadata()` [*metadataResult*](./objects#metadata-result)
 - `api`  
   The second parameter contains the following fields:
   - `v1`
@@ -46,6 +48,8 @@ This trigger is called before the claims are set in the access token and the tok
     - `user`
       - `getMetadata()` [*metadataResult*](./objects#metadata-result)
       - `grants` [*UserGrantList*](./objects#user-grant-list)
+    - `org`
+      - `getMetadata()` [*metadataResult*](./objects#metadata-result)
 - `api`  
   The second parameter contains the following fields:
   - `v1`

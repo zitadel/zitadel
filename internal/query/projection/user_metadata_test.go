@@ -3,12 +3,12 @@ package projection
 import (
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestUserMetadataProjection_reduces(t *testing.T) {
@@ -41,7 +41,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.user_metadata4 (instance_id, user_id, key, resource_owner, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (instance_id, user_id, key) DO UPDATE SET (resource_owner, creation_date, change_date, sequence, value) = (EXCLUDED.resource_owner, EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
+							expectedStmt: "INSERT INTO projections.user_metadata5 (instance_id, user_id, key, resource_owner, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (instance_id, user_id, key) DO UPDATE SET (resource_owner, creation_date, change_date, sequence, value) = (EXCLUDED.resource_owner, EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"agg-id",
@@ -76,7 +76,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_metadata4 WHERE (user_id = $1) AND (key = $2) AND (instance_id = $3)",
+							expectedStmt: "DELETE FROM projections.user_metadata5 WHERE (user_id = $1) AND (key = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"key",
@@ -104,7 +104,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_metadata4 WHERE (user_id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.user_metadata5 WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -131,7 +131,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_metadata4 WHERE (user_id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.user_metadata5 WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -158,7 +158,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_metadata4 WHERE (instance_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.user_metadata5 WHERE (instance_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"agg-id",
@@ -185,7 +185,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_metadata4 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_metadata5 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -199,7 +199,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			event := baseEvent(t)
 			got, err := tt.reduce(event)
-			if _, ok := err.(errors.InvalidArgument); !ok {
+			if ok := zerrors.IsErrorInvalidArgument(err); !ok {
 				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
 			}
 

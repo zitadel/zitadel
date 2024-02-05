@@ -7,8 +7,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -52,7 +52,7 @@ func HumanEmailChangedEventMapper(event eventstore.Event) (eventstore.Event, err
 	}
 	err := event.Unmarshal(emailChangedEvent)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-4M0sd", "unable to unmarshal human password changed")
+		return nil, zerrors.ThrowInternal(err, "USER-4M0sd", "unable to unmarshal human password changed")
 	}
 
 	return emailChangedEvent, nil
@@ -177,7 +177,7 @@ func HumanEmailCodeAddedEventMapper(event eventstore.Event) (eventstore.Event, e
 	}
 	err := event.Unmarshal(codeAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-3M0sd", "unable to unmarshal human email code added")
+		return nil, zerrors.ThrowInternal(err, "USER-3M0sd", "unable to unmarshal human email code added")
 	}
 
 	return codeAdded, nil

@@ -4,13 +4,13 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -114,7 +114,7 @@ func (p *passwordAgeProjection) reduceAdded(event eventstore.Event) (*handler.St
 		policyEvent = e.PasswordAgePolicyAddedEvent
 		isDefault = true
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-CJqF0", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordAgePolicyAddedEventType, instance.PasswordAgePolicyAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-CJqF0", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordAgePolicyAddedEventType, instance.PasswordAgePolicyAddedEventType})
 	}
 	return handler.NewCreateStatement(
 		&policyEvent,
@@ -140,7 +140,7 @@ func (p *passwordAgeProjection) reduceChanged(event eventstore.Event) (*handler.
 	case *instance.PasswordAgePolicyChangedEvent:
 		policyEvent = e.PasswordAgePolicyChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-i7FZt", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordAgePolicyChangedEventType, instance.PasswordAgePolicyChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-i7FZt", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordAgePolicyChangedEventType, instance.PasswordAgePolicyChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(AgePolicyChangeDateCol, policyEvent.CreationDate()),
@@ -164,7 +164,7 @@ func (p *passwordAgeProjection) reduceChanged(event eventstore.Event) (*handler.
 func (p *passwordAgeProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PasswordAgePolicyRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-EtHWB", "reduce.wrong.event.type %s", org.PasswordAgePolicyRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-EtHWB", "reduce.wrong.event.type %s", org.PasswordAgePolicyRemovedEventType)
 	}
 	return handler.NewDeleteStatement(
 		policyEvent,
@@ -177,7 +177,7 @@ func (p *passwordAgeProjection) reduceRemoved(event eventstore.Event) (*handler.
 func (p *passwordAgeProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-edLs2", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-edLs2", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
 	return handler.NewDeleteStatement(

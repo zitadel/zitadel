@@ -11,13 +11,12 @@ import (
 
 	"github.com/muhlemmer/gu"
 
-	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	objpb "github.com/zitadel/zitadel/pkg/grpc/object"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 )
@@ -285,7 +284,7 @@ func sessionQueryToQuery(sq *session.SearchQuery) (query.SearchQuery, error) {
 	case *session.SearchQuery_CreationDateQuery:
 		return creationDateQueryToQuery(q.CreationDateQuery)
 	default:
-		return nil, caos_errs.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-Sfefs", "List.Query.Invalid")
 	}
 }
 
@@ -352,10 +351,7 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 		if err != nil {
 			return nil, err
 		}
-
-		// trigger activity log for session for user
-		activity.Trigger(ctx, user.ResourceOwner, user.ID, activity.SessionAPI)
-		sessionChecks = append(sessionChecks, command.CheckUser(user.ID))
+		sessionChecks = append(sessionChecks, command.CheckUser(user.ID, user.ResourceOwner))
 	}
 	if password := checks.GetPassword(); password != nil {
 		sessionChecks = append(sessionChecks, command.CheckPassword(password.GetPassword()))
@@ -451,7 +447,7 @@ func (s *Server) createOTPEmailChallengeCommand(req *session.RequestChallenges_O
 	case nil:
 		return nil, s.command.CreateOTPEmailChallenge(), nil
 	default:
-		return nil, nil, caos_errs.ThrowUnimplementedf(nil, "SESSION-k3ng0", "delivery_type oneOf %T in OTPEmailChallenge not implemented", t)
+		return nil, nil, zerrors.ThrowUnimplementedf(nil, "SESSION-k3ng0", "delivery_type oneOf %T in OTPEmailChallenge not implemented", t)
 	}
 }
 
@@ -465,7 +461,7 @@ func userCheck(user *session.CheckUser) (userSearch, error) {
 	case *session.CheckUser_LoginName:
 		return userByLoginName(s.LoginName)
 	default:
-		return nil, caos_errs.ThrowUnimplementedf(nil, "SESSION-d3b4g0", "user search %T not implemented", s)
+		return nil, zerrors.ThrowUnimplementedf(nil, "SESSION-d3b4g0", "user search %T not implemented", s)
 	}
 }
 
@@ -478,11 +474,7 @@ func userByID(userID string) userSearch {
 }
 
 func userByLoginName(loginName string) (userSearch, error) {
-	loginNameQuery, err := query.NewUserLoginNamesSearchQuery(loginName)
-	if err != nil {
-		return nil, err
-	}
-	return userSearchByLoginName{loginNameQuery}, nil
+	return userSearchByLoginName{loginName}, nil
 }
 
 type userSearchByID struct {
@@ -490,13 +482,13 @@ type userSearchByID struct {
 }
 
 func (u userSearchByID) search(ctx context.Context, q *query.Queries) (*query.User, error) {
-	return q.GetUserByID(ctx, true, u.id, false)
+	return q.GetUserByID(ctx, true, u.id)
 }
 
 type userSearchByLoginName struct {
-	loginNameQuery query.SearchQuery
+	loginName string
 }
 
 func (u userSearchByLoginName) search(ctx context.Context, q *query.Queries) (*query.User, error) {
-	return q.GetUser(ctx, true, false, u.loginNameQuery)
+	return q.GetUserByLoginName(ctx, true, u.loginName)
 }

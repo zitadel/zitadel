@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -94,7 +94,7 @@ func LoginPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, erro
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-nWndT", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-nWndT", "unable to unmarshal policy")
 	}
 
 	return e, nil
@@ -135,7 +135,7 @@ func NewLoginPolicyChangedEvent(
 	changes []LoginPolicyChanges,
 ) (*LoginPolicyChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-ADg34", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "POLICY-ADg34", "Errors.NoChangesFound")
 	}
 	changeEvent := &LoginPolicyChangedEvent{
 		BaseEvent: *base,
@@ -257,7 +257,7 @@ func LoginPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, er
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-ehssl", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-ehssl", "unable to unmarshal policy")
 	}
 
 	return e, nil

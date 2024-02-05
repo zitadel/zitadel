@@ -31,9 +31,11 @@ curl --request POST \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
   --data '{
-  "idp_id": "$IDP_ID",
-  "successUrl": "https://custom.com/login/idp/success",
-  "failureUrl": "https://custom.com/login/idp/fail"
+  "idpId": "$IDP_ID",
+  "urls": {
+    "successUrl": "https://custom.com/login/idp/success",
+    "failureUrl": "https://custom.com/login/idp/fail"
+  }
 }'
 ```
 
@@ -76,7 +78,7 @@ curl --request POST \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
   --data '{
-  "token": "k50WQmDaPIazQDJsyKaEPaQPwgsytxqgQ3K1ifQeQtAmeQ"
+  "idpIntentToken": "k50WQmDaPIazQDJsyKaEPaQPwgsytxqgQ3K1ifQeQtAmeQ"
 }'
 ```
 

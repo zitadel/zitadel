@@ -3,11 +3,11 @@ package projection
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -89,7 +89,7 @@ func (p *secretGeneratorProjection) Reducers() []handler.AggregateReducer {
 func (p *secretGeneratorProjection) reduceSecretGeneratorAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SecretGeneratorAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-sk99F", "reduce.wrong.event.type %s", instance.SecretGeneratorAddedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-sk99F", "reduce.wrong.event.type %s", instance.SecretGeneratorAddedEventType)
 	}
 	return handler.NewCreateStatement(
 		e,
@@ -114,7 +114,7 @@ func (p *secretGeneratorProjection) reduceSecretGeneratorAdded(event eventstore.
 func (p *secretGeneratorProjection) reduceSecretGeneratorChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SecretGeneratorChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-s00Fs", "reduce.wrong.event.type %s", instance.SecretGeneratorChangedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-s00Fs", "reduce.wrong.event.type %s", instance.SecretGeneratorChangedEventType)
 	}
 
 	columns := make([]handler.Column, 0, 7)
@@ -152,7 +152,7 @@ func (p *secretGeneratorProjection) reduceSecretGeneratorChanged(event eventstor
 func (p *secretGeneratorProjection) reduceSecretGeneratorRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SecretGeneratorRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fmiIf", "reduce.wrong.event.type %s", instance.SecretGeneratorRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-fmiIf", "reduce.wrong.event.type %s", instance.SecretGeneratorRemovedEventType)
 	}
 	return handler.NewDeleteStatement(
 		e,

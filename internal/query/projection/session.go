@@ -4,17 +4,17 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
-	SessionsProjectionTable = "projections.sessions7"
+	SessionsProjectionTable = "projections.sessions8"
 
 	SessionColumnID                     = "id"
 	SessionColumnCreationDate           = "creation_date"
@@ -25,6 +25,7 @@ const (
 	SessionColumnInstanceID             = "instance_id"
 	SessionColumnCreator                = "creator"
 	SessionColumnUserID                 = "user_id"
+	SessionColumnUserResourceOwner      = "user_resource_owner"
 	SessionColumnUserCheckedAt          = "user_checked_at"
 	SessionColumnPasswordCheckedAt      = "password_checked_at"
 	SessionColumnIntentCheckedAt        = "intent_checked_at"
@@ -64,6 +65,7 @@ func (*sessionProjection) Init() *old_handler.Check {
 			handler.NewColumn(SessionColumnInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(SessionColumnCreator, handler.ColumnTypeText),
 			handler.NewColumn(SessionColumnUserID, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(SessionColumnUserResourceOwner, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SessionColumnUserCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnPasswordCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
 			handler.NewColumn(SessionColumnIntentCheckedAt, handler.ColumnTypeTimestamp, handler.Nullable()),
@@ -168,7 +170,7 @@ func (p *sessionProjection) Reducers() []handler.AggregateReducer {
 func (p *sessionProjection) reduceSessionAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*session.AddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Sfrgf", "reduce.wrong.event.type %s", session.AddedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Sfrgf", "reduce.wrong.event.type %s", session.AddedType)
 	}
 
 	cols := make([]handler.Column, 0, 12)
@@ -205,7 +207,7 @@ func (p *sessionProjection) reduceSessionAdded(event eventstore.Event) (*handler
 func (p *sessionProjection) reduceUserChecked(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*session.UserCheckedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-saDg5", "reduce.wrong.event.type %s", session.UserCheckedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-saDg5", "reduce.wrong.event.type %s", session.UserCheckedType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -213,6 +215,7 @@ func (p *sessionProjection) reduceUserChecked(event eventstore.Event) (*handler.
 			handler.NewCol(SessionColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SessionColumnSequence, e.Sequence()),
 			handler.NewCol(SessionColumnUserID, e.UserID),
+			handler.NewCol(SessionColumnUserResourceOwner, e.UserResourceOwner),
 			handler.NewCol(SessionColumnUserCheckedAt, e.CheckedAt),
 		},
 		[]handler.Condition{
@@ -225,7 +228,7 @@ func (p *sessionProjection) reduceUserChecked(event eventstore.Event) (*handler.
 func (p *sessionProjection) reducePasswordChecked(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*session.PasswordCheckedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SDgrb", "reduce.wrong.event.type %s", session.PasswordCheckedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SDgrb", "reduce.wrong.event.type %s", session.PasswordCheckedType)
 	}
 
 	return handler.NewUpdateStatement(
@@ -245,7 +248,7 @@ func (p *sessionProjection) reducePasswordChecked(event eventstore.Event) (*hand
 func (p *sessionProjection) reduceIntentChecked(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*session.IntentCheckedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SDgr2", "reduce.wrong.event.type %s", session.IntentCheckedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SDgr2", "reduce.wrong.event.type %s", session.IntentCheckedType)
 	}
 
 	return handler.NewUpdateStatement(
@@ -265,7 +268,7 @@ func (p *sessionProjection) reduceIntentChecked(event eventstore.Event) (*handle
 func (p *sessionProjection) reduceWebAuthNChecked(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*session.WebAuthNCheckedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-WieM4", "reduce.wrong.event.type %s", session.WebAuthNCheckedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-WieM4", "reduce.wrong.event.type %s", session.WebAuthNCheckedType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -285,7 +288,7 @@ func (p *sessionProjection) reduceWebAuthNChecked(event eventstore.Event) (*hand
 func (p *sessionProjection) reduceTOTPChecked(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*session.TOTPCheckedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Oqu8i", "reduce.wrong.event.type %s", session.TOTPCheckedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Oqu8i", "reduce.wrong.event.type %s", session.TOTPCheckedType)
 	}
 
 	return handler.NewUpdateStatement(
@@ -345,7 +348,7 @@ func (p *sessionProjection) reduceOTPEmailChecked(event eventstore.Event) (*hand
 func (p *sessionProjection) reduceTokenSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*session.TokenSetEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAfd3", "reduce.wrong.event.type %s", session.TokenSetType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAfd3", "reduce.wrong.event.type %s", session.TokenSetType)
 	}
 
 	return handler.NewUpdateStatement(
@@ -365,7 +368,7 @@ func (p *sessionProjection) reduceTokenSet(event eventstore.Event) (*handler.Sta
 func (p *sessionProjection) reduceMetadataSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*session.MetadataSetEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAfd3", "reduce.wrong.event.type %s", session.MetadataSetType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAfd3", "reduce.wrong.event.type %s", session.MetadataSetType)
 	}
 
 	return handler.NewUpdateStatement(
@@ -405,7 +408,7 @@ func (p *sessionProjection) reduceLifetimeSet(event eventstore.Event) (*handler.
 func (p *sessionProjection) reduceSessionTerminated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*session.TerminateEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAftn", "reduce.wrong.event.type %s", session.TerminateType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-SAftn", "reduce.wrong.event.type %s", session.TerminateType)
 	}
 
 	return handler.NewDeleteStatement(
@@ -420,7 +423,7 @@ func (p *sessionProjection) reduceSessionTerminated(event eventstore.Event) (*ha
 func (p *sessionProjection) reducePasswordChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanPasswordChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Deg3d", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Deg3d", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
 	}
 
 	return handler.NewUpdateStatement(
@@ -430,6 +433,7 @@ func (p *sessionProjection) reducePasswordChanged(event eventstore.Event) (*hand
 		},
 		[]handler.Condition{
 			handler.NewCond(SessionColumnUserID, e.Aggregate().ID),
+			handler.NewCond(SessionColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewLessThanCond(SessionColumnPasswordCheckedAt, e.CreationDate()),
 		},
 	), nil

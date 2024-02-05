@@ -143,7 +143,7 @@ module.exports = {
             },
             {
               label: "Privacy Policy",
-              href: "/legal/privacy-policy",
+              href: "/legal/policies/privacy-policy",
             },
           ],
         },
@@ -178,7 +178,7 @@ module.exports = {
       selector: "div#",
     },
     prism: {
-      additionalLanguages: ["csharp", "dart", "groovy", "regex"],
+      additionalLanguages: ["csharp", "dart", "groovy", "regex", "java", "php", "python"],
     },
     colorMode: {
       defaultMode: "dark",

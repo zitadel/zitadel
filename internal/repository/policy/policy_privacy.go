@@ -2,8 +2,8 @@ package policy
 
 import (
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -51,7 +51,7 @@ func PrivacyPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, er
 	}
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-2k0fs", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-2k0fs", "unable to unmarshal policy")
 	}
 
 	return e, nil
@@ -79,7 +79,7 @@ func NewPrivacyPolicyChangedEvent(
 	changes []PrivacyPolicyChanges,
 ) (*PrivacyPolicyChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-PPo0s", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "POLICY-PPo0s", "Errors.NoChangesFound")
 	}
 	changeEvent := &PrivacyPolicyChangedEvent{
 		BaseEvent: *base,
@@ -123,7 +123,7 @@ func PrivacyPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, 
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-22nf9", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-22nf9", "unable to unmarshal policy")
 	}
 
 	return e, nil

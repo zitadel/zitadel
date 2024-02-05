@@ -3,7 +3,7 @@ package domain
 import (
 	"time"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -30,7 +30,7 @@ func ValidateExpirationDate(date time.Time) (time.Time, error) {
 		return defaultExpDate, nil
 	}
 	if date.Before(time.Now()) {
-		return time.Time{}, errors.ThrowInvalidArgument(nil, "DOMAIN-dv3t5", "Errors.AuthNKey.ExpireBeforeNow")
+		return time.Time{}, zerrors.ThrowInvalidArgument(nil, "DOMAIN-dv3t5", "Errors.AuthNKey.ExpireBeforeNow")
 	}
 	return date, nil
 }

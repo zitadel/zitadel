@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type state struct {
@@ -19,6 +19,7 @@ type state struct {
 	aggregateType  eventstore.AggregateType
 	aggregateID    string
 	sequence       uint64
+	offset         uint32
 }
 
 var (
@@ -30,8 +31,6 @@ var (
 	updateStateStmt string
 	//go:embed state_lock.sql
 	lockStateStmt string
-	//go:embed state_set_last_run.sql
-	updateStateLastRunStmt string
 
 	errJustUpdated = errors.New("projection was just updated")
 )
@@ -47,6 +46,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, config *triggerC
 		sequence      = new(sql.NullInt64)
 		timestamp     = new(sql.NullTime)
 		position      = new(sql.NullFloat64)
+		offset        = new(sql.NullInt64)
 	)
 
 	stateQuery := currentStateStmt
@@ -61,6 +61,7 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, config *triggerC
 		sequence,
 		timestamp,
 		position,
+		offset,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
 		err = h.lockState(tx, currentState.instanceID)
@@ -75,6 +76,8 @@ func (h *Handler) currentState(ctx context.Context, tx *sql.Tx, config *triggerC
 	currentState.sequence = uint64(sequence.Int64)
 	currentState.eventTimestamp = timestamp.Time
 	currentState.position = position.Float64
+	// psql does not provide unsigned numbers so we work around it
+	currentState.offset = uint32(offset.Int64)
 	return currentState, nil
 }
 
@@ -87,21 +90,17 @@ func (h *Handler) setState(tx *sql.Tx, updatedState *state) error {
 		updatedState.sequence,
 		updatedState.eventTimestamp,
 		updatedState.position,
+		updatedState.offset,
 	)
 	if err != nil {
-		h.log().WithError(err).Debug("unable to update state")
-		return err
+		h.log().WithError(err).Warn("unable to update state")
+		return zerrors.ThrowInternal(err, "V2-WF23g2", "unable to update state")
 	}
 	if affected, err := res.RowsAffected(); affected == 0 {
 		h.log().OnError(err).Error("unable to check if states are updated")
-		return errs.ThrowInternal(err, "V2-FGEKi", "unable to update state")
+		return zerrors.ThrowInternal(err, "V2-FGEKi", "unable to update state")
 	}
 	return nil
-}
-
-func (h *Handler) updateLastUpdated(ctx context.Context, tx *sql.Tx, updatedState *state) {
-	_, err := tx.ExecContext(ctx, updateStateLastRunStmt, h.projection.Name(), updatedState.instanceID)
-	h.log().OnError(err).Debug("unable to update last updated")
 }
 
 func (h *Handler) lockState(tx *sql.Tx, instanceID string) error {
@@ -113,7 +112,7 @@ func (h *Handler) lockState(tx *sql.Tx, instanceID string) error {
 		return err
 	}
 	if affected, err := res.RowsAffected(); affected == 0 || err != nil {
-		return errs.ThrowInternal(err, "V2-lpiK0", "projection already locked")
+		return zerrors.ThrowInternal(err, "V2-lpiK0", "projection already locked")
 	}
 	return nil
 }

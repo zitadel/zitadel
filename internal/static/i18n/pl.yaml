@@ -31,8 +31,17 @@ Errors:
   Limits:
     NotFound: Limit nie znaleziony
     NoneSpecified: Nie określono limitów
+    Instance:
+      Blocked: Instancja jest zablokowana
+  Restrictions:
+    NoneSpecified: Nie określono ograniczeń
+    DefaultLanguageMustBeAllowed: Domyślny język musi być dozwolony
   Language:
     NotParsed: Nie można przeanalizować języka
+    NotSupported: Język nie jest obsługiwany
+    NotAllowed: Język nie jest dozwolony
+    Undefined: Język jest niezdefiniowany
+    Duplicate: Języki mają duplikaty
   OIDCSettings:
     NotFound: Konfiguracja OIDC nie znaleziona
     AlreadyExists: Konfiguracja OIDC już istnieje
@@ -137,7 +146,7 @@ Errors:
     ExternalIDP:
       Invalid: Nieprawidłowy IDP zewnętrzny
       IDPConfigNotExisting: Dostawca IDP jest nieprawidłowy dla tej organizacji
-      NotAllowed: IDP zewnętrzne nie jest dozwolone w tej organizacji
+      NotAllowed: IDP zewnętrzne nie jest dozwolone
       MinimumExternalIDPNeeded: Przynajmniej jeden IDP musi być dodany
       AlreadyExists: IDP zewnętrzne już istnieje
       NotFound: IDP zewnętrzne nie znaleziony
@@ -429,6 +438,7 @@ Errors:
   UserSession:
     NotFound: Sesja użytkownika nie znaleziona
   Key:
+    NotFound: Klucz nie odnaleziony
     ExpireBeforeNow: Data ważności jest już przeszła
   Login:
     LoginPolicy:
