@@ -2,14 +2,16 @@ name: "Code Scanning"
 
 on:
   push:
-    branches: 
+    branches:
     -  'main'
+    - 'codeql'
     paths-ignore:
     - 'docs/**'
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: 
+    branches:
     -  'main'
+    - 'codeql'
     paths-ignore:
     - 'docs/**'
 
@@ -38,7 +40,7 @@ jobs:
         make core_build
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       # Override language selection by uncommenting this and choosing your languages
       with:
         languages: ${{ matrix.language }}
@@ -52,18 +54,18 @@ jobs:
     # ✏️ If the Autobuild fails above, remove it and uncomment the following three lines
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
-    
+
     # autobuild does not work anymore
     # and to be able to compile without an actual console build, we just need a placeholder in the console dist folder
     - if: matrix.language == 'javascript'
       name: Autobuild
-      uses: github/codeql-action/autobuild@v2
+      uses: github/codeql-action/autobuild@v3
     - if: matrix.language == 'go'
       #name: Autobuild
-      #uses: github/codeql-action/autobuild@v2
+      #uses: github/codeql-action/autobuild@v3
       name: compile go
       run: |
         make compile
         go list ./...
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v3
