@@ -22,6 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
 	feature_repo "github.com/zitadel/zitadel/internal/repository/feature"
+	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
 	key_repo "github.com/zitadel/zitadel/internal/repository/keypair"
@@ -65,6 +66,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	limits.RegisterEventMappers(es)
 	restrictions.RegisterEventMappers(es)
 	feature_repo.RegisterEventMappers(es)
+	feature_v2.RegisterEventMappers(es)
 	deviceauth.RegisterEventMappers(es)
 	return es
 }
