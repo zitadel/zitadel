@@ -25,7 +25,7 @@ jobs:
         language: [go,javascript]
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - if: matrix.language == 'go'
       name: Install Go
       uses: actions/setup-go@v4
@@ -34,7 +34,7 @@ jobs:
 
     # node to install sass for go
     - if: matrix.language == 'go'
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
     - if: matrix.language == 'go'
       run: |
         npm install -g sass
@@ -58,15 +58,7 @@ jobs:
 
     # autobuild does not work anymore
     # and to be able to compile without an actual console build, we just need a placeholder in the console dist folder
-    - if: matrix.language == 'javascript'
-      name: Autobuild
+    - name: Autobuild
       uses: github/codeql-action/autobuild@v3
-    - if: matrix.language == 'go'
-      #name: Autobuild
-      #uses: github/codeql-action/autobuild@v3
-      name: compile go
-      run: |
-        make compile
-        go list ./...
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
