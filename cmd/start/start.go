@@ -34,6 +34,7 @@ import (
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/admin"
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
+	"github.com/zitadel/zitadel/internal/api/grpc/feature/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	oidc_v2 "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/org/v2"
@@ -394,6 +395,9 @@ func startAPIs(
 		return err
 	}
 	if err := apis.RegisterService(ctx, org.CreateServer(commands, queries, permissionCheck)); err != nil {
+		return err
+	}
+	if err := apis.RegisterService(ctx, feature.CreateServer(commands, queries)); err != nil {
 		return err
 	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)

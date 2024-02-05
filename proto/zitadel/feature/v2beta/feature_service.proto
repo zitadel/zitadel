@@ -194,7 +194,7 @@ service FeatureService {
 
   rpc SetInstanceFeatures (SetInstanceFeaturesRequest) returns (SetInstanceFeaturesResponse) {
     option (google.api.http) = {
-      put: "/v2beta/features/instance/{instance_id}"
+      put: "/v2beta/features/instance"
       body: "*"
     };
 
@@ -221,7 +221,7 @@ service FeatureService {
 
   rpc ResetInstanceFeatures (ResetInstanceFeaturesRequest) returns (ResetInstanceFeaturesResponse) {
     option (google.api.http) = {
-      delete: "/v2beta/features/instance/{instance_id}"
+      delete: "/v2beta/features/instance"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -247,7 +247,7 @@ service FeatureService {
 
   rpc GetInstanceFeatures (GetInstanceFeaturesRequest) returns (GetInstanceFeaturesResponse) {
     option (google.api.http) = {
-      get: "/v2beta/features/instance/{instance_id}"
+      get: "/v2beta/features/instance"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
