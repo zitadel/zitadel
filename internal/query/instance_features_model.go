@@ -33,9 +33,12 @@ func (m *InstanceFeaturesReadModel) Reduce() error {
 	for _, event := range m.Events {
 		switch e := event.(type) {
 		case *feature_v2.ResetEvent:
-			return m.reduceReset()
+			m.reduceReset()
 		case *feature_v2.SetEvent[bool]:
-			return m.reduceBoolFeature(e)
+			err := m.reduceBoolFeature(e)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return m.ReadModel.Reduce()
@@ -56,14 +59,13 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 		Builder().ResourceOwner(m.ResourceOwner)
 }
 
-func (m *InstanceFeaturesReadModel) reduceReset() error {
+func (m *InstanceFeaturesReadModel) reduceReset() {
 	if m.populateFromSystem() {
-		return nil
+		return
 	}
 	m.instance.LoginDefaultOrg = FeatureSource[bool]{}
 	m.instance.TriggerIntrospectionProjections = FeatureSource[bool]{}
 	m.instance.LegacyIntrospection = FeatureSource[bool]{}
-	return nil
 }
 
 func (m *InstanceFeaturesReadModel) populateFromSystem() bool {

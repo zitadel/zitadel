@@ -14,12 +14,12 @@ var (
 	SystemResetEventType                           = resetEventTypeFromFeature(feature.LevelSystem)
 	SystemDefaultLoginInstanceEventType            = setEventTypeFromFeature(feature.LevelSystem, feature.KeyLoginDefaultOrg)
 	SystemTriggerIntrospectionProjectionsEventType = setEventTypeFromFeature(feature.LevelSystem, feature.KeyTriggerIntrospectionProjections)
-	SystemLegacyIntrospectionEventType             = setEventTypeFromFeature(feature.LevelSystem, feature.KeyTriggerIntrospectionProjections)
+	SystemLegacyIntrospectionEventType             = setEventTypeFromFeature(feature.LevelSystem, feature.KeyLegacyIntrospection)
 
 	InstanceResetEventType                           = resetEventTypeFromFeature(feature.LevelInstance)
 	InstanceDefaultLoginInstanceEventType            = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLoginDefaultOrg)
 	InstanceTriggerIntrospectionProjectionsEventType = setEventTypeFromFeature(feature.LevelInstance, feature.KeyTriggerIntrospectionProjections)
-	InstanceLegacyIntrospectionEventType             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyTriggerIntrospectionProjections)
+	InstanceLegacyIntrospectionEventType             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLegacyIntrospection)
 )
 
 const (

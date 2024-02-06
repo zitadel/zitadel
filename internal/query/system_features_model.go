@@ -8,8 +8,8 @@ import (
 
 type SystemFeaturesReadModel struct {
 	*eventstore.ReadModel
-	defaultFeatures *feature.Features
-	system          *SystemFeatures
+	defaults *feature.Features
+	system   *SystemFeatures
 }
 
 func NewSystemFeaturesReadModel(defaults *feature.Features) *SystemFeaturesReadModel {
@@ -18,7 +18,8 @@ func NewSystemFeaturesReadModel(defaults *feature.Features) *SystemFeaturesReadM
 			AggregateID:   "SYSTEM",
 			ResourceOwner: "SYSTEM",
 		},
-		system: new(SystemFeatures),
+		defaults: defaults,
+		system:   new(SystemFeatures),
 	}
 	m.populateFromDefaults()
 	return m
@@ -28,9 +29,12 @@ func (m *SystemFeaturesReadModel) Reduce() error {
 	for _, event := range m.Events {
 		switch e := event.(type) {
 		case *feature_v2.ResetEvent:
-			return m.reduceReset()
+			m.reduceReset()
 		case *feature_v2.SetEvent[bool]:
-			return m.reduceBoolFeature(e)
+			err := m.reduceBoolFeature(e)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return m.ReadModel.Reduce()
@@ -51,31 +55,30 @@ func (m *SystemFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 		Builder().ResourceOwner(m.ResourceOwner)
 }
 
-func (m *SystemFeaturesReadModel) reduceReset() error {
+func (m *SystemFeaturesReadModel) reduceReset() {
 	if m.populateFromDefaults() {
-		return nil
+		return
 	}
 	m.system.LoginDefaultOrg = FeatureSource[bool]{}
 	m.system.TriggerIntrospectionProjections = FeatureSource[bool]{}
 	m.system.LegacyIntrospection = FeatureSource[bool]{}
-	return nil
 }
 
 func (m *SystemFeaturesReadModel) populateFromDefaults() bool {
-	if m.defaultFeatures == nil {
+	if m.defaults == nil {
 		return false
 	}
 	m.system.LoginDefaultOrg = FeatureSource[bool]{
 		Level: feature.LevelDefault,
-		Value: m.defaultFeatures.LoginDefaultOrg,
+		Value: m.defaults.LoginDefaultOrg,
 	}
 	m.system.TriggerIntrospectionProjections = FeatureSource[bool]{
 		Level: feature.LevelDefault,
-		Value: m.defaultFeatures.TriggerIntrospectionProjections,
+		Value: m.defaults.TriggerIntrospectionProjections,
 	}
 	m.system.LegacyIntrospection = FeatureSource[bool]{
 		Level: feature.LevelDefault,
-		Value: m.defaultFeatures.LegacyIntrospection,
+		Value: m.defaults.LegacyIntrospection,
 	}
 	return true
 }
