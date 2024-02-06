@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type InstanceFeatures struct {
@@ -28,10 +29,12 @@ func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures)
 	aggregate := feature_v2.NewAggregate(instanceID, instanceID)
 	cmds := make([]eventstore.Command, 0, len(feature.KeyValues())-1)
 
-	appendNonNilFeature(ctx, cmds, aggregate, f.LoginDefaultOrg, feature_v2.InstanceDefaultLoginInstanceEventType)
-	appendNonNilFeature(ctx, cmds, aggregate, f.TriggerIntrospectionProjections, feature_v2.InstanceTriggerIntrospectionProjectionsEventType)
-	appendNonNilFeature(ctx, cmds, aggregate, f.LegacyIntrospection, feature_v2.InstanceLegacyIntrospectionEventType)
-
+	cmds = appendNonNilFeature(ctx, cmds, aggregate, f.LoginDefaultOrg, feature_v2.InstanceDefaultLoginInstanceEventType)
+	cmds = appendNonNilFeature(ctx, cmds, aggregate, f.TriggerIntrospectionProjections, feature_v2.InstanceTriggerIntrospectionProjectionsEventType)
+	cmds = appendNonNilFeature(ctx, cmds, aggregate, f.LegacyIntrospection, feature_v2.InstanceLegacyIntrospectionEventType)
+	if len(cmds) == 0 {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Gie6U", "Errors.NoChangesFound")
+	}
 	events, err := c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
