@@ -300,6 +300,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 		code            string
 		resourceOwner   string
 		password        string
+		userAgentID     string
 		secretGenerator crypto.Generator
 	}
 	type res struct {
@@ -578,6 +579,83 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "valid code with password and userAgentID, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate)),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanInitialCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								time.Hour*1,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanInitializedCheckSucceededEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$password",
+							false,
+							"userAgent1",
+						),
+					),
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args: args{
+				ctx:             context.Background(),
+				userID:          "user1",
+				code:            "a",
+				resourceOwner:   "org1",
+				password:        "password",
+				userAgentID:     "userAgent1",
+				secretGenerator: GetMockSecretGenerator(t),
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -585,7 +663,7 @@ func TestCommandSide_VerifyInitCode(t *testing.T) {
 				eventstore:         tt.fields.eventstore,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
-			err := r.HumanVerifyInitCode(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.code, tt.args.password, tt.args.secretGenerator)
+			err := r.HumanVerifyInitCode(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.code, tt.args.password, tt.args.userAgentID, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
