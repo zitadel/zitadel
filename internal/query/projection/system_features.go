@@ -72,16 +72,16 @@ func reduceSystemSetFeature[T any](event eventstore.Event) (*handler.Statement, 
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-uPh8O", "reduce.wrong.event.type %T", event)
 	}
-	key, err := featureKeyFromEventType(e.EventType)
+	f, err := e.FeatureJSON()
 	if err != nil {
 		return nil, err
 	}
 	columns := []handler.Column{
-		handler.NewCol(SystemFeatureKeyCol, key),
+		handler.NewCol(SystemFeatureKeyCol, f.Key),
 		handler.NewCol(SystemFeatureCreationDateCol, handler.OnlySetValueOnInsert(SystemFeatureTable, e.CreationDate())),
 		handler.NewCol(SystemFeatureChangeDateCol, e.CreationDate()),
 		handler.NewCol(SystemFeatureSequenceCol, e.Sequence()),
-		handler.NewCol(SystemFeatureValueCol, e.Value),
+		handler.NewCol(SystemFeatureValueCol, f.Value),
 	}
 	return handler.NewUpsertStatement(e, columns[0:1], columns), nil
 }

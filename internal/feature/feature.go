@@ -1,13 +1,13 @@
 package feature
 
-//go:generate enumer -type Feature -transform snake
-type Feature int
+//go:generate enumer -type Key -transform snake -trimprefix Key
+type Key int
 
 const (
-	Unspecified Feature = iota
-	LoginDefaultOrg
-	TriggerIntrospectionProjections
-	LegacyIntrospection
+	KeyUnspecified Key = iota
+	KeyLoginDefaultOrg
+	KeyTriggerIntrospectionProjections
+	KeyLegacyIntrospection
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
@@ -15,6 +15,7 @@ type Level int
 
 const (
 	LevelUnspecified Level = iota
+	LevelDefault
 	LevelSystem
 	LevelInstance
 	LevelOrg

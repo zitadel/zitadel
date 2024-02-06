@@ -1,6 +1,8 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 type ObjectDetails struct {
 	Sequence      uint64

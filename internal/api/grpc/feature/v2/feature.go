@@ -30,7 +30,11 @@ func (s *Server) ResetSystemFeatures(ctx context.Context, req *feature.ResetSyst
 }
 
 func (s *Server) GetSystemFeatures(ctx context.Context, req *feature.GetSystemFeaturesRequest) (_ *feature.GetSystemFeaturesResponse, err error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSystemFeatures not implemented")
+	f, err := s.query.GetSystemFeatures(ctx, req.GetInheritance())
+	if err != nil {
+		return nil, err
+	}
+	return systemFeaturesToPb(f), nil
 }
 
 func (s *Server) SetInstanceFeatures(ctx context.Context, req *feature.SetInstanceFeaturesRequest) (_ *feature.SetInstanceFeaturesResponse, err error) {
@@ -54,8 +58,13 @@ func (s *Server) ResetInstanceFeatures(ctx context.Context, req *feature.ResetIn
 }
 
 func (s *Server) GetInstanceFeatures(ctx context.Context, req *feature.GetInstanceFeaturesRequest) (_ *feature.GetInstanceFeaturesResponse, err error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetInstanceFeatures not implemented")
+	f, err := s.query.GetInstanceFeatures(ctx, req.GetInheritance())
+	if err != nil {
+		return nil, err
+	}
+	return instanceFeaturesToPb(f), nil
 }
+
 func (s *Server) SetOrganizationFeatures(ctx context.Context, req *feature.SetOrganizationFeaturesRequest) (_ *feature.SetOrganizationFeaturesResponse, err error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetOrganizationFeatures not implemented")
 }

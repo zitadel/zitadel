@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _LevelName = "unspecifiedsysteminstanceorgprojectappuser"
+const _LevelName = "unspecifieddefaultsysteminstanceorgprojectappuser"
 
-var _LevelIndex = [...]uint8{0, 11, 17, 25, 28, 35, 38, 42}
+var _LevelIndex = [...]uint8{0, 11, 18, 24, 32, 35, 42, 45, 49}
 
-const _LevelLowerName = "unspecifiedsysteminstanceorgprojectappuser"
+const _LevelLowerName = "unspecifieddefaultsysteminstanceorgprojectappuser"
 
 func (i Level) String() string {
 	if i < 0 || i >= Level(len(_LevelIndex)-1) {
@@ -25,41 +25,45 @@ func (i Level) String() string {
 func _LevelNoOp() {
 	var x [1]struct{}
 	_ = x[LevelUnspecified-(0)]
-	_ = x[LevelSystem-(1)]
-	_ = x[LevelInstance-(2)]
-	_ = x[LevelOrg-(3)]
-	_ = x[LevelProject-(4)]
-	_ = x[LevelApp-(5)]
-	_ = x[LevelUser-(6)]
+	_ = x[LevelDefault-(1)]
+	_ = x[LevelSystem-(2)]
+	_ = x[LevelInstance-(3)]
+	_ = x[LevelOrg-(4)]
+	_ = x[LevelProject-(5)]
+	_ = x[LevelApp-(6)]
+	_ = x[LevelUser-(7)]
 }
 
-var _LevelValues = []Level{LevelUnspecified, LevelSystem, LevelInstance, LevelOrg, LevelProject, LevelApp, LevelUser}
+var _LevelValues = []Level{LevelUnspecified, LevelDefault, LevelSystem, LevelInstance, LevelOrg, LevelProject, LevelApp, LevelUser}
 
 var _LevelNameToValueMap = map[string]Level{
 	_LevelName[0:11]:       LevelUnspecified,
 	_LevelLowerName[0:11]:  LevelUnspecified,
-	_LevelName[11:17]:      LevelSystem,
-	_LevelLowerName[11:17]: LevelSystem,
-	_LevelName[17:25]:      LevelInstance,
-	_LevelLowerName[17:25]: LevelInstance,
-	_LevelName[25:28]:      LevelOrg,
-	_LevelLowerName[25:28]: LevelOrg,
-	_LevelName[28:35]:      LevelProject,
-	_LevelLowerName[28:35]: LevelProject,
-	_LevelName[35:38]:      LevelApp,
-	_LevelLowerName[35:38]: LevelApp,
-	_LevelName[38:42]:      LevelUser,
-	_LevelLowerName[38:42]: LevelUser,
+	_LevelName[11:18]:      LevelDefault,
+	_LevelLowerName[11:18]: LevelDefault,
+	_LevelName[18:24]:      LevelSystem,
+	_LevelLowerName[18:24]: LevelSystem,
+	_LevelName[24:32]:      LevelInstance,
+	_LevelLowerName[24:32]: LevelInstance,
+	_LevelName[32:35]:      LevelOrg,
+	_LevelLowerName[32:35]: LevelOrg,
+	_LevelName[35:42]:      LevelProject,
+	_LevelLowerName[35:42]: LevelProject,
+	_LevelName[42:45]:      LevelApp,
+	_LevelLowerName[42:45]: LevelApp,
+	_LevelName[45:49]:      LevelUser,
+	_LevelLowerName[45:49]: LevelUser,
 }
 
 var _LevelNames = []string{
 	_LevelName[0:11],
-	_LevelName[11:17],
-	_LevelName[17:25],
-	_LevelName[25:28],
-	_LevelName[28:35],
-	_LevelName[35:38],
-	_LevelName[38:42],
+	_LevelName[11:18],
+	_LevelName[18:24],
+	_LevelName[24:32],
+	_LevelName[32:35],
+	_LevelName[35:42],
+	_LevelName[42:45],
+	_LevelName[45:49],
 }
 
 // LevelString retrieves an enum value from the enum constants string name.

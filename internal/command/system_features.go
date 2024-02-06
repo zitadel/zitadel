@@ -17,7 +17,7 @@ type SystemFeatures struct {
 
 func (c *Commands) SetSystemFeatures(ctx context.Context, f *SystemFeatures) (*domain.ObjectDetails, error) {
 	aggregate := feature_v2.NewAggregate("SYSTEM", "SYSTEM")
-	cmds := make([]eventstore.Command, 0, len(feature.FeatureValues())-1)
+	cmds := make([]eventstore.Command, 0, len(feature.KeyValues())-1)
 
 	appendNonNilFeature(ctx, cmds, aggregate, f.LoginDefaultOrg, feature_v2.SystemDefaultLoginInstanceEventType)
 	appendNonNilFeature(ctx, cmds, aggregate, f.TriggerIntrospectionProjections, feature_v2.SystemTriggerIntrospectionProjectionsEventType)

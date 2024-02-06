@@ -26,7 +26,7 @@ func appendNonNilFeature[T any](ctx context.Context, cmds []eventstore.Command, 
 func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures) (*domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	aggregate := feature_v2.NewAggregate(instanceID, instanceID)
-	cmds := make([]eventstore.Command, 0, len(feature.FeatureValues())-1)
+	cmds := make([]eventstore.Command, 0, len(feature.KeyValues())-1)
 
 	appendNonNilFeature(ctx, cmds, aggregate, f.LoginDefaultOrg, feature_v2.InstanceDefaultLoginInstanceEventType)
 	appendNonNilFeature(ctx, cmds, aggregate, f.TriggerIntrospectionProjections, feature_v2.InstanceTriggerIntrospectionProjectionsEventType)

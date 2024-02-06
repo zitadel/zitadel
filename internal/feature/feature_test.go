@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestFeature(t *testing.T) {
+func TestKey(t *testing.T) {
 	tests := []string{
 		"unspecified",
 		"login_default_org",
@@ -16,7 +16,7 @@ func TestFeature(t *testing.T) {
 	}
 	for _, want := range tests {
 		t.Run(want, func(t *testing.T) {
-			feature, err := FeatureString(want)
+			feature, err := KeyString(want)
 			require.NoError(t, err)
 			assert.Equal(t, want, feature.String())
 		})

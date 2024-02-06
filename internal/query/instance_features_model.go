@@ -1,0 +1,99 @@
+package query
+
+import (
+	"context"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/feature"
+	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
+)
+
+type InstanceFeaturesReadModel struct {
+	*eventstore.ReadModel
+	system   *SystemFeatures
+	instance *InstanceFeatures
+}
+
+func NewInstanceFeaturesReadModel(ctx context.Context, system *SystemFeatures) *InstanceFeaturesReadModel {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	m := &InstanceFeaturesReadModel{
+		ReadModel: &eventstore.ReadModel{
+			AggregateID:   instanceID,
+			ResourceOwner: instanceID,
+		},
+		instance: new(InstanceFeatures),
+		system:   system,
+	}
+	m.populateFromSystem()
+	return m
+}
+
+func (m *InstanceFeaturesReadModel) Reduce() error {
+	for _, event := range m.Events {
+		switch e := event.(type) {
+		case *feature_v2.ResetEvent:
+			return m.reduceReset()
+		case *feature_v2.SetEvent[bool]:
+			return m.reduceBoolFeature(e)
+		}
+	}
+	return m.ReadModel.Reduce()
+}
+
+func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
+		AddQuery().
+		AggregateTypes(feature_v2.AggregateType).
+		AggregateIDs(m.AggregateID).
+		EventTypes(
+			feature_v2.InstanceResetEventType,
+			feature_v2.InstanceDefaultLoginInstanceEventType,
+			feature_v2.InstanceTriggerIntrospectionProjectionsEventType,
+			feature_v2.InstanceLegacyIntrospectionEventType,
+		).
+		Builder().ResourceOwner(m.ResourceOwner)
+}
+
+func (m *InstanceFeaturesReadModel) reduceReset() error {
+	if m.populateFromSystem() {
+		return nil
+	}
+	m.instance.LoginDefaultOrg = FeatureSource[bool]{}
+	m.instance.TriggerIntrospectionProjections = FeatureSource[bool]{}
+	m.instance.LegacyIntrospection = FeatureSource[bool]{}
+	return nil
+}
+
+func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
+	if m.system == nil {
+		return false
+	}
+	m.instance.LoginDefaultOrg = m.system.LoginDefaultOrg
+	m.instance.TriggerIntrospectionProjections = m.system.TriggerIntrospectionProjections
+	m.instance.LegacyIntrospection = m.system.LegacyIntrospection
+	return true
+}
+
+func (m *InstanceFeaturesReadModel) reduceBoolFeature(event *feature_v2.SetEvent[bool]) error {
+	level, key, err := event.FeatureInfo()
+	if err != nil {
+		return err
+	}
+	var dst *FeatureSource[bool]
+
+	switch key {
+	case feature.KeyLoginDefaultOrg:
+		dst = &m.instance.LoginDefaultOrg
+	case feature.KeyTriggerIntrospectionProjections:
+		dst = &m.instance.TriggerIntrospectionProjections
+	case feature.KeyLegacyIntrospection:
+		dst = &m.instance.LegacyIntrospection
+	}
+	*dst = FeatureSource[bool]{
+		Level: level,
+		Value: event.Value,
+	}
+	return nil
+}

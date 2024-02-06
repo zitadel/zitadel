@@ -6,6 +6,19 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta;feature";
 
+
+enum Source {
+  SOURCE_UNSPECIFIED = 0;
+  SOURCE_DEFAULT = 1;
+  SOURCE_SYSTEM = 2;
+  SOURCE_INSTANCE = 3;
+  SOURCE_ORGANIZATION = 4;
+  SOURCE_PROJECT = 5;     // reserved for future use
+  SOURCE_APP = 6;         // reserved for future use
+  SOURCE_USER = 7;
+}
+
+// FeatureFlag is a simple boolean Feature setting, without further payload.
 message FeatureFlag {
   bool enabled = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -14,20 +27,8 @@ message FeatureFlag {
     }
   ];
 
-  enum Source {
-    SOURCE_UNSPECIFIED = 0;
-    SOURCE_DEFAULT = 1;
-    SOURCE_SYSTEM = 2;
-    SOURCE_INSTANCE = 3;
-    SOURCE_ORGANIZATION = 4;
-    SOURCE_PROJECT = 5;     // reserved for future use
-    SOURCE_APP = 6;         // reserved for future use
-    SOURCE_USER = 7;
-  }
-
   Source source = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "false";
       description: "The source where the setting of the feature was defined. The source may be the resource itself or a resource owner through inheritance.";
     }
   ];
