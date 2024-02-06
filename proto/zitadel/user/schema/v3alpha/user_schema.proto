@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package zitadel.user.schema.v3alpha;
+
+import "zitadel/object/v2beta/object.proto";
+import "google/protobuf/struct.proto";
+import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha";
+
+message UserSchema {
+
+  // ID is the read-only unique identifier of the schema.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\""
+    }
+  ];
+  // Details provide some base information (such as the last change date) of the schema.
+  zitadel.object.v2beta.Details details = 2;
+  // Type is a human readable word describing the schema.
+  string type = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"employees\""
+    }
+  ];
+  // Current state of the schema.
+  State state = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"STATE_ACTIVE\""
+    }
+  ];
+  // Revision is a read only version of the schema, each update increases the revision.
+  uint32 revision = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2\""
+    }
+  ];
+  // JSON schema representation defining the user.
+  google.protobuf.Struct schema = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      // (--TODO: add example--)
+    }
+  ];
+  // Defines the possible types of authenticators.
+  //
+  // This allows creating different user types like human/machine without usage of actions to validate possible authenticators.
+  //
+  // Removal of an authenticator does not remove the authenticator on a user.
+  repeated AuthenticatorType possible_authenticators = 7  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      // (--TODO: add example--)
+    }
+  ];
+}
+
+enum FieldName {
+  FIELD_NAME_UNSPECIFIED = 0;
+  FIELD_NAME_TYPE = 1;
+  FIELD_NAME_STATE = 2;
+  FIELD_NAME_REVISION = 3;
+  FIELD_NAME_CREATION_DATE = 4;
+}
+
+message SearchQuery {
+  oneof query {
+    option (validate.required) = true;
+
+    // Limit the result to a specific schema type. .
+    TypeQuery type_query = 1;
+    // Limit the result to a specific state of the schema.
+    StateQuery state_query = 2;
+  }
+}
+
+message TypeQuery {
+  // Defines which type to query for.
+  string type = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200,
+      example: "\"employees\"";
+    }
+  ];
+  // Defines if the text comparison method used for the type query.
+  zitadel.object.v2beta.TextQueryMethod method = 2 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    }
+  ];
+}
+
+message StateQuery {
+  // Defines the state to query for.
+  State state = 1 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"STATE_ACTIVE\""
+    }
+  ];
+}
+
+enum State {
+  STATE_UNSPECIFIED = 0;
+  STATE_ACTIVE = 1;
+  STATE_INACTIVE = 2;
+  //(--TODO: do we need that?--)
+  STATE_DELETED = 3;
+}
+
+//(--TODO: add authenticator types--)
+enum AuthenticatorType {
+  AUTHENTICATOR_TYPE_UNSPECIFIED = 0;
+}

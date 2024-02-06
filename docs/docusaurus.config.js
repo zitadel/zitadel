@@ -287,7 +287,14 @@ module.exports = {
             sidebarOptions: {
               groupPathsBy: "tag",
             },
-          }
+          },
+          user_schema: {
+            specPath: ".artifacts/openapi/zitadel/user/schema/v3alpha/user_schema_service.swagger.json",
+            outputDir: "docs/apis/resources/user_schema_service_v3",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
         }
       },
     ],
