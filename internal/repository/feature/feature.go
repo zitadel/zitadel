@@ -1,3 +1,5 @@
+// Package feature implements the v1 feature repository.
+// DEPRECATED: use ./feature_v2 instead.
 package feature
 
 import (

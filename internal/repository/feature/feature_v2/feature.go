@@ -31,8 +31,8 @@ func resetEventTypeFromFeature(level feature.Level) eventstore.EventType {
 	return eventstore.EventType(strings.Join([]string{AggregateType, level.String(), resetSuffix}, "."))
 }
 
-func setEventTypeFromFeature(level feature.Level, feature feature.Key) eventstore.EventType {
-	return eventstore.EventType(strings.Join([]string{AggregateType, level.String(), feature.String(), setSuffix}, "."))
+func setEventTypeFromFeature(level feature.Level, key feature.Key) eventstore.EventType {
+	return eventstore.EventType(strings.Join([]string{AggregateType, level.String(), key.String(), setSuffix}, "."))
 }
 
 type ResetEvent struct {
