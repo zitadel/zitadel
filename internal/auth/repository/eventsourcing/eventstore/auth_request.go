@@ -7,7 +7,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	cache "github.com/zitadel/zitadel/internal/auth_request/repository"
@@ -49,8 +48,6 @@ type AuthRequestRepo struct {
 	ProjectProvider           projectProvider
 	ApplicationProvider       applicationProvider
 	CustomTextProvider        customTextProvider
-
-	FeatureCheck feature.Checker
 
 	IdGenerator id.Generator
 }
@@ -662,11 +659,13 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 	}
 	if orgID == "" {
 		orgID = authz.GetInstance(ctx).DefaultOrganisationID()
-		f, err := repo.FeatureCheck.CheckInstanceBooleanFeature(ctx, domain.FeatureLoginDefaultOrg)
-		logging.WithFields("authReq", request.ID).OnError(err).Warnf("could not check feature %s", domain.FeatureLoginDefaultOrg)
-		if !f.Boolean {
-			orgID = authz.GetInstance(ctx).InstanceID()
-		}
+		/*
+			f, err := repo.FeatureCheck.CheckInstanceBooleanFeature(ctx, domain.FeatureLoginDefaultOrg)
+			logging.WithFields("authReq", request.ID).OnError(err).Warnf("could not check feature %s", domain.FeatureLoginDefaultOrg)
+			if !f.Boolean {
+				orgID = authz.GetInstance(ctx).InstanceID()
+			}
+		*/
 	}
 
 	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)

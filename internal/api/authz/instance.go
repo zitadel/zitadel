@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/feature"
 )
 
 var (
@@ -23,6 +25,7 @@ type Instance interface {
 	SecurityPolicyAllowedOrigins() []string
 	Block() *bool
 	AuditLogRetention() *time.Duration
+	Features() feature.Features
 }
 
 type InstanceVerifier interface {
@@ -81,6 +84,10 @@ func (i *instance) DefaultOrganisationID() string {
 
 func (i *instance) SecurityPolicyAllowedOrigins() []string {
 	return nil
+}
+
+func (i *instance) Features() feature.Features {
+	return feature.Features{}
 }
 
 func GetInstance(ctx context.Context) Instance {
