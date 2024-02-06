@@ -41,6 +41,34 @@ func (s *Server) SetEmail(ctx context.Context, req *user.SetEmailRequest) (resp 
 	}, nil
 }
 
+func (s *Server) ResendEmailCode(ctx context.Context, req *user.ResendEmailCodeRequest) (resp *user.ResendEmailCodeResponse, err error) {
+	var resourceOwner string // TODO: check if still needed
+	var email *domain.Email
+
+	switch v := req.GetVerification().(type) {
+	case *user.ResendEmailCodeRequest_SendCode:
+		email, err = s.command.ResetUserEmailCodeURLTemplate(ctx, req.GetUserId(), resourceOwner, s.userCodeAlg, v.SendCode.GetUrlTemplate())
+	case *user.ResendEmailCodeRequest_ReturnCode:
+		email, err = s.command.ResetUserEmailReturnCode(ctx, req.GetUserId(), resourceOwner, s.userCodeAlg)
+	case nil:
+		email, err = s.command.ResetUserEmailCode(ctx, req.GetUserId(), resourceOwner, s.userCodeAlg)
+	default:
+		err = zerrors.ThrowUnimplementedf(nil, "USERv2-faj0l0nj5x", "verification oneOf %T in method ResendEmailCode not implemented", v)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return &user.ResendEmailCodeResponse{
+		Details: &object.Details{
+			Sequence:      email.Sequence,
+			ChangeDate:    timestamppb.New(email.ChangeDate),
+			ResourceOwner: email.ResourceOwner,
+		},
+		VerificationCode: email.PlainCode,
+	}, nil
+}
+
 func (s *Server) VerifyEmail(ctx context.Context, req *user.VerifyEmailRequest) (*user.VerifyEmailResponse, error) {
 	details, err := s.command.VerifyUserEmail(ctx,
 		req.GetUserId(),

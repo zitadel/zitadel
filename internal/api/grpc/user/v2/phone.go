@@ -41,6 +41,34 @@ func (s *Server) SetPhone(ctx context.Context, req *user.SetPhoneRequest) (resp 
 	}, nil
 }
 
+func (s *Server) ResendPhoneCode(ctx context.Context, req *user.ResendPhoneCodeRequest) (resp *user.ResendPhoneCodeResponse, err error) {
+	var resourceOwner string // TODO: check if still needed
+	var phone *domain.Phone
+
+	switch v := req.GetVerification().(type) {
+	case *user.ResendPhoneCodeRequest_SendCode:
+		phone, err = s.command.ResendUserPhoneCode(ctx, req.GetUserId(), resourceOwner, s.userCodeAlg)
+	case *user.ResendPhoneCodeRequest_ReturnCode:
+		phone, err = s.command.ResendUserPhoneCodeReturnCode(ctx, req.GetUserId(), resourceOwner, s.userCodeAlg)
+	case nil:
+		phone, err = s.command.ResendUserPhoneCode(ctx, req.GetUserId(), resourceOwner, s.userCodeAlg)
+	default:
+		err = zerrors.ThrowUnimplementedf(nil, "USERv2-ResendUserPhoneCode", "verification oneOf %T in method SetPhone not implemented", v)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return &user.ResendPhoneCodeResponse{
+		Details: &object.Details{
+			Sequence:      phone.Sequence,
+			ChangeDate:    timestamppb.New(phone.ChangeDate),
+			ResourceOwner: phone.ResourceOwner,
+		},
+		VerificationCode: phone.PlainCode,
+	}, nil
+}
+
 func (s *Server) VerifyPhone(ctx context.Context, req *user.VerifyPhoneRequest) (*user.VerifyPhoneResponse, error) {
 	details, err := s.command.VerifyUserPhone(ctx,
 		req.GetUserId(),
