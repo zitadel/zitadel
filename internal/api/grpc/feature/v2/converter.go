@@ -68,6 +68,6 @@ func featureLevelToSourcePb(level feature.Level) feature_pb.Source {
 	case feature.LevelUser:
 		return feature_pb.Source_SOURCE_USER
 	default:
-		return feature_pb.Source_SOURCE_UNSPECIFIED
+		return feature_pb.Source(level)
 	}
 }
