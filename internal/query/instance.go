@@ -198,7 +198,7 @@ func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Inst
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	domain := strings.Split(host, ":")[0] //remove possible port
+	domain := strings.Split(host, ":")[0] // remove possible port
 	instance, scan := scanAuthzInstance(q.defaultFeatures, host, domain)
 	err = q.client.QueryRowContext(ctx, scan, instanceByDomainQuery, domain)
 	logging.OnError(err).WithField("host", host).WithField("domain", domain).Warn("instance by host")

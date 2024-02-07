@@ -6,6 +6,7 @@ import (
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -13,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	feature_pb "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func Test_systemFeaturesToCommand(t *testing.T) {

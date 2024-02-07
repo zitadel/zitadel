@@ -1,12 +1,13 @@
 package feature
 
 import (
+	"google.golang.org/grpc"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
 	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
-	"google.golang.org/grpc"
 )
 
 type Server struct {

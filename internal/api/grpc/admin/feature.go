@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/muhlemmer/gu"
+
 	object_pb "github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
