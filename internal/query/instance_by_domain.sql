@@ -1,6 +1,3 @@
---deallocate q;
---prepare q(text) as
-
 with domain as (
 	select instance_id from projections.instance_domains
 	where domain = $1
@@ -31,5 +28,3 @@ join projections.instances i on i.id = d.instance_id
 left join projections.security_policies s on i.id = s.instance_id
 left join projections.limits l on i.id = l.instance_id
 left join features f on i.id = f.instance_id;
-
---execute q('localhost');

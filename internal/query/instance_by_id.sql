@@ -1,6 +1,3 @@
--- deallocate q;
--- prepare q(text) as
-
 with features as (
 	select instance_id, json_object_agg(
 		coalesce(i.key, s.key),
@@ -28,5 +25,3 @@ left join projections.security_policies s on i.id = s.instance_id
 left join projections.limits l on i.id = l.instance_id
 left join features f on i.id = f.instance_id
 where i.id = $1;
-
---execute q('230690539048009730');
