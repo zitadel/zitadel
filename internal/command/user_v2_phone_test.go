@@ -391,19 +391,6 @@ func TestCommands_ResendUserPhoneCode(t *testing.T) {
 								return event
 							}(),
 						),
-						eventFromEventPusher(
-							user.NewHumanPhoneCodeAddedEventV2(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("a"),
-								},
-								time.Hour*1,
-								true,
-							),
-						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -412,7 +399,7 @@ func TestCommands_ResendUserPhoneCode(t *testing.T) {
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
-			wantErr: zerrors.ThrowInvalidArgument(nil, "PHONE-5xrra88eq8", "Errors.User.Code.Empty"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "PHONE-5xrra88eq8", "Errors.User.Code.Empty"),
 		},
 	}
 	for _, tt := range tests {
@@ -527,7 +514,7 @@ func TestCommands_ResendUserPhoneCodeReturnCode(t *testing.T) {
 				userID:        "user1",
 				resourceOwner: "org1",
 			},
-			wantErr: zerrors.ThrowInvalidArgument(nil, "PHONE-5xrra88eq8", "Errors.User.Code.Empty"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "PHONE-5xrra88eq8", "Errors.User.Code.Empty"),
 		},
 	}
 	for _, tt := range tests {
