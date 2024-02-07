@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "实例",
+    "INSTANCE": "默认设置",
     "DASHBOARD": "首页",
     "PERSONAL_INFO": "个人信息",
     "DOCUMENTATION": "文档",
@@ -1023,6 +1023,7 @@
       "DESCRIPTION": "这些设置将扩展或覆盖您的实例设置。"
     },
     "LIST": {
+      "ORGS": "组织",
       "LANGUAGES": "语言",
       "LOGIN": "登录行为和安全",
       "LOCKOUT": "安全锁策略",
@@ -1040,15 +1041,20 @@
       "PRIVACYPOLICY": "隐私政策",
       "OIDC": "OIDC 令牌有效期和过期时间",
       "SECRETS": "验证码外观",
-      "SECURITY": "安全设置"
+      "SECURITY": "安全设置",
+      "EVENTS": "活动",
+      "FAILEDEVENTS": "失败事件",
+      "VIEWS": "数据表"
     },
     "GROUPS": {
+      "GENERAL": "通用",
       "NOTIFICATIONS": "通知",
       "LOGIN": "登录和访问",
       "DOMAIN": "域名",
       "TEXTS": "文本和语言",
       "APPEARANCE": "外观",
-      "OTHER": "其他"
+      "OTHER": "其他",
+      "STORAGE": "贮存"
     }
   },
   "SETTING": {
