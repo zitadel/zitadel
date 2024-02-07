@@ -3,7 +3,7 @@ with features as (
 		coalesce(i.key, s.key),
 		coalesce(i.value, s.value)
 	) features
-	from (select $1 instance_id) x
+	from (select $1::text instance_id) x
 	cross join projections.system_features s
 	full outer join projections.instance_features i using (key, instance_id)
 	group by instance_id
