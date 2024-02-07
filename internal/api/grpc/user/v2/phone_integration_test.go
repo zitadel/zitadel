@@ -135,26 +135,14 @@ func TestServer_ResendPhoneCode(t *testing.T) {
 			req: &user.ResendPhoneCodeRequest{
 				UserId: "xxx",
 			},
-			want: &user.ResendPhoneCodeResponse{
-				Details: &object.Details{
-					Sequence:      1,
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
-				},
-			},
+			wantErr: true,
 		},
 		{
 			name: "user not existing",
 			req: &user.ResendPhoneCodeRequest{
 				UserId: verifiedUserID,
 			},
-			want: &user.ResendPhoneCodeResponse{
-				Details: &object.Details{
-					Sequence:      1,
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
-				},
-			},
+			wantErr: true,
 		},
 		{
 			name: "resend code",
