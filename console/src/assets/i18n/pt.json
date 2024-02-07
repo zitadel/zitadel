@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instância",
+    "INSTANCE": "Configurações padrão",
     "DASHBOARD": "Início",
     "PERSONAL_INFO": "Informações Pessoais",
     "DOCUMENTATION": "Documentação",
@@ -1025,6 +1025,7 @@
       "DESCRIPTION": "Essas configurações estendem e sobrescrevem as configurações da sua instância."
     },
     "LIST": {
+      "ORGS": "Organizações",
       "LANGUAGES": "Idiomas",
       "LOGIN": "Comportamento de Login e Segurança",
       "LOCKOUT": "Bloqueio",
@@ -1042,15 +1043,20 @@
       "PRIVACYPOLICY": "Política de Privacidade",
       "OIDC": "Tempo de Vida e Expiração do Token OIDC",
       "SECRETS": "Aparência de Segredo",
-      "SECURITY": "Configurações de Segurança"
+      "SECURITY": "Configurações de Segurança",
+      "EVENTS": "Eventos",
+      "FAILEDEVENTS": "Eventos com Falha",
+      "VIEWS": "Visualizações"
     },
     "GROUPS": {
+      "GENERAL": "Geral",
       "NOTIFICATIONS": "Notificações",
       "LOGIN": "Login e Acesso",
       "DOMAIN": "Domínio",
       "TEXTS": "Textos e Idiomas",
       "APPEARANCE": "Aparência",
-      "OTHER": "Outro"
+      "OTHER": "Outro",
+      "STORAGE": "armazenar"
     }
   },
   "SETTING": {
