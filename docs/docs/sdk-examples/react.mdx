@@ -1,0 +1,72 @@
+---
+title: React
+sidebar_label: React
+---
+
+<table>
+  <tr>
+    <td width="100px">
+      <img width="100px" src="/docs/img/tech/react.png" alt="react" />
+    </td>
+    <td>
+      <a href="https://react.dev/" target="_blank">
+        React
+      </a>{" "}
+      is a declarative, component-based JavaScript library for building user
+      interfaces. Integrate authentication to your React application easily by
+      using the{" "}
+      <a href="https://github.com/zitadel/zitadel-react" target="_blank">
+        zitadel-react
+      </a>{" "}
+      SDK.
+    </td>
+  </tr>
+</table>
+
+### Resources
+
+- [SDK with Example App](https://github.com/zitadel/zitadel-react)
+- [Step-By-Step Guide](/docs/examples/login/react)
+
+### React SDK
+
+The [zitadel-react](https://github.com/zitadel/zitadel-react) SDK is a wrapper around the [oidc-client-ts](https://www.npmjs.com/package/oidc-client-ts) and abstracts the handling of specific configurations for ZITADEL.
+
+The following features are covered by the SDK:
+
+- Authenticate your user with ZITADEL using OIDC
+- Requesting ZITADEL userinfo endpoint to get user data
+- Refresh Token
+- Requesting User Roles from userinfo
+- Check if user has specified role
+- Logout
+
+The goal is to extend the SDK over the time with the following features:
+
+- Integrate ZITADEL APIs to read and manage resources
+- Build your own login UI using our Session API
+
+### Example Application
+
+The [zitadel-react](https://github.com/zitadel/zitadel-react) repository also includes an Example Application ready to start and show how a React application looks like with integrated ZITADEL Login.
+
+What does the Example include:
+
+- Home Page with Login Button
+- Authenticating user with OIDC PKCE Flow
+- Public Page: Accessible without authentication
+- Private Page: Shows user information of authenticated user, only accessible after login
+- Administrator Page: Only accessible after login and with specific administrator role for the application
+- Logout
+
+### Step-By-Step Guide
+
+The [Step-By-Step Guide](/docs/examples/login/react) leads you through the whole process from configuring the right application in ZITADEL to a ready application with integrated Login.
+
+After completing the Step-By-Step Guide you will have:
+
+1. Example Web Application with integrated ZITADEL Login
+2. Example page accessible by authenticated user showing retrieved user information
+3. Example administrator page accessible by user with administrator role
+4. Logout
+5. Correct setup for your application in ZITADEL
