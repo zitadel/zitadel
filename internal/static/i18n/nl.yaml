@@ -128,6 +128,7 @@ Errors:
       NotFound: Code niet gevonden
       Expired: Code is verlopen
       GeneratorAlgNotSupported: Generator algoritme wordt niet ondersteund
+      Invalid: Code is ongeldig
     Password:
       NotFound: Wachtwoord niet gevonden
       Empty: Wachtwoord is leeg

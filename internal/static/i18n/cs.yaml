@@ -127,6 +127,7 @@ Errors:
       NotFound: Kód nenalezen
       Expired: Kód vypršel
       GeneratorAlgNotSupported: Nepodporovaný algoritmus generátoru
+      Invalid: Kód je neplatný
     Password:
       NotFound: Heslo nenalezeno
       Empty: Heslo je prázdné
