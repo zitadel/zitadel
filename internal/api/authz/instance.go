@@ -99,6 +99,10 @@ func GetInstance(ctx context.Context) Instance {
 	return instance
 }
 
+func GetFeatures(ctx context.Context) feature.Features {
+	return GetInstance(ctx).Features()
+}
+
 func WithInstance(ctx context.Context, instance Instance) context.Context {
 	return context.WithValue(ctx, instanceKey, instance)
 }
