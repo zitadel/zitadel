@@ -22,15 +22,6 @@ func DomainPolicyToModel(policy *DomainPolicy) *iam_model.DomainPolicy {
 	}
 }
 
-func (p *DomainPolicy) Changes(changed *DomainPolicy) map[string]interface{} {
-	changes := make(map[string]interface{}, 1)
-
-	if p.UserLoginMustBeDomain != changed.UserLoginMustBeDomain {
-		changes["userLoginMustBeDomain"] = changed.UserLoginMustBeDomain
-	}
-	return changes
-}
-
 func (p *DomainPolicy) SetData(event eventstore.Event) error {
 	err := event.Unmarshal(p)
 	if err != nil {

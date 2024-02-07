@@ -42,7 +42,10 @@ const (
 
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 	client, err := o.query.GetOIDCClientByID(ctx, id, false)
 	if err != nil {
 		return nil, err
@@ -59,7 +62,10 @@ func (o *OPStorage) GetKeyByIDAndClientID(ctx context.Context, keyID, userID str
 
 func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer string) (_ *jose.JSONWebKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 	publicKeyData, err := o.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, keyID, issuer, false)
 	if err != nil {
 		return nil, err
@@ -75,7 +81,12 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 	}, nil
 }
 
-func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string, scopes []string) ([]string, error) {
+func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string, scopes []string) (_ []string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 	user, err := o.query.GetUserByID(ctx, true, subject)
 	if err != nil {
 		return nil, err
@@ -85,7 +96,10 @@ func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string
 
 func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 	ctx = authz.SetCtxData(ctx, authz.CtxData{
 		UserID: oidcCtx,
 		OrgID:  oidcCtx,
@@ -102,7 +116,10 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 
 func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo *oidc.UserInfo, tokenID, subject, origin string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
 		token, err := o.query.ActiveAccessTokenByToken(ctx, tokenID)
@@ -129,7 +146,10 @@ func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo *oidc.Use
 
 func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo *oidc.UserInfo, userID, applicationID string, scopes []string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 	if applicationID != "" {
 		app, err := o.query.AppByOIDCClientID(ctx, applicationID)
 		if err != nil {
@@ -159,7 +179,10 @@ func (o *OPStorage) SetUserinfoFromRequest(ctx context.Context, userinfo *oidc.U
 
 func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection *oidc.IntrospectionResponse, tokenID, subject, clientID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
 		token, err := o.query.ActiveAccessTokenByToken(ctx, tokenID)
@@ -196,7 +219,12 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 		token.CreationDate, token.Expiration)
 }
 
-func (o *OPStorage) ClientCredentialsTokenRequest(ctx context.Context, clientID string, scope []string) (op.TokenRequest, error) {
+func (o *OPStorage) ClientCredentialsTokenRequest(ctx context.Context, clientID string, scope []string) (_ op.TokenRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 	user, err := o.query.GetUserByLoginName(ctx, false, clientID)
 	if err != nil {
 		return nil, err
@@ -463,6 +491,24 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, user *query.User, userGra
 					return object.UserGrantsFromQuery(c, userGrants)
 				}),
 			),
+			actions.SetFields("org",
+				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
+					return func(goja.FunctionCall) goja.Value {
+						metadata, err := o.query.SearchOrgMetadata(
+							ctx,
+							true,
+							user.ResourceOwner,
+							&query.OrgMetadataSearchQueries{},
+							false,
+						)
+						if err != nil {
+							logging.WithError(err).Info("unable to get org metadata in action")
+							panic(err)
+						}
+						return object.OrgMetadataListFromQuery(c, metadata)
+					}
+				}),
+			),
 		),
 	)
 
@@ -545,6 +591,12 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, user *query.User, userGra
 }
 
 func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clientID string, scopes []string) (claims map[string]interface{}, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
+
 	roles := make([]string, 0)
 	var allRoles bool
 	for _, scope := range scopes {
@@ -656,6 +708,24 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userG
 					return object.UserGrantsFromQuery(c, userGrants)
 				}),
 			),
+			actions.SetFields("org",
+				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
+					return func(goja.FunctionCall) goja.Value {
+						metadata, err := o.query.SearchOrgMetadata(
+							ctx,
+							true,
+							user.ResourceOwner,
+							&query.OrgMetadataSearchQueries{},
+							false,
+						)
+						if err != nil {
+							logging.WithError(err).Info("unable to get org metadata in action")
+							panic(err)
+						}
+						return object.OrgMetadataListFromQuery(c, metadata)
+					}
+				}),
+			),
 		),
 	)
 
@@ -752,7 +822,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	queries = append(queries, userIDQuery)
 	grants, err := o.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: queries,
-	}, true, false)
+	}, true)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -903,7 +973,10 @@ func userinfoClaims(userInfo *oidc.UserInfo) func(c *actions.FieldConfig) interf
 
 func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCredentials]) (_ op.Client, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	if oidc.GrantType(r.Form.Get("grant_type")) == oidc.GrantTypeClientCredentials {
 		return s.clientCredentialsAuth(ctx, r.Data.ClientID, r.Data.ClientSecret)

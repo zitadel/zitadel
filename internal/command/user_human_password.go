@@ -31,10 +31,10 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password stri
 	if err = c.checkPermission(ctx, domain.PermissionUserWrite, wm.ResourceOwner, userID); err != nil {
 		return nil, err
 	}
-	return c.setPassword(ctx, wm, password, oneTime)
+	return c.setPassword(ctx, wm, password, "", oneTime)
 }
 
-func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID, code, password string) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID, code, password, userAgentID string) (objectDetails *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -58,13 +58,13 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID,
 		return nil, err
 	}
 
-	return c.setPassword(ctx, wm, password, false)
+	return c.setPassword(ctx, wm, password, userAgentID, false)
 }
 
 // setEncodedPassword add change event from already encoded password to HumanPasswordWriteModel and return the necessary object details for response
-func (c *Commands) setEncodedPassword(ctx context.Context, wm *HumanPasswordWriteModel, password string, changeRequired bool) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) setEncodedPassword(ctx context.Context, wm *HumanPasswordWriteModel, password, userAgentID string, changeRequired bool) (objectDetails *domain.ObjectDetails, err error) {
 	agg := user.NewAggregate(wm.AggregateID, wm.ResourceOwner)
-	command, err := c.setPasswordCommand(ctx, &agg.Aggregate, wm.UserState, password, changeRequired, true)
+	command, err := c.setPasswordCommand(ctx, &agg.Aggregate, wm.UserState, password, userAgentID, changeRequired, true)
 	if err != nil {
 		return nil, err
 	}
@@ -76,9 +76,9 @@ func (c *Commands) setEncodedPassword(ctx context.Context, wm *HumanPasswordWrit
 }
 
 // setPassword add change event to HumanPasswordWriteModel and return the necessary object details for response
-func (c *Commands) setPassword(ctx context.Context, wm *HumanPasswordWriteModel, password string, changeRequired bool) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) setPassword(ctx context.Context, wm *HumanPasswordWriteModel, password, userAgentID string, changeRequired bool) (objectDetails *domain.ObjectDetails, err error) {
 	agg := user.NewAggregate(wm.AggregateID, wm.ResourceOwner)
-	command, err := c.setPasswordCommand(ctx, &agg.Aggregate, wm.UserState, password, changeRequired, false)
+	command, err := c.setPasswordCommand(ctx, &agg.Aggregate, wm.UserState, password, userAgentID, changeRequired, false)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (c *Commands) setPassword(ctx context.Context, wm *HumanPasswordWriteModel,
 	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
 
-func (c *Commands) setPasswordCommand(ctx context.Context, agg *eventstore.Aggregate, userState domain.UserState, password string, changeRequired, encoded bool) (_ eventstore.Command, err error) {
+func (c *Commands) setPasswordCommand(ctx context.Context, agg *eventstore.Aggregate, userState domain.UserState, password, userAgentID string, changeRequired, encoded bool) (_ eventstore.Command, err error) {
 	if err = c.canUpdatePassword(ctx, password, agg.ResourceOwner, userState); err != nil {
 		return nil, err
 	}
@@ -101,13 +101,13 @@ func (c *Commands) setPasswordCommand(ctx context.Context, agg *eventstore.Aggre
 		if err = convertPasswapErr(err); err != nil {
 			return nil, err
 		}
-		return user.NewHumanPasswordChangedEvent(ctx, agg, encodedPassword, changeRequired, ""), nil
+		return user.NewHumanPasswordChangedEvent(ctx, agg, encodedPassword, changeRequired, userAgentID), nil
 	}
-	return user.NewHumanPasswordChangedEvent(ctx, agg, password, changeRequired, ""), nil
+	return user.NewHumanPasswordChangedEvent(ctx, agg, password, changeRequired, userAgentID), nil
 }
 
 // ChangePassword change password of existing user
-func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword string) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword, userAgentID string) (objectDetails *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -126,7 +126,7 @@ func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPasswor
 	if err != nil {
 		return nil, err
 	}
-	return c.setEncodedPassword(ctx, wm, newPasswordHash, false)
+	return c.setEncodedPassword(ctx, wm, newPasswordHash, userAgentID, false)
 }
 
 // verifyAndUpdatePassword verify if the old password is correct with the encoded hash and

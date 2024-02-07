@@ -1,17 +1,5 @@
-with existing as (
-    SELECT
-        instance_id
-        , aggregate_type
-        , aggregate_id
-        , MAX("sequence") "sequence"
-    FROM 
-        eventstore.events2 existing
-    WHERE 
-        %s
-    GROUP BY 
-        instance_id
-        , aggregate_type
-        , aggregate_id
+WITH existing AS (
+    %s
 ) SELECT 
     e.instance_id
     , e.owner
@@ -23,8 +11,8 @@ FROM
 JOIN 
     existing 
 ON 
-        e.instance_id = existing.instance_id
-        AND e.aggregate_type = existing.aggregate_type
-        AND e.aggregate_id = existing.aggregate_id
-        AND e.sequence = existing.sequence
+    e.instance_id = existing.instance_id
+    AND e.aggregate_type = existing.aggregate_type
+    AND e.aggregate_id = existing.aggregate_id
+    AND e.sequence = existing.sequence
 FOR UPDATE;

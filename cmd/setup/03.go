@@ -41,28 +41,17 @@ type FirstInstance struct {
 	domain            string
 }
 
-func (mig *FirstInstance) Execute(ctx context.Context) error {
-	keyStorage, err := crypto_db.NewKeyStorage(mig.db, mig.masterKey)
+func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error {
+	keyStorage, err := mig.verifyEncryptionKeys(ctx)
 	if err != nil {
-		return fmt.Errorf("cannot start key storage: %w", err)
-	}
-	if err = verifyKey(mig.userEncryptionKey, keyStorage); err != nil {
 		return err
 	}
 	userAlg, err := crypto.NewAESCrypto(mig.userEncryptionKey, keyStorage)
 	if err != nil {
 		return err
 	}
-
-	if err = verifyKey(mig.smtpEncryptionKey, keyStorage); err != nil {
-		return err
-	}
 	smtpEncryption, err := crypto.NewAESCrypto(mig.smtpEncryptionKey, keyStorage)
 	if err != nil {
-		return err
-	}
-
-	if err = verifyKey(mig.oidcEncryptionKey, keyStorage); err != nil {
 		return err
 	}
 	oidcEncryption, err := crypto.NewAESCrypto(mig.oidcEncryptionKey, keyStorage)
@@ -132,7 +121,27 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 			(mig.instanceSetup.Org.Machine.MachineKey != nil && key == nil)) {
 		return err
 	}
+	return mig.outputMachineAuthentication(key, token)
+}
 
+func (mig *FirstInstance) verifyEncryptionKeys(ctx context.Context) (*crypto_db.Database, error) {
+	keyStorage, err := crypto_db.NewKeyStorage(mig.db, mig.masterKey)
+	if err != nil {
+		return nil, fmt.Errorf("cannot start key storage: %w", err)
+	}
+	if err = verifyKey(ctx, mig.userEncryptionKey, keyStorage); err != nil {
+		return nil, err
+	}
+	if err = verifyKey(ctx, mig.smtpEncryptionKey, keyStorage); err != nil {
+		return nil, err
+	}
+	if err = verifyKey(ctx, mig.oidcEncryptionKey, keyStorage); err != nil {
+		return nil, err
+	}
+	return keyStorage, nil
+}
+
+func (mig *FirstInstance) outputMachineAuthentication(key *command.MachineKey, token string) error {
 	if key != nil {
 		keyDetails, err := key.Detail()
 		if err != nil {
@@ -167,7 +176,7 @@ func (mig *FirstInstance) String() string {
 	return "03_default_instance"
 }
 
-func verifyKey(key *crypto.KeyConfig, storage crypto.KeyStorage) (err error) {
+func verifyKey(ctx context.Context, key *crypto.KeyConfig, storage crypto.KeyStorage) (err error) {
 	_, err = crypto.LoadKey(key.EncryptionKeyID, storage)
 	if err == nil {
 		return nil
@@ -176,5 +185,5 @@ func verifyKey(key *crypto.KeyConfig, storage crypto.KeyStorage) (err error) {
 	if err != nil {
 		return err
 	}
-	return storage.CreateKeys(k)
+	return storage.CreateKeys(ctx, k)
 }

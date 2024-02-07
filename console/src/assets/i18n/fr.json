@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instance",
+    "INSTANCE": "paramètres par défaut",
     "DASHBOARD": "Accueil",
     "PERSONAL_INFO": "Informations personnelles",
     "DOCUMENTATION": "Documentation",
@@ -227,6 +227,7 @@
     "EMAIL": "Courriel",
     "USERNAME": "Nom de l'utilisateur",
     "ORGNAME": "Nom de l'organisation",
+    "PRIMARYDOMAIN": "Domaine principal",
     "PROJECTNAME": "Nom du projet",
     "RESOURCEOWNER": "Propriétaire des ressources",
     "METHODS": {
@@ -267,8 +268,8 @@
       "DESCRIPTION": "Cliquez sur le bouton ci-dessous pour vous reconnecter."
     },
     "EXHAUSTED": {
-      "TITLE": "Ton quota de demandes authentifiées est épuisé.",
-      "DESCRIPTION": "Supprimez ou augmentez la limite de cette instance ZITADEL."
+      "TITLE": "Votre instance est bloquée.",
+      "DESCRIPTION": "Demandez à votre administrateur d'instance ZITADEL de mettre à jour l'abonnement."
     },
     "INVALID_FORMAT": "Le format n'est pas valide",
     "NOTANEMAIL": "La valeur donnée n'est pas une adresse e-mail",
@@ -1022,6 +1023,7 @@
       "DESCRIPTION": "Ces paramètres étendent et remplacent les paramètres de votre instance."
     },
     "LIST": {
+      "ORGS": "Organisations",
       "LANGUAGES": "Langues",
       "LOGIN": "Comportement de connexion et sécurité",
       "LOCKOUT": "Verrouillage",
@@ -1039,15 +1041,20 @@
       "PRIVACYPOLICY": "Politique de confidentialité",
       "OIDC": "Durée de vie et expiration des jetons OIDC",
       "SECRETS": "Apparence secrète",
-      "SECURITY": "Paramètres de sécurité"
+      "SECURITY": "Paramètres de sécurité",
+      "EVENTS": "Événements",
+      "FAILEDEVENTS": "Événements échoués",
+      "VIEWS": "Vues"
     },
     "GROUPS": {
+      "GENERAL": "Général",
       "NOTIFICATIONS": "Notifications",
       "LOGIN": "Connexion et accès",
       "DOMAIN": "Domaine",
       "TEXTS": "Textes et langues",
       "APPEARANCE": "Apparence",
-      "OTHER": "Autres"
+      "OTHER": "Autres",
+      "STORAGE": "Stockage"
     }
   },
   "SETTING": {
@@ -1250,6 +1257,7 @@
       "DESCRIPTIONCREATEMGMT": "Les utilisateurs peuvent choisir parmi les fournisseurs d'identité disponibles ci-dessous. Note",
       "ADVANCED": "Avancé",
       "LIFETIMEDURATIONS": "Durée de vie des connexions",
+      "LIFETIME_INVALID": "Le formulaire contient des valeurs non valides.",
       "SAVED": "Enregistré avec succès !"
     },
     "PRIVACY_POLICY": {
@@ -2236,7 +2244,8 @@
     "TOAST": {
       "UPDATED": "Autorisation mise à jour.",
       "REMOVED": "Autorisation supprimée",
-      "BULKREMOVED": "Autorisations supprimées."
+      "BULKREMOVED": "Autorisations supprimées.",
+      "CANTSHOWINFO": "Vous ne pouvez pas visiter le profil de cet utilisateur car vous n'êtes pas membre de l'organisation à laquelle appartient cet utilisateur."
     },
     "DIALOG": {
       "DELETE_TITLE": "Supprimer une autorisation",
