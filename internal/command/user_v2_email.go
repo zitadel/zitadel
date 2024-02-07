@@ -85,7 +85,7 @@ func (c *Commands) changeUserEmailWithCode(ctx context.Context, userID, resource
 }
 
 func (c *Commands) resendUserEmailCode(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm, returnCode bool, urlTmpl string) (*domain.Email, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode)
+	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}

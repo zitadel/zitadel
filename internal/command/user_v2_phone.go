@@ -64,7 +64,7 @@ func (c *Commands) changeUserPhoneWithCode(ctx context.Context, userID, resource
 }
 
 func (c *Commands) resendUserPhoneCode(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm, returnCode bool) (*domain.Phone, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode)
+	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
