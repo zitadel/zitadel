@@ -653,19 +653,16 @@ func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, 
 }
 
 func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.AuthRequest) error {
+	instance := authz.GetInstance(ctx)
 	orgID := request.RequestedOrgID
 	if orgID == "" {
 		orgID = request.UserOrgID
 	}
 	if orgID == "" {
 		orgID = authz.GetInstance(ctx).DefaultOrganisationID()
-		/*
-			f, err := repo.FeatureCheck.CheckInstanceBooleanFeature(ctx, domain.FeatureLoginDefaultOrg)
-			logging.WithFields("authReq", request.ID).OnError(err).Warnf("could not check feature %s", domain.FeatureLoginDefaultOrg)
-			if !f.Boolean {
-				orgID = authz.GetInstance(ctx).InstanceID()
-			}
-		*/
+		if instance.Features().LoginDefaultOrg {
+			orgID = instance.InstanceID()
+		}
 	}
 
 	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
@@ -691,7 +688,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		return err
 	}
 	request.LabelPolicy = labelPolicy
-	defaultLoginTranslations, err := repo.getLoginTexts(ctx, authz.GetInstance(ctx).InstanceID())
+	defaultLoginTranslations, err := repo.getLoginTexts(ctx, instance.InstanceID())
 	if err != nil {
 		return err
 	}

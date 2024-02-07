@@ -40,6 +40,7 @@ type instance struct {
 	appID     string
 	clientID  string
 	orgID     string
+	features  feature.Features
 }
 
 func (i *instance) Block() *bool {
@@ -87,7 +88,7 @@ func (i *instance) SecurityPolicyAllowedOrigins() []string {
 }
 
 func (i *instance) Features() feature.Features {
-	return feature.Features{}
+	return i.features
 }
 
 func GetInstance(ctx context.Context) Instance {
@@ -125,5 +126,14 @@ func WithConsole(ctx context.Context, projectID, appID string) context.Context {
 	i.projectID = projectID
 	i.appID = appID
 	//i.clientID = clientID
+	return context.WithValue(ctx, instanceKey, i)
+}
+
+func WithFeatures(ctx context.Context, f feature.Features) context.Context {
+	i, ok := ctx.Value(instanceKey).(*instance)
+	if !ok {
+		i = new(instance)
+	}
+	i.features = f
 	return context.WithValue(ctx, instanceKey, i)
 }

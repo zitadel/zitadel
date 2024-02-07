@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/muhlemmer/gu"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
@@ -12,7 +13,6 @@ import (
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
 )
 
 func TestMustNewConfig(t *testing.T) {
@@ -28,12 +28,12 @@ func TestMustNewConfig(t *testing.T) {
 		args: args{yaml: `
 DefaultInstance:
   Features:
-  - FeatureLoginDefaultOrg: true
+    LoginDefaultOrg: true
 `},
 		want: &Config{
 			DefaultInstance: command.InstanceSetup{
-				Features: map[domain.Feature]any{
-					domain.FeatureLoginDefaultOrg: true,
+				Features: &command.InstanceFeatures{
+					LoginDefaultOrg: gu.Ptr(true),
 				},
 			},
 		},

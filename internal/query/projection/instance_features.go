@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	feature_v1 "github.com/zitadel/zitadel/internal/repository/feature"
 	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -50,6 +51,10 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 		Aggregate: feature_v2.AggregateType,
 		EventReducers: []handler.EventReducer{
 			{
+				Event:  feature_v1.DefaultLoginInstanceEventType,
+				Reduce: reduceSetDefaultLoginInstance_v1,
+			},
+			{
 				Event:  feature_v2.InstanceResetEventType,
 				Reduce: reduceInstanceResetFeatures,
 			},
@@ -67,6 +72,16 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 			},
 		},
 	}}
+}
+
+func reduceSetDefaultLoginInstance_v1(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*feature_v1.SetEvent[feature_v1.Boolean])
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-in2Xo", "reduce.wrong.event.type %T", event)
+	}
+	return reduceInstanceSetFeature[bool](
+		feature_v1.DefaultLoginInstanceEventToV2(e),
+	)
 }
 
 func reduceInstanceSetFeature[T any](event eventstore.Event) (*handler.Statement, error) {

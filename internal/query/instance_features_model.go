@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/feature"
+	feature_v1 "github.com/zitadel/zitadel/internal/repository/feature"
 	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
 )
 
@@ -29,16 +30,20 @@ func NewInstanceFeaturesReadModel(ctx context.Context, system *SystemFeatures) *
 	return m
 }
 
-func (m *InstanceFeaturesReadModel) Reduce() error {
+func (m *InstanceFeaturesReadModel) Reduce() (err error) {
 	for _, event := range m.Events {
 		switch e := event.(type) {
 		case *feature_v2.ResetEvent:
 			m.reduceReset()
+		case *feature_v1.SetEvent[feature_v1.Boolean]:
+			err = m.reduceBoolFeature(
+				feature_v1.DefaultLoginInstanceEventToV2(e),
+			)
 		case *feature_v2.SetEvent[bool]:
-			err := m.reduceBoolFeature(e)
-			if err != nil {
-				return err
-			}
+			err = m.reduceBoolFeature(e)
+		}
+		if err != nil {
+			return err
 		}
 	}
 	return m.ReadModel.Reduce()
@@ -51,6 +56,7 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(feature_v2.AggregateType).
 		AggregateIDs(m.AggregateID).
 		EventTypes(
+			feature_v1.DefaultLoginInstanceEventType,
 			feature_v2.InstanceResetEventType,
 			feature_v2.InstanceDefaultLoginInstanceEventType,
 			feature_v2.InstanceTriggerIntrospectionProjectionsEventType,
