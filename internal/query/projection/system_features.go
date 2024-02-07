@@ -77,7 +77,7 @@ func reduceSystemSetFeature[T any](event eventstore.Event) (*handler.Statement, 
 		return nil, err
 	}
 	columns := []handler.Column{
-		handler.NewCol(SystemFeatureKeyCol, f.Key),
+		handler.NewCol(SystemFeatureKeyCol, f.Key.String()),
 		handler.NewCol(SystemFeatureCreationDateCol, handler.OnlySetValueOnInsert(SystemFeatureTable, e.CreationDate())),
 		handler.NewCol(SystemFeatureChangeDateCol, e.CreationDate()),
 		handler.NewCol(SystemFeatureSequenceCol, e.Sequence()),
@@ -91,5 +91,8 @@ func reduceSystemResetFeatures(event eventstore.Event) (*handler.Statement, erro
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-roo6A", "reduce.wrong.event.type %T", event)
 	}
-	return handler.NewDeleteStatement(e, []handler.Condition{}), nil
+	return handler.NewDeleteStatement(e, []handler.Condition{
+		// Hack: need at least one condition or the query builder will throw us an error
+		handler.NewIsNotNullCond(SystemFeatureKeyCol),
+	}), nil
 }
