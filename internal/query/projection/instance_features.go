@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	feature_v1 "github.com/zitadel/zitadel/internal/repository/feature"
 	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -59,7 +60,7 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceInstanceResetFeatures,
 			},
 			{
-				Event:  feature_v2.InstanceDefaultLoginInstanceEventType,
+				Event:  feature_v2.InstanceLoginDefaultOrgEventType,
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{
@@ -69,6 +70,10 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 			{
 				Event:  feature_v2.InstanceLegacyIntrospectionEventType,
 				Reduce: reduceInstanceSetFeature[bool],
+			},
+			{
+				Event:  instance.InstanceRemovedEventType,
+				Reduce: reduceInstanceRemovedHelper(InstanceDomainInstanceIDCol),
 			},
 		},
 	}}
@@ -94,8 +99,8 @@ func reduceInstanceSetFeature[T any](event eventstore.Event) (*handler.Statement
 		return nil, err
 	}
 	columns := []handler.Column{
-		handler.NewCol(InstanceFeatureInstanceIDCol, e.Aggregate().InstanceID),
-		handler.NewCol(InstanceFeatureKeyCol, f.Key),
+		handler.NewCol(InstanceFeatureInstanceIDCol, e.Aggregate().ID),
+		handler.NewCol(InstanceFeatureKeyCol, f.Key.String()),
 		handler.NewCol(InstanceFeatureCreationDateCol, handler.OnlySetValueOnInsert(InstanceFeatureTable, e.CreationDate())),
 		handler.NewCol(InstanceFeatureChangeDateCol, e.CreationDate()),
 		handler.NewCol(InstanceFeatureSequenceCol, e.Sequence()),
@@ -110,6 +115,6 @@ func reduceInstanceResetFeatures(event eventstore.Event) (*handler.Statement, er
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-roo6A", "reduce.wrong.event.type %T", event)
 	}
 	return handler.NewDeleteStatement(e, []handler.Condition{
-		handler.NewCond(InstanceFeatureInstanceIDCol, e.Aggregate().InstanceID),
+		handler.NewCond(InstanceFeatureInstanceIDCol, e.Aggregate().ID),
 	}), nil
 }

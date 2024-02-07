@@ -58,7 +58,7 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			feature_v1.DefaultLoginInstanceEventType,
 			feature_v2.InstanceResetEventType,
-			feature_v2.InstanceDefaultLoginInstanceEventType,
+			feature_v2.InstanceLoginDefaultOrgEventType,
 			feature_v2.InstanceTriggerIntrospectionProjectionsEventType,
 			feature_v2.InstanceLegacyIntrospectionEventType,
 		).

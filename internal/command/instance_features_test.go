@@ -43,7 +43,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 				expectPush(
 					feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
-						feature_v2.InstanceDefaultLoginInstanceEventType, true,
+						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					),
 				),
 			),
@@ -109,7 +109,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 				expectPush(
 					feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
-						feature_v2.InstanceDefaultLoginInstanceEventType, true,
+						feature_v2.InstanceLoginDefaultOrgEventType, true,
 					),
 					feature_v2.NewSetEvent[bool](
 						ctx, aggregate,

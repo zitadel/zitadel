@@ -21,7 +21,7 @@ func DefaultLoginInstanceEventToV2(e *SetEvent[Boolean]) *feature_v2.SetEvent[bo
 		BaseEvent: e.BaseEvent,
 		Value:     e.Value.Boolean,
 	}
-	v2e.BaseEvent.EventType = feature_v2.InstanceDefaultLoginInstanceEventType
+	v2e.BaseEvent.EventType = feature_v2.InstanceLoginDefaultOrgEventType
 	return v2e
 }
 

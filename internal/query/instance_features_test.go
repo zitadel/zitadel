@@ -91,7 +91,7 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 				expectFilter(
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
-						feature_v2.InstanceDefaultLoginInstanceEventType, false,
+						feature_v2.InstanceLoginDefaultOrgEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
@@ -132,7 +132,7 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 				expectFilter(
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
-						feature_v2.InstanceDefaultLoginInstanceEventType, false,
+						feature_v2.InstanceLoginDefaultOrgEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
@@ -177,7 +177,7 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 				expectFilter(
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
-						feature_v2.InstanceDefaultLoginInstanceEventType, false,
+						feature_v2.InstanceLoginDefaultOrgEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						ctx, aggregate,

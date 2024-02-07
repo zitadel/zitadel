@@ -17,7 +17,7 @@ var (
 	SystemLegacyIntrospectionEventType             = setEventTypeFromFeature(feature.LevelSystem, feature.KeyLegacyIntrospection)
 
 	InstanceResetEventType                           = resetEventTypeFromFeature(feature.LevelInstance)
-	InstanceDefaultLoginInstanceEventType            = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLoginDefaultOrg)
+	InstanceLoginDefaultOrgEventType                 = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLoginDefaultOrg)
 	InstanceTriggerIntrospectionProjectionsEventType = setEventTypeFromFeature(feature.LevelInstance, feature.KeyTriggerIntrospectionProjections)
 	InstanceLegacyIntrospectionEventType             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLegacyIntrospection)
 )
