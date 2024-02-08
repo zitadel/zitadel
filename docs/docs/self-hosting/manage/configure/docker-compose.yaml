@@ -18,6 +18,7 @@ services:
       - "./example-zitadel-init-steps.yaml:/example-zitadel-init-steps.yaml:ro"
       - "zitadel-certs:/crdb-certs:ro"
 
+#TODO: add move to psql
   certs:
     image: "cockroachdb/cockroach:latest"
     entrypoint: ["/bin/bash", "-c"]

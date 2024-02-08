@@ -8,6 +8,7 @@ ExternalDomain: my.domain
 ExternalPort: 443
 
 # If not using the docker compose example, adjust these values for connecting ZITADEL to your CockroachDB
+#TODO: add move to psql
 Database:
   cockroach:
     Host: 'my-cockroach-db'

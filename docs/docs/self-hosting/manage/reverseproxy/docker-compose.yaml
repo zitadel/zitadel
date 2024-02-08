@@ -76,6 +76,7 @@ services:
       start_period: '10s'
 
   db:
+  #TODO: add move to psql
     restart: 'always'
     image: 'cockroachdb/cockroach:latest'
     command: 'start-single-node --insecure --http-addr :9090'
