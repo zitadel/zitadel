@@ -1,0 +1,49 @@
+
+1. Go to the **Users** tab in your organization as shown below and click on the **Service Users** tab.
+
+![Register the API](/img/examples/secure-api/service-user-jwt/1.png)
+
+2. To add a service user, click on the **New** button.
+
+![Register the API](/img/examples/secure-api/service-user-jwt/2.png)
+
+
+3. Next, add the details of the service user and select either **Bearer** or **JWT** for **Access Token Type** and click on **Create**. For this example, we will select **JWT**.
+
+![Register the API](/img/examples/secure-api/service-user-jwt/3.png)
+
+
+4. Now you will see the saved details.
+
+![Register the API](/img/examples/secure-api/service-user-jwt/4.png)
+
+
+5. Next,  we need to generate a private-public key pair in ZITADEL and you must get the private key to sign your JWT.  Go to **Keys** and click on **New**.
+
+![Register the API](/img/examples/secure-api/service-user-jwt/5.png)
+
+
+6. Select type **JSON** and click **Add**.
+
+![Register the API](/img/examples/secure-api/service-user-jwt/6.png)
+
+7. Download the key by clicking **Download**. After the download, click **Close**.
+
+![Register the API](/img/examples/secure-api/service-user-jwt/7.png)
+
+
+8. You will see the following screen afterwards.
+
+![Register the API](/img/examples/secure-api/service-user-jwt/8.png)
+
+
+9. The downloaded key will be of the following format:
+
+```
+{
+    "type":"serviceaccount",
+    "keyId":"<YOUR_KEY_ID>",
+    "key":"-----BEGIN RSA PRIVATE KEY-----\n<YOUR_KEY>\n-----END RSA PRIVATE KEY-----\n",
+    "userId":"<YOUR_USER_ID>"
+}
+```
