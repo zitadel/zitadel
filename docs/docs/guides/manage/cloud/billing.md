@@ -50,7 +50,7 @@ Depending on your billing address we will mark the invoice as reverse charge.
 You will only need to add billing information if your want to get the pro tier. There are two options on how to add your billing info.
 
 1. Go to the billing menu and add a new payment method.
-2Add the billing information directly during the upgrade process.
+2. Add the billing information directly during the upgrade process.
 
 ## Invoices
 
