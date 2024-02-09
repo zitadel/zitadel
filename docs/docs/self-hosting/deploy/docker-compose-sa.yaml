@@ -23,7 +23,7 @@ services:
       - 'ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME=Admin'
       - 'ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINEKEY_TYPE=1'
     depends_on:
-      crdb:
+      db:
         condition: 'service_healthy'
     ports:
       - '8080:8080'
