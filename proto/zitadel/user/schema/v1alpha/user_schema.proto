@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package zitadel.user.schema.v3alpha;
+package zitadel.user.schema.v1alpha;
 
 import "zitadel/object/v2beta/object.proto";
 import "google/protobuf/struct.proto";
 import "validate/validate.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/schema/v1alpha";
 
 message UserSchema {
 
@@ -44,13 +44,11 @@ message UserSchema {
     }
   ];
   // Defines the possible types of authenticators.
-  //
   // This allows creating different user types like human/machine without usage of actions to validate possible authenticators.
-  //
   // Removal of an authenticator does not remove the authenticator on a user.
   repeated AuthenticatorType possible_authenticators = 7  [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      // (--TODO: add example--)
+      example: "[\"AUTHENTICATOR_TYPE_USERNAME\",\"AUTHENTICATOR_TYPE_PASSWORD\",\"AUTHENTICATOR_TYPE_WEBAUTHN\"]";
     }
   ];
 }
@@ -67,7 +65,7 @@ message SearchQuery {
   oneof query {
     option (validate.required) = true;
 
-    // Limit the result to a specific schema type. .
+    // Limit the result to a specific schema type.
     TypeQuery type_query = 1;
     // Limit the result to a specific state of the schema.
     StateQuery state_query = 2;
@@ -83,11 +81,9 @@ message TypeQuery {
       example: "\"employees\"";
     }
   ];
-  // Defines if the text comparison method used for the type query.
+  // Defines which text comparison method used for the type query.
   zitadel.object.v2beta.TextQueryMethod method = 2 [
-    (validate.rules).enum.defined_only = true,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-    }
+    (validate.rules).enum.defined_only = true
   ];
 }
 
@@ -105,11 +101,17 @@ enum State {
   STATE_UNSPECIFIED = 0;
   STATE_ACTIVE = 1;
   STATE_INACTIVE = 2;
-  //(--TODO: do we need that?--)
-  STATE_DELETED = 3;
 }
 
-//(--TODO: add authenticator types--)
 enum AuthenticatorType {
   AUTHENTICATOR_TYPE_UNSPECIFIED = 0;
+  //(--TODO: i guess we can also disable this?--)
+  AUTHENTICATOR_TYPE_USERNAME = 1;
+  AUTHENTICATOR_TYPE_PASSWORD = 2;
+  AUTHENTICATOR_TYPE_WEBAUTHN = 3;
+  AUTHENTICATOR_TYPE_TOTP = 4;
+  AUTHENTICATOR_TYPE_OTP_EMAIL = 5;
+  AUTHENTICATOR_TYPE_OTP_SMS = 6;
+  AUTHENTICATOR_TYPE_AUTHENTICATION_KEY = 7;
+  AUTHENTICATOR_TYPE_IDENTITY_PROVIDER = 8;
 }

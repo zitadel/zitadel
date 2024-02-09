@@ -1,17 +1,18 @@
 syntax = "proto3";
 
-package zitadel.user.schema.v3alpha;
+package zitadel.user.schema.v1alpha;
 
-import "zitadel/object/v2beta/object.proto";
-import "zitadel/user/schema/v3alpha/user_schema.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
+import "zitadel/object/v2beta/object.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+import "zitadel/user/schema/v1alpha/user_schema.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/schema/v1alpha";
 
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
@@ -104,23 +105,20 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 service UserSchemaService {
 
-  // Search user schemas
+  // List user schemas
   //
-  // Search for user schemas. By default, we will return all user schema of your instance. Make sure to include a limit and sorting for pagination.
+  // List all matching user schemas. By default, we will return all user schema of your instance. Make sure to include a limit and sorting for pagination.
   rpc ListUserSchemas(ListUserSchemasRequest) returns (ListUserSchemasResponse) {
     option (google.api.http) = {
-      post: "/v3alpha/schemas/search"
+      post: "/v1alpha/user_schemas/search"
       body: "*"
     };
 
-    //    option (zitadel.protoc_gen_zitadel.v2.options) = {
-    //      auth_option: {
-    //        permission: "authenticated"
-    //      }
-    //      http_response: {
-    //        success_code: 200
-    //      }
-    //    };
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "userschema.read"
+      }
+    };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -148,17 +146,14 @@ service UserSchemaService {
   // Returns the user schema identified by the requested ID.
   rpc GetUserSchemaByID(GetUserSchemaByIDRequest) returns (GetUserSchemaByIDResponse) {
     option (google.api.http) = {
-      get: "/v3alpha/schemas/{id}"
+      get: "/v1alpha/user_schemas/{id}"
     };
 
-    //    option (zitadel.protoc_gen_zitadel.v2.options) = {
-    //      auth_option: {
-    //        permission: "authenticated"
-    //      }
-    //      http_response: {
-    //        success_code: 200
-    //      }
-    //    };
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "userschema.read"
+      }
+    };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -175,24 +170,29 @@ service UserSchemaService {
   // Create the first revision of a new user schema. The schema can then be used on users to store and validate their data.
   rpc CreateUserSchema(CreateUserSchemaRequest) returns (CreateUserSchemaResponse) {
     option (google.api.http) = {
-      post: "/v3alpha/schemas"
+      post: "/v1alpha/user_schemas"
       body: "*"
     };
 
-    //    option (zitadel.protoc_gen_zitadel.v2.options) = {
-    //      auth_option: {
-    //        permission: "authenticated"
-    //      }
-    //      http_response: {
-    //        success_code: 201
-    //      }
-    //    };
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "userschema.write"
+      }
+      http_response: {
+        success_code: 201
+      }
+    };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
         key: "201";
         value: {
           description: "Schema successfully created";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/v1alphaCreateUserSchemaResponse";
+            }
+          }
         };
       };
     };
@@ -203,18 +203,15 @@ service UserSchemaService {
   // Update an existing user schema to a new revision. Users based on the current revision will not be affected until they are updated.
   rpc UpdateUserSchema(UpdateUserSchemaRequest) returns (UpdateUserSchemaResponse) {
     option (google.api.http) = {
-      put: "/v3alpha/schemas/{id}"
+      put: "/v1alpha/user_schemas/{id}"
       body: "*"
     };
 
-    //    option (zitadel.protoc_gen_zitadel.v2.options) = {
-    //      auth_option: {
-    //        permission: "authenticated"
-    //      }
-    //      http_response: {
-    //        success_code: 201
-    //      }
-    //    };
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "userschema.write"
+      }
+    };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -231,17 +228,14 @@ service UserSchemaService {
   // Deactivate an existing user schema and change it into a read-only state. Users based on this schema cannot be updated anymore, but are still able to authenticate.
   rpc DeactivateUserSchema(DeactivateUserSchemaRequest) returns (DeactivateUserSchemaResponse) {
     option (google.api.http) = {
-      post: "/v3alpha/schemas/{id}/deactivate"
+      post: "/v1alpha/user_schemas/{id}/deactivate"
     };
 
-    //    option (zitadel.protoc_gen_zitadel.v2.options) = {
-    //      auth_option: {
-    //        permission: "authenticated"
-    //      }
-    //      http_response: {
-    //        success_code: 201
-    //      }
-    //    };
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "userschema.write"
+      }
+    };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -258,17 +252,14 @@ service UserSchemaService {
   // Reactivate an previously deactivated user schema and change it into an active state again.
   rpc ReactivateUserSchema(ReactivateUserSchemaRequest) returns (ReactivateUserSchemaResponse) {
     option (google.api.http) = {
-      post: "/v3alpha/schemas/{id}/reactivate"
+      post: "/v1alpha/user_schemas/{id}/reactivate"
     };
 
-    //    option (zitadel.protoc_gen_zitadel.v2.options) = {
-    //      auth_option: {
-    //        permission: "authenticated"
-    //      }
-    //      http_response: {
-    //        success_code: 201
-    //      }
-    //    };
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "userschema.write"
+      }
+    };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -285,17 +276,14 @@ service UserSchemaService {
   // Delete an existing user schema. This operation is only allowed if there are no associated users to it.
   rpc DeleteUserSchema(DeleteUserSchemaRequest) returns (DeleteUserSchemaResponse) {
     option (google.api.http) = {
-      delete: "/v3alpha/schemas/{id}"
+      delete: "/v1alpha/user_schemas/{id}"
     };
 
-    //    option (zitadel.protoc_gen_zitadel.v2.options) = {
-    //      auth_option: {
-    //        permission: "authenticated"
-    //      }
-    //      http_response: {
-    //        success_code: 201
-    //      }
-    //    };
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "userschema.delete"
+      }
+    };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
@@ -310,25 +298,25 @@ service UserSchemaService {
 }
 
 message ListUserSchemasRequest {
-  // list limitations and ordering
+  // list limitations and ordering.
   zitadel.object.v2beta.ListQuery query = 1;
-  // the field the result is sorted
-  zitadel.user.schema.v3alpha.FieldName sorting_column = 2 [
+  // the field the result is sorted.
+  zitadel.user.schema.v1alpha.FieldName sorting_column = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"FIELD_NAME_TYPE\""
+      example: "\"FIELD_NAME_TYPE\"";
     }
   ];
   // Define the criteria to query for.
-  repeated zitadel.user.schema.v3alpha.SearchQuery queries = 3;
+  repeated zitadel.user.schema.v1alpha.SearchQuery queries = 3;
 }
 
 message ListUserSchemasResponse {
   // Details provides information about the returned result including total amount found.
   zitadel.object.v2beta.ListDetails details = 1;
   // States by which field the results are sorted.
-  zitadel.user.schema.v3alpha.FieldName sorting_column = 2;
+  zitadel.user.schema.v1alpha.FieldName sorting_column = 2;
   // The result contains the user schemas, which matched the queries.
-  repeated zitadel.user.schema.v3alpha.UserSchema result = 3;
+  repeated zitadel.user.schema.v1alpha.UserSchema result = 3;
 }
 
 
@@ -346,7 +334,7 @@ message GetUserSchemaByIDRequest {
 }
 
 message GetUserSchemaByIDResponse {
-  zitadel.user.schema.v3alpha.UserSchema schema = 1;
+  zitadel.user.schema.v1alpha.UserSchema schema = 1;
 }
 
 
@@ -358,7 +346,7 @@ message CreateUserSchemaRequest {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      example: "\"employees\""
+      example: "\"employees\"";
     }
   ];
   // JSON schema representation defining the user.
@@ -396,7 +384,7 @@ message UpdateUserSchemaRequest {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
-      example: "\"employees\""
+      example: "\"employees\"";
     }
   ];
   // JSON schema representation defining the user.

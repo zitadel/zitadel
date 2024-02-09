@@ -289,8 +289,15 @@ module.exports = {
             },
           },
           user_schema: {
-            specPath: ".artifacts/openapi/zitadel/user/schema/v3alpha/user_schema_service.swagger.json",
-            outputDir: "docs/apis/resources/user_schema_service_v3",
+            specPath: ".artifacts/openapi/zitadel/user/schema/v1alpha/user_schema_service.swagger.json",
+            outputDir: "docs/apis/resources/user_schema_service_v1",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
+          user_v3: {
+            specPath: ".artifacts/openapi/zitadel/user/v3alpha/user_service.swagger.json",
+            outputDir: "docs/apis/resources/user_service_v3",
             sidebarOptions: {
               groupPathsBy: "tag",
             },

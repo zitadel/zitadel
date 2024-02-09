@@ -8,3 +8,4 @@ plugins:
     opt:
       - allow_delete_body
       - remove_internal_comments=true
+      - preserve_rpc_order=true
