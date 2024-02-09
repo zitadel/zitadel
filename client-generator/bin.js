@@ -130,7 +130,7 @@ function getConfigFromFramework() {
                 config = readConfig('angular');
             break;
         }
-        config.frameworks = frameworks;
+        config.frameworks = frameworks.map(framework => framework.id);
         return config;
     });
 }
