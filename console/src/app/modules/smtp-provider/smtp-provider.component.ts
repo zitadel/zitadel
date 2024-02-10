@@ -20,6 +20,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import {
   AmazonSESDefaultSettings,
+  BrevoDefaultSettings,
   GenericDefaultSettings,
   GoogleDefaultSettings,
   MailchimpDefaultSettings,
@@ -86,6 +87,9 @@ export class SMTPProviderComponent {
           break;
         case 'mailchimp':
           this.providerDefaultSetting = MailchimpDefaultSettings;
+          break;
+        case 'brevo':
+          this.providerDefaultSetting = BrevoDefaultSettings;
           break;
       }
 

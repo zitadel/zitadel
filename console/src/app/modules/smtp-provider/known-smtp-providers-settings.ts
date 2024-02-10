@@ -141,6 +141,18 @@ export const MailchimpDefaultSettings: ProviderDefaultSettings = {
   routerLinkElement: 'mailchimp',
 };
 
+export const BrevoDefaultSettings: ProviderDefaultSettings = {
+  name: 'brevo',
+  requiredTls: false,
+  host: 'smtp-relay.sendinblue.com',
+  unencryptedPort: 587,
+  encryptedPort: 465,
+  user: { value: '', placeholder: 'Your SMTP login email address' },
+  password: { value: '', placeholder: 'Your SMTP key' },
+  image: './assets/images/smtp/brevo.svg',
+  routerLinkElement: 'brevo',
+};
+
 export const GenericDefaultSettings: ProviderDefaultSettings = {
   name: 'generic',
   requiredTls: false,
@@ -151,11 +163,12 @@ export const GenericDefaultSettings: ProviderDefaultSettings = {
 
 export const SMTPKnownProviders = [
   AmazonSESDefaultSettings,
+  BrevoDefaultSettings,
   // GoogleDefaultSettings,
   MailgunDefaultSettings,
+  MailchimpDefaultSettings,
   MailjetDefaultSettings,
   PostmarkDefaultSettings,
   SendgridDefaultSettings,
-  MailchimpDefaultSettings,
   GenericDefaultSettings,
 ];
