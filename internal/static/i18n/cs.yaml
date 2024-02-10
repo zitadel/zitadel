@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limity nebyly nalezeny
     NoneSpecified: Nebyly určeny žádné limity
+    Instance:
+      Blocked: Instance je blokována
   Restrictions:
     NoneSpecified: Nebyla určena žádná omezení
     DefaultLanguageMustBeAllowed: Výchozí jazyk musí být povolen
@@ -144,7 +146,7 @@ Errors:
     ExternalIDP:
       Invalid: Externí IDP je neplatné
       IDPConfigNotExisting: Konfigurace poskytovatele IDP je pro tuto organizaci neplatná
-      NotAllowed: Externí IDP není v této organizaci povoleno
+      NotAllowed: Externí IDP není povolen
       MinimumExternalIDPNeeded: Musí být přidán alespoň jeden IDP
       AlreadyExists: Externí IDP již obsazeno
       NotFound: Externí IDP nenalezeno

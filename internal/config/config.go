@@ -9,7 +9,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"sigs.k8s.io/yaml"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type ValidatableConfiguration interface {
@@ -52,13 +52,13 @@ func readConfigFile(readerFunc ReaderFunc, configFile string, obj interface{}) e
 
 	configStr, err := ioutil.ReadFile(configFile)
 	if err != nil {
-		return errors.ThrowInternalf(err, "CONFI-nJk2a", "failed to read config file %s", configFile)
+		return zerrors.ThrowInternalf(err, "CONFI-nJk2a", "failed to read config file %s", configFile)
 	}
 
 	configStr = []byte(os.ExpandEnv(string(configStr)))
 
 	if err := readerFunc(configStr, obj); err != nil {
-		return errors.ThrowInternalf(err, "CONFI-2Mc3c", "error parse config file %s", configFile)
+		return zerrors.ThrowInternalf(err, "CONFI-2Mc3c", "error parse config file %s", configFile)
 	}
 
 	return nil
@@ -74,5 +74,5 @@ func readerFuncForFile(configFile string) (ReaderFunc, error) {
 	case ".toml":
 		return TOMLReader, nil
 	}
-	return nil, errors.ThrowUnimplementedf(nil, "CONFI-ZLk4u", "file extension (%s) not supported", ext)
+	return nil, zerrors.ThrowUnimplementedf(nil, "CONFI-ZLk4u", "file extension (%s) not supported", ext)
 }

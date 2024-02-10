@@ -7,7 +7,7 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { CardModule } from '../card/card.module';
 import DomainsModule from '../domains/domains.module';
 import { DomainPolicyModule } from '../policies/domain-policy/domain-policy.module';
-import { GeneralSettingsModule } from '../policies/general-settings/general-settings.module';
+import { LanguageSettingsModule } from '../policies/language-settings/language-settings.module';
 import { IdpSettingsModule } from '../policies/idp-settings/idp-settings.module';
 import { LoginPolicyModule } from '../policies/login-policy/login-policy.module';
 import { LoginTextsPolicyModule } from '../policies/login-texts/login-texts.module';
@@ -23,6 +23,11 @@ import { SecretGeneratorModule } from '../policies/secret-generator/secret-gener
 import { SecurityPolicyModule } from '../policies/security-policy/security-policy.module';
 import { SidenavModule } from '../sidenav/sidenav.module';
 import { SettingsListComponent } from './settings-list.component';
+import FailedEventsModule from '../failed-events/failed-events.module';
+import IamViewsModule from '../iam-views/iam-views.module';
+import EventsModule from '../events/events.module';
+import OrgListModule from 'src/app/pages/org-list/org-list.module';
+import { OrgTableModule } from '../org-table/org-table.module';
 import { SMTPSettingsModule } from '../policies/smtp-settings/smtp-settings.module';
 
 @NgModule({
@@ -36,7 +41,7 @@ import { SMTPSettingsModule } from '../policies/smtp-settings/smtp-settings.modu
     PasswordComplexityPolicyModule,
     PasswordLockoutPolicyModule,
     PrivateLabelingPolicyModule,
-    GeneralSettingsModule,
+    LanguageSettingsModule,
     NotificationPolicyModule,
     IdpSettingsModule,
     SMTPSettingsModule,
@@ -45,12 +50,16 @@ import { SMTPSettingsModule } from '../policies/smtp-settings/smtp-settings.modu
     SecurityPolicyModule,
     DomainsModule,
     LoginTextsPolicyModule,
+    OrgTableModule,
     DomainPolicyModule,
     TranslateModule,
     HasRolePipeModule,
     NotificationSMSProviderModule,
     OIDCConfigurationModule,
     SecretGeneratorModule,
+    FailedEventsModule,
+    IamViewsModule,
+    EventsModule,
   ],
   exports: [SettingsListComponent],
 })

@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -12,9 +12,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type SMTPConfigsSearchQueries struct {
@@ -127,7 +127,7 @@ func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID strin
 		SMTPConfigColumnState.identifier():       domain.SMTPConfigStateActive,
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-3m9sl", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-3m9sl", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -148,7 +148,7 @@ func (q *Queries) SMTPConfigByID(ctx context.Context, aggregateID, id string) (c
 		SMTPConfigColumnID.identifier():          id,
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-8f8gw", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-8f8gw", "Errors.Query.SQLStatement")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -199,10 +199,10 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				&config.Description,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-fwofw", "Errors.SMTPConfig.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-fwofw", "Errors.SMTPConfig.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-9k87F", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-9k87F", "Errors.Internal")
 			}
 			config.Password = password
 			return config, nil
@@ -252,10 +252,10 @@ func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 					&configs.Count,
 				)
 				if err != nil {
-					if errs.Is(err, sql.ErrNoRows) {
-						return nil, errors.ThrowNotFound(err, "QUERY-fwofw", "Errors.SMTPConfig.NotFound")
+					if errors.Is(err, sql.ErrNoRows) {
+						return nil, zerrors.ThrowNotFound(err, "QUERY-fwofw", "Errors.SMTPConfig.NotFound")
 					}
-					return nil, errors.ThrowInternal(err, "QUERY-9k87F", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(err, "QUERY-9k87F", "Errors.Internal")
 				}
 				configs.Configs = append(configs.Configs, config)
 			}
@@ -273,7 +273,7 @@ func (q *Queries) SearchSMTPConfigs(ctx context.Context, queries *SMTPConfigsSea
 			SMTPConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-sZ7Cx", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-sZ7Cx", "Errors.Query.InvalidRequest")
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -281,7 +281,7 @@ func (q *Queries) SearchSMTPConfigs(ctx context.Context, queries *SMTPConfigsSea
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-tOpKN", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-tOpKN", "Errors.Internal")
 	}
 	configs.State, err = q.latestState(ctx, smsConfigsTable)
 	return configs, err

@@ -57,7 +57,7 @@
 @import 'src/app/modules/shortcuts/shortcuts.component.scss';
 @import 'src/app/modules/policies/idp-settings/idp-settings.component.scss';
 @import 'src/app/modules/project-role-chip/project-role-chip.component';
-@import 'src/app/pages/events/events.component';
+@import 'src/app/modules/events/events.component';
 @import 'src/app/pages/home/home.component.scss';
 @import 'src/app/modules/policies/security-policy/security-policy.component.scss';
 @import 'src/app/modules/idp-table/idp-table.component.scss';
@@ -65,6 +65,7 @@
 @import 'src/app/modules/policies/login-policy/factor-table/factor-table.component.scss';
 @import 'src/app/modules/info-overlay/info-overlay.component.scss';
 @import 'src/app/modules/create-layout/create-layout.component.scss';
+@import 'src/app/modules/domains/domain-verification/domain-verification.component.scss';
 @import 'src/app/modules/smtp-table/smtp-table.component.scss';
 @import 'src/app/modules/smtp-provider/smtp-provider.scss';
 @import 'src/app/modules/policies/smtp-settings/smtp-settings.component.scss';
@@ -141,5 +142,6 @@
   @include codemirror-theme($theme);
   @include contact-theme($theme);
   @include app-create-theme($theme);
+  @include domain-verification-theme($theme);
   @include smtp-settings-theme($theme);
 }

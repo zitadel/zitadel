@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) getOrgPasswordComplexityPolicy(ctx context.Context, orgID string) (*domain.PasswordComplexityPolicy, error) {
@@ -30,7 +30,7 @@ func (c *Commands) orgPasswordComplexityPolicyWriteModelByID(ctx context.Context
 
 func (c *Commands) AddPasswordComplexityPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
 	if resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-7ufEs", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-7ufEs", "Errors.ResourceOwnerMissing")
 	}
 	if err := policy.IsValid(); err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (c *Commands) AddPasswordComplexityPolicy(ctx context.Context, resourceOwne
 		return nil, err
 	}
 	if addedPolicy.State == domain.PolicyStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "Org-LdhbS", "Errors.Org.PasswordComplexityPolicy.AlreadyExists")
+		return nil, zerrors.ThrowAlreadyExists(nil, "Org-LdhbS", "Errors.Org.PasswordComplexityPolicy.AlreadyExists")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
@@ -67,7 +67,7 @@ func (c *Commands) AddPasswordComplexityPolicy(ctx context.Context, resourceOwne
 
 func (c *Commands) ChangePasswordComplexityPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
 	if resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-3J8fs", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-3J8fs", "Errors.ResourceOwnerMissing")
 	}
 	if err := policy.IsValid(); err != nil {
 		return nil, err
@@ -79,13 +79,13 @@ func (c *Commands) ChangePasswordComplexityPolicy(ctx context.Context, resourceO
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "ORG-Dgs3g", "Errors.Org.PasswordComplexityPolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "ORG-Dgs3g", "Errors.Org.PasswordComplexityPolicy.NotFound")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PasswordComplexityPolicyWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.MinLength, policy.HasLowercase, policy.HasUppercase, policy.HasNumber, policy.HasSymbol)
 	if !hasChanged {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-DAs21", "Errors.Org.PasswordComplexityPolicy.NotChanged")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "Org-DAs21", "Errors.Org.PasswordComplexityPolicy.NotChanged")
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
@@ -101,7 +101,7 @@ func (c *Commands) ChangePasswordComplexityPolicy(ctx context.Context, resourceO
 
 func (c *Commands) RemovePasswordComplexityPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
 	if orgID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-J8fsf", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-J8fsf", "Errors.ResourceOwnerMissing")
 	}
 	existingPolicy := NewOrgPasswordComplexityPolicyWriteModel(orgID)
 	event, err := c.removePasswordComplexityPolicy(ctx, existingPolicy)
@@ -125,7 +125,7 @@ func (c *Commands) removePasswordComplexityPolicy(ctx context.Context, existingP
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "ORG-ADgs2", "Errors.Org.PasswordComplexityPolicy.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "ORG-ADgs2", "Errors.Org.PasswordComplexityPolicy.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
 	return org.NewPasswordComplexityPolicyRemovedEvent(ctx, orgAgg), nil

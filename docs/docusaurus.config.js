@@ -61,6 +61,8 @@ module.exports = {
         alt: "ZITADEL logo",
         src: "img/zitadel-logo-dark.svg",
         srcDark: "img/zitadel-logo-light.svg",
+        href: "https://zitadel.com",
+        target: "_blank",
       },
       items: [
         {
@@ -178,7 +180,7 @@ module.exports = {
       selector: "div#",
     },
     prism: {
-      additionalLanguages: ["csharp", "dart", "groovy", "regex"],
+      additionalLanguages: ["csharp", "dart", "groovy", "regex", "java", "php", "python"],
     },
     colorMode: {
       defaultMode: "dark",

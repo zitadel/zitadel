@@ -32,8 +32,6 @@ import {
   GetMyProfileResponse,
   GetMyUserRequest,
   GetMyUserResponse,
-  GetSupportedLanguagesRequest,
-  GetSupportedLanguagesResponse,
   ListMyAuthFactorsRequest,
   ListMyAuthFactorsResponse,
   ListMyLinkedIDPsRequest,
@@ -142,14 +140,13 @@ export class GrpcAuthService {
   public zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
   public readonly fetchedZitadelPermissions: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  private cachedOrgs: Org.AsObject[] = [];
+  public cachedOrgs: BehaviorSubject<Org.AsObject[]> = new BehaviorSubject<Org.AsObject[]>([]);
   private cachedLabelPolicies: { [orgId: string]: LabelPolicy.AsObject } = {};
 
   constructor(
     private readonly grpcService: GrpcService,
     private oauthService: OAuthService,
     private storage: StorageService,
-    themeService: ThemeService,
   ) {
     this.zitadelPermissions$.subscribe(this.zitadelPermissions);
 
@@ -223,15 +220,14 @@ export class GrpcAuthService {
 
   public async getActiveOrg(id?: string): Promise<Org.AsObject> {
     if (id) {
-      const find = this.cachedOrgs.find((tmp) => tmp.id === id);
+      const find = this.cachedOrgs.getValue().find((tmp) => tmp.id === id);
       if (find) {
         this.setActiveOrg(find);
         return Promise.resolve(find);
       } else {
         const orgs = (await this.listMyProjectOrgs(10, 0)).resultList;
-        this.cachedOrgs = orgs;
-
-        const toFind = this.cachedOrgs.find((tmp) => tmp.id === id);
+        this.cachedOrgs.next(orgs);
+        const toFind = orgs.find((tmp) => tmp.id === id);
         if (toFind) {
           this.setActiveOrg(toFind);
           return Promise.resolve(toFind);
@@ -240,10 +236,10 @@ export class GrpcAuthService {
         }
       }
     } else {
-      let orgs = this.cachedOrgs;
+      let orgs = this.cachedOrgs.getValue();
       if (orgs.length === 0) {
         orgs = (await this.listMyProjectOrgs()).resultList;
-        this.cachedOrgs = orgs;
+        this.cachedOrgs.next(orgs);
       }
 
       const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.local);
@@ -375,6 +371,11 @@ export class GrpcAuthService {
     return this.grpcService.auth.listMyAuthFactors(new ListMyAuthFactorsRequest(), null).then((resp) => resp.toObject());
   }
 
+  public async revalidateOrgs() {
+    const orgs = (await this.listMyProjectOrgs()).resultList;
+    this.cachedOrgs.next(orgs);
+  }
+
   public listMyProjectOrgs(
     limit?: number,
     offset?: number,
@@ -492,11 +493,6 @@ export class GrpcAuthService {
   public resendMyEmailVerification(): Promise<ResendMyEmailVerificationResponse.AsObject> {
     const req = new ResendMyEmailVerificationRequest();
     return this.grpcService.auth.resendMyEmailVerification(req, null).then((resp) => resp.toObject());
-  }
-
-  public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
-    const req = new GetSupportedLanguagesRequest();
-    return this.grpcService.auth.getSupportedLanguages(req, null).then((resp) => resp.toObject());
   }
 
   public getMyLoginPolicy(): Promise<GetMyLoginPolicyResponse.AsObject> {

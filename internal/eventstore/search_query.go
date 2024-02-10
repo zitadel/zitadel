@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // SearchQueryBuilder represents the builder for your filter
@@ -14,11 +14,11 @@ import (
 type SearchQueryBuilder struct {
 	columns               Columns
 	limit                 uint64
-	offset                uint16
+	offset                uint32
 	desc                  bool
 	resourceOwner         string
 	instanceID            *string
-	excludedInstanceIDs   []string
+	instanceIDs           []string
 	editorUser            string
 	queries               []*SearchQuery
 	tx                    *sql.Tx
@@ -38,7 +38,7 @@ func (b *SearchQueryBuilder) GetLimit() uint64 {
 	return b.limit
 }
 
-func (b *SearchQueryBuilder) GetOffset() uint16 {
+func (b *SearchQueryBuilder) GetOffset() uint32 {
 	return b.offset
 }
 
@@ -52,6 +52,10 @@ func (b *SearchQueryBuilder) GetResourceOwner() string {
 
 func (b *SearchQueryBuilder) GetInstanceID() *string {
 	return b.instanceID
+}
+
+func (b *SearchQueryBuilder) GetInstanceIDs() []string {
+	return b.instanceIDs
 }
 
 func (b *SearchQueryBuilder) GetEditorUser() string {
@@ -78,10 +82,6 @@ func (b SearchQueryBuilder) GetAwaitOpenTransactions() bool {
 	return b.awaitOpenTransactions
 }
 
-func (q SearchQueryBuilder) GetExcludedInstanceIDs() []string {
-	return q.excludedInstanceIDs
-}
-
 func (q SearchQueryBuilder) GetEventSequenceGreater() uint64 {
 	return q.eventSequenceGreater
 }
@@ -96,7 +96,7 @@ func (q SearchQueryBuilder) GetCreationDateBefore() time.Time {
 
 // ensureInstanceID makes sure that the instance id is always set
 func (b *SearchQueryBuilder) ensureInstanceID(ctx context.Context) {
-	if b.instanceID == nil && authz.GetInstance(ctx).InstanceID() != "" {
+	if b.instanceID == nil && len(b.instanceIDs) == 0 && authz.GetInstance(ctx).InstanceID() != "" {
 		b.InstanceID(authz.GetInstance(ctx).InstanceID())
 	}
 }
@@ -141,7 +141,7 @@ const (
 
 func (c Columns) Validate() error {
 	if c <= 0 || c >= columnsCount {
-		return errors.ThrowPreconditionFailed(nil, "REPOS-x8R35", "column out of range")
+		return zerrors.ThrowPreconditionFailed(nil, "REPOS-x8R35", "column out of range")
 	}
 	return nil
 }
@@ -160,7 +160,7 @@ func (builder *SearchQueryBuilder) Matches(commands ...Command) []Command {
 		if builder.limit > 0 && builder.limit <= uint64(len(matches)) {
 			break
 		}
-		if builder.offset > 0 && uint16(i) < builder.offset {
+		if builder.offset > 0 && uint32(i) < builder.offset {
 			continue
 		}
 
@@ -213,12 +213,12 @@ func (builder *SearchQueryBuilder) Limit(limit uint64) *SearchQueryBuilder {
 }
 
 // Limit defines how many events are returned maximally.
-func (builder *SearchQueryBuilder) Offset(offset uint16) *SearchQueryBuilder {
+func (builder *SearchQueryBuilder) Offset(offset uint32) *SearchQueryBuilder {
 	builder.offset = offset
 	return builder
 }
 
-// ResourceOwner defines the resource owner (org) of the events
+// ResourceOwner defines the resource owner (org or instance) of the events
 func (builder *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQueryBuilder {
 	builder.resourceOwner = resourceOwner
 	return builder
@@ -227,6 +227,12 @@ func (builder *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQu
 // InstanceID defines the instanceID (system) of the events
 func (builder *SearchQueryBuilder) InstanceID(instanceID string) *SearchQueryBuilder {
 	builder.instanceID = &instanceID
+	return builder
+}
+
+// InstanceIDs defines the instanceIDs (system) of the events
+func (builder *SearchQueryBuilder) InstanceIDs(instanceIDs []string) *SearchQueryBuilder {
+	builder.instanceIDs = instanceIDs
 	return builder
 }
 
@@ -275,12 +281,6 @@ func (builder *SearchQueryBuilder) AwaitOpenTransactions() *SearchQueryBuilder {
 // SequenceGreater filters for events with sequence greater the requested sequence
 func (builder *SearchQueryBuilder) SequenceGreater(sequence uint64) *SearchQueryBuilder {
 	builder.eventSequenceGreater = sequence
-	return builder
-}
-
-// ExcludedInstanceID filters for events not having the given instanceIDs
-func (builder *SearchQueryBuilder) ExcludedInstanceID(instanceIDs ...string) *SearchQueryBuilder {
-	builder.excludedInstanceIDs = instanceIDs
 	return builder
 }
 

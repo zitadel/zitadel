@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limieten niet gevonden
     NoneSpecified: Geen limieten gespecificeerd
+    Instance:
+      Blocked: Instantie is geblokkeerd
   Restrictions:
     NoneSpecified: Geen beperkingen gespecificeerd
     DefaultLanguageMustBeAllowed: De standaardtaal moet worden toegestaan
@@ -144,7 +146,7 @@ Errors:
     ExternalIDP:
       Invalid: Externe IDP ongeldig
       IDPConfigNotExisting: IDP provider ongeldig voor deze organisatie
-      NotAllowed: Externe IDP niet toegestaan op deze organisatie
+      NotAllowed: Externe IDP niet toegestaan
       MinimumExternalIDPNeeded: Er moet minstens één IDP worden toegevoegd
       AlreadyExists: Externe IDP al ingenomen
       NotFound: Externe IDP niet gevonden

@@ -21,9 +21,9 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -42,13 +42,16 @@ const (
 
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 	client, err := o.query.GetOIDCClientByID(ctx, id, false)
 	if err != nil {
 		return nil, err
 	}
 	if client.State != domain.AppStateActive {
-		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
 	}
 	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultLoginURLV2), nil
 }
@@ -59,7 +62,10 @@ func (o *OPStorage) GetKeyByIDAndClientID(ctx context.Context, keyID, userID str
 
 func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer string) (_ *jose.JSONWebKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 	publicKeyData, err := o.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, keyID, issuer, false)
 	if err != nil {
 		return nil, err
@@ -75,7 +81,12 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 	}, nil
 }
 
-func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string, scopes []string) ([]string, error) {
+func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string, scopes []string) (_ []string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 	user, err := o.query.GetUserByID(ctx, true, subject)
 	if err != nil {
 		return nil, err
@@ -85,7 +96,10 @@ func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string
 
 func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secret string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 	ctx = authz.SetCtxData(ctx, authz.CtxData{
 		UserID: oidcCtx,
 		OrgID:  oidcCtx,
@@ -102,7 +116,10 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 
 func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo *oidc.UserInfo, tokenID, subject, origin string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
 		token, err := o.query.ActiveAccessTokenByToken(ctx, tokenID)
@@ -117,7 +134,7 @@ func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo *oidc.Use
 
 	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
 	if err != nil {
-		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
+		return zerrors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
 	if token.ApplicationID != "" {
 		if err = o.isOriginAllowed(ctx, token.ApplicationID, origin); err != nil {
@@ -129,7 +146,10 @@ func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo *oidc.Use
 
 func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo *oidc.UserInfo, userID, applicationID string, scopes []string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 	if applicationID != "" {
 		app, err := o.query.AppByOIDCClientID(ctx, applicationID)
 		if err != nil {
@@ -138,7 +158,7 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo *oidc.Us
 		if app.OIDCConfig.AssertIDTokenRole {
 			scopes, err = o.assertProjectRoleScopes(ctx, applicationID, scopes)
 			if err != nil {
-				return errors.ThrowPreconditionFailed(err, "OIDC-Dfe2s", "Errors.Internal")
+				return zerrors.ThrowPreconditionFailed(err, "OIDC-Dfe2s", "Errors.Internal")
 			}
 		}
 	}
@@ -159,7 +179,10 @@ func (o *OPStorage) SetUserinfoFromRequest(ctx context.Context, userinfo *oidc.U
 
 func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection *oidc.IntrospectionResponse, tokenID, subject, clientID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
 		token, err := o.query.ActiveAccessTokenByToken(ctx, tokenID)
@@ -168,7 +191,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 		}
 		projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
 		if err != nil {
-			return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
+			return zerrors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 		}
 		return o.introspect(ctx, introspection,
 			tokenID, token.UserID, token.ClientID, clientID, projectID,
@@ -178,16 +201,16 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 
 	token, err := o.repo.TokenByIDs(ctx, subject, tokenID)
 	if err != nil {
-		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
+		return zerrors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
 	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
 	if err != nil {
-		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
+		return zerrors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 	}
 	if token.IsPAT {
 		err = o.assertClientScopesForPAT(ctx, token, clientID, projectID)
 		if err != nil {
-			return errors.ThrowPreconditionFailed(err, "OIDC-AGefw", "Errors.Internal")
+			return zerrors.ThrowPreconditionFailed(err, "OIDC-AGefw", "Errors.Internal")
 		}
 	}
 	return o.introspect(ctx, introspection,
@@ -196,12 +219,13 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 		token.CreationDate, token.Expiration)
 }
 
-func (o *OPStorage) ClientCredentialsTokenRequest(ctx context.Context, clientID string, scope []string) (op.TokenRequest, error) {
-	loginname, err := query.NewUserLoginNamesSearchQuery(clientID)
-	if err != nil {
-		return nil, err
-	}
-	user, err := o.query.GetUser(ctx, false, loginname)
+func (o *OPStorage) ClientCredentialsTokenRequest(ctx context.Context, clientID string, scope []string) (_ op.TokenRequest, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
+	user, err := o.query.GetUserByLoginName(ctx, false, clientID)
 	if err != nil {
 		return nil, err
 	}
@@ -220,7 +244,7 @@ func (o *OPStorage) ClientCredentialsTokenRequest(ctx context.Context, clientID 
 // ClientCredentials method is kept to keep the storage interface implemented.
 // However, it should never be called as the VerifyClient method on the Server is overridden.
 func (o *OPStorage) ClientCredentials(context.Context, string, string) (op.Client, error) {
-	return nil, errors.ThrowInternal(nil, "OIDC-Su8So", "Errors.Internal")
+	return nil, zerrors.ThrowInternal(nil, "OIDC-Su8So", "Errors.Internal")
 }
 
 // isOriginAllowed checks whether a call by the client to the endpoint is allowed from the provided origin
@@ -236,7 +260,7 @@ func (o *OPStorage) isOriginAllowed(ctx context.Context, clientID, origin string
 	if api_http.IsOriginAllowed(app.OIDCConfig.AllowedOrigins, origin) {
 		return nil
 	}
-	return errors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
+	return zerrors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
 }
 
 func (o *OPStorage) introspect(
@@ -269,7 +293,7 @@ func (o *OPStorage) introspect(
 			return nil
 		}
 	}
-	return errors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
+	return zerrors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
 }
 
 func (o *OPStorage) checkOrgScopes(ctx context.Context, user *query.User, scopes []string) ([]string, error) {
@@ -467,6 +491,24 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, user *query.User, userGra
 					return object.UserGrantsFromQuery(c, userGrants)
 				}),
 			),
+			actions.SetFields("org",
+				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
+					return func(goja.FunctionCall) goja.Value {
+						metadata, err := o.query.SearchOrgMetadata(
+							ctx,
+							true,
+							user.ResourceOwner,
+							&query.OrgMetadataSearchQueries{},
+							false,
+						)
+						if err != nil {
+							logging.WithError(err).Info("unable to get org metadata in action")
+							panic(err)
+						}
+						return object.OrgMetadataListFromQuery(c, metadata)
+					}
+				}),
+			),
 		),
 	)
 
@@ -549,6 +591,12 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, user *query.User, userGra
 }
 
 func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clientID string, scopes []string) (claims map[string]interface{}, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
+
 	roles := make([]string, 0)
 	var allRoles bool
 	for _, scope := range scopes {
@@ -660,6 +708,24 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userG
 					return object.UserGrantsFromQuery(c, userGrants)
 				}),
 			),
+			actions.SetFields("org",
+				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
+					return func(goja.FunctionCall) goja.Value {
+						metadata, err := o.query.SearchOrgMetadata(
+							ctx,
+							true,
+							user.ResourceOwner,
+							&query.OrgMetadataSearchQueries{},
+							false,
+						)
+						if err != nil {
+							logging.WithError(err).Info("unable to get org metadata in action")
+							panic(err)
+						}
+						return object.OrgMetadataListFromQuery(c, metadata)
+					}
+				}),
+			),
 		),
 	)
 
@@ -736,7 +802,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	}
 	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID)
 	// applicationID might contain a username (e.g. client credentials) -> ignore the not found
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return nil, nil, err
 	}
 	// ensure the projectID of the requesting is part of the roleAudience
@@ -756,7 +822,7 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	queries = append(queries, userIDQuery)
 	grants, err := o.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: queries,
-	}, true, false)
+	}, true)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -907,7 +973,10 @@ func userinfoClaims(userInfo *oidc.UserInfo) func(c *actions.FieldConfig) interf
 
 func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCredentials]) (_ op.Client, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	if oidc.GrantType(r.Form.Get("grant_type")) == oidc.GrantTypeClientCredentials {
 		return s.clientCredentialsAuth(ctx, r.Data.ClientID, r.Data.ClientSecret)
@@ -918,7 +987,7 @@ func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCreden
 		return nil, err
 	}
 	client, err := s.query.GetOIDCClientByID(ctx, clientID, assertion)
-	if errors.IsNotFound(err) {
+	if zerrors.IsNotFound(err) {
 		return nil, oidc.ErrInvalidClient().WithParent(err).WithDescription("client not found")
 	}
 	if err != nil {
@@ -926,6 +995,12 @@ func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCreden
 	}
 	if client.State != domain.AppStateActive {
 		return nil, oidc.ErrInvalidClient().WithDescription("client is not active")
+	}
+	if client.Settings == nil {
+		client.Settings = &query.OIDCSettings{
+			AccessTokenLifetime: s.defaultAccessTokenLifetime,
+			IdTokenLifetime:     s.defaultIdTokenLifetime,
+		}
 	}
 
 	switch client.AuthMethodType {

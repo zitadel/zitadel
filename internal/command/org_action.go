@@ -5,10 +5,10 @@ import (
 	"sort"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddActionWithID(ctx context.Context, addAction *domain.Action, resourceOwner, actionID string) (_ string, _ *domain.ObjectDetails, err error) {
@@ -17,7 +17,7 @@ func (c *Commands) AddActionWithID(ctx context.Context, addAction *domain.Action
 		return "", nil, err
 	}
 	if existingAction.State != domain.ActionStateUnspecified {
-		return "", nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-nau2k", "Errors.Action.AlreadyExisting")
+		return "", nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-nau2k", "Errors.Action.AlreadyExisting")
 	}
 
 	return c.addActionWithID(ctx, addAction, resourceOwner, actionID)
@@ -25,7 +25,7 @@ func (c *Commands) AddActionWithID(ctx context.Context, addAction *domain.Action
 
 func (c *Commands) AddAction(ctx context.Context, addAction *domain.Action, resourceOwner string) (_ string, _ *domain.ObjectDetails, err error) {
 	if !addAction.IsValid() {
-		return "", nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-eg2gf", "Errors.Action.Invalid")
+		return "", nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-eg2gf", "Errors.Action.Invalid")
 	}
 
 	actionID, err := c.idGenerator.Next()
@@ -61,7 +61,7 @@ func (c *Commands) addActionWithID(ctx context.Context, addAction *domain.Action
 
 func (c *Commands) ChangeAction(ctx context.Context, actionChange *domain.Action, resourceOwner string) (*domain.ObjectDetails, error) {
 	if !actionChange.IsValid() || actionChange.AggregateID == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Df2f3", "Errors.Action.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Df2f3", "Errors.Action.Invalid")
 	}
 
 	existingAction, err := c.getActionWriteModelByID(ctx, actionChange.AggregateID, resourceOwner)
@@ -69,7 +69,7 @@ func (c *Commands) ChangeAction(ctx context.Context, actionChange *domain.Action
 		return nil, err
 	}
 	if !existingAction.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Sfg2t", "Errors.Action.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Sfg2t", "Errors.Action.NotFound")
 	}
 
 	actionAgg := ActionAggregateFromWriteModel(&existingAction.WriteModel)
@@ -96,7 +96,7 @@ func (c *Commands) ChangeAction(ctx context.Context, actionChange *domain.Action
 
 func (c *Commands) DeactivateAction(ctx context.Context, actionID string, resourceOwner string) (*domain.ObjectDetails, error) {
 	if actionID == "" || resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-DAhk5", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-DAhk5", "Errors.IDMissing")
 	}
 
 	existingAction, err := c.getActionWriteModelByID(ctx, actionID, resourceOwner)
@@ -104,10 +104,10 @@ func (c *Commands) DeactivateAction(ctx context.Context, actionID string, resour
 		return nil, err
 	}
 	if !existingAction.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-NRmhu", "Errors.Action.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-NRmhu", "Errors.Action.NotFound")
 	}
 	if existingAction.State != domain.ActionStateActive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Dgj92", "Errors.Action.NotActive")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Dgj92", "Errors.Action.NotActive")
 	}
 	actionAgg := ActionAggregateFromWriteModel(&existingAction.WriteModel)
 	events := []eventstore.Command{
@@ -126,7 +126,7 @@ func (c *Commands) DeactivateAction(ctx context.Context, actionID string, resour
 
 func (c *Commands) ReactivateAction(ctx context.Context, actionID string, resourceOwner string) (*domain.ObjectDetails, error) {
 	if actionID == "" || resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-BNm56", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-BNm56", "Errors.IDMissing")
 	}
 
 	existingAction, err := c.getActionWriteModelByID(ctx, actionID, resourceOwner)
@@ -134,10 +134,10 @@ func (c *Commands) ReactivateAction(ctx context.Context, actionID string, resour
 		return nil, err
 	}
 	if !existingAction.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Aa22g", "Errors.Action.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Aa22g", "Errors.Action.NotFound")
 	}
 	if existingAction.State != domain.ActionStateInactive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-J53zh", "Errors.Action.NotInactive")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-J53zh", "Errors.Action.NotInactive")
 	}
 
 	actionAgg := ActionAggregateFromWriteModel(&existingAction.WriteModel)
@@ -157,7 +157,7 @@ func (c *Commands) ReactivateAction(ctx context.Context, actionID string, resour
 
 func (c *Commands) DeleteAction(ctx context.Context, actionID, resourceOwner string, flowTypes ...domain.FlowType) (*domain.ObjectDetails, error) {
 	if actionID == "" || resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Gfg3g", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Gfg3g", "Errors.IDMissing")
 	}
 
 	existingAction, err := c.getActionWriteModelByID(ctx, actionID, resourceOwner)
@@ -165,7 +165,7 @@ func (c *Commands) DeleteAction(ctx context.Context, actionID, resourceOwner str
 		return nil, err
 	}
 	if !existingAction.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Dgh4h", "Errors.Action.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Dgh4h", "Errors.Action.NotFound")
 	}
 	actionAgg := ActionAggregateFromWriteModel(&existingAction.WriteModel)
 	events := []eventstore.Command{

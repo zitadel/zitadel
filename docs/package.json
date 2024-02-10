@@ -33,7 +33,7 @@
     "docusaurus-plugin-openapi-docs": "^1.7.3",
     "docusaurus-theme-openapi-docs": "^1.7.3",
     "mdx-mermaid": "^1.1.0",
-    "postcss": "^8.4.19",
+    "postcss": "^8.4.31",
     "raw-loader": "^4.0.2",
     "react": "17.0.2",
     "react-copy-to-clipboard": "^5.1.0",

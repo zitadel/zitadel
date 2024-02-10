@@ -6,10 +6,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/feature"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) SetBooleanInstanceFeature(ctx context.Context, f domain.Feature, value bool) (*domain.ObjectDetails, error) {
@@ -36,7 +36,7 @@ func (c *Commands) SetBooleanInstanceFeature(ctx context.Context, f domain.Featu
 func prepareSetFeature[T feature.SetEventType](writeModel *InstanceFeatureWriteModel[T], value T, idGenerator id.Generator) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if !writeModel.feature.IsAFeature() || writeModel.feature == domain.FeatureUnspecified {
-			return nil, errors.ThrowPreconditionFailed(nil, "FEAT-JK3td", "Errors.Feature.NotExisting")
+			return nil, zerrors.ThrowPreconditionFailed(nil, "FEAT-JK3td", "Errors.Feature.NotExisting")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			events, err := filter(ctx, writeModel.Query())

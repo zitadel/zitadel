@@ -5,13 +5,13 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -232,7 +232,7 @@ func (p *appProjection) Reducers() []handler.AggregateReducer {
 func (p *appProjection) reduceAppAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ApplicationAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-1xYE6", "reduce.wrong.event.type %s", project.ApplicationAddedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-1xYE6", "reduce.wrong.event.type %s", project.ApplicationAddedType)
 	}
 	return handler.NewCreateStatement(
 		e,
@@ -253,7 +253,7 @@ func (p *appProjection) reduceAppAdded(event eventstore.Event) (*handler.Stateme
 func (p *appProjection) reduceAppChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ApplicationChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ZJ8JA", "reduce.wrong.event.type %s", project.ApplicationChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ZJ8JA", "reduce.wrong.event.type %s", project.ApplicationChangedType)
 	}
 	if e.Name == "" {
 		return handler.NewNoOpStatement(event), nil
@@ -275,7 +275,7 @@ func (p *appProjection) reduceAppChanged(event eventstore.Event) (*handler.State
 func (p *appProjection) reduceAppDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ApplicationDeactivatedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-MVWxZ", "reduce.wrong.event.type %s", project.ApplicationDeactivatedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-MVWxZ", "reduce.wrong.event.type %s", project.ApplicationDeactivatedType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -294,7 +294,7 @@ func (p *appProjection) reduceAppDeactivated(event eventstore.Event) (*handler.S
 func (p *appProjection) reduceAppReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ApplicationReactivatedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-D0HZO", "reduce.wrong.event.type %s", project.ApplicationReactivatedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-D0HZO", "reduce.wrong.event.type %s", project.ApplicationReactivatedType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -313,7 +313,7 @@ func (p *appProjection) reduceAppReactivated(event eventstore.Event) (*handler.S
 func (p *appProjection) reduceAppRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ApplicationRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Y99aq", "reduce.wrong.event.type %s", project.ApplicationRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y99aq", "reduce.wrong.event.type %s", project.ApplicationRemovedType)
 	}
 	return handler.NewDeleteStatement(
 		e,
@@ -327,7 +327,7 @@ func (p *appProjection) reduceAppRemoved(event eventstore.Event) (*handler.State
 func (p *appProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DlUlO", "reduce.wrong.event.type %s", project.ProjectRemovedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-DlUlO", "reduce.wrong.event.type %s", project.ProjectRemovedType)
 	}
 	return handler.NewDeleteStatement(
 		e,
@@ -341,7 +341,7 @@ func (p *appProjection) reduceProjectRemoved(event eventstore.Event) (*handler.S
 func (p *appProjection) reduceAPIConfigAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.APIConfigAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Y99aq", "reduce.wrong.event.type %s", project.APIConfigAddedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Y99aq", "reduce.wrong.event.type %s", project.APIConfigAddedType)
 	}
 	return handler.NewMultiStatement(
 		e,
@@ -371,7 +371,7 @@ func (p *appProjection) reduceAPIConfigAdded(event eventstore.Event) (*handler.S
 func (p *appProjection) reduceAPIConfigChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.APIConfigChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-vnZKi", "reduce.wrong.event.type %s", project.APIConfigChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-vnZKi", "reduce.wrong.event.type %s", project.APIConfigChangedType)
 	}
 	cols := make([]handler.Column, 0, 2)
 	if e.ClientSecret != nil {
@@ -409,7 +409,7 @@ func (p *appProjection) reduceAPIConfigChanged(event eventstore.Event) (*handler
 func (p *appProjection) reduceAPIConfigSecretChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.APIConfigSecretChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ttb0I", "reduce.wrong.event.type %s", project.APIConfigSecretChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ttb0I", "reduce.wrong.event.type %s", project.APIConfigSecretChangedType)
 	}
 	return handler.NewMultiStatement(
 		e,
@@ -439,7 +439,7 @@ func (p *appProjection) reduceAPIConfigSecretChanged(event eventstore.Event) (*h
 func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.OIDCConfigAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-GNHU1", "reduce.wrong.event.type %s", project.OIDCConfigAddedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-GNHU1", "reduce.wrong.event.type %s", project.OIDCConfigAddedType)
 	}
 	return handler.NewMultiStatement(
 		e,
@@ -483,7 +483,7 @@ func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.OIDCConfigChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-GNHU1", "reduce.wrong.event.type %s", project.OIDCConfigChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-GNHU1", "reduce.wrong.event.type %s", project.OIDCConfigChangedType)
 	}
 
 	cols := make([]handler.Column, 0, 15)
@@ -563,7 +563,7 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 func (p *appProjection) reduceOIDCConfigSecretChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.OIDCConfigSecretChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-GNHU1", "reduce.wrong.event.type %s", project.OIDCConfigSecretChangedType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-GNHU1", "reduce.wrong.event.type %s", project.OIDCConfigSecretChangedType)
 	}
 	return handler.NewMultiStatement(
 		e,
@@ -593,7 +593,7 @@ func (p *appProjection) reduceOIDCConfigSecretChanged(event eventstore.Event) (*
 func (p *appProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Hyd1f", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Hyd1f", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
 	return handler.NewDeleteStatement(
@@ -608,7 +608,7 @@ func (p *appProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Sta
 func (p *appProjection) reduceSAMLConfigAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.SAMLConfigAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-GMHU1", "reduce.wrong.event.type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "HANDL-GMHU1", "reduce.wrong.event.type")
 	}
 	return handler.NewMultiStatement(
 		e,
@@ -638,7 +638,7 @@ func (p *appProjection) reduceSAMLConfigAdded(event eventstore.Event) (*handler.
 func (p *appProjection) reduceSAMLConfigChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.SAMLConfigChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-GMHU2", "reduce.wrong.event.type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "HANDL-GMHU2", "reduce.wrong.event.type")
 	}
 
 	cols := make([]handler.Column, 0, 3)

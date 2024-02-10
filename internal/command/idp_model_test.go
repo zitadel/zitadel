@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_AllIDPWriteModel(t *testing.T) {
@@ -179,7 +179,7 @@ func TestCommands_AllIDPWriteModel(t *testing.T) {
 				idpType:       domain.IDPTypeUnspecified,
 			},
 			res: res{
-				err: errors.ThrowInternal(nil, "COMMAND-xw921211", "Errors.IDPConfig.NotExisting"),
+				err: zerrors.ThrowInternal(nil, "COMMAND-xw921211", "Errors.IDPConfig.NotExisting"),
 			},
 		},
 		{
@@ -334,7 +334,7 @@ func TestCommands_AllIDPWriteModel(t *testing.T) {
 				idpType:       domain.IDPTypeUnspecified,
 			},
 			res: res{
-				err: errors.ThrowInternal(nil, "COMMAND-xw921111", "Errors.IDPConfig.NotExisting"),
+				err: zerrors.ThrowInternal(nil, "COMMAND-xw921111", "Errors.IDPConfig.NotExisting"),
 			},
 		},
 	}

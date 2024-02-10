@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limite non trovato
     NoneSpecified: Nessun limite specificato
+    Instance:
+      Blocked: L'istanza è bloccata
   Restrictions:
     NoneSpecified: Nessuna restrizione specificata
     DefaultLanguageMustBeAllowed: La lingua predefinita deve essere consentita
@@ -145,7 +147,7 @@ Errors:
     ExternalIDP:
       Invalid: IDP esterno non valido
       IDPConfigNotExisting: IDP non valido per questa organizzazione
-      NotAllowed: IDP esterno non consentito su questa organizzazione
+      NotAllowed: IDP esterno non consentito
       MinimumExternalIDPNeeded: Almeno un IDP deve essere aggiunto
       AlreadyExists: IDP esterno già preso
       NotFound: IDP esterno non trovato

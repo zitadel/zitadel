@@ -1,8 +1,8 @@
 package policy
 
 import (
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -44,7 +44,7 @@ func MailTemplateAddedEventMapper(event eventstore.Event) (eventstore.Event, err
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-5m9if", "unable to unmarshal mail template")
+		return nil, zerrors.ThrowInternal(err, "POLIC-5m9if", "unable to unmarshal mail template")
 	}
 
 	return e, nil
@@ -69,7 +69,7 @@ func NewMailTemplateChangedEvent(
 	changes []MailTemplateChanges,
 ) (*MailTemplateChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-m9osd", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "POLICY-m9osd", "Errors.NoChangesFound")
 	}
 	changeEvent := &MailTemplateChangedEvent{
 		BaseEvent: *base,
@@ -95,7 +95,7 @@ func MailTemplateChangedEventMapper(event eventstore.Event) (eventstore.Event, e
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-3uu8K", "unable to unmarshal mail template policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-3uu8K", "unable to unmarshal mail template policy")
 	}
 
 	return e, nil

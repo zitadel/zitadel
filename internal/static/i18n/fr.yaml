@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limites non trouvée
     NoneSpecified: Aucune limite spécifiée
+    Instance:
+      Blocked: Instance bloquée
   Restrictions:
     NoneSpecified: Aucune restriction spécifiée
     DefaultLanguageMustBeAllowed: La langue par défaut doit être autorisée
@@ -145,7 +147,7 @@ Errors:
     ExternalIDP:
       Invalid: IDP Externer invalide
       IDPConfigNotExisting: Le fournisseur IDP n'est pas valide pour cette organisation
-      NotAllowed: IDP externe non autorisé pour cette organisation
+      NotAllowed: IDP externe non autorisé
       MinimumExternalIDPNeeded: Au moins un IDP doit être ajouté
       AlreadyExists: External IDP déjà pris
       NotFound: IDP externe non trouvé

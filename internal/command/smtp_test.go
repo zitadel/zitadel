@@ -10,12 +10,12 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddSMTPConfig(t *testing.T) {
@@ -67,16 +67,13 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 						User:     "user",
 						Password: "password",
 					},
-					Tls:            true,
-					From:           "from@domain.ch",
-					FromName:       "name",
-					ReplyToAddress: "replyto@domain.ch",
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
+
 		{
 			name: "add smtp config, ok",
 			fields: fields{
@@ -228,7 +225,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -253,7 +250,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -374,7 +371,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 				smtp: &smtp.Config{},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -390,7 +387,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 				id:   "configID",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -417,7 +414,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 				id:         "ID",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -473,7 +470,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -529,7 +526,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 				id:         "ID",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -626,7 +623,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 				id:         "ID",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -651,7 +648,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 				id:         "ID",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -781,7 +778,7 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 				id:       "ID",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -887,7 +884,7 @@ func TestCommandSide_ActivateSMTPConfig(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -904,7 +901,7 @@ func TestCommandSide_ActivateSMTPConfig(t *testing.T) {
 				id:         "id",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1003,7 +1000,7 @@ func TestCommandSide_DeactivateSMTPConfig(t *testing.T) {
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1020,7 +1017,7 @@ func TestCommandSide_DeactivateSMTPConfig(t *testing.T) {
 				id:         "id",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1127,7 +1124,7 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 				id:  "ID",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{

@@ -6,11 +6,10 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/errors"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -80,13 +79,13 @@ func (u *User) AppendEvent(event *es_models.Event) error {
 		return u.Machine.AppendEvent(event)
 	}
 
-	return errors.ThrowNotFound(nil, "MODEL-x9TaX", "Errors.UserType.Undefined")
+	return zerrors.ThrowNotFound(nil, "MODEL-x9TaX", "Errors.UserType.Undefined")
 }
 
 func (u *User) setData(event *es_models.Event) error {
 	if err := json.Unmarshal(event.Data, u); err != nil {
 		logging.Log("EVEN-ZDzQy").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-yGmhh", "could not unmarshal event")
+		return zerrors.ThrowInternal(err, "MODEL-yGmhh", "could not unmarshal event")
 	}
 	return nil
 }

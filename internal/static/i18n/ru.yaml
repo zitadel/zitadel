@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Лимиты не найдены
     NoneSpecified: Не указаны лимиты
+    Instance:
+      Blocked: Экземпляр заблокирован
   Restrictions:
     NoneSpecified: Не указаны ограничения
     DefaultLanguageMustBeAllowed: Язык по умолчанию должен быть разрешен
@@ -144,7 +146,7 @@ Errors:
     ExternalIDP:
       Invalid: Внешний идентификационный номер недействителен.
       IDPConfigNotExisting: Поставщик МВУ недействителен для этой организации.
-      NotAllowed: Внешний IDP не разрешен в этой организации.
+      NotAllowed: Внешний IDP не разрешен
       MinimumExternalIDPNeeded: Необходимо добавить хотя бы одного ВПЛ.
       AlreadyExists: Внешнее ВПЛ уже занято
       NotFound: Внешний IDP не найден

@@ -4,8 +4,8 @@ import (
 	"database/sql"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // SearchQuery defines the which and how data are queried
@@ -17,10 +17,11 @@ type SearchQuery struct {
 	AllowTimeTravel       bool
 	AwaitOpenTransactions bool
 	Limit                 uint64
-	Offset                uint16
+	Offset                uint32
 	Desc                  bool
 
 	InstanceID        *Filter
+	InstanceIDs       *Filter
 	ExcludedInstances *Filter
 	Creator           *Filter
 	Owner             *Filter
@@ -99,16 +100,16 @@ func NewFilter(field Field, value interface{}, operation Operation) *Filter {
 // Validate checks if the fields of the filter have valid values
 func (f *Filter) Validate() error {
 	if f == nil {
-		return errors.ThrowPreconditionFailed(nil, "REPO-z6KcG", "filter is nil")
+		return zerrors.ThrowPreconditionFailed(nil, "REPO-z6KcG", "filter is nil")
 	}
 	if f.Field <= 0 || f.Field >= fieldCount {
-		return errors.ThrowPreconditionFailed(nil, "REPO-zw62U", "field not definded")
+		return zerrors.ThrowPreconditionFailed(nil, "REPO-zw62U", "field not definded")
 	}
 	if f.Value == nil {
-		return errors.ThrowPreconditionFailed(nil, "REPO-GJ9ct", "no value definded")
+		return zerrors.ThrowPreconditionFailed(nil, "REPO-GJ9ct", "no value definded")
 	}
 	if f.Operation <= 0 || f.Operation >= operationCount {
-		return errors.ThrowPreconditionFailed(nil, "REPO-RrQTy", "operation not definded")
+		return zerrors.ThrowPreconditionFailed(nil, "REPO-RrQTy", "operation not definded")
 	}
 	return nil
 }
@@ -116,7 +117,7 @@ func (f *Filter) Validate() error {
 func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, error) {
 	if builder == nil ||
 		builder.GetColumns().Validate() != nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "builder invalid")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "builder invalid")
 	}
 
 	query := &SearchQuery{
@@ -132,7 +133,7 @@ func QueryFromBuilder(builder *eventstore.SearchQueryBuilder) (*SearchQuery, err
 
 	for _, f := range []func(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter{
 		instanceIDFilter,
-		excludedInstanceIDFilter,
+		instanceIDsFilter,
 		editorUserFilter,
 		resourceOwnerFilter,
 		positionAfterFilter,
@@ -182,14 +183,6 @@ func eventSequenceGreaterFilter(builder *eventstore.SearchQueryBuilder, query *S
 	return query.Sequence
 }
 
-func excludedInstanceIDFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {
-	if len(builder.GetExcludedInstanceIDs()) == 0 {
-		return nil
-	}
-	query.ExcludedInstances = NewFilter(FieldInstanceID, database.TextArray[string](builder.GetExcludedInstanceIDs()), OperationNotIn)
-	return query.ExcludedInstances
-}
-
 func creationDateAfterFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {
 	if builder.GetCreationDateAfter().IsZero() {
 		return nil
@@ -228,6 +221,14 @@ func instanceIDFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery
 	}
 	query.InstanceID = NewFilter(FieldInstanceID, *builder.GetInstanceID(), OperationEquals)
 	return query.InstanceID
+}
+
+func instanceIDsFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {
+	if builder.GetInstanceIDs() == nil {
+		return nil
+	}
+	query.InstanceIDs = NewFilter(FieldInstanceID, builder.GetInstanceIDs(), OperationIn)
+	return query.InstanceIDs
 }
 
 func positionAfterFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuery) *Filter {

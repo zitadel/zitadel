@@ -6,7 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestPrepareGetByQuery(t *testing.T) {
@@ -114,7 +114,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: caos_errs.IsNotFound,
+				errFunc: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -128,7 +128,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: caos_errs.IsInternal,
+				errFunc: zerrors.IsInternal,
 			},
 		},
 		{
@@ -142,7 +142,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: caos_errs.IsErrorInvalidArgument,
+				errFunc: zerrors.IsErrorInvalidArgument,
 			},
 		},
 	}
@@ -212,7 +212,7 @@ func TestPreparePut(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: caos_errs.IsInternal,
+				errFunc: zerrors.IsInternal,
 			},
 		},
 	}
@@ -284,7 +284,7 @@ func TestPrepareDelete(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: caos_errs.IsInternal,
+				errFunc: zerrors.IsInternal,
 			},
 		},
 	}
@@ -375,7 +375,7 @@ func TestPrepareDeleteByKeys(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: caos_errs.IsInternal,
+				errFunc: zerrors.IsInternal,
 			},
 		},
 	}

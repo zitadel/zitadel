@@ -58,6 +58,8 @@ import {
   DeactivateSMTPConfigResponse,
   DeleteProviderRequest,
   DeleteProviderResponse,
+  GetAllowedLanguagesRequest,
+  GetAllowedLanguagesResponse,
   GetCustomDomainClaimedMessageTextRequest,
   GetCustomDomainClaimedMessageTextResponse,
   GetCustomDomainPolicyRequest,
@@ -130,6 +132,7 @@ import {
   GetPrivacyPolicyResponse,
   GetProviderByIDRequest,
   GetProviderByIDResponse,
+  GetRestrictionsResponse,
   GetSecretGeneratorRequest,
   GetSecretGeneratorResponse,
   GetSecurityPolicyRequest,
@@ -162,6 +165,8 @@ import {
   ListLoginPolicySecondFactorsResponse,
   ListMilestonesRequest,
   ListMilestonesResponse,
+  ListOrgsRequest,
+  ListOrgsResponse,
   ListProvidersRequest,
   ListProvidersResponse,
   ListSecretGeneratorsRequest,
@@ -202,6 +207,7 @@ import {
   ResetCustomDomainPolicyToDefaultResponse,
   ResetCustomLoginTextsToDefaultRequest,
   ResetCustomLoginTextsToDefaultResponse,
+  SelectLanguages,
   SetCustomLoginTextsRequest,
   SetCustomLoginTextsResponse,
   SetDefaultDomainClaimedMessageTextRequest,
@@ -226,6 +232,8 @@ import {
   SetDefaultVerifyPhoneMessageTextResponse,
   SetDefaultVerifySMSOTPMessageTextRequest,
   SetDefaultVerifySMSOTPMessageTextResponse,
+  SetRestrictionsRequest,
+  SetRestrictionsResponse,
   SetSecurityPolicyRequest,
   SetSecurityPolicyResponse,
   SetUpOrgRequest,
@@ -318,6 +326,8 @@ import {
   MilestoneQuery,
   MilestoneType,
 } from '../proto/generated/zitadel/milestone/v1/milestone_pb';
+import { OrgFieldName, OrgQuery } from '../proto/generated/zitadel/org_pb';
+import { SortDirection } from '@angular/material/sort';
 
 export interface OnboardingActions {
   order: number;
@@ -441,6 +451,11 @@ export class AdminService {
   public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
     const req = new GetSupportedLanguagesRequest();
     return this.grpcService.admin.getSupportedLanguages(req, null).then((resp) => resp.toObject());
+  }
+
+  public getAllowedLanguages(): Promise<GetAllowedLanguagesResponse.AsObject> {
+    const req = new GetAllowedLanguagesRequest();
+    return this.grpcService.admin.getAllowedLanguages(req, null).then((resp) => resp.toObject());
   }
 
   public getDefaultLoginTexts(req: GetDefaultLoginTextsRequest): Promise<GetDefaultLoginTextsResponse.AsObject> {
@@ -831,6 +846,29 @@ export class AdminService {
     req.setLanguage(language);
 
     return this.grpcService.admin.setDefaultLanguage(req, null).then((resp) => resp.toObject());
+  }
+
+  /* restrictions */
+
+  public getRestrictions(): Promise<GetRestrictionsResponse.AsObject> {
+    const req = new GetDefaultLanguageRequest();
+    return this.grpcService.admin.getRestrictions(req, null).then((resp) => resp.toObject());
+  }
+
+  public setRestrictions(
+    disallowPublicOrgRegistration?: boolean,
+    allowedLanguages?: string[],
+  ): Promise<SetRestrictionsResponse.AsObject> {
+    const req = new SetRestrictionsRequest();
+    if (disallowPublicOrgRegistration !== undefined) {
+      req.setDisallowPublicOrgRegistration(disallowPublicOrgRegistration);
+    }
+    if (allowedLanguages !== undefined) {
+      const langs = new SelectLanguages();
+      langs.setListList(allowedLanguages);
+      req.setAllowedLanguages(langs);
+    }
+    return this.grpcService.admin.setRestrictions(req, null).then((resp) => resp.toObject());
   }
 
   /* notification policy */
@@ -1307,5 +1345,34 @@ export class AdminService {
 
   public listMilestones(req: ListMilestonesRequest): Promise<ListMilestonesResponse.AsObject> {
     return this.grpcService.admin.listMilestones(req, null).then((resp) => resp.toObject());
+  }
+
+  public listOrgs(
+    limit: number,
+    offset: number,
+    queriesList?: OrgQuery[],
+    sortingColumn?: OrgFieldName,
+    sortingDirection?: SortDirection,
+  ): Promise<ListOrgsResponse.AsObject> {
+    const req = new ListOrgsRequest();
+    const query = new ListQuery();
+    if (limit) {
+      query.setLimit(limit);
+    }
+    if (offset) {
+      query.setOffset(offset);
+    }
+    if (sortingDirection) {
+      query.setAsc(sortingDirection === 'asc');
+    }
+    req.setQuery(query);
+    if (sortingColumn) {
+      req.setSortingColumn(sortingColumn);
+    }
+
+    if (queriesList) {
+      req.setQueriesList(queriesList);
+    }
+    return this.grpcService.admin.listOrgs(req, null).then((resp) => resp.toObject());
   }
 }

@@ -32,11 +32,11 @@ import (
 	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/webauthn"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -181,7 +181,7 @@ func (s *Tester) createMachineUserOrgOwner(ctx context.Context) {
 
 	ctx, user := s.createMachineUser(ctx, MachineUserOrgOwner, OrgOwner)
 	_, err = s.Commands.AddOrgMember(ctx, user.ResourceOwner, user.ID, "ORG_OWNER")
-	target := new(caos_errs.AlreadyExistsError)
+	target := new(zerrors.AlreadyExistsError)
 	if !errors.As(err, &target) {
 		logging.OnError(err).Fatal("add org member")
 	}
@@ -192,7 +192,7 @@ func (s *Tester) createMachineUserInstanceOwner(ctx context.Context) {
 
 	ctx, user := s.createMachineUser(ctx, MachineUserInstanceOwner, IAMOwner)
 	_, err = s.Commands.AddInstanceMember(ctx, user.ID, "IAM_OWNER")
-	target := new(caos_errs.AlreadyExistsError)
+	target := new(zerrors.AlreadyExistsError)
 	if !errors.As(err, &target) {
 		logging.OnError(err).Fatal("add instance member")
 	}
@@ -261,6 +261,14 @@ func (s *Tester) WithAuthorizationToken(ctx context.Context, token string) conte
 	return metadata.NewOutgoingContext(ctx, md)
 }
 
+func (s *Tester) BearerToken(ctx context.Context) string {
+	md, ok := metadata.FromOutgoingContext(ctx)
+	if !ok {
+		return ""
+	}
+	return md.Get("Authorization")[0]
+}
+
 func (s *Tester) ensureSystemUser() {
 	const ISSUER = "tester"
 	if s.Users.Get(FirstInstanceUsersKey, SystemUser) != nil {
@@ -303,16 +311,18 @@ func (s *Tester) Done() {
 //
 // Note: the database must already be setup and initialized before
 // using NewTester. See the CONTRIBUTING.md document for details.
-func NewTester(ctx context.Context) *Tester {
+func NewTester(ctx context.Context, zitadelConfigYAML ...string) *Tester {
 	args := strings.Split(commandLine, " ")
 
 	sc := make(chan *start.Server)
 	//nolint:contextcheck
 	cmd := cmd.New(os.Stdout, os.Stdin, args, sc)
 	cmd.SetArgs(args)
-	err := viper.MergeConfig(bytes.NewBuffer(zitadelYAML))
-	logging.OnError(err).Fatal()
-
+	for _, yaml := range append([]string{string(zitadelYAML)}, zitadelConfigYAML...) {
+		err := viper.MergeConfig(bytes.NewBuffer([]byte(yaml)))
+		logging.OnError(err).Fatal()
+	}
+	var err error
 	flavor := os.Getenv("INTEGRATION_DB_FLAVOR")
 	switch flavor {
 	case "cockroach", "":

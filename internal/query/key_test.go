@@ -20,9 +20,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	key_repo "github.com/zitadel/zitadel/internal/repository/keypair"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -88,7 +88,7 @@ func Test_KeyPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -169,7 +169,7 @@ func Test_KeyPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -269,7 +269,7 @@ MZbmlCoBru+rC8ITlTX/0V1ZcsSbL8tYWhthyu9x6yjo1bH85wiVI4gs0MhU8f2a
 -----END PUBLIC KEY-----
 `
 
-func TestQueries_GetActivePublicKeyByID(t *testing.T) {
+func TestQueries_GetPublicKeyByID(t *testing.T) {
 	now := time.Now()
 	future := now.Add(time.Hour)
 
@@ -292,39 +292,7 @@ func TestQueries_GetActivePublicKeyByID(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(),
 			),
-			wantErr: errs.ThrowNotFound(nil, "QUERY-Ahf7x", "Errors.Key.NotFound"),
-		},
-		{
-			name: "expired error",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(key_repo.NewAddedEvent(context.Background(),
-						&eventstore.Aggregate{
-							ID:            "keyID",
-							Type:          key_repo.AggregateType,
-							ResourceOwner: "instanceID",
-							InstanceID:    "instanceID",
-							Version:       key_repo.AggregateVersion,
-						},
-						domain.KeyUsageSigning, "alg",
-						&crypto.CryptoValue{
-							CryptoType: crypto.TypeEncryption,
-							Algorithm:  "alg",
-							KeyID:      "keyID",
-							Crypted:    []byte("private"),
-						},
-						&crypto.CryptoValue{
-							CryptoType: crypto.TypeEncryption,
-							Algorithm:  "alg",
-							KeyID:      "keyID",
-							Crypted:    []byte("public"),
-						},
-						now.Add(-time.Hour),
-						now.Add(-time.Hour),
-					)),
-				),
-			),
-			wantErr: errs.ThrowInvalidArgument(nil, "QUERY-ciF4k", "Errors.Key.ExpireBeforeNow"),
+			wantErr: zerrors.ThrowNotFound(nil, "QUERY-Ahf7x", "Errors.Key.NotFound"),
 		},
 		{
 			name: "decrypt error",
@@ -363,7 +331,7 @@ func TestQueries_GetActivePublicKeyByID(t *testing.T) {
 				expect.DecryptionKeyIDs().Return([]string{})
 				return encryption
 			},
-			wantErr: errs.ThrowInternal(nil, "QUERY-Ie4oh", "Errors.Internal"),
+			wantErr: zerrors.ThrowInternal(nil, "QUERY-Ie4oh", "Errors.Internal"),
 		},
 		{
 			name: "parse error",
@@ -403,7 +371,7 @@ func TestQueries_GetActivePublicKeyByID(t *testing.T) {
 				expect.Decrypt([]byte("public"), "keyID").Return([]byte("foo"), nil)
 				return encryption
 			},
-			wantErr: errs.ThrowInternal(nil, "QUERY-Kai2Z", "Errors.Internal"),
+			wantErr: zerrors.ThrowInternal(nil, "QUERY-Kai2Z", "Errors.Internal"),
 		},
 		{
 			name: "success",
@@ -470,7 +438,7 @@ func TestQueries_GetActivePublicKeyByID(t *testing.T) {
 				q.keyEncryptionAlgorithm = tt.encryption(t)
 			}
 			ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
-			key, err := q.GetActivePublicKeyByID(ctx, "keyID", now)
+			key, err := q.GetPublicKeyByID(ctx, "keyID")
 			if tt.wantErr != nil {
 				require.ErrorIs(t, err, tt.wantErr)
 				return

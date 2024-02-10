@@ -6,11 +6,11 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/settings"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -104,7 +104,7 @@ func (p *debugNotificationProviderProjection) reduceDebugNotificationProviderAdd
 		providerEvent = e.DebugNotificationProviderAddedEvent
 		providerType = domain.NotificationProviderTypeLog
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pYPxS", "reduce.wrong.event.type %v", []eventstore.EventType{instance.DebugNotificationProviderFileAddedEventType, instance.DebugNotificationProviderLogAddedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-pYPxS", "reduce.wrong.event.type %v", []eventstore.EventType{instance.DebugNotificationProviderFileAddedEventType, instance.DebugNotificationProviderLogAddedEventType})
 	}
 
 	return handler.NewCreateStatement(&providerEvent, []handler.Column{
@@ -131,7 +131,7 @@ func (p *debugNotificationProviderProjection) reduceDebugNotificationProviderCha
 		providerEvent = e.DebugNotificationProviderChangedEvent
 		providerType = domain.NotificationProviderTypeLog
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pYPxS", "reduce.wrong.event.type %v", []eventstore.EventType{instance.DebugNotificationProviderFileChangedEventType, instance.DebugNotificationProviderLogChangedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-pYPxS", "reduce.wrong.event.type %v", []eventstore.EventType{instance.DebugNotificationProviderFileChangedEventType, instance.DebugNotificationProviderLogChangedEventType})
 	}
 
 	cols := []handler.Column{
@@ -164,7 +164,7 @@ func (p *debugNotificationProviderProjection) reduceDebugNotificationProviderRem
 		providerEvent = e.DebugNotificationProviderRemovedEvent
 		providerType = domain.NotificationProviderTypeLog
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-dow9f", "reduce.wrong.event.type %v", []eventstore.EventType{instance.DebugNotificationProviderFileRemovedEventType, instance.DebugNotificationProviderLogRemovedEventType})
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-dow9f", "reduce.wrong.event.type %v", []eventstore.EventType{instance.DebugNotificationProviderFileRemovedEventType, instance.DebugNotificationProviderLogRemovedEventType})
 	}
 
 	return handler.NewDeleteStatement(

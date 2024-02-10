@@ -92,11 +92,11 @@ func (c *Client) RestrictAdditionalAccessTokenScopes() func(scopes []string) []s
 }
 
 func (c *Client) AccessTokenLifetime() time.Duration {
-	return c.client.AccessTokenLifetime
+	return c.client.Settings.AccessTokenLifetime
 }
 
 func (c *Client) IDTokenLifetime() time.Duration {
-	return c.client.IDTokenLifetime
+	return c.client.Settings.IdTokenLifetime
 }
 
 func (c *Client) AccessTokenType() op.AccessTokenType {
@@ -134,6 +134,20 @@ func (c *Client) ClockSkew() time.Duration {
 
 func (c *Client) IDTokenUserinfoClaimsAssertion() bool {
 	return c.client.IDTokenUserinfoAssertion
+}
+
+func (c *Client) RedirectURIGlobs() []string {
+	if c.DevMode() {
+		return c.RedirectURIs()
+	}
+	return nil
+}
+
+func (c *Client) PostLogoutRedirectURIGlobs() []string {
+	if c.DevMode() {
+		return c.PostLogoutRedirectURIs()
+	}
+	return nil
 }
 
 func accessTokenTypeToOIDC(tokenType domain.OIDCTokenType) op.AccessTokenType {

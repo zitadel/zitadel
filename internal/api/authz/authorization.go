@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -56,7 +56,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 
 func checkUserPermissions(req interface{}, userPerms []string, authOpt Option) error {
 	if len(userPerms) == 0 {
-		return errors.ThrowPermissionDenied(nil, "AUTH-5mWD2", "No matching permissions found")
+		return zerrors.ThrowPermissionDenied(nil, "AUTH-5mWD2", "No matching permissions found")
 	}
 
 	if authOpt.CheckParam == "" {
@@ -71,7 +71,7 @@ func checkUserPermissions(req interface{}, userPerms []string, authOpt Option) e
 		return nil
 	}
 
-	return errors.ThrowPermissionDenied(nil, "AUTH-3jknH", "No matching permissions found")
+	return zerrors.ThrowPermissionDenied(nil, "AUTH-3jknH", "No matching permissions found")
 }
 
 func SplitPermission(perm string) (string, string) {

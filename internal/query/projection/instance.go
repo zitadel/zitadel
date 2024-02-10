@@ -3,11 +3,11 @@ package projection
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -95,7 +95,7 @@ func (p *instanceProjection) Reducers() []handler.AggregateReducer {
 func (p *instanceProjection) reduceInstanceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.InstanceAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-29nlS", "reduce.wrong.event.type %s", instance.InstanceAddedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-29nlS", "reduce.wrong.event.type %s", instance.InstanceAddedEventType)
 	}
 	return handler.NewCreateStatement(
 		e,
@@ -113,7 +113,7 @@ func reduceInstanceRemovedHelper(instanceIDCol string) func(event eventstore.Eve
 	return func(event eventstore.Event) (*handler.Statement, error) {
 		e, ok := event.(*instance.InstanceRemovedEvent)
 		if !ok {
-			return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-22nlS", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
+			return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-22nlS", "reduce.wrong.event.type %s", instance.InstanceRemovedEventType)
 		}
 		return handler.NewDeleteStatement(
 			e,
@@ -127,7 +127,7 @@ func reduceInstanceRemovedHelper(instanceIDCol string) func(event eventstore.Eve
 func (p *instanceProjection) reduceInstanceChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.InstanceChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-so2am1", "reduce.wrong.event.type %s", instance.InstanceChangedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-so2am1", "reduce.wrong.event.type %s", instance.InstanceChangedEventType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -145,7 +145,7 @@ func (p *instanceProjection) reduceInstanceChanged(event eventstore.Event) (*han
 func (p *instanceProjection) reduceDefaultOrgSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DefaultOrgSetEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2n9f2", "reduce.wrong.event.type %s", instance.DefaultOrgSetEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-2n9f2", "reduce.wrong.event.type %s", instance.DefaultOrgSetEventType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -163,7 +163,7 @@ func (p *instanceProjection) reduceDefaultOrgSet(event eventstore.Event) (*handl
 func (p *instanceProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.ProjectSetEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.ProjectSetEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.ProjectSetEventType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -181,7 +181,7 @@ func (p *instanceProjection) reduceIAMProjectSet(event eventstore.Event) (*handl
 func (p *instanceProjection) reduceConsoleSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.ConsoleSetEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dgf11", "reduce.wrong.event.type %s", instance.ConsoleSetEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Dgf11", "reduce.wrong.event.type %s", instance.ConsoleSetEventType)
 	}
 	return handler.NewUpdateStatement(
 		e,
@@ -200,7 +200,7 @@ func (p *instanceProjection) reduceConsoleSet(event eventstore.Event) (*handler.
 func (p *instanceProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DefaultLanguageSetEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.DefaultLanguageSetEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.DefaultLanguageSetEventType)
 	}
 	return handler.NewUpdateStatement(
 		e,

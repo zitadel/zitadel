@@ -101,23 +101,18 @@ func (mr *MockQueriesMockRecorder) GetInstanceRestrictions(arg0 any) *gomock.Cal
 }
 
 // GetNotifyUserByID mocks base method.
-func (m *MockQueries) GetNotifyUserByID(arg0 context.Context, arg1 bool, arg2 string, arg3 ...query.SearchQuery) (*query.NotifyUser, error) {
+func (m *MockQueries) GetNotifyUserByID(arg0 context.Context, arg1 bool, arg2 string) (*query.NotifyUser, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1, arg2}
-	for _, a := range arg3 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetNotifyUserByID", varargs...)
+	ret := m.ctrl.Call(m, "GetNotifyUserByID", arg0, arg1, arg2)
 	ret0, _ := ret[0].(*query.NotifyUser)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetNotifyUserByID indicates an expected call of GetNotifyUserByID.
-func (mr *MockQueriesMockRecorder) GetNotifyUserByID(arg0, arg1, arg2 any, arg3 ...any) *gomock.Call {
+func (mr *MockQueriesMockRecorder) GetNotifyUserByID(arg0, arg1, arg2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1, arg2}, arg3...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNotifyUserByID", reflect.TypeOf((*MockQueries)(nil).GetNotifyUserByID), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNotifyUserByID", reflect.TypeOf((*MockQueries)(nil).GetNotifyUserByID), arg0, arg1, arg2)
 }
 
 // MailTemplateByOrg mocks base method.
