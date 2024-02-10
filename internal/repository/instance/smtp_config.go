@@ -271,7 +271,7 @@ func SMTPConfigActivatedEventMapper(event eventstore.Event) (eventstore.Event, e
 	}
 	err := event.Unmarshal(smtpConfigActivated)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-KPr5t", "unable to unmarshal smtp config removed")
+		return nil, zerrors.ThrowInternal(err, "IAM-KPr5t", "unable to unmarshal smtp config removed")
 	}
 
 	return smtpConfigActivated, nil
@@ -311,7 +311,7 @@ func SMTPConfigDeactivatedEventMapper(event eventstore.Event) (eventstore.Event,
 	}
 	err := event.Unmarshal(smtpConfigDeactivated)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-KPr5t", "unable to unmarshal smtp config removed")
+		return nil, zerrors.ThrowInternal(err, "IAM-KPr5t", "unable to unmarshal smtp config removed")
 	}
 
 	return smtpConfigDeactivated, nil
