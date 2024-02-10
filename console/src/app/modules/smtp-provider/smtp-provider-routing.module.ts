@@ -11,6 +11,7 @@ const types = [
   { path: 'postmark', component: SMTPProviderComponent },
   { path: 'sendgrid', component: SMTPProviderComponent },
   { path: 'mailjet', component: SMTPProviderComponent },
+  { path: 'mailchimp', component: SMTPProviderComponent },
 ];
 
 const routes: Routes = types.map((value) => {

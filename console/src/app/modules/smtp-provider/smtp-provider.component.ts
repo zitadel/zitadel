@@ -22,6 +22,7 @@ import {
   AmazonSESDefaultSettings,
   GenericDefaultSettings,
   GoogleDefaultSettings,
+  MailchimpDefaultSettings,
   MailgunDefaultSettings,
   MailjetDefaultSettings,
   PostmarkDefaultSettings,
@@ -82,6 +83,9 @@ export class SMTPProviderComponent {
           break;
         case 'sendgrid':
           this.providerDefaultSetting = SendgridDefaultSettings;
+          break;
+        case 'mailchimp':
+          this.providerDefaultSetting = MailchimpDefaultSettings;
           break;
       }
 

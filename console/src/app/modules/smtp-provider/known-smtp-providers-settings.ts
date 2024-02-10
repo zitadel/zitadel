@@ -129,6 +129,18 @@ export const SendgridDefaultSettings: ProviderDefaultSettings = {
   routerLinkElement: 'sendgrid',
 };
 
+export const MailchimpDefaultSettings: ProviderDefaultSettings = {
+  name: 'mailchimp',
+  requiredTls: false,
+  host: 'smtp.mandrillapp.com',
+  unencryptedPort: 587,
+  encryptedPort: 465,
+  user: { value: '', placeholder: 'Your Mailchimp primary contact email' },
+  password: { value: '', placeholder: 'Your Mailchimp Transactional API key' },
+  image: './assets/images/smtp/mailchimp.svg',
+  routerLinkElement: 'mailchimp',
+};
+
 export const GenericDefaultSettings: ProviderDefaultSettings = {
   name: 'generic',
   requiredTls: false,
@@ -144,5 +156,6 @@ export const SMTPKnownProviders = [
   MailjetDefaultSettings,
   PostmarkDefaultSettings,
   SendgridDefaultSettings,
+  MailchimpDefaultSettings,
   GenericDefaultSettings,
 ];
