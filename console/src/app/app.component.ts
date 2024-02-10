@@ -306,18 +306,21 @@ export class AppComponent implements OnDestroy {
   private setFavicon(theme: string): void {
     this.authService.labelpolicy.pipe(takeUntil(this.destroy$)).subscribe((lP) => {
       if (theme === 'dark-theme' && lP?.iconUrlDark) {
+        // Check if asset url is stable, maybe it was deleted but still wasn't applied
         fetch(lP.iconUrlDark).then((response) => {
           if (response.ok) {
             this.document.getElementById('appFavicon')?.setAttribute('href', lP.iconUrlDark);
           }
         });
       } else if (theme === 'light-theme' && lP?.iconUrl) {
+        // Check if asset url is stable, maybe it was deleted but still wasn't applied
         fetch(lP.iconUrl).then((response) => {
           if (response.ok) {
             this.document.getElementById('appFavicon')?.setAttribute('href', lP.iconUrl);
           }
         });
       } else {
+        // Default Zitadel favicon
         this.document.getElementById('appFavicon')?.setAttribute('href', 'favicon.ico');
       }
     });
