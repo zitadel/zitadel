@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	SMTPConfigProjectionTable = "projections.smtp_configs2"
-
+	SMTPConfigProjectionTable      = "projections.smtp_configs2"
+	SMTPConfigColumnID             = "id"
 	SMTPConfigColumnAggregateID    = "aggregate_id"
 	SMTPConfigColumnCreationDate   = "creation_date"
 	SMTPConfigColumnChangeDate     = "change_date"
@@ -27,7 +27,6 @@ const (
 	SMTPConfigColumnSMTPHost       = "host"
 	SMTPConfigColumnSMTPUser       = "username"
 	SMTPConfigColumnSMTPPassword   = "password"
-	SMTPConfigColumnID             = "id"
 	SMTPConfigColumnState          = "state"
 	SMTPConfigColumnDescription    = "description"
 )
@@ -45,7 +44,7 @@ func (*smtpConfigProjection) Name() string {
 func (*smtpConfigProjection) Init() *old_handler.Check {
 	return handler.NewTableCheck(
 		handler.NewTable([]*handler.InitColumn{
-			handler.NewColumn(SMTPConfigColumnID, handler.ColumnTypeText, handler.Default("migrated")),
+			handler.NewColumn(SMTPConfigColumnID, handler.ColumnTypeText),
 			handler.NewColumn(SMTPConfigColumnAggregateID, handler.ColumnTypeText),
 			handler.NewColumn(SMTPConfigColumnCreationDate, handler.ColumnTypeTimestamp),
 			handler.NewColumn(SMTPConfigColumnChangeDate, handler.ColumnTypeTimestamp),
@@ -62,7 +61,7 @@ func (*smtpConfigProjection) Init() *old_handler.Check {
 			handler.NewColumn(SMTPConfigColumnState, handler.ColumnTypeEnum),
 			handler.NewColumn(SMTPConfigColumnDescription, handler.ColumnTypeText),
 		},
-			handler.NewPrimaryKey(SMTPConfigColumnInstanceID, SMTPConfigColumnID),
+			handler.NewPrimaryKey(SMTPConfigColumnInstanceID, SMTPConfigColumnResourceOwner, SMTPConfigColumnID),
 		),
 	)
 }
