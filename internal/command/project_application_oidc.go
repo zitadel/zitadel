@@ -360,10 +360,9 @@ func getOIDCAppWriteModel(ctx context.Context, filter preparation.FilterToQueryR
 	return appWriteModel, err
 }
 
-func trimStringSliceWhiteSpaces(rawSlice []string) []string {
-	trimmedSlice := make([]string, 0)
-	for _, s := range rawSlice {
-		trimmedSlice = append(trimmedSlice, strings.TrimSpace(s))
+func trimStringSliceWhiteSpaces(slice []string) []string {
+	for i, s := range slice {
+		slice[i] = strings.TrimSpace(s)
 	}
-	return trimmedSlice
+	return slice
 }
