@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instancja",
+    "INSTANCE": "Ustawienia domyślne",
     "DASHBOARD": "Strona główna",
     "PERSONAL_INFO": "Informacje Osobiste",
     "DOCUMENTATION": "Dokumentacja",
@@ -1023,6 +1023,7 @@
       "DESCRIPTION": "Te ustawienia rozszerzają i nadpisują ustawienia instancji."
     },
     "LIST": {
+      "ORGS": "Organizacje",
       "LANGUAGES": "Języki",
       "LOGIN": "Zachowanie logowania i bezpieczeństwo",
       "LOCKOUT": "Blokada",
@@ -1040,15 +1041,20 @@
       "PRIVACYPOLICY": "Polityka prywatności",
       "OIDC": "Czas trwania tokenów OIDC i wygaśnięcie",
       "SECRETS": "Wygląd sekretów",
-      "SECURITY": "Ustawienia bezpieczeństwa"
+      "SECURITY": "Ustawienia bezpieczeństwa",
+      "EVENTS": "Zdarzenia",
+      "FAILEDEVENTS": "Nieudane Zdarzenia",
+      "VIEWS": "Widoki"
     },
     "GROUPS": {
+      "GENERAL": "Informacje ogólne",
       "NOTIFICATIONS": "Powiadomienia",
       "LOGIN": "Logowanie i dostęp",
       "DOMAIN": "Domena",
       "TEXTS": "Teksty i języki",
       "APPEARANCE": "Wygląd",
-      "OTHER": "Inne"
+      "OTHER": "Inne",
+      "STORAGE": "składowanie"
     }
   },
   "SETTING": {
