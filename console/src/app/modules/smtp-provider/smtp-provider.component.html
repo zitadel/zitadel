@@ -20,7 +20,7 @@
       {{
         !id
           ? ('SMTP.CREATE.STEPS.CREATE_DESC_TITLE' | translate: { value: providerDefaultSetting.name | titlecase })
-          : ('SMTP.CREATE.STEPS.CURRENT_DESC_TITLE' | translate )
+          : ('SMTP.CREATE.STEPS.CURRENT_DESC_TITLE' | translate)
       }}
     </h2>
   </div>
@@ -80,9 +80,9 @@
             name="smtp-password"
             autocomplete="off webauthn"
             formControlName="password"
-            placeholder="{{ providerDefaultSetting.password.placeholder }}"
+            placeholder="{{ hasSMTPConfig ? '****************' : providerDefaultSetting.password.placeholder }}"
             type="password"
-            required="{{ !id }}"
+            required="{{ !hasSMTPConfig }}"
           />
         </cnsl-form-field>
       </form>
@@ -132,7 +132,7 @@
             firstFormGroup.invalid || secondFormGroup.invalid || (['iam.policy.write'] | hasRole | async) === false
           "
         >
-          {{ !id ? ('ACTIONS.CREATE' | translate) : ('ACTIONS.SAVE' | translate) }}
+          {{ !hasSMTPConfig ? ('ACTIONS.CREATE' | translate) : ('ACTIONS.SAVE' | translate) }}
         </button>
       </div>
     </mat-step>

@@ -79,10 +79,6 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config 
 }
 
 func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id string, config *smtp.Config) (*domain.ObjectDetails, error) {
-	if id == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "SMTP-x8vo9", "Errors.IDMissing")
-	}
-
 	from := strings.TrimSpace(config.From)
 	if from == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "INST-HSv2d", "Errors.Invalid.Argument")
@@ -187,10 +183,6 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, instanceID, id 
 }
 
 func (c *Commands) ActivateSMTPConfig(ctx context.Context, instanceID, id, activatedId string) (*domain.ObjectDetails, error) {
-	if id == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "SMTP-nm56k", "Errors.IDMissing")
-	}
-
 	if len(activatedId) > 0 {
 		_, err := c.DeactivateSMTPConfig(ctx, instanceID, activatedId)
 		if err != nil {
@@ -227,9 +219,6 @@ func (c *Commands) ActivateSMTPConfig(ctx context.Context, instanceID, id, activ
 }
 
 func (c *Commands) DeactivateSMTPConfig(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
-	if id == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "SMTP-98ikl", "Errors.IDMissing")
-	}
 	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
 	if err != nil {
 		return nil, err
@@ -257,10 +246,6 @@ func (c *Commands) DeactivateSMTPConfig(ctx context.Context, instanceID, id stri
 }
 
 func (c *Commands) RemoveSMTPConfig(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
-	if id == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "SMTP-7f5cv", "Errors.IDMissing")
-	}
-
 	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
 	if err != nil {
 		return nil, err
