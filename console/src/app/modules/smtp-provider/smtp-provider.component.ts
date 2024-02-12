@@ -122,7 +122,9 @@ export class SMTPProviderComponent {
 
       if (!this.router.url.endsWith('/create')) {
         this.id = this.route.snapshot.paramMap.get('id') || '';
-        this.fetchData(this.id);
+        if (this.id) {
+          this.fetchData(this.id);
+        }
       }
     });
   }

@@ -170,7 +170,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 		columns,
 		[]handler.Condition{
 			handler.NewCond(SMTPConfigColumnID, e.ID),
-			handler.NewCond(SMTPConfigColumnAggregateID, e.Aggregate().ID),
+			handler.NewCond(SMTPConfigColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
@@ -191,7 +191,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigPasswordChanged(event eventstore.
 		},
 		[]handler.Condition{
 			handler.NewCond(SMTPConfigColumnID, e.ID),
-			handler.NewCond(SMTPConfigColumnAggregateID, e.Aggregate().ID),
+			handler.NewCond(SMTPConfigColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
@@ -212,7 +212,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigActivated(event eventstore.Event)
 		},
 		[]handler.Condition{
 			handler.NewCond(SMTPConfigColumnID, e.ID),
-			handler.NewCond(SMTPConfigColumnAggregateID, e.Aggregate().ID),
+			handler.NewCond(SMTPConfigColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
@@ -233,7 +233,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigDeactivated(event eventstore.Even
 		},
 		[]handler.Condition{
 			handler.NewCond(SMTPConfigColumnID, e.ID),
-			handler.NewCond(SMTPConfigColumnAggregateID, e.Aggregate().ID),
+			handler.NewCond(SMTPConfigColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil
@@ -248,7 +248,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigRemoved(event eventstore.Event) (
 		e,
 		[]handler.Condition{
 			handler.NewCond(SMTPConfigColumnID, e.ID),
-			handler.NewCond(SMTPConfigColumnAggregateID, e.Aggregate().ID),
+			handler.NewCond(SMTPConfigColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCond(SMTPConfigColumnInstanceID, e.Aggregate().InstanceID),
 		},
 	), nil

@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"strings"
 
@@ -16,6 +17,7 @@ import (
 )
 
 func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config *smtp.Config) (string, *domain.ObjectDetails, error) {
+	fmt.Println("Here", config)
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
@@ -54,6 +56,7 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config 
 	}
 
 	iamAgg := InstanceAggregateFromWriteModel(ctx, &smtpConfigWriteModel.WriteModel)
+	fmt.Println("Here2", id, config)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigAddedEvent(
 		ctx,
 		iamAgg,
@@ -79,6 +82,10 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config 
 }
 
 func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id string, config *smtp.Config) (*domain.ObjectDetails, error) {
+	if id == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "SMTP-x8vo9", "Errors.IDMissing")
+	}
+
 	from := strings.TrimSpace(config.From)
 	if from == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "INST-HSv2d", "Errors.Invalid.Argument")
@@ -183,6 +190,10 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, instanceID, id 
 }
 
 func (c *Commands) ActivateSMTPConfig(ctx context.Context, instanceID, id, activatedId string) (*domain.ObjectDetails, error) {
+	if id == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "SMTP-nm56k", "Errors.IDMissing")
+	}
+
 	if len(activatedId) > 0 {
 		_, err := c.DeactivateSMTPConfig(ctx, instanceID, activatedId)
 		if err != nil {
@@ -219,6 +230,10 @@ func (c *Commands) ActivateSMTPConfig(ctx context.Context, instanceID, id, activ
 }
 
 func (c *Commands) DeactivateSMTPConfig(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
+	if id == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "SMTP-98ikl", "Errors.IDMissing")
+	}
+
 	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
 	if err != nil {
 		return nil, err
@@ -246,6 +261,10 @@ func (c *Commands) DeactivateSMTPConfig(ctx context.Context, instanceID, id stri
 }
 
 func (c *Commands) RemoveSMTPConfig(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
+	if id == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "SMTP-7f5cv", "Errors.IDMissing")
+	}
+
 	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
 	if err != nil {
 		return nil, err
@@ -292,7 +311,6 @@ func (c *Commands) getSMTPConfig(ctx context.Context, instanceID, id, domain str
 // TODO: SetUpInstance still uses this and would be removed as soon as deprecated PrepareCommands is removed
 func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, description, from, name, replyTo, hostAndPort, user string, password []byte, tls bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-
 		if from = strings.TrimSpace(from); from == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-mruNY", "Errors.Invalid.Argument")
 		}

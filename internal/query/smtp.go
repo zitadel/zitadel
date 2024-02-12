@@ -116,15 +116,15 @@ type SMTPConfig struct {
 	Description    string
 }
 
-func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (config *SMTPConfig, err error) {
+func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, resourceOwner string) (config *SMTPConfig, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	stmt, scan := prepareSMTPConfigQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
-		SMTPConfigColumnAggregateID.identifier(): aggregateID,
-		SMTPConfigColumnInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
-		SMTPConfigColumnState.identifier():       domain.SMTPConfigStateActive,
+		SMTPConfigColumnResourceOwner.identifier(): resourceOwner,
+		SMTPConfigColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
+		SMTPConfigColumnState.identifier():         domain.SMTPConfigStateActive,
 	}).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-3m9sl", "Errors.Query.SQLStatement")

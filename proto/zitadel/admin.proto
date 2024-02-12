@@ -4075,7 +4075,7 @@ message GetSMTPConfigResponse {
 }
 
 message GetSMTPConfigByIdRequest {
-    string id = 1 [(validate.rules).string = {min_len: 0, max_len: 100}];
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
 }
 
 message GetSMTPConfigByIdResponse {
@@ -4210,7 +4210,7 @@ message UpdateSMTPConfigRequest {
             max_length: 200;
         }
     ];
-    string id = 9 [(validate.rules).string = {min_len: 0, max_len: 100}];
+    string id = 9 [(validate.rules).string = {min_len: 1, max_len: 100}];
 }
 
 message UpdateSMTPConfigResponse {
@@ -4231,7 +4231,7 @@ message UpdateSMTPConfigPasswordResponse {
 }
 
 message ActivateSMTPConfigRequest {
-    string id = 1 [(validate.rules).string = {min_len: 0, max_len: 200}];
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message ActivateSMTPConfigResponse {
@@ -4239,7 +4239,7 @@ message ActivateSMTPConfigResponse {
 }
 
 message DeactivateSMTPConfigRequest {
-    string id = 1 [(validate.rules).string = {min_len: 0, max_len: 200}];
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message DeactivateSMTPConfigResponse {
@@ -4247,7 +4247,7 @@ message DeactivateSMTPConfigResponse {
 }
 
 message RemoveSMTPConfigRequest {
-    string id = 1 [(validate.rules).string = {min_len: 0, max_len: 100}];
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
 }
 
 message RemoveSMTPConfigResponse {
