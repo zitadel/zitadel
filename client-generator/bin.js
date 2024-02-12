@@ -6,26 +6,142 @@ import * as envfile from 'envfile';
 import http from 'node:http';
 import open from 'open';
 import url from 'url';
-import { listFrameworks } from '@netlify/framework-info'
+import { listFrameworks } from '@netlify/framework-info';
+
+class ApplicationType {
+    static WEB = "web";
+    static NATIVE = "native";
+    static USER_AGENT = "user_agent";
+    static API = "api";
+    static SAML = "saml";
+}
+class Scope {
+    static OPENID = "openid";
+    static PROFILE = "profile";
+    static EMAIL = "email";
+    static OFFLINE_ACCESS = "offline_access";
+}
+
+class GrantType {
+    static AUTHORIZATION_CODE = "authorization_code";
+    static IMPLICIT = "implicit";
+    static REFRESH_TOKEN = "refresh_token";
+    static DEVICE_CODE = "device_code";
+}
+
+class ResponseType {
+    static CODE = "code";
+    static ID_TOKEN = "id_token";
+    static ID_TOKEN_TOKEN = "id_token token"
+}
+
+class AuthenticationType {
+    static BASIC = "basic";
+    static NONE = "none";
+    static POST = "post";
+    static PRIVATE_KEY_JWT = "private_key_jwt";
+}
+
+class AppTypes {
+    static ANGULAR = {
+        type: "angular",
+        applicationType: ApplicationType.USER_AGENT,
+        redirectUris: ["localhost:4200"],
+        postLogoutUris: ["localhost:4200"],
+        scope: [Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.OFFLINE_ACCESS],
+        grantTypes: [GrantType.AUTHORIZATION_CODE],
+        responseTypes: [ResponseType.CODE],
+        authenticationType: AuthenticationType.NONE
+    }
+    static NEXT = {
+        type: "next",
+        applicationType: ApplicationType.WEB,
+        redirectUris: ["http://localhost:3000/api/auth/callback/zitadel"],
+        postLogoutUris: ["http://localhost:3000"],
+        scope: [Scope.OPENID, Scope.EMAIL, Scope.PROFILE],
+        grantTypes: [GrantType.AUTHORIZATION_CODE],
+        responseTypes: [ResponseType.CODE],
+        authenticationType: AuthenticationType.BASIC
+    }
+    static NUXT = {
+        type: "nuxt",
+        applicationType: "",
+        redirectUris: [""],
+        postLogoutUris: [""],
+        scope: [Scope.OPENID, Scope.EMAIL, Scope.PROFILE],
+        grantTypes: [""],
+        responseTypes: [""],
+        authenticationType: ""
+    }
+    static REACT = {
+        type: "react",
+        applicationType: ApplicationType.USER_AGENT,
+        redirectUris: ["http://localhost:3000/callback"],
+        postLogoutUris: ["http://localhost:3000"],
+        scope: [Scope.OPENID, Scope.EMAIL, Scope.PROFILE],
+        grantTypes: [GrantType.AUTHORIZATION_CODE],
+        responseTypes: [ResponseType.CODE],
+        authenticationType: AuthenticationType.NONE
+    }
+    static SVELTE = {
+        type: "svelte",
+        applicationType: ApplicationType.WEB,
+        redirectUris: ["http://localhost:3000/api/auth/callback/zitadel"],
+        postLogoutUris: ["http://localhost:3000"],
+        scope: [Scope.OPENID, Scope.EMAIL, Scope.PROFILE],
+        grantTypes: [GrantType.AUTHORIZATION_CODE],
+        responseTypes: [ResponseType.CODE],
+        authenticationType: AuthenticationType.BASIC
+    }
+    static VUE = {
+        type: "vue",
+        applicationType: ApplicationType.USER_AGENT,
+        redirectUris: ['http://localhost:5173/auth/signinwin/zitadel'],
+        postLogoutUris: ['http://localhost:5173'],
+        scope: [Scope.OPENID, Scope.EMAIL, Scope.PROFILE],
+        grantTypes: [GrantType.AUTHORIZATION_CODE],
+        responseTypes: [ResponseType.CODE],
+        authenticationType: AuthenticationType.NONE
+    }
+    static VITE = {
+        type: "vite",
+        applicationType: ApplicationType.USER_AGENT,
+        redirectUris: ["http://localhost:3000/callback"],
+        postLogoutUris: ["http://localhost:3000"],
+        scope: [Scope.OPENID, Scope.EMAIL, Scope.PROFILE],
+        grantTypes: [GrantType.AUTHORIZATION_CODE],
+        responseTypes: [ResponseType.CODE],
+        authenticationType: AuthenticationType.NONE
+    }
+    static UNKNOWN = {
+        type: "unknown",
+        applicationType: ApplicationType.USER_AGENT,
+        redirectUris: ["http://localhost:3000"],
+        postLogoutUris: ["http://localhost:3000"],
+        scope: [Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.OFFLINE_ACCESS],
+        grantTypes: [GrantType.AUTHORIZATION_CODE],
+        responseTypes: [ResponseType.CODE],
+        authenticationType: AuthenticationType.NONE
+    }
+}
 
 program
     .version('1.0.0', '-v, --version')
     .usage('[OPTIONS]...')
-    .requiredOption('-u, --url <URL>', 'url to your zitadel instance (e.g. https://myprefix.zitadel.cloud)')
     .option('--env-file <PATH>', 'path to .env file, if not set it is created in the current directory', './.env')
+    .option('-p, --project-id <PROJECT_ID>', 'id of the project you want the app to be created in')
+    .option('-n, --app-name <APP_NAME>', 'name of the app you want to create')
+    .option('-o, --org-id <ORG_ID>', 'id of the org you want the app ot be created in, by default it uses the organization of the signed in user')
+    .requiredOption('-u, --url <URL>', 'url to your zitadel instance (e.g. https://myprefix.zitadel.cloud)')
     .parse(process.argv);
 
 const options = program.opts();
+const port = 3333;
 
-let config = await getConfigFromFramework();
-let params = new URLSearchParams(config).toString()
+let zitadelUrl = await generateURL(options, port);
+open(zitadelUrl.toString());
 
-console.log(params);
-console.log(JSON.stringify(config));
-
-open(`${options.url}/ui/console/projects/app-create?${params}`);
-
-awaitCredentials(3000);
+awaitCredentials(port);
 
 function awaitCredentials(port) {
     new Promise((resolve) => {
@@ -64,29 +180,29 @@ function getConfigFromFramework() {
         console.log(frameworks[0].id);
         switch (frameworks[0].id) {
             case 'angular':
-                config = readConfig('angular');
+                config = AppTypes.ANGULAR;
                 break;
             case 'next-nx':
             case 'next':
-                config = readConfig('next');
+                config = AppTypes.NEXT;
                 break;
             case 'nuxt':
             case 'nuxt3':
-                config = readConfig('nuxt');
+                config = AppTypes.NUXT;
                 break;
             case 'react-static':
             case 'create-react-app':
-                config = readConfig('react');
+                config = AppTypes.REACT;
                 break;
             case 'svelte':
             case 'svelte-kit':
-                config = readConfig('svelte');
+                config = AppTypes.SVELTE;
                 break;
             case 'vue':
-                config = readConfig('vue');
+                config = AppTypes.VUE;
                 break;
             case 'vite':
-                config = readConfig('vite');
+                config = AppTypes.VITE;
                 break;
             case 'astro':
             case 'docusaurus':
@@ -127,7 +243,7 @@ function getConfigFromFramework() {
             case 'gulp':
             case 'wmr':
             default: 
-                config = readConfig('angular');
+                config = AppTypes.UNKNOWN;
             break;
         }
         config.frameworks = frameworks.map(framework => framework.id);
@@ -135,14 +251,23 @@ function getConfigFromFramework() {
     });
 }
 
-function readConfig(name) {
-    return {
-        "type": "angular",
-        "redirectUris": ["localhost:4200"],
-        "scope": ["openid", "profile", "email", "offline_access"],
-        "grantTypes": ["authorizationCode"],
-        "responseTypes": ["code"],
-        "authenticationType": "none"
-    };
-    // return JSON.parse(fs.readFileSync(`./frameworks/${name}.json`));
+async function generateURL(options, port) {
+    let config = await getConfigFromFramework();
+
+    if (options?.projectId != undefined) {
+        config.projectId = options.projectId
+    }
+    if (options?.orgId != undefined) {
+        config.orgId = options.orgId
+    }
+    if (options?.appName != undefined) {
+        config.appName = options.appName
+    }
+
+    config.redirectTo = new URL(`http://localhost${port}`).toString();
+
+    let url = new URL(`${options.url}/ui/console/projects/app-create`)
+    url.search = new URLSearchParams(config);
+
+    return url;
 }

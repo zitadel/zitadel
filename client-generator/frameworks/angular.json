@@ -1,8 +1,0 @@
-{
-    "type": "angular",
-    "redirectUris": ["localhost:4200"],
-    "scope": ["openid", "profile", "email", "offline_access"],
-    "grantTypes": ["authorizationCode"],
-    "responseTypes": ["code"],
-    "authenticationType": "none"
-}
