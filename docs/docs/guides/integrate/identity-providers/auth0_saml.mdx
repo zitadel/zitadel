@@ -1,0 +1,76 @@
+---
+title: Configure Auth0 with SAML as an Identity Provider in ZITADEL
+sidebar_label: Auth0(SAML)
+id: auth0saml
+---
+
+import GeneralConfigDescription from './_general_config_description.mdx';
+import Intro from './_intro.mdx';
+import CustomLoginPolicy from './_custom_login_policy.mdx';
+import IDPsOverview from './_idps_overview.mdx';
+import Activate from './_activate.mdx';
+import TestSetup from './_test_setup.mdx';
+
+<Intro provider="Auth0 SAML"/>
+
+## Auth0
+
+### Create an application
+
+Beforehand the Application Callback URL is `http://{CUSTOMDOMAIN}.zitadel.cloud/ui/login/login/externalidp/saml/acs`
+Create an application as described in [the Auth0 Documentation](https://auth0.com/docs/authenticate/single-sign-on/outbound-single-sign-on/configure-auth0-saml-identity-provider#configure-saml-sso-in-auth0)
+
+Note down the metadata URL, which should be something like `https://{tenant}.eu.auth0.com/samlp/metadata/{ID}`.
+
+### Download metadata
+
+You can either download the metadata under [https://{tenant}.eu.auth0.com/samlp/metadata/{ID}](https://{tenant}.eu.auth0.com/samlp/metadata/{ID}) or skip this step and
+fill in the URL when creating the SAML SP in ZITADEL.
+
+## ZITADEL configuration
+
+### Add custom login policy
+
+<CustomLoginPolicy/>
+
+### Go to the IdP providers overview
+
+<IDPsOverview templates="SAML SP"/>
+
+### Create a new SAML ServiceProvider
+
+The SAML SP provider template has everything you need preconfigured.
+Add the metadata.xml or the URL to the metadata which are accessible by you ZITADEL instance.
+All the necessary configuration is contained in the metadata which has to be exchanged by the ServiceProvider and the IdentityProvider.
+
+<GeneralConfigDescription provider_account="SAML account" />
+
+![SAML SP Provider](/img/guides/zitadel_saml_create_provider.png)
+
+### Download metadata
+
+Normally, you would need to download the ServiceProvider metadata from ZITADEL to upload to the IdentityProvider.
+They are available under [https://{CUSTOMDOMAIN}/idps/{ID of the provider in ZITADEL}/saml/metadata], but this step can be skipped due to the fact that Auth0 only needs the Assertion Consumer Service (ACS) URL.
+
+### Fill Application Callback URL on Auth0
+
+On [the Auth0 Documentation](https://auth0.com/docs/authenticate/single-sign-on/outbound-single-sign-on/configure-auth0-saml-identity-provider#configure-saml-sso-in-auth0) for step 7:
+
+`7. On the Settings tab, enter the Application Callback URL from the service provider (or application) to which the SAML assertions should be sent after Auth0 has authenticated the user. This is the Assertion Consumer Service (ACS) URL.`
+
+Use `https://{CUSTOMDOMAIN}.zitadel.cloud/idps/{ID of the provider}/saml/acs`, which would result in for example `https://example.zitadel.cloud/idps/251744315338916304/saml/acs`.
+
+### Activate IdP
+
+<Activate/>
+
+![Activate the SAML SP Provider](/img/guides/zitadel_activate_saml.png)
+
+## Test the setup
+
+<TestSetup loginscreen="your SAML SP login"/>
+
+
+![SAML SP Button](/img/guides/zitadel_login_saml.png)
+
+![SAML SP Login](/img/guides/mocksaml_login.png)
