@@ -155,10 +155,9 @@ function awaitCredentials(port) {
         })
 
         server.listen(port, () => {
-            console.log(`Server listening on port ${port}`);
+            console.log(`Awaiting response from browser`);
         });
     }).then((res) => {
-        console.log(`got request ${JSON.stringify(res.data)}`);
         writeCredentials(res.data.clientId, res.data.clientSecret);
         res.server.close();
     })
@@ -168,7 +167,9 @@ function writeCredentials(clientID, clientSecret) {
     let parsedEnv = envfile.parse(options.envFile);
     parsedEnv.CLIENT_ID = clientID ? clientID : parsedEnv.CLIENT_ID ? parsedEnv.CLIENT_ID : '';
     parsedEnv.CLIENT_SECRET = clientSecret ? clientSecret : parsedEnv.CLIENT_SECRET ? parsedEnv.CLIENT_SECRET : '';
-    fs.writeFileSync(options.envFile, envfile.stringify(parsedEnv))
+    fs.writeFileSync(options.envFile, envfile.stringify(parsedEnv));
+
+    console.log(`credentials were written to ${options.envFile}`)
 }
 
 function getConfigFromFramework() {
