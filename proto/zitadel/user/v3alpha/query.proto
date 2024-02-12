@@ -15,60 +15,56 @@ message SearchQuery {
     option (validate.required) = true;
 
 
+    // Union the results of each sub query ('OR').
     OrQuery or_query = 11;
+    // Limit the result to match all sub queries ('AND').
+    // Note that if you specify multiple queries, they will be implicitly used as andQueries.
+    // Use the andQuery in combination with orQuery and notQuery.
     AndQuery and_query = 12;
+    // Exclude / Negate the result of the sub query ('NOT').
     NotQuery not_query = 13;
 
     // Limit the result to a specific user ID.
     UserIDQuery user_id_query = 1;
     // Limit the result to a specific organization.
     OrganizationIDQuery organization_id_query = 2;
+    // Limit the result to a specific username.
+    UsernameQuery username_query = 3;
     // Limit the result to a specific contact email.
-    EmailQuery email_query = 3;
+    EmailQuery email_query = 4;
     // Limit the result to a specific contact phone.
-    PhoneQuery phone_query = 4;
+    PhoneQuery phone_query = 5;
     // Limit the result to a specific state of the user.
-    StateQuery state_query = 5;
+    StateQuery state_query = 6;
     // Limit the result to a specific schema ID.
-    SchemaIDQuery schema_ID_query = 6;
+    SchemaIDQuery schema_ID_query = 7;
     // Limit the result to a specific schema type.
-    SchemaTypeQuery schema_type_query = 7;
+    SchemaTypeQuery schema_type_query = 8;
   }
 }
 
 message OrQuery {
-  // Union the results of each sub query ('OR').
-  repeated SearchQuery queries = 1;
+  repeated SearchQuery queries = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) =  {
+      example: "[{\"userIdQuery\": {\"id\": \"163840776835432705\",\"method\": \"TEXT_QUERY_METHOD_EQUALS\"}},{\"userIdQuery\": {\"id\": \"163840776835943483\",\"method\": \"TEXT_QUERY_METHOD_EQUALS\"}}]"
+    }
+  ];
 }
 message AndQuery {
-  // Limit the result to match all sub queries ('AND').
-  repeated SearchQuery queries = 1;
+  repeated SearchQuery queries = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) =  {
+      example: "[{\"organizationIdQuery\": {\"id\": \"163840776835432705\",\"method\": \"TEXT_QUERY_METHOD_EQUALS\"}},{\"usernameQuery\": {\"username\": \"gigi\",\"method\": \"TEXT_QUERY_METHOD_EQUALS\"}}]"
+    }
+  ];
 }
 
 message NotQuery {
-  // Exclude / Negate the result of the sub query ('NOT').
-  SearchQuery query = 1;
-}
-
-message UsernameQuery {
-  // Defines the username to query for.
-  string username = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1;
-      max_length: 200;
-      example: "\"gigi-giraffe\"";
+  SearchQuery query = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) =  {
+      example: "{\"schemaIDQuery\": {\"id\": \"163840776835432705\"}}"
     }
   ];
-  // Defines which text comparison method used for the username query.
-  zitadel.object.v2beta.TextQueryMethod method = 2 [
-    (validate.rules).enum.defined_only = true
-  ];
-  // Defines that the username must only be unique in the organisation.
-  bool is_organization_specific = 3;
 }
-
 
 message UserIDQuery {
   // Defines the ID of the user to query for.
@@ -102,6 +98,25 @@ message OrganizationIDQuery {
   zitadel.object.v2beta.TextQueryMethod method = 2 [
     (validate.rules).enum.defined_only = true
   ];
+}
+
+message UsernameQuery {
+  // Defines the username to query for.
+  string username = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"gigi-giraffe\"";
+    }
+  ];
+  // Defines which text comparison method used for the username query.
+  zitadel.object.v2beta.TextQueryMethod method = 2 [
+    (validate.rules).enum.defined_only = true
+  ];
+  // Defines that the username must only be unique in the organisation.
+  bool is_organization_specific = 3;
 }
 
 message EmailQuery {

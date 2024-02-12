@@ -19,7 +19,7 @@ message UserSchema {
   ];
   // Details provide some base information (such as the last change date) of the schema.
   zitadel.object.v2beta.Details details = 2;
-  // Type is a human readable word describing the schema.
+  // Type is a human readable text describing the schema.
   string type = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"employees\""
@@ -40,7 +40,7 @@ message UserSchema {
   // JSON schema representation defining the user.
   google.protobuf.Struct schema = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      // (--TODO: add example--)
+      example: "{\"$schema\":\"https://example.com/user/employees\",\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"required\":true},\"description\":{\"type\":\"string\"}}}"
     }
   ];
   // Defines the possible types of authenticators.

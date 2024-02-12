@@ -105,14 +105,6 @@ message WebAuthN {
   //(--bool user_verified = 4;--)
 }
 
-message OTP {
-  oneof transport {
-    //(--TODO:only verified or return verification state?--)
-    string email = 1;
-    string phone = 2;
-  }
-}
-
 message OTPSMS {
   // unique identifier of the one-time-password (OTP) SMS authenticator.
   string otp_sms_id = 1 [

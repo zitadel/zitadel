@@ -631,7 +631,7 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "user.passkey.write" // TODO: ?
+        permission: "authenticated"
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -654,7 +654,7 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "user.passkey.write" // TODO: ?
+        permission: "authenticated"
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -725,7 +725,7 @@ service UserService {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "user.passkey.write" // TODO: ?
+        permission: "authenticated"
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -1058,7 +1058,7 @@ message CreateUserRequest {
   // Provide data about the user. It will be validated based on the specified schema.
   google.protobuf.Struct data = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      //(--TODO example--)
+      example: "{\"name\":\"Gigi\",\"description\":\"the giraffe\"}"
     }
   ];
 }
@@ -1099,7 +1099,11 @@ message UpdateUserRequest {
     }
   ];
   // Update the user data if needed. It will be validated based on the specified schema.
-  optional google.protobuf.Struct data = 6;
+  optional google.protobuf.Struct data = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "{\"name\":\"Gigi\",\"description\":\"the giraffe\"}"
+    }
+  ];
 }
 
 message UpdateUserResponse {

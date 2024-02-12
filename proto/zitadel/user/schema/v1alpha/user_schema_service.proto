@@ -354,14 +354,14 @@ message CreateUserSchemaRequest {
     (validate.rules).message = {required: true},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      // (--TODO: add example--)
+      example: "{\"$schema\":\"https://example.com/user/employees\",\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"required\":true},\"description\":{\"type\":\"string\"}}}"
     }
   ];
   // Defines the possible types of authenticators.
   repeated AuthenticatorType possible_authenticators = 3 [
     (validate.rules).enum = {defined_only: true},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      // (--TODO: add example--)
+      example: "[\"AUTHENTICATOR_TYPE_USERNAME\",\"AUTHENTICATOR_TYPE_PASSWORD\",\"AUTHENTICATOR_TYPE_WEBAUTHN\"]";
     }
   ];
 }
@@ -392,7 +392,7 @@ message UpdateUserSchemaRequest {
     (validate.rules).message = {required: true},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      // (--TODO: add example--)
+      example: "{\"$schema\":\"https://example.com/user/employees\",\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"required\":true},\"description\":{\"type\":\"string\"}}}"
     }
   ];
   // Defines the possible types of authenticators.
@@ -401,7 +401,7 @@ message UpdateUserSchemaRequest {
   repeated AuthenticatorType possible_authenticators = 4 [
     (validate.rules).enum = {defined_only: true},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      // (--TODO: add example--)
+      example: "[\"AUTHENTICATOR_TYPE_USERNAME\",\"AUTHENTICATOR_TYPE_PASSWORD\",\"AUTHENTICATOR_TYPE_WEBAUTHN\"]";
     }
   ];
 }
