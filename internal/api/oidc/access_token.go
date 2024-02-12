@@ -39,7 +39,7 @@ func (s *Server) verifyAccessToken(ctx context.Context, tkn string) (*accessToke
 		}
 		tokenID, subject = split[0], split[1]
 	} else {
-		verifier := op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), s.keySet)
+		verifier := op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), s.accessTokenKeySet)
 		claims, err := op.VerifyAccessToken[*oidc.AccessTokenClaims](ctx, tkn, verifier)
 		if err != nil {
 			return nil, zerrors.ThrowPermissionDenied(err, "OIDC-Eib8e", "token is not valid or has expired")

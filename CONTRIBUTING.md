@@ -219,7 +219,7 @@ docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml down
 In order to run the integrations tests for the gRPC API, PostgreSQL and CockroachDB must be started and initialized:
 
 ```bash
-export INTEGRATION_DB_FLAVOR="cockroach" ZITADEL_MASTERKEY="MasterkeyNeedsToHave32Characters"
+export INTEGRATION_DB_FLAVOR="postgres" ZITADEL_MASTERKEY="MasterkeyNeedsToHave32Characters"
 docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait ${INTEGRATION_DB_FLAVOR}
 make core_integration_test
 docker compose -f internal/integration/config/docker-compose.yaml down

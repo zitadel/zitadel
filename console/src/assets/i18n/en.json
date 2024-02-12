@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instance",
+    "INSTANCE": "Default settings",
     "DASHBOARD": "Home",
     "PERSONAL_INFO": "Personal Information",
     "DOCUMENTATION": "Documentation",
@@ -228,6 +228,7 @@
     "EMAIL": "Email",
     "USERNAME": "User Name",
     "ORGNAME": "Organization Name",
+    "PRIMARYDOMAIN": "Primary Domain",
     "PROJECTNAME": "Project Name",
     "RESOURCEOWNER": "Resource Owner",
     "METHODS": {
@@ -1023,6 +1024,7 @@
       "DESCRIPTION": "These settings extend and overwrite your instance settings."
     },
     "LIST": {
+      "ORGS": "Organizations",
       "LANGUAGES": "Languages",
       "LOGIN": "Login Behavior and Security",
       "LOCKOUT": "Lockout",
@@ -1040,15 +1042,20 @@
       "PRIVACYPOLICY": "Privacy Policy",
       "OIDC": "OIDC Token lifetime and expiration",
       "SECRETS": "Secret Generator",
-      "SECURITY": "Security settings"
+      "SECURITY": "Security settings",
+      "EVENTS": "Events",
+      "FAILEDEVENTS": "Failed Events",
+      "VIEWS": "Views"
     },
     "GROUPS": {
+      "GENERAL": "General Information",
       "NOTIFICATIONS": "Notifications",
       "LOGIN": "Login and Access",
       "DOMAIN": "Domain",
       "TEXTS": "Texts and Languages",
       "APPEARANCE": "Appearance",
-      "OTHER": "Other"
+      "OTHER": "Other",
+      "STORAGE": "Storage"
     }
   },
   "SETTING": {
@@ -2255,7 +2262,8 @@
     "TOAST": {
       "UPDATED": "Authorization updated.",
       "REMOVED": "Authorization removed",
-      "BULKREMOVED": "Authorizations removed."
+      "BULKREMOVED": "Authorizations removed.",
+      "CANTSHOWINFO": "You cannot visit this user's profile as you are not a member of the organization where this user belongs to"
     },
     "DIALOG": {
       "DELETE_TITLE": "Delete authorization",

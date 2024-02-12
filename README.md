@@ -11,7 +11,7 @@
         <img src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg" /></a>
     <a href="https://github.com/zitadel/zitadel/actions" alt="ZITADEL Release">
         <img alt="GitHub Workflow Status (with event)" src="https://img.shields.io/github/actions/workflow/status/zitadel/zitadel/build.yml?event=pull_request"></a>
-    <a href="https://github.com/zitadel/zitadel/releases" alt="Release">
+    <a href="https://zitadel.com/docs/support/software-release-cycles-support" alt="Release">
         <img src="https://badgen.net/github/release/zitadel/zitadel/stable" /></a>
     <a href="https://github.com/zitadel/zitadel/releases" alt="Release">
         <img alt="Dynamic YAML Badge" src="https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fzitadel%2Fzitadel%2Fmain%2Frelease-channels.yaml&query=%24.stable&label=stable"></a>
@@ -39,26 +39,16 @@ Look no further — ZITADEL is the identity infrastructure, simplified for you.
 
 We provide you with a wide range of out-of-the-box features to accelerate your project, including:
 
-:white_check_mark: Multi-tenancy with branding customization
-
-:white_check_mark: Secure login
-
-:white_check_mark: Self-service
-
-:white_check_mark: OpenID Connect
-
-:white_check_mark: OAuth2.x
-
-:white_check_mark: SAML2
-
-:white_check_mark: LDAP
-
-:white_check_mark: Passkeys / FIDO2
-
-:white_check_mark: OTP
-
-:white_check_mark: U2F, and an unlimited audit trail is there for you, ready to use.
-
+:white_check_mark: Multi-tenancy with team management  
+:white_check_mark: Secure login  
+:white_check_mark: Self-service  
+:white_check_mark: OpenID Connect  
+:white_check_mark: OAuth2.x  
+:white_check_mark: SAML2  
+:white_check_mark: LDAP  
+:white_check_mark: Passkeys / FIDO2  
+:white_check_mark: OTP  
+and an unlimited audit trail is there for you, ready to use.
 
 With ZITADEL, you are assured of a robust and customizable turnkey solution for all your authentication and authorization needs.
 
@@ -86,18 +76,18 @@ See all guides [here](https://zitadel.com/docs/self-hosting/deploy/overview)
 
 ### Setup ZITADEL Cloud (SaaS)
 
-If you want to experience a hands-free ZITADEL, you should use [ZITADEL Cloud](https://zitadel.cloud).
+If you want to experience a hands-free ZITADEL, you should use [ZITADEL Cloud](https://zitadel.com).
 
 ZITADEL Cloud comes with a free tier, providing you with all the same features as the open-source version.
 Learn more about the [pay-as-you-go pricing](https://zitadel.com/pricing).
 
 ### Example applications
 
-Clone one of our [example applications](https://zitadel.com/docs/examples/introduction#clone-a-sample-project) or deploy them directly to Vercel.
+Clone one of our [example applications](https://zitadel.com/docs/sdk-examples/introduction) or deploy them directly to Vercel.
 
 ### SDKs
 
-Use our [SDKs](https://zitadel.com/docs/examples/sdks) for your favorite language and framework.
+Use our [SDKs](https://zitadel.com/docs/sdk-examples/introduction) for your favorite language and framework.
 
 ## Why choose ZITADEL
 
@@ -115,6 +105,7 @@ Yet it offers everything you need for a customer identity ([CIAM](https://zitade
 ## Features
 
 Authentication
+
 - Single Sign On (SSO)
 - Passkeys support (FIDO2 / WebAuthN)
 - Username / Password
@@ -128,12 +119,15 @@ Authentication
 - [Machine-to-machine](https://zitadel.com/docs/guides/integrate/serviceusers) with JWT profile, Personal Access Tokens (PAT), and Client Credentials
 
 Multi-Tenancy
+
 - [Identity Brokering](https://zitadel.com/docs/guides/integrate/identity-brokering) with templates for popular identity providers
+- [Customizable onboaring](https://zitadel.com/docs/guides/solution-scenarios/onboarding) for B2B and their users
 - [Delegate role management to third-parties](https://zitadel.com/docs/guides/manage/console/projects)
 - [Domain discovery](https://zitadel.com/docs/guides/solution-scenarios/domain-discovery)
 
 Integration
-- [GRPC and REST APIs](https://zitadel.com/docs/apis/introduction)
+
+- [GRPC and REST APIs](https://zitadel.com/docs/apis/introduction) for every functionality and resource
 - [Actions](https://zitadel.com/docs/apis/actions/introduction) to call any API, send webhooks, adjust workflows, or customize tokens
 - [Role Based Access Control (RBAC)](https://zitadel.com/docs/guides/integrate/retrieve-user-roles)
 
@@ -145,6 +139,7 @@ Self-Service
 Deployment
 - [Postgres](https://zitadel.com/docs/self-hosting/manage/database#postgres) (version >= 14) or [CockroachDB](https://zitadel.com/docs/self-hosting/manage/database#cockroach) (version latest stable)
 - [Zero Downtime Updates](https://zitadel.com/docs/concepts/architecture/solution#zero-downtime-updates)
+- [High scalability](https://zitadel.com/docs/self-hosting/manage/production)
 
 Track upcoming features on our [roadmap](https://zitadel.com/roadmap).
 
