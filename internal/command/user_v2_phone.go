@@ -15,20 +15,20 @@ import (
 
 // ChangeUserPhone sets a user's phone number, generates a code
 // and triggers a notification sms.
-func (c *Commands) ChangeUserPhone(ctx context.Context, userID, resourceOwner, phone string, alg crypto.EncryptionAlgorithm) (*domain.Phone, error) {
-	return c.changeUserPhoneWithCode(ctx, userID, resourceOwner, phone, alg, false)
+func (c *Commands) ChangeUserPhone(ctx context.Context, userID, phone string, alg crypto.EncryptionAlgorithm) (*domain.Phone, error) {
+	return c.changeUserPhoneWithCode(ctx, userID, phone, alg, false)
 }
 
 // ChangeUserPhoneReturnCode sets a user's phone number, generates a code and does not send a notification sms.
 // The generated plain text code will be set in the returned Phone object.
-func (c *Commands) ChangeUserPhoneReturnCode(ctx context.Context, userID, resourceOwner, phone string, alg crypto.EncryptionAlgorithm) (*domain.Phone, error) {
-	return c.changeUserPhoneWithCode(ctx, userID, resourceOwner, phone, alg, true)
+func (c *Commands) ChangeUserPhoneReturnCode(ctx context.Context, userID, phone string, alg crypto.EncryptionAlgorithm) (*domain.Phone, error) {
+	return c.changeUserPhoneWithCode(ctx, userID, phone, alg, true)
 }
 
 // ChangeUserPhoneVerified sets a user's phone number and marks it is verified.
 // No code is generated and no confirmation sms is send.
-func (c *Commands) ChangeUserPhoneVerified(ctx context.Context, userID, resourceOwner, phone string) (*domain.Phone, error) {
-	cmd, err := c.NewUserPhoneEvents(ctx, userID, resourceOwner)
+func (c *Commands) ChangeUserPhoneVerified(ctx context.Context, userID, phone string) (*domain.Phone, error) {
+	cmd, err := c.NewUserPhoneEvents(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -44,39 +44,39 @@ func (c *Commands) ChangeUserPhoneVerified(ctx context.Context, userID, resource
 
 // ResendUserPhoneCode generates a code
 // and triggers a notification sms.
-func (c *Commands) ResendUserPhoneCode(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm) (*domain.Phone, error) {
-	return c.resendUserPhoneCode(ctx, userID, resourceOwner, alg, false)
+func (c *Commands) ResendUserPhoneCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm) (*domain.Phone, error) {
+	return c.resendUserPhoneCode(ctx, userID, alg, false)
 }
 
 // ResendUserPhoneCodeReturnCode generates a code and does not send a notification sms.
 // The generated plain text code will be set in the returned Phone object.
-func (c *Commands) ResendUserPhoneCodeReturnCode(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm) (*domain.Phone, error) {
-	return c.resendUserPhoneCode(ctx, userID, resourceOwner, alg, true)
+func (c *Commands) ResendUserPhoneCodeReturnCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm) (*domain.Phone, error) {
+	return c.resendUserPhoneCode(ctx, userID, alg, true)
 }
 
-func (c *Commands) changeUserPhoneWithCode(ctx context.Context, userID, resourceOwner, phone string, alg crypto.EncryptionAlgorithm, returnCode bool) (*domain.Phone, error) {
+func (c *Commands) changeUserPhoneWithCode(ctx context.Context, userID, phone string, alg crypto.EncryptionAlgorithm, returnCode bool) (*domain.Phone, error) {
 	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode)
 	if err != nil {
 		return nil, err
 	}
 	gen := crypto.NewEncryptionGenerator(*config, alg)
-	return c.changeUserPhoneWithGenerator(ctx, userID, resourceOwner, phone, gen, returnCode)
+	return c.changeUserPhoneWithGenerator(ctx, userID, phone, gen, returnCode)
 }
 
-func (c *Commands) resendUserPhoneCode(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm, returnCode bool) (*domain.Phone, error) {
+func (c *Commands) resendUserPhoneCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, returnCode bool) (*domain.Phone, error) {
 	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
 	gen := crypto.NewEncryptionGenerator(*config, alg)
-	return c.resendUserPhoneCodeWithGenerator(ctx, userID, resourceOwner, gen, returnCode)
+	return c.resendUserPhoneCodeWithGenerator(ctx, userID, gen, returnCode)
 }
 
 // changeUserPhoneWithGenerator set a user's phone number.
 // returnCode controls if the plain text version of the code will be set in the return object.
 // When the plain text code is returned, no notification sms will be send to the user.
-func (c *Commands) changeUserPhoneWithGenerator(ctx context.Context, userID, resourceOwner, phone string, gen crypto.Generator, returnCode bool) (*domain.Phone, error) {
-	cmd, err := c.NewUserPhoneEvents(ctx, userID, resourceOwner)
+func (c *Commands) changeUserPhoneWithGenerator(ctx context.Context, userID, phone string, gen crypto.Generator, returnCode bool) (*domain.Phone, error) {
+	cmd, err := c.NewUserPhoneEvents(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -97,8 +97,8 @@ func (c *Commands) changeUserPhoneWithGenerator(ctx context.Context, userID, res
 // resendUserPhoneCodeWithGenerator generates a new code.
 // returnCode controls if the plain text version of the code will be set in the return object.
 // When the plain text code is returned, no notification sms will be send to the user.
-func (c *Commands) resendUserPhoneCodeWithGenerator(ctx context.Context, userID, resourceOwner string, gen crypto.Generator, returnCode bool) (*domain.Phone, error) {
-	cmd, err := c.NewUserPhoneEvents(ctx, userID, resourceOwner)
+func (c *Commands) resendUserPhoneCodeWithGenerator(ctx context.Context, userID string, gen crypto.Generator, returnCode bool) (*domain.Phone, error) {
+	cmd, err := c.NewUserPhoneEvents(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -116,17 +116,17 @@ func (c *Commands) resendUserPhoneCodeWithGenerator(ctx context.Context, userID,
 	return cmd.Push(ctx)
 }
 
-func (c *Commands) VerifyUserPhone(ctx context.Context, userID, resourceOwner, code string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
+func (c *Commands) VerifyUserPhone(ctx context.Context, userID, code string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
 	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode)
 	if err != nil {
 		return nil, err
 	}
 	gen := crypto.NewEncryptionGenerator(*config, alg)
-	return c.verifyUserPhoneWithGenerator(ctx, userID, resourceOwner, code, gen)
+	return c.verifyUserPhoneWithGenerator(ctx, userID, code, gen)
 }
 
-func (c *Commands) verifyUserPhoneWithGenerator(ctx context.Context, userID, resourceOwner, code string, gen crypto.Generator) (*domain.ObjectDetails, error) {
-	cmd, err := c.NewUserPhoneEvents(ctx, userID, resourceOwner)
+func (c *Commands) verifyUserPhoneWithGenerator(ctx context.Context, userID, code string, gen crypto.Generator) (*domain.ObjectDetails, error) {
+	cmd, err := c.NewUserPhoneEvents(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -154,12 +154,12 @@ type UserPhoneEvents struct {
 // NewUserPhoneEvents constructs a UserPhoneEvents with a Human Phone Write Model,
 // filtered by userID and resourceOwner.
 // If a model cannot be found, or it's state is invalid and error is returned.
-func (c *Commands) NewUserPhoneEvents(ctx context.Context, userID, resourceOwner string) (*UserPhoneEvents, error) {
+func (c *Commands) NewUserPhoneEvents(ctx context.Context, userID string) (*UserPhoneEvents, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-xP292j", "Errors.User.Phone.IDMissing")
 	}
 
-	model, err := c.phoneWriteModelByID(ctx, userID, resourceOwner)
+	model, err := c.phoneWriteModelByID(ctx, userID, "")
 	if err != nil {
 		return nil, err
 	}
