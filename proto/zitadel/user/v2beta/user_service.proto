@@ -232,7 +232,7 @@ service UserService {
   }
 
 
-  // Change the email of a user
+  // Resend code to verify user email
   rpc ResendEmailCode (ResendEmailCodeRequest) returns (ResendEmailCodeResponse) {
     option (google.api.http) = {
       post: "/v2beta/users/{user_id}/email/resend"
@@ -1023,6 +1023,7 @@ message ResendEmailCodeRequest{
       example: "\"69629026806489455\"";
     }
   ];
+  // if no verification is specified, an email is sent with the default url
   oneof verification {
     SendEmailVerificationCode send_code = 2;
     ReturnEmailVerificationCode return_code = 3;
@@ -1104,6 +1105,7 @@ message ResendPhoneCodeRequest{
       example: "\"69629026806489455\"";
     }
   ];
+  // if no verification is specified, an sms is sent
   oneof verification {
     SendPhoneVerificationCode send_code = 3;
     ReturnPhoneVerificationCode return_code = 4;
