@@ -112,7 +112,7 @@ service UserService {
   //
   // List all matching users. By default, we will return all users of your instance.
   // Make sure to include a limit and sorting for pagination.
-  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
+  rpc ListUsers (ListUsersRequest) returns (ListUsersResponse) {
     option (google.api.http) = {
       post: "/v3alpha/users/search"
       body: "*"
@@ -148,7 +148,7 @@ service UserService {
   // User by ID
   //
   // Returns the user identified by the requested ID.
-  rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
+  rpc GetUserByID (GetUserByIDRequest) returns (GetUserByIDResponse) {
     option (google.api.http) = {
       get: "/v3alpha/users/{user_id}"
     };
@@ -172,7 +172,7 @@ service UserService {
   // Create a user
   //
   // Create a new user with an optional data schema.
-  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
     option (google.api.http) = {
       post: "/v3alpha/users"
       body: "*"
@@ -206,7 +206,7 @@ service UserService {
   // Update a user
   //
   // Update an existing user with data based on a user schema.
-  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+  rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
     option (google.api.http) = {
       put: "/v3alpha/users/{user_id}"
       body: "*"
@@ -236,7 +236,7 @@ service UserService {
   // but you still need access to the user data.
   //
   // The endpoint returns an error if the user is already in the state 'deactivated'.
-  rpc DeactivateUser(DeactivateUserRequest) returns (DeactivateUserResponse) {
+  rpc DeactivateUser (DeactivateUserRequest) returns (DeactivateUserResponse) {
     option (google.api.http) = {
       post: "/v3alpha/users/{user_id}/deactivate"
     };
@@ -263,7 +263,7 @@ service UserService {
   // The user will be able to log in again.
   //
   // The endpoint returns an error if the user is not in the state 'deactivated'.
-  rpc ReactivateUser(ReactivateUserRequest) returns (ReactivateUserResponse) {
+  rpc ReactivateUser (ReactivateUserRequest) returns (ReactivateUserResponse) {
     option (google.api.http) = {
       post: "/v3alpha/users/{user_id}/reactivate"
     };
@@ -292,7 +292,7 @@ service UserService {
   // because of an event that happened (wrong password, etc.)
   //
   // The endpoint returns an error if the user is already in the state 'locked'.
-  rpc LockUser(LockUserRequest) returns (LockUserResponse) {
+  rpc LockUser (LockUserRequest) returns (LockUserResponse) {
     option (google.api.http) = {
       post: "/v3alpha/users/{user_id}/lock"
     };
@@ -319,7 +319,7 @@ service UserService {
   // The user will be able to log in again.
   //
   // The endpoint returns an error if the user is not in the state 'locked'.
-  rpc UnlockUser(UnlockUserRequest) returns (UnlockUserResponse) {
+  rpc UnlockUser (UnlockUserRequest) returns (UnlockUserResponse) {
     option (google.api.http) = {
       post: "/v3alpha/users/{user_id}/unlock"
     };
@@ -344,7 +344,7 @@ service UserService {
   //
   // Delete an existing user and change the state to 'deleted'.
   // The user will be able to log in anymore.
-  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
+  rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse) {
     option (google.api.http) = {
       delete: "/v3alpha/users/{user_id}"
     };
@@ -361,6 +361,33 @@ service UserService {
         value: {
           description: "User successfully deleted";
         };
+      };
+    };
+  }
+
+  // Validate a user
+  //
+  // Verify if an existing user satisfies a schema.
+  // This can be used if a user is based on an older revision of the schema
+  // or if a user needs to be migrated to a new schema.
+  rpc ValidateUser (ValidateUserRequest) returns (ValidateUserResponse) {
+    option (google.api.http) = {
+      post: "/v3alpha/users/{user_id}/validate"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "User validation completed"; //(--TODO: do we always return 200/no error if the process was ok with potential validation error list or a 400?--)
+        }
       };
     };
   }
@@ -1208,6 +1235,33 @@ message DeleteUserResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
+message ValidateUserRequest {
+  // unique identifier of the user.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // The schema the user will be verified against. If none is provided,
+  // the latest revision of the user's current schema will be used for verification.
+  optional string schema_id = 5 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message ValidateUserResponse {
+  //(--TODO: do we always return 200/no error if the process was ok with potential validation error list or a 400?--)
+}
+
 message SetContactEmailRequest {
   // unique identifier of the user.
   string user_id = 1 [
@@ -1233,7 +1287,7 @@ message SetContactEmailResponse {
   ];
 }
 
-message VerifyContactEmailRequest{
+message VerifyContactEmailRequest {
   // unique identifier of the user.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -1256,11 +1310,11 @@ message VerifyContactEmailRequest{
   ];
 }
 
-message VerifyContactEmailResponse{
+message VerifyContactEmailResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
-message SetContactPhoneRequest{
+message SetContactPhoneRequest {
   // unique identifier of the user.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -1275,7 +1329,7 @@ message SetContactPhoneRequest{
   SetPhone phone = 2;
 }
 
-message SetContactPhoneResponse{
+message SetContactPhoneResponse {
   zitadel.object.v2beta.Details details = 1;
   // The phone verification code will be set if a contact phone was set with a return_code verification option.
   optional string email_code = 3 [
@@ -1285,7 +1339,7 @@ message SetContactPhoneResponse{
   ];
 }
 
-message VerifyContactPhoneRequest{
+message VerifyContactPhoneRequest {
   // unique identifier of the user.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -1308,7 +1362,7 @@ message VerifyContactPhoneRequest{
   ];
 }
 
-message VerifyContactPhoneResponse{
+message VerifyContactPhoneResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
@@ -1407,7 +1461,7 @@ message SetPasswordResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
-message RequestPasswordResetRequest{
+message RequestPasswordResetRequest {
   // unique identifier of the user.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -1427,7 +1481,7 @@ message RequestPasswordResetRequest{
   }
 }
 
-message RequestPasswordResetResponse{
+message RequestPasswordResetResponse {
   zitadel.object.v2beta.Details details = 1;
   // In case the medium was set to return_code, the code will be returned.
   optional string verification_code = 2 [
@@ -1529,7 +1583,7 @@ message VerifyWebAuthNRegistrationRequest {
   ];
 }
 
-message VerifyWebAuthNRegistrationResponse{
+message VerifyWebAuthNRegistrationResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
@@ -1582,7 +1636,7 @@ message RemoveWebAuthNAuthenticatorRequest {
   ];
 }
 
-message RemoveWebAuthNAuthenticatorResponse{
+message RemoveWebAuthNAuthenticatorResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
@@ -1681,7 +1735,7 @@ message RemoveTOTPAuthenticatorRequest {
   ];
 }
 
-message RemoveTOTPAuthenticatorResponse{
+message RemoveTOTPAuthenticatorResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
@@ -1777,7 +1831,7 @@ message RemoveOTPSMSAuthenticatorRequest {
   ];
 }
 
-message RemoveOTPSMSAuthenticatorResponse{
+message RemoveOTPSMSAuthenticatorResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
@@ -1872,11 +1926,11 @@ message RemoveOTPEmailAuthenticatorRequest {
   ];
 }
 
-message RemoveOTPEmailAuthenticatorResponse{
+message RemoveOTPEmailAuthenticatorResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
-message StartIdentityProviderIntentRequest{
+message StartIdentityProviderIntentRequest {
   // ID of an existing identity provider (IDP).
   string idp_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -1894,7 +1948,7 @@ message StartIdentityProviderIntentRequest{
   }
 }
 
-message StartIdentityProviderIntentResponse{
+message StartIdentityProviderIntentResponse {
   zitadel.object.v2beta.Details details = 1;
   // the next step to take in the idp intent flow.
   oneof next_step {
@@ -1912,7 +1966,7 @@ message StartIdentityProviderIntentResponse{
   }
 }
 
-message RetrieveIdentityProviderIntentRequest{
+message RetrieveIdentityProviderIntentRequest {
   // ID of the identity provider (IDP) intent, previously returned on the success response of the start identity provider intent.
   string idp_intent_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -1935,7 +1989,7 @@ message RetrieveIdentityProviderIntentRequest{
   ];
 }
 
-message RetrieveIdentityProviderIntentResponse{
+message RetrieveIdentityProviderIntentResponse {
   zitadel.object.v2beta.Details details = 1;
   // Information returned by the identity provider (IDP) such as the identification of the user
   // and detailed / profile information.
@@ -1948,7 +2002,7 @@ message RetrieveIdentityProviderIntentResponse{
   ];
 }
 
-message AddIDPAuthenticatorRequest{
+message AddIDPAuthenticatorRequest {
   // unique identifier of the user.
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -1989,7 +2043,7 @@ message RemoveIDPAuthenticatorRequest {
   ];
 }
 
-message RemoveIDPAuthenticatorResponse{
+message RemoveIDPAuthenticatorResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 

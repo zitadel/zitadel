@@ -108,7 +108,7 @@ service UserSchemaService {
   // List user schemas
   //
   // List all matching user schemas. By default, we will return all user schema of your instance. Make sure to include a limit and sorting for pagination.
-  rpc ListUserSchemas(ListUserSchemasRequest) returns (ListUserSchemasResponse) {
+  rpc ListUserSchemas (ListUserSchemasRequest) returns (ListUserSchemasResponse) {
     option (google.api.http) = {
       post: "/v1alpha/user_schemas/search"
       body: "*"
@@ -144,7 +144,7 @@ service UserSchemaService {
   // User schema by ID
   //
   // Returns the user schema identified by the requested ID.
-  rpc GetUserSchemaByID(GetUserSchemaByIDRequest) returns (GetUserSchemaByIDResponse) {
+  rpc GetUserSchemaByID (GetUserSchemaByIDRequest) returns (GetUserSchemaByIDResponse) {
     option (google.api.http) = {
       get: "/v1alpha/user_schemas/{id}"
     };
@@ -168,7 +168,7 @@ service UserSchemaService {
   // Create a user schema
   //
   // Create the first revision of a new user schema. The schema can then be used on users to store and validate their data.
-  rpc CreateUserSchema(CreateUserSchemaRequest) returns (CreateUserSchemaResponse) {
+  rpc CreateUserSchema (CreateUserSchemaRequest) returns (CreateUserSchemaResponse) {
     option (google.api.http) = {
       post: "/v1alpha/user_schemas"
       body: "*"
@@ -201,7 +201,7 @@ service UserSchemaService {
   // Update a user schema
   //
   // Update an existing user schema to a new revision. Users based on the current revision will not be affected until they are updated.
-  rpc UpdateUserSchema(UpdateUserSchemaRequest) returns (UpdateUserSchemaResponse) {
+  rpc UpdateUserSchema (UpdateUserSchemaRequest) returns (UpdateUserSchemaResponse) {
     option (google.api.http) = {
       put: "/v1alpha/user_schemas/{id}"
       body: "*"
@@ -226,7 +226,7 @@ service UserSchemaService {
   // Deactivate a user schema
   //
   // Deactivate an existing user schema and change it into a read-only state. Users based on this schema cannot be updated anymore, but are still able to authenticate.
-  rpc DeactivateUserSchema(DeactivateUserSchemaRequest) returns (DeactivateUserSchemaResponse) {
+  rpc DeactivateUserSchema (DeactivateUserSchemaRequest) returns (DeactivateUserSchemaResponse) {
     option (google.api.http) = {
       post: "/v1alpha/user_schemas/{id}/deactivate"
     };
@@ -250,7 +250,7 @@ service UserSchemaService {
   // Reactivate a user schema
   //
   // Reactivate an previously deactivated user schema and change it into an active state again.
-  rpc ReactivateUserSchema(ReactivateUserSchemaRequest) returns (ReactivateUserSchemaResponse) {
+  rpc ReactivateUserSchema (ReactivateUserSchemaRequest) returns (ReactivateUserSchemaResponse) {
     option (google.api.http) = {
       post: "/v1alpha/user_schemas/{id}/reactivate"
     };
@@ -274,7 +274,7 @@ service UserSchemaService {
   // Delete a user schema
   //
   // Delete an existing user schema. This operation is only allowed if there are no associated users to it.
-  rpc DeleteUserSchema(DeleteUserSchemaRequest) returns (DeleteUserSchemaResponse) {
+  rpc DeleteUserSchema (DeleteUserSchemaRequest) returns (DeleteUserSchemaResponse) {
     option (google.api.http) = {
       delete: "/v1alpha/user_schemas/{id}"
     };
