@@ -401,6 +401,9 @@ func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 
 func getUserResourceOwner(ctx context.Context, es handler.EventStore, instanceID, userID string) (string, error) {
 	userRO, _, _, err := getResourceOwners(ctx, es, instanceID, userID, "", "")
+	if userRO == "" {
+		return "", zerrors.ThrowNotFound(nil, "PROJ-uahkkord22", "Errors.NotFound")
+	}
 	return userRO, err
 }
 
@@ -439,9 +442,8 @@ func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, u
 	if err != nil {
 		return "", "", "", err
 	}
-	if len(events) != eventCount {
-		return "", "", "", zerrors.ThrowNotFound(nil, "PROJ-0I91sp", "Errors.NotFound")
-	}
+
+	// sorted ascending
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.GrantAddedEvent:
