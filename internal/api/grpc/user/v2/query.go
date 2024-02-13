@@ -14,12 +14,11 @@ import (
 )
 
 func (s *Server) GetUserByID(ctx context.Context, req *user.GetUserByIDRequest) (_ *user.GetUserByIDResponse, err error) {
-	ctxData := authz.GetCtxData(ctx)
 	resp, err := s.query.GetUserByID(ctx, true, req.GetUserId())
 	if err != nil {
 		return nil, err
 	}
-	if ctxData.UserID != req.GetUserId() {
+	if authz.GetCtxData(ctx).UserID != req.GetUserId() {
 		if err := s.checkPermission(ctx, domain.PermissionUserRead, resp.ResourceOwner, req.GetUserId()); err != nil {
 			return nil, err
 		}
