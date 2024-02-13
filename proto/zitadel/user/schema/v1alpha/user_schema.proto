@@ -105,7 +105,6 @@ enum State {
 
 enum AuthenticatorType {
   AUTHENTICATOR_TYPE_UNSPECIFIED = 0;
-  //(--TODO: i guess we can also disable this?--)
   AUTHENTICATOR_TYPE_USERNAME = 1;
   AUTHENTICATOR_TYPE_PASSWORD = 2;
   AUTHENTICATOR_TYPE_WEBAUTHN = 3;

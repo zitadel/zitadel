@@ -77,7 +77,6 @@ message SetUsername {
 
 message Password {
   // States the time the password was last changed.
-  //(--TODO:do we want to include that in the list or is there a separate call?--)
   google.protobuf.Timestamp last_changed = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2019-04-01T08:45:00.000000Z\"";
@@ -101,8 +100,14 @@ message WebAuthN {
   // State whether the WebAuthN registration has been completed.
   //(--TODO:only verified or return verification state?--)
   bool is_verified = 3;
-  //(--TODO:do we need to know if the user has been verified in the initial registration or do we only care on authentication?--)
-  //(--bool user_verified = 4;--)
+  // States if the user has been verified during the registration. Authentication with this device
+  // will be considered as multi factor authentication (MFA) without the need to check a password
+  // (typically known as Passkeys).
+  // Without user verification it will be a second factor authentication (2FA), typically done
+  // after a password check.
+  //
+  // More on WebAuthN User Verification: https://www.w3.org/TR/webauthn/#user-verification
+  bool user_verified = 4;
 }
 
 message OTPSMS {
