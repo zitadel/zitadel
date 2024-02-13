@@ -80,8 +80,8 @@ module.exports = {
         },
         {
           type: "link",
-              label: "Node.js",
-            href: "https://www.npmjs.com/package/@zitadel/node",
+          label: "Node.js",
+          href: "https://www.npmjs.com/package/@zitadel/node",
         },
         {
           type: "link",
@@ -268,6 +268,7 @@ module.exports = {
             "guides/integrate/login-ui/password-reset",
             "guides/integrate/login-ui/logout",
             "guides/integrate/login-ui/oidc-standard",
+            "guides/integrate/login-ui/typescript-repo",
           ],
         },
         {
@@ -424,15 +425,15 @@ module.exports = {
             title: "Onboarding Customers and Users",
             slug: "/guides/solution-scenarios/onboarding",
             description:
-                "When building your own application, one of the first questions you have to face, is 'How do my customers onboard to my application?'\n" +
-                "This guide will show you the built-in solution you have, within ZITADEL and how you can use ZITADEL when you have more advanced needs.",
+              "When building your own application, one of the first questions you have to face, is 'How do my customers onboard to my application?'\n" +
+              "This guide will show you the built-in solution you have, within ZITADEL and how you can use ZITADEL when you have more advanced needs.",
           },
           collapsed: true,
           items: [
             "guides/solution-scenarios/onboarding/b2b",
             "guides/solution-scenarios/onboarding/end-users",
           ],
-        }
+        },
       ],
     },
     {

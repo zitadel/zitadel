@@ -1,0 +1,54 @@
+---
+title: Typescript Repository
+sidebar_label: Typescript Repository
+---
+
+To replace our current golang built login UI and showcase the use of our new resource and OIDC APIs, we've created the [Typescript Repository](https://github.com/zitadel/typescript).
+The Typescript Repository contains all TypeScript and JavaScript packages and applications you need to create your own ZITADEL Login UI.
+The repo implements the [OIDC standard](./oidc-standard)
+
+## Included Apps And Packages
+
+- `login`: The login UI used by ZITADEL Cloud, powered by Next.js
+- `@zitadel/server`: core components for establishing node client connection, grpc stub
+- `@zitadel/client`: core components for establishing web client connection, grpc stub
+- `@zitadel/react`: shared React utilities and components built with tailwindcss
+- `@zitadel/next`: shared Next.js utilities
+- `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
+- `eslint-config-zitadel`: ESLint preset
+
+## Implemented features of OIDC Standard
+
+- [ ] Authorization Code Flow with PKCE
+- [ ] AuthRequest `hintUserId`
+- [ ] AuthRequest `loginHint`
+- [ ] AuthRequest `prompt`
+  - [x] Login
+  - [x] Select Account
+  - [ ] Consent
+  - [ ] Create
+- Scopes
+  - [ ] `openid email profile address``
+  - [ ] `offline access`
+  - [ ] `urn:zitadel:iam:org:idp:id:{idp_id}`
+  - [ ] `urn:zitadel:iam:org:project:id:zitadel:aud`
+  - [ ] `urn:zitadel:iam:org:id:{orgid}`
+- [ ] AuthRequest UI locales
+- IDPs
+  - [ ] Google
+  - [ ] GitHub
+  - [ ] GitLab
+  - [ ] Azure
+  - [ ] Apple
+- Multifactor
+  - [x] Passkeys
+  - [ ] TOTP
+- Passwordless
+  - [x] Passkeys
+- Security Prompts
+  - [x] Setup Passkey as Passwordless method
+  - [ ] Setup TOTP as Multifactor
+  - [ ] Password Change
+- Register
+  - [x] Email Password
+  - [x] Passkey
