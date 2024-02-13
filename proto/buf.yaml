@@ -4,6 +4,7 @@ deps:
   - buf.build/grpc-ecosystem/grpc-gateway
   - buf.build/envoyproxy/protoc-gen-validate
   - buf.build/googleapis/googleapis
+  - buf.build/adlerhurst/cli-client
 breaking:
   use:
     - FILE

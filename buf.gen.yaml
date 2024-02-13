@@ -19,3 +19,6 @@ plugins:
     out: .artifacts/grpc
   - plugin: zitadel
     out: .artifacts/grpc
+  - plugin: cli-client
+    out: .artifacts/grpc
+    # opt: paths=source_relative

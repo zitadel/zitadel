@@ -1,9 +1,6 @@
 module github.com/zitadel/zitadel
 
-go 1.21.1
-
-// https://go.dev/doc/toolchain
-toolchain go1.21.5
+go 1.22.0
 
 require (
 	cloud.google.com/go/storage v1.36.0
@@ -11,6 +8,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.21.0
 	github.com/Masterminds/squirrel v1.5.4
+	github.com/adlerhurst/cli-client v0.0.0-00010101000000-000000000000
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b
 	github.com/benbjohnson/clock v1.3.5
 	github.com/boombuler/barcode v1.0.1
@@ -194,7 +192,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/pflag v1.0.5
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
@@ -212,3 +210,5 @@ require (
 )
 
 replace github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.4
+
+replace github.com/adlerhurst/cli-client => ../../adlerhurst/cli-client

@@ -1,0 +1,1 @@
+Warning: Duplicate generated file name "github.com/zitadel/zitadel/pkg/grpc/user/v2beta/user_service.pb.zitadel.go". Buf will continue without error here and drop the second occurrence of this file, but please raise an issue with the maintainer of the plugin.

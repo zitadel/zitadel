@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/admin"
+	"github.com/zitadel/zitadel/cmd/alpha"
 	"github.com/zitadel/zitadel/cmd/build"
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/cmd/key"
@@ -57,6 +58,7 @@ func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server
 		start.NewStartFromSetup(server),
 		key.New(),
 		ready.New(),
+		alpha.New(),
 	)
 
 	cmd.InitDefaultVersionFlag()
