@@ -2,7 +2,6 @@ package execution
 
 import (
 	"context"
-	"net/url"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -22,7 +21,7 @@ type AddedEvent struct {
 
 	Name             string               `json:"name"`
 	ExecutionType    domain.ExecutionType `json:"executionType"`
-	URL              *url.URL             `json:"url"`
+	URL              string               `json:"url"`
 	Timeout          time.Duration        `json:"timeout"`
 	Async            bool                 `json:"async"`
 	InterruptOnError bool                 `json:"interruptOnError"`
@@ -45,7 +44,7 @@ func NewAddedEvent(
 	aggregate *eventstore.Aggregate,
 	name string,
 	executionType domain.ExecutionType,
-	url *url.URL,
+	url string,
 	timeout time.Duration,
 	async bool,
 	interruptOnError bool,
@@ -57,11 +56,23 @@ func NewAddedEvent(
 		name, executionType, url, timeout, async, interruptOnError}
 }
 
+func AddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	added := &AddedEvent{
+		BaseEvent: eventstore.BaseEventFromRepo(event),
+	}
+	err := event.Unmarshal(added)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "EXEC-fx8f8yfbn1", "unable to unmarshal execution added")
+	}
+
+	return added, nil
+}
+
 type ChangedEvent struct {
-	eventstore.BaseEvent `json:"-"`
+	*eventstore.BaseEvent `json:"-"`
 
 	ExecutionType    *domain.ExecutionType `json:"executionType,omitempty"`
-	URL              *url.URL              `json:"url,omitempty"`
+	URL              *string               `json:"url,omitempty"`
 	Timeout          *time.Duration        `json:"timeout,omitempty"`
 	Async            *bool                 `json:"async,omitempty"`
 	InterruptOnError *bool                 `json:"interruptOnError,omitempty"`
@@ -79,12 +90,9 @@ func NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	changes []Changes,
-) (*ChangedEvent, error) {
-	if len(changes) == 0 {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "EXEC-n1yzrtkyb1", "Errors.NoChangesFound")
-	}
+) *ChangedEvent {
 	changeEvent := &ChangedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			ChangedEventType,
@@ -93,20 +101,20 @@ func NewChangedEvent(
 	for _, change := range changes {
 		change(changeEvent)
 	}
-	return changeEvent, nil
+	return changeEvent
 }
 
 type Changes func(event *ChangedEvent)
 
-func ChangeType(executionType domain.ExecutionType) func(event *ChangedEvent) {
+func ChangeExecutionType(executionType domain.ExecutionType) func(event *ChangedEvent) {
 	return func(e *ChangedEvent) {
 		e.ExecutionType = &executionType
 	}
 }
 
-func ChangeURL(url *url.URL) func(event *ChangedEvent) {
+func ChangeURL(url string) func(event *ChangedEvent) {
 	return func(e *ChangedEvent) {
-		e.URL = url
+		e.URL = &url
 	}
 }
 
@@ -130,7 +138,7 @@ func ChangeInterruptOnError(interruptOnError bool) func(event *ChangedEvent) {
 
 func ChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	changed := &ChangedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
+		BaseEvent: eventstore.BaseEventFromRepo(event),
 	}
 	err := event.Unmarshal(changed)
 	if err != nil {
@@ -160,4 +168,16 @@ func (e *RemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 
 func NewRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string) *RemovedEvent {
 	return &RemovedEvent{eventstore.NewBaseEventForPush(ctx, aggregate, RemovedEventType), name}
+}
+
+func RemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	removed := &RemovedEvent{
+		BaseEvent: eventstore.BaseEventFromRepo(event),
+	}
+	err := event.Unmarshal(removed)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "EXEC-0kuc12c7bc", "unable to unmarshal execution removed")
+	}
+
+	return removed, nil
 }
