@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Istanza",
+    "INSTANCE": "Impostazioni default",
     "DASHBOARD": "Pagina iniziale",
     "PERSONAL_INFO": "Informazioni personali",
     "DOCUMENTATION": "Documentazione",
@@ -226,6 +226,7 @@
     "EMAIL": "Email",
     "USERNAME": "User Name",
     "ORGNAME": "Nome organizzazione",
+    "PRIMARYDOMAIN": "Dominio primario",
     "PROJECTNAME": "Nome del progetto",
     "RESOURCEOWNER": "Resource Owner",
     "METHODS": {
@@ -1022,6 +1023,7 @@
       "DESCRIPTION": "Queste impostazioni si applicheranno alla organizzazione corrente."
     },
     "LIST": {
+      "ORGS": "Organizzazioni",
       "LANGUAGES": "Lingue",
       "LOGIN": "Comportamento login e sicurezza",
       "LOCKOUT": "Meccanismi di bloccaggio",
@@ -1039,15 +1041,20 @@
       "PRIVACYPOLICY": "Informativa sulla privacy e TOS",
       "OIDC": "OIDC Token lifetime e scadenza",
       "SECRETS": "Aspetto dei segreti",
-      "SECURITY": "Impostazioni di sicurezza"
+      "SECURITY": "Impostazioni di sicurezza",
+      "EVENTS": "Eventi",
+      "FAILEDEVENTS": "Eventi falliti",
+      "VIEWS": "Views"
     },
     "GROUPS": {
+      "GENERAL": "Generale",
       "NOTIFICATIONS": "Notifiche",
       "LOGIN": "Accesso e login",
       "DOMAIN": "Dominio",
       "TEXTS": "Testi e lingue",
       "APPEARANCE": "Aspetto",
-      "OTHER": "Altro"
+      "OTHER": "Altro",
+      "STORAGE": "Dati"
     }
   },
   "SETTING": {

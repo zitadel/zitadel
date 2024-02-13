@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instancia",
+    "INSTANCE": "configuración por defecto",
     "DASHBOARD": "Inicio",
     "PERSONAL_INFO": "Información personal",
     "DOCUMENTATION": "Documentación",
@@ -228,6 +228,7 @@
     "EMAIL": "Email",
     "USERNAME": "Nombre de usuario",
     "ORGNAME": "Nombre de organización",
+    "PRIMARYDOMAIN": "Dominio primario",
     "PROJECTNAME": "Nombre de proyecto",
     "RESOURCEOWNER": "Propietario del recurso",
     "METHODS": {
@@ -1024,6 +1025,7 @@
       "DESCRIPTION": "Estas configuraciones amplían y sobrescriben tus configuraciones de instancia."
     },
     "LIST": {
+      "ORGS": "Organizaciones",
       "LANGUAGES": "Idiomas",
       "LOGIN": "Comportamiento del inicio de sesión y de la seguridad",
       "LOCKOUT": "Bloqueo",
@@ -1041,15 +1043,20 @@
       "PRIVACYPOLICY": "Política de privacidad",
       "OIDC": "OIDC Token lifetime and expiration",
       "SECRETS": "Apariencia del secreto",
-      "SECURITY": "Ajustes de seguridad"
+      "SECURITY": "Ajustes de seguridad",
+      "EVENTS": "Eventos",
+      "FAILEDEVENTS": "Eventos fallidos",
+      "VIEWS": "Vistas"
     },
     "GROUPS": {
+      "GENERAL": "General",
       "NOTIFICATIONS": "Notificaciones",
       "LOGIN": "Inicio de sesión y acceso",
       "DOMAIN": "Dominio",
       "TEXTS": "Textos e idiomas",
       "APPEARANCE": "Apariencia",
-      "OTHER": "Otros"
+      "OTHER": "Otros",
+      "STORAGE": "Datos"
     }
   },
   "SETTING": {

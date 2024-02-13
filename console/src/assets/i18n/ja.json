@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "インスタンス",
+    "INSTANCE": "デフォルトの設定",
     "DASHBOARD": "ホーム",
     "PERSONAL_INFO": "個人情報",
     "DOCUMENTATION": "ドキュメント",
@@ -228,6 +228,7 @@
     "EMAIL": "Eメール",
     "USERNAME": "ユーザー名",
     "ORGNAME": "組織名",
+    "PRIMARYDOMAIN": "プライマリドメイン",
     "PROJECTNAME": "プロジェクト名",
     "RESOURCEOWNER": "リソース所有者",
     "METHODS": {
@@ -1023,6 +1024,7 @@
       "DESCRIPTION": "これらの設定は、インスタンス設定を拡張・上書きします。"
     },
     "LIST": {
+      "ORGS": "組織",
       "LANGUAGES": "一般設定",
       "LOGIN": "ログイン動作とセキュリティ",
       "LOCKOUT": "ロックアウト",
@@ -1040,15 +1042,20 @@
       "PRIVACYPOLICY": "プライバシーポリシー",
       "OIDC": "OIDCトークンのライフタイムと有効期限",
       "SECRETS": "シークレット設定",
-      "SECURITY": "セキュリティ設定"
+      "SECURITY": "セキュリティ設定",
+      "EVENTS": "イベント",
+      "FAILEDEVENTS": "失敗したイベント",
+      "VIEWS": "ビュー"
     },
     "GROUPS": {
+      "GENERAL": "一般",
       "NOTIFICATIONS": "通知",
       "LOGIN": "ログインとアクセス",
       "DOMAIN": "ドメイン",
       "TEXTS": "テキストと言語",
       "APPEARANCE": "設定",
-      "OTHER": "その他"
+      "OTHER": "その他",
+      "STORAGE": "ストレージ"
     }
   },
   "SETTING": {
