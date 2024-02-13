@@ -119,7 +119,7 @@ func NewServer(
 	provider, err := op.NewProvider(
 		opConfig,
 		storage,
-		op.IssuerFromForwardedOrHost("", op.WithIssuerFromCustomHeaders("forwarded", "x-zitadel-forwarded")),
+		op.IssuerFromForwardedOrHost("", op.WithIssuerFromCustomHeaders("x-zitadel-forwarded", "forwarded")),
 		options...,
 	)
 	if err != nil {
