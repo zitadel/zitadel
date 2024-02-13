@@ -98,7 +98,6 @@ message WebAuthN {
     }
   ];
   // State whether the WebAuthN registration has been completed.
-  //(--TODO:only verified or return verification state?--)
   bool is_verified = 3;
   // States if the user has been verified during the registration. Authentication with this device
   // will be considered as multi factor authentication (MFA) without the need to check a password
@@ -123,7 +122,8 @@ message OTPSMS {
       example: "\"+41791234567\"";
     }
   ];
-  //(--TODO:only verified or return verification state?--)
+  // State whether the OTP SMS registration has been completed.
+  bool is_verified = 3;
 }
 
 message OTPEmail {
@@ -139,7 +139,8 @@ message OTPEmail {
       example: "\"mini@mouse.com\"";
     }
   ];
-  //(--TODO:only verified or return verification state?--)
+  // State whether the OTP Email registration has been completed.
+  bool is_verified = 3;
 }
 
 message TOTP {
@@ -155,7 +156,8 @@ message TOTP {
       example: "\"Google Authenticator\""
     }
   ];
-  //(--TODO:only verified or return verification state?--)
+  // State whether the TOTP registration has been completed.
+  bool is_verified = 3;
 }
 
 message AuthenticationKey {
@@ -246,8 +248,7 @@ message SetPassword {
   bool change_required = 3;
 }
 
-message SendPasswordResetLink {
-  //  NotificationType notification_type = 1; // TODO: did we ever implement this?
+message SendPasswordResetEmail {
   // Optionally set a url_template, which will be used in the password reset mail
   // sent by ZITADEL to guide the user to your password change page.
   // If no template is set, the default ZITADEL url will be used.
@@ -260,6 +261,8 @@ message SendPasswordResetLink {
     }
   ];
 }
+
+message SendPasswordResetSMS {}
 
 message ReturnPasswordResetCode {}
 

@@ -365,33 +365,6 @@ service UserService {
     };
   }
 
-  // Validate a user
-  //
-  // Verify if an existing user satisfies a schema.
-  // This can be used if a user is based on an older revision of the schema
-  // or if a user needs to be migrated to a new schema.
-  rpc ValidateUser (ValidateUserRequest) returns (ValidateUserResponse) {
-    option (google.api.http) = {
-      post: "/v3alpha/users/{user_id}/validate"
-      body: "*"
-    };
-
-    option (zitadel.protoc_gen_zitadel.v2.options) = {
-      auth_option: {
-        permission: "authenticated"
-      }
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
-        key: "200"
-        value: {
-          description: "User validation completed"; //(--TODO: do we always return 200/no error if the process was ok with potential validation error list or a 400?--)
-        }
-      };
-    };
-  }
-
   // Set contact email
   //
   // Add or update the contact email address of a user.
@@ -1235,33 +1208,6 @@ message DeleteUserResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
-message ValidateUserRequest {
-  // unique identifier of the user.
-  string user_id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1,
-      max_length: 200,
-      example: "\"69629026806489455\"";
-    }
-  ];
-  // The schema the user will be verified against. If none is provided,
-  // the latest revision of the user's current schema will be used for verification.
-  optional string schema_id = 5 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1,
-      max_length: 200,
-      example: "\"69629026806489455\"";
-    }
-  ];
-}
-
-message ValidateUserResponse {
-  //(--TODO: do we always return 200/no error if the process was ok with potential validation error list or a 400?--)
-}
-
 message SetContactEmailRequest {
   // unique identifier of the user.
   string user_id = 1 [
@@ -1475,9 +1421,11 @@ message RequestPasswordResetRequest {
   // If no medium is specified, an email is sent with the default url.
   oneof medium {
     // Let ZITADEL send the link to the user via email.
-    SendPasswordResetLink send_link = 2;
+    SendPasswordResetEmail send_email = 2;
+    // Let ZITADEL send the link to the user via SMS.
+    SendPasswordResetSMS send_sms = 3;
     // Get the code back to provide it to the user in your preferred mechanism.
-    ReturnPasswordResetCode return_code = 3;
+    ReturnPasswordResetCode return_code = 4;
   }
 }
 

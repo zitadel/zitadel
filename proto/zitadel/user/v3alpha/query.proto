@@ -16,30 +16,30 @@ message SearchQuery {
 
 
     // Union the results of each sub query ('OR').
-    OrQuery or_query = 11;
+    OrQuery or_query = 1;
     // Limit the result to match all sub queries ('AND').
     // Note that if you specify multiple queries, they will be implicitly used as andQueries.
     // Use the andQuery in combination with orQuery and notQuery.
-    AndQuery and_query = 12;
+    AndQuery and_query = 2;
     // Exclude / Negate the result of the sub query ('NOT').
-    NotQuery not_query = 13;
+    NotQuery not_query = 3;
 
     // Limit the result to a specific user ID.
-    UserIDQuery user_id_query = 1;
+    UserIDQuery user_id_query = 4;
     // Limit the result to a specific organization.
-    OrganizationIDQuery organization_id_query = 2;
+    OrganizationIDQuery organization_id_query = 5;
     // Limit the result to a specific username.
-    UsernameQuery username_query = 3;
+    UsernameQuery username_query = 6;
     // Limit the result to a specific contact email.
-    EmailQuery email_query = 4;
+    EmailQuery email_query = 7;
     // Limit the result to a specific contact phone.
-    PhoneQuery phone_query = 5;
+    PhoneQuery phone_query = 8;
     // Limit the result to a specific state of the user.
-    StateQuery state_query = 6;
+    StateQuery state_query = 9;
     // Limit the result to a specific schema ID.
-    SchemaIDQuery schema_ID_query = 7;
+    SchemaIDQuery schema_ID_query = 10;
     // Limit the result to a specific schema type.
-    SchemaTypeQuery schema_type_query = 8;
+    SchemaTypeQuery schema_type_query = 11;
   }
 }
 
