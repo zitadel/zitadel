@@ -5,7 +5,7 @@ describe('events', () => {
 
   it('events can be filtered', () => {
     const eventTypeEnglish = 'Instance added';
-    cy.visit('/events');
+    cy.visit('/instance?id=events');
     cy.get('[data-e2e="event-type-cell"]').should('have.length', 20);
     cy.get('[data-e2e="open-filter-button"]').click();
     cy.get('[data-e2e="event-type-filter-checkbox"]').click();
