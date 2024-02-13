@@ -417,6 +417,31 @@ service UserService {
     };
   }
 
+  // Resend the contact email code
+  //
+  // Resend the email with the verification code for the contact email address.
+  rpc ResendContactEmailCode (ResendContactEmailCodeRequest) returns (ResendContactEmailCodeResponse) {
+    option (google.api.http) = {
+      post: "/v3alpha/users/{user_id}/email/resend"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Code resend successfully requested";
+        }
+      };
+    };
+  }
+
   // Set contact phone
   //
   // Add or update the contact phone number of a user.
@@ -464,6 +489,31 @@ service UserService {
         key: "200"
         value: {
           description: "Contact phone successfully verified";
+        }
+      };
+    };
+  }
+
+  // Resend the contact phone code
+  //
+  // Resend the phone with the verification code for the contact phone number.
+  rpc ResendContactPhoneCode (ResendContactPhoneCodeRequest) returns (ResendContactPhoneCodeResponse) {
+    option (google.api.http) = {
+      post: "/v3alpha/users/{user_id}/phone/resend"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Code resend successfully requested";
         }
       };
     };
@@ -1260,6 +1310,32 @@ message VerifyContactEmailResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
+message ResendContactEmailCodeRequest {
+  // unique identifier of the user.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // if no verification is specified, an email is sent
+  oneof verification {
+    // Let ZITADEL send the link to the user via email.
+    SendEmailVerificationCode send_code = 2;
+    // Get the code back to provide it to the user in your preferred mechanism.
+    ReturnEmailVerificationCode return_code = 3;
+  }
+}
+
+message ResendContactEmailCodeResponse {
+  zitadel.object.v2beta.Details details = 1;
+  // in case the verification was set to return_code, the code will be returned.
+  optional string verification_code = 2;
+}
+
 message SetContactPhoneRequest {
   // unique identifier of the user.
   string user_id = 1 [
@@ -1310,6 +1386,32 @@ message VerifyContactPhoneRequest {
 
 message VerifyContactPhoneResponse {
   zitadel.object.v2beta.Details details = 1;
+}
+
+message ResendContactPhoneCodeRequest {
+  // unique identifier of the user.
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // if no verification is specified, a SMS is sent
+  oneof verification {
+    // Let ZITADEL send the link to the user via SMS.
+    SendPhoneVerificationCode send_code = 2;
+    // Get the code back to provide it to the user in your preferred mechanism.
+    ReturnPhoneVerificationCode return_code = 3;
+  }
+}
+
+message ResendContactPhoneCodeResponse {
+    zitadel.object.v2beta.Details details = 1;
+    // in case the verification was set to return_code, the code will be returned.
+    optional string verification_code = 2;
 }
 
 message AddUsernameRequest {
