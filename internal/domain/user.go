@@ -18,7 +18,7 @@ func (s UserState) Exists() bool {
 	return s != UserStateUnspecified && s != UserStateDeleted
 }
 
-func (s UserState) NotDisabled() bool {
+func (s UserState) IsEnabled() bool {
 	return s == UserStateActive || s == UserStateInitial
 }
 

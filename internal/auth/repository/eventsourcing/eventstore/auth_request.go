@@ -747,7 +747,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 		return err
 	}
 	// if there's an active (human) user, let's use it
-	if user != nil && !user.HumanView.IsZero() && domain.UserState(user.State).NotDisabled() {
+	if user != nil && !user.HumanView.IsZero() && domain.UserState(user.State).IsEnabled() {
 		request.SetUserInfo(user.ID, loginName, user.PreferredLoginName, "", "", user.ResourceOwner)
 		return nil
 	}
