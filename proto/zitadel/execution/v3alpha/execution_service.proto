@@ -214,7 +214,7 @@ message CreateTargetRequest {
   ];
   // Timeout defines the duration until ZITADEL cancels the execution.
   google.protobuf.Duration timeout = 4 [
-    (validate.rules).duration = {gt: {seconds: 0}},
+    (validate.rules).duration = {gt: {seconds: 0}, required: true},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"10s\"";
@@ -249,7 +249,6 @@ message UpdateTargetRequest {
   // Optionally change the unique name of the target.
   optional string name = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1,
       max_length: 200,
@@ -263,7 +262,6 @@ message UpdateTargetRequest {
   // Optionally change the URL of the REST POST endpoint of the target.
   optional string url = 4 [
     (validate.rules).string = {min_len: 1, max_len: 1000, uri: true},
-    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1,
       max_length: 1000,
@@ -273,7 +271,6 @@ message UpdateTargetRequest {
   // Optionally change the timeout, which defines the duration until ZITADEL cancels the execution.
   optional google.protobuf.Duration timeout = 5 [
     (validate.rules).duration = {gt: {seconds: 0}},
-    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"10s\"";
     }
