@@ -39,7 +39,7 @@ func TestGetHeader(t *testing.T) {
 				ctx:        metadata.NewIncomingContext(context.Background(), metadata.Pairs("header", "value")),
 				headername: "header",
 			},
-			"fail",
+			"value",
 		},
 	}
 	for _, tt := range tests {
