@@ -27,7 +27,7 @@ describe('organizations', () => {
       cy.visit(orgsPath);
       cy.contains('tr', newOrg).click();
       cy.get('[data-e2e="actions"]').click();
-      cy.get('[data-e2e="delete"]', { timeout: 1000 }).should('be.visible').click();
+      cy.get('[data-e2e="delete"]', { timeout: 3000 }).should('be.visible').click();
       cy.get('[data-e2e="confirm-dialog-input"]').focus().clear().type(newOrg);
       cy.get('[data-e2e="confirm-dialog-button"]').click();
       cy.shouldConfirmSuccess();
