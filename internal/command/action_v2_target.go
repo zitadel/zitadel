@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"net/url"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -21,13 +22,28 @@ type AddTarget struct {
 	InterruptOnError bool
 }
 
-func (a *AddTarget) IsValid() bool {
-	return a.Name != ""
+func (a *AddTarget) IsValid() error {
+	if a.Name == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-ddqbm9us5p", "Errors.Target.Invalid")
+	}
+	if a.Timeout == 0 {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-39f35d8uri", "Errors.Target.NoTimeout")
+	}
+	_, err := url.Parse(a.URL)
+	if err != nil || a.URL == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-1r2k6qo6wg", "Errors.Target.InvalidURL")
+	}
+
+	return nil
 }
 
 func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner string) (_ *domain.ObjectDetails, err error) {
-	if !add.IsValid() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-ddqbm9us5p", "Errors.Target.Invalid")
+	if resourceOwner == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-brml926e2d", "Errors.IDMissing")
+	}
+
+	if err := add.IsValid(); err != nil {
+		return nil, err
 	}
 
 	if add.AggregateID == "" {
@@ -68,9 +84,31 @@ type ChangeTarget struct {
 	InterruptOnError *bool
 }
 
+func (a *ChangeTarget) IsValid() error {
+	if a.AggregateID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-1l6ympeagp", "Errors.IDMissing")
+	}
+	if a.Name != nil && *a.Name == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-d1wx4lm0zr", "Errors.Target.Invalid")
+	}
+	if a.Timeout != nil && *a.Timeout == 0 {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-08b39vdi57", "Errors.Target.NoTimeout")
+	}
+	if a.URL != nil {
+		_, err := url.Parse(*a.URL)
+		if err != nil || *a.URL == "" {
+			return zerrors.ThrowInvalidArgument(nil, "COMMAND-jsbaera7b6", "Errors.Target.InvalidURL")
+		}
+	}
+	return nil
+}
+
 func (c *Commands) ChangeTarget(ctx context.Context, change *ChangeTarget, resourceOwner string) (*domain.ObjectDetails, error) {
-	if change.AggregateID == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-1l6ympeagp", "Errors.Target.Invalid")
+	if resourceOwner == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-zqibgg0wwh", "Errors.IDMissing")
+	}
+	if err := change.IsValid(); err != nil {
+		return nil, err
 	}
 
 	existing, err := c.getTargetWriteModelByID(ctx, change.AggregateID, resourceOwner)

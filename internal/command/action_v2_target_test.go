@@ -39,6 +39,20 @@ func TestCommands_AddTarget(t *testing.T) {
 		res    res
 	}{
 		{
+			"no resourceowner, error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				add:           &AddTarget{},
+				resourceOwner: "",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			"no name, error",
 			fields{
 				eventstore: eventstoreExpect(t),
@@ -46,6 +60,58 @@ func TestCommands_AddTarget(t *testing.T) {
 			args{
 				ctx:           context.Background(),
 				add:           &AddTarget{},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"no timeout, error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: context.Background(),
+				add: &AddTarget{
+					Name: "name",
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"no purl, error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: context.Background(),
+				add: &AddTarget{
+					Name:    "name",
+					Timeout: time.Second,
+					URL:     "",
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"no parsable url, error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: context.Background(),
+				add: &AddTarget{
+					Name:    "name",
+					Timeout: time.Second,
+					URL:     "://",
+				},
 				resourceOwner: "org1",
 			},
 			res{
@@ -63,7 +129,7 @@ func TestCommands_AddTarget(t *testing.T) {
 							"name",
 							domain.TargetTypeWebhook,
 							"https://example.com",
-							0,
+							time.Second,
 							false,
 							false,
 						),
@@ -76,6 +142,7 @@ func TestCommands_AddTarget(t *testing.T) {
 				add: &AddTarget{
 					Name:       "name",
 					URL:        "https://example.com",
+					Timeout:    time.Second,
 					TargetType: domain.TargetTypeWebhook,
 				},
 				resourceOwner: "org1",
@@ -94,7 +161,7 @@ func TestCommands_AddTarget(t *testing.T) {
 							"name",
 							domain.TargetTypeWebhook,
 							"https://example.com",
-							0,
+							time.Second,
 							false,
 							false,
 						),
@@ -107,6 +174,7 @@ func TestCommands_AddTarget(t *testing.T) {
 				add: &AddTarget{
 					Name:       "name",
 					TargetType: domain.TargetTypeWebhook,
+					Timeout:    time.Second,
 					URL:        "https://example.com",
 				},
 				resourceOwner: "org1",
@@ -197,14 +265,90 @@ func TestCommands_ChangeTarget(t *testing.T) {
 		res    res
 	}{
 		{
+			"resourceowner missing, error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				change:        &ChangeTarget{},
+				resourceOwner: "",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			"id missing, error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				change:        &ChangeTarget{},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"name empty, error",
 			fields{
 				eventstore: eventstoreExpect(t),
 			},
 			args{
 				ctx: context.Background(),
 				change: &ChangeTarget{
-					Name: stringPointer("name"),
+					Name: gu.Ptr(""),
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"timeout empty, error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: context.Background(),
+				change: &ChangeTarget{
+					Timeout: gu.Ptr(time.Duration(0)),
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"url empty, error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: context.Background(),
+				change: &ChangeTarget{
+					URL: gu.Ptr(""),
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"url not parsable, error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: context.Background(),
+				change: &ChangeTarget{
+					URL: gu.Ptr("://"),
 				},
 				resourceOwner: "org1",
 			},
