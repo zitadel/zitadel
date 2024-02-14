@@ -485,143 +485,182 @@ module.exports = {
       link: {
         type: "generated-index",
         title: "Core Resources",
-        slug: "/apis/resources/",
+        slug: "/apis/apis/",
         description: "Resource based API definitions",
       },
       items: [
         {
           type: "category",
-          label: "Authenticated User",
+          label: "Service Based (V1)",
+          collapsed: false,
           link: {
             type: "generated-index",
-            title: "Auth API",
-            slug: "/apis/resources/auth",
-            description:
-              "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
+            title: "Service Based APIs (V1)",
+            slug: "/apis/services/",
+            description: "Service based API definitions",
           },
-          items: require("./docs/apis/resources/auth/sidebar.js"),
+          items: [
+            {
+              type: "category",
+              label: "Authenticated User",
+              link: {
+                type: "generated-index",
+                title: "Auth API",
+                slug: "/apis/resources/auth",
+                description:
+                    "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
+              },
+              items: require("./docs/apis/resources/auth/sidebar.js"),
+            },
+            {
+              type: "category",
+              label: "Organization Objects",
+              link: {
+                type: "generated-index",
+                title: "Management API",
+                slug: "/apis/resources/mgmt",
+                description:
+                    "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
+              },
+              items: require("./docs/apis/resources/mgmt/sidebar.js"),
+            },
+            {
+              type: "category",
+              label: "Instance Objects",
+              link: {
+                type: "generated-index",
+                title: "Admin API",
+                slug: "/apis/resources/admin",
+                description:
+                    "This API is intended to configure and manage one ZITADEL instance itself.",
+              },
+              items: require("./docs/apis/resources/admin/sidebar.js"),
+            },
+            {
+              type: "category",
+              label: "Instance Lifecycle",
+              link: {
+                type: "generated-index",
+                title: "System API",
+                slug: "/apis/resources/system",
+                description:
+                    "This API is intended to manage the different ZITADEL instances within the system.\n" +
+                    "\n" +
+                    "Checkout the guide how to access the ZITADEL System API.",
+              },
+              items: require("./docs/apis/resources/system/sidebar.js"),
+            },
+          ],
         },
         {
           type: "category",
-          label: "Organization Objects",
+          label: "Resource Based (V2)",
+          collapsed: false,
           link: {
             type: "generated-index",
-            title: "Management API",
-            slug: "/apis/resources/mgmt",
-            description:
-              "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
+            title: "Resource Based APIs (V2)",
+            slug: "/apis/resources/",
+            description: "Resource based API definitions",
           },
-          items: require("./docs/apis/resources/mgmt/sidebar.js"),
+          items: [
+            {
+              type: "category",
+              label: "User Lifecycle (Beta)",
+              link: {
+                type: "generated-index",
+                title: "User Service API (Beta)",
+                slug: "/apis/resources/user_service",
+                description:
+                  "This API is intended to manage users in a ZITADEL instance.\n" +
+                  "\n" +
+                  "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+              },
+              items: require("./docs/apis/resources/user_service/sidebar.js"),
+            },
+            {
+              type: "category",
+              label: "Session Lifecycle (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Session Service API (Beta)",
+                slug: "/apis/resources/session_service",
+                description:
+                  "This API is intended to manage sessions in a ZITADEL instance.\n" +
+                  "\n" +
+                  "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+              },
+              items: require("./docs/apis/resources/session_service/sidebar.js"),
+            },
+            {
+              type: "category",
+              label: "OIDC Lifecycle (Beta)",
+              link: {
+                type: "generated-index",
+                title: "OIDC Service API (Beta)",
+                slug: "/apis/resources/oidc_service",
+                description:
+                  "Get OIDC Auth Request details and create callback URLs.\n" +
+                  "\n" +
+                  "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+              },
+              items: require("./docs/apis/resources/oidc_service/sidebar.js"),
+            },
+            {
+              type: "category",
+              label: "Settings Lifecycle (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Settings Service API (Beta)",
+                slug: "/apis/resources/settings_service",
+                description:
+                  "This API is intended to manage settings in a ZITADEL instance.\n" +
+                  "\n" +
+                  "This project is in beta state. It can AND will continue to break until the services provide the same functionality as the current login.",
+              },
+              items: require("./docs/apis/resources/settings_service/sidebar.js"),
+            },
+          ]
         },
         {
           type: "category",
-          label: "Instance Objects",
+          label: "Resource Based (V3)",
+          collapsed: false,
           link: {
             type: "generated-index",
-            title: "Admin API",
-            slug: "/apis/resources/admin",
-            description:
-              "This API is intended to configure and manage one ZITADEL instance itself.",
+            title: "Resource Based APIs (V3)",
+            slug: "/apis/resources_v3/",
+            description: "Resource based API definitions",
           },
-          items: require("./docs/apis/resources/admin/sidebar.js"),
-        },
-        {
-          type: "category",
-          label: "Instance Lifecycle",
-          link: {
-            type: "generated-index",
-            title: "System API",
-            slug: "/apis/resources/system",
-            description:
-              "This API is intended to manage the different ZITADEL instances within the system.\n" +
-              "\n" +
-              "Checkout the guide how to access the ZITADEL System API.",
-          },
-          items: require("./docs/apis/resources/system/sidebar.js"),
-        },
-        {
-          type: "category",
-          label: "User Lifecycle (Beta)",
-          link: {
-            type: "generated-index",
-            title: "User Service API (Beta)",
-            slug: "/apis/resources/user_service",
-            description:
-              "This API is intended to manage users in a ZITADEL instance.\n" +
-              "\n" +
-              "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
-          },
-          items: require("./docs/apis/resources/user_service/sidebar.js"),
-        },
-        {
-          type: "category",
-          label: "Session Lifecycle (Beta)",
-          link: {
-            type: "generated-index",
-            title: "Session Service API (Beta)",
-            slug: "/apis/resources/session_service",
-            description:
-              "This API is intended to manage sessions in a ZITADEL instance.\n" +
-              "\n" +
-              "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
-          },
-          items: require("./docs/apis/resources/session_service/sidebar.js"),
-        },
-        {
-          type: "category",
-          label: "OIDC Lifecycle (Beta)",
-          link: {
-            type: "generated-index",
-            title: "OIDC Service API (Beta)",
-            slug: "/apis/resources/oidc_service",
-            description:
-              "Get OIDC Auth Request details and create callback URLs.\n" +
-              "\n" +
-              "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
-          },
-          items: require("./docs/apis/resources/oidc_service/sidebar.js"),
-        },
-        {
-          type: "category",
-          label: "Settings Lifecycle (Beta)",
-          link: {
-            type: "generated-index",
-            title: "Settings Service API (Beta)",
-            slug: "/apis/resources/settings_service",
-            description:
-              "This API is intended to manage settings in a ZITADEL instance.\n" +
-              "\n" +
-              "This project is in beta state. It can AND will continue to break until the services provide the same functionality as the current login.",
-          },
-          items: require("./docs/apis/resources/settings_service/sidebar.js"),
-        },
-        {
-          type: "category",
-          label: "User Schema Lifecycle (Alpha)",
-          link: {
-            type: "generated-index",
-            title: "User Schema Service API (Aplha)",
-            slug: "/apis/resources/user_schema_service",
-            description:
-                "This API is intended to manage data schemas for users in a ZITADEL instance.\n" +
-                "\n" +
-                "This project is in alpha state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.",
-          },
-          items: require("./docs/apis/resources/user_schema_service_v1/sidebar.js"),
-        },
-        {
-          type: "category",
-          label: "User Lifecycle (Alpha)",
-          link: {
-            type: "generated-index",
-            title: "User Service API (Aplha)",
-            slug: "/apis/resources/user_service_v3",
-            description:
-                "This API is intended to manage users with your own data schema in a ZITADEL instance.\n"+
-                "\n"+
-                "This project is in alpha state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services."
-          },
-          items: require("./docs/apis/resources/user_service_v3/sidebar.js"),
+          items: [
+            {
+              type: "category",
+              label: "User Schema Lifecycle (Alpha)",
+              link: {
+                type: "generated-index",
+                title: "User Schema Service API (Aplha)",
+                slug: "/apis/resources/user_schema_service",
+                description:
+                    "This API is intended to manage data schemas for users in a ZITADEL instance.\n" +
+                    "\n" +
+                    "This project is in alpha state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.",
+              },
+              items: require("./docs/apis/resources/user_schema_service_v1/sidebar.js"),
+            },
+            {
+              type: "category",
+              label: "User Lifecycle (Alpha)",
+              link: {
+                type: "generated-index",
+                title: "User Service API (Aplha)",
+                slug: "/apis/resources/user_service_v3",
+                description:
+                    "This API is intended to manage users with your own data schema in a ZITADEL instance.\n"+
+                    "\n"+
+                    "This project is in alpha state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services."
+              },
+              items: require("./docs/apis/resources/user_service_v3/sidebar.js"),
+            },
+          ]
         },
         {
           type: "category",
