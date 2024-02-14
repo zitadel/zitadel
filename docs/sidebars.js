@@ -644,7 +644,7 @@ module.exports = {
                     "\n" +
                     "This project is in alpha state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.",
               },
-              items: require("./docs/apis/resources/user_schema_service_v1/sidebar.js"),
+              items: require("./docs/apis/resources/user_schema_service_v3/sidebar.js"),
             },
             {
               type: "category",
