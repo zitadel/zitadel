@@ -240,7 +240,7 @@ func publicAPIBlockingTest(domain string) *test {
 // If expectSet is false, we expect the cookie to be deleted
 func assertSetLimitingCookie(t assert.TestingT, response *http.Response, expectSet bool) {
 	for _, cookie := range response.Cookies() {
-		if cookie.Name == "zitadel.quota.fail.exhausted" {
+		if cookie.Name == "zitadel.quota.exhausted" {
 			if expectSet {
 				assert.Greater(t, cookie.MaxAge, 0)
 			} else {
