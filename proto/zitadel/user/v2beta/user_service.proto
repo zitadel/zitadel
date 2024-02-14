@@ -231,6 +231,32 @@ service UserService {
     };
   }
 
+
+  // Resend code to verify user email
+  rpc ResendEmailCode (ResendEmailCodeRequest) returns (ResendEmailCodeResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/users/{user_id}/email/resend"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Resend code to verify user email";
+      description: "Resend code to verify user email."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
   // Verify the email with the provided code
   rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {
     option (google.api.http) = {
@@ -272,6 +298,30 @@ service UserService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Set the user phone";
       description: "Set the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc ResendPhoneCode (ResendPhoneCodeRequest) returns (ResendPhoneCodeResponse) {
+    option (google.api.http) = {
+      post: "/v2beta/users/{user_id}/phone/resend"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Resend code to verify user phone";
+      description: "Resend code to verify user phone."
       responses: {
         key: "200"
         value: {
@@ -963,6 +1013,29 @@ message SetEmailResponse{
   optional string verification_code = 2;
 }
 
+message ResendEmailCodeRequest{
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // if no verification is specified, an email is sent with the default url
+  oneof verification {
+    SendEmailVerificationCode send_code = 2;
+    ReturnEmailVerificationCode return_code = 3;
+  }
+}
+
+message ResendEmailCodeResponse{
+  zitadel.object.v2beta.Details details = 1;
+  // in case the verification was set to return_code, the code will be returned
+  optional string verification_code = 2;
+}
+
 message VerifyEmailRequest{
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -1017,6 +1090,29 @@ message SetPhoneRequest{
 }
 
 message SetPhoneResponse{
+  zitadel.object.v2beta.Details details = 1;
+  // in case the verification was set to return_code, the code will be returned
+  optional string verification_code = 2;
+}
+
+message ResendPhoneCodeRequest{
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // if no verification is specified, an sms is sent
+  oneof verification {
+    SendPhoneVerificationCode send_code = 3;
+    ReturnPhoneVerificationCode return_code = 4;
+  }
+}
+
+message ResendPhoneCodeResponse{
   zitadel.object.v2beta.Details details = 1;
   // in case the verification was set to return_code, the code will be returned
   optional string verification_code = 2;
