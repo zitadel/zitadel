@@ -1,7 +1,7 @@
 package initialise
 
 import (
-	"database/sql"
+	"context"
 	"embed"
 
 	"github.com/spf13/cobra"
@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/database/dialect"
 )
 
 var (
@@ -38,7 +39,7 @@ func New() *cobra.Command {
 		Long: `Sets up the minimum requirements to start ZITADEL.
 
 Prerequisites:
-- cockroachdb
+- cockroachDB
 
 The user provided by flags needs privileges to
 - create the database if it does not exist
@@ -48,7 +49,7 @@ The user provided by flags needs privileges to
 		Run: func(cmd *cobra.Command, args []string) {
 			config := MustNewConfig(viper.GetViper())
 
-			InitAll(config)
+			InitAll(cmd.Context(), config)
 		},
 	}
 
@@ -56,7 +57,7 @@ The user provided by flags needs privileges to
 	return cmd
 }
 
-func InitAll(config *Config) {
+func InitAll(ctx context.Context, config *Config) {
 	err := initialise(config.Database,
 		VerifyUser(config.Database.Username(), config.Database.Password()),
 		VerifyDatabase(config.Database.DatabaseName()),
@@ -64,11 +65,11 @@ func InitAll(config *Config) {
 	)
 	logging.OnError(err).Fatal("unable to initialize the database")
 
-	err = verifyZitadel(config.Database)
+	err = verifyZitadel(ctx, config.Database)
 	logging.OnError(err).Fatal("unable to initialize ZITADEL")
 }
 
-func initialise(config database.Config, steps ...func(*sql.DB) error) error {
+func initialise(config database.Config, steps ...func(*database.DB) error) error {
 	logging.Info("initialization started")
 
 	err := ReadStmts(config.Type())
@@ -76,16 +77,16 @@ func initialise(config database.Config, steps ...func(*sql.DB) error) error {
 		return err
 	}
 
-	db, err := database.Connect(config, true)
+	db, err := database.Connect(config, true, dialect.DBPurposeQuery)
 	if err != nil {
 		return err
 	}
 	defer db.Close()
 
-	return Init(db.DB, steps...)
+	return Init(db, steps...)
 }
 
-func Init(db *sql.DB, steps ...func(*sql.DB) error) error {
+func Init(db *database.DB, steps ...func(*database.DB) error) error {
 	for _, step := range steps {
 		if err := step(db); err != nil {
 			return err

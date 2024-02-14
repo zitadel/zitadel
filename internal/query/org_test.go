@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"database/sql/driver"
-	errs "errors"
+	"errors"
 	"fmt"
 	"regexp"
 	"testing"
@@ -13,23 +13,23 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
-	orgUniqueQuery = "SELECT COUNT(*) = 0 FROM projections.orgs LEFT JOIN projections.org_domains2 ON projections.orgs.id = projections.org_domains2.org_id AND projections.orgs.instance_id = projections.org_domains2.instance_id AS OF SYSTEM TIME '-1 ms' WHERE (projections.org_domains2.is_verified = $1 AND projections.orgs.instance_id = $2 AND (projections.org_domains2.domain ILIKE $3 OR projections.orgs.name ILIKE $4) AND projections.orgs.org_state <> $5)"
+	orgUniqueQuery = "SELECT COUNT(*) = 0 FROM projections.orgs1 LEFT JOIN projections.org_domains2 ON projections.orgs1.id = projections.org_domains2.org_id AND projections.orgs1.instance_id = projections.org_domains2.instance_id AS OF SYSTEM TIME '-1 ms' WHERE (projections.org_domains2.is_verified = $1 AND projections.orgs1.instance_id = $2 AND (projections.org_domains2.domain ILIKE $3 OR projections.orgs1.name ILIKE $4) AND projections.orgs1.org_state <> $5)"
 	orgUniqueCols  = []string{"is_unique"}
 
-	prepareOrgsQueryStmt = `SELECT projections.orgs.id,` +
-		` projections.orgs.creation_date,` +
-		` projections.orgs.change_date,` +
-		` projections.orgs.resource_owner,` +
-		` projections.orgs.org_state,` +
-		` projections.orgs.sequence,` +
-		` projections.orgs.name,` +
-		` projections.orgs.primary_domain,` +
+	prepareOrgsQueryStmt = `SELECT projections.orgs1.id,` +
+		` projections.orgs1.creation_date,` +
+		` projections.orgs1.change_date,` +
+		` projections.orgs1.resource_owner,` +
+		` projections.orgs1.org_state,` +
+		` projections.orgs1.sequence,` +
+		` projections.orgs1.name,` +
+		` projections.orgs1.primary_domain,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.orgs` +
+		` FROM projections.orgs1` +
 		` AS OF SYSTEM TIME '-1 ms' `
 	prepareOrgsQueryCols = []string{
 		"id",
@@ -43,15 +43,15 @@ var (
 		"count",
 	}
 
-	prepareOrgQueryStmt = `SELECT projections.orgs.id,` +
-		` projections.orgs.creation_date,` +
-		` projections.orgs.change_date,` +
-		` projections.orgs.resource_owner,` +
-		` projections.orgs.org_state,` +
-		` projections.orgs.sequence,` +
-		` projections.orgs.name,` +
-		` projections.orgs.primary_domain` +
-		` FROM projections.orgs` +
+	prepareOrgQueryStmt = `SELECT projections.orgs1.id,` +
+		` projections.orgs1.creation_date,` +
+		` projections.orgs1.change_date,` +
+		` projections.orgs1.resource_owner,` +
+		` projections.orgs1.org_state,` +
+		` projections.orgs1.sequence,` +
+		` projections.orgs1.name,` +
+		` projections.orgs1.primary_domain` +
+		` FROM projections.orgs1` +
 		` AS OF SYSTEM TIME '-1 ms' `
 	prepareOrgQueryCols = []string{
 		"id",
@@ -65,8 +65,8 @@ var (
 	}
 
 	prepareOrgUniqueStmt = `SELECT COUNT(*) = 0` +
-		` FROM projections.orgs` +
-		` LEFT JOIN projections.org_domains2 ON projections.orgs.id = projections.org_domains2.org_id AND projections.orgs.instance_id = projections.org_domains2.instance_id` +
+		` FROM projections.orgs1` +
+		` LEFT JOIN projections.org_domains2 ON projections.orgs1.id = projections.org_domains2.org_id AND projections.orgs1.instance_id = projections.org_domains2.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms' `
 	prepareOrgUniqueCols = []string{
 		"count",
@@ -203,25 +203,25 @@ func Test_OrgPrepares(t *testing.T) {
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.Is(err, sql.ErrConnDone) {
+					if !errors.Is(err, sql.ErrConnDone) {
 						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
 					}
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Orgs)(nil),
 		},
 		{
 			name:    "prepareOrgQuery no result",
 			prepare: prepareOrgQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(prepareOrgQueryStmt),
 					nil,
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errors.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -268,25 +268,25 @@ func Test_OrgPrepares(t *testing.T) {
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.Is(err, sql.ErrConnDone) {
+					if !errors.Is(err, sql.ErrConnDone) {
 						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
 					}
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Org)(nil),
 		},
 		{
 			name:    "prepareOrgUniqueQuery no result",
 			prepare: prepareOrgUniqueQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(prepareOrgUniqueStmt),
 					nil,
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errors.IsInternal(err) {
+					if !zerrors.IsInternal(err) {
 						return fmt.Errorf("err should be zitadel.Internal got: %w", err), false
 					}
 					return nil, true
@@ -317,13 +317,13 @@ func Test_OrgPrepares(t *testing.T) {
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.Is(err, sql.ErrConnDone) {
+					if !errors.Is(err, sql.ErrConnDone) {
 						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
 					}
 					return nil, true
 				},
 			},
-			object: nil,
+			object: false,
 		},
 	}
 	for _, tt := range tests {
@@ -400,7 +400,7 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 			},
 			want: want{
 				isUnique: false,
-				err:      errors.IsErrorInvalidArgument,
+				err:      zerrors.IsErrorInvalidArgument,
 			},
 		},
 	}

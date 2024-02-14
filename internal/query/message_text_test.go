@@ -11,7 +11,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -64,13 +64,13 @@ func Test_MessageTextPrepares(t *testing.T) {
 			name:    "prepareMessageTextQuery no result",
 			prepare: prepareMessageTextQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(prepareMessageTextStmt),
 					nil,
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -135,7 +135,7 @@ func Test_MessageTextPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*MessageText)(nil),
 		},
 	}
 	for _, tt := range tests {

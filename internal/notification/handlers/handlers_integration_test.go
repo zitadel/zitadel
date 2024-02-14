@@ -20,11 +20,17 @@ var (
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
 		ctx, _, cancel := integration.Contexts(5 * time.Minute)
-		CTX = ctx
 		defer cancel()
-		Tester = integration.NewTester(ctx)
-		SystemCTX = Tester.WithAuthorization(ctx, integration.SystemUser)
+		CTX = ctx
+
+		Tester = integration.NewTester(ctx, `
+Quotas:
+  Access:
+    Enabled: true
+`)
 		defer Tester.Done()
+
+		SystemCTX = Tester.WithAuthorization(ctx, integration.SystemUser)
 		return m.Run()
 	}())
 }

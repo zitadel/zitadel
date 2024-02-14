@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
-import { MatLegacyCheckboxModule as MatCheckboxModule } from '@angular/material/legacy-checkbox';
-import { MatLegacyChipsModule as MatChipsModule } from '@angular/material/legacy-chips';
-import { MatLegacyProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
-import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
-import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { InputModule } from 'src/app/modules/input/input.module';
 
@@ -17,6 +17,7 @@ import { InfoSectionModule } from '../info-section/info-section.module';
 import { ProviderOptionsModule } from '../provider-options/provider-options.module';
 import { StringListModule } from '../string-list/string-list.module';
 import { LDAPAttributesComponent } from './ldap-attributes/ldap-attributes.component';
+import { ProviderAppleComponent } from './provider-apple/provider-apple.component';
 import { ProviderAzureADComponent } from './provider-azure-ad/provider-azure-ad.component';
 import { ProviderGithubESComponent } from './provider-github-es/provider-github-es.component';
 import { ProviderGithubComponent } from './provider-github/provider-github.component';
@@ -28,6 +29,7 @@ import { ProviderLDAPComponent } from './provider-ldap/provider-ldap.component';
 import { ProviderOAuthComponent } from './provider-oauth/provider-oauth.component';
 import { ProviderOIDCComponent } from './provider-oidc/provider-oidc.component';
 import { ProvidersRoutingModule } from './providers-routing.module';
+import { ProviderSamlSpComponent } from './provider-saml-sp/provider-saml-sp.component';
 
 @NgModule({
   declarations: [
@@ -43,6 +45,8 @@ import { ProvidersRoutingModule } from './providers-routing.module';
     ProviderOIDCComponent,
     ProviderOAuthComponent,
     ProviderLDAPComponent,
+    ProviderAppleComponent,
+    ProviderSamlSpComponent,
   ],
   imports: [
     ProvidersRoutingModule,
@@ -62,7 +66,7 @@ import { ProvidersRoutingModule } from './providers-routing.module';
     MatTooltipModule,
     TranslateModule,
     ProviderOptionsModule,
-    MatLegacyProgressSpinnerModule,
+    MatProgressSpinnerModule,
   ],
 })
 export default class ProvidersModule {}

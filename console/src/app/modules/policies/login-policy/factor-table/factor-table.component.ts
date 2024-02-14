@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
@@ -51,7 +51,11 @@ export class FactorTableComponent {
 
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
-  constructor(public translate: TranslateService, private toast: ToastService, private dialog: MatDialog) {}
+  constructor(
+    public translate: TranslateService,
+    private toast: ToastService,
+    private dialog: MatDialog,
+  ) {}
 
   public removeMfa(type: MultiFactorType | SecondFactorType): void {
     const dialogRef = this.dialog.open(WarnDialogComponent, {
@@ -146,13 +150,13 @@ export class FactorTableComponent {
       this.componentType === LoginMethodComponentType.MultiFactor
         ? [MultiFactorType.MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION]
         : this.componentType === LoginMethodComponentType.SecondFactor
-        ? [
-            SecondFactorType.SECOND_FACTOR_TYPE_U2F,
-            SecondFactorType.SECOND_FACTOR_TYPE_OTP,
-            SecondFactorType.SECOND_FACTOR_TYPE_OTP_SMS,
-            SecondFactorType.SECOND_FACTOR_TYPE_OTP_EMAIL,
-          ]
-        : [];
+          ? [
+              SecondFactorType.SECOND_FACTOR_TYPE_U2F,
+              SecondFactorType.SECOND_FACTOR_TYPE_OTP,
+              SecondFactorType.SECOND_FACTOR_TYPE_OTP_SMS,
+              SecondFactorType.SECOND_FACTOR_TYPE_OTP_EMAIL,
+            ]
+          : [];
 
     const filtered = (allTypes as Array<MultiFactorType | SecondFactorType>).filter((type) => !this.list.includes(type));
 

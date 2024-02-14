@@ -4,12 +4,11 @@ import (
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestLockoutPolicyProjection_reduces(t *testing.T) {
@@ -25,20 +24,20 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "org reduceAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LockoutPolicyAddedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.LockoutPolicyAddedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"maxPasswordAttempts": 10,
 						"showLockOutFailures": true
 }`),
-				), org.LockoutPolicyAddedEventMapper),
+					), org.LockoutPolicyAddedEventMapper),
 			},
 			reduce: (&lockoutPolicyProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -64,19 +63,19 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 			name:   "org reduceChanged",
 			reduce: (&lockoutPolicyProjection{}).reduceChanged,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LockoutPolicyChangedEventType),
-					org.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						org.LockoutPolicyChangedEventType,
+						org.AggregateType,
+						[]byte(`{
 						"maxPasswordAttempts": 10,
 						"showLockOutFailures": true
 		}`),
-				), org.LockoutPolicyChangedEventMapper),
+					), org.LockoutPolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -98,16 +97,16 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 			name:   "org reduceRemoved",
 			reduce: (&lockoutPolicyProjection{}).reduceRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.LockoutPolicyRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.LockoutPolicyRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.LockoutPolicyRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.LockoutPolicyRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -124,17 +123,17 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(LockoutPolicyInstanceIDCol),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -151,19 +150,19 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 			name:   "instance reduceAdded",
 			reduce: (&lockoutPolicyProjection{}).reduceAdded,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LockoutPolicyAddedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.LockoutPolicyAddedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"maxPasswordAttempts": 10,
 						"showLockOutFailures": true
 					}`),
-				), instance.LockoutPolicyAddedEventMapper),
+					), instance.LockoutPolicyAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -189,19 +188,19 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 			name:   "instance reduceChanged",
 			reduce: (&lockoutPolicyProjection{}).reduceChanged,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.LockoutPolicyChangedEventType),
-					instance.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						instance.LockoutPolicyChangedEventType,
+						instance.AggregateType,
+						[]byte(`{
 						"maxPasswordAttempts": 10,
 						"showLockOutFailures": true
 					}`),
-				), instance.LockoutPolicyChangedEventMapper),
+					), instance.LockoutPolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -223,24 +222,21 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&lockoutPolicyProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.lockout_policies2 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedStmt: "DELETE FROM projections.lockout_policies2 WHERE (instance_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								true,
 								"instance-id",
 								"agg-id",
 							},
@@ -254,7 +250,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			event := baseEvent(t)
 			got, err := tt.reduce(event)
-			if _, ok := err.(errors.InvalidArgument); !ok {
+			if ok := zerrors.IsErrorInvalidArgument(err); !ok {
 				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
 			}
 

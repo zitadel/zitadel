@@ -6,92 +6,8 @@ import (
 	"github.com/jinzhu/gorm"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
-
-func TestPrepareGetByKey(t *testing.T) {
-	type args struct {
-		table string
-		key   ColumnKey
-		value string
-	}
-	type res struct {
-		result  Test
-		wantErr bool
-		errFunc func(err error) bool
-	}
-	tests := []struct {
-		name string
-		db   *dbMock
-		args args
-		res  res
-	}{
-		{
-			"ok",
-			mockDB(t).
-				expectGetByID("TESTTABLE", "test", "VALUE"),
-			args{
-				table: "TESTTABLE",
-				key:   TestSearchKey_TEST,
-				value: "VALUE",
-			},
-			res{
-				result:  Test{ID: "VALUE"},
-				wantErr: false,
-			},
-		},
-		{
-			"not found",
-			mockDB(t).
-				expectGetByIDErr("TESTTABLE", "test", "VALUE", gorm.ErrRecordNotFound),
-			args{
-				table: "TESTTABLE",
-				key:   TestSearchKey_TEST,
-				value: "VALUE",
-			},
-			res{
-				result:  Test{ID: "VALUE"},
-				wantErr: true,
-				errFunc: caos_errs.IsNotFound,
-			},
-		},
-		{
-			"db err",
-			mockDB(t).
-				expectGetByIDErr("TESTTABLE", "test", "VALUE", gorm.ErrUnaddressable),
-			args{
-				table: "TESTTABLE",
-				key:   TestSearchKey_TEST,
-				value: "VALUE",
-			},
-			res{
-				result:  Test{ID: "VALUE"},
-				wantErr: true,
-				errFunc: caos_errs.IsInternal,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			res := &Test{}
-			getByID := PrepareGetByKey(tt.args.table, tt.args.key, tt.args.value)
-			err := getByID(tt.db.db, res)
-
-			if !tt.res.wantErr && err != nil {
-				t.Errorf("got wrong err should be nil: %v ", err)
-			}
-
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if err := tt.db.mock.ExpectationsWereMet(); err != nil {
-				t.Errorf("there were unfulfilled expectations: %s", err)
-			}
-
-			tt.db.close()
-		})
-	}
-}
 
 func TestPrepareGetByQuery(t *testing.T) {
 	type args struct {
@@ -198,7 +114,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: caos_errs.IsNotFound,
+				errFunc: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -212,7 +128,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: caos_errs.IsInternal,
+				errFunc: zerrors.IsInternal,
 			},
 		},
 		{
@@ -226,7 +142,7 @@ func TestPrepareGetByQuery(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: caos_errs.IsErrorInvalidArgument,
+				errFunc: zerrors.IsErrorInvalidArgument,
 			},
 		},
 	}
@@ -296,7 +212,7 @@ func TestPreparePut(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: caos_errs.IsInternal,
+				errFunc: zerrors.IsInternal,
 			},
 		},
 	}
@@ -368,7 +284,7 @@ func TestPrepareDelete(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: caos_errs.IsInternal,
+				errFunc: zerrors.IsInternal,
 			},
 		},
 	}
@@ -459,96 +375,13 @@ func TestPrepareDeleteByKeys(t *testing.T) {
 			res{
 				result:  Test{ID: "VALUE"},
 				wantErr: true,
-				errFunc: caos_errs.IsInternal,
+				errFunc: zerrors.IsInternal,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			getDelete := PrepareDeleteByKeys(tt.args.table, tt.args.keys...)
-			err := getDelete(tt.db.db)
-
-			if !tt.res.wantErr && err != nil {
-				t.Errorf("got wrong err should be nil: %v ", err)
-			}
-
-			if tt.res.wantErr && !tt.res.errFunc(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if err := tt.db.mock.ExpectationsWereMet(); !tt.res.wantErr && err != nil {
-				t.Errorf("there were unfulfilled expectations: %s", err)
-			}
-
-			tt.db.close()
-		})
-	}
-}
-
-func TestPrepareDeleteByObject(t *testing.T) {
-	type args struct {
-		table  string
-		object interface{}
-	}
-	type res struct {
-		result  Test
-		wantErr bool
-		errFunc func(err error) bool
-	}
-	tests := []struct {
-		name string
-		db   *dbMock
-		args args
-		res  res
-	}{
-		{
-			"delete",
-			mockDB(t).
-				expectBegin(nil).
-				expectRemoveByObject("TESTTABLE", Test{ID: "VALUE", Test: "TEST"}).
-				expectCommit(nil),
-			args{
-				table:  "TESTTABLE",
-				object: &Test{ID: "VALUE", Test: "TEST"},
-			},
-			res{
-				result:  Test{ID: "VALUE"},
-				wantErr: false,
-			},
-		},
-		{
-			"delete multiple PK",
-			mockDB(t).
-				expectBegin(nil).
-				expectRemoveByObjectMultiplePKs("TESTTABLE", TestMultiplePK{TestID: "TESTID", HodorID: "HODORID", Test: "TEST"}).
-				expectCommit(nil),
-			args{
-				table:  "TESTTABLE",
-				object: &TestMultiplePK{TestID: "TESTID", HodorID: "HODORID", Test: "TEST"},
-			},
-			res{
-				wantErr: false,
-			},
-		},
-		{
-			"db error",
-			mockDB(t).
-				expectBegin(nil).
-				expectRemoveErr("TESTTABLE", "id", "VALUE", gorm.ErrUnaddressable).
-				expectCommit(nil),
-			args{
-				table:  "TESTTABLE",
-				object: &Test{ID: "VALUE", Test: "TEST"},
-			},
-			res{
-				result:  Test{ID: "VALUE"},
-				wantErr: true,
-				errFunc: caos_errs.IsInternal,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			getDelete := PrepareDeleteByObject(tt.args.table, tt.args.object)
 			err := getDelete(tt.db.db)
 
 			if !tt.res.wantErr && err != nil {

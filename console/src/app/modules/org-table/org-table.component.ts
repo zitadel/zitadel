@@ -1,7 +1,7 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, Input, ViewChild } from '@angular/core';
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
 import { MatSort, Sort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
@@ -88,7 +88,7 @@ export class OrgTableComponent {
       }
 
     return from(
-      this.authService.listMyProjectOrgs(request.limit, request.offset, request.queries, sortingField, this.sort?.direction),
+      this.adminService.listOrgs(request.limit, request.offset, request.queries, sortingField, this.sort?.direction),
     ).pipe(
       map((resp) => {
         this.timestamp = resp.details?.viewTimestamp;

@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"testing"
 
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -63,13 +63,13 @@ func Test_OrgMetadataPrepares(t *testing.T) {
 			name:    "prepareOrgMetadataQuery no result",
 			prepare: prepareOrgMetadataQuery,
 			want: want{
-				sqlExpectations: mockQuery(
+				sqlExpectations: mockQueryScanErr(
 					regexp.QuoteMeta(orgMetadataQuery),
 					nil,
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -118,7 +118,7 @@ func Test_OrgMetadataPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*OrgMetadata)(nil),
 		},
 		{
 			name:    "prepareOrgMetadataListQuery no result",
@@ -130,7 +130,7 @@ func Test_OrgMetadataPrepares(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -239,7 +239,7 @@ func Test_OrgMetadataPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*OrgMetadataList)(nil),
 		},
 	}
 	for _, tt := range tests {

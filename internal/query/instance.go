@@ -3,19 +3,21 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -26,6 +28,10 @@ var (
 	instanceTable = table{
 		name:          projection.InstanceProjectionTable,
 		instanceIDCol: projection.InstanceColumnID,
+	}
+	limitsTable = table{
+		name:          projection.LimitsProjectionTable,
+		instanceIDCol: projection.LimitsColumnInstanceID,
 	}
 	InstanceColumnID = Column{
 		name:  projection.InstanceColumnID,
@@ -67,6 +73,18 @@ var (
 		name:  projection.InstanceColumnDefaultLanguage,
 		table: instanceTable,
 	}
+	LimitsColumnInstanceID = Column{
+		name:  projection.LimitsColumnInstanceID,
+		table: limitsTable,
+	}
+	LimitsColumnAuditLogRetention = Column{
+		name:  projection.LimitsColumnAuditLogRetention,
+		table: limitsTable,
+	}
+	LimitsColumnBlock = Column{
+		name:  projection.LimitsColumnBlock,
+		table: limitsTable,
+	}
 )
 
 type Instance struct {
@@ -76,19 +94,21 @@ type Instance struct {
 	Sequence     uint64
 	Name         string
 
-	DefaultOrgID string
-	IAMProjectID string
-	ConsoleID    string
-	ConsoleAppID string
-	DefaultLang  language.Tag
-	Domains      []*InstanceDomain
-	host         string
-	csp          csp
+	DefaultOrgID      string
+	IAMProjectID      string
+	ConsoleID         string
+	ConsoleAppID      string
+	DefaultLang       language.Tag
+	Domains           []*InstanceDomain
+	host              string
+	csp               csp
+	block             *bool
+	auditLogRetention *time.Duration
 }
 
 type csp struct {
 	enabled        bool
-	allowedOrigins database.StringArray
+	allowedOrigins database.TextArray[string]
 }
 
 type Instances struct {
@@ -135,6 +155,14 @@ func (i *Instance) SecurityPolicyAllowedOrigins() []string {
 	return i.csp.allowedOrigins
 }
 
+func (i *Instance) Block() *bool {
+	return i.block
+}
+
+func (i *Instance) AuditLogRetention() *time.Duration {
+	return i.auditLogRetention
+}
+
 type InstanceSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
@@ -146,6 +174,15 @@ func NewInstanceIDsListSearchQuery(ids ...string) (SearchQuery, error) {
 		list[i] = value
 	}
 	return NewListQuery(InstanceColumnID, list, ListIn)
+}
+
+func NewInstanceDomainsListSearchQuery(domains ...string) (SearchQuery, error) {
+	list := make([]interface{}, len(domains))
+	for i, value := range domains {
+		list[i] = value
+	}
+
+	return NewListQuery(InstanceDomainDomainCol, list, ListIn)
 }
 
 func (q *InstanceSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -163,26 +200,28 @@ func (q *Queries) SearchInstances(ctx context.Context, queries *InstanceSearchQu
 	filter, query, scan := prepareInstancesQuery(ctx, q.client)
 	stmt, args, err := query(queries.toQuery(filter)).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-M9fow", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-M9fow", "Errors.Query.SQLStatement")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		instances, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-3j98f", "Errors.Internal")
-	}
-	instances, err = scan(rows)
-	if err != nil {
-		return nil, err
+		return nil, zerrors.ThrowInternal(err, "QUERY-3j98f", "Errors.Internal")
 	}
 	return instances, err
 }
 
-func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (_ *Instance, err error) {
+func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (instance *Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.InstanceProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerInstanceProjection")
+		ctx, err = projection.InstanceProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	stmt, scan := prepareInstanceDomainQuery(ctx, q.client, authz.GetInstance(ctx).RequestedDomain())
@@ -190,17 +229,17 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (_ *Inst
 		InstanceColumnID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-d9ngs", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-d9ngs", "Errors.Query.SQLStatement")
 	}
 
-	row, err := q.client.QueryContext(ctx, query, args...)
-	if err != nil {
-		return nil, err
-	}
-	return scan(row)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		instance, err = scan(rows)
+		return err
+	}, query, args...)
+	return instance, err
 }
 
-func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Instance, err error) {
+func (q *Queries) InstanceByHost(ctx context.Context, host string) (instance authz.Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -210,14 +249,14 @@ func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Inst
 		InstanceDomainDomainCol.identifier(): host,
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SAfg2", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-SAfg2", "Errors.Query.SQLStatement")
 	}
 
-	row, err := q.client.QueryContext(ctx, query, args...)
-	if err != nil {
-		return nil, err
-	}
-	return scan(row)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		instance, err = scan(rows)
+		return err
+	}, query, args...)
+	return instance, err
 }
 
 func (q *Queries) InstanceByID(ctx context.Context) (_ authz.Instance, err error) {
@@ -247,8 +286,10 @@ func prepareInstanceQuery(ctx context.Context, db prepareDatabase, host string) 
 			From(instanceTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Instance, error) {
-			instance := &Instance{host: host}
-			lang := ""
+			var (
+				instance = &Instance{host: host}
+				lang     = ""
+			)
 			err := row.Scan(
 				&instance.ID,
 				&instance.CreationDate,
@@ -261,10 +302,10 @@ func prepareInstanceQuery(ctx context.Context, db prepareDatabase, host string) 
 				&lang,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-5m09s", "Errors.IAM.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-5m09s", "Errors.IAM.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-3j9sf", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-3j9sf", "Errors.Internal")
 			}
 			instance.DefaultLang = language.Make(lang)
 			return instance, nil
@@ -278,7 +319,8 @@ func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 	return sq.Select(
 			InstanceColumnID.identifier(),
 			countColumn.identifier(),
-		).From(instanceTable.identifier()),
+		).Distinct().From(instanceTable.identifier()).
+			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)),
 		func(builder sq.SelectBuilder) sq.SelectBuilder {
 			return sq.Select(
 				instanceFilterCountColumn,
@@ -363,7 +405,7 @@ func prepareInstancesQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-8nlWW", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-8nlWW", "Errors.Query.CloseRows")
 			}
 
 			return &Instances{
@@ -431,7 +473,7 @@ func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase, host st
 					&sequence,
 				)
 				if err != nil {
-					return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
 				}
 				if !domain.Valid {
 					continue
@@ -447,11 +489,11 @@ func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase, host st
 				})
 			}
 			if instance.ID == "" {
-				return nil, errors.ThrowNotFound(nil, "QUERY-n0wng", "Errors.IAM.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "QUERY-n0wng", "Errors.IAM.NotFound")
 			}
 			instance.DefaultLang = language.Make(lang)
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-Dfbe2", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-Dfbe2", "Errors.Query.CloseRows")
 			}
 			return instance, nil
 		}
@@ -477,10 +519,13 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 			InstanceDomainSequenceCol.identifier(),
 			SecurityPolicyColumnEnabled.identifier(),
 			SecurityPolicyColumnAllowedOrigins.identifier(),
+			LimitsColumnAuditLogRetention.identifier(),
+			LimitsColumnBlock.identifier(),
 		).
 			From(instanceTable.identifier()).
 			LeftJoin(join(InstanceDomainInstanceIDCol, InstanceColumnID)).
-			LeftJoin(join(SecurityPolicyColumnInstanceID, InstanceColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(SecurityPolicyColumnInstanceID, InstanceColumnID)).
+			LeftJoin(join(LimitsColumnInstanceID, InstanceColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Instance, error) {
 			instance := &Instance{
@@ -497,6 +542,8 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 					creationDate          sql.NullTime
 					sequence              sql.NullInt64
 					securityPolicyEnabled sql.NullBool
+					auditLogRetention     database.NullDuration
+					block                 sql.NullBool
 				)
 				err := rows.Scan(
 					&instance.ID,
@@ -517,9 +564,11 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 					&sequence,
 					&securityPolicyEnabled,
 					&instance.csp.allowedOrigins,
+					&auditLogRetention,
+					&block,
 				)
 				if err != nil {
-					return nil, errors.ThrowInternal(err, "QUERY-d3fas", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(err, "QUERY-d3fas", "Errors.Internal")
 				}
 				if !domain.Valid {
 					continue
@@ -533,14 +582,20 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 					IsGenerated:  isGenerated.Bool,
 					InstanceID:   instance.ID,
 				})
+				if auditLogRetention.Valid {
+					instance.auditLogRetention = &auditLogRetention.Duration
+				}
+				if block.Valid {
+					instance.block = &block.Bool
+				}
 				instance.csp.enabled = securityPolicyEnabled.Bool
 			}
 			if instance.ID == "" {
-				return nil, errors.ThrowNotFound(nil, "QUERY-n0wng", "Errors.IAM.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.IAM.NotFound")
 			}
 			instance.DefaultLang = language.Make(lang)
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-Dfbe2", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-Dfbe2", "Errors.Query.CloseRows")
 			}
 			return instance, nil
 		}

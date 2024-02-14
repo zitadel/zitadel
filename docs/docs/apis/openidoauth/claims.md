@@ -1,5 +1,6 @@
 ---
-title: Claims
+title: Claims in ZITADEL
+sidebar_label: Claims
 ---
 
 ZITADEL asserts claims on different places according to the corresponding specifications or project and clients settings.
@@ -8,26 +9,26 @@ Please check below the matrix for an overview where which scope is asserted.
 | Claims                                            | Userinfo       | Introspection  | ID Token                                    | Access Token                         |
 |:--------------------------------------------------|:---------------|----------------|---------------------------------------------|--------------------------------------|
 | acr                                               | No             | No             | Yes                                         | No                                   |
-| address                                           | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| address                                           | When requested | When requested | When requested and response_type `id_token` | No                                   |
 | amr                                               | No             | No             | Yes                                         | No                                   |
 | aud                                               | No             | Yes            | Yes                                         | When JWT                             |
 | auth_time                                         | No             | No             | Yes                                         | No                                   |
 | azp (client_id when Introspect)                   | No             | Yes            | Yes                                         | When JWT                             |
-| email                                             | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| email_verified                                    | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| email                                             | When requested | When requested | When requested and response_type `id_token` | No                                   |
+| email_verified                                    | When requested | When requested | When requested and response_type `id_token` | No                                   |
 | exp                                               | No             | Yes            | Yes                                         | When JWT                             |
-| family_name                                       | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| gender                                            | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| given_name                                        | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| family_name                                       | When requested | When requested | When requested and response_type `id_token` | No                                   |
+| gender                                            | When requested | When requested | When requested and response_type `id_token` | No                                   |
+| given_name                                        | When requested | When requested | When requested and response_type `id_token` | No                                   |
 | iat                                               | No             | Yes            | Yes                                         | When JWT                             |
 | iss                                               | No             | Yes            | Yes                                         | When JWT                             |
 | jti                                               | No             | Yes            | No                                          | When JWT                             |
-| locale                                            | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| name                                              | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| locale                                            | When requested | When requested | When requested and response_type `id_token` | No                                   |
+| name                                              | When requested | When requested | When requested and response_type `id_token` | No                                   |
 | nbf                                               | No             | Yes            | Yes                                         | When JWT                             |
 | nonce                                             | No             | No             | Yes                                         | No                                   |
-| phone                                             | When requested | When requested | When requested amd response_type `id_token` | No                                   |
-| phone_verified                                    | When requested | When requested | When requested amd response_type `id_token` | No                                   |
+| phone                                             | When requested | When requested | When requested and response_type `id_token` | No                                   |
+| phone_verified                                    | When requested | When requested | When requested and response_type `id_token` | No                                   |
 | preferred_username (username when Introspect)     | When requested | When requested | Yes                                         | No                                   |
 | sub                                               | Yes            | Yes            | Yes                                         | When JWT                             |
 | urn:zitadel:iam:org:domain:primary:{domainname}   | When requested | When requested | When requested                              | When JWT and requested               |
@@ -42,7 +43,7 @@ Please check below the matrix for an overview where which scope is asserted.
 | Claims             | Example                                  | Description                                                                                                                                            |
 |:-------------------|:-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
 | acr                | TBA                                      | TBA                                                                                                                                                    |
-| address            | `Lerchenfeldstrasse 3, 9014 St. Gallen`   | TBA                                                                                                                                                    |
+| address            | `Lerchenfeldstrasse 3, 9014 St. Gallen`  | TBA                                                                                                                                                    |
 | amr                | `pwd mfa`                                | Authentication Method References as defined in [RFC8176](https://tools.ietf.org/html/rfc8176) <br/> `password` value is deprecated, please check `pwd` |
 | aud                | `69234237810729019`                      | The audience of the token, by default all client id's and the project id are included                                                                  |
 | auth_time          | `1311280969`                             | Unix time of the authentication                                                                                                                        |
@@ -54,7 +55,7 @@ Please check below the matrix for an overview where which scope is asserted.
 | gender             | `other`                                  | Gender of the subject                                                                                                                                  |
 | given_name         | `Road`                                   | Given name of the subject                                                                                                                              |
 | iat                | `1311280970`                             | Time of the token was issued at (as unix time)                                                                                                         |
-| iss                | `{your_domain}`                          | Issuing domain of a token                                                                                                                              |
+| iss                | `$CUSTOM-DOMAIN`                                      | Issuing domain of a token                                                                                                                              |
 | jti                | `69234237813329048`                      | Unique id of the token                                                                                                                                 |
 | locale             | `en`                                     | Language from the subject                                                                                                                              |
 | name               | `Road Runner`                            | The subjects full name                                                                                                                                 |
@@ -67,7 +68,30 @@ Please check below the matrix for an overview where which scope is asserted.
 
 ## Custom Claims
 
+Custom claims are being inserted into user tokens in addition to the standard claims.
+Your app can use custom claims to handle more complex scenarios, such as restricting access based on these claims.
+
 You can add custom claims using the [complement token flow](/docs/apis/actions/complement-token) of the [actions feature](/docs/apis/actions/introduction).
+
+Multiple examples of Actions that result in custom claims can be found in our [Marketplace for ZITADEL Actions](https://github.com/zitadel/actions).
+
+### Static values as custom claim
+
+```javascript reference
+https://github.com/zitadel/actions/blob/de69b56f6d0463817953b59a52ffd6afc6a366fb/examples/add_claim.js#L9-L11
+```
+
+### Metadata as custom claim
+
+```javascript reference
+https://github.com/zitadel/actions/blob/main/examples/add_metadata.js#L9-L15
+```
+
+### Format roles claims
+
+```javascript reference
+https://github.com/zitadel/actions/blob/main/examples/custom_roles.js#L20-L33
+```
 
 ## Reserved Claims
 

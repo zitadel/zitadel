@@ -6,7 +6,7 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type AuthRequest struct {
@@ -55,6 +55,7 @@ type AuthRequest struct {
 	LockoutPolicy            *LockoutPolicy
 	DefaultTranslations      []*CustomText
 	OrgTranslations          []*CustomText
+	SAMLRequestID            string
 }
 
 type ExternalUser struct {
@@ -105,7 +106,26 @@ const (
 	MFATypeTOTP MFAType = iota
 	MFATypeU2F
 	MFATypeU2FUserVerification
+	MFATypeOTPSMS
+	MFATypeOTPEmail
 )
+
+func (m MFAType) UserAuthMethodType() UserAuthMethodType {
+	switch m {
+	case MFATypeTOTP:
+		return UserAuthMethodTypeTOTP
+	case MFATypeU2F:
+		return UserAuthMethodTypeU2F
+	case MFATypeU2FUserVerification:
+		return UserAuthMethodTypePasswordless
+	case MFATypeOTPSMS:
+		return UserAuthMethodTypeOTPSMS
+	case MFATypeOTPEmail:
+		return UserAuthMethodTypeOTPEmail
+	default:
+		return UserAuthMethodTypeUnspecified
+	}
+}
 
 type MFALevel int
 
@@ -136,7 +156,7 @@ func NewAuthRequestFromType(requestType AuthRequestType) (*AuthRequest, error) {
 	case AuthRequestTypeDevice:
 		return &AuthRequest{Request: &AuthRequestDevice{}}, nil
 	}
-	return nil, errors.ThrowInvalidArgument(nil, "DOMAIN-ds2kl", "invalid request type")
+	return nil, zerrors.ThrowInvalidArgument(nil, "DOMAIN-ds2kl", "invalid request type")
 }
 
 func (a *AuthRequest) WithCurrentInfo(info *BrowserInfo) *AuthRequest {
@@ -205,4 +225,29 @@ func (a *AuthRequest) Done() bool {
 		}
 	}
 	return false
+}
+
+func (a *AuthRequest) PrivateLabelingOrgID(defaultID string) string {
+	if a.RequestedOrgID != "" {
+		return a.RequestedOrgID
+	}
+	if (a.PrivateLabelingSetting == PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy || a.PrivateLabelingSetting == PrivateLabelingSettingUnspecified) &&
+		a.UserOrgID != "" {
+		return a.UserOrgID
+	}
+	if a.PrivateLabelingSetting != PrivateLabelingSettingUnspecified {
+		return a.ApplicationResourceOwner
+	}
+	return defaultID
+}
+
+func (a *AuthRequest) UserAuthMethodTypes() []UserAuthMethodType {
+	list := make([]UserAuthMethodType, 0, len(a.MFAsVerified)+1)
+	if a.PasswordVerified {
+		list = append(list, UserAuthMethodTypePassword)
+	}
+	for _, mfa := range a.MFAsVerified {
+		list = append(list, mfa.UserAuthMethodType())
+	}
+	return list
 }

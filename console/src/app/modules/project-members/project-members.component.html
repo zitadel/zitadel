@@ -6,7 +6,7 @@
   <p class="subinfo" sub>
     <span class="cnsl-secondary-text">{{ 'PROJECT.MEMBER.DESCRIPTION' | translate }}</span>
     <a mat-icon-button href="https://zitadel.com/docs/concepts/structure/managers" target="_blank">
-      <i class="las la-info-circle"></i>
+      <mat-icon class="icon">info_outline</mat-icon>
     </a>
   </p>
   <cnsl-members-table
@@ -23,8 +23,8 @@
         'project.member.write:' + (projectType === ProjectType.PROJECTTYPE_OWNED)
           ? $any(project)?.id
           : projectType === ProjectType.PROJECTTYPE_GRANTED
-          ? $any(project)?.projectId
-          : ''
+            ? $any(project)?.projectId
+            : ''
       ]
         | hasRole
         | async
@@ -35,8 +35,8 @@
         'project.member.delete:' + (projectType === ProjectType.PROJECTTYPE_OWNED)
           ? $any(project)?.id
           : projectType === ProjectType.PROJECTTYPE_GRANTED
-          ? $any(project)?.projectId
-          : ''
+            ? $any(project)?.projectId
+            : ''
       ]
         | hasRole
         | async
@@ -50,8 +50,8 @@
         'project.member.delete:' + (projectType === ProjectType.PROJECTTYPE_OWNED)
           ? $any(project)?.id
           : projectType === ProjectType.PROJECTTYPE_GRANTED
-          ? $any(project)?.projectId
-          : '',
+            ? $any(project)?.projectId
+            : '',
         'project.member.delete'
       ]"
     >
@@ -74,8 +74,8 @@
         'project.member.write:' + (projectType === ProjectType.PROJECTTYPE_OWNED)
           ? $any(project)?.id
           : projectType === ProjectType.PROJECTTYPE_GRANTED
-          ? $any(project)?.projectId
-          : '',
+            ? $any(project)?.projectId
+            : '',
         'project.member.write'
       ]"
     >

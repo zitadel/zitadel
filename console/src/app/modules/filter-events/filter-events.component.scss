@@ -1,17 +1,15 @@
-@use '@angular/material' as mat;
-
 @mixin filter-events-theme($theme) {
   $primary: map-get($theme, primary);
-  $primary-color: mat.get-color-from-palette($primary, 500);
-  $lighter-primary-color: mat.get-color-from-palette($primary, 300);
-  $darker-primary-color: mat.get-color-from-palette($primary, 700);
+  $primary-color: map-get($primary, 500);
+  $lighter-primary-color: map-get($primary, 300);
+  $darker-primary-color: map-get($primary, 700);
 
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
   $secondary-text: map-get($foreground, secondary-text);
   $is-dark-theme: map-get($theme, is-dark);
 
-  $link-hover-color: if($is-dark-theme, mat.get-color-from-palette($primary, 200), $primary-color);
+  $link-hover-color: if($is-dark-theme, map-get($primary, 200), $primary-color);
   $link-color: if($is-dark-theme, $lighter-primary-color, $primary-color);
 
   .filter-events-wrapper {
@@ -21,7 +19,7 @@
     display: flex;
     flex-direction: column;
     padding: 0.5rem 0;
-    min-width: 320px;
+    min-width: 360px;
     max-width: 360px;
     padding-bottom: 0.5rem;
     position: relative;
@@ -57,16 +55,28 @@
       align-items: center;
     }
 
+    .mdc-text-field--filled:not(.mdc-text-field--disabled) {
+      background-color: map-get($background, cards);
+    }
+
+    .datetime-input {
+      width: 100%;
+    }
+
+    .datetime-range {
+      display: inline-block;
+    }
+
     .filter-events-sub {
       display: flex;
       flex-direction: row;
       align-items: center;
-      justify-content: space-between;
+      justify-content: space-around;
       padding: 0 0.5rem;
       background-color: if($is-dark-theme, #00000020, #00000008);
       margin: 0 -0.5rem;
 
-      .aggregate-type-select .mat-select {
+      .aggregate-type-select .mat-mdc-select {
         height: 36px;
         padding: 7px 10px;
       }

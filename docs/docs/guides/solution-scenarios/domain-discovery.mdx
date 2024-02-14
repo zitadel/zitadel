@@ -1,5 +1,6 @@
 ---
-title: Domain Discovery
+title: Domain Discovery in ZITADEL
+sidebar_label: Domain Discovery
 ---
 
 This guide should explain how domain discovery works and how to configure it in ZITADEL.
@@ -27,7 +28,7 @@ Follow this guide to configure your ZITADEL instance for this scenario.
 
 You will use the instance default settings for the login for the organization **CIAM**.
 When opening `login.mycompany.com` then the login policy of the instance will be applied.
-This means that you have to configure the [Login and Access](/docs/guides/manage/console/instance-settings#login-behaviour-and-access) Policy and [Identity Providers](/docs/guides/manage/console/instance-settings#identity-providers) for the **CIAM** users on the instance itself.
+This means that you have to configure the [Login and Access](/docs/guides/manage/console/instance-settings#login-behavior-and-access) Policy and [Identity Providers](/docs/guides/manage/console/instance-settings#identity-providers) for the **CIAM** users on the instance itself.
 
 :::info
 You can also configure these settings on the default organization (see below) and send the scope `urn:zitadel:iam:org:id:{id}` with every [auth request](/docs/apis/openidoauth/authrequest#organization-policies-and-branding).
@@ -42,7 +43,7 @@ The default organization will hold all unmatched users, ie. all users that are n
 
 ### Enable Domain Discovery
 
-In the [Login Behavior and Security Settings](/docs/guides/manage/console/instance-settings#login-behaviour-and-access) enable "Domain discovery allowed"
+In the [Login Behavior and Security Settings](/docs/guides/manage/console/instance-settings#login-behavior-and-access) enable "Domain discovery allowed"
 
 ### Configure login with email
 
@@ -87,7 +88,7 @@ Make sure to [Force MFA](/docs/guides/manage/console/instance-settings#multifact
 
 ### Verify domains
 
-Switch to the organization **Alpha** and select the tab "Domains". 
+Switch to the organization **Alpha** and navigate to the settings and "Verified domains".
 Verify the domain alpha.com following the [organization guide](/docs/guides/manage/console/organizations#domain-verification-and-primary-domain).
 
 Do the same for the **Beta** organization.
@@ -100,7 +101,7 @@ You can also disable domain verification with acme challenge in the [instance se
 
 You should be all setup to try out domain discovery.
 
-The user journeys for the different users would look as follows: 
+The user journeys for the different users would look as follows:
 
 - User (Alice, Bob, Chuck) clicks a login button in your application
 - Redirected to `login.mycompany.com` (ZITADEL running under a custom domain)

@@ -1,8 +1,6 @@
-@use '@angular/material' as mat;
-
 @mixin idp-settings-theme($theme) {
   $primary: map-get($theme, primary);
-  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-color: map-get($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
@@ -63,6 +61,10 @@
         margin-right: 1rem;
         height: 36px;
         width: 36px;
+
+        &.apple {
+          margin-bottom: 4px;
+        }
 
         &.dark {
           display: if($is-dark-theme, block, none);

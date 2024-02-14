@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, EventEmitter, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {
@@ -15,20 +15,12 @@ import {
   UpdateCustomLabelPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
-import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
+import { LabelPolicy, ThemeMode } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { AssetEndpoint, AssetService, AssetType } from 'src/app/services/asset.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
-import {
-  BACKGROUND,
-  DARK_BACKGROUND,
-  DARK_PRIMARY,
-  DARK_WARN,
-  PRIMARY,
-  ThemeService,
-  WARN,
-} from 'src/app/services/theme.service';
+import { ThemeService } from 'src/app/services/theme.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import * as opentype from 'opentype.js';
@@ -88,6 +80,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public View: any = View;
   public ColorType: any = ColorType;
   public AssetType: any = AssetType;
+  public ThemeMode: any = ThemeMode;
 
   public fontName = '';
 
@@ -105,6 +98,32 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
     private themeService: ThemeService,
     private dialog: MatDialog,
   ) {}
+
+  public toggleThemeMode(): void {
+    if (this.view === View.CURRENT) {
+      return;
+    }
+    if (this.previewData?.themeMode === ThemeMode.THEME_MODE_LIGHT) {
+      this.theme = Theme.LIGHT;
+    }
+    if (this.previewData?.themeMode === ThemeMode.THEME_MODE_DARK) {
+      this.theme = Theme.DARK;
+    }
+    this.savePolicy();
+  }
+
+  public toggleView(view: View): void {
+    let themeMode = this.data?.themeMode;
+    if (view === View.PREVIEW) {
+      themeMode = this.previewData?.themeMode;
+    }
+    if (themeMode === ThemeMode.THEME_MODE_LIGHT) {
+      this.theme = Theme.LIGHT;
+    }
+    if (themeMode === ThemeMode.THEME_MODE_DARK) {
+      this.theme = Theme.DARK;
+    }
+  }
 
   public toggleHoverLogo(theme: Theme, isHovering: boolean): void {
     if (theme === Theme.DARK) {
@@ -614,6 +633,8 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
 
       req.setDisableWatermark(this.previewData.disableWatermark);
       req.setHideLoginNameSuffix(this.previewData.hideLoginNameSuffix);
+
+      req.setThemeMode(this.previewData.themeMode);
     }
   }
 
@@ -629,7 +650,6 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
               this.getData().then((data) => {
                 if (data.policy) {
                   this.data = data.policy;
-                  this.applyToConsole(data.policy);
                 }
               });
               this.getPreviewData().then((data) => {
@@ -651,7 +671,6 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
               this.getData().then((data) => {
                 if (data.policy) {
                   this.data = data.policy;
-                  this.applyToConsole(data.policy);
                 }
               });
             }, 1000);
@@ -660,26 +679,6 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
             this.toast.showError(error);
           });
     }
-  }
-
-  private applyToConsole(labelpolicy: LabelPolicy.AsObject): void {
-    const darkPrimary = labelpolicy?.primaryColorDark || DARK_PRIMARY;
-    const lightPrimary = labelpolicy?.primaryColor || PRIMARY;
-
-    const darkWarn = labelpolicy?.warnColorDark || DARK_WARN;
-    const lightWarn = labelpolicy?.warnColor || WARN;
-
-    const darkBackground = labelpolicy?.backgroundColorDark || DARK_BACKGROUND;
-    const lightBackground = labelpolicy?.backgroundColor || BACKGROUND;
-
-    this.themeService.savePrimaryColor(darkPrimary, true);
-    this.themeService.savePrimaryColor(lightPrimary, false);
-
-    this.themeService.saveWarnColor(darkWarn, true);
-    this.themeService.saveWarnColor(lightWarn, false);
-
-    this.themeService.saveBackgroundColor(darkBackground, true);
-    this.themeService.saveBackgroundColor(lightBackground, false);
   }
 
   public resetPolicy(): Promise<any> {

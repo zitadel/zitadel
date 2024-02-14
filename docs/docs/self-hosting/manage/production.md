@@ -1,5 +1,6 @@
 ---
-title: Production Setup
+title: ZITADEL Production Setup
+sidebar_lable: Production Setup
 ---
 
 As soon as you successfully deployed ZITADEL as a proof of concept using one of our [deployment guides](/docs/self-hosting/deploy/overview),
@@ -120,7 +121,7 @@ Database:
 You also might want to configure how [projections](/concepts/eventstore/implementation#projections) are computed. These are the default values:
 
 ```yaml
-# The Projections section defines the behaviour for the scheduled and synchronous events projections.
+# The Projections section defines the behavior for the scheduled and synchronous events projections.
 Projections:
   # Time interval between scheduled projections
   RequeueEvery: 60s
@@ -200,6 +201,7 @@ DefaultInstance:
     # if the host of the sender is different from ExternalDomain set DefaultInstance.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain to false
     From:
     FromName:
+    ReplyToAddress:
 ```
 
 - If you don't want to use the DefaultInstance configuration for the first instance that ZITADEL automatically creates for you during the [setup phase](/self-hosting/manage/configure#database-initialization), you can provide a FirstInstance YAML section using the --steps argument.
@@ -207,10 +209,10 @@ DefaultInstance:
 - Probably, you also want to [apply your custom branding](/guides/manage/customize/branding), [hook into certain events](/guides/manage/customize/behavior), [customize texts](/guides/manage/customize/texts) or [add metadata to your users](/guides/manage/customize/user-metadata).
 - If you want to automatically create ZITADEL resources, you can use the [ZITADEL Terraform Provider](/guides/manage/terraform/basics).
 
-## Quotas
+## Limits and Quotas
 
 If you host ZITADEL as a service,
-you might want to [limit usage and/or execute tasks on certain usage units and levels](/self-hosting/manage/quotas).
+you might want to [limit usage and/or execute tasks on certain usage units and levels](/self-hosting/manage/usage_control).
 
 ## Minimum system requirements
 

@@ -6,62 +6,77 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"net"
+	"net/http"
 	"regexp"
 	"testing"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
-	expectedSessionQuery = regexp.QuoteMeta(`SELECT projections.sessions4.id,` +
-		` projections.sessions4.creation_date,` +
-		` projections.sessions4.change_date,` +
-		` projections.sessions4.sequence,` +
-		` projections.sessions4.state,` +
-		` projections.sessions4.resource_owner,` +
-		` projections.sessions4.creator,` +
-		` projections.sessions4.user_id,` +
-		` projections.sessions4.user_checked_at,` +
-		` projections.login_names2.login_name,` +
-		` projections.users8_humans.display_name,` +
-		` projections.users8.resource_owner,` +
-		` projections.sessions4.password_checked_at,` +
-		` projections.sessions4.intent_checked_at,` +
-		` projections.sessions4.webauthn_checked_at,` +
-		` projections.sessions4.webauthn_user_verified,` +
-		` projections.sessions4.metadata,` +
-		` projections.sessions4.token_id` +
-		` FROM projections.sessions4` +
-		` LEFT JOIN projections.login_names2 ON projections.sessions4.user_id = projections.login_names2.user_id AND projections.sessions4.instance_id = projections.login_names2.instance_id` +
-		` LEFT JOIN projections.users8_humans ON projections.sessions4.user_id = projections.users8_humans.user_id AND projections.sessions4.instance_id = projections.users8_humans.instance_id` +
-		` LEFT JOIN projections.users8 ON projections.sessions4.user_id = projections.users8.id AND projections.sessions4.instance_id = projections.users8.instance_id` +
+	expectedSessionQuery = regexp.QuoteMeta(`SELECT projections.sessions8.id,` +
+		` projections.sessions8.creation_date,` +
+		` projections.sessions8.change_date,` +
+		` projections.sessions8.sequence,` +
+		` projections.sessions8.state,` +
+		` projections.sessions8.resource_owner,` +
+		` projections.sessions8.creator,` +
+		` projections.sessions8.user_id,` +
+		` projections.sessions8.user_resource_owner,` +
+		` projections.sessions8.user_checked_at,` +
+		` projections.login_names3.login_name,` +
+		` projections.users10_humans.display_name,` +
+		` projections.sessions8.password_checked_at,` +
+		` projections.sessions8.intent_checked_at,` +
+		` projections.sessions8.webauthn_checked_at,` +
+		` projections.sessions8.webauthn_user_verified,` +
+		` projections.sessions8.totp_checked_at,` +
+		` projections.sessions8.otp_sms_checked_at,` +
+		` projections.sessions8.otp_email_checked_at,` +
+		` projections.sessions8.metadata,` +
+		` projections.sessions8.token_id,` +
+		` projections.sessions8.user_agent_fingerprint_id,` +
+		` projections.sessions8.user_agent_ip,` +
+		` projections.sessions8.user_agent_description,` +
+		` projections.sessions8.user_agent_header,` +
+		` projections.sessions8.expiration` +
+		` FROM projections.sessions8` +
+		` LEFT JOIN projections.login_names3 ON projections.sessions8.user_id = projections.login_names3.user_id AND projections.sessions8.instance_id = projections.login_names3.instance_id` +
+		` LEFT JOIN projections.users10_humans ON projections.sessions8.user_id = projections.users10_humans.user_id AND projections.sessions8.instance_id = projections.users10_humans.instance_id` +
+		` LEFT JOIN projections.users10 ON projections.sessions8.user_id = projections.users10.id AND projections.sessions8.instance_id = projections.users10.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
-	expectedSessionsQuery = regexp.QuoteMeta(`SELECT projections.sessions4.id,` +
-		` projections.sessions4.creation_date,` +
-		` projections.sessions4.change_date,` +
-		` projections.sessions4.sequence,` +
-		` projections.sessions4.state,` +
-		` projections.sessions4.resource_owner,` +
-		` projections.sessions4.creator,` +
-		` projections.sessions4.user_id,` +
-		` projections.sessions4.user_checked_at,` +
-		` projections.login_names2.login_name,` +
-		` projections.users8_humans.display_name,` +
-		` projections.users8.resource_owner,` +
-		` projections.sessions4.password_checked_at,` +
-		` projections.sessions4.intent_checked_at,` +
-		` projections.sessions4.webauthn_checked_at,` +
-		` projections.sessions4.webauthn_user_verified,` +
-		` projections.sessions4.metadata,` +
+	expectedSessionsQuery = regexp.QuoteMeta(`SELECT projections.sessions8.id,` +
+		` projections.sessions8.creation_date,` +
+		` projections.sessions8.change_date,` +
+		` projections.sessions8.sequence,` +
+		` projections.sessions8.state,` +
+		` projections.sessions8.resource_owner,` +
+		` projections.sessions8.creator,` +
+		` projections.sessions8.user_id,` +
+		` projections.sessions8.user_resource_owner,` +
+		` projections.sessions8.user_checked_at,` +
+		` projections.login_names3.login_name,` +
+		` projections.users10_humans.display_name,` +
+		` projections.sessions8.password_checked_at,` +
+		` projections.sessions8.intent_checked_at,` +
+		` projections.sessions8.webauthn_checked_at,` +
+		` projections.sessions8.webauthn_user_verified,` +
+		` projections.sessions8.totp_checked_at,` +
+		` projections.sessions8.otp_sms_checked_at,` +
+		` projections.sessions8.otp_email_checked_at,` +
+		` projections.sessions8.metadata,` +
+		` projections.sessions8.expiration,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.sessions4` +
-		` LEFT JOIN projections.login_names2 ON projections.sessions4.user_id = projections.login_names2.user_id AND projections.sessions4.instance_id = projections.login_names2.instance_id` +
-		` LEFT JOIN projections.users8_humans ON projections.sessions4.user_id = projections.users8_humans.user_id AND projections.sessions4.instance_id = projections.users8_humans.instance_id` +
-		` LEFT JOIN projections.users8 ON projections.sessions4.user_id = projections.users8.id AND projections.sessions4.instance_id = projections.users8.instance_id` +
+		` FROM projections.sessions8` +
+		` LEFT JOIN projections.login_names3 ON projections.sessions8.user_id = projections.login_names3.user_id AND projections.sessions8.instance_id = projections.login_names3.instance_id` +
+		` LEFT JOIN projections.users10_humans ON projections.sessions8.user_id = projections.users10_humans.user_id AND projections.sessions8.instance_id = projections.users10_humans.instance_id` +
+		` LEFT JOIN projections.users10 ON projections.sessions8.user_id = projections.users10.id AND projections.sessions8.instance_id = projections.users10.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
 
 	sessionCols = []string{
@@ -73,16 +88,24 @@ var (
 		"resource_owner",
 		"creator",
 		"user_id",
+		"user_resource_owner",
 		"user_checked_at",
 		"login_name",
 		"display_name",
-		"user_resource_owner",
 		"password_checked_at",
 		"intent_checked_at",
 		"webauthn_checked_at",
 		"webauthn_user_verified",
+		"totp_checked_at",
+		"otp_sms_checked_at",
+		"otp_email_checked_at",
 		"metadata",
 		"token",
+		"user_agent_fingerprint_id",
+		"user_agent_ip",
+		"user_agent_description",
+		"user_agent_header",
+		"expiration",
 	}
 
 	sessionsCols = []string{
@@ -94,15 +117,19 @@ var (
 		"resource_owner",
 		"creator",
 		"user_id",
+		"user_resource_owner",
 		"user_checked_at",
 		"login_name",
 		"display_name",
-		"user_resource_owner",
 		"password_checked_at",
 		"intent_checked_at",
 		"webauthn_checked_at",
 		"webauthn_user_verified",
+		"totp_checked_at",
+		"otp_sms_checked_at",
+		"otp_email_checked_at",
 		"metadata",
+		"expiration",
 		"count",
 	}
 )
@@ -147,15 +174,19 @@ func Test_SessionsPrepare(t *testing.T) {
 							"ro",
 							"creator",
 							"user-id",
+							"resourceOwner",
 							testNow,
 							"login-name",
 							"display-name",
-							"resourceOwner",
 							testNow,
 							testNow,
 							testNow,
 							true,
+							testNow,
+							testNow,
+							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
+							testNow,
 						},
 					},
 				),
@@ -190,9 +221,19 @@ func Test_SessionsPrepare(t *testing.T) {
 							WebAuthNCheckedAt: testNow,
 							UserVerified:      true,
 						},
+						TOTPFactor: SessionTOTPFactor{
+							TOTPCheckedAt: testNow,
+						},
+						OTPSMSFactor: SessionOTPFactor{
+							OTPCheckedAt: testNow,
+						},
+						OTPEmailFactor: SessionOTPFactor{
+							OTPCheckedAt: testNow,
+						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
 						},
+						Expiration: testNow,
 					},
 				},
 			},
@@ -214,15 +255,19 @@ func Test_SessionsPrepare(t *testing.T) {
 							"ro",
 							"creator",
 							"user-id",
+							"resourceOwner",
 							testNow,
 							"login-name",
 							"display-name",
-							"resourceOwner",
 							testNow,
 							testNow,
 							testNow,
 							true,
+							testNow,
+							testNow,
+							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
+							testNow,
 						},
 						{
 							"session-id2",
@@ -233,15 +278,19 @@ func Test_SessionsPrepare(t *testing.T) {
 							"ro",
 							"creator2",
 							"user-id2",
+							"resourceOwner",
 							testNow,
 							"login-name2",
 							"display-name2",
-							"resourceOwner",
 							testNow,
 							testNow,
 							testNow,
 							false,
+							testNow,
+							testNow,
+							testNow,
 							[]byte(`{"key": "dmFsdWU="}`),
+							testNow,
 						},
 					},
 				),
@@ -276,9 +325,19 @@ func Test_SessionsPrepare(t *testing.T) {
 							WebAuthNCheckedAt: testNow,
 							UserVerified:      true,
 						},
+						TOTPFactor: SessionTOTPFactor{
+							TOTPCheckedAt: testNow,
+						},
+						OTPSMSFactor: SessionOTPFactor{
+							OTPCheckedAt: testNow,
+						},
+						OTPEmailFactor: SessionOTPFactor{
+							OTPCheckedAt: testNow,
+						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
 						},
+						Expiration: testNow,
 					},
 					{
 						ID:            "session-id2",
@@ -305,9 +364,19 @@ func Test_SessionsPrepare(t *testing.T) {
 							WebAuthNCheckedAt: testNow,
 							UserVerified:      false,
 						},
+						TOTPFactor: SessionTOTPFactor{
+							TOTPCheckedAt: testNow,
+						},
+						OTPSMSFactor: SessionOTPFactor{
+							OTPCheckedAt: testNow,
+						},
+						OTPEmailFactor: SessionOTPFactor{
+							OTPCheckedAt: testNow,
+						},
 						Metadata: map[string][]byte{
 							"key": []byte("value"),
 						},
+						Expiration: testNow,
 					},
 				},
 			},
@@ -327,7 +396,7 @@ func Test_SessionsPrepare(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Sessions)(nil),
 		},
 	}
 	for _, tt := range tests {
@@ -352,13 +421,13 @@ func Test_SessionPrepare(t *testing.T) {
 			name:    "prepareSessionQuery no result",
 			prepare: prepareSessionQueryTesting(t, ""),
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					expectedSessionQuery,
 					nil,
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -382,16 +451,24 @@ func Test_SessionPrepare(t *testing.T) {
 						"ro",
 						"creator",
 						"user-id",
+						"resourceOwner",
 						testNow,
 						"login-name",
 						"display-name",
-						"resourceOwner",
 						testNow,
 						testNow,
 						testNow,
 						true,
+						testNow,
+						testNow,
+						testNow,
 						[]byte(`{"key": "dmFsdWU="}`),
 						"tokenID",
+						"fingerPrintID",
+						"1.2.3.4",
+						"agentDescription",
+						[]byte(`{"foo":["foo","bar"]}`),
+						testNow,
 					},
 				),
 			},
@@ -420,9 +497,25 @@ func Test_SessionPrepare(t *testing.T) {
 					WebAuthNCheckedAt: testNow,
 					UserVerified:      true,
 				},
+				TOTPFactor: SessionTOTPFactor{
+					TOTPCheckedAt: testNow,
+				},
+				OTPSMSFactor: SessionOTPFactor{
+					OTPCheckedAt: testNow,
+				},
+				OTPEmailFactor: SessionOTPFactor{
+					OTPCheckedAt: testNow,
+				},
 				Metadata: map[string][]byte{
 					"key": []byte("value"),
 				},
+				UserAgent: domain.UserAgent{
+					FingerprintID: gu.Ptr("fingerPrintID"),
+					IP:            net.IPv4(1, 2, 3, 4),
+					Description:   gu.Ptr("agentDescription"),
+					Header:        http.Header{"foo": []string{"foo", "bar"}},
+				},
+				Expiration: testNow,
 			},
 		},
 		{
@@ -440,7 +533,7 @@ func Test_SessionPrepare(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Session)(nil),
 		},
 	}
 	for _, tt := range tests {

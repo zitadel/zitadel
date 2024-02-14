@@ -2,13 +2,10 @@ package user
 
 import (
 	"context"
-	"encoding/json"
-
-	"github.com/zitadel/zitadel/internal/eventstore"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	"golang.org/x/text/language"
 )
 
@@ -28,11 +25,11 @@ type HumanProfileChangedEvent struct {
 	Gender            *domain.Gender `json:"gender,omitempty"`
 }
 
-func (e *HumanProfileChangedEvent) Data() interface{} {
+func (e *HumanProfileChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanProfileChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanProfileChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -42,7 +39,7 @@ func NewHumanProfileChangedEvent(
 	changes []ProfileChanges,
 ) (*HumanProfileChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "USER-33n8F", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "USER-33n8F", "Errors.NoChangesFound")
 	}
 	changeEvent := &HumanProfileChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -95,13 +92,13 @@ func ChangeGender(gender domain.Gender) func(event *HumanProfileChangedEvent) {
 	}
 }
 
-func HumanProfileChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanProfileChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	profileChanged := &HumanProfileChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, profileChanged)
+	err := event.Unmarshal(profileChanged)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-5M0pd", "unable to unmarshal human profile changed")
+		return nil, zerrors.ThrowInternal(err, "USER-5M0pd", "unable to unmarshal human profile changed")
 	}
 
 	return profileChanged, nil

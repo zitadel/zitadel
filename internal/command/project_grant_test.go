@@ -7,15 +7,14 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddProjectGrant(t *testing.T) {
@@ -55,7 +54,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -77,7 +76,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -107,7 +106,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -144,7 +143,7 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -176,15 +175,12 @@ func TestCommandSide_AddProjectGrant(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewGrantAddedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectgrant1",
-								"grantedorg1",
-								[]string{"key1"},
-							)),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewAddProjectGrantUniqueConstraint("grantedorg1", "project1")),
+						project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+							[]string{"key1"},
+						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "projectgrant1"),
@@ -271,7 +267,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -295,7 +291,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -326,7 +322,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -365,7 +361,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -411,7 +407,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -465,7 +461,7 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -513,13 +509,11 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewGrantChangedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectgrant1",
-								[]string{"key1", "key2"},
-							)),
-						},
+						project.NewGrantChangedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							[]string{"key1", "key2"},
+						),
 					),
 				),
 			},
@@ -594,13 +588,11 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 					),
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewGrantChangedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectgrant1",
-								[]string{"key1"},
-							)),
-						},
+						project.NewGrantChangedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							[]string{"key1"},
+						),
 					),
 				),
 			},
@@ -685,17 +677,15 @@ func TestCommandSide_ChangeProjectGrant(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewGrantChangedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectgrant1",
-								[]string{"key1"},
-							)),
-							eventFromEventPusher(usergrant.NewUserGrantCascadeChangedEvent(context.Background(),
-								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
-								[]string{"key1"},
-							)),
-						},
+						project.NewGrantChangedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							[]string{"key1"},
+						),
+						usergrant.NewUserGrantCascadeChangedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							[]string{"key1"},
+						),
 					),
 				),
 			},
@@ -778,7 +768,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -794,7 +784,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -812,7 +802,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -839,7 +829,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -877,7 +867,7 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -903,12 +893,10 @@ func TestCommandSide_DeactivateProjectGrant(t *testing.T) {
 						)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewGrantDeactivateEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectgrant1",
-							)),
-						},
+						project.NewGrantDeactivateEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+						),
 					),
 				),
 			},
@@ -977,7 +965,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -993,7 +981,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1011,7 +999,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1038,7 +1026,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1072,7 +1060,7 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1102,12 +1090,10 @@ func TestCommandSide_ReactivateProjectGrant(t *testing.T) {
 						)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewGrantReactivatedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectgrant1",
-							)),
-						},
+						project.NewGrantReactivatedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+						),
 					),
 				),
 			},
@@ -1177,7 +1163,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1193,7 +1179,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -1211,7 +1197,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -1238,7 +1224,7 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -1264,14 +1250,11 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 						)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewGrantRemovedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectgrant1",
-								"grantedorg1",
-							)),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectGrantUniqueConstraint("grantedorg1", "project1")),
+						project.NewGrantRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+						),
 					),
 				),
 			},
@@ -1311,14 +1294,11 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 					),
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewGrantRemovedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectgrant1",
-								"grantedorg1",
-							)),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectGrantUniqueConstraint("grantedorg1", "project1")),
+						project.NewGrantRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+						),
 					),
 				),
 			},
@@ -1365,21 +1345,17 @@ func TestCommandSide_RemoveProjectGrant(t *testing.T) {
 							"projectgrant1",
 							[]string{"key1"}))),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewGrantRemovedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"projectgrant1",
-								"grantedorg1",
-							)),
-							eventFromEventPusher(usergrant.NewUserGrantCascadeRemovedEvent(context.Background(),
-								&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
-								"user1",
-								"project1",
-								"projectgrant1",
-							)),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewRemoveProjectGrantUniqueConstraint("grantedorg1", "project1")),
-						uniqueConstraintsFromEventConstraint(usergrant.NewRemoveUserGrantUniqueConstraint("org1", "user1", "project1", "projectgrant1")),
+						project.NewGrantRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"projectgrant1",
+							"grantedorg1",
+						),
+						usergrant.NewUserGrantCascadeRemovedEvent(context.Background(),
+							&usergrant.NewAggregate("usergrant1", "org1").Aggregate,
+							"user1",
+							"project1",
+							"projectgrant1",
+						),
 					),
 				),
 			},

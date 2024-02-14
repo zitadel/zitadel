@@ -9,7 +9,8 @@ jobs:
       fail-fast: false
       matrix:
         browser: [firefox, chrome]
-    runs-on: ubuntu-latest
+    runs-on:
+      group: zitadel-public
     steps:
       - 
         name: Checkout Repository

@@ -6,8 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	"github.com/zitadel/zitadel/internal/zerrors"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func (s *Server) PasswordReset(ctx context.Context, req *user.PasswordResetRequest) (_ *user.PasswordResetResponse, err error) {
@@ -22,7 +22,7 @@ func (s *Server) PasswordReset(ctx context.Context, req *user.PasswordResetReque
 	case nil:
 		details, code, err = s.command.RequestPasswordReset(ctx, req.GetUserId())
 	default:
-		err = caos_errs.ThrowUnimplementedf(nil, "USERv2-SDeeg", "verification oneOf %T in method RequestPasswordReset not implemented", m)
+		err = zerrors.ThrowUnimplementedf(nil, "USERv2-SDeeg", "verification oneOf %T in method RequestPasswordReset not implemented", m)
 	}
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func notificationTypeToDomain(notificationType user.NotificationType) domain.Not
 }
 
 func (s *Server) SetPassword(ctx context.Context, req *user.SetPasswordRequest) (_ *user.SetPasswordResponse, err error) {
-	var resourceOwner = authz.GetCtxData(ctx).ResourceOwner
+	var resourceOwner = authz.GetCtxData(ctx).OrgID
 	var details *domain.ObjectDetails
 
 	switch v := req.GetVerification().(type) {
@@ -59,7 +59,7 @@ func (s *Server) SetPassword(ctx context.Context, req *user.SetPasswordRequest) 
 	case nil:
 		details, err = s.command.SetPassword(ctx, resourceOwner, req.GetUserId(), req.GetNewPassword().GetPassword(), req.GetNewPassword().GetChangeRequired())
 	default:
-		err = caos_errs.ThrowUnimplementedf(nil, "USERv2-SFdf2", "verification oneOf %T in method SetPasswordRequest not implemented", v)
+		err = zerrors.ThrowUnimplementedf(nil, "USERv2-SFdf2", "verification oneOf %T in method SetPasswordRequest not implemented", v)
 	}
 	if err != nil {
 		return nil, err

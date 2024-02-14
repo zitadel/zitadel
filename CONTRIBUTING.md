@@ -101,7 +101,8 @@ Please make sure you cover your changes with tests before marking a Pull Request
 - [ ] Integration tests against the gRPC server ensure that probable good and bad read and write permissions are tested.
 - [ ] Integration tests against the gRPC server ensure that the API is easily usable despite eventual consistency.
 - [ ] Integration tests against the gRPC server ensure that all probable login and registration flows are covered."
-- [ ] Integration tests ensure that certain commands send expected notifications.
+- [ ] Integration tests ensure that certain commands emit expected events that trigger notifications.
+- [ ] Integration tests ensure that certain events trigger expected notifications.
 
 ## Contribute
 
@@ -135,7 +136,7 @@ ZITADEL uses [golangci-lint](https://golangci-lint.run) for code quality checks.
 The commands in this section are tested against the following software versions:
 
 - [Docker version 20.10.17](https://docs.docker.com/engine/install/)
-- [Go version 1.20](https://go.dev/doc/install)
+- [Go version 1.21](https://go.dev/doc/install)
 - [Delve 1.9.1](https://github.com/go-delve/delve/tree/v1.9.1/Documentation/installation)
 
 Make some changes to the source code, then run the database locally.
@@ -218,8 +219,8 @@ docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml down
 In order to run the integrations tests for the gRPC API, PostgreSQL and CockroachDB must be started and initialized:
 
 ```bash
-export INTEGRATION_DB_FLAVOR="cockroach" ZITADEL_MASTERKEY="MasterkeyNeedsToHave32Characters"
-docker compose -f internal/integration/config/docker-compose.yaml up --wait ${INTEGRATION_DB_FLAVOR}
+export INTEGRATION_DB_FLAVOR="postgres" ZITADEL_MASTERKEY="MasterkeyNeedsToHave32Characters"
+docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait ${INTEGRATION_DB_FLAVOR}
 make core_integration_test
 docker compose -f internal/integration/config/docker-compose.yaml down
 ```

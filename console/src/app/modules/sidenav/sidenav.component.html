@@ -28,11 +28,6 @@
 
           <button
             (click)="value = setting.id"
-            *ngIf="
-              !setting.requiredRoles ||
-              (setting.requiredRoles.mgmt && (setting.requiredRoles.mgmt | hasRole | async)) ||
-              (setting.requiredRoles.admin && (setting.requiredRoles.admin | hasRole | async))
-            "
             class="sidenav-setting-list-element hide-on-mobile"
             [ngClass]="{ active: currentSetting === setting.id, show: currentSetting === undefined }"
             [attr.data-e2e]="'sidenav-element-' + setting.id"

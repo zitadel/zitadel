@@ -7,9 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/idp"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
-	"github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -42,7 +40,7 @@ func (s *Server) ListLoginPolicyIDPs(ctx context.Context, req *admin_pb.ListLogi
 	}
 	return &admin_pb.ListLoginPolicyIDPsResponse{
 		Result:  idp.IDPLoginPolicyLinksToPb(res.Links),
-		Details: object.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: object.ToListDetails(res.Count, res.Sequence, res.LastRun),
 	}, nil
 }
 
@@ -61,19 +59,7 @@ func (s *Server) AddIDPToLoginPolicy(ctx context.Context, req *admin_pb.AddIDPTo
 }
 
 func (s *Server) RemoveIDPFromLoginPolicy(ctx context.Context, req *admin_pb.RemoveIDPFromLoginPolicyRequest) (*admin_pb.RemoveIDPFromLoginPolicyResponse, error) {
-	idpQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(req.IdpId)
-	if err != nil {
-		return nil, err
-	}
-	idps, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
-		Queries: []query.SearchQuery{idpQuery},
-	}, true)
-
-	if err != nil {
-		return nil, err
-	}
-
-	objectDetails, err := s.command.RemoveIDPProviderFromDefaultLoginPolicy(ctx, &domain.IDPProvider{IDPConfigID: req.IdpId}, user.ExternalIDPViewsToExternalIDPs(idps.Links)...)
+	objectDetails, err := s.command.RemoveIDPProviderFromDefaultLoginPolicy(ctx, &domain.IDPProvider{IDPConfigID: req.IdpId})
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +74,7 @@ func (s *Server) ListLoginPolicySecondFactors(ctx context.Context, req *admin_pb
 		return nil, err
 	}
 	return &admin_pb.ListLoginPolicySecondFactorsResponse{
-		Details: object.ToListDetails(result.Count, result.Sequence, result.Timestamp),
+		Details: object.ToListDetails(result.Count, result.Sequence, result.LastRun),
 		Result:  policy_grpc.ModelSecondFactorTypesToPb(result.Factors),
 	}, nil
 }
@@ -119,7 +105,7 @@ func (s *Server) ListLoginPolicyMultiFactors(ctx context.Context, req *admin_pb.
 		return nil, err
 	}
 	return &admin_pb.ListLoginPolicyMultiFactorsResponse{
-		Details: object.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: object.ToListDetails(res.Count, res.Sequence, res.LastRun),
 		Result:  policy_grpc.ModelMultiFactorTypesToPb(res.Factors),
 	}, nil
 }

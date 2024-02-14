@@ -10,7 +10,7 @@ import (
 	"github.com/h2non/gock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 
@@ -247,12 +247,17 @@ func TestSession_FetchUser(t *testing.T) {
 			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes, tt.fields.options...)
 			require.NoError(t, err)
 
-			session := &Session{Session: &oauth.Session{
-				AuthURL:  tt.fields.authURL,
+			session := &Session{
+				Provider: provider,
 				Code:     tt.fields.code,
-				Tokens:   tt.fields.tokens,
-				Provider: provider.Provider,
-			}}
+
+				OAuthSession: &oauth.Session{
+					AuthURL:  tt.fields.authURL,
+					Tokens:   tt.fields.tokens,
+					Provider: provider.Provider,
+					Code:     tt.fields.code,
+				},
+			}
 
 			user, err := session.FetchUser(context.Background())
 			if tt.want.err != nil && !tt.want.err(err) {
@@ -392,10 +397,12 @@ func TestSession_RetrievePreviousID(t *testing.T) {
 
 			provider, err := New(tt.fields.name, tt.fields.clientID, tt.fields.clientSecret, tt.fields.redirectURI, tt.fields.scopes)
 			require.NoError(t, err)
-			session := &Session{Session: &oauth.Session{
-				Tokens:   tt.fields.tokens,
-				Provider: provider.Provider,
-			}}
+			session := &Session{
+				Provider: provider,
+				OAuthSession: &oauth.Session{
+					Tokens:   tt.fields.tokens,
+					Provider: provider.Provider,
+				}}
 
 			id, err := session.RetrievePreviousID()
 			if tt.res.err {

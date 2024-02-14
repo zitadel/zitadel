@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestFormatPhoneNumber(t *testing.T) {
@@ -22,7 +22,7 @@ func TestFormatPhoneNumber(t *testing.T) {
 			args: args{
 				number: "PhoneNumber",
 			},
-			errFunc: errors.IsErrorInvalidArgument,
+			errFunc: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "format phone +4171 xxx xx xx",

@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -11,9 +11,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type DebugNotificationProvider struct {
@@ -70,7 +70,7 @@ var (
 	}
 )
 
-func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType) (_ *DebugNotificationProvider, err error) {
+func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType) (provider *DebugNotificationProvider, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -87,11 +87,14 @@ func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID str
 		}).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-f9jSf", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-f9jSf", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		provider, err = scan(row)
+		return err
+	}, stmt, args...)
+	return provider, err
 }
 
 func prepareDebugNotificationProviderQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*DebugNotificationProvider, error)) {
@@ -119,10 +122,10 @@ func prepareDebugNotificationProviderQuery(ctx context.Context, db prepareDataba
 				&p.Compact,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-s9ujf", "Errors.NotificationProvider.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-s9ujf", "Errors.NotificationProvider.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-2liu0", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-2liu0", "Errors.Internal")
 			}
 			return p, nil
 		}

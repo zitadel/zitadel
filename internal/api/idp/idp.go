@@ -1,21 +1,26 @@
 package idp
 
 import (
+	"bytes"
 	"context"
+	"encoding/xml"
 	"errors"
+	"fmt"
+	"io"
 	"net/http"
 
+	"github.com/crewjam/saml"
 	"github.com/gorilla/mux"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
-	z_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/form"
 	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/apple"
 	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/idp/providers/github"
 	"github.com/zitadel/zitadel/internal/idp/providers/gitlab"
@@ -24,18 +29,27 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/idp/providers/oauth"
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
+	saml2 "github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
 	HandlerPrefix = "/idps"
-	callbackPath  = "/callback"
+
+	idpPrefix = "/{" + varIDPID + ":[0-9]+}"
+
+	callbackPath    = "/callback"
+	metadataPath    = idpPrefix + "/saml/metadata"
+	acsPath         = idpPrefix + "/saml/acs"
+	certificatePath = idpPrefix + "/saml/certificate"
 
 	paramIntentID         = "id"
 	paramToken            = "token"
 	paramUserID           = "user"
 	paramError            = "error"
 	paramErrorDescription = "error_description"
+	varIDPID              = "idpid"
 )
 
 type Handler struct {
@@ -44,6 +58,8 @@ type Handler struct {
 	parser              *form.Parser
 	encryptionAlgorithm crypto.EncryptionAlgorithm
 	callbackURL         func(ctx context.Context) string
+	samlRootURL         func(ctx context.Context, idpID string) string
+	loginSAMLRootURL    func(ctx context.Context) string
 }
 
 type externalIDPCallbackData struct {
@@ -51,12 +67,33 @@ type externalIDPCallbackData struct {
 	Code             string `schema:"code"`
 	Error            string `schema:"error"`
 	ErrorDescription string `schema:"error_description"`
+
+	// Apple returns a user on first registration
+	User string `schema:"user"`
+}
+
+type externalSAMLIDPCallbackData struct {
+	IDPID      string
+	Response   string
+	RelayState string
 }
 
 // CallbackURL generates the instance specific URL to the IDP callback handler
 func CallbackURL(externalSecure bool) func(ctx context.Context) string {
 	return func(ctx context.Context) string {
 		return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + HandlerPrefix + callbackPath
+	}
+}
+
+func SAMLRootURL(externalSecure bool) func(ctx context.Context, idpID string) string {
+	return func(ctx context.Context, idpID string) string {
+		return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + HandlerPrefix + "/" + idpID + "/"
+	}
+}
+
+func LoginSAMLRootURL(externalSecure bool) func(ctx context.Context) string {
+	return func(ctx context.Context) string {
+		return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + login.HandlerPrefix + login.EndpointSAMLACS
 	}
 }
 
@@ -73,27 +110,183 @@ func NewHandler(
 		parser:              form.NewParser(),
 		encryptionAlgorithm: encryptionAlgorithm,
 		callbackURL:         CallbackURL(externalSecure),
+		samlRootURL:         SAMLRootURL(externalSecure),
+		loginSAMLRootURL:    LoginSAMLRootURL(externalSecure),
 	}
 
 	router := mux.NewRouter()
 	router.Use(instanceInterceptor)
 	router.HandleFunc(callbackPath, h.handleCallback)
+	router.HandleFunc(metadataPath, h.handleMetadata)
+	router.HandleFunc(certificatePath, h.handleCertificate)
+	router.HandleFunc(acsPath, h.handleACS)
 	return router
 }
 
+func parseSAMLRequest(r *http.Request) *externalSAMLIDPCallbackData {
+	vars := mux.Vars(r)
+	return &externalSAMLIDPCallbackData{
+		IDPID:      vars[varIDPID],
+		Response:   r.FormValue("SAMLResponse"),
+		RelayState: r.FormValue("RelayState"),
+	}
+}
+
+func (h *Handler) getProvider(ctx context.Context, idpID string) (idp.Provider, error) {
+	return h.commands.GetProvider(ctx, idpID, h.callbackURL(ctx), h.samlRootURL(ctx, idpID))
+}
+
+func (h *Handler) handleCertificate(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	data := parseSAMLRequest(r)
+
+	provider, err := h.getProvider(ctx, data.IDPID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	samlProvider, ok := provider.(*saml2.Provider)
+	if !ok {
+		http.Error(w, zerrors.ThrowInvalidArgument(nil, "SAML-lrud8s9coi", "Errors.Intent.IDPInvalid").Error(), http.StatusBadRequest)
+		return
+	}
+
+	certPem := new(bytes.Buffer)
+	if _, err := certPem.Write(samlProvider.Certificate); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Disposition", "attachment; filename=idp.crt")
+	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
+	_, err = io.Copy(w, certPem)
+	if err != nil {
+		http.Error(w, fmt.Errorf("failed to response with certificate: %w", err).Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h *Handler) handleMetadata(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	data := parseSAMLRequest(r)
+
+	provider, err := h.getProvider(ctx, data.IDPID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	samlProvider, ok := provider.(*saml2.Provider)
+	if !ok {
+		http.Error(w, zerrors.ThrowInvalidArgument(nil, "SAML-lrud8s9coi", "Errors.Intent.IDPInvalid").Error(), http.StatusBadRequest)
+		return
+	}
+
+	sp, err := samlProvider.GetSP()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	metadata := sp.ServiceProvider.Metadata()
+
+	for i, spDesc := range metadata.SPSSODescriptors {
+		spDesc.AssertionConsumerServices = append(
+			spDesc.AssertionConsumerServices,
+			saml.IndexedEndpoint{
+				Binding:  saml.HTTPPostBinding,
+				Location: h.loginSAMLRootURL(ctx),
+				Index:    len(spDesc.AssertionConsumerServices) + 1,
+			}, saml.IndexedEndpoint{
+				Binding:  saml.HTTPArtifactBinding,
+				Location: h.loginSAMLRootURL(ctx),
+				Index:    len(spDesc.AssertionConsumerServices) + 2,
+			},
+		)
+		metadata.SPSSODescriptors[i] = spDesc
+	}
+
+	buf, _ := xml.MarshalIndent(metadata, "", "  ")
+	w.Header().Set("Content-Type", "application/samlmetadata+xml")
+	_, err = w.Write(buf)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+}
+
+func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	data := parseSAMLRequest(r)
+
+	provider, err := h.getProvider(ctx, data.IDPID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	samlProvider, ok := provider.(*saml2.Provider)
+	if !ok {
+		err := zerrors.ThrowInvalidArgument(nil, "SAML-ui9wyux0hp", "Errors.Intent.IDPInvalid")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	sp, err := samlProvider.GetSP()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	intent, err := h.commands.GetActiveIntent(ctx, data.RelayState)
+	if err != nil {
+		if zerrors.IsNotFound(err) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		redirectToFailureURLErr(w, r, intent, err)
+		return
+	}
+
+	session := saml2.Session{
+		ServiceProvider: sp,
+		RequestID:       intent.RequestID,
+		Request:         r,
+	}
+
+	idpUser, err := session.FetchUser(r.Context())
+	if err != nil {
+		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
+		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
+		redirectToFailureURLErr(w, r, intent, err)
+		return
+	}
+
+	userID, err := h.checkExternalUser(ctx, intent.IDPID, idpUser.GetID())
+	logging.WithFields("intent", intent.AggregateID).OnError(err).Error("could not check if idp user already exists")
+
+	token, err := h.commands.SucceedSAMLIDPIntent(ctx, intent, idpUser, userID, session.Assertion)
+	if err != nil {
+		redirectToFailureURLErr(w, r, intent, zerrors.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
+		return
+	}
+	redirectToSuccessURL(w, r, intent, token, userID)
+}
+
 func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	data, err := h.parseCallbackRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	intent := h.getActiveIntent(w, r, data.State)
-	if intent == nil {
-		// if we didn't get an active intent the error was already handled (either redirected or display directly)
+	intent, err := h.commands.GetActiveIntent(ctx, data.State)
+	if err != nil {
+		if zerrors.IsNotFound(err) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		redirectToFailureURLErr(w, r, intent, err)
 		return
 	}
 
-	ctx := r.Context()
 	// the provider might have returned an error
 	if data.Error != "" {
 		cmdErr := h.commands.FailIDPIntent(ctx, intent, reason(data.Error, data.ErrorDescription))
@@ -102,7 +295,7 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	provider, err := h.commands.GetProvider(ctx, intent.IDPID, h.callbackURL(ctx))
+	provider, err := h.getProvider(ctx, intent.IDPID)
 	if err != nil {
 		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
 		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
@@ -110,7 +303,7 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idpUser, idpSession, err := h.fetchIDPUser(ctx, provider, data.Code)
+	idpUser, idpSession, err := h.fetchIDPUserFromCode(ctx, provider, data.Code, data.User)
 	if err != nil {
 		cmdErr := h.commands.FailIDPIntent(ctx, intent, err.Error())
 		logging.WithFields("intent", intent.AggregateID).OnError(cmdErr).Error("failed to push failed event on idp intent")
@@ -127,7 +320,7 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 
 	token, err := h.commands.SucceedIDPIntent(ctx, intent, idpUser, idpSession, userID)
 	if err != nil {
-		redirectToFailureURLErr(w, r, intent, z_errs.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
+		redirectToFailureURLErr(w, r, intent, zerrors.ThrowInternal(err, "IDP-JdD3g", "Errors.Intent.TokenCreationFailed"))
 		return
 	}
 	redirectToSuccessURL(w, r, intent, token, userID)
@@ -156,26 +349,9 @@ func (h *Handler) parseCallbackRequest(r *http.Request) (*externalIDPCallbackDat
 		return nil, err
 	}
 	if data.State == "" {
-		return nil, z_errs.ThrowInvalidArgument(nil, "IDP-Hk38e", "Errors.Intent.StateMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "IDP-Hk38e", "Errors.Intent.StateMissing")
 	}
 	return data, nil
-}
-
-func (h *Handler) getActiveIntent(w http.ResponseWriter, r *http.Request, state string) *command.IDPIntentWriteModel {
-	intent, err := h.commands.GetIntentWriteModel(r.Context(), state, "")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return nil
-	}
-	if intent.State == domain.IDPIntentStateUnspecified {
-		http.Error(w, reason("IDP-Hk38e", "Errors.Intent.NotStarted"), http.StatusBadRequest)
-		return nil
-	}
-	if intent.State != domain.IDPIntentStateStarted {
-		redirectToFailureURL(w, r, intent, "IDP-Sfrgs", "Errors.Intent.NotStarted")
-		return nil
-	}
-	return intent
 }
 
 func redirectToSuccessURL(w http.ResponseWriter, r *http.Request, intent *command.IDPIntentWriteModel, token, userID string) {
@@ -192,7 +368,7 @@ func redirectToSuccessURL(w http.ResponseWriter, r *http.Request, intent *comman
 func redirectToFailureURLErr(w http.ResponseWriter, r *http.Request, i *command.IDPIntentWriteModel, err error) {
 	msg := err.Error()
 	var description string
-	zErr := new(z_errs.CaosError)
+	zErr := new(zerrors.ZitadelError)
 	if errors.As(err, &zErr) {
 		msg = zErr.GetID()
 		description = zErr.GetMessage() // TODO: i18n?
@@ -209,7 +385,7 @@ func redirectToFailureURL(w http.ResponseWriter, r *http.Request, i *command.IDP
 	http.Redirect(w, r, i.FailureURL.String(), http.StatusFound)
 }
 
-func (h *Handler) fetchIDPUser(ctx context.Context, identityProvider idp.Provider, code string) (user idp.User, idpTokens idp.Session, err error) {
+func (h *Handler) fetchIDPUserFromCode(ctx context.Context, identityProvider idp.Provider, code string, appleUser string) (user idp.User, idpTokens idp.Session, err error) {
 	var session idp.Session
 	switch provider := identityProvider.(type) {
 	case *oauth.Provider:
@@ -217,17 +393,19 @@ func (h *Handler) fetchIDPUser(ctx context.Context, identityProvider idp.Provide
 	case *openid.Provider:
 		session = &openid.Session{Provider: provider, Code: code}
 	case *azuread.Provider:
-		session = &azuread.Session{Session: &oauth.Session{Provider: provider.Provider, Code: code}}
+		session = &azuread.Session{Provider: provider, Code: code}
 	case *github.Provider:
 		session = &oauth.Session{Provider: provider.Provider, Code: code}
 	case *gitlab.Provider:
 		session = &openid.Session{Provider: provider.Provider, Code: code}
 	case *google.Provider:
 		session = &openid.Session{Provider: provider.Provider, Code: code}
-	case *jwt.Provider, *ldap.Provider:
-		return nil, nil, z_errs.ThrowInvalidArgument(nil, "IDP-52jmn", "Errors.ExternalIDP.IDPTypeNotImplemented")
+	case *apple.Provider:
+		session = &apple.Session{Session: &openid.Session{Provider: provider.Provider, Code: code}, UserFormValue: appleUser}
+	case *jwt.Provider, *ldap.Provider, *saml2.Provider:
+		return nil, nil, zerrors.ThrowInvalidArgument(nil, "IDP-52jmn", "Errors.ExternalIDP.IDPTypeNotImplemented")
 	default:
-		return nil, nil, z_errs.ThrowUnimplemented(nil, "IDP-SSDg", "Errors.ExternalIDP.IDPTypeNotImplemented")
+		return nil, nil, zerrors.ThrowUnimplemented(nil, "IDP-SSDg", "Errors.ExternalIDP.IDPTypeNotImplemented")
 	}
 
 	user, err = session.FetchUser(ctx)

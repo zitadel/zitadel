@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/org"
 	user_grpc "github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
@@ -19,7 +18,7 @@ import (
 )
 
 func (s *Server) GetMyUser(ctx context.Context, _ *auth_pb.GetMyUserRequest) (*auth_pb.GetMyUserResponse, error) {
-	user, err := s.query.GetUserByID(ctx, true, authz.GetCtxData(ctx).UserID, false)
+	user, err := s.query.GetUserByID(ctx, true, authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +32,7 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 		return nil, err
 	}
 	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID}}
-	grants, err := s.query.UserGrants(ctx, queries, true, false)
+	grants, err := s.query.UserGrants(ctx, queries, true)
 	if err != nil {
 		return nil, err
 	}
@@ -73,9 +72,10 @@ func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserC
 		AllowTimeTravel().
 		Limit(limit).
 		OrderDesc().
+		AwaitOpenTransactions().
 		ResourceOwner(authz.GetCtxData(ctx).ResourceOwner).
-		AddQuery().
 		SequenceGreater(sequence).
+		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(authz.GetCtxData(ctx).UserID).
 		Builder()
@@ -83,7 +83,7 @@ func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserC
 		query.OrderAsc()
 	}
 
-	changes, err := s.query.SearchEvents(ctx, query, s.auditLogRetention)
+	changes, err := s.query.SearchEvents(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadata
 	}
 	return &auth_pb.ListMyMetadataResponse{
 		Result:  metadata.UserMetadataListToPb(res.Metadata),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastRun),
 	}, nil
 }
 
@@ -152,13 +152,13 @@ func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGr
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.UserGrants(ctx, queries, false, false)
+	res, err := s.query.UserGrants(ctx, queries, false)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.ListMyUserGrantsResponse{
 		Result:  UserGrantsToPb(res.UserGrants),
-		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		Details: obj_grpc.ToListDetails(res.Count, res.Sequence, res.LastRun),
 	}, nil
 }
 
@@ -181,7 +181,7 @@ func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProje
 			return nil, err
 		}
 
-		grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantProjectID, userGrantUserID}}, false, false)
+		grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantProjectID, userGrantUserID}}, false)
 		if err != nil {
 			return nil, err
 		}
@@ -225,7 +225,7 @@ func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProje
 		return nil, err
 	}
 	return &auth_pb.ListMyProjectOrgsResponse{
-		Details: obj_grpc.ToListDetails(orgs.Count, orgs.Sequence, orgs.Timestamp),
+		Details: obj_grpc.ToListDetails(orgs.Count, orgs.Sequence, orgs.LastRun),
 		Result:  org.OrgsToPb(orgs.Orgs),
 	}, nil
 }
@@ -272,41 +272,6 @@ func ListMyProjectOrgsRequestToQuery(req *auth_pb.ListMyProjectOrgsRequest) (*qu
 		},
 		Queries: queries,
 	}, nil
-}
-
-func membershipToDomain(memberships []*query.Membership) []*domain.UserMembership {
-	result := make([]*domain.UserMembership, len(memberships))
-	for i, membership := range memberships {
-		typ, displayName, aggID, objID := MemberTypeToDomain(membership)
-		result[i] = &domain.UserMembership{
-			UserID:        membership.UserID,
-			MemberType:    typ,
-			AggregateID:   aggID,
-			ObjectID:      objID,
-			Roles:         membership.Roles,
-			DisplayName:   displayName,
-			CreationDate:  membership.CreationDate,
-			ChangeDate:    membership.ChangeDate,
-			ResourceOwner: membership.ResourceOwner,
-			//TODO: implement
-			// ResourceOwnerName: membership.ResourceOwnerName,
-			Sequence: membership.Sequence,
-		}
-	}
-	return result
-}
-
-func MemberTypeToDomain(m *query.Membership) (_ domain.MemberType, displayName, aggID, objID string) {
-	if m.Org != nil {
-		return domain.MemberTypeOrganisation, m.Org.Name, m.Org.OrgID, ""
-	} else if m.IAM != nil {
-		return domain.MemberTypeIam, m.IAM.Name, m.IAM.IAMID, ""
-	} else if m.Project != nil {
-		return domain.MemberTypeProject, m.Project.Name, m.Project.ProjectID, ""
-	} else if m.ProjectGrant != nil {
-		return domain.MemberTypeProjectGrant, m.ProjectGrant.ProjectName, m.ProjectGrant.ProjectID, m.ProjectGrant.GrantID
-	}
-	return domain.MemberTypeUnspecified, "", "", ""
 }
 
 func cascadingMemberships(memberships []*query.Membership) []*command.CascadingMembership {

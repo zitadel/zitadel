@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	"io"
 
 	"golang.org/x/text/language"
@@ -13,9 +14,12 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
-	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	"github.com/zitadel/zitadel/internal/idp"
+	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
+	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest) (_ *user.AddHumanUserResponse, err error) {
@@ -24,8 +28,7 @@ func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest
 		return nil, err
 	}
 	orgID := authz.GetCtxData(ctx).OrgID
-	err = s.command.AddHuman(ctx, orgID, human, false)
-	if err != nil {
+	if err = s.command.AddUserHuman(ctx, orgID, human, false, s.userCodeAlg); err != nil {
 		return nil, err
 	}
 	return &user.AddHumanUserResponse{
@@ -68,8 +71,8 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 	return &command.AddHuman{
 		ID:          req.GetUserId(),
 		Username:    username,
-		FirstName:   req.GetProfile().GetFirstName(),
-		LastName:    req.GetProfile().GetLastName(),
+		FirstName:   req.GetProfile().GetGivenName(),
+		LastName:    req.GetProfile().GetFamilyName(),
 		NickName:    req.GetProfile().GetNickName(),
 		DisplayName: req.GetProfile().GetDisplayName(),
 		Email: command.Email{
@@ -110,12 +113,178 @@ func genderToDomain(gender user.Gender) domain.Gender {
 	}
 }
 
+func (s *Server) UpdateHumanUser(ctx context.Context, req *user.UpdateHumanUserRequest) (_ *user.UpdateHumanUserResponse, err error) {
+	human, err := UpdateUserRequestToChangeHuman(req)
+	if err != nil {
+		return nil, err
+	}
+	err = s.command.ChangeUserHuman(ctx, human, s.userCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	return &user.UpdateHumanUserResponse{
+		Details:   object.DomainToDetailsPb(human.Details),
+		EmailCode: human.EmailCode,
+		PhoneCode: human.PhoneCode,
+	}, nil
+}
+
+func (s *Server) LockUser(ctx context.Context, req *user.LockUserRequest) (_ *user.LockUserResponse, err error) {
+	details, err := s.command.LockUserV2(ctx, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &user.LockUserResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UnlockUser(ctx context.Context, req *user.UnlockUserRequest) (_ *user.UnlockUserResponse, err error) {
+	details, err := s.command.UnlockUserV2(ctx, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &user.UnlockUserResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) DeactivateUser(ctx context.Context, req *user.DeactivateUserRequest) (_ *user.DeactivateUserResponse, err error) {
+	details, err := s.command.DeactivateUserV2(ctx, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &user.DeactivateUserResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) ReactivateUser(ctx context.Context, req *user.ReactivateUserRequest) (_ *user.ReactivateUserResponse, err error) {
+	details, err := s.command.ReactivateUserV2(ctx, req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return &user.ReactivateUserResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
+
+func ifNotNilPtr[v, p any](value *v, conv func(v) p) *p {
+	var pNil *p
+	if value == nil {
+		return pNil
+	}
+	pVal := conv(*value)
+	return &pVal
+}
+
+func UpdateUserRequestToChangeHuman(req *user.UpdateHumanUserRequest) (*command.ChangeHuman, error) {
+	email, err := SetHumanEmailToEmail(req.Email, req.GetUserId())
+	if err != nil {
+		return nil, err
+	}
+	return &command.ChangeHuman{
+		ID:       req.GetUserId(),
+		Username: req.Username,
+		Profile:  SetHumanProfileToProfile(req.Profile),
+		Email:    email,
+		Phone:    SetHumanPhoneToPhone(req.Phone),
+		Password: SetHumanPasswordToPassword(req.Password),
+	}, nil
+}
+
+func SetHumanProfileToProfile(profile *user.SetHumanProfile) *command.Profile {
+	if profile == nil {
+		return nil
+	}
+	var firstName *string
+	if profile.GivenName != "" {
+		firstName = &profile.GivenName
+	}
+	var lastName *string
+	if profile.FamilyName != "" {
+		lastName = &profile.FamilyName
+	}
+	return &command.Profile{
+		FirstName:         firstName,
+		LastName:          lastName,
+		NickName:          profile.NickName,
+		DisplayName:       profile.DisplayName,
+		PreferredLanguage: ifNotNilPtr(profile.PreferredLanguage, language.Make),
+		Gender:            ifNotNilPtr(profile.Gender, genderToDomain),
+	}
+}
+
+func SetHumanEmailToEmail(email *user.SetHumanEmail, userID string) (*command.Email, error) {
+	if email == nil {
+		return nil, nil
+	}
+	var urlTemplate string
+	if email.GetSendCode() != nil && email.GetSendCode().UrlTemplate != nil {
+		urlTemplate = *email.GetSendCode().UrlTemplate
+		if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, userID, "code", "orgID"); err != nil {
+			return nil, err
+		}
+	}
+	return &command.Email{
+		Address:     domain.EmailAddress(email.Email),
+		Verified:    email.GetIsVerified(),
+		ReturnCode:  email.GetReturnCode() != nil,
+		URLTemplate: urlTemplate,
+	}, nil
+}
+
+func SetHumanPhoneToPhone(phone *user.SetHumanPhone) *command.Phone {
+	if phone == nil {
+		return nil
+	}
+	return &command.Phone{
+		Number:     domain.PhoneNumber(phone.GetPhone()),
+		Verified:   phone.GetIsVerified(),
+		ReturnCode: phone.GetReturnCode() != nil,
+	}
+}
+
+func SetHumanPasswordToPassword(password *user.SetPassword) *command.Password {
+	if password == nil {
+		return nil
+	}
+	var changeRequired bool
+	var passwordStr *string
+	if password.GetPassword() != nil {
+		passwordStr = &password.GetPassword().Password
+		changeRequired = password.GetPassword().GetChangeRequired()
+	}
+	var hash *string
+	if password.GetHashedPassword() != nil {
+		hash = &password.GetHashedPassword().Hash
+		changeRequired = password.GetHashedPassword().GetChangeRequired()
+	}
+	var code *string
+	if password.GetVerificationCode() != "" {
+		codeT := password.GetVerificationCode()
+		code = &codeT
+	}
+	var oldPassword *string
+	if password.GetCurrentPassword() != "" {
+		oldPasswordT := password.GetCurrentPassword()
+		oldPassword = &oldPasswordT
+	}
+	return &command.Password{
+		PasswordCode:        code,
+		OldPassword:         oldPassword,
+		Password:            passwordStr,
+		EncodedPasswordHash: hash,
+		ChangeRequired:      changeRequired,
+	}
+}
+
 func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_ *user.AddIDPLinkResponse, err error) {
 	orgID := authz.GetCtxData(ctx).OrgID
-	details, err := s.command.AddUserIDPLink(ctx, req.UserId, orgID, &domain.UserIDPLink{
-		IDPConfigID:    req.GetIdpLink().GetIdpId(),
-		ExternalUserID: req.GetIdpLink().GetUserId(),
-		DisplayName:    req.GetIdpLink().GetUserName(),
+	details, err := s.command.AddUserIDPLink(ctx, req.UserId, orgID, &command.AddLink{
+		IDPID:         req.GetIdpLink().GetIdpId(),
+		DisplayName:   req.GetIdpLink().GetUserName(),
+		IDPExternalID: req.GetIdpLink().GetUserId(),
 	})
 	if err != nil {
 		return nil, err
@@ -125,72 +294,316 @@ func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_
 	}, nil
 }
 
-func (s *Server) StartIdentityProviderFlow(ctx context.Context, req *user.StartIdentityProviderFlowRequest) (_ *user.StartIdentityProviderFlowResponse, err error) {
-	id, details, err := s.command.CreateIntent(ctx, req.GetIdpId(), req.GetSuccessUrl(), req.GetFailureUrl(), authz.GetCtxData(ctx).OrgID)
+func (s *Server) DeleteUser(ctx context.Context, req *user.DeleteUserRequest) (_ *user.DeleteUserResponse, err error) {
+	memberships, grants, err := s.removeUserDependencies(ctx, req.GetUserId())
 	if err != nil {
 		return nil, err
 	}
-	authURL, err := s.command.AuthURLFromProvider(ctx, req.GetIdpId(), id, s.idpCallback(ctx))
+	details, err := s.command.RemoveUserV2(ctx, req.UserId, memberships, grants...)
 	if err != nil {
 		return nil, err
 	}
-	return &user.StartIdentityProviderFlowResponse{
-		Details:  object.DomainToDetailsPb(details),
-		NextStep: &user.StartIdentityProviderFlowResponse_AuthUrl{AuthUrl: authURL},
+	return &user.DeleteUserResponse{
+		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
-func (s *Server) RetrieveIdentityProviderInformation(ctx context.Context, req *user.RetrieveIdentityProviderInformationRequest) (_ *user.RetrieveIdentityProviderInformationResponse, err error) {
-	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIntentId(), authz.GetCtxData(ctx).OrgID)
+func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*command.CascadingMembership, []string, error) {
+	userGrantUserQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
+	if err != nil {
+		return nil, nil, err
+	}
+	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
+		Queries: []query.SearchQuery{userGrantUserQuery},
+	}, true)
+	if err != nil {
+		return nil, nil, err
+	}
+	membershipsUserQuery, err := query.NewMembershipUserIDQuery(userID)
+	if err != nil {
+		return nil, nil, err
+	}
+	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
+		Queries: []query.SearchQuery{membershipsUserQuery},
+	}, false)
+	if err != nil {
+		return nil, nil, err
+	}
+	return cascadingMemberships(memberships.Memberships), userGrantsToIDs(grants.UserGrants), nil
+}
+
+func cascadingMemberships(memberships []*query.Membership) []*command.CascadingMembership {
+	cascades := make([]*command.CascadingMembership, len(memberships))
+	for i, membership := range memberships {
+		cascades[i] = &command.CascadingMembership{
+			UserID:        membership.UserID,
+			ResourceOwner: membership.ResourceOwner,
+			IAM:           cascadingIAMMembership(membership.IAM),
+			Org:           cascadingOrgMembership(membership.Org),
+			Project:       cascadingProjectMembership(membership.Project),
+			ProjectGrant:  cascadingProjectGrantMembership(membership.ProjectGrant),
+		}
+	}
+	return cascades
+}
+
+func cascadingIAMMembership(membership *query.IAMMembership) *command.CascadingIAMMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingIAMMembership{IAMID: membership.IAMID}
+}
+func cascadingOrgMembership(membership *query.OrgMembership) *command.CascadingOrgMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingOrgMembership{OrgID: membership.OrgID}
+}
+func cascadingProjectMembership(membership *query.ProjectMembership) *command.CascadingProjectMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingProjectMembership{ProjectID: membership.ProjectID}
+}
+func cascadingProjectGrantMembership(membership *query.ProjectGrantMembership) *command.CascadingProjectGrantMembership {
+	if membership == nil {
+		return nil
+	}
+	return &command.CascadingProjectGrantMembership{ProjectID: membership.ProjectID, GrantID: membership.GrantID}
+}
+
+func userGrantsToIDs(userGrants []*query.UserGrant) []string {
+	converted := make([]string, len(userGrants))
+	for i, grant := range userGrants {
+		converted[i] = grant.ID
+	}
+	return converted
+}
+
+func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *user.StartIdentityProviderIntentRequest) (_ *user.StartIdentityProviderIntentResponse, err error) {
+	switch t := req.GetContent().(type) {
+	case *user.StartIdentityProviderIntentRequest_Urls:
+		return s.startIDPIntent(ctx, req.GetIdpId(), t.Urls)
+	case *user.StartIdentityProviderIntentRequest_Ldap:
+		return s.startLDAPIntent(ctx, req.GetIdpId(), t.Ldap)
+	default:
+		return nil, zerrors.ThrowUnimplementedf(nil, "USERv2-S2g21", "type oneOf %T in method StartIdentityProviderIntent not implemented", t)
+	}
+}
+
+func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*user.StartIdentityProviderIntentResponse, error) {
+	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	if err := s.checkIntentToken(req.GetToken(), intent.AggregateID); err != nil {
+	content, redirect, err := s.command.AuthFromProvider(ctx, idpID, intentWriteModel.AggregateID, s.idpCallback(ctx), s.samlRootURL(ctx, idpID))
+	if err != nil {
+		return nil, err
+	}
+	if redirect {
+		return &user.StartIdentityProviderIntentResponse{
+			Details:  object.DomainToDetailsPb(details),
+			NextStep: &user.StartIdentityProviderIntentResponse_AuthUrl{AuthUrl: content},
+		}, nil
+	} else {
+		return &user.StartIdentityProviderIntentResponse{
+			Details: object.DomainToDetailsPb(details),
+			NextStep: &user.StartIdentityProviderIntentResponse_PostForm{
+				PostForm: []byte(content),
+			},
+		}, nil
+	}
+}
+
+func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderIntentResponse, error) {
+	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, "", "", authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	externalUser, userID, attributes, err := s.ldapLogin(ctx, intentWriteModel.IDPID, ldapCredentials.GetUsername(), ldapCredentials.GetPassword())
+	if err != nil {
+		if err := s.command.FailIDPIntent(ctx, intentWriteModel, err.Error()); err != nil {
+			return nil, err
+		}
+		return nil, err
+	}
+	token, err := s.command.SucceedLDAPIDPIntent(ctx, intentWriteModel, externalUser, userID, attributes)
+	if err != nil {
+		return nil, err
+	}
+	return &user.StartIdentityProviderIntentResponse{
+		Details: object.DomainToDetailsPb(details),
+		NextStep: &user.StartIdentityProviderIntentResponse_IdpIntent{
+			IdpIntent: &user.IDPIntent{
+				IdpIntentId:    intentWriteModel.AggregateID,
+				IdpIntentToken: token,
+				UserId:         userID,
+			},
+		},
+	}, nil
+}
+
+func (s *Server) checkLinkedExternalUser(ctx context.Context, idpID, externalUserID string) (string, error) {
+	idQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(idpID)
+	if err != nil {
+		return "", err
+	}
+	externalIDQuery, err := query.NewIDPUserLinksExternalIDSearchQuery(externalUserID)
+	if err != nil {
+		return "", err
+	}
+	queries := []query.SearchQuery{
+		idQuery, externalIDQuery,
+	}
+	links, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
+	if err != nil {
+		return "", err
+	}
+	if len(links.Links) == 1 {
+		return links.Links[0].UserID, nil
+	}
+	return "", nil
+}
+
+func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string) (idp.User, string, map[string][]string, error) {
+	provider, err := s.command.GetProvider(ctx, idpID, "", "")
+	if err != nil {
+		return nil, "", nil, err
+	}
+	ldapProvider, ok := provider.(*ldap.Provider)
+	if !ok {
+		return nil, "", nil, zerrors.ThrowInvalidArgument(nil, "IDP-9a02j2n2bh", "Errors.ExternalIDP.IDPTypeNotImplemented")
+	}
+	session := ldapProvider.GetSession(username, password)
+	externalUser, err := session.FetchUser(ctx)
+	if errors.Is(err, ldap.ErrFailedLogin) || errors.Is(err, ldap.ErrNoSingleUser) {
+		return nil, "", nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-nzun2i", "Errors.User.ExternalIDP.LoginFailed")
+	}
+	if err != nil {
+		return nil, "", nil, err
+	}
+	userID, err := s.checkLinkedExternalUser(ctx, idpID, externalUser.GetID())
+	if err != nil {
+		return nil, "", nil, err
+	}
+
+	attributes := make(map[string][]string, 0)
+	for _, item := range session.Entry.Attributes {
+		attributes[item.Name] = item.Values
+	}
+	return externalUser, userID, attributes, nil
+}
+
+func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.RetrieveIdentityProviderIntentRequest) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
+	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIdpIntentId(), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.checkIntentToken(req.GetIdpIntentToken(), intent.AggregateID); err != nil {
 		return nil, err
 	}
 	if intent.State != domain.IDPIntentStateSucceeded {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDP-Hk38e", "Errors.Intent.NotSucceeded")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-Hk38e", "Errors.Intent.NotSucceeded")
 	}
-	return intentToIDPInformationPb(intent, s.idpAlg)
+	return idpIntentToIDPIntentPb(intent, s.idpAlg)
 }
 
-func intentToIDPInformationPb(intent *command.IDPIntentWriteModel, alg crypto.EncryptionAlgorithm) (_ *user.RetrieveIdentityProviderInformationResponse, err error) {
-	var idToken *string
-	if intent.IDPIDToken != "" {
-		idToken = &intent.IDPIDToken
-	}
-	var accessToken string
-	if intent.IDPAccessToken != nil {
-		accessToken, err = crypto.DecryptString(intent.IDPAccessToken, alg)
-		if err != nil {
-			return nil, err
-		}
-	}
+func idpIntentToIDPIntentPb(intent *command.IDPIntentWriteModel, alg crypto.EncryptionAlgorithm) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
 	rawInformation := new(structpb.Struct)
 	err = rawInformation.UnmarshalJSON(intent.IDPUser)
 	if err != nil {
 		return nil, err
 	}
-
-	return &user.RetrieveIdentityProviderInformationResponse{
-		Details: &object_pb.Details{
-			Sequence:      intent.ProcessedSequence,
-			ChangeDate:    timestamppb.New(intent.ChangeDate),
-			ResourceOwner: intent.ResourceOwner,
-		},
+	information := &user.RetrieveIdentityProviderIntentResponse{
+		Details: intentToDetailsPb(intent),
 		IdpInformation: &user.IDPInformation{
-			Access: &user.IDPInformation_Oauth{
-				Oauth: &user.IDPOAuthAccessInformation{
-					AccessToken: accessToken,
-					IdToken:     idToken,
-				},
-			},
 			IdpId:          intent.IDPID,
 			UserId:         intent.IDPUserID,
 			UserName:       intent.IDPUserName,
 			RawInformation: rawInformation,
 		},
+		UserId: intent.UserID,
+	}
+	if intent.IDPIDToken != "" || intent.IDPAccessToken != nil {
+		information.IdpInformation.Access, err = idpOAuthTokensToPb(intent.IDPIDToken, intent.IDPAccessToken, alg)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if intent.IDPEntryAttributes != nil {
+		access, err := IDPEntryAttributesToPb(intent.IDPEntryAttributes)
+		if err != nil {
+			return nil, err
+		}
+		information.IdpInformation.Access = access
+	}
+
+	if intent.Assertion != nil {
+		assertion, err := crypto.Decrypt(intent.Assertion, alg)
+		if err != nil {
+			return nil, err
+		}
+		information.IdpInformation.Access = IDPSAMLResponseToPb(assertion)
+	}
+
+	return information, nil
+}
+
+func idpOAuthTokensToPb(idpIDToken string, idpAccessToken *crypto.CryptoValue, alg crypto.EncryptionAlgorithm) (_ *user.IDPInformation_Oauth, err error) {
+	var idToken *string
+	if idpIDToken != "" {
+		idToken = &idpIDToken
+	}
+	var accessToken string
+	if idpAccessToken != nil {
+		accessToken, err = crypto.DecryptString(idpAccessToken, alg)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &user.IDPInformation_Oauth{
+		Oauth: &user.IDPOAuthAccessInformation{
+			AccessToken: accessToken,
+			IdToken:     idToken,
+		},
 	}, nil
+}
+
+func intentToDetailsPb(intent *command.IDPIntentWriteModel) *object_pb.Details {
+	return &object_pb.Details{
+		Sequence:      intent.ProcessedSequence,
+		ChangeDate:    timestamppb.New(intent.ChangeDate),
+		ResourceOwner: intent.ResourceOwner,
+	}
+}
+
+func IDPEntryAttributesToPb(entryAttributes map[string][]string) (*user.IDPInformation_Ldap, error) {
+	values := make(map[string]interface{}, 0)
+	for k, v := range entryAttributes {
+		intValues := make([]interface{}, len(v))
+		for i, value := range v {
+			intValues[i] = value
+		}
+		values[k] = intValues
+	}
+	attributes, err := structpb.NewStruct(values)
+	if err != nil {
+		return nil, err
+	}
+	return &user.IDPInformation_Ldap{
+		Ldap: &user.IDPLDAPAccessInformation{
+			Attributes: attributes,
+		},
+	}, nil
+}
+
+func IDPSAMLResponseToPb(assertion []byte) *user.IDPInformation_Saml {
+	return &user.IDPInformation_Saml{
+		Saml: &user.IDPSAMLAccessInformation{
+			Assertion: assertion,
+		},
+	}
 }
 
 func (s *Server) checkIntentToken(token string, intentID string) error {
@@ -198,7 +611,7 @@ func (s *Server) checkIntentToken(token string, intentID string) error {
 }
 
 func (s *Server) ListAuthenticationMethodTypes(ctx context.Context, req *user.ListAuthenticationMethodTypesRequest) (*user.ListAuthenticationMethodTypesResponse, error) {
-	authMethods, err := s.query.ListActiveUserAuthMethodTypes(ctx, req.GetUserId(), false)
+	authMethods, err := s.query.ListActiveUserAuthMethodTypes(ctx, req.GetUserId())
 	if err != nil {
 		return nil, err
 	}

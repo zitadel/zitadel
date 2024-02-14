@@ -7,14 +7,13 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_AddAction(t *testing.T) {
@@ -51,7 +50,7 @@ func TestCommands_AddAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -59,19 +58,14 @@ func TestCommands_AddAction(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectPushFailed(
-						errors.ThrowPreconditionFailed(nil, "id", "name already exists"),
-						[]*repository.Event{
-							eventFromEventPusher(
-								action.NewAddedEvent(context.Background(),
-									&action.NewAggregate("id1", "org1").Aggregate,
-									"name",
-									"name() {};",
-									0,
-									false,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(action.NewAddActionNameUniqueConstraint("name", "org1")),
+						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
+						action.NewAddedEvent(context.Background(),
+							&action.NewAggregate("id1", "org1").Aggregate,
+							"name",
+							"name() {};",
+							0,
+							false,
+						),
 					),
 				),
 				idGenerator: mock.ExpectID(t, "id1"),
@@ -85,7 +79,7 @@ func TestCommands_AddAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -93,18 +87,13 @@ func TestCommands_AddAction(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								action.NewAddedEvent(context.Background(),
-									&action.NewAggregate("id2", "org1").Aggregate,
-									"name2",
-									"name2() {};",
-									0,
-									false,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(action.NewAddActionNameUniqueConstraint("name2", "org1")),
+						action.NewAddedEvent(context.Background(),
+							&action.NewAggregate("id2", "org1").Aggregate,
+							"name2",
+							"name2() {};",
+							0,
+							false,
+						),
 					),
 				),
 				idGenerator: mock.ExpectID(t, "id2"),
@@ -179,7 +168,7 @@ func TestCommands_ChangeAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -201,7 +190,7 @@ func TestCommands_ChangeAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -233,7 +222,7 @@ func TestCommands_ChangeAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -252,23 +241,17 @@ func TestCommands_ChangeAction(t *testing.T) {
 						),
 					),
 					expectPushFailed(
-						errors.ThrowPreconditionFailed(nil, "id", "name already exists"),
-						[]*repository.Event{
-							eventFromEventPusher(
-								func() *action.ChangedEvent {
-									event, _ := action.NewChangedEvent(context.Background(),
-										&action.NewAggregate("id1", "org1").Aggregate,
-										[]action.ActionChanges{
-											action.ChangeName("name2", "name"),
-											action.ChangeScript("name2() {};"),
-										},
-									)
-									return event
-								}(),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(action.NewRemoveActionNameUniqueConstraint("name", "org1")),
-						uniqueConstraintsFromEventConstraint(action.NewAddActionNameUniqueConstraint("name2", "org1")),
+						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
+						func() *action.ChangedEvent {
+							event, _ := action.NewChangedEvent(context.Background(),
+								&action.NewAggregate("id1", "org1").Aggregate,
+								[]action.ActionChanges{
+									action.ChangeName("name2", "name"),
+									action.ChangeScript("name2() {};"),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 			},
@@ -284,7 +267,7 @@ func TestCommands_ChangeAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -303,22 +286,16 @@ func TestCommands_ChangeAction(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								func() *action.ChangedEvent {
-									event, _ := action.NewChangedEvent(context.Background(),
-										&action.NewAggregate("id1", "org1").Aggregate,
-										[]action.ActionChanges{
-											action.ChangeName("name2", "name"),
-											action.ChangeScript("name2() {};"),
-										},
-									)
-									return event
-								}(),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(action.NewRemoveActionNameUniqueConstraint("name", "org1")),
-						uniqueConstraintsFromEventConstraint(action.NewAddActionNameUniqueConstraint("name2", "org1")),
+						func() *action.ChangedEvent {
+							event, _ := action.NewChangedEvent(context.Background(),
+								&action.NewAggregate("id1", "org1").Aggregate,
+								[]action.ActionChanges{
+									action.ChangeName("name2", "name"),
+									action.ChangeScript("name2() {};"),
+								},
+							)
+							return event
+						}(),
 					),
 				),
 			},
@@ -389,7 +366,7 @@ func TestCommands_DeactivateAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -405,7 +382,7 @@ func TestCommands_DeactivateAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -436,7 +413,7 @@ func TestCommands_DeactivateAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -455,13 +432,9 @@ func TestCommands_DeactivateAction(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								action.NewDeactivatedEvent(context.Background(),
-									&action.NewAggregate("id1", "org1").Aggregate,
-								),
-							),
-						},
+						action.NewDeactivatedEvent(context.Background(),
+							&action.NewAggregate("id1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -526,7 +499,7 @@ func TestCommands_ReactivateAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -542,7 +515,7 @@ func TestCommands_ReactivateAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -568,7 +541,7 @@ func TestCommands_ReactivateAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -592,13 +565,9 @@ func TestCommands_ReactivateAction(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								action.NewReactivatedEvent(context.Background(),
-									&action.NewAggregate("id1", "org1").Aggregate,
-								),
-							),
-						},
+						action.NewReactivatedEvent(context.Background(),
+							&action.NewAggregate("id1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -664,7 +633,7 @@ func TestCommands_DeleteAction(t *testing.T) {
 				resourceOwner: "",
 			},
 			res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -680,7 +649,7 @@ func TestCommands_DeleteAction(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -699,15 +668,10 @@ func TestCommands_DeleteAction(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								action.NewRemovedEvent(context.Background(),
-									&action.NewAggregate("id1", "org1").Aggregate,
-									"name",
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(action.NewRemoveActionNameUniqueConstraint("name", "org1")),
+						action.NewRemovedEvent(context.Background(),
+							&action.NewAggregate("id1", "org1").Aggregate,
+							"name",
+						),
 					),
 				),
 			},
@@ -738,22 +702,15 @@ func TestCommands_DeleteAction(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								action.NewRemovedEvent(context.Background(),
-									&action.NewAggregate("id1", "org1").Aggregate,
-									"name",
-								),
-							),
-							eventFromEventPusher(
-								org.NewTriggerActionsCascadeRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									domain.FlowTypeExternalAuthentication,
-									"id1",
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(action.NewRemoveActionNameUniqueConstraint("name", "org1")),
+						action.NewRemovedEvent(context.Background(),
+							&action.NewAggregate("id1", "org1").Aggregate,
+							"name",
+						),
+						org.NewTriggerActionsCascadeRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							domain.FlowTypeExternalAuthentication,
+							"id1",
+						),
 					),
 				),
 			},

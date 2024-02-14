@@ -66,12 +66,12 @@ func (l *Login) renderMFAVerifySelected(w http.ResponseWriter, r *http.Request, 
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	data := l.getUserData(r, authReq, "", "", errID, errMessage)
+	translator := l.getTranslator(r.Context(), authReq)
+	data := l.getUserData(r, authReq, translator, "", "", errID, errMessage)
 	if verificationStep == nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	translator := l.getTranslator(r.Context(), authReq)
 
 	switch selectedProvider {
 	case domain.MFATypeU2F:
@@ -84,6 +84,12 @@ func (l *Login) renderMFAVerifySelected(w http.ResponseWriter, r *http.Request, 
 		data.SelectedMFAProvider = domain.MFATypeTOTP
 		data.Title = translator.LocalizeWithoutArgs("VerifyMFAOTP.Title")
 		data.Description = translator.LocalizeWithoutArgs("VerifyMFAOTP.Description")
+	case domain.MFATypeOTPSMS:
+		l.handleOTPVerification(w, r, authReq, verificationStep.MFAProviders, domain.MFATypeOTPSMS, nil)
+		return
+	case domain.MFATypeOTPEmail:
+		l.handleOTPVerification(w, r, authReq, verificationStep.MFAProviders, domain.MFATypeOTPEmail, nil)
+		return
 	default:
 		l.renderError(w, r, authReq, err)
 		return

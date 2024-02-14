@@ -9,10 +9,11 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/zitadel/zitadel/internal/integration"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
 	"google.golang.org/protobuf/types/known/structpb"
+
+	"github.com/zitadel/zitadel/internal/integration"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func TestServer_RegisterPasskey(t *testing.T) {
@@ -22,6 +23,10 @@ func TestServer_RegisterPasskey(t *testing.T) {
 		Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
 	})
 	require.NoError(t, err)
+
+	// We also need a user session
+	Tester.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
 
 	type args struct {
 		ctx context.Context
@@ -94,14 +99,12 @@ func TestServer_RegisterPasskey(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		/* TODO: after we are able to obtain a Bearer token for a human user
-		https://github.com/zitadel/zitadel/issues/6022
 		{
-			name: "human user",
+			name: "user setting its own passkey",
 			args: args{
-				ctx: CTX,
+				ctx: Tester.WithAuthorizationToken(CTX, sessionToken),
 				req: &user.RegisterPasskeyRequest{
-					UserId: humanUserID,
+					UserId: userID,
 				},
 			},
 			want: &user.RegisterPasskeyResponse{
@@ -110,7 +113,6 @@ func TestServer_RegisterPasskey(t *testing.T) {
 				},
 			},
 		},
-		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

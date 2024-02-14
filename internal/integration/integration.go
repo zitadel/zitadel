@@ -8,15 +8,19 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"os"
+	"reflect"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
-	"github.com/zitadel/oidc/v2/pkg/client"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/client"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
@@ -28,10 +32,11 @@ import (
 	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/webauthn"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -71,6 +76,11 @@ const (
 	UserPassword          = "VeryS3cret!"
 )
 
+const (
+	PortMilestoneServer = "8081"
+	PortQuotaServer     = "8082"
+)
+
 // User information with a Personal Access Token.
 type User struct {
 	*query.User
@@ -101,6 +111,11 @@ type Tester struct {
 	Organisation *query.Org
 	Users        InstanceUserMap
 
+	MilestoneChan           chan []byte
+	milestoneServer         *httptest.Server
+	QuotaNotificationChan   chan []byte
+	quotaNotificationServer *httptest.Server
+
 	Client   Client
 	WebAuthN *webauthn.Client
 	wg       sync.WaitGroup // used for shutdown
@@ -112,12 +127,11 @@ func (s *Tester) Host() string {
 	return fmt.Sprintf("%s:%d", s.Config.ExternalDomain, s.Config.Port)
 }
 
-func (s *Tester) createClientConn(ctx context.Context, opts ...grpc.DialOption) {
-	target := s.Host()
-	cc, err := grpc.DialContext(ctx, target, append(opts,
+func (s *Tester) createClientConn(ctx context.Context, target string) {
+	cc, err := grpc.DialContext(ctx, target,
 		grpc.WithBlock(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)...)
+	)
 	if err != nil {
 		s.Shutdown <- os.Interrupt
 		s.wg.Wait()
@@ -167,7 +181,7 @@ func (s *Tester) createMachineUserOrgOwner(ctx context.Context) {
 
 	ctx, user := s.createMachineUser(ctx, MachineUserOrgOwner, OrgOwner)
 	_, err = s.Commands.AddOrgMember(ctx, user.ResourceOwner, user.ID, "ORG_OWNER")
-	target := new(caos_errs.AlreadyExistsError)
+	target := new(zerrors.AlreadyExistsError)
 	if !errors.As(err, &target) {
 		logging.OnError(err).Fatal("add org member")
 	}
@@ -178,7 +192,7 @@ func (s *Tester) createMachineUserInstanceOwner(ctx context.Context) {
 
 	ctx, user := s.createMachineUser(ctx, MachineUserInstanceOwner, IAMOwner)
 	_, err = s.Commands.AddInstanceMember(ctx, user.ID, "IAM_OWNER")
-	target := new(caos_errs.AlreadyExistsError)
+	target := new(zerrors.AlreadyExistsError)
 	if !errors.As(err, &target) {
 		logging.OnError(err).Fatal("add instance member")
 	}
@@ -200,7 +214,7 @@ func (s *Tester) createMachineUser(ctx context.Context, username string, userTyp
 
 	usernameQuery, err := query.NewUserUsernameSearchQuery(username, query.TextEquals)
 	logging.OnError(err).Fatal("user query")
-	user, err := s.Queries.GetUser(ctx, true, true, usernameQuery)
+	user, err := s.Queries.GetUser(ctx, true, usernameQuery)
 	if errors.Is(err, sql.ErrNoRows) {
 		_, err = s.Commands.AddMachine(ctx, &command.Machine{
 			ObjectRoot: models.ObjectRoot{
@@ -212,7 +226,7 @@ func (s *Tester) createMachineUser(ctx context.Context, username string, userTyp
 			AccessTokenType: domain.OIDCTokenTypeJWT,
 		})
 		logging.WithFields("username", username).OnError(err).Fatal("add machine user")
-		user, err = s.Queries.GetUser(ctx, true, true, usernameQuery)
+		user, err = s.Queries.GetUser(ctx, true, usernameQuery)
 	}
 	logging.WithFields("username", username).OnError(err).Fatal("get user")
 
@@ -239,7 +253,20 @@ func (s *Tester) WithInstanceAuthorization(ctx context.Context, u UserType, inst
 }
 
 func (s *Tester) WithAuthorizationToken(ctx context.Context, token string) context.Context {
-	return metadata.AppendToOutgoingContext(ctx, "Authorization", fmt.Sprintf("Bearer %s", token))
+	md, ok := metadata.FromOutgoingContext(ctx)
+	if !ok {
+		md = make(metadata.MD)
+	}
+	md.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	return metadata.NewOutgoingContext(ctx, md)
+}
+
+func (s *Tester) BearerToken(ctx context.Context) string {
+	md, ok := metadata.FromOutgoingContext(ctx)
+	if !ok {
+		return ""
+	}
+	return md.Get("Authorization")[0]
 }
 
 func (s *Tester) ensureSystemUser() {
@@ -266,6 +293,8 @@ func (s *Tester) Done() {
 
 	s.Shutdown <- os.Interrupt
 	s.wg.Wait()
+	s.milestoneServer.Close()
+	s.quotaNotificationServer.Close()
 }
 
 // NewTester start a new Zitadel server by passing the default commandline.
@@ -274,24 +303,26 @@ func (s *Tester) Done() {
 // INTEGRATION_DB_FLAVOR environment variable and can have the values "cockroach"
 // or "postgres". Defaults to "cockroach".
 //
-// The deault Instance and Organisation are read from the DB and system
+// The default Instance and Organisation are read from the DB and system
 // users are created as needed.
 //
 // After the server is started, a [grpc.ClientConn] will be created and
 // the server is polled for it's health status.
 //
-// Note: the database must already be setup and intialized before
+// Note: the database must already be setup and initialized before
 // using NewTester. See the CONTRIBUTING.md document for details.
-func NewTester(ctx context.Context) *Tester {
+func NewTester(ctx context.Context, zitadelConfigYAML ...string) *Tester {
 	args := strings.Split(commandLine, " ")
 
 	sc := make(chan *start.Server)
 	//nolint:contextcheck
 	cmd := cmd.New(os.Stdout, os.Stdin, args, sc)
 	cmd.SetArgs(args)
-	err := viper.MergeConfig(bytes.NewBuffer(zitadelYAML))
-	logging.OnError(err).Fatal()
-
+	for _, yaml := range append([]string{string(zitadelYAML)}, zitadelConfigYAML...) {
+		err := viper.MergeConfig(bytes.NewBuffer([]byte(yaml)))
+		logging.OnError(err).Fatal()
+	}
+	var err error
 	flavor := os.Getenv("INTEGRATION_DB_FLAVOR")
 	switch flavor {
 	case "cockroach", "":
@@ -306,6 +337,13 @@ func NewTester(ctx context.Context) *Tester {
 	tester := Tester{
 		Users: make(InstanceUserMap),
 	}
+	tester.MilestoneChan = make(chan []byte, 100)
+	tester.milestoneServer, err = runMilestoneServer(ctx, tester.MilestoneChan)
+	logging.OnError(err).Fatal()
+	tester.QuotaNotificationChan = make(chan []byte, 100)
+	tester.quotaNotificationServer, err = runQuotaServer(ctx, tester.QuotaNotificationChan)
+	logging.OnError(err).Fatal()
+
 	tester.wg.Add(1)
 	go func(wg *sync.WaitGroup) {
 		logging.OnError(cmd.Execute()).Fatal()
@@ -317,13 +355,13 @@ func NewTester(ctx context.Context) *Tester {
 	case <-ctx.Done():
 		logging.OnError(ctx.Err()).Fatal("waiting for integration tester server")
 	}
-	tester.createClientConn(ctx)
+	host := tester.Host()
+	tester.createClientConn(ctx, host)
 	tester.createLoginClient(ctx)
-	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, http_util.BuildOrigin(tester.Host(), tester.Config.ExternalSecure))
+	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, http_util.BuildOrigin(host, tester.Config.ExternalSecure))
 	tester.createMachineUserOrgOwner(ctx)
 	tester.createMachineUserInstanceOwner(ctx)
 	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, "https://"+tester.Host())
-
 	return &tester
 }
 
@@ -332,4 +370,52 @@ func Contexts(timeout time.Duration) (ctx, errCtx context.Context, cancel contex
 	cancel()
 	ctx, cancel = context.WithTimeout(context.Background(), timeout)
 	return ctx, errCtx, cancel
+}
+
+func runMilestoneServer(ctx context.Context, bodies chan []byte) (*httptest.Server, error) {
+	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if r.Header.Get("single-value") != "single-value" {
+			http.Error(w, "single-value header not set", http.StatusInternalServerError)
+			return
+		}
+		if reflect.DeepEqual(r.Header.Get("multi-value"), "multi-value-1,multi-value-2") {
+			http.Error(w, "single-value header not set", http.StatusInternalServerError)
+			return
+		}
+		bodies <- body
+		w.WriteHeader(http.StatusOK)
+	}))
+	config := net.ListenConfig()
+	listener, err := config.Listen(ctx, "tcp", ":"+PortMilestoneServer)
+	if err != nil {
+		return nil, err
+	}
+	mockServer.Listener = listener
+	mockServer.Start()
+	return mockServer, nil
+}
+
+func runQuotaServer(ctx context.Context, bodies chan []byte) (*httptest.Server, error) {
+	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		bodies <- body
+		w.WriteHeader(http.StatusOK)
+	}))
+	config := net.ListenConfig()
+	listener, err := config.Listen(ctx, "tcp", ":"+PortQuotaServer)
+	if err != nil {
+		return nil, err
+	}
+	mockServer.Listener = listener
+	mockServer.Start()
+	return mockServer, nil
 }

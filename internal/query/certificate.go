@@ -11,9 +11,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Certificate interface {
@@ -66,7 +66,7 @@ var (
 	}
 )
 
-func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage domain.KeyUsage) (_ *Certificates, err error) {
+func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage domain.KeyUsage) (certs *Certificates, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -85,22 +85,22 @@ func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage dom
 		},
 	).OrderBy(KeyPrivateColExpiry.identifier()).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SDfkg", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-SDfkg", "Errors.Query.SQLStatement")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		certs, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Sgan4", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Sgan4", "Errors.Internal")
 	}
-	keys, err := scan(rows)
-	if err != nil {
-		return nil, err
+
+	certs.State, err = q.latestState(ctx, keyTable)
+	if !zerrors.IsNotFound(err) {
+		return certs, err
 	}
-	keys.LatestSequence, err = q.latestSequence(ctx, keyTable)
-	if !errors.IsNotFound(err) {
-		return keys, err
-	}
-	return keys, nil
+	return certs, nil
 }
 
 func prepareCertificateQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Certificates, error)) {
@@ -146,7 +146,7 @@ func prepareCertificateQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-rKd6k", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-rKd6k", "Errors.Query.CloseRows")
 			}
 
 			return &Certificates{

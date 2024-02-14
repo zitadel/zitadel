@@ -24,7 +24,7 @@ You can do so by using [Console](../console/users) or [setting user metadata](/d
 
 Most of the methods below require you to login with the correct user while setting some scopes.
 Make sure you pick the right user when logging into the test application.
-Use the [OIDC authentication request playground](/docs/apis/openidoauth/authrequest) or the configuration of an [example client](/docs/examples/introduction) to set the required scopes and receive a valid access token.
+Use the [OIDC authentication request playground](/docs/apis/openidoauth/authrequest) or the configuration of an [example client](/docs/sdk-examples/introduction) to set the required scopes and receive a valid access token.
 
 :::info Getting a token
 In case you want to test out different settings configure an application with code flow (PKCE).
@@ -50,7 +50,7 @@ Request the user information by calling the [userinfo endpoint](/docs/apis/openi
 
 ```bash
 curl --request GET \
-  --url "https://$ZITADEL_DOMAIN/oidc/v1/userinfo" \
+  --url "https://$CUSTOM-DOMAIN/oidc/v1/userinfo" \
   --header "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -157,7 +157,7 @@ You can use the authentication service to request and search for the user's meta
 The introspection endpoint and the token endpoint in the examples above do not require a special scope to access.
 Yet when accessing the authentication service, you need to pass the [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) `urn:zitadel:iam:org:project:id:zitadel:aud` along with the authentication request.
 This scope allows the user to access ZITADEL's APIs, specifically the authentication API that we need for this method.
-Use the [OIDC authentication request playground](/docs/apis/openidoauth/authrequest) or the configuration of an [example client](/docs/examples/introduction) to set the required scopes and receive a valid access token.
+Use the [OIDC authentication request playground](/docs/apis/openidoauth/authrequest) or the configuration of an [example client](/docs/sdk-examples/introduction) to set the required scopes and receive a valid access token.
 
 :::note Invalid audience
 If you get the error "invalid audience (APP-Zxfako)", then you need to add the reserved scope `urn:zitadel:iam:org:project:id:zitadel:aud` to your authentication request.
@@ -166,7 +166,7 @@ If you get the error "invalid audience (APP-Zxfako)", then you need to add the r
 You can request the user's metadata with the [List My Metadata](/docs/apis/resources/auth/auth-service-list-my-metadata) method:
 
 ```bash
-curl -L -X POST "https://$ZITADEL_DOMAIN/auth/v1/users/me/metadata/_search" \
+curl -L -X POST "https://$CUSTOM-DOMAIN/auth/v1/users/me/metadata/_search" \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H "Authorization: Bearer $ACCESS_TOKEN" \
@@ -188,7 +188,7 @@ curl -L -X POST "https://$ZITADEL_DOMAIN/auth/v1/users/me/metadata/_search" \
 ```
 
 Replace `$ACCESS_TOKEN` with your user's access token.  
-Replace `$ZITADEL_DOMAIN` with your ZITADEL instance's url.  
+Replace `$CUSTOM-DOMAIN` with your ZITADEL instance's url.  
 Replace `$METADATA_KEY` with they key you want to search for (f.e. "ContractNumber")
 
 :::info Get all metadata

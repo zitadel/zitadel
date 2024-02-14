@@ -8,10 +8,10 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type AddPat struct {
@@ -44,13 +44,13 @@ func NewPersonalAccessToken(resourceOwner string, userID string, expirationDate 
 
 func (pat *PersonalAccessToken) content() error {
 	if pat.ResourceOwner == "" {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-xs0k2n", "Errors.ResourceOwnerMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-xs0k2n", "Errors.ResourceOwnerMissing")
 	}
 	if pat.AggregateID == "" {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-0pzb1", "Errors.User.UserIDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-0pzb1", "Errors.User.UserIDMissing")
 	}
 	if pat.TokenID == "" {
-		return errors.ThrowInvalidArgument(nil, "COMMAND-68xm2o", "Errors.IDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-68xm2o", "Errors.IDMissing")
 	}
 	return nil
 }
@@ -69,10 +69,10 @@ func (pat *PersonalAccessToken) checkAggregate(ctx context.Context, filter prepa
 		return err
 	}
 	if !isUserStateExists(userWriteModel.UserState) {
-		return errors.ThrowPreconditionFailed(nil, "COMMAND-Dggw2", "Errors.User.NotFound")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Dggw2", "Errors.User.NotFound")
 	}
 	if pat.AllowedUserType != domain.UserTypeUnspecified && userWriteModel.UserType != pat.AllowedUserType {
-		return errors.ThrowPreconditionFailed(nil, "COMMAND-Df2f1", "Errors.User.WrongType")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Df2f1", "Errors.User.WrongType")
 	}
 	return nil
 }
@@ -95,7 +95,7 @@ func (c *Commands) AddPersonalAccessToken(ctx context.Context, pat *PersonalAcce
 	}
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }
@@ -144,7 +144,7 @@ func (c *Commands) RemovePersonalAccessToken(ctx context.Context, pat *PersonalA
 	}
 	return &domain.ObjectDetails{
 		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreationDate(),
+		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
 	}, nil
 }
@@ -160,7 +160,7 @@ func prepareRemovePersonalAccessToken(pat *PersonalAccessToken) preparation.Vali
 				return nil, err
 			}
 			if !writeModel.Exists() {
-				return nil, errors.ThrowNotFound(nil, "COMMAND-4m77G", "Errors.User.PAT.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "COMMAND-4m77G", "Errors.User.PAT.NotFound")
 			}
 			return []eventstore.Command{
 				user.NewPersonalAccessTokenRemovedEvent(

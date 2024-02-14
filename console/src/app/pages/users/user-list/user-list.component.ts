@@ -14,7 +14,11 @@ export class UserListComponent {
   public Type: any = Type;
   public type: Type = Type.TYPE_HUMAN;
 
-  constructor(public translate: TranslateService, activatedRoute: ActivatedRoute, breadcrumbService: BreadcrumbService) {
+  constructor(
+    public translate: TranslateService,
+    activatedRoute: ActivatedRoute,
+    breadcrumbService: BreadcrumbService,
+  ) {
     activatedRoute.queryParams.pipe(take(1)).subscribe((params: Params) => {
       const { type } = params;
       if (type && type === 'human') {

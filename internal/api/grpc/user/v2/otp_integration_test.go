@@ -9,20 +9,20 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func TestServer_AddOTPSMS(t *testing.T) {
 	userID := Tester.CreateHumanUser(CTX).GetUserId()
 	Tester.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Tester.CreateVerfiedWebAuthNSession(t, CTX, userID)
+	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
 
 	// TODO: add when phone can be added to user
 	/*
 		userIDPhone := Tester.CreateHumanUser(CTX).GetUserId()
 		Tester.RegisterUserPasskey(CTX, userIDPhone)
-		_, sessionTokenPhone, _, _ := Tester.CreateVerfiedWebAuthNSession(t, CTX, userIDPhone)
+		_, sessionTokenPhone, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userIDPhone)
 	*/
 	type args struct {
 		ctx context.Context
@@ -99,7 +99,7 @@ func TestServer_RemoveOTPSMS(t *testing.T) {
 	/*
 		userID := Tester.CreateHumanUser(CTX).GetUserId()
 		Tester.RegisterUserPasskey(CTX, userID)
-		_, sessionToken, _, _ := Tester.CreateVerfiedWebAuthNSession(t, CTX, userID)
+		_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
 	*/
 
 	type args struct {
@@ -157,7 +157,7 @@ func TestServer_RemoveOTPSMS(t *testing.T) {
 func TestServer_AddOTPEmail(t *testing.T) {
 	userID := Tester.CreateHumanUser(CTX).GetUserId()
 	Tester.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Tester.CreateVerfiedWebAuthNSession(t, CTX, userID)
+	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
 
 	userVerified := Tester.CreateHumanUser(CTX)
 	_, err := Tester.Client.UserV2.VerifyEmail(CTX, &user.VerifyEmailRequest{
@@ -166,7 +166,7 @@ func TestServer_AddOTPEmail(t *testing.T) {
 	})
 	require.NoError(t, err)
 	Tester.RegisterUserPasskey(CTX, userVerified.GetUserId())
-	_, sessionTokenVerified, _, _ := Tester.CreateVerfiedWebAuthNSession(t, CTX, userVerified.GetUserId())
+	_, sessionTokenVerified, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
 
 	type args struct {
 		ctx context.Context
@@ -238,11 +238,11 @@ func TestServer_AddOTPEmail(t *testing.T) {
 func TestServer_RemoveOTPEmail(t *testing.T) {
 	userID := Tester.CreateHumanUser(CTX).GetUserId()
 	Tester.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Tester.CreateVerfiedWebAuthNSession(t, CTX, userID)
+	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
 
 	userVerified := Tester.CreateHumanUser(CTX)
 	Tester.RegisterUserPasskey(CTX, userVerified.GetUserId())
-	_, sessionTokenVerified, _, _ := Tester.CreateVerfiedWebAuthNSession(t, CTX, userVerified.GetUserId())
+	_, sessionTokenVerified, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
 	userVerifiedCtx := Tester.WithAuthorizationToken(context.Background(), sessionTokenVerified)
 	_, err := Tester.Client.UserV2.VerifyEmail(userVerifiedCtx, &user.VerifyEmailRequest{
 		UserId:           userVerified.GetUserId(),

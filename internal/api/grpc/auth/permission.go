@@ -34,7 +34,7 @@ func (s *Server) ListMyProjectPermissions(ctx context.Context, _ *auth_pb.ListMy
 	if err != nil {
 		return nil, err
 	}
-	userGrant, err := s.query.UserGrant(ctx, true, false, userGrantOrgID, userGrantProjectID, userGrantUserID)
+	userGrant, err := s.query.UserGrant(ctx, true, userGrantOrgID, userGrantProjectID, userGrantUserID)
 	if err != nil {
 		return nil, err
 	}
@@ -54,6 +54,6 @@ func (s *Server) ListMyMemberships(ctx context.Context, req *auth_pb.ListMyMembe
 	}
 	return &auth_pb.ListMyMembershipsResponse{
 		Result:  user_grpc.MembershipsToMembershipsPb(response.Memberships),
-		Details: object.ToListDetails(response.Count, response.Sequence, response.Timestamp),
+		Details: object.ToListDetails(response.Count, response.Sequence, response.LastRun),
 	}, nil
 }

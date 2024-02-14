@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
-	z_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func SetHTTPConfig(config *HTTPConfig) {
@@ -75,7 +75,7 @@ func NewIPChecker(i string) (AddressChecker, error) {
 	if ip := net.ParseIP(i); ip != nil {
 		return &IPChecker{IP: ip}, nil
 	}
-	return nil, z_errs.ThrowInvalidArgument(nil, "ACTIO-ddJ7h", "invalid ip")
+	return nil, zerrors.ThrowInvalidArgument(nil, "ACTIO-ddJ7h", "invalid ip")
 }
 
 type IPChecker struct {

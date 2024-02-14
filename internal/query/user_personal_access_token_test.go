@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/database"
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -75,13 +75,13 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 			name:    "preparePersonalAccessTokenQuery no result",
 			prepare: preparePersonalAccessTokenQuery,
 			want: want{
-				sqlExpectations: mockQuery(
+				sqlExpectations: mockQueryScanErr(
 					personalAccessTokenStmt,
 					nil,
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -104,7 +104,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 						uint64(20211202),
 						"user-id",
 						time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-						database.StringArray{"openid"},
+						database.TextArray[string]{"openid"},
 					},
 				),
 			},
@@ -116,7 +116,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 				Sequence:      20211202,
 				UserID:        "user-id",
 				Expiration:    time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-				Scopes:        database.StringArray{"openid"},
+				Scopes:        database.TextArray[string]{"openid"},
 			},
 		},
 		{
@@ -134,7 +134,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*PersonalAccessToken)(nil),
 		},
 		{
 			name:    "preparePersonalAccessTokensQuery no result",
@@ -164,7 +164,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 							uint64(20211202),
 							"user-id",
 							time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-							database.StringArray{"openid"},
+							database.TextArray[string]{"openid"},
 						},
 					},
 				),
@@ -182,7 +182,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 						Sequence:      20211202,
 						UserID:        "user-id",
 						Expiration:    time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-						Scopes:        database.StringArray{"openid"},
+						Scopes:        database.TextArray[string]{"openid"},
 					},
 				},
 			},
@@ -203,7 +203,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 							uint64(20211202),
 							"user-id",
 							time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-							database.StringArray{"openid"},
+							database.TextArray[string]{"openid"},
 						},
 						{
 							"token-id2",
@@ -213,7 +213,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 							uint64(20211202),
 							"user-id",
 							time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-							database.StringArray{"openid"},
+							database.TextArray[string]{"openid"},
 						},
 					},
 				),
@@ -231,7 +231,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 						Sequence:      20211202,
 						UserID:        "user-id",
 						Expiration:    time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-						Scopes:        database.StringArray{"openid"},
+						Scopes:        database.TextArray[string]{"openid"},
 					},
 					{
 						ID:            "token-id2",
@@ -241,7 +241,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 						Sequence:      20211202,
 						UserID:        "user-id",
 						Expiration:    time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-						Scopes:        database.StringArray{"openid"},
+						Scopes:        database.TextArray[string]{"openid"},
 					},
 				},
 			},
@@ -261,7 +261,7 @@ func Test_PersonalAccessTokenPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*PersonalAccessTokens)(nil),
 		},
 	}
 	for _, tt := range tests {

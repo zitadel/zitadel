@@ -4,7 +4,7 @@ package {{.GoPackageName}}
 
 import (
 	"github.com/zitadel/zitadel/internal/api/authz"
-    {{if .AuthContext}}"github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"{{end}}
+	{{if .AuthContext}}"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"{{end}}
 )
 
 var {{.ServiceName}}_AuthMethods = authz.MethodMapping {
@@ -17,8 +17,11 @@ var {{.ServiceName}}_AuthMethods = authz.MethodMapping {
 }
 
 {{ range $m := .AuthContext}}
-func (r *{{ $m.Name }}) OrganisationFromRequest() *object.Organisation {
-    return r{{$m.OrgMethod}}
+func (r *{{ $m.Name }}) OrganizationFromRequest() *middleware.Organization {
+	return &middleware.Organization{
+		ID: r{{$m.OrgMethod}}.GetOrgId(),
+		Domain: r{{$m.OrgMethod}}.GetOrgDomain(),
+	}
 }
 {{ end }}
 

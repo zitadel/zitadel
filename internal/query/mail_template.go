@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -11,9 +11,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type MailTemplate struct {
@@ -70,7 +70,7 @@ var (
 	}
 )
 
-func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (_ *MailTemplate, err error) {
+func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string, withOwnerRemoved bool) (template *MailTemplate, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -90,14 +90,17 @@ func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string, withOwner
 		OrderBy(MailTemplateColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-m0sJg", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-m0sJg", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		template, err = scan(row)
+		return err
+	}, query, args...)
+	return template, err
 }
 
-func (q *Queries) DefaultMailTemplate(ctx context.Context) (_ *MailTemplate, err error) {
+func (q *Queries) DefaultMailTemplate(ctx context.Context) (template *MailTemplate, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -109,11 +112,14 @@ func (q *Queries) DefaultMailTemplate(ctx context.Context) (_ *MailTemplate, err
 		OrderBy(MailTemplateColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-2m0fH", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-2m0fH", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		template, err = scan(row)
+		return err
+	}, query, args...)
+	return template, err
 }
 
 func prepareMailTemplateQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*MailTemplate, error)) {
@@ -140,10 +146,10 @@ func prepareMailTemplateQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				&policy.State,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-2NO0g", "Errors.MailTemplate.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-2NO0g", "Errors.MailTemplate.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-4Nisf", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-4Nisf", "Errors.Internal")
 			}
 			return policy, nil
 		}

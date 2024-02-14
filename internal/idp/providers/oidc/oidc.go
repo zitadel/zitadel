@@ -3,8 +3,9 @@ package oidc
 import (
 	"context"
 
-	"github.com/zitadel/oidc/v2/pkg/client/rp"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"golang.org/x/oauth2"
 
 	"github.com/zitadel/zitadel/internal/idp"
 )
@@ -22,7 +23,7 @@ type Provider struct {
 	isAutoUpdate      bool
 	useIDToken        bool
 	userInfoMapper    func(info *oidc.UserInfo) idp.User
-	authOptions       []rp.AuthURLOpt
+	authOptions       []func(bool) rp.AuthURLOpt
 }
 
 type ProviderOpts func(provider *Provider)
@@ -70,10 +71,25 @@ func WithRelyingPartyOption(option rp.Option) ProviderOpts {
 	}
 }
 
-// WithSelectAccount adds the select_account prompt to the auth request
+// WithSelectAccount adds the select_account prompt to the auth request (if no login_hint is set)
 func WithSelectAccount() ProviderOpts {
 	return func(p *Provider) {
-		p.authOptions = append(p.authOptions, rp.WithPrompt(oidc.PromptSelectAccount))
+		p.authOptions = append(p.authOptions, func(loginHintSet bool) rp.AuthURLOpt {
+			if loginHintSet {
+				return nil
+			}
+			return rp.WithPrompt(oidc.PromptSelectAccount)
+		})
+	}
+}
+
+// WithResponseMode sets the `response_mode` params in the auth request
+func WithResponseMode(mode oidc.ResponseMode) ProviderOpts {
+	return func(p *Provider) {
+		paramOpt := rp.WithResponseModeURLParam(mode)
+		p.authOptions = append(p.authOptions, func(_ bool) rp.AuthURLOpt {
+			return rp.AuthURLOpt(paramOpt)
+		})
 	}
 }
 
@@ -92,7 +108,7 @@ func New(name, issuer, clientID, clientSecret, redirectURI string, scopes []stri
 	for _, option := range options {
 		option(provider)
 	}
-	provider.RelyingParty, err = rp.NewRelyingPartyOIDC(issuer, clientID, clientSecret, redirectURI, setDefaultScope(scopes), provider.options...)
+	provider.RelyingParty, err = rp.NewRelyingPartyOIDC(context.TODO(), issuer, clientID, clientSecret, redirectURI, setDefaultScope(scopes), provider.options...)
 	if err != nil {
 		return nil, err
 	}
@@ -120,15 +136,28 @@ func (p *Provider) Name() string {
 
 // BeginAuth implements the [idp.Provider] interface.
 // It will create a [Session] with an OIDC authorization request as AuthURL.
-func (p *Provider) BeginAuth(ctx context.Context, state string, params ...any) (idp.Session, error) {
-	opts := p.authOptions
+func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Parameter) (idp.Session, error) {
+	opts := make([]rp.AuthURLOpt, 0)
+	var loginHintSet bool
 	for _, param := range params {
-		if option, ok := param.(rp.AuthURLOpt); ok {
-			opts = append(opts, option)
+		if username, ok := param.(idp.LoginHintParam); ok {
+			loginHintSet = true
+			opts = append(opts, loginHint(string(username)))
+		}
+	}
+	for _, option := range p.authOptions {
+		if opt := option(loginHintSet); opt != nil {
+			opts = append(opts, opt)
 		}
 	}
 	url := rp.AuthURL(state, p.RelyingParty, opts...)
 	return &Session{AuthURL: url, Provider: p}, nil
+}
+
+func loginHint(hint string) rp.AuthURLOpt {
+	return func() []oauth2.AuthCodeOption {
+		return []oauth2.AuthCodeOption{oauth2.SetAuthURLParam("login_hint", hint)}
+	}
 }
 
 // IsLinkingAllowed implements the [idp.Provider] interface.

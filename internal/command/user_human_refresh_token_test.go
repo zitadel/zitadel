@@ -6,19 +6,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
@@ -60,7 +59,7 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 			},
 			args: args{},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -85,7 +84,7 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 				clientID: "clientID",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -99,7 +98,7 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 				refreshToken: "invalid",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -115,7 +114,7 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 				refreshToken: base64.RawURLEncoding.EncodeToString([]byte("userID2:tokenID:token")),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -153,7 +152,7 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 				refreshToken: base64.RawURLEncoding.EncodeToString([]byte("userID:tokenID:token")),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -186,7 +185,7 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 				refreshToken: base64.RawURLEncoding.EncodeToString([]byte("userID:tokenID:tokenID")),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		//fails because of timestamp equality
@@ -241,7 +240,7 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 		//				)),
 		//			),
 		//			expectPushFailed(
-		//				caos_errs.ThrowInternal(nil, "ERROR", "internal"),
+		//				zerrors.ThrowInternal(nil, "ERROR", "internal"),
 		//				[]*repository.Event{
 		//					eventFromEventPusher(user.NewUserTokenAddedEvent(
 		//						context.Background(),
@@ -281,7 +280,7 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 		//		authTime:              time.Now(),
 		//	},
 		//	res: res{
-		//		err: caos_errs.IsInternal,
+		//		err: zerrors.IsInternal,
 		//	},
 		//},
 	}
@@ -335,7 +334,7 @@ func TestCommands_RevokeRefreshToken(t *testing.T) {
 			},
 			args{},
 			res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -352,7 +351,7 @@ func TestCommands_RevokeRefreshToken(t *testing.T) {
 				"tokenID",
 			},
 			res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -375,14 +374,12 @@ func TestCommands_RevokeRefreshToken(t *testing.T) {
 							10*time.Hour,
 						)),
 					),
-					expectPushFailed(caos_errs.ThrowInternal(nil, "ERROR", "internal"),
-						[]*repository.Event{
-							eventFromEventPusher(user.NewHumanRefreshTokenRemovedEvent(
-								context.Background(),
-								&user.NewAggregate("userID", "orgID").Aggregate,
-								"tokenID",
-							)),
-						},
+					expectPushFailed(zerrors.ThrowInternal(nil, "ERROR", "internal"),
+						user.NewHumanRefreshTokenRemovedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "orgID").Aggregate,
+							"tokenID",
+						),
 					),
 				),
 			},
@@ -393,7 +390,7 @@ func TestCommands_RevokeRefreshToken(t *testing.T) {
 				"tokenID",
 			},
 			res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -417,13 +414,11 @@ func TestCommands_RevokeRefreshToken(t *testing.T) {
 						)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(user.NewHumanRefreshTokenRemovedEvent(
-								context.Background(),
-								&user.NewAggregate("userID", "orgID").Aggregate,
-								"tokenID",
-							)),
-						},
+						user.NewHumanRefreshTokenRemovedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "orgID").Aggregate,
+							"tokenID",
+						),
 					),
 				),
 			},
@@ -490,7 +485,7 @@ func TestCommands_RevokeRefreshTokens(t *testing.T) {
 				nil,
 			},
 			res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -523,7 +518,7 @@ func TestCommands_RevokeRefreshTokens(t *testing.T) {
 				[]string{"tokenID", "tokenID2"},
 			},
 			res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -562,19 +557,17 @@ func TestCommands_RevokeRefreshTokens(t *testing.T) {
 							10*time.Hour,
 						)),
 					),
-					expectPushFailed(caos_errs.ThrowInternal(nil, "ERROR", "internal"),
-						[]*repository.Event{
-							eventFromEventPusher(user.NewHumanRefreshTokenRemovedEvent(
-								context.Background(),
-								&user.NewAggregate("userID", "orgID").Aggregate,
-								"tokenID",
-							)),
-							eventFromEventPusher(user.NewHumanRefreshTokenRemovedEvent(
-								context.Background(),
-								&user.NewAggregate("userID", "orgID").Aggregate,
-								"tokenID2",
-							)),
-						},
+					expectPushFailed(zerrors.ThrowInternal(nil, "ERROR", "internal"),
+						user.NewHumanRefreshTokenRemovedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "orgID").Aggregate,
+							"tokenID",
+						),
+						user.NewHumanRefreshTokenRemovedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "orgID").Aggregate,
+							"tokenID2",
+						),
 					),
 				),
 			},
@@ -585,7 +578,7 @@ func TestCommands_RevokeRefreshTokens(t *testing.T) {
 				[]string{"tokenID", "tokenID2"},
 			},
 			res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -625,18 +618,16 @@ func TestCommands_RevokeRefreshTokens(t *testing.T) {
 						)),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(user.NewHumanRefreshTokenRemovedEvent(
-								context.Background(),
-								&user.NewAggregate("userID", "orgID").Aggregate,
-								"tokenID",
-							)),
-							eventFromEventPusher(user.NewHumanRefreshTokenRemovedEvent(
-								context.Background(),
-								&user.NewAggregate("userID", "orgID").Aggregate,
-								"tokenID2",
-							)),
-						},
+						user.NewHumanRefreshTokenRemovedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "orgID").Aggregate,
+							"tokenID",
+						),
+						user.NewHumanRefreshTokenRemovedEvent(
+							context.Background(),
+							&user.NewAggregate("userID", "orgID").Aggregate,
+							"tokenID2",
+						),
 					),
 				),
 			},
@@ -679,7 +670,7 @@ func refreshTokenEncryptionAlgorithm(ctrl *gomock.Controller) crypto.EncryptionA
 	mCrypto.EXPECT().Decrypt(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
 		func(refrehToken []byte, keyID string) ([]byte, error) {
 			if keyID != "id" {
-				return nil, caos_errs.ThrowInternal(nil, "id", "invalid key id")
+				return nil, zerrors.ThrowInternal(nil, "id", "invalid key id")
 			}
 			return refrehToken, nil
 		},
@@ -814,7 +805,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -828,7 +819,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 				refreshToken: "invalid",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -844,7 +835,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 				refreshToken: base64.RawURLEncoding.EncodeToString([]byte("userID2:tokenID:token")),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -882,7 +873,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 				refreshToken: base64.RawURLEncoding.EncodeToString([]byte("userID:tokenID:token")),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -915,7 +906,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 				refreshToken: base64.RawURLEncoding.EncodeToString([]byte("userID:tokenID:tokenID")),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -955,7 +946,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 				idleExpiration: 1 * time.Hour,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -996,7 +987,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 				idleExpiration: 1 * time.Hour,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{

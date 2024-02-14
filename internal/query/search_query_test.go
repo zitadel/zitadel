@@ -191,7 +191,7 @@ func TestNewSubSelect(t *testing.T) {
 			name: "no column 1",
 			args: args{
 				column:  Column{},
-				queries: []SearchQuery{&TextQuery{testCol, "horst", TextEquals}},
+				queries: []SearchQuery{&textQuery{testCol, "horst", TextEquals}},
 			},
 			wantErr: func(err error) bool {
 				return errors.Is(err, ErrMissingColumn)
@@ -201,7 +201,7 @@ func TestNewSubSelect(t *testing.T) {
 			name: "no column name 1",
 			args: args{
 				column:  testNoCol,
-				queries: []SearchQuery{&TextQuery{testCol, "horst", TextEquals}},
+				queries: []SearchQuery{&textQuery{testCol, "horst", TextEquals}},
 			},
 			wantErr: func(err error) bool {
 				return errors.Is(err, ErrMissingColumn)
@@ -211,22 +211,22 @@ func TestNewSubSelect(t *testing.T) {
 			name: "correct 1",
 			args: args{
 				column:  testCol,
-				queries: []SearchQuery{&TextQuery{testCol, "horst", TextEquals}},
+				queries: []SearchQuery{&textQuery{testCol, "horst", TextEquals}},
 			},
 			want: &SubSelect{
 				Column:  testCol,
-				Queries: []SearchQuery{&TextQuery{testCol, "horst", TextEquals}},
+				Queries: []SearchQuery{&textQuery{testCol, "horst", TextEquals}},
 			},
 		},
 		{
 			name: "correct 3",
 			args: args{
 				column:  testCol,
-				queries: []SearchQuery{&TextQuery{testCol, "horst1", TextEquals}, &TextQuery{testCol, "horst2", TextEquals}, &TextQuery{testCol, "horst3", TextEquals}},
+				queries: []SearchQuery{&textQuery{testCol, "horst1", TextEquals}, &textQuery{testCol, "horst2", TextEquals}, &textQuery{testCol, "horst3", TextEquals}},
 			},
 			want: &SubSelect{
 				Column:  testCol,
-				Queries: []SearchQuery{&TextQuery{testCol, "horst1", TextEquals}, &TextQuery{testCol, "horst2", TextEquals}, &TextQuery{testCol, "horst3", TextEquals}},
+				Queries: []SearchQuery{&textQuery{testCol, "horst1", TextEquals}, &textQuery{testCol, "horst2", TextEquals}, &textQuery{testCol, "horst3", TextEquals}},
 			},
 		},
 	}
@@ -275,7 +275,7 @@ func TestSubSelect_comp(t *testing.T) {
 			name: "queries 1",
 			fields: fields{
 				Column:  testCol,
-				Queries: []SearchQuery{&TextQuery{testCol, "horst", TextEquals}},
+				Queries: []SearchQuery{&textQuery{testCol, "horst", TextEquals}},
 			},
 			want: want{
 				query: sq.Select("test_table.test_col").From("test_table").Where(sq.Eq{"test_table.test_col": interface{}("horst")}),
@@ -285,7 +285,7 @@ func TestSubSelect_comp(t *testing.T) {
 			name: "queries 1 with alias",
 			fields: fields{
 				Column:  testColAlias,
-				Queries: []SearchQuery{&TextQuery{testColAlias, "horst", TextEquals}},
+				Queries: []SearchQuery{&textQuery{testColAlias, "horst", TextEquals}},
 			},
 			want: want{
 				query: sq.Select("test_alias.test_col").From("test_table AS test_alias").Where(sq.Eq{"test_alias.test_col": interface{}("horst")}),
@@ -295,7 +295,7 @@ func TestSubSelect_comp(t *testing.T) {
 			name: "queries 3",
 			fields: fields{
 				Column:  testCol,
-				Queries: []SearchQuery{&TextQuery{testCol, "horst1", TextEquals}, &TextQuery{testCol, "horst2", TextEquals}, &TextQuery{testCol, "horst3", TextEquals}},
+				Queries: []SearchQuery{&textQuery{testCol, "horst1", TextEquals}, &textQuery{testCol, "horst2", TextEquals}, &textQuery{testCol, "horst3", TextEquals}},
 			},
 			want: want{
 				query: sq.Select("test_table.test_col").From("test_table").From("test_table").Where(sq.Eq{"test_table.test_col": "horst1"}).From("test_table").Where(sq.Eq{"test_table.test_col": "horst2"}).From("test_table").Where(sq.Eq{"test_table.test_col": "horst3"}),
@@ -585,12 +585,12 @@ func TestNewListQuery(t *testing.T) {
 			name: "correct",
 			args: args{
 				column:  testCol,
-				data:    &SubSelect{Column: testCol, Queries: []SearchQuery{&TextQuery{testCol, "horst1", TextEquals}}},
+				data:    &SubSelect{Column: testCol, Queries: []SearchQuery{&textQuery{testCol, "horst1", TextEquals}}},
 				compare: ListIn,
 			},
 			want: &ListQuery{
 				Column:  testCol,
-				Data:    &SubSelect{Column: testCol, Queries: []SearchQuery{&TextQuery{testCol, "horst1", TextEquals}}},
+				Data:    &SubSelect{Column: testCol, Queries: []SearchQuery{&textQuery{testCol, "horst1", TextEquals}}},
 				Compare: ListIn,
 			},
 		},
@@ -697,7 +697,7 @@ func TestListQuery_comp(t *testing.T) {
 			name: "in subquery text",
 			fields: fields{
 				Column:  testCol,
-				Data:    &SubSelect{Column: testCol, Queries: []SearchQuery{&TextQuery{testCol, "horst", TextEquals}}},
+				Data:    &SubSelect{Column: testCol, Queries: []SearchQuery{&textQuery{testCol, "horst", TextEquals}}},
 				Compare: ListIn,
 			},
 			want: want{
@@ -779,7 +779,7 @@ func TestNewTextQuery(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *TextQuery
+		want    *textQuery
 		wantErr func(error) bool
 	}{
 		{
@@ -827,16 +827,315 @@ func TestNewTextQuery(t *testing.T) {
 			},
 		},
 		{
-			name: "correct",
+			name: "equals",
 			args: args{
 				column:  testCol,
 				value:   "hurst",
 				compare: TextEquals,
 			},
-			want: &TextQuery{
+			want: &textQuery{
 				Column:  testCol,
 				Text:    "hurst",
 				Compare: TextEquals,
+			},
+		},
+		{
+			name: "equals ignore case",
+			args: args{
+				column:  testCol,
+				value:   "hurst",
+				compare: TextEqualsIgnoreCase,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "hurst",
+				Compare: TextEqualsIgnoreCase,
+			},
+		},
+		{
+			name: "equals ignore case % wildcard",
+			args: args{
+				column:  testCol,
+				value:   "hu%rst",
+				compare: TextEqualsIgnoreCase,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "hu\\%rst",
+				Compare: TextEqualsIgnoreCase,
+			},
+		},
+		{
+			name: "equals ignore case _ wildcard",
+			args: args{
+				column:  testCol,
+				value:   "hu_rst",
+				compare: TextEqualsIgnoreCase,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "hu\\_rst",
+				Compare: TextEqualsIgnoreCase,
+			},
+		},
+		{
+			name: "equals ignore case _, % wildcards",
+			args: args{
+				column:  testCol,
+				value:   "h_urst%",
+				compare: TextEqualsIgnoreCase,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "h\\_urst\\%",
+				Compare: TextEqualsIgnoreCase,
+			},
+		},
+		{
+			name: "not equal",
+			args: args{
+				column:  testCol,
+				value:   "hurst",
+				compare: TextNotEquals,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "hurst",
+				Compare: TextNotEquals,
+			},
+		},
+		{
+			name: "starts with",
+			args: args{
+				column:  testCol,
+				value:   "hurst",
+				compare: TextStartsWith,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "hurst",
+				Compare: TextStartsWith,
+			},
+		},
+		{
+			name: "starts with _ wildcard",
+			args: args{
+				column:  testCol,
+				value:   "_hurst",
+				compare: TextStartsWith,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "\\_hurst",
+				Compare: TextStartsWith,
+			},
+		},
+		{
+			name: "starts with % wildcard",
+			args: args{
+				column:  testCol,
+				value:   "hurst%",
+				compare: TextStartsWith,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "hurst\\%",
+				Compare: TextStartsWith,
+			},
+		},
+		{
+			name: "starts with %, % wildcard",
+			args: args{
+				column:  testCol,
+				value:   "hu%%rst",
+				compare: TextStartsWith,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "hu\\%\\%rst",
+				Compare: TextStartsWith,
+			},
+		},
+		{
+			name: "starts with ignore case",
+			args: args{
+				column:  testCol,
+				value:   "hurst",
+				compare: TextStartsWithIgnoreCase,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "hurst",
+				Compare: TextStartsWithIgnoreCase,
+			},
+		},
+		{
+			name: "starts with ignore case _ wildcard",
+			args: args{
+				column:  testCol,
+				value:   "hur_st",
+				compare: TextStartsWithIgnoreCase,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "hur\\_st",
+				Compare: TextStartsWithIgnoreCase,
+			},
+		},
+		{
+			name: "starts with ignore case % wildcard",
+			args: args{
+				column:  testCol,
+				value:   "hurst%",
+				compare: TextStartsWithIgnoreCase,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "hurst\\%",
+				Compare: TextStartsWithIgnoreCase,
+			},
+		},
+		{
+			name: "starts with ignore case _, _ wildcard",
+			args: args{
+				column:  testCol,
+				value:   "h_r_t",
+				compare: TextStartsWithIgnoreCase,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "h\\_r\\_t",
+				Compare: TextStartsWithIgnoreCase,
+			},
+		},
+		{
+			name: "ends with",
+			args: args{
+				column:  testCol,
+				value:   "hurst",
+				compare: TextEndsWith,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "hurst",
+				Compare: TextEndsWith,
+			},
+		},
+		{
+			name: "ends with % wildcard",
+			args: args{
+				column:  testCol,
+				value:   "%hurst",
+				compare: TextEndsWith,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "\\%hurst",
+				Compare: TextEndsWith,
+			},
+		},
+		{
+			name: "ends with _ wildcard",
+			args: args{
+				column:  testCol,
+				value:   "hurst_",
+				compare: TextEndsWith,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "hurst\\_",
+				Compare: TextEndsWith,
+			},
+		},
+		{
+			name: "ends with _, % wildcard",
+			args: args{
+				column:  testCol,
+				value:   "hurst_%",
+				compare: TextEndsWith,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "hurst\\_\\%",
+				Compare: TextEndsWith,
+			},
+		},
+		{
+			name: "ends with ignore case",
+			args: args{
+				column:  testCol,
+				value:   "hurst",
+				compare: TextEndsWithIgnoreCase,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "hurst",
+				Compare: TextEndsWithIgnoreCase,
+			},
+		},
+		{
+			name: "ends with ignore case _, %, _ wildcards",
+			args: args{
+				column:  testCol,
+				value:   "h_r_t%",
+				compare: TextEndsWithIgnoreCase,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "h\\_r\\_t\\%",
+				Compare: TextEndsWithIgnoreCase,
+			},
+		},
+		{
+			name: "contains",
+			args: args{
+				column:  testCol,
+				value:   "hurst",
+				compare: TextContains,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "hurst",
+				Compare: TextContains,
+			},
+		},
+		{
+			name: "contains % wildcard",
+			args: args{
+				column:  testCol,
+				value:   "%",
+				compare: TextContains,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "\\%",
+				Compare: TextContains,
+			},
+		},
+		{
+			name: "contains ignore csae",
+			args: args{
+				column:  testCol,
+				value:   "hurst",
+				compare: TextContainsIgnoreCase,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "hurst",
+				Compare: TextContainsIgnoreCase,
+			},
+		},
+		{
+			name: "contains ignore csae _ wildcard",
+			args: args{
+				column:  testCol,
+				value:   "hurs_",
+				compare: TextContainsIgnoreCase,
+			},
+			want: &textQuery{
+				Column:  testCol,
+				Text:    "hurs\\_",
+				Compare: TextContainsIgnoreCase,
 			},
 		},
 	}
@@ -895,6 +1194,17 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 		},
 		{
+			name: "equals ignore case wildcard",
+			fields: fields{
+				Column:  testCol,
+				Text:    "Hu%%rst",
+				Compare: TextEqualsIgnoreCase,
+			},
+			want: want{
+				query: sq.ILike{"test_table.test_col": "Hu\\%\\%rst"},
+			},
+		},
+		{
 			name: "starts with",
 			fields: fields{
 				Column:  testCol,
@@ -903,6 +1213,17 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.Like{"test_table.test_col": "Hurst%"},
+			},
+		},
+		{
+			name: "starts with wildcards",
+			fields: fields{
+				Column:  testCol,
+				Text:    "_Hurst%",
+				Compare: TextStartsWith,
+			},
+			want: want{
+				query: sq.Like{"test_table.test_col": "\\_Hurst\\%%"},
 			},
 		},
 		{
@@ -917,6 +1238,17 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 		},
 		{
+			name: "starts with ignore case wildcards",
+			fields: fields{
+				Column:  testCol,
+				Text:    "Hurst%",
+				Compare: TextStartsWithIgnoreCase,
+			},
+			want: want{
+				query: sq.ILike{"test_table.test_col": "Hurst\\%%"},
+			},
+		},
+		{
 			name: "ends with",
 			fields: fields{
 				Column:  testCol,
@@ -925,6 +1257,17 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.Like{"test_table.test_col": "%Hurst"},
+			},
+		},
+		{
+			name: "ends with wildcards",
+			fields: fields{
+				Column:  testCol,
+				Text:    "Hurst%",
+				Compare: TextEndsWith,
+			},
+			want: want{
+				query: sq.Like{"test_table.test_col": "%Hurst\\%"},
 			},
 		},
 		{
@@ -939,6 +1282,17 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 		},
 		{
+			name: "ends with ignore case wildcards",
+			fields: fields{
+				Column:  testCol,
+				Text:    "%Hurst",
+				Compare: TextEndsWithIgnoreCase,
+			},
+			want: want{
+				query: sq.ILike{"test_table.test_col": "%\\%Hurst"},
+			},
+		},
+		{
 			name: "contains",
 			fields: fields{
 				Column:  testCol,
@@ -950,6 +1304,17 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 		},
 		{
+			name: "contains wildcards",
+			fields: fields{
+				Column:  testCol,
+				Text:    "Hu%rst%",
+				Compare: TextContains,
+			},
+			want: want{
+				query: sq.Like{"test_table.test_col": "%Hu\\%rst\\%%"},
+			},
+		},
+		{
 			name: "containts ignore case",
 			fields: fields{
 				Column:  testCol,
@@ -958,6 +1323,17 @@ func TestTextQuery_comp(t *testing.T) {
 			},
 			want: want{
 				query: sq.ILike{"test_table.test_col": "%Hurst%"},
+			},
+		},
+		{
+			name: "contains ignore case wildcards",
+			fields: fields{
+				Column:  testCol,
+				Text:    "%Hurst%",
+				Compare: TextContainsIgnoreCase,
+			},
+			want: want{
+				query: sq.ILike{"test_table.test_col": "%\\%Hurst\\%%"},
 			},
 		},
 		{
@@ -999,10 +1375,10 @@ func TestTextQuery_comp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &TextQuery{
-				Column:  tt.fields.Column,
-				Text:    tt.fields.Text,
-				Compare: tt.fields.Compare,
+			s, _ := NewTextQuery(tt.fields.Column, tt.fields.Text, tt.fields.Compare)
+			if s == nil {
+				// used to check correct behavior of comp
+				s = &textQuery{Column: tt.fields.Column, Text: tt.fields.Text, Compare: tt.fields.Compare}
 			}
 			query := s.comp()
 			if query == nil && tt.want.isNil {
@@ -1013,95 +1389,6 @@ func TestTextQuery_comp(t *testing.T) {
 
 			if !reflect.DeepEqual(query, tt.want.query) {
 				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, query, query)
-			}
-		})
-	}
-}
-
-func TestTextComparisonFromMethod(t *testing.T) {
-	type args struct {
-		m domain.SearchMethod
-	}
-	tests := []struct {
-		name string
-		args args
-		want TextComparison
-	}{
-		{
-			name: "equals",
-			args: args{
-				m: domain.SearchMethodEquals,
-			},
-			want: TextEquals,
-		},
-		{
-			name: "equals ignore case",
-			args: args{
-				m: domain.SearchMethodEqualsIgnoreCase,
-			},
-			want: TextEqualsIgnoreCase,
-		},
-		{
-			name: "starts with",
-			args: args{
-				m: domain.SearchMethodStartsWith,
-			},
-			want: TextStartsWith,
-		},
-		{
-			name: "starts with ignore case",
-			args: args{
-				m: domain.SearchMethodStartsWithIgnoreCase,
-			},
-			want: TextStartsWithIgnoreCase,
-		},
-		{
-			name: "ends with",
-			args: args{
-				m: domain.SearchMethodEndsWith,
-			},
-			want: TextEndsWith,
-		},
-		{
-			name: "ends with ignore case",
-			args: args{
-				m: domain.SearchMethodEndsWithIgnoreCase,
-			},
-			want: TextEndsWithIgnoreCase,
-		},
-		{
-			name: "contains",
-			args: args{
-				m: domain.SearchMethodContains,
-			},
-			want: TextContains,
-		},
-		{
-			name: "list contains",
-			args: args{
-				m: domain.SearchMethodListContains,
-			},
-			want: TextListContains,
-		},
-		{
-			name: "containts ignore case",
-			args: args{
-				m: domain.SearchMethodContainsIgnoreCase,
-			},
-			want: TextContainsIgnoreCase,
-		},
-		{
-			name: "invalid search method",
-			args: args{
-				m: -1,
-			},
-			want: textCompareMax,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := TextComparisonFromMethod(tt.args.m); got != tt.want {
-				t.Errorf("TextCompareFromMethod() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -1378,6 +1665,530 @@ func TestNumberComparisonFromMethod(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := NumberComparisonFromMethod(tt.args.m); got != tt.want {
 				t.Errorf("TextCompareFromMethod() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNewOrQuery(t *testing.T) {
+
+	type args struct {
+		queries []SearchQuery
+	}
+
+	singleCorrectQuery, _ := NewTextQuery(testCol, "hello", TextEquals)
+
+	tests := []struct {
+		name    string
+		args    args
+		want    *OrQuery
+		wantErr func(error) bool
+	}{
+		{
+			name: "empty values",
+			args: args{
+				queries: []SearchQuery{},
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, ErrMissingColumn)
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				queries: []SearchQuery{singleCorrectQuery},
+			},
+			want: &OrQuery{
+				queries: []SearchQuery{singleCorrectQuery},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewOrQuery(tt.args.queries...)
+			if err != nil && tt.wantErr == nil {
+				t.Errorf("NewOrQuery() no error expected got %v", err)
+				return
+			} else if tt.wantErr != nil && !tt.wantErr(err) {
+				t.Errorf("NewOrQuery() unexpeted error = %v", err)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewOrQuery() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+func TestOrQuery_comp(t *testing.T) {
+	q1, _ := NewTextQuery(testCol, "hello1", TextEquals)
+	q2, _ := NewTextQuery(testCol, "hello2", TextEquals)
+	q3, _ := NewTextQuery(testCol2, "world1", TextEquals)
+	q4, _ := NewTextQuery(testCol2, "world2", TextEquals)
+	orq, _ := NewOrQuery(q3, q4)
+
+	type fields struct {
+		queries []SearchQuery
+	}
+	type want struct {
+		query interface{}
+		isNil bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   want
+	}{
+		{
+			name: "single input",
+			fields: fields{
+				queries: []SearchQuery{q1},
+			},
+			want: want{
+				query: sq.Or{sq.Eq{"test_table.test_col": "hello1"}},
+			},
+		},
+		{
+			name: "multi input",
+			fields: fields{
+				queries: []SearchQuery{q1, q2},
+			},
+			want: want{
+				query: sq.Or{sq.Eq{"test_table.test_col": "hello1"}, sq.Eq{"test_table.test_col": "hello2"}},
+			},
+		},
+		{
+			name: "nested inputs",
+			fields: fields{
+				queries: []SearchQuery{q1, orq},
+			},
+			want: want{
+				query: sq.Or{sq.Eq{"test_table.test_col": "hello1"}, sq.Or{sq.Eq{"test_table2.test_col2": "world1"}, sq.Eq{"test_table2.test_col2": "world2"}}},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &OrQuery{
+				queries: tt.fields.queries,
+			}
+			query := s.comp()
+			if query == nil && tt.want.isNil {
+				return
+			} else if tt.want.isNil && query != nil {
+				t.Error("query should not be nil")
+			}
+
+			if !reflect.DeepEqual(query, tt.want.query) {
+				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, query, query)
+			}
+		})
+	}
+}
+func TestNewAndQuery(t *testing.T) {
+
+	type args struct {
+		queries []SearchQuery
+	}
+
+	singleCorrectQuery, _ := NewTextQuery(testCol, "hello", TextEquals)
+
+	tests := []struct {
+		name    string
+		args    args
+		want    *AndQuery
+		wantErr func(error) bool
+	}{
+		{
+			name: "empty values",
+			args: args{
+				queries: []SearchQuery{},
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, ErrMissingColumn)
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				queries: []SearchQuery{singleCorrectQuery},
+			},
+			want: &AndQuery{
+				queries: []SearchQuery{singleCorrectQuery},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewAndQuery(tt.args.queries...)
+			if err != nil && tt.wantErr == nil {
+				t.Errorf("NewAndQuery() no error expected got %v", err)
+				return
+			} else if tt.wantErr != nil && !tt.wantErr(err) {
+				t.Errorf("NewAndQuery() unexpeted error = %v", err)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewAndQuery() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestAndQuery_comp(t *testing.T) {
+	q1, _ := NewTextQuery(testCol, "hello1", TextEquals)
+	q2, _ := NewTextQuery(testCol, "hello2", TextEquals)
+	q3, _ := NewTextQuery(testCol2, "world1", TextEquals)
+	q4, _ := NewTextQuery(testCol2, "world2", TextEquals)
+	andq, _ := NewAndQuery(q3, q4)
+
+	type fields struct {
+		queries []SearchQuery
+	}
+	type want struct {
+		query interface{}
+		isNil bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   want
+	}{
+		{
+			name: "single input",
+			fields: fields{
+				queries: []SearchQuery{q1},
+			},
+			want: want{
+				query: sq.And{sq.Eq{"test_table.test_col": "hello1"}},
+			},
+		},
+		{
+			name: "multi input",
+			fields: fields{
+				queries: []SearchQuery{q1, q2},
+			},
+			want: want{
+				query: sq.And{sq.Eq{"test_table.test_col": "hello1"}, sq.Eq{"test_table.test_col": "hello2"}},
+			},
+		},
+		{
+			name: "nested inputs",
+			fields: fields{
+				queries: []SearchQuery{q1, andq},
+			},
+			want: want{
+				query: sq.And{sq.Eq{"test_table.test_col": "hello1"}, sq.And{sq.Eq{"test_table2.test_col2": "world1"}, sq.Eq{"test_table2.test_col2": "world2"}}},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &AndQuery{
+				queries: tt.fields.queries,
+			}
+			query := s.comp()
+			if query == nil && tt.want.isNil {
+				return
+			} else if tt.want.isNil && query != nil {
+				t.Error("query should not be nil")
+			}
+
+			if !reflect.DeepEqual(query, tt.want.query) {
+				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, query, query)
+			}
+		})
+	}
+}
+
+func TestNewNotQuery(t *testing.T) {
+
+	type args struct {
+		query SearchQuery
+	}
+
+	singleCorrectQuery, _ := NewTextQuery(testCol, "hello", TextEquals)
+
+	tests := []struct {
+		name    string
+		args    args
+		want    *NotQuery
+		wantErr func(error) bool
+	}{
+		{
+			name: "empty query",
+			args: args{
+				query: nil,
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, ErrMissingColumn)
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				query: singleCorrectQuery,
+			},
+			want: &NotQuery{
+				query: singleCorrectQuery,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewNotQuery(tt.args.query)
+			if err != nil && tt.wantErr == nil {
+				t.Errorf("NewNotQuery() no error expected got %v", err)
+				return
+			} else if tt.wantErr != nil && !tt.wantErr(err) {
+				t.Errorf("NewNotQuery() unexpeted error = %v", err)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewNotQuery() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNotQuery_comp(t *testing.T) {
+	q1, _ := NewTextQuery(testCol, "hello1", TextEquals)
+
+	type fields struct {
+		query SearchQuery
+	}
+	type want struct {
+		query interface{}
+		isNil bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   want
+	}{
+		{
+			name: "single input",
+			fields: fields{
+				query: q1,
+			},
+			want: want{
+				query: &NotQuery{query: q1},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &NotQuery{
+				query: tt.fields.query,
+			}
+			query := s.comp()
+			if query == nil && tt.want.isNil {
+				return
+			} else if tt.want.isNil && query != nil {
+				t.Error("query should not be nil")
+			}
+
+			if !reflect.DeepEqual(query, tt.want.query) {
+				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, query, query)
+			}
+		})
+	}
+}
+func TestNotQuery_ToSql(t *testing.T) {
+	q, _ := NewTextQuery(testCol, "hello1", TextEquals)
+	type fields struct {
+		query SearchQuery
+	}
+	type want struct {
+		query string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   want
+	}{
+		{
+			name: "single input",
+			fields: fields{
+				query: q,
+			},
+			want: want{
+				query: "NOT (test_table.test_col = hello1)",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &NotQuery{
+				query: tt.fields.query,
+			}
+			queryStr, _, err := s.ToSql()
+			if err != nil {
+				t.Error("an error raised ")
+			}
+			if queryStr == tt.want.query {
+				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, queryStr, queryStr)
+			}
+		})
+	}
+}
+
+func TestAndOrQueryCombo(t *testing.T) {
+	q1, _ := NewTextQuery(testCol, "hello1", TextEquals)
+	q2, _ := NewTextQuery(testCol, "hello2", TextEquals)
+	q3, _ := NewTextQuery(testCol2, "world1", TextEquals)
+	q4, _ := NewTextQuery(testCol2, "world2", TextEquals)
+	andq, _ := NewAndQuery(q3, q4)
+	orq, _ := NewOrQuery(q1, q2, andq)
+
+	type fields struct {
+		query SearchQuery
+	}
+	type want struct {
+		query interface{}
+		isNil bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   want
+	}{
+		{
+			name: "OR containing AND query",
+			fields: fields{
+				query: orq,
+			},
+			want: want{
+				query: sq.Or{sq.Eq{"test_table.test_col": "hello1"}, sq.Eq{"test_table.test_col": "hello2"}, sq.And{sq.Eq{"test_table2.test_col2": "world1"}, sq.Eq{"test_table2.test_col2": "world2"}}},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := tt.fields.query
+			query := s.comp()
+			if query == nil && tt.want.isNil {
+				return
+			} else if tt.want.isNil && query != nil {
+				t.Error("query should not be nil")
+			}
+
+			if !reflect.DeepEqual(query, tt.want.query) {
+				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, query, query)
+			}
+		})
+	}
+}
+
+func TestNewInTextQuery(t *testing.T) {
+	type args struct {
+		column Column
+		value  []string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *InTextQuery
+		wantErr func(error) bool
+	}{
+		{
+			name: "empty values",
+			args: args{
+				column: testCol,
+				value:  []string{},
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, ErrEmptyValues)
+			},
+		},
+		{
+			name: "no column",
+			args: args{
+				column: Column{},
+				value:  []string{"adler", "hurst"},
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, ErrMissingColumn)
+			},
+		},
+		{
+			name: "no column name",
+			args: args{
+				column: testNoCol,
+				value:  []string{"adler", "hurst"},
+			},
+			wantErr: func(err error) bool {
+				return errors.Is(err, ErrMissingColumn)
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				column: testCol,
+				value:  []string{"adler", "hurst"},
+			},
+			want: &InTextQuery{
+				Column: testCol,
+				Values: []string{"adler", "hurst"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewInTextQuery(tt.args.column, tt.args.value)
+			if err != nil && tt.wantErr == nil {
+				t.Errorf("NewTextQuery() no error expected got %v", err)
+				return
+			} else if tt.wantErr != nil && !tt.wantErr(err) {
+				t.Errorf("NewTextQuery() unexpeted error = %v", err)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewTextQuery() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestInTextQuery_comp(t *testing.T) {
+	type fields struct {
+		Column Column
+		Values []string
+	}
+	type want struct {
+		query interface{}
+		isNil bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   want
+	}{
+		{
+			name: "equals",
+			fields: fields{
+				Column: testCol,
+				Values: []string{"Adler", "Hurst"},
+			},
+			want: want{
+				query: sq.Eq{"test_table.test_col": []string{"Adler", "Hurst"}},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &InTextQuery{
+				Column: tt.fields.Column,
+				Values: tt.fields.Values,
+			}
+			query := s.comp()
+			if query == nil && tt.want.isNil {
+				return
+			} else if tt.want.isNil && query != nil {
+				t.Error("query should not be nil")
+			}
+
+			if !reflect.DeepEqual(query, tt.want.query) {
+				t.Errorf("wrong query: want: %v, (%T), got: %v, (%T)", tt.want.query, tt.want.query, query, query)
 			}
 		})
 	}

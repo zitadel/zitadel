@@ -10,13 +10,12 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestAddOIDCApp(t *testing.T) {
@@ -57,7 +56,7 @@ func TestAddOIDCApp(t *testing.T) {
 				},
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-NnavI", "Errors.Invalid.Argument"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "PROJE-NnavI", "Errors.Invalid.Argument"),
 			},
 		},
 		{
@@ -79,11 +78,11 @@ func TestAddOIDCApp(t *testing.T) {
 				},
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-Fef31", "Errors.Invalid.Argument"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "PROJE-Fef31", "Errors.Invalid.Argument"),
 			},
 		},
 		{
-			name:   "project not exists",
+			name:   "project doesn't exist",
 			fields: fields{},
 			args: args{
 				app: &addOIDCApp{
@@ -106,7 +105,74 @@ func TestAddOIDCApp(t *testing.T) {
 					Filter(),
 			},
 			want: Want{
-				CreateErr: errors.ThrowNotFound(nil, "PROJE-6swVG", ""),
+				CreateErr: zerrors.ThrowNotFound(nil, "PROJE-6swVG", ""),
+			},
+		},
+		{
+			name: "correct, using uris with whitespaces",
+			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "clientID"),
+			},
+			args: args{
+				app: &addOIDCApp{
+					AddApp: AddApp{
+						Aggregate: *agg,
+						ID:        "id",
+						Name:      "name",
+					},
+					RedirectUris:           []string{" https://test.ch "},
+					PostLogoutRedirectUris: []string{" https://test.ch/logout "},
+					GrantTypes:             []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ResponseTypes:          []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+					Version:                domain.OIDCVersionV1,
+					AdditionalOrigins:      []string{" https://sub.test.ch "},
+					ApplicationType:        domain.OIDCApplicationTypeWeb,
+					AuthMethodType:         domain.OIDCAuthMethodTypeNone,
+					AccessTokenType:        domain.OIDCTokenTypeBearer,
+				},
+				filter: NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							project.NewProjectAddedEvent(
+								ctx,
+								&agg.Aggregate,
+								"project",
+								false,
+								false,
+								false,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						}, nil
+					}).
+					Filter(),
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					project.NewApplicationAddedEvent(ctx, &agg.Aggregate,
+						"id",
+						"name",
+					),
+					project.NewOIDCConfigAddedEvent(ctx, &agg.Aggregate,
+						domain.OIDCVersionV1,
+						"id",
+						"clientID@project",
+						nil,
+						[]string{"https://test.ch"},
+						[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+						[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+						domain.OIDCApplicationTypeWeb,
+						domain.OIDCAuthMethodTypeNone,
+						[]string{"https://test.ch/logout"},
+						false,
+						domain.OIDCTokenTypeBearer,
+						false,
+						false,
+						false,
+						0,
+						[]string{"https://sub.test.ch"},
+						false,
+					),
+				},
 			},
 		},
 		{
@@ -224,7 +290,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -247,7 +313,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -277,7 +343,112 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "create oidc app basic using whitespaces in uris, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingUnspecified),
+						),
+					),
+					expectPush(
+						project.NewApplicationAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"app",
+						),
+						project.NewOIDCConfigAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							domain.OIDCVersionV1,
+							"app1",
+							"client1@project",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							[]string{"https://test.ch"},
+							[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+							[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+							domain.OIDCApplicationTypeWeb,
+							domain.OIDCAuthMethodTypePost,
+							[]string{"https://test.ch/logout"},
+							true,
+							domain.OIDCTokenTypeBearer,
+							true,
+							true,
+							true,
+							time.Second*1,
+							[]string{"https://sub.test.ch"},
+							true,
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1"),
+			},
+			args: args{
+				ctx: context.Background(),
+				oidcApp: &domain.OIDCApp{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					AppName:                  "app",
+					AuthMethodType:           domain.OIDCAuthMethodTypePost,
+					OIDCVersion:              domain.OIDCVersionV1,
+					RedirectUris:             []string{" https://test.ch "},
+					ResponseTypes:            []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+					GrantTypes:               []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ApplicationType:          domain.OIDCApplicationTypeWeb,
+					PostLogoutRedirectUris:   []string{" https://test.ch/logout "},
+					DevMode:                  true,
+					AccessTokenType:          domain.OIDCTokenTypeBearer,
+					AccessTokenRoleAssertion: true,
+					IDTokenRoleAssertion:     true,
+					IDTokenUserinfoAssertion: true,
+					ClockSkew:                time.Second * 1,
+					AdditionalOrigins:        []string{" https://sub.test.ch "},
+					SkipNativeAppSuccessPage: true,
+				},
+				resourceOwner:   "org1",
+				secretGenerator: GetMockSecretGenerator(t),
+			},
+			res: res{
+				want: &domain.OIDCApp{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
+					},
+					AppID:                    "app1",
+					AppName:                  "app",
+					ClientID:                 "client1@project",
+					ClientSecretString:       "a",
+					AuthMethodType:           domain.OIDCAuthMethodTypePost,
+					OIDCVersion:              domain.OIDCVersionV1,
+					RedirectUris:             []string{"https://test.ch"},
+					ResponseTypes:            []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+					GrantTypes:               []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ApplicationType:          domain.OIDCApplicationTypeWeb,
+					PostLogoutRedirectUris:   []string{"https://test.ch/logout"},
+					DevMode:                  true,
+					AccessTokenType:          domain.OIDCTokenTypeBearer,
+					AccessTokenRoleAssertion: true,
+					IDTokenRoleAssertion:     true,
+					IDTokenUserinfoAssertion: true,
+					ClockSkew:                time.Second * 1,
+					AdditionalOrigins:        []string{"https://sub.test.ch"},
+					SkipNativeAppSuccessPage: true,
+					State:                    domain.AppStateActive,
+					Compliance:               &domain.Compliance{},
+				},
 			},
 		},
 		{
@@ -294,44 +465,37 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewApplicationAddedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"app1",
-									"app",
-								),
-							),
-							eventFromEventPusher(
-								project.NewOIDCConfigAddedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									domain.OIDCVersionV1,
-									"app1",
-									"client1@project",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									},
-									[]string{"https://test.ch"},
-									[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
-									[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
-									domain.OIDCApplicationTypeWeb,
-									domain.OIDCAuthMethodTypePost,
-									[]string{"https://test.ch/logout"},
-									true,
-									domain.OIDCTokenTypeBearer,
-									true,
-									true,
-									true,
-									time.Second*1,
-									[]string{"https://sub.test.ch"},
-									true,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewAddApplicationUniqueConstraint("app", "project1")),
+						project.NewApplicationAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"app",
+						),
+						project.NewOIDCConfigAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							domain.OIDCVersionV1,
+							"app1",
+							"client1@project",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							[]string{"https://test.ch"},
+							[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+							[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+							domain.OIDCApplicationTypeWeb,
+							domain.OIDCAuthMethodTypePost,
+							[]string{"https://test.ch/logout"},
+							true,
+							domain.OIDCTokenTypeBearer,
+							true,
+							true,
+							true,
+							time.Second*1,
+							[]string{"https://sub.test.ch"},
+							true,
+						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1"),
@@ -450,7 +614,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -474,7 +638,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -498,7 +662,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -523,7 +687,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -597,7 +761,81 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "no changes whitespaces are ignored, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewApplicationAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"app1",
+								"app",
+							),
+						),
+						eventFromEventPusher(
+							project.NewOIDCConfigAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								domain.OIDCVersionV1,
+								"app1",
+								"client1@project",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								[]string{"https://test.ch"},
+								[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+								[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+								domain.OIDCApplicationTypeWeb,
+								domain.OIDCAuthMethodTypePost,
+								[]string{"https://test.ch/logout"},
+								true,
+								domain.OIDCTokenTypeBearer,
+								true,
+								true,
+								true,
+								time.Second*1,
+								[]string{"https://sub.test.ch"},
+								true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				oidcApp: &domain.OIDCApp{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					AppID:                    "app1",
+					AppName:                  "app",
+					AuthMethodType:           domain.OIDCAuthMethodTypePost,
+					OIDCVersion:              domain.OIDCVersionV1,
+					RedirectUris:             []string{"https://test.ch "},
+					ResponseTypes:            []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+					GrantTypes:               []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ApplicationType:          domain.OIDCApplicationTypeWeb,
+					PostLogoutRedirectUris:   []string{" https://test.ch/logout"},
+					DevMode:                  true,
+					AccessTokenType:          domain.OIDCTokenTypeBearer,
+					AccessTokenRoleAssertion: true,
+					IDTokenRoleAssertion:     true,
+					IDTokenUserinfoAssertion: true,
+					ClockSkew:                time.Second * 1,
+					AdditionalOrigins:        []string{" https://sub.test.ch "},
+					SkipNativeAppSuccessPage: true,
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -643,14 +881,10 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newOIDCAppChangedEvent(context.Background(),
-									"app1",
-									"project1",
-									"org1"),
-							),
-						},
+						newOIDCAppChangedEvent(context.Background(),
+							"app1",
+							"project1",
+							"org1"),
 					),
 				),
 			},
@@ -664,11 +898,11 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 					AppName:                  "app",
 					AuthMethodType:           domain.OIDCAuthMethodTypePost,
 					OIDCVersion:              domain.OIDCVersionV1,
-					RedirectUris:             []string{"https://test-change.ch"},
+					RedirectUris:             []string{" https://test-change.ch "},
 					ResponseTypes:            []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 					GrantTypes:               []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
 					ApplicationType:          domain.OIDCApplicationTypeWeb,
-					PostLogoutRedirectUris:   []string{"https://test-change.ch/logout"},
+					PostLogoutRedirectUris:   []string{" https://test-change.ch/logout "},
 					DevMode:                  true,
 					AccessTokenType:          domain.OIDCTokenTypeJWT,
 					AccessTokenRoleAssertion: false,
@@ -763,7 +997,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -780,7 +1014,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -798,7 +1032,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -844,19 +1078,16 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewOIDCConfigSecretChangedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"app1",
-									&crypto.CryptoValue{
-										CryptoType: crypto.TypeEncryption,
-										Algorithm:  "enc",
-										KeyID:      "id",
-										Crypted:    []byte("a"),
-									}),
-							),
-						},
+						project.NewOIDCConfigSecretChangedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+						),
 					),
 				),
 			},

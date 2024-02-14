@@ -7,12 +7,11 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddPasswordComplexityPolicy(t *testing.T) {
@@ -52,7 +51,7 @@ func TestCommandSide_AddPasswordComplexityPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -83,7 +82,7 @@ func TestCommandSide_AddPasswordComplexityPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -93,15 +92,11 @@ func TestCommandSide_AddPasswordComplexityPolicy(t *testing.T) {
 					t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									8,
-									true, true, true, true,
-								),
-							),
-						},
+						org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							8,
+							true, true, true, true,
+						),
 					),
 				),
 			},
@@ -187,7 +182,7 @@ func TestCommandSide_ChangePasswordComplexityPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -210,7 +205,7 @@ func TestCommandSide_ChangePasswordComplexityPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -241,7 +236,7 @@ func TestCommandSide_ChangePasswordComplexityPolicy(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -259,11 +254,7 @@ func TestCommandSide_ChangePasswordComplexityPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newPasswordComplexityPolicyChangedEvent(context.Background(), "org1", 10, false, false, false, false),
-							),
-						},
+						newPasswordComplexityPolicyChangedEvent(context.Background(), "org1", 10, false, false, false, false),
 					),
 				),
 			},
@@ -341,7 +332,7 @@ func TestCommandSide_RemovePasswordComplexityPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -357,7 +348,7 @@ func TestCommandSide_RemovePasswordComplexityPolicy(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -375,12 +366,8 @@ func TestCommandSide_RemovePasswordComplexityPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewPasswordComplexityPolicyRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate),
-							),
-						},
+						org.NewPasswordComplexityPolicyRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate),
 					),
 				),
 			},

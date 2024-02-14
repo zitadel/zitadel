@@ -7,10 +7,9 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type OIDCConfig struct {
@@ -75,11 +74,11 @@ func (key *ClientKey) AppendEvents(events ...*es_models.Event) error {
 
 func (key *ClientKey) AppendEvent(event *es_models.Event) (err error) {
 	key.ObjectRoot.AppendEvent(event)
-	switch eventstore.EventType(event.Type) {
+	switch event.Type() {
 	case project.ApplicationKeyAddedEventType:
 		err = json.Unmarshal(event.Data, key)
 		if err != nil {
-			return errors.ThrowInternal(err, "MODEL-Fetg3", "Errors.Internal")
+			return zerrors.ThrowInternal(err, "MODEL-Fetg3", "Errors.Internal")
 		}
 	case project.ApplicationKeyRemovedEventType:
 		key.ExpirationDate = event.CreationDate

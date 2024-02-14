@@ -2,7 +2,6 @@ package setup
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"os"
 	"strings"
@@ -14,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	crypto_db "github.com/zitadel/zitadel/internal/crypto/database"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -24,13 +24,14 @@ type FirstInstance struct {
 	Org             command.InstanceOrgSetup
 	MachineKeyPath  string
 	PatPath         string
+	Features        map[domain.Feature]any
 
 	instanceSetup     command.InstanceSetup
 	userEncryptionKey *crypto.KeyConfig
 	smtpEncryptionKey *crypto.KeyConfig
 	oidcEncryptionKey *crypto.KeyConfig
 	masterKey         string
-	db                *sql.DB
+	db                *database.DB
 	es                *eventstore.Eventstore
 	defaults          systemdefaults.SystemDefaults
 	zitadelRoles      []authz.RoleMapping
@@ -40,28 +41,17 @@ type FirstInstance struct {
 	domain            string
 }
 
-func (mig *FirstInstance) Execute(ctx context.Context) error {
-	keyStorage, err := crypto_db.NewKeyStorage(mig.db, mig.masterKey)
+func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error {
+	keyStorage, err := mig.verifyEncryptionKeys(ctx)
 	if err != nil {
-		return fmt.Errorf("cannot start key storage: %w", err)
-	}
-	if err = verifyKey(mig.userEncryptionKey, keyStorage); err != nil {
 		return err
 	}
 	userAlg, err := crypto.NewAESCrypto(mig.userEncryptionKey, keyStorage)
 	if err != nil {
 		return err
 	}
-
-	if err = verifyKey(mig.smtpEncryptionKey, keyStorage); err != nil {
-		return err
-	}
 	smtpEncryption, err := crypto.NewAESCrypto(mig.smtpEncryptionKey, keyStorage)
 	if err != nil {
-		return err
-	}
-
-	if err = verifyKey(mig.oidcEncryptionKey, keyStorage); err != nil {
 		return err
 	}
 	oidcEncryption, err := crypto.NewAESCrypto(mig.oidcEncryptionKey, keyStorage)
@@ -91,6 +81,7 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 		0,
 		0,
 		0,
+		nil,
 	)
 	if err != nil {
 		return err
@@ -103,13 +94,21 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 	// check if username is email style or else append @<orgname>.<custom-domain>
 	//this way we have the same value as before changing `UserLoginMustBeDomain` to false
 	if !mig.instanceSetup.DomainPolicy.UserLoginMustBeDomain && !strings.Contains(mig.instanceSetup.Org.Human.Username, "@") {
-		mig.instanceSetup.Org.Human.Username = mig.instanceSetup.Org.Human.Username + "@" + domain.NewIAMDomainName(mig.instanceSetup.Org.Name, mig.instanceSetup.CustomDomain)
+		orgDomain, err := domain.NewIAMDomainName(mig.instanceSetup.Org.Name, mig.instanceSetup.CustomDomain)
+		if err != nil {
+			return err
+		}
+		mig.instanceSetup.Org.Human.Username = mig.instanceSetup.Org.Human.Username + "@" + orgDomain
 	}
 	mig.instanceSetup.Org.Human.Email.Address = mig.instanceSetup.Org.Human.Email.Address.Normalize()
 	if mig.instanceSetup.Org.Human.Email.Address == "" {
 		mig.instanceSetup.Org.Human.Email.Address = domain.EmailAddress(mig.instanceSetup.Org.Human.Username)
 		if !strings.Contains(string(mig.instanceSetup.Org.Human.Email.Address), "@") {
-			mig.instanceSetup.Org.Human.Email.Address = domain.EmailAddress(mig.instanceSetup.Org.Human.Username + "@" + domain.NewIAMDomainName(mig.instanceSetup.Org.Name, mig.instanceSetup.CustomDomain))
+			orgDomain, err := domain.NewIAMDomainName(mig.instanceSetup.Org.Name, mig.instanceSetup.CustomDomain)
+			if err != nil {
+				return err
+			}
+			mig.instanceSetup.Org.Human.Email.Address = domain.EmailAddress(mig.instanceSetup.Org.Human.Username + "@" + orgDomain)
 		}
 	}
 
@@ -122,7 +121,27 @@ func (mig *FirstInstance) Execute(ctx context.Context) error {
 			(mig.instanceSetup.Org.Machine.MachineKey != nil && key == nil)) {
 		return err
 	}
+	return mig.outputMachineAuthentication(key, token)
+}
 
+func (mig *FirstInstance) verifyEncryptionKeys(ctx context.Context) (*crypto_db.Database, error) {
+	keyStorage, err := crypto_db.NewKeyStorage(mig.db, mig.masterKey)
+	if err != nil {
+		return nil, fmt.Errorf("cannot start key storage: %w", err)
+	}
+	if err = verifyKey(ctx, mig.userEncryptionKey, keyStorage); err != nil {
+		return nil, err
+	}
+	if err = verifyKey(ctx, mig.smtpEncryptionKey, keyStorage); err != nil {
+		return nil, err
+	}
+	if err = verifyKey(ctx, mig.oidcEncryptionKey, keyStorage); err != nil {
+		return nil, err
+	}
+	return keyStorage, nil
+}
+
+func (mig *FirstInstance) outputMachineAuthentication(key *command.MachineKey, token string) error {
 	if key != nil {
 		keyDetails, err := key.Detail()
 		if err != nil {
@@ -157,7 +176,7 @@ func (mig *FirstInstance) String() string {
 	return "03_default_instance"
 }
 
-func verifyKey(key *crypto.KeyConfig, storage crypto.KeyStorage) (err error) {
+func verifyKey(ctx context.Context, key *crypto.KeyConfig, storage crypto.KeyStorage) (err error) {
 	_, err = crypto.LoadKey(key.EncryptionKeyID, storage)
 	if err == nil {
 		return nil
@@ -166,5 +185,5 @@ func verifyKey(key *crypto.KeyConfig, storage crypto.KeyStorage) (err error) {
 	if err != nil {
 		return err
 	}
-	return storage.CreateKeys(k)
+	return storage.CreateKeys(ctx, k)
 }

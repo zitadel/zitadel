@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -52,13 +52,13 @@ func Test_PasswordAgePolicyPrepares(t *testing.T) {
 			name:    "preparePasswordAgePolicyQuery no result",
 			prepare: preparePasswordAgePolicyQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					regexp.QuoteMeta(preparePasswordAgePolicyStmt),
 					nil,
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -113,7 +113,7 @@ func Test_PasswordAgePolicyPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*PasswordAgePolicy)(nil),
 		},
 	}
 	for _, tt := range tests {

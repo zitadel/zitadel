@@ -3,11 +3,11 @@ package view
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
-	"github.com/zitadel/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -15,85 +15,56 @@ const (
 )
 
 func (v *View) UserSessionByIDs(agentID, userID, instanceID string) (*model.UserSessionView, error) {
-	return view.UserSessionByIDs(v.Db, userSessionTable, agentID, userID, instanceID)
-}
-
-func (v *View) UserSessionsByUserID(userID, instanceID string) ([]*model.UserSessionView, error) {
-	return view.UserSessionsByUserID(v.Db, userSessionTable, userID, instanceID)
+	return view.UserSessionByIDs(v.client, agentID, userID, instanceID)
 }
 
 func (v *View) UserSessionsByAgentID(agentID, instanceID string) ([]*model.UserSessionView, error) {
-	return view.UserSessionsByAgentID(v.Db, userSessionTable, agentID, instanceID)
+	return view.UserSessionsByAgentID(v.client, agentID, instanceID)
 }
 
-func (v *View) UserSessionsByOrgID(orgID, instanceID string) ([]*model.UserSessionView, error) {
-	return view.UserSessionsByOrgID(v.Db, userSessionTable, orgID, instanceID)
+func (v *View) PutUserSession(userSession *model.UserSessionView) error {
+	return view.PutUserSession(v.Db, userSessionTable, userSession)
 }
 
-func (v *View) ActiveUserSessionsCount() (uint64, error) {
-	return view.ActiveUserSessions(v.Db, userSessionTable)
-}
-
-func (v *View) PutUserSession(userSession *model.UserSessionView, event *models.Event) error {
-	err := view.PutUserSession(v.Db, userSessionTable, userSession)
-	if err != nil {
-		return err
-	}
-	return v.ProcessedUserSessionSequence(event)
-}
-
-func (v *View) PutUserSessions(userSession []*model.UserSessionView, event *models.Event) error {
-	err := view.PutUserSessions(v.Db, userSessionTable, userSession...)
-	if err != nil {
-		return err
-	}
-	return v.ProcessedUserSessionSequence(event)
-}
-
-func (v *View) DeleteUserSessions(userID, instanceID string, event *models.Event) error {
+func (v *View) DeleteUserSessions(userID, instanceID string) error {
 	err := view.DeleteUserSessions(v.Db, userSessionTable, userID, instanceID)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedUserSessionSequence(event)
+	return nil
 }
 
-func (v *View) DeleteInstanceUserSessions(event *models.Event) error {
-	err := view.DeleteInstanceUserSessions(v.Db, userSessionTable, event.InstanceID)
-	if err != nil && !errors.IsNotFound(err) {
+func (v *View) DeleteInstanceUserSessions(instanceID string) error {
+	err := view.DeleteInstanceUserSessions(v.Db, userSessionTable, instanceID)
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedUserSessionSequence(event)
+	return nil
 }
 
-func (v *View) DeleteOrgUserSessions(event *models.Event) error {
-	err := view.DeleteOrgUserSessions(v.Db, userSessionTable, event.InstanceID, event.ResourceOwner)
-	if err != nil && !errors.IsNotFound(err) {
+func (v *View) DeleteOrgUserSessions(event eventstore.Event) error {
+	err := view.DeleteOrgUserSessions(v.Db, userSessionTable, event.Aggregate().InstanceID, event.Aggregate().ResourceOwner)
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedUserSessionSequence(event)
+	return nil
 }
 
-func (v *View) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(ctx, userSessionTable, instanceID)
-}
-
-func (v *View) GetLatestUserSessionSequences(ctx context.Context, instanceIDs []string) ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(ctx, userSessionTable, instanceIDs)
-}
-
-func (v *View) ProcessedUserSessionSequence(event *models.Event) error {
-	return v.saveCurrentSequence(userSessionTable, event)
-}
-
-func (v *View) UpdateUserSessionSpoolerRunTimestamp(instanceIDs []string) error {
-	return v.updateSpoolerRunSequence(userSessionTable, instanceIDs)
-}
-
-func (v *View) GetLatestUserSessionFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
-	return v.latestFailedEvent(userSessionTable, instanceID, sequence)
-}
-
-func (v *View) ProcessedUserSessionFailedEvent(failedEvent *repository.FailedEvent) error {
-	return v.saveFailedEvent(failedEvent)
+func (v *View) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (_ *query.CurrentState, err error) {
+	q := &query.CurrentStateSearchQueries{
+		Queries: make([]query.SearchQuery, 2),
+	}
+	q.Queries[0], err = query.NewCurrentStatesInstanceIDSearchQuery(instanceID)
+	if err != nil {
+		return nil, err
+	}
+	q.Queries[1], err = query.NewCurrentStatesProjectionSearchQuery(userSessionTable)
+	if err != nil {
+		return nil, err
+	}
+	states, err := v.query.SearchCurrentStates(ctx, q)
+	if err != nil || states.SearchResponse.Count == 0 {
+		return nil, err
+	}
+	return states.CurrentStates[0], nil
 }

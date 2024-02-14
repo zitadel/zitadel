@@ -184,7 +184,53 @@ message SearchQuery {
         StateQuery state_query = 7;
         TypeQuery type_query = 8;
         LoginNameQuery login_name_query = 9;
+        InUserIDQuery in_user_ids_query = 10;
+        OrQuery or_query = 11;
+        AndQuery and_query = 12;
+        NotQuery not_query = 13;
+        InUserEmailsQuery in_user_emails_query = 14;
     }
+}
+
+message OrQuery {
+    repeated SearchQuery queries = 1 [        
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {            
+            description: "the sub queries to 'OR'"
+        }
+    ];
+}
+message AndQuery {
+    repeated SearchQuery queries = 1 [        
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {            
+            description: "the sub queries to 'AND'"
+        }
+    ];
+}
+
+message NotQuery {
+    SearchQuery query = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {            
+            description: "the sub query to negate (NOT)"
+        }
+    ];
+}
+
+message InUserIDQuery {
+    repeated string user_ids = 1 [        
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {            
+            description: "the ids of the users to include"
+            example: "[\"69629023906488334\",\"69622366012355662\"]";
+        }
+    ];
+}
+
+message InUserEmailsQuery {
+    repeated string user_emails = 1 [        
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {            
+            description: "the emails of the users to include"
+            example: "[\"test@example.com\",\"test@example.org\"]";
+        }
+    ];
 }
 
 message UserNameQuery {
@@ -738,6 +784,21 @@ message UserGrant {
     Type user_type = 19 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "type of the user (human / machine)"
+        }
+    ];
+    string granted_org_id = 20 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+    string granted_org_name = 21 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\"";
+        }
+    ];
+    string granted_org_domain = 22 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"zitadel.cloud\"";
         }
     ];
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2alpha"
+	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 )
 
 var ignoreTypes = []protoreflect.FullName{"google.protobuf.Duration"}
@@ -258,6 +258,7 @@ func Test_brandingSettingsToPb(t *testing.T) {
 		FontURL:             "fonts",
 		WatermarkDisabled:   true,
 		HideLoginNameSuffix: true,
+		ThemeMode:           domain.LabelPolicyThemeDark,
 		IsDefault:           true,
 	}
 	want := &settings.BrandingSettings{
@@ -281,6 +282,7 @@ func Test_brandingSettingsToPb(t *testing.T) {
 		DisableWatermark:    true,
 		HideLoginNameSuffix: true,
 		ResourceOwnerType:   settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
+		ThemeMode:           settings.ThemeMode_THEME_MODE_DARK,
 	}
 
 	got := brandingSettingsToPb(arg, "http://example.com")

@@ -1,8 +1,6 @@
 package deviceauth
 
 import (
-	"strings"
-
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -13,15 +11,11 @@ const (
 	DuplicateDeviceCode = "Errors.DeviceCode.AlreadyExists"
 )
 
-func deviceCodeUniqueField(clientID, deviceCode string) string {
-	return strings.Join([]string{clientID, deviceCode}, ":")
-}
-
-func NewAddUniqueConstraints(clientID, deviceCode, userCode string) []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{
+func NewAddUniqueConstraints(deviceCode, userCode string) []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{
 		eventstore.NewAddEventUniqueConstraint(
 			UniqueDeviceCode,
-			deviceCodeUniqueField(clientID, deviceCode),
+			deviceCode,
 			DuplicateDeviceCode,
 		),
 		eventstore.NewAddEventUniqueConstraint(
@@ -32,13 +26,13 @@ func NewAddUniqueConstraints(clientID, deviceCode, userCode string) []*eventstor
 	}
 }
 
-func NewRemoveUniqueConstraints(clientID, deviceCode, userCode string) []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{
-		eventstore.NewRemoveEventUniqueConstraint(
+func NewRemoveUniqueConstraints(deviceCode, userCode string) []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{
+		eventstore.NewRemoveUniqueConstraint(
 			UniqueDeviceCode,
-			deviceCodeUniqueField(clientID, deviceCode),
+			deviceCode,
 		),
-		eventstore.NewRemoveEventUniqueConstraint(
+		eventstore.NewRemoveUniqueConstraint(
 			UniqueUserCode,
 			userCode,
 		),

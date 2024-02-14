@@ -2,12 +2,10 @@ package instance
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -51,21 +49,21 @@ func NewSMSConfigTwilioAddedEvent(
 	}
 }
 
-func (e *SMSConfigTwilioAddedEvent) Data() interface{} {
+func (e *SMSConfigTwilioAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SMSConfigTwilioAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SMSConfigTwilioAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func SMSConfigTwilioAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SMSConfigTwilioAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	smsConfigAdded := &SMSConfigTwilioAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, smsConfigAdded)
+	err := event.Unmarshal(smsConfigAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-smwiR", "unable to unmarshal sms config twilio added")
+		return nil, zerrors.ThrowInternal(err, "IAM-smwiR", "unable to unmarshal sms config twilio added")
 	}
 
 	return smsConfigAdded, nil
@@ -86,7 +84,7 @@ func NewSMSConfigTwilioChangedEvent(
 	changes []SMSConfigTwilioChanges,
 ) (*SMSConfigTwilioChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IAM-smn8e", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-smn8e", "Errors.NoChangesFound")
 	}
 	changeEvent := &SMSConfigTwilioChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -116,21 +114,21 @@ func ChangeSMSConfigTwilioSenderNumber(senderNumber string) func(event *SMSConfi
 	}
 }
 
-func (e *SMSConfigTwilioChangedEvent) Data() interface{} {
+func (e *SMSConfigTwilioChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SMSConfigTwilioChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SMSConfigTwilioChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func SMSConfigTwilioChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SMSConfigTwilioChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	smsConfigChanged := &SMSConfigTwilioChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, smsConfigChanged)
+	err := event.Unmarshal(smsConfigChanged)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-smwiR", "unable to unmarshal sms config twilio added")
+		return nil, zerrors.ThrowInternal(err, "IAM-smwiR", "unable to unmarshal sms config twilio added")
 	}
 
 	return smsConfigChanged, nil
@@ -160,21 +158,21 @@ func NewSMSConfigTokenChangedEvent(
 	}
 }
 
-func (e *SMSConfigTwilioTokenChangedEvent) Data() interface{} {
+func (e *SMSConfigTwilioTokenChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SMSConfigTwilioTokenChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SMSConfigTwilioTokenChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func SMSConfigTwilioTokenChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SMSConfigTwilioTokenChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	smtpConfigTokenChagned := &SMSConfigTwilioTokenChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, smtpConfigTokenChagned)
+	err := event.Unmarshal(smtpConfigTokenChagned)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-fi9Wf", "unable to unmarshal sms config token changed")
+		return nil, zerrors.ThrowInternal(err, "IAM-fi9Wf", "unable to unmarshal sms config token changed")
 	}
 
 	return smtpConfigTokenChagned, nil
@@ -200,21 +198,21 @@ func NewSMSConfigTwilioActivatedEvent(
 	}
 }
 
-func (e *SMSConfigActivatedEvent) Data() interface{} {
+func (e *SMSConfigActivatedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SMSConfigActivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SMSConfigActivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func SMSConfigActivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SMSConfigActivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	smsConfigActivated := &SMSConfigActivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, smsConfigActivated)
+	err := event.Unmarshal(smsConfigActivated)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-dn92f", "unable to unmarshal sms config twilio activated changed")
+		return nil, zerrors.ThrowInternal(err, "IAM-dn92f", "unable to unmarshal sms config twilio activated changed")
 	}
 
 	return smsConfigActivated, nil
@@ -240,21 +238,21 @@ func NewSMSConfigDeactivatedEvent(
 	}
 }
 
-func (e *SMSConfigDeactivatedEvent) Data() interface{} {
+func (e *SMSConfigDeactivatedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SMSConfigDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SMSConfigDeactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func SMSConfigDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SMSConfigDeactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	smsConfigDeactivated := &SMSConfigDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, smsConfigDeactivated)
+	err := event.Unmarshal(smsConfigDeactivated)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-dn92f", "unable to unmarshal sms config twilio deactivated changed")
+		return nil, zerrors.ThrowInternal(err, "IAM-dn92f", "unable to unmarshal sms config twilio deactivated changed")
 	}
 
 	return smsConfigDeactivated, nil
@@ -280,21 +278,21 @@ func NewSMSConfigRemovedEvent(
 	}
 }
 
-func (e *SMSConfigRemovedEvent) Data() interface{} {
+func (e *SMSConfigRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *SMSConfigRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SMSConfigRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func SMSConfigRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func SMSConfigRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	smsConfigRemoved := &SMSConfigRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, smsConfigRemoved)
+	err := event.Unmarshal(smsConfigRemoved)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-99iNF", "unable to unmarshal sms config removed")
+		return nil, zerrors.ThrowInternal(err, "IAM-99iNF", "unable to unmarshal sms config removed")
 	}
 
 	return smsConfigRemoved, nil

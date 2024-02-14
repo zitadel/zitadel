@@ -10,6 +10,8 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/cmd/encryption"
+	"github.com/zitadel/zitadel/cmd/systemapi"
 	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
@@ -23,7 +25,6 @@ import (
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/network"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -60,10 +61,10 @@ type Config struct {
 	AssetStorage      static_config.AssetStorageConfig
 	InternalAuthZ     internal_authz.Config
 	SystemDefaults    systemdefaults.SystemDefaults
-	EncryptionKeys    *encryptionKeyConfig
+	EncryptionKeys    *encryption.EncryptionKeyConfig
 	DefaultInstance   command.InstanceSetup
 	AuditLogRetention time.Duration
-	SystemAPIUsers    map[string]*internal_authz.SystemAPIUser
+	SystemAPIUsers    systemapi.Users
 	CustomerPortal    string
 	Machine           *id.Config
 	Actions           *actions.Config
@@ -74,7 +75,11 @@ type Config struct {
 }
 
 type QuotasConfig struct {
-	Access *middleware.AccessConfig
+	Access struct {
+		logstore.EmitterConfig  `mapstructure:",squash"`
+		middleware.AccessConfig `mapstructure:",squash"`
+	}
+	Execution *logstore.EmitterConfig
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
@@ -83,9 +88,10 @@ func MustNewConfig(v *viper.Viper) *Config {
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 			sliceTypeEnvDecodeHookFunc[*domain.CustomMessageText],
-			sliceTypeEnvDecodeHookFunc[*command.AddQuota],
+			sliceTypeEnvDecodeHookFunc[*command.SetQuota],
 			sliceTypeEnvDecodeHookFunc[internal_authz.RoleMapping],
-			mapTypeEnvDecodeHookFunc[*internal_authz.SystemAPIUser],
+			mapTypeEnvDecodeHookFunc[string, *internal_authz.SystemAPIUser],
+			mapTypeEnvDecodeHookFunc[domain.Feature, any],
 			mapHTTPHeaderDecodeHook,
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
@@ -94,6 +100,9 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
 			actions.HTTPConfigDecodeHook,
+			systemapi.UsersDecodeHook,
+			hook.EnumHookFunc(domain.FeatureString),
+			hook.EnumHookFunc(internal_authz.MemberTypeString),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read config")
@@ -113,26 +122,13 @@ func MustNewConfig(v *viper.Viper) *Config {
 	return config
 }
 
-type encryptionKeyConfig struct {
-	DomainVerification   *crypto.KeyConfig
-	IDPConfig            *crypto.KeyConfig
-	OIDC                 *crypto.KeyConfig
-	SAML                 *crypto.KeyConfig
-	OTP                  *crypto.KeyConfig
-	SMS                  *crypto.KeyConfig
-	SMTP                 *crypto.KeyConfig
-	User                 *crypto.KeyConfig
-	CSRFCookieKeyID      string
-	UserAgentCookieKeyID string
-}
-
 func sliceTypeEnvDecodeHookFunc[T any](from, to reflect.Value) (any, error) {
 	into := make([]T, 0)
 	return complexTypeEnvDecodeHook(from, to, into)
 }
 
-func mapTypeEnvDecodeHookFunc[T any](from, to reflect.Value) (any, error) {
-	into := make(map[string]T, 0)
+func mapTypeEnvDecodeHookFunc[K ~string | ~int, V any](from, to reflect.Value) (any, error) {
+	into := make(map[K]V, 0)
 	return complexTypeEnvDecodeHook(from, to, into)
 }
 

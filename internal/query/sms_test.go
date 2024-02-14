@@ -10,7 +10,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -225,7 +225,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*SMSConfigs)(nil),
 		},
 	}
 	for _, tt := range tests {
@@ -250,13 +250,13 @@ func Test_SMSConfigPrepare(t *testing.T) {
 			name:    "prepareSMSConfigQuery no result",
 			prepare: prepareSMSConfigQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					expectedSMSConfigQuery,
 					nil,
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -317,7 +317,7 @@ func Test_SMSConfigPrepare(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*SMSConfig)(nil),
 		},
 	}
 	for _, tt := range tests {

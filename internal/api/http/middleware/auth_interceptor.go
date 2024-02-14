@@ -11,11 +11,11 @@ import (
 )
 
 type AuthInterceptor struct {
-	verifier   *authz.TokenVerifier
+	verifier   authz.APITokenVerifier
 	authConfig authz.Config
 }
 
-func AuthorizationInterceptor(verifier *authz.TokenVerifier, authConfig authz.Config) *AuthInterceptor {
+func AuthorizationInterceptor(verifier authz.APITokenVerifier, authConfig authz.Config) *AuthInterceptor {
 	return &AuthInterceptor{
 		verifier:   verifier,
 		authConfig: authConfig,
@@ -48,7 +48,7 @@ func (a *AuthInterceptor) HandlerFunc(next http.HandlerFunc) http.HandlerFunc {
 
 type httpReq struct{}
 
-func authorize(r *http.Request, verifier *authz.TokenVerifier, authConfig authz.Config) (_ context.Context, err error) {
+func authorize(r *http.Request, verifier authz.APITokenVerifier, authConfig authz.Config) (_ context.Context, err error) {
 	ctx := r.Context()
 	authOpt, needsToken := verifier.CheckAuthMethod(r.Method + ":" + r.RequestURI)
 	if !needsToken {

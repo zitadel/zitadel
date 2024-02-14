@@ -16,7 +16,7 @@ import (
 )
 
 func (s *Server) GetAppByID(ctx context.Context, req *mgmt_pb.GetAppByIDRequest) (*mgmt_pb.GetAppByIDResponse, error) {
-	app, err := s.query.AppByProjectAndAppID(ctx, true, req.ProjectId, req.AppId, false)
+	app, err := s.query.AppByProjectAndAppID(ctx, true, req.ProjectId, req.AppId)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*m
 	}
 	return &mgmt_pb.ListAppsResponse{
 		Result:  project_grpc.AppsToPb(apps.Apps),
-		Details: object_grpc.ToListDetails(apps.Count, apps.Sequence, apps.Timestamp),
+		Details: object_grpc.ToListDetails(apps.Count, apps.Sequence, apps.LastRun),
 	}, nil
 }
 
@@ -55,10 +55,11 @@ func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChanges
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AllowTimeTravel().
 		Limit(limit).
+		AwaitOpenTransactions().
 		OrderDesc().
 		ResourceOwner(authz.GetCtxData(ctx).OrgID).
-		AddQuery().
 		SequenceGreater(sequence).
+		AddQuery().
 		AggregateTypes(project.AggregateType).
 		AggregateIDs(req.ProjectId).
 		EventData(map[string]interface{}{
@@ -69,7 +70,7 @@ func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChanges
 		query.OrderAsc()
 	}
 
-	changes, err := s.query.SearchEvents(ctx, query, s.auditLogRetention)
+	changes, err := s.query.SearchEvents(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -258,7 +259,7 @@ func (s *Server) GetAppKey(ctx context.Context, req *mgmt_pb.GetAppKeyRequest) (
 	if err != nil {
 		return nil, err
 	}
-	key, err := s.query.GetAuthNKeyByID(ctx, true, req.KeyId, false, resourceOwner, aggregateID, objectID)
+	key, err := s.query.GetAuthNKeyByID(ctx, true, req.KeyId, resourceOwner, aggregateID, objectID)
 	if err != nil {
 		return nil, err
 	}
@@ -278,7 +279,7 @@ func (s *Server) ListAppKeys(ctx context.Context, req *mgmt_pb.ListAppKeysReques
 	}
 	return &mgmt_pb.ListAppKeysResponse{
 		Result:  authn_grpc.KeysToPb(keys.AuthNKeys),
-		Details: object_grpc.ToListDetails(keys.Count, keys.Sequence, keys.Timestamp),
+		Details: object_grpc.ToListDetails(keys.Count, keys.Sequence, keys.LastRun),
 	}, nil
 }
 

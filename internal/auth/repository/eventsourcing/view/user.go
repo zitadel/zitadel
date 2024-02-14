@@ -5,13 +5,12 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	"github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
-	"github.com/zitadel/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -23,25 +22,31 @@ func (v *View) UserByID(userID, instanceID string) (*model.UserView, error) {
 }
 
 func (v *View) UserByLoginName(ctx context.Context, loginName, instanceID string) (*model.UserView, error) {
-	loginNameQuery, err := query.NewUserLoginNamesSearchQuery(loginName)
+	queriedUser, err := v.query.GetNotifyUserByLoginName(ctx, true, loginName)
 	if err != nil {
 		return nil, err
 	}
 
-	return v.userByID(ctx, instanceID, loginNameQuery)
+	//nolint: contextcheck // no lint was added because refactor would change too much code
+	return view.UserByID(v.Db, userTable, queriedUser.ID, instanceID)
 }
 
 func (v *View) UserByLoginNameAndResourceOwner(ctx context.Context, loginName, resourceOwner, instanceID string) (*model.UserView, error) {
-	loginNameQuery, err := query.NewUserLoginNamesSearchQuery(loginName)
-	if err != nil {
-		return nil, err
-	}
-	resourceOwnerQuery, err := query.NewUserResourceOwnerSearchQuery(resourceOwner, query.TextEquals)
+	queriedUser, err := v.query.GetNotifyUserByLoginName(ctx, true, loginName)
 	if err != nil {
 		return nil, err
 	}
 
-	return v.userByID(ctx, instanceID, loginNameQuery, resourceOwnerQuery)
+	//nolint: contextcheck // no lint was added because refactor would change too much code
+	user, err := view.UserByID(v.Db, userTable, queriedUser.ID, instanceID)
+	if err != nil {
+		return nil, err
+	}
+	if user.ResourceOwner != resourceOwner {
+		return nil, zerrors.ThrowNotFound(nil, "VIEW-qScmi", "Errors.User.NotFound")
+	}
+
+	return user, nil
 }
 
 func (v *View) UserByEmail(ctx context.Context, email, instanceID string) (*model.UserView, error) {
@@ -87,32 +92,35 @@ func (v *View) UserByPhoneAndResourceOwner(ctx context.Context, phone, resourceO
 }
 
 func (v *View) userByID(ctx context.Context, instanceID string, queries ...query.SearchQuery) (*model.UserView, error) {
-	queriedUser, err := v.query.GetNotifyUser(ctx, true, false, queries...)
+	queriedUser, err := v.query.GetNotifyUser(ctx, true, queries...)
 	if err != nil {
 		return nil, err
 	}
+
+	// always load the latest sequence first, so in case the user was not found by id,
+	// the sequence will be equal or lower than the actual projection and no events are lost
+	sequence, err := v.GetLatestUserSequence(ctx, instanceID)
+	logging.WithFields("instanceID", instanceID).
+		OnError(err).
+		Errorf("could not get current sequence for userByID")
 
 	user, err := view.UserByID(v.Db, userTable, queriedUser.ID, instanceID)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return nil, err
 	}
 
 	if err != nil {
-		sequence, err := v.GetLatestUserSequence(ctx, instanceID)
-		logging.WithFields("instanceID", instanceID).
-			OnError(err).
-			Errorf("could not get current sequence for userByID")
 		user = new(model.UserView)
 		if sequence != nil {
-			user.Sequence = sequence.CurrentSequence
+			user.ChangeDate = sequence.EventCreatedAt
 		}
 	}
 
-	query, err := view.UserByIDQuery(queriedUser.ID, instanceID, user.Sequence, user.EventTypes())
+	query, err := view.UserByIDQuery(queriedUser.ID, instanceID, user.ChangeDate, user.EventTypes())
 	if err != nil {
 		return nil, err
 	}
-	events, err := v.es.FilterEvents(ctx, query)
+	events, err := v.es.Filter(ctx, query)
 	if err != nil && user.Sequence == 0 {
 		return nil, err
 	} else if err != nil {
@@ -128,7 +136,7 @@ func (v *View) userByID(ctx context.Context, instanceID string, queries ...query
 	}
 
 	if user.State == int32(usr_model.UserStateDeleted) {
-		return nil, errors.ThrowNotFound(nil, "VIEW-r4y8r", "Errors.User.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "VIEW-r4y8r", "Errors.User.NotFound")
 	}
 
 	return user, nil
@@ -138,82 +146,53 @@ func (v *View) UsersByOrgID(orgID, instanceID string) ([]*model.UserView, error)
 	return view.UsersByOrgID(v.Db, userTable, orgID, instanceID)
 }
 
-func (v *View) UserIDsByDomain(domain, instanceID string) ([]string, error) {
-	return view.UserIDsByDomain(v.Db, userTable, domain, instanceID)
+func (v *View) PutUser(user *model.UserView, event eventstore.Event) error {
+	return view.PutUser(v.Db, userTable, user)
 }
 
-func (v *View) SearchUsers(request *usr_model.UserSearchRequest) ([]*model.UserView, uint64, error) {
-	return view.SearchUsers(v.Db, userTable, request)
+func (v *View) PutUsers(users []*model.UserView, event eventstore.Event) error {
+	return view.PutUsers(v.Db, userTable, users...)
 }
 
-func (v *View) GetGlobalUserByLoginName(email, instanceID string) (*model.UserView, error) {
-	return view.GetGlobalUserByLoginName(v.Db, userTable, email, instanceID)
-}
-
-func (v *View) UserMFAs(userID, instanceID string) ([]*usr_model.MultiFactor, error) {
-	return view.UserMFAs(v.Db, userTable, userID, instanceID)
-}
-
-func (v *View) PutUser(user *model.UserView, event *models.Event) error {
-	err := view.PutUser(v.Db, userTable, user)
-	if err != nil {
-		return err
-	}
-	return v.ProcessedUserSequence(event)
-}
-
-func (v *View) PutUsers(users []*model.UserView, event *models.Event) error {
-	err := view.PutUsers(v.Db, userTable, users...)
-	if err != nil {
-		return err
-	}
-	return v.ProcessedUserSequence(event)
-}
-
-func (v *View) DeleteUser(userID, instanceID string, event *models.Event) error {
+func (v *View) DeleteUser(userID, instanceID string, event eventstore.Event) error {
 	err := view.DeleteUser(v.Db, userTable, userID, instanceID)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedUserSequence(event)
+	return nil
 }
 
-func (v *View) DeleteInstanceUsers(event *models.Event) error {
-	err := view.DeleteInstanceUsers(v.Db, userTable, event.InstanceID)
-	if err != nil && !errors.IsNotFound(err) {
+func (v *View) DeleteInstanceUsers(event eventstore.Event) error {
+	err := view.DeleteInstanceUsers(v.Db, userTable, event.Aggregate().InstanceID)
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedUserSequence(event)
+	return nil
 }
 
-func (v *View) UpdateOrgOwnerRemovedUsers(event *models.Event) error {
-	err := view.UpdateOrgOwnerRemovedUsers(v.Db, userTable, event.InstanceID, event.AggregateID)
-	if err != nil && !errors.IsNotFound(err) {
+func (v *View) UpdateOrgOwnerRemovedUsers(event eventstore.Event) error {
+	err := view.UpdateOrgOwnerRemovedUsers(v.Db, userTable, event.Aggregate().InstanceID, event.Aggregate().ID)
+	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
-	return v.ProcessedUserSequence(event)
+	return nil
 }
 
-func (v *View) GetLatestUserSequence(ctx context.Context, instanceID string) (*repository.CurrentSequence, error) {
-	return v.latestSequence(ctx, userTable, instanceID)
-}
-
-func (v *View) GetLatestUserSequences(ctx context.Context, instanceIDs []string) ([]*repository.CurrentSequence, error) {
-	return v.latestSequences(ctx, userTable, instanceIDs)
-}
-
-func (v *View) ProcessedUserSequence(event *models.Event) error {
-	return v.saveCurrentSequence(userTable, event)
-}
-
-func (v *View) UpdateUserSpoolerRunTimestamp(instanceIDs []string) error {
-	return v.updateSpoolerRunSequence(userTable, instanceIDs)
-}
-
-func (v *View) GetLatestUserFailedEvent(sequence uint64, instanceID string) (*repository.FailedEvent, error) {
-	return v.latestFailedEvent(userTable, instanceID, sequence)
-}
-
-func (v *View) ProcessedUserFailedEvent(failedEvent *repository.FailedEvent) error {
-	return v.saveFailedEvent(failedEvent)
+func (v *View) GetLatestUserSequence(ctx context.Context, instanceID string) (_ *query.CurrentState, err error) {
+	q := &query.CurrentStateSearchQueries{
+		Queries: make([]query.SearchQuery, 2),
+	}
+	q.Queries[0], err = query.NewCurrentStatesInstanceIDSearchQuery(instanceID)
+	if err != nil {
+		return nil, err
+	}
+	q.Queries[1], err = query.NewCurrentStatesProjectionSearchQuery(userTable)
+	if err != nil {
+		return nil, err
+	}
+	states, err := v.query.SearchCurrentStates(ctx, q)
+	if err != nil || states.SearchResponse.Count == 0 {
+		return nil, err
+	}
+	return states.CurrentStates[0], nil
 }

@@ -14,8 +14,8 @@
       serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'provider', 'google', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'provider', 'google', 'create']
-        : []
+          ? ['/org', 'provider', 'google', 'create']
+          : []
     "
   >
     <img class="idp-logo" src="./assets/images/idp/google.png" alt="google" />
@@ -30,8 +30,8 @@
       serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'provider', 'azure-ad', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'provider', 'azure-ad', 'create']
-        : []
+          ? ['/org', 'provider', 'azure-ad', 'create']
+          : []
     "
   >
     <img class="idp-logo" src="./assets/images/idp/ms.svg" alt="microsoft" />
@@ -47,8 +47,8 @@
       serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'provider', 'github', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'provider', 'github', 'create']
-        : []
+          ? ['/org', 'provider', 'github', 'create']
+          : []
     "
   >
     <img class="idp-logo dark" src="./assets/images/idp/github-dark.svg" alt="GitHub" />
@@ -65,8 +65,8 @@
       serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'provider', 'github-es', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'provider', 'github-es', 'create']
-        : []
+          ? ['/org', 'provider', 'github-es', 'create']
+          : []
     "
   >
     <img class="idp-logo dark" src="./assets/images/idp/github-dark.svg" alt="GitHub" />
@@ -83,8 +83,8 @@
       serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'provider', 'gitlab', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'provider', 'gitlab', 'create']
-        : []
+          ? ['/org', 'provider', 'gitlab', 'create']
+          : []
     "
   >
     <img class="idp-logo" src="./assets/images/idp/gitlab.svg" alt="GitLab" />
@@ -99,8 +99,8 @@
       serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'provider', 'gitlab-self-hosted', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'provider', 'gitlab-self-hosted', 'create']
-        : []
+          ? ['/org', 'provider', 'gitlab-self-hosted', 'create']
+          : []
     "
   >
     <img class="idp-logo" src="./assets/images/idp/gitlab.svg" alt="GitLab" />
@@ -113,10 +113,27 @@
     class="item card"
     [routerLink]="
       serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'apple', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+          ? ['/org', 'provider', 'apple', 'create']
+          : []
+    "
+  >
+    <img class="idp-logo apple dark" src="./assets/images/idp/apple-dark.svg" alt="Apple" />
+    <img class="idp-logo apple light" src="./assets/images/idp/apple.svg" alt="Apple" />
+    <div class="text-container">
+      <span class="title">Apple</span>
+    </div>
+  </a>
+
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'provider', 'oidc', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'provider', 'oidc', 'create']
-        : []
+          ? ['/org', 'provider', 'oidc', 'create']
+          : []
     "
   >
     <div class="idp-icon">
@@ -133,8 +150,8 @@
       serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'provider', 'oauth', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'provider', 'oauth', 'create']
-        : []
+          ? ['/org', 'provider', 'oauth', 'create']
+          : []
     "
   >
     <img class="idp-logo" src="./assets/images/idp/oauth.svg" alt="oauth" />
@@ -150,8 +167,8 @@
       serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'provider', 'jwt', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'provider', 'jwt', 'create']
-        : []
+          ? ['/org', 'provider', 'jwt', 'create']
+          : []
     "
   >
     <div class="idp-icon">
@@ -168,8 +185,8 @@
       serviceType === PolicyComponentServiceType.ADMIN
         ? ['/instance', 'provider', 'ldap', 'create']
         : serviceType === PolicyComponentServiceType.MGMT
-        ? ['/org', 'provider', 'ldap', 'create']
-        : []
+          ? ['/org', 'provider', 'ldap', 'create']
+          : []
     "
   >
     <div class="idp-icon">
@@ -177,6 +194,22 @@
     </div>
     <div class="text-container">
       <span class="title">Active Directory / LDAP</span>
+    </div>
+  </a>
+
+  <a
+    class="item card"
+    [routerLink]="
+      serviceType === PolicyComponentServiceType.ADMIN
+        ? ['/instance', 'provider', 'saml', 'create']
+        : serviceType === PolicyComponentServiceType.MGMT
+          ? ['/org', 'provider', 'saml', 'create']
+          : []
+    "
+  >
+    <img class="idp-logo" src="./assets/images/idp/saml-icon.svg" alt="oauth" />
+    <div class="text-container">
+      <span class="title">SAML SP</span>
     </div>
   </a>
 </div>

@@ -8,6 +8,9 @@ Database:
   cockroach:
     # This makes the e2e config reusable with an out-of-docker zitadel process and an /etc/hosts entry
     Host: host.docker.internal
+    EventPushConnRatio: 0.2
+    MaxOpenConns: 40
+    MaxIdleConns: 20
 
 TLS:
   Enabled: false
@@ -17,24 +20,6 @@ FirstInstance:
     Human:
       PasswordChangeRequired: false
 
-LogStore:
-  Access:
-    Database:
-      Enabled: true
-      Debounce:
-        MinFrequency: 0s
-        MaxBulkSize: 0
-  Execution:
-    Database:
-      Enabled: true
-    Stdout:
-      Enabled: false
-
-Quotas:
-  Access:
-    ExhaustedCookieKey: "zitadel.quota.limiting"
-    ExhaustedCookieMaxAge: "600s"
-
 Console:
   InstanceManagementURL: "https://example.com/instances/{{.InstanceID}}"
 
@@ -42,6 +27,15 @@ Projections:
   Customizations:
     NotificationsQuotas:
       RequeueEvery: 1s
+
+Quotas:
+  Access:
+    Enabled: true
+    Debounce:
+      MinFrequency: 0s
+      MaxBulkSize: 0
+    ExhaustedCookieKey: "zitadel.quota.limiting"
+    ExhaustedCookieMaxAge: "600s"
 
 DefaultInstance:
   LoginPolicy:

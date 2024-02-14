@@ -7,9 +7,9 @@ import (
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	settings_pb "github.com/zitadel/zitadel/pkg/grpc/settings"
 )
@@ -47,7 +47,7 @@ func SecretGeneratorQueryToModel(apiQuery *settings_pb.SecretGeneratorQuery) (qu
 		domainType := SecretGeneratorTypeToDomain(q.TypeQuery.GeneratorType)
 		return query.NewSecretGeneratorTypeSearchQuery(int32(domainType))
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ORG-fm9es", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-fm9es", "List.Query.Invalid")
 	}
 }
 
@@ -132,9 +132,10 @@ func SecretGeneratorTypeToDomain(generatorType settings_pb.SecretGeneratorType) 
 
 func AddSMTPToConfig(req *admin_pb.AddSMTPConfigRequest) *smtp.Config {
 	return &smtp.Config{
-		Tls:      req.Tls,
-		From:     req.SenderAddress,
-		FromName: req.SenderName,
+		Tls:            req.Tls,
+		From:           req.SenderAddress,
+		FromName:       req.SenderName,
+		ReplyToAddress: req.ReplyToAddress,
 		SMTP: smtp.SMTP{
 			Host:     req.Host,
 			User:     req.User,
@@ -145,9 +146,10 @@ func AddSMTPToConfig(req *admin_pb.AddSMTPConfigRequest) *smtp.Config {
 
 func UpdateSMTPToConfig(req *admin_pb.UpdateSMTPConfigRequest) *smtp.Config {
 	return &smtp.Config{
-		Tls:      req.Tls,
-		From:     req.SenderAddress,
-		FromName: req.SenderName,
+		Tls:            req.Tls,
+		From:           req.SenderAddress,
+		FromName:       req.SenderName,
+		ReplyToAddress: req.ReplyToAddress,
 		SMTP: smtp.SMTP{
 			Host: req.Host,
 			User: req.User,
@@ -157,12 +159,13 @@ func UpdateSMTPToConfig(req *admin_pb.UpdateSMTPConfigRequest) *smtp.Config {
 
 func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
 	mapped := &settings_pb.SMTPConfig{
-		Tls:           smtp.TLS,
-		SenderAddress: smtp.SenderAddress,
-		SenderName:    smtp.SenderName,
-		Host:          smtp.Host,
-		User:          smtp.User,
-		Details:       obj_grpc.ToViewDetailsPb(smtp.Sequence, smtp.CreationDate, smtp.ChangeDate, smtp.AggregateID),
+		Tls:            smtp.TLS,
+		SenderAddress:  smtp.SenderAddress,
+		SenderName:     smtp.SenderName,
+		ReplyToAddress: smtp.ReplyToAddress,
+		Host:           smtp.Host,
+		User:           smtp.User,
+		Details:        obj_grpc.ToViewDetailsPb(smtp.Sequence, smtp.CreationDate, smtp.ChangeDate, smtp.AggregateID),
 	}
 	return mapped
 }

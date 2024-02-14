@@ -13,9 +13,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	"github.com/zitadel/zitadel/internal/zerrors"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func Test_passkeyAuthenticatorToDomain(t *testing.T) {
@@ -81,7 +81,7 @@ func Test_passkeyRegistrationDetailsToPb(t *testing.T) {
 				},
 				err: nil,
 			},
-			wantErr: caos_errs.ThrowInternal(nil, "USERv2-Dohr6", "Errors.Internal"),
+			wantErr: zerrors.ThrowInternal(nil, "USERv2-Dohr6", "Errors.Internal"),
 		},
 		{
 			name: "ok",

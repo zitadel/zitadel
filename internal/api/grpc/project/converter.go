@@ -3,9 +3,8 @@ package project
 import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
-	proj_model "github.com/zitadel/zitadel/internal/project/model"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	proj_pb "github.com/zitadel/zitadel/pkg/grpc/project"
 )
 
@@ -75,7 +74,7 @@ func ProjectQueryToModel(apiQuery *proj_pb.ProjectQuery) (query.SearchQuery, err
 	case *proj_pb.ProjectQuery_ProjectResourceOwnerQuery:
 		return query.NewProjectResourceOwnerSearchQuery(q.ProjectResourceOwnerQuery.ResourceOwner)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
 	}
 }
 
@@ -112,45 +111,6 @@ func privateLabelingSettingToPb(setting domain.PrivateLabelingSetting) proj_pb.P
 	}
 }
 
-func grantedProjectStateToPb(state proj_model.ProjectState) proj_pb.ProjectGrantState {
-	switch state {
-	case proj_model.ProjectStateActive:
-		return proj_pb.ProjectGrantState_PROJECT_GRANT_STATE_ACTIVE
-	case proj_model.ProjectStateInactive:
-		return proj_pb.ProjectGrantState_PROJECT_GRANT_STATE_INACTIVE
-	default:
-		return proj_pb.ProjectGrantState_PROJECT_GRANT_STATE_UNSPECIFIED
-	}
-}
-
-func GrantedProjectQueriesToModel(queries []*proj_pb.ProjectQuery) (_ []*proj_model.ProjectGrantViewSearchQuery, err error) {
-	q := make([]*proj_model.ProjectGrantViewSearchQuery, len(queries))
-	for i, query := range queries {
-		q[i], err = GrantedProjectQueryToModel(query)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return q, nil
-}
-
-func GrantedProjectQueryToModel(query *proj_pb.ProjectQuery) (*proj_model.ProjectGrantViewSearchQuery, error) {
-	switch q := query.Query.(type) {
-	case *proj_pb.ProjectQuery_NameQuery:
-		return GrantedProjectQueryNameToModel(q.NameQuery), nil
-	default:
-		return nil, errors.ThrowInvalidArgument(nil, "ORG-Ags42", "List.Query.Invalid")
-	}
-}
-
-func GrantedProjectQueryNameToModel(query *proj_pb.ProjectNameQuery) *proj_model.ProjectGrantViewSearchQuery {
-	return &proj_model.ProjectGrantViewSearchQuery{
-		Key:    proj_model.GrantedProjectSearchKeyName,
-		Method: object.TextMethodToModel(query.Method),
-		Value:  query.Name,
-	}
-}
-
 func RoleQueriesToModel(queries []*proj_pb.RoleQuery) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
@@ -169,7 +129,7 @@ func RoleQueryToModel(apiQuery *proj_pb.RoleQuery) (query.SearchQuery, error) {
 	case *proj_pb.RoleQuery_DisplayNameQuery:
 		return query.NewProjectRoleDisplayNameSearchQuery(object.TextMethodToQuery(q.DisplayNameQuery.Method), q.DisplayNameQuery.DisplayName)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-fms0e", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-fms0e", "List.Query.Invalid")
 	}
 }
 

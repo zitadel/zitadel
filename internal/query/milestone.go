@@ -9,10 +9,10 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Milestones struct {
@@ -69,7 +69,7 @@ var (
 )
 
 // SearchMilestones tries to defer the instanceID from the passed context if no instanceIDs are passed
-func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, queries *MilestonesSearchQueries) (_ *Milestones, err error) {
+func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, queries *MilestonesSearchQueries) (milestones *Milestones, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	query, scan := prepareMilestonesQuery(ctx, q.client)
@@ -78,25 +78,17 @@ func (q *Queries) SearchMilestones(ctx context.Context, instanceIDs []string, qu
 	}
 	stmt, args, err := queries.toQuery(query).Where(sq.Eq{MilestoneInstanceIDColID.identifier(): instanceIDs}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-A9i5k", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-A9i5k", "Errors.Query.SQLStatement")
 	}
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		milestones, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		if closeErr := rows.Close(); closeErr != nil && err == nil {
-			err = errors.ThrowInternal(closeErr, "QUERY-CK9mI", "Errors.Query.CloseRows")
-		}
-	}()
-	milestones, err := scan(rows)
-	if err != nil {
-		return nil, err
-	}
-	if err = rows.Err(); err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-asLsI", "Errors.Internal")
-	}
-	milestones.LatestSequence, err = q.latestSequence(ctx, milestonesTable)
+
+	milestones.State, err = q.latestState(ctx, milestonesTable)
 	return milestones, err
 
 }

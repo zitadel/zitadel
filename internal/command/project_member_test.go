@@ -5,16 +5,15 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/repository/member"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
-	"golang.org/x/text/language"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddProjectMember(t *testing.T) {
@@ -54,7 +53,7 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -76,7 +75,7 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -104,7 +103,7 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -155,7 +154,7 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -180,15 +179,12 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 						),
 					),
 					expectFilter(),
-					expectPushFailed(caos_errs.ThrowAlreadyExists(nil, "ERROR", "internal"),
-						[]*repository.Event{
-							eventFromEventPusher(project.NewProjectMemberAddedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"user1",
-								[]string{"PROJECT_OWNER"}...,
-							)),
-						},
-						uniqueConstraintsFromEventConstraint(member.NewAddMemberUniqueConstraint("project1", "user1")),
+					expectPushFailed(zerrors.ThrowAlreadyExists(nil, "ERROR", "internal"),
+						project.NewProjectMemberAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"user1",
+							[]string{"PROJECT_OWNER"}...,
+						),
 					),
 				),
 				zitadelRoles: []authz.RoleMapping{
@@ -209,7 +205,7 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -235,14 +231,11 @@ func TestCommandSide_AddProjectMember(t *testing.T) {
 					),
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewProjectMemberAddedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"user1",
-								[]string{"PROJECT_OWNER"}...,
-							)),
-						},
-						uniqueConstraintsFromEventConstraint(member.NewAddMemberUniqueConstraint("project1", "user1")),
+						project.NewProjectMemberAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"user1",
+							[]string{"PROJECT_OWNER"}...,
+						),
 					),
 				),
 				zitadelRoles: []authz.RoleMapping{
@@ -331,7 +324,7 @@ func TestCommandSide_ChangeProjectMember(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -353,7 +346,7 @@ func TestCommandSide_ChangeProjectMember(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -381,7 +374,7 @@ func TestCommandSide_ChangeProjectMember(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -417,7 +410,7 @@ func TestCommandSide_ChangeProjectMember(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -435,13 +428,11 @@ func TestCommandSide_ChangeProjectMember(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewProjectMemberChangedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"user1",
-								[]string{"PROJECT_OWNER", "PROJECT_VIEWER"}...,
-							)),
-						},
+						project.NewProjectMemberChangedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"user1",
+							[]string{"PROJECT_OWNER", "PROJECT_VIEWER"}...,
+						),
 					),
 				),
 				zitadelRoles: []authz.RoleMapping{
@@ -530,7 +521,7 @@ func TestCommandSide_RemoveProjectMember(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -547,7 +538,7 @@ func TestCommandSide_RemoveProjectMember(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -583,13 +574,10 @@ func TestCommandSide_RemoveProjectMember(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewProjectMemberRemovedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"user1",
-							)),
-						},
-						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint("project1", "user1")),
+						project.NewProjectMemberRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"user1",
+						),
 					),
 				),
 			},

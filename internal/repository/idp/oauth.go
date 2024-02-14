@@ -1,12 +1,9 @@
 package idp
 
 import (
-	"encoding/json"
-
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type OAuthIDPAddedEvent struct {
@@ -52,22 +49,22 @@ func NewOAuthIDPAddedEvent(
 	}
 }
 
-func (e *OAuthIDPAddedEvent) Data() interface{} {
+func (e *OAuthIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OAuthIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OAuthIDPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func OAuthIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OAuthIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &OAuthIDPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-Et1dq", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-Et1dq", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -94,7 +91,7 @@ func NewOAuthIDPChangedEvent(
 	changes []OAuthIDPChanges,
 ) (*OAuthIDPChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDP-BH3dl", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-BH3dl", "Errors.NoChangesFound")
 	}
 	changedEvent := &OAuthIDPChangedEvent{
 		BaseEvent: *base,
@@ -161,22 +158,22 @@ func ChangeOAuthIDAttribute(idAttribute string) func(*OAuthIDPChangedEvent) {
 	}
 }
 
-func (e *OAuthIDPChangedEvent) Data() interface{} {
+func (e *OAuthIDPChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *OAuthIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OAuthIDPChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func OAuthIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OAuthIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &OAuthIDPChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-SAf3gw", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-SAf3gw", "unable to unmarshal event")
 	}
 
 	return e, nil

@@ -10,14 +10,12 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/repository/member"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestAddMember(t *testing.T) {
@@ -44,7 +42,7 @@ func TestAddMember(t *testing.T) {
 				userID: "",
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-4Mlfs", "Errors.Invalid.Argument"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "ORG-4Mlfs", "Errors.Invalid.Argument"),
 			},
 		},
 		{
@@ -54,7 +52,7 @@ func TestAddMember(t *testing.T) {
 				userID: "12342",
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "V2-PfYhb", "Errors.Invalid.Argument"),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "V2-PfYhb", "Errors.Invalid.Argument"),
 			},
 		},
 		{
@@ -65,7 +63,7 @@ func TestAddMember(t *testing.T) {
 				roles:  []string{"ORG_OWNER"},
 			},
 			want: Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "Org-4N8es", ""),
+				ValidationErr: zerrors.ThrowInvalidArgument(nil, "Org-4N8es", ""),
 			},
 		},
 		{
@@ -85,7 +83,7 @@ func TestAddMember(t *testing.T) {
 					}).Filter(),
 			},
 			want: Want{
-				CreateErr: errors.ThrowPreconditionFailed(nil, "ORG-GoXOn", "Errors.User.NotFound"),
+				CreateErr: zerrors.ThrowPreconditionFailed(nil, "ORG-GoXOn", "Errors.User.NotFound"),
 			},
 		},
 		{
@@ -125,7 +123,7 @@ func TestAddMember(t *testing.T) {
 					Filter(),
 			},
 			want: Want{
-				CreateErr: errors.ThrowAlreadyExists(nil, "ORG-poWwe", "Errors.Org.Member.AlreadyExists"),
+				CreateErr: zerrors.ThrowAlreadyExists(nil, "ORG-poWwe", "Errors.Org.Member.AlreadyExists"),
 			},
 		},
 		{
@@ -264,7 +262,7 @@ func TestIsMember(t *testing.T) {
 			name: "error durring filter",
 			args: args{
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-					return nil, errors.ThrowInternal(nil, "PROJE-Op26p", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(nil, "PROJE-Op26p", "Errors.Internal")
 				},
 				orgID:  "orgID",
 				userID: "userID",
@@ -320,7 +318,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -337,7 +335,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				roles:  []string{"ORG_OWNER"},
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -360,7 +358,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				roles:  []string{domain.RoleOrgOwner},
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -406,7 +404,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				roles:  []string{"ORG_OWNER"},
 			},
 			res: res{
-				err: errors.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -431,15 +429,12 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 						),
 					),
 					expectFilter(),
-					expectPushFailed(errors.ThrowAlreadyExists(nil, "ERROR", "internal"),
-						[]*repository.Event{
-							eventFromEventPusher(org.NewMemberAddedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								"user1",
-								[]string{"ORG_OWNER"}...,
-							)),
-						},
-						uniqueConstraintsFromEventConstraint(member.NewAddMemberUniqueConstraint("org1", "user1")),
+					expectPushFailed(zerrors.ThrowAlreadyExists(nil, "ERROR", "internal"),
+						org.NewMemberAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"user1",
+							[]string{"ORG_OWNER"}...,
+						),
 					),
 				),
 				zitadelRoles: []authz.RoleMapping{
@@ -455,7 +450,7 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 				roles:  []string{"ORG_OWNER"},
 			},
 			res: res{
-				err: errors.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -481,14 +476,11 @@ func TestCommandSide_AddOrgMember(t *testing.T) {
 					),
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(org.NewMemberAddedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								"user1",
-								[]string{"ORG_OWNER"}...,
-							)),
-						},
-						uniqueConstraintsFromEventConstraint(member.NewAddMemberUniqueConstraint("org1", "user1")),
+						org.NewMemberAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"user1",
+							[]string{"ORG_OWNER"}...,
+						),
 					),
 				),
 				zitadelRoles: []authz.RoleMapping{
@@ -570,7 +562,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -591,7 +583,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -618,7 +610,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -653,7 +645,7 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 				},
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -671,13 +663,11 @@ func TestCommandSide_ChangeOrgMember(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(org.NewMemberChangedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								"user1",
-								[]string{"ORG_OWNER", "ORG_OWNER_VIEWER"}...,
-							)),
-						},
+						org.NewMemberChangedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"user1",
+							[]string{"ORG_OWNER", "ORG_OWNER_VIEWER"}...,
+						),
 					),
 				),
 				zitadelRoles: []authz.RoleMapping{
@@ -765,7 +755,7 @@ func TestCommandSide_RemoveOrgMember(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -782,7 +772,7 @@ func TestCommandSide_RemoveOrgMember(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -818,13 +808,10 @@ func TestCommandSide_RemoveOrgMember(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(project.NewProjectMemberRemovedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"user1",
-							)),
-						},
-						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint("project1", "user1")),
+						project.NewProjectMemberRemovedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"user1",
+						),
 					),
 				),
 			},

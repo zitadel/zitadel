@@ -1,23 +1,16 @@
 import { Injectable } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { BehaviorSubject, from, merge, Observable, of, Subject } from 'rxjs';
-import {
-  catchError,
-  distinctUntilChanged,
-  filter,
-  finalize,
-  map,
-  mergeMap,
-  switchMap,
-  take,
-  timeout,
-  withLatestFrom,
-} from 'rxjs/operators';
+import { BehaviorSubject, forkJoin, from, Observable, of, Subject } from 'rxjs';
+import { catchError, distinctUntilChanged, filter, finalize, map, switchMap, timeout, withLatestFrom } from 'rxjs/operators';
 
 import {
+  AddMyAuthFactorOTPEmailRequest,
+  AddMyAuthFactorOTPEmailResponse,
   AddMyAuthFactorOTPRequest,
   AddMyAuthFactorOTPResponse,
+  AddMyAuthFactorOTPSMSRequest,
+  AddMyAuthFactorOTPSMSResponse,
   AddMyAuthFactorU2FRequest,
   AddMyAuthFactorU2FResponse,
   AddMyPasswordlessLinkRequest,
@@ -39,8 +32,6 @@ import {
   GetMyProfileResponse,
   GetMyUserRequest,
   GetMyUserResponse,
-  GetSupportedLanguagesRequest,
-  GetSupportedLanguagesResponse,
   ListMyAuthFactorsRequest,
   ListMyAuthFactorsResponse,
   ListMyLinkedIDPsRequest,
@@ -61,8 +52,12 @@ import {
   ListMyUserSessionsResponse,
   ListMyZitadelPermissionsRequest,
   ListMyZitadelPermissionsResponse,
+  RemoveMyAuthFactorOTPEmailRequest,
+  RemoveMyAuthFactorOTPEmailResponse,
   RemoveMyAuthFactorOTPRequest,
   RemoveMyAuthFactorOTPResponse,
+  RemoveMyAuthFactorOTPSMSRequest,
+  RemoveMyAuthFactorOTPSMSResponse,
   RemoveMyAuthFactorU2FRequest,
   RemoveMyAuthFactorU2FResponse,
   RemoveMyAvatarRequest,
@@ -145,14 +140,13 @@ export class GrpcAuthService {
   public zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
   public readonly fetchedZitadelPermissions: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
-  private cachedOrgs: Org.AsObject[] = [];
+  public cachedOrgs: BehaviorSubject<Org.AsObject[]> = new BehaviorSubject<Org.AsObject[]>([]);
   private cachedLabelPolicies: { [orgId: string]: LabelPolicy.AsObject } = {};
 
   constructor(
     private readonly grpcService: GrpcService,
     private oauthService: OAuthService,
     private storage: StorageService,
-    themeService: ThemeService,
   ) {
     this.zitadelPermissions$.subscribe(this.zitadelPermissions);
 
@@ -166,7 +160,6 @@ export class GrpcAuthService {
 
     this.labelpolicy$.subscribe({
       next: (policy) => {
-        themeService.applyLabelPolicy(policy);
         this.labelpolicy.next(policy);
         this.labelPolicyLoading$.next(false);
       },
@@ -176,25 +169,21 @@ export class GrpcAuthService {
       },
     });
 
-    this.user = merge(
-      of(this.oauthService.getAccessToken()).pipe(filter((token) => (token ? true : false))),
+    this.user = forkJoin([
+      of(this.oauthService.getAccessToken()),
       this.oauthService.events.pipe(
         filter((e) => e.type === 'token_received'),
         timeout(this.oauthService.waitForTokenInMsec || 0),
         catchError((_) => of(null)), // timeout is not an error
         map((_) => this.oauthService.getAccessToken()),
       ),
-    ).pipe(
-      take(1),
-      mergeMap(() => {
+    ]).pipe(
+      filter((token) => (token ? true : false)),
+      distinctUntilChanged(),
+      switchMap(() => {
         return from(
           this.getMyUser().then((resp) => {
-            const user = resp.user;
-            if (user) {
-              return user;
-            } else {
-              return undefined;
-            }
+            return resp.user;
           }),
         );
       }),
@@ -231,15 +220,14 @@ export class GrpcAuthService {
 
   public async getActiveOrg(id?: string): Promise<Org.AsObject> {
     if (id) {
-      const find = this.cachedOrgs.find((tmp) => tmp.id === id);
+      const find = this.cachedOrgs.getValue().find((tmp) => tmp.id === id);
       if (find) {
         this.setActiveOrg(find);
         return Promise.resolve(find);
       } else {
         const orgs = (await this.listMyProjectOrgs(10, 0)).resultList;
-        this.cachedOrgs = orgs;
-
-        const toFind = this.cachedOrgs.find((tmp) => tmp.id === id);
+        this.cachedOrgs.next(orgs);
+        const toFind = orgs.find((tmp) => tmp.id === id);
         if (toFind) {
           this.setActiveOrg(toFind);
           return Promise.resolve(toFind);
@@ -248,10 +236,10 @@ export class GrpcAuthService {
         }
       }
     } else {
-      let orgs = this.cachedOrgs;
+      let orgs = this.cachedOrgs.getValue();
       if (orgs.length === 0) {
         orgs = (await this.listMyProjectOrgs()).resultList;
-        this.cachedOrgs = orgs;
+        this.cachedOrgs.next(orgs);
       }
 
       const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.local);
@@ -301,15 +289,37 @@ export class GrpcAuthService {
         filter(([hL, p]) => {
           return hL === true && !!p.length;
         }),
-        map(([_, zroles]) => {
-          const what = this.hasRoles(zroles, roles, requiresAll);
-          return what;
-        }),
+        map(([_, zroles]) => this.hasRoles(zroles, roles, requiresAll)),
         distinctUntilChanged(),
       );
     } else {
       return of(false);
     }
+  }
+
+  /**
+   * filters objects based on roles
+   * @param objects array of objects
+   * @param mapper mapping function which maps to a string[] or Regexp[] of roles
+   * @param requiresAll wheter all, or just a single roles is required to fulfill
+   */
+  public isAllowedMapper<T>(
+    objects: T[],
+    mapper: (attr: any) => string[] | RegExp[],
+    requiresAll: boolean = false,
+  ): Observable<T[]> {
+    return this.fetchedZitadelPermissions.pipe(
+      withLatestFrom(this.zitadelPermissions),
+      filter(([hL, p]) => {
+        return hL === true && !!p.length;
+      }),
+      map(([_, zroles]) => {
+        return objects.filter((obj) => {
+          const roles = mapper(obj);
+          return this.hasRoles(zroles, roles, requiresAll);
+        });
+      }),
+    );
   }
 
   /**
@@ -359,6 +369,11 @@ export class GrpcAuthService {
 
   public listMyMultiFactors(): Promise<ListMyAuthFactorsResponse.AsObject> {
     return this.grpcService.auth.listMyAuthFactors(new ListMyAuthFactorsRequest(), null).then((resp) => resp.toObject());
+  }
+
+  public async revalidateOrgs() {
+    const orgs = (await this.listMyProjectOrgs()).resultList;
+    this.cachedOrgs.next(orgs);
   }
 
   public listMyProjectOrgs(
@@ -480,11 +495,6 @@ export class GrpcAuthService {
     return this.grpcService.auth.resendMyEmailVerification(req, null).then((resp) => resp.toObject());
   }
 
-  public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
-    const req = new GetSupportedLanguagesRequest();
-    return this.grpcService.auth.getSupportedLanguages(req, null).then((resp) => resp.toObject());
-  }
-
   public getMyLoginPolicy(): Promise<GetMyLoginPolicyResponse.AsObject> {
     const req = new GetMyLoginPolicyRequest();
     return this.grpcService.auth.getMyLoginPolicy(req, null).then((resp) => resp.toObject());
@@ -557,6 +567,18 @@ export class GrpcAuthService {
     return this.grpcService.auth.addMyAuthFactorOTP(new AddMyAuthFactorOTPRequest(), null).then((resp) => resp.toObject());
   }
 
+  public addMyAuthFactorOTPSMS(): Promise<AddMyAuthFactorOTPSMSResponse.AsObject> {
+    return this.grpcService.auth
+      .addMyAuthFactorOTPSMS(new AddMyAuthFactorOTPSMSRequest(), null)
+      .then((resp) => resp.toObject());
+  }
+
+  public addMyAuthFactorOTPEmail(): Promise<AddMyAuthFactorOTPEmailResponse.AsObject> {
+    return this.grpcService.auth
+      .addMyAuthFactorOTPEmail(new AddMyAuthFactorOTPEmailRequest(), null)
+      .then((resp) => resp.toObject());
+  }
+
   public addMyMultiFactorU2F(): Promise<AddMyAuthFactorU2FResponse.AsObject> {
     return this.grpcService.auth.addMyAuthFactorU2F(new AddMyAuthFactorU2FRequest(), null).then((resp) => resp.toObject());
   }
@@ -614,6 +636,18 @@ export class GrpcAuthService {
   public removeMyMultiFactorOTP(): Promise<RemoveMyAuthFactorOTPResponse.AsObject> {
     return this.grpcService.auth
       .removeMyAuthFactorOTP(new RemoveMyAuthFactorOTPRequest(), null)
+      .then((resp) => resp.toObject());
+  }
+
+  public removeMyAuthFactorOTPSMS(): Promise<RemoveMyAuthFactorOTPSMSResponse.AsObject> {
+    return this.grpcService.auth
+      .removeMyAuthFactorOTPSMS(new RemoveMyAuthFactorOTPSMSRequest(), null)
+      .then((resp) => resp.toObject());
+  }
+
+  public removeMyAuthFactorOTPEmail(): Promise<RemoveMyAuthFactorOTPEmailResponse.AsObject> {
+    return this.grpcService.auth
+      .removeMyAuthFactorOTPEmail(new RemoveMyAuthFactorOTPEmailRequest(), null)
       .then((resp) => resp.toObject());
   }
 

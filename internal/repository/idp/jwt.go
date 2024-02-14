@@ -1,11 +1,8 @@
 package idp
 
 import (
-	"encoding/json"
-
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type JWTIDPAddedEvent struct {
@@ -42,22 +39,22 @@ func NewJWTIDPAddedEvent(
 	}
 }
 
-func (e *JWTIDPAddedEvent) Data() interface{} {
+func (e *JWTIDPAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *JWTIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *JWTIDPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func JWTIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func JWTIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &JWTIDPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-Et1dq", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-Et1dq", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -81,7 +78,7 @@ func NewJWTIDPChangedEvent(
 	changes []JWTIDPChanges,
 ) (*JWTIDPChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDP-BH3dl", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-BH3dl", "Errors.NoChangesFound")
 	}
 	changedEvent := &JWTIDPChangedEvent{
 		BaseEvent: *base,
@@ -131,22 +128,22 @@ func ChangeJWTOptions(options OptionChanges) func(*JWTIDPChangedEvent) {
 	}
 }
 
-func (e *JWTIDPChangedEvent) Data() interface{} {
+func (e *JWTIDPChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *JWTIDPChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *JWTIDPChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func JWTIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func JWTIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &JWTIDPChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-D3gjzh", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-D3gjzh", "unable to unmarshal event")
 	}
 
 	return e, nil

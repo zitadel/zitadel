@@ -51,7 +51,7 @@
       "TITLE": "Faites fonctionner votre ZITADEL",
       "DESCRIPTION": "Cette liste de contrôle vous aide à configurer votre instance et vous guide à travers les étapes les plus essentielles."
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Créez votre marque",
         "description": "Définissez la couleur et la forme de votre connexion et téléchargez votre logo et vos icônes.",
@@ -62,15 +62,20 @@
         "description": "Définissez paramètres de serveur de messagerie",
         "action": "Configurez"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Créez projet",
         "description": "Ajoutez projet et définissez ses rôles et autorisations.",
         "action": "Créez projet"
       },
-      "project.application.added": {
-        "title": "Créez votre première application",
-        "description": "Créez une application web, native, api ou saml et configurez votre flux d'authentification.",
-        "action": "Créez application"
+      "APPLICATION_CREATED": {
+        "title": "Enregistrez votre application",
+        "description": "Enregistrez votre application web, native, api ou saml et configurez un flux d'authentification.",
+        "action": "Enregistrez l'application"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Connectez-vous à votre application",
+        "description": "Intégrez votre application avec ZITADEL pour l'authentification et testez-la en vous connectant avec votre utilisateur administrateur.",
+        "action": "Connexion"
       },
       "user.human.added": {
         "title": "Ajouter des utilisateurs",
@@ -85,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instance",
+    "INSTANCE": "paramètres par défaut",
     "DASHBOARD": "Accueil",
     "PERSONAL_INFO": "Informations personnelles",
     "DOCUMENTATION": "Documentation",
@@ -95,7 +100,6 @@
     "EVENTS": "Événements",
     "FAILEDEVENTS": "Événements échoués",
     "ORGANIZATION": "Organisation",
-    "DOMAINS": "Domaines",
     "PROJECT": "Projets",
     "PROJECTOVERVIEW": "Vue d'ensemble",
     "PROJECTGRANTS": "Subventions",
@@ -223,6 +227,7 @@
     "EMAIL": "Courriel",
     "USERNAME": "Nom de l'utilisateur",
     "ORGNAME": "Nom de l'organisation",
+    "PRIMARYDOMAIN": "Domaine principal",
     "PROJECTNAME": "Nom du projet",
     "RESOURCEOWNER": "Propriétaire des ressources",
     "METHODS": {
@@ -263,8 +268,8 @@
       "DESCRIPTION": "Cliquez sur le bouton ci-dessous pour vous reconnecter."
     },
     "EXHAUSTED": {
-      "TITLE": "Ton quota de demandes authentifiées est épuisé.",
-      "DESCRIPTION": "Supprimez ou augmentez la limite de cette instance ZITADEL."
+      "TITLE": "Votre instance est bloquée.",
+      "DESCRIPTION": "Demandez à votre administrateur d'instance ZITADEL de mettre à jour l'abonnement."
     },
     "INVALID_FORMAT": "Le format n'est pas valide",
     "NOTANEMAIL": "La valeur donnée n'est pas une adresse e-mail",
@@ -274,7 +279,7 @@
     "SYMBOLERROR": "Doit inclure un symbole ou un signe de ponctuation.",
     "NUMBERERROR": "Doit inclure un chiffre.",
     "PWNOTEQUAL": "Les mots de passe fournis ne correspondent pas.",
-    "PHONE": "Le numéro de téléphone doit commencer par 00 ou +."
+    "PHONE": "Le numéro de téléphone doit commencer par +."
   },
   "USER": {
     "SETTINGS": {
@@ -411,8 +416,8 @@
       "DESCRIPTION": "Ajoutez un second facteur pour garantir une sécurité optimale de votre compte.",
       "MANAGE_DESCRIPTION": "Gérez les méthodes de second facteur de vos utilisateurs.",
       "ADD": "Ajouter un facteur",
-      "OTP": "Application d'authentification pour OTP (One-time password)",
-      "OTP_DIALOG_TITLE": "Ajouter un OTP",
+      "OTP": "Application d'authentification pour TOTP (Time-based One-time password)",
+      "OTP_DIALOG_TITLE": "Ajouter un TOTP",
       "OTP_DIALOG_DESCRIPTION": "Scannez le code QR avec une application d'authentification et saisissez le code ci-dessous pour vérifier et activer la méthode OTP.",
       "U2F": "Empreinte digitale, clés de sécurité, Face ID et autres",
       "U2F_DIALOG_TITLE": "Vérifier le facteur",
@@ -420,6 +425,12 @@
       "U2F_SUCCESS": "Facteur ajouté avec succès !",
       "U2F_ERROR": "Une erreur s'est produite pendant l'installation !",
       "U2F_NAME": "Nom de l'authentificateur",
+      "OTPSMS": "OTP (One-Time Password) avec SMS",
+      "OTPEMAIL": "OTP (password monouso) con e-mail",
+      "SETUPOTPSMSDESCRIPTION": "Voulez-vous configurer ce numéro de téléphone comme deuxième facteur OTP (mot de passe à usage unique) ?",
+      "OTPSMSSUCCESS": "OTP Factor mis en place avec succès.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Votre téléphone doit être vérifié pour pouvoir utiliser cette méthode.",
+      "OTPEMAILSUCCESS": "OTP Factor mis en place avec succès.",
       "TYPE": {
         "0": "Pas de MFA défini",
         "1": "Mot de passe à usage unique (OTP)",
@@ -480,7 +491,7 @@
       "TITLE": "Profil",
       "EMAIL": "Courriel",
       "PHONE": "Numéro de téléphone",
-      "PHONE_HINT": "Utilisez 00 ou le symbole + suivi de l'indicatif du pays de l'appelant, ou sélectionnez le pays dans la liste déroulante et saisissez enfin le numéro de téléphone",
+      "PHONE_HINT": "Utilisez le symbole + suivi de l'indicatif du pays de l'appelant, ou sélectionnez le pays dans la liste déroulante et saisissez enfin le numéro de téléphone",
       "USERNAME": "Nom de l'utilisateur",
       "CHANGEUSERNAME": "modifier",
       "CHANGEUSERNAME_TITLE": "Modifier le nom d'utilisateur",
@@ -489,6 +500,7 @@
       "LASTNAME": "Nom de famille",
       "NICKNAME": "Surnom",
       "DISPLAYNAME": "Nom d'affichage",
+      "PREFERREDLOGINNAME": "Nom de connexion préféré",
       "PREFERRED_LANGUAGE": "Langue",
       "GENDER": "Sexe",
       "PASSWORD": "Mot de passe",
@@ -586,7 +598,8 @@
         "EDITVALUE": "Numéro de téléphone",
         "EDITDESC": "Entrez le nouveau numéro de téléphone dans le champ ci-dessous.",
         "DELETETITLE": "Supprimer le numéro de téléphone",
-        "DELETEDESC": "Voulez-vous vraiment supprimer le numéro de téléphone ?"
+        "DELETEDESC": "Voulez-vous vraiment supprimer le numéro de téléphone ?",
+        "OTPSMSREMOVALWARNING": "Ce compte utilise ce numéro de téléphone comme deuxième facteur. Vous ne pourrez plus l'utiliser après avoir continué."
       },
       "RESENDCODE": "Renvoyer le code",
       "ENTERCODE": "Vérifier",
@@ -705,7 +718,6 @@
   },
   "METADATA": {
     "TITLE": "Métadonnées",
-    "DESCRIPTION": "",
     "KEY": "Clé",
     "VALUE": "Valeur",
     "ADD": "Nouvelle entrée",
@@ -735,6 +747,10 @@
     "TIMEOUT": "Délai d'attente",
     "TIMEOUTINSEC": "Délai en secondes",
     "ALLOWEDTOFAIL": "Autorisé à échouer",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Avertissement",
+      "DESCRIPTION": "Si vous désactivez ce paramètre, cela peut empêcher les utilisateurs de votre organisation de se connecter. De plus, vous ne pourrez plus accéder à la console pour désactiver l'action. Nous vous recommandons de créer un utilisateur administrateur dans une organisation distincte ou de tester les scripts d'abord dans un environnement de développement ou une organisation de développement."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Type de flux",
     "TRIGGERTYPE": "Type de déclencheur",
@@ -784,7 +800,7 @@
     },
     "PAGES": {
       "STATE": "Statut",
-      "DOMAINLIST": "Domaines"
+      "DOMAINLIST": "Domaines personnalisés"
     },
     "STATE": {
       "0": "Inconnu",
@@ -856,14 +872,16 @@
         },
         "SEQUENCE": {
           "LABEL": "séquence",
-          "CHECKBOX": "Filtrer par séquence",
-          "SORT": "Triage",
-          "ASC": "Ascendant",
-          "DESC": "Descendant"
+          "CHECKBOX": "Filtrer par séquence"
         },
+        "SORT": "Triage",
+        "ASC": "Ascendant",
+        "DESC": "Descendant",
         "CREATIONDATE": {
-          "LABEL": "Date de création",
-          "CHECKBOX": "Filtrer par date de création"
+          "RADIO_FROM": "De",
+          "RADIO_RANGE": "Gamme",
+          "LABEL_SINCE": "Depuis",
+          "LABEL_UNTIL": "Jusqu'à"
         },
         "OTHER": "autre",
         "OTHERS": "autres"
@@ -913,20 +931,22 @@
         "BTN": "Renommer"
       },
       "ORGDOMAIN": {
-        "TITLE": "Vérification de la propriété du domaine de l'organisation",
-        "VERIFICATION": "Pour vérifier la propriété de votre domaine, vous devez télécharger un fichier de vérification et le charger à l'URL indiquée ci-dessous, ou placer une entrée DNS TXT Record pour l'URL indiquée. Pour terminer, cliquez sur le bouton de vérification.",
-        "VERIFICATION_SKIP": "Vous pouvez ignorer la vérification pour l'instant et continuer à créer votre organisation, mais cette étape doit être terminée pour pouvoir utiliser votre organisation !",
-        "VERIFICATION_VALIDATION_DESC": "Les jetons sont vérifiés régulièrement pour s'assurer que vous êtes toujours propriétaire du domaine.",
+        "TITLE": "Vérifier la propriété de {{value}}",
+        "VERIFICATION": "Nous vous proposons deux méthodes pour valider manuellement votre domaine :",
+        "VERIFICATION_HTML": "-HTTP. Hébergez un fichier de vérification temporaire sur votre site Web",
+        "VERIFICATION_DNS": "-DNS. Créer une entrée DNS d'enregistrement TXT",
+        "VERIFICATION_DNS_DESC": "Si vous gérez {{ value }} et que vous avez accès à vos enregistrements DNS, vous pouvez créer un nouvel enregistrement TXT avec les valeurs suivantes :",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Utilisez ce code pour la valeur de l'enregistrement TXT :",
+        "VERIFICATION_HTTP_DESC": "Si vous avez accès à l'hébergement de votre site Web, téléchargez simplement le fichier de vérification et téléchargez-le à l'URL fournie.",
+        "VERIFICATION_HTTP_URL_LABEL": "URL attendue :",
+        "VERIFICATION_HTTP_FILE_LABEL": "Dossier de vérification :",
+        "VERIFICATION_SKIP": "Vous pouvez ignorer la vérification pour le moment et continuer à créer votre organisation, mais pour pouvoir utiliser votre domaine, cette étape doit être complétée !",
+        "VERIFICATION_VALIDATION_DESC": "Ne supprimez pas le code de vérification, car ZITADEL revérifiera de temps en temps la propriété de votre domaine.",
         "VERIFICATION_NEWTOKEN_TITLE": "Demander un nouveau jeton",
-        "VERIFICATION_NEWTOKEN_DESC": "Si vous voulez demander un nouveau jeton, sélectionnez votre méthode préférée. Si vous voulez valider un jeton persistant, cliquez sur le bouton ci-dessus.",
-        "VERIFICATION_VALIDATION_ONGOING": "Un jeton de vérification a déjà été demandé. Cliquez sur le bouton pour déclencher un contrôle de vérification.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Type de jeton",
-        "VERIFICATION_SUCCESSFUL": "Domaine vérifié avec succès !",
-        "REQUESTNEWTOKEN": "Demander un nouveau jeton",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "VERIFICATION_VALIDATION_ONGOING": "La méthode {{ value }} a été sélectionnée pour vérifier votre domaine. Cliquez sur le bouton pour déclencher une vérification ou réinitialiser le processus de vérification.",
+        "VERIFICATION_SUCCESSFUL": "Domaine vérifié avec succès !",
+        "RESETMETHOD": "Réinitialiser la méthode de vérification"
       },
       "DOWNLOAD_FILE": "Télécharger le fichier",
       "SELECTORGTOOLTIP": "Sélectionnez cette organisation.",
@@ -941,7 +961,7 @@
     },
     "DOMAINS": {
       "NEW": "Ajouter un domaine",
-      "TITLE": "Domaines",
+      "TITLE": "Domaines vérifiés",
       "DESCRIPTION": "Configurez vos domaines. Ce domaine peut être utilisé pour se connecter avec vos utilisateurs.",
       "SETPRIMARY": "Définir comme primaire",
       "DELETE": {
@@ -956,8 +976,7 @@
     "STATE": {
       "0": "Non défini",
       "1": "Actif",
-      "2": "Désactivé",
-      "3": "Supprimé"
+      "2": "Désactivé"
     },
     "MEMBER": {
       "TITLE": "Gestionnaires de l'organisation",
@@ -1004,50 +1023,73 @@
       "DESCRIPTION": "Ces paramètres étendent et remplacent les paramètres de votre instance."
     },
     "LIST": {
-      "GENERAL": "Général",
+      "ORGS": "Organisations",
+      "LANGUAGES": "Langues",
       "LOGIN": "Comportement de connexion et sécurité",
       "LOCKOUT": "Verrouillage",
       "COMPLEXITY": "Complexité du mot de passe",
       "NOTIFICATIONS": "Paramètres de notification",
+      "SMTP_PROVIDER": "Fournisseur SMTP",
+      "SMS_PROVIDER": "SMS/Téléphone Fournisseur",
       "NOTIFICATIONS_DESC": "Paramètres SMTP et SMS",
       "MESSAGETEXTS": "Textes des messages",
       "IDP": "Fournisseurs d'identité",
+      "VERIFIED_DOMAINS": "Domaines vérifiés",
       "DOMAIN": "Paramètres du domaine",
       "LOGINTEXTS": "Textes de l'interface de connexion",
       "BRANDING": "Image de marque",
       "PRIVACYPOLICY": "Politique de confidentialité",
       "OIDC": "Durée de vie et expiration des jetons OIDC",
       "SECRETS": "Apparence secrète",
-      "SECURITY": "Paramètres de sécurité"
+      "SECURITY": "Paramètres de sécurité",
+      "EVENTS": "Événements",
+      "FAILEDEVENTS": "Événements échoués",
+      "VIEWS": "Vues"
     },
     "GROUPS": {
+      "GENERAL": "Général",
       "NOTIFICATIONS": "Notifications",
       "LOGIN": "Connexion et accès",
       "DOMAIN": "Domaine",
       "TEXTS": "Textes et langues",
       "APPEARANCE": "Apparence",
-      "OTHER": "Autres"
+      "OTHER": "Autres",
+      "STORAGE": "Stockage"
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Langue par défaut",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски"
+    "LANGUAGES": {
+      "TITLE": "Paramètres de langue",
+      "DEFAULT": "Langue par défaut",
+      "ALLOWED": "Langues autorisées",
+      "NOT_ALLOWED": "Langues non autorisées",
+      "ALLOW_ALL": "Autoriser toutes les langues",
+      "DISALLOW_ALL": "Interdire toutes les langues",
+      "SETASDEFAULT": "Définir comme langue par défaut",
+      "DEFAULT_SAVED": "Langue par défaut enregistrée",
+      "ALLOWED_SAVED": "Langues autorisées enregistrées",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "Paramètres SMTP",
       "SENDERADDRESS": "Adresse e-mail de l'expéditeur",
       "SENDERNAME": "Nom de l'expéditeur",
+      "REPLYTOADDRESS": "Adresse Reply-to",
       "HOSTANDPORT": "Hôte et port",
       "USER": "Utilisateur",
       "PASSWORD": "Mot de passe",
@@ -1077,6 +1119,7 @@
         "TOKEN": "Jeton",
         "SENDERNUMBER": "Numéro d'expéditeur",
         "ADDED": "Twilio a été ajouté avec succès.",
+        "UPDATED": "Twilio a été mis à jour avec succès.",
         "REMOVED": "Twilio a été supprimé avec succès",
         "CHANGETOKEN": "Changer de Token",
         "SETTOKEN": "Définir le jeton",
@@ -1093,7 +1136,7 @@
       "INDAYS": "Jours"
     },
     "SECRETS": {
-      "TITLE": "Apparence du secret",
+      "TITLE": "Générateur du secret",
       "TYPES": "Types de secret",
       "TYPE": {
         "1": "Courrier d'initialisation",
@@ -1105,7 +1148,7 @@
         "7": "Mot de passe à usage unique (OTP) - SMS",
         "8": "Mot de passe à usage unique (OTP) - e-mail"
       },
-      "ADDGENERATOR": "Définir l'apparence du secret",
+      "ADDGENERATOR": "Configurer générateur de mot de passe",
       "GENERATORTYPE": "Type",
       "EXPIRY": "Expiration (en heures)",
       "INCLUDEDIGITS": "Inclure les chiffres",
@@ -1183,6 +1226,11 @@
         "ERROR": "L'utilisateur n'a pas pu être trouvé !",
         "PRIMARYBUTTON": "suivant",
         "SECONDARYBUTTON": "enregistrez-vous"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Mode automatique",
+        "THEME_MODE_LIGHT": "Mode clair uniquement",
+        "THEME_MODE_DARK": "Mode sombre uniquement"
       }
     },
     "PWD_AGE": {
@@ -1209,6 +1257,7 @@
       "DESCRIPTIONCREATEMGMT": "Les utilisateurs peuvent choisir parmi les fournisseurs d'identité disponibles ci-dessous. Note",
       "ADVANCED": "Avancé",
       "LIFETIMEDURATIONS": "Durée de vie des connexions",
+      "LIFETIME_INVALID": "Le formulaire contient des valeurs non valides.",
       "SAVED": "Enregistré avec succès !"
     },
     "PRIVACY_POLICY": {
@@ -1234,8 +1283,10 @@
       "RESET_DESCRIPTION": "Vous êtes sur le point de restaurer toutes les valeurs par défaut. Toutes les modifications que vous avez apportées seront définitivement supprimées. Voulez-vous vraiment continuer ?",
       "UNSAVED_TITLE": "Continuer sans sauvegarder ?",
       "UNSAVED_DESCRIPTION": "Vous avez apporté des modifications sans les sauvegarder. Voulez-vous les enregistrer maintenant ?",
-      "LOCALE": "Code Locale",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Vous avez sélectionné une langue qui n'est pas autorisée. Vous pouvez continuer à modifier les textes. Mais si vous voulez que vos utilisateurs puissent réellement utiliser cette langue, modifiez les restrictions de vos instances.",
+      "LANGUAGES_NOT_ALLOWED": "Non autorisé:",
+      "LANGUAGE": "Langue",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1246,7 +1297,10 @@
         "zh": "简体中文",
         "bg": "Български",
         "pt": "Portuguese",
-        "mk": "Македонски"
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'email effectuée",
@@ -1339,11 +1393,12 @@
       "MAXAGEDAYS": "Âge maximum en jours",
       "USERLOGINMUSTBEDOMAIN": "Le nom de connexion de l'utilisateur doit contenir le nom de domaine de l'organisation",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Si vous activez ce paramètre, tous les noms de connexion seront suffixés avec le domaine de l'organisation. Si ce paramètre est désactivé, vous devez vous assurer que les noms d'utilisateur sont uniques pour toutes les organisations.",
-      "VALIDATEORGDOMAINS": "Valider les domaines d'Org",
+      "VALIDATEORGDOMAINS": "Vérification du domaine de l'organisation requise (challenge DNS ou HTTP)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "L'adresse de l'expéditeur SMTP correspond au domaine de l'instance",
       "ALLOWUSERNAMEPASSWORD": "Nom d'utilisateur Mot de passe autorisé",
       "ALLOWEXTERNALIDP": "IDP externe autorisé",
-      "ALLOWREGISTER": "Enregistrement autorisé",
+      "ALLOWREGISTERUSERS": "Enregistrer les utilisateurs autorisés",
+      "ALLOWREGISTERORGS": "Enregistrer les organisations autorisées",
       "ALLOWUSERNAMEPASSWORD_DESC": "La connexion classique avec nom d'utilisateur et mot de passe est autorisée.",
       "ALLOWEXTERNALIDP_DESC": "La connexion est autorisée pour les fournisseurs d'identité sous-jacents",
       "ALLOWREGISTER_DESC": "Si l'option est sélectionnée, une étape supplémentaire pour l'enregistrement d'un utilisateur apparaît dans la connexion.",
@@ -1825,7 +1880,9 @@
       "DELETED": "Idp supprimé avec succès !",
       "ADDED": "Ajouté avec succès.",
       "REMOVED": "Suppression réussie."
-    }
+    },
+    "ISIDTOKENMAPPING": "Mappage depuis le jeton ID",
+    "ISIDTOKENMAPPING_DESC": "Si sélectionné, les informations du fournisseur sont mappées à partir du jeton ID, et non à partir du point d'extrémité userinfo."
   },
   "MFA": {
     "LIST": {
@@ -1971,6 +2028,8 @@
       "CLIENTSECRET_DESCRIPTION": "Conservez votre secret client dans un endroit sûr car il disparaîtra une fois la boîte de dialogue fermée.",
       "REGENERATESECRET": "Régénérer le secret du client",
       "DEVMODE": "Mode développement",
+      "DEVMODE_ENABLED": "Activé",
+      "DEVMODE_DISABLED": "Désactivé",
       "DEVMODEDESC": "Attention",
       "SKIPNATIVEAPPSUCCESSPAGE": "Sauter la page de succès de connexion",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Sauter la page de succès après la connexion pour cette application native",
@@ -2051,6 +2110,25 @@
         "1": "Clé privée JWT"
       }
     },
+    "SAML": {
+      "SELECTION": {
+        "TITLE": "SAML",
+        "DESCRIPTION": "Applications SAML"
+      },
+      "CONFIGSECTION": "Configuration SAML",
+      "CHOOSEMETADATASOURCE": "Fournissez votre configuration SAML à l'aide de l'une des options suivantes :",
+      "METADATAOPT1": "Option 1. Spécifiez l'URL où se trouve le fichier de métadonnées",
+      "METADATAOPT2": "Option 2. Téléchargez un fichier contenant vos métadonnées XML",
+      "METADATAOPT3": "Option 3. Créer un fichier de métadonnées minimal à la volée fournissant l'ENTITYID et l'URL ACS",
+      "UPLOAD": "Télécharger le fichier XML",
+      "METADATA": "Métadonnées",
+      "METADATAFROMFILE": "Métadonnées du fichier",
+      "CERTIFICATE": "Certificat SAML",
+      "DOWNLOADCERT": "Télécharger le certificat SAML",
+      "CREATEMETADATA": "Créer des métadonnées",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
+    },
     "AUTHMETHODS": {
       "CODE": {
         "TITLE": "Code",
@@ -2114,7 +2192,10 @@
     "zh": "简体中文",
     "bg": "Български",
     "pt": "Portuguese",
-    "mk": "Македонски"
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский",
+    "nl": "Nederlands"
   },
   "MEMBER": {
     "ADD": "Ajouter un manager",
@@ -2163,7 +2244,8 @@
     "TOAST": {
       "UPDATED": "Autorisation mise à jour.",
       "REMOVED": "Autorisation supprimée",
-      "BULKREMOVED": "Autorisations supprimées."
+      "BULKREMOVED": "Autorisations supprimées.",
+      "CANTSHOWINFO": "Vous ne pouvez pas visiter le profil de cet utilisateur car vous n'êtes pas membre de l'organisation à laquelle appartient cet utilisateur."
     },
     "DIALOG": {
       "DELETE_TITLE": "Supprimer une autorisation",

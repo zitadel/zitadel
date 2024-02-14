@@ -2,15 +2,14 @@ package login
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
-	"github.com/rakyll/statik/fs"
 
+	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -40,6 +39,7 @@ type Login struct {
 	samlAuthCallbackURL func(context.Context, string) string
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
+	featureCheck        feature.Checker
 }
 
 type Config struct {
@@ -47,6 +47,9 @@ type Config struct {
 	CSRFCookieName     string
 	Cache              middleware.CacheConfig
 	AssetCache         middleware.CacheConfig
+
+	// LoginV2
+	DefaultOTPEmailURLV2 string
 }
 
 const (
@@ -73,6 +76,7 @@ func CreateLogin(config Config,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpConfigAlg crypto.EncryptionAlgorithm,
 	csrfCookieKey []byte,
+	featureCheck feature.Checker,
 ) (*Login, error) {
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
@@ -85,18 +89,14 @@ func CreateLogin(config Config,
 		authRepo:            authRepo,
 		idpConfigAlg:        idpConfigAlg,
 		userCodeAlg:         userCodeAlg,
+		featureCheck:        featureCheck,
 	}
-	statikFS, err := fs.NewWithNamespace("login")
-	if err != nil {
-		return nil, fmt.Errorf("unable to create filesystem: %w", err)
-	}
-
 	csrfInterceptor := createCSRFInterceptor(config.CSRFCookieName, csrfCookieKey, externalSecure, login.csrfErrorHandler())
 	cacheInterceptor := createCacheInterceptor(config.Cache.MaxAge, config.Cache.SharedMaxAge, assetCache)
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
 
-	login.router = CreateRouter(login, statikFS, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), oidcInstanceHandler, samlInstanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor, accessHandler)
-	login.renderer = CreateRenderer(HandlerPrefix, statikFS, staticStorage, config.LanguageCookieName)
+	login.router = CreateRouter(login, middleware.TelemetryHandler(IgnoreInstanceEndpoints...), oidcInstanceHandler, samlInstanceHandler, csrfInterceptor, cacheInterceptor, security, userAgentCookie, issuerInterceptor, accessHandler)
+	login.renderer = CreateRenderer(HandlerPrefix, staticStorage, config.LanguageCookieName)
 	login.parser = form.NewParser()
 	return login, nil
 }
@@ -105,7 +105,7 @@ func csp() *middleware.CSP {
 	csp := middleware.DefaultSCP
 	csp.ObjectSrc = middleware.CSPSourceOptsSelf()
 	csp.StyleSrc = csp.StyleSrc.AddNonce()
-	csp.ScriptSrc = csp.ScriptSrc.AddNonce()
+	csp.ScriptSrc = csp.ScriptSrc.AddNonce().AddHash("sha256", "AjPdJSbZmeWHnEc5ykvJFay8FTWeTeRbs9dutfZ0HqE=")
 	return &csp
 }
 
@@ -117,11 +117,30 @@ func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecu
 				handler.ServeHTTP(w, r)
 				return
 			}
+			// ignore form post callback
+			// it will redirect to the "normal" callback, where the cookie is set again
+			if (r.URL.Path == EndpointExternalLoginCallbackFormPost || r.URL.Path == EndpointSAMLACS) && r.Method == http.MethodPost {
+				handler.ServeHTTP(w, r)
+				return
+			}
+			// by default we use SameSite Lax and the externalSecure (TLS) for the secure flag
+			sameSiteMode := csrf.SameSiteLaxMode
+			secureOnly := externalSecure
+			instance := authz.GetInstance(r.Context())
+			// in case of `allow iframe`...
+			if len(instance.SecurityPolicyAllowedOrigins()) > 0 {
+				// ... we need to change to SameSite none ...
+				sameSiteMode = csrf.SameSiteNoneMode
+				// ... and since SameSite none requires the secure flag, we'll set it for TLS and for localhost
+				// (regardless of the TLS / externalSecure settings)
+				secureOnly = externalSecure || instance.RequestedDomain() == "localhost"
+			}
 			csrf.Protect(csrfCookieKey,
-				csrf.Secure(externalSecure),
-				csrf.CookieName(http_utils.SetCookiePrefix(cookieName, "", path, externalSecure)),
+				csrf.Secure(secureOnly),
+				csrf.CookieName(http_utils.SetCookiePrefix(cookieName, externalSecure, http_utils.PrefixHost)),
 				csrf.Path(path),
 				csrf.ErrorHandler(errorHandler),
+				csrf.SameSite(sameSiteMode),
 			)(handler).ServeHTTP(w, r)
 		})
 	}
@@ -148,11 +167,15 @@ func (l *Login) Handler() http.Handler {
 }
 
 func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string) ([]string, error) {
-	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+domain.NewIAMDomainName(orgName, authz.GetInstance(ctx).RequestedDomain()), query.TextEndsWithIgnoreCase)
+	orgDomain, err := domain.NewIAMDomainName(orgName, authz.GetInstance(ctx).RequestedDomain())
 	if err != nil {
 		return nil, err
 	}
-	users, err := l.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{loginName}}, false)
+	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+orgDomain, query.TextEndsWithIgnoreCase)
+	if err != nil {
+		return nil, err
+	}
+	users, err := l.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{loginName}})
 	if err != nil {
 		return nil, err
 	}
@@ -166,6 +189,14 @@ func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string
 func setContext(ctx context.Context, resourceOwner string) context.Context {
 	data := authz.CtxData{
 		UserID: login,
+		OrgID:  resourceOwner,
+	}
+	return authz.SetCtxData(ctx, data)
+}
+
+func setUserContext(ctx context.Context, userID, resourceOwner string) context.Context {
+	data := authz.CtxData{
+		UserID: userID,
 		OrgID:  resourceOwner,
 	}
 	return authz.SetCtxData(ctx, data)

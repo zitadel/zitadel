@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -19,11 +19,11 @@ const (
 // - the organisation (**either** provided by ID or verified domain) exists
 // - the user is permitted to call the requested endpoint (permission option in proto)
 // it will pass the [CtxData] and permission of the user into the ctx [context.Context]
-func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, orgDomain string, verifier *TokenVerifier, authConfig Config, requiredAuthOption Option, method string) (ctxSetter func(context.Context) context.Context, err error) {
+func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, orgDomain string, verifier APITokenVerifier, authConfig Config, requiredAuthOption Option, method string) (ctxSetter func(context.Context) context.Context, err error) {
 	ctx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	ctxData, err := VerifyTokenAndCreateCtxData(ctx, token, orgID, orgDomain, verifier, method)
+	ctxData, err := VerifyTokenAndCreateCtxData(ctx, token, orgID, orgDomain, verifier)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID, 
 
 func checkUserPermissions(req interface{}, userPerms []string, authOpt Option) error {
 	if len(userPerms) == 0 {
-		return errors.ThrowPermissionDenied(nil, "AUTH-5mWD2", "No matching permissions found")
+		return zerrors.ThrowPermissionDenied(nil, "AUTH-5mWD2", "No matching permissions found")
 	}
 
 	if authOpt.CheckParam == "" {
@@ -71,7 +71,7 @@ func checkUserPermissions(req interface{}, userPerms []string, authOpt Option) e
 		return nil
 	}
 
-	return errors.ThrowPermissionDenied(nil, "AUTH-3jknH", "No matching permissions found")
+	return zerrors.ThrowPermissionDenied(nil, "AUTH-3jknH", "No matching permissions found")
 }
 
 func SplitPermission(perm string) (string, string) {

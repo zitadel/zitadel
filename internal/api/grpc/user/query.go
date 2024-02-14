@@ -2,15 +2,15 @@ package user
 
 import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
-func UserQueriesToQuery(queries []*user_pb.SearchQuery) (_ []query.SearchQuery, err error) {
+func UserQueriesToQuery(queries []*user_pb.SearchQuery, level uint8) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
-		q[i], err = UserQueryToQuery(query)
+		q[i], err = UserQueryToQuery(query, level)
 		if err != nil {
 			return nil, err
 		}
@@ -18,7 +18,11 @@ func UserQueriesToQuery(queries []*user_pb.SearchQuery) (_ []query.SearchQuery, 
 	return q, nil
 }
 
-func UserQueryToQuery(query *user_pb.SearchQuery) (query.SearchQuery, error) {
+func UserQueryToQuery(query *user_pb.SearchQuery, level uint8) (query.SearchQuery, error) {
+	if level > 20 {
+		// can't go deeper than 20 levels of nesting.
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-zsQ97", "Errors.User.TooManyNestingLevels")
+	}
 	switch q := query.Query.(type) {
 	case *user_pb.SearchQuery_UserNameQuery:
 		return UserNameQueryToQuery(q.UserNameQuery)
@@ -40,8 +44,18 @@ func UserQueryToQuery(query *user_pb.SearchQuery) (query.SearchQuery, error) {
 		return LoginNameQueryToQuery(q.LoginNameQuery)
 	case *user_pb.SearchQuery_ResourceOwner:
 		return ResourceOwnerQueryToQuery(q.ResourceOwner)
+	case *user_pb.SearchQuery_InUserIdsQuery:
+		return InUserIdsQueryToQuery(q.InUserIdsQuery)
+	case *user_pb.SearchQuery_InUserEmailsQuery:
+		return InUserEmailsQueryToQuery(q.InUserEmailsQuery)
+	case *user_pb.SearchQuery_OrQuery:
+		return OrQueryToQuery(q.OrQuery, level)
+	case *user_pb.SearchQuery_AndQuery:
+		return AndQueryToQuery(q.AndQuery, level)
+	case *user_pb.SearchQuery_NotQuery:
+		return NotQueryToQuery(q.NotQuery, level)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}
 }
 
@@ -83,4 +97,34 @@ func LoginNameQueryToQuery(q *user_pb.LoginNameQuery) (query.SearchQuery, error)
 
 func ResourceOwnerQueryToQuery(q *user_pb.ResourceOwnerQuery) (query.SearchQuery, error) {
 	return query.NewUserResourceOwnerSearchQuery(q.OrgID, query.TextEquals)
+}
+
+func InUserIdsQueryToQuery(q *user_pb.InUserIDQuery) (query.SearchQuery, error) {
+	return query.NewUserInUserIdsSearchQuery(q.UserIds)
+}
+
+func InUserEmailsQueryToQuery(q *user_pb.InUserEmailsQuery) (query.SearchQuery, error) {
+	return query.NewUserInUserEmailsSearchQuery(q.UserEmails)
+}
+
+func OrQueryToQuery(q *user_pb.OrQuery, level uint8) (query.SearchQuery, error) {
+	mappedQueries, err := UserQueriesToQuery(q.Queries, level+1)
+	if err != nil {
+		return nil, err
+	}
+	return query.NewUserOrSearchQuery(mappedQueries)
+}
+func AndQueryToQuery(q *user_pb.AndQuery, level uint8) (query.SearchQuery, error) {
+	mappedQueries, err := UserQueriesToQuery(q.Queries, level+1)
+	if err != nil {
+		return nil, err
+	}
+	return query.NewUserAndSearchQuery(mappedQueries)
+}
+func NotQueryToQuery(q *user_pb.NotQuery, level uint8) (query.SearchQuery, error) {
+	mappedQuery, err := UserQueryToQuery(q.Query, level+1)
+	if err != nil {
+		return nil, err
+	}
+	return query.NewUserNotSearchQuery(mappedQuery)
 }

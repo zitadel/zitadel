@@ -28,8 +28,20 @@ Errors:
       RemoveFailed: オブジェクトの削除に失敗しました
   Limit:
     ExceedsDefault: デフォルトの制限を超えています
+  Limits:
+    NotFound: 制限が見つかりません
+    NoneSpecified: 制限が指定されていません
+    Instance:
+      Blocked: インスタンスはブロックされています
+  Restrictions:
+    NoneSpecified: 制限が指定されていません
+    DefaultLanguageMustBeAllowed: デフォルト言語は許可されている必要があります
   Language:
     NotParsed: 言語のパースに失敗しました
+    NotSupported: 言語はサポートされていません
+    NotAllowed: 言語は許可されていません
+    Undefined: 言語は未定義です
+    Duplicate: 言語に重複があります
   OIDCSettings:
     NotFound: OIDC構成が見つかりません
     AlreadyExists: すでに存在するOIDC構成です
@@ -48,6 +60,7 @@ Errors:
   Notification:
     NoDomain: メッセージのドメインが見つかりません
   User:
+    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: ユーザーが見つかりません
     AlreadyExists: 既に存在するユーザーです
     NotFoundOnOrg: ユーザーが選択した組織内で見つかりません
@@ -112,7 +125,7 @@ Errors:
       Empty: パスワードは空です
       Invalid: 無効なパスワードです
       NotSet: パスワードが未設置です
-      NotChanged: パスワードは変更されていません
+      NotChanged: 新しいパスワードは現在のパスワードと同じにすることはできません
       NotSupported: パスワードハッシュエンコードはサポートされていません
     PasswordComplexityPolicy:
       NotFound: パスワードポリシーが見つかりません
@@ -125,10 +138,11 @@ Errors:
     ExternalIDP:
       Invalid: 無効な外部IDPです
       IDPConfigNotExisting: この組織はIDPプロバイダーが無効です
-      NotAllowed: この組織では外部IDPが許可されていません
+      NotAllowed: 外部IDPは許可されていません
       MinimumExternalIDPNeeded: 少なくとも1つのIDPを追加する必要があります
       AlreadyExists: 外部IDPはすでに使用されています
       NotFound: 外部IDPが見つかりません
+      LoginFailed: 外部IDPでのログインに失敗
     MFA:
       OTP:
         AlreadyReady: 多要素OTP（ワンタイムパスワード）は設定済みです
@@ -173,6 +187,11 @@ Errors:
     DomainVerificationTypeInvalid: ドメイン認証タイプが無効です
     DomainVerificationMissing: ドメイン認証はまだ開始されていません
     DomainVerificationFailed: ドメイン認証に失敗しました
+    DomainVerificationTXTNotFound: _zitadel-challenge TXT レコードがドメインで見つかりませんでした。 DNS サーバーに追加したことを確認するか、新しいレコードが伝播されるまで待ちます
+    DomainVerificationTXTNoMatch: ドメインの _zitadel-challenge TXT レコードが見つかりましたが、正しいトークン テキストが含まれていません。 DNS サーバーに正しいトークンを追加したかどうかを確認するか、新しいレコードが伝播されるまで待ちます
+    DomainVerificationHTTPNotFound: チャレンジを含むファイルが予期された URL に見つかりませんでした。読み取り権限のある適切な場所にファイルがアップロードされていることを確認してください
+    DomainVerificationHTTPNoMatch: チャレンジを含むファイルが予期された URL で見つかりましたが、正しいトークン テキストが含まれていません。内容を確認してください
+    DomainVerificationTimeout: DNSサーバーへのクエリでタイムアウトが発生しました
     PrimaryDomainNotDeletable: プライマリドメインは削除できません
     DomainNotFound: ドメインが見つかりません
     MemberIDMissing: メンバーIDがありません
@@ -188,8 +207,13 @@ Errors:
     Domain:
       AlreadyExists: ドメインはすでに存在します
       InvalidCharacter: ドメインは英数字、'.'、'-'のみ使用可能です。
+      EmptyString: 無効な数字およびアルファベット以外の文字は空のスペースに置き換えられ、結果のドメインは空の文字列になります
     IDP:
       InvalidSearchQuery: 無効な検索クエリです
+      ClientIDMissing: クライアントIDがありません
+      TeamIDMissing: チームIDがありません
+      KeyIDMissing: キーIDがありません
+      PrivateKeyMissing: 秘密キーがありません
     LoginPolicy:
       NotFound: ログインポリシーが見つかりません
       Invalid: 無効なログインポリシーです
@@ -292,7 +316,7 @@ Errors:
       NotActive: プロジェクトグラントはアクティブではありません
       NotInactive: プロジェクトグラントは非アクティブではありません
   IAM:
-    NotFound: インスタンスが見つかりません
+    NotFound: インスタンスが見つかりません https://zitadel.com/docs/self-hosting/manage/custom-domain
     Member:
       RolesNotChanged: ロールは変更されていません
     MemberInvalid: 無効なメンバーです
@@ -399,9 +423,11 @@ Errors:
     AuditRetention: 履歴は監査ログの管理外にあります
   Token:
     NotFound: トークンが見つかりません
+    Invalid: 無効なトークンです
   UserSession:
     NotFound: ユーザーが見つかりません
   Key:
+    NotFound: キーが見つかりません
     ExpireBeforeNow: 有効期限が過去です
   Login:
     LoginPolicy:
@@ -465,12 +491,16 @@ Errors:
   Session:
     NotExisting: セッションが存在しない
     Terminated: セッションはすでに終了しています
+    Expired: セッションの有効期限が切れました
+    PositiveLifetime: セッションの有効期間は 0 未満であってはなりません
     Token:
       Invalid: セッショントークンが無効です
     WebAuthN:
       NoChallenge: WebAuthN チャレンジを使用しないセッション
   Intent:
     IDPMissing: リクエストにIDP IDが含まれていません
+    IDPInvalid: リクエストのIDPが無効
+    ResponseInvalid: IDPの回答は無効
     SuccessURLMissing: リクエストに成功時の URL がありません
     FailureURLMissing: リクエストに失敗の URL がありません
     StateMissing: リクエストに State パラメータがありません
@@ -489,6 +519,10 @@ Errors:
       Invalid: トークンが無効です
       Expired: トークンの有効期限が切れている
     InvalidClient: トークンが発行されていません
+  Feature:
+    NotExisting: 機能が存在しません
+    TypeNotSupported: 機能タイプはサポートされていません
+    InvalidValue: この機能には無効な値です
 
 AggregateTypes:
   action: アクション
@@ -499,6 +533,7 @@ AggregateTypes:
   user: ユーザー
   usergrant: ユーザーグラント
   quota: クォータ
+  feature: 特徴
 
 EventTypes:
   user:
@@ -603,6 +638,24 @@ EventTypes:
           check:
             succeeded: MFA OTPチェックの成功
             failed: MFA OTPチェックの失敗
+          sms:
+            added: 多要素 OTP SMS を追加しました
+            removed: 多要素 OTP SMS を削除しました
+            code:
+              added: 多要素 OTP SMS コードを追加しました
+              sent: 多要素 OTP SMS コードが送信されました
+            check:
+              succeeded: 多要素 OTP SMS 検証が成功しました
+              failed: 多要素 OTP SMS 検証が失敗しました
+          email:
+            added: 多要素 OTP 電子メールを追加しました
+            removed: 多要素 OTP 電子メールを削除しました
+            code:
+              added: 多要素 OTP 電子メール コードを追加しました
+              sent: 多要素 OTP 電子メール コードが送信されました
+            check:
+              succeeded: 多要素 OTP 電子メール検証が成功しました
+              failed: 多要素 OTP 電子メール検証が失敗しました
         u2f:
           token:
             added: MFA U2Fトークンの追加
@@ -1187,6 +1240,7 @@ Action:
       ExternalAuthentication: 外部認証
       CustomiseToken: トークンを補完
       InternalAuthentication: 内部認証
+      CustomizeSAMLResponse: SAMLResponse の補完
   TriggerType:
     Unspecified: 未定義
     PostAuthentication: 認証後
@@ -1194,3 +1248,4 @@ Action:
     PostCreation: 作成後
     PreUserinfoCreation: ユーザー情報作成前
     PreAccessTokenCreation: アクセストークン作成前
+    PreSAMLResponseCreation: SAMLResponse の作成前

@@ -2,12 +2,9 @@ package user
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -25,11 +22,11 @@ type HumanAddressChangedEvent struct {
 	StreetAddress *string `json:"streetAddress,omitempty"`
 }
 
-func (e *HumanAddressChangedEvent) Data() interface{} {
+func (e *HumanAddressChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *HumanAddressChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *HumanAddressChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -39,7 +36,7 @@ func NewAddressChangedEvent(
 	changes []AddressChanges,
 ) (*HumanAddressChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "USER-3n8fs", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "USER-3n8fs", "Errors.NoChangesFound")
 	}
 	changeEvent := &HumanAddressChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -86,13 +83,13 @@ func ChangeStreetAddress(street string) func(event *HumanAddressChangedEvent) {
 	}
 }
 
-func HumanAddressChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func HumanAddressChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	addressChanged := &HumanAddressChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, addressChanged)
+	err := event.Unmarshal(addressChanged)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-5M0pd", "unable to unmarshal human address changed")
+		return nil, zerrors.ThrowInternal(err, "USER-5M0pd", "unable to unmarshal human address changed")
 	}
 
 	return addressChanged, nil

@@ -57,8 +57,10 @@
 
   <ng-template cnslHasRole [hasRole]="['org.create', 'iam.write']">
     <button mat-button [routerLink]="['/orgs/create']" (click)="closedCard.emit()">
-      <mat-icon class="avatar">add</mat-icon>
-      {{ 'MENU.NEWORG' | translate }}
+      <div class="cnsl-action-button">
+        <mat-icon class="avatar">add</mat-icon>
+        <span>{{ 'MENU.NEWORG' | translate }}</span>
+      </div>
     </button>
   </ng-template>
 </div>

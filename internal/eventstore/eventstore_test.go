@@ -2,16 +2,15 @@ package eventstore
 
 import (
 	"context"
-	"database/sql"
+	"encoding/json"
 	"fmt"
 	"reflect"
-	"sync"
 	"testing"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/service"
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // testEvent implements the Event interface
@@ -36,11 +35,11 @@ func newTestEvent(id, description string, data func() interface{}, checkPrevious
 	}
 }
 
-func (e *testEvent) Data() interface{} {
+func (e *testEvent) Payload() interface{} {
 	return e.data()
 }
 
-func (e *testEvent) UniqueConstraints() []*EventUniqueConstraint {
+func (e *testEvent) UniqueConstraints() []*UniqueConstraint {
 	return nil
 }
 
@@ -48,7 +47,7 @@ func (e *testEvent) Assets() []*Asset {
 	return nil
 }
 
-func testFilterMapper(event *repository.Event) (Event, error) {
+func testFilterMapper(event Event) (Event, error) {
 	if event == nil {
 		return newTestEvent("testID", "hodor", nil, false), nil
 	}
@@ -61,7 +60,7 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 	}
 	type args struct {
 		eventType EventType
-		mapper    func(*repository.Event) (Event, error)
+		mapper    func(Event) (Event, error)
 	}
 	type res struct {
 		event       Event
@@ -74,19 +73,6 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 		args   args
 		res    res
 	}{
-		{
-			name: "no event type",
-			args: args{
-				eventType: "",
-				mapper:    testFilterMapper,
-			},
-			fields: fields{
-				eventMapper: map[EventType]eventTypeInterceptors{},
-			},
-			res: res{
-				mapperCount: 0,
-			},
-		},
 		{
 			name: "no event mapper",
 			args: args{
@@ -135,8 +121,8 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 			fields: fields{
 				eventMapper: map[EventType]eventTypeInterceptors{
 					"event.type": {
-						eventMapper: func(*repository.Event) (Event, error) {
-							return nil, errors.ThrowUnimplemented(nil, "V2-1qPvn", "unimplemented")
+						eventMapper: func(Event) (Event, error) {
+							return nil, zerrors.ThrowUnimplemented(nil, "V2-1qPvn", "unimplemented")
 						},
 					},
 				},
@@ -153,12 +139,11 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			es := &Eventstore{
-				eventInterceptors: tt.fields.eventMapper,
-			}
-			es = es.RegisterFilterEventMapper("test", tt.args.eventType, tt.args.mapper)
-			if len(es.eventInterceptors) != tt.res.mapperCount {
-				t.Errorf("unexpected mapper count: want %d, got %d", tt.res.mapperCount, len(es.eventInterceptors))
+
+			eventInterceptors = tt.fields.eventMapper
+			RegisterFilterEventMapper("test", tt.args.eventType, tt.args.mapper)
+			if len(eventInterceptors) != tt.res.mapperCount {
+				t.Errorf("unexpected mapper count: want %d, got %d", tt.res.mapperCount, len(eventInterceptors))
 				return
 			}
 
@@ -166,7 +151,7 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 				return
 			}
 
-			mapper := es.eventInterceptors[tt.args.eventType]
+			mapper := eventInterceptors[tt.args.eventType]
 			event, err := mapper.eventMapper(nil)
 			if err != nil {
 				t.Errorf("unexpected error %v", err)
@@ -342,401 +327,107 @@ func Test_eventData(t *testing.T) {
 	}
 }
 
-func TestEventstore_aggregatesToEvents(t *testing.T) {
-	type args struct {
-		instanceID string
-		events     []Command
-	}
-	type res struct {
-		wantErr bool
-		events  []*repository.Event
-	}
-	tests := []struct {
-		name string
-		args args
-		res  res
-	}{
-		{
-			name: "one aggregate one event",
-			args: args{
-				instanceID: "instanceID",
-				events: []Command{
-					newTestEvent(
-						"1",
-						"",
-						func() interface{} {
-							return nil
-						},
-						false),
-				},
-			},
-			res: res{
-				wantErr: false,
-				events: []*repository.Event{
-					{
-						AggregateID:   "1",
-						AggregateType: "test.aggregate",
-						Data:          []byte(nil),
-						EditorService: "editorService",
-						EditorUser:    "editorUser",
-						ResourceOwner: sql.NullString{String: "caos", Valid: true},
-						InstanceID:    "instanceID",
-						Type:          "test.event",
-						Version:       "v1",
-					},
-				},
-			},
-		},
-		{
-			name: "one aggregate multiple events",
-			args: args{
-				instanceID: "instanceID",
-				events: []Command{
-					newTestEvent(
-						"1",
-						"",
-						func() interface{} {
-							return nil
-						},
-						false),
-					newTestEvent(
-						"1",
-						"",
-						func() interface{} {
-							return nil
-						},
-						false),
-				},
-			},
-			res: res{
-				wantErr: false,
-				events: []*repository.Event{
-					{
-						AggregateID:   "1",
-						AggregateType: "test.aggregate",
-						Data:          []byte(nil),
-						EditorService: "editorService",
-						EditorUser:    "editorUser",
-						ResourceOwner: sql.NullString{String: "caos", Valid: true},
-						InstanceID:    "instanceID",
-						Type:          "test.event",
-						Version:       "v1",
-					},
-					{
-						AggregateID:   "1",
-						AggregateType: "test.aggregate",
-						Data:          []byte(nil),
-						EditorService: "editorService",
-						EditorUser:    "editorUser",
-						ResourceOwner: sql.NullString{String: "caos", Valid: true},
-						InstanceID:    "instanceID",
-						Type:          "test.event",
-						Version:       "v1",
-					},
-				},
-			},
-		},
-		{
-			name: "invalid data",
-			args: args{
-				instanceID: "instanceID",
-				events: []Command{
-					newTestEvent(
-						"1",
-						"",
-						func() interface{} {
-							return `{"data":""`
-						},
-						false),
-				},
-			},
-			res: res{
-				wantErr: true,
-			},
-		},
-		{
-			name: "no aggregate id",
-			args: args{
-				events: []Command{
-					&testEvent{
-						BaseEvent: *NewBaseEventForPush(
-							service.WithService(authz.NewMockContext("instanceID", "resourceOwner", "editorUser"), "editorService"),
-							NewAggregate(
-								authz.NewMockContext("zitadel", "caos", "adlerhurst"),
-								"",
-								"test.aggregate",
-								"v1",
-							),
-							"test.event",
-						),
-						data: func() interface{} {
-							return nil
-						},
-					},
-				},
-			},
-			res: res{
-				wantErr: true,
-			},
-		},
-		{
-			name: "no aggregate type",
-			args: args{
-				events: []Command{
-					&testEvent{
-						BaseEvent: *NewBaseEventForPush(
-							service.WithService(authz.NewMockContext("instanceID", "resourceOwner", "editorUser"), "editorService"),
-							NewAggregate(
-								authz.NewMockContext("zitadel", "caos", "adlerhurst"),
-								"id",
-								"",
-								"v1",
-							),
-							"test.event",
-						),
-						data: func() interface{} {
-							return nil
-						},
-					},
-				},
-			},
-			res: res{
-				wantErr: true,
-			},
-		},
-		{
-			name: "no aggregate version",
-			args: args{
-				events: []Command{
-					&testEvent{
-						BaseEvent: *NewBaseEventForPush(
-							service.WithService(authz.NewMockContext("instanceID", "resourceOwner", "editorUser"), "editorService"),
-							NewAggregate(
-								authz.NewMockContext("zitadel", "caos", "adlerhurst"),
-								"id",
-								"test.aggregate",
-								"",
-							),
-							"test.event",
-						),
-						data: func() interface{} {
-							return nil
-						},
-					},
-				},
-			},
-			res: res{
-				wantErr: true,
-			},
-		},
-		{
-			name: "no event type",
-			args: args{
-				events: []Command{
-					&testEvent{
-						BaseEvent: *NewBaseEventForPush(
-							service.WithService(authz.NewMockContext("instanceID", "resourceOwner", "editorUser"), "editorService"),
-							NewAggregate(
-								authz.NewMockContext("zitadel", "caos", "adlerhurst"),
-								"id",
-								"test.aggregate",
-								"v1",
-							),
-							"",
-						),
-						data: func() interface{} {
-							return nil
-						},
-					},
-				},
-			},
-			res: res{
-				wantErr: true,
-			},
-		},
-		{
-			name: "no resourceowner",
-			args: args{
-				events: []Command{
-					&testEvent{
-						BaseEvent: *NewBaseEventForPush(
-							service.WithService(authz.NewMockContext("instanceID", "", "editorUser"), "editorService"),
-							NewAggregate(
-								authz.NewMockContext("zitadel", "", "adlerhurst"),
-								"id",
-								"test.aggregate",
-								"v1",
-							),
-							"test.event",
-						),
-						data: func() interface{} {
-							return nil
-						},
-					},
-				},
-			},
-			res: res{
-				wantErr: false,
-				events: []*repository.Event{
-					{
-						AggregateID:   "id",
-						AggregateType: "test.aggregate",
-						Data:          []byte(nil),
-						EditorService: "editorService",
-						EditorUser:    "editorUser",
-						ResourceOwner: sql.NullString{String: "", Valid: false},
-						InstanceID:    "zitadel",
-						Type:          "test.event",
-						Version:       "v1",
-					},
-				},
-			},
-		},
-		{
-			name: "multiple aggregates",
-			args: args{
-				events: []Command{
-					newTestEvent(
-						"1",
-						"",
-						func() interface{} {
-							return nil
-						},
-						false),
-					newTestEvent(
-						"1",
-						"",
-						func() interface{} {
-							return nil
-						},
-						false),
-					newTestEvent(
-						"2",
-						"",
-						func() interface{} {
-							return nil
-						},
-						true),
-				},
-			},
-			res: res{
-				wantErr: false,
-				events: combineEventLists(
-					[]*repository.Event{
-						{
-							AggregateID:   "1",
-							AggregateType: "test.aggregate",
-							Data:          []byte(nil),
-							EditorService: "editorService",
-							EditorUser:    "editorUser",
-							ResourceOwner: sql.NullString{String: "caos", Valid: true},
-							InstanceID:    "zitadel",
-							Type:          "test.event",
-							Version:       "v1",
-						},
-						{
-							AggregateID:   "1",
-							AggregateType: "test.aggregate",
-							Data:          []byte(nil),
-							EditorService: "editorService",
-							EditorUser:    "editorUser",
-							ResourceOwner: sql.NullString{String: "caos", Valid: true},
-							InstanceID:    "zitadel",
-							Type:          "test.event",
-							Version:       "v1",
-						},
-					},
-					[]*repository.Event{
-						{
-							AggregateID:   "2",
-							AggregateType: "test.aggregate",
-							Data:          []byte(nil),
-							EditorService: "editorService",
-							EditorUser:    "editorUser",
-							ResourceOwner: sql.NullString{String: "caos", Valid: true},
-							InstanceID:    "zitadel",
-							Type:          "test.event",
-							Version:       "v1",
-						},
-					},
-				),
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			events, _, err := commandsToRepository(tt.args.instanceID, tt.args.events)
-			if (err != nil) != tt.res.wantErr {
-				t.Errorf("Eventstore.aggregatesToEvents() error = %v, wantErr %v", err, tt.res.wantErr)
-				return
-			}
+type testPusher struct {
+	events []Event
+	err    error
 
-			if err != nil {
-				return
-			}
-
-			if len(tt.res.events) != len(events) {
-				t.Errorf("length of events unequal want: %d got %d", len(tt.res.events), len(events))
-				return
-			}
-
-			for i := 0; i < len(tt.res.events); i++ {
-				compareEvents(t, tt.res.events[i], events[i])
-			}
-		})
-	}
+	t *testing.T
 }
 
-type testRepo struct {
-	events    []*repository.Event
-	sequence  uint64
+func (repo *testPusher) Health(ctx context.Context) error {
+	return nil
+}
+
+func (repo *testPusher) Push(ctx context.Context, commands ...Command) (events []Event, err error) {
+	if repo.err != nil {
+		return nil, repo.err
+	}
+
+	if len(repo.events) != len(commands) {
+		repo.t.Errorf("length of events unequal want: %d got %d", len(repo.events), len(commands))
+		return nil, fmt.Errorf("")
+	}
+
+	events = make([]Event, len(commands))
+
+	for i := 0; i < len(repo.events); i++ {
+
+		var payload []byte
+		switch p := commands[i].Payload().(type) {
+		case []byte:
+			payload = p
+		case nil:
+			// don't do anything
+		default:
+			payload, err = json.Marshal(p)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		compareEvents(repo.t, repo.events[i], commands[i])
+		events[i] = &BaseEvent{
+			Seq:       uint64(i),
+			Creation:  time.Now(),
+			EventType: commands[i].Type(),
+			Data:      payload,
+			User:      commands[i].Creator(),
+			Agg: &Aggregate{
+				Version:       commands[i].Aggregate().Version,
+				ID:            commands[i].Aggregate().ID,
+				Type:          commands[i].Aggregate().Type,
+				ResourceOwner: commands[i].Aggregate().ResourceOwner,
+				InstanceID:    commands[i].Aggregate().InstanceID,
+			},
+		}
+	}
+
+	return events, nil
+}
+
+type testQuerier struct {
+	events    []Event
+	sequence  float64
 	instances []string
 	err       error
 	t         *testing.T
 }
 
-func (repo *testRepo) Health(ctx context.Context) error {
+func (repo *testQuerier) Health(ctx context.Context) error {
 	return nil
 }
 
-func (repo *testRepo) CreateInstance(ctx context.Context, instance string) error {
+func (repo *testQuerier) CreateInstance(ctx context.Context, instance string) error {
 	return nil
 }
 
-func (repo *testRepo) Step20(context.Context, uint64) error { return nil }
-
-func (repo *testRepo) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
-	if repo.err != nil {
-		return repo.err
-	}
-
-	if len(repo.events) != len(events) {
-		repo.t.Errorf("length of events unequal want: %d got %d", len(repo.events), len(events))
-		return fmt.Errorf("")
-	}
-
-	for i := 0; i < len(repo.events); i++ {
-		compareEvents(repo.t, repo.events[i], events[i])
-	}
-
-	return nil
-}
-
-func (repo *testRepo) Filter(ctx context.Context, searchQuery *repository.SearchQuery) ([]*repository.Event, error) {
+func (repo *testQuerier) Filter(ctx context.Context, searchQuery *SearchQueryBuilder) ([]Event, error) {
 	if repo.err != nil {
 		return nil, repo.err
 	}
 	return repo.events, nil
 }
 
-func (repo *testRepo) LatestSequence(ctx context.Context, queryFactory *repository.SearchQuery) (uint64, error) {
+func (repo *testQuerier) FilterToReducer(ctx context.Context, searchQuery *SearchQueryBuilder, reduce Reducer) error {
+	if repo.err != nil {
+		return repo.err
+	}
+	for _, event := range repo.events {
+		if err := reduce(event); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (repo *testQuerier) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (float64, error) {
 	if repo.err != nil {
 		return 0, repo.err
 	}
 	return repo.sequence, nil
 }
 
-func (repo *testRepo) InstanceIDs(ctx context.Context, queryFactory *repository.SearchQuery) ([]string, error) {
+func (repo *testQuerier) InstanceIDs(ctx context.Context, queryFactory *SearchQueryBuilder) ([]string, error) {
 	if repo.err != nil {
 		return nil, repo.err
 	}
@@ -748,8 +439,8 @@ func TestEventstore_Push(t *testing.T) {
 		events []Command
 	}
 	type fields struct {
-		repo        *testRepo
-		eventMapper map[EventType]func(*repository.Event) (Event, error)
+		pusher      *testPusher
+		eventMapper map[EventType]func(Event) (Event, error)
 	}
 	type res struct {
 		wantErr bool
@@ -768,31 +459,37 @@ func TestEventstore_Push(t *testing.T) {
 						"1",
 						"",
 						func() interface{} {
-							return nil
+							return []byte(nil)
 						},
 						false),
 				},
 			},
 			fields: fields{
-				repo: &testRepo{
+				pusher: &testPusher{
 					t: t,
-					events: []*repository.Event{
-						{
-							AggregateID:   "1",
-							AggregateType: "test.aggregate",
-							Data:          []byte(nil),
-							EditorService: "editorService",
-							EditorUser:    "editorUser",
-							ResourceOwner: sql.NullString{String: "caos", Valid: true},
-							InstanceID:    "zitadel",
-							Type:          "test.event",
-							Version:       "v1",
+					events: []Event{
+						&BaseEvent{
+							Agg: &Aggregate{
+								ID:            "1",
+								Type:          "test.aggregate",
+								ResourceOwner: "caos",
+								InstanceID:    "zitadel",
+							},
+							Data:      []byte(nil),
+							User:      "editorUser",
+							EventType: "test.event",
 						},
 					},
 				},
-				eventMapper: map[EventType]func(*repository.Event) (Event, error){
-					"test.event": func(e *repository.Event) (Event, error) {
-						return &testEvent{}, nil
+				eventMapper: map[EventType]func(Event) (Event, error){
+					"test.event": func(e Event) (Event, error) {
+						return &testEvent{
+							BaseEvent: BaseEvent{
+								Agg: &Aggregate{
+									Type: e.Aggregate().Type,
+								},
+							},
+						}, nil
 					},
 				},
 			},
@@ -805,49 +502,55 @@ func TestEventstore_Push(t *testing.T) {
 						"1",
 						"",
 						func() interface{} {
-							return nil
+							return []byte(nil)
 						},
 						false),
 					newTestEvent(
 						"1",
 						"",
 						func() interface{} {
-							return nil
+							return []byte(nil)
 						},
 						false),
 				},
 			},
 			fields: fields{
-				repo: &testRepo{
+				pusher: &testPusher{
 					t: t,
-					events: []*repository.Event{
-						{
-							AggregateID:   "1",
-							AggregateType: "test.aggregate",
-							Data:          []byte(nil),
-							EditorService: "editorService",
-							EditorUser:    "editorUser",
-							ResourceOwner: sql.NullString{String: "caos", Valid: true},
-							InstanceID:    "zitadel",
-							Type:          "test.event",
-							Version:       "v1",
+					events: []Event{
+						&BaseEvent{
+							Agg: &Aggregate{
+								ID:            "1",
+								Type:          "test.aggregate",
+								ResourceOwner: "caos",
+								InstanceID:    "zitadel",
+							},
+							Data:      []byte(nil),
+							User:      "editorUser",
+							EventType: "test.event",
 						},
-						{
-							AggregateID:   "1",
-							AggregateType: "test.aggregate",
-							Data:          []byte(nil),
-							EditorService: "editorService",
-							EditorUser:    "editorUser",
-							ResourceOwner: sql.NullString{String: "caos", Valid: true},
-							InstanceID:    "zitadel",
-							Type:          "test.event",
-							Version:       "v1",
+						&BaseEvent{
+							Agg: &Aggregate{
+								ID:            "1",
+								Type:          "test.aggregate",
+								ResourceOwner: "caos",
+								InstanceID:    "zitadel",
+							},
+							Data:      []byte(nil),
+							User:      "editorUser",
+							EventType: "test.event",
 						},
 					},
 				},
-				eventMapper: map[EventType]func(*repository.Event) (Event, error){
-					"test.event": func(e *repository.Event) (Event, error) {
-						return &testEvent{}, nil
+				eventMapper: map[EventType]func(Event) (Event, error){
+					"test.event": func(e Event) (Event, error) {
+						return &testEvent{
+							BaseEvent: BaseEvent{
+								Agg: &Aggregate{
+									Type: e.Aggregate().Type,
+								},
+							},
+						}, nil
 					},
 				},
 			},
@@ -863,71 +566,77 @@ func TestEventstore_Push(t *testing.T) {
 						"1",
 						"",
 						func() interface{} {
-							return nil
+							return []byte(nil)
 						},
 						false),
 					newTestEvent(
 						"1",
 						"",
 						func() interface{} {
-							return nil
+							return []byte(nil)
 						},
 						false),
 					newTestEvent(
 						"2",
 						"",
 						func() interface{} {
-							return nil
+							return []byte(nil)
 						},
 						true),
 				},
 			},
 			fields: fields{
-				repo: &testRepo{
+				pusher: &testPusher{
 					t: t,
 					events: combineEventLists(
-						[]*repository.Event{
-							{
-								AggregateID:   "1",
-								AggregateType: "test.aggregate",
-								Data:          []byte(nil),
-								EditorService: "editorService",
-								EditorUser:    "editorUser",
-								ResourceOwner: sql.NullString{String: "caos", Valid: true},
-								InstanceID:    "zitadel",
-								Type:          "test.event",
-								Version:       "v1",
+						[]Event{
+							&BaseEvent{
+								Agg: &Aggregate{
+									ID:            "1",
+									Type:          "test.aggregate",
+									ResourceOwner: "caos",
+									InstanceID:    "zitadel",
+								},
+								Data:      []byte(nil),
+								User:      "editorUser",
+								EventType: "test.event",
 							},
-							{
-								AggregateID:   "1",
-								AggregateType: "test.aggregate",
-								Data:          []byte(nil),
-								EditorService: "editorService",
-								EditorUser:    "editorUser",
-								ResourceOwner: sql.NullString{String: "caos", Valid: true},
-								InstanceID:    "zitadel",
-								Type:          "test.event",
-								Version:       "v1",
+							&BaseEvent{
+								Agg: &Aggregate{
+									ID:            "1",
+									Type:          "test.aggregate",
+									ResourceOwner: "caos",
+									InstanceID:    "zitadel",
+								},
+								Data:      []byte(nil),
+								User:      "editorUser",
+								EventType: "test.event",
 							},
 						},
-						[]*repository.Event{
-							{
-								AggregateID:   "2",
-								AggregateType: "test.aggregate",
-								Data:          []byte(nil),
-								EditorService: "editorService",
-								EditorUser:    "editorUser",
-								ResourceOwner: sql.NullString{String: "caos", Valid: true},
-								InstanceID:    "zitadel",
-								Type:          "test.event",
-								Version:       "v1",
+						[]Event{
+							&BaseEvent{
+								Agg: &Aggregate{
+									ID:            "2",
+									Type:          "test.aggregate",
+									ResourceOwner: "caos",
+									InstanceID:    "zitadel",
+								},
+								Data:      []byte(nil),
+								User:      "editorUser",
+								EventType: "test.event",
 							},
 						},
 					),
 				},
-				eventMapper: map[EventType]func(*repository.Event) (Event, error){
-					"test.event": func(e *repository.Event) (Event, error) {
-						return &testEvent{}, nil
+				eventMapper: map[EventType]func(Event) (Event, error){
+					"test.event": func(e Event) (Event, error) {
+						return &testEvent{
+							BaseEvent: BaseEvent{
+								Agg: &Aggregate{
+									Type: e.Aggregate().Type,
+								},
+							},
+						}, nil
 					},
 				},
 			},
@@ -943,15 +652,15 @@ func TestEventstore_Push(t *testing.T) {
 						"1",
 						"",
 						func() interface{} {
-							return nil
+							return []byte(nil)
 						},
 						false),
 				},
 			},
 			fields: fields{
-				repo: &testRepo{
+				pusher: &testPusher{
 					t:   t,
-					err: errors.ThrowInternal(nil, "V2-qaa4S", "test err"),
+					err: zerrors.ThrowInternal(nil, "V2-qaa4S", "test err"),
 				},
 			},
 			res: res{
@@ -972,9 +681,9 @@ func TestEventstore_Push(t *testing.T) {
 				},
 			},
 			fields: fields{
-				repo: &testRepo{
+				pusher: &testPusher{
 					t:   t,
-					err: errors.ThrowInternal(nil, "V2-qaa4S", "test err"),
+					err: zerrors.ThrowInternal(nil, "V2-qaa4S", "test err"),
 				},
 			},
 			res: res{
@@ -984,16 +693,15 @@ func TestEventstore_Push(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			eventInterceptors = map[EventType]eventTypeInterceptors{}
 			es := &Eventstore{
-				repo:              tt.fields.repo,
-				interceptorMutex:  sync.Mutex{},
-				eventInterceptors: map[EventType]eventTypeInterceptors{},
+				pusher: tt.fields.pusher,
 			}
 			for eventType, mapper := range tt.fields.eventMapper {
-				es = es.RegisterFilterEventMapper("test", eventType, mapper)
+				RegisterFilterEventMapper("test", eventType, mapper)
 			}
-			if len(es.eventInterceptors) != len(tt.fields.eventMapper) {
-				t.Errorf("register event mapper failed expected mapper amount: %d, got: %d", len(tt.fields.eventMapper), len(es.eventInterceptors))
+			if len(eventInterceptors) != len(tt.fields.eventMapper) {
+				t.Errorf("register event mapper failed expected mapper amount: %d, got: %d", len(tt.fields.eventMapper), len(eventInterceptors))
 				t.FailNow()
 			}
 
@@ -1010,8 +718,8 @@ func TestEventstore_FilterEvents(t *testing.T) {
 		query *SearchQueryBuilder
 	}
 	type fields struct {
-		repo        *testRepo
-		eventMapper map[EventType]func(*repository.Event) (Event, error)
+		repo        *testQuerier
+		eventMapper map[EventType]func(Event) (Event, error)
 	}
 	type res struct {
 		wantErr bool
@@ -1023,19 +731,10 @@ func TestEventstore_FilterEvents(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "invalid factory",
-			args: args{
-				query: nil,
-			},
-			res: res{
-				wantErr: true,
-			},
-		},
-		{
 			name: "no events",
 			args: args{
 				query: &SearchQueryBuilder{
-					columns: repository.ColumnsEvent,
+					columns: ColumnsEvent,
 					queries: []*SearchQuery{
 						{
 							builder:        &SearchQueryBuilder{},
@@ -1045,12 +744,12 @@ func TestEventstore_FilterEvents(t *testing.T) {
 				},
 			},
 			fields: fields{
-				repo: &testRepo{
-					events: []*repository.Event{},
+				repo: &testQuerier{
+					events: []Event{},
 					t:      t,
 				},
-				eventMapper: map[EventType]func(*repository.Event) (Event, error){
-					"test.event": func(e *repository.Event) (Event, error) {
+				eventMapper: map[EventType]func(Event) (Event, error){
+					"test.event": func(e Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -1063,7 +762,7 @@ func TestEventstore_FilterEvents(t *testing.T) {
 			name: "repo error",
 			args: args{
 				query: &SearchQueryBuilder{
-					columns: repository.ColumnsEvent,
+					columns: ColumnsEvent,
 					queries: []*SearchQuery{
 						{
 							builder:        &SearchQueryBuilder{},
@@ -1073,12 +772,12 @@ func TestEventstore_FilterEvents(t *testing.T) {
 				},
 			},
 			fields: fields{
-				repo: &testRepo{
+				repo: &testQuerier{
 					t:   t,
-					err: errors.ThrowInternal(nil, "V2-RfkBa", "test err"),
+					err: zerrors.ThrowInternal(nil, "V2-RfkBa", "test err"),
 				},
-				eventMapper: map[EventType]func(*repository.Event) (Event, error){
-					"test.event": func(e *repository.Event) (Event, error) {
+				eventMapper: map[EventType]func(Event) (Event, error){
+					"test.event": func(e Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -1091,7 +790,7 @@ func TestEventstore_FilterEvents(t *testing.T) {
 			name: "found events",
 			args: args{
 				query: &SearchQueryBuilder{
-					columns: repository.ColumnsEvent,
+					columns: ColumnsEvent,
 					queries: []*SearchQuery{
 						{
 							builder:        &SearchQueryBuilder{},
@@ -1101,17 +800,19 @@ func TestEventstore_FilterEvents(t *testing.T) {
 				},
 			},
 			fields: fields{
-				repo: &testRepo{
-					events: []*repository.Event{
-						{
-							AggregateID: "test.aggregate",
-							Type:        "test.event",
+				repo: &testQuerier{
+					events: []Event{
+						&BaseEvent{
+							Agg: &Aggregate{
+								ID: "test.aggregate",
+							},
+							EventType: "test.event",
 						},
 					},
 					t: t,
 				},
-				eventMapper: map[EventType]func(*repository.Event) (Event, error){
-					"test.event": func(e *repository.Event) (Event, error) {
+				eventMapper: map[EventType]func(Event) (Event, error){
+					"test.event": func(e Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -1123,17 +824,16 @@ func TestEventstore_FilterEvents(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			eventInterceptors = map[EventType]eventTypeInterceptors{}
 			es := &Eventstore{
-				repo:              tt.fields.repo,
-				interceptorMutex:  sync.Mutex{},
-				eventInterceptors: map[EventType]eventTypeInterceptors{},
+				querier: tt.fields.repo,
 			}
 
 			for eventType, mapper := range tt.fields.eventMapper {
-				es = es.RegisterFilterEventMapper("test", eventType, mapper)
+				RegisterFilterEventMapper("test", eventType, mapper)
 			}
-			if len(es.eventInterceptors) != len(tt.fields.eventMapper) {
-				t.Errorf("register event mapper failed expected mapper amount: %d, got: %d", len(tt.fields.eventMapper), len(es.eventInterceptors))
+			if len(eventInterceptors) != len(tt.fields.eventMapper) {
+				t.Errorf("register event mapper failed expected mapper amount: %d, got: %d", len(tt.fields.eventMapper), len(eventInterceptors))
 				t.FailNow()
 			}
 
@@ -1150,7 +850,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 		query *SearchQueryBuilder
 	}
 	type fields struct {
-		repo *testRepo
+		repo *testQuerier
 	}
 	type res struct {
 		wantErr bool
@@ -1162,19 +862,10 @@ func TestEventstore_LatestSequence(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "invalid factory",
-			args: args{
-				query: nil,
-			},
-			res: res{
-				wantErr: true,
-			},
-		},
-		{
 			name: "no events",
 			args: args{
 				query: &SearchQueryBuilder{
-					columns: repository.ColumnsMaxSequence,
+					columns: ColumnsMaxSequence,
 					queries: []*SearchQuery{
 						{
 							builder:        &SearchQueryBuilder{},
@@ -1184,8 +875,8 @@ func TestEventstore_LatestSequence(t *testing.T) {
 				},
 			},
 			fields: fields{
-				repo: &testRepo{
-					events: []*repository.Event{},
+				repo: &testQuerier{
+					events: []Event{},
 					t:      t,
 				},
 			},
@@ -1197,7 +888,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			name: "repo error",
 			args: args{
 				query: &SearchQueryBuilder{
-					columns: repository.ColumnsMaxSequence,
+					columns: ColumnsMaxSequence,
 					queries: []*SearchQuery{
 						{
 							builder:        &SearchQueryBuilder{},
@@ -1207,9 +898,9 @@ func TestEventstore_LatestSequence(t *testing.T) {
 				},
 			},
 			fields: fields{
-				repo: &testRepo{
+				repo: &testQuerier{
 					t:   t,
-					err: errors.ThrowInternal(nil, "V2-RfkBa", "test err"),
+					err: zerrors.ThrowInternal(nil, "V2-RfkBa", "test err"),
 				},
 			},
 			res: res{
@@ -1220,7 +911,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 			name: "found events",
 			args: args{
 				query: &SearchQueryBuilder{
-					columns: repository.ColumnsMaxSequence,
+					columns: ColumnsMaxSequence,
 					queries: []*SearchQuery{
 						{
 							builder:        &SearchQueryBuilder{},
@@ -1230,9 +921,9 @@ func TestEventstore_LatestSequence(t *testing.T) {
 				},
 			},
 			fields: fields{
-				repo: &testRepo{
-					sequence: 50,
-					t:        t,
+				repo: &testQuerier{
+					// sequence: time.Now(),
+					t: t,
 				},
 			},
 			res: res{
@@ -1243,7 +934,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			es := &Eventstore{
-				repo: tt.fields.repo,
+				querier: tt.fields.repo,
 			}
 
 			_, err := es.LatestSequence(context.Background(), tt.args.query)
@@ -1282,8 +973,8 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 		readModel reducer
 	}
 	type fields struct {
-		repo        *testRepo
-		eventMapper map[EventType]func(*repository.Event) (Event, error)
+		repo        *testQuerier
+		eventMapper map[EventType]func(Event) (Event, error)
 	}
 	type res struct {
 		wantErr bool
@@ -1295,19 +986,10 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "invalid factory",
-			args: args{
-				query: nil,
-			},
-			res: res{
-				wantErr: true,
-			},
-		},
-		{
 			name: "no events",
 			args: args{
 				query: &SearchQueryBuilder{
-					columns: repository.ColumnsEvent,
+					columns: ColumnsEvent,
 					queries: []*SearchQuery{
 						{
 							builder:        &SearchQueryBuilder{},
@@ -1321,12 +1003,12 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 				},
 			},
 			fields: fields{
-				repo: &testRepo{
-					events: []*repository.Event{},
+				repo: &testQuerier{
+					events: []Event{},
 					t:      t,
 				},
-				eventMapper: map[EventType]func(*repository.Event) (Event, error){
-					"test.event": func(e *repository.Event) (Event, error) {
+				eventMapper: map[EventType]func(Event) (Event, error){
+					"test.event": func(e Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -1339,7 +1021,7 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 			name: "repo error",
 			args: args{
 				query: &SearchQueryBuilder{
-					columns: repository.ColumnsEvent,
+					columns: ColumnsEvent,
 					queries: []*SearchQuery{
 						{
 							builder:        &SearchQueryBuilder{},
@@ -1353,12 +1035,12 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 				},
 			},
 			fields: fields{
-				repo: &testRepo{
+				repo: &testQuerier{
 					t:   t,
-					err: errors.ThrowInternal(nil, "V2-RfkBa", "test err"),
+					err: zerrors.ThrowInternal(nil, "V2-RfkBa", "test err"),
 				},
-				eventMapper: map[EventType]func(*repository.Event) (Event, error){
-					"test.event": func(e *repository.Event) (Event, error) {
+				eventMapper: map[EventType]func(Event) (Event, error){
+					"test.event": func(e Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -1371,7 +1053,7 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 			name: "found events",
 			args: args{
 				query: &SearchQueryBuilder{
-					columns: repository.ColumnsEvent,
+					columns: ColumnsEvent,
 					queries: []*SearchQuery{
 						{
 							builder:        &SearchQueryBuilder{},
@@ -1385,17 +1067,19 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 				},
 			},
 			fields: fields{
-				repo: &testRepo{
-					events: []*repository.Event{
-						{
-							AggregateID: "test.aggregate",
-							Type:        "test.event",
+				repo: &testQuerier{
+					events: []Event{
+						&BaseEvent{
+							Agg: &Aggregate{
+								ID: "test.aggregate",
+							},
+							EventType: "test.event",
 						},
 					},
 					t: t,
 				},
-				eventMapper: map[EventType]func(*repository.Event) (Event, error){
-					"test.event": func(e *repository.Event) (Event, error) {
+				eventMapper: map[EventType]func(Event) (Event, error){
+					"test.event": func(e Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -1405,7 +1089,7 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 			name: "append in reducer fails",
 			args: args{
 				query: &SearchQueryBuilder{
-					columns: repository.ColumnsEvent,
+					columns: ColumnsEvent,
 					queries: []*SearchQuery{
 						{
 							builder:        &SearchQueryBuilder{},
@@ -1415,22 +1099,24 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 				},
 				readModel: &testReducer{
 					t:              t,
-					err:            errors.ThrowInvalidArgument(nil, "V2-W06TG", "test err"),
+					err:            zerrors.ThrowInvalidArgument(nil, "V2-W06TG", "test err"),
 					expectedLength: 1,
 				},
 			},
 			fields: fields{
-				repo: &testRepo{
-					events: []*repository.Event{
-						{
-							AggregateID: "test.aggregate",
-							Type:        "test.event",
+				repo: &testQuerier{
+					events: []Event{
+						&BaseEvent{
+							Agg: &Aggregate{
+								ID: "test.aggregate",
+							},
+							EventType: "test.event",
 						},
 					},
 					t: t,
 				},
-				eventMapper: map[EventType]func(*repository.Event) (Event, error){
-					"test.event": func(e *repository.Event) (Event, error) {
+				eventMapper: map[EventType]func(Event) (Event, error){
+					"test.event": func(e Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -1443,15 +1129,13 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			es := &Eventstore{
-				repo:              tt.fields.repo,
-				interceptorMutex:  sync.Mutex{},
-				eventInterceptors: map[EventType]eventTypeInterceptors{},
+				querier: tt.fields.repo,
 			}
 			for eventType, mapper := range tt.fields.eventMapper {
-				es = es.RegisterFilterEventMapper("test", eventType, mapper)
+				RegisterFilterEventMapper("test", eventType, mapper)
 			}
-			if len(es.eventInterceptors) != len(tt.fields.eventMapper) {
-				t.Errorf("register event mapper failed expected mapper amount: %d, got: %d", len(tt.fields.eventMapper), len(es.eventInterceptors))
+			if len(eventInterceptors) != len(tt.fields.eventMapper) {
+				t.Errorf("register event mapper failed expected mapper amount: %d, got: %d", len(tt.fields.eventMapper), len(eventInterceptors))
 				t.FailNow()
 			}
 
@@ -1463,52 +1147,46 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 	}
 }
 
-func combineEventLists(lists ...[]*repository.Event) []*repository.Event {
-	events := []*repository.Event{}
+func combineEventLists(lists ...[]Event) []Event {
+	events := []Event{}
 	for _, list := range lists {
 		events = append(events, list...)
 	}
 	return events
 }
 
-func compareEvents(t *testing.T, want, got *repository.Event) {
+func compareEvents(t *testing.T, want Event, got Command) {
 	t.Helper()
 
-	if want.AggregateID != got.AggregateID {
-		t.Errorf("wrong aggregateID got %q want %q", got.AggregateID, want.AggregateID)
+	if want.Aggregate().ID != got.Aggregate().ID {
+		t.Errorf("wrong aggregateID got %q want %q", got.Aggregate().ID, want.Aggregate().ID)
 	}
-	if want.AggregateType != got.AggregateType {
-		t.Errorf("wrong aggregateType got %q want %q", got.AggregateType, want.AggregateType)
+	if want.Aggregate().Type != got.Aggregate().Type {
+		t.Errorf("wrong aggregateType got %q want %q", got.Aggregate().Type, want.Aggregate().Type)
 	}
-	if !reflect.DeepEqual(want.Data, got.Data) {
-		t.Errorf("wrong data got %s want %s", string(got.Data), string(want.Data))
+	if !reflect.DeepEqual(want.DataAsBytes(), got.Payload()) {
+		t.Errorf("wrong data got %s want %s", string(got.Payload().([]byte)), string(want.DataAsBytes()))
 	}
-	if want.EditorService != got.EditorService {
-		t.Errorf("wrong editor service got %q want %q", got.EditorService, want.EditorService)
+	if want.Creator() != got.Creator() {
+		t.Errorf("wrong creator got %q want %q", got.Creator(), want.Creator())
 	}
-	if want.EditorUser != got.EditorUser {
-		t.Errorf("wrong editor user got %q want %q", got.EditorUser, want.EditorUser)
+	if want.Aggregate().ResourceOwner != got.Aggregate().ResourceOwner {
+		t.Errorf("wrong resource owner got %q want %q", got.Aggregate().ResourceOwner, want.Aggregate().ResourceOwner)
 	}
-	if want.ResourceOwner != got.ResourceOwner {
-		t.Errorf("wrong resource owner got %q want %q", got.ResourceOwner.String, want.ResourceOwner.String)
+	if want.Type() != got.Type() {
+		t.Errorf("wrong event type got %q want %q", got.Type(), want.Type())
 	}
-	if want.Type != got.Type {
-		t.Errorf("wrong event type got %q want %q", got.Type, want.Type)
-	}
-	if want.Version != got.Version {
-		t.Errorf("wrong version got %q want %q", got.Version, want.Version)
-	}
-	if want.PreviousAggregateSequence != got.PreviousAggregateSequence {
-		t.Errorf("wrong previous sequence got %d want %d", got.PreviousAggregateSequence, want.PreviousAggregateSequence)
+	if want.Revision() != got.Revision() {
+		t.Errorf("wrong version got %q want %q", got.Revision(), want.Revision())
 	}
 }
 
 func TestEventstore_mapEvents(t *testing.T) {
 	type fields struct {
-		eventMapper map[EventType]func(*repository.Event) (Event, error)
+		eventMapper map[EventType]func(Event) (Event, error)
 	}
 	type args struct {
-		events []*repository.Event
+		events []Event
 	}
 	type res struct {
 		events  []Event
@@ -1520,37 +1198,19 @@ func TestEventstore_mapEvents(t *testing.T) {
 		args   args
 		res    res
 	}{
-		//{
-		//	name: "no mapper",
-		//	args: args{
-		//		events: []*repository.Event{
-		//			{
-		//				Type: "no.mapper.found",
-		//			},
-		//		},
-		//	},
-		//	fields: fields{
-		//		eventMapper: map[EventType]func(*repository.Event) (EventReader, error){},
-		//	},
-		//	res: res{
-		//		//TODO: as long as not all events are implemented in v2 eventstore doesn't return an error
-		//		// afterwards it will return an error on un
-		//		wantErr: true,
-		//	},
-		//},
 		{
 			name: "mapping failed",
 			args: args{
-				events: []*repository.Event{
-					{
-						Type: "test.event",
+				events: []Event{
+					&BaseEvent{
+						EventType: "test.event",
 					},
 				},
 			},
 			fields: fields{
-				eventMapper: map[EventType]func(*repository.Event) (Event, error){
-					"test.event": func(*repository.Event) (Event, error) {
-						return nil, errors.ThrowInternal(nil, "V2-8FbQk", "test err")
+				eventMapper: map[EventType]func(Event) (Event, error){
+					"test.event": func(Event) (Event, error) {
+						return nil, zerrors.ThrowInternal(nil, "V2-8FbQk", "test err")
 					},
 				},
 			},
@@ -1561,15 +1221,15 @@ func TestEventstore_mapEvents(t *testing.T) {
 		{
 			name: "mapping succeeded",
 			args: args{
-				events: []*repository.Event{
-					{
-						Type: "test.event",
+				events: []Event{
+					&BaseEvent{
+						EventType: "test.event",
 					},
 				},
 			},
 			fields: fields{
-				eventMapper: map[EventType]func(*repository.Event) (Event, error){
-					"test.event": func(*repository.Event) (Event, error) {
+				eventMapper: map[EventType]func(Event) (Event, error){
+					"test.event": func(Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -1584,15 +1244,12 @@ func TestEventstore_mapEvents(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			es := &Eventstore{
-				interceptorMutex:  sync.Mutex{},
-				eventInterceptors: map[EventType]eventTypeInterceptors{},
-			}
+			es := &Eventstore{}
 			for eventType, mapper := range tt.fields.eventMapper {
-				es = es.RegisterFilterEventMapper("test", eventType, mapper)
+				RegisterFilterEventMapper("test", eventType, mapper)
 			}
-			if len(es.eventInterceptors) != len(tt.fields.eventMapper) {
-				t.Errorf("register event mapper failed expected mapper amount: %d, got: %d", len(tt.fields.eventMapper), len(es.eventInterceptors))
+			if len(eventInterceptors) != len(tt.fields.eventMapper) {
+				t.Errorf("register event mapper failed expected mapper amount: %d, got: %d", len(tt.fields.eventMapper), len(eventInterceptors))
 				t.FailNow()
 			}
 

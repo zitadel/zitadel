@@ -10,13 +10,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var testMetadata = []byte(`<?xml version="1.0"?>
@@ -82,7 +81,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -105,7 +104,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -135,7 +134,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -168,7 +167,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -185,26 +184,18 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewApplicationAddedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"app1",
-									"app",
-								),
-							),
-							eventFromEventPusher(
-								project.NewSAMLConfigAddedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"app1",
-									"https://test.com/saml/metadata",
-									testMetadata,
-									"",
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewAddApplicationUniqueConstraint("app", "project1")),
-						uniqueConstraintsFromEventConstraint(project.NewAddSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata")),
+						project.NewApplicationAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"app",
+						),
+						project.NewSAMLConfigAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"https://test.com/saml/metadata",
+							testMetadata,
+							"",
+						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1"),
@@ -251,26 +242,18 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								project.NewApplicationAddedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"app1",
-									"app",
-								),
-							),
-							eventFromEventPusher(
-								project.NewSAMLConfigAddedEvent(context.Background(),
-									&project.NewAggregate("project1", "org1").Aggregate,
-									"app1",
-									"https://test.com/saml/metadata",
-									testMetadata,
-									"http://localhost:8080/saml/metadata",
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewAddApplicationUniqueConstraint("app", "project1")),
-						uniqueConstraintsFromEventConstraint(project.NewAddSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata")),
+						project.NewApplicationAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"app",
+						),
+						project.NewSAMLConfigAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"https://test.com/saml/metadata",
+							testMetadata,
+							"http://localhost:8080/saml/metadata",
+						),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1"),
@@ -335,7 +318,7 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 	}
@@ -400,7 +383,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -422,7 +405,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -444,7 +427,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -467,7 +450,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -512,7 +495,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -557,7 +540,7 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: errors.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -584,20 +567,14 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newSAMLAppChangedEventMetadataURL(context.Background(),
-									"app1",
-									"project1",
-									"org1",
-									"https://test.com/saml/metadata",
-									"https://test2.com/saml/metadata",
-									testMetadataChangedEntityID,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata")),
-						uniqueConstraintsFromEventConstraint(project.NewAddSAMLConfigEntityIDUniqueConstraint("https://test2.com/saml/metadata")),
+						newSAMLAppChangedEventMetadataURL(context.Background(),
+							"app1",
+							"project1",
+							"org1",
+							"https://test.com/saml/metadata",
+							"https://test2.com/saml/metadata",
+							testMetadataChangedEntityID,
+						),
 					),
 				),
 				httpClient: newTestClient(http.StatusOK, testMetadataChangedEntityID),
@@ -656,20 +633,14 @@ func TestCommandSide_ChangeSAMLApplication(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newSAMLAppChangedEventMetadata(context.Background(),
-									"app1",
-									"project1",
-									"org1",
-									"https://test.com/saml/metadata",
-									"https://test2.com/saml/metadata",
-									testMetadataChangedEntityID,
-								),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(project.NewRemoveSAMLConfigEntityIDUniqueConstraint("https://test.com/saml/metadata")),
-						uniqueConstraintsFromEventConstraint(project.NewAddSAMLConfigEntityIDUniqueConstraint("https://test2.com/saml/metadata")),
+						newSAMLAppChangedEventMetadata(context.Background(),
+							"app1",
+							"project1",
+							"org1",
+							"https://test.com/saml/metadata",
+							"https://test2.com/saml/metadata",
+							testMetadataChangedEntityID,
+						),
 					),
 				),
 				httpClient: nil,

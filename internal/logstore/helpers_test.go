@@ -4,16 +4,14 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/logstore"
-	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/query"
 )
 
 type emitterOption func(config *logstore.EmitterConfig)
 
 func emitterConfig(options ...emitterOption) *logstore.EmitterConfig {
 	cfg := &logstore.EmitterConfig{
-		Enabled:         true,
-		Keep:            time.Hour,
-		CleanupInterval: time.Hour,
+		Enabled: true,
 		Debounce: &logstore.DebouncerConfig{
 			MinFrequency: 0,
 			MaxBulkSize:  0,
@@ -37,17 +35,10 @@ func withDisabled() emitterOption {
 	}
 }
 
-func withCleanupping(keep, interval time.Duration) emitterOption {
-	return func(c *logstore.EmitterConfig) {
-		c.Keep = keep
-		c.CleanupInterval = interval
-	}
-}
+type quotaOption func(config *query.Quota)
 
-type quotaOption func(config *quota.AddedEvent)
-
-func quotaConfig(quotaOptions ...quotaOption) quota.AddedEvent {
-	q := &quota.AddedEvent{
+func quotaConfig(quotaOptions ...quotaOption) *query.Quota {
+	q := &query.Quota{
 		Amount:        90,
 		Limit:         false,
 		ResetInterval: 90 * time.Second,
@@ -56,18 +47,18 @@ func quotaConfig(quotaOptions ...quotaOption) quota.AddedEvent {
 	for _, opt := range quotaOptions {
 		opt(q)
 	}
-	return *q
+	return q
 }
 
 func withAmountAndInterval(n uint64) quotaOption {
-	return func(c *quota.AddedEvent) {
+	return func(c *query.Quota) {
 		c.Amount = n
 		c.ResetInterval = time.Duration(n) * time.Second
 	}
 }
 
 func withLimiting() quotaOption {
-	return func(c *quota.AddedEvent) {
+	return func(c *query.Quota) {
 		c.Limit = true
 	}
 }

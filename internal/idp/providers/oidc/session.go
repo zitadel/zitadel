@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/zitadel/oidc/v2/pkg/client/rp"
-	"github.com/zitadel/oidc/v2/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/client/rp"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -24,9 +24,9 @@ type Session struct {
 	Tokens   *oidc.Tokens[*oidc.IDTokenClaims]
 }
 
-// GetAuthURL implements the [idp.Session] interface.
-func (s *Session) GetAuthURL() string {
-	return s.AuthURL
+// GetAuth implements the [idp.Session] interface.
+func (s *Session) GetAuth(ctx context.Context) (string, bool) {
+	return idp.Redirect(s.AuthURL)
 }
 
 // FetchUser implements the [idp.Session] interface.
@@ -34,11 +34,11 @@ func (s *Session) GetAuthURL() string {
 // call the userinfo endpoint and map the received information into an [idp.User].
 func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	if s.Tokens == nil {
-		if err = s.authorize(ctx); err != nil {
+		if err = s.Authorize(ctx); err != nil {
 			return nil, err
 		}
 	}
-	info, err := rp.Userinfo(
+	info, err := rp.Userinfo[*oidc.UserInfo](ctx,
 		s.Tokens.AccessToken,
 		s.Tokens.TokenType,
 		s.Tokens.IDTokenClaims.GetSubject(),
@@ -54,7 +54,7 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	return u, nil
 }
 
-func (s *Session) authorize(ctx context.Context) (err error) {
+func (s *Session) Authorize(ctx context.Context) (err error) {
 	if s.Code == "" {
 		return ErrCodeMissing
 	}

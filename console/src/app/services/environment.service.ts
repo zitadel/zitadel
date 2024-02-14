@@ -28,7 +28,7 @@ interface WellKnown {
 })
 export class EnvironmentService {
   private environmentJsonPath = './assets/environment.json';
-  private wellknownPath = '/.well-known/openid-configuration`';
+  private wellknownPath = '/.well-known/openid-configuration';
   public auth!: AuthServiceClient;
   public mgmt!: ManagementServiceClient;
   public admin!: AdminServiceClient;
@@ -36,7 +36,10 @@ export class EnvironmentService {
   private environment$: Observable<Environment>;
   private wellKnown$: Observable<WellKnown>;
 
-  constructor(private http: HttpClient, private exhaustedSvc: ExhaustedService) {
+  constructor(
+    private http: HttpClient,
+    private exhaustedSvc: ExhaustedService,
+  ) {
     this.environment$ = this.createEnvironment();
     this.wellKnown$ = this.createWellKnown(this.environment$);
   }

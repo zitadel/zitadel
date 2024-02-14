@@ -4,20 +4,19 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestUserGrantProjection_reduces(t *testing.T) {
@@ -33,47 +32,49 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAdded",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(usergrant.UserGrantAddedType),
-					usergrant.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						usergrant.UserGrantAddedType,
+						usergrant.AggregateType,
+						[]byte(`{
 						"userId": "user-id",
 						"projectId": "project-id",
 						"roleKeys": ["role"]
 					}`),
-				), usergrant.UserGrantAddedEventMapper),
+					), usergrant.UserGrantAddedEventMapper),
 			},
 			reduce: (&userGrantProjection{
-				StatementHandler: getStatementHandlerWithFilters(
-					user.NewHumanAddedEvent(context.Background(),
-						&user.NewAggregate("user-id", "org1").Aggregate,
-						"username1",
-						"firstname1",
-						"lastname1",
-						"nickname1",
-						"displayname1",
-						language.German,
-						domain.GenderMale,
-						"email1",
-						true,
-					),
-					project.NewProjectAddedEvent(context.Background(),
-						&project.NewAggregate("project-id", "org2").Aggregate,
-						"project",
-						false,
-						false,
-						false,
-						domain.PrivateLabelingSettingUnspecified,
-					),
-				)(t)}).reduceAdded,
+				es: newMockEventStore().
+					appendFilterResponse([]eventstore.Event{
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user-id", "org1").Aggregate,
+							"username1",
+							"firstname1",
+							"lastname1",
+							"nickname1",
+							"displayname1",
+							language.German,
+							domain.GenderMale,
+							"email1",
+							true,
+						),
+						project.NewProjectAddedEvent(context.Background(),
+							&project.NewAggregate("project-id", "org2").Aggregate,
+							"project",
+							false,
+							false,
+							false,
+							domain.PrivateLabelingSettingUnspecified,
+						),
+					}),
+			}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    usergrant.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: usergrant.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.user_grants3 (id, resource_owner, instance_id, creation_date, change_date, sequence, user_id, resource_owner_user, project_id, resource_owner_project, grant_id, granted_org, roles, state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.user_grants4 (id, resource_owner, instance_id, creation_date, change_date, sequence, user_id, resource_owner_user, project_id, resource_owner_project, grant_id, granted_org, roles, state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"ro-id",
@@ -87,7 +88,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 								"org2",
 								"",
 								"",
-								database.StringArray{"role"},
+								database.TextArray[string]{"role"},
 								domain.UserGrantStateActive,
 							},
 						},
@@ -98,46 +99,48 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceAdded with projectgrant",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(usergrant.UserGrantAddedType),
-					usergrant.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						usergrant.UserGrantAddedType,
+						usergrant.AggregateType,
+						[]byte(`{
 						"userId": "user-id",
 						"projectId": "project-id",
                         "grantId": "grant-id",
 						"roleKeys": ["role"]
 					}`),
-				), usergrant.UserGrantAddedEventMapper),
+					), usergrant.UserGrantAddedEventMapper),
 			},
 			reduce: (&userGrantProjection{
-				StatementHandler: getStatementHandlerWithFilters(
-					user.NewHumanAddedEvent(context.Background(),
-						&user.NewAggregate("user-id", "org1").Aggregate,
-						"username1",
-						"firstname1",
-						"lastname1",
-						"nickname1",
-						"displayname1",
-						language.German,
-						domain.GenderMale,
-						"email1",
-						true,
-					),
-					project.NewGrantAddedEvent(context.Background(),
-						&project.NewAggregate("project-id", "org2").Aggregate,
-						"grant-id",
-						"org3",
-						[]string{},
-					),
-				)(t)}).reduceAdded,
+				es: newMockEventStore().
+					appendFilterResponse([]eventstore.Event{
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user-id", "org1").Aggregate,
+							"username1",
+							"firstname1",
+							"lastname1",
+							"nickname1",
+							"displayname1",
+							language.German,
+							domain.GenderMale,
+							"email1",
+							true,
+						),
+						project.NewGrantAddedEvent(context.Background(),
+							&project.NewAggregate("project-id", "org2").Aggregate,
+							"grant-id",
+							"org3",
+							[]string{},
+						),
+					}),
+			}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    usergrant.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: usergrant.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.user_grants3 (id, resource_owner, instance_id, creation_date, change_date, sequence, user_id, resource_owner_user, project_id, resource_owner_project, grant_id, granted_org, roles, state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+							expectedStmt: "INSERT INTO projections.user_grants4 (id, resource_owner, instance_id, creation_date, change_date, sequence, user_id, resource_owner_user, project_id, resource_owner_project, grant_id, granted_org, roles, state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"ro-id",
@@ -151,7 +154,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 								"",
 								"grant-id",
 								"org3",
-								database.StringArray{"role"},
+								database.TextArray[string]{"role"},
 								domain.UserGrantStateActive,
 							},
 						},
@@ -162,26 +165,26 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(usergrant.UserGrantChangedType),
-					usergrant.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						usergrant.UserGrantChangedType,
+						usergrant.AggregateType,
+						[]byte(`{
 						"roleKeys": ["role"]
 					}`),
-				), usergrant.UserGrantChangedEventMapper),
+					), usergrant.UserGrantChangedEventMapper),
 			},
 			reduce: (&userGrantProjection{}).reduceChanged,
 			want: wantReduce{
-				aggregateType:    usergrant.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: usergrant.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants3 SET (change_date, roles, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.user_grants4 SET (change_date, roles, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
-								database.StringArray{"role"},
+								database.TextArray[string]{"role"},
 								uint64(15),
 								"agg-id",
 								"instance-id",
@@ -194,26 +197,26 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceCascadeChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(usergrant.UserGrantCascadeChangedType),
-					usergrant.AggregateType,
-					[]byte(`{
+				event: getEvent(
+					testEvent(
+						usergrant.UserGrantCascadeChangedType,
+						usergrant.AggregateType,
+						[]byte(`{
 						"roleKeys": ["role"]
 					}`),
-				), usergrant.UserGrantCascadeChangedEventMapper),
+					), usergrant.UserGrantCascadeChangedEventMapper),
 			},
 			reduce: (&userGrantProjection{}).reduceChanged,
 			want: wantReduce{
-				aggregateType:    usergrant.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: usergrant.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants3 SET (change_date, roles, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.user_grants4 SET (change_date, roles, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
-								database.StringArray{"role"},
+								database.TextArray[string]{"role"},
 								uint64(15),
 								"agg-id",
 								"instance-id",
@@ -226,21 +229,21 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(usergrant.UserGrantRemovedType),
-					usergrant.AggregateType,
-					nil,
-				), usergrant.UserGrantRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						usergrant.UserGrantRemovedType,
+						usergrant.AggregateType,
+						nil,
+					), usergrant.UserGrantRemovedEventMapper),
 			},
 			reduce: (&userGrantProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    usergrant.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: usergrant.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_grants3 WHERE (id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.user_grants4 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								"instance-id",
@@ -253,21 +256,21 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 		{
 			name: "instance reduceInstanceRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceRemovedEventType),
-					instance.AggregateType,
-					nil,
-				), instance.InstanceRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						instance.InstanceRemovedEventType,
+						instance.AggregateType,
+						nil,
+					), instance.InstanceRemovedEventMapper),
 			},
 			reduce: reduceInstanceRemovedHelper(UserGrantInstanceID),
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("instance"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_grants3 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_grants4 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -279,21 +282,21 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceCascadeRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(usergrant.UserGrantCascadeRemovedType),
-					usergrant.AggregateType,
-					nil,
-				), usergrant.UserGrantCascadeRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						usergrant.UserGrantCascadeRemovedType,
+						usergrant.AggregateType,
+						nil,
+					), usergrant.UserGrantCascadeRemovedEventMapper),
 			},
 			reduce: (&userGrantProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    usergrant.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: usergrant.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_grants3 WHERE (id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.user_grants4 WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								"instance-id",
@@ -306,21 +309,21 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceDeactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(usergrant.UserGrantDeactivatedType),
-					usergrant.AggregateType,
-					nil,
-				), usergrant.UserGrantDeactivatedEventMapper),
+				event: getEvent(
+					testEvent(
+						usergrant.UserGrantDeactivatedType,
+						usergrant.AggregateType,
+						nil,
+					), usergrant.UserGrantDeactivatedEventMapper),
 			},
 			reduce: (&userGrantProjection{}).reduceDeactivated,
 			want: wantReduce{
-				aggregateType:    usergrant.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: usergrant.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants3 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.user_grants4 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserGrantStateInactive,
@@ -336,21 +339,21 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceReactivated",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(usergrant.UserGrantReactivatedType),
-					usergrant.AggregateType,
-					nil,
-				), usergrant.UserGrantDeactivatedEventMapper),
+				event: getEvent(
+					testEvent(
+						usergrant.UserGrantReactivatedType,
+						usergrant.AggregateType,
+						nil,
+					), usergrant.UserGrantReactivatedEventMapper),
 			},
 			reduce: (&userGrantProjection{}).reduceReactivated,
 			want: wantReduce{
-				aggregateType:    usergrant.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: usergrant.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants3 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.user_grants4 SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserGrantStateActive,
@@ -366,21 +369,21 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceUserRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(user.UserRemovedType),
-					user.AggregateType,
-					nil,
-				), user.UserRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						user.UserRemovedType,
+						user.AggregateType,
+						nil,
+					), user.UserRemovedEventMapper),
 			},
 			reduce: (&userGrantProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				aggregateType:    user.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: user.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_grants3 WHERE (user_id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.user_grants4 WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								"instance-id",
@@ -393,21 +396,21 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.ProjectRemovedType),
-					project.AggregateType,
-					nil,
-				), project.ProjectRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.ProjectRemovedType,
+						project.AggregateType,
+						nil,
+					), project.ProjectRemovedEventMapper),
 			},
 			reduce: (&userGrantProjection{}).reduceProjectRemoved,
 			want: wantReduce{
-				aggregateType:    project.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: project.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_grants3 WHERE (project_id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.user_grants4 WHERE (project_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								"instance-id",
@@ -420,21 +423,21 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectGrantRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantRemovedType),
-					project.AggregateType,
-					[]byte(`{"grantId": "grantID"}`),
-				), project.GrantRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.GrantRemovedType,
+						project.AggregateType,
+						[]byte(`{"grantId": "grantID"}`),
+					), project.GrantRemovedEventMapper),
 			},
 			reduce: (&userGrantProjection{}).reduceProjectGrantRemoved,
 			want: wantReduce{
-				aggregateType:    project.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: project.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_grants3 WHERE (grant_id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.user_grants4 WHERE (grant_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"grantID",
 								"instance-id",
@@ -447,21 +450,21 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceRoleRemoved",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.RoleRemovedType),
-					project.AggregateType,
-					[]byte(`{"key": "key"}`),
-				), project.RoleRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.RoleRemovedType,
+						project.AggregateType,
+						[]byte(`{"key": "key"}`),
+					), project.RoleRemovedEventMapper),
 			},
 			reduce: (&userGrantProjection{}).reduceRoleRemoved,
 			want: wantReduce{
-				aggregateType:    project.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: project.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants3 SET roles = array_remove(roles, $1) WHERE (project_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.user_grants4 SET roles = array_remove(roles, $1) WHERE (project_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"key",
 								"agg-id",
@@ -475,23 +478,23 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 		{
 			name: "reduceProjectGrantChanged",
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(project.GrantChangedType),
-					project.AggregateType,
-					[]byte(`{"grantId": "grantID", "roleKeys": ["key"]}`),
-				), project.GrantChangedEventMapper),
+				event: getEvent(
+					testEvent(
+						project.GrantChangedType,
+						project.AggregateType,
+						[]byte(`{"grantId": "grantID", "roleKeys": ["key"]}`),
+					), project.GrantChangedEventMapper),
 			},
 			reduce: (&userGrantProjection{}).reduceProjectGrantChanged,
 			want: wantReduce{
-				aggregateType:    project.AggregateType,
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: project.AggregateType,
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants3 SET (roles) = (SELECT ARRAY( SELECT UNNEST(roles) INTERSECT SELECT UNNEST ($1::TEXT[]))) WHERE (grant_id = $2) AND (instance_id = $3)",
+							expectedStmt: "UPDATE projections.user_grants4 SET (roles) = (SELECT ARRAY( SELECT UNNEST(roles) INTERSECT SELECT UNNEST ($1::TEXT[]))) WHERE (grant_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
-								database.StringArray{"key"},
+								database.TextArray[string]{"key"},
 								"grantID",
 								"instance-id",
 							},
@@ -504,54 +507,42 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 			name:   "org.reduceOwnerRemoved",
 			reduce: (&userGrantProjection{}).reduceOwnerRemoved,
 			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(org.OrgRemovedEventType),
-					org.AggregateType,
-					nil,
-				), org.OrgRemovedEventMapper),
+				event: getEvent(
+					testEvent(
+						org.OrgRemovedEventType,
+						org.AggregateType,
+						nil,
+					), org.OrgRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("org"),
-				sequence:         15,
-				previousSequence: 10,
+				aggregateType: eventstore.AggregateType("org"),
+				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_grants3 SET (change_date, sequence, owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner = $5)",
+							expectedStmt: "DELETE FROM projections.user_grants4 WHERE (instance_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								true,
 								"instance-id",
 								"agg-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.user_grants3 SET (change_date, sequence, user_owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner_user = $5)",
+							expectedStmt: "DELETE FROM projections.user_grants4 WHERE (instance_id = $1) AND (resource_owner_user = $2)",
 							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								true,
 								"instance-id",
 								"agg-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.user_grants3 SET (change_date, sequence, project_owner_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (resource_owner_project = $5)",
+							expectedStmt: "DELETE FROM projections.user_grants4 WHERE (instance_id = $1) AND (resource_owner_project = $2)",
 							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								true,
 								"instance-id",
 								"agg-id",
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.user_grants3 SET (change_date, sequence, granted_org_removed) = ($1, $2, $3) WHERE (instance_id = $4) AND (granted_org = $5)",
+							expectedStmt: "DELETE FROM projections.user_grants4 WHERE (instance_id = $1) AND (granted_org = $2)",
 							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								true,
 								"instance-id",
 								"agg-id",
 							},
@@ -565,7 +556,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			event := baseEvent(t)
 			got, err := tt.reduce(event)
-			if _, ok := err.(errors.InvalidArgument); !ok {
+			if ok := zerrors.IsErrorInvalidArgument(err); !ok {
 				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
 			}
 
@@ -576,28 +567,284 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 	}
 }
 
-func getStatementHandlerWithFilters(events ...eventstore.Command) func(t *testing.T) crdb.StatementHandler {
-	filters := make([]expect, 0)
-	for _, event := range events {
-		filters = append(filters,
-			expectFilter(
-				eventFromEventPusher(
-					event,
-				),
-			),
-		)
+func Test_getResourceOwners(t *testing.T) {
+	type args struct {
+		instanceID string
+		userID     string
+		projectID  string
+		grantID    string
 	}
-
-	return func(t *testing.T) crdb.StatementHandler {
-		return crdb.StatementHandler{
-			ProjectionHandler: &handler.ProjectionHandler{
-				Handler: handler.Handler{
-					Eventstore: eventstoreExpect(
-						t,
-						filters...,
-					),
-				},
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type want struct {
+		userRO     string
+		projectRO  string
+		grantedOrg string
+		wantErr    bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   want
+	}{
+		{
+			name: "user RO, filter error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilterError(zerrors.ThrowNotFound(nil, "error", "error")),
+				),
 			},
-		}
+			args: args{
+				instanceID: "instance",
+				userID:     "user",
+			},
+			want: want{
+				wantErr: true,
+			},
+		},
+		{
+			name: "user RO",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user", "org").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				instanceID: "instance",
+				userID:     "user",
+			},
+			want: want{
+				userRO:  "org",
+				wantErr: false,
+			},
+		},
+		{
+			name: "user RO, no user",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				instanceID: "instance",
+				userID:     "user",
+			},
+			want: want{
+				wantErr: true,
+			},
+		},
+		{
+			name: "user and project RO",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user", "org").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project", "org").Aggregate,
+								"project",
+								false,
+								false,
+								false,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				instanceID: "instance",
+				userID:     "user",
+				projectID:  "project",
+			},
+			want: want{
+				userRO:    "org",
+				projectRO: "org",
+				wantErr:   false,
+			},
+		},
+		{
+			name: "user and project RO, no project",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user", "org").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				instanceID: "instance",
+				userID:     "user",
+				projectID:  "project",
+			},
+			want: want{
+				wantErr: true,
+			},
+		},
+		{
+			name: "user and grant RO",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user", "org").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project", "org").Aggregate,
+								"projectgrant1",
+								"grantedorg1",
+								[]string{"key1"},
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				instanceID: "instance",
+				userID:     "user",
+				projectID:  "project",
+				grantID:    "projectgrant1",
+			},
+			want: want{
+				userRO:     "org",
+				grantedOrg: "grantedorg1",
+				wantErr:    false,
+			},
+		},
+		{
+			name: "user and grant RO, no grant",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user", "org").Aggregate,
+								"username1",
+								"firstname1",
+								"lastname1",
+								"nickname1",
+								"displayname1",
+								language.German,
+								domain.GenderMale,
+								"email1",
+								true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				instanceID: "instance",
+				userID:     "user",
+				projectID:  "project",
+				grantID:    "projectgrant1",
+			},
+			want: want{
+				wantErr: true,
+			},
+		},
+		{
+			name: "user and grant RO, no user",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							project.NewGrantAddedEvent(context.Background(),
+								&project.NewAggregate("project", "org").Aggregate,
+								"projectgrant1",
+								"grantedorg1",
+								[]string{"key1"},
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				instanceID: "instance",
+				userID:     "user",
+				projectID:  "project",
+				grantID:    "projectgrant1",
+			},
+			want: want{
+				wantErr: true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			userRO, projectRO, grantedOrg, err := getResourceOwners(context.Background(), tt.fields.eventstore, tt.args.instanceID, tt.args.userID, tt.args.projectID, tt.args.grantID)
+			if tt.want.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tt.want.userRO, userRO)
+				require.Equal(t, tt.want.projectRO, projectRO)
+				require.Equal(t, tt.want.grantedOrg, grantedOrg)
+			}
+		})
 	}
 }

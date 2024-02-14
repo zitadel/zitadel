@@ -1,11 +1,8 @@
 package policy
 
 import (
-	"encoding/json"
-
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -22,11 +19,11 @@ type MailTemplateAddedEvent struct {
 	Template []byte `json:"template,omitempty"`
 }
 
-func (e *MailTemplateAddedEvent) Data() interface{} {
+func (e *MailTemplateAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *MailTemplateAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MailTemplateAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -40,14 +37,14 @@ func NewMailTemplateAddedEvent(
 	}
 }
 
-func MailTemplateAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MailTemplateAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &MailTemplateAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-5m9if", "unable to unmarshal mail template")
+		return nil, zerrors.ThrowInternal(err, "POLIC-5m9if", "unable to unmarshal mail template")
 	}
 
 	return e, nil
@@ -59,11 +56,11 @@ type MailTemplateChangedEvent struct {
 	Template *[]byte `json:"template,omitempty"`
 }
 
-func (e *MailTemplateChangedEvent) Data() interface{} {
+func (e *MailTemplateChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *MailTemplateChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MailTemplateChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -72,7 +69,7 @@ func NewMailTemplateChangedEvent(
 	changes []MailTemplateChanges,
 ) (*MailTemplateChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-m9osd", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "POLICY-m9osd", "Errors.NoChangesFound")
 	}
 	changeEvent := &MailTemplateChangedEvent{
 		BaseEvent: *base,
@@ -91,14 +88,14 @@ func ChangeTemplate(template []byte) func(*MailTemplateChangedEvent) {
 	}
 }
 
-func MailTemplateChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MailTemplateChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e := &MailTemplateChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
-	err := json.Unmarshal(event.Data, e)
+	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-3uu8K", "unable to unmarshal mail template policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-3uu8K", "unable to unmarshal mail template policy")
 	}
 
 	return e, nil
@@ -108,11 +105,11 @@ type MailTemplateRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *MailTemplateRemovedEvent) Data() interface{} {
+func (e *MailTemplateRemovedEvent) Payload() interface{} {
 	return nil
 }
 
-func (e *MailTemplateRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MailTemplateRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -122,7 +119,7 @@ func NewMailTemplateRemovedEvent(base *eventstore.BaseEvent) *MailTemplateRemove
 	}
 }
 
-func MailTemplateRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MailTemplateRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &MailTemplateRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

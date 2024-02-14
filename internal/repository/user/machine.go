@@ -2,13 +2,10 @@ package user
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-
-	"github.com/zitadel/zitadel/internal/errors"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -28,12 +25,12 @@ type MachineAddedEvent struct {
 	AccessTokenType domain.OIDCTokenType `json:"accessTokenType,omitempty"`
 }
 
-func (e *MachineAddedEvent) Data() interface{} {
+func (e *MachineAddedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *MachineAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain)}
+func (e *MachineAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, e.userLoginMustBeDomain)}
 }
 
 func NewMachineAddedEvent(
@@ -59,13 +56,13 @@ func NewMachineAddedEvent(
 	}
 }
 
-func MachineAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MachineAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	machineAdded := &MachineAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, machineAdded)
+	err := event.Unmarshal(machineAdded)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-tMv9s", "unable to unmarshal machine added")
+		return nil, zerrors.ThrowInternal(err, "USER-tMv9s", "unable to unmarshal machine added")
 	}
 
 	return machineAdded, nil
@@ -79,11 +76,11 @@ type MachineChangedEvent struct {
 	AccessTokenType *domain.OIDCTokenType `json:"accessTokenType,omitempty"`
 }
 
-func (e *MachineChangedEvent) Data() interface{} {
+func (e *MachineChangedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *MachineChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *MachineChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
@@ -93,7 +90,7 @@ func NewMachineChangedEvent(
 	changes []MachineChanges,
 ) (*MachineChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "USER-3M9fs", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "USER-3M9fs", "Errors.NoChangesFound")
 	}
 	changeEvent := &MachineChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -128,13 +125,13 @@ func ChangeAccessTokenType(accessTokenType domain.OIDCTokenType) func(event *Mac
 	}
 }
 
-func MachineChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func MachineChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	machineChanged := &MachineChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, machineChanged)
+	err := event.Unmarshal(machineChanged)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-4M9ds", "unable to unmarshal machine changed")
+		return nil, zerrors.ThrowInternal(err, "USER-4M9ds", "unable to unmarshal machine changed")
 	}
 
 	return machineChanged, nil

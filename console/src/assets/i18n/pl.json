@@ -51,7 +51,7 @@
       "TITLE": "Uruchom swój ZITADEL",
       "DESCRIPTION": "Ta lista kontrolna pomoże Ci skonfigurować instancję i poprowadzi Cię przez najważniejsze kroki."
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Skonfiguruj swoją markę",
         "description": "Zdefiniuj kolorystykę i kształt swojego loginu oraz wgraj swoje logo i ikony.",
@@ -62,15 +62,20 @@
         "description": "Ustawienie własnego serwera pocztowego",
         "action": "skonfiguruj ustawienia SMTP"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Stwórz swój pierwszy projekt",
         "description": "Dodaj swój pierwszy projekt i określ jego role i uprawnienia.",
         "action": "Utwórz projekt"
       },
-      "project.application.added": {
-        "title": "Utwórz swoją pierwszą aplikację",
-        "description": "Utwórz aplikację internetową, natywną, api lub saml i skonfiguruj swój przepływ uwierzytelniania.",
-        "action": "Utwórz aplikację"
+      "APPLICATION_CREATED": {
+        "title": "Zarejestruj swoją aplikację",
+        "description": "Zarejestruj swoją aplikację webową, natywną, API lub SAML i skonfiguruj przepływ uwierzytelniania.",
+        "action": "Zarejestruj aplikację"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Zaloguj się do swojej aplikacji",
+        "description": "Zintegruj swoją aplikację z ZITADEL w celu uwierzytelniania i przetestuj ją, logując się za pomocą swojego użytkownika administratora.",
+        "action": "Zaloguj się"
       },
       "user.human.added": {
         "title": "Dodaj użytkowników",
@@ -85,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instancja",
+    "INSTANCE": "Ustawienia domyślne",
     "DASHBOARD": "Strona główna",
     "PERSONAL_INFO": "Informacje Osobiste",
     "DOCUMENTATION": "Dokumentacja",
@@ -95,7 +100,6 @@
     "EVENTS": "Zdarzenia",
     "FAILEDEVENTS": "Nieudane Zdarzenia",
     "ORGANIZATION": "Organizacja",
-    "DOMAINS": "Domeny",
     "PROJECT": "Projekty",
     "PROJECTOVERVIEW": "Przegląd",
     "PROJECTGRANTS": "Uprawnienia",
@@ -223,6 +227,7 @@
     "EMAIL": "Email",
     "USERNAME": "Nazwa Użytkownika",
     "ORGNAME": "Nazwa Organizacji",
+    "PRIMARYDOMAIN": "Domena podstawowa",
     "PROJECTNAME": "Nazwa Projektu",
     "RESOURCEOWNER": "Właściciel Zasobu",
     "METHODS": {
@@ -263,8 +268,8 @@
       "DESCRIPTION": "Kliknij przycisk poniżej, aby ponownie się zalogować."
     },
     "EXHAUSTED": {
-      "TITLE": "Twój limit uwierzytelnionych wniosków został wyczerpany.",
-      "DESCRIPTION": "Usuń lub zwiększ limit dla tej instancji ZITADEL."
+      "TITLE": "Twoja instancja jest zablokowana.",
+      "DESCRIPTION": "Poproś administratora swojej instancji ZITADEL o aktualizację subskrypcji."
     },
     "INVALID_FORMAT": "Format jest nieprawidłowy.",
     "NOTANEMAIL": "Podana wartość nie jest adresem e-mail.",
@@ -274,7 +279,7 @@
     "SYMBOLERROR": "Musi zawierać symbol lub znak interpunkcyjny.",
     "NUMBERERROR": "Musi zawierać cyfrę.",
     "PWNOTEQUAL": "Podane hasła nie są identyczne.",
-    "PHONE": "Numer telefonu musi zaczynać się od 00 lub +."
+    "PHONE": "Numer telefonu musi zaczynać się od +."
   },
   "USER": {
     "SETTINGS": {
@@ -411,8 +416,8 @@
       "DESCRIPTION": "Dodaj drugi czynnik, aby zapewnić optymalne bezpieczeństwo twojego konta.",
       "MANAGE_DESCRIPTION": "Zarządzaj metodami drugiego czynnika swoich użytkowników.",
       "ADD": "Dodaj czynnik",
-      "OTP": "Aplikacja uwierzytelniająca OTP (jednorazowe hasło)",
-      "OTP_DIALOG_TITLE": "Dodaj OTP",
+      "OTP": "Aplikacja uwierzytelniająca TOTP (jednorazowe hasło)",
+      "OTP_DIALOG_TITLE": "Dodaj TOTP",
       "OTP_DIALOG_DESCRIPTION": "Zeskanuj kod QR za pomocą aplikacji uwierzytelniającej i wprowadź poniższy kod, aby zweryfikować i aktywować metodę OTP.",
       "U2F": "Odcisk palca, klucze bezpieczeństwa, Face ID i inne",
       "U2F_DIALOG_TITLE": "Zweryfikuj czynnik",
@@ -420,6 +425,12 @@
       "U2F_SUCCESS": "Czynnik został pomyślnie dodany!",
       "U2F_ERROR": "Wystąpił błąd podczas konfiguracji!",
       "U2F_NAME": "Nazwa uwierzytelniacza",
+      "OTPSMS": "OTP (hasło jednorazowe) z SMS-em",
+      "OTPEMAIL": "OTP (hasło jednorazowe) z e-mailem",
+      "SETUPOTPSMSDESCRIPTION": "Czy chcesz ustawić ten numer telefonu jako drugi czynnik OTP (hasło jednorazowe)?",
+      "OTPSMSSUCCESS": "Pomyślnie skonfigurowano współczynnik OTP.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Aby skorzystać z tej metody, Twój telefon musi zostać zweryfikowany.",
+      "OTPEMAILSUCCESS": "Pomyślnie skonfigurowano współczynnik OTP.",
       "TYPE": {
         "0": "Nie zdefiniowano MFA",
         "1": "Jednorazowe hasło (OTP)",
@@ -480,7 +491,7 @@
       "TITLE": "Profil",
       "EMAIL": "E-mail",
       "PHONE": "Numer telefonu",
-      "PHONE_HINT": "Użyj 00 lub symbolu +, a następnie kodu kraju, z którego dzwonisz, lub wybierz kraj z listy rozwijanej i wprowadź numer telefonu.",
+      "PHONE_HINT": "Użyj symbolu +, a następnie kodu kraju, z którego dzwonisz, lub wybierz kraj z listy rozwijanej i wprowadź numer telefonu.",
       "USERNAME": "Nazwa użytkownika",
       "CHANGEUSERNAME": "modyfikuj",
       "CHANGEUSERNAME_TITLE": "Zmień nazwę użytkownika",
@@ -489,6 +500,7 @@
       "LASTNAME": "Nazwisko",
       "NICKNAME": "Przezwisko",
       "DISPLAYNAME": "Nazwa wyświetlana",
+      "PREFERREDLOGINNAME": "Preferowana nazwa logowania",
       "PREFERRED_LANGUAGE": "Język",
       "GENDER": "Płeć",
       "PASSWORD": "Hasło",
@@ -586,7 +598,8 @@
         "EDITVALUE": "Numer telefonu",
         "EDITDESC": "Wprowadź nowy numer telefonu poniżej.",
         "DELETETITLE": "Usuń numer telefonu",
-        "DELETEDESC": "Czy na pewno chcesz usunąć numer telefonu"
+        "DELETEDESC": "Czy na pewno chcesz usunąć numer telefonu",
+        "OTPSMSREMOVALWARNING": "To konto używa tego numeru telefonu jako drugiego czynnika. Po przejściu dalej nie będziesz mógł z niego korzystać."
       },
       "RESENDCODE": "Wyślij kod ponownie",
       "ENTERCODE": "Zweryfikuj",
@@ -705,7 +718,6 @@
   },
   "METADATA": {
     "TITLE": "Metadane",
-    "DESCRIPTION": "",
     "KEY": "Klucz",
     "VALUE": "Wartość",
     "ADD": "Nowy wpis",
@@ -735,6 +747,10 @@
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout w sekundach",
     "ALLOWEDTOFAIL": "Dozwolone na porażkę",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Ostrzeżenie",
+      "DESCRIPTION": "Jeśli wyłączysz tę opcję, może to spowodować, że użytkownicy Twojej organizacji nie będą mogli się zalogować. Ponadto nie będziesz już mógł uzyskać dostępu do konsoli, aby wyłączyć akcję. Zalecamy utworzenie administratora w oddzielnej organizacji lub przetestowanie skryptów najpierw w środowisku deweloperskim lub organizacji deweloperskiej."
+    },
     "SCRIPT": "Skrypt",
     "FLOWTYPE": "Typ Przepływu",
     "TRIGGERTYPE": "Typ Wyzwalacza",
@@ -784,7 +800,7 @@
     },
     "PAGES": {
       "STATE": "Status",
-      "DOMAINLIST": "Domeny"
+      "DOMAINLIST": "Własne domeny"
     },
     "STATE": {
       "0": "Nieokreślony",
@@ -856,14 +872,16 @@
         },
         "SEQUENCE": {
           "LABEL": "Sekwencja",
-          "CHECKBOX": "Filtruj według sekwencji",
-          "SORT": "Sortowanie",
-          "ASC": "Rosnące",
-          "DESC": "Malejące"
+          "CHECKBOX": "Filtruj według sekwencji"
         },
+        "SORT": "Sortowanie",
+        "ASC": "Rosnące",
+        "DESC": "Malejące",
         "CREATIONDATE": {
-          "LABEL": "Data utworzenia",
-          "CHECKBOX": "Filtruj według daty utworzenia"
+          "RADIO_FROM": "Od",
+          "RADIO_RANGE": "Zakres",
+          "LABEL_SINCE": "Od",
+          "LABEL_UNTIL": "Do"
         },
         "OTHER": "inne",
         "OTHERS": "inni"
@@ -913,20 +931,22 @@
         "BTN": "Zmień nazwę"
       },
       "ORGDOMAIN": {
-        "TITLE": "Weryfikacja własności domeny organizacji",
-        "VERIFICATION": "Aby zweryfikować własność swojej domeny, musisz pobrać plik weryfikacyjny i przesłać go na podany poniżej adres URL lub dodać rekord TXT DNS dla podanego adresu URL. Aby zakończyć, kliknij przycisk weryfikuj.",
-        "VERIFICATION_SKIP": "Możesz teraz pominąć weryfikację i kontynuować tworzenie swojej organizacji, ale aby korzystać z organizacji, ta krok musi zostać ukończony!",
-        "VERIFICATION_VALIDATION_DESC": "Tokeny są regularnie sprawdzane, aby upewnić się, że nadal jesteś właścicielem domeny.",
-        "VERIFICATION_NEWTOKEN_TITLE": "Prośba o nowy token",
-        "VERIFICATION_NEWTOKEN_DESC": "Jeśli chcesz poprosić o nowy token, wybierz preferowany sposób. Jeśli chcesz zwalidować trwający token, kliknij powyższy przycisk.",
-        "VERIFICATION_VALIDATION_ONGOING": "Token weryfikacyjny został już zażądany. Kliknij przycisk, aby uruchomić sprawdzenie weryfikacyjne.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Typ tokenu:",
-        "VERIFICATION_SUCCESSFUL": "Domena zweryfikowana pomyślnie!",
-        "REQUESTNEWTOKEN": "Poproś o nowy token",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "TITLE": "Zweryfikuj własność {{value}}",
+        "VERIFICATION": "Oferujemy dwie metody ręcznej weryfikacji domeny:",
+        "VERIFICATION_HTML": "-HTTP. Umieść tymczasowy plik weryfikacyjny w swojej witrynie",
+        "VERIFICATION_DNS": "-DNS. Utwórz wpis DNS rekordu TXT",
+        "VERIFICATION_DNS_DESC": "Jeśli zarządzasz wartością {{ value }} i masz dostęp do swoich rekordów DNS, możesz utworzyć nowy rekord TXT z następującymi wartościami:",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Użyj tego kodu dla wartości rekordu TXT:",
+        "VERIFICATION_HTTP_DESC": "Jeśli masz dostęp do hostingu swojej witryny, po prostu pobierz plik weryfikacyjny i prześlij go pod podanym adresem URL",
+        "VERIFICATION_HTTP_URL_LABEL": "Oczekiwany adres URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Plik weryfikacyjny:",
+        "VERIFICATION_SKIP": "Możesz na razie pominąć weryfikację i kontynuować tworzenie organizacji, jednak aby móc korzystać z domeny, ten krok musi zostać ukończony!",
+        "VERIFICATION_VALIDATION_DESC": "Nie usuwaj kodu weryfikacyjnego, ponieważ ZITADEL będzie od czasu do czasu ponownie sprawdzał własność Twojej domeny.",
+        "VERIFICATION_NEWTOKEN_TITLE": "Poproś o nowy token",
+        "VERIFICATION_VALIDATION_ONGOING": "Wybrano metodę {{ value }} do weryfikacji Twojej domeny. Kliknij przycisk, aby uruchomić kontrolę weryfikacyjną lub zresetować proces weryfikacji.",
+        "VERIFICATION_SUCCESSFUL": "Domena pomyślnie zweryfikowana!",
+        "RESETMETHOD": "Zresetuj metodę weryfikacji"
       },
       "DOWNLOAD_FILE": "Pobierz plik",
       "SELECTORGTOOLTIP": "Wybierz tę organizację.",
@@ -941,7 +961,7 @@
     },
     "DOMAINS": {
       "NEW": "Dodaj domenę",
-      "TITLE": "Domeny",
+      "TITLE": "Zweryfikowane domeny",
       "DESCRIPTION": "Skonfiguruj swoje domeny. Ta domena może być używana do logowania się z Twoimi użytkownikami.",
       "SETPRIMARY": "Ustaw jako główną",
       "DELETE": {
@@ -956,8 +976,7 @@
     "STATE": {
       "0": "Nieokreślone",
       "1": "Aktywne",
-      "2": "Dezaktywowane",
-      "3": "Usunięte"
+      "2": "Dezaktywowane"
     },
     "MEMBER": {
       "TITLE": "Menadżerowie organizacji",
@@ -1004,50 +1023,73 @@
       "DESCRIPTION": "Te ustawienia rozszerzają i nadpisują ustawienia instancji."
     },
     "LIST": {
-      "GENERAL": "Ogólne",
+      "ORGS": "Organizacje",
+      "LANGUAGES": "Języki",
       "LOGIN": "Zachowanie logowania i bezpieczeństwo",
       "LOCKOUT": "Blokada",
       "COMPLEXITY": "Złożoność hasła",
       "NOTIFICATIONS": "Ustawienia powiadomień",
+      "SMTP_PROVIDER": "Dostawca SMTP",
+      "SMS_PROVIDER": "Dostawca SMS-ów/telefonów",
       "NOTIFICATIONS_DESC": "Ustawienia SMTP i SMS",
       "MESSAGETEXTS": "Teksty wiadomości",
       "IDP": "Dostawcy tożsamości",
+      "VERIFIED_DOMAINS": "Zweryfikowane domeny",
       "DOMAIN": "Ustawienia domeny",
       "LOGINTEXTS": "Teksty interfejsu logowania",
       "BRANDING": "Marka",
       "PRIVACYPOLICY": "Polityka prywatności",
       "OIDC": "Czas trwania tokenów OIDC i wygaśnięcie",
       "SECRETS": "Wygląd sekretów",
-      "SECURITY": "Ustawienia bezpieczeństwa"
+      "SECURITY": "Ustawienia bezpieczeństwa",
+      "EVENTS": "Zdarzenia",
+      "FAILEDEVENTS": "Nieudane Zdarzenia",
+      "VIEWS": "Widoki"
     },
     "GROUPS": {
+      "GENERAL": "Informacje ogólne",
       "NOTIFICATIONS": "Powiadomienia",
       "LOGIN": "Logowanie i dostęp",
       "DOMAIN": "Domena",
       "TEXTS": "Teksty i języki",
       "APPEARANCE": "Wygląd",
-      "OTHER": "Inne"
+      "OTHER": "Inne",
+      "STORAGE": "składowanie"
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Domyślny język",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски"
+    "LANGUAGES": {
+      "TITLE": "Ustawienia językowe",
+      "DEFAULT": "Domyślny język",
+      "ALLOWED": "Dozwolone języki",
+      "NOT_ALLOWED": "Niedozwolone języki",
+      "ALLOW_ALL": "Zezwól na wszystkie języki",
+      "DISALLOW_ALL": "Zabroń wszystkich języków",
+      "SETASDEFAULT": "Ustaw jako domyślny język",
+      "DEFAULT_SAVED": "Domyślny język zapisany",
+      "ALLOWED_SAVED": "Dozwolone języki zapisane",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "Ustawienia SMTP",
       "SENDERADDRESS": "Adres e-mail nadawcy",
       "SENDERNAME": "Nazwa nadawcy",
+      "REPLYTOADDRESS": "Adres Reply-to",
       "HOSTANDPORT": "Host i port",
       "USER": "Użytkownik",
       "PASSWORD": "Hasło",
@@ -1077,6 +1119,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Numer nadawcy",
         "ADDED": "Twilio dodano pomyślnie.",
+        "UPDATED": "Twilio zostało pomyślnie zaktualizowane.",
         "REMOVED": "Twilio usunięte",
         "CHANGETOKEN": "Zmień Token",
         "SETTOKEN": "Ustaw Token",
@@ -1183,6 +1226,11 @@
         "ERROR": "Nie znaleziono użytkownika!",
         "PRIMARYBUTTON": "Dalej",
         "SECONDARYBUTTON": "Zarejestruj"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Tryb automatyczny",
+        "THEME_MODE_LIGHT": "Tylko tryb jasny",
+        "THEME_MODE_DARK": "Tylko tryb ciemny"
       }
     },
     "PWD_AGE": {
@@ -1209,6 +1257,7 @@
       "DESCRIPTIONCREATEMGMT": "Użytkownicy mogą wybrać z dostępnych poniżej dostawców tożsamości. Uwaga: Możesz korzystać z dostawców ustawionych przez system lub tylko dla twojej organizacji.",
       "ADVANCED": "Zaawansowane",
       "LIFETIMEDURATIONS": "Czasy trwania logowania",
+      "LIFETIME_INVALID": "Formularz zawiera nieprawidłowe wartości.",
       "SAVED": "Pomyślnie zapisano!"
     },
     "PRIVACY_POLICY": {
@@ -1234,8 +1283,10 @@
       "RESET_DESCRIPTION": "Masz zamiar przywrócić domyślne linki dla TOS i polityki prywatności. Czy na pewno chcesz kontynuować?",
       "UNSAVED_TITLE": "Kontynuuj bez zapisywania?",
       "UNSAVED_DESCRIPTION": "Wprowadziłeś zmiany bez zapisywania. Czy chcesz zapisać teraz?",
-      "LOCALE": "Kod Języka",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "Wybrałeś język, który nie jest dozwolony. Możesz kontynuować modyfikowanie tekstów. Ale jeśli chcesz, aby twoi użytkownicy mogli faktycznie używać tego języka, zmień ograniczenia swoich instancji.",
+      "LANGUAGES_NOT_ALLOWED": "Niedozwolone:",
+      "LANGUAGE": "Język",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1246,7 +1297,10 @@
         "zh": "简体中文",
         "bg": "Български",
         "pt": "Portuguese",
-        "mk": "Македонски"
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
       },
       "KEYS": {
         "emailVerificationDoneText": "Weryfikacja adresu e-mail zakończona",
@@ -1339,11 +1393,12 @@
       "MAXAGEDAYS": "Maksymalny wiek w dniach",
       "USERLOGINMUSTBEDOMAIN": "Dodaj domenę organizacji jako przyrostek do nazw logowania",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Jeśli włączysz to ustawienie, wszystkie nazwy logowania będą miały przyrostek z domeną organizacji. Jeśli to ustawienie jest wyłączone, musisz zapewnić unikalność nazw użytkowników we wszystkich organizacjach.",
-      "VALIDATEORGDOMAINS": "Sprawdzanie ważności domen organizacji",
+      "VALIDATEORGDOMAINS": "Weryfikacja domeny organizacji jest wymagana (wyzwanie DNS lub HTTP)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "Adres nadawcy SMTP pasuje do domeny instancji",
       "ALLOWUSERNAMEPASSWORD": "Zezwól na użycie nazwy użytkownika i hasła",
       "ALLOWEXTERNALIDP": "Zezwól na zewnętrznego dostawcę tożsamości",
-      "ALLOWREGISTER": "Zezwól na rejestrację",
+      "ALLOWREGISTERUSERS": "Zezwól na rejestrację użytkowników",
+      "ALLOWREGISTERORGS": "Zezwól na rejestrację organizacji",
       "ALLOWUSERNAMEPASSWORD_DESC": "Zwykłe logowanie za pomocą nazwy użytkownika i hasła jest dozwolone.",
       "ALLOWEXTERNALIDP_DESC": "Logowanie jest dozwolone dla dostawców tożsamości podstawowych",
       "ALLOWREGISTER_DESC": "Jeśli ta opcja jest zaznaczona, pojawi się dodatkowy krok rejestracji użytkownika w procesie logowania.",
@@ -1825,7 +1880,9 @@
       "DELETED": "Dostawca tożsamości usunięty pomyślnie!",
       "ADDED": "Dodano pomyślnie.",
       "REMOVED": "Usunięto pomyślnie."
-    }
+    },
+    "ISIDTOKENMAPPING": "Mapowanie z tokena ID",
+    "ISIDTOKENMAPPING_DESC": "Jeśli wybrane, informacje dostawcy są mapowane z tokena ID, a nie z punktu końcowego userinfo."
   },
   "MFA": {
     "LIST": {
@@ -1971,6 +2028,8 @@
       "CLIENTSECRET_DESCRIPTION": "Trzymaj swój sekret klienta w bezpiecznym miejscu, ponieważ zniknie on po zamknięciu okna dialogowego.",
       "REGENERATESECRET": "Odtwórz sekret klienta",
       "DEVMODE": "Tryb rozwoju",
+      "DEVMODE_ENABLED": "Aktywowany",
+      "DEVMODE_DISABLED": "Dezaktywowane",
       "DEVMODEDESC": "Uwaga: przy włączonym trybie rozwoju adresy URI przekierowania nie będą sprawdzane.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Pomiń stronę sukcesu po zalogowaniu",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Pomiń stronę sukcesu po zalogowaniu dla tej Natywny aplikację",
@@ -2057,11 +2116,18 @@
         "DESCRIPTION": "Aplikacje SAML"
       },
       "CONFIGSECTION": "Konfiguracja SAML",
-      "URL": "Adres URL, gdzie znajduje się plik metadanych",
-      "OR": "lub",
-      "XML": "Prześlij plik XML metadanych",
+      "CHOOSEMETADATASOURCE": "Podaj konfigurację SAML, korzystając z jednej z następujących opcji:",
+      "METADATAOPT1": "Opcja 1. Podaj adres URL, pod którym znajduje się plik metadanych",
+      "METADATAOPT2": "Opcja 2. Prześlij plik zawierający metadane XML",
+      "METADATAOPT3": "Opcja 3. Utwórz na bieżąco minimalny plik metadanych, podając ENTITYID i adres URL ACS",
+      "UPLOAD": "Prześlij plik XML",
       "METADATA": "Metadane",
-      "METADATAFROMFILE": "Metadane z pliku"
+      "METADATAFROMFILE": "Metadane z pliku",
+      "CERTIFICATE": "Certyfikat SAML-a",
+      "DOWNLOADCERT": "Pobierz certyfikat SAML",
+      "CREATEMETADATA": "Utwórz metadane",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {
@@ -2126,7 +2192,10 @@
     "zh": "简体中文",
     "bg": "Български",
     "pt": "Portuguese",
-    "mk": "Македонски"
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский",
+    "nl": "Nederlands"
   },
   "MEMBER": {
     "ADD": "Dodaj managera",
@@ -2175,7 +2244,8 @@
     "TOAST": {
       "UPDATED": "Autoryzacja zaktualizowana.",
       "REMOVED": "Autoryzacja usunięta",
-      "BULKREMOVED": "Autoryzacje usunięte."
+      "BULKREMOVED": "Autoryzacje usunięte.",
+      "CANTSHOWINFO": "Nie możesz odwiedzić profilu tego użytkownika, ponieważ nie jesteś członkiem organizacji, do której należy ten użytkownik"
     },
     "DIALOG": {
       "DELETE_TITLE": "Usuń autoryzację",

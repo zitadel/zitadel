@@ -20,7 +20,7 @@ module.exports = {
   ],
   customFields: {
     description:
-      "Documentation for ZITADEL - The best of Auth0 and Keycloak combined. Built for the serverless era.",
+      "Documentation for ZITADEL - Identity infrastructure, simplified for you.",
   },
   themeConfig: {
     metadata: [
@@ -61,6 +61,8 @@ module.exports = {
         alt: "ZITADEL logo",
         src: "img/zitadel-logo-dark.svg",
         srcDark: "img/zitadel-logo-light.svg",
+        href: "https://zitadel.com",
+        target: "_blank",
       },
       items: [
         {
@@ -143,7 +145,7 @@ module.exports = {
             },
             {
               label: "Privacy Policy",
-              href: "/legal/privacy-policy",
+              href: "/legal/policies/privacy-policy",
             },
           ],
         },
@@ -178,7 +180,7 @@ module.exports = {
       selector: "div#",
     },
     prism: {
-      additionalLanguages: ["csharp", "dart", "groovy", "regex"],
+      additionalLanguages: ["csharp", "dart", "groovy", "regex", "java", "php", "python"],
     },
     colorMode: {
       defaultMode: "dark",
@@ -261,28 +263,28 @@ module.exports = {
             },
           },
           user: {
-            specPath: ".artifacts/openapi/zitadel/user/v2alpha/user_service.swagger.json",
+            specPath: ".artifacts/openapi/zitadel/user/v2beta/user_service.swagger.json",
             outputDir: "docs/apis/resources/user_service",
             sidebarOptions: {
               groupPathsBy: "tag",
             },
           },
           session: {
-            specPath: ".artifacts/openapi/zitadel/session/v2alpha/session_service.swagger.json",
+            specPath: ".artifacts/openapi/zitadel/session/v2beta/session_service.swagger.json",
             outputDir: "docs/apis/resources/session_service",
             sidebarOptions: {
               groupPathsBy: "tag",
             },
           },
           oidc: {
-            specPath: ".artifacts/openapi/zitadel/oidc/v2alpha/oidc_service.swagger.json",
+            specPath: ".artifacts/openapi/zitadel/oidc/v2beta/oidc_service.swagger.json",
             outputDir: "docs/apis/resources/oidc_service",
             sidebarOptions: {
               groupPathsBy: "tag",
             },
           },
           settings: {
-            specPath: ".artifacts/openapi/zitadel/settings/v2alpha/settings_service.swagger.json",
+            specPath: ".artifacts/openapi/zitadel/settings/v2beta/settings_service.swagger.json",
             outputDir: "docs/apis/resources/settings_service",
             sidebarOptions: {
               groupPathsBy: "tag",

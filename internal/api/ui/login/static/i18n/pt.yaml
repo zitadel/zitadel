@@ -25,7 +25,7 @@ SelectAccount:
   DescriptionLinking: Selecione sua conta para vincular com seu usuário externo.
   OtherUser: Outro usuário
   SessionState0: ativo
-  SessionState1: inativo
+  SessionState1: Sem sessão iniciada
   MustBeMemberOfOrg: O usuário deve ser membro da organização {{.OrgName}}.
 
 Password:
@@ -89,6 +89,8 @@ InitMFAPrompt:
   Description: A autenticação de 2 fatores fornece uma segurança adicional para sua conta de usuário. Isso garante que apenas você tenha acesso à sua conta.
   Provider0: Aplicativo de autenticação (por exemplo, Google/Microsoft Authenticator, Authy)
   Provider1: Dependente do dispositivo (por exemplo, FaceID, Windows Hello, Impressão digital)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   NextButtonText: próximo
   SkipButtonText: pular
 
@@ -100,6 +102,16 @@ InitMFAOTP:
   CodeLabel: Código
   NextButtonText: próximo
   CancelButtonText: cancelar
+
+InitMFASMS:
+  Title: Verificação de 2 fatores
+  DescriptionPhone: Crie sua verificação de 2 fatores. Digite seu número de telefone para verificá-lo.
+  DescriptionCode: Crie sua verificação de 2 fatores. Digite o código recebido para verificar seu número de telefone.
+  PhoneLabel: Número de telefone
+  CodeLabel: Código
+  EditButtonText: editar
+  ResendButtonText: reenviar código
+  NextButtonText: próximo
 
 InitMFAU2F:
   Title: Adicionar chave de segurança
@@ -118,12 +130,21 @@ InitMFADone:
 MFAProvider:
   Provider0: Aplicativo de autenticação (por exemplo, Google/Microsoft Authenticator, Authy)
   Provider1: Dependente do dispositivo (por exemplo, FaceID, Windows Hello, Impressão digital)
+  Provider3: OTP SMS
+  Provider4: OTP e-mail
   ChooseOther: ou escolha outra opção
 
 VerifyMFAOTP:
   Title: Verificar 2 fatores
   Description: Verifique seu segundo fator
   CodeLabel: Código
+  NextButtonText: próximo
+
+VerifyOTP:
+  Title: Verificar 2 fatores
+  Description: Verifique seu segundo fator
+  CodeLabel: Código
+  ResendButtonText: reenviar código
   NextButtonText: próximo
 
 VerifyMFAU2F:
@@ -221,6 +242,9 @@ RegistrationUser:
   Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
   GenderLabel: Gênero
   Female: Feminino
   Male: Masculino
@@ -246,16 +270,20 @@ ExternalRegistrationUserOverview:
   NicknameLabel: Apelido
   PhoneLabel: Número de telefone
   LanguageLabel: Idioma
-  German: Alemão
-  English: Inglês
+  German: Deutsch
+  English: English
   Italian: Italiano
-  French: Francês
-  Chinese: Chinês simplificado
-  Japanese: Japonês
-  Polish: Polonês
-  Spanish: Espanhol
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
   TosAndPrivacyLabel: Termos e condições
   TosConfirm: Eu aceito os
   TosLinkText: termos de serviço
@@ -309,17 +337,21 @@ ExternalNotFound:
   TosLinkText: termos de serviço
   PrivacyConfirm: Eu aceito a
   PrivacyLinkText: política de privacidade
-  German: Alemão
-  English: Inglês
+  German: Deutsch
+  English: English
   Italian: Italiano
-  French: Francês
-  Chinese: Chinês simplificado
-  Polish: Polonês
-  Japanese: Japonês
-  Spanish: Espanhol
-  Bulgarian: Búlgaro
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
   Portuguese: Português
   Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+
 DeviceAuth:
   Title: Autorização de dispositivo
   UserCode:
@@ -344,6 +376,8 @@ Footer:
   PrivacyPolicy: Política de privacidade
   Help: Ajuda
   SupportEmail: E-mail de suporte
+
+SignIn: Iniciar sessão com a {{.Provider}}
 
 Errors:
   Internal: Ocorreu um erro interno
@@ -397,7 +431,7 @@ Errors:
       Empty: A senha está vazia
       Invalid: A senha é inválida
       InvalidAndLocked: A senha é inválida e o usuário está bloqueado, entre em contato com o administrador.
-      NotChanged: Senha não alterada
+      NotChanged: A nova senha não pode ser igual à sua senha atual
     UsernameOrPassword:
       Invalid: Nome de usuário ou senha inválidos
     PasswordComplexityPolicy:

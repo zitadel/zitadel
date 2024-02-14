@@ -10,9 +10,20 @@ Metrics:
 
 Tracing:
   # Choose one in "otel", "google", "log" and "none"
+  # Depending on the type there are different configuration options
+  # for type 'otel' is used for standard [open telemetry](https://opentelemetry.io)
+  # Fraction: 1.0
+  # Endpoint: 'otel.collector.endpoint'
+  # 
+  # type 'log' or '' disables tracing
+  # 
+  # for type 'google'
+  # ProjectID: ''
+  # Fraction: 1.0
   Type: none # ZITADEL_TRACING_TYPE
   Fraction: 1.0 # ZITADEL_TRACING_FRACTION
-  MetricPrefix: zitadel # ZITADEL_TRACING_METRICPREFIX
+  # The endpoint of the otel collector endpoint
+  Endpoint: '' #ZITADEL_TRACING_ENDPOINT
 
 Telemetry:
   # As long as Enabled is true, ZITADEL tries to send usage data to the configured Telemetry.Endpoints.
@@ -41,16 +52,15 @@ Telemetry:
 
 # Port ZITADEL will listen on
 Port: 8080 # ZITADEL_PORT
-# Port ZITADEL is exposed on, it can differ from port e.g. if you proxy the traffic
-# !!! Changing this after the initial setup breaks your system !!!
+# ExternalPort is the port on which end users access ZITADEL.
+# It can differ from Port e.g. if a reverse proxy forwards the traffic to ZITADEL
+# Read more about external access: https://zitadel.com/docs/self-hosting/manage/custom-domain
 ExternalPort: 8080 # ZITADEL_EXTERNALPORT
-# Domain/hostname ZITADEL is exposed externally
-# !!! Changing this after the initial setup breaks your system !!!
+# ExternalPort is the domain on which end users access ZITADEL.
+# Read more about external access: https://zitadel.com/docs/self-hosting/manage/custom-domain
 ExternalDomain: localhost # ZITADEL_EXTERNALDOMAIN
-# specifies if ZITADEL is exposed externally through TLS
-# this must be set to true even if TLS is not enabled on ZITADEL itself
-# but TLS traffic is terminated on a reverse proxy
-# !!! Changing this after the initial setup breaks your system !!!
+# ExternalSecure specifies if ZITADEL is exposed externally using HTTPS or HTTP.
+# Read more about external access: https://zitadel.com/docs/self-hosting/manage/custom-domain
 ExternalSecure: true # ZITADEL_EXTERNALSECURE
 TLS:
   # If enabled, ZITADEL will serve all traffic over TLS (HTTPS and gRPC)
@@ -80,13 +90,24 @@ HTTP1HostHeader: "host" # ZITADEL_HTTP1HOSTHEADER
 WebAuthNName: ZITADEL # ZITADEL_WEBAUTHNNAME
 
 Database:
+  # ZITADEL manages three database connection pools.
+  # The *ConnRatio settings define the ratio of how many connections from
+  # MaxOpenConns and MaxIdleConns are used to push events and spool projections.
+  # Remaining connection are used for queries (search).
+  # Values may not be negative and the sum of the ratios must always be less than 1.
+  # For example this defaults define 40 MaxOpenConns overall.
+  # - 40*0.2=8 connections are allocated to the event pusher;
+  # - 40*0.2=8 connections are allocated to the projection spooler;
+  # - 40-(8+8)=24 connections are remaining for queries;
+  EventPushConnRatio: 0.2 # ZITADEL_DATABASE_COCKROACH_EVENTPUSHCONNRATIO
+  ProjectionSpoolerConnRatio: 0.2 # ZITADEL_DATABASE_COCKROACH_PROJECTIONSPOOLERCONNRATIO
   # CockroachDB is the default database of ZITADEL
   cockroach:
     Host: localhost # ZITADEL_DATABASE_COCKROACH_HOST
     Port: 26257 # ZITADEL_DATABASE_COCKROACH_PORT
     Database: zitadel # ZITADEL_DATABASE_COCKROACH_DATABASE
-    MaxOpenConns: 20 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
-    MaxIdleConns: 10 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
+    MaxOpenConns: 40 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
+    MaxIdleConns: 20 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
     MaxConnLifetime: 30m # ZITADEL_DATABASE_COCKROACH_MAXCONNLIFETIME
     MaxConnIdleTime: 5m # ZITADEL_DATABASE_COCKROACH_MAXCONNIDLETIME
     Options: "" # ZITADEL_DATABASE_COCKROACH_OPTIONS
@@ -179,66 +200,95 @@ AssetStorage:
 
 # The Projections section defines the behavior for the scheduled and synchronous events projections.
 Projections:
+  # The maximum duration a transaction remains open 
+  # before it spots left folding additional events
+  # and updates the table.
+  TransactionDuration: 500ms # ZITADEL_PROJECTIONS_TRANSACTIONDURATION
   # Time interval between scheduled projections
   RequeueEvery: 60s # ZITADEL_PROJECTIONS_REQUEUEEVERY
   # Time between retried database statements resulting from projected events
   RetryFailedAfter: 1s # ZITADEL_PROJECTIONS_RETRYFAILEDAFTER
   # Retried execution number of database statements resulting from projected events
   MaxFailureCount: 5 # ZITADEL_PROJECTIONS_MAXFAILURECOUNT
-  # Number of concurrent projection routines. Values of 0 and below are overwritten to 1
-  ConcurrentInstances: 1 # ZITADEL_PROJECTIONS_CONCURRENTINSTANCES
   # Limit of returned events per query
   BulkLimit: 200 # ZITADEL_PROJECTIONS_BULKLIMIT
   # Only instances are projected, for which at least a projection-relevant event exists within the timeframe
   # from HandleActiveInstances duration in the past until the projection's current time
-  # Defaults to twice the RequeueEvery duration
-  HandleActiveInstances: 120s # ZITADEL_PROJECTIONS_HANDLEACTIVEINSTANCES
+  # If set to 0 (default), every instance is always considered active
+  HandleActiveInstances: 0s # ZITADEL_PROJECTIONS_HANDLEACTIVEINSTANCES
   # In the Customizations section, all settings from above can be overwritten for each specific projection
   Customizations:
     Projects:
-      BulkLimit: 2000 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_PROJECTS_BULKLIMIT
+      TransactionDuration: 2s
+    custom_texts:
+      TransactionDuration: 2s
+      BulkLimit: 400
     # The Notifications projection is used for sending emails and SMS to users
     Notifications:
       # As notification projections don't result in database statements, retries don't have an effect
-      MaxFailureCount: 0 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONS_MAXFAILURECOUNT
+      MaxFailureCount: 10 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONS_MAXFAILURECOUNT
+      # Sending emails can take longer than 500ms
+      TransactionDuration: 5s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONS_TRANSACTIONDURATION
+    password_complexities:
+      TransactionDuration: 2s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_PASSWORD_COMPLEXITIES_TRANSACTIONDURATION
+    lockout_policy:
+      TransactionDuration: 2s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_LOCKOUT_POLICY_TRANSACTIONDURATION
     # The NotificationsQuotas projection is used for calling quota webhooks
     NotificationsQuotas:
       # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
       # An instance is active, as long as there are projected events on the instance, that are not older than the HandleActiveInstances duration.
       # Delivery guarantee requirements are higher for quota webhooks
-      # Defaults to 45 days
-      HandleActiveInstances: 1080h # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_HANDLEACTIVEINSTANCES
+      # If set to 0 (default), every instance is always considered active
+      HandleActiveInstances: 0s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_HANDLEACTIVEINSTANCES
       # As quota notification projections don't result in database statements, retries don't have an effect
-      MaxFailureCount: 0 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_MAXFAILURECOUNT
+      MaxFailureCount: 10 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_MAXFAILURECOUNT
       # Quota notifications are not so time critical. Setting RequeueEvery every five minutes doesn't annoy the db too much.
       RequeueEvery: 300s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONSQUOTAS_REQUEUEEVERY
+      # Sending emails can take longer than 500ms
+      TransactionDuration: 5s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_NOTIFICATIONQUOTAS_TRANSACTIONDURATION
+    milestones:
+      BulkLimit: 50
     # The Telemetry projection is used for calling telemetry webhooks
     Telemetry:
       # In case of failed deliveries, ZITADEL retries to send the data points to the configured endpoints, but only for active instances.
       # An instance is active, as long as there are projected events on the instance, that are not older than the HandleActiveInstances duration.
       # Telemetry delivery guarantee requirements are a bit higher than normal data projections, as they are not interactively retryable.
-      # Defaults to 15 days
-      HandleActiveInstances: 360h # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_HANDLEACTIVEINSTANCES
+      # If set to 0 (default), every instance is always considered active
+      HandleActiveInstances: 0s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_HANDLEACTIVEINSTANCES
       # As sending telemetry data doesn't result in database statements, retries don't have any effects
       MaxFailureCount: 0 # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_MAXFAILURECOUNT
       # Telemetry data synchronization is not time critical. Setting RequeueEvery to 55 minutes doesn't annoy the database too much.
       RequeueEvery: 3300s # ZITADEL_PROJECTIONS_CUSTOMIZATIONS_TELEMETRY_REQUEUEEVERY
 
 Auth:
+  # See Projections.BulkLimit
   SearchLimit: 1000 # ZITADEL_AUTH_SEARCHLIMIT
   Spooler:
-    ConcurrentWorkers: 1 # ZITADEL_AUTH_SPOOLER_CONCURRENTWORKERS
-    ConcurrentInstances: 1 # ZITADEL_AUTH_SPOOLER_CONCURRENTINSTANCES
-    BulkLimit: 10000 # ZITADEL_AUTH_SPOOLER_BULKLIMIT
-    FailureCountUntilSkip: 5 # ZITADEL_AUTH_SPOOLER_FAILURECOUNTUNTILSKIP
+  # See Projections.TransationDuration
+    TransactionDuration: 10s #ZITADEL_AUTH_SPOOLER_TRANSACTIONDURATION
+    # See Projections.BulkLimit
+    BulkLimit: 100 #ZITADEL_AUTH_SPOOLER_BULKLIMIT
+    # See Projections.MaxFailureCount
+    FailureCountUntilSkip: 5 #ZITADEL_AUTH_SPOOLER_FAILURECOUNTUNTILSKIP
+    # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
+    # from HandleActiveInstances duration in the past until the projections current time
+    # If set to 0 (default), every instance is always considered active
+    HandleActiveInstances: 0s #ZITADEL_AUTH_SPOOLER_HANDLEACTIVEINSTANCES
 
 Admin:
+  # See Projections.BulkLimit
   SearchLimit: 1000 # ZITADEL_ADMIN_SEARCHLIMIT
   Spooler:
-    ConcurrentWorkers: 1 # ZITADEL_ADMIN_SPOOLER_CONCURRENTWORKERS
-    ConcurrentInstances: 1 # ZITADEL_ADMIN_SPOOLER_CONCURRENTINSTANCES
-    BulkLimit: 10000 # ZITADEL_ADMIN_SPOOLER_BULKLIMIT
-    FailureCountUntilSkip: 5 # ZITADEL_ADMIN_SPOOLER_FAILURECOUNTUNTILSKIP
+    # See Projections.TransationDuration
+    TransactionDuration: 10s
+    # See Projections.BulkLimit
+    BulkLimit: 200
+    # See Projections.MaxFailureCount
+    FailureCountUntilSkip: 5
+    # Only instance are projected, for which at least a projection relevant event exists withing the timeframe
+    # from HandleActiveInstances duration in the past until the projections current time
+    # If set to 0 (default), every instance is always considered active
+    HandleActiveInstances: 0s
 
 UserAgentCookie:
   Name: zitadel.useragent # ZITADEL_USERAGENTCOOKIE_NAME
@@ -284,6 +334,12 @@ OIDC:
       Path: /oauth/v2/device_authorization # ZITADEL_OIDC_CUSTOMENDPOINTS_DEVICEAUTH_PATH
   DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
   DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
+  Features:
+    # Wheter projection triggers are used in the new Introspection implementation.
+    TriggerIntrospectionProjections: false
+    # Allows fallback to the Legacy Introspection implementation
+    LegacyIntrospection: false
+  PublicKeyCacheMaxAge: 24h # ZITADEL_OIDC_PUBLICKEYCACHEMAXAGE
 
 SAML:
   ProviderConfig:
@@ -309,6 +365,7 @@ Login:
     MaxAge: 12h # ZITADEL_LOGIN_CACHE_MAXAGE
     # 168h is 7 days, one week
     SharedMaxAge: 168h # ZITADEL_LOGIN_CACHE_SHAREDMAXAGE
+  DefaultOTPEmailURLV2: "/otp/verify?loginName={{.LoginName}}&code={{.Code}}" # ZITADEL_LOGIN_CACHE_DEFAULTOTPEMAILURLV2
 
 Console:
   ShortCache:
@@ -319,16 +376,6 @@ Console:
     # 168h is 7 days, one week
     SharedMaxAge: 168h # ZITADEL_CONSOLE_LONGCACHE_SHAREDMAXAGE
   InstanceManagementURL: "" # ZITADEL_CONSOLE_INSTANCEMANAGEMENTURL
-
-# TODO: Is this still used?
-Notification:
-  Repository:
-    Spooler:
-      ConcurrentWorkers: 1 # ZITADEL_NOTIFICATION_REPOSITORY_SPOOLER_CONCURRENTWORKERS
-      ConcurrentInstances: 10 # ZITADEL_NOTIFICATION_REPOSITORY_SPOOLER_CONCURRENTINSTANCES
-      BulkLimit: 10000 # ZITADEL_NOTIFICATION_REPOSITORY_SPOOLER_BULKLIMIT
-      FailureCountUntilSkip: 5 # ZITADEL_NOTIFICATION_REPOSITORY_SPOOLER_FAILURECOUNTUNTILSKIP
-      Handlers:
 
 EncryptionKeys:
   DomainVerification:
@@ -358,12 +405,28 @@ EncryptionKeys:
   CSRFCookieKeyID: "csrfCookieKey" # ZITADEL_ENCRYPTIONKEYS_CSRFCOOKIEKEYID
   UserAgentCookieKeyID: "userAgentCookieKey" # ZITADEL_ENCRYPTIONKEYS_USERAGENTCOOKIEKEYID
 
-SystemAPIUsers: # ZITADEL_SYSTEMAPIUSERS
-# Add keys for authentication of the systemAPI here:
-# you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
-# - systemuser:
-#     Path: /path/to/superuser/key.pem  # you can provide the key either by reference with the path
-# - systemuser2:
+SystemAPIUsers:
+# # Add keys for authentication of the systemAPI here:
+# # you can specify any name for the user, but they will have to match the `issuer` and `sub` claim in the JWT:
+# - superuser:
+#     Path: /path/to/superuser/ey.pem  # you can provide the key either by reference with the path
+#     Memberships:
+#       # MemberType System allows the user to access all APIs for all instances or organizations
+#       - MemberType: System
+#         Roles:
+#           - "SYSTEM_OWNER"
+#           # Actually, we don't recommend adding IAM_OWNER and ORG_OWNER to the System membership, as this basically enables god mode for the system user
+#           - "IAM_OWNER"
+#           - "ORG_OWNER"
+#       # MemberType IAM and Organization let you restrict access to a specific instance or organization by specifying the AggregateID
+#       - MemberType: IAM
+#         Roles: "IAM_OWNER"
+#         AggregateID: "123456789012345678"
+#       - MemberType: Organization
+#         Roles: "ORG_OWNER"
+#         AggregateID: "123456789012345678"
+# - superuser2:
+#     # If no memberships are specified, the user has a membership of type System with the role "SYSTEM_OWNER"
 #     KeyData: <base64 encoded key>     # or you can directly embed it as base64 encoded value
 # Configure the SystemAPIUsers by environment variable using JSON notation:
 # ZITADEL_SYSTEMAPIUSERS='{"systemuser":{"Path":"/path/to/superuser/key.pem"},"systemuser2":{"KeyData":"<base64 encoded key>"}}'
@@ -375,10 +438,10 @@ SystemDefaults:
     MachineKeySize: 2048 # ZITADEL_SYSTEMDEFAULTS_SECRETGENERATORS_MACHINEKEYSIZE
     ApplicationKeySize: 2048 # ZITADEL_SYSTEMDEFAULTS_SECRETGENERATORS_APPLICATIONKEYSIZE
   PasswordHasher:
-  # Set hasher configuration for user passwords.
-  # Passwords previously hashed with a different algorithm
-  # or cost are automatically re-hashed using this config,
-  # upon password validation or update.
+    # Set hasher configuration for user passwords.
+    # Passwords previously hashed with a different algorithm
+    # or cost are automatically re-hashed using this config,
+    # upon password validation or update.
     Hasher:
       Algorithm: "bcrypt" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
       Cost: 14 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_COST
@@ -419,7 +482,7 @@ SystemDefaults:
     # https://passlib.readthedocs.io/en/stable/modular_crypt_format.html
     #
     # Supported verifiers: (uncomment to enable)
-    # Verifiers:
+    Verifiers:
     #   - "argon2" # verifier for both argon2i and argon2id.
     #   - "bcrypt"
     #   - "md5"
@@ -456,58 +519,33 @@ Actions:
 
 LogStore:
   Access:
-    Database:
-      # If enabled, all access logs are stored in the database table logstore.access
-      Enabled: false # ZITADEL_LOGSTORE_ACCESS_DATABASE_ENABLED
-      # Logs that are older than the keep duration are cleaned up continuously
-      # 2160h are 90 days, 3 months
-      Keep: 2160h # ZITADEL_LOGSTORE_ACCESS_DATABASE_KEEP
-      # CleanupInterval defines the time between cleanup iterations
-      CleanupInterval: 4h # ZITADEL_LOGSTORE_ACCESS_DATABASE_CLEANUPINTERVAL
-      # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
-      # Log entries are held in memory until one of the conditions MinFrequency or MaxBulkSize meets.
-      Debounce:
-        MinFrequency: 2m # ZITADEL_LOGSTORE_ACCESS_DATABASE_DEBOUNCE_MINFREQUENCY
-        MaxBulkSize: 100 # ZITADEL_LOGSTORE_ACCESS_DATABASE_DEBOUNCE_MAXBULKSIZE
     Stdout:
       # If enabled, all access logs are printed to the binary's standard output
       Enabled: false # ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED
-      # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
-      # Log entries are held in memory until one of the conditions MinFrequency or MaxBulkSize meets.
-      Debounce:
-        MinFrequency: 0s # ZITADEL_LOGSTORE_ACCESS_STDOUT_DEBOUNCE_MINFREQUENCY
-        MaxBulkSize: 0 # ZITADEL_LOGSTORE_ACCESS_STDOUT_DEBOUNCE_MAXBULKSIZE
   Execution:
-    Database:
-      # If enabled, all action execution logs are stored in the database table logstore.execution
-      Enabled: false # ZITADEL_LOGSTORE_EXECUTION_DATABASE_ENABLED
-      # Logs that are older than the keep duration are cleaned up continuously
-      # 2160h are 90 days, 3 months
-      Keep: 2160h # ZITADEL_LOGSTORE_EXECUTION_DATABASE_KEEP
-      # CleanupInterval defines the time between cleanup iterations
-      CleanupInterval: 4h # ZITADEL_LOGSTORE_EXECUTION_DATABASE_CLEANUPINTERVAL
-      # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
-      # Log entries are held in memory until one of the conditions MinFrequency or MaxBulkSize meets.
-      Debounce:
-        MinFrequency: 0s # ZITADEL_LOGSTORE_EXECUTION_DATABASE_DEBOUNCE_MINFREQUENCY
-        MaxBulkSize: 0 # ZITADEL_LOGSTORE_EXECUTION_DATABASE_DEBOUNCE_MAXBULKSIZE
     Stdout:
       # If enabled, all execution logs are printed to the binary's standard output
       Enabled: true # ZITADEL_LOGSTORE_EXECUTION_STDOUT_ENABLED
-      # Debouncing enables to asynchronously emit log entries, so the normal execution performance is not impaired
-      # Log entries are held in memory until one of the conditions MinFrequency or MaxBulkSize meets.
-      Debounce:
-        MinFrequency: 0s # ZITADEL_LOGSTORE_EXECUTION_STDOUT_DEBOUNCE_MINFREQUENCY
-        MaxBulkSize: 0 # ZITADEL_LOGSTORE_EXECUTION_STDOUT_DEBOUNCE_MAXBULKSIZE
 
 Quotas:
   Access:
+    # If enabled, authenticated requests are counted and potentially limited depending on the configured quota of the instance
+    Enabled: false # ZITADEL_QUOTAS_ACCESS_ENABLED
+    Debounce:
+      MinFrequency: 0s # ZITADEL_QUOTAS_ACCESS_DEBOUNCE_MINFREQUENCY
+      MaxBulkSize: 0 # ZITADEL_QUOTAS_ACCESS_DEBOUNCE_MAXBULKSIZE
     ExhaustedCookieKey: "zitadel.quota.exhausted" # ZITADEL_QUOTAS_ACCESS_EXHAUSTEDCOOKIEKEY
     ExhaustedCookieMaxAge: "300s" # ZITADEL_QUOTAS_ACCESS_EXHAUSTEDCOOKIEMAXAGE
+  Execution:
+    # If enabled, all action executions are counted and potentially limited depending on the configured quota of the instance
+    Enabled: false # ZITADEL_QUOTAS_EXECUTION_DATABASE_ENABLED
+    Debounce:
+      MinFrequency: 0s # ZITADEL_QUOTAS_EXECUTION_DEBOUNCE_MINFREQUENCY
+      MaxBulkSize: 0 # ZITADEL_QUOTAS_EXECUTION_DEBOUNCE_MAXBULKSIZE
 
 Eventstore:
-  PushTimeout: 15s # ZITADEL_EVENTSTORE_PUSHTIMEOUT
-  AllowOrderByCreationDate: false # ZITADEL_EVENTSTORE_ALLOWORDERBYCREATIONDATE
+  # Sets the maximum duration of transactions pushing events
+  PushTimeout: 15s #ZITADEL_EVENTSTORE_PUSHTIMEOUT
 
 DefaultInstance:
   InstanceName: ZITADEL # ZITADEL_DEFAULTINSTANCE_INSTANCENAME
@@ -624,7 +662,7 @@ DefaultInstance:
     MaxAgeDays: 0 # ZITADEL_DEFAULTINSTANCE_PASSWORDAGEPOLICY_MAXAGEDAYS
   DomainPolicy:
     UserLoginMustBeDomain: false # ZITADEL_DEFAULTINSTANCE_DOMAINPOLICY_USERLOGINMUSTBEDOMAIN
-    ValidateOrgDomains: true # ZITADEL_DEFAULTINSTANCE_DOMAINPOLICY_VALIDATEORGDOMAINS
+    ValidateOrgDomains: false # ZITADEL_DEFAULTINSTANCE_DOMAINPOLICY_VALIDATEORGDOMAINS
     SMTPSenderAddressMatchesInstanceDomain: false # ZITADEL_DEFAULTINSTANCE_DOMAINPOLICY_SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN
   LoginPolicy:
     AllowUsernamePassword: true # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_ALLOWUSERNAMEPASSWORD
@@ -633,7 +671,7 @@ DefaultInstance:
     ForceMFA: false # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_FORCEMFA
     HidePasswordReset: false # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_HIDEPASSWORDRESET
     IgnoreUnknownUsernames: false # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_IGNOREUNKNOWNUSERNAMES
-    AllowDomainDiscovery: false # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_ALLOWDOMAINDISCOVERY
+    AllowDomainDiscovery: true # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_ALLOWDOMAINDISCOVERY
     # 1 is allowed, 0 is not allowed
     PasswordlessType: 1 # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_PASSWORDLESSTYPE
     # DefaultRedirectURL is empty by default because we use the Console UI
@@ -688,14 +726,15 @@ DefaultInstance:
       Host: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_HOST
       User: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_USER
       Password: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_PASSWORD
-    TLS: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_SSL
+    TLS: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_TLS
     # If the host of the sender is different from ExternalDomain set DefaultInstance.DomainPolicy.SMTPSenderAddressMatchesInstanceDomain to false
-    From: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_FROM
-    FromName: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_FROMNAME
+    From: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_FROM
+    FromName: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_FROMNAME
+    ReplyToAddress: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_REPLYTOADDRESS
   # Configure the MessageTexts by environment variable using JSON notation:
   # ZITADEL_DEFAULTINSTANCE_MESSAGETEXTS='[{"messageTextType": "InitCode", "title": "My custom title"},{"messageTextType": "PasswordReset", "greeting": "Hi there!"}]'
   # Beware that if you configure the MessageTexts by environment variable, all the default MessageTexts are lost.
-  MessageTexts: # ZITADEL_DEFAULTINSTANCE_MESSAGETEXTS
+  MessageTexts:
     - MessageTextType: InitCode
       Language: de
       Title: Zitadel - User initialisieren
@@ -766,7 +805,7 @@ DefaultInstance:
       PreHeader: Verify email
       Subject: Verify email
       Greeting: Hello {{.DisplayName}},
-      Text: A new email has been added. Please use the button below to verify your mail. (Code {{.Code}}) If you din't add a new email, please ignore this email.
+      Text: A new email has been added. Please use the button below to verify your email. (Code {{.Code}}) If you din't add a new email, please ignore this email.
       ButtonText: Verify email
     - MessageTextType: VerifyPhone
       Language: en
@@ -792,7 +831,25 @@ DefaultInstance:
       Greeting: Hello {{.DisplayName}},
       Text: The password of your user has changed. If this change was not done by you, please be advised to immediately reset your password.
       ButtonText: Login
-
+  Features:
+    - FeatureLoginDefaultOrg: true
+  Limits:
+    # AuditLogRetention limits the number of events that can be queried via the events API by their age.
+    # A value of "0s" means that all events are available.
+    # If this value is set, it overwrites the system default unless it is not reset via the admin API.
+    AuditLogRetention: # ZITADEL_DEFAULTINSTANCE_LIMITS_AUDITLOGRETENTION
+    # If Block is true, all requests except to /ui/console or the system API are blocked and /ui/login is redirected to /ui/console.
+    # /ui/console shows a message that the instance is blocked with a link to Console.InstanceManagementURL
+    Block: # ZITADEL_DEFAULTINSTANCE_LIMITS_BLOCK
+  Restrictions:
+    # DisallowPublicOrgRegistration defines if ZITADEL should expose the endpoint /ui/login/register/org
+    # If it is true, the endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.
+    DisallowPublicOrgRegistration: # ZITADEL_DEFAULTINSTANCE_RESTRICTIONS_DISALLOWPUBLICORGREGISTRATION
+    # AllowedLanguages restricts the languages that can be used.
+    # If the list is empty, all supported languages are allowed.
+    AllowedLanguages: # ZITADEL_DEFAULTINSTANCE_RESTRICTIONS_ALLOWEDLANGUAGES
+    # - en
+    # - de
   Quotas:
     # Items take a slice of quota configurations, whereas, for each unit type and instance, one or zero quotas may exist.
     # The following unit types are supported
@@ -818,7 +875,8 @@ DefaultInstance:
 #        ResetInterval: 720h # 30 days
 #        # Amount defines the number of units for this quota
 #        Amount: 25000
-#        # Limit defines whether ZITADEL should block further usage when the configured amount is used
+#        # Limit defines whether ZITADEL should block further authenticated requests when the configured amount is used.
+#        # If you not only want to block authenticated requests but also authentication itself, consider using the system APIs SetLimits method.
 #        Limit: false
 #        # Notifications are emitted by ZITADEL when certain quota percentages are reached
 #        Notifications:
@@ -829,6 +887,9 @@ DefaultInstance:
 #            # CallURL is called when a relative amount of the quota is used.
 #            CallURL: "https://httpbin.org/post"
 
+# AuditLogRetention limits the number of events that can be queried via the events API by their age.
+# A value of "0s" means that all events are available.
+# If an audit log retention is set using an instance limit, it will overwrite the system default.
 AuditLogRetention: 0s # ZITADEL_AUDITLOGRETENTION
 
 InternalAuthZ:
@@ -836,6 +897,29 @@ InternalAuthZ:
   # ZITADEL_INTERNALAUTHZ_ROLEPERMISSIONMAPPINGS='[{"role": "IAM_OWNER", "permissions": ["iam.read", "iam.write"]}]'
   # Beware that if you configure the RolePermissionMappings by environment variable, all the default RolePermissionMappings are lost.
   RolePermissionMappings:
+    - Role: "SYSTEM_OWNER"
+      Permissions:
+        - "system.instance.read"
+        - "system.instance.write"
+        - "system.instance.delete"
+        - "system.domain.read"
+        - "system.domain.write"
+        - "system.domain.delete"
+        - "system.debug.read"
+        - "system.debug.write"
+        - "system.debug.delete"
+        - "system.feature.write"
+        - "system.limits.write"
+        - "system.limits.delete"
+        - "system.quota.write"
+        - "system.quota.delete"
+        - "system.iam.member.read"
+    - Role: "SYSTEM_OWNER_VIEWER"
+      Permissions:
+        - "system.instance.read"
+        - "system.domain.read"
+        - "system.debug.read"
+        - "system.iam.member.read"
     - Role: "IAM_OWNER"
       Permissions:
         - "iam.read"
@@ -855,6 +939,9 @@ InternalAuthZ:
         - "iam.flow.read"
         - "iam.flow.write"
         - "iam.flow.delete"
+        - "iam.feature.write"
+        - "iam.restrictions.read"
+        - "iam.restrictions.write"
         - "org.read"
         - "org.global.read"
         - "org.create"
@@ -905,6 +992,8 @@ InternalAuthZ:
         - "project.grant.member.write"
         - "project.grant.member.delete"
         - "events.read"
+        - "milestones.read"
+        - "session.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"
@@ -913,6 +1002,7 @@ InternalAuthZ:
         - "iam.idp.read"
         - "iam.action.read"
         - "iam.flow.read"
+        - "iam.restrictions.read"
         - "org.read"
         - "org.member.read"
         - "org.idp.read"
@@ -930,6 +1020,7 @@ InternalAuthZ:
         - "project.grant.read"
         - "project.grant.member.read"
         - "events.read"
+        - "milestones.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
@@ -981,6 +1072,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "session.delete"
     - Role: "IAM_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1004,6 +1096,7 @@ InternalAuthZ:
         - "project.grant.write"
         - "project.grant.delete"
         - "project.grant.member.read"
+        - "session.delete"
     - Role: "ORG_OWNER"
       Permissions:
         - "org.read"
@@ -1053,6 +1146,7 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "project.grant.member.write"
         - "project.grant.member.delete"
+        - "session.delete"
     - Role: "ORG_USER_MANAGER"
       Permissions:
         - "org.read"
@@ -1067,6 +1161,7 @@ InternalAuthZ:
         - "policy.read"
         - "project.read"
         - "project.role.read"
+        - "session.delete"
     - Role: "ORG_OWNER_VIEWER"
       Permissions:
         - "org.read"
@@ -1245,3 +1340,12 @@ InternalAuthZ:
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
+
+# If a new projection is introduced it will be prefilled during the setup process (if enabled)
+# This can prevent serving outdated data after a version upgrade, but might require a longer setup / upgrade process:
+# https://zitadel.com/docs/self-hosting/manage/updating_scaling
+InitProjections:
+  Enabled: false # ZITADEL_INITPROJECTIONS_ENABLED
+  RetryFailedAfter: 100ms # ZITADEL_INITPROJECTIONS_RETRYFAILEDAFTER
+  MaxFailureCount: 2 # ZITADEL_INITPROJECTIONS_MAXFAILURECOUNT
+  BulkLimit: 1000 # ZITADEL_INITPROJECTIONS_BULKLIMIT

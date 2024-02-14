@@ -7,10 +7,10 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_ClearFlow(t *testing.T) {
@@ -44,7 +44,7 @@ func TestCommands_ClearFlow(t *testing.T) {
 			},
 			res{
 				details: nil,
-				err:     errors.IsErrorInvalidArgument,
+				err:     zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -61,7 +61,7 @@ func TestCommands_ClearFlow(t *testing.T) {
 			},
 			res{
 				details: nil,
-				err:     errors.IsPreconditionFailed,
+				err:     zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -79,11 +79,9 @@ func TestCommands_ClearFlow(t *testing.T) {
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							org.NewFlowClearedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								domain.FlowTypeExternalAuthentication,
-							),
+						org.NewFlowClearedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							domain.FlowTypeExternalAuthentication,
 						),
 					),
 				),
@@ -155,7 +153,7 @@ func TestCommands_SetTriggerActions(t *testing.T) {
 			},
 			res{
 				details: nil,
-				err:     errors.IsErrorInvalidArgument,
+				err:     zerrors.IsErrorInvalidArgument,
 			},
 		},
 		//TODO: combination not possible at the moment, add when more flow types available
@@ -201,7 +199,7 @@ func TestCommands_SetTriggerActions(t *testing.T) {
 			},
 			res{
 				details: nil,
-				err:     errors.IsPreconditionFailed,
+				err:     zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -221,7 +219,7 @@ func TestCommands_SetTriggerActions(t *testing.T) {
 			},
 			res{
 				details: nil,
-				err:     errors.IsPreconditionFailed,
+				err:     zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -241,13 +239,11 @@ func TestCommands_SetTriggerActions(t *testing.T) {
 						),
 					),
 					expectPush(
-						eventPusherToEvents(
-							org.NewTriggerActionsSetEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								domain.FlowTypeExternalAuthentication,
-								domain.TriggerTypePostAuthentication,
-								[]string{"actionID1"},
-							),
+						org.NewTriggerActionsSetEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							domain.FlowTypeExternalAuthentication,
+							domain.TriggerTypePostAuthentication,
+							[]string{"actionID1"},
 						),
 					),
 				),

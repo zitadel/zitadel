@@ -1,6 +1,7 @@
 package ready
 
 import (
+	"crypto/tls"
 	"net"
 	"net/http"
 	"os"
@@ -26,12 +27,21 @@ func New() *cobra.Command {
 }
 
 func ready(config *Config) bool {
-	res, err := http.Get("http://" + net.JoinHostPort("localhost", strconv.Itoa(int(config.Port))) + "/debug/ready")
+	scheme := "https"
+	if !config.TLS.Enabled {
+		scheme = "http"
+	}
+	// Checking the TLS cert is not in the scope of the readiness check
+	httpClient := http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}}
+	res, err := httpClient.Get(scheme + "://" + net.JoinHostPort("localhost", strconv.Itoa(int(config.Port))) + "/debug/ready")
 	if err != nil {
 		logging.WithError(err).Warn("ready check failed")
 		return false
 	}
 	defer res.Body.Close()
-	logging.WithFields("status", res.StatusCode).Warn("ready check failed")
-	return res.StatusCode == 200
+	if res.StatusCode != 200 {
+		logging.WithFields("status", res.StatusCode).Warn("ready check failed")
+		return false
+	}
+	return true
 }

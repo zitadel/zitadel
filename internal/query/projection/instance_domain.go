@@ -3,11 +3,11 @@ package projection
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/crdb"
+	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -22,37 +22,42 @@ const (
 	InstanceDomainIsPrimaryCol    = "is_primary"
 )
 
-type instanceDomainProjection struct {
-	crdb.StatementHandler
+type instanceDomainProjection struct{}
+
+func newInstanceDomainProjection(ctx context.Context, config handler.Config) *handler.Handler {
+	return handler.NewHandler(ctx, &config, new(instanceDomainProjection))
 }
 
-func newInstanceDomainProjection(ctx context.Context, config crdb.StatementHandlerConfig) *instanceDomainProjection {
-	p := new(instanceDomainProjection)
-	config.ProjectionName = InstanceDomainTable
-	config.Reducers = p.reducers()
-	config.InitCheck = crdb.NewTableCheck(
-		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(InstanceDomainInstanceIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(InstanceDomainCreationDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(InstanceDomainChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(InstanceDomainSequenceCol, crdb.ColumnTypeInt64),
-			crdb.NewColumn(InstanceDomainDomainCol, crdb.ColumnTypeText),
-			crdb.NewColumn(InstanceDomainIsGeneratedCol, crdb.ColumnTypeBool),
-			crdb.NewColumn(InstanceDomainIsPrimaryCol, crdb.ColumnTypeBool),
+func (*instanceDomainProjection) Name() string {
+	return InstanceDomainTable
+}
+
+func (*instanceDomainProjection) Init() *old_handler.Check {
+	return handler.NewTableCheck(
+		handler.NewTable([]*handler.InitColumn{
+			handler.NewColumn(InstanceDomainInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(InstanceDomainCreationDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(InstanceDomainChangeDateCol, handler.ColumnTypeTimestamp),
+			handler.NewColumn(InstanceDomainSequenceCol, handler.ColumnTypeInt64),
+			handler.NewColumn(InstanceDomainDomainCol, handler.ColumnTypeText),
+			handler.NewColumn(InstanceDomainIsGeneratedCol, handler.ColumnTypeBool),
+			handler.NewColumn(InstanceDomainIsPrimaryCol, handler.ColumnTypeBool),
 		},
-			crdb.NewPrimaryKey(InstanceDomainInstanceIDCol, InstanceDomainDomainCol),
-			crdb.WithIndex(crdb.NewIndex("instance_domain", []string{InstanceDomainDomainCol})),
+			handler.NewPrimaryKey(InstanceDomainInstanceIDCol, InstanceDomainDomainCol),
+			handler.WithIndex(
+				handler.NewIndex("instance_domain", []string{InstanceDomainDomainCol},
+					handler.WithInclude(InstanceDomainCreationDateCol, InstanceDomainChangeDateCol, InstanceDomainSequenceCol, InstanceDomainIsGeneratedCol, InstanceDomainIsPrimaryCol),
+				),
+			),
 		),
 	)
-	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
 }
 
-func (p *instanceDomainProjection) reducers() []handler.AggregateReducer {
+func (p *instanceDomainProjection) Reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
-			EventRedusers: []handler.EventReducer{
+			EventReducers: []handler.EventReducer{
 				{
 					Event:  instance.InstanceDomainAddedEventType,
 					Reduce: p.reduceDomainAdded,
@@ -77,9 +82,9 @@ func (p *instanceDomainProjection) reducers() []handler.AggregateReducer {
 func (p *instanceDomainProjection) reduceDomainAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DomainAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-38nNf", "reduce.wrong.event.type %s", instance.InstanceDomainAddedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-38nNf", "reduce.wrong.event.type %s", instance.InstanceDomainAddedEventType)
 	}
-	return crdb.NewCreateStatement(
+	return handler.NewCreateStatement(
 		e,
 		[]handler.Column{
 			handler.NewCol(InstanceDomainCreationDateCol, e.CreationDate()),
@@ -96,11 +101,11 @@ func (p *instanceDomainProjection) reduceDomainAdded(event eventstore.Event) (*h
 func (p *instanceDomainProjection) reduceDomainPrimarySet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DomainPrimarySetEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-f8nlw", "reduce.wrong.event.type %s", instance.InstanceDomainPrimarySetEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-f8nlw", "reduce.wrong.event.type %s", instance.InstanceDomainPrimarySetEventType)
 	}
-	return crdb.NewMultiStatement(
+	return handler.NewMultiStatement(
 		e,
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(InstanceDomainChangeDateCol, e.CreationDate()),
 				handler.NewCol(InstanceDomainSequenceCol, e.Sequence()),
@@ -111,7 +116,7 @@ func (p *instanceDomainProjection) reduceDomainPrimarySet(event eventstore.Event
 				handler.NewCond(InstanceDomainIsPrimaryCol, true),
 			},
 		),
-		crdb.AddUpdateStatement(
+		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(InstanceDomainChangeDateCol, e.CreationDate()),
 				handler.NewCol(InstanceDomainSequenceCol, e.Sequence()),
@@ -128,9 +133,9 @@ func (p *instanceDomainProjection) reduceDomainPrimarySet(event eventstore.Event
 func (p *instanceDomainProjection) reduceDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DomainRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-388Nk", "reduce.wrong.event.type %s", instance.InstanceDomainRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-388Nk", "reduce.wrong.event.type %s", instance.InstanceDomainRemovedEventType)
 	}
-	return crdb.NewDeleteStatement(
+	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(InstanceDomainDomainCol, e.Domain),

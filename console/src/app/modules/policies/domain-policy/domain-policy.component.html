@@ -5,7 +5,6 @@
 <h2>{{ 'POLICY.DOMAIN_POLICY.TITLE' | translate }}</h2>
 <cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
 
-<!-- <ng-template cnslHasRole [hasRole]="['domain.policy.delete']"> -->
 <button
   *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
   matTooltip="{{ 'POLICY.RESET' | translate }}"
@@ -17,8 +16,8 @@
       serviceType === PolicyComponentServiceType.ADMIN
         ? 'iam.policy.write'
         : serviceType === PolicyComponentServiceType.MGMT
-        ? 'policy.write'
-        : ''
+          ? 'policy.write'
+          : ''
     ]
       | hasRole
       | async) === false
@@ -26,7 +25,6 @@
 >
   {{ 'POLICY.RESET' | translate }}
 </button>
-<!-- </ng-template> -->
 
 <div class="domain-policy-content" *ngIf="domainData">
   <div class="row">
@@ -40,8 +38,8 @@
           serviceType === PolicyComponentServiceType.ADMIN
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
-            ? 'policy.write'
-            : ''
+              ? 'policy.write'
+              : ''
         ]
           | hasRole
           | async) === false
@@ -59,21 +57,21 @@
         <div class="left-right">
           <div *ngIf="domainData.userLoginMustBeDomain"><small>domain</small><span>acme.com</span></div>
           <div *ngIf="domainData.userLoginMustBeDomain"><small>username</small><span>john</span></div>
-          <div *ngIf="domainData.userLoginMustBeDomain"><small>loginname</small><span>john@acme.com</span></div>
+          <div *ngIf="domainData.userLoginMustBeDomain"><small>loginname</small><span>john&#64;acme.com</span></div>
 
           <div *ngIf="!domainData.userLoginMustBeDomain"><small>domain</small><span>acme.com</span></div>
-          <div *ngIf="!domainData.userLoginMustBeDomain"><small>username</small><span>john@acme.com</span></div>
-          <div *ngIf="!domainData.userLoginMustBeDomain"><small>loginname</small><span>john@acme.com</span></div>
+          <div *ngIf="!domainData.userLoginMustBeDomain"><small>username</small><span>john&#64;acme.com</span></div>
+          <div *ngIf="!domainData.userLoginMustBeDomain"><small>loginname</small><span>john&#64;acme.com</span></div>
         </div>
         <i class="las la-arrow-right"></i>
         <div class="left-right">
           <div *ngIf="domainData.userLoginMustBeDomain"><small>domain</small><span>acme.com</span></div>
-          <div *ngIf="domainData.userLoginMustBeDomain"><small>username</small><span>john@acme.com</span></div>
-          <div *ngIf="domainData.userLoginMustBeDomain"><small>loginname</small><span>john@acme.com</span></div>
+          <div *ngIf="domainData.userLoginMustBeDomain"><small>username</small><span>john&#64;acme.com</span></div>
+          <div *ngIf="domainData.userLoginMustBeDomain"><small>loginname</small><span>john&#64;acme.com</span></div>
 
           <div *ngIf="!domainData.userLoginMustBeDomain"><small>domain</small><span>acme.com</span></div>
           <div *ngIf="!domainData.userLoginMustBeDomain"><small>username</small><span>john</span></div>
-          <div *ngIf="!domainData.userLoginMustBeDomain"><small>loginname</small><span>john@acme.com</span></div>
+          <div *ngIf="!domainData.userLoginMustBeDomain"><small>loginname</small><span>john&#64;acme.com</span></div>
         </div>
       </div>
     </div>
@@ -90,8 +88,8 @@
           serviceType === PolicyComponentServiceType.ADMIN
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
-            ? 'policy.write'
-            : ''
+              ? 'policy.write'
+              : ''
         ]
           | hasRole
           | async) === false
@@ -112,8 +110,8 @@
           serviceType === PolicyComponentServiceType.ADMIN
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
-            ? 'policy.write'
-            : ''
+              ? 'policy.write'
+              : ''
         ]
           | hasRole
           | async) === false
@@ -135,8 +133,8 @@
         serviceType === PolicyComponentServiceType.ADMIN
           ? 'iam.policy.write'
           : serviceType === PolicyComponentServiceType.MGMT
-          ? 'policy.write'
-          : ''
+            ? 'policy.write'
+            : ''
       ]
         | hasRole
         | async) === false

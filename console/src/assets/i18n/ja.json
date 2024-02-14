@@ -43,15 +43,15 @@
     }
   },
   "ONBOARDING": {
-    "DESCRIPTION": "オンボーディングの手順",
+    "DESCRIPTION": "チュートリアル",
     "MOREDESCRIPTION": "より多くのショートカット",
     "COMPLETED": "完了",
-    "DISMISS": "いいえ、私はプロです。",
+    "DISMISS": "熟知しているので必要ありません。",
     "CARD": {
       "TITLE": "ZITADELの起動",
       "DESCRIPTION": "このチェックリストを使用して、重要な手順を確認しながらインスタンスをセットアップします。"
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "ブランドをセットアップする",
         "description": "ログインの色と形状を定義し、ロゴとアイコンをアップロードします。",
@@ -62,15 +62,20 @@
         "description": "独自のメールサーバーを設定します。",
         "action": "SMTP 設定を設定する"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "最初のプロジェクトを作成する",
         "description": "最初のプロジェクトを追加し、ロールと認証を定義します。",
         "action": "プロジェクトを作成"
       },
-      "project.application.added": {
-        "title": "最初のアプリケーションを作成する",
-        "description": "Web、ネイティブ、API、またはSAMLアプリケーションを作成し、認証フローをセットアップします。",
-        "action": "アプリケーションを作成"
+      "APPLICATION_CREATED": {
+        "title": "アプリを登録する",
+        "description": "Web、ネイティブ、API、またはSAMLアプリケーションを登録し、認証フローをセットアップします。",
+        "action": "アプリを登録する"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "アプリにログインする",
+        "description": "アプリケーションをZITADELと統合して認証し、管理者ユーザーでログインしてテストします。",
+        "action": "ログイン"
       },
       "user.human.added": {
         "title": "ユーザーを追加する",
@@ -85,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "インスタンス",
+    "INSTANCE": "デフォルトの設定",
     "DASHBOARD": "ホーム",
     "PERSONAL_INFO": "個人情報",
     "DOCUMENTATION": "ドキュメント",
@@ -95,7 +100,6 @@
     "EVENTS": "イベント",
     "FAILEDEVENTS": "失敗したイベント",
     "ORGANIZATION": "組織",
-    "DOMAINS": "ドメイン",
     "PROJECT": "プロジェクト",
     "PROJECTOVERVIEW": "概要",
     "PROJECTGRANTS": "グラント",
@@ -224,6 +228,7 @@
     "EMAIL": "Eメール",
     "USERNAME": "ユーザー名",
     "ORGNAME": "組織名",
+    "PRIMARYDOMAIN": "プライマリドメイン",
     "PROJECTNAME": "プロジェクト名",
     "RESOURCEOWNER": "リソース所有者",
     "METHODS": {
@@ -264,18 +269,18 @@
       "DESCRIPTION": "下のボタンをクリックして、もう一度ログインする。"
     },
     "EXHAUSTED": {
-      "TITLE": "認証されたリクエストのクォータを使い果たしました",
-      "DESCRIPTION": "このZITADELインスタンスの制限を削除または増加させる"
+      "TITLE": "あなたのインスタンスはブロックされています。",
+      "DESCRIPTION": "ZITADELインスタンス管理者にサブスクリプションの更新を依頼してください。"
     },
     "INVALID_FORMAT": "不正なフォーマットです",
     "NOTANEMAIL": "入力された値がメールアドレスではありません。",
     "MINLENGTH": "{{requiredLength}} 文字以上の文字列が必要です。",
     "UPPERCASEMISSING": "大文字を含める必要があります。",
     "LOWERCASEMISSING": "小文字を含める必要があります。",
-    "SYMBOLERROR": "シンボルや句読点を含める必要があります。",
-    "NUMBERERROR": "小数点を含める必要があります。",
+    "SYMBOLERROR": "記号を含める必要があります。",
+    "NUMBERERROR": "数字を含める必要があります。",
     "PWNOTEQUAL": "パスワードが一致しません。",
-    "PHONE": "電話番号は00か+で始まる必要があります。"
+    "PHONE": "電話番号は + で始まる必要があります。"
   },
   "USER": {
     "SETTINGS": {
@@ -412,7 +417,7 @@
       "DESCRIPTION": "二要素認証を追加して、アカウントに最適なセキュリティを確保します。",
       "MANAGE_DESCRIPTION": "ユーザーの二要素認証を管理する。",
       "ADD": "二要素認証を追加する",
-      "OTP": "OTP用認証アプリ（ワンタイム・パスワード）",
+      "OTP": "TOTP用認証アプリ（ワンタイム・パスワード）",
       "OTP_DIALOG_TITLE": "OTPの追加",
       "OTP_DIALOG_DESCRIPTION": "認証アプリでQRコードを読み取り、下記のコードを入力することで、OTP方式の確認と有効化ができます。",
       "U2F": "指紋、セキュリティキー、フェイスIDなど",
@@ -421,6 +426,12 @@
       "U2F_SUCCESS": "二要素認証が正常に追加されました！",
       "U2F_ERROR": "セットアップ中にエラーが発生しました！",
       "U2F_NAME": "認証者名",
+      "OTPSMS": "OTP（ワンタイムパスワード）とSMS",
+      "OTPEMAIL": "電子メールによる OTP (ワンタイム パスワード)",
+      "SETUPOTPSMSDESCRIPTION": "この電話番号を OTP (ワンタイム パスワード) の第 2 要素として設定しますか?",
+      "OTPSMSSUCCESS": "OTP 係数の設定が成功しました。",
+      "OTPSMSPHONEMUSTBEVERIFIED": "この方法を使用するには、電話を認証する必要があります。",
+      "OTPEMAILSUCCESS": "OTP 係数の設定が成功しました。",
       "TYPE": {
         "0": "MFAは定義されていません",
         "1": "ワンタイムパスワード（OTP）",
@@ -481,7 +492,7 @@
       "TITLE": "プロフィール",
       "EMAIL": "Eメール",
       "PHONE": "電話番号",
-      "PHONE_HINT": "00または+マークの後に通話先の国番号を入力するか、ドロップダウンから国を選択し、最後に電話番号を入力します。",
+      "PHONE_HINT": "+ マークに続いて電話をかけたい国コードを入力するか、ドロップダウンから国を選択して電話番号を入力します。",
       "USERNAME": "ユーザー名",
       "CHANGEUSERNAME": "変更",
       "CHANGEUSERNAME_TITLE": "ユーザー名の変更",
@@ -490,6 +501,7 @@
       "LASTNAME": "姓",
       "NICKNAME": "ニックネーム",
       "DISPLAYNAME": "表示名",
+      "PREFERREDLOGINNAME": "優先ログイン名",
       "PREFERRED_LANGUAGE": "言語",
       "GENDER": "性別",
       "PASSWORD": "パスワード",
@@ -587,7 +599,8 @@
         "EDITVALUE": "電話番号",
         "EDITDESC": "下のフィールドに新しい電話番号を入力してください。",
         "DELETETITLE": "電話番号の削除",
-        "DELETEDESC": "本当に電話番号を削除してよろしいですか？"
+        "DELETEDESC": "本当に電話番号を削除してよろしいですか？",
+        "OTPSMSREMOVALWARNING": "このアカウントは、この電話番号を二要素認証に使用しています。続行すると二要素認証が使用できなくなります。"
       },
       "RESENDCODE": "再送信コード",
       "ENTERCODE": "認証",
@@ -706,7 +719,6 @@
   },
   "METADATA": {
     "TITLE": "メタデータ",
-    "DESCRIPTION": "",
     "KEY": "キー",
     "VALUE": "値",
     "ADD": "新しいエントリ",
@@ -736,6 +748,10 @@
     "TIMEOUT": "タイムアウト",
     "TIMEOUTINSEC": "数秒でタイムアウト",
     "ALLOWEDTOFAIL": "失敗を許可",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "警告",
+      "DESCRIPTION": "この設定を無効にすると、組織のユーザーがログインできなくなる可能性があります。さらに、アクションを無効にするためにコンソールにアクセスできなくなります。開発環境または開発組織でスクリプトを最初にテストするか、別の組織で管理者ユーザーを作成することをお勧めします。"
+    },
     "SCRIPT": "スクリプトp",
     "FLOWTYPE": "フロータイプ",
     "TRIGGERTYPE": "トリガータイプ",
@@ -785,7 +801,7 @@
     },
     "PAGES": {
       "STATE": "ステータス",
-      "DOMAINLIST": "ドメイン"
+      "DOMAINLIST": "カスタムドメイン"
     },
     "STATE": {
       "0": "未定義",
@@ -857,14 +873,16 @@
         },
         "SEQUENCE": {
           "LABEL": "シーケンス",
-          "CHECKBOX": "シーケンスで絞り込み",
-          "SORT": "ソート",
-          "ASC": "昇順",
-          "DESC": "降順"
+          "CHECKBOX": "シーケンスで絞り込み"
         },
+        "SORT": "ソート",
+        "ASC": "昇順",
+        "DESC": "降順",
         "CREATIONDATE": {
-          "LABEL": "作成日",
-          "CHECKBOX": "作成日で絞り込み"
+          "RADIO_FROM": "から",
+          "RADIO_RANGE": "範囲",
+          "LABEL_SINCE": "以降",
+          "LABEL_UNTIL": "まで"
         },
         "OTHER": "その他",
         "OTHERS": "その他"
@@ -914,20 +932,22 @@
         "BTN": "名前の変更"
       },
       "ORGDOMAIN": {
-        "TITLE": "組織ドメインの所有権の認証",
-        "VERIFICATION": "ドメインの所有権を確認するには、検証ファイルをダウンロードし、下記の提供されたURLにアップロードするか、提供されたURLのTXTレコードのDNSエントリーを配置する必要があります。完了するには、検証するボタンをクリックしてください。",
-        "VERIFICATION_SKIP": "認証をスキップしたまま組織を作成することはできますが、組織を使用するにはこのステップを完了する必要があります。",
-        "VERIFICATION_VALIDATION_DESC": "ユーザーがドメインの所有者であることを確認するために、トークンは定期的にチェックされます。",
+        "TITLE": "{{value}} の所有権を確認します",
+        "VERIFICATION": "ドメインを手動で検証する 2 つの方法が提供されています。",
+        "VERIFICATION_HTML": "- HTTP。 Web サイト上で一時検証ファイルをホストする",
+        "VERIFICATION_DNS": "-DNS。 TXT レコードの DNS エントリを作成する",
+        "VERIFICATION_DNS_DESC": "{{ value }} を管理しており、DNS レコードにアクセスできる場合は、次の値を使用して新しい TXT レコードを作成できます。",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "TXT レコードの値には次のコードを使用します。",
+        "VERIFICATION_HTTP_DESC": "Web サイトのホスティングにアクセスできる場合は、検証ファイルをダウンロードし、指定された URL にアップロードするだけです。",
+        "VERIFICATION_HTTP_URL_LABEL": "予想される URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "検証ファイル:",
+        "VERIFICATION_SKIP": "現時点では検証をスキップして組織の作成を続行できますが、ドメインを使用するにはこの手順を完了する必要があります。",
+        "VERIFICATION_VALIDATION_DESC": "ZITADEL はドメインの所有権を随時再確認するため、確認コードは削除しないでください。",
         "VERIFICATION_NEWTOKEN_TITLE": "新しいトークンをリクエストする",
-        "VERIFICATION_NEWTOKEN_DESC": "新しいトークンをリクエストする場合は、方法を選択します。永続的なトークンを認証する場合は、上のボタンをクリックします。",
-        "VERIFICATION_VALIDATION_ONGOING": "認証トークンはすでにリクエストされています。ボタンをクリックして、認証チェックをトリガーする。",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "トークンのタイプ：",
-        "VERIFICATION_SUCCESSFUL": "ドメインは正常に認証されました！",
-        "REQUESTNEWTOKEN": "新しいトークンをリクエストする",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "VERIFICATION_VALIDATION_ONGOING": "ドメインを確認するために {{ value }} 方法が選択されました。ボタンをクリックして検証チェックをトリガーするか、検証プロセスをリセットします。",
+        "VERIFICATION_SUCCESSFUL": "ドメインが正常に認証されました。",
+        "RESETMETHOD": "リセット確認方法"
       },
       "DOWNLOAD_FILE": "ファイルをダウンロード",
       "SELECTORGTOOLTIP": "この組織を選択",
@@ -942,7 +962,7 @@
     },
     "DOMAINS": {
       "NEW": "ドメインを追加する",
-      "TITLE": "ドメイン",
+      "TITLE": "検証済みドメイン",
       "DESCRIPTION": "ドメインを設定します。このドメインは、ユーザーのログインで使用できます。",
       "SETPRIMARY": "プライマリとして設定する",
       "DELETE": {
@@ -957,8 +977,7 @@
     "STATE": {
       "0": "未定義",
       "1": "アクティブ",
-      "2": "非アクティブ",
-      "3": "削除"
+      "2": "非アクティブ"
     },
     "MEMBER": {
       "TITLE": "組織マネージャー",
@@ -1005,50 +1024,73 @@
       "DESCRIPTION": "これらの設定は、インスタンス設定を拡張・上書きします。"
     },
     "LIST": {
-      "GENERAL": "全般",
+      "ORGS": "組織",
+      "LANGUAGES": "一般設定",
       "LOGIN": "ログイン動作とセキュリティ",
       "LOCKOUT": "ロックアウト",
       "COMPLEXITY": "パスワードの複雑さ",
       "NOTIFICATIONS": "通知設定",
+      "SMTP_PROVIDER": "SMTPプロバイダー",
+      "SMS_PROVIDER": "SMS/電話プロバイダー",
       "NOTIFICATIONS_DESC": "SMTPおよびSMS設定",
       "MESSAGETEXTS": "メッセージテキスト",
       "IDP": "IDプロバイダー",
+      "VERIFIED_DOMAINS": "検証済みドメイン",
       "DOMAIN": "ドメイン設定",
       "LOGINTEXTS": "ログイン画面のテキスト",
       "BRANDING": "ブランディング",
       "PRIVACYPOLICY": "プライバシーポリシー",
       "OIDC": "OIDCトークンのライフタイムと有効期限",
       "SECRETS": "シークレット設定",
-      "SECURITY": "セキュリティ設定"
+      "SECURITY": "セキュリティ設定",
+      "EVENTS": "イベント",
+      "FAILEDEVENTS": "失敗したイベント",
+      "VIEWS": "ビュー"
     },
     "GROUPS": {
+      "GENERAL": "一般",
       "NOTIFICATIONS": "通知",
       "LOGIN": "ログインとアクセス",
       "DOMAIN": "ドメイン",
       "TEXTS": "テキストと言語",
       "APPEARANCE": "設定",
-      "OTHER": "その他"
+      "OTHER": "その他",
+      "STORAGE": "ストレージ"
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "デフォルトの言語",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски"
+    "LANGUAGES": {
+      "TITLE": "言語設定",
+      "DEFAULT": "デフォルト言語",
+      "ALLOWED": "許可された言語",
+      "NOT_ALLOWED": "許可されていない言語",
+      "ALLOW_ALL": "すべての言語を許可する",
+      "DISALLOW_ALL": "すべての言語を許可しない",
+      "SETASDEFAULT": "デフォルト言語として設定する",
+      "DEFAULT_SAVED": "デフォルト言語が保存されました",
+      "ALLOWED_SAVED": "許可された言語が保存されました",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "SMTP設定",
       "SENDERADDRESS": "送信者のメールアドレス",
       "SENDERNAME": "送信者名",
+      "REPLYTOADDRESS": "返信先アドレス",
       "HOSTANDPORT": "ホストとポート",
       "USER": "ユーザー",
       "PASSWORD": "パスワード",
@@ -1078,6 +1120,7 @@
         "TOKEN": "トークン",
         "SENDERNUMBER": "送信者番号",
         "ADDED": "Twilioは正常に追加されました。",
+        "UPDATED": "Twilio が正常に更新されました。",
         "REMOVED": "Twilioが削除されました",
         "CHANGETOKEN": "トークンを変更する",
         "SETTOKEN": "トークンを設定する",
@@ -1180,6 +1223,11 @@
         "ERROR": "ユーザーは見つかりません！",
         "PRIMARYBUTTON": "次へ",
         "SECONDARYBUTTON": "登録"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "自動モード",
+        "THEME_MODE_LIGHT": "ライトモードのみ",
+        "THEME_MODE_DARK": "ダークモードのみ"
       }
     },
     "PWD_AGE": {
@@ -1206,6 +1254,7 @@
       "DESCRIPTIONCREATEMGMT": "ユーザーは、以下の利用可能なIDプロバイダーから選択できます。注：システムセットプロバイダーと、組織用に設定されたプロバイダーのみを使用できます。",
       "ADVANCED": "高度",
       "LIFETIMEDURATIONS": "ログインライフタイム",
+      "LIFETIME_INVALID": "フォームに無効な値が含まれています。",
       "SAVED": "正常に保存されました！"
     },
     "PRIVACY_POLICY": {
@@ -1230,8 +1279,10 @@
       "RESET_DESCRIPTION": "すべてのデフォルト値を復元しようとしています。ユーザーが行ったすべての変更は完全に削除されます。本当によろしいですか？",
       "UNSAVED_TITLE": "保存せずに続行しますか？",
       "UNSAVED_DESCRIPTION": "あなたは保存せずに変更を加えました。今すぐ保存しますか？",
-      "LOCALE": "ロケールコード",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "許可されていない言語を選択しました。テキストを変更し続けることはできますが、実際にこの言語を使用できるようにするには、インスタンスの制限を変更してください。",
+      "LANGUAGES_NOT_ALLOWED": "許可されていない言語：",
+      "LANGUAGE": "言語",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1242,7 +1293,10 @@
         "zh": "简体中文",
         "bg": "Български",
         "pt": "Portuguese",
-        "mk": "Македонски"
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -1335,11 +1389,12 @@
       "MAXAGEDAYS": "最大有効期限",
       "USERLOGINMUSTBEDOMAIN": "ログイン名の接尾辞として組織ドメインを追加する",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "この設定を有効にすると、すべてのログイン名が組織ドメインで接尾辞が付けられます。この設定が無効になっている場合、ユーザー名がすべての組織で一意であることを確認する必要があります。",
-      "VALIDATEORGDOMAINS": "組織ドメインを認証する",
+      "VALIDATEORGDOMAINS": "組織のドメイン検証が必要です (DNSまたはHTTPチャレンジ)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP送信者アドレスはインスタンスドメインに一致しています",
       "ALLOWUSERNAMEPASSWORD": "ユーザー名とパスワードを許可",
       "ALLOWEXTERNALIDP": "外部IDPを許可",
-      "ALLOWREGISTER": "登録を許可",
+      "ALLOWREGISTERUSERS": "ユーザーの登録を許可",
+      "ALLOWREGISTERORGS": "組織の登録を許可",
       "ALLOWUSERNAMEPASSWORD_DESC": "ユーザー名とパスワードを使用した従来のログインを許可します。",
       "ALLOWEXTERNALIDP_DESC": "基礎となるIDプロバイダーにログインを許可します。",
       "ALLOWREGISTER_DESC": "このオプションが選択されている場合、ユーザーを登録するための追加のステップがログインに表示されます。",
@@ -1816,7 +1871,9 @@
       "DELETED": "IDPは正常に削除されました！",
       "ADDED": "正常に追加されました。",
       "REMOVED": "正常に削除されました。"
-    }
+    },
+    "ISIDTOKENMAPPING": "IDトークンからのマッピング",
+    "ISIDTOKENMAPPING_DESC": "選択された場合、プロバイダ情報はIDトークンからマッピングされ、userinfoエンドポイントからではありません。"
   },
   "MFA": {
     "LIST": {
@@ -1962,6 +2019,8 @@
       "CLIENTSECRET_DESCRIPTION": "クライアントシークレットは、ダイアログを閉じると消えてしまうので、安全な場所に保管してください。",
       "REGENERATESECRET": "クライアントシークレットを再生成する",
       "DEVMODE": "開発モード",
+      "DEVMODE_ENABLED": "アクティブ化された",
+      "DEVMODE_DISABLED": "無効化されました",
       "DEVMODEDESC": "注意：開発モードを有効にすると、URIが認証されません。",
       "SKIPNATIVEAPPSUCCESSPAGE": "ログイン後に成功ページをスキップする",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "このネイティブアプリのログイン後に成功ページをスキップする",
@@ -2048,11 +2107,18 @@
         "DESCRIPTION": "SAMLアプリケーション"
       },
       "CONFIGSECTION": "SAML構成",
-      "URL": "メタデータファイルが配置されているURL",
-      "OR": "または",
-      "XML": "メタデータXMLをアップロードする",
+      "CHOOSEMETADATASOURCE": "次のオプションのいずれかを使用して SAML 構成を指定します。",
+      "METADATAOPT1": "オプション 1. メタデータ ファイルが存在する URL を指定する",
+      "METADATAOPT2": "オプション 2. メタデータ XML を含むファイルをアップロードする",
+      "METADATAOPT3": "オプション 3. ENTITYID と ACS URL を指定して最小限のメタデータ ファイルをオンザフライで作成する",
+      "UPLOAD": "XMLファイルをアップロードする",
       "METADATA": "メタデータ",
-      "METADATAFROMFILE": "ファイルからのメタデータ"
+      "METADATAFROMFILE": "ファイルからのメタデータ",
+      "CERTIFICATE": "SAML証明書",
+      "DOWNLOADCERT": "SAML証明書をダウンロードする",
+      "CREATEMETADATA": "メタデータの作成",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {
@@ -2117,7 +2183,10 @@
     "zh": "简体中文",
     "bg": "Български",
     "pt": "Portuguese",
-    "mk": "Македонски"
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский",
+    "nl": "Nederlands"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",
@@ -2166,7 +2235,8 @@
     "TOAST": {
       "UPDATED": "認可が更新されました。",
       "REMOVED": "認可が削除されました",
-      "BULKREMOVED": "認可が削除されました。"
+      "BULKREMOVED": "認可が削除されました。",
+      "CANTSHOWINFO": "このユーザーが所属する組織のメンバーではないため、このユーザーのプロフィールにアクセスできません"
     },
     "DIALOG": {
       "DELETE_TITLE": "認可の削除",

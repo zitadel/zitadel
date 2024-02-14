@@ -1,8 +1,7 @@
-@use '@angular/material' as mat;
-
 @mixin identity-provider-theme($theme) {
   $is-dark-theme: map-get($theme, is-dark);
   $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
 
   .identity-provider-desc {
     font-size: 14px;
@@ -18,6 +17,10 @@
         width: 36px;
         margin-right: 1rem;
         flex-shrink: 0;
+
+        &.apple {
+          margin-bottom: 4px;
+        }
 
         &.dark {
           display: if($is-dark-theme, block, none);
@@ -59,7 +62,7 @@
         font-size: 12px;
       }
 
-      .mat-chip-input {
+      .mat-mdc-chip-input {
         width: 100%;
         margin: 0;
       }
@@ -71,6 +74,58 @@
 
       @media only screen and (max-width: 450px) {
         max-width: none;
+      }
+    }
+
+    .pk-label {
+      font-size: 12px;
+      margin-top: 0.5rem;
+    }
+
+    .private-key-wrapper {
+      position: relative;
+      height: 70px;
+      width: 70px;
+      box-sizing: border-box;
+      border-radius: 0.5rem;
+      margin-top: 0.5rem;
+      border: 1px solid map-get($foreground, divider);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .dl-btn {
+        z-index: 2;
+        position: absolute;
+        right: 0;
+        top: 0;
+        cursor: pointer;
+        visibility: hidden;
+        transform: translateX(50%) translateY(-50%);
+      }
+
+      img {
+        top: 0;
+        left: 0;
+        width: 70px;
+        height: 70px;
+        object-fit: contain;
+        object-position: center;
+        border-radius: 0.5rem;
+      }
+
+      &.icon {
+        border-radius: 50%;
+
+        img {
+          border-radius: 50%;
+        }
+      }
+
+      &:hover {
+        .dl-btn {
+          visibility: visible;
+        }
       }
     }
 
@@ -124,6 +179,7 @@
     button[mat-raised-button] {
       border-radius: 0.5rem;
       padding: 0.5rem 4rem;
+      height: 3.5rem;
     }
   }
 

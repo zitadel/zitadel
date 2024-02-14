@@ -10,9 +10,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Domain struct {
@@ -67,18 +67,18 @@ func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearch
 	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-ZRfj1", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-ZRfj1", "Errors.Query.SQLStatement")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		domains, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-M6mYN", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-M6mYN", "Errors.Internal")
 	}
-	domains, err = scan(rows)
-	if err != nil {
-		return nil, err
-	}
-	domains.LatestSequence, err = q.latestSequence(ctx, orgDomainsTable)
+
+	domains.State, err = q.latestState(ctx, orgDomainsTable)
 	return domains, err
 }
 
@@ -118,7 +118,7 @@ func prepareDomainsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-rKd6k", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-rKd6k", "Errors.Query.CloseRows")
 			}
 
 			return &Domains{

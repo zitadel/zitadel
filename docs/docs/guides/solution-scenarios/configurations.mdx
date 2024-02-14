@@ -1,6 +1,6 @@
 ---
-title: How to configure ZITADEL for your scenario
-sidebar_label: Common configurations
+title: Configure ZITADEL for your Scenario
+sidebar_label: Common Configurations
 ---
 
 Each customer does have different needs and use-cases. In ZITADEL you are able to configure your settings depending on your needs.
@@ -41,7 +41,7 @@ Read more about [applications](../manage/console/applications) and the [redirect
 It is possible to trigger the organization directly with the authorization request to ZITADEL.
 
 This will have the following impacts:
-- Trigger organization login behaviour settings
+- Trigger organization login behavior settings
 - Trigger organization branding
 - Only allow users from selected organization to login
 
@@ -70,7 +70,7 @@ You can either set this attribute on your whole ZITADEL instance or just on some
 No matter how the username of your user does look like.
 You can additionally allow login with the email attribute of the user.
 
-You can find this in the "Login Behaviour and Security" Setting of your instance or organizations.
+You can find this in the "Login Behavior and Security" Setting of your instance or organizations.
 Go to the "Advanced" section, per default login with email address should be allowed. It is possible to disable it.
 
 ![Login Policy Advanced Setting: Disable email for login](/img/guides/scenarios/login_policy_advanced.png)
@@ -105,7 +105,7 @@ Go to the "Advanced" section, per default login with phone number should be allo
 ## Embedding ZITADEL in an iFrame
 
 To maximise the security during login and in the Console UI, ZITADEL follows security best practices by setting a
-Content-Security-Policy (CSP) and X-Frame-Options:
+Content-Security-Policy (CSP), X-Frame-Options and cookies with SameSite Lax:
 
 ```
 Content-Security-Policy: frame-ancestors 'none'
@@ -136,4 +136,21 @@ This will change the CSP to the following:
 Content-Security-Policy: frame-ancestors https://custom-domain.com
 ```
 
-and remove the X-Frame-Options header.
+remove the X-Frame-Options header and change the SameSite to `None`.
+
+:::note
+Please note, that SameSite None requires the cookie to be flagged `secure`, which means it must be sent over TLS (HTTPS) or localhost.
+This also means that domains other than localhost must use TLS for this option to work.
+This is due to browser restrictions: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#none
+:::
+
+### Disable Multi-factor (MFA) Prompt
+
+To encourage the users to more security for their accounts, a multi-factor prompt is shown after a certain time, to prompt them to configure an additional factor.
+This prompt is shown even if multi-factor is not enforced for the users.
+
+If you do want to disable the prompt for your users, go to the login behavior settings and set the "Multifactor Init Lifetime" to 0.
+If the setting is not configured to 0, it means that after that time, the user will be asked again to setup a factor.
+
+![Login Behavior Settings: Multi-factor init lifetime](/img/guides/scenarios/login-settings-mfa-init-lifetime.png)
+

@@ -5,20 +5,20 @@ import (
 	"reflect"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) ClearFlow(ctx context.Context, flowType domain.FlowType, resourceOwner string) (*domain.ObjectDetails, error) {
 	if !flowType.Valid() || resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Dfw2h", "Errors.Flow.FlowTypeMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Dfw2h", "Errors.Flow.FlowTypeMissing")
 	}
 	existingFlow, err := c.getOrgFlowWriteModelByType(ctx, flowType, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if len(existingFlow.Triggers) == 0 {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-DgGh3", "Errors.Flow.Empty")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-DgGh3", "Errors.Flow.Empty")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingFlow.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, org.NewFlowClearedEvent(ctx, orgAgg, flowType))
@@ -34,17 +34,17 @@ func (c *Commands) ClearFlow(ctx context.Context, flowType domain.FlowType, reso
 
 func (c *Commands) SetTriggerActions(ctx context.Context, flowType domain.FlowType, triggerType domain.TriggerType, actionIDs []string, resourceOwner string) (*domain.ObjectDetails, error) {
 	if !flowType.Valid() || !triggerType.Valid() || resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Dfhj5", "Errors.Flow.FlowTypeMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Dfhj5", "Errors.Flow.FlowTypeMissing")
 	}
 	if !flowType.HasTrigger(triggerType) {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Dfgh6", "Errors.Flow.WrongTriggerType")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Dfgh6", "Errors.Flow.WrongTriggerType")
 	}
 	existingFlow, err := c.getOrgFlowWriteModelByType(ctx, flowType, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if reflect.DeepEqual(existingFlow.Triggers[triggerType], actionIDs) {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Nfh52", "Errors.Flow.NoChanges")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Nfh52", "Errors.Flow.NoChanges")
 	}
 	if len(actionIDs) > 0 {
 		exists, err := c.actionsIDsExist(ctx, actionIDs, resourceOwner)
@@ -52,7 +52,7 @@ func (c *Commands) SetTriggerActions(ctx context.Context, flowType domain.FlowTy
 			return nil, err
 		}
 		if !exists {
-			return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-dg422", "Errors.Flow.ActionIDsNotExist")
+			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-dg422", "Errors.Flow.ActionIDsNotExist")
 		}
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingFlow.WriteModel)

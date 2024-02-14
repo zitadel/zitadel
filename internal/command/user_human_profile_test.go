@@ -8,11 +8,10 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_ChangeHumanProfile(t *testing.T) {
@@ -37,8 +36,7 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 		{
 			name: "user not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: eventstoreExpect(t,
 					expectFilter(),
 				),
 			},
@@ -52,13 +50,13 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 					LastName:          "lastname",
 					NickName:          "nickname",
 					DisplayName:       "displayname",
-					PreferredLanguage: language.German,
+					PreferredLanguage: AllowedLanguage,
 					Gender:            domain.GenderFemale,
 				},
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -75,7 +73,7 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 								"lastname",
 								"nickname",
 								"displayname",
-								language.German,
+								AllowedLanguage,
 								domain.GenderFemale,
 								"email",
 								true,
@@ -94,13 +92,13 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 					LastName:          "lastname",
 					NickName:          "nickname",
 					DisplayName:       "displayname",
-					PreferredLanguage: language.German,
+					PreferredLanguage: AllowedLanguage,
 					Gender:            domain.GenderFemale,
 				},
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -117,7 +115,7 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 								"lastname",
 								"nickname",
 								"displayname",
-								language.German,
+								DisallowedLanguage,
 								domain.GenderUnspecified,
 								"email",
 								true,
@@ -125,19 +123,15 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newProfileChangedEvent(context.Background(),
-									"user1", "org1",
-									"firstname2",
-									"lastname2",
-									"nickname2",
-									"displayname2",
-									language.English,
-									domain.GenderMale,
-								),
-							),
-						},
+						newProfileChangedEvent(context.Background(),
+							"user1", "org1",
+							"firstname2",
+							"lastname2",
+							"nickname2",
+							"displayname2",
+							AllowedLanguage,
+							domain.GenderMale,
+						),
 					),
 				),
 			},
@@ -151,7 +145,7 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 					LastName:          "lastname2",
 					NickName:          "nickname2",
 					DisplayName:       "displayname2",
-					PreferredLanguage: language.English,
+					PreferredLanguage: AllowedLanguage,
 					Gender:            domain.GenderMale,
 				},
 				resourceOwner: "org1",
@@ -166,7 +160,133 @@ func TestCommandSide_ChangeHumanProfile(t *testing.T) {
 					LastName:          "lastname2",
 					NickName:          "nickname2",
 					DisplayName:       "displayname2",
-					PreferredLanguage: language.English,
+					PreferredLanguage: AllowedLanguage,
+					Gender:            domain.GenderMale,
+				},
+			},
+		},
+		{
+			name: "undefined preferred language, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								DisallowedLanguage,
+								domain.GenderUnspecified,
+								"email",
+								true,
+							),
+						),
+					),
+					expectPush(
+						newProfileChangedEvent(context.Background(),
+							"user1", "org1",
+							"firstname2",
+							"lastname2",
+							"nickname2",
+							"displayname2",
+							language.Und,
+							domain.GenderMale,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				address: &domain.Profile{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "user1",
+					},
+					FirstName:   "firstname2",
+					LastName:    "lastname2",
+					NickName:    "nickname2",
+					DisplayName: "displayname2",
+					Gender:      domain.GenderMale,
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.Profile{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					FirstName:         "firstname2",
+					LastName:          "lastname2",
+					NickName:          "nickname2",
+					DisplayName:       "displayname2",
+					PreferredLanguage: language.Und,
+					Gender:            domain.GenderMale,
+				},
+			},
+		}, {
+			name: "unsupported preferred language, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								DisallowedLanguage,
+								domain.GenderUnspecified,
+								"email",
+								true,
+							),
+						),
+					),
+					expectPush(
+						newProfileChangedEvent(context.Background(),
+							"user1", "org1",
+							"firstname2",
+							"lastname2",
+							"nickname2",
+							"displayname2",
+							UnsupportedLanguage,
+							domain.GenderMale,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				address: &domain.Profile{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "user1",
+					},
+					FirstName:         "firstname2",
+					LastName:          "lastname2",
+					NickName:          "nickname2",
+					DisplayName:       "displayname2",
+					PreferredLanguage: UnsupportedLanguage,
+					Gender:            domain.GenderMale,
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.Profile{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					FirstName:         "firstname2",
+					LastName:          "lastname2",
+					NickName:          "nickname2",
+					DisplayName:       "displayname2",
+					PreferredLanguage: UnsupportedLanguage,
 					Gender:            domain.GenderMale,
 				},
 			},

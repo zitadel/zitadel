@@ -23,6 +23,7 @@ type Email struct {
 	CC              []string
 	SenderEmail     string
 	SenderName      string
+	ReplyToAddress  string
 	Subject         string
 	Content         string
 	TriggeringEvent eventstore.Event
@@ -35,6 +36,9 @@ func (msg *Email) GetContent() (string, error) {
 		from = fmt.Sprintf("%s <%s>", msg.SenderName, msg.SenderEmail)
 	}
 	headers["From"] = from
+	if msg.ReplyToAddress != "" {
+		headers["Reply-to"] = msg.ReplyToAddress
+	}
 	headers["Return-Path"] = msg.SenderEmail
 	headers["To"] = strings.Join(msg.Recipients, ", ")
 	headers["Cc"] = strings.Join(msg.CC, ", ")
@@ -50,7 +54,7 @@ func (msg *Email) GetContent() (string, error) {
 	if !isHTML(msg.Content) {
 		mime = "MIME-version: 1.0;" + lineBreak + "Content-Type: text/plain; charset=\"UTF-8\";" + lineBreak + lineBreak
 	}
-	subject := "Subject: " + msg.Subject + lineBreak
+	subject := "Subject: " + qEncodeSubject(msg.Subject) + lineBreak
 	message += subject + mime + lineBreak + msg.Content
 
 	return message, nil
@@ -62,4 +66,9 @@ func (msg *Email) GetTriggeringEvent() eventstore.Event {
 
 func isHTML(input string) bool {
 	return isHTMLRgx.MatchString(input)
+}
+
+// returns a RFC1342 "Q" encoded string to allow non-ascii characters
+func qEncodeSubject(subject string) string {
+	return "=?utf-8?q?" + subject + "?="
 }

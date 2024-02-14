@@ -36,6 +36,8 @@ const (
 	IDPTypeGitLab
 	IDPTypeGitLabSelfHosted
 	IDPTypeGoogle
+	IDPTypeApple
+	IDPTypeSAML
 )
 
 func (t IDPType) GetCSSClass() string {
@@ -50,11 +52,14 @@ func (t IDPType) GetCSSClass() string {
 		return "gitlab"
 	case IDPTypeAzureAD:
 		return "azure"
+	case IDPTypeApple:
+		return "apple"
 	case IDPTypeUnspecified,
 		IDPTypeOIDC,
 		IDPTypeJWT,
 		IDPTypeOAuth,
-		IDPTypeLDAP:
+		IDPTypeLDAP,
+		IDPTypeSAML:
 		fallthrough
 	default:
 		return ""
@@ -78,6 +83,8 @@ func (t IDPType) DisplayName() string {
 		return "GitLab"
 	case IDPTypeGoogle:
 		return "Google"
+	case IDPTypeApple:
+		return "Apple"
 	case IDPTypeUnspecified,
 		IDPTypeOIDC,
 		IDPTypeJWT,
@@ -85,13 +92,20 @@ func (t IDPType) DisplayName() string {
 		IDPTypeLDAP,
 		IDPTypeAzureAD,
 		IDPTypeGitHubEnterprise,
-		IDPTypeGitLabSelfHosted:
+		IDPTypeGitLabSelfHosted,
+		IDPTypeSAML:
 		fallthrough
 	default:
 		// we should never get here, so log it
 		logging.Errorf("name of provider (type %d) is empty", t)
 		return ""
 	}
+}
+
+// IsSignInButton returns if the button should be displayed with a translated
+// "Sign in with {{.DisplayName}}", e.g. "Sign in with Apple"
+func (t IDPType) IsSignInButton() bool {
+	return t == IDPTypeApple
 }
 
 type IDPIntentState int32

@@ -49,6 +49,33 @@ SystemAPIUsers:
       KeyData: <base64 encoded value of system-user-1.pub>
 ```
 
+You can define memberships for the user as well:
+
+```yaml
+SystemAPIUsers:
+ - system-user-1:
+     Path: /system-user-1.pub
+     Memberships:
+       # MemberType System allows the user to access all APIs for all instances or organizations
+       - MemberType: System
+         Roles:
+           - "SYSTEM_OWNER"
+           - "IAM_OWNER"
+           - "ORG_OWNER"
+       # MemberType IAM and Organization let you restrict access to a specific instance or organization by specifying the AggregateID
+       - MemberType: IAM
+         Roles: "IAM_OWNER"
+         AggregateID: "123456789012345678"
+       - MemberType: Organization
+         Roles: "ORG_OWNER"
+         AggregateID: "123456789012345678"
+ - superuser2:
+     # If no memberships are specified, the user has a membership of type System with the role "SYSTEM_OWNER"
+     KeyData: <base64 encoded key>     # or you can directly embed it as base64 encoded value
+```
+
+If you don't specify any memberships, you are allowed to access the whole [ZITADEL System API](/apis/resources/system).
+
 ## Generate JWT
 
 Similar to the OAuth 2.0 JWT Profile, we will create and sign a JWT. For this API, the JWT will not be used to authenticate against ZITADEL Authorization Server, but rather directly to the API itself.
@@ -59,7 +86,7 @@ The JWT payload will need to contain the following claims:
 {
   "iss": "<userid>",
   "sub": "<userid>",
-  "aud": "<https://your_domain>",
+  "aud": "<https://$CUSTOM-DOMAIN>",
   "exp": <now+1h>,
   "iat": <now>
 }
@@ -95,7 +122,7 @@ Now that you configured ZITADEL and created a JWT, you can call the System API a
 
 ```bash
 curl --request POST \
-  --url {your_domain}/system/v1/instances/_search \
+  --url $CUSTOM-DOMAIN/system/v1/instances/_search \
   --header 'Authorization: Bearer {token}' \
   --header 'Content-Type: application/json'
 ```
@@ -144,8 +171,6 @@ You should get a successful response with a `totalResult` number of 1 and the de
 	]
 }
 ```
-
-With this token you are allowed to access the whole [ZITADEL System API](/apis/resources/system).
 
 ## Summary
 

@@ -4,17 +4,20 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
-	errs "errors"
+	"errors"
 	"fmt"
 	"time"
+
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type AuthRequest struct {
@@ -33,7 +36,7 @@ type AuthRequest struct {
 
 func (a *AuthRequest) checkLoginClient(ctx context.Context) error {
 	if uid := authz.GetCtxData(ctx).UserID; uid != a.LoginClient {
-		return errors.ThrowPermissionDenied(nil, "OIDCv2-aL0ag", "Errors.AuthRequest.WrongLoginClient")
+		return zerrors.ThrowPermissionDenied(nil, "OIDCv2-aL0ag", "Errors.AuthRequest.WrongLoginClient")
 	}
 	return nil
 }
@@ -50,28 +53,35 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.AuthRequestProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerAuthRequestProjection")
+		ctx, err = projection.AuthRequestProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	var (
-		scope   database.StringArray
-		prompt  database.EnumArray[domain.Prompt]
-		locales database.StringArray
+		scope   database.TextArray[string]
+		prompt  database.Array[domain.Prompt]
+		locales database.TextArray[string]
 	)
 
 	dst := new(AuthRequest)
-	err = q.client.DB.QueryRowContext(
-		ctx, q.authRequestByIDQuery(ctx),
+	err = q.client.QueryRowContext(
+		ctx,
+		func(row *sql.Row) error {
+			return row.Scan(
+				&dst.ID, &dst.CreationDate, &dst.LoginClient, &dst.ClientID, &scope, &dst.RedirectURI,
+				&prompt, &locales, &dst.LoginHint, &dst.MaxAge, &dst.HintUserID,
+			)
+		},
+		q.authRequestByIDQuery(ctx),
 		id, authz.GetInstance(ctx).InstanceID(),
-	).Scan(
-		&dst.ID, &dst.CreationDate, &dst.LoginClient, &dst.ClientID, &scope, &dst.RedirectURI,
-		&prompt, &locales, &dst.LoginHint, &dst.MaxAge, &dst.HintUserID,
 	)
-	if errs.Is(err, sql.ErrNoRows) {
-		return nil, errors.ThrowNotFound(err, "QUERY-Thee9", "Errors.AuthRequest.NotExisting")
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, zerrors.ThrowNotFound(err, "QUERY-Thee9", "Errors.AuthRequest.NotExisting")
 	}
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-Ou8ue", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Ou8ue", "Errors.Internal")
 	}
 
 	dst.Scope = scope

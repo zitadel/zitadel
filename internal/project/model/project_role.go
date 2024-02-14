@@ -9,7 +9,3 @@ type ProjectRole struct {
 	DisplayName string
 	Group       string
 }
-
-func (p *ProjectRole) IsValid() bool {
-	return p.AggregateID != "" && p.Key != ""
-}

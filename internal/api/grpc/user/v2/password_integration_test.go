@@ -12,8 +12,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2alpha"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func TestServer_RequestPasswordReset(t *testing.T) {
@@ -158,10 +158,7 @@ func TestServer_SetPassword(t *testing.T) {
 						Password: "InitialPassw0rd!",
 					},
 				})
-				if err != nil {
-					return err
-				}
-				return nil
+				return err
 			},
 			args: args{
 				ctx: CTX,

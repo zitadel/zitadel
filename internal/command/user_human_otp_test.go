@@ -3,23 +3,24 @@ package command
 import (
 	"context"
 	"io"
+	"net"
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/pquerna/otp/totp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddHumanTOTP(t *testing.T) {
@@ -56,7 +57,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -73,7 +74,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -82,19 +83,17 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.German,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
 						),
 					),
 					expectFilter(),
@@ -106,7 +105,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -115,27 +114,23 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.German,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
 						),
 					),
 					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("org1", "org1").Aggregate,
-								"org",
-							),
+						org.NewOrgAddedEvent(context.Background(),
+							&user.NewAggregate("org1", "org1").Aggregate,
+							"org",
 						),
 					),
 					expectFilter(),
@@ -148,7 +143,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -157,54 +152,47 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username",
-								"firstname",
-								"lastname",
-								"nickname",
-								"displayname",
-								language.German,
-								domain.GenderUnspecified,
-								"email@test.ch",
-								true,
-							),
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.German,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
 						),
 					),
 					expectFilter(
-						eventFromEventPusher(
-							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("org1", "org1").Aggregate,
-								"org",
-							),
+						org.NewOrgAddedEvent(context.Background(),
+							&user.NewAggregate("org1", "org1").Aggregate,
+							"org",
 						),
 					),
 					expectFilter(
-						eventFromEventPusher(
-							org.NewDomainPolicyAddedEvent(context.Background(),
-								&org.NewAggregate("org1").Aggregate,
-								true,
-								true,
-								true,
-							),
+						org.NewDomainPolicyAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							true,
+							true,
+							true,
 						),
 					),
 					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanOTPAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("a"),
-								}),
+						user.NewHumanOTPAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
 						),
-						eventFromEventPusher(
-							user.NewHumanOTPVerifiedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"agent1")),
+						user.NewHumanOTPVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"agent1",
+						),
 					),
 				),
 			},
@@ -214,7 +202,7 @@ func TestCommandSide_AddHumanTOTP(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 	}
@@ -266,7 +254,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-MM9fs", "Errors.User.NotFound"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SqyJz", "Errors.User.NotFound"),
 		},
 		{
 			name: "org not existing, not found error",
@@ -297,7 +285,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-55M9f", "Errors.Org.NotFound"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-55M9f", "Errors.Org.NotFound"),
 		},
 		{
 			name: "org iam policy not existing, not found error",
@@ -337,7 +325,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-8ugTs", "Errors.Org.DomainPolicy.NotFound"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-8ugTs", "Errors.Org.DomainPolicy.NotFound"),
 		},
 		{
 			name: "otp already exists, already exists error",
@@ -401,7 +389,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
-			wantErr: caos_errs.ThrowAlreadyExists(nil, "COMMAND-do9se", "Errors.User.MFA.OTP.AlreadyReady"),
+			wantErr: zerrors.ThrowAlreadyExists(nil, "COMMAND-do9se", "Errors.User.MFA.OTP.AlreadyReady"),
 		},
 		{
 			name: "issuer not in context",
@@ -450,7 +438,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
-			wantErr: caos_errs.ThrowInternal(nil, "TOTP-ieY3o", "Errors.Internal"),
+			wantErr: zerrors.ThrowInternal(nil, "TOTP-ieY3o", "Errors.Internal"),
 		},
 		{
 			name: "success",
@@ -556,7 +544,7 @@ func TestCommands_HumanCheckMFATOTPSetup(t *testing.T) {
 		{
 			name:    "missing user id",
 			args:    args{},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing"),
 		},
 		{
 			name: "filter error",
@@ -590,7 +578,7 @@ func TestCommands_HumanCheckMFATOTPSetup(t *testing.T) {
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
-			wantErr: caos_errs.ThrowNotFound(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotExisting"),
+			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotExisting"),
 		},
 		{
 			name: "otp already ready error",
@@ -614,7 +602,7 @@ func TestCommands_HumanCheckMFATOTPSetup(t *testing.T) {
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-qx4ls", "Errors.Users.MFA.OTP.AlreadyReady"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-qx4ls", "Errors.Users.MFA.OTP.AlreadyReady"),
 		},
 		{
 			name: "wrong code",
@@ -633,7 +621,7 @@ func TestCommands_HumanCheckMFATOTPSetup(t *testing.T) {
 				code:          "wrong",
 				userID:        "user1",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.MFA.OTP.InvalidCode"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.MFA.OTP.InvalidCode"),
 		},
 		{
 			name: "push error",
@@ -646,12 +634,10 @@ func TestCommands_HumanCheckMFATOTPSetup(t *testing.T) {
 						),
 					),
 					expectPushFailed(io.ErrClosedPipe,
-						[]*repository.Event{eventFromEventPusher(
-							user.NewHumanOTPVerifiedEvent(ctx,
-								userAgg,
-								"agent1",
-							),
-						)},
+						user.NewHumanOTPVerifiedEvent(ctx,
+							userAgg,
+							"agent1",
+						),
 					),
 				),
 			},
@@ -672,12 +658,12 @@ func TestCommands_HumanCheckMFATOTPSetup(t *testing.T) {
 							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
 						),
 					),
-					expectPush([]*repository.Event{eventFromEventPusher(
+					expectPush(
 						user.NewHumanOTPVerifiedEvent(ctx,
 							userAgg,
 							"agent1",
 						),
-					)}),
+					),
 				),
 			},
 			args: args{
@@ -741,7 +727,7 @@ func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 				userID: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -758,7 +744,7 @@ func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -775,13 +761,9 @@ func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								user.NewHumanOTPRemovedEvent(context.Background(),
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanOTPRemovedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -849,7 +831,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-QSF2s", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-QSF2s", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -863,7 +845,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
+				err: zerrors.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
 			},
 		},
 		{
@@ -885,7 +867,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowAlreadyExists(nil, "COMMAND-Ad3g2", "Errors.User.MFA.OTP.AlreadyReady"),
+				err: zerrors.ThrowAlreadyExists(nil, "COMMAND-Ad3g2", "Errors.User.MFA.OTP.AlreadyReady"),
 			},
 		},
 		{
@@ -901,7 +883,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Q54j2", "Errors.User.MFA.OTP.NotReady"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Q54j2", "Errors.User.MFA.OTP.NotReady"),
 			},
 		},
 		{
@@ -934,7 +916,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Q54j2", "Errors.User.MFA.OTP.NotReady"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Q54j2", "Errors.User.MFA.OTP.NotReady"),
 			},
 		},
 		{
@@ -955,13 +937,9 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("inst1",
-								user.NewHumanOTPSMSAddedEvent(ctx,
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanOTPSMSAddedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -983,6 +961,133 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.AddHumanOTPSMS(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
+			assert.ErrorIs(t, err, tt.res.err)
+			assert.Equal(t, tt.res.want, got)
+		})
+	}
+}
+
+func TestCommandSide_AddHumanOTPSMSWithCheckSucceeded(t *testing.T) {
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
+	type fields struct {
+		eventstore func(*testing.T) *eventstore.Eventstore
+	}
+	type (
+		args struct {
+			ctx           context.Context
+			userID        string
+			resourceOwner string
+			authRequest   *domain.AuthRequest
+		}
+	)
+	type res struct {
+		want *domain.ObjectDetails
+		err  error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "successful add",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanPhoneChangedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"+4179654321",
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPhoneVerifiedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPSMSAddedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "successful add with auth request",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanPhoneChangedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"+4179654321",
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPhoneVerifiedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPSMSAddedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+						user.NewHumanOTPSMSCheckSucceededEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&user.AuthRequestInfo{
+								ID:          "authRequestID",
+								UserAgentID: "userAgentID",
+								BrowserInfo: &user.BrowserInfo{
+									UserAgent:      "user-agent",
+									AcceptLanguage: "en",
+									RemoteIP:       net.IP{192, 0, 2, 1},
+								},
+							},
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+				authRequest: &domain.AuthRequest{
+					ID:      "authRequestID",
+					AgentID: "userAgentID",
+					BrowserInfo: &domain.BrowserInfo{
+						UserAgent:      "user-agent",
+						AcceptLanguage: "en",
+						RemoteIP:       net.IP{192, 0, 2, 1},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			got, err := r.AddHumanOTPSMSWithCheckSucceeded(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authRequest)
 			assert.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})
@@ -1023,7 +1128,7 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-S3br2", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-S3br2", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -1040,7 +1145,7 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+				err: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 			},
 		},
 		{
@@ -1057,7 +1162,7 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowNotFound(nil, "COMMAND-Sr3h3", "Errors.User.MFA.OTP.NotExisting"),
+				err: zerrors.ThrowNotFound(nil, "COMMAND-Sr3h3", "Errors.User.MFA.OTP.NotExisting"),
 			},
 		},
 		{
@@ -1072,13 +1177,9 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("inst1",
-								user.NewHumanOTPSMSRemovedEvent(ctx,
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanOTPSMSRemovedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -1104,6 +1205,587 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 			got, err := r.RemoveHumanOTPSMS(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
+		})
+	}
+}
+
+func TestCommandSide_HumanSendOTPSMS(t *testing.T) {
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
+	defaultGenerators := &SecretGenerators{
+		OTPSMS: &crypto.GeneratorConfig{
+			Length:              8,
+			Expiry:              time.Hour,
+			IncludeLowerLetters: true,
+			IncludeUpperLetters: true,
+			IncludeDigits:       true,
+			IncludeSymbols:      true,
+		},
+	}
+	type fields struct {
+		eventstore              func(*testing.T) *eventstore.Eventstore
+		userEncryption          crypto.EncryptionAlgorithm
+		defaultSecretGenerators *SecretGenerators
+	}
+	type (
+		args struct {
+			ctx           context.Context
+			userID        string
+			resourceOwner string
+			authRequest   *domain.AuthRequest
+		}
+	)
+	type res struct {
+		want *domain.ObjectDetails
+		err  error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore:              expectEventstore(),
+				defaultSecretGenerators: defaultGenerators,
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-S3SF1", "Errors.User.UserIDMissing"),
+			},
+		},
+		{
+			name: "otp sms not added, not found error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+				defaultSecretGenerators: defaultGenerators,
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFD52", "Errors.User.MFA.OTP.NotReady"),
+			},
+		},
+		{
+			name: "successful add",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPSMSAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								domain.SecretGeneratorTypeOTPSMS,
+								8,
+								time.Hour,
+								true,
+								true,
+								true,
+								true,
+							)),
+					),
+					expectPush(
+						user.NewHumanOTPSMSCodeAddedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("12345678"),
+							},
+							time.Hour,
+							nil,
+						),
+					),
+				),
+				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
+				defaultSecretGenerators: defaultGenerators,
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "successful add (without secret config)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPSMSAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectFilter(),
+					expectPush(
+						user.NewHumanOTPSMSCodeAddedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("12345678"),
+							},
+							time.Hour,
+							nil,
+						),
+					),
+				),
+				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
+				defaultSecretGenerators: defaultGenerators,
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "successful add with auth request",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPSMSAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								domain.SecretGeneratorTypeOTPSMS,
+								8,
+								time.Hour,
+								true,
+								true,
+								true,
+								true,
+							)),
+					),
+					expectPush(
+						user.NewHumanOTPSMSCodeAddedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("12345678"),
+							},
+							time.Hour,
+							&user.AuthRequestInfo{
+								ID:          "authRequestID",
+								UserAgentID: "userAgentID",
+								BrowserInfo: &user.BrowserInfo{
+									UserAgent:      "user-agent",
+									AcceptLanguage: "en",
+									RemoteIP:       net.IP{192, 0, 2, 1},
+								},
+							},
+						),
+					),
+				),
+				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
+				defaultSecretGenerators: defaultGenerators,
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+				authRequest: &domain.AuthRequest{
+					ID:      "authRequestID",
+					AgentID: "userAgentID",
+					BrowserInfo: &domain.BrowserInfo{
+						UserAgent:      "user-agent",
+						AcceptLanguage: "en",
+						RemoteIP:       net.IP{192, 0, 2, 1},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:              tt.fields.eventstore(t),
+				userEncryption:          tt.fields.userEncryption,
+				defaultSecretGenerators: tt.fields.defaultSecretGenerators,
+			}
+			err := r.HumanSendOTPSMS(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authRequest)
+			assert.ErrorIs(t, err, tt.res.err)
+		})
+	}
+}
+
+func TestCommandSide_HumanOTPSMSCodeSent(t *testing.T) {
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
+	type fields struct {
+		eventstore func(*testing.T) *eventstore.Eventstore
+	}
+	type (
+		args struct {
+			ctx           context.Context
+			userID        string
+			resourceOwner string
+		}
+	)
+	type res struct {
+		want *domain.ObjectDetails
+		err  error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-AE2h2", "Errors.User.UserIDMissing"),
+			},
+		},
+		{
+			name: "otp sms not added, not found error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SD3gh", "Errors.User.MFA.OTP.NotReady"),
+			},
+		},
+		{
+			name: "successful add",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPSMSAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPSMSCodeSentEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			err := r.HumanOTPSMSCodeSent(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
+			assert.ErrorIs(t, err, tt.res.err)
+		})
+	}
+}
+
+func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
+	type fields struct {
+		eventstore     func(*testing.T) *eventstore.Eventstore
+		userEncryption crypto.EncryptionAlgorithm
+	}
+	type (
+		args struct {
+			ctx           context.Context
+			userID        string
+			code          string
+			resourceOwner string
+			authRequest   *domain.AuthRequest
+		}
+	)
+	type res struct {
+		want *domain.ObjectDetails
+		err  error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "",
+				code:          "",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-S453v", "Errors.User.UserIDMissing"),
+			},
+		},
+		{
+			name: "code missing, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-SJl2g", "Errors.User.Code.Empty"),
+			},
+		},
+		{
+			name: "otp sms not added, precondition failed error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "code",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-d2r52", "Errors.User.MFA.OTP.NotReady"),
+			},
+		},
+		{
+			name: "otp sms code not added, precondition failed error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPSMSAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "code",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-S34gh", "Errors.User.Code.NotFound"),
+			},
+		},
+		{
+			name: "invalid code, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPSMSAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPSMSCodeAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("other-code"),
+								},
+								time.Hour,
+								&user.AuthRequestInfo{
+									ID:          "authRequestID",
+									UserAgentID: "userAgentID",
+									BrowserInfo: &user.BrowserInfo{
+										UserAgent:      "user-agent",
+										AcceptLanguage: "en",
+										RemoteIP:       net.IP{192, 0, 2, 1},
+									},
+								},
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPSMSCheckFailedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&user.AuthRequestInfo{
+								ID:          "authRequestID",
+								UserAgentID: "userAgentID",
+								BrowserInfo: &user.BrowserInfo{
+									UserAgent:      "user-agent",
+									AcceptLanguage: "en",
+									RemoteIP:       net.IP{192, 0, 2, 1},
+								},
+							},
+						),
+					),
+				),
+				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "code",
+				resourceOwner: "org1",
+				authRequest: &domain.AuthRequest{
+					ID:      "authRequestID",
+					AgentID: "userAgentID",
+					BrowserInfo: &domain.BrowserInfo{
+						UserAgent:      "user-agent",
+						AcceptLanguage: "en",
+						RemoteIP:       net.IP{192, 0, 2, 1},
+					},
+				},
+			},
+			res: res{
+				err: zerrors.ThrowInvalidArgument(nil, "CODE-woT0xc", "Errors.User.Code.Invalid"),
+			},
+		},
+		{
+			name: "code ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPSMSAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPSMSCodeAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour,
+								&user.AuthRequestInfo{
+									ID:          "authRequestID",
+									UserAgentID: "userAgentID",
+									BrowserInfo: &user.BrowserInfo{
+										UserAgent:      "user-agent",
+										AcceptLanguage: "en",
+										RemoteIP:       net.IP{192, 0, 2, 1},
+									},
+								},
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPSMSCheckSucceededEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&user.AuthRequestInfo{
+								ID:          "authRequestID",
+								UserAgentID: "userAgentID",
+								BrowserInfo: &user.BrowserInfo{
+									UserAgent:      "user-agent",
+									AcceptLanguage: "en",
+									RemoteIP:       net.IP{192, 0, 2, 1},
+								},
+							},
+						),
+					),
+				),
+				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "code",
+				resourceOwner: "org1",
+				authRequest: &domain.AuthRequest{
+					ID:      "authRequestID",
+					AgentID: "userAgentID",
+					BrowserInfo: &domain.BrowserInfo{
+						UserAgent:      "user-agent",
+						AcceptLanguage: "en",
+						RemoteIP:       net.IP{192, 0, 2, 1},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:     tt.fields.eventstore(t),
+				userEncryption: tt.fields.userEncryption,
+			}
+			err := r.HumanCheckOTPSMS(tt.args.ctx, tt.args.userID, tt.args.code, tt.args.resourceOwner, tt.args.authRequest)
+			assert.ErrorIs(t, err, tt.res.err)
 		})
 	}
 }
@@ -1141,7 +1823,7 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-Sg1hz", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-Sg1hz", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -1163,7 +1845,7 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowAlreadyExists(nil, "COMMAND-MKL2s", "Errors.User.MFA.OTP.AlreadyReady"),
+				err: zerrors.ThrowAlreadyExists(nil, "COMMAND-MKL2s", "Errors.User.MFA.OTP.AlreadyReady"),
 			},
 		},
 		{
@@ -1179,7 +1861,7 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-KLJ2d", "Errors.User.MFA.OTP.NotReady"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-KLJ2d", "Errors.User.MFA.OTP.NotReady"),
 			},
 		},
 		{
@@ -1200,13 +1882,9 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("inst1",
-								user.NewHumanOTPEmailAddedEvent(ctx,
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanOTPEmailAddedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 			},
@@ -1228,6 +1906,133 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.AddHumanOTPEmail(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
+			assert.ErrorIs(t, err, tt.res.err)
+			assert.Equal(t, tt.res.want, got)
+		})
+	}
+}
+
+func TestCommandSide_AddHumanOTPEmailWithCheckSucceeded(t *testing.T) {
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
+	type fields struct {
+		eventstore func(*testing.T) *eventstore.Eventstore
+	}
+	type (
+		args struct {
+			ctx           context.Context
+			userID        string
+			resourceOwner string
+			authRequest   *domain.AuthRequest
+		}
+	)
+	type res struct {
+		want *domain.ObjectDetails
+		err  error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "successful add",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanEmailChangedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"email@test.ch",
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPEmailAddedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "successful add with auth request",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanEmailChangedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"email@test.ch",
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPEmailAddedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+						user.NewHumanOTPEmailCheckSucceededEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&user.AuthRequestInfo{
+								ID:          "authRequestID",
+								UserAgentID: "userAgentID",
+								BrowserInfo: &user.BrowserInfo{
+									UserAgent:      "user-agent",
+									AcceptLanguage: "en",
+									RemoteIP:       net.IP{192, 0, 2, 1},
+								},
+							},
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+				authRequest: &domain.AuthRequest{
+					ID:      "authRequestID",
+					AgentID: "userAgentID",
+					BrowserInfo: &domain.BrowserInfo{
+						UserAgent:      "user-agent",
+						AcceptLanguage: "en",
+						RemoteIP:       net.IP{192, 0, 2, 1},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			got, err := r.AddHumanOTPEmailWithCheckSucceeded(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authRequest)
 			assert.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})
@@ -1268,7 +2073,7 @@ func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "COMMAND-S2h11", "Errors.User.UserIDMissing"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-S2h11", "Errors.User.UserIDMissing"),
 			},
 		},
 		{
@@ -1285,7 +2090,7 @@ func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+				err: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 			},
 		},
 		{
@@ -1302,7 +2107,7 @@ func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.ThrowNotFound(nil, "COMMAND-b312D", "Errors.User.MFA.OTP.NotExisting"),
+				err: zerrors.ThrowNotFound(nil, "COMMAND-b312D", "Errors.User.MFA.OTP.NotExisting"),
 			},
 		},
 		{
@@ -1317,13 +2122,9 @@ func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusherWithInstanceID("inst1",
-								user.NewHumanOTPEmailRemovedEvent(ctx,
-									&user.NewAggregate("user1", "org1").Aggregate,
-								),
-							),
-						},
+						user.NewHumanOTPEmailRemovedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -1349,6 +2150,587 @@ func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
 			got, err := r.RemoveHumanOTPEmail(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
+		})
+	}
+}
+
+func TestCommandSide_HumanSendOTPEmail(t *testing.T) {
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
+	defaultGenerators := &SecretGenerators{
+		OTPEmail: &crypto.GeneratorConfig{
+			Length:              8,
+			Expiry:              time.Hour,
+			IncludeLowerLetters: true,
+			IncludeUpperLetters: true,
+			IncludeDigits:       true,
+			IncludeSymbols:      true,
+		},
+	}
+	type fields struct {
+		eventstore              func(*testing.T) *eventstore.Eventstore
+		userEncryption          crypto.EncryptionAlgorithm
+		defaultSecretGenerators *SecretGenerators
+	}
+	type (
+		args struct {
+			ctx           context.Context
+			userID        string
+			resourceOwner string
+			authRequest   *domain.AuthRequest
+		}
+	)
+	type res struct {
+		want *domain.ObjectDetails
+		err  error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore:              expectEventstore(),
+				defaultSecretGenerators: defaultGenerators,
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-S3SF1", "Errors.User.UserIDMissing"),
+			},
+		},
+		{
+			name: "otp email not added, not found error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+				defaultSecretGenerators: defaultGenerators,
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFD52", "Errors.User.MFA.OTP.NotReady"),
+			},
+		},
+		{
+			name: "successful add",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPEmailAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								domain.SecretGeneratorTypeOTPEmail,
+								8,
+								time.Hour,
+								true,
+								true,
+								true,
+								true,
+							)),
+					),
+					expectPush(
+						user.NewHumanOTPEmailCodeAddedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("12345678"),
+							},
+							time.Hour,
+							nil,
+						),
+					),
+				),
+				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
+				defaultSecretGenerators: defaultGenerators,
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "successful add (without secret config)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPEmailAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectFilter(),
+					expectPush(
+						user.NewHumanOTPEmailCodeAddedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("12345678"),
+							},
+							time.Hour,
+							nil,
+						),
+					),
+				),
+				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
+				defaultSecretGenerators: defaultGenerators,
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "successful add with auth request",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPEmailAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(context.Background(),
+								&instance.NewAggregate("instanceID").Aggregate,
+								domain.SecretGeneratorTypeOTPEmail,
+								8,
+								time.Hour,
+								true,
+								true,
+								true,
+								true,
+							)),
+					),
+					expectPush(
+						user.NewHumanOTPEmailCodeAddedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("12345678"),
+							},
+							time.Hour,
+							&user.AuthRequestInfo{
+								ID:          "authRequestID",
+								UserAgentID: "userAgentID",
+								BrowserInfo: &user.BrowserInfo{
+									UserAgent:      "user-agent",
+									AcceptLanguage: "en",
+									RemoteIP:       net.IP{192, 0, 2, 1},
+								},
+							},
+						),
+					),
+				),
+				userEncryption:          crypto.CreateMockEncryptionAlgWithCode(gomock.NewController(t), "12345678"),
+				defaultSecretGenerators: defaultGenerators,
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+				authRequest: &domain.AuthRequest{
+					ID:      "authRequestID",
+					AgentID: "userAgentID",
+					BrowserInfo: &domain.BrowserInfo{
+						UserAgent:      "user-agent",
+						AcceptLanguage: "en",
+						RemoteIP:       net.IP{192, 0, 2, 1},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:              tt.fields.eventstore(t),
+				userEncryption:          tt.fields.userEncryption,
+				defaultSecretGenerators: tt.fields.defaultSecretGenerators,
+			}
+			err := r.HumanSendOTPEmail(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authRequest)
+			assert.ErrorIs(t, err, tt.res.err)
+		})
+	}
+}
+
+func TestCommandSide_HumanOTPEmailCodeSent(t *testing.T) {
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
+	type fields struct {
+		eventstore func(*testing.T) *eventstore.Eventstore
+	}
+	type (
+		args struct {
+			ctx           context.Context
+			userID        string
+			resourceOwner string
+		}
+	)
+	type res struct {
+		want *domain.ObjectDetails
+		err  error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-AE2h2", "Errors.User.UserIDMissing"),
+			},
+		},
+		{
+			name: "otp email not added, not found error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SD3gh", "Errors.User.MFA.OTP.NotReady"),
+			},
+		},
+		{
+			name: "successful add",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPEmailAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPEmailCodeSentEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			err := r.HumanOTPEmailCodeSent(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
+			assert.ErrorIs(t, err, tt.res.err)
+		})
+	}
+}
+
+func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
+	ctx := authz.NewMockContext("inst1", "org1", "user1")
+	type fields struct {
+		eventstore     func(*testing.T) *eventstore.Eventstore
+		userEncryption crypto.EncryptionAlgorithm
+	}
+	type (
+		args struct {
+			ctx           context.Context
+			userID        string
+			code          string
+			resourceOwner string
+			authRequest   *domain.AuthRequest
+		}
+	)
+	type res struct {
+		want *domain.ObjectDetails
+		err  error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "userid missing, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "",
+				code:          "",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-S453v", "Errors.User.UserIDMissing"),
+			},
+		},
+		{
+			name: "code missing, invalid argument error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-SJl2g", "Errors.User.Code.Empty"),
+			},
+		},
+		{
+			name: "otp email not added, precondition failed error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "code",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-d2r52", "Errors.User.MFA.OTP.NotReady"),
+			},
+		},
+		{
+			name: "otp email code not added, precondition failed error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPEmailAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "code",
+				resourceOwner: "org1",
+			},
+			res: res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-S34gh", "Errors.User.Code.NotFound"),
+			},
+		},
+		{
+			name: "invalid code, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPEmailAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPEmailCodeAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("other-code"),
+								},
+								time.Hour,
+								&user.AuthRequestInfo{
+									ID:          "authRequestID",
+									UserAgentID: "userAgentID",
+									BrowserInfo: &user.BrowserInfo{
+										UserAgent:      "user-agent",
+										AcceptLanguage: "en",
+										RemoteIP:       net.IP{192, 0, 2, 1},
+									},
+								},
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPEmailCheckFailedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&user.AuthRequestInfo{
+								ID:          "authRequestID",
+								UserAgentID: "userAgentID",
+								BrowserInfo: &user.BrowserInfo{
+									UserAgent:      "user-agent",
+									AcceptLanguage: "en",
+									RemoteIP:       net.IP{192, 0, 2, 1},
+								},
+							},
+						),
+					),
+				),
+				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "code",
+				resourceOwner: "org1",
+				authRequest: &domain.AuthRequest{
+					ID:      "authRequestID",
+					AgentID: "userAgentID",
+					BrowserInfo: &domain.BrowserInfo{
+						UserAgent:      "user-agent",
+						AcceptLanguage: "en",
+						RemoteIP:       net.IP{192, 0, 2, 1},
+					},
+				},
+			},
+			res: res{
+				err: zerrors.ThrowInvalidArgument(nil, "CODE-woT0xc", "Errors.User.Code.Invalid"),
+			},
+		},
+		{
+			name: "code ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPEmailAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPEmailCodeAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour,
+								&user.AuthRequestInfo{
+									ID:          "authRequestID",
+									UserAgentID: "userAgentID",
+									BrowserInfo: &user.BrowserInfo{
+										UserAgent:      "user-agent",
+										AcceptLanguage: "en",
+										RemoteIP:       net.IP{192, 0, 2, 1},
+									},
+								},
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPEmailCheckSucceededEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&user.AuthRequestInfo{
+								ID:          "authRequestID",
+								UserAgentID: "userAgentID",
+								BrowserInfo: &user.BrowserInfo{
+									UserAgent:      "user-agent",
+									AcceptLanguage: "en",
+									RemoteIP:       net.IP{192, 0, 2, 1},
+								},
+							},
+						),
+					),
+				),
+				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "code",
+				resourceOwner: "org1",
+				authRequest: &domain.AuthRequest{
+					ID:      "authRequestID",
+					AgentID: "userAgentID",
+					BrowserInfo: &domain.BrowserInfo{
+						UserAgent:      "user-agent",
+						AcceptLanguage: "en",
+						RemoteIP:       net.IP{192, 0, 2, 1},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:     tt.fields.eventstore(t),
+				userEncryption: tt.fields.userEncryption,
+			}
+			err := r.HumanCheckOTPEmail(tt.args.ctx, tt.args.userID, tt.args.code, tt.args.resourceOwner, tt.args.authRequest)
+			assert.ErrorIs(t, err, tt.res.err)
 		})
 	}
 }

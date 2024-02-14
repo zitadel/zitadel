@@ -19,7 +19,12 @@
 
 <div class="max-width-container">
   <cnsl-meta-layout>
-    <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList" queryParam="id">
+    <cnsl-sidenav
+      [(ngModel)]="currentSetting"
+      [settingsList]="settingsList"
+      queryParam="id"
+      (ngModelChange)="settingChanged()"
+    >
       <ng-container *ngIf="currentSetting === 'general'">
         <cnsl-card
           *ngIf="user && user.human && user.human.profile"
@@ -30,7 +35,7 @@
             [showEditImage]="true"
             [preferredLoginName]="user.preferredLoginName"
             [genders]="genders"
-            [languages]="languages"
+            [languages]="(langSvc.supported$ | async) || []"
             [username]="user.userName"
             [user]="user.human"
             [disabled]="false"
@@ -115,7 +120,11 @@
 
         <cnsl-auth-passwordless *ngIf="user" #mfaComponent></cnsl-auth-passwordless>
 
-        <cnsl-auth-user-mfa *ngIf="user" #mfaComponent></cnsl-auth-user-mfa>
+        <cnsl-auth-user-mfa
+          [phoneVerified]="user.human?.phone?.isPhoneVerified ?? false"
+          *ngIf="user"
+          #mfaComponent
+        ></cnsl-auth-user-mfa>
       </ng-container>
 
       <ng-container *ngIf="currentSetting === 'grants'">

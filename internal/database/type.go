@@ -3,26 +3,24 @@ package database
 import (
 	"database/sql/driver"
 	"encoding/json"
+	"time"
 
 	"github.com/jackc/pgtype"
 )
 
-type StringArray []string
+type TextArray[t ~string] []t
 
 // Scan implements the [database/sql.Scanner] interface.
-func (s *StringArray) Scan(src any) error {
+func (s *TextArray[t]) Scan(src any) error {
 	array := new(pgtype.TextArray)
 	if err := array.Scan(src); err != nil {
 		return err
 	}
-	if err := array.AssignTo(s); err != nil {
-		return err
-	}
-	return nil
+	return array.AssignTo(s)
 }
 
 // Value implements the [database/sql/driver.Valuer] interface.
-func (s StringArray) Value() (driver.Value, error) {
+func (s TextArray[t]) Value() (driver.Value, error) {
 	if len(s) == 0 {
 		return nil, nil
 	}
@@ -35,37 +33,37 @@ func (s StringArray) Value() (driver.Value, error) {
 	return array.Value()
 }
 
-type enumField interface {
+type arrayField interface {
 	~int8 | ~uint8 | ~int16 | ~uint16 | ~int32 | ~uint32
 }
 
-type EnumArray[F enumField] []F
+type Array[F arrayField] []F
 
 // Scan implements the [database/sql.Scanner] interface.
-func (s *EnumArray[F]) Scan(src any) error {
-	array := new(pgtype.Int2Array)
+func (a *Array[F]) Scan(src any) error {
+	array := new(pgtype.Int8Array)
 	if err := array.Scan(src); err != nil {
 		return err
 	}
-	ints := make([]int32, 0, len(array.Elements))
-	if err := array.AssignTo(&ints); err != nil {
+	elements := make([]int64, len(array.Elements))
+	if err := array.AssignTo(&elements); err != nil {
 		return err
 	}
-	*s = make([]F, len(ints))
-	for i, a := range ints {
-		(*s)[i] = F(a)
+	*a = make([]F, len(elements))
+	for i, element := range elements {
+		(*a)[i] = F(element)
 	}
 	return nil
 }
 
 // Value implements the [database/sql/driver.Valuer] interface.
-func (s EnumArray[F]) Value() (driver.Value, error) {
-	if len(s) == 0 {
+func (a Array[F]) Value() (driver.Value, error) {
+	if len(a) == 0 {
 		return nil, nil
 	}
 
-	array := pgtype.Int2Array{}
-	if err := array.Set(s); err != nil {
+	array := pgtype.Int8Array{}
+	if err := array.Set(a); err != nil {
 		return nil, err
 	}
 
@@ -92,4 +90,38 @@ func (m Map[V]) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return json.Marshal(m)
+}
+
+type Duration time.Duration
+
+// Scan implements the [database/sql.Scanner] interface.
+func (d *Duration) Scan(src any) error {
+	interval := new(pgtype.Interval)
+	if err := interval.Scan(src); err != nil {
+		return err
+	}
+	*d = Duration(time.Duration(interval.Microseconds*1000) + time.Duration(interval.Days)*24*time.Hour + time.Duration(interval.Months)*30*24*time.Hour)
+	return nil
+}
+
+// NullDuration can be used for NULL intervals.
+// If Valid is false, the scanned value was NULL
+// This behavior is similar to [database/sql.NullString]
+type NullDuration struct {
+	Valid    bool
+	Duration time.Duration
+}
+
+// Scan implements the [database/sql.Scanner] interface.
+func (d *NullDuration) Scan(src any) error {
+	if src == nil {
+		d.Duration, d.Valid = 0, false
+		return nil
+	}
+	duration := new(Duration)
+	if err := duration.Scan(src); err != nil {
+		return err
+	}
+	d.Duration, d.Valid = time.Duration(*duration), true
+	return nil
 }

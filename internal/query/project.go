@@ -3,17 +3,20 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -69,10 +72,6 @@ var (
 		name:  projection.ProjectColumnState,
 		table: projectsTable,
 	}
-	ProjectColumnOwnerRemoved = Column{
-		name:  projection.ProjectColumnOwnerRemoved,
-		table: projectsTable,
-	}
 )
 
 type Projects struct {
@@ -100,12 +99,15 @@ type ProjectSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id string, withOwnerRemoved bool) (_ *Project, err error) {
+func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id string) (project *Project, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if shouldTriggerBulk {
-		ctx = projection.ProjectProjection.Trigger(ctx)
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerProjectProjection")
+		ctx, err = projection.ProjectProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
 	}
 
 	stmt, scan := prepareProjectQuery(ctx, q.client)
@@ -113,41 +115,37 @@ func (q *Queries) ProjectByID(ctx context.Context, shouldTriggerBulk bool, id st
 		ProjectColumnID.identifier():         id,
 		ProjectColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	if !withOwnerRemoved {
-		eq[ProjectColumnOwnerRemoved.identifier()] = false
-	}
 	query, args, err := stmt.Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-2m00Q", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-2m00Q", "Errors.Query.SQLStatment")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		project, err = scan(row)
+		return err
+	}, query, args...)
+	return project, err
 }
 
-func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQueries, withOwnerRemoved bool) (projects *Projects, err error) {
+func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQueries) (projects *Projects, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareProjectsQuery(ctx, q.client)
 	eq := sq.Eq{ProjectColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
-	if !withOwnerRemoved {
-		eq[ProjectColumnOwnerRemoved.identifier()] = false
-	}
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-fn9ew", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-fn9ew", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		projects, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-2j00f", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-2j00f", "Errors.Internal")
 	}
-	projects, err = scan(rows)
-	if err != nil {
-		return nil, err
-	}
-	projects.LatestSequence, err = q.latestSequence(ctx, projectsTable)
+	projects.State, err = q.latestState(ctx, projectsTable)
 	return projects, err
 }
 
@@ -227,10 +225,10 @@ func prepareProjectQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				&p.PrivateLabelingSetting,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-fk2fs", "Errors.Project.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-fk2fs", "Errors.Project.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-dj2FF", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-dj2FF", "Errors.Internal")
 			}
 			return p, nil
 		}
@@ -278,7 +276,7 @@ func prepareProjectsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBui
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-QMXJv", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-QMXJv", "Errors.Query.CloseRows")
 			}
 
 			return &Projects{

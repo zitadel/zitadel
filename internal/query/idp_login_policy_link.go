@@ -9,9 +9,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type IDPLoginPolicyLink struct {
@@ -103,17 +103,17 @@ func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string,
 
 	stmt, args, err := queries.toQuery(query).Where(eq).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-FDbKW", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-FDbKW", "Errors.Query.InvalidRequest")
 	}
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil || rows.Err() != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-ZkKUc", "Errors.Internal")
-	}
-	idps, err = scan(rows)
+
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		idps, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
-		return nil, err
+		return nil, zerrors.ThrowInternal(err, "QUERY-ZkKUc", "Errors.Internal")
 	}
-	idps.LatestSequence, err = q.latestSequence(ctx, idpLoginPolicyLinkTable)
+	idps.State, err = q.latestState(ctx, idpLoginPolicyLinkTable)
 	return idps, err
 }
 
@@ -168,7 +168,7 @@ func prepareIDPLoginPolicyLinksQuery(ctx context.Context, db prepareDatabase, re
 			}
 
 			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-vOLFG", "Errors.Query.CloseRows")
+				return nil, zerrors.ThrowInternal(err, "QUERY-vOLFG", "Errors.Query.CloseRows")
 			}
 
 			return &IDPLoginPolicyLinks{

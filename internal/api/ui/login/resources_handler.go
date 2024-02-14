@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/assets"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/i18n"
 )
 
 type dynamicResourceData struct {
@@ -15,8 +16,8 @@ type dynamicResourceData struct {
 	FileName      string `schema:"filename"`
 }
 
-func (l *Login) handleResources(staticDir http.FileSystem) http.Handler {
-	return http.FileServer(staticDir)
+func (l *Login) handleResources() http.Handler {
+	return http.FileServer(i18n.LoadFilesystem(i18n.LOGIN))
 }
 
 func (l *Login) handleDynamicResources(w http.ResponseWriter, r *http.Request) {

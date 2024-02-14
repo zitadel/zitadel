@@ -19,16 +19,16 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type API struct {
 	port              uint16
 	grpcServer        *grpc.Server
-	verifier          *internal_authz.TokenVerifier
+	verifier          internal_authz.APITokenVerifier
 	health            healthCheck
 	router            *mux.Router
 	http1HostName     string
@@ -47,7 +47,7 @@ func New(
 	port uint16,
 	router *mux.Router,
 	queries *query.Queries,
-	verifier *internal_authz.TokenVerifier,
+	verifier internal_authz.APITokenVerifier,
 	authZ internal_authz.Config,
 	tlsConfig *tls.Config, http2HostName, http1HostName string,
 	accessInterceptor *http_mw.AccessInterceptor,
@@ -63,7 +63,7 @@ func New(
 	}
 
 	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig, accessInterceptor.AccessService())
-	api.grpcGateway, err = server.CreateGateway(ctx, port, http1HostName, accessInterceptor)
+	api.grpcGateway, err = server.CreateGateway(ctx, port, http1HostName, accessInterceptor, tlsConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func New(
 // creates a new grpc gateway and registers it as a separate http handler
 //
 // used for v1 api (system, admin, mgmt, auth)
-func (a *API) RegisterServer(ctx context.Context, grpcServer server.WithGatewayPrefix) error {
+func (a *API) RegisterServer(ctx context.Context, grpcServer server.WithGatewayPrefix, tlsConfig *tls.Config) error {
 	grpcServer.RegisterServer(a.grpcServer)
 	handler, prefix, err := server.CreateGatewayWithPrefix(
 		ctx,
@@ -89,6 +89,7 @@ func (a *API) RegisterServer(ctx context.Context, grpcServer server.WithGatewayP
 		a.http1HostName,
 		a.accessInterceptor,
 		a.queries,
+		tlsConfig,
 	)
 	if err != nil {
 		return err
@@ -195,7 +196,7 @@ func (a *API) healthHandler() http.Handler {
 	checks := []ValidationFunction{
 		func(ctx context.Context) error {
 			if err := a.health.Health(ctx); err != nil {
-				return errors.ThrowInternal(err, "API-F24h2", "DB CONNECTION ERROR")
+				return zerrors.ThrowInternal(err, "API-F24h2", "DB CONNECTION ERROR")
 			}
 			return nil
 		},

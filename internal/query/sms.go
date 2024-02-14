@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -12,9 +12,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type SMSConfigs struct {
@@ -115,7 +115,7 @@ var (
 	}
 )
 
-func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (_ *SMSConfig, err error) {
+func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (config *SMSConfig, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -127,14 +127,17 @@ func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (_ *SMSC
 		},
 	).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		config, err = scan(row)
+		return err
+	}, stmt, args...)
+	return config, err
 }
 
-func (q *Queries) SMSProviderConfig(ctx context.Context, queries ...SearchQuery) (_ *SMSConfig, err error) {
+func (q *Queries) SMSProviderConfig(ctx context.Context, queries ...SearchQuery) (config *SMSConfig, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -148,14 +151,17 @@ func (q *Queries) SMSProviderConfig(ctx context.Context, queries ...SearchQuery)
 		},
 	).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-dn9JW", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		config, err = scan(row)
+		return err
+	}, stmt, args...)
+	return config, err
 }
 
-func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearchQueries) (_ *SMSConfigs, err error) {
+func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearchQueries) (configs *SMSConfigs, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -165,19 +171,18 @@ func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearc
 			SMSConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-sn9Jf", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-sn9Jf", "Errors.Query.InvalidRequest")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
+		configs, err = scan(rows)
+		return err
+	}, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
 	}
-	apps, err := scan(rows)
-	if err != nil {
-		return nil, err
-	}
-	apps.LatestSequence, err = q.latestSequence(ctx, smsConfigsTable)
-	return apps, err
+	configs.State, err = q.latestState(ctx, smsConfigsTable)
+	return configs, err
 }
 
 func NewSMSProviderStateQuery(state domain.SMSConfigState) (SearchQuery, error) {
@@ -223,10 +228,10 @@ func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			)
 
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-fn99w", "Errors.SMSConfig.NotExisting")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-fn99w", "Errors.SMSConfig.NotExisting")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-3n9Js", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-3n9Js", "Errors.Internal")
 			}
 
 			twilioConfig.set(config)
@@ -278,7 +283,7 @@ func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				)
 
 				if err != nil {
-					return nil, errors.ThrowInternal(err, "QUERY-d9jJd", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(err, "QUERY-d9jJd", "Errors.Internal")
 				}
 
 				twilioConfig.set(config)

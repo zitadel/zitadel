@@ -6,8 +6,11 @@
   [settingsList]="settingsList"
   queryParam="id"
 >
-  <ng-container *ngIf="currentSetting === 'general' && serviceType === PolicyComponentServiceType.ADMIN">
-    <cnsl-general-settings></cnsl-general-settings>
+  <ng-container *ngIf="currentSetting === 'organizations'">
+    <h2>{{ 'ORG.PAGES.LIST' | translate }}</h2>
+    <p class="org-desc cnsl-secondary-text">{{ 'ORG.PAGES.LISTDESCRIPTION' | translate }}</p>
+
+    <cnsl-org-table></cnsl-org-table>
   </ng-container>
   <ng-container *ngIf="currentSetting === 'complexity'">
     <cnsl-password-complexity-policy [serviceType]="serviceType"></cnsl-password-complexity-policy>
@@ -18,25 +21,27 @@
   <ng-container *ngIf="currentSetting === 'login'">
     <cnsl-login-policy [serviceType]="serviceType"></cnsl-login-policy>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'domain'">
+  <ng-container *ngIf="currentSetting === 'verified_domains'">
+    <cnsl-domains></cnsl-domains>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'domain' && (['iam.policy.write'] | hasRole | async) === true">
     <cnsl-domain-policy [serviceType]="serviceType"></cnsl-domain-policy>
   </ng-container>
   <ng-container *ngIf="currentSetting === 'idp'">
     <cnsl-idp-settings [serviceType]="serviceType"></cnsl-idp-settings>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'notifications' && serviceType === PolicyComponentServiceType.ADMIN">
+  <ng-container *ngIf="currentSetting === 'notifications'">
     <cnsl-notification-policy [serviceType]="serviceType"></cnsl-notification-policy>
-    <cnsl-notification-settings [serviceType]="serviceType"></cnsl-notification-settings>
   </ng-container>
-
-  <ng-container *ngIf="currentSetting === 'notifications' && serviceType === PolicyComponentServiceType.MGMT">
-    <cnsl-notification-policy [serviceType]="serviceType"></cnsl-notification-policy
-  ></ng-container>
-
+  <ng-container *ngIf="currentSetting === 'smtpprovider' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-notification-smtp-provider [serviceType]="serviceType"></cnsl-notification-smtp-provider>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'smsprovider' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-notification-sms-provider [serviceType]="serviceType"></cnsl-notification-sms-provider>
+  </ng-container>
   <ng-container *ngIf="currentSetting === 'oidc' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-oidc-configuration></cnsl-oidc-configuration>
   </ng-container>
-
   <ng-container *ngIf="currentSetting === 'secrets' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-secret-generator></cnsl-secret-generator>
   </ng-container>
@@ -54,5 +59,17 @@
   </ng-container>
   <ng-container *ngIf="currentSetting === 'privacypolicy'">
     <cnsl-privacy-policy [serviceType]="serviceType"></cnsl-privacy-policy>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'languages' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-language-settings></cnsl-language-settings>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'views' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-iam-views></cnsl-iam-views>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'events' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-events></cnsl-events>
+  </ng-container>
+  <ng-container *ngIf="currentSetting === 'failedevents' && serviceType === PolicyComponentServiceType.ADMIN">
+    <cnsl-iam-failed-events></cnsl-iam-failed-events>
   </ng-container>
 </cnsl-sidenav>

@@ -2,6 +2,7 @@ import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import localeBg from '@angular/common/locales/bg';
 import localeDe from '@angular/common/locales/de';
+import localeCs from '@angular/common/locales/cs';
 import localeEn from '@angular/common/locales/en';
 import localeEs from '@angular/common/locales/es';
 import localeFr from '@angular/common/locales/fr';
@@ -11,13 +12,15 @@ import localeMk from '@angular/common/locales/mk';
 import localePl from '@angular/common/locales/pl';
 import localePt from '@angular/common/locales/pt';
 import localeZh from '@angular/common/locales/zh';
+import localeRu from '@angular/common/locales/ru';
+import localeNl from '@angular/common/locales/nl';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyDialogModule as MatDialogModule } from '@angular/material/legacy-dialog';
-import { MatLegacySelectModule as MatSelectModule } from '@angular/material/legacy-select';
-import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/legacy-snack-bar';
-import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServiceWorkerModule } from '@angular/service-worker';
@@ -66,6 +69,7 @@ import { StatehandlerService, StatehandlerServiceImpl } from './services/stateha
 import { StorageService } from './services/storage.service';
 import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
+import { LanguagesService } from './services/languages.service';
 
 registerLocaleData(localeDe);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/de.json'));
@@ -89,6 +93,12 @@ registerLocaleData(localePt);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/pt.json'));
 registerLocaleData(localeMk);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/mk.json'));
+registerLocaleData(localeRu);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/ru.json'));
+registerLocaleData(localeCs);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/cs.json'));
+registerLocaleData(localeNl);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/nl.json'));
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {
@@ -219,6 +229,7 @@ const authConfig: AuthConfig = {
     AssetService,
     ToastService,
     NavigationService,
+    LanguagesService,
     { provide: 'windowObject', useValue: window },
   ],
   bootstrap: [AppComponent],

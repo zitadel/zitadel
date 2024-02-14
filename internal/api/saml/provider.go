@@ -38,8 +38,8 @@ func NewProvider(
 	es *eventstore.Eventstore,
 	projections *database.DB,
 	instanceHandler,
-	userAgentCookie,
-	accessHandler func(http.Handler) http.Handler,
+	userAgentCookie func(http.Handler) http.Handler,
+	accessHandler *middleware.AccessInterceptor,
 ) (*provider.Provider, error) {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 
@@ -63,8 +63,9 @@ func NewProvider(
 			middleware.NoCacheInterceptor().Handler,
 			instanceHandler,
 			userAgentCookie,
-			accessHandler,
+			accessHandler.HandleWithPublicAuthPathPrefixes(publicAuthPathPrefixes(conf.ProviderConfig)),
 			http_utils.CopyHeadersToContext,
+			middleware.ActivityHandler,
 		),
 		provider.WithCustomTimeFormat("2006-01-02T15:04:05.999Z"),
 	}
@@ -99,4 +100,23 @@ func newStorage(
 		query:           query,
 		defaultLoginURL: fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
 	}, nil
+}
+
+func publicAuthPathPrefixes(config *provider.Config) []string {
+	metadataEndpoint := HandlerPrefix + provider.DefaultMetadataEndpoint
+	certificateEndpoint := HandlerPrefix + provider.DefaultCertificateEndpoint
+	ssoEndpoint := HandlerPrefix + provider.DefaultSingleSignOnEndpoint
+	if config.MetadataConfig != nil && config.MetadataConfig.Path != "" {
+		metadataEndpoint = HandlerPrefix + config.MetadataConfig.Path
+	}
+	if config.IDPConfig == nil || config.IDPConfig.Endpoints == nil {
+		return []string{metadataEndpoint, certificateEndpoint, ssoEndpoint}
+	}
+	if config.IDPConfig.Endpoints.Certificate != nil && config.IDPConfig.Endpoints.Certificate.Relative() != "" {
+		certificateEndpoint = HandlerPrefix + config.IDPConfig.Endpoints.Certificate.Relative()
+	}
+	if config.IDPConfig.Endpoints.SingleSignOn != nil && config.IDPConfig.Endpoints.SingleSignOn.Relative() != "" {
+		ssoEndpoint = HandlerPrefix + config.IDPConfig.Endpoints.SingleSignOn.Relative()
+	}
+	return []string{metadataEndpoint, certificateEndpoint, ssoEndpoint}
 }

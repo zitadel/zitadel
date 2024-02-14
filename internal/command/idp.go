@@ -6,8 +6,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/repository/idp"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type GenericOAuthProvider struct {
@@ -110,6 +110,25 @@ type LDAPProvider struct {
 	IDPOptions        idp.Options
 }
 
+type SAMLProvider struct {
+	Name              string
+	Metadata          []byte
+	MetadataURL       string
+	Binding           string
+	WithSignedRequest bool
+	IDPOptions        idp.Options
+}
+
+type AppleProvider struct {
+	Name       string
+	ClientID   string
+	TeamID     string
+	KeyID      string
+	PrivateKey []byte
+	Scopes     []string
+	IDPOptions idp.Options
+}
+
 func ExistsIDP(ctx context.Context, filter preparation.FilterToQueryReducer, id, orgID string) (exists bool, err error) {
 	writeModel := NewOrgIDPRemoveWriteModel(orgID, id)
 	events, err := filter(ctx, writeModel.Query())
@@ -148,7 +167,7 @@ func IDPProviderWriteModel(ctx context.Context, filter preparation.FilterToQuery
 		return nil, err
 	}
 	if len(events) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "COMMAND-as02jin", "Errors.IDPConfig.NotExisting")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-as02jin", "Errors.IDPConfig.NotExisting")
 	}
 	writeModel.AppendEvents(events...)
 	if err := writeModel.Reduce(); err != nil {

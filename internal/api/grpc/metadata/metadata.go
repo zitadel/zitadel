@@ -2,8 +2,8 @@ package metadata
 
 import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	meta_pb "github.com/zitadel/zitadel/pkg/grpc/metadata"
 )
 
@@ -65,7 +65,7 @@ func MetadataQueryToQuery(query *meta_pb.MetadataQuery) (query.SearchQuery, erro
 	case *meta_pb.MetadataQuery_KeyQuery:
 		return MetadataKeyQueryToQuery(q.KeyQuery)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "METAD-fdg23", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "METAD-fdg23", "List.Query.Invalid")
 	}
 }
 

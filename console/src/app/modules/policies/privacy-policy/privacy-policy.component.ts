@@ -1,6 +1,6 @@
 import { Component, Injector, Input, OnDestroy, OnInit, Type } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import {
@@ -42,8 +42,8 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
     this.serviceType === PolicyComponentServiceType.ADMIN
       ? 'iam.policy.write'
       : this.serviceType === PolicyComponentServiceType.MGMT
-      ? 'policy.write'
-      : '',
+        ? 'policy.write'
+        : '',
   ]);
 
   public LANGPLACEHOLDER: string = '{{.Lang}}';

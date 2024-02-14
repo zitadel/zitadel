@@ -2,13 +2,14 @@ import { MediaMatcher } from '@angular/cdk/layout';
 import { Location } from '@angular/common';
 import { Component, EventEmitter, OnDestroy } from '@angular/core';
 import { Validators } from '@angular/forms';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
-import { Subscription, take } from 'rxjs';
+import { from, Observable, Subscription, take } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { phoneValidator, requiredValidator } from 'src/app/modules/form-field/validators/validators';
+import { InfoDialogComponent } from 'src/app/modules/info-dialog/info-dialog.component';
 import { MetadataDialogComponent } from 'src/app/modules/metadata/metadata-dialog/metadata-dialog.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
@@ -23,8 +24,8 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { formatPhone } from 'src/app/utils/formatPhone';
-import { supportedLanguages } from 'src/app/utils/language';
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
+import { LanguagesService } from '../../../../services/languages.service';
 
 @Component({
   selector: 'cnsl-auth-user-detail',
@@ -34,7 +35,6 @@ import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.c
 export class AuthUserDetailComponent implements OnDestroy {
   public user?: User.AsObject;
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages: string[] = supportedLanguages;
 
   private subscription: Subscription = new Subscription();
 
@@ -64,6 +64,7 @@ export class AuthUserDetailComponent implements OnDestroy {
   ];
   public currentSetting: string | undefined = this.settingsList[0].id;
   public loginPolicy?: LoginPolicy.AsObject;
+  private savedLanguage?: string;
 
   constructor(
     public translate: TranslateService,
@@ -76,10 +77,12 @@ export class AuthUserDetailComponent implements OnDestroy {
     private mediaMatcher: MediaMatcher,
     private _location: Location,
     activatedRoute: ActivatedRoute,
+    public langSvc: LanguagesService,
   ) {
     activatedRoute.queryParams.pipe(take(1)).subscribe((params: Params) => {
       const { id } = params;
       if (id) {
+        this.cleanupTranslation();
         this.currentSetting = id;
       }
     });
@@ -96,10 +99,6 @@ export class AuthUserDetailComponent implements OnDestroy {
     this.loading = true;
     this.refreshUser();
 
-    this.userService.getSupportedLanguages().then((lang) => {
-      this.languages = lang.languagesList;
-    });
-
     this.userService.getMyLoginPolicy().then((policy) => {
       if (policy.policy) {
         this.loginPolicy = policy.policy;
@@ -108,6 +107,7 @@ export class AuthUserDetailComponent implements OnDestroy {
   }
 
   private changeSelection(small: boolean): void {
+    this.cleanupTranslation();
     if (small) {
       this.currentSetting = undefined;
     } else {
@@ -137,6 +137,7 @@ export class AuthUserDetailComponent implements OnDestroy {
             }),
           ]);
         }
+        this.savedLanguage = resp.user?.human?.profile?.preferredLanguage;
         this.loading = false;
       })
       .catch((error) => {
@@ -146,7 +147,20 @@ export class AuthUserDetailComponent implements OnDestroy {
   }
 
   public ngOnDestroy(): void {
+    this.cleanupTranslation();
     this.subscription.unsubscribe();
+  }
+
+  public settingChanged(): void {
+    this.cleanupTranslation();
+  }
+
+  private cleanupTranslation(): void {
+    if (this?.savedLanguage) {
+      this.translate.use(this?.savedLanguage);
+    } else {
+      this.translate.use(this.translate.defaultLang);
+    }
   }
 
   public changeUsername(): void {
@@ -192,6 +206,7 @@ export class AuthUserDetailComponent implements OnDestroy {
         )
         .then(() => {
           this.toast.showInfo('USER.TOAST.SAVED', true);
+          this.savedLanguage = this.user?.human?.profile?.preferredLanguage;
           this.refreshChanges$.emit();
         })
         .catch((error) => {
@@ -223,10 +238,36 @@ export class AuthUserDetailComponent implements OnDestroy {
       .then(() => {
         this.toast.showInfo('USER.TOAST.PHONESAVED', true);
         this.refreshUser();
+        this.promptSetupforSMSOTP();
       })
       .catch((error) => {
         this.toast.showError(error);
       });
+  }
+
+  public promptSetupforSMSOTP(): void {
+    const dialogRef = this.dialog.open(InfoDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.CONTINUE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'USER.MFA.OTPSMS',
+        descriptionKey: 'USER.MFA.SETUPOTPSMSDESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.userService.addMyAuthFactorOTPSMS().then(() => {
+          this.translate
+            .get('USER.MFA.OTPSMSSUCCESS')
+            .pipe(take(1))
+            .subscribe((msg) => {
+              this.toast.showInfo(msg);
+            });
+        });
+      }
+    });
   }
 
   public changedLanguage(language: string): void {
@@ -276,7 +317,10 @@ export class AuthUserDetailComponent implements OnDestroy {
   public savePhone(phone: string): void {
     if (this.user?.human) {
       // Format phone before save (add +)
-      phone = formatPhone(phone).phone;
+      const formattedPhone = formatPhone(phone);
+      if (formattedPhone) {
+        phone = formattedPhone.phone;
+      }
 
       this.userService
         .setMyPhone(phone)
@@ -379,7 +423,7 @@ export class AuthUserDetailComponent implements OnDestroy {
               this.metadata = resp.resultList.map((md) => {
                 return {
                   key: md.key,
-                  value: Buffer.from(md.value as string, 'base64').toString('ascii'),
+                  value: Buffer.from(md.value as string, 'base64').toString('utf8'),
                 };
               });
             })

@@ -3,9 +3,11 @@ package command
 import (
 	"time"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/session"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type WebAuthNChallengeModel struct {
@@ -13,6 +15,12 @@ type WebAuthNChallengeModel struct {
 	AllowedCrentialIDs [][]byte
 	UserVerification   domain.UserVerificationRequirement
 	RPID               string
+}
+
+type OTPCode struct {
+	Code         *crypto.CryptoValue
+	Expiry       time.Duration
+	CreationDate time.Time
 }
 
 func (p *WebAuthNChallengeModel) WebAuthNLogin(human *domain.Human, credentialAssertionData []byte) *domain.WebAuthNLogin {
@@ -31,27 +39,33 @@ type SessionWriteModel struct {
 
 	TokenID              string
 	UserID               string
+	UserResourceOwner    string
 	UserCheckedAt        time.Time
 	PasswordCheckedAt    time.Time
 	IntentCheckedAt      time.Time
 	WebAuthNCheckedAt    time.Time
+	TOTPCheckedAt        time.Time
+	OTPSMSCheckedAt      time.Time
+	OTPEmailCheckedAt    time.Time
 	WebAuthNUserVerified bool
 	Metadata             map[string][]byte
 	State                domain.SessionState
+	Expiration           time.Time
 
-	WebAuthNChallenge *WebAuthNChallengeModel
+	WebAuthNChallenge     *WebAuthNChallengeModel
+	OTPSMSCodeChallenge   *OTPCode
+	OTPEmailCodeChallenge *OTPCode
 
 	aggregate *eventstore.Aggregate
 }
 
-func NewSessionWriteModel(sessionID string, resourceOwner string) *SessionWriteModel {
+func NewSessionWriteModel(sessionID string, instanceID string) *SessionWriteModel {
 	return &SessionWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:   sessionID,
-			ResourceOwner: resourceOwner,
+			AggregateID: sessionID,
 		},
 		Metadata:  make(map[string][]byte),
-		aggregate: &session.NewAggregate(sessionID, resourceOwner).Aggregate,
+		aggregate: &session.NewAggregate(sessionID, instanceID).Aggregate,
 	}
 }
 
@@ -70,8 +84,20 @@ func (wm *SessionWriteModel) Reduce() error {
 			wm.reduceWebAuthNChallenged(e)
 		case *session.WebAuthNCheckedEvent:
 			wm.reduceWebAuthNChecked(e)
+		case *session.TOTPCheckedEvent:
+			wm.reduceTOTPChecked(e)
+		case *session.OTPSMSChallengedEvent:
+			wm.reduceOTPSMSChallenged(e)
+		case *session.OTPSMSCheckedEvent:
+			wm.reduceOTPSMSChecked(e)
+		case *session.OTPEmailChallengedEvent:
+			wm.reduceOTPEmailChallenged(e)
+		case *session.OTPEmailCheckedEvent:
+			wm.reduceOTPEmailChecked(e)
 		case *session.TokenSetEvent:
 			wm.reduceTokenSet(e)
+		case *session.LifetimeSetEvent:
+			wm.reduceLifetimeSet(e)
 		case *session.TerminateEvent:
 			wm.reduceTerminate()
 		}
@@ -91,8 +117,14 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 			session.IntentCheckedType,
 			session.WebAuthNChallengedType,
 			session.WebAuthNCheckedType,
+			session.TOTPCheckedType,
+			session.OTPSMSChallengedType,
+			session.OTPSMSCheckedType,
+			session.OTPEmailChallengedType,
+			session.OTPEmailCheckedType,
 			session.TokenSetType,
 			session.MetadataSetType,
+			session.LifetimeSetType,
 			session.TerminateType,
 		).
 		Builder()
@@ -109,6 +141,7 @@ func (wm *SessionWriteModel) reduceAdded(e *session.AddedEvent) {
 
 func (wm *SessionWriteModel) reduceUserChecked(e *session.UserCheckedEvent) {
 	wm.UserID = e.UserID
+	wm.UserResourceOwner = e.UserResourceOwner
 	wm.UserCheckedAt = e.CheckedAt
 }
 
@@ -135,8 +168,42 @@ func (wm *SessionWriteModel) reduceWebAuthNChecked(e *session.WebAuthNCheckedEve
 	wm.WebAuthNUserVerified = e.UserVerified
 }
 
+func (wm *SessionWriteModel) reduceTOTPChecked(e *session.TOTPCheckedEvent) {
+	wm.TOTPCheckedAt = e.CheckedAt
+}
+
+func (wm *SessionWriteModel) reduceOTPSMSChallenged(e *session.OTPSMSChallengedEvent) {
+	wm.OTPSMSCodeChallenge = &OTPCode{
+		Code:         e.Code,
+		Expiry:       e.Expiry,
+		CreationDate: e.CreationDate(),
+	}
+}
+
+func (wm *SessionWriteModel) reduceOTPSMSChecked(e *session.OTPSMSCheckedEvent) {
+	wm.OTPSMSCodeChallenge = nil
+	wm.OTPSMSCheckedAt = e.CheckedAt
+}
+
+func (wm *SessionWriteModel) reduceOTPEmailChallenged(e *session.OTPEmailChallengedEvent) {
+	wm.OTPEmailCodeChallenge = &OTPCode{
+		Code:         e.Code,
+		Expiry:       e.Expiry,
+		CreationDate: e.CreationDate(),
+	}
+}
+
+func (wm *SessionWriteModel) reduceOTPEmailChecked(e *session.OTPEmailCheckedEvent) {
+	wm.OTPEmailCodeChallenge = nil
+	wm.OTPEmailCheckedAt = e.CheckedAt
+}
+
 func (wm *SessionWriteModel) reduceTokenSet(e *session.TokenSetEvent) {
 	wm.TokenID = e.TokenID
+}
+
+func (wm *SessionWriteModel) reduceLifetimeSet(e *session.LifetimeSetEvent) {
+	wm.Expiration = e.CreationDate().Add(e.Lifetime)
 }
 
 func (wm *SessionWriteModel) reduceTerminate() {
@@ -149,9 +216,10 @@ func (wm *SessionWriteModel) AuthenticationTime() time.Time {
 	for _, check := range []time.Time{
 		wm.PasswordCheckedAt,
 		wm.WebAuthNCheckedAt,
+		wm.TOTPCheckedAt,
 		wm.IntentCheckedAt,
-		// TODO: add OTP check https://github.com/zitadel/zitadel/issues/5477
-		// TODO: add OTP (sms and email) check https://github.com/zitadel/zitadel/issues/6224
+		wm.OTPSMSCheckedAt,
+		wm.OTPEmailCheckedAt,
 	} {
 		if check.After(authTime) {
 			authTime = check
@@ -176,20 +244,34 @@ func (wm *SessionWriteModel) AuthMethodTypes() []domain.UserAuthMethodType {
 	if !wm.IntentCheckedAt.IsZero() {
 		types = append(types, domain.UserAuthMethodTypeIDP)
 	}
-	// TODO: add checks with https://github.com/zitadel/zitadel/issues/5477
-	/*
-		if !wm.TOTPCheckedAt.IsZero() {
-			types = append(types, domain.UserAuthMethodTypeTOTP)
-		}
-	*/
-	// TODO: add checks with https://github.com/zitadel/zitadel/issues/6224
-	/*
-		if !wm.TOTPFactor.OTPSMSCheckedAt.IsZero() {
-			types = append(types, domain.UserAuthMethodTypeOTPSMS)
-		}
-		if !wm.TOTPFactor.OTPEmailCheckedAt.IsZero() {
-			types = append(types, domain.UserAuthMethodTypeOTPEmail)
-		}
-	*/
+	if !wm.TOTPCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypeTOTP)
+	}
+	if !wm.OTPSMSCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypeOTPSMS)
+	}
+	if !wm.OTPEmailCheckedAt.IsZero() {
+		types = append(types, domain.UserAuthMethodTypeOTPEmail)
+	}
 	return types
+}
+
+// CheckNotInvalidated checks that the session was not invalidated either manually ([session.TerminateType])
+// or automatically (expired).
+func (wm *SessionWriteModel) CheckNotInvalidated() error {
+	if wm.State == domain.SessionStateTerminated {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Hewfq", "Errors.Session.Terminated")
+	}
+	if !wm.Expiration.IsZero() && wm.Expiration.Before(time.Now()) {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Hkl3d", "Errors.Session.Expired")
+	}
+	return nil
+}
+
+// CheckIsActive checks that the session was not invalidated ([CheckNotInvalidated]) and actually already exists.
+func (wm *SessionWriteModel) CheckIsActive() error {
+	if wm.State == domain.SessionStateUnspecified {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Flk38", "Errors.Session.NotExisting")
+	}
+	return wm.CheckNotInvalidated()
 }

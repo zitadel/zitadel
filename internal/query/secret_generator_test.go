@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -234,19 +234,19 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*SecretGenerators)(nil),
 		},
 		{
 			name:    "prepareSecretGeneratorQuery no result",
 			prepare: prepareSecretGeneratorQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					prepareSecretGeneratorStmt,
 					nil,
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -307,7 +307,7 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*SecretGenerator)(nil),
 		},
 	}
 	for _, tt := range tests {

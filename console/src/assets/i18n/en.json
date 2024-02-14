@@ -51,7 +51,7 @@
       "TITLE": "Get your ZITADEL running",
       "DESCRIPTION": "This checklist helps to setup your instance and guides your through the most essential steps"
     },
-    "EVENTS": {
+    "MILESTONES": {
       "instance.policy.label.added": {
         "title": "Setup your brand",
         "description": "Define coloring and shape of your login and upload your logo and icons.",
@@ -62,15 +62,20 @@
         "description": "Set your own mail server settings.",
         "action": "Setup SMTP"
       },
-      "project.added": {
+      "PROJECT_CREATED": {
         "title": "Create a project",
         "description": "Add a project and define its roles and authorizations.",
         "action": "Create project"
       },
-      "project.application.added": {
-        "title": "Create an application",
-        "description": "Create a web, native, api or saml application and setup your authentication flow.",
-        "action": "Create app"
+      "APPLICATION_CREATED": {
+        "title": "Register your app",
+        "description": "Register your web, native, api or saml application and setup an authentication flow.",
+        "action": "Register app"
+      },
+      "AUTHENTICATION_SUCCEEDED_ON_APPLICATION": {
+        "title": "Log in to your app",
+        "description": "Integrate your application with ZITADEL for authentication and test it by logging in with your admin user.",
+        "action": "Log in"
       },
       "user.human.added": {
         "title": "Add users",
@@ -85,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instance",
+    "INSTANCE": "Default settings",
     "DASHBOARD": "Home",
     "PERSONAL_INFO": "Personal Information",
     "DOCUMENTATION": "Documentation",
@@ -95,7 +100,6 @@
     "EVENTS": "Events",
     "FAILEDEVENTS": "Failed Events",
     "ORGANIZATION": "Organization",
-    "DOMAINS": "Domains",
     "PROJECT": "Projects",
     "PROJECTOVERVIEW": "Overview",
     "PROJECTGRANTS": "Grants",
@@ -224,6 +228,7 @@
     "EMAIL": "Email",
     "USERNAME": "User Name",
     "ORGNAME": "Organization Name",
+    "PRIMARYDOMAIN": "Primary Domain",
     "PROJECTNAME": "Project Name",
     "RESOURCEOWNER": "Resource Owner",
     "METHODS": {
@@ -264,8 +269,8 @@
       "DESCRIPTION": "Click the button below to log in again."
     },
     "EXHAUSTED": {
-      "TITLE": "Your quota for authenticated requests is exhausted.",
-      "DESCRIPTION": "Remove or increase the quota limit for this ZITADEL instance."
+      "TITLE": "Your instance is blocked.",
+      "DESCRIPTION": "Ask your ZITADEL instance administrator to update the subscription."
     },
     "INVALID_FORMAT": "The formatting is invalid.",
     "NOTANEMAIL": "The given value is not an e-mail address.",
@@ -275,7 +280,7 @@
     "SYMBOLERROR": "Must include a symbol or punctuation mark.",
     "NUMBERERROR": "Must include a digit.",
     "PWNOTEQUAL": "The passwords provided do not match.",
-    "PHONE": "The phone number must start with 00 or +."
+    "PHONE": "The phone number must start with +."
   },
   "USER": {
     "SETTINGS": {
@@ -412,7 +417,7 @@
       "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
       "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
       "ADD": "Add Factor",
-      "OTP": "Authenticator App for OTP (One-Time Password)",
+      "OTP": "Authenticator App for TOTP (Time-based One-Time Password)",
       "OTP_DIALOG_TITLE": "Add OTP",
       "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
       "U2F": "Fingerprint, Security Keys, Face ID and other",
@@ -421,6 +426,12 @@
       "U2F_SUCCESS": "Factor added successfully!",
       "U2F_ERROR": "An error during setup occurred!",
       "U2F_NAME": "Authenticator Name",
+      "OTPSMS": "OTP (One-Time Password) with SMS",
+      "OTPEMAIL": "OTP (One-Time Password) with Email",
+      "SETUPOTPSMSDESCRIPTION": "Do you want to setup this phonenumber as OTP (One-Time password) second factor?",
+      "OTPSMSSUCCESS": "OTP factor set up with success.",
+      "OTPSMSPHONEMUSTBEVERIFIED": "Your phone must be verified in order to use this method.",
+      "OTPEMAILSUCCESS": "OTP factor set up with success.",
       "TYPE": {
         "0": "No MFA defined",
         "1": "One Time Password (OTP)",
@@ -481,7 +492,7 @@
       "TITLE": "Profile",
       "EMAIL": "E-mail",
       "PHONE": "Phone number",
-      "PHONE_HINT": "Use 00 or the + symbol followed by the calling country code, or select the country from the dropdown and finally enter the phone number",
+      "PHONE_HINT": "Use the + symbol followed by the calling country code, or select the country from the dropdown and finally enter the phone number",
       "USERNAME": "User Name",
       "CHANGEUSERNAME": "modify",
       "CHANGEUSERNAME_TITLE": "Change username",
@@ -490,6 +501,7 @@
       "LASTNAME": "Family Name",
       "NICKNAME": "Nickname",
       "DISPLAYNAME": "Display Name",
+      "PREFERREDLOGINNAME": "Preferred login name",
       "PREFERRED_LANGUAGE": "Language",
       "GENDER": "Gender",
       "PASSWORD": "Password",
@@ -587,7 +599,8 @@
         "EDITVALUE": "Phone number",
         "EDITDESC": "Enter the new phone number in the field below.",
         "DELETETITLE": "Delete phone number",
-        "DELETEDESC": "Do you really want to delete the phone number"
+        "DELETEDESC": "Do you really want to delete the phone number",
+        "OTPSMSREMOVALWARNING": "This account uses this phone number as second factor. You won't be able to use it after you proceed."
       },
       "RESENDCODE": "Resend Code",
       "ENTERCODE": "Verify",
@@ -706,7 +719,6 @@
   },
   "METADATA": {
     "TITLE": "Metadata",
-    "DESCRIPTION": "",
     "KEY": "Key",
     "VALUE": "Value",
     "ADD": "New Entry",
@@ -736,6 +748,10 @@
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in seconds",
     "ALLOWEDTOFAIL": "Allowed To Fail",
+    "ALLOWEDTOFAILWARN": {
+      "TITLE": "Warning",
+      "DESCRIPTION": "If you disable this setting, it may cause users in your organization to be unable to sign in. Additionally, you will no longer be able to access the console to disable the action. We recommend creating an administrator user in a separate organization or testing scripts first in a development environment or a development organization."
+    },
     "SCRIPT": "Script",
     "FLOWTYPE": "Flow Type",
     "TRIGGERTYPE": "Trigger Type",
@@ -785,7 +801,7 @@
     },
     "PAGES": {
       "STATE": "Status",
-      "DOMAINLIST": "Domains"
+      "DOMAINLIST": "Custom Domains"
     },
     "STATE": {
       "0": "Unspecified",
@@ -857,14 +873,16 @@
         },
         "SEQUENCE": {
           "LABEL": "Sequence",
-          "CHECKBOX": "Filter by Sequence",
-          "SORT": "Sorting",
-          "ASC": "Ascending",
-          "DESC": "Descending"
+          "CHECKBOX": "Filter by Sequence"
         },
+        "SORT": "Sort",
+        "ASC": "Ascending",
+        "DESC": "Descending",
         "CREATIONDATE": {
-          "LABEL": "Creation Date",
-          "CHECKBOX": "Filter by Creation Date"
+          "RADIO_FROM": "From",
+          "RADIO_RANGE": "Range",
+          "LABEL_SINCE": "Since",
+          "LABEL_UNTIL": "Until"
         },
         "OTHER": "other",
         "OTHERS": "others"
@@ -914,20 +932,22 @@
         "BTN": "Rename"
       },
       "ORGDOMAIN": {
-        "TITLE": "Organization Domain Ownership Verification",
-        "VERIFICATION": "To verify the ownership of your domain, you need to download a verification file and upload it at the provided URL listed below, or place a TXT Record DNS entry for the provided URL. To complete, click the button to verify.",
-        "VERIFICATION_SKIP": "You can skip verification for now and continue to create your organization, but in order to use your organization this step has to be completed!",
-        "VERIFICATION_VALIDATION_DESC": "The tokens are checked regularly to ensure you are still owner of the domain.",
+        "TITLE": "Verify {{value}} ownership",
+        "VERIFICATION": "We offer you two methods to manually validate your domain:",
+        "VERIFICATION_HTML": "- HTTP. Host a temporary verification file on your website",
+        "VERIFICATION_DNS": "- DNS. Create a TXT Record DNS entry",
+        "VERIFICATION_DNS_DESC": "If you manage {{ value }} and you have access to your DNS records, you can create a new TXT record with the following values:",
+        "VERIFICATION_DNS_HOST_LABEL": "Host:",
+        "VERIFICATION_DNS_CHALLENGE_LABEL": "Use this code for the value of the TXT record:",
+        "VERIFICATION_HTTP_DESC": "If you have access to your website hosting, simply download the verification file and upload it at the provided URL",
+        "VERIFICATION_HTTP_URL_LABEL": "Expected URL:",
+        "VERIFICATION_HTTP_FILE_LABEL": "Verification file:",
+        "VERIFICATION_SKIP": "You can skip verification for now and continue to create your organization, but in order to use your domain this step has to be completed!",
+        "VERIFICATION_VALIDATION_DESC": "Do not delete the verification code, as ZITADEL will re-check the ownership of your domain from time to time.",
         "VERIFICATION_NEWTOKEN_TITLE": "Request New Token",
-        "VERIFICATION_NEWTOKEN_DESC": "If you want to request a new token, select you preferred method. If you want to validate a persisting token, click the button above.",
-        "VERIFICATION_VALIDATION_ONGOING": "A verification token has already been requested. Click on the button to trigger a verification check.",
-        "VERIFICATION_VALIDATION_ONGOING_TYPE": "Type of the token:",
+        "VERIFICATION_VALIDATION_ONGOING": "The {{ value }} method has been selected to verify your domain. Click on the button to trigger a verification check or reset the verification process.",
         "VERIFICATION_SUCCESSFUL": "Domain successfully verified!",
-        "REQUESTNEWTOKEN": "Request new token",
-        "TYPES": {
-          "1": "HTTP",
-          "2": "DNS"
-        }
+        "RESETMETHOD": "Reset verification method"
       },
       "DOWNLOAD_FILE": "Download File",
       "SELECTORGTOOLTIP": "Select this organization.",
@@ -942,23 +962,22 @@
     },
     "DOMAINS": {
       "NEW": "Add Domain",
-      "TITLE": "Domains",
-      "DESCRIPTION": "Configure your domains. This domain can be used to log in with your users.",
+      "TITLE": "Verified domains",
+      "DESCRIPTION": "Configure your organization domains. This domain can be used for domain discovery and username suffixing.",
       "SETPRIMARY": "Set as Primary",
       "DELETE": {
         "TITLE": "Delete Domain",
-        "DESCRIPTION": "You are about to delete one of your domains. Note that your users can no longer use this domain for their login."
+        "DESCRIPTION": "You are about to delete one of your domains."
       },
       "ADD": {
         "TITLE": "Add Domain",
-        "DESCRIPTION": "You are about to add a domain for your organization. After successful process, you users will be able to use the domain for their login."
+        "DESCRIPTION": "You are about to add a domain for your organization. After successful process, the domain can be used for domain discovery and as suffix for your users."
       }
     },
     "STATE": {
       "0": "Not defined",
       "1": "Active",
-      "2": "Deactivated",
-      "3": "Removed"
+      "2": "Deactivated"
     },
     "MEMBER": {
       "TITLE": "Organization Managers",
@@ -1005,50 +1024,73 @@
       "DESCRIPTION": "These settings extend and overwrite your instance settings."
     },
     "LIST": {
-      "GENERAL": "General",
+      "ORGS": "Organizations",
+      "LANGUAGES": "Languages",
       "LOGIN": "Login Behavior and Security",
       "LOCKOUT": "Lockout",
       "COMPLEXITY": "Password complexity",
-      "NOTIFICATIONS": "Notification settings",
+      "NOTIFICATIONS": "Notifications",
+      "SMTP_PROVIDER": "SMTP Provider",
+      "SMS_PROVIDER": "SMS/Phone Provider",
       "NOTIFICATIONS_DESC": "SMTP and SMS Settings",
       "MESSAGETEXTS": "Message Texts",
       "IDP": "Identity Providers",
+      "VERIFIED_DOMAINS": "Verified domains",
       "DOMAIN": "Domain settings",
       "LOGINTEXTS": "Login Interface Texts",
       "BRANDING": "Branding",
       "PRIVACYPOLICY": "Privacy Policy",
       "OIDC": "OIDC Token lifetime and expiration",
-      "SECRETS": "Secret Appearance",
-      "SECURITY": "Security settings"
+      "SECRETS": "Secret Generator",
+      "SECURITY": "Security settings",
+      "EVENTS": "Events",
+      "FAILEDEVENTS": "Failed Events",
+      "VIEWS": "Views"
     },
     "GROUPS": {
+      "GENERAL": "General Information",
       "NOTIFICATIONS": "Notifications",
       "LOGIN": "Login and Access",
       "DOMAIN": "Domain",
       "TEXTS": "Texts and Languages",
       "APPEARANCE": "Appearance",
-      "OTHER": "Other"
+      "OTHER": "Other",
+      "STORAGE": "Storage"
     }
   },
   "SETTING": {
-    "DEFAULTLANGUAGE": "Default Language",
-    "LANGUAGE": {
-      "de": "Deutsch",
-      "en": "English",
-      "es": "Español",
-      "fr": "Français",
-      "it": "Italiano",
-      "ja": "日本語",
-      "pl": "Polski",
-      "zh": "简体中文",
-      "bg": "Български",
-      "pt": "Portuguese",
-      "mk": "Македонски"
+    "LANGUAGES": {
+      "TITLE": "Language Settings",
+      "DEFAULT": "Default Language",
+      "ALLOWED": "Allowed Languages",
+      "NOT_ALLOWED": "Not Allowed Languages",
+      "ALLOW_ALL": "Allow All",
+      "DISALLOW_ALL": "Disallow All",
+      "SETASDEFAULT": "Set as Default Language",
+      "DEFAULT_SAVED": "Default Language saved",
+      "ALLOWED_SAVED": "Allowed Languages saved",
+      "OPTIONS": {
+        "de": "Deutsch",
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "it": "Italiano",
+        "ja": "日本語",
+        "pl": "Polski",
+        "zh": "简体中文",
+        "bg": "Български",
+        "pt": "Portuguese",
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
+      }
     },
     "SMTP": {
       "TITLE": "SMTP Settings",
       "SENDERADDRESS": "Sender Email Address",
       "SENDERNAME": "Sender Name",
+      "REPLYTOADDRESS": "Reply-to Address",
       "HOSTANDPORT": "Host And Port",
       "USER": "User",
       "PASSWORD": "Password",
@@ -1078,6 +1120,7 @@
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
         "ADDED": "Twilio added successfully.",
+        "UPDATED": "Twilio updated successfully.",
         "REMOVED": "Twilio removed",
         "CHANGETOKEN": "Change Token",
         "SETTOKEN": "Set Token",
@@ -1094,7 +1137,7 @@
       "INDAYS": "Days"
     },
     "SECRETS": {
-      "TITLE": "Secret Appearance",
+      "TITLE": "Secret Generator",
       "TYPES": "Secret Types",
       "TYPE": {
         "1": "Initialization Mail",
@@ -1106,7 +1149,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - Email"
       },
-      "ADDGENERATOR": "Define Secret Appearance",
+      "ADDGENERATOR": "Define Secret Generator",
       "GENERATORTYPE": "Type",
       "EXPIRY": "Expiration (in hours)",
       "INCLUDEDIGITS": "Include Numbers",
@@ -1184,6 +1227,11 @@
         "ERROR": "User could not be found!",
         "PRIMARYBUTTON": "next",
         "SECONDARYBUTTON": "register"
+      },
+      "THEMEMODE": {
+        "THEME_MODE_AUTO": "Auto Mode",
+        "THEME_MODE_LIGHT": "Light Mode only",
+        "THEME_MODE_DARK": "Dark Mode only"
       }
     },
     "PWD_AGE": {
@@ -1210,6 +1258,7 @@
       "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organization only.",
       "ADVANCED": "Advanced",
       "LIFETIMEDURATIONS": "Login Lifetimes",
+      "LIFETIME_INVALID": "Form contains invalid value(s).",
       "SAVED": "Saved successfully!"
     },
     "PRIVACY_POLICY": {
@@ -1235,8 +1284,10 @@
       "RESET_DESCRIPTION": "You are about to restore all default values. All changes you have made will be permanently deleted. Do you really want to continue?",
       "UNSAVED_TITLE": "Continue without saving?",
       "UNSAVED_DESCRIPTION": "You have made changes without saving. Do you want to save now?",
-      "LOCALE": "Locale Code",
-      "LOCALES": {
+      "ACTIVE_LANGUAGE_NOT_ALLOWED": "You selected a language that is not allowed. You can go on modifying the texts. But if you want your users to actually be able to use this language, change your instances restrictions.",
+      "LANGUAGES_NOT_ALLOWED": "Not allowed:",
+      "LANGUAGE": "Language",
+      "LANGUAGES": {
         "de": "Deutsch",
         "en": "English",
         "es": "Español",
@@ -1247,7 +1298,10 @@
         "zh": "简体中文",
         "bg": "Български",
         "pt": "Portuguese",
-        "mk": "Македонски"
+        "mk": "Македонски",
+        "cs": "Čeština",
+        "ru": "Русский",
+        "nl": "Nederlands"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1340,11 +1394,12 @@
       "MAXAGEDAYS": "Max Age in days",
       "USERLOGINMUSTBEDOMAIN": "Add organization domain as suffix to loginnames",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
-      "VALIDATEORGDOMAINS": "Validate Org domains",
+      "VALIDATEORGDOMAINS": "Organization domain verification required (DNS or HTTP challenge)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
       "ALLOWUSERNAMEPASSWORD": "Username Password allowed",
       "ALLOWEXTERNALIDP": "External IDP allowed",
-      "ALLOWREGISTER": "Register allowed",
+      "ALLOWREGISTERUSERS": "Register users allowed",
+      "ALLOWREGISTERORGS": "Register organizations allowed",
       "ALLOWUSERNAMEPASSWORD_DESC": "The conventional login with user name and password is allowed.",
       "ALLOWEXTERNALIDP_DESC": "The login is allowed for the underlying identity providers",
       "ALLOWREGISTER_DESC": "If the option is selected, an additional step for registering a user appears in the login.",
@@ -1698,6 +1753,14 @@
       "LDAP": {
         "TITLE": "Active Directory / LDAP",
         "DESCRIPTION": "Enter the credentials for your LDAP Provider"
+      },
+      "APPLE": {
+        "TITLE": "Sign in with Apple",
+        "DESCRIPTION": "Enter the credentials for your Apple Provider"
+      },
+      "SAML": {
+        "TITLE": "Sign in with Saml SP",
+        "DESCRIPTION": "Enter the credentials for your SAML Provider"
       }
     },
     "DETAIL": {
@@ -1811,6 +1874,20 @@
       "JWTENDPOINT": "JWT Endpoint",
       "JWTKEYSENDPOINT": "JWT Keys Endpoint"
     },
+    "APPLE": {
+      "TEAMID": "Team ID",
+      "KEYID": "Key ID",
+      "PRIVATEKEY": "Private Key",
+      "UPDATEPRIVATEKEY": "Update Private Key",
+      "UPLOADPRIVATEKEY": "Upload Private Key",
+      "KEYMAXSIZEEXCEEDED": "Maximum size of 5kB exceeded."
+    },
+    "SAML": {
+      "METADATAXML": "Metadata Xml",
+      "METADATAURL": "Metadata URL",
+      "BINDING": "Binding",
+      "SIGNEDREQUEST": "Signed Request"
+    },
     "TOAST": {
       "SAVED": "Successfully saved.",
       "REACTIVATED": "Idp reactivated.",
@@ -1821,7 +1898,9 @@
       "DELETED": "Idp removed successfully!",
       "ADDED": "Added successfully.",
       "REMOVED": "Removed successfully."
-    }
+    },
+    "ISIDTOKENMAPPING": "Map from the ID token",
+    "ISIDTOKENMAPPING_DESC": "If selected, provider information gets mapped from the ID token, not from the userinfo endpoint."
   },
   "MFA": {
     "LIST": {
@@ -1967,6 +2046,8 @@
       "CLIENTSECRET_DESCRIPTION": "Keep your client secret at a safe place as it will disappear once the dialog is closed.",
       "REGENERATESECRET": "Regenerate Client Secret",
       "DEVMODE": "Development Mode",
+      "DEVMODE_ENABLED": "Enabled",
+      "DEVMODE_DISABLED": "Disabled",
       "DEVMODEDESC": "Beware: With development mode enabled redirect URIs will not be validated.",
       "SKIPNATIVEAPPSUCCESSPAGE": "Skip Login Success Page",
       "SKIPNATIVEAPPSUCCESSPAGE_DESCRIPTION": "Skip the success page after a login for this native app.",
@@ -2053,11 +2134,18 @@
         "DESCRIPTION": "SAML Applications"
       },
       "CONFIGSECTION": "SAML Configuration",
-      "URL": "Url where Metadata file is located",
-      "OR": "or",
-      "XML": "Upload Metadata XML",
+      "CHOOSEMETADATASOURCE": "Provide your SAML configuration using one of the following options:",
+      "METADATAOPT1": "Option 1. Specify the url where metadata file is located",
+      "METADATAOPT2": "Option 2. Upload a file containing your metadata XML",
+      "METADATAOPT3": "Option 3. Create a minimal metadata file on the fly providing ENTITYID and ACS URL",
+      "UPLOAD": "Upload XML file",
       "METADATA": "Metadata",
-      "METADATAFROMFILE": "Metadata from File"
+      "METADATAFROMFILE": "Metadata from file",
+      "CERTIFICATE": "SAML certificate",
+      "DOWNLOADCERT": "Download SAML certificate",
+      "CREATEMETADATA": "Create metadata",
+      "ENTITYID": "Entity ID",
+      "ACSURL": "ACS endpoint URL"
     },
     "AUTHMETHODS": {
       "CODE": {
@@ -2122,7 +2210,10 @@
     "zh": "简体中文",
     "bg": "Български",
     "pt": "Portuguese",
-    "mk": "Македонски"
+    "mk": "Македонски",
+    "cs": "Čeština",
+    "ru": "Русский",
+    "nl": "Nederlands"
   },
   "MEMBER": {
     "ADD": "Add a Manager",
@@ -2171,7 +2262,8 @@
     "TOAST": {
       "UPDATED": "Authorization updated.",
       "REMOVED": "Authorization removed",
-      "BULKREMOVED": "Authorizations removed."
+      "BULKREMOVED": "Authorizations removed.",
+      "CANTSHOWINFO": "You cannot visit this user's profile as you are not a member of the organization where this user belongs to"
     },
     "DIALOG": {
       "DELETE_TITLE": "Delete authorization",

@@ -1,7 +1,9 @@
 package initialise
 
 import (
+	"context"
 	"database/sql"
+	"database/sql/driver"
 	"errors"
 	"testing"
 )
@@ -31,10 +33,52 @@ func Test_verifyEvents(t *testing.T) {
 			targetErr: sql.ErrConnDone,
 		},
 		{
+			name: "events already exists",
+			args: args{
+				db: prepareDB(t,
+					expectBegin(nil),
+					expectQuery(
+						"SELECT count(*) FROM information_schema.tables WHERE table_schema = 'eventstore' AND table_name like 'events%'",
+						nil,
+						[]string{"count"},
+						[][]driver.Value{
+							{1},
+						},
+					),
+					expectCommit(nil),
+				),
+			},
+		},
+		{
+			name: "events and events2 already exists",
+			args: args{
+				db: prepareDB(t,
+					expectBegin(nil),
+					expectQuery(
+						"SELECT count(*) FROM information_schema.tables WHERE table_schema = 'eventstore' AND table_name like 'events%'",
+						nil,
+						[]string{"count"},
+						[][]driver.Value{
+							{2},
+						},
+					),
+					expectCommit(nil),
+				),
+			},
+		},
+		{
 			name: "create table fails",
 			args: args{
 				db: prepareDB(t,
 					expectBegin(nil),
+					expectQuery(
+						"SELECT count(*) FROM information_schema.tables WHERE table_schema = 'eventstore' AND table_name like 'events%'",
+						nil,
+						[]string{"count"},
+						[][]driver.Value{
+							{0},
+						},
+					),
 					expectExec(createEventsStmt, sql.ErrNoRows),
 					expectRollback(nil),
 				),
@@ -46,6 +90,14 @@ func Test_verifyEvents(t *testing.T) {
 			args: args{
 				db: prepareDB(t,
 					expectBegin(nil),
+					expectQuery(
+						"SELECT count(*) FROM information_schema.tables WHERE table_schema = 'eventstore' AND table_name like 'events%'",
+						nil,
+						[]string{"count"},
+						[][]driver.Value{
+							{0},
+						},
+					),
 					expectExec(createEventsStmt, nil),
 					expectCommit(nil),
 				),
@@ -56,7 +108,7 @@ func Test_verifyEvents(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := createEvents(tt.args.db.db); !errors.Is(err, tt.targetErr) {
+			if err := createEvents(context.Background(), tt.args.db.db); !errors.Is(err, tt.targetErr) {
 				t.Errorf("createEvents() error = %v, want: %v", err, tt.targetErr)
 			}
 			if err := tt.args.db.mock.ExpectationsWereMet(); err != nil {
@@ -109,7 +161,7 @@ func Test_verifyEncryptionKeys(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := createEncryptionKeys(tt.args.db.db); !errors.Is(err, tt.targetErr) {
+			if err := createEncryptionKeys(context.Background(), tt.args.db.db); !errors.Is(err, tt.targetErr) {
 				t.Errorf("createEvents() error = %v, want: %v", err, tt.targetErr)
 			}
 			if err := tt.args.db.mock.ExpectationsWereMet(); err != nil {

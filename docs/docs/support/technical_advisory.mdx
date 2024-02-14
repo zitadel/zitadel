@@ -1,13 +1,13 @@
 ---
-title: Technical Advisory
+title: ZITADEL Technical Advisories
+sidebar_label: Technical Advisories
 ---
 
-Technical advisories are notices that report major issues with ZITADEL Self-Hosted or the ZITADEL Cloud platform that could potentially impact security or stability in production environments. 
+Technical advisories are notices that report major issues with ZITADEL Self-Hosted or the ZITADEL Cloud platform that could potentially impact security or stability in production environments.
 These advisories may include details about the nature of the issue, its potential impact, and recommended mitigation actions.
 
-Users are strongly encouraged to evaluate these advisories and consider the recommended mitigation actions independently from their version upgrade schedule. 
+Users are strongly encouraged to evaluate these advisories and consider the recommended mitigation actions independently from their version upgrade schedule.
 We understand that these advisories may include breaking changes, and we aim to provide clear guidance on how to address these changes.
-
 
 <table>
   <tr>
@@ -19,12 +19,140 @@ We understand that these advisories may include breaking changes, and we aim to 
     <th>Date</th>
   </tr>
   <tr>
-    <td><a href="./advisory/a10000">A-10000</a></td>
+    <td>
+      <a href="./advisory/a10000">A-10000</a>
+    </td>
     <td>Reusing user session</td>
-    <td>Breaking Behaviour Change</td>
-    <td>The default behavior for users logging in is to be directed to the Select Account Page on the Login. With the upcoming changes, users will be automatically authenticated when logging into a second application, as long as they only have one active session. No action is required on your part if this is the intended behavior.</td>
+    <td>Breaking Behavior Change</td>
+    <td>
+      The default behavior for users logging in is to be directed to the Select
+      Account Page on the Login. With the upcoming changes, users will be
+      automatically authenticated when logging into a second application, as
+      long as they only have one active session. No action is required on your
+      part if this is the intended behavior.
+    </td>
     <td>2.32.0</td>
     <td>Calendar week 32</td>
+  </tr>
+  <tr>
+    <td>
+      <a href="./advisory/a10001">A-10001</a>
+    </td>
+    <td>Login Policy - Allow Register</td>
+    <td>Breaking Behavior Change</td>
+    <td>
+      When disabling the option, users are currently not able to register
+      locally and also not through an external IDP. With the upcoming change,
+      the setting will only prevent local registration. Restriction to Identity
+      Providers can be managed through the corresponding IDP Template. No action
+      is required on your side if this is the intended behavior or if you
+      already disabled registration on your IDP.
+    </td>
+    <td>2.35.0</td>
+    <td>Calendar week 34</td>
+  </tr>
+  <tr>
+    <td>
+      <a href="./advisory/a10002">A-10002</a>
+    </td>
+    <td>Console - Branding</td>
+    <td>Breaking Design Change</td>
+    <td>
+      Since Angular Material v15 many of the UI components have been refactored
+      to be based on the official Material Design Components for Web (MDC).
+      These refactored components do not support dynamic styling, so in order to
+      keep the library up-to-date, the console UI will loose its dynamic theming
+      capability. If you need users to have your branding settings (background-,
+      button-, link and text coloring) you should implement your own user
+      facing UI yourself and not use ZITADELs console UI.
+      ZITADEL hosted Login-UI is not affected by this change.
+    </td>
+    <td>2.40.0</td>
+    <td>Calendar week 44</td>
+  </tr>
+  <tr>
+    <td>
+      <a href="./advisory/a10003">A-10003</a>
+    </td>
+    <td>Login-UI - Default Context</td>
+    <td>Breaking Behavior Change</td>
+    <td>
+        When users are redirected to the ZITADEL Login-UI without any organizational context,
+        they're currently presented a login screen, based on the instance settings,
+        e.g. available IDPs and possible login mechanisms. If the user will then register himself,
+        by the registration form or through an IDP, the user will always be created on the default organization.
+        With the introduced change, the settings will no longer be loaded from the instance, but rather the default organization directly.
+    </td>
+    <td>2.38.0</td>
+    <td>Calendar week 41</td>
+  </tr>
+  <tr>
+    <td>
+      <a href="./advisory/a10004">A-10004</a>
+    </td>
+    <td>Sequence uniquenes</td>
+    <td>Breaking Behavior Change</td>
+    <td>
+      Due to storage optimisations ZITADEL changes the behavior of sequences.
+      This change improves command (create, update, delete) performance of ZITADEL.
+      Sequences are no longer unique inside an instance.
+      From now on sequences are upcounting per aggregate id. 
+      For example sequences of newly created users begin at 1.
+      Existing sequences remain untouched.
+    </td>
+    <td>2.39.0</td>
+    <td>2023-10-14</td>
+  </tr>
+  <tr>
+    <td>
+      <a href="./advisory/a10005">A-10005</a>
+    </td>
+    <td>Expected downtime during upgrade</td>
+    <td>Expected downtime during upgrade</td>
+    <td>
+      Migrating to versions &gt;= 2.39 from &lt; 2.39 will cause down time during setup starts and the new version is started.
+      This is caused by storage optimisations which replace the `eventstore.events` database table with the new `eventstore.events2` table.
+      All existing events are migrated during the execution of the `zitadel setup` command.
+      New events will be inserted into the new `eventstore.events2` table. The old table `evetstore.events` is renamed to `eventstore.events_old` and will be dropped in a future release of ZITADEL.
+    </td>
+    <td>2.39.0</td>
+    <td>Calendar week 41/42 2023</td>
+  </tr>
+  <tr>
+    <td>
+      <a href="./advisory/a10006">A-10006</a>
+    </td>
+    <td>Additional grant to cockroach database user</td>
+    <td>Breaking Behavior Change</td>
+    <td>
+      Versions &gt;= 2.39.0 require the cockroach database user of ZITADEL to be granted to the `VIEWACTIVITY` grant. This can either be reached by grant the role manually or execute the `zitadel init` command.
+    </td>
+    <td>2.39.0</td>
+    <td>Calendar week 41/42 2023</td>
+  </tr>
+  <tr>
+    <td>
+      <a href="./advisory/a10007">A-10007</a>
+    </td>
+    <td>Additional grant to cockroach database user</td>
+    <td>Breaking Behavior Change</td>
+    <td>
+      Upcoming Versions require the SYSTEM_OWNER role to be available in the permission role mappings. Self-hosting ZITADEL users who define custom permission role mappings need to make sure their system users don't lose access to the system API.
+    </td>
+    <td>Upcoming</td>
+    <td>Upcoming</td>
+  </tr>
+  <tr>
+    <td>
+      <a href="./advisory/a10008">A-10008</a>
+    </td>
+    <td>New flag to prefill projections during setup instead of after start</td>
+    <td>Feature description</td>
+    <td>
+      new flag `--init-projections` introduced to `zitadel setup` commands (`setup`, `start-from-setup`, `start-from-init`)
+    </td>
+    <td>2.44.0, 2.43.6, 2.42.12</td>
+    <td>2024-01-25</td>
   </tr>
 </table>
 
@@ -37,10 +165,16 @@ As ZITADEL Cloud customer, you can also login to the <a href="https://zitadel.cl
 
 ## Categories
 
-### Breaking Behaviour Change
+### Breaking Behavior Change
 
 A breaking behavior change refers to a modification or update that changes the behavior of ZITADEL.
 This change does not necessarily affect the APIs or any functions you are calling, so it may not require an update to your code.
 However, if you rely on specific results or behaviors, they may no longer be guaranteed after the change is implemented.
 Therefore, it is important to be aware of breaking behavior changes and their potential impact on your use of ZITADEL, and to take appropriate action if needed to ensure continued functionality.
 
+### Expected downtime during upgrade
+
+Expected downtime during upgrade means that ZITADEL might become unavailable during an upgrade.
+ZITADEL is built for [zero downtime upgrades](/docs/concepts/architecture/solution#zero-downtime-updates) at upgrades can be executed without downtime by just updating to a more recent version.
+When deploying certain changes a zero downtime upgrade might not be possible, for example to guarantee data integrity.
+In such cases we will issue a technical advisory to make you aware of this unexpected behavior.

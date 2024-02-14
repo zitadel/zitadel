@@ -4,9 +4,13 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-func RegisterEventMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(AggregateType, AddedEventType, AddedEventMapper).
-		RegisterFilterEventMapper(AggregateType, RemovedEventType, RemovedEventMapper).
-		RegisterFilterEventMapper(AggregateType, NotificationDueEventType, NotificationDueEventMapper).
-		RegisterFilterEventMapper(AggregateType, NotifiedEventType, NotifiedEventMapper)
+func init() {
+	// AddedEventType is not emitted anymore.
+	// For ease of use, old events are directly mapped to SetEvent.
+	// This works, because the data structures are compatible.
+	eventstore.RegisterFilterEventMapper(AggregateType, AddedEventType, SetEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, SetEventType, SetEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, RemovedEventType, RemovedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, NotificationDueEventType, NotificationDueEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, NotifiedEventType, NotifiedEventMapper)
 }

@@ -12,8 +12,8 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/static"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var _ static.Storage = (*Minio)(nil)
@@ -27,14 +27,14 @@ type Minio struct {
 
 func (m *Minio) PutObject(ctx context.Context, instanceID, location, resourceOwner, name, contentType string, objectType static.ObjectType, object io.Reader, objectSize int64) (*static.Asset, error) {
 	err := m.createBucket(ctx, instanceID, location)
-	if err != nil && !caos_errs.IsErrorAlreadyExists(err) {
+	if err != nil && !zerrors.IsErrorAlreadyExists(err) {
 		return nil, err
 	}
 	bucketName := m.prefixBucketName(instanceID)
 	objectName := fmt.Sprintf("%s/%s", resourceOwner, name)
 	info, err := m.Client.PutObject(ctx, bucketName, objectName, object, objectSize, minio.PutObjectOptions{ContentType: contentType})
 	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "MINIO-590sw", "Errors.Assets.Object.PutFailed")
+		return nil, zerrors.ThrowInternal(err, "MINIO-590sw", "Errors.Assets.Object.PutFailed")
 	}
 	return &static.Asset{
 		InstanceID:    info.Bucket,
@@ -53,18 +53,18 @@ func (m *Minio) GetObject(ctx context.Context, instanceID, resourceOwner, name s
 	objectName := fmt.Sprintf("%s/%s", resourceOwner, name)
 	object, err := m.Client.GetObject(ctx, bucketName, objectName, minio.GetObjectOptions{})
 	if err != nil {
-		return nil, nil, caos_errs.ThrowInternal(err, "MINIO-VGDgv", "Errors.Assets.Object.GetFailed")
+		return nil, nil, zerrors.ThrowInternal(err, "MINIO-VGDgv", "Errors.Assets.Object.GetFailed")
 	}
 	info := func() (*static.Asset, error) {
 		info, err := object.Stat()
 		if err != nil {
-			return nil, caos_errs.ThrowInternal(err, "MINIO-F96xF", "Errors.Assets.Object.GetFailed")
+			return nil, zerrors.ThrowInternal(err, "MINIO-F96xF", "Errors.Assets.Object.GetFailed")
 		}
 		return m.objectToAssetInfo(instanceID, resourceOwner, info), nil
 	}
 	asset, err := io.ReadAll(object)
 	if err != nil {
-		return nil, nil, caos_errs.ThrowInternal(err, "MINIO-SFef1", "Errors.Assets.Object.GetFailed")
+		return nil, nil, zerrors.ThrowInternal(err, "MINIO-SFef1", "Errors.Assets.Object.GetFailed")
 	}
 	return asset, info, nil
 }
@@ -75,9 +75,9 @@ func (m *Minio) GetObjectInfo(ctx context.Context, instanceID, resourceOwner, na
 	objectInfo, err := m.Client.StatObject(ctx, bucketName, objectName, minio.StatObjectOptions{})
 	if err != nil {
 		if errResp := minio.ToErrorResponse(err); errResp.StatusCode == http.StatusNotFound {
-			return nil, caos_errs.ThrowNotFound(err, "MINIO-Gdfh4", "Errors.Assets.Object.GetFailed")
+			return nil, zerrors.ThrowNotFound(err, "MINIO-Gdfh4", "Errors.Assets.Object.GetFailed")
 		}
-		return nil, caos_errs.ThrowInternal(err, "MINIO-1vySX", "Errors.Assets.Object.GetFailed")
+		return nil, zerrors.ThrowInternal(err, "MINIO-1vySX", "Errors.Assets.Object.GetFailed")
 	}
 	return m.objectToAssetInfo(instanceID, resourceOwner, objectInfo), nil
 }
@@ -87,7 +87,7 @@ func (m *Minio) RemoveObject(ctx context.Context, instanceID, resourceOwner, nam
 	objectName := fmt.Sprintf("%s/%s", resourceOwner, name)
 	err := m.Client.RemoveObject(ctx, bucketName, objectName, minio.RemoveObjectOptions{})
 	if err != nil {
-		return caos_errs.ThrowInternal(err, "MINIO-x85RT", "Errors.Assets.Object.RemoveFailed")
+		return zerrors.ThrowInternal(err, "MINIO-x85RT", "Errors.Assets.Object.RemoveFailed")
 	}
 	return nil
 }
@@ -115,7 +115,7 @@ func (m *Minio) RemoveObjects(ctx context.Context, instanceID, resourceOwner str
 					logging.WithFields("bucketName", bucketName, "path", path).Warn("list objects for remove failed with not found")
 					continue
 				}
-				return caos_errs.ThrowInternal(object.Err, "MINIO-WQF32", "Errors.Assets.Object.ListFailed")
+				return zerrors.ThrowInternal(object.Err, "MINIO-WQF32", "Errors.Assets.Object.ListFailed")
 			}
 			objectsCh <- object
 		}
@@ -124,13 +124,13 @@ func (m *Minio) RemoveObjects(ctx context.Context, instanceID, resourceOwner str
 
 	if m.MultiDelete {
 		for objError := range m.Client.RemoveObjects(ctx, bucketName, objectsCh, minio.RemoveObjectsOptions{GovernanceBypass: true}) {
-			return caos_errs.ThrowInternal(objError.Err, "MINIO-Sfdgr", "Errors.Assets.Object.RemoveFailed")
+			return zerrors.ThrowInternal(objError.Err, "MINIO-Sfdgr", "Errors.Assets.Object.RemoveFailed")
 		}
 		return g.Wait()
 	}
 	for objectInfo := range objectsCh {
 		if err := m.Client.RemoveObject(ctx, bucketName, objectInfo.Key, minio.RemoveObjectOptions{GovernanceBypass: true}); err != nil {
-			return caos_errs.ThrowInternal(err, "MINIO-GVgew", "Errors.Assets.Object.RemoveFailed")
+			return zerrors.ThrowInternal(err, "MINIO-GVgew", "Errors.Assets.Object.RemoveFailed")
 		}
 	}
 	return g.Wait()
@@ -149,14 +149,14 @@ func (m *Minio) createBucket(ctx context.Context, name, location string) error {
 	exists, err := m.Client.BucketExists(ctx, name)
 	if err != nil {
 		logging.WithFields("bucketname", name).WithError(err).Error("cannot check if bucket exists")
-		return caos_errs.ThrowInternal(err, "MINIO-1b8fs", "Errors.Assets.Bucket.Internal")
+		return zerrors.ThrowInternal(err, "MINIO-1b8fs", "Errors.Assets.Bucket.Internal")
 	}
 	if exists {
-		return caos_errs.ThrowAlreadyExists(nil, "MINIO-9n3MK", "Errors.Assets.Bucket.AlreadyExists")
+		return zerrors.ThrowAlreadyExists(nil, "MINIO-9n3MK", "Errors.Assets.Bucket.AlreadyExists")
 	}
 	err = m.Client.MakeBucket(ctx, name, minio.MakeBucketOptions{Region: location})
 	if err != nil {
-		return caos_errs.ThrowInternal(err, "MINIO-4m90d", "Errors.Assets.Bucket.CreateFailed")
+		return zerrors.ThrowInternal(err, "MINIO-4m90d", "Errors.Assets.Bucket.CreateFailed")
 	}
 	return nil
 }

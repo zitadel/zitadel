@@ -16,19 +16,20 @@ import (
 
 var (
 	membershipsStmt = regexp.QuoteMeta(
-		"SELECT memberships.user_id" +
-			", memberships.roles" +
-			", memberships.creation_date" +
-			", memberships.change_date" +
-			", memberships.sequence" +
-			", memberships.resource_owner" +
-			", memberships.org_id" +
-			", memberships.id" +
-			", memberships.project_id" +
-			", memberships.grant_id" +
-			", projections.project_grants3.granted_org_id" +
-			", projections.projects3.name" +
-			", projections.orgs.name" +
+		"SELECT members.user_id" +
+			", members.roles" +
+			", members.creation_date" +
+			", members.change_date" +
+			", members.sequence" +
+			", members.resource_owner" +
+			", members.org_id" +
+			", members.id" +
+			", members.project_id" +
+			", members.grant_id" +
+			", projections.project_grants4.granted_org_id" +
+			", projections.projects4.name" +
+			", projections.orgs1.name" +
+			", projections.instances.name" +
 			", COUNT(*) OVER ()" +
 			" FROM (" +
 			"SELECT members.user_id" +
@@ -42,8 +43,7 @@ var (
 			", NULL::TEXT AS id" +
 			", NULL::TEXT AS project_id" +
 			", NULL::TEXT AS grant_id" +
-			" FROM projections.org_members3 AS members" +
-			" WHERE members.owner_removed = $1 AND members.user_owner_removed = $2" +
+			" FROM projections.org_members4 AS members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -56,8 +56,7 @@ var (
 			", members.id" +
 			", NULL::TEXT AS project_id" +
 			", NULL::TEXT AS grant_id" +
-			" FROM projections.instance_members3 AS members" +
-			" WHERE members.owner_removed = $3 AND members.user_owner_removed = $4" +
+			" FROM projections.instance_members4 AS members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -70,8 +69,7 @@ var (
 			", NULL::TEXT AS id" +
 			", members.project_id" +
 			", NULL::TEXT AS grant_id" +
-			" FROM projections.project_members3 AS members" +
-			" WHERE members.owner_removed = $5 AND members.user_owner_removed = $6" +
+			" FROM projections.project_members4 AS members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -84,12 +82,12 @@ var (
 			", NULL::TEXT AS id" +
 			", members.project_id" +
 			", members.grant_id" +
-			" FROM projections.project_grant_members3 AS members" +
-			" WHERE members.granted_org_removed = $7 AND members.owner_removed = $8 AND members.user_owner_removed = $9" +
-			") AS memberships" +
-			" LEFT JOIN projections.projects3 ON memberships.project_id = projections.projects3.id AND memberships.instance_id = projections.projects3.instance_id" +
-			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id AND memberships.instance_id = projections.orgs.instance_id" +
-			" LEFT JOIN projections.project_grants3 ON memberships.grant_id = projections.project_grants3.grant_id AND memberships.instance_id = projections.project_grants3.instance_id" +
+			" FROM projections.project_grant_members4 AS members" +
+			") AS members" +
+			" LEFT JOIN projections.projects4 ON members.project_id = projections.projects4.id AND members.instance_id = projections.projects4.instance_id" +
+			" LEFT JOIN projections.orgs1 ON members.org_id = projections.orgs1.id AND members.instance_id = projections.orgs1.instance_id" +
+			" LEFT JOIN projections.project_grants4 ON members.grant_id = projections.project_grants4.grant_id AND members.instance_id = projections.project_grants4.instance_id" +
+			" LEFT JOIN projections.instances ON members.instance_id = projections.instances.id" +
 			` AS OF SYSTEM TIME '-1 ms'`)
 	membershipCols = []string{
 		"user_id",
@@ -105,6 +103,7 @@ var (
 		"granted_org_id",
 		"name", //project name
 		"name", //org name
+		"name", // instance name
 		"count",
 	}
 )
@@ -122,7 +121,7 @@ func Test_MembershipPrepares(t *testing.T) {
 	}{
 		{
 			name:    "prepareMembershipsQuery no result",
-			prepare: prepareMembershipWrapper(false),
+			prepare: prepareMembershipWrapper(),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -134,7 +133,7 @@ func Test_MembershipPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareMembershipsQuery one org member",
-			prepare: prepareMembershipWrapper(false),
+			prepare: prepareMembershipWrapper(),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -142,7 +141,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							database.StringArray{"role1", "role2"},
+							database.TextArray[string]{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -154,6 +153,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							"org-name",
+							nil,
 						},
 					},
 				),
@@ -165,7 +165,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         database.StringArray{"role1", "role2"},
+						Roles:         database.TextArray[string]{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -177,7 +177,7 @@ func Test_MembershipPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareMembershipsQuery one instance member",
-			prepare: prepareMembershipWrapper(false),
+			prepare: prepareMembershipWrapper(),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -185,7 +185,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							database.StringArray{"role1", "role2"},
+							database.TextArray[string]{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -197,6 +197,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							"instance",
 						},
 					},
 				),
@@ -208,19 +209,19 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         database.StringArray{"role1", "role2"},
+						Roles:         database.TextArray[string]{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
 						ResourceOwner: "ro",
-						IAM:           &IAMMembership{IAMID: "iam-id", Name: "iam-id"},
+						IAM:           &IAMMembership{IAMID: "iam-id", Name: "instance"},
 					},
 				},
 			},
 		},
 		{
 			name:    "prepareMembershipsQuery one project member",
-			prepare: prepareMembershipWrapper(false),
+			prepare: prepareMembershipWrapper(),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -228,7 +229,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							database.StringArray{"role1", "role2"},
+							database.TextArray[string]{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -240,6 +241,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							"project-name",
 							nil,
+							nil,
 						},
 					},
 				),
@@ -251,7 +253,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         database.StringArray{"role1", "role2"},
+						Roles:         database.TextArray[string]{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -263,7 +265,7 @@ func Test_MembershipPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareMembershipsQuery one project grant member",
-			prepare: prepareMembershipWrapper(false),
+			prepare: prepareMembershipWrapper(),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -271,7 +273,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							database.StringArray{"role1", "role2"},
+							database.TextArray[string]{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -282,6 +284,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							"grant-id",
 							"granted-org-id",
 							"project-name",
+							nil,
 							nil,
 						},
 					},
@@ -294,7 +297,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         database.StringArray{"role1", "role2"},
+						Roles:         database.TextArray[string]{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -311,7 +314,7 @@ func Test_MembershipPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareMembershipsQuery one for each member type",
-			prepare: prepareMembershipWrapper(false),
+			prepare: prepareMembershipWrapper(),
 			want: want{
 				sqlExpectations: mockQueries(
 					membershipsStmt,
@@ -319,7 +322,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"user-id",
-							database.StringArray{"role1", "role2"},
+							database.TextArray[string]{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -331,10 +334,11 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							"org-name",
+							nil,
 						},
 						{
 							"user-id",
-							database.StringArray{"role1", "role2"},
+							database.TextArray[string]{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -346,10 +350,11 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							"instance",
 						},
 						{
 							"user-id",
-							database.StringArray{"role1", "role2"},
+							database.TextArray[string]{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -361,10 +366,11 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							"project-name",
 							nil,
+							nil,
 						},
 						{
 							"user-id",
-							database.StringArray{"role1", "role2"},
+							database.TextArray[string]{"role1", "role2"},
 							testNow,
 							testNow,
 							uint64(20211202),
@@ -375,6 +381,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							"grant-id",
 							"granted-org-id",
 							"project-name",
+							nil,
 							nil,
 						},
 					},
@@ -387,7 +394,7 @@ func Test_MembershipPrepares(t *testing.T) {
 				Memberships: []*Membership{
 					{
 						UserID:        "user-id",
-						Roles:         database.StringArray{"role1", "role2"},
+						Roles:         database.TextArray[string]{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -396,16 +403,16 @@ func Test_MembershipPrepares(t *testing.T) {
 					},
 					{
 						UserID:        "user-id",
-						Roles:         database.StringArray{"role1", "role2"},
+						Roles:         database.TextArray[string]{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
 						ResourceOwner: "ro",
-						IAM:           &IAMMembership{IAMID: "iam-id", Name: "iam-id"},
+						IAM:           &IAMMembership{IAMID: "iam-id", Name: "instance"},
 					},
 					{
 						UserID:        "user-id",
-						Roles:         database.StringArray{"role1", "role2"},
+						Roles:         database.TextArray[string]{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -414,7 +421,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					},
 					{
 						UserID:        "user-id",
-						Roles:         database.StringArray{"role1", "role2"},
+						Roles:         database.TextArray[string]{"role1", "role2"},
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						Sequence:      20211202,
@@ -431,7 +438,7 @@ func Test_MembershipPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareMembershipsQuery sql err",
-			prepare: prepareMembershipWrapper(false),
+			prepare: prepareMembershipWrapper(),
 			want: want{
 				sqlExpectations: mockQueryErr(
 					membershipsStmt,
@@ -444,7 +451,7 @@ func Test_MembershipPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*Memberships)(nil),
 		},
 	}
 	for _, tt := range tests {
@@ -454,9 +461,9 @@ func Test_MembershipPrepares(t *testing.T) {
 	}
 }
 
-func prepareMembershipWrapper(withOwnerRemoved bool) func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
+func prepareMembershipWrapper() func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
 	return func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
-		builder, _, fun := prepareMembershipsQuery(ctx, db, withOwnerRemoved)
+		builder, _, fun := prepareMembershipsQuery(ctx, db, &MembershipSearchQuery{})
 		return builder, fun
 	}
 }

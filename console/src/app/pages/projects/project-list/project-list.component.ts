@@ -1,8 +1,8 @@
 import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+import { MatDialog } from '@angular/material/dialog';
+import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
@@ -60,6 +60,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public ProjectState: any = ProjectState;
   public ProjectType: any = ProjectType;
   private destroy$: Subject<void> = new Subject();
+  public INITIAL_PAGE_SIZE: number = 20;
 
   constructor(
     public translate: TranslateService,
@@ -84,7 +85,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
           break;
       }
 
-      this.getData(type);
+      this.getData(type, this.INITIAL_PAGE_SIZE, 0);
     });
   }
 

@@ -1,13 +1,14 @@
 package initialise
 
 import (
-	"database/sql"
 	_ "embed"
 	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
+
+	"github.com/zitadel/zitadel/internal/database"
 )
 
 func newDatabase() *cobra.Command {
@@ -16,10 +17,10 @@ func newDatabase() *cobra.Command {
 		Short: "initialize only the database",
 		Long: `Sets up the ZITADEL database.
 
-Prereqesits:
+Prerequisites:
 - cockroachDB or postgreSQL
 
-The user provided by flags needs priviledge to 
+The user provided by flags needs privileges to 
 - create the database if it does not exist
 - see other users and create a new one if the user does not exist
 - grant all rights of the ZITADEL database to the user created if not yet set
@@ -33,8 +34,8 @@ The user provided by flags needs priviledge to
 	}
 }
 
-func VerifyDatabase(databaseName string) func(*sql.DB) error {
-	return func(db *sql.DB) error {
+func VerifyDatabase(databaseName string) func(*database.DB) error {
+	return func(db *database.DB) error {
 		logging.WithFields("database", databaseName).Info("verify database")
 
 		return exec(db, fmt.Sprintf(string(databaseStmt), databaseName), []string{dbAlreadyExistsCode})

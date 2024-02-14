@@ -6,10 +6,10 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type HumanPasswordReadModel struct {
@@ -31,14 +31,14 @@ func (q *Queries) GetHumanPassword(ctx context.Context, orgID, userID string) (e
 	defer func() { span.EndWithError(err) }()
 
 	if userID == "" {
-		return "", errors.ThrowInvalidArgument(nil, "QUERY-4Mfsf", "Errors.User.UserIDMissing")
+		return "", zerrors.ThrowInvalidArgument(nil, "QUERY-4Mfsf", "Errors.User.UserIDMissing")
 	}
 	existingPassword, err := q.passwordReadModel(ctx, userID, orgID)
 	if err != nil {
-		return "", errors.ThrowInternal(nil, "QUERY-p1k1n2i", "Errors.User.NotFound")
+		return "", zerrors.ThrowInternal(nil, "QUERY-p1k1n2i", "Errors.User.NotFound")
 	}
 	if existingPassword.UserState == domain.UserStateUnspecified || existingPassword.UserState == domain.UserStateDeleted {
-		return "", errors.ThrowPreconditionFailed(nil, "QUERY-3n77z", "Errors.User.NotFound")
+		return "", zerrors.ThrowPreconditionFailed(nil, "QUERY-3n77z", "Errors.User.NotFound")
 	}
 	return existingPassword.EncodedHash, nil
 }
@@ -100,8 +100,13 @@ func (wm *HumanPasswordReadModel) Reduce() error {
 			wm.PasswordCheckFailedCount += 1
 		case *user.HumanPasswordCheckSucceededEvent:
 			wm.PasswordCheckFailedCount = 0
+		case *user.UserLockedEvent:
+			wm.UserState = domain.UserStateLocked
 		case *user.UserUnlockedEvent:
 			wm.PasswordCheckFailedCount = 0
+			if wm.UserState != domain.UserStateDeleted {
+				wm.UserState = domain.UserStateActive
+			}
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
 		case *user.HumanPasswordHashUpdatedEvent:
@@ -113,6 +118,7 @@ func (wm *HumanPasswordReadModel) Reduce() error {
 
 func (wm *HumanPasswordReadModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
 		AllowTimeTravel().
 		AddQuery().
 		AggregateTypes(user.AggregateType).
@@ -128,6 +134,7 @@ func (wm *HumanPasswordReadModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanPasswordCheckSucceededType,
 			user.HumanPasswordHashUpdatedType,
 			user.UserRemovedType,
+			user.UserLockedType,
 			user.UserUnlockedType,
 			user.UserV1AddedType,
 			user.UserV1RegisteredType,

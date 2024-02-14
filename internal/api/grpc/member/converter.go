@@ -4,17 +4,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/api/grpc/user"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	member_pb "github.com/zitadel/zitadel/pkg/grpc/member"
 )
-
-func MemberToDomain(member *member_pb.Member) *domain.Member {
-	return &domain.Member{
-		UserID: member.UserId,
-		Roles:  member.Roles,
-	}
-}
 
 func MembersToPb(assetAPIPrefix string, members []*query.Member) []*member_pb.Member {
 	m := make([]*member_pb.Member, len(members))
@@ -66,6 +59,6 @@ func MemberQueryToMember(search *member_pb.SearchQuery) (query.SearchQuery, erro
 	case *member_pb.SearchQuery_UserIdQuery:
 		return query.NewMemberUserIDSearchQuery(q.UserIdQuery.UserId)
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "MEMBE-7Bb92", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(nil, "MEMBE-7Bb92", "Errors.Query.InvalidRequest")
 	}
 }

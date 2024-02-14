@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"context"
-	errs "errors"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -14,9 +14,9 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -24,7 +24,7 @@ const (
 )
 
 func InstanceInterceptor(verifier authz.InstanceVerifier, headerName string, explicitInstanceIdServices ...string) grpc.UnaryServerInterceptor {
-	translator, err := newZitadelTranslator(language.English)
+	translator, err := i18n.NewZitadelTranslator(language.English)
 	logging.OnError(err).Panic("unable to get translator")
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		return setInstance(ctx, req, info, handler, verifier, headerName, translator, explicitInstanceIdServices...)
@@ -46,8 +46,8 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 			ctx = authz.WithInstanceID(ctx, withInstanceIDProperty.GetInstanceId())
 			instance, err := verifier.InstanceByID(ctx)
 			if err != nil {
-				notFoundErr := new(errors.NotFoundError)
-				if errs.As(err, &notFoundErr) {
+				notFoundErr := new(zerrors.NotFoundError)
+				if errors.As(err, &notFoundErr) {
 					notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 				}
 				return nil, status.Error(codes.NotFound, err.Error())
@@ -62,8 +62,8 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 	}
 	instance, err := verifier.InstanceByHost(interceptorCtx, host)
 	if err != nil {
-		notFoundErr := new(errors.NotFoundError)
-		if errs.As(err, &notFoundErr) {
+		notFoundErr := new(zerrors.NotFoundError)
+		if errors.As(err, &notFoundErr) {
 			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 		}
 		return nil, status.Error(codes.NotFound, err.Error())

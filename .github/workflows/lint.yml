@@ -52,7 +52,7 @@ jobs:
     - 
       uses: bufbuild/buf-breaking-action@v1
       with:
-        against: "https://github.com/${{ github.repository }}.git#branch=main"
+        against: "https://github.com/${{ github.repository }}.git#branch=${{ github.base_ref }}"
 
   console:
     if: ${{ github.event_name == 'pull_request' }}
@@ -85,7 +85,7 @@ jobs:
     - 
       uses: actions/setup-go@v4
       with:
-        go-version: ${{ github.event.inputs.go_version }}
+        go-version: ${{ inputs.go_version }}
     - 
       uses: actions/cache/restore@v3
       timeout-minutes: 1

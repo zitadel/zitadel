@@ -4,8 +4,11 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-func RegisterEventMappers(es *eventstore.Eventstore) {
-	es.RegisterFilterEventMapper(AggregateType, StartedEventType, StartedEventMapper).
-		RegisterFilterEventMapper(AggregateType, SucceededEventType, SucceededEventMapper).
-		RegisterFilterEventMapper(AggregateType, FailedEventType, FailedEventMapper)
+func init() {
+	eventstore.RegisterFilterEventMapper(AggregateType, StartedEventType, StartedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, SucceededEventType, SucceededEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, SAMLSucceededEventType, SAMLSucceededEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, SAMLRequestEventType, SAMLRequestEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, LDAPSucceededEventType, LDAPSucceededEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, FailedEventType, FailedEventMapper)
 }

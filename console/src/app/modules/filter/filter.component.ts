@@ -64,7 +64,10 @@ export class FilterComponent implements OnDestroy {
     this.destroy$.complete();
   }
 
-  constructor(private router: Router, protected route: ActivatedRoute) {
+  constructor(
+    private router: Router,
+    protected route: ActivatedRoute,
+  ) {
     const changes$ = this.filterChanged.asObservable();
     changes$.pipe(takeUntil(this.destroy$)).subscribe((queries) => {
       const filters: Array<FilterSearchQueryAsObject | {}> | undefined = queries

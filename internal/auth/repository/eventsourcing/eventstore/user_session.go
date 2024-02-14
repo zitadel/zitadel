@@ -20,8 +20,3 @@ func (repo *UserSessionRepo) GetMyUserSessions(ctx context.Context) ([]*usr_mode
 	}
 	return model.UserSessionsToModel(userSessions), nil
 }
-
-func (repo *UserSessionRepo) ActiveUserSessionCount() int64 {
-	userSessions, _ := repo.View.ActiveUserSessionsCount()
-	return int64(userSessions)
-}

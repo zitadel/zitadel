@@ -30,7 +30,7 @@ func (s *Server) ListOrgIDPs(ctx context.Context, req *mgmt_pb.ListOrgIDPsReques
 	}
 	return &mgmt_pb.ListOrgIDPsResponse{
 		Result:  idp_grpc.IDPViewsToPb(resp.IDPs),
-		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.Timestamp),
+		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.LastRun),
 	}, nil
 }
 
@@ -167,7 +167,7 @@ func (s *Server) ListProviders(ctx context.Context, req *mgmt_pb.ListProvidersRe
 	}
 	return &mgmt_pb.ListProvidersResponse{
 		Result:  idp_grpc.ProvidersToPb(resp.Templates),
-		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.Timestamp),
+		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.LastRun),
 	}, nil
 }
 
@@ -393,6 +393,58 @@ func (s *Server) UpdateLDAPProvider(ctx context.Context, req *mgmt_pb.UpdateLDAP
 		return nil, err
 	}
 	return &mgmt_pb.UpdateLDAPProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddAppleProvider(ctx context.Context, req *mgmt_pb.AddAppleProviderRequest) (*mgmt_pb.AddAppleProviderResponse, error) {
+	id, details, err := s.command.AddOrgAppleProvider(ctx, authz.GetCtxData(ctx).OrgID, addAppleProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddAppleProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateAppleProvider(ctx context.Context, req *mgmt_pb.UpdateAppleProviderRequest) (*mgmt_pb.UpdateAppleProviderResponse, error) {
+	details, err := s.command.UpdateOrgAppleProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateAppleProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateAppleProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) AddSAMLProvider(ctx context.Context, req *mgmt_pb.AddSAMLProviderRequest) (*mgmt_pb.AddSAMLProviderResponse, error) {
+	id, details, err := s.command.AddOrgSAMLProvider(ctx, authz.GetCtxData(ctx).OrgID, addSAMLProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddSAMLProviderResponse{
+		Id:      id,
+		Details: object_pb.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) UpdateSAMLProvider(ctx context.Context, req *mgmt_pb.UpdateSAMLProviderRequest) (*mgmt_pb.UpdateSAMLProviderResponse, error) {
+	details, err := s.command.UpdateOrgSAMLProvider(ctx, authz.GetCtxData(ctx).OrgID, req.Id, updateSAMLProviderToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateSAMLProviderResponse{
+		Details: object_pb.DomainToChangeDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) RegenerateSAMLProviderCertificate(ctx context.Context, req *mgmt_pb.RegenerateSAMLProviderCertificateRequest) (*mgmt_pb.RegenerateSAMLProviderCertificateResponse, error) {
+	details, err := s.command.RegenerateOrgSAMLProviderCertificate(ctx, authz.GetCtxData(ctx).OrgID, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RegenerateSAMLProviderCertificateResponse{
 		Details: object_pb.DomainToChangeDetailsPb(details),
 	}, nil
 }

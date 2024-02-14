@@ -9,14 +9,22 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/cmd/encryption"
+	"github.com/zitadel/zitadel/cmd/systemapi"
+	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	static_config "github.com/zitadel/zitadel/internal/static/config"
 )
 
 type Config struct {
@@ -27,10 +35,26 @@ type Config struct {
 	ExternalPort    uint16
 	ExternalSecure  bool
 	Log             *logging.Config
-	EncryptionKeys  *encryptionKeyConfig
+	EncryptionKeys  *encryption.EncryptionKeyConfig
 	DefaultInstance command.InstanceSetup
 	Machine         *id.Config
 	Projections     projection.Config
+	Eventstore      *eventstore.Config
+
+	InitProjections InitProjections
+	AssetStorage    static_config.AssetStorageConfig
+	OIDC            oidc.Config
+	Login           login.Config
+	WebAuthNName    string
+	Telemetry       *handlers.TelemetryPusherConfig
+	SystemAPIUsers  systemapi.Users
+}
+
+type InitProjections struct {
+	Enabled          bool
+	RetryFailedAfter time.Duration
+	MaxFailureCount  uint8
+	BulkLimit        uint64
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
@@ -43,6 +67,9 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
+			hook.EnumHookFunc(domain.FeatureString),
+			hook.EnumHookFunc(authz.MemberTypeString),
+			actions.HTTPConfigDecodeHook,
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")
@@ -56,23 +83,25 @@ func MustNewConfig(v *viper.Viper) *Config {
 }
 
 type Steps struct {
-	s1ProjectionTable    *ProjectionTable
-	s2AssetsTable        *AssetTable
-	FirstInstance        *FirstInstance
-	s4EventstoreIndexes  *EventstoreIndexesNew
-	s5LastFailed         *LastFailed
-	s6OwnerRemoveColumns *OwnerRemoveColumns
-	s7LogstoreTables     *LogstoreTables
-	s8AuthTokens         *AuthTokenIndexes
-	s9EventstoreIndexes2 *EventstoreIndexesNew
-	CorrectCreationDate  *CorrectCreationDate
-	AddEventCreatedAt    *AddEventCreatedAt
-}
-
-type encryptionKeyConfig struct {
-	User *crypto.KeyConfig
-	SMTP *crypto.KeyConfig
-	OIDC *crypto.KeyConfig
+	s1ProjectionTable               *ProjectionTable
+	s2AssetsTable                   *AssetTable
+	FirstInstance                   *FirstInstance
+	s5LastFailed                    *LastFailed
+	s6OwnerRemoveColumns            *OwnerRemoveColumns
+	s7LogstoreTables                *LogstoreTables
+	s8AuthTokens                    *AuthTokenIndexes
+	CorrectCreationDate             *CorrectCreationDate
+	s12AddOTPColumns                *AddOTPColumns
+	s13FixQuotaProjection           *FixQuotaConstraints
+	s14NewEventsTable               *NewEventsTable
+	s15CurrentStates                *CurrentProjectionState
+	s16UniqueConstraintsLower       *UniqueConstraintToLower
+	s17AddOffsetToUniqueConstraints *AddOffsetToCurrentStates
+	s18AddLowerFieldsToLoginNames   *AddLowerFieldsToLoginNames
+	s19AddCurrentStatesIndex        *AddCurrentSequencesIndex
+	s20AddByUserSessionIndex        *AddByUserIndexToSession
+	s21AddBlockFieldToLimits        *AddBlockFieldToLimits
+	s22ActiveInstancesIndex         *ActiveInstanceEvents
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
@@ -97,6 +126,8 @@ func MustNewSteps(v *viper.Viper) *Steps {
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
+			hook.EnumHookFunc(domain.FeatureString),
+			systemapi.UsersDecodeHook,
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read steps")

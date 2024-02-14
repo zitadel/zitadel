@@ -4,10 +4,10 @@ import (
 	"github.com/jinzhu/gorm"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/user/model"
 	usr_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 	"github.com/zitadel/zitadel/internal/view/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TokenByIDs(db *gorm.DB, table, tokenID, userID, instanceID string) (*usr_model.TokenView, error) {
@@ -18,8 +18,8 @@ func TokenByIDs(db *gorm.DB, table, tokenID, userID, instanceID string) (*usr_mo
 		&usr_model.TokenSearchQuery{Key: model.TokenSearchKeyInstanceID, Method: domain.SearchMethodEquals, Value: instanceID},
 	)
 	err := query(db, token)
-	if errors.IsNotFound(err) {
-		return nil, errors.ThrowNotFound(nil, "VIEW-6ub3p", "Errors.Token.NotFound")
+	if zerrors.IsNotFound(err) {
+		return nil, zerrors.ThrowNotFound(nil, "VIEW-6ub3p", "Errors.Token.NotFound")
 	}
 	return token, err
 }

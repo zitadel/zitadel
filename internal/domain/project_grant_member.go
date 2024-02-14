@@ -12,17 +12,6 @@ type ProjectGrantMember struct {
 	Roles   []string
 }
 
-func NewProjectGrantMember(aggregateID, userID, grantID string, roles ...string) *ProjectGrantMember {
-	return &ProjectGrantMember{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID: aggregateID,
-		},
-		GrantID: grantID,
-		UserID:  userID,
-		Roles:   roles,
-	}
-}
-
 func (i *ProjectGrantMember) IsValid() bool {
 	return i.AggregateID != "" && i.GrantID != "" && i.UserID != "" && len(i.Roles) != 0
 }

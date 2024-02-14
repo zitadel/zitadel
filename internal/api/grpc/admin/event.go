@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -17,7 +18,7 @@ func (s *Server) ListEvents(ctx context.Context, in *admin_pb.ListEventsRequest)
 	if err != nil {
 		return nil, err
 	}
-	events, err := s.query.SearchEvents(ctx, filter, s.auditLogRetention)
+	events, err := s.query.SearchEvents(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
@@ -36,6 +37,25 @@ func (s *Server) ListAggregateTypes(ctx context.Context, in *admin_pb.ListAggreg
 }
 
 func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) (*eventstore.SearchQueryBuilder, error) {
+	var fromTime, sinceTime, untilTime time.Time
+	// We ignore the deprecation warning here because we still need to support the deprecated field.
+	//nolint:staticcheck
+	if creationDatePb := req.GetCreationDate(); creationDatePb != nil {
+		fromTime = creationDatePb.AsTime()
+	}
+	if fromTimePb := req.GetFrom(); fromTimePb != nil {
+		fromTime = fromTimePb.AsTime()
+	}
+	if timeRange := req.GetRange(); timeRange != nil {
+		// If range is set, we ignore the from and the deprecated creation_date fields
+		fromTime = time.Time{}
+		if timeSincePb := timeRange.GetSince(); timeSincePb != nil {
+			sinceTime = timeSincePb.AsTime()
+		}
+		if timeUntilPb := timeRange.GetUntil(); timeUntilPb != nil {
+			untilTime = timeUntilPb.AsTime()
+		}
+	}
 	eventTypes := make([]eventstore.EventType, len(req.EventTypes))
 	for i, eventType := range req.EventTypes {
 		eventTypes[i] = eventstore.EventType(eventType)
@@ -57,19 +77,26 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 		OrderDesc().
 		InstanceID(authz.GetInstance(ctx).InstanceID()).
 		Limit(limit).
+		AwaitOpenTransactions().
 		ResourceOwner(req.ResourceOwner).
 		EditorUser(req.EditorUserId).
-		AddQuery().
-		AggregateIDs(aggregateIDs...).
-		AggregateTypes(aggregateTypes...).
-		EventTypes(eventTypes...).
-		CreationDateAfter(req.CreationDate.AsTime()).
 		SequenceGreater(req.Sequence).
-		Builder()
+		CreationDateAfter(sinceTime).
+		CreationDateBefore(untilTime)
 
-	if req.Asc {
-		builder.OrderAsc()
+	if len(aggregateIDs) > 0 || len(aggregateTypes) > 0 || len(eventTypes) > 0 {
+		builder.AddQuery().
+			AggregateIDs(aggregateIDs...).
+			AggregateTypes(aggregateTypes...).
+			EventTypes(eventTypes...).
+			Builder()
 	}
 
+	if req.GetAsc() {
+		builder.OrderAsc()
+		builder.CreationDateAfter(fromTime)
+	} else {
+		builder.CreationDateBefore(fromTime)
+	}
 	return builder, nil
 }

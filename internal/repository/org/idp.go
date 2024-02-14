@@ -6,7 +6,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 )
 
@@ -33,6 +32,10 @@ const (
 	GoogleIDPChangedEventType           eventstore.EventType = "org.idp.google.changed"
 	LDAPIDPAddedEventType               eventstore.EventType = "org.idp.ldap.added"
 	LDAPIDPChangedEventType             eventstore.EventType = "org.idp.ldap.changed"
+	AppleIDPAddedEventType              eventstore.EventType = "org.idp.apple.added"
+	AppleIDPChangedEventType            eventstore.EventType = "org.idp.apple.changed"
+	SAMLIDPAddedEventType               eventstore.EventType = "org.idp.saml.added"
+	SAMLIDPChangedEventType             eventstore.EventType = "org.idp.saml.changed"
 	IDPRemovedEventType                 eventstore.EventType = "org.idp.removed"
 )
 
@@ -76,7 +79,7 @@ func NewOAuthIDPAddedEvent(
 	}
 }
 
-func OAuthIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OAuthIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.OAuthIDPAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -111,7 +114,7 @@ func NewOAuthIDPChangedEvent(
 	return &OAuthIDPChangedEvent{OAuthIDPChangedEvent: *changedEvent}, nil
 }
 
-func OAuthIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OAuthIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.OAuthIDPChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -156,7 +159,7 @@ func NewOIDCIDPAddedEvent(
 	}
 }
 
-func OIDCIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.OIDCIDPAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -191,7 +194,7 @@ func NewOIDCIDPChangedEvent(
 	return &OIDCIDPChangedEvent{OIDCIDPChangedEvent: *changedEvent}, nil
 }
 
-func OIDCIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.OIDCIDPChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -235,7 +238,7 @@ func NewOIDCIDPMigratedAzureADEvent(
 	}
 }
 
-func OIDCIDPMigratedAzureADEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCIDPMigratedAzureADEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.OIDCIDPMigratedAzureADEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -275,7 +278,7 @@ func NewOIDCIDPMigratedGoogleEvent(
 	}
 }
 
-func OIDCIDPMigratedGoogleEventMapper(event *repository.Event) (eventstore.Event, error) {
+func OIDCIDPMigratedGoogleEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.OIDCIDPMigratedGoogleEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -318,7 +321,7 @@ func NewJWTIDPAddedEvent(
 	}
 }
 
-func JWTIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func JWTIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.JWTIDPAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -353,7 +356,7 @@ func NewJWTIDPChangedEvent(
 	return &JWTIDPChangedEvent{JWTIDPChangedEvent: *changedEvent}, nil
 }
 
-func JWTIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func JWTIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.JWTIDPChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -398,7 +401,7 @@ func NewAzureADIDPAddedEvent(
 	}
 }
 
-func AzureADIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func AzureADIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.AzureADIDPAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -433,7 +436,7 @@ func NewAzureADIDPChangedEvent(
 	return &AzureADIDPChangedEvent{AzureADIDPChangedEvent: *changedEvent}, nil
 }
 
-func AzureADIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func AzureADIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.AzureADIDPChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -474,7 +477,7 @@ func NewGitHubIDPAddedEvent(
 	}
 }
 
-func GitHubIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GitHubIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.GitHubIDPAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -509,7 +512,7 @@ func NewGitHubIDPChangedEvent(
 	return &GitHubIDPChangedEvent{GitHubIDPChangedEvent: *changedEvent}, nil
 }
 
-func GitHubIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GitHubIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.GitHubIDPChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -556,7 +559,7 @@ func NewGitHubEnterpriseIDPAddedEvent(
 	}
 }
 
-func GitHubEnterpriseIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GitHubEnterpriseIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.GitHubEnterpriseIDPAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -591,7 +594,7 @@ func NewGitHubEnterpriseIDPChangedEvent(
 	return &GitHubEnterpriseIDPChangedEvent{GitHubEnterpriseIDPChangedEvent: *changedEvent}, nil
 }
 
-func GitHubEnterpriseIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GitHubEnterpriseIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.GitHubEnterpriseIDPChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -632,7 +635,7 @@ func NewGitLabIDPAddedEvent(
 	}
 }
 
-func GitLabIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GitLabIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.GitLabIDPAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -667,7 +670,7 @@ func NewGitLabIDPChangedEvent(
 	return &GitLabIDPChangedEvent{GitLabIDPChangedEvent: *changedEvent}, nil
 }
 
-func GitLabIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GitLabIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.GitLabIDPChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -710,7 +713,7 @@ func NewGitLabSelfHostedIDPAddedEvent(
 	}
 }
 
-func GitLabSelfHostedIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GitLabSelfHostedIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.GitLabSelfHostedIDPAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -745,7 +748,7 @@ func NewGitLabSelfHostedIDPChangedEvent(
 	return &GitLabSelfHostedIDPChangedEvent{GitLabSelfHostedIDPChangedEvent: *changedEvent}, nil
 }
 
-func GitLabSelfHostedIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GitLabSelfHostedIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.GitLabSelfHostedIDPChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -786,7 +789,7 @@ func NewGoogleIDPAddedEvent(
 	}
 }
 
-func GoogleIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GoogleIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.GoogleIDPAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -821,7 +824,7 @@ func NewGoogleIDPChangedEvent(
 	return &GoogleIDPChangedEvent{GoogleIDPChangedEvent: *changedEvent}, nil
 }
 
-func GoogleIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func GoogleIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.GoogleIDPChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -876,7 +879,7 @@ func NewLDAPIDPAddedEvent(
 	}
 }
 
-func LDAPIDPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LDAPIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.LDAPIDPAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -911,13 +914,172 @@ func NewLDAPIDPChangedEvent(
 	return &LDAPIDPChangedEvent{LDAPIDPChangedEvent: *changedEvent}, nil
 }
 
-func LDAPIDPChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func LDAPIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.LDAPIDPChangedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
 	return &LDAPIDPChangedEvent{LDAPIDPChangedEvent: *e.(*idp.LDAPIDPChangedEvent)}, nil
+}
+
+type AppleIDPAddedEvent struct {
+	idp.AppleIDPAddedEvent
+}
+
+func NewAppleIDPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name,
+	clientID,
+	teamID,
+	keyID string,
+	privateKey *crypto.CryptoValue,
+	scopes []string,
+	options idp.Options,
+) *AppleIDPAddedEvent {
+
+	return &AppleIDPAddedEvent{
+		AppleIDPAddedEvent: *idp.NewAppleIDPAddedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				AppleIDPAddedEventType,
+			),
+			id,
+			name,
+			clientID,
+			teamID,
+			keyID,
+			privateKey,
+			scopes,
+			options,
+		),
+	}
+}
+
+func AppleIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	e, err := idp.AppleIDPAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &AppleIDPAddedEvent{AppleIDPAddedEvent: *e.(*idp.AppleIDPAddedEvent)}, nil
+}
+
+type AppleIDPChangedEvent struct {
+	idp.AppleIDPChangedEvent
+}
+
+func NewAppleIDPChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+	changes []idp.AppleIDPChanges,
+) (*AppleIDPChangedEvent, error) {
+
+	changedEvent, err := idp.NewAppleIDPChangedEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			AppleIDPChangedEventType,
+		),
+		id,
+		changes,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &AppleIDPChangedEvent{AppleIDPChangedEvent: *changedEvent}, nil
+}
+
+func AppleIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	e, err := idp.AppleIDPChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &AppleIDPChangedEvent{AppleIDPChangedEvent: *e.(*idp.AppleIDPChangedEvent)}, nil
+}
+
+type SAMLIDPAddedEvent struct {
+	idp.SAMLIDPAddedEvent
+}
+
+func NewSAMLIDPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id,
+	name string,
+	metadata []byte,
+	key *crypto.CryptoValue,
+	certificate []byte,
+	binding string,
+	withSignedRequest bool,
+	options idp.Options,
+) *SAMLIDPAddedEvent {
+
+	return &SAMLIDPAddedEvent{
+		SAMLIDPAddedEvent: *idp.NewSAMLIDPAddedEvent(
+			eventstore.NewBaseEventForPush(
+				ctx,
+				aggregate,
+				SAMLIDPAddedEventType,
+			),
+			id,
+			name,
+			metadata,
+			key,
+			certificate,
+			binding,
+			withSignedRequest,
+			options,
+		),
+	}
+}
+
+func SAMLIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	e, err := idp.SAMLIDPAddedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &SAMLIDPAddedEvent{SAMLIDPAddedEvent: *e.(*idp.SAMLIDPAddedEvent)}, nil
+}
+
+type SAMLIDPChangedEvent struct {
+	idp.SAMLIDPChangedEvent
+}
+
+func NewSAMLIDPChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+	changes []idp.SAMLIDPChanges,
+) (*SAMLIDPChangedEvent, error) {
+	changedEvent, err := idp.NewSAMLIDPChangedEvent(
+		eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			SAMLIDPChangedEventType,
+		),
+		id,
+		changes,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &SAMLIDPChangedEvent{SAMLIDPChangedEvent: *changedEvent}, nil
+}
+
+func SAMLIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	e, err := idp.SAMLIDPChangedEventMapper(event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &SAMLIDPChangedEvent{SAMLIDPChangedEvent: *e.(*idp.SAMLIDPChangedEvent)}, nil
 }
 
 type IDPRemovedEvent struct {
@@ -941,11 +1103,11 @@ func NewIDPRemovedEvent(
 	}
 }
 
-func (e *IDPRemovedEvent) Data() interface{} {
+func (e *IDPRemovedEvent) Payload() interface{} {
 	return e
 }
 
-func IDPRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func IDPRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	e, err := idp.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err

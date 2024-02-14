@@ -26,10 +26,12 @@ type Session struct {
 	loginUrl string
 	User     string
 	Password string
+	Entry    *ldap.Entry
 }
 
-func (s *Session) GetAuthURL() string {
-	return s.loginUrl
+// GetAuth implements the [idp.Session] interface.
+func (s *Session) GetAuth(ctx context.Context) (string, bool) {
+	return idp.Redirect(s.loginUrl)
 }
 
 func (s *Session) FetchUser(_ context.Context) (_ idp.User, err error) {
@@ -57,6 +59,7 @@ func (s *Session) FetchUser(_ context.Context) (_ idp.User, err error) {
 	if err != nil {
 		return nil, err
 	}
+	s.Entry = user
 
 	return mapLDAPEntryToUser(
 		user,

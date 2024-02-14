@@ -65,11 +65,41 @@ func UserGrantsFromQuery(c *actions.FieldConfig, userGrants *query.UserGrants) g
 	grantList := &userGrantList{
 		Count:     userGrants.Count,
 		Sequence:  userGrants.Sequence,
-		Timestamp: userGrants.Timestamp,
+		Timestamp: userGrants.LastRun,
 		Grants:    make([]*userGrant, len(userGrants.UserGrants)),
 	}
 
 	for i, grant := range userGrants.UserGrants {
+		grantList.Grants[i] = &userGrant{
+			Id:                         grant.ID,
+			ProjectGrantId:             grant.GrantID,
+			State:                      grant.State,
+			CreationDate:               grant.CreationDate,
+			ChangeDate:                 grant.ChangeDate,
+			Sequence:                   grant.Sequence,
+			UserId:                     grant.UserID,
+			Roles:                      grant.Roles,
+			UserResourceOwner:          grant.UserResourceOwner,
+			UserGrantResourceOwner:     grant.ResourceOwner,
+			UserGrantResourceOwnerName: grant.OrgName,
+			ProjectId:                  grant.ProjectID,
+			ProjectName:                grant.ProjectName,
+		}
+	}
+
+	return c.Runtime.ToValue(grantList)
+}
+
+func UserGrantsFromSlice(c *actions.FieldConfig, userGrants []query.UserGrant) goja.Value {
+	if userGrants == nil {
+		return c.Runtime.ToValue(nil)
+	}
+	grantList := &userGrantList{
+		Count:  uint64(len(userGrants)),
+		Grants: make([]*userGrant, len(userGrants)),
+	}
+
+	for i, grant := range userGrants {
 		grantList.Grants[i] = &userGrant{
 			Id:                         grant.ID,
 			ProjectGrantId:             grant.GrantID,

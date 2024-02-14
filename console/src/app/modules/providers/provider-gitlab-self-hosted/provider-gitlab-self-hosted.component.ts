@@ -2,7 +2,7 @@ import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
-import { MatLegacyChipInputEvent as MatChipInputEvent } from '@angular/material/legacy-chips';
+import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs';
 import {
@@ -66,8 +66,8 @@ export class ProviderGitlabSelfHostedComponent {
         this.serviceType === PolicyComponentServiceType.ADMIN
           ? ['iam.idp.write']
           : this.serviceType === PolicyComponentServiceType.MGMT
-          ? ['org.idp.write']
-          : [],
+            ? ['org.idp.write']
+            : [],
       )
       .pipe(take(1))
       .subscribe((allowed) => {

@@ -7,11 +7,10 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/policy"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_AddNotificationPolicy(t *testing.T) {
@@ -46,7 +45,7 @@ func TestCommandSide_AddNotificationPolicy(t *testing.T) {
 				passwordChange: true,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -70,7 +69,7 @@ func TestCommandSide_AddNotificationPolicy(t *testing.T) {
 				passwordChange: true,
 			},
 			res: res{
-				err: caos_errs.IsErrorAlreadyExists,
+				err: zerrors.IsErrorAlreadyExists,
 			},
 		},
 		{
@@ -80,14 +79,10 @@ func TestCommandSide_AddNotificationPolicy(t *testing.T) {
 					t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewNotificationPolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									true,
-								),
-							),
-						},
+						org.NewNotificationPolicyAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							true,
+						),
 					),
 				),
 			},
@@ -109,14 +104,10 @@ func TestCommandSide_AddNotificationPolicy(t *testing.T) {
 					t,
 					expectFilter(),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewNotificationPolicyAddedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate,
-									false,
-								),
-							),
-						},
+						org.NewNotificationPolicyAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							false,
+						),
 					),
 				),
 			},
@@ -182,7 +173,7 @@ func TestCommandSide_ChangeNotificationPolicy(t *testing.T) {
 				passwordChange: true,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -199,7 +190,7 @@ func TestCommandSide_ChangeNotificationPolicy(t *testing.T) {
 				passwordChange: true,
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -223,7 +214,7 @@ func TestCommandSide_ChangeNotificationPolicy(t *testing.T) {
 				passwordChange: true,
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -240,11 +231,7 @@ func TestCommandSide_ChangeNotificationPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newNotificationPolicyChangedEvent(context.Background(), "org1", false),
-							),
-						},
+						newNotificationPolicyChangedEvent(context.Background(), "org1", false),
 					),
 				),
 			},
@@ -308,7 +295,7 @@ func TestCommandSide_RemoveNotificationPolicy(t *testing.T) {
 				ctx: context.Background(),
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -324,7 +311,7 @@ func TestCommandSide_RemoveNotificationPolicy(t *testing.T) {
 				orgID: "org1",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -341,12 +328,8 @@ func TestCommandSide_RemoveNotificationPolicy(t *testing.T) {
 						),
 					),
 					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								org.NewNotificationPolicyRemovedEvent(context.Background(),
-									&org.NewAggregate("org1").Aggregate),
-							),
-						},
+						org.NewNotificationPolicyRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate),
 					),
 				),
 			},

@@ -10,12 +10,14 @@ import (
 	"testing"
 
 	"github.com/dop251/goja"
-	"github.com/zitadel/zitadel/internal/errors"
+
 	"github.com/zitadel/zitadel/internal/logstore"
+	"github.com/zitadel/zitadel/internal/logstore/record"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func Test_isHostBlocked(t *testing.T) {
-	SetLogstoreService(logstore.New(nil, nil, nil))
+	SetLogstoreService(logstore.New[*record.ExecutionLog](nil, nil))
 	var denyList = []AddressChecker{
 		mustNewIPChecker(t, "192.168.5.0/24"),
 		mustNewIPChecker(t, "127.0.0.1"),
@@ -206,7 +208,7 @@ func TestHTTP_fetchConfigFromArg(t *testing.T) {
 			},
 			wantConfig: fetchConfig{},
 			wantErr: func(err error) bool {
-				return errors.IsErrorInvalidArgument(err)
+				return zerrors.IsErrorInvalidArgument(err)
 			},
 		},
 	}

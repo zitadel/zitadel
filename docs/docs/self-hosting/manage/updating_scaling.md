@@ -1,5 +1,6 @@
 ---
-title: Updating and Scaling
+title: Update and Scale ZITADEL
+sidebar_label: Update and Scale
 ---
 
 ## TL;DR
@@ -60,16 +61,21 @@ ZITADEL uses the privileged and preexisting database user configured in `Databas
 - If not already done, it grants the necessary permissions ZITADEL needs to the non privileged user.
 - If they don’t exist already, it creates all schemas and some basic tables.
 
+The init phase is idempotent if executed with the same binary version.
+
 ### The Setup Phase
 
-During `zitadel setup`, ZITADEL creates projection tables and migrates existing data.
+During `zitadel setup`, ZITADEL creates projection tables and migrates existing data, if `--init-projections=true` is set.
 Depending on the ZITADEL version and the runtime resources,
 this step can take several minutes.
 When deploying a new ZITADEL version,
 make sure the setup phase runs before you roll out the new `zitadel start` processes.
 The setup phase is executed in subsequent steps
 whereas a new version's execution takes over where the last execution stopped.
-Therefore, configuration changes relevant for the setup phase won’t take effect in regard to the setup execution.
+
+Some configuration changes are only applied during the setup phase, like ExternalDomain, ExternalPort and ExternalSecure.
+
+The setup phase is idempotent if executed with the same binary version.
 
 ### The Runtime Phase
 
@@ -79,5 +85,4 @@ Beware, in the background, out-of-date projections
 [recompute their state by replaying all missed events](/docs/concepts/eventstore/implementation#projections).
 If a new ZITADEL version is deployed, this can take quite a long time,
 depending on the amount of events to catch up.
-You probably should consider manually migrating these projections first.
-Refer to the [release notes for v2.14.0](https://github.com/zitadel/zitadel/releases/tag/v2.14.0) as an example.
+You probably should consider providing `--init-projections=true`-flag to the [Setup Phase](#the-setup-phase) to shift the synchronization time to previous steps and delay the startup phase until events are caught up.

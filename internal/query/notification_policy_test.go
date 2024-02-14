@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -50,13 +50,13 @@ func Test_NotificationPolicyPrepares(t *testing.T) {
 			name:    "prepareNotificationPolicyQuery no result",
 			prepare: prepareNotificationPolicyQuery,
 			want: want{
-				sqlExpectations: mockQueries(
+				sqlExpectations: mockQueriesScanErr(
 					notificationPolicyStmt,
 					nil,
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be NotFoundError got: %w", err), false
 					}
 					return nil, true
@@ -109,7 +109,7 @@ func Test_NotificationPolicyPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: nil,
+			object: (*NotificationPolicy)(nil),
 		},
 	}
 	for _, tt := range tests {
