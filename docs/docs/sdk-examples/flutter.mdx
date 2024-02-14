@@ -1,0 +1,67 @@
+---
+title: Flutter
+sidebar_label: Flutter
+---
+
+<table>
+    <tr>
+        <td width="100px">
+            <img width="100px" src="/docs/img/tech/flutter.svg" alt="flutter logo"/>
+        </td>
+        <td>
+            <a href="https://flutter.dev/" target="_blank">Flutter</a> is a cross-platform mobile app development framework that allows developers to build native iOS and Android apps using a single codebase.
+            Integrate authentication to your Flutter App easily by using the <a href="https://github.com/zitadel/zitadel_flutter" target="_blank">zitadel-flutter</a> Example.
+        </td>
+    </tr>
+</table>
+
+### Resources
+- [Flutter Example Application Repository](https://github.com/zitadel/zitadel_flutter)
+- [Step-By-Step Guide](/docs/examples/login/flutter) to create your Flutter App with ZITADEL Login
+- [Dart Client Library for ZITADEL](https://github.com/smartive/zitadel-dart)
+
+### Flutter SDK
+
+ZITADEL doesn't provide a specific Flutter SDK for authentication in your Web/Mobile App.
+You can use any OIDC Library such as [package:oidc](https://pub.dev/packages/oidc).
+For Mobile Apps we recommend [Flutter AppAuth](https://pub.dev/packages/flutter_appauth).
+
+Check out our [Example Application](/docs/sdk-examples/flutter#example-application).
+
+Additionally, you can use [smartive/zitadel-dart](https://github.com/smartive/zitadel-dart) for user and resource management.
+- Manage Resources through ZITADEL APIs
+  - Authenticate Service User
+  - Generated gRPC Clients for integrating ZITADEL API
+  - User, Organization, Project, etc. Management
+
+:::note
+This library is built by our community.
+:::
+
+### Example Application
+
+The [zitadel-flutter](https://github.com/zitadel/zitadel_flutter) repository includes an Example Application ready to start and show how an Flutter application looks like with integrated ZITADEL Login.
+
+What does the Example include:
+- Home Page with Login Button
+- Authenticating user with OIDC PKCE Flow
+- Private Page: Only accessible after login
+
+### Step-By-Step Guide
+
+The [Step-By-Step Guide](/docs/examples/login/flutter) leads you through the whole process from configuring the right application in ZITADEL to a ready application with integrated Login.
+
+After completing the Step-By-Step Guide you will have:
+1. Example Mobile App with integrated ZITADEL Login
+2. Example page accessible by authenticated user
+3. Correct setup for your application in ZITADEL
+
+<div style={{display: 'grid', 'gridColumnGap': '1rem', 'gridTemplateColumns': '1fr 1fr', 'maxWidth': '500px', 'margin': '0 auto'}}>
+    <img src="/docs/img/flutter/not-authed.png" alt="Unauthenticated" height="500px" />
+    <img src="/docs/img/flutter/authed.png" alt="Flutter Authenticated" height="500px" />
+</div>
+
+<div style={{display: 'grid', 'gridColumnGap': '1rem', 'gridTemplateColumns': '1fr 1fr', 'maxWidth': '800px', 'margin': '0 auto'}}>
+    <img src="/docs/img/flutter/web-not-authed.png" alt="Unauthenticated" height="500px" />
+    <img src="/docs/img/flutter/web-authed.png" alt="Flutter Authenticated" height="500px" />
+</div>
