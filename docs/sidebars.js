@@ -11,14 +11,20 @@ module.exports = {
           type: "category",
           label: "Frontend",
           items: [
-            "examples/login/react",
-            "examples/login/vue",
             "examples/login/angular",
             "examples/login/flutter",
-            "examples/login/nextjs",
             "examples/login/go",
-            "examples/login/symfony",
             "examples/login/java-spring",
+            "examples/login/nextjs",
+            "examples/login/python-django",
+            "examples/login/react",
+            "examples/login/symfony",
+            "examples/login/vue",
+            {
+              type: "link",
+              label: ".Net",
+              href: "https://github.com/smartive/zitadel-net",
+            },
           ],
           collapsed: true,
         },
@@ -27,33 +33,72 @@ module.exports = {
           label: "Backend",
           items: [
             "examples/secure-api/go",
-            "examples/secure-api/python-flask",
-            "examples/secure-api/dot-net",
-            "examples/secure-api/nodejs-nestjs",
             "examples/secure-api/java-spring",
+            "examples/secure-api/python-django",
+            "examples/secure-api/python-flask",
+            "examples/secure-api/nodejs-nestjs",
+            {
+              type: "link",
+              label: ".Net",
+              href: "https://github.com/smartive/zitadel-net",
+            },
           ],
           collapsed: true,
         },
       ],
     },
-    "examples/sdks",
     {
       type: "category",
-      label: "Example Applications",
+      label: "Examples & SDKs",
       items: [
-        "examples/introduction",
+        "sdk-examples/introduction",
+        "sdk-examples/angular",
+        "sdk-examples/flutter",
+        "sdk-examples/go",
+        "sdk-examples/java",
+        "sdk-examples/nestjs",
+        "sdk-examples/nextjs",
+        "sdk-examples/python-flask",
+        "sdk-examples/python-django",
+        "sdk-examples/react",
+        "sdk-examples/symfony",
+        "sdk-examples/vue",
         {
           type: "link",
-          label: "Frontend", // The link label
-          href: "/examples/introduction#frontend", // The internal path
+          label: "Dart",
+          href: "https://github.com/smartive/zitadel-dart",
         },
         {
           type: "link",
-          label: "Backend", // The link label
-          href: "/examples/introduction#backend", // The internal path
+          label: "Elixir",
+          href: "https://github.com/maennchen/zitadel_api",
+        },
+        {
+          type: "link",
+          label: "NextAuth",
+          href: "https://next-auth.js.org/providers/zitadel",
+        },
+        {
+          type: "link",
+              label: "Node.js",
+            href: "https://www.npmjs.com/package/@zitadel/node",
+        },
+        {
+          type: "link",
+          label: ".Net",
+          href: "https://github.com/smartive/zitadel-net",
+        },
+        {
+          type: "link",
+          label: "Passport.js",
+          href: "https://github.com/buehler/node-passport-zitadel",
+        },
+        {
+          type: "link",
+          label: "Rust",
+          href: "https://github.com/smartive/zitadel-rust",
         },
       ],
-      collapsed: true,
     },
     {
       type: "category",
@@ -248,6 +293,7 @@ module.exports = {
             "guides/integrate/identity-providers/migrate",
             "guides/integrate/identity-providers/okta",
             "guides/integrate/identity-providers/keycloak",
+            "guides/integrate/identity-providers/additional-information",
           ],
         },
         {
@@ -370,6 +416,23 @@ module.exports = {
         "guides/solution-scenarios/configurations",
         "guides/solution-scenarios/frontend-calling-backend-API",
         "guides/solution-scenarios/device-authorization",
+        {
+          type: "category",
+          label: "Onboarding Customers and Users",
+          link: {
+            type: "generated-index",
+            title: "Onboarding Customers and Users",
+            slug: "/guides/solution-scenarios/onboarding",
+            description:
+                "When building your own application, one of the first questions you have to face, is 'How do my customers onboard to my application?'\n" +
+                "This guide will show you the built-in solution you have, within ZITADEL and how you can use ZITADEL when you have more advanced needs.",
+          },
+          collapsed: true,
+          items: [
+            "guides/solution-scenarios/onboarding/b2b",
+            "guides/solution-scenarios/onboarding/end-users",
+          ],
+        }
       ],
     },
     {

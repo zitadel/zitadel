@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instance",
+    "INSTANCE": "Výchozí nastavení",
     "DASHBOARD": "Domů",
     "PERSONAL_INFO": "Osobní informace",
     "DOCUMENTATION": "Dokumentace",
@@ -228,6 +228,7 @@
     "EMAIL": "Email",
     "USERNAME": "Uživatelské jméno",
     "ORGNAME": "Název organizace",
+    "PRIMARYDOMAIN": "Primární doména",
     "PROJECTNAME": "Název projektu",
     "RESOURCEOWNER": "Vlastník zdroje",
     "METHODS": {
@@ -1023,6 +1024,7 @@
       "DESCRIPTION": "Tato nastavení rozšiřují a přepisují nastavení vaší instance."
     },
     "LIST": {
+      "ORGS": "Organizace",
       "LANGUAGES": "Jazyky",
       "LOGIN": "Chování při přihlášení a bezpečnost",
       "LOCKOUT": "Blokování",
@@ -1040,15 +1042,20 @@
       "PRIVACYPOLICY": "Zásady ochrany osobních údajů",
       "OIDC": "Životnost a expirace OIDC tokenu",
       "SECRETS": "Generátor tajemství",
-      "SECURITY": "Bezpečnostní nastavení"
+      "SECURITY": "Bezpečnostní nastavení",
+      "EVENTS": "Události",
+      "FAILEDEVENTS": "Selhané události",
+      "VIEWS": "Pohledy"
     },
     "GROUPS": {
+      "GENERAL": "Obecné informace",
       "NOTIFICATIONS": "Oznámení",
       "LOGIN": "Přihlášení a přístup",
       "DOMAIN": "Doména",
       "TEXTS": "Texty a jazyky",
       "APPEARANCE": "Vzhled",
-      "OTHER": "Ostatní"
+      "OTHER": "Ostatní",
+      "STORAGE": "Data"
     }
   },
   "SETTING": {
@@ -2246,7 +2253,8 @@
     "TOAST": {
       "UPDATED": "Autorizace aktualizována.",
       "REMOVED": "Autorizace odebrána",
-      "BULKREMOVED": "Autorizace odebrány."
+      "BULKREMOVED": "Autorizace odebrány.",
+      "CANTSHOWINFO": "Nemůžete navštívit profil tohoto uživatele, protože nejste členem organizace, do které tento uživatel patří"
     },
     "DIALOG": {
       "DELETE_TITLE": "Smazat autorizaci",

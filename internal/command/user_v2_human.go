@@ -394,7 +394,7 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 
 	// password already hashed in request
 	if password.EncodedPasswordHash != nil {
-		cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, *password.EncodedPasswordHash, password.ChangeRequired, true)
+		cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, *password.EncodedPasswordHash, "", password.ChangeRequired, true)
 		if cmd != nil {
 			return append(cmds, cmd), err
 		}
@@ -402,7 +402,7 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 	}
 	// password already hashed in verify
 	if encodedPassword != "" {
-		cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, encodedPassword, password.ChangeRequired, true)
+		cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, encodedPassword, "", password.ChangeRequired, true)
 		if cmd != nil {
 			return append(cmds, cmd), err
 		}
@@ -410,7 +410,7 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 	}
 	// password still to be hashed
 	if password.Password != nil {
-		cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, *password.Password, password.ChangeRequired, false)
+		cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, *password.Password, "", password.ChangeRequired, false)
 		if cmd != nil {
 			return append(cmds, cmd), err
 		}

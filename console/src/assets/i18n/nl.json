@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instantie",
+    "INSTANCE": "Standaard instellingen",
     "DASHBOARD": "Home",
     "PERSONAL_INFO": "Persoonlijke informatie",
     "DOCUMENTATION": "Documentatie",
@@ -228,6 +228,7 @@
     "EMAIL": "E-mail",
     "USERNAME": "Gebruikersnaam",
     "ORGNAME": "Organisatienaam",
+    "PRIMARYDOMAIN": "Primair domein",
     "PROJECTNAME": "Projectnaam",
     "RESOURCEOWNER": "Eigenaar van de bron",
     "METHODS": {
@@ -1023,6 +1024,7 @@
       "DESCRIPTION": "Deze instellingen breiden uw instantie instellingen uit en overschrijven deze."
     },
     "LIST": {
+      "ORGS": "Organisaties",
       "LANGUAGES": "Talen",
       "LOGIN": "Login Gedrag en Beveiliging",
       "LOCKOUT": "Lockout",
@@ -1040,15 +1042,20 @@
       "PRIVACYPOLICY": "Privacybeleid",
       "OIDC": "OIDC Token levensduur en vervaldatum",
       "SECRETS": "Secret Generator",
-      "SECURITY": "Beveiligingsinstellingen"
+      "SECURITY": "Beveiligingsinstellingen",
+      "EVENTS": "Evenementen",
+      "FAILEDEVENTS": "Mislukte evenementen",
+      "VIEWS": "Weergaves"
     },
     "GROUPS": {
+      "GENERAL": "Algemeen",
       "NOTIFICATIONS": "Notificaties",
       "LOGIN": "Login en Toegang",
       "DOMAIN": "Domein",
       "TEXTS": "Teksten en Talen",
       "APPEARANCE": "Verschijning",
-      "OTHER": "Andere"
+      "OTHER": "Andere",
+      "STORAGE": "opslag"
     }
   },
   "SETTING": {
@@ -2255,7 +2262,8 @@
     "TOAST": {
       "UPDATED": "Autorisatie bijgewerkt.",
       "REMOVED": "Autorisatie verwijderd",
-      "BULKREMOVED": "Autorisaties verwijderd."
+      "BULKREMOVED": "Autorisaties verwijderd.",
+      "CANTSHOWINFO": "U kunt het profiel van deze gebruiker niet bezoeken omdat u geen lid bent van de organisatie waartoe deze gebruiker behoort"
     },
     "DIALOG": {
       "DELETE_TITLE": "Verwijder autorisatie",

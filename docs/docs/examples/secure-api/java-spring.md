@@ -38,7 +38,7 @@ If your starting from scratch, you can use the Spring Initializer with the [foll
 ### Support class
 
 To be able to take the most out of ZITADELs RBAC, we first need to create a CustomAuthorityOpaqueTokenIntrospector, that will
-customize the introspection behaviour and map the role claims (`urn:zitadel:iam:org:project:roles`)
+customize the introspection behavior and map the role claims (`urn:zitadel:iam:org:project:roles`)
 into Spring Security `authiorities`, which can be used later on to determine the granted permissions.
 
 So in your application, create a `support/zitadel` package and in there the `CustomAuthorityOpaqueTokenIntrospector.java`:
