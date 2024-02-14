@@ -42,7 +42,6 @@ enum State {
   USER_STATE_INACTIVE = 2;
   USER_STATE_DELETED = 3;
   USER_STATE_LOCKED = 4;
-  USER_STATE_INITIAL = 5;
 }
 
 message Schema {
