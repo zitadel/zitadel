@@ -1,4 +1,4 @@
-package execution
+package target
 
 import "github.com/zitadel/zitadel/internal/eventstore"
 

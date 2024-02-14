@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -12,18 +13,18 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
-	"github.com/zitadel/zitadel/internal/repository/execution"
+	"github.com/zitadel/zitadel/internal/repository/target"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func TestCommands_AddExecution(t *testing.T) {
+func TestCommands_AddTarget(t *testing.T) {
 	type fields struct {
 		eventstore  *eventstore.Eventstore
 		idGenerator id.Generator
 	}
 	type args struct {
 		ctx           context.Context
-		addExecution  *Execution
+		add           *AddTarget
 		resourceOwner string
 	}
 	type res struct {
@@ -44,7 +45,7 @@ func TestCommands_AddExecution(t *testing.T) {
 			},
 			args{
 				ctx:           context.Background(),
-				addExecution:  &Execution{},
+				add:           &AddTarget{},
 				resourceOwner: "org1",
 			},
 			res{
@@ -57,10 +58,10 @@ func TestCommands_AddExecution(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
-						execution.NewAddedEvent(context.Background(),
-							execution.NewAggregate("id1", "org1"),
+						target.NewAddedEvent(context.Background(),
+							target.NewAggregate("id1", "org1"),
 							"name",
-							domain.ExecutionTypeWebhook,
+							domain.TargetTypeWebhook,
 							"https://example.com",
 							0,
 							false,
@@ -72,10 +73,10 @@ func TestCommands_AddExecution(t *testing.T) {
 			},
 			args{
 				ctx: context.Background(),
-				addExecution: &Execution{
+				add: &AddTarget{
 					Name:          "name",
 					URL:           "https://example.com",
-					ExecutionType: domain.ExecutionTypeWebhook,
+					ExecutionType: domain.TargetTypeWebhook,
 				},
 				resourceOwner: "org1",
 			},
@@ -88,10 +89,10 @@ func TestCommands_AddExecution(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						execution.NewAddedEvent(context.Background(),
-							execution.NewAggregate("id1", "org1"),
+						target.NewAddedEvent(context.Background(),
+							target.NewAggregate("id1", "org1"),
 							"name",
-							domain.ExecutionTypeWebhook,
+							domain.TargetTypeWebhook,
 							"https://example.com",
 							0,
 							false,
@@ -103,9 +104,9 @@ func TestCommands_AddExecution(t *testing.T) {
 			},
 			args{
 				ctx: context.Background(),
-				addExecution: &Execution{
+				add: &AddTarget{
 					Name:          "name",
-					ExecutionType: domain.ExecutionTypeWebhook,
+					ExecutionType: domain.TargetTypeWebhook,
 					URL:           "https://example.com",
 				},
 				resourceOwner: "org1",
@@ -122,10 +123,10 @@ func TestCommands_AddExecution(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectPush(
-						execution.NewAddedEvent(context.Background(),
-							execution.NewAggregate("id1", "org1"),
+						target.NewAddedEvent(context.Background(),
+							target.NewAggregate("id1", "org1"),
 							"name",
-							domain.ExecutionTypeWebhook,
+							domain.TargetTypeWebhook,
 							"https://example.com",
 							time.Second,
 							true,
@@ -137,9 +138,9 @@ func TestCommands_AddExecution(t *testing.T) {
 			},
 			args{
 				ctx: context.Background(),
-				addExecution: &Execution{
+				add: &AddTarget{
 					Name:             "name",
-					ExecutionType:    domain.ExecutionTypeWebhook,
+					ExecutionType:    domain.TargetTypeWebhook,
 					URL:              "https://example.com",
 					Timeout:          time.Second,
 					Async:            true,
@@ -161,7 +162,7 @@ func TestCommands_AddExecution(t *testing.T) {
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			details, err := c.AddExecution(tt.args.ctx, tt.args.addExecution, tt.args.resourceOwner)
+			details, err := c.AddTarget(tt.args.ctx, tt.args.add, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -169,21 +170,21 @@ func TestCommands_AddExecution(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.id, tt.args.addExecution.AggregateID)
+				assert.Equal(t, tt.res.id, tt.args.add.AggregateID)
 				assert.Equal(t, tt.res.details, details)
 			}
 		})
 	}
 }
 
-func TestCommands_ChangeExecution(t *testing.T) {
+func TestCommands_ChangeTarget(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx             context.Context
-		changeExecution *Execution
-		resourceOwner   string
+		ctx           context.Context
+		change        *ChangeTarget
+		resourceOwner string
 	}
 	type res struct {
 		details *domain.ObjectDetails
@@ -202,8 +203,8 @@ func TestCommands_ChangeExecution(t *testing.T) {
 			},
 			args{
 				ctx: context.Background(),
-				changeExecution: &Execution{
-					Name: "name",
+				change: &ChangeTarget{
+					Name: stringPointer("name"),
 				},
 				resourceOwner: "org1",
 			},
@@ -220,11 +221,11 @@ func TestCommands_ChangeExecution(t *testing.T) {
 			},
 			args{
 				ctx: context.Background(),
-				changeExecution: &Execution{
+				change: &ChangeTarget{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "id1",
 					},
-					Name: "name",
+					Name: gu.Ptr("name"),
 				},
 				resourceOwner: "org1",
 			},
@@ -238,10 +239,10 @@ func TestCommands_ChangeExecution(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewAddedEvent(context.Background(),
-								execution.NewAggregate("id1", "org1"),
+							target.NewAddedEvent(context.Background(),
+								target.NewAggregate("id1", "org1"),
 								"name",
-								domain.ExecutionTypeWebhook,
+								domain.TargetTypeWebhook,
 								"https://example.com",
 								0,
 								false,
@@ -253,12 +254,11 @@ func TestCommands_ChangeExecution(t *testing.T) {
 			},
 			args{
 				ctx: context.Background(),
-				changeExecution: &Execution{
+				change: &ChangeTarget{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "id1",
 					},
-					ExecutionType: domain.ExecutionTypeWebhook,
-					URL:           "https://example.com",
+					ExecutionType: gu.Ptr(domain.TargetTypeWebhook),
 				},
 				resourceOwner: "org1",
 			},
@@ -269,15 +269,57 @@ func TestCommands_ChangeExecution(t *testing.T) {
 			},
 		},
 		{
+			"unique constraint failed, error",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							target.NewAddedEvent(context.Background(),
+								target.NewAggregate("id1", "org1"),
+								"name",
+								domain.TargetTypeWebhook,
+								"https://example.com",
+								0,
+								false,
+								false,
+							),
+						),
+					),
+					expectPushFailed(
+						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
+						target.NewChangedEvent(context.Background(),
+							target.NewAggregate("id1", "org1"),
+							[]target.Changes{
+								target.ChangeName("name", "name2"),
+							},
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				change: &ChangeTarget{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "id1",
+					},
+					Name: gu.Ptr("name2"),
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
 			"push ok",
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewAddedEvent(context.Background(),
-								execution.NewAggregate("id1", "org1"),
+							target.NewAddedEvent(context.Background(),
+								target.NewAggregate("id1", "org1"),
 								"name",
-								domain.ExecutionTypeWebhook,
+								domain.TargetTypeWebhook,
 								"https://example.com",
 								0,
 								false,
@@ -286,10 +328,10 @@ func TestCommands_ChangeExecution(t *testing.T) {
 						),
 					),
 					expectPush(
-						execution.NewChangedEvent(context.Background(),
-							execution.NewAggregate("id1", "org1"),
-							[]execution.Changes{
-								execution.ChangeURL("https://example2.com"),
+						target.NewChangedEvent(context.Background(),
+							target.NewAggregate("id1", "org1"),
+							[]target.Changes{
+								target.ChangeName("name", "name2"),
 							},
 						),
 					),
@@ -297,12 +339,11 @@ func TestCommands_ChangeExecution(t *testing.T) {
 			},
 			args{
 				ctx: context.Background(),
-				changeExecution: &Execution{
+				change: &ChangeTarget{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "id1",
 					},
-					URL:           "https://example2.com",
-					ExecutionType: domain.ExecutionTypeWebhook,
+					Name: gu.Ptr("name2"),
 				},
 				resourceOwner: "org1",
 			},
@@ -318,10 +359,10 @@ func TestCommands_ChangeExecution(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewAddedEvent(context.Background(),
-								execution.NewAggregate("id1", "org1"),
+							target.NewAddedEvent(context.Background(),
+								target.NewAggregate("id1", "org1"),
 								"name",
-								domain.ExecutionTypeWebhook,
+								domain.TargetTypeWebhook,
 								"https://example.com",
 								0,
 								false,
@@ -330,14 +371,15 @@ func TestCommands_ChangeExecution(t *testing.T) {
 						),
 					),
 					expectPush(
-						execution.NewChangedEvent(context.Background(),
-							execution.NewAggregate("id1", "org1"),
-							[]execution.Changes{
-								execution.ChangeURL("https://example2.com"),
-								execution.ChangeExecutionType(domain.ExecutionTypeRequestResponse),
-								execution.ChangeTimeout(time.Second),
-								execution.ChangeAsync(true),
-								execution.ChangeInterruptOnError(true),
+						target.NewChangedEvent(context.Background(),
+							target.NewAggregate("id1", "org1"),
+							[]target.Changes{
+								target.ChangeName("name", "name2"),
+								target.ChangeURL("https://example2.com"),
+								target.ChangeExecutionType(domain.TargetTypeRequestResponse),
+								target.ChangeTimeout(time.Second),
+								target.ChangeAsync(true),
+								target.ChangeInterruptOnError(true),
 							},
 						),
 					),
@@ -345,15 +387,16 @@ func TestCommands_ChangeExecution(t *testing.T) {
 			},
 			args{
 				ctx: context.Background(),
-				changeExecution: &Execution{
+				change: &ChangeTarget{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "id1",
 					},
-					URL:              "https://example2.com",
-					ExecutionType:    domain.ExecutionTypeRequestResponse,
-					Timeout:          time.Second,
-					Async:            true,
-					InterruptOnError: true,
+					Name:             gu.Ptr("name2"),
+					URL:              gu.Ptr("https://example2.com"),
+					ExecutionType:    gu.Ptr(domain.TargetTypeRequestResponse),
+					Timeout:          gu.Ptr(time.Second),
+					Async:            gu.Ptr(true),
+					InterruptOnError: gu.Ptr(true),
 				},
 				resourceOwner: "org1",
 			},
@@ -369,7 +412,7 @@ func TestCommands_ChangeExecution(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			details, err := c.ChangeExecution(tt.args.ctx, tt.args.changeExecution, tt.args.resourceOwner)
+			details, err := c.ChangeTarget(tt.args.ctx, tt.args.change, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -383,7 +426,7 @@ func TestCommands_ChangeExecution(t *testing.T) {
 	}
 }
 
-func TestCommands_DeleteExecution(t *testing.T) {
+func TestCommands_DeleteTarget(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -438,10 +481,10 @@ func TestCommands_DeleteExecution(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewAddedEvent(context.Background(),
-								execution.NewAggregate("id1", "org1"),
+							target.NewAddedEvent(context.Background(),
+								target.NewAggregate("id1", "org1"),
 								"name",
-								domain.ExecutionTypeWebhook,
+								domain.TargetTypeWebhook,
 								"https://example.com",
 								0,
 								false,
@@ -450,8 +493,8 @@ func TestCommands_DeleteExecution(t *testing.T) {
 						),
 					),
 					expectPush(
-						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("id1", "org1"),
+						target.NewRemovedEvent(context.Background(),
+							target.NewAggregate("id1", "org1"),
 							"name",
 						),
 					),
@@ -474,7 +517,7 @@ func TestCommands_DeleteExecution(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			details, err := c.DeleteExecution(tt.args.ctx, tt.args.id, tt.args.resourceOwner)
+			details, err := c.DeleteTarget(tt.args.ctx, tt.args.id, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

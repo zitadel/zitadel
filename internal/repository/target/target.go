@@ -1,4 +1,4 @@
-package execution
+package target
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	eventTypePrefix  eventstore.EventType = "execution."
+	eventTypePrefix  eventstore.EventType = "target."
 	AddedEventType                        = eventTypePrefix + "added"
 	ChangedEventType                      = eventTypePrefix + "changed"
 	RemovedEventType                      = eventTypePrefix + "removed"
@@ -19,12 +19,12 @@ const (
 type AddedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	Name             string               `json:"name"`
-	ExecutionType    domain.ExecutionType `json:"executionType"`
-	URL              string               `json:"url"`
-	Timeout          time.Duration        `json:"timeout"`
-	Async            bool                 `json:"async"`
-	InterruptOnError bool                 `json:"interruptOnError"`
+	Name             string            `json:"name"`
+	ExecutionType    domain.TargetType `json:"executionType"`
+	URL              string            `json:"url"`
+	Timeout          time.Duration     `json:"timeout"`
+	Async            bool              `json:"async"`
+	InterruptOnError bool              `json:"interruptOnError"`
 }
 
 func (e *AddedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -43,7 +43,7 @@ func NewAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	name string,
-	executionType domain.ExecutionType,
+	executionType domain.TargetType,
 	url string,
 	timeout time.Duration,
 	async bool,
@@ -71,11 +71,14 @@ func AddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 type ChangedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	ExecutionType    *domain.ExecutionType `json:"executionType,omitempty"`
-	URL              *string               `json:"url,omitempty"`
-	Timeout          *time.Duration        `json:"timeout,omitempty"`
-	Async            *bool                 `json:"async,omitempty"`
-	InterruptOnError *bool                 `json:"interruptOnError,omitempty"`
+	Name             *string            `json:"name,omitempty"`
+	ExecutionType    *domain.TargetType `json:"executionType,omitempty"`
+	URL              *string            `json:"url,omitempty"`
+	Timeout          *time.Duration     `json:"timeout,omitempty"`
+	Async            *bool              `json:"async,omitempty"`
+	InterruptOnError *bool              `json:"interruptOnError,omitempty"`
+
+	oldName string
 }
 
 func (e *ChangedEvent) Payload() interface{} {
@@ -83,7 +86,10 @@ func (e *ChangedEvent) Payload() interface{} {
 }
 
 func (e *ChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
+	if e.oldName == "" {
+		return nil
+	}
+	return NewUpdateUniqueConstraints(e.oldName, *e.Name)
 }
 
 func NewChangedEvent(
@@ -106,7 +112,14 @@ func NewChangedEvent(
 
 type Changes func(event *ChangedEvent)
 
-func ChangeExecutionType(executionType domain.ExecutionType) func(event *ChangedEvent) {
+func ChangeName(oldName, name string) func(event *ChangedEvent) {
+	return func(e *ChangedEvent) {
+		e.Name = &name
+		e.oldName = oldName
+	}
+}
+
+func ChangeExecutionType(executionType domain.TargetType) func(event *ChangedEvent) {
 	return func(e *ChangedEvent) {
 		e.ExecutionType = &executionType
 	}

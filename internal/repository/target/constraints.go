@@ -1,20 +1,20 @@
-package execution
+package target
 
 import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 const (
-	UniqueExecution    = "execution"
-	DuplicateExecution = "Errors.Execution.AlreadyExists"
+	UniqueTarget    = "target"
+	DuplicateTarget = "Errors.Target.AlreadyExists"
 )
 
 func NewAddUniqueConstraints(name string) []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{
 		eventstore.NewAddEventUniqueConstraint(
-			UniqueExecution,
+			UniqueTarget,
 			name,
-			DuplicateExecution,
+			DuplicateTarget,
 		),
 	}
 }
@@ -22,8 +22,18 @@ func NewAddUniqueConstraints(name string) []*eventstore.UniqueConstraint {
 func NewRemoveUniqueConstraints(name string) []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{
 		eventstore.NewRemoveUniqueConstraint(
-			UniqueExecution,
+			UniqueTarget,
 			name,
 		),
 	}
+}
+
+func NewUpdateUniqueConstraints(oldName, name string) []*eventstore.UniqueConstraint {
+	return append(
+		append(
+			[]*eventstore.UniqueConstraint{},
+			NewRemoveUniqueConstraints(oldName)...,
+		),
+		NewAddUniqueConstraints(name)...,
+	)
 }
