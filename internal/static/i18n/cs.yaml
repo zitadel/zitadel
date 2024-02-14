@@ -532,10 +532,10 @@ Errors:
     TypeNotSupported: Typ funkce není podporován
     InvalidValue: Neplatná hodnota pro tuto funkci
   Target:
-    Invalid: Target is invalid
-    NoTimeout: Target has no timeout
-    InvalidURL: Target has an invalid URL
-    NotFound: Target not found
+    Invalid: Cíl je neplatný
+    NoTimeout: Cíl nemá časový limit
+    InvalidURL: Cíl má neplatnou adresu URL
+    NotFound: Cíl nenalezen
 
 AggregateTypes:
   action: Akce
@@ -547,8 +547,13 @@ AggregateTypes:
   usergrant: Uživatelský grant
   quota: Kvóta
   feature: Funkce
+  target: Cíl
 
 EventTypes:
+  target:
+    added: Cíl vytvořen
+    changed: Cíl změněn
+    removed: Cíl smazán
   user:
     added: Uživatel přidán
     selfregistered: Uživatel se zaregistroval sám
