@@ -551,6 +551,11 @@ Errors:
     NotExisting: Функцията не съществува
     TypeNotSupported: Типът функция не се поддържа
     InvalidValue: Невалидна стойност за тази функция
+  Target:
+    Invalid: Target is invalid
+    NoTimeout: Target has no timeout
+    InvalidURL: Target has an invalid URL
+    NotFound: Target not found
 
 AggregateTypes:
   action: Действие

@@ -528,6 +528,11 @@ Errors:
     NotExisting: O recurso não existe
     TypeNotSupported: O tipo de recurso não é compatível
     InvalidValue: Valor inválido para este recurso
+  Target:
+    Invalid: A meta é inválida
+    NoTimeout: O destino não tem tempo limite
+    InvalidURL: O destino tem um URL inválido
+    NotFound: Destino não encontrado
 
 AggregateTypes:
   action: Ação
@@ -539,8 +544,13 @@ AggregateTypes:
   usergrant: Concessão de usuário
   quota: Cota
   feature: Recurso
+  target: objetivo
 
 EventTypes:
+  target:
+    added: Destino criado
+    changed: Destino alterada
+    removed: Destino excluído
   user:
     added: Usuário adicionado
     selfregistered: Usuário se registrou

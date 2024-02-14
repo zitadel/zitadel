@@ -534,6 +534,11 @@ Errors:
     NotExisting: Funkcja nie istnieje
     TypeNotSupported: Typ funkcji nie jest obsługiwany
     InvalidValue: Nieprawidłowa wartość dla tej funkcji
+  Target:
+    Invalid: Cel jest nieprawidłowy
+    NoTimeout: Cel nie ma limitu czasu
+    InvalidURL: Cel ma nieprawidłowy adres URL
+    NotFound: Nie znaleziono celu
 
 AggregateTypes:
   action: Działanie
@@ -545,8 +550,13 @@ AggregateTypes:
   usergrant: Uprawnienie użytkownika
   quota: Limit
   feature: Funkcja
+  target: Cel
 
 EventTypes:
+  target:
+    added: Cel został utworzony
+    changed: Cel zmieniony
+    removed: Cel usunięty
   user:
     added: Użytkownik dodany
     selfregistered: Użytkownik zarejestrował się
