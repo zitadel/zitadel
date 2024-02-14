@@ -20,7 +20,7 @@ type AddedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
 	Name             string            `json:"name"`
-	ExecutionType    domain.TargetType `json:"executionType"`
+	TargetType       domain.TargetType `json:"targetType"`
 	URL              string            `json:"url"`
 	Timeout          time.Duration     `json:"timeout"`
 	Async            bool              `json:"async"`
@@ -43,7 +43,7 @@ func NewAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	name string,
-	executionType domain.TargetType,
+	targetType domain.TargetType,
 	url string,
 	timeout time.Duration,
 	async bool,
@@ -53,7 +53,7 @@ func NewAddedEvent(
 		eventstore.NewBaseEventForPush(
 			ctx, aggregate, AddedEventType,
 		),
-		name, executionType, url, timeout, async, interruptOnError}
+		name, targetType, url, timeout, async, interruptOnError}
 }
 
 func AddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
@@ -62,7 +62,7 @@ func AddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(added)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "EXEC-fx8f8yfbn1", "unable to unmarshal execution added")
+		return nil, zerrors.ThrowInternal(err, "TARGET-fx8f8yfbn1", "unable to unmarshal target added")
 	}
 
 	return added, nil
@@ -72,7 +72,7 @@ type ChangedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
 	Name             *string            `json:"name,omitempty"`
-	ExecutionType    *domain.TargetType `json:"executionType,omitempty"`
+	TargetType       *domain.TargetType `json:"targetType,omitempty"`
 	URL              *string            `json:"url,omitempty"`
 	Timeout          *time.Duration     `json:"timeout,omitempty"`
 	Async            *bool              `json:"async,omitempty"`
@@ -119,9 +119,9 @@ func ChangeName(oldName, name string) func(event *ChangedEvent) {
 	}
 }
 
-func ChangeExecutionType(executionType domain.TargetType) func(event *ChangedEvent) {
+func ChangeTargetType(targetType domain.TargetType) func(event *ChangedEvent) {
 	return func(e *ChangedEvent) {
-		e.ExecutionType = &executionType
+		e.TargetType = &targetType
 	}
 }
 
@@ -155,7 +155,7 @@ func ChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(changed)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "EXEC-w6402p4ek7", "unable to unmarshal execution changed")
+		return nil, zerrors.ThrowInternal(err, "TARGET-w6402p4ek7", "unable to unmarshal target changed")
 	}
 
 	return changed, nil
@@ -189,7 +189,7 @@ func RemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 	err := event.Unmarshal(removed)
 	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "EXEC-0kuc12c7bc", "unable to unmarshal execution removed")
+		return nil, zerrors.ThrowInternal(err, "TARGET-0kuc12c7bc", "unable to unmarshal target removed")
 	}
 
 	return removed, nil

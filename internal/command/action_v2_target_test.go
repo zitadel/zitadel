@@ -74,9 +74,9 @@ func TestCommands_AddTarget(t *testing.T) {
 			args{
 				ctx: context.Background(),
 				add: &AddTarget{
-					Name:          "name",
-					URL:           "https://example.com",
-					ExecutionType: domain.TargetTypeWebhook,
+					Name:       "name",
+					URL:        "https://example.com",
+					TargetType: domain.TargetTypeWebhook,
 				},
 				resourceOwner: "org1",
 			},
@@ -105,9 +105,9 @@ func TestCommands_AddTarget(t *testing.T) {
 			args{
 				ctx: context.Background(),
 				add: &AddTarget{
-					Name:          "name",
-					ExecutionType: domain.TargetTypeWebhook,
-					URL:           "https://example.com",
+					Name:       "name",
+					TargetType: domain.TargetTypeWebhook,
+					URL:        "https://example.com",
 				},
 				resourceOwner: "org1",
 			},
@@ -140,7 +140,7 @@ func TestCommands_AddTarget(t *testing.T) {
 				ctx: context.Background(),
 				add: &AddTarget{
 					Name:             "name",
-					ExecutionType:    domain.TargetTypeWebhook,
+					TargetType:       domain.TargetTypeWebhook,
 					URL:              "https://example.com",
 					Timeout:          time.Second,
 					Async:            true,
@@ -258,7 +258,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "id1",
 					},
-					ExecutionType: gu.Ptr(domain.TargetTypeWebhook),
+					TargetType: gu.Ptr(domain.TargetTypeWebhook),
 				},
 				resourceOwner: "org1",
 			},
@@ -376,7 +376,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 							[]target.Changes{
 								target.ChangeName("name", "name2"),
 								target.ChangeURL("https://example2.com"),
-								target.ChangeExecutionType(domain.TargetTypeRequestResponse),
+								target.ChangeTargetType(domain.TargetTypeRequestResponse),
 								target.ChangeTimeout(time.Second),
 								target.ChangeAsync(true),
 								target.ChangeInterruptOnError(true),
@@ -393,7 +393,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 					},
 					Name:             gu.Ptr("name2"),
 					URL:              gu.Ptr("https://example2.com"),
-					ExecutionType:    gu.Ptr(domain.TargetTypeRequestResponse),
+					TargetType:       gu.Ptr(domain.TargetTypeRequestResponse),
 					Timeout:          gu.Ptr(time.Second),
 					Async:            gu.Ptr(true),
 					InterruptOnError: gu.Ptr(true),

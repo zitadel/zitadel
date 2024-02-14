@@ -14,7 +14,7 @@ type AddTarget struct {
 	models.ObjectRoot
 
 	Name             string
-	ExecutionType    domain.TargetType
+	TargetType       domain.TargetType
 	URL              string
 	Timeout          time.Duration
 	Async            bool
@@ -42,7 +42,7 @@ func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner 
 		ctx,
 		TargetAggregateFromWriteModel(&wm.WriteModel),
 		add.Name,
-		add.ExecutionType,
+		add.TargetType,
 		add.URL,
 		add.Timeout,
 		add.Async,
@@ -61,7 +61,7 @@ type ChangeTarget struct {
 	models.ObjectRoot
 
 	Name             *string
-	ExecutionType    *domain.TargetType
+	TargetType       *domain.TargetType
 	URL              *string
 	Timeout          *time.Duration
 	Async            *bool
@@ -85,7 +85,7 @@ func (c *Commands) ChangeTarget(ctx context.Context, change *ChangeTarget, resou
 		ctx,
 		TargetAggregateFromWriteModel(&existing.WriteModel),
 		change.Name,
-		change.ExecutionType,
+		change.TargetType,
 		change.URL,
 		change.Timeout,
 		change.Async,

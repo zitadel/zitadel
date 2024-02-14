@@ -14,7 +14,7 @@ type TargetWriteModel struct {
 	eventstore.WriteModel
 
 	Name             string
-	ExecutionType    domain.TargetType
+	TargetType       domain.TargetType
 	URL              string
 	Timeout          time.Duration
 	Async            bool
@@ -38,7 +38,7 @@ func (wm *TargetWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *target.AddedEvent:
 			wm.Name = e.Name
-			wm.ExecutionType = e.ExecutionType
+			wm.TargetType = e.TargetType
 			wm.URL = e.URL
 			wm.Timeout = e.Timeout
 			wm.Async = e.Async
@@ -47,8 +47,8 @@ func (wm *TargetWriteModel) Reduce() error {
 			if e.Name != nil {
 				wm.Name = *e.Name
 			}
-			if e.ExecutionType != nil {
-				wm.ExecutionType = *e.ExecutionType
+			if e.TargetType != nil {
+				wm.TargetType = *e.TargetType
 			}
 			if e.URL != nil {
 				wm.URL = *e.URL
@@ -85,7 +85,7 @@ func (wm *TargetWriteModel) NewChangedEvent(
 	ctx context.Context,
 	agg *eventstore.Aggregate,
 	name *string,
-	executionType *domain.TargetType,
+	targetType *domain.TargetType,
 	url *string,
 	timeout *time.Duration,
 	async *bool,
@@ -95,8 +95,8 @@ func (wm *TargetWriteModel) NewChangedEvent(
 	if name != nil && wm.Name != *name {
 		changes = append(changes, target.ChangeName(wm.Name, *name))
 	}
-	if executionType != nil && wm.ExecutionType != *executionType {
-		changes = append(changes, target.ChangeExecutionType(*executionType))
+	if targetType != nil && wm.TargetType != *targetType {
+		changes = append(changes, target.ChangeTargetType(*targetType))
 	}
 	if url != nil && wm.URL != *url {
 		changes = append(changes, target.ChangeURL(*url))
