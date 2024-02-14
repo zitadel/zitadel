@@ -534,6 +534,11 @@ Errors:
     NotExisting: La característica no existe
     TypeNotSupported: El tipo de característica no es compatible
     InvalidValue: Valor no válido para esta característica
+  Target:
+    Invalid: El objetivo no es válido
+    NoTimeout: El objetivo no tiene tiempo de espera
+    InvalidURL: El destino tiene una URL no válida
+    NotFound: El objetivo no encontrado
 
 AggregateTypes:
   action: Acción

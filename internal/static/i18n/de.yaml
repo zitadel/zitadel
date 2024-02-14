@@ -534,6 +534,11 @@ Errors:
     NotExisting: Feature existiert nicht
     TypeNotSupported: Feature Typ wird nicht unterstützt
     InvalidValue: Ungültiger Wert für dieses Feature
+  Target:
+    Invalid: Target is invalid
+    NoTimeout: Target has no timeout
+    InvalidURL: Target has an invalid URL
+    NotFound: Target not found
 
 AggregateTypes:
   action: Action

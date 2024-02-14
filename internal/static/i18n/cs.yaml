@@ -531,6 +531,11 @@ Errors:
     NotExisting: Funkce neexistuje
     TypeNotSupported: Typ funkce není podporován
     InvalidValue: Neplatná hodnota pro tuto funkci
+  Target:
+    Invalid: Target is invalid
+    NoTimeout: Target has no timeout
+    InvalidURL: Target has an invalid URL
+    NotFound: Target not found
 
 AggregateTypes:
   action: Akce
