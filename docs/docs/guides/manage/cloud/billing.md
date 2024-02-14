@@ -1,12 +1,21 @@
 ---
-title: Billing
+title: Settings / Billing
 ---
+
+## General
+
+In the general settings you can change your team name, notification settings and delete your team.
+
+![Customer Portal Settings General](/img/manuals/portal/customer_portal_settings_general.png)
+
+
+## Billing
 
 In the billing page shows your configured payment methods and the invoice 
 
 ![Customer Portal Billing](/img/manuals/portal/customer_portal_billing.png)
 
-## Payment Method
+### Payment Method
 
 If you click on the "+" Button a popup will be shown with the needed fields to add a new payment method.
 At the moment we provide only "Credit Card" payment
@@ -38,11 +47,14 @@ Depending on your billing address we will mark the invoice as reverse charge.
 
 ## Update Billing Information
 
-You will only need to add billing information if your instance is in the paid tier. There are two options on how to add your billing info.
+You will only need to add billing information if your want to get the pro tier. There are two options on how to add your billing info.
 
-2. Go to the billing menu and add a new payment method. You will be able to choose the added method, when upgrading the instance to the paid tier.
-3. Add the billing information directly during the upgrade process.
+1. Go to the billing menu and add a new payment method.
+2. Add the billing information directly during the upgrade process.
 
 ## Invoices
 
 We show all you invoices, and you are able to download them directly in the Customer Portal.
+
+
+![Customer Portal INvoices](/img/manuals/portal/customer_portal_invoices.png)
