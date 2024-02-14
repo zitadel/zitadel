@@ -3,6 +3,8 @@ package execution
 import (
 	"context"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -10,18 +12,19 @@ import (
 )
 
 func (s *Server) CreateTarget(ctx context.Context, req *execution.CreateTargetRequest) (*execution.CreateTargetResponse, error) {
-	details, err := s.command.AddExecution(ctx, createTargetToCommand(req), "") // TODO: RO?
+	add := createTargetToCommand(req)
+	details, err := s.command.AddTarget(ctx, add, "") // TODO: RO?
 	if err != nil {
 		return nil, err
 	}
 	return &execution.CreateTargetResponse{
-		Id:      "", // TODO: id?
+		Id:      add.AggregateID,
 		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
 func (s *Server) UpdateTarget(ctx context.Context, req *execution.UpdateTargetRequest) (*execution.UpdateTargetResponse, error) {
-	details, err := s.command.ChangeExecution(ctx, updateTargetToCommand(req), "") // TODO: RO?
+	details, err := s.command.ChangeTarget(ctx, updateTargetToCommand(req), "") // TODO: RO?
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +34,7 @@ func (s *Server) UpdateTarget(ctx context.Context, req *execution.UpdateTargetRe
 }
 
 func (s *Server) DeleteTarget(ctx context.Context, req *execution.DeleteTargetRequest) (*execution.DeleteTargetResponse, error) {
-	details, err := s.command.DeleteExecution(ctx, req.GetTargetId(), "") // TODO: RO?
+	details, err := s.command.DeleteTarget(ctx, req.GetTargetId(), "") // TODO: RO?
 	if err != nil {
 		return nil, err
 	}
@@ -40,10 +43,10 @@ func (s *Server) DeleteTarget(ctx context.Context, req *execution.DeleteTargetRe
 	}, nil
 }
 
-func createTargetToCommand(req *execution.CreateTargetRequest) *command.Execution {
-	return &command.Execution{
+func createTargetToCommand(req *execution.CreateTargetRequest) *command.AddTarget {
+	return &command.AddTarget{
 		Name:             req.GetName(),
-		ExecutionType:    executionTypeToDomain(req.GetType()),
+		TargetType:       targetTypeToDomain(req.GetType()),
 		URL:              req.GetUrl(),
 		Timeout:          req.GetTimeout().AsDuration(),
 		Async:            req.GetIsAsync(),
@@ -51,26 +54,36 @@ func createTargetToCommand(req *execution.CreateTargetRequest) *command.Executio
 	}
 }
 
-func updateTargetToCommand(req *execution.UpdateTargetRequest) *command.Execution {
-	return &command.Execution{
-		Name:             req.GetName(),
-		ExecutionType:    executionTypeToDomain(req.GetType()),
-		URL:              req.GetUrl(),
-		Timeout:          req.GetTimeout().AsDuration(),
-		Async:            req.GetIsAsync(),
-		InterruptOnError: req.GetInterruptOnError(),
+func updateTargetToCommand(req *execution.UpdateTargetRequest) *command.ChangeTarget {
+	if req == nil {
+		return nil
 	}
+	target := &command.ChangeTarget{
+		Name: req.Name,
+		URL:  req.Url,
+	}
+	if req.Type != nil {
+		target.TargetType = gu.Ptr(targetTypeToDomain(req.GetType()))
+	}
+	if req.Timeout != nil {
+		target.Timeout = gu.Ptr(req.GetTimeout().AsDuration())
+	}
+	if req.ExecutionType != nil {
+		target.Async = gu.Ptr(req.GetIsAsync())
+		target.InterruptOnError = gu.Ptr(req.GetInterruptOnError())
+	}
+	return target
 }
 
-func executionTypeToDomain(executionType execution.TargetType) domain.ExecutionType {
+func targetTypeToDomain(executionType execution.TargetType) domain.TargetType {
 	switch executionType {
 	case execution.TargetType_TARGET_TYPE_UNSPECIFIED:
-		return domain.ExecutionTypeUndefined
+		return domain.TargetTypeUnspecified
 	case execution.TargetType_TARGET_TYPE_REST_WEBHOOK:
-		return domain.ExecutionTypeWebhook
+		return domain.TargetTypeWebhook
 	case execution.TargetType_TARGET_TYPE_REST_REQUEST_RESPONSE:
-		return domain.ExecutionTypeRequestResponse
+		return domain.TargetTypeRequestResponse
 	default:
-		return domain.ExecutionTypeUndefined
+		return domain.TargetTypeUnspecified
 	}
 }

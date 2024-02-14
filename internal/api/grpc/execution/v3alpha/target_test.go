@@ -1,11 +1,11 @@
 package execution
 
 import (
-	"reflect"
 	"testing"
 	"time"
 
 	"github.com/muhlemmer/gu"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/internal/command"
@@ -20,14 +20,14 @@ func Test_createTargetToCommand(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want *command.Execution
+		want *command.AddTarget
 	}{
 		{
 			name: "nil",
 			args: args{nil},
-			want: &command.Execution{
+			want: &command.AddTarget{
 				Name:             "",
-				ExecutionType:    domain.ExecutionTypeUndefined,
+				TargetType:       domain.TargetTypeUnspecified,
 				URL:              "",
 				Timeout:          0,
 				Async:            false,
@@ -45,9 +45,9 @@ func Test_createTargetToCommand(t *testing.T) {
 					IsAsync: true,
 				},
 			}},
-			want: &command.Execution{
+			want: &command.AddTarget{
 				Name:             "target 1",
-				ExecutionType:    domain.ExecutionTypeWebhook,
+				TargetType:       domain.TargetTypeWebhook,
 				URL:              "https://example.com/hooks/1",
 				Timeout:          10 * time.Second,
 				Async:            true,
@@ -65,9 +65,9 @@ func Test_createTargetToCommand(t *testing.T) {
 					InterruptOnError: true,
 				},
 			}},
-			want: &command.Execution{
+			want: &command.AddTarget{
 				Name:             "target 1",
-				ExecutionType:    domain.ExecutionTypeRequestResponse,
+				TargetType:       domain.TargetTypeRequestResponse,
 				URL:              "https://example.com/hooks/1",
 				Timeout:          10 * time.Second,
 				Async:            false,
@@ -77,9 +77,8 @@ func Test_createTargetToCommand(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := createTargetToCommand(tt.args.req); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("createTargetToCommand() = %v, want %v", got, tt.want)
-			}
+			got := createTargetToCommand(tt.args.req)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -91,19 +90,12 @@ func Test_updateTargetToCommand(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want *command.Execution
+		want *command.ChangeTarget
 	}{
 		{
 			name: "nil",
 			args: args{nil},
-			want: &command.Execution{
-				Name:             "",
-				ExecutionType:    domain.ExecutionTypeUndefined,
-				URL:              "",
-				Timeout:          0,
-				Async:            false,
-				InterruptOnError: false,
-			},
+			want: nil,
 		},
 		{
 			name: "all fields nil",
@@ -114,13 +106,31 @@ func Test_updateTargetToCommand(t *testing.T) {
 				Timeout:       nil,
 				ExecutionType: nil,
 			}},
-			want: &command.Execution{
-				Name:             "",
-				ExecutionType:    domain.ExecutionTypeUndefined,
-				URL:              "",
-				Timeout:          0,
-				Async:            false,
-				InterruptOnError: false,
+			want: &command.ChangeTarget{
+				Name:             nil,
+				TargetType:       nil,
+				URL:              nil,
+				Timeout:          nil,
+				Async:            nil,
+				InterruptOnError: nil,
+			},
+		},
+		{
+			name: "all fields empty",
+			args: args{&execution.UpdateTargetRequest{
+				Name:          gu.Ptr(""),
+				Type:          gu.Ptr(execution.TargetType_TARGET_TYPE_UNSPECIFIED),
+				Url:           gu.Ptr(""),
+				Timeout:       durationpb.New(0),
+				ExecutionType: nil,
+			}},
+			want: &command.ChangeTarget{
+				Name:             gu.Ptr(""),
+				TargetType:       gu.Ptr(domain.TargetTypeUnspecified),
+				URL:              gu.Ptr(""),
+				Timeout:          gu.Ptr(0 * time.Second),
+				Async:            nil,
+				InterruptOnError: nil,
 			},
 		},
 		{
@@ -134,13 +144,13 @@ func Test_updateTargetToCommand(t *testing.T) {
 					IsAsync: true,
 				},
 			}},
-			want: &command.Execution{
-				Name:             "target 1",
-				ExecutionType:    domain.ExecutionTypeWebhook,
-				URL:              "https://example.com/hooks/1",
-				Timeout:          10 * time.Second,
-				Async:            true,
-				InterruptOnError: false,
+			want: &command.ChangeTarget{
+				Name:             gu.Ptr("target 1"),
+				TargetType:       gu.Ptr(domain.TargetTypeWebhook),
+				URL:              gu.Ptr("https://example.com/hooks/1"),
+				Timeout:          gu.Ptr(10 * time.Second),
+				Async:            gu.Ptr(true),
+				InterruptOnError: gu.Ptr(false),
 			},
 		},
 		{
@@ -154,21 +164,20 @@ func Test_updateTargetToCommand(t *testing.T) {
 					InterruptOnError: true,
 				},
 			}},
-			want: &command.Execution{
-				Name:             "target 1",
-				ExecutionType:    domain.ExecutionTypeRequestResponse,
-				URL:              "https://example.com/hooks/1",
-				Timeout:          10 * time.Second,
-				Async:            false,
-				InterruptOnError: true,
+			want: &command.ChangeTarget{
+				Name:             gu.Ptr("target 1"),
+				TargetType:       gu.Ptr(domain.TargetTypeRequestResponse),
+				URL:              gu.Ptr("https://example.com/hooks/1"),
+				Timeout:          gu.Ptr(10 * time.Second),
+				Async:            gu.Ptr(false),
+				InterruptOnError: gu.Ptr(true),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := updateTargetToCommand(tt.args.req); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("createTargetToCommand() = %v, want %v", got, tt.want)
-			}
+			got := updateTargetToCommand(tt.args.req)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
