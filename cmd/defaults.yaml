@@ -171,7 +171,7 @@ Machine:
     Webhook:
       Enabled: true # ZITADEL_MACHINE_IDENTIFICATION_WEBHOOK_ENABLED
       Url: "http://metadata.google.internal/computeMetadata/v1/instance/id" # ZITADEL_MACHINE_IDENTIFICATION_WEBHOOK_URL
-      Headers: # ZITADEL_MACHINE_IDENTIFICATION_WEBHOOK_HEADERS
+      Headers:
         "Metadata-Flavor": "Google"
     #
     # AWS EC2 IMDSv1 Configuration: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-data-retrieval.html
