@@ -46,10 +46,20 @@ func (s *Server) DeleteTarget(ctx context.Context, req *execution.DeleteTargetRe
 }
 
 func createTargetToCommand(req *execution.CreateTargetRequest) *command.AddTarget {
+	var targetType domain.TargetType
+	var url string
+	switch t := req.GetTargetType().(type) {
+	case *execution.CreateTargetRequest_RestWebhook:
+		targetType = domain.TargetTypeWebhook
+		url = t.RestWebhook.GetUrl()
+	case *execution.CreateTargetRequest_RestRequestResponse:
+		targetType = domain.TargetTypeRequestResponse
+		url = t.RestRequestResponse.GetUrl()
+	}
 	return &command.AddTarget{
 		Name:             req.GetName(),
-		TargetType:       targetTypeToDomain(req.GetType()),
-		URL:              req.GetUrl(),
+		TargetType:       targetType,
+		URL:              url,
 		Timeout:          req.GetTimeout().AsDuration(),
 		Async:            req.GetIsAsync(),
 		InterruptOnError: req.GetInterruptOnError(),
@@ -65,10 +75,14 @@ func updateTargetToCommand(req *execution.UpdateTargetRequest) *command.ChangeTa
 			AggregateID: req.GetTargetId(),
 		},
 		Name: req.Name,
-		URL:  req.Url,
 	}
-	if req.Type != nil {
-		target.TargetType = gu.Ptr(targetTypeToDomain(req.GetType()))
+	switch t := req.GetTargetType().(type) {
+	case *execution.UpdateTargetRequest_RestWebhook:
+		target.TargetType = gu.Ptr(domain.TargetTypeWebhook)
+		target.URL = gu.Ptr(t.RestWebhook.GetUrl())
+	case *execution.UpdateTargetRequest_RestRequestResponse:
+		target.TargetType = gu.Ptr(domain.TargetTypeRequestResponse)
+		target.URL = gu.Ptr(t.RestRequestResponse.GetUrl())
 	}
 	if req.Timeout != nil {
 		target.Timeout = gu.Ptr(req.GetTimeout().AsDuration())
@@ -78,17 +92,4 @@ func updateTargetToCommand(req *execution.UpdateTargetRequest) *command.ChangeTa
 		target.InterruptOnError = gu.Ptr(req.GetInterruptOnError())
 	}
 	return target
-}
-
-func targetTypeToDomain(executionType execution.TargetType) domain.TargetType {
-	switch executionType {
-	case execution.TargetType_TARGET_TYPE_UNSPECIFIED:
-		return domain.TargetTypeUnspecified
-	case execution.TargetType_TARGET_TYPE_REST_WEBHOOK:
-		return domain.TargetTypeWebhook
-	case execution.TargetType_TARGET_TYPE_REST_REQUEST_RESPONSE:
-		return domain.TargetTypeRequestResponse
-	default:
-		return domain.TargetTypeUnspecified
-	}
 }

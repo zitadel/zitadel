@@ -199,19 +199,12 @@ message CreateTargetRequest {
     }
   ];
   // Defines the target type and how the response of the target is treated.
-  TargetType type = 2 [
-    (validate.rules).enum = {defined_only: true, not_in: [0]}
-  ];
-  // URL to the REST POST endpoint of the target.
-  string url = 3 [
-    (validate.rules).string = {min_len: 1, max_len: 1000, uri: true},
-    (google.api.field_behavior) = REQUIRED,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1,
-      max_length: 1000,
-      example: "\"https://example.com/hooks/ip_check\"";
-    }
-  ];
+  oneof target_type {
+    option (validate.required) = true;
+
+    SetRESTWebhook rest_webhook = 2;
+    SetRESTRequestResponse rest_request_response = 3;
+  }
   // Timeout defines the duration until ZITADEL cancels the execution.
   google.protobuf.Duration timeout = 4 [
     (validate.rules).duration = {gt: {seconds: 0}, required: true},
@@ -255,19 +248,12 @@ message UpdateTargetRequest {
       example: "\"ip_allow_list\"";
     }
   ];
-  // Optionally change the target type and how the response of the target is treated.
-  optional TargetType type = 3 [
-    (validate.rules).enum = {defined_only: true, not_in: [0]}
-  ];
-  // Optionally change the URL of the REST POST endpoint of the target.
-  optional string url = 4 [
-    (validate.rules).string = {min_len: 1, max_len: 1000, uri: true},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1,
-      max_length: 1000,
-      example: "\"https://example.com/hooks/ip_check\"";
-    }
-  ];
+  // Optionally change the target type and how the response of the target is treated,
+  // or its target URL.
+  oneof target_type {
+    SetRESTWebhook rest_webhook = 3;
+    SetRESTRequestResponse rest_request_response = 4;
+  }
   // Optionally change the timeout, which defines the duration until ZITADEL cancels the execution.
   optional google.protobuf.Duration timeout = 5 [
     (validate.rules).duration = {gt: {seconds: 0}},

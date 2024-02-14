@@ -509,9 +509,12 @@ func (s *Tester) CreateProjectMembership(t *testing.T, ctx context.Context, proj
 
 func (s *Tester) CreateTarget(ctx context.Context, t *testing.T) *execution.CreateTargetResponse {
 	target, err := s.Client.ExecutionV3.CreateTarget(ctx, &execution.CreateTargetRequest{
-		Name:    fmt.Sprint(time.Now().UnixNano() + 1),
-		Type:    execution.TargetType_TARGET_TYPE_REST_WEBHOOK,
-		Url:     "https://example.com",
+		Name: fmt.Sprint(time.Now().UnixNano() + 1),
+		TargetType: &execution.CreateTargetRequest_RestWebhook{
+			RestWebhook: &execution.SetRESTWebhook{
+				Url: "https://example.com",
+			},
+		},
 		Timeout: durationpb.New(10 * time.Second),
 		ExecutionType: &execution.CreateTargetRequest_InterruptOnError{
 			InterruptOnError: true,
