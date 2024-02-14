@@ -1,3 +1,6 @@
+issuer: 
+endpoint:
+
 Log:
   Level: info # ZITADEL_LOG_LEVEL
   Formatter:

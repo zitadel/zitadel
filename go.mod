@@ -20,7 +20,7 @@ require (
 	github.com/dop251/goja v0.0.0-20231027120936-b396bb4c349d
 	github.com/dop251/goja_nodejs v0.0.0-20231122114759-e84d9a924c5c
 	github.com/drone/envsubst v1.0.3
-	github.com/envoyproxy/protoc-gen-validate v1.0.3
+	github.com/envoyproxy/protoc-gen-validate v1.0.4
 	github.com/fatih/color v1.16.0
 	github.com/go-jose/go-jose/v3 v3.0.1
 	github.com/go-ldap/ldap/v3 v3.4.6
@@ -31,7 +31,7 @@ require (
 	github.com/gorilla/securecookie v1.1.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1
 	github.com/h2non/gock v1.2.0
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/jackc/pgconn v1.14.1
@@ -80,8 +80,8 @@ require (
 	golang.org/x/sync v0.6.0
 	golang.org/x/text v0.14.0
 	google.golang.org/api v0.156.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20240108191215-35c7eff3a6b1
-	google.golang.org/grpc v1.60.1
+	google.golang.org/genproto/googleapis/api v0.0.0-20240125205218-1f4bbc51befe
+	google.golang.org/grpc v1.61.0
 	google.golang.org/protobuf v1.32.0
 	sigs.k8s.io/yaml v1.4.0
 )
@@ -112,10 +112,11 @@ require (
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/zenazn/goji v1.0.1 // indirect
 	github.com/zitadel/schema v1.3.0 // indirect
+	github.com/zitadel/zitadel-go/v2 v2.1.7 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	google.golang.org/genproto v0.0.0-20240108191215-35c7eff3a6b1 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240108191215-35c7eff3a6b1 // indirect
+	google.golang.org/genproto v0.0.0-20240116215550-a9fa1716bcac // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240125205218-1f4bbc51befe // indirect
 )
 
 require (
