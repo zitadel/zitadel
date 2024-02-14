@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package zitadel.execution.v3alpha;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/object/v2beta/object.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha;execution";
+
+enum TargetType {
+  TARGET_TYPE_UNSPECIFIED = 0;
+  // REST webhook: Only the response status is used, resp. checked by ZITADEL.
+  // The response payload is ignored.
+  TARGET_TYPE_REST_WEBHOOK = 1;
+  // REST request and response: The  response status and payload are used.
+  // The payload is used to manipulate the object.
+  TARGET_TYPE_REST_REQUEST_RESPONSE = 2;
+}
