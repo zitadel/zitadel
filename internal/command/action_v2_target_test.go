@@ -83,7 +83,7 @@ func TestCommands_AddTarget(t *testing.T) {
 			},
 		},
 		{
-			"no purl, error",
+			"no url, error",
 			fields{
 				eventstore: eventstoreExpect(t),
 			},
