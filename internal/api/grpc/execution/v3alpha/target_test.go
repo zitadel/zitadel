@@ -37,9 +37,12 @@ func Test_createTargetToCommand(t *testing.T) {
 		{
 			name: "all fields (async webhook)",
 			args: args{&execution.CreateTargetRequest{
-				Name:    "target 1",
-				Type:    execution.TargetType_TARGET_TYPE_REST_WEBHOOK,
-				Url:     "https://example.com/hooks/1",
+				Name: "target 1",
+				TargetType: &execution.CreateTargetRequest_RestWebhook{
+					RestWebhook: &execution.SetRESTWebhook{
+						Url: "https://example.com/hooks/1",
+					},
+				},
 				Timeout: durationpb.New(10 * time.Second),
 				ExecutionType: &execution.CreateTargetRequest_IsAsync{
 					IsAsync: true,
@@ -57,9 +60,12 @@ func Test_createTargetToCommand(t *testing.T) {
 		{
 			name: "all fields (interrupting response)",
 			args: args{&execution.CreateTargetRequest{
-				Name:    "target 1",
-				Type:    execution.TargetType_TARGET_TYPE_REST_REQUEST_RESPONSE,
-				Url:     "https://example.com/hooks/1",
+				Name: "target 1",
+				TargetType: &execution.CreateTargetRequest_RestRequestResponse{
+					RestRequestResponse: &execution.SetRESTRequestResponse{
+						Url: "https://example.com/hooks/1",
+					},
+				},
 				Timeout: durationpb.New(10 * time.Second),
 				ExecutionType: &execution.CreateTargetRequest_InterruptOnError{
 					InterruptOnError: true,
@@ -101,8 +107,7 @@ func Test_updateTargetToCommand(t *testing.T) {
 			name: "all fields nil",
 			args: args{&execution.UpdateTargetRequest{
 				Name:          nil,
-				Type:          nil,
-				Url:           nil,
+				TargetType:    nil,
 				Timeout:       nil,
 				ExecutionType: nil,
 			}},
@@ -119,15 +124,14 @@ func Test_updateTargetToCommand(t *testing.T) {
 			name: "all fields empty",
 			args: args{&execution.UpdateTargetRequest{
 				Name:          gu.Ptr(""),
-				Type:          gu.Ptr(execution.TargetType_TARGET_TYPE_UNSPECIFIED),
-				Url:           gu.Ptr(""),
+				TargetType:    nil,
 				Timeout:       durationpb.New(0),
 				ExecutionType: nil,
 			}},
 			want: &command.ChangeTarget{
 				Name:             gu.Ptr(""),
-				TargetType:       gu.Ptr(domain.TargetTypeUnspecified),
-				URL:              gu.Ptr(""),
+				TargetType:       nil,
+				URL:              nil,
 				Timeout:          gu.Ptr(0 * time.Second),
 				Async:            nil,
 				InterruptOnError: nil,
@@ -136,9 +140,12 @@ func Test_updateTargetToCommand(t *testing.T) {
 		{
 			name: "all fields (async webhook)",
 			args: args{&execution.UpdateTargetRequest{
-				Name:    gu.Ptr("target 1"),
-				Type:    gu.Ptr(execution.TargetType_TARGET_TYPE_REST_WEBHOOK),
-				Url:     gu.Ptr("https://example.com/hooks/1"),
+				Name: gu.Ptr("target 1"),
+				TargetType: &execution.UpdateTargetRequest_RestWebhook{
+					RestWebhook: &execution.SetRESTWebhook{
+						Url: "https://example.com/hooks/1",
+					},
+				},
 				Timeout: durationpb.New(10 * time.Second),
 				ExecutionType: &execution.UpdateTargetRequest_IsAsync{
 					IsAsync: true,
@@ -156,9 +163,12 @@ func Test_updateTargetToCommand(t *testing.T) {
 		{
 			name: "all fields (interrupting response)",
 			args: args{&execution.UpdateTargetRequest{
-				Name:    gu.Ptr("target 1"),
-				Type:    gu.Ptr(execution.TargetType_TARGET_TYPE_REST_REQUEST_RESPONSE),
-				Url:     gu.Ptr("https://example.com/hooks/1"),
+				Name: gu.Ptr("target 1"),
+				TargetType: &execution.UpdateTargetRequest_RestRequestResponse{
+					RestRequestResponse: &execution.SetRESTRequestResponse{
+						Url: "https://example.com/hooks/1",
+					},
+				},
 				Timeout: durationpb.New(10 * time.Second),
 				ExecutionType: &execution.UpdateTargetRequest_InterruptOnError{
 					InterruptOnError: true,

@@ -68,18 +68,30 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "empty type",
 			ctx:  CTX,
 			req: &execution.CreateTargetRequest{
-				Name: fmt.Sprint(time.Now().UnixNano() + 1),
-				Type: 0,
+				Name:       fmt.Sprint(time.Now().UnixNano() + 1),
+				TargetType: nil,
 			},
 			wantErr: true,
 		},
 		{
-			name: "empty url",
+			name: "empty webhook url",
 			ctx:  CTX,
 			req: &execution.CreateTargetRequest{
 				Name: fmt.Sprint(time.Now().UnixNano() + 1),
-				Type: execution.TargetType_TARGET_TYPE_REST_WEBHOOK,
-				Url:  "",
+				TargetType: &execution.CreateTargetRequest_RestWebhook{
+					RestWebhook: &execution.SetRESTWebhook{},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "empty request response url",
+			ctx:  CTX,
+			req: &execution.CreateTargetRequest{
+				Name: fmt.Sprint(time.Now().UnixNano() + 1),
+				TargetType: &execution.CreateTargetRequest_RestRequestResponse{
+					RestRequestResponse: &execution.SetRESTRequestResponse{},
+				},
 			},
 			wantErr: true,
 		},
@@ -87,9 +99,12 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "empty timeout",
 			ctx:  CTX,
 			req: &execution.CreateTargetRequest{
-				Name:          fmt.Sprint(time.Now().UnixNano() + 1),
-				Type:          execution.TargetType_TARGET_TYPE_REST_WEBHOOK,
-				Url:           "https://example.com",
+				Name: fmt.Sprint(time.Now().UnixNano() + 1),
+				TargetType: &execution.CreateTargetRequest_RestWebhook{
+					RestWebhook: &execution.SetRESTWebhook{
+						Url: "https://example.com",
+					},
+				},
 				Timeout:       nil,
 				ExecutionType: nil,
 			},
@@ -99,9 +114,12 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "empty execution type, ok",
 			ctx:  CTX,
 			req: &execution.CreateTargetRequest{
-				Name:          fmt.Sprint(time.Now().UnixNano() + 1),
-				Type:          execution.TargetType_TARGET_TYPE_REST_WEBHOOK,
-				Url:           "https://example.com",
+				Name: fmt.Sprint(time.Now().UnixNano() + 1),
+				TargetType: &execution.CreateTargetRequest_RestWebhook{
+					RestWebhook: &execution.SetRESTWebhook{
+						Url: "https://example.com",
+					},
+				},
 				Timeout:       durationpb.New(10 * time.Second),
 				ExecutionType: nil,
 			},
@@ -116,9 +134,12 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "async execution, ok",
 			ctx:  CTX,
 			req: &execution.CreateTargetRequest{
-				Name:    fmt.Sprint(time.Now().UnixNano() + 1),
-				Type:    execution.TargetType_TARGET_TYPE_REST_WEBHOOK,
-				Url:     "https://example.com",
+				Name: fmt.Sprint(time.Now().UnixNano() + 1),
+				TargetType: &execution.CreateTargetRequest_RestWebhook{
+					RestWebhook: &execution.SetRESTWebhook{
+						Url: "https://example.com",
+					},
+				},
 				Timeout: durationpb.New(10 * time.Second),
 				ExecutionType: &execution.CreateTargetRequest_IsAsync{
 					IsAsync: true,
@@ -135,9 +156,12 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "interrupt on error execution, ok",
 			ctx:  CTX,
 			req: &execution.CreateTargetRequest{
-				Name:    fmt.Sprint(time.Now().UnixNano() + 1),
-				Type:    execution.TargetType_TARGET_TYPE_REST_WEBHOOK,
-				Url:     "https://example.com",
+				Name: fmt.Sprint(time.Now().UnixNano() + 1),
+				TargetType: &execution.CreateTargetRequest_RestWebhook{
+					RestWebhook: &execution.SetRESTWebhook{
+						Url: "https://example.com",
+					},
+				},
 				Timeout: durationpb.New(10 * time.Second),
 				ExecutionType: &execution.CreateTargetRequest_InterruptOnError{
 					InterruptOnError: true,
@@ -237,7 +261,11 @@ func TestServer_UpdateTarget(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				req: &execution.UpdateTargetRequest{
-					Type: gu.Ptr(execution.TargetType_TARGET_TYPE_REST_REQUEST_RESPONSE),
+					TargetType: &execution.UpdateTargetRequest_RestRequestResponse{
+						RestRequestResponse: &execution.SetRESTRequestResponse{
+							Url: "https://example.com",
+						},
+					},
 				},
 			},
 			want: &execution.UpdateTargetResponse{
@@ -257,7 +285,11 @@ func TestServer_UpdateTarget(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				req: &execution.UpdateTargetRequest{
-					Url: gu.Ptr("https://example.com/hooks/new"),
+					TargetType: &execution.UpdateTargetRequest_RestWebhook{
+						RestWebhook: &execution.SetRESTWebhook{
+							Url: "https://example.com/hooks/new",
+						},
+					},
 				},
 			},
 			want: &execution.UpdateTargetResponse{
