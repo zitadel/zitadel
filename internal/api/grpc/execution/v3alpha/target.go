@@ -5,15 +5,17 @@ import (
 
 	"github.com/muhlemmer/gu"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
 )
 
 func (s *Server) CreateTarget(ctx context.Context, req *execution.CreateTargetRequest) (*execution.CreateTargetResponse, error) {
 	add := createTargetToCommand(req)
-	details, err := s.command.AddTarget(ctx, add, "") // TODO: RO?
+	details, err := s.command.AddTarget(ctx, add, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +26,7 @@ func (s *Server) CreateTarget(ctx context.Context, req *execution.CreateTargetRe
 }
 
 func (s *Server) UpdateTarget(ctx context.Context, req *execution.UpdateTargetRequest) (*execution.UpdateTargetResponse, error) {
-	details, err := s.command.ChangeTarget(ctx, updateTargetToCommand(req), "") // TODO: RO?
+	details, err := s.command.ChangeTarget(ctx, updateTargetToCommand(req), authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +36,7 @@ func (s *Server) UpdateTarget(ctx context.Context, req *execution.UpdateTargetRe
 }
 
 func (s *Server) DeleteTarget(ctx context.Context, req *execution.DeleteTargetRequest) (*execution.DeleteTargetResponse, error) {
-	details, err := s.command.DeleteTarget(ctx, req.GetTargetId(), "") // TODO: RO?
+	details, err := s.command.DeleteTarget(ctx, req.GetTargetId(), authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -59,6 +61,9 @@ func updateTargetToCommand(req *execution.UpdateTargetRequest) *command.ChangeTa
 		return nil
 	}
 	target := &command.ChangeTarget{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: req.GetTargetId(),
+		},
 		Name: req.Name,
 		URL:  req.Url,
 	}
