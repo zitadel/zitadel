@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package zitadel.user.schema.v1alpha;
+package zitadel.user.schema.v3alpha;
 
 import "google/api/field_behavior.proto";
 import "google/protobuf/struct.proto";
@@ -8,7 +8,7 @@ import "validate/validate.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "zitadel/object/v2beta/object.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/schema/v1alpha";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha";
 
 message UserSchema {
 
