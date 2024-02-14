@@ -127,6 +127,7 @@ Errors:
       NotFound: Код не найден
       Expired: Срок действия кода истек
       GeneratorAlgNotSupported: Неподдерживаемый алгоритм генератора
+      Invalid: Код недействителен
     Password:
       NotFound: Пароль не найден
       Empty: Пароль пуст

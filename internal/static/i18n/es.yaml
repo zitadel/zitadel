@@ -128,6 +128,7 @@ Errors:
       NotFound: Código no encontrado
       Expired: El código ha caducado
       GeneratorAlgNotSupported: Algoritmo generador no soportado
+      Invalid: El código no es válido
     Password:
       NotFound: Contraseña no encontrada
       Empty: La contraseña está vacía
