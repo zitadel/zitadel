@@ -349,14 +349,20 @@ message CreateUserSchemaRequest {
       example: "\"employees\"";
     }
   ];
-  // JSON schema representation defining the user.
-  google.protobuf.Struct schema = 2 [
-    (validate.rules).message = {required: true},
-    (google.api.field_behavior) = REQUIRED,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "{\"$schema\":\"https://example.com/user/employees\",\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"required\":true},\"description\":{\"type\":\"string\"}}}"
-    }
-  ];
+  oneof data_type {
+    option (validate.required) = true;
+
+    // JSON schema representation defining the user.
+    google.protobuf.Struct schema = 2 [
+      (validate.rules).message = {required: true},
+      (google.api.field_behavior) = REQUIRED,
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "{\"$schema\":\"https://example.com/user/employees\",\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"required\":true},\"description\":{\"type\":\"string\"}}}"
+      }
+    ];
+
+    // (--In the future we will allow to use an external registry.--)
+  }
   // Defines the possible types of authenticators.
   repeated AuthenticatorType possible_authenticators = 3 [
     (validate.rules).repeated = {unique: true, items: {enum: {defined_only: true}}},
@@ -387,14 +393,16 @@ message UpdateUserSchemaRequest {
       example: "\"employees\"";
     }
   ];
-  // JSON schema representation defining the user.
-  optional google.protobuf.Struct schema = 3 [
-    (validate.rules).message = {required: true},
-    (google.api.field_behavior) = REQUIRED,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "{\"$schema\":\"https://example.com/user/employees\",\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"required\":true},\"description\":{\"type\":\"string\"}}}"
-    }
-  ];
+  oneof data_type {
+    // JSON schema representation defining the user.
+    google.protobuf.Struct schema = 3 [
+      (validate.rules).message = {required: true},
+      (google.api.field_behavior) = REQUIRED,
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        example: "{\"$schema\":\"https://example.com/user/employees\",\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"required\":true},\"description\":{\"type\":\"string\"}}}"
+      }
+    ];
+  }
   // Defines the possible types of authenticators.
   //
   // Removal of an authenticator does not remove the authenticator on a user.
