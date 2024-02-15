@@ -11,14 +11,15 @@ module.exports = {
           type: "category",
           label: "Frontend",
           items: [
-            "examples/login/react",
-            "examples/login/vue",
             "examples/login/angular",
             "examples/login/flutter",
-            "examples/login/nextjs",
             "examples/login/go",
-            "examples/login/symfony",
             "examples/login/java-spring",
+            "examples/login/nextjs",
+            "examples/login/python-django",
+            "examples/login/react",
+            "examples/login/symfony",
+            "examples/login/vue",
             {
               type: "link",
               label: ".Net",
@@ -32,37 +33,72 @@ module.exports = {
           label: "Backend",
           items: [
             "examples/secure-api/go",
+            "examples/secure-api/java-spring",
+            "examples/secure-api/python-django",
             "examples/secure-api/python-flask",
+            "examples/secure-api/nodejs-nestjs",
             {
               type: "link",
               label: ".Net",
               href: "https://github.com/smartive/zitadel-net",
             },
-            "examples/secure-api/nodejs-nestjs",
-            "examples/secure-api/java-spring",
           ],
           collapsed: true,
         },
       ],
     },
-    "examples/sdks",
     {
       type: "category",
-      label: "Example Applications",
+      label: "Examples & SDKs",
       items: [
-        "examples/introduction",
+        "sdk-examples/introduction",
+        "sdk-examples/angular",
+        "sdk-examples/flutter",
+        "sdk-examples/go",
+        "sdk-examples/java",
+        "sdk-examples/nestjs",
+        "sdk-examples/nextjs",
+        "sdk-examples/python-flask",
+        "sdk-examples/python-django",
+        "sdk-examples/react",
+        "sdk-examples/symfony",
+        "sdk-examples/vue",
         {
           type: "link",
-          label: "Frontend", // The link label
-          href: "/examples/introduction#frontend", // The internal path
+          label: "Dart",
+          href: "https://github.com/smartive/zitadel-dart",
         },
         {
           type: "link",
-          label: "Backend", // The link label
-          href: "/examples/introduction#backend", // The internal path
+          label: "Elixir",
+          href: "https://github.com/maennchen/zitadel_api",
+        },
+        {
+          type: "link",
+          label: "NextAuth",
+          href: "https://next-auth.js.org/providers/zitadel",
+        },
+        {
+          type: "link",
+              label: "Node.js",
+            href: "https://www.npmjs.com/package/@zitadel/node",
+        },
+        {
+          type: "link",
+          label: ".Net",
+          href: "https://github.com/smartive/zitadel-net",
+        },
+        {
+          type: "link",
+          label: "Passport.js",
+          href: "https://github.com/buehler/node-passport-zitadel",
+        },
+        {
+          type: "link",
+          label: "Rust",
+          href: "https://github.com/smartive/zitadel-rust",
         },
       ],
-      collapsed: true,
     },
     {
       type: "category",
@@ -661,6 +697,20 @@ module.exports = {
               items: require("./docs/apis/resources/user_service_v3/sidebar.js"),
             },
           ]
+        },
+        {
+          type: "category",
+          label: "Execution Lifecycle (Alpha)",
+          link: {
+            type: "generated-index",
+            title: "Execution Service API (Alpha)",
+            slug: "/apis/resources/execution_service_v3",
+            description:
+                "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance.\n"+
+                "\n"+
+                "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
+          },
+          items: require("./docs/apis/resources/execution_service_v3/sidebar.js"),
         },
         {
           type: "category",

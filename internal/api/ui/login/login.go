@@ -105,7 +105,7 @@ func csp() *middleware.CSP {
 	csp := middleware.DefaultSCP
 	csp.ObjectSrc = middleware.CSPSourceOptsSelf()
 	csp.StyleSrc = csp.StyleSrc.AddNonce()
-	csp.ScriptSrc = csp.ScriptSrc.AddNonce()
+	csp.ScriptSrc = csp.ScriptSrc.AddNonce().AddHash("sha256", "AjPdJSbZmeWHnEc5ykvJFay8FTWeTeRbs9dutfZ0HqE=")
 	return &csp
 }
 
