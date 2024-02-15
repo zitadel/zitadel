@@ -26,6 +26,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
+	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
@@ -38,28 +39,30 @@ import (
 )
 
 type Client struct {
-	CC        *grpc.ClientConn
-	Admin     admin.AdminServiceClient
-	Mgmt      mgmt.ManagementServiceClient
-	Auth      auth.AuthServiceClient
-	UserV2    user.UserServiceClient
-	SessionV2 session.SessionServiceClient
-	OIDCv2    oidc_pb.OIDCServiceClient
-	OrgV2     organisation.OrganizationServiceClient
-	System    system.SystemServiceClient
+	CC          *grpc.ClientConn
+	Admin       admin.AdminServiceClient
+	Mgmt        mgmt.ManagementServiceClient
+	Auth        auth.AuthServiceClient
+	UserV2      user.UserServiceClient
+	SessionV2   session.SessionServiceClient
+	OIDCv2      oidc_pb.OIDCServiceClient
+	OrgV2       organisation.OrganizationServiceClient
+	System      system.SystemServiceClient
+	ExecutionV3 execution.ExecutionServiceClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
 	return Client{
-		CC:        cc,
-		Admin:     admin.NewAdminServiceClient(cc),
-		Mgmt:      mgmt.NewManagementServiceClient(cc),
-		Auth:      auth.NewAuthServiceClient(cc),
-		UserV2:    user.NewUserServiceClient(cc),
-		SessionV2: session.NewSessionServiceClient(cc),
-		OIDCv2:    oidc_pb.NewOIDCServiceClient(cc),
-		OrgV2:     organisation.NewOrganizationServiceClient(cc),
-		System:    system.NewSystemServiceClient(cc),
+		CC:          cc,
+		Admin:       admin.NewAdminServiceClient(cc),
+		Mgmt:        mgmt.NewManagementServiceClient(cc),
+		Auth:        auth.NewAuthServiceClient(cc),
+		UserV2:      user.NewUserServiceClient(cc),
+		SessionV2:   session.NewSessionServiceClient(cc),
+		OIDCv2:      oidc_pb.NewOIDCServiceClient(cc),
+		OrgV2:       organisation.NewOrganizationServiceClient(cc),
+		System:      system.NewSystemServiceClient(cc),
+		ExecutionV3: execution.NewExecutionServiceClient(cc),
 	}
 }
 
@@ -502,4 +505,21 @@ func (s *Tester) CreateProjectMembership(t *testing.T, ctx context.Context, proj
 		Roles:     []string{domain.RoleProjectOwner},
 	})
 	require.NoError(t, err)
+}
+
+func (s *Tester) CreateTarget(ctx context.Context, t *testing.T) *execution.CreateTargetResponse {
+	target, err := s.Client.ExecutionV3.CreateTarget(ctx, &execution.CreateTargetRequest{
+		Name: fmt.Sprint(time.Now().UnixNano() + 1),
+		TargetType: &execution.CreateTargetRequest_RestWebhook{
+			RestWebhook: &execution.SetRESTWebhook{
+				Url: "https://example.com",
+			},
+		},
+		Timeout: durationpb.New(10 * time.Second),
+		ExecutionType: &execution.CreateTargetRequest_InterruptOnError{
+			InterruptOnError: true,
+		},
+	})
+	require.NoError(t, err)
+	return target
 }
