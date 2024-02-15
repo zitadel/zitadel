@@ -20,7 +20,6 @@ services:
     depends_on:
       certs:
         condition: 'service_completed_successfully'
-
     volumes:
       - './example-zitadel-config.yaml:/example-zitadel-config.yaml:ro'
       - './example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro'
@@ -28,34 +27,71 @@ services:
       - 'zitadel-certs:/crdb-certs:ro'
 
   certs:
-    image: 'cockroachdb/cockroach:latest'
+    image: 'ubuntu:latest'
     entrypoint: [ '/bin/bash', '-c' ]
-    command: [ 'cp /certs/* /zitadel-certs/ && cockroach cert create-client --overwrite --certs-dir /zitadel-certs/ --ca-key /zitadel-certs/ca.key zitadel_user && chown 1000:1000 /zitadel-certs/*' ]
+    command: >
+      "apt update
+      && apt install openssl
+      && cd /zitadel-certs
+      && openssl req -new -x509 -days 365 -nodes -text -out server.crt -keyout server.key -subj "/CN=127.0.0.1"
+      && chmod 600 server.key server.crt"
     volumes:
-      - 'certs:/certs:ro'
       - 'zitadel-certs:/zitadel-certs:rw'
-    depends_on:
-      my-cockroach-db:
-        condition: 'service_healthy'
-#TODO: add move to psql
-  my-cockroach-db:
-    restart: 'always'
-    networks:
-      - 'zitadel'
-    image: 'cockroachdb/cockroach:latest'
-    command: 'start-single-node --advertise-addr my-cockroach-db'
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
-      interval: '10s'
-      timeout: '30s'
-      retries: 5
-      start_period: '20s'
+
+  # certs:
+  #   image: 'ubuntu:latest'
+  #   entrypoint: [ '/bin/bash', '-c' ]
+  #   command: >
+  #     "apt update
+  #     && apt install openssl
+  #     && cd /zitadel-certs
+  #     && openssl req -new -text -passout pass:abcd -subj /CN=localhost -out server.req -keyout privkey.pem
+  #     && openssl rsa -in privkey.pem -passin pass:abcd -out server.key
+  #     && openssl req -x509 -in server.req -text -key server.key -out server.crt
+  #     && chmod 600 server.key"
+  #   volumes:
+  #     - 'zitadel-certs:/zitadel-certs:rw'
+
+  db:
+    image: postgres:16-alpine
+    restart: always
+    command: -c ssl=on -c ssl_cert_file=/zitadel-certs/server.crt -c ssl_key_file=/zitadel-certs/server.key
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     ports:
-      - '9090:8080'
-      - '26257:26257'
+      - '5432:5432'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s 
+    depends_on:
+      certs:
+        condition: 'service_completed_successfully'
     volumes:
-      - 'certs:/cockroach/certs:rw'
-      - 'data:/cockroach/cockroach-data:rw'
+      - 'zitadel-certs:/zitadel-certs:ro'
+
+#TODO: add move to psql
+  # my-cockroach-db:
+  #   restart: 'always'
+  #   networks:
+  #     - 'zitadel'
+  #   image: 'cockroachdb/cockroach:latest'
+  #   command: 'start-single-node --advertise-addr my-cockroach-db'
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+  #     interval: '10s'
+  #     timeout: '30s'
+  #     retries: 5
+  #     start_period: '20s'
+  #   ports:
+  #     - '9090:8080'
+  #     - '26257:26257'
+  #   volumes:
+  #     - 'certs:/cockroach/certs:rw'
+  #     - 'data:/cockroach/cockroach-data:rw'
 
 networks:
   zitadel:
