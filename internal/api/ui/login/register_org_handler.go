@@ -1,7 +1,6 @@
 package login
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -136,11 +135,6 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 		l.customTexts(r.Context(), translator, "")
 	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplRegisterOrg], data, nil)
-}
-
-func (l *Login) publicOrgRegistrationIsDisallowed(ctx context.Context) (bool, error) {
-	restrictions, err := l.query.GetInstanceRestrictions(ctx)
-	return restrictions.DisallowPublicOrgRegistration, err
 }
 
 func (d registerOrgFormData) toUserDomain() *domain.Human {

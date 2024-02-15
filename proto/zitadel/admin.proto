@@ -3859,11 +3859,7 @@ service AdminService {
             responses: {
                 key: "200";
                 value: {
-<<<<<<< HEAD
-                    description: "The status 200 is also returned if no restrictions were ever set. In this case, all feature restrictions have zero values.";
-=======
                     description: "The status 200 is also returned if no restrictions were ever set. In this case, all feature restrictions are undefined.";
->>>>>>> main
                 };
             };
         };

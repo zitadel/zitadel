@@ -20,11 +20,6 @@ import (
 func TestSetRestrictions(t *testing.T) {
 	type fields func(*testing.T) (*eventstore.Eventstore, id.Generator)
 	type args struct {
-<<<<<<< HEAD
-		ctx             context.Context
-		resourceOwner   string
-=======
->>>>>>> main
 		setRestrictions *SetRestrictions
 	}
 	type res struct {
