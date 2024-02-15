@@ -34,7 +34,8 @@ services:
       && apt install openssl
       && cd /zitadel-certs
       && openssl req -new -x509 -days 365 -nodes -text -out server.crt -keyout server.key -subj "/CN=127.0.0.1"
-      && chmod 600 server.key server.crt"
+      && chmod 600 server.key server.crt
+      && ls -latr"
     volumes:
       - 'zitadel-certs:/zitadel-certs:rw'
 
@@ -55,7 +56,7 @@ services:
   db:
     image: postgres:16-alpine
     restart: always
-    command: -c ssl=on -c ssl_cert_file=/zitadel-certs/server.crt -c ssl_key_file=/zitadel-certs/server.key
+    command: -c ssl=on -c ssl_cert_file=zitadel-certs/server.crt -c ssl_key_file=zitadel-certs/server.key
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
