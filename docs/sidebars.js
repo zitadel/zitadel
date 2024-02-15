@@ -128,6 +128,7 @@ module.exports = {
           label: "Console",
           items: [
             "guides/manage/console/overview",
+            "guides/solution-scenarios/disable-console",
             "guides/manage/console/instance-settings",
             "guides/manage/console/organizations",
             "guides/manage/console/projects",
@@ -416,6 +417,7 @@ module.exports = {
         "guides/solution-scenarios/configurations",
         "guides/solution-scenarios/frontend-calling-backend-API",
         "guides/solution-scenarios/device-authorization",
+        "guides/solution-scenarios/disable-console",
         {
           type: "category",
           label: "Onboarding Customers and Users",
