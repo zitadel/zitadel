@@ -65,7 +65,7 @@ curl -L -X PUT "https://$CUSTOM_DOMAIN/management/v1/projects/$PROJECT_ID" \
 -H 'Accept: application/json' \
 -H "Authorization: Bearer $PAT" \
 --data-raw '{
-  "name": "$PROJECT_NAME",
+  "name": "ZITADEL",
   "projectRoleAssertion": false,
   "projectRoleCheck": false,
   "hasProjectCheck": true,
@@ -77,7 +77,6 @@ Where
 - CUSTOM_DOMAIN is your domain, f.e. b2b-demo-rbxajm.zitadel.cloud
 - PAT is your service user's personal access token
 - PROJECT_ID is the default-project's ID that can be found in Console, see screenshot above
-- PROJECT_NAME is the default-project's name as shown in the Console
 
 You should now be able to login with users of organization that have the grant (in this example users of the organization "Customer-A").
 All other users should see the following error message after authentication:
