@@ -535,10 +535,10 @@ Errors:
     TypeNotSupported: Feature Typ wird nicht unterstützt
     InvalidValue: Ungültiger Wert für dieses Feature
   Target:
-    Invalid: Target is invalid
-    NoTimeout: Target has no timeout
-    InvalidURL: Target has an invalid URL
-    NotFound: Target not found
+    Invalid: Ziel ist ungültig
+    NoTimeout: Ziel hat keinen Timeout
+    InvalidURL: Ziel hat eine ungültige URL
+    NotFound: Ziel nicht gefunden
 
 AggregateTypes:
   action: Action
@@ -550,8 +550,13 @@ AggregateTypes:
   usergrant: Benutzerberechtigung
   quota: Kontingent
   feature: Feature
+  target: Ziel
 
 EventTypes:
+  target:
+    added: Ziel erstellt
+    changed: Ziel geändert
+    removed: Ziel gelöscht
   user:
     added: Benutzer hinzugefügt
     selfregistered: Benutzer hat sich selbst registriert

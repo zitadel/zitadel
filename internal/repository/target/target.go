@@ -36,7 +36,7 @@ func (e *AddedEvent) Payload() any {
 }
 
 func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return NewAddUniqueConstraints(e.Name)
+	return []*eventstore.UniqueConstraint{NewAddUniqueConstraint(e.Name)}
 }
 
 func NewAddedEvent(
@@ -89,7 +89,10 @@ func (e *ChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	if e.oldName == "" {
 		return nil
 	}
-	return NewUpdateUniqueConstraints(e.oldName, *e.Name)
+	return []*eventstore.UniqueConstraint{
+		NewRemoveUniqueConstraint(e.oldName),
+		NewAddUniqueConstraint(*e.Name),
+	}
 }
 
 func NewChangedEvent(
@@ -176,7 +179,7 @@ func (e *RemovedEvent) Payload() any {
 }
 
 func (e *RemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return NewRemoveUniqueConstraints(e.name)
+	return []*eventstore.UniqueConstraint{NewRemoveUniqueConstraint(e.name)}
 }
 
 func NewRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string) *RemovedEvent {

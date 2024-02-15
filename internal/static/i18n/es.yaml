@@ -537,7 +537,7 @@ Errors:
   Target:
     Invalid: El objetivo no es válido
     NoTimeout: El objetivo no tiene tiempo de espera
-    InvalidURL: El destino tiene una URL no válida
+    InvalidURL: El objetivo tiene una URL no válida
     NotFound: El objetivo no encontrado
 
 AggregateTypes:
@@ -550,8 +550,13 @@ AggregateTypes:
   usergrant: Concesión de usuario
   quota: Cuota
   feature: Característica
+  target: Objectivo
 
 EventTypes:
+  target:
+    added: Objetivo creado
+    changed: Objetivo cambiado
+    removed: Objetivo eliminado
   user:
     added: Usuario añadido
     selfregistered: El usuario se registró por sí mismo

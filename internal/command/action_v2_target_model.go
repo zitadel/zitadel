@@ -117,12 +117,11 @@ func (wm *TargetWriteModel) NewChangedEvent(
 }
 
 func TargetAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
-	return eventstore.AggregateFromWriteModel(wm, target.AggregateType, target.AggregateVersion)
-}
-
-func NewExecutionAggregate(id, resourceOwner string) *eventstore.Aggregate {
-	return TargetAggregateFromWriteModel(&eventstore.WriteModel{
-		AggregateID:   id,
-		ResourceOwner: resourceOwner,
-	})
+	return &eventstore.Aggregate{
+		ID:            wm.AggregateID,
+		Type:          target.AggregateType,
+		ResourceOwner: wm.ResourceOwner,
+		InstanceID:    wm.InstanceID,
+		Version:       target.AggregateVersion,
+	}
 }
