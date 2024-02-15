@@ -124,7 +124,7 @@ type SetHumanEmailFlag struct {
 func (x *SetHumanEmailFlag) AddFlags(parent *pflag.FlagSet) {
 	x.set = pflag.NewFlagSet("SetHumanEmail", pflag.ContinueOnError)
 
-	x.emailFlag = cli_client.NewStringParser(x.set, "email", "")
+	x.emailFlag = cli_client.NewStringParser(x.set, "address", "")
 	x.isVerifiedFlag = cli_client.NewBoolParser(x.set, "is-verified", "")
 	x.sendCodeFlag = &SendEmailVerificationCodeFlag{SendEmailVerificationCode: new(SendEmailVerificationCode)}
 	x.sendCodeFlag.AddFlags(x.set)

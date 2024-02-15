@@ -40,7 +40,7 @@ func New() *cobra.Command {
 		session.SessionServiceCmd,
 		settings.SettingsServiceCmd,
 		system.SystemServiceCmd,
-		user.UserServiceCmd,
+		user.UserCmd,
 	)
 
 	return cmd

@@ -8,9 +8,11 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
+import "adlerhurst/cli/v1alpha/cli.proto";
 
 message SetHumanEmail {
   string email = 1 [
+    (adlerhurst.cli.v1alpha.flag).name = "address",
     (validate.rules).string = {min_len: 1, max_len: 200, email: true},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

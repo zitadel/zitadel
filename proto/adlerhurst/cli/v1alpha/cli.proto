@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package adlerhurst.cli.v1alpha;
+
+option go_package = "github.com/adlerhurst/cli-client;cli";
+
+import "google/protobuf/descriptor.proto";
+
+// if defined the generated code includes a main
+// function to compile the code with any further interaction
+extend google.protobuf.FileOptions {
+    CLIOption cli = 51000;
+}
+
+message CLIOption {
+    string name = 1;
+}
+
+// defines the commands name
+// e.g. ./my-cli user
+// my-cli ${service.command_name}
+extend google.protobuf.ServiceOptions {
+    CommandOption command = 51000;
+}
+
+// defines the subcommands name
+// e.g. ./my-cli user add
+// my-cli ${service.command_name} ${method.name}
+extend google.protobuf.MethodOptions {
+    CommandOption sub_command = 51000;
+}
+
+message CommandOption {
+    string name = 1;
+    bool ignored = 2;
+}
+
+// my-cli ${service.command_name} ${method.name} --${field.arg_name}
+extend google.protobuf.FieldOptions {
+    FlagOption flag = 51000;
+}
+
+message FlagOption {
+    string name = 1;
+    bool ignored = 2;
+}
