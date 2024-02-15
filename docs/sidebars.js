@@ -293,6 +293,7 @@ module.exports = {
             "guides/integrate/identity-providers/migrate",
             "guides/integrate/identity-providers/okta",
             "guides/integrate/identity-providers/keycloak",
+            "guides/integrate/identity-providers/mocksaml",
             "guides/integrate/identity-providers/additional-information",
           ],
         },
