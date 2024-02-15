@@ -87,6 +87,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public refreshPreview: EventEmitter<void> = new EventEmitter();
   public org!: Org.AsObject;
   public InfoSectionType: any = InfoSectionType;
+  private iconChanged: boolean = false;
 
   private destroy$: Subject<void> = new Subject();
   public view: View = View.PREVIEW;
@@ -265,6 +266,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
             return previewHandler(this.service.removeLabelPolicyLogo());
           }
         } else if (type === AssetType.ICON) {
+          this.iconChanged = true;
           if (theme === Theme.DARK) {
             return previewHandler(this.service.removeLabelPolicyIconDark());
           } else if (theme === Theme.LIGHT) {
@@ -300,6 +302,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
               return previewHandler(this.service.removeLabelPolicyLogo());
             }
           } else if (type === AssetType.ICON) {
+            this.iconChanged = true;
             if (theme === Theme.DARK) {
               return previewHandler(this.service.removeLabelPolicyIconDark());
             } else if (theme === Theme.LIGHT) {
@@ -348,6 +351,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
               break;
           }
         }
+        this.iconChanged = true;
       }
     }
   }
@@ -647,6 +651,10 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
           .then(() => {
             this.toast.showInfo('POLICY.PRIVATELABELING.ACTIVATED', true);
             setTimeout(() => {
+              if (this.iconChanged) {
+                this.iconChanged = false;
+                window.location.reload();
+              }
               this.getData().then((data) => {
                 if (data.policy) {
                   this.data = data.policy;
@@ -668,6 +676,10 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
           .then(() => {
             this.toast.showInfo('POLICY.PRIVATELABELING.ACTIVATED', true);
             setTimeout(() => {
+              if (this.iconChanged) {
+                this.iconChanged = false;
+                window.location.reload();
+              }
               this.getData().then((data) => {
                 if (data.policy) {
                   this.data = data.policy;

@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Instance",
+    "INSTANCE": "paramètres par défaut",
     "DASHBOARD": "Accueil",
     "PERSONAL_INFO": "Informations personnelles",
     "DOCUMENTATION": "Documentation",
@@ -227,6 +227,7 @@
     "EMAIL": "Courriel",
     "USERNAME": "Nom de l'utilisateur",
     "ORGNAME": "Nom de l'organisation",
+    "PRIMARYDOMAIN": "Domaine principal",
     "PROJECTNAME": "Nom du projet",
     "RESOURCEOWNER": "Propriétaire des ressources",
     "METHODS": {
@@ -1022,6 +1023,7 @@
       "DESCRIPTION": "Ces paramètres étendent et remplacent les paramètres de votre instance."
     },
     "LIST": {
+      "ORGS": "Organisations",
       "LANGUAGES": "Langues",
       "LOGIN": "Comportement de connexion et sécurité",
       "LOCKOUT": "Verrouillage",
@@ -1039,15 +1041,20 @@
       "PRIVACYPOLICY": "Politique de confidentialité",
       "OIDC": "Durée de vie et expiration des jetons OIDC",
       "SECRETS": "Apparence secrète",
-      "SECURITY": "Paramètres de sécurité"
+      "SECURITY": "Paramètres de sécurité",
+      "EVENTS": "Événements",
+      "FAILEDEVENTS": "Événements échoués",
+      "VIEWS": "Vues"
     },
     "GROUPS": {
+      "GENERAL": "Général",
       "NOTIFICATIONS": "Notifications",
       "LOGIN": "Connexion et accès",
       "DOMAIN": "Domaine",
       "TEXTS": "Textes et langues",
       "APPEARANCE": "Apparence",
-      "OTHER": "Autres"
+      "OTHER": "Autres",
+      "STORAGE": "Stockage"
     }
   },
   "SETTING": {

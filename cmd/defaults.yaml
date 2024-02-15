@@ -337,6 +337,7 @@ OIDC:
     TriggerIntrospectionProjections: false
     # Allows fallback to the Legacy Introspection implementation
     LegacyIntrospection: false
+  PublicKeyCacheMaxAge: 24h # ZITADEL_OIDC_PUBLICKEYCACHEMAXAGE
 
 SAML:
   ProviderConfig:
@@ -981,6 +982,8 @@ InternalAuthZ:
         - "events.read"
         - "milestones.read"
         - "session.delete"
+        - "execution.target.write"
+        - "execution.target.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"

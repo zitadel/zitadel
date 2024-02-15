@@ -23,7 +23,7 @@ We understand that these advisories may include breaking changes, and we aim to 
       <a href="./advisory/a10000">A-10000</a>
     </td>
     <td>Reusing user session</td>
-    <td>Breaking Behaviour Change</td>
+    <td>Breaking Behavior Change</td>
     <td>
       The default behavior for users logging in is to be directed to the Select
       Account Page on the Login. With the upcoming changes, users will be
@@ -39,13 +39,13 @@ We understand that these advisories may include breaking changes, and we aim to 
       <a href="./advisory/a10001">A-10001</a>
     </td>
     <td>Login Policy - Allow Register</td>
-    <td>Breaking Behaviour Change</td>
+    <td>Breaking Behavior Change</td>
     <td>
       When disabling the option, users are currently not able to register
       locally and also not through an external IDP. With the upcoming change,
       the setting will only prevent local registration. Restriction to Identity
       Providers can be managed through the corresponding IDP Template. No action
-      is required on your side if this is the intended behaviour or if you
+      is required on your side if this is the intended behavior or if you
       already disabled registration on your IDP.
     </td>
     <td>2.35.0</td>
@@ -75,7 +75,7 @@ We understand that these advisories may include breaking changes, and we aim to 
       <a href="./advisory/a10003">A-10003</a>
     </td>
     <td>Login-UI - Default Context</td>
-    <td>Breaking Behaviour Change</td>
+    <td>Breaking Behavior Change</td>
     <td>
         When users are redirected to the ZITADEL Login-UI without any organizational context,
         they're currently presented a login screen, based on the instance settings,
@@ -91,9 +91,9 @@ We understand that these advisories may include breaking changes, and we aim to 
       <a href="./advisory/a10004">A-10004</a>
     </td>
     <td>Sequence uniquenes</td>
-    <td>Breaking Behaviour Change</td>
+    <td>Breaking Behavior Change</td>
     <td>
-      Due to storage optimisations ZITADEL changes the behaviour of sequences. 
+      Due to storage optimisations ZITADEL changes the behavior of sequences.
       This change improves command (create, update, delete) performance of ZITADEL.
       Sequences are no longer unique inside an instance.
       From now on sequences are upcounting per aggregate id. 
@@ -123,7 +123,7 @@ We understand that these advisories may include breaking changes, and we aim to 
       <a href="./advisory/a10006">A-10006</a>
     </td>
     <td>Additional grant to cockroach database user</td>
-    <td>Breaking Behaviour Change</td>
+    <td>Breaking Behavior Change</td>
     <td>
       Versions &gt;= 2.39.0 require the cockroach database user of ZITADEL to be granted to the `VIEWACTIVITY` grant. This can either be reached by grant the role manually or execute the `zitadel init` command.
     </td>
@@ -135,7 +135,7 @@ We understand that these advisories may include breaking changes, and we aim to 
       <a href="./advisory/a10007">A-10007</a>
     </td>
     <td>Additional grant to cockroach database user</td>
-    <td>Breaking Behaviour Change</td>
+    <td>Breaking Behavior Change</td>
     <td>
       Upcoming Versions require the SYSTEM_OWNER role to be available in the permission role mappings. Self-hosting ZITADEL users who define custom permission role mappings need to make sure their system users don't lose access to the system API.
     </td>
@@ -151,7 +151,7 @@ We understand that these advisories may include breaking changes, and we aim to 
     <td>
       new flag `--init-projections` introduced to `zitadel setup` commands (`setup`, `start-from-setup`, `start-from-init`)
     </td>
-    <td>2.44.0</td>
+    <td>2.44.0, 2.43.6, 2.42.12</td>
     <td>2024-01-25</td>
   </tr>
 </table>
@@ -165,7 +165,7 @@ As ZITADEL Cloud customer, you can also login to the <a href="https://zitadel.cl
 
 ## Categories
 
-### Breaking Behaviour Change
+### Breaking Behavior Change
 
 A breaking behavior change refers to a modification or update that changes the behavior of ZITADEL.
 This change does not necessarily affect the APIs or any functions you are calling, so it may not require an update to your code.

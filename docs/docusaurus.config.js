@@ -61,6 +61,8 @@ module.exports = {
         alt: "ZITADEL logo",
         src: "img/zitadel-logo-dark.svg",
         srcDark: "img/zitadel-logo-light.svg",
+        href: "https://zitadel.com",
+        target: "_blank",
       },
       items: [
         {
@@ -178,7 +180,7 @@ module.exports = {
       selector: "div#",
     },
     prism: {
-      additionalLanguages: ["csharp", "dart", "groovy", "regex", "java", "php"],
+      additionalLanguages: ["csharp", "dart", "groovy", "regex", "java", "php", "python"],
     },
     colorMode: {
       defaultMode: "dark",
@@ -284,6 +286,13 @@ module.exports = {
           settings: {
             specPath: ".artifacts/openapi/zitadel/settings/v2beta/settings_service.swagger.json",
             outputDir: "docs/apis/resources/settings_service",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
+          execution_v3: {
+            specPath: ".artifacts/openapi/zitadel/execution/v3alpha/execution_service.swagger.json",
+            outputDir: "docs/apis/resources/execution_service_v3",
             sidebarOptions: {
               groupPathsBy: "tag",
             },

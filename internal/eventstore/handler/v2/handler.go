@@ -471,11 +471,11 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 
 	txCtx := ctx
 	if h.txDuration > 0 {
-		var cancel func()
-		ctx, cancel = context.WithTimeout(ctx, h.txDuration)
-		defer cancel()
+		var cancel, cancelTx func()
 		// add 100ms to store current state if iteration takes too long
-		txCtx, cancel = context.WithTimeout(ctx, h.txDuration+100*time.Millisecond)
+		txCtx, cancelTx = context.WithTimeout(ctx, h.txDuration+100*time.Millisecond)
+		defer cancelTx()
+		ctx, cancel = context.WithTimeout(ctx, h.txDuration)
 		defer cancel()
 	}
 
