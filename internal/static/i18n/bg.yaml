@@ -130,6 +130,7 @@ Errors:
       NotFound: Кодът не е намерен
       Expired: Кодът е изтекъл
       GeneratorAlgNotSupported: Неподдържан генераторен алгоритъм
+      Invalid: кодът е невалиден
     Password:
       NotFound: Паролата не е намерена
       Empty: Паролата е празна

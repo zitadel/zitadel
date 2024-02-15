@@ -120,6 +120,7 @@ Errors:
       NotFound: コードが見つかりません
       Expired: 有効期限切れのコードです
       GeneratorAlgNotSupported: サポートされていない生成アルゴリズムです
+      Invalid: コードが無効
     Password:
       NotFound: パスワードが見つかりません
       Empty: パスワードは空です
