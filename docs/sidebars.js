@@ -633,6 +633,20 @@ module.exports = {
         },
         {
           type: "category",
+          label: "Execution Lifecycle (Alpha)",
+          link: {
+            type: "generated-index",
+            title: "Execution Service API (Alpha)",
+            slug: "/apis/resources/execution_service_v3",
+            description:
+                "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance.\n"+
+                "\n"+
+                "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
+          },
+          items: require("./docs/apis/resources/execution_service_v3/sidebar.js"),
+        },
+        {
+          type: "category",
           label: "Assets",
           collapsed: true,
           items: ["apis/assets/assets"],

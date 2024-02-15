@@ -519,6 +519,16 @@ Errors:
       Invalid: Токен недействителен
       Expired: Срок действия токена истек
     InvalidClient: Токен не был выпущен для этого клиента
+  Feature:
+    NotExisting: ункция не существует
+    TypeNotSupported: Тип объекта не поддерживается
+    InvalidValue: Недопустимое значение для этой функции.
+  Target:
+    Invalid: Цель недействительна.
+    NoTimeout: У цели нет тайм-аута
+    InvalidURL: Цель имеет неверный URL-адрес
+    NotFound: Цель не найдена
+
 AggregateTypes:
   action: Действие
   instance: Пример
@@ -528,7 +538,14 @@ AggregateTypes:
   user: Пользователь
   usergrant: Разрешение пользователя
   quota: Квота
+  feature: Особенность
+  target: мишень
+
 EventTypes:
+  target:
+    added: Цель создана
+    changed: Цель изменена
+    removed: Цель удалена.
   user:
     added: Добавлено пользователем
     selfregistered: Пользователь зарегистрировался сам
