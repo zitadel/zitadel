@@ -8,10 +8,10 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_SetUserMetadata(t *testing.T) {
@@ -54,7 +54,7 @@ func TestCommandSide_SetUserMetadata(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -89,7 +89,7 @@ func TestCommandSide_SetUserMetadata(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -198,7 +198,7 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -219,7 +219,7 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -255,7 +255,7 @@ func TestCommandSide_BulkSetUserMetadata(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -365,7 +365,7 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 				metadataKey: "key",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -382,7 +382,7 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 				metadataKey: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -416,7 +416,7 @@ func TestCommandSide_UserRemoveMetadata(t *testing.T) {
 				metadataKey: "key",
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -524,7 +524,7 @@ func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 				userID: "user1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -542,7 +542,7 @@ func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 				metadataList: []string{"key", "key1"},
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -584,7 +584,7 @@ func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 				metadataList: []string{"key", "key1"},
 			},
 			res: res{
-				err: caos_errs.IsNotFound,
+				err: zerrors.IsNotFound,
 			},
 		},
 		{
@@ -633,7 +633,7 @@ func TestCommandSide_BulkRemoveUserMetadata(t *testing.T) {
 				metadataList: []string{""},
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{

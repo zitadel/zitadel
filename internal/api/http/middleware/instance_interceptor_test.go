@@ -7,11 +7,13 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
 )
 
 func Test_instanceInterceptor_Handler(t *testing.T) {
@@ -70,6 +72,7 @@ func Test_instanceInterceptor_Handler(t *testing.T) {
 			a := &instanceInterceptor{
 				verifier:   tt.fields.verifier,
 				headerName: tt.fields.headerName,
+				translator: newZitadelTranslator(),
 			}
 			next := &testHandler{}
 			got := a.HandlerFunc(next.ServeHTTP)
@@ -137,6 +140,7 @@ func Test_instanceInterceptor_HandlerFunc(t *testing.T) {
 			a := &instanceInterceptor{
 				verifier:   tt.fields.verifier,
 				headerName: tt.fields.headerName,
+				translator: newZitadelTranslator(),
 			}
 			next := &testHandler{}
 			got := a.HandlerFunc(next.ServeHTTP)
@@ -164,7 +168,7 @@ func Test_setInstance(t *testing.T) {
 		res  res
 	}{
 		{
-			"hostname not found, error",
+			"special host header not found, error",
 			args{
 				r: func() *http.Request {
 					r := httptest.NewRequest("", "/url", nil)
@@ -179,7 +183,7 @@ func Test_setInstance(t *testing.T) {
 			},
 		},
 		{
-			"invalid host, error",
+			"special host header invalid, error",
 			args{
 				r: func() *http.Request {
 					r := httptest.NewRequest("", "/url", nil)
@@ -195,7 +199,7 @@ func Test_setInstance(t *testing.T) {
 			},
 		},
 		{
-			"valid host",
+			"special host header valid, ok",
 			args{
 				r: func() *http.Request {
 					r := httptest.NewRequest("", "/url", nil)
@@ -208,6 +212,52 @@ func Test_setInstance(t *testing.T) {
 			res{
 				want: authz.WithInstance(context.Background(), &mockInstance{}),
 				err:  false,
+			},
+		},
+		{
+			"host from origin if header is not special, ok",
+			args{
+				r: func() *http.Request {
+					r := httptest.NewRequest("", "/url", nil)
+					r.Header.Set("host", "fromrequest")
+					return r.WithContext(zitadel_http.WithComposedOrigin(r.Context(), "https://fromorigin:9999"))
+				}(),
+				verifier:   &mockInstanceVerifier{"fromorigin:9999"},
+				headerName: "host",
+			},
+			res{
+				want: authz.WithInstance(zitadel_http.WithComposedOrigin(context.Background(), "https://fromorigin:9999"), &mockInstance{}),
+				err:  false,
+			},
+		},
+		{
+			"host from origin, instance not found",
+			args{
+				r: func() *http.Request {
+					r := httptest.NewRequest("", "/url", nil)
+					return r.WithContext(zitadel_http.WithComposedOrigin(r.Context(), "https://fromorigin:9999"))
+				}(),
+				verifier:   &mockInstanceVerifier{"unknowndomain"},
+				headerName: "host",
+			},
+			res{
+				want: nil,
+				err:  true,
+			},
+		},
+		{
+			"host from origin invalid, err",
+			args{
+				r: func() *http.Request {
+					r := httptest.NewRequest("", "/url", nil)
+					return r.WithContext(zitadel_http.WithComposedOrigin(r.Context(), "https://from origin:9999"))
+				}(),
+				verifier:   &mockInstanceVerifier{"from origin"},
+				headerName: "host",
+			},
+			res{
+				want: nil,
+				err:  true,
 			},
 		},
 	}
@@ -249,6 +299,14 @@ func (m *mockInstanceVerifier) InstanceByID(context.Context) (authz.Instance, er
 }
 
 type mockInstance struct{}
+
+func (m *mockInstance) Block() *bool {
+	panic("shouldn't be called here")
+}
+
+func (m *mockInstance) AuditLogRetention() *time.Duration {
+	panic("shouldn't be called here")
+}
 
 func (m *mockInstance) InstanceID() string {
 	return "instanceID"

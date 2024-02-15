@@ -31,10 +31,17 @@ Errors:
   Limits:
     NotFound: Limits konnten nicht gefunden werden
     NoneSpecified: Keine Limits angegeben
+    Instance:
+      Blocked: Instanz ist blockiert
   Restrictions:
     NoneSpecified: Keine Restriktionen angegeben
+    DefaultLanguageMustBeAllowed: Default Sprache muss erlaubt sein
   Language:
     NotParsed: Sprache konnte nicht gemapped werden
+    NotSupported: Sprache wird nicht unterstützt
+    NotAllowed: Sprache ist nicht erlaubt
+    Undefined: Sprache ist nicht definiert
+    Duplicate: Sprachen haben Duplikate
   OIDCSettings:
     NotFound: OIDC Konfiguration konnte nicht gefunden werden
     AlreadyExists: OIDC Konfiguration existiert bereits
@@ -121,6 +128,7 @@ Errors:
       NotFound: Code konnte nicht gefunden werden
       Expired: Code ist abgelaufen
       GeneratorAlgNotSupported: Generator Algorithmus wird nicht unterstützt
+      Invalid: Code ist nicht gültig
     Password:
       NotFound: Password nicht gefunden
       Empty: Passwort ist leer
@@ -139,7 +147,7 @@ Errors:
     ExternalIDP:
       Invalid: Externer IDP ungültig
       IDPConfigNotExisting: IDP Provider ungültig für diese Organisation
-      NotAllowed: Externer IDP ist auf dieser Organisation nicht erlaubt.
+      NotAllowed: Externer IDP nicht erlaubt
       MinimumExternalIDPNeeded: Mindestens ein IDP muss hinzugefügt werden.
       AlreadyExists: External IDP ist bereits vergeben
       NotFound: Externer IDP nicht gefunden
@@ -431,6 +439,7 @@ Errors:
   UserSession:
     NotFound: Benutzer Sitzung konnte nicht gefunden werden
   Key:
+    NotFound: Schlüssel nicht gefunden
     ExpireBeforeNow: Das Ablaufdatum liegt in der Vergangenheit
   Login:
     LoginPolicy:
@@ -526,6 +535,11 @@ Errors:
     NotExisting: Feature existiert nicht
     TypeNotSupported: Feature Typ wird nicht unterstützt
     InvalidValue: Ungültiger Wert für dieses Feature
+  Target:
+    Invalid: Ziel ist ungültig
+    NoTimeout: Ziel hat keinen Timeout
+    InvalidURL: Ziel hat eine ungültige URL
+    NotFound: Ziel nicht gefunden
 
 AggregateTypes:
   action: Action
@@ -537,8 +551,13 @@ AggregateTypes:
   usergrant: Benutzerberechtigung
   quota: Kontingent
   feature: Feature
+  target: Ziel
 
 EventTypes:
+  target:
+    added: Ziel erstellt
+    changed: Ziel geändert
+    removed: Ziel gelöscht
   user:
     added: Benutzer hinzugefügt
     selfregistered: Benutzer hat sich selbst registriert

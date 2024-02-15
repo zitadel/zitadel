@@ -3,8 +3,8 @@ package project
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -71,7 +71,7 @@ func SAMLConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "SAML-BDd15", "unable to unmarshal saml config")
+		return nil, zerrors.ThrowInternal(err, "SAML-BDd15", "unable to unmarshal saml config")
 	}
 
 	return e, nil
@@ -109,7 +109,7 @@ func NewSAMLConfigChangedEvent(
 	changes []SAMLConfigChanges,
 ) (*SAMLConfigChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "SAML-i8idç", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "SAML-i8idç", "Errors.NoChangesFound")
 	}
 
 	changeEvent := &SAMLConfigChangedEvent{
@@ -154,7 +154,7 @@ func SAMLConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, err
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "SAML-BFd15", "unable to unmarshal saml config")
+		return nil, zerrors.ThrowInternal(err, "SAML-BFd15", "unable to unmarshal saml config")
 	}
 
 	return e, nil

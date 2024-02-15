@@ -7,10 +7,12 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type key int
@@ -103,14 +105,15 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 	}
 	userID, clientID, agentID, prefLang, resourceOwner, err := t.VerifyAccessToken(ctx, tokenWOBearer)
 	var sysMemberships Memberships
-	if err != nil && !zitadel_errors.IsUnauthenticated(err) {
+	if err != nil && !zerrors.IsUnauthenticated(err) {
 		return CtxData{}, err
 	}
 	if err != nil {
+		logging.WithFields("org_id", orgID, "org_domain", orgDomain).WithError(err).Warn("authz: verify access token")
 		var sysTokenErr error
 		sysMemberships, userID, sysTokenErr = t.VerifySystemToken(ctx, tokenWOBearer, orgID)
 		if sysTokenErr != nil || sysMemberships == nil {
-			return CtxData{}, zitadel_errors.ThrowUnauthenticated(errors.Join(err, sysTokenErr), "AUTH-7fs1e", "Errors.Token.Invalid")
+			return CtxData{}, zerrors.ThrowUnauthenticated(errors.Join(err, sysTokenErr), "AUTH-7fs1e", "Errors.Token.Invalid")
 		}
 	}
 	var projectID string
@@ -118,7 +121,7 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 	if clientID != "" {
 		projectID, origins, err = t.ProjectIDAndOriginsByClientID(ctx, clientID)
 		if err != nil {
-			return CtxData{}, zitadel_errors.ThrowPermissionDenied(err, "AUTH-GHpw2", "could not read projectid by clientid")
+			return CtxData{}, zerrors.ThrowPermissionDenied(err, "AUTH-GHpw2", "could not read projectid by clientid")
 		}
 		// We used to check origins for every token, but service users shouldn't be used publicly (native app / SPA).
 		// Therefore, mostly won't send an origin and aren't able to configure them anyway.
@@ -130,11 +133,11 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID, orgDomain st
 	if orgID == "" && orgDomain == "" {
 		orgID = resourceOwner
 	}
-	// System API calls dont't have a resource owner
+	// System API calls don't have a resource owner
 	if orgID != "" {
 		orgID, err = t.ExistsOrg(ctx, orgID, orgDomain)
 		if err != nil {
-			return CtxData{}, zitadel_errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
+			return CtxData{}, zerrors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
 		}
 	}
 	return CtxData{
@@ -173,13 +176,13 @@ func checkOrigin(ctx context.Context, origins []string) error {
 	if http_util.IsOriginAllowed(origins, origin) {
 		return nil
 	}
-	return zitadel_errors.ThrowPermissionDenied(nil, "AUTH-DZG21", "Errors.OriginNotAllowed")
+	return zerrors.ThrowPermissionDenied(nil, "AUTH-DZG21", "Errors.OriginNotAllowed")
 }
 
 func extractBearerToken(token string) (part string, err error) {
 	parts := strings.Split(token, BearerPrefix)
 	if len(parts) != 2 {
-		return "", zitadel_errors.ThrowUnauthenticated(nil, "AUTH-7fs1e", "invalid auth header")
+		return "", zerrors.ThrowUnauthenticated(nil, "AUTH-7fs1e", "invalid auth header")
 	}
 	return parts[1], nil
 }

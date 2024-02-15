@@ -12,9 +12,19 @@ module.exports = {
           label: "Frontend",
           items: [
             "examples/login/angular",
-            "examples/login/react",
             "examples/login/flutter",
+            "examples/login/go",
+            "examples/login/java-spring",
             "examples/login/nextjs",
+            "examples/login/python-django",
+            "examples/login/react",
+            "examples/login/symfony",
+            "examples/login/vue",
+            {
+              type: "link",
+              label: ".Net",
+              href: "https://github.com/smartive/zitadel-net",
+            },
           ],
           collapsed: true,
         },
@@ -23,31 +33,72 @@ module.exports = {
           label: "Backend",
           items: [
             "examples/secure-api/go",
+            "examples/secure-api/java-spring",
+            "examples/secure-api/python-django",
             "examples/secure-api/python-flask",
-            "examples/secure-api/dot-net"
+            "examples/secure-api/nodejs-nestjs",
+            {
+              type: "link",
+              label: ".Net",
+              href: "https://github.com/smartive/zitadel-net",
+            },
           ],
           collapsed: true,
         },
       ],
     },
-    "examples/sdks",
     {
       type: "category",
-      label: "Example Applications",
+      label: "Examples & SDKs",
       items: [
-        "examples/introduction",
+        "sdk-examples/introduction",
+        "sdk-examples/angular",
+        "sdk-examples/flutter",
+        "sdk-examples/go",
+        "sdk-examples/java",
+        "sdk-examples/nestjs",
+        "sdk-examples/nextjs",
+        "sdk-examples/python-flask",
+        "sdk-examples/python-django",
+        "sdk-examples/react",
+        "sdk-examples/symfony",
+        "sdk-examples/vue",
         {
-          type: 'link',
-          label: 'Frontend', // The link label
-          href: '/examples/introduction#frontend', // The internal path
+          type: "link",
+          label: "Dart",
+          href: "https://github.com/smartive/zitadel-dart",
         },
         {
-          type: 'link',
-          label: 'Backend', // The link label
-          href: '/examples/introduction#backend', // The internal path
-        }
+          type: "link",
+          label: "Elixir",
+          href: "https://github.com/maennchen/zitadel_api",
+        },
+        {
+          type: "link",
+          label: "NextAuth",
+          href: "https://next-auth.js.org/providers/zitadel",
+        },
+        {
+          type: "link",
+              label: "Node.js",
+            href: "https://www.npmjs.com/package/@zitadel/node",
+        },
+        {
+          type: "link",
+          label: ".Net",
+          href: "https://github.com/smartive/zitadel-net",
+        },
+        {
+          type: "link",
+          label: "Passport.js",
+          href: "https://github.com/buehler/node-passport-zitadel",
+        },
+        {
+          type: "link",
+          label: "Rust",
+          href: "https://github.com/smartive/zitadel-rust",
+        },
       ],
-      collapsed: true,
     },
     {
       type: "category",
@@ -127,9 +178,9 @@ module.exports = {
             "guides/migrate/sources/zitadel",
             "guides/migrate/sources/auth0",
             "guides/migrate/sources/keycloak",
-          ]
+          ],
         },
-      ]
+      ],
     },
     {
       type: "category",
@@ -150,8 +201,7 @@ module.exports = {
             type: "generated-index",
             title: "Authenticate Human Users",
             slug: "guides/integrate/human-users",
-            description:
-              "How to authenticate human users with OpenID Connect",
+            description: "How to authenticate human users with OpenID Connect",
           },
           items: [
             "guides/integrate/login-users",
@@ -196,9 +246,7 @@ module.exports = {
           type: "category",
           label: "Role Management",
           collapsed: true,
-          items: [
-            "guides/integrate/retrieve-user-roles"
-          ],
+          items: ["guides/integrate/retrieve-user-roles"],
         },
         {
           type: "category",
@@ -208,8 +256,7 @@ module.exports = {
             title: "Build your own Login UI",
             slug: "/guides/integrate/login-ui",
             description:
-                "In the following guides you will learn how to create your own login UI with our APIs. The different scenarios like username/password, external identity provider, etc. will be shown."
-
+              "In the following guides you will learn how to create your own login UI with our APIs. The different scenarios like username/password, external identity provider, etc. will be shown.",
           },
           collapsed: true,
           items: [
@@ -220,7 +267,7 @@ module.exports = {
             "guides/integrate/login-ui/select-account",
             "guides/integrate/login-ui/password-reset",
             "guides/integrate/login-ui/logout",
-            "guides/integrate/login-ui/oidc-standard"
+            "guides/integrate/login-ui/oidc-standard",
           ],
         },
         {
@@ -228,11 +275,11 @@ module.exports = {
           label: "Configure Identity Providers",
           link: {
             type: "generated-index",
-            title: "Let Users Login with Preferred Identity Provider in ZITADEL",
+            title:
+              "Let Users Login with Preferred Identity Provider in ZITADEL",
             slug: "/guides/integrate/identity-providers",
             description:
               "In the following guides you will learn how to configure and setup your preferred external identity provider in ZITADEL.",
-
           },
           collapsed: true,
           items: [
@@ -246,6 +293,7 @@ module.exports = {
             "guides/integrate/identity-providers/migrate",
             "guides/integrate/identity-providers/okta",
             "guides/integrate/identity-providers/keycloak",
+            "guides/integrate/identity-providers/additional-information",
           ],
         },
         {
@@ -254,9 +302,9 @@ module.exports = {
           collapsed: true,
           items: [
             {
-              type: 'link',
-              label: 'Authenticate Service Users',
-              href: '/guides/integrate/serviceusers',
+              type: "link",
+              label: "Authenticate Service Users",
+              href: "/guides/integrate/serviceusers",
             },
             "guides/integrate/access-zitadel-apis",
             "guides/integrate/access-zitadel-system-api",
@@ -281,48 +329,47 @@ module.exports = {
             slug: "/guides/integrate/services",
             description:
               "With the guides in this section you will learn how to integrate ZITADEL with your services.",
-
           },
           collapsed: true,
           items: [
             {
-              type: 'autogenerated',
-              dirName: 'guides/integrate/services',
+              type: "autogenerated",
+              dirName: "guides/integrate/services",
             },
             {
-              type: 'link',
-              label: 'Bold BI (boldbi.com)',
-              href: 'https://support.boldbi.com/kb/article/13708/how-to-configure-zitadel-oauth-login-in-bold-bi',
+              type: "link",
+              label: "Bold BI (boldbi.com)",
+              href: "https://support.boldbi.com/kb/article/13708/how-to-configure-zitadel-oauth-login-in-bold-bi",
             },
             {
-              type: 'link',
-              label: 'Cloudflare workers',
-              href: 'https://zitadel.com/blog/increase-spa-security-with-cloudflare-workers',
+              type: "link",
+              label: "Cloudflare workers",
+              href: "https://zitadel.com/blog/increase-spa-security-with-cloudflare-workers",
             },
             {
-              type: 'link',
-              label: 'Firezone (firezone.dev)',
-              href: 'https://www.firezone.dev/docs/authenticate/oidc/zitadel',
+              type: "link",
+              label: "Firezone (firezone.dev)",
+              href: "https://www.firezone.dev/docs/authenticate/oidc/zitadel",
             },
             {
-              type: 'link',
-              label: 'Nextcloud',
-              href: 'https://zitadel.com/blog/zitadel-as-sso-provider-for-selfhosting',
+              type: "link",
+              label: "Nextcloud",
+              href: "https://zitadel.com/blog/zitadel-as-sso-provider-for-selfhosting",
             },
             {
-              type: 'link',
-              label: 'Netbird (netbird.io)',
-              href: 'https://docs.netbird.io/selfhosted/identity-providers',
+              type: "link",
+              label: "Netbird (netbird.io)",
+              href: "https://docs.netbird.io/selfhosted/identity-providers",
             },
             {
-              type: 'link',
-              label: 'Psono (psono.com)',
-              href: 'https://doc.psono.com/admin/configuration/oidc-zitadel.html',
+              type: "link",
+              label: "Psono (psono.com)",
+              href: "https://doc.psono.com/admin/configuration/oidc-zitadel.html",
             },
             {
-              type: 'link',
-              label: 'Zoho Desk (zoho.com)',
-              href: 'https://help.zoho.com/portal/en/kb/desk/user-management-and-security/data-security/articles/setting-up-saml-single-signon-for-help-center#Zitadel_IDP',
+              type: "link",
+              label: "Zoho Desk (zoho.com)",
+              href: "https://help.zoho.com/portal/en/kb/desk/user-management-and-security/data-security/articles/setting-up-saml-single-signon-for-help-center#Zitadel_IDP",
             },
           ],
         },
@@ -335,18 +382,17 @@ module.exports = {
             slug: "/guides/integrate/tools",
             description:
               "With the guides in this section you will learn how to integrate ZITADEL with your favorite tools.",
-
           },
           collapsed: true,
           items: [
             {
-              type: 'link',
-              label: 'Argo CD',
-              href: 'https://argo-cd.readthedocs.io/en/latest/operator-manual/user-management/zitadel/',
+              type: "link",
+              label: "Argo CD",
+              href: "https://argo-cd.readthedocs.io/en/latest/operator-manual/user-management/zitadel/",
             },
             "guides/integrate/tools/apache2",
             "guides/integrate/authenticated-mongodb-charts",
-            "examples/identity-proxy/oauth2-proxy"
+            "examples/identity-proxy/oauth2-proxy",
           ],
         },
       ],
@@ -370,6 +416,23 @@ module.exports = {
         "guides/solution-scenarios/configurations",
         "guides/solution-scenarios/frontend-calling-backend-API",
         "guides/solution-scenarios/device-authorization",
+        {
+          type: "category",
+          label: "Onboarding Customers and Users",
+          link: {
+            type: "generated-index",
+            title: "Onboarding Customers and Users",
+            slug: "/guides/solution-scenarios/onboarding",
+            description:
+                "When building your own application, one of the first questions you have to face, is 'How do my customers onboard to my application?'\n" +
+                "This guide will show you the built-in solution you have, within ZITADEL and how you can use ZITADEL when you have more advanced needs.",
+          },
+          collapsed: true,
+          items: [
+            "guides/solution-scenarios/onboarding/b2b",
+            "guides/solution-scenarios/onboarding/end-users",
+          ],
+        }
       ],
     },
     {
@@ -397,7 +460,7 @@ module.exports = {
         "concepts/features/actions",
         "concepts/features/audit-trail",
         "concepts/features/selfservice",
-      ]
+      ],
     },
     {
       type: "category",
@@ -417,7 +480,7 @@ module.exports = {
             "concepts/eventstore/implementation",
           ],
         },
-      ]
+      ],
     },
     {
       type: "category",
@@ -427,26 +490,26 @@ module.exports = {
         "support/software-release-cycles-support",
         "support/troubleshooting",
         {
-          type: 'link',
-          label: 'Support Service Descriptions',
-          href: '/legal/service-description/support-services',
+          type: "link",
+          label: "Support Service Descriptions",
+          href: "/legal/service-description/support-services",
         },
         {
-          type: 'category',
+          type: "category",
           label: "Technical Advisory",
           link: {
-            type: 'doc',
-            id: 'support/technical_advisory',
+            type: "doc",
+            id: "support/technical_advisory",
           },
           collapsed: true,
           items: [
-              {
-                type: 'autogenerated',
-                dirName: 'support/advisory',
-              },
+            {
+              type: "autogenerated",
+              dirName: "support/advisory",
+            },
           ],
         },
-      ]
+      ],
     },
   ],
   apis: [
@@ -459,8 +522,7 @@ module.exports = {
         type: "generated-index",
         title: "Core Resources",
         slug: "/apis/resources/",
-        description:
-          "Resource based API definitions",
+        description: "Resource based API definitions",
       },
       items: [
         {
@@ -472,7 +534,6 @@ module.exports = {
             slug: "/apis/resources/auth",
             description:
               "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
-
           },
           items: require("./docs/apis/resources/auth/sidebar.js"),
         },
@@ -522,8 +583,8 @@ module.exports = {
             title: "User Service API (Beta)",
             slug: "/apis/resources/user_service",
             description:
-              "This API is intended to manage users in a ZITADEL instance.\n"+
-              "\n"+
+              "This API is intended to manage users in a ZITADEL instance.\n" +
+              "\n" +
               "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
           },
           items: require("./docs/apis/resources/user_service/sidebar.js"),
@@ -536,8 +597,8 @@ module.exports = {
             title: "Session Service API (Beta)",
             slug: "/apis/resources/session_service",
             description:
-              "This API is intended to manage sessions in a ZITADEL instance.\n"+
-              "\n"+
+              "This API is intended to manage sessions in a ZITADEL instance.\n" +
+              "\n" +
               "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
           },
           items: require("./docs/apis/resources/session_service/sidebar.js"),
@@ -550,8 +611,8 @@ module.exports = {
             title: "OIDC Service API (Beta)",
             slug: "/apis/resources/oidc_service",
             description:
-              "Get OIDC Auth Request details and create callback URLs.\n"+
-              "\n"+
+              "Get OIDC Auth Request details and create callback URLs.\n" +
+              "\n" +
               "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
           },
           items: require("./docs/apis/resources/oidc_service/sidebar.js"),
@@ -564,11 +625,25 @@ module.exports = {
             title: "Settings Service API (Beta)",
             slug: "/apis/resources/settings_service",
             description:
-              "This API is intended to manage settings in a ZITADEL instance.\n"+
-              "\n"+
+              "This API is intended to manage settings in a ZITADEL instance.\n" +
+              "\n" +
               "This project is in beta state. It can AND will continue to break until the services provide the same functionality as the current login.",
           },
           items: require("./docs/apis/resources/settings_service/sidebar.js"),
+        },
+        {
+          type: "category",
+          label: "Execution Lifecycle (Alpha)",
+          link: {
+            type: "generated-index",
+            title: "Execution Service API (Alpha)",
+            slug: "/apis/resources/execution_service_v3",
+            description:
+                "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance.\n"+
+                "\n"+
+                "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
+          },
+          items: require("./docs/apis/resources/execution_service_v3/sidebar.js"),
         },
         {
           type: "category",
@@ -576,7 +651,7 @@ module.exports = {
           collapsed: true,
           items: ["apis/assets/assets"],
         },
-      ]
+      ],
     },
     {
       type: "category",
@@ -616,12 +691,12 @@ module.exports = {
         "apis/actions/complement-token",
         "apis/actions/customize-samlresponse",
         "apis/actions/objects",
-      ]
+      ],
     },
     {
       type: "doc",
       label: "gRPC Status Codes",
-      id: "apis/statuscodes"
+      id: "apis/statuscodes",
     },
     {
       type: "category",
@@ -630,9 +705,9 @@ module.exports = {
       items: ["apis/observability/metrics", "apis/observability/health"],
     },
     {
-      type: 'link',
-      label: 'Rate Limits (Cloud)', // The link label
-      href: '/legal/policies/rate-limit-policy', // The internal path
+      type: "link",
+      label: "Rate Limits (Cloud)", // The link label
+      href: "/legal/policies/rate-limit-policy", // The internal path
     },
   ],
   selfHosting: [
@@ -648,7 +723,7 @@ module.exports = {
         "self-hosting/deploy/knative",
         "self-hosting/deploy/kubernetes",
         "self-hosting/deploy/loadbalancing-example/loadbalancing-example",
-        "self-hosting/deploy/troubleshooting/troubleshooting"
+        "self-hosting/deploy/troubleshooting/troubleshooting",
       ],
     },
     {
@@ -671,7 +746,7 @@ module.exports = {
             "self-hosting/manage/reverseproxy/traefik/traefik",
             "self-hosting/manage/reverseproxy/nginx/nginx",
             "self-hosting/manage/reverseproxy/caddy/caddy",
-//            "self-hosting/manage/reverseproxy/httpd/httpd", grpc NOT WORKING
+            //            "self-hosting/manage/reverseproxy/httpd/httpd", grpc NOT WORKING
             "self-hosting/manage/reverseproxy/cloudflare/cloudflare",
             "self-hosting/manage/reverseproxy/cloudflare_tunnel/cloudflare_tunnel",
             "self-hosting/manage/reverseproxy/zitadel_cloud/zitadel_cloud",
@@ -682,7 +757,7 @@ module.exports = {
         "self-hosting/manage/tls_modes",
         "self-hosting/manage/database/database",
         "self-hosting/manage/updating_scaling",
-        "self-hosting/manage/usage_control"
+        "self-hosting/manage/usage_control",
       ],
     },
   ],
@@ -711,13 +786,14 @@ module.exports = {
             type: "generated-index",
             title: "Service description",
             slug: "/legal/service-description",
-            description: "Description of services and service levels for ZITADEL Cloud and Enterprise subscriptions.",
+            description:
+              "Description of services and service levels for ZITADEL Cloud and Enterprise subscriptions.",
           },
           items: [
             {
-              type: 'autogenerated',
-              dirName: 'legal/service-description',
-            }
+              type: "autogenerated",
+              dirName: "legal/service-description",
+            },
           ],
         },
         {
@@ -728,16 +804,17 @@ module.exports = {
             type: "generated-index",
             title: "Policies",
             slug: "/legal/policies",
-            description: "Policies and guidelines in addition to our terms of services.",
+            description:
+              "Policies and guidelines in addition to our terms of services.",
           },
           items: [
             {
-              type: 'autogenerated',
-              dirName: 'legal/policies',
-            }
-          ]
+              type: "autogenerated",
+              dirName: "legal/policies",
+            },
+          ],
         },
-      ]
+      ],
     },
   ],
 };

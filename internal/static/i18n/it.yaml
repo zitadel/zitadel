@@ -31,10 +31,17 @@ Errors:
   Limits:
     NotFound: Limite non trovato
     NoneSpecified: Nessun limite specificato
+    Instance:
+      Blocked: L'istanza è bloccata
   Restrictions:
     NoneSpecified: Nessuna restrizione specificata
+    DefaultLanguageMustBeAllowed: La lingua predefinita deve essere consentita
   Language:
     NotParsed: Impossibile analizzare la lingua
+    NotSupported: Lingua non supportata
+    NotAllowed: Lingua non consentita
+    Undefined: Lingua non definita
+    Duplicate: Lingue duplicate
   OIDCSettings:
     NotFound: Impossibile trovare la configurazione OIDC
     AlreadyExists: La configurazione OIDC esiste già
@@ -121,6 +128,7 @@ Errors:
       NotFound: Codice non trovato
       Expired: Il codice è scaduto
       GeneratorAlgNotSupported: L'algoritmo del generatore non è supportato
+      Invalid: Il codice non è valido
     Password:
       NotFound: Password non trovato
       Empty: La password è vuota
@@ -139,7 +147,7 @@ Errors:
     ExternalIDP:
       Invalid: IDP esterno non valido
       IDPConfigNotExisting: IDP non valido per questa organizzazione
-      NotAllowed: IDP esterno non consentito su questa organizzazione
+      NotAllowed: IDP esterno non consentito
       MinimumExternalIDPNeeded: Almeno un IDP deve essere aggiunto
       AlreadyExists: IDP esterno già preso
       NotFound: IDP esterno non trovato
@@ -432,6 +440,7 @@ Errors:
   UserSession:
     NotFound: Sessione non trovata
   Key:
+    NotFound: Chiave non trovata
     ExpireBeforeNow: La data di scadenza è passata
   Login:
     LoginPolicy:
@@ -527,6 +536,11 @@ Errors:
     NotExisting: La funzionalità non esiste
     TypeNotSupported: Il tipo di funzionalità non è supportato
     InvalidValue: Valore non valido per questa funzionalità
+  Target:
+    Invalid: Il target non è valido
+    NoTimeout: Il target non ha timeout
+    InvalidURL: La destinazione ha un URL non valido
+    NotFound: Obiettivo non trovato
 
 AggregateTypes:
   action: Azione
@@ -538,8 +552,13 @@ AggregateTypes:
   usergrant: Sovvenzione utente
   quota: Quota
   feature: Funzionalità
+  target: Bersaglio
 
 EventTypes:
+  target:
+    added: Obiettivo creato
+    changed: Obiettivo cambiato
+    removed: Obiettivo eliminato
   user:
     added: Utente aggiunto
     selfregistered: L'utente si è registrato

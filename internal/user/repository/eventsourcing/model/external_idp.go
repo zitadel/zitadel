@@ -5,8 +5,8 @@ import (
 
 	"github.com/zitadel/logging"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type ExternalIDP struct {
@@ -54,7 +54,7 @@ func (pw *ExternalIDP) setData(event *es_models.Event) error {
 	pw.ObjectRoot.AppendEvent(event)
 	if err := json.Unmarshal(event.Data, pw); err != nil {
 		logging.Log("EVEN-Msi9d").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-A9osf", "could not unmarshal event")
+		return zerrors.ThrowInternal(err, "MODEL-A9osf", "could not unmarshal event")
 	}
 	return nil
 }

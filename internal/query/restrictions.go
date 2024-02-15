@@ -7,12 +7,15 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
-	zitade_errors "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	zitade_errors "github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -44,8 +47,12 @@ var (
 		name:  projection.RestrictionsColumnSequence,
 		table: restrictionsTable,
 	}
-	RestrictionsColumnDisallowPublicOrgRegistrations = Column{
+	RestrictionsColumnDisallowPublicOrgRegistration = Column{
 		name:  projection.RestrictionsColumnDisallowPublicOrgRegistration,
+		table: restrictionsTable,
+	}
+	RestrictionsColumnAllowedLanguages = Column{
+		name:  projection.RestrictionsColumnAllowedLanguages,
 		table: restrictionsTable,
 	}
 )
@@ -58,6 +65,7 @@ type Restrictions struct {
 	Sequence      uint64
 
 	DisallowPublicOrgRegistration bool
+	AllowedLanguages              []language.Tag
 }
 
 func (q *Queries) GetInstanceRestrictions(ctx context.Context) (restrictions Restrictions, err error) {
@@ -91,18 +99,25 @@ func prepareRestrictionsQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			RestrictionsColumnChangeDate.identifier(),
 			RestrictionsColumnResourceOwner.identifier(),
 			RestrictionsColumnSequence.identifier(),
-			RestrictionsColumnDisallowPublicOrgRegistrations.identifier(),
+			RestrictionsColumnDisallowPublicOrgRegistration.identifier(),
+			RestrictionsColumnAllowedLanguages.identifier(),
 		).
 			From(restrictionsTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (restrictions Restrictions, err error) {
-			return restrictions, row.Scan(
+			allowedLanguages := database.TextArray[string](make([]string, 0))
+			disallowPublicOrgRegistration := sql.NullBool{}
+			err = row.Scan(
 				&restrictions.AggregateID,
 				&restrictions.CreationDate,
 				&restrictions.ChangeDate,
 				&restrictions.ResourceOwner,
 				&restrictions.Sequence,
-				&restrictions.DisallowPublicOrgRegistration,
+				&disallowPublicOrgRegistration,
+				&allowedLanguages,
 			)
+			restrictions.DisallowPublicOrgRegistration = disallowPublicOrgRegistration.Bool
+			restrictions.AllowedLanguages = domain.StringsToLanguages(allowedLanguages)
+			return restrictions, err
 		}
 }

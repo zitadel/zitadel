@@ -3,18 +3,17 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"math"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/pkg/errors"
 
 	"github.com/zitadel/zitadel/internal/api/call"
-	zitadel_errors "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -85,7 +84,7 @@ func (q *Queries) GetDueQuotaNotifications(ctx context.Context, instanceID strin
 		},
 	).ToSql()
 	if err != nil {
-		return nil, zitadel_errors.ThrowInternal(err, "QUERY-XmYn9", "Errors.Query.SQLStatement")
+		return nil, zerrors.ThrowInternal(err, "QUERY-XmYn9", "Errors.Query.SQLStatement")
 	}
 	var notifications *QuotaNotifications
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
@@ -166,10 +165,10 @@ func prepareQuotaNotificationsQuery(ctx context.Context, db prepareDatabase) (sq
 				var nextDueThreshold sql.NullInt16
 				err := rows.Scan(&cfg.ID, &cfg.CallURL, &cfg.Percent, &cfg.Repeat, &nextDueThreshold)
 				if err != nil {
-					if errs.Is(err, sql.ErrNoRows) {
-						return nil, zitadel_errors.ThrowNotFound(err, "QUERY-bbqWb", "Errors.QuotaNotification.NotExisting")
+					if errors.Is(err, sql.ErrNoRows) {
+						return nil, zerrors.ThrowNotFound(err, "QUERY-bbqWb", "Errors.QuotaNotification.NotExisting")
 					}
-					return nil, zitadel_errors.ThrowInternal(err, "QUERY-8copS", "Errors.Internal")
+					return nil, zerrors.ThrowInternal(err, "QUERY-8copS", "Errors.Internal")
 				}
 				if nextDueThreshold.Valid {
 					cfg.NextDueThreshold = uint16(nextDueThreshold.Int16)

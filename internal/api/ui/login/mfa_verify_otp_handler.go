@@ -61,12 +61,13 @@ func (l *Login) renderOTPVerification(w http.ResponseWriter, r *http.Request, au
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
+	translator := l.getTranslator(r.Context(), authReq)
 	data := &mfaOTPData{
-		userData:         l.getUserData(r, authReq, "VerifyMFAU2F.Title", "VerifyMFAU2F.Description", errID, errMessage),
+		userData:         l.getUserData(r, authReq, translator, "VerifyMFAU2F.Title", "VerifyMFAU2F.Description", errID, errMessage),
 		MFAProviders:     removeSelectedProviderFromList(providers, selectedProvider),
 		SelectedProvider: selectedProvider,
 	}
-	l.renderer.RenderTemplate(w, r, l.getTranslator(r.Context(), authReq), l.renderer.Templates[tmplOTPVerification], data, nil)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplOTPVerification], data, nil)
 }
 
 // handleOTPVerificationCheck handles form submissions of the OTP verification.

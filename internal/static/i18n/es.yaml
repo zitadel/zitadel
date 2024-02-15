@@ -31,10 +31,17 @@ Errors:
   Limits:
     NotFound: Límite no encontrado
     NoneSpecified: No se especificaron límites
+    Instance:
+      Blocked: La instancia está bloqueada
   Restrictions:
     NoneSpecified: No se especificaron restricciones
+    DefaultLanguageMustBeAllowed: El idioma por defecto debe estar permitido
   Language:
     NotParsed: No pude analizar el idioma
+    NotSupported: El idioma no está soportado
+    NotAllowed: El idioma no está permitido
+    Undefined: El idioma no está definido
+    Duplicate: Idiomas duplicados
   OIDCSettings:
     NotFound: Configuración OIDC no encontrada
     AlreadyExists: La configuración OIDC ya existe
@@ -121,6 +128,7 @@ Errors:
       NotFound: Código no encontrado
       Expired: El código ha caducado
       GeneratorAlgNotSupported: Algoritmo generador no soportado
+      Invalid: El código no es válido
     Password:
       NotFound: Contraseña no encontrada
       Empty: La contraseña está vacía
@@ -139,7 +147,7 @@ Errors:
     ExternalIDP:
       Invalid: IDP externo no válido
       IDPConfigNotExisting: Proveedor IDP no válido para esta organización
-      NotAllowed: IDP externo no permitido para esta organización
+      NotAllowed: IDP externo no permitido
       MinimumExternalIDPNeeded: Al menos de añadirse un IDP
       AlreadyExists: IDP externo ya cogido
       NotFound: IDP no encontrado
@@ -431,6 +439,7 @@ Errors:
   UserSession:
     NotFound: UserSession no encontrado
   Key:
+    NotFound: Clave no encontrada
     ExpireBeforeNow: La fecha de caducidad está en el pasado
   Login:
     LoginPolicy:
@@ -526,6 +535,11 @@ Errors:
     NotExisting: La característica no existe
     TypeNotSupported: El tipo de característica no es compatible
     InvalidValue: Valor no válido para esta característica
+  Target:
+    Invalid: El objetivo no es válido
+    NoTimeout: El objetivo no tiene tiempo de espera
+    InvalidURL: El objetivo tiene una URL no válida
+    NotFound: El objetivo no encontrado
 
 AggregateTypes:
   action: Acción
@@ -537,8 +551,13 @@ AggregateTypes:
   usergrant: Concesión de usuario
   quota: Cuota
   feature: Característica
+  target: Objectivo
 
 EventTypes:
+  target:
+    added: Objetivo creado
+    changed: Objetivo cambiado
+    removed: Objetivo eliminado
   user:
     added: Usuario añadido
     selfregistered: El usuario se registró por sí mismo

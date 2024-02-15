@@ -3,6 +3,7 @@ package projection
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -11,7 +12,7 @@ import (
 )
 
 const (
-	RestrictionsProjectionTable = "projections.restrictions"
+	RestrictionsProjectionTable = "projections.restrictions2"
 
 	RestrictionsColumnAggregateID   = "aggregate_id"
 	RestrictionsColumnCreationDate  = "creation_date"
@@ -21,6 +22,7 @@ const (
 	RestrictionsColumnSequence      = "sequence"
 
 	RestrictionsColumnDisallowPublicOrgRegistration = "disallow_public_org_registration"
+	RestrictionsColumnAllowedLanguages              = "allowed_languages"
 )
 
 type restrictionsProjection struct{}
@@ -42,7 +44,8 @@ func (*restrictionsProjection) Init() *old_handler.Check {
 			handler.NewColumn(RestrictionsColumnResourceOwner, handler.ColumnTypeText),
 			handler.NewColumn(RestrictionsColumnInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(RestrictionsColumnSequence, handler.ColumnTypeInt64),
-			handler.NewColumn(RestrictionsColumnDisallowPublicOrgRegistration, handler.ColumnTypeBool),
+			handler.NewColumn(RestrictionsColumnDisallowPublicOrgRegistration, handler.ColumnTypeBool, handler.Nullable()),
+			handler.NewColumn(RestrictionsColumnAllowedLanguages, handler.ColumnTypeTextArray, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(RestrictionsColumnInstanceID, RestrictionsColumnResourceOwner),
 		),
@@ -89,8 +92,11 @@ func (p *restrictionsProjection) reduceRestrictionsSet(event eventstore.Event) (
 		handler.NewCol(RestrictionsColumnSequence, e.Sequence()),
 		handler.NewCol(RestrictionsColumnAggregateID, e.Aggregate().ID),
 	}
-	if e.DisallowPublicOrgRegistrations != nil {
-		updateCols = append(updateCols, handler.NewCol(RestrictionsColumnDisallowPublicOrgRegistration, *e.DisallowPublicOrgRegistrations))
+	if e.DisallowPublicOrgRegistration != nil {
+		updateCols = append(updateCols, handler.NewCol(RestrictionsColumnDisallowPublicOrgRegistration, *e.DisallowPublicOrgRegistration))
+	}
+	if e.AllowedLanguages != nil {
+		updateCols = append(updateCols, handler.NewCol(RestrictionsColumnAllowedLanguages, domain.LanguagesToStrings(*e.AllowedLanguages)))
 	}
 	return handler.NewUpsertStatement(e, conflictCols, updateCols), nil
 }

@@ -31,10 +31,17 @@ Errors:
   Limits:
     NotFound: Limites non trouvée
     NoneSpecified: Aucune limite spécifiée
+    Instance:
+      Blocked: Instance bloquée
   Restrictions:
     NoneSpecified: Aucune restriction spécifiée
+    DefaultLanguageMustBeAllowed: La langue par défaut doit être autorisée
   Language:
     NotParsed: Impossible d'analyser la langue
+    NotSupported: Langue non prise en charge
+    NotAllowed: Langue non autorisée
+    Undefined: Langue non définie
+    Duplicate: Langues en double
   OIDCSettings:
     NotFound: Configuration OIDC non trouvée
     AlreadyExists: La configuration OIDC existe déjà
@@ -121,6 +128,7 @@ Errors:
       NotFound: Code non trouvé
       Expired: Le code est expiré
       GeneratorAlgNotSupported: Algorithme de générateur non pris en charge
+      Invalid: Le code n'est pas valide
     Password:
       NotFound: Mot de passe non trouvé
       Empty: Le mot de passe est vide
@@ -139,7 +147,7 @@ Errors:
     ExternalIDP:
       Invalid: IDP Externer invalide
       IDPConfigNotExisting: Le fournisseur IDP n'est pas valide pour cette organisation
-      NotAllowed: IDP externe non autorisé pour cette organisation
+      NotAllowed: IDP externe non autorisé
       MinimumExternalIDPNeeded: Au moins un IDP doit être ajouté
       AlreadyExists: External IDP déjà pris
       NotFound: IDP externe non trouvé
@@ -431,6 +439,7 @@ Errors:
   UserSession:
     NotFound: UserSession non trouvé
   Key:
+    NotFound: Clé introuvable
     ExpireBeforeNow: La date d'expiration est dans le passé
   Login:
     LoginPolicy:
@@ -526,6 +535,11 @@ Errors:
     NotExisting: La fonctionnalité n'existe pas
     TypeNotSupported: Le type de fonctionnalité n'est pas pris en charge
     InvalidValue: Valeur non valide pour cette fonctionnalité
+  Target:
+    Invalid: La cible n'est pas valide
+    NoTimeout: La cible n'a pas de délai d'attente
+    InvalidURL: La cible a une URL non valide
+    NotFound: La cible introuvable
 
 AggregateTypes:
   action: Action
@@ -537,8 +551,13 @@ AggregateTypes:
   usergrant: Subvention de l'utilisateur
   quota: Contingent
   feature: Fonctionnalité
+  target: Cible
 
 EventTypes:
+  target:
+    added: Cible créée
+    changed: Cible modifiée
+    removed: Cible supprimée
   user:
     added: Utilisateur ajouté
     selfregistered: L'utilisateur s'est enregistré lui-même

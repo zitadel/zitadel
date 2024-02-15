@@ -19,7 +19,7 @@ on /authorize with at least the following parameters:
 We recommend always using two additional parameters `state` and `nonce`. The former enables you to transfer a state through
 the authentication process. The latter is used to bind the client session with the id_token and to mitigate replay attacks.
 
-PKCE stands for Proof Key for Code Exchange. So other than "normal" code exchange, the does not authenticate using
+PKCE stands for Proof Key for Code Exchange. So other than "normal" code exchange, the PKCE does not authenticate using
 client_id and client_secret but an additional code. You will have to generate a random string, hash it and send this hash
 on the authorization_endpoint. On the token_endpoint you will then send the plain string for the authorization to compute
 the hash as well and to verify it's correct. In order to do so you're required to send the following two parameters as well:

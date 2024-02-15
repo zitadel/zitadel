@@ -1,0 +1,61 @@
+InitCode:
+  Title: Gebruiker Initialiseren
+  PreHeader: Gebruiker Initialiseren
+  Subject: Gebruiker Initialiseren
+  Greeting: Hallo {{.DisplayName}},
+  Text: Deze gebruiker is aangemaakt. Gebruik de gebruikersnaam {{.PreferredLoginName}} om in te loggen. Klik op de knop hieronder om het initialisatieproces te voltooien. (Code {{.Code}}) Als u niet om deze mail heeft gevraagd, negeer deze dan.
+  ButtonText: Voltooi initialisatie
+PasswordReset:
+  Title: Wachtwoord resetten
+  PreHeader: Wachtwoord resetten
+  Subject: Wachtwoord resetten
+  Greeting: Hallo {{.DisplayName}},
+  Text: We hebben een verzoek ontvangen om uw wachtwoord te resetten. Gebruik de knop hieronder om uw wachtwoord te resetten. (Code {{.Code}}) Als u niet om deze mail heeft gevraagd, negeer deze dan.
+  ButtonText: Reset wachtwoord
+VerifyEmail:
+  Title: Verifieer email
+  PreHeader: Verifieer email
+  Subject: Verifieer email
+  Greeting: Hallo {{.DisplayName}},
+  Text: Er is een nieuwe email toegevoegd. Gebruik de knop hieronder om uw email te verifiëren. (Code {{.Code}}) Als u geen nieuwe email heeft toegevoegd, negeer deze email dan.
+  ButtonText: Verifieer email
+VerifyPhone:
+  Title: Verifieer telefoon
+  PreHeader: Verifieer telefoon
+  Subject: Verifieer telefoon
+  Greeting: Hallo {{.DisplayName}},
+  Text: Er is een nieuw telefoonnummer toegevoegd. Gebruik de volgende code om het te verifiëren {{.Code}}
+  ButtonText: Verifieer telefoon
+VerifyEmailOTP:
+  Title: Verifieer One-Time Wachtwoord
+  PreHeader: Verifieer One-Time Wachtwoord
+  Subject: Verifieer One-Time Wachtwoord
+  Greeting: Hallo {{.DisplayName}},
+  Text: Gebruik het eenmalige wachtwoord {{.OTP}} om binnen de volgende vijf minuten te authenticeren of klik op de "Authenticeer" knop.
+  ButtonText: Authenticeer
+VerifySMSOTP:
+  Text: >-
+    {{.OTP}} is uw eenmalige wachtwoord voor {{ .Domain }}. Gebruik het binnen de volgende {{.Expiry}} minuten.
+    
+    @{{.Domain}} #{{.OTP}}
+DomainClaimed:
+  Title: Domein is geclaimd
+  PreHeader: Verander email / gebruikersnaam
+  Subject: Domein is geclaimd
+  Greeting: Hallo {{.DisplayName}},
+  Text: Het domein {{.Domain}} is geclaimd door een organisatie. Uw huidige gebruiker {{.Username}} is geen onderdeel van deze organisatie. Daarom moet u uw email veranderen wanneer u inlogt. We hebben een tijdelijke gebruikersnaam ({{.TempUsername}}) voor deze login gecreëerd.
+  ButtonText: Inloggen
+PasswordlessRegistration:
+  Title: Voeg Wachtwoordloze Login Toe
+  PreHeader: Voeg Wachtwoordloze Login Toe
+  Subject: Voeg Wachtwoordloze Login Toe
+  Greeting: Hallo {{.DisplayName}},
+  Text: We hebben een verzoek ontvangen om een token toe te voegen voor wachtwoordloze login. Gebruik de knop hieronder om uw token of apparaat toe te voegen voor wachtwoordloze login.
+  ButtonText: Voeg Wachtwoordloze Login Toe
+PasswordChange:
+  Title: Wachtwoord van gebruiker is veranderd
+  PreHeader: Verander wachtwoord
+  Subject: Wachtwoord van gebruiker is veranderd
+  Greeting: Hallo {{.DisplayName}},
+  Text: Het wachtwoord van uw gebruiker is veranderd. Als deze wijziging niet door u is gedaan, wordt u geadviseerd om direct uw wachtwoord te resetten.
+  ButtonText: Inloggen

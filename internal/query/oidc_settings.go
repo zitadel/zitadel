@@ -3,16 +3,16 @@ package query
 import (
 	"context"
 	"database/sql"
-	errs "errors"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -69,10 +69,10 @@ type OIDCSettings struct {
 	ResourceOwner string
 	Sequence      uint64
 
-	AccessTokenLifetime        time.Duration
-	IdTokenLifetime            time.Duration
-	RefreshTokenIdleExpiration time.Duration
-	RefreshTokenExpiration     time.Duration
+	AccessTokenLifetime        time.Duration `json:"access_token_lifetime,omitempty"`
+	IdTokenLifetime            time.Duration `json:"id_token_lifetime,omitempty"`
+	RefreshTokenIdleExpiration time.Duration `json:"refresh_token_idle_expiration,omitempty"`
+	RefreshTokenExpiration     time.Duration `json:"refresh_token_expiration,omitempty"`
 }
 
 func (q *Queries) OIDCSettingsByAggID(ctx context.Context, aggregateID string) (settings *OIDCSettings, err error) {
@@ -85,7 +85,7 @@ func (q *Queries) OIDCSettingsByAggID(ctx context.Context, aggregateID string) (
 		OIDCSettingsColumnInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
 	}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-s9nle", "Errors.Query.SQLStatment")
+		return nil, zerrors.ThrowInternal(err, "QUERY-s9nle", "Errors.Query.SQLStatment")
 	}
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
@@ -122,10 +122,10 @@ func prepareOIDCSettingsQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				&oidcSettings.RefreshTokenExpiration,
 			)
 			if err != nil {
-				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-s9nlw", "Errors.OIDCSettings.NotFound")
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-s9nlw", "Errors.OIDCSettings.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-9bf8s", "Errors.Internal")
+				return nil, zerrors.ThrowInternal(err, "QUERY-9bf8s", "Errors.Internal")
 			}
 			return oidcSettings, nil
 		}

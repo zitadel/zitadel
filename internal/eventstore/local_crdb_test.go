@@ -27,7 +27,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	ts, err := testserver.NewTestServer()
+	ts, err := testserver.NewTestServer(testserver.CustomVersionOpt(os.Getenv("ZITADEL_CRDB_VERSION")))
 	if err != nil {
 		logging.WithFields("error", err).Fatal("unable to start db")
 	}
@@ -88,7 +88,7 @@ func initDB(db *database.DB) error {
 	if err != nil {
 		return err
 	}
-	err = initialise.VerifyZitadel(db, *config)
+	err = initialise.VerifyZitadel(context.Background(), db, *config)
 	if err != nil {
 		return err
 	}

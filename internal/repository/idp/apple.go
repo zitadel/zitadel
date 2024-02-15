@@ -2,8 +2,8 @@ package idp
 
 import (
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type AppleIDPAddedEvent struct {
@@ -58,7 +58,7 @@ func AppleIDPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) 
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-Beqss", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-Beqss", "unable to unmarshal event")
 	}
 
 	return e, nil
@@ -83,7 +83,7 @@ func NewAppleIDPChangedEvent(
 	changes []AppleIDPChanges,
 ) (*AppleIDPChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "IDP-SF3h2", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-SF3h2", "Errors.NoChangesFound")
 	}
 	changedEvent := &AppleIDPChangedEvent{
 		BaseEvent: *base,
@@ -154,7 +154,7 @@ func AppleIDPChangedEventMapper(event eventstore.Event) (eventstore.Event, error
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IDP-NBe1s", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "IDP-NBe1s", "unable to unmarshal event")
 	}
 
 	return e, nil

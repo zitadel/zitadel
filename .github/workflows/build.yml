@@ -48,6 +48,7 @@ jobs:
       go_version: "1.21"
       core_cache_key: ${{ needs.core.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
+      crdb_version: "23.1.13"
 
   core-integration-test:
     needs: core
@@ -64,7 +65,7 @@ jobs:
       go_version: "1.21"
       node_version: "18"
       buf_version: "latest"
-      go_lint_version: "v1.53.2"
+      go_lint_version: "v1.55.2"
       core_cache_key: ${{ needs.core.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
 
@@ -91,7 +92,7 @@ jobs:
       pull-requests: write
     needs:
       [version, core-unit-test, core-integration-test, lint, container, e2e]
-    if: ${{ needs.version.outputs.published == 'true' && github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
     with:

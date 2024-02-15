@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
@@ -13,7 +14,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	z_db "github.com/zitadel/zitadel/internal/database"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func Test_database_ReadKeys(t *testing.T) {
@@ -62,7 +63,7 @@ func Test_database_ReadKeys(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -114,7 +115,7 @@ func Test_database_ReadKeys(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := &database{
+			d := &Database{
 				client:    tt.fields.client.db,
 				masterKey: tt.fields.masterKey,
 				decrypt:   tt.fields.decrypt,
@@ -187,7 +188,7 @@ func Test_database_ReadKey(t *testing.T) {
 				id: "id1",
 			},
 			res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -212,7 +213,7 @@ func Test_database_ReadKey(t *testing.T) {
 				id: "id1",
 			},
 			res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -246,7 +247,7 @@ func Test_database_ReadKey(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := &database{
+			d := &Database{
 				client:    tt.fields.client.db,
 				masterKey: tt.fields.masterKey,
 				decrypt:   tt.fields.decrypt,
@@ -303,7 +304,7 @@ func Test_database_CreateKeys(t *testing.T) {
 				},
 			},
 			res{
-				err: caos_errs.IsInternal,
+				err: zerrors.IsInternal,
 			},
 		},
 		{
@@ -390,12 +391,12 @@ func Test_database_CreateKeys(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := &database{
+			d := &Database{
 				client:    tt.fields.client.db,
 				masterKey: tt.fields.masterKey,
 				encrypt:   tt.fields.encrypt,
 			}
-			err := d.CreateKeys(tt.args.keys...)
+			err := d.CreateKeys(context.Background(), tt.args.keys...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			} else if tt.res.err != nil && !tt.res.err(err) {
@@ -422,7 +423,7 @@ func Test_checkMasterKeyLength(t *testing.T) {
 			args{
 				masterKey: "",
 			},
-			caos_errs.IsInternal,
+			zerrors.IsInternal,
 		},
 		{
 			"valid length",

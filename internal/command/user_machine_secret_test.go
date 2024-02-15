@@ -3,14 +3,16 @@ package command
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommandSide_GenerateMachineSecret(t *testing.T) {
@@ -50,7 +52,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 				set:           nil,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -68,7 +70,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 				set:           nil,
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -87,7 +89,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 				set:           nil,
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -189,7 +191,7 @@ func TestCommandSide_RemoveMachineSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -205,7 +207,7 @@ func TestCommandSide_RemoveMachineSecret(t *testing.T) {
 				resourceOwner: "",
 			},
 			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
+				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -222,7 +224,7 @@ func TestCommandSide_RemoveMachineSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -250,7 +252,7 @@ func TestCommandSide_RemoveMachineSecret(t *testing.T) {
 				resourceOwner: "org1",
 			},
 			res: res{
-				err: caos_errs.IsPreconditionFailed,
+				err: zerrors.IsPreconditionFailed,
 			},
 		},
 		{
@@ -319,212 +321,34 @@ func TestCommandSide_RemoveMachineSecret(t *testing.T) {
 	}
 }
 
-func TestCommandSide_VerifyMachineSecret(t *testing.T) {
-	type fields struct {
-		eventstore *eventstore.Eventstore
+func TestCommands_MachineSecretCheckSucceeded(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	agg := user.NewAggregate("userID", "orgID")
+	cmd := user.NewMachineSecretCheckSucceededEvent(ctx, &agg.Aggregate)
+
+	c := &Commands{
+		eventstore: eventstoreExpect(t,
+			expectPushSlow(time.Second/100, cmd),
+		),
 	}
-	type args struct {
-		ctx           context.Context
-		userID        string
-		resourceOwner string
-		secret        string
+	c.MachineSecretCheckSucceeded(ctx, "userID", "orgID")
+	require.NoError(t, c.Close(ctx))
+}
+
+func TestCommands_MachineSecretCheckFailed(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	agg := user.NewAggregate("userID", "orgID")
+	cmd := user.NewMachineSecretCheckFailedEvent(ctx, &agg.Aggregate)
+
+	c := &Commands{
+		eventstore: eventstoreExpect(t,
+			expectPushSlow(time.Second/100, cmd),
+		),
 	}
-	type res struct {
-		want *domain.ObjectDetails
-		err  func(error) bool
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		res    res
-	}{
-		{
-			name: "user invalid, invalid argument error userID",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx:           context.Background(),
-				userID:        "",
-				resourceOwner: "org1",
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
-			name: "user invalid, invalid argument error resourceowner",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx:           context.Background(),
-				userID:        "user1",
-				resourceOwner: "",
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
-			name: "user not existing, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-				),
-			},
-			args: args{
-				ctx:           context.Background(),
-				userID:        "user1",
-				resourceOwner: "org1",
-			},
-			res: res{
-				err: caos_errs.IsPreconditionFailed,
-			},
-		},
-		{
-			name: "user existing without secret, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"user1",
-								"username",
-								"user",
-								false,
-								domain.OIDCTokenTypeBearer,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:           context.Background(),
-				userID:        "user1",
-				resourceOwner: "org1",
-			},
-			res: res{
-				err: caos_errs.IsPreconditionFailed,
-			},
-		},
-		{
-			name: "verify machine secret, ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"user1",
-								"username",
-								"user",
-								false,
-								domain.OIDCTokenTypeBearer,
-							),
-						),
-						eventFromEventPusher(
-							user.NewMachineSecretSetEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "bcrypt",
-									KeyID:      "id",
-									Crypted:    []byte("$2a$14$HxC7TAXMeowdqHdSBUfsjOUc0IGajYeApxdYl9lAYC0duZmSkgFia"),
-								},
-							),
-						),
-					),
-					expectPush(
-						user.NewMachineSecretCheckSucceededEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:           context.Background(),
-				userID:        "user1",
-				resourceOwner: "org1",
-				secret:        "test",
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-		{
-			name: "verify machine secret, failed",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewMachineAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"user1",
-								"username",
-								"user",
-								false,
-								domain.OIDCTokenTypeBearer,
-							),
-						),
-						eventFromEventPusher(
-							user.NewMachineSecretSetEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "bcrypt",
-									KeyID:      "id",
-									Crypted:    []byte("$2a$14$HxC7TAXMeowdqHdSBUfsjOUc0IGajYeApxdYl9lAYC0duZmSkgFia"),
-								},
-							),
-						),
-					),
-					expectPush(
-						user.NewMachineSecretCheckFailedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
-						),
-					),
-				),
-			},
-			args: args{
-				ctx:           context.Background(),
-				userID:        "user1",
-				resourceOwner: "org1",
-				secret:        "wrong",
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
-				eventstore: tt.fields.eventstore,
-				codeAlg:    crypto.NewBCrypt(14),
-			}
-			got, err := r.VerifyMachineSecret(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.secret)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
-			}
-		})
-	}
+	c.MachineSecretCheckFailed(ctx, "userID", "orgID")
+	require.NoError(t, c.Close(ctx))
 }

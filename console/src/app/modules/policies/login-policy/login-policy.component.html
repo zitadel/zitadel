@@ -34,8 +34,8 @@
           serviceType === PolicyComponentServiceType.ADMIN
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
-            ? 'policy.write'
-            : ''
+              ? 'policy.write'
+              : ''
         ]
           | hasRole
           | async) === false
@@ -62,8 +62,8 @@
         serviceType === PolicyComponentServiceType.ADMIN
           ? 'iam.policy.write'
           : serviceType === PolicyComponentServiceType.MGMT
-          ? 'policy.write'
-          : ''
+            ? 'policy.write'
+            : ''
       ]
         | hasRole
         | async) === false
@@ -89,8 +89,8 @@
         serviceType === PolicyComponentServiceType.ADMIN
           ? 'iam.policy.write'
           : serviceType === PolicyComponentServiceType.MGMT
-          ? 'policy.write'
-          : ''
+            ? 'policy.write'
+            : ''
       ]
         | hasRole
         | async) === false
@@ -111,8 +111,8 @@
         serviceType === PolicyComponentServiceType.ADMIN
           ? 'iam.policy.write'
           : serviceType === PolicyComponentServiceType.MGMT
-          ? 'policy.write'
-          : ''
+            ? 'policy.write'
+            : ''
       ]
         | hasRole
         | async) === false
@@ -134,8 +134,8 @@
         serviceType === PolicyComponentServiceType.ADMIN
           ? 'iam.policy.write'
           : serviceType === PolicyComponentServiceType.MGMT
-          ? 'policy.write'
-          : ''
+            ? 'policy.write'
+            : ''
       ]
         | hasRole
         | async) === false
@@ -210,8 +210,8 @@
           serviceType === PolicyComponentServiceType.ADMIN
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
-            ? 'policy.write'
-            : ''
+              ? 'policy.write'
+              : ''
         ]
           | hasRole
           | async) === false
@@ -235,21 +235,27 @@
           serviceType === PolicyComponentServiceType.ADMIN
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
-            ? 'policy.write'
-            : ''
+              ? 'policy.write'
+              : ''
         ]
           | hasRole
           | async) === false
       "
     >
-      {{ 'POLICY.DATA.ALLOWREGISTER' | translate }}
+      {{ 'POLICY.DATA.ALLOWREGISTERUSERS' | translate }}
     </mat-checkbox>
-
-    <!-- <ng-template #regInfo>
-      <cnsl-info-section class="info">
-        {{ 'POLICY.DATA.ALLOWREGISTER_DESC' | translate }}
-      </cnsl-info-section>
-    </ng-template> -->
+  </div>
+  <div class="login-policy-row">
+    <mat-checkbox
+      class="login-policy-toggle"
+      color="primary"
+      ngDefaultControl
+      [(ngModel)]="allowOrgRegistration"
+      *ngIf="serviceType === PolicyComponentServiceType.ADMIN"
+      [disabled]="(['iam.restrictions.write'] | hasRole | async) === false"
+    >
+      {{ 'POLICY.DATA.ALLOWREGISTERORGS' | translate }}
+    </mat-checkbox>
   </div>
   <div class="login-policy-row">
     <mat-checkbox
@@ -262,8 +268,8 @@
           serviceType === PolicyComponentServiceType.ADMIN
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
-            ? 'policy.write'
-            : ''
+              ? 'policy.write'
+              : ''
         ]
           | hasRole
           | async) === false
@@ -290,8 +296,8 @@
           serviceType === PolicyComponentServiceType.ADMIN
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
-            ? 'policy.write'
-            : ''
+              ? 'policy.write'
+              : ''
         ]
           | hasRole
           | async) === false
@@ -318,8 +324,8 @@
           serviceType === PolicyComponentServiceType.ADMIN
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
-            ? 'policy.write'
-            : ''
+              ? 'policy.write'
+              : ''
         ]
           | hasRole
           | async) === false
@@ -340,8 +346,8 @@
           serviceType === PolicyComponentServiceType.ADMIN
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
-            ? 'policy.write'
-            : ''
+              ? 'policy.write'
+              : ''
         ]
           | hasRole
           | async) === false
@@ -362,8 +368,8 @@
           serviceType === PolicyComponentServiceType.ADMIN
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
-            ? 'policy.write'
-            : ''
+              ? 'policy.write'
+              : ''
         ]
           | hasRole
           | async) === false
@@ -384,8 +390,8 @@
           serviceType === PolicyComponentServiceType.ADMIN
             ? 'iam.policy.write'
             : serviceType === PolicyComponentServiceType.MGMT
-            ? 'policy.write'
-            : ''
+              ? 'policy.write'
+              : ''
         ]
           | hasRole
           | async) === false
@@ -407,8 +413,8 @@
             serviceType === PolicyComponentServiceType.ADMIN
               ? 'iam.policy.write'
               : serviceType === PolicyComponentServiceType.MGMT
-              ? 'policy.write'
-              : ''
+                ? 'policy.write'
+                : ''
           ]
             | hasRole
             | async) === false
@@ -428,12 +434,13 @@
     type="submit"
     mat-raised-button
     [disabled]="
+      (['iam.restrictions.write'] | hasRole | async) === false &&
       ([
         serviceType === PolicyComponentServiceType.ADMIN
           ? 'iam.policy.write'
           : serviceType === PolicyComponentServiceType.MGMT
-          ? 'policy.write'
-          : ''
+            ? 'policy.write'
+            : ''
       ]
         | hasRole
         | async) === false

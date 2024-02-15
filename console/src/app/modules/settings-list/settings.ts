@@ -1,9 +1,18 @@
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { SidenavSetting } from '../sidenav/sidenav.component';
 
-export const GENERAL: SidenavSetting = {
-  id: 'general',
-  i18nKey: 'SETTINGS.LIST.GENERAL',
+export const ORGANIZATIONS: SidenavSetting = {
+  id: 'organizations',
+  i18nKey: 'SETTINGS.LIST.ORGS',
+  groupI18nKey: 'SETTINGS.GROUPS.GENERAL',
+  requiredRoles: {
+    [PolicyComponentServiceType.ADMIN]: ['iam.read'],
+  },
+};
+
+export const LANGUAGES: SidenavSetting = {
+  id: 'languages',
+  i18nKey: 'SETTINGS.LIST.LANGUAGES',
   requiredRoles: {
     [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
   },
@@ -30,6 +39,33 @@ export const SECURITY: SidenavSetting = {
   i18nKey: 'SETTINGS.LIST.SECURITY',
   requiredRoles: {
     [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+  },
+};
+
+export const VIEWS: SidenavSetting = {
+  id: 'views',
+  i18nKey: 'SETTINGS.LIST.VIEWS',
+  groupI18nKey: 'SETTINGS.GROUPS.STORAGE',
+  requiredRoles: {
+    [PolicyComponentServiceType.ADMIN]: ['iam.read'],
+  },
+};
+
+export const FAILEDEVENTS: SidenavSetting = {
+  id: 'failedevents',
+  i18nKey: 'SETTINGS.LIST.FAILEDEVENTS',
+  groupI18nKey: 'SETTINGS.GROUPS.STORAGE',
+  requiredRoles: {
+    [PolicyComponentServiceType.ADMIN]: ['iam.read'],
+  },
+};
+
+export const EVENTS: SidenavSetting = {
+  id: 'events',
+  i18nKey: 'SETTINGS.LIST.EVENTS',
+  groupI18nKey: 'SETTINGS.GROUPS.STORAGE',
+  requiredRoles: {
+    [PolicyComponentServiceType.ADMIN]: ['events.read'],
   },
 };
 

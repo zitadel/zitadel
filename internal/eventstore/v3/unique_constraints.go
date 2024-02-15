@@ -11,13 +11,15 @@ import (
 	"github.com/jackc/pgconn"
 	"github.com/zitadel/logging"
 
-	errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
 	//go:embed unique_constraints_delete.sql
 	deleteConstraintStmt string
+	//go:embed unique_constraints_delete_placeholders.sql
+	deleteConstraintPlaceholdersStmt string
 	//go:embed unique_constraints_add.sql
 	addConstraintStmt string
 )
@@ -35,11 +37,12 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventst
 		for _, constraint := range command.UniqueConstraints() {
 			switch constraint.Action {
 			case eventstore.UniqueConstraintAdd:
+				constraint.UniqueField = strings.ToLower(constraint.UniqueField)
 				addPlaceholders = append(addPlaceholders, fmt.Sprintf("($%d, $%d, $%d)", len(addArgs)+1, len(addArgs)+2, len(addArgs)+3))
 				addArgs = append(addArgs, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)
 				addConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintRemove:
-				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf("(instance_id = $%d AND unique_type = $%d AND unique_field = $%d)", len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
+				deletePlaceholders = append(deletePlaceholders, fmt.Sprintf(deleteConstraintPlaceholdersStmt, len(deleteArgs)+1, len(deleteArgs)+2, len(deleteArgs)+3))
 				deleteArgs = append(deleteArgs, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)
 				deleteConstraints[fmt.Sprintf(uniqueConstraintPlaceholderFmt, command.Aggregate().InstanceID, constraint.UniqueType, constraint.UniqueField)] = constraint
 			case eventstore.UniqueConstraintInstanceRemove:
@@ -58,7 +61,7 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventst
 			if constraint := constraintFromErr(err, deleteConstraints); constraint != nil {
 				errMessage = constraint.ErrorMessage
 			}
-			return errs.ThrowInternal(err, "V3-C8l3V", errMessage)
+			return zerrors.ThrowInternal(err, "V3-C8l3V", errMessage)
 		}
 	}
 	if len(addPlaceholders) > 0 {
@@ -69,7 +72,7 @@ func handleUniqueConstraints(ctx context.Context, tx *sql.Tx, commands []eventst
 			if constraint := constraintFromErr(err, addConstraints); constraint != nil {
 				errMessage = constraint.ErrorMessage
 			}
-			return errs.ThrowAlreadyExists(err, "V3-DKcYh", errMessage)
+			return zerrors.ThrowAlreadyExists(err, "V3-DKcYh", errMessage)
 		}
 	}
 	return nil

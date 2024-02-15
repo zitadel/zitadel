@@ -14,9 +14,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/cockroach"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func Test_getCondition(t *testing.T) {
@@ -142,7 +142,7 @@ func Test_prepareColumns(t *testing.T) {
 			},
 			res: res{
 				query: `SELECT "position" FROM eventstore.events2`,
-				dbErr: errors.IsErrorInvalidArgument,
+				dbErr: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -212,7 +212,7 @@ func Test_prepareColumns(t *testing.T) {
 			},
 			res: res{
 				query: `SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events`,
-				dbErr: errors.IsErrorInvalidArgument,
+				dbErr: zerrors.IsErrorInvalidArgument,
 			},
 		},
 		{
@@ -228,7 +228,7 @@ func Test_prepareColumns(t *testing.T) {
 			},
 			res: res{
 				query: `SELECT creation_date, event_type, event_sequence, event_data, editor_user, resource_owner, instance_id, aggregate_type, aggregate_id, aggregate_version FROM eventstore.events`,
-				dbErr: errors.IsInternal,
+				dbErr: zerrors.IsInternal,
 			},
 		},
 	}
@@ -277,7 +277,7 @@ func prepareTestScan(err error, res []interface{}) scan {
 			return err
 		}
 		if len(dests) != len(res) {
-			return errors.ThrowInvalidArgumentf(nil, "SQL-NML1q", "expected len %d got %d", len(res), len(dests))
+			return zerrors.ThrowInvalidArgumentf(nil, "SQL-NML1q", "expected len %d got %d", len(res), len(dests))
 		}
 		for i, r := range res {
 			_, ok := dests[i].(*eventstore.Version)

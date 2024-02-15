@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
@@ -30,8 +30,8 @@ var (
 		` projections.sessions8.user_id,` +
 		` projections.sessions8.user_resource_owner,` +
 		` projections.sessions8.user_checked_at,` +
-		` projections.login_names2.login_name,` +
-		` projections.users8_humans.display_name,` +
+		` projections.login_names3.login_name,` +
+		` projections.users10_humans.display_name,` +
 		` projections.sessions8.password_checked_at,` +
 		` projections.sessions8.intent_checked_at,` +
 		` projections.sessions8.webauthn_checked_at,` +
@@ -47,9 +47,9 @@ var (
 		` projections.sessions8.user_agent_header,` +
 		` projections.sessions8.expiration` +
 		` FROM projections.sessions8` +
-		` LEFT JOIN projections.login_names2 ON projections.sessions8.user_id = projections.login_names2.user_id AND projections.sessions8.instance_id = projections.login_names2.instance_id` +
-		` LEFT JOIN projections.users8_humans ON projections.sessions8.user_id = projections.users8_humans.user_id AND projections.sessions8.instance_id = projections.users8_humans.instance_id` +
-		` LEFT JOIN projections.users8 ON projections.sessions8.user_id = projections.users8.id AND projections.sessions8.instance_id = projections.users8.instance_id` +
+		` LEFT JOIN projections.login_names3 ON projections.sessions8.user_id = projections.login_names3.user_id AND projections.sessions8.instance_id = projections.login_names3.instance_id` +
+		` LEFT JOIN projections.users10_humans ON projections.sessions8.user_id = projections.users10_humans.user_id AND projections.sessions8.instance_id = projections.users10_humans.instance_id` +
+		` LEFT JOIN projections.users10 ON projections.sessions8.user_id = projections.users10.id AND projections.sessions8.instance_id = projections.users10.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
 	expectedSessionsQuery = regexp.QuoteMeta(`SELECT projections.sessions8.id,` +
 		` projections.sessions8.creation_date,` +
@@ -61,8 +61,8 @@ var (
 		` projections.sessions8.user_id,` +
 		` projections.sessions8.user_resource_owner,` +
 		` projections.sessions8.user_checked_at,` +
-		` projections.login_names2.login_name,` +
-		` projections.users8_humans.display_name,` +
+		` projections.login_names3.login_name,` +
+		` projections.users10_humans.display_name,` +
 		` projections.sessions8.password_checked_at,` +
 		` projections.sessions8.intent_checked_at,` +
 		` projections.sessions8.webauthn_checked_at,` +
@@ -74,9 +74,9 @@ var (
 		` projections.sessions8.expiration,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.sessions8` +
-		` LEFT JOIN projections.login_names2 ON projections.sessions8.user_id = projections.login_names2.user_id AND projections.sessions8.instance_id = projections.login_names2.instance_id` +
-		` LEFT JOIN projections.users8_humans ON projections.sessions8.user_id = projections.users8_humans.user_id AND projections.sessions8.instance_id = projections.users8_humans.instance_id` +
-		` LEFT JOIN projections.users8 ON projections.sessions8.user_id = projections.users8.id AND projections.sessions8.instance_id = projections.users8.instance_id` +
+		` LEFT JOIN projections.login_names3 ON projections.sessions8.user_id = projections.login_names3.user_id AND projections.sessions8.instance_id = projections.login_names3.instance_id` +
+		` LEFT JOIN projections.users10_humans ON projections.sessions8.user_id = projections.users10_humans.user_id AND projections.sessions8.instance_id = projections.users10_humans.instance_id` +
+		` LEFT JOIN projections.users10 ON projections.sessions8.user_id = projections.users10.id AND projections.sessions8.instance_id = projections.users10.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms'`)
 
 	sessionCols = []string{
@@ -427,7 +427,7 @@ func Test_SessionPrepare(t *testing.T) {
 					nil,
 				),
 				err: func(err error) (error, bool) {
-					if !errs.IsNotFound(err) {
+					if !zerrors.IsNotFound(err) {
 						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
 					}
 					return nil, true

@@ -31,10 +31,17 @@ Errors:
   Limits:
     NotFound: Limite não encontrado
     NoneSpecified: Nenhum limite especificado
+    Instance:
+      Blocked: A instância está bloqueada
   Restrictions:
     NoneSpecified: Nenhuma restrição especificada
+    DefaultLanguageMustBeAllowed: O idioma padrão deve ser permitido
   Language:
     NotParsed: Não foi possível analisar o idioma
+    NotSupported: Idioma não suportado
+    NotAllowed: Idioma não permitido
+    Undefined: Idioma indefinido
+    Duplicate: Idiomas têm duplicatas
   OIDCSettings:
     NotFound: Configuração OIDC não encontrada
     AlreadyExists: Configuração OIDC já existe
@@ -121,6 +128,7 @@ Errors:
       NotFound: Código não encontrado
       Expired: Código expirou
       GeneratorAlgNotSupported: Algoritmo do gerador não suportado
+      Invalid: Código é inválido
     Password:
       NotFound: Senha não encontrada
       Empty: Senha está vazia
@@ -138,7 +146,7 @@ Errors:
     ExternalIDP:
       Invalid: IDP externo inválido
       IDPConfigNotExisting: Provedor de IDP inválido para esta organização
-      NotAllowed: IDP externo não permitido nesta organização
+      NotAllowed: IDP externo não permitido
       MinimumExternalIDPNeeded: Pelo menos um IDP deve ser adicionado
       AlreadyExists: IDP externo já está em uso
       NotFound: IDP externo não encontrado
@@ -429,6 +437,7 @@ Errors:
   UserSession:
     NotFound: Sessão do usuário não encontrada
   Key:
+    NotFound: Chave não encontrada
     ExpireBeforeNow: A data de expiração está no passado
   Login:
     LoginPolicy:
@@ -520,6 +529,11 @@ Errors:
     NotExisting: O recurso não existe
     TypeNotSupported: O tipo de recurso não é compatível
     InvalidValue: Valor inválido para este recurso
+  Target:
+    Invalid: A meta é inválida
+    NoTimeout: O destino não tem tempo limite
+    InvalidURL: O destino tem um URL inválido
+    NotFound: Destino não encontrado
 
 AggregateTypes:
   action: Ação
@@ -531,8 +545,13 @@ AggregateTypes:
   usergrant: Concessão de usuário
   quota: Cota
   feature: Recurso
+  target: objetivo
 
 EventTypes:
+  target:
+    added: Destino criado
+    changed: Destino alterada
+    removed: Destino excluído
   user:
     added: Usuário adicionado
     selfregistered: Usuário se registrou

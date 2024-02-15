@@ -1,8 +1,8 @@
 package policy
 
 import (
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -49,7 +49,7 @@ func DomainPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, err
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-TvSmA", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-TvSmA", "unable to unmarshal policy")
 	}
 
 	return e, nil
@@ -76,7 +76,7 @@ func NewDomainPolicyChangedEvent(
 	changes []DomainPolicyChanges,
 ) (*DomainPolicyChangedEvent, error) {
 	if len(changes) == 0 {
-		return nil, errors.ThrowPreconditionFailed(nil, "POLICY-DAf3h", "Errors.NoChangesFound")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "POLICY-DAf3h", "Errors.NoChangesFound")
 	}
 	changeEvent := &DomainPolicyChangedEvent{
 		BaseEvent: *base,
@@ -114,7 +114,7 @@ func DomainPolicyChangedEventMapper(event eventstore.Event) (eventstore.Event, e
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "POLIC-0Pl9d", "unable to unmarshal policy")
+		return nil, zerrors.ThrowInternal(err, "POLIC-0Pl9d", "unable to unmarshal policy")
 	}
 
 	return e, nil

@@ -31,10 +31,17 @@ Errors:
   Limits:
     NotFound: 未找到限制
     NoneSpecified: 未指定限制
+    Instance:
+      Blocked: 实例被阻止
   Restrictions:
     NoneSpecified: 未指定限制
+    DefaultLanguageMustBeAllowed: 默认语言必须被允许
   Language:
     NotParsed: 无法解析语言
+    NotSupported: 语言不支持
+    NotAllowed: 语言不被允许
+    Undefined: 语言未定义
+    Duplicate: 语言有重复
   OIDCSettings:
     NotFound: OIDC 配置未找到
     AlreadyExists: OIDC 配置已存在
@@ -121,6 +128,7 @@ Errors:
       NotFound: 验证码不存在
       Expired: 验证码已过期
       GeneratorAlgNotSupported: 不支持的生成器算法
+      Invalid: 代码无效
     Password:
       NotFound: 未找到密码
       Empty: 密码为空
@@ -139,7 +147,7 @@ Errors:
     ExternalIDP:
       Invalid: 外部 IDP 无效
       IDPConfigNotExisting: IDP 提供者对此组织无效
-      NotAllowed: 此组织不允许外部 IDP
+      NotAllowed: 外部 IDP 不允许
       MinimumExternalIDPNeeded: 必须添加至少一个 IDP
       AlreadyExists: 外部 IDP 已存在
       NotFound: 未找到外部 IDP
@@ -431,6 +439,7 @@ Errors:
   UserSession:
     NotFound: 用户会话不存在
   Key:
+    NotFound: 找不到钥匙
     ExpireBeforeNow: 过期日期是过去的无效日期
   Login:
     LoginPolicy:
@@ -526,6 +535,11 @@ Errors:
     NotExisting: 功能不存在
     TypeNotSupported: 不支持功能类型
     InvalidValue: 此功能的值无效
+  Target:
+    Invalid: 目标无效
+    NoTimeout: 目标没有超时
+    InvalidURL: 目标的 URL 无效
+    NotFound: 未找到目标
 
 AggregateTypes:
   action: 动作
@@ -537,8 +551,13 @@ AggregateTypes:
   usergrant: 用户授权
   quota: 配额
   feature: 特征
+  target: 靶
 
 EventTypes:
+  target:
+    added: 目标已创建
+    changed: 目标改变
+    removed: 目标已删除
   user:
     added: 已添加用户
     selfregistered: 自注册用户

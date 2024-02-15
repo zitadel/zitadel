@@ -36,7 +36,7 @@ export class ToastService {
     }
   }
 
-  public showError(error: any | string, isGrpc: boolean = true, i18nKey: boolean = false): void {
+  public showError = (error: any | string, isGrpc: boolean = true, i18nKey: boolean = false) => {
     if (isGrpc) {
       const { message, code, metadata } = error;
       if (code !== 16) {
@@ -57,7 +57,7 @@ export class ToastService {
     } else {
       this.showMessage(error as string, '', false);
     }
-  }
+  };
 
   private showMessage(message: string, action: string, success: boolean): Observable<void> {
     const ref = this.snackBar.open(message, action, {

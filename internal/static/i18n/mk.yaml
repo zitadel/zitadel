@@ -31,10 +31,17 @@ Errors:
   Limits:
     NotFound: Лимитот не е пронајден
     NoneSpecified: Не се наведени лимити
+    Instance:
+      Blocked: Инстанцата е блокирана
   Restrictions:
     NoneSpecified: Не се наведени ограничувања
+    DefaultLanguageMustBeAllowed: Стандардниот јазик мора да биде дозволен
   Language:
     NotParsed: Јазикот не може да се парсира
+    NotSupported: Јазикот не е поддржан
+    NotAllowed: Јазикот не е дозволен
+    Undefined: Јазикот е недефиниран
+    Duplicate: Јазиците имаат дупликати
   OIDCSettings:
     NotFound: OIDC конфигурацијата не е пронајдена
     AlreadyExists: OIDC конфигурацијата веќе постои
@@ -139,7 +146,7 @@ Errors:
     ExternalIDP:
       Invalid: Невалиден надворешен IDP
       IDPConfigNotExisting: IDP не е валиден за оваа организација
-      NotAllowed: Надворешниоте IDP не е дозволен на оваа организација
+      NotAllowed: Надворешниот IDP не е дозволен
       MinimumExternalIDPNeeded: Мора да се додаде најмалку еден надворешен IDP
       AlreadyExists: Надворешниот IDP е веќе зафатен
       NotFound: Надворешниот IDP не е пронајден
@@ -431,6 +438,7 @@ Errors:
   UserSession:
     NotFound: Корисничката сесија не е пронајдена
   Key:
+    NotFound: Клучот не е пронајден
     ExpireBeforeNow: Датумот на истекување е во минатото
   Login:
     LoginPolicy:
@@ -526,6 +534,11 @@ Errors:
     NotExisting: Функцијата не постои
     TypeNotSupported: Типот на функција не е поддржан
     InvalidValue: Неважечка вредност за оваа функција
+  Target:
+    Invalid: Целта е неважечка
+    NoTimeout: Целта нема тајмаут
+    InvalidURL: Целта има неважечка URL-адреса
+    NotFound: Целта не е пронајдена
 
 AggregateTypes:
   action: Акција
@@ -537,8 +550,13 @@ AggregateTypes:
   usergrant: Овластување на корисник
   quota: Квота
   feature: Карактеристика
+  target: Цел
 
 EventTypes:
+  target:
+    added: Целта е избришана
+    changed: Целта е променета
+    removed: Целта е избришана
   user:
     added: Додаден корисник
     selfregistered: Корисникот се регистрираше сам

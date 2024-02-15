@@ -11,9 +11,9 @@ import (
 	"go.opentelemetry.io/otel/metric"
 	sdk_metric "go.opentelemetry.io/otel/sdk/metric"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	otel_resource "github.com/zitadel/zitadel/internal/telemetry/otel"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type Metrics struct {
@@ -66,7 +66,7 @@ func (m *Metrics) RegisterCounter(name, description string) error {
 func (m *Metrics) AddCount(ctx context.Context, name string, value int64, labels map[string]attribute.Value) error {
 	counter, exists := m.Counters.Load(name)
 	if !exists {
-		return caos_errs.ThrowNotFound(nil, "METER-4u8fs", "Errors.Metrics.Counter.NotFound")
+		return zerrors.ThrowNotFound(nil, "METER-4u8fs", "Errors.Metrics.Counter.NotFound")
 	}
 	counter.(metric.Int64Counter).Add(ctx, value, MapToAddOption(labels)...)
 	return nil

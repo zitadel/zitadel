@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/feature"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type FeatureWriteModel[T feature.SetEventType] struct {
@@ -26,7 +26,7 @@ func NewFeatureWriteModel[T feature.SetEventType](instanceID, resourceOwner stri
 		feature: feature,
 	}
 	if wm.Value.FeatureType() != feature.Type() {
-		return nil, errors.ThrowPreconditionFailed(nil, "FEAT-AS4k1", "Errors.Feature.InvalidValue")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "FEAT-AS4k1", "Errors.Feature.InvalidValue")
 	}
 	return wm, nil
 }
@@ -56,7 +56,7 @@ func (wm *FeatureWriteModel[T]) Reduce() error {
 		case *feature.SetEvent[T]:
 			wm.Value = e.Value
 		default:
-			return errors.ThrowPreconditionFailed(nil, "FEAT-SDfjk", "Errors.Feature.TypeNotSupported")
+			return zerrors.ThrowPreconditionFailed(nil, "FEAT-SDfjk", "Errors.Feature.TypeNotSupported")
 		}
 	}
 	return wm.WriteModel.Reduce()

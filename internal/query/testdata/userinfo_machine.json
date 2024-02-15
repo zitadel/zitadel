@@ -1,0 +1,41 @@
+{
+  "user": {
+    "id": "240707570677841922",
+    "creation_date": "2023-11-14T13:34:52.473732+00:00",
+    "change_date": "2023-11-14T13:35:02.861342+00:00",
+    "sequence": 2,
+    "state": 1,
+    "resource_owner": "231848297847848962",
+    "username": "tests",
+    "preferred_login_name": "tests@demo.localhost",
+    "human": null,
+    "machine": {
+      "name": "tests",
+      "description": "My test service user"
+    }
+  },
+  "org": {
+    "id": "231848297847848962",
+    "name": "demo",
+    "primary_domain": "demo.localhost"
+  },
+  "metadata": [
+    {
+      "creation_date": "2023-11-14T13:35:30.126849+00:00",
+      "change_date": "2023-11-14T13:35:30.126849+00:00",
+      "sequence": 3,
+      "resource_owner": "231848297847848962",
+      "key": "first",
+      "value": "SGVsbG8gV29ybGQh"
+    },
+    {
+      "creation_date": "2023-11-14T13:35:44.028343+00:00",
+      "change_date": "2023-11-14T13:35:44.028343+00:00",
+      "sequence": 4,
+      "resource_owner": "231848297847848962",
+      "key": "second",
+      "value": "QnllIFdvcmxkIQ=="
+    }
+  ],
+  "user_grants": null
+}

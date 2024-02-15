@@ -5,14 +5,14 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddNotificationPolicy(ctx context.Context, resourceOwner string, passwordChange bool) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-x801sk2i", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-x801sk2i", "Errors.ResourceOwnerMissing")
 	}
 	orgAgg := org.NewAggregate(resourceOwner)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddNotificationPolicy(orgAgg, passwordChange))
@@ -42,7 +42,7 @@ func prepareAddNotificationPolicy(
 				return nil, err
 			}
 			if writeModel.State == domain.PolicyStateActive {
-				return nil, caos_errs.ThrowAlreadyExists(nil, "Org-xa08n2", "Errors.Org.NotificationPolicy.AlreadyExists")
+				return nil, zerrors.ThrowAlreadyExists(nil, "Org-xa08n2", "Errors.Org.NotificationPolicy.AlreadyExists")
 			}
 			return []eventstore.Command{
 				org.NewNotificationPolicyAddedEvent(ctx, &a.Aggregate, passwordChange),
@@ -53,7 +53,7 @@ func prepareAddNotificationPolicy(
 
 func (c *Commands) ChangeNotificationPolicy(ctx context.Context, resourceOwner string, passwordChange bool) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-x091n1g", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-x091n1g", "Errors.ResourceOwnerMissing")
 	}
 	orgAgg := org.NewAggregate(resourceOwner)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareChangeNotificationPolicy(orgAgg, passwordChange))
@@ -84,11 +84,11 @@ func prepareChangeNotificationPolicy(
 			}
 
 			if writeModel.State == domain.PolicyStateUnspecified || writeModel.State == domain.PolicyStateRemoved {
-				return nil, caos_errs.ThrowNotFound(nil, "ORG-x029n3", "Errors.Org.NotificationPolicy.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "ORG-x029n3", "Errors.Org.NotificationPolicy.NotFound")
 			}
 			change, hasChanged := writeModel.NewChangedEvent(ctx, &a.Aggregate, passwordChange)
 			if !hasChanged {
-				return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-ioqnxz", "Errors.Org.NotificationPolicy.NotChanged")
+				return nil, zerrors.ThrowPreconditionFailed(nil, "Org-ioqnxz", "Errors.Org.NotificationPolicy.NotChanged")
 			}
 			return []eventstore.Command{
 				change,
@@ -99,7 +99,7 @@ func prepareChangeNotificationPolicy(
 
 func (c *Commands) RemoveNotificationPolicy(ctx context.Context, resourceOwner string) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-x89ns2", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "Org-x89ns2", "Errors.ResourceOwnerMissing")
 	}
 	orgAgg := org.NewAggregate(resourceOwner)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareRemoveNotificationPolicy(orgAgg))
@@ -129,7 +129,7 @@ func prepareRemoveNotificationPolicy(
 			}
 
 			if writeModel.State == domain.PolicyStateUnspecified || writeModel.State == domain.PolicyStateRemoved {
-				return nil, caos_errs.ThrowNotFound(nil, "ORG-x029n1s", "Errors.Org.NotificationPolicy.NotFound")
+				return nil, zerrors.ThrowNotFound(nil, "ORG-x029n1s", "Errors.Org.NotificationPolicy.NotFound")
 			}
 			return []eventstore.Command{
 				org.NewNotificationPolicyRemovedEvent(ctx, &a.Aggregate),

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func ZitadelErrorToHTTPStatusCode(err error) (statusCode int, ok bool) {
@@ -13,32 +13,32 @@ func ZitadelErrorToHTTPStatusCode(err error) (statusCode int, ok bool) {
 	}
 	//nolint:errorlint
 	switch err.(type) {
-	case *caos_errs.AlreadyExistsError:
+	case *zerrors.AlreadyExistsError:
 		return http.StatusConflict, true
-	case *caos_errs.DeadlineExceededError:
+	case *zerrors.DeadlineExceededError:
 		return http.StatusGatewayTimeout, true
-	case *caos_errs.InternalError:
+	case *zerrors.InternalError:
 		return http.StatusInternalServerError, true
-	case *caos_errs.InvalidArgumentError:
+	case *zerrors.InvalidArgumentError:
 		return http.StatusBadRequest, true
-	case *caos_errs.NotFoundError:
+	case *zerrors.NotFoundError:
 		return http.StatusNotFound, true
-	case *caos_errs.PermissionDeniedError:
+	case *zerrors.PermissionDeniedError:
 		return http.StatusForbidden, true
-	case *caos_errs.PreconditionFailedError:
+	case *zerrors.PreconditionFailedError:
 		// use the same code as grpc-gateway:
 		// https://github.com/grpc-ecosystem/grpc-gateway/blob/9e33e38f15cb7d2f11096366e62ea391a3459ba9/runtime/errors.go#L59
 		return http.StatusBadRequest, true
-	case *caos_errs.UnauthenticatedError:
+	case *zerrors.UnauthenticatedError:
 		return http.StatusUnauthorized, true
-	case *caos_errs.UnavailableError:
+	case *zerrors.UnavailableError:
 		return http.StatusServiceUnavailable, true
-	case *caos_errs.UnimplementedError:
+	case *zerrors.UnimplementedError:
 		return http.StatusNotImplemented, true
-	case *caos_errs.ResourceExhaustedError:
+	case *zerrors.ResourceExhaustedError:
 		return http.StatusTooManyRequests, true
 	default:
-		c := new(caos_errs.CaosError)
+		c := new(zerrors.ZitadelError)
 		if errors.As(err, &c) {
 			return ZitadelErrorToHTTPStatusCode(errors.Unwrap(err))
 		}

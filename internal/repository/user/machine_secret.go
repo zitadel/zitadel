@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -51,7 +51,7 @@ func MachineSecretSetEventMapper(event eventstore.Event) (eventstore.Event, erro
 	}
 	err := event.Unmarshal(credentialsSet)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-lopbqu", "unable to unmarshal machine secret set")
+		return nil, zerrors.ThrowInternal(err, "USER-lopbqu", "unable to unmarshal machine secret set")
 	}
 
 	return credentialsSet, nil
@@ -88,7 +88,7 @@ func MachineSecretRemovedEventMapper(event eventstore.Event) (eventstore.Event, 
 	}
 	err := event.Unmarshal(credentialsRemoved)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-quox9j2", "unable to unmarshal machine secret removed")
+		return nil, zerrors.ThrowInternal(err, "USER-quox9j2", "unable to unmarshal machine secret removed")
 	}
 
 	return credentialsRemoved, nil
@@ -125,7 +125,7 @@ func MachineSecretCheckSucceededEventMapper(event eventstore.Event) (eventstore.
 	}
 	err := event.Unmarshal(check)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-x002n1p", "unable to unmarshal machine secret check succeeded")
+		return nil, zerrors.ThrowInternal(err, "USER-x002n1p", "unable to unmarshal machine secret check succeeded")
 	}
 
 	return check, nil
@@ -162,7 +162,7 @@ func MachineSecretCheckFailedEventMapper(event eventstore.Event) (eventstore.Eve
 	}
 	err := event.Unmarshal(check)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-x7901b1l", "unable to unmarshal machine secret check failed")
+		return nil, zerrors.ThrowInternal(err, "USER-x7901b1l", "unable to unmarshal machine secret check failed")
 	}
 
 	return check, nil

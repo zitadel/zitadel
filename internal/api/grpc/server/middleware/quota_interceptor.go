@@ -7,10 +7,10 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func QuotaExhaustedInterceptor(svc *logstore.Service[*record.AccessLog], ignoreService ...string) grpc.UnaryServerInterceptor {
@@ -43,7 +43,7 @@ func QuotaExhaustedInterceptor(svc *logstore.Service[*record.AccessLog], ignoreS
 		instance := authz.GetInstance(ctx)
 		remaining := svc.Limit(interceptorCtx, instance.InstanceID())
 		if remaining != nil && *remaining == 0 {
-			return nil, errors.ThrowResourceExhausted(nil, "QUOTA-vjAy8", "Quota.Access.Exhausted")
+			return nil, zerrors.ThrowResourceExhausted(nil, "QUOTA-vjAy8", "Quota.Access.Exhausted")
 		}
 		span.End()
 		return handler(ctx, req)

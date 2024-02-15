@@ -5,19 +5,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_ChangeUserPhone(t *testing.T) {
@@ -26,9 +26,8 @@ func TestCommands_ChangeUserPhone(t *testing.T) {
 		checkPermission domain.PermissionCheck
 	}
 	type args struct {
-		userID        string
-		resourceOwner string
-		phone         string
+		userID string
+		phone  string
 	}
 	tests := []struct {
 		name    string
@@ -74,11 +73,10 @@ func TestCommands_ChangeUserPhone(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
-				userID:        "user1",
-				resourceOwner: "org1",
-				phone:         "",
+				userID: "user1",
+				phone:  "",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "missing phone",
@@ -118,11 +116,10 @@ func TestCommands_ChangeUserPhone(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				userID:        "user1",
-				resourceOwner: "org1",
-				phone:         "",
+				userID: "user1",
+				phone:  "",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty"),
 		},
 		{
 			name: "not changed",
@@ -162,11 +159,10 @@ func TestCommands_ChangeUserPhone(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				userID:        "user1",
-				resourceOwner: "org1",
-				phone:         "+41791234567",
+				userID: "user1",
+				phone:  "+41791234567",
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Phone.NotChanged"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Phone.NotChanged"),
 		},
 	}
 	for _, tt := range tests {
@@ -175,7 +171,7 @@ func TestCommands_ChangeUserPhone(t *testing.T) {
 				eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
 			}
-			_, err := c.ChangeUserPhone(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.phone, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			_, err := c.ChangeUserPhone(context.Background(), tt.args.userID, tt.args.phone, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 			require.ErrorIs(t, err, tt.wantErr)
 			// successful cases are tested in TestCommands_changeUserPhoneWithGenerator
 		})
@@ -188,9 +184,8 @@ func TestCommands_ChangeUserPhoneReturnCode(t *testing.T) {
 		checkPermission domain.PermissionCheck
 	}
 	type args struct {
-		userID        string
-		resourceOwner string
-		phone         string
+		userID string
+		phone  string
 	}
 	tests := []struct {
 		name    string
@@ -236,11 +231,10 @@ func TestCommands_ChangeUserPhoneReturnCode(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
-				userID:        "user1",
-				resourceOwner: "org1",
-				phone:         "+41791234567",
+				userID: "user1",
+				phone:  "+41791234567",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "missing phone",
@@ -280,11 +274,10 @@ func TestCommands_ChangeUserPhoneReturnCode(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				userID:        "user1",
-				resourceOwner: "org1",
-				phone:         "",
+				userID: "user1",
+				phone:  "",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty"),
 		},
 	}
 	for _, tt := range tests {
@@ -293,9 +286,233 @@ func TestCommands_ChangeUserPhoneReturnCode(t *testing.T) {
 				eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
 			}
-			_, err := c.ChangeUserPhoneReturnCode(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.phone, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			_, err := c.ChangeUserPhoneReturnCode(context.Background(), tt.args.userID, tt.args.phone, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 			require.ErrorIs(t, err, tt.wantErr)
 			// successful cases are tested in TestCommands_changeUserPhoneWithGenerator
+		})
+	}
+}
+
+func TestCommands_ResendUserPhoneCode(t *testing.T) {
+	type fields struct {
+		eventstore      *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
+	}
+	type args struct {
+		userID string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr error
+	}{
+		{
+			name: "missing permission",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(context.Background(),
+								&instance.NewAggregate("inst1").Aggregate,
+								domain.SecretGeneratorTypeVerifyPhoneCode,
+								12, time.Minute, true, true, true, true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								event := user.NewHumanAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"username",
+									"firstname",
+									"lastname",
+									"nickname",
+									"displayname",
+									language.German,
+									domain.GenderUnspecified,
+									"email@test.ch",
+									true,
+								)
+								event.AddPhoneData("+41791234567")
+								return event
+							}(),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				userID: "user1",
+			},
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+		},
+		{
+			name: "no code",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(context.Background(),
+								&instance.NewAggregate("inst1").Aggregate,
+								domain.SecretGeneratorTypeVerifyPhoneCode,
+								12, time.Minute, true, true, true, true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								event := user.NewHumanAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"username",
+									"firstname",
+									"lastname",
+									"nickname",
+									"displayname",
+									language.German,
+									domain.GenderUnspecified,
+									"email@test.ch",
+									true,
+								)
+								event.AddPhoneData("+41791234567")
+								return event
+							}(),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				userID: "user1",
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "PHONE-5xrra88eq8", "Errors.User.Code.Empty"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:      tt.fields.eventstore,
+				checkPermission: tt.fields.checkPermission,
+			}
+			_, err := c.ResendUserPhoneCode(context.Background(), tt.args.userID, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			require.ErrorIs(t, err, tt.wantErr)
+			// successful cases are tested in TestCommands_resendUserPhoneCodeWithGenerator
+		})
+	}
+}
+
+func TestCommands_ResendUserPhoneCodeReturnCode(t *testing.T) {
+	type fields struct {
+		eventstore      *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
+	}
+	type args struct {
+		userID string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr error
+	}{
+		{
+			name: "missing permission",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(context.Background(),
+								&instance.NewAggregate("inst1").Aggregate,
+								domain.SecretGeneratorTypeVerifyPhoneCode,
+								12, time.Minute, true, true, true, true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								event := user.NewHumanAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"username",
+									"firstname",
+									"lastname",
+									"nickname",
+									"displayname",
+									language.German,
+									domain.GenderUnspecified,
+									"email@test.ch",
+									true,
+								)
+								event.AddPhoneData("+41791234567")
+								return event
+							}(),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				userID: "user1",
+			},
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+		},
+		{
+			name: "no code",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSecretGeneratorAddedEvent(context.Background(),
+								&instance.NewAggregate("inst1").Aggregate,
+								domain.SecretGeneratorTypeVerifyEmailCode,
+								12, time.Minute, true, true, true, true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								event := user.NewHumanAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"username",
+									"firstname",
+									"lastname",
+									"nickname",
+									"displayname",
+									language.German,
+									domain.GenderUnspecified,
+									"email@test.ch",
+									true,
+								)
+								event.AddPhoneData("+41791234567")
+								return event
+							}(),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				userID: "user1",
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "PHONE-5xrra88eq8", "Errors.User.Code.Empty"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:      tt.fields.eventstore,
+				checkPermission: tt.fields.checkPermission,
+			}
+			_, err := c.ResendUserPhoneCodeReturnCode(context.Background(), tt.args.userID, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+			require.ErrorIs(t, err, tt.wantErr)
+			// successful cases are tested in TestCommands_resendUserPhoneCodeWithGenerator
 		})
 	}
 }
@@ -306,9 +523,8 @@ func TestCommands_ChangeUserPhoneVerified(t *testing.T) {
 		checkPermission domain.PermissionCheck
 	}
 	type args struct {
-		userID        string
-		resourceOwner string
-		phone         string
+		userID string
+		phone  string
 	}
 	tests := []struct {
 		name    string
@@ -324,11 +540,10 @@ func TestCommands_ChangeUserPhoneVerified(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
-				userID:        "",
-				resourceOwner: "org1",
-				phone:         "+41791234567",
+				userID: "",
+				phone:  "+41791234567",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-xP292j", "Errors.User.Phone.IDMissing"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-xP292j", "Errors.User.Phone.IDMissing"),
 		},
 		{
 			name: "missing permission",
@@ -359,11 +574,10 @@ func TestCommands_ChangeUserPhoneVerified(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
-				userID:        "user1",
-				resourceOwner: "org1",
-				phone:         "+41791234567",
+				userID: "user1",
+				phone:  "+41791234567",
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "missing phone",
@@ -394,11 +608,10 @@ func TestCommands_ChangeUserPhoneVerified(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				userID:        "user1",
-				resourceOwner: "org1",
-				phone:         "",
+				userID: "user1",
+				phone:  "",
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty"),
 		},
 		{
 			name: "phone changed",
@@ -438,9 +651,8 @@ func TestCommands_ChangeUserPhoneVerified(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				userID:        "user1",
-				resourceOwner: "org1",
-				phone:         "+41791234568",
+				userID: "user1",
+				phone:  "+41791234568",
 			},
 			want: &domain.Phone{
 				ObjectRoot: models.ObjectRoot{
@@ -458,7 +670,7 @@ func TestCommands_ChangeUserPhoneVerified(t *testing.T) {
 				eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := c.ChangeUserPhoneVerified(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.phone)
+			got, err := c.ChangeUserPhoneVerified(context.Background(), tt.args.userID, tt.args.phone)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, got, tt.want)
 		})
@@ -471,10 +683,9 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 		checkPermission domain.PermissionCheck
 	}
 	type args struct {
-		userID        string
-		resourceOwner string
-		phone         string
-		returnCode    bool
+		userID     string
+		phone      string
+		returnCode bool
 	}
 	tests := []struct {
 		name    string
@@ -489,12 +700,11 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				eventstore: eventstoreExpect(t),
 			},
 			args: args{
-				userID:        "",
-				resourceOwner: "org1",
-				phone:         "+41791234567",
-				returnCode:    false,
+				userID:     "",
+				phone:      "+41791234567",
+				returnCode: false,
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "COMMAND-xP292j", "Errors.User.Phone.IDMissing"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-xP292j", "Errors.User.Phone.IDMissing"),
 		},
 		{
 			name: "missing permission",
@@ -525,12 +735,11 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args: args{
-				userID:        "user1",
-				resourceOwner: "org1",
-				phone:         "+41791234567",
-				returnCode:    false,
+				userID:     "user1",
+				phone:      "+41791234567",
+				returnCode: false,
 			},
-			wantErr: caos_errs.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
 		},
 		{
 			name: "missing phone",
@@ -561,12 +770,11 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				userID:        "user1",
-				resourceOwner: "org1",
-				phone:         "",
-				returnCode:    false,
+				userID:     "user1",
+				phone:      "",
+				returnCode: false,
 			},
-			wantErr: caos_errs.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "PHONE-Zt0NV", "Errors.User.Phone.Empty"),
 		},
 		{
 			name: "not changed",
@@ -597,12 +805,11 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				userID:        "user1",
-				resourceOwner: "org1",
-				phone:         "+41791234567",
-				returnCode:    false,
+				userID:     "user1",
+				phone:      "+41791234567",
+				returnCode: false,
 			},
-			wantErr: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Phone.NotChanged"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Phone.NotChanged"),
 		},
 		{
 			name: "phone changed",
@@ -650,10 +857,9 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				userID:        "user1",
-				resourceOwner: "org1",
-				phone:         "+41791234568",
-				returnCode:    false,
+				userID:     "user1",
+				phone:      "+41791234568",
+				returnCode: false,
 			},
 			want: &domain.Phone{
 				ObjectRoot: models.ObjectRoot{
@@ -710,10 +916,9 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				userID:        "user1",
-				resourceOwner: "org1",
-				phone:         "+41791234568",
-				returnCode:    true,
+				userID:     "user1",
+				phone:      "+41791234568",
+				returnCode: true,
 			},
 			want: &domain.Phone{
 				ObjectRoot: models.ObjectRoot{
@@ -732,7 +937,251 @@ func TestCommands_changeUserPhoneWithGenerator(t *testing.T) {
 				eventstore:      tt.fields.eventstore,
 				checkPermission: tt.fields.checkPermission,
 			}
-			got, err := c.changeUserPhoneWithGenerator(context.Background(), tt.args.userID, tt.args.resourceOwner, tt.args.phone, GetMockSecretGenerator(t), tt.args.returnCode)
+			got, err := c.changeUserPhoneWithGenerator(context.Background(), tt.args.userID, tt.args.phone, GetMockSecretGenerator(t), tt.args.returnCode)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, got, tt.want)
+		})
+	}
+}
+
+func TestCommands_resendUserPhoneCodeWithGenerator(t *testing.T) {
+	type fields struct {
+		eventstore      *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
+	}
+	type args struct {
+		userID     string
+		returnCode bool
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *domain.Phone
+		wantErr error
+	}{
+		{
+			name: "missing user",
+			fields: fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args: args{
+				userID:     "",
+				returnCode: false,
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-xP292j", "Errors.User.Phone.IDMissing"),
+		},
+		{
+			name: "missing permission",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								event := user.NewHumanAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"username",
+									"firstname",
+									"lastname",
+									"nickname",
+									"displayname",
+									language.German,
+									domain.GenderUnspecified,
+									"email@test.ch",
+									true,
+								)
+								event.AddPhoneData("+41791234567")
+								return event
+							}(),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				userID:     "user1",
+				returnCode: false,
+			},
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+		},
+		{
+			name: "no code",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								event := user.NewHumanAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"username",
+									"firstname",
+									"lastname",
+									"nickname",
+									"displayname",
+									language.German,
+									domain.GenderUnspecified,
+									"email@test.ch",
+									true,
+								)
+								event.AddPhoneData("+41791234567")
+								return event
+							}(),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				userID:     "user1",
+				returnCode: false,
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "PHONE-5xrra88eq8", "Errors.User.Code.Empty"),
+		},
+		{
+			name: "resend",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								event := user.NewHumanAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"username",
+									"firstname",
+									"lastname",
+									"nickname",
+									"displayname",
+									language.German,
+									domain.GenderUnspecified,
+									"email@test.ch",
+									true,
+								)
+								event.AddPhoneData("+41791234567")
+								return event
+							}(),
+						),
+						eventFromEventPusher(
+							user.NewHumanPhoneCodeAddedEventV2(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								time.Hour*1,
+								true,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanPhoneCodeAddedEventV2(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+							false,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				userID:     "user1",
+				returnCode: false,
+			},
+			want: &domain.Phone{
+				ObjectRoot: models.ObjectRoot{
+					AggregateID:   "user1",
+					ResourceOwner: "org1",
+				},
+				PhoneNumber:     "+41791234567",
+				IsPhoneVerified: false,
+			},
+		},
+		{
+			name: "return code",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								event := user.NewHumanAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"username",
+									"firstname",
+									"lastname",
+									"nickname",
+									"displayname",
+									language.German,
+									domain.GenderUnspecified,
+									"email@test.ch",
+									true,
+								)
+								event.AddPhoneData("+41791234567")
+								return event
+							}(),
+						),
+						eventFromEventPusher(
+							user.NewHumanPhoneCodeAddedEventV2(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								time.Hour*1,
+								true,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanPhoneCodeAddedEventV2(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+							true,
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args: args{
+				userID:     "user1",
+				returnCode: true,
+			},
+			want: &domain.Phone{
+				ObjectRoot: models.ObjectRoot{
+					AggregateID:   "user1",
+					ResourceOwner: "org1",
+				},
+				PhoneNumber:     "+41791234567",
+				IsPhoneVerified: false,
+				PlainCode:       gu.Ptr("a"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:      tt.fields.eventstore,
+				checkPermission: tt.fields.checkPermission,
+			}
+			got, err := c.resendUserPhoneCodeWithGenerator(context.Background(), tt.args.userID, GetMockSecretGenerator(t), tt.args.returnCode)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, got, tt.want)
 		})

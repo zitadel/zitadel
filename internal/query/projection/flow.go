@@ -3,16 +3,16 @@ package projection
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
-	FlowTriggerTable             = "projections.flow_triggers2"
+	FlowTriggerTable             = "projections.flow_triggers3"
 	FlowTypeCol                  = "flow_type"
 	FlowChangeDateCol            = "change_date"
 	FlowSequenceCol              = "sequence"
@@ -21,7 +21,6 @@ const (
 	FlowInstanceIDCol            = "instance_id"
 	FlowActionTriggerSequenceCol = "trigger_sequence"
 	FlowActionIDCol              = "action_id"
-	FlowOwnerRemovedCol          = "owner_removed"
 )
 
 type flowProjection struct{}
@@ -45,10 +44,8 @@ func (*flowProjection) Init() *old_handler.Check {
 			handler.NewColumn(FlowInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(FlowActionTriggerSequenceCol, handler.ColumnTypeInt64),
 			handler.NewColumn(FlowActionIDCol, handler.ColumnTypeText),
-			handler.NewColumn(FlowOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(FlowInstanceIDCol, FlowTypeCol, FlowTriggerTypeCol, FlowResourceOwnerCol, FlowActionIDCol),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{FlowOwnerRemovedCol})),
 		),
 	)
 }
@@ -87,7 +84,7 @@ func (p *flowProjection) Reducers() []handler.AggregateReducer {
 func (p *flowProjection) reduceTriggerActionsSetEventType(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.TriggerActionsSetEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.TriggerActionsSetEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.TriggerActionsSetEventType)
 	}
 	stmts := make([]func(reader eventstore.Event) handler.Exec, len(e.ActionIDs)+1)
 	stmts[0] = handler.AddDeleteStatement(
@@ -118,7 +115,7 @@ func (p *flowProjection) reduceTriggerActionsSetEventType(event eventstore.Event
 func (p *flowProjection) reduceFlowClearedEventType(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.FlowClearedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.FlowClearedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.FlowClearedEventType)
 	}
 	return handler.NewDeleteStatement(
 		e,
@@ -133,7 +130,7 @@ func (p *flowProjection) reduceFlowClearedEventType(event eventstore.Event) (*ha
 func (p *flowProjection) reduceOwnerRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Yd7WC", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "PROJE-Yd7WC", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
 	return handler.NewDeleteStatement(

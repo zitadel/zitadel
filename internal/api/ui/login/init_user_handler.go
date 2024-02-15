@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
-	caos_errs "github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -72,7 +73,7 @@ func (l *Login) handleInitUserCheck(w http.ResponseWriter, r *http.Request) {
 
 func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *initUserFormData, err error) {
 	if data.Password != data.PasswordConfirm {
-		err := caos_errs.ThrowInvalidArgument(nil, "VIEW-fsdfd", "Errors.User.Password.ConfirmationWrong")
+		err := zerrors.ThrowInvalidArgument(nil, "VIEW-fsdfd", "Errors.User.Password.ConfirmationWrong")
 		l.renderInitUser(w, r, authReq, data.UserID, data.LoginName, data.Code, data.PasswordSet, err)
 		return
 	}
@@ -85,7 +86,8 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 		l.renderInitUser(w, r, authReq, data.UserID, data.LoginName, "", data.PasswordSet, err)
 		return
 	}
-	err = l.command.HumanVerifyInitCode(setContext(r.Context(), userOrgID), data.UserID, userOrgID, data.Code, data.Password, initCodeGenerator)
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	err = l.command.HumanVerifyInitCode(setContext(r.Context(), userOrgID), data.UserID, userOrgID, data.Code, data.Password, userAgentID, initCodeGenerator)
 	if err != nil {
 		l.renderInitUser(w, r, authReq, data.UserID, data.LoginName, "", data.PasswordSet, err)
 		return
@@ -118,7 +120,7 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 
 	translator := l.getTranslator(r.Context(), authReq)
 	data := initUserData{
-		baseData:    l.getBaseData(r, authReq, "InitUser.Title", "InitUser.Description", errID, errMessage),
+		baseData:    l.getBaseData(r, authReq, translator, "InitUser.Title", "InitUser.Description", errID, errMessage),
 		profileData: l.getProfileData(authReq),
 		UserID:      userID,
 		Code:        code,
@@ -146,7 +148,7 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 		}
 	}
 	if authReq == nil {
-		user, err := l.query.GetUserByID(r.Context(), false, userID, false)
+		user, err := l.query.GetUserByID(r.Context(), false, userID)
 		if err == nil {
 			l.customTexts(r.Context(), translator, user.ResourceOwner)
 		}
@@ -155,8 +157,8 @@ func (l *Login) renderInitUser(w http.ResponseWriter, r *http.Request, authReq *
 }
 
 func (l *Login) renderInitUserDone(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgID string) {
-	data := l.getUserData(r, authReq, "InitUserDone.Title", "InitUserDone.Description", "", "")
 	translator := l.getTranslator(r.Context(), authReq)
+	data := l.getUserData(r, authReq, translator, "InitUserDone.Title", "InitUserDone.Description", "", "")
 	if authReq == nil {
 		l.customTexts(r.Context(), translator, orgID)
 	}

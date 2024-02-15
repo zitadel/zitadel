@@ -10,11 +10,11 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/errors"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/quota"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestQuotasProjection_reduces(t *testing.T) {
@@ -348,7 +348,7 @@ func TestQuotasProjection_reduces(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			event := baseEvent(t)
 			got, err := tt.reduce(event)
-			if !errors.IsErrorInvalidArgument(err) {
+			if !zerrors.IsErrorInvalidArgument(err) {
 				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
 			}
 			event = tt.args.event(t)

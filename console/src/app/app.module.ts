@@ -13,6 +13,7 @@ import localePl from '@angular/common/locales/pl';
 import localePt from '@angular/common/locales/pt';
 import localeZh from '@angular/common/locales/zh';
 import localeRu from '@angular/common/locales/ru';
+import localeNl from '@angular/common/locales/nl';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -68,6 +69,7 @@ import { StatehandlerService, StatehandlerServiceImpl } from './services/stateha
 import { StorageService } from './services/storage.service';
 import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
+import { LanguagesService } from './services/languages.service';
 
 registerLocaleData(localeDe);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/de.json'));
@@ -95,6 +97,8 @@ registerLocaleData(localeRu);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/ru.json'));
 registerLocaleData(localeCs);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/cs.json'));
+registerLocaleData(localeNl);
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/nl.json'));
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {
@@ -225,6 +229,7 @@ const authConfig: AuthConfig = {
     AssetService,
     ToastService,
     NavigationService,
+    LanguagesService,
     { provide: 'windowObject', useValue: window },
   ],
   bootstrap: [AppComponent],

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/errors"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type action interface {
@@ -63,7 +63,7 @@ func EventData(event Command) ([]byte, error) {
 		if json.Valid(data) {
 			return data, nil
 		}
-		return nil, errors.ThrowInvalidArgument(nil, "V2-6SbbS", "data bytes are not json")
+		return nil, zerrors.ThrowInvalidArgument(nil, "V2-6SbbS", "data bytes are not json")
 	}
 	dataType := reflect.TypeOf(event.Payload())
 	if dataType.Kind() == reflect.Ptr {
@@ -72,11 +72,11 @@ func EventData(event Command) ([]byte, error) {
 	if dataType.Kind() == reflect.Struct {
 		dataBytes, err := json.Marshal(event.Payload())
 		if err != nil {
-			return nil, errors.ThrowInvalidArgument(err, "V2-xG87M", "could  not marshal data")
+			return nil, zerrors.ThrowInvalidArgument(err, "V2-xG87M", "could  not marshal data")
 		}
 		return dataBytes, nil
 	}
-	return nil, errors.ThrowInvalidArgument(nil, "V2-91NRm", "wrong type of event data")
+	return nil, zerrors.ThrowInvalidArgument(nil, "V2-91NRm", "wrong type of event data")
 }
 
 type BaseEventSetter[T any] interface {
@@ -91,15 +91,15 @@ func GenericEventMapper[T any, PT BaseEventSetter[T]](event Event) (Event, error
 
 	err := event.Unmarshal(e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "ES-Thai6", "unable to unmarshal event")
+		return nil, zerrors.ThrowInternal(err, "ES-Thai6", "unable to unmarshal event")
 	}
 
 	return e, nil
 }
 
-func isEventTypes(event Event, types ...EventType) bool {
+func isEventTypes(command Command, types ...EventType) bool {
 	for _, typ := range types {
-		if event.Type() == typ {
+		if command.Type() == typ {
 			return true
 		}
 	}
