@@ -1,0 +1,71 @@
+---
+title: Python Django
+sidebar_label: Python Django
+---
+
+<table>
+    <tr>
+        <td width="100px">
+            <img width="100px" src="/docs/img/tech/django.png" alt="phyton logo"/>
+        </td>
+        <td>
+            <a href="https://www.djangoproject.com/" target="_blank">Django</a> is a high-level <a href="https://www.python.org">Python</a> web framework that encourages rapid development and clean, pragmatic design.
+            Get started integrating authentication to your Django API Application by checking out our <a href="https://github.com/zitadel/example-python-django-oauth" target="_blank">example-python-django-oauth</a> or your Django Web application by checking out our <a href="https://github.com/zitadel/example-python-django-oidc" target="_blank">example-python-django-oidc</a> Example.
+        </td>
+    </tr>
+</table>
+
+
+### Resources
+- [Example API App Repository](https://github.com/zitadel/example-python-django-oauth)
+- [API App Step-By-Step Guide](/docs/examples/secure-api/python-django)
+- [Example Web App Repository](https://github.com/zitadel/example-python-django-oidc)
+- [Web App Step-By-Step Guide](/docs/examples/login/python-django)
+
+### Django SDK
+
+ZITADEL does not provide a Python Django specific SDK.
+But you can integrate ZITADEL to your application by using any OIDC Library such as [mozilla-django-oidc](https://github.com/mozilla/mozilla-django-oidc) or [authlib](https://github.com/lepture/authlib).
+
+### Examples Application
+
+What does the API Application Example include:
+- REST API Application secured with OAuth2
+- Public Endpoint: Accessible without authentication
+- Private Endpoint: Accessible with a token
+- Administrator Endpoint: Accessible with a token of a user with admin role
+
+[Example API App](https://github.com/zitadel/example-python-django-oauth)
+
+What does the Web Application Example include:
+1. Example Web Application with integrated ZITADEL Login
+2. Example page accessible by authenticated user showing retrieved user information
+3. Example page accessible by authenticated user showing polls
+    - Votes for polls can only be done if authenticated
+    - New polls can be created by user with admin role
+4. Logout
+5. Correct setup for your application in ZITADEL
+
+[Example Web App](https://github.com/zitadel/example-python-django-oidc)
+
+### Step-By-Step Guide
+
+After completing the Step-By-Step Guide for an API you will have:
+1. Example REST API checking tokens against ZITADEL with OAuth2
+2. Public Endpoint accessible by any user
+3. Private Endpoint accessible by authenticated user
+4. Private Endpoint accessible by user with role 'admin'
+5. Correct setup for your application in ZITADEL
+
+[API App Step-By-Step Guide](/docs/examples/secure-api/python-django)
+
+After completing the Step-By-Step Guide for an Web application you will have:
+1. Example Web Application with integrated ZITADEL Login
+2. Example page accessible by authenticated user showing retrieved user information
+3. Example page accessible by authenticated user showing polls
+    - Votes for polls can only be done if authenticated
+    - New polls can be created by user with admin role
+4. Logout
+5. Correct setup for your application in ZITADEL
+
+[Web App Step-By-Step Guide](/docs/examples/login/python-django)
