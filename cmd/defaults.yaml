@@ -994,6 +994,8 @@ InternalAuthZ:
         - "events.read"
         - "milestones.read"
         - "session.delete"
+        - "execution.target.write"
+        - "execution.target.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"

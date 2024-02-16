@@ -21,6 +21,7 @@
     h2 {
       font-size: 1rem;
       margin: 0 0 1rem 0;
+      color: $text-color;
     }
 
     .keyboard-shortcuts-wrapper {
@@ -85,21 +86,30 @@
   .keyboard-shortcuts-plus {
     font-size: 14px;
   }
-}
 
-.title {
-  font-size: 1.2rem;
-  margin-top: 0;
+  .title {
+    font-size: 1.2rem;
+    margin-top: 0;
+    color: $text-color;
+  }
 }
 
 .action {
   display: flex;
-
+  margin-top: 1rem;
   button {
     border-radius: 0.5rem;
+    .mat-mdc-button-persistent-ripple {
+      border-style: none !important;
+    }
   }
 
   .fill-space {
     flex: 1;
   }
+}
+
+.container {
+  padding: 1.5rem;
+  border-radius: 6px !important;
 }

@@ -289,8 +289,29 @@ module.exports = {
             sidebarOptions: {
               groupPathsBy: "tag",
             },
-          }
-        }
+          },
+          user_schema: {
+            specPath: ".artifacts/openapi/zitadel/user/schema/v3alpha/user_schema_service.swagger.json",
+            outputDir: "docs/apis/resources/user_schema_service_v3",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
+          user_v3: {
+            specPath: ".artifacts/openapi/zitadel/user/v3alpha/user_service.swagger.json",
+            outputDir: "docs/apis/resources/user_service_v3",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+            },
+          },
+          execution_v3: {
+            specPath: ".artifacts/openapi/zitadel/execution/v3alpha/execution_service.swagger.json",
+            outputDir: "docs/apis/resources/execution_service_v3",
+            sidebarOptions: {
+                groupPathsBy: "tag",
+            },
+          },
+        },
       },
     ],
     require.resolve("docusaurus-plugin-image-zoom"),
