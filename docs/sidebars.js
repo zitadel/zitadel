@@ -128,7 +128,6 @@ module.exports = {
           label: "Console",
           items: [
             "guides/manage/console/overview",
-            "guides/solution-scenarios/restrict-console",
             "guides/manage/console/instance-settings",
             "guides/manage/console/organizations",
             "guides/manage/console/projects",
