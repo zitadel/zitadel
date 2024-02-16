@@ -12,7 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/cmd/systemapi"
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -116,7 +115,7 @@ Actions:
     DenyList: []
 `},
 		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, config.SystemAPIUsers, systemapi.Users{
+			assert.Equal(t, config.SystemAPIUsers, map[string]*authz.SystemAPIUser{
 				"superuser": {
 					Memberships: authz.Memberships{{
 						MemberType: authz.MemberTypeSystem,
@@ -140,7 +139,7 @@ Actions:
     DenyList: []
 `, encodedKey)},
 		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, config.SystemAPIUsers, systemapi.Users{
+			assert.Equal(t, config.SystemAPIUsers, map[string]*authz.SystemAPIUser{
 				"systemuser": {
 					Path: "/path/to/superuser/key.pem",
 				},

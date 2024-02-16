@@ -1,9 +1,6 @@
 package start
 
 import (
-	"encoding/json"
-	"net/http"
-	"reflect"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -11,7 +8,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/encryption"
-	"github.com/zitadel/zitadel/cmd/systemapi"
+	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
@@ -64,7 +61,7 @@ type Config struct {
 	EncryptionKeys    *encryption.EncryptionKeyConfig
 	DefaultInstance   command.InstanceSetup
 	AuditLogRetention time.Duration
-	SystemAPIUsers    systemapi.Users
+	SystemAPIUsers    map[string]*internal_authz.SystemAPIUser
 	CustomerPortal    string
 	Machine           *id.Config
 	Actions           *actions.Config
@@ -87,12 +84,12 @@ func MustNewConfig(v *viper.Viper) *Config {
 
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
-			sliceTypeEnvDecodeHookFunc[*domain.CustomMessageText],
-			sliceTypeEnvDecodeHookFunc[*command.SetQuota],
-			sliceTypeEnvDecodeHookFunc[internal_authz.RoleMapping],
-			mapTypeEnvDecodeHookFunc[string, *internal_authz.SystemAPIUser],
-			mapTypeEnvDecodeHookFunc[domain.Feature, any],
-			mapHTTPHeaderDecodeHook,
+			hooks.SliceTypeStringDecode[*domain.CustomMessageText],
+			hooks.SliceTypeStringDecode[*command.SetQuota],
+			hooks.SliceTypeStringDecode[internal_authz.RoleMapping],
+			hooks.MapTypeStringDecode[string, *internal_authz.SystemAPIUser],
+			hooks.MapTypeStringDecode[domain.Feature, any],
+			hooks.MapHTTPHeaderStringDecode,
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
@@ -100,7 +97,6 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
 			actions.HTTPConfigDecodeHook,
-			systemapi.UsersDecodeHook,
 			hook.EnumHookFunc(domain.FeatureString),
 			hook.EnumHookFunc(internal_authz.MemberTypeString),
 		)),
@@ -120,32 +116,4 @@ func MustNewConfig(v *viper.Viper) *Config {
 	actions.SetHTTPConfig(&config.Actions.HTTP)
 
 	return config
-}
-
-func sliceTypeEnvDecodeHookFunc[T any](from, to reflect.Value) (any, error) {
-	into := make([]T, 0)
-	return complexTypeEnvDecodeHook(from, to, into)
-}
-
-func mapTypeEnvDecodeHookFunc[K ~string | ~int, V any](from, to reflect.Value) (any, error) {
-	into := make(map[K]V, 0)
-	return complexTypeEnvDecodeHook(from, to, into)
-}
-
-func mapHTTPHeaderDecodeHook(from, to reflect.Value) (any, error) {
-	into := http.Header{}
-	return complexTypeEnvDecodeHook(from, to, into)
-}
-
-func complexTypeEnvDecodeHook(from, to reflect.Value, out any) (any, error) {
-	fromInterface := from.Interface()
-	if to.Type() != reflect.TypeOf(out) {
-		return fromInterface, nil
-	}
-	data, ok := fromInterface.(string)
-	if !ok {
-		return fromInterface, nil
-	}
-	err := json.Unmarshal([]byte(data), &out)
-	return out, err
 }
