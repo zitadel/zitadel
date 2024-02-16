@@ -10,6 +10,18 @@ services:
       - ZITADEL_EXTERNALPORT=80
       - ZITADEL_EXTERNALSECURE=false
       - ZITADEL_TLS_ENABLED=false
+      # database configuration
+      - ZITADEL_DATABASE_POSTGRES_HOST=db
+      - ZITADEL_DATABASE_POSTGRES_PORT=5432
+      - ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel
+      - ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel_user
+      - ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel_pw
+      - ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable
+    networks:
+      - 'zitadel'
     depends_on:
       zitadel-init:
         condition: 'service_completed_successfully'
@@ -24,6 +36,18 @@ services:
       - ZITADEL_EXTERNALPORT=443
       - ZITADEL_EXTERNALSECURE=true
       - ZITADEL_TLS_ENABLED=false
+      # database configuration
+      - ZITADEL_DATABASE_POSTGRES_HOST=db
+      - ZITADEL_DATABASE_POSTGRES_PORT=5432
+      - ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel
+      - ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel_user
+      - ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel_pw
+      - ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable
+    networks:
+      - 'zitadel'
     depends_on:
       zitadel-init:
         condition: 'service_completed_successfully'
@@ -40,9 +64,21 @@ services:
       - ZITADEL_TLS_ENABLED=true
       - ZITADEL_TLS_CERTPATH=/etc/certs/selfsigned.crt
       - ZITADEL_TLS_KEYPATH=/etc/certs/selfsigned.key
+      # database configuration
+      - ZITADEL_DATABASE_POSTGRES_HOST=db
+      - ZITADEL_DATABASE_POSTGRES_PORT=5432
+      - ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel
+      - ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel_user
+      - ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel_pw
+      - ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable
     volumes:
       - ./selfsigned.crt:/etc/certs/selfsigned.crt
       - ./selfsigned.key:/etc/certs/selfsigned.key
+    networks:
+      - 'zitadel'
     depends_on:
       zitadel-init:
         condition: 'service_completed_successfully'
@@ -68,6 +104,18 @@ services:
       - ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED=true
       # For convenience, ZITADEL should not ask to change the initial admin users password.
       - ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED=false
+      # database configuration
+      - ZITADEL_DATABASE_POSTGRES_HOST=db
+      - ZITADEL_DATABASE_POSTGRES_PORT=5432
+      - ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel
+      - ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel_user
+      - ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel_pw
+      - ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres
+      - ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable
+    networks:
+      - 'zitadel'
     healthcheck:
       test: ["CMD", "/app/zitadel", "ready"]
       interval: '10s'
@@ -76,16 +124,26 @@ services:
       start_period: '10s'
 
   db:
-  #TODO: add move to psql
     restart: 'always'
-    image: 'cockroachdb/cockroach:latest'
-    command: 'start-single-node --insecure --http-addr :9090'
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=postgres
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:9090/health?ready=1']
-      interval: '10s'
-      timeout: '30s'
-      retries: 5
-      start_period: '20s'
+      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+      interval: 5s
+      timeout: 60s
+      retries: 10
+      start_period: 5s
     ports:
-      - "26257:26257"
-      - "9090:9090"
+      - '5432:5432'
+    networks:
+      - 'zitadel'
+    volumes:
+      - 'data:/var/lib/postgresql/data:rw'
+
+networks:
+  zitadel:
+
+volumes:
+  data:

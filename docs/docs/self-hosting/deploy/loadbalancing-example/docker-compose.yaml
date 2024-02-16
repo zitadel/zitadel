@@ -4,7 +4,7 @@ services:
   traefik:
     networks:
       - 'zitadel'
-    image: "traefik:v2.10.1"
+    image: "traefik:latest"
     ports:
       - "80:80"
       - "443:443"
@@ -18,86 +18,34 @@ services:
     image: 'ghcr.io/zitadel/zitadel:stable'
     command: 'start-from-init --config /example-zitadel-config.yaml --config /example-zitadel-secrets.yaml --steps /example-zitadel-init-steps.yaml --masterkey "${ZITADEL_MASTERKEY}" --tlsMode external'
     depends_on:
-      certs:
-        condition: 'service_completed_successfully'
+      db:
+        condition: 'service_healthy'
     volumes:
       - './example-zitadel-config.yaml:/example-zitadel-config.yaml:ro'
       - './example-zitadel-secrets.yaml:/example-zitadel-secrets.yaml:ro'
       - './example-zitadel-init-steps.yaml:/example-zitadel-init-steps.yaml:ro'
-      - 'zitadel-certs:/crdb-certs:ro'
-
-  certs:
-    image: 'ubuntu:latest'
-    entrypoint: [ '/bin/bash', '-c' ]
-    command: >
-      "apt update
-      && apt install openssl
-      && cd /zitadel-certs
-      && openssl req -new -x509 -days 365 -nodes -text -out server.crt -keyout server.key -subj "/CN=127.0.0.1"
-      && chmod 600 server.key server.crt
-      && ls -latr"
-    volumes:
-      - 'zitadel-certs:/zitadel-certs:rw'
-
-  # certs:
-  #   image: 'ubuntu:latest'
-  #   entrypoint: [ '/bin/bash', '-c' ]
-  #   command: >
-  #     "apt update
-  #     && apt install openssl
-  #     && cd /zitadel-certs
-  #     && openssl req -new -text -passout pass:abcd -subj /CN=localhost -out server.req -keyout privkey.pem
-  #     && openssl rsa -in privkey.pem -passin pass:abcd -out server.key
-  #     && openssl req -x509 -in server.req -text -key server.key -out server.crt
-  #     && chmod 600 server.key"
-  #   volumes:
-  #     - 'zitadel-certs:/zitadel-certs:rw'
 
   db:
     image: postgres:16-alpine
     restart: always
-    command: -c ssl=on -c ssl_cert_file=zitadel-certs/server.crt -c ssl_key_file=zitadel-certs/server.key
     environment:
-      - POSTGRES_USER=postgres
+      - POSTGRES_USER=root
       - POSTGRES_PASSWORD=postgres
     ports:
       - '5432:5432'
+    networks:
+      - 'zitadel'
     healthcheck:
       test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
-      interval: 30s
+      interval: 10s
       timeout: 60s
       retries: 5
-      start_period: 80s 
-    depends_on:
-      certs:
-        condition: 'service_completed_successfully'
+      start_period: 10s 
     volumes:
-      - 'zitadel-certs:/zitadel-certs:ro'
-
-#TODO: add move to psql
-  # my-cockroach-db:
-  #   restart: 'always'
-  #   networks:
-  #     - 'zitadel'
-  #   image: 'cockroachdb/cockroach:latest'
-  #   command: 'start-single-node --advertise-addr my-cockroach-db'
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
-  #     interval: '10s'
-  #     timeout: '30s'
-  #     retries: 5
-  #     start_period: '20s'
-  #   ports:
-  #     - '9090:8080'
-  #     - '26257:26257'
-  #   volumes:
-  #     - 'certs:/cockroach/certs:rw'
-  #     - 'data:/cockroach/cockroach-data:rw'
+      - 'data:/var/lib/postgresql/data:rw'
 
 networks:
   zitadel:
 
 volumes:
-  certs:
-  zitadel-certs:
   data:
