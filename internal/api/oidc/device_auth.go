@@ -109,14 +109,9 @@ func newDeviceAuthorizationState(d *query.DeviceAuth) *op.DeviceAuthorizationSta
 // As generated user codes are of low entropy, this implementation also takes care or
 // device authorization request cleanup, when it has been Approved, Denied or Expired.
 func (o *OPStorage) GetDeviceAuthorizatonState(ctx context.Context, clientID, deviceCode string) (state *op.DeviceAuthorizationState, err error) {
-	const logMsg = "get device authorization state"
-	logger := logging.WithFields("device_code", deviceCode)
-
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
-		if err != nil {
-			logger.WithError(err).Error(logMsg)
-		}
+		err = oidcError(err)
 		span.EndWithError(err)
 	}()
 
@@ -124,7 +119,8 @@ func (o *OPStorage) GetDeviceAuthorizatonState(ctx context.Context, clientID, de
 	if err != nil {
 		return nil, err
 	}
-	logger.SetFields(
+	logging.WithFields(
+		"device_code", deviceCode,
 		"expires", deviceAuth.Expires, "scopes", deviceAuth.Scopes,
 		"subject", deviceAuth.Subject, "state", deviceAuth.State,
 	).Debug("device authorization state")

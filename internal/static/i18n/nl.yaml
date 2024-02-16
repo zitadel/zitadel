@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limieten niet gevonden
     NoneSpecified: Geen limieten gespecificeerd
+    Instance:
+      Blocked: Instantie is geblokkeerd
   Restrictions:
     NoneSpecified: Geen beperkingen gespecificeerd
     DefaultLanguageMustBeAllowed: De standaardtaal moet worden toegestaan
@@ -126,6 +128,7 @@ Errors:
       NotFound: Code niet gevonden
       Expired: Code is verlopen
       GeneratorAlgNotSupported: Generator algoritme wordt niet ondersteund
+      Invalid: Code is ongeldig
     Password:
       NotFound: Wachtwoord niet gevonden
       Empty: Wachtwoord is leeg
@@ -532,6 +535,11 @@ Errors:
     NotExisting: Functie bestaat niet
     TypeNotSupported: Functie type wordt niet ondersteund
     InvalidValue: Ongeldige waarde voor deze functie
+  Target:
+    Invalid: Doel is ongeldig
+    NoTimeout: Doel heeft geen time-out
+    InvalidURL: Doel heeft een ongeldige URL
+    NotFound: Doel niet gevonden
 
 AggregateTypes:
   action: Actie
@@ -543,8 +551,13 @@ AggregateTypes:
   usergrant: Gebruikerstoekenning
   quota: Quota
   feature: Functie
+  target: Doel
 
 EventTypes:
+  target:
+    added: Doel gemaakt
+    changed: Doel gewijzigd
+    removed: Doel verwijderd
   user:
     added: Gebruiker toegevoegd
     selfregistered: Gebruiker heeft zichzelf geregistreerd

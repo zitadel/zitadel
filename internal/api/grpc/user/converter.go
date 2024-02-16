@@ -15,6 +15,7 @@ func UsersToPb(users []*query.User, assetPrefix string) []*user_pb.User {
 	}
 	return u
 }
+
 func UserToPb(user *query.User, assetPrefix string) *user_pb.User {
 	return &user_pb.User{
 		Id:                 user.ID,

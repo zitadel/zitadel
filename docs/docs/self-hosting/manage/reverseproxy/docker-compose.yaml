@@ -5,7 +5,7 @@ services:
   zitadel-disabled-tls:
     extends:
       service: zitadel-init
-    command: 'start-from-setup --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
+    command: 'start-from-setup --init-projections --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
     environment:
       - ZITADEL_EXTERNALPORT=80
       - ZITADEL_EXTERNALSECURE=false
@@ -19,7 +19,7 @@ services:
   zitadel-external-tls:
     extends:
       service: zitadel-init
-    command: 'start-from-setup --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
+    command: 'start-from-setup --init-projections --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
     environment:
       - ZITADEL_EXTERNALPORT=443
       - ZITADEL_EXTERNALSECURE=true
@@ -33,7 +33,7 @@ services:
   zitadel-enabled-tls:
     extends:
       service: zitadel-init
-    command: 'start-from-setup --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
+    command: 'start-from-setup --init-projections --masterkey "MasterkeyNeedsToHave32Characters" --config /zitadel.yaml --steps /zitadel.yaml'
     environment:
       - ZITADEL_EXTERNALPORT=443
       - ZITADEL_EXTERNALSECURE=true

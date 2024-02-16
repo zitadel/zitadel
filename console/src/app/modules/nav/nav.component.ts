@@ -90,7 +90,6 @@ export class NavComponent implements OnDestroy {
   private destroy$: Subject<void> = new Subject();
 
   public BreadcrumbType: any = BreadcrumbType;
-  public customerPortalLink$ = this.envService.env.pipe(map((env) => env.customer_portal));
 
   public positions: ConnectedPosition[] = [
     new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
@@ -98,7 +97,6 @@ export class NavComponent implements OnDestroy {
   ];
 
   constructor(
-    private envService: EnvironmentService,
     public authService: GrpcAuthService,
     public adminService: AdminService,
     public authenticationService: AuthenticationService,

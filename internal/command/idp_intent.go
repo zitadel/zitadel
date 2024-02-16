@@ -285,7 +285,7 @@ func tokensForSucceededIDPIntent(session idp.Session, encryptionAlg crypto.Encry
 	case *jwt.Session:
 		tokens = s.Tokens
 	case *azuread.Session:
-		tokens = s.Tokens
+		tokens = s.Tokens()
 	case *apple.Session:
 		tokens = s.Tokens
 	default:

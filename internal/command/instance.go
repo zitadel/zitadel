@@ -209,7 +209,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	orgAgg := org.NewAggregate(orgID)
 	userAgg := user.NewAggregate(userID, orgID)
 	projectAgg := project.NewAggregate(setup.zitadel.projectID, orgID)
-	limitsAgg := limits.NewAggregate(setup.zitadel.limitsID, instanceID, instanceID)
+	limitsAgg := limits.NewAggregate(setup.zitadel.limitsID, instanceID)
 	restrictionsAgg := restrictions.NewAggregate(setup.zitadel.restrictionsID, instanceID, instanceID)
 
 	validations := []preparation.Validation{

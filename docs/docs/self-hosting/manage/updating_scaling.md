@@ -65,7 +65,7 @@ The init phase is idempotent if executed with the same binary version.
 
 ### The Setup Phase
 
-During `zitadel setup`, ZITADEL creates projection tables and migrates existing data.
+During `zitadel setup`, ZITADEL creates projection tables and migrates existing data, if `--init-projections=true` is set.
 Depending on the ZITADEL version and the runtime resources,
 this step can take several minutes.
 When deploying a new ZITADEL version,
@@ -85,5 +85,4 @@ Beware, in the background, out-of-date projections
 [recompute their state by replaying all missed events](/docs/concepts/eventstore/implementation#projections).
 If a new ZITADEL version is deployed, this can take quite a long time,
 depending on the amount of events to catch up.
-You probably should consider manually migrating these projections first.
-Refer to the [release notes for v2.14.0](https://github.com/zitadel/zitadel/releases/tag/v2.14.0) as an example.
+You probably should consider providing `--init-projections=true`-flag to the [Setup Phase](#the-setup-phase) to shift the synchronization time to previous steps and delay the startup phase until events are caught up.

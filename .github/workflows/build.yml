@@ -48,6 +48,7 @@ jobs:
       go_version: "1.21"
       core_cache_key: ${{ needs.core.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
+      crdb_version: "23.1.13"
 
   core-integration-test:
     needs: core

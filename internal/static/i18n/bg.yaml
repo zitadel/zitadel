@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Лимитът не е намерен
     NoneSpecified: Не са посочени лимити
+    Instance:
+      Blocked: Инстанцията е блокирана
   Restrictions:
     NoneSpecified: Не са посочени ограничения
     DefaultLanguageMustBeAllowed: Езикът по подразбиране трябва да бъде разрешен
@@ -128,6 +130,7 @@ Errors:
       NotFound: Кодът не е намерен
       Expired: Кодът е изтекъл
       GeneratorAlgNotSupported: Неподдържан генераторен алгоритъм
+      Invalid: кодът е невалиден
     Password:
       NotFound: Паролата не е намерена
       Empty: Паролата е празна
@@ -549,6 +552,11 @@ Errors:
     NotExisting: Функцията не съществува
     TypeNotSupported: Типът функция не се поддържа
     InvalidValue: Невалидна стойност за тази функция
+  Target:
+    Invalid: Целта е невалидна
+    NoTimeout: Целта няма време за изчакване
+    InvalidURL: Целта има невалиден URL адрес
+    NotFound: Целта не е намерена
 
 AggregateTypes:
   action: Действие
@@ -560,8 +568,13 @@ AggregateTypes:
   usergrant: Предоставяне на потребител
   quota: Квота
   feature: Особеност
+  target: Целта
 
 EventTypes:
+  target:
+    added: Целта е създадена
+    changed: Целта е променена
+    removed: Целта е изтрита
   user:
     added: Добавен потребител
     selfregistered: Потребителят се регистрира сам
