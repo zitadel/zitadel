@@ -107,6 +107,23 @@ The Login Policy defines how the login process should look like and which authen
   width="600px"
 />
 
+### Default Redirect URI
+
+The Default Redirect URI will be used, if a user calls the login page directly.
+More specifically, typically a client will initiate login with an auth request.
+The auth request contains a client-id and a redirect uri, that must match the configuration in ZITADEL.
+If there is no auth request, users will be redirected to the Default Redirect URI, which is by default https://<custom_domain>/ui/console/
+
+Reasons why ZITADEL doesn't have a redirect URI:
+- The login has not been called with an OIDC authorize request
+- The user landed on the login through an email link, e.g. Password Reset, Initialize User
+
+We recommend setting your own default redirect URI, if you do not want end users to access ZITADEL console.
+
+Change default redirect url of instance: https://<custom_domain>/ui/console/settings?id=login
+
+![Login Policy Advanced Setting: Default Redirect URL](/img/guides/solution-scenarios/console-default-redirect.png)
+
 ### Passwordless
 
 Passwordless authentication means that the user doesn't need to enter a password to login. In our case the user has to enter his loginname and as the next step proof the identity through a registered device or token.

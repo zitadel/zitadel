@@ -19,14 +19,11 @@ If you are running ZITADEL self-hosted we recommend to restrict the access to ZI
 
 ### Default redirect url
 
-The Default Redirect URI will be used, if a user calls the login page directly. More specifically, typically a client will initiate login with an auth request.
-The auth request contains a client-id and a redirect uri, that must match the configuration in ZITADEL.
-If there is no auth request, users will be redirected to the Default Redirect URI, which is by default https://<custom_domain>/ui/console/
+One goal is to never send the end user to the ZITADEL management console.
+This does make sense if you build your own user profile page within your application.
+In that case you probably want to redirect the user to your own application, instead of to the console.
 
-
-Change default redirect url of instance: https://<custom_domain>/ui/console/settings?id=login
-
-![Login Policy Advanced Setting: Default Redirect URL](/img/guides/solution-scenarios/console-default-redirect.png)
+Read more about how to set the default redirect URI: [Settings - Default Redirect URI](/docs/guides/manage/console/instance-settings#default-redirect-uri)
 
 ### Restricting Console in default-project
 
