@@ -1,6 +1,6 @@
 ---
 title: ZITADEL with Node.js 
-sidebar_label: Node.js
+sidebar_label: NestJS
 ---
 
 # ZITADEL with Node.js (NestJS)
