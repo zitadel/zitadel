@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/encryption"
+	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/oidc"
@@ -69,6 +70,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			hook.EnumHookFunc(domain.FeatureString),
 			hook.EnumHookFunc(authz.MemberTypeString),
 			actions.HTTPConfigDecodeHook,
+			hooks.MapTypeStringDecode[string, *authz.SystemAPIUser],
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")
