@@ -27,13 +27,13 @@ Read more about how to set the default redirect URI: [Settings - Default Redirec
 
 ### Restricting Console in default-project
 
-With this workaround, you will limit users from accessing the default-project, if they are not explicitly granted to use this project.
+With this workaround, you will limit users from accessing the [default-project](/docs/concepts/structure/projects#default-project), if they are not explicitly granted to use this project.
 When setting the "Check for Project on Authentication" setting on a project, only users of organizations with a grant to that project can access it.
 By default, this setting is disabled, so all users can access the project.
 
 ![Project Settings: Check for Project on authentication](/img/guides/solution-scenarios/console-check-project-auth.png)
 
-Start by granting the organization of your Managers that should be able to access the Console the "ZITADEL" project:
+Start by granting the organization of your managers, that should be able to access the Console, the [default project](/docs/concepts/structure/projects#default-project):
 
 1. Click on the default-project > Grants > New +
    ![Project Settings: Default Project - Grants](/img/guides/solution-scenarios/console-zitadel-project-grants.png)
@@ -44,7 +44,7 @@ Start by granting the organization of your Managers that should be able to acces
 3. You can skip the screen with the role selection, and click save
 4. Make sure the grant is in now in the overview and marked as active.
 
-To avoid accidental lock-out, the default project hides the checkbox "Check Project on Authentication" in the Console:
+To avoid accidental lock-out, the [default project](/docs/concepts/structure/projects#default-project) hides the checkbox "Check Project on Authentication" in the Console:
 ![Default Project](/img/guides/solution-scenarios/console-default-project.png)
 
 You need to use the [update project API call](/docs/apis/resources/mgmt/management-service-update-project) to set the configuration on the project.
