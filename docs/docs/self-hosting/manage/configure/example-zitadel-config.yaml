@@ -5,7 +5,7 @@ Log:
 # Make ZITADEL accessible over HTTP, not HTTPS
 ExternalSecure: false
 
-# If not using the docker compose example, adjust these values for connecting ZITADEL to your CockroachDB
+# If not using the docker compose example, adjust these values for connecting ZITADEL to your PostgreSQL
 Database:
   postgres:
     Host: 'db'

@@ -97,8 +97,6 @@ services:
       # If ZITADEL can't resolve a requests original host to this domain,
       # it will return a 404 Instance not found error.
       - ZITADEL_EXTERNALDOMAIN=127.0.0.1.sslip.io
-      # ZITADEL accesses the database via the docker network.
-      - ZITADEL_DATABASE_COCKROACH_HOST=db
       # In case something doesn't work as expected,
       # it can be handy to be able to read the access logs.
       - ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED=true
