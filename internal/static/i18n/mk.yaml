@@ -534,6 +534,11 @@ Errors:
     NotExisting: Функцијата не постои
     TypeNotSupported: Типот на функција не е поддржан
     InvalidValue: Неважечка вредност за оваа функција
+  Target:
+    Invalid: Целта е неважечка
+    NoTimeout: Целта нема тајмаут
+    InvalidURL: Целта има неважечка URL-адреса
+    NotFound: Целта не е пронајдена
 
 AggregateTypes:
   action: Акција
@@ -545,8 +550,13 @@ AggregateTypes:
   usergrant: Овластување на корисник
   quota: Квота
   feature: Карактеристика
+  target: Цел
 
 EventTypes:
+  target:
+    added: Целта е избришана
+    changed: Целта е променета
+    removed: Целта е избришана
   user:
     added: Додаден корисник
     selfregistered: Корисникот се регистрираше сам
