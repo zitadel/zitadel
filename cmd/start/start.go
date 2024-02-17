@@ -377,10 +377,12 @@ func startAPIs(
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
 
+	es := es_v4.NewEventstore(postgres.New(dbClient), nil)
+
 	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain), tlsConfig); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, config.SystemDefaults, config.ExternalSecure, keys.User, config.AuditLogRetention), tlsConfig); err != nil {
+	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, config.SystemDefaults, config.ExternalSecure, keys.User, config.AuditLogRetention, es), tlsConfig); err != nil {
 		return err
 	}
 	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, keys.User, config.ExternalSecure), tlsConfig); err != nil {
@@ -399,7 +401,6 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, settings.CreateServer(commands, queries, config.ExternalSecure)); err != nil {
 		return err
 	}
-	es := es_v4.NewEventstore(postgres.New(dbClient), nil)
 	if err := apis.RegisterService(ctx, org.CreateServer(commands, queries, permissionCheck, es)); err != nil {
 		return err
 	}

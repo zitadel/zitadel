@@ -10,7 +10,8 @@ import (
 var uniqueOrgDomain = "org_domain"
 
 var (
-	_           eventstore.Command = (*DomainAddedEvent)(nil)
+	_ eventstore.Command = (*DomainAddedEvent)(nil)
+	// TODO: use same logic as in [strings.Builder] to get rid of the following line
 	DomainAdded *DomainAddedEvent
 )
 
@@ -26,17 +27,19 @@ func NewDomainAddedEvent(ctx context.Context, name string) (*DomainAddedEvent, e
 	return &DomainAddedEvent{AddedEvent: event}, nil
 }
 
+// Type implements [eventstore.action].
 func (e *DomainAddedEvent) Type() string {
-	return string(append([]byte("org."), e.AddedEvent.Type()...))
+	return string(append([]byte(eventTypePrefix), e.AddedEvent.Type()...))
 }
 
-// UniqueConstraints implements eventstore.Command.
+// UniqueConstraints implements [eventstore.Command].
 func (e *DomainAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
 var (
-	_              eventstore.Command = (*DomainVerifiedEvent)(nil)
+	_ eventstore.Command = (*DomainVerifiedEvent)(nil)
+	// TODO: use same logic as in [strings.Builder] to get rid of the following line
 	DomainVerified *DomainVerifiedEvent
 )
 
@@ -52,11 +55,12 @@ func NewDomainVerifiedEvent(ctx context.Context, name string) (*DomainVerifiedEv
 	return &DomainVerifiedEvent{VerifiedEvent: event}, nil
 }
 
+// Type implements [eventstore.action].
 func (e *DomainVerifiedEvent) Type() string {
-	return string(append([]byte("org."), e.VerifiedEvent.Type()...))
+	return string(append([]byte(eventTypePrefix), e.VerifiedEvent.Type()...))
 }
 
-// UniqueConstraints implements eventstore.Command.
+// UniqueConstraints implements [eventstore.Command].
 func (e *DomainVerifiedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{
 		eventstore.NewAddEventUniqueConstraint(uniqueOrgDomain, e.Name, "Errors.Org.Domain.AlreadyExists"),
@@ -64,7 +68,8 @@ func (e *DomainVerifiedEvent) UniqueConstraints() []*eventstore.UniqueConstraint
 }
 
 var (
-	_                eventstore.Command = (*SetDomainPrimaryEvent)(nil)
+	_ eventstore.Command = (*SetDomainPrimaryEvent)(nil)
+	// TODO: use same logic as in [strings.Builder] to get rid of the following line
 	DomainSetPrimary *SetDomainPrimaryEvent
 )
 
@@ -80,11 +85,12 @@ func NewSetDomainPrimaryEvent(ctx context.Context, name string) (*SetDomainPrima
 	return &SetDomainPrimaryEvent{PrimarySetEvent: event}, nil
 }
 
+// Type implements [eventstore.action].
 func (e *SetDomainPrimaryEvent) Type() string {
-	return string(append([]byte("org."), e.PrimarySetEvent.Type()...))
+	return string(append([]byte(eventTypePrefix), e.PrimarySetEvent.Type()...))
 }
 
-// UniqueConstraints implements eventstore.Command.
+// UniqueConstraints implements [eventstore.Command].
 func (*SetDomainPrimaryEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }

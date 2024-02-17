@@ -24,17 +24,17 @@ func NewSetPrimaryEvent(ctx context.Context, name string) (*PrimarySetEvent, err
 	}, nil
 }
 
-// Creator implements eventstore.Command.
+// Creator implements [eventstore.action].
 func (a *PrimarySetEvent) Creator() string {
 	return a.creator
 }
 
-// Payload implements eventstore.Command.
+// Payload implements [eventstore.Command].
 func (a *PrimarySetEvent) Payload() any {
 	return a
 }
 
-// Revision implements eventstore.Command.
+// Revision implements [eventstore.action].
 func (*PrimarySetEvent) Revision() uint16 {
 	return 1
 }

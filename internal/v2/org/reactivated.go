@@ -1,20 +1,42 @@
 package org
 
-import "github.com/zitadel/zitadel/internal/eventstore"
+import "github.com/zitadel/zitadel/internal/v2/eventstore"
 
 var (
-	_           eventstore.Event = (*reactivated)(nil)
-	Reactivated *reactivated
+	_ eventstore.Command = (*ReactivatedEvent)(nil)
+	// TODO: use same logic as in [strings.Builder] to get rid of the following line
+	Reactivated *ReactivatedEvent
 )
 
-type reactivated struct {
-	eventstore.BaseEvent
+type ReactivatedEvent struct {
+	creator string
 }
 
-func NewReactivated() *reactivated {
-	return new(reactivated)
+func NewReactivatedEvent() *ReactivatedEvent {
+	return new(ReactivatedEvent)
 }
 
-func (*reactivated) Type() eventstore.EventType {
+// Creator implements [eventstore.action].
+func (e *ReactivatedEvent) Creator() string {
+	return e.creator
+}
+
+// Payload implements [eventstore.Command].
+func (*ReactivatedEvent) Payload() any {
+	return nil
+}
+
+// Revision implements [eventstore.action].
+func (*ReactivatedEvent) Revision() uint16 {
+	return 1
+}
+
+// UniqueConstraints implements [eventstore.Command].
+func (*ReactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	panic("unimplemented")
+}
+
+// Type implements [eventstore.action].
+func (*ReactivatedEvent) Type() string {
 	return "org.reactivated"
 }

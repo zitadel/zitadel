@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+	cmd_v2 "github.com/zitadel/zitadel/internal/v2/command"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -28,13 +29,19 @@ func (s *Server) SetDefaultOrg(ctx context.Context, req *admin_pb.SetDefaultOrgR
 }
 
 func (s *Server) RemoveOrg(ctx context.Context, req *admin_pb.RemoveOrgRequest) (*admin_pb.RemoveOrgResponse, error) {
-	details, err := s.command.RemoveOrg(ctx, req.OrgId)
+	intent, err := cmd_v2.NewRemoveOrg(req.GetOrgId()).ToPushIntent(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.RemoveOrgResponse{
-		Details: object.DomainToChangeDetailsPb(details),
-	}, nil
+	return new(admin_pb.RemoveOrgResponse), s.es.Push(ctx, intent)
+
+	// details, err := s.command.RemoveOrg(ctx, req.OrgId)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// return &admin_pb.RemoveOrgResponse{
+	// 	Details: object.DomainToChangeDetailsPb(details),
+	// }, nil
 }
 
 func (s *Server) GetDefaultOrg(ctx context.Context, _ *admin_pb.GetDefaultOrgRequest) (*admin_pb.GetDefaultOrgResponse, error) {

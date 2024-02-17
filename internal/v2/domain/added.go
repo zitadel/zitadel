@@ -24,17 +24,17 @@ func NewAddedEvent(ctx context.Context, name string) (*AddedEvent, error) {
 	}, nil
 }
 
-// Creator implements eventstore.Command.
+// Creator implements [eventstore.action].
 func (e *AddedEvent) Creator() string {
 	return e.creator
 }
 
-// Payload implements eventstore.Command.
+// Payload implements [eventstore.Command].
 func (e *AddedEvent) Payload() any {
 	return e
 }
 
-// Revision implements eventstore.Command.
+// Revision implements [eventstore.action].
 func (*AddedEvent) Revision() uint16 {
 	return 1
 }

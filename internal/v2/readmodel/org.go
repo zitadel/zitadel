@@ -24,7 +24,7 @@ func (rm *Org) Reduce(events ...eventstore.Event) error {
 			added := new(org.AddedEvent)
 			event.Unmarshal(added)
 			_ = added.Name
-		case org.Changed.Type():
+		case eventstore.EventType(org.Changed.Type()):
 			if err := event.Unmarshal(rm); err != nil {
 				return err
 			}

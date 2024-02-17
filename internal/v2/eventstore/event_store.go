@@ -51,7 +51,7 @@ func (agg *Aggregate) Equals(aggregate *Aggregate) bool {
 	if aggregate.Owner != "" && aggregate.Owner != agg.Owner {
 		return false
 	}
-	return false
+	return true
 }
 
 type PushIntent interface {

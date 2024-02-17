@@ -32,7 +32,8 @@ func intentToCommands(intent *intent) (commands []*command, err error) {
 				revision:  cmd.Revision(),
 				typ:       cmd.Type(),
 				payload:   payload,
-				sequence:  intent.sequence + uint32(i),
+				// always add at least 1 to the currently stored sequence
+				sequence: intent.sequence + uint32(i) + 1,
 			},
 			uniqueConstraints: cmd.UniqueConstraints(),
 		}

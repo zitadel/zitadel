@@ -10,11 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/v2/org"
 )
 
-/*
-api/org/v2 -> internal/v2/org/Create
-
-*/
-
 var (
 	_ eventstore.Reducer    = (*CreateOrg)(nil)
 	_ eventstore.PushIntent = (*CreateOrg)(nil)

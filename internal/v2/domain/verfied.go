@@ -24,17 +24,17 @@ func NewVerifiedEvent(ctx context.Context, name string) (*VerifiedEvent, error) 
 	}, nil
 }
 
-// Creator implements eventstore.Command.
+// Creator implements [eventstore.action].
 func (a *VerifiedEvent) Creator() string {
 	return a.creator
 }
 
-// Payload implements eventstore.Command.
+// Payload implements [eventstore.Command].
 func (a *VerifiedEvent) Payload() any {
 	return a
 }
 
-// Revision implements eventstore.Command.
+// Revision implements [eventstore.action].
 func (*VerifiedEvent) Revision() uint16 {
 	return 1
 }

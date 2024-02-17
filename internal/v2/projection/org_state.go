@@ -3,6 +3,7 @@ package projection
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/v2/org"
 )
@@ -19,7 +20,7 @@ func NewStateProjection(ctx context.Context, id string) *OrgState {
 	// TODO: check buffer for id and return from buffer if exists
 	return &OrgState{
 		projection: projection{
-			instance: "", //TODO: instance from context
+			instance: authz.GetInstance(ctx).InstanceID(),
 		},
 		id: id,
 	}
@@ -34,9 +35,9 @@ func (p *OrgState) Filter() *eventstore.SearchQueryBuilder {
 		AggregateIDs(p.id).
 		EventTypes(
 			eventstore.EventType(org.Added.Type()),
-			org.Deactivated.Type(),
-			org.Reactivated.Type(),
-			org.Removed.Type(),
+			eventstore.EventType(org.Deactivated.Type()),
+			eventstore.EventType(org.Reactivated.Type()),
+			eventstore.EventType(org.Removed.Type()),
 		).
 		Builder()
 }
@@ -46,11 +47,11 @@ func (p *OrgState) Reduce(events ...eventstore.Event) error {
 		switch event.Type() {
 		case eventstore.EventType(org.Added.Type()):
 			p.State = org.ActiveState
-		case org.Deactivated.Type():
+		case eventstore.EventType(org.Deactivated.Type()):
 			p.State = org.InactiveState
-		case org.Reactivated.Type():
+		case eventstore.EventType(org.Reactivated.Type()):
 			p.State = org.ActiveState
-		case org.Removed.Type():
+		case eventstore.EventType(org.Removed.Type()):
 			p.State = org.RemovedState
 		default:
 			continue

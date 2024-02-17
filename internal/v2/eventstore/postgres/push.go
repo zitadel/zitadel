@@ -144,16 +144,16 @@ func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) err
 				stmt.writeArgs(cmd.aggregate.Instance, constraint.UniqueType, constraint.UniqueField)
 				stmt.builder.WriteString(`)`)
 			case eventstore.UniqueConstraintInstanceRemove:
+				stmt.builder.WriteString(`DELETE FROM eventstore.unique_constraints WHERE instance_id = `)
+				stmt.writeArgs(cmd.aggregate.Instance)
+			case eventstore.UniqueConstraintRemove:
 				stmt.builder.WriteString(`DELETE FROM eventstore.unique_constraints WHERE `)
 				stmt.builder.WriteString(deleteUniqueConstraintClause)
 				stmt.appendArgs(
-					sql.Named("instanceId", cmd.aggregate.Instance),
-					sql.Named("uniqueType", constraint.UniqueType),
-					sql.Named("uniqueField", constraint.UniqueField),
+					cmd.aggregate.Instance,
+					constraint.UniqueType,
+					constraint.UniqueField,
 				)
-			case eventstore.UniqueConstraintRemove:
-				stmt.builder.WriteString(`DELETE FROM eventstore.unique_constraints WHERE instance_id = `)
-				stmt.writeArgs(cmd.aggregate.Instance)
 			}
 			_, err := tx.ExecContext(ctx, stmt.builder.String(), stmt.args...)
 			if err != nil {
@@ -173,14 +173,14 @@ func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) err
 // the query is so complex because we accidentally stored unique constraint case sensitive
 // the query checks first if there is a case sensitive match and afterwards if there is a case insensitive match
 var deleteUniqueConstraintClause = `
-(instance_id = @instanceId AND unique_type = @uniqueType AND unique_field = (
+(instance_id = $1 AND unique_type = $2 AND unique_field = (
     SELECT unique_field from (
         SELECT instance_id, unique_type, unique_field
         FROM eventstore.unique_constraints
-        WHERE instance_id = @instanceId AND unique_type = @uniqueType AND unique_field = @uniqueField
+        WHERE instance_id = $1 AND unique_type = $2 AND unique_field = $3
     UNION ALL
         SELECT instance_id, unique_type, unique_field
         FROM eventstore.unique_constraints
-        WHERE instance_id = @instanceId AND unique_type = @uniqueType AND unique_field = LOWER(@uniqueField)
+        WHERE instance_id = $1 AND unique_type = $2 AND unique_field = LOWER($3)
     ) AS case_insensitive_constraints LIMIT 1)
 )`

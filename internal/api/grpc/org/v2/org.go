@@ -12,7 +12,7 @@ import (
 )
 
 func (s *Server) AddOrganization(ctx context.Context, request *org.AddOrganizationRequest) (*org.AddOrganizationResponse, error) {
-	intent, err := cmd_v2.NewCreateOrg(request.GetName()).ToPushIntent(ctx)
+	intent, err := cmd_v2.NewCreateOrg("test").ToPushIntent(ctx)
 	if err != nil {
 		return nil, err
 	}
