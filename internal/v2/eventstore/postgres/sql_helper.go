@@ -8,7 +8,7 @@ func closeTx(tx *sql.Tx, err error) error {
 		return err
 	}
 
-	return tx.Rollback()
+	return tx.Commit()
 }
 
 type destMapper[R any] func(index int, scan func(dest ...any) error) (*R, error)

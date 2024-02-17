@@ -104,9 +104,12 @@ func push(ctx context.Context, tx *sql.Tx, commands []*command) error {
 	stmt.builder.WriteString(`INSERT INTO eventstore.events2 (instance_id, "owner", aggregate_type, aggregate_id, revision, creator, event_type, payload, "sequence", in_tx_order, created_at, "position") VALUES `)
 	for i, cmd := range commands {
 		stmt.builder.WriteString(`(`)
-		stmt.writeArgs(cmd.aggregate.Instance, cmd.aggregate.Owner, cmd.aggregate.Type, cmd.aggregate.ID, cmd.revision, cmd.creator, cmd.typ, cmd.sequence, i)
+		stmt.writeArgs(cmd.aggregate.Instance, cmd.aggregate.Owner, cmd.aggregate.Type, cmd.aggregate.ID, cmd.revision, cmd.creator, cmd.typ, cmd.payload, cmd.sequence, i)
 		stmt.builder.WriteString(", statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())")
 		stmt.builder.WriteString(`)`)
+		if i < len(commands)-1 {
+			stmt.builder.WriteString(", ")
+		}
 	}
 	stmt.builder.WriteString(` RETURNING created_at, "position"`)
 
