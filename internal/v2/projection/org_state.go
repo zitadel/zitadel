@@ -30,10 +30,10 @@ func (p *OrgState) Filter() *eventstore.SearchQueryBuilder {
 		InstanceID(p.instance).
 		PositionAfter(p.position).
 		AddQuery().
-		AggregateTypes(org.AggregateType).
+		AggregateTypes(eventstore.AggregateType(org.AggregateType)).
 		AggregateIDs(p.id).
 		EventTypes(
-			org.Added.Type(),
+			eventstore.EventType(org.Added.Type()),
 			org.Deactivated.Type(),
 			org.Reactivated.Type(),
 			org.Removed.Type(),
@@ -44,7 +44,7 @@ func (p *OrgState) Filter() *eventstore.SearchQueryBuilder {
 func (p *OrgState) Reduce(events ...eventstore.Event) error {
 	for _, event := range events {
 		switch event.Type() {
-		case org.Added.Type():
+		case eventstore.EventType(org.Added.Type()):
 			p.State = org.ActiveState
 		case org.Deactivated.Type():
 			p.State = org.InactiveState

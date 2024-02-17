@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
@@ -18,6 +19,8 @@ type Server struct {
 	command         *command.Commands
 	query           *query.Queries
 	checkPermission domain.PermissionCheck
+
+	es *eventstore.EventStore
 }
 
 type Config struct{}
@@ -26,11 +29,13 @@ func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
 	checkPermission domain.PermissionCheck,
+	es *eventstore.EventStore,
 ) *Server {
 	return &Server{
 		command:         command,
 		query:           query,
 		checkPermission: checkPermission,
+		es:              es,
 	}
 }
 

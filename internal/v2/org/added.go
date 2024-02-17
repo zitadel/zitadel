@@ -1,22 +1,59 @@
 package org
 
-import "github.com/zitadel/zitadel/internal/eventstore"
+import (
+	"context"
+	"strings"
 
-var (
-	_     eventstore.Event = (*added)(nil)
-	Added *added
+	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type added struct {
-	eventstore.BaseEvent
+var uniqueOrgName = "org_name"
 
-	Name string
+var (
+	_     eventstore.Command = (*AddedEvent)(nil)
+	Added *AddedEvent
+)
+
+type AddedEvent struct {
+	Name string `json:"name"`
+
+	creator string
 }
 
-func NewAdded() *added {
-	return new(added)
+func NewAddedEvent(ctx context.Context, name string) (*AddedEvent, error) {
+	if name = strings.TrimSpace(name); name == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument")
+	}
+	return &AddedEvent{
+		Name:    name,
+		creator: authz.GetCtxData(ctx).UserID,
+	}, nil
 }
 
-func (*added) Type() eventstore.EventType {
+// Creator implements eventstore.Command.
+func (a *AddedEvent) Creator() string {
+	return a.creator
+}
+
+// Payload implements eventstore.Command.
+func (a *AddedEvent) Payload() any {
+	return a
+}
+
+// Revision implements eventstore.Command.
+func (*AddedEvent) Revision() uint16 {
+	return 1
+}
+
+// UniqueConstraints implements eventstore.Command.
+func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return []*eventstore.UniqueConstraint{
+		eventstore.NewAddEventUniqueConstraint(uniqueOrgName, e.Name, "Errors.Org.AlreadyExists"),
+	}
+}
+
+func (*AddedEvent) Type() string {
 	return "org.added"
 }

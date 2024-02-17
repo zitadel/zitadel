@@ -6,20 +6,26 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/user/v2"
 	"github.com/zitadel/zitadel/internal/command"
+	cmd_v2 "github.com/zitadel/zitadel/internal/v2/command"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 )
 
 func (s *Server) AddOrganization(ctx context.Context, request *org.AddOrganizationRequest) (*org.AddOrganizationResponse, error) {
-	orgSetup, err := addOrganizationRequestToCommand(request)
+	intent, err := cmd_v2.NewCreateOrg(request.GetName()).ToPushIntent(ctx)
 	if err != nil {
 		return nil, err
 	}
-	createdOrg, err := s.command.SetUpOrg(ctx, orgSetup, false)
-	if err != nil {
-		return nil, err
-	}
-	return createdOrganizationToPb(createdOrg)
+	return new(org.AddOrganizationResponse), s.es.Push(ctx, intent)
+	// orgSetup, err := addOrganizationRequestToCommand(request)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// createdOrg, err := s.command.SetUpOrg(ctx, orgSetup, false)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// return createdOrganizationToPb(createdOrg)
 }
 
 func addOrganizationRequestToCommand(request *org.AddOrganizationRequest) (*command.OrgSetup, error) {

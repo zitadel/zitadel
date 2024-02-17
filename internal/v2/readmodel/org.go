@@ -20,8 +20,8 @@ func (rm *Org) Filter() *eventstore.SearchQueryBuilder {
 func (rm *Org) Reduce(events ...eventstore.Event) error {
 	for _, event := range events {
 		switch event.Type() {
-		case org.Added.Type():
-			added := org.NewAdded()
+		case eventstore.EventType(org.Added.Type()):
+			added := new(org.AddedEvent)
 			event.Unmarshal(added)
 			_ = added.Name
 		case org.Changed.Type():
