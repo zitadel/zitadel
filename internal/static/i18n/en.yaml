@@ -129,6 +129,7 @@ Errors:
       NotFound: Code not found
       Expired: Code is expired
       GeneratorAlgNotSupported: Unsupported generator algorithm
+      Invalid: Code is invalid
     Password:
       NotFound: Password not found
       Empty: Password is empty
@@ -535,6 +536,11 @@ Errors:
     NotExisting: Feature does not exist
     TypeNotSupported: Feature type is not supported
     InvalidValue: Invalid value for this feature
+  Target:
+    Invalid: Target is invalid
+    NoTimeout: Target has no timeout
+    InvalidURL: Target has an invalid URL
+    NotFound: Target not found
 
 AggregateTypes:
   action: Action
@@ -546,8 +552,13 @@ AggregateTypes:
   usergrant: User grant
   quota: Quota
   feature: Feature
+  target: Target
 
 EventTypes:
+  target:
+    added: Target created
+    changed: Target changed
+    removed: Target deleted
   user:
     added: User added
     selfregistered: User registered himself

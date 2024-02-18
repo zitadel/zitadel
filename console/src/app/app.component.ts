@@ -226,9 +226,11 @@ export class AppComponent implements OnDestroy {
     });
 
     this.isDarkTheme = this.themeService.isDarkTheme;
-    this.isDarkTheme
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((dark) => this.onSetTheme(dark ? 'dark-theme' : 'light-theme'));
+    this.isDarkTheme.pipe(takeUntil(this.destroy$)).subscribe((dark) => {
+      const theme = dark ? 'dark-theme' : 'light-theme';
+      this.onSetTheme(theme);
+      this.setFavicon(theme);
+    });
 
     this.translate.onLangChange.pipe(takeUntil(this.destroy$)).subscribe((language: LangChangeEvent) => {
       this.document.documentElement.lang = language.lang;
@@ -299,6 +301,29 @@ export class AppComponent implements OnDestroy {
       if (allowed) {
         this.mgmtService.listProjects(0, 0);
         this.mgmtService.listGrantedProjects(0, 0);
+      }
+    });
+  }
+
+  private setFavicon(theme: string): void {
+    this.authService.labelpolicy.pipe(takeUntil(this.destroy$)).subscribe((lP) => {
+      if (theme === 'dark-theme' && lP?.iconUrlDark) {
+        // Check if asset url is stable, maybe it was deleted but still wasn't applied
+        fetch(lP.iconUrlDark).then((response) => {
+          if (response.ok) {
+            this.document.getElementById('appFavicon')?.setAttribute('href', lP.iconUrlDark);
+          }
+        });
+      } else if (theme === 'light-theme' && lP?.iconUrl) {
+        // Check if asset url is stable, maybe it was deleted but still wasn't applied
+        fetch(lP.iconUrl).then((response) => {
+          if (response.ok) {
+            this.document.getElementById('appFavicon')?.setAttribute('href', lP.iconUrl);
+          }
+        });
+      } else {
+        // Default Zitadel favicon
+        this.document.getElementById('appFavicon')?.setAttribute('href', 'favicon.ico');
       }
     });
   }

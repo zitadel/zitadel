@@ -129,6 +129,7 @@ Errors:
       NotFound: Codice non trovato
       Expired: Il codice è scaduto
       GeneratorAlgNotSupported: L'algoritmo del generatore non è supportato
+      Invalid: Il codice non è valido
     Password:
       NotFound: Password non trovato
       Empty: La password è vuota
@@ -535,6 +536,11 @@ Errors:
     NotExisting: La funzionalità non esiste
     TypeNotSupported: Il tipo di funzionalità non è supportato
     InvalidValue: Valore non valido per questa funzionalità
+  Target:
+    Invalid: Il target non è valido
+    NoTimeout: Il target non ha timeout
+    InvalidURL: La destinazione ha un URL non valido
+    NotFound: Obiettivo non trovato
 
 AggregateTypes:
   action: Azione
@@ -546,8 +552,13 @@ AggregateTypes:
   usergrant: Sovvenzione utente
   quota: Quota
   feature: Funzionalità
+  target: Bersaglio
 
 EventTypes:
+  target:
+    added: Obiettivo creato
+    changed: Obiettivo cambiato
+    removed: Obiettivo eliminato
   user:
     added: Utente aggiunto
     selfregistered: L'utente si è registrato
