@@ -1,8 +1,8 @@
-package postgres
+package database
 
 import "database/sql"
 
-func closeTx(tx *sql.Tx, err error) error {
+func CloseTx(tx *sql.Tx, err error) error {
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -11,9 +11,9 @@ func closeTx(tx *sql.Tx, err error) error {
 	return tx.Commit()
 }
 
-type destMapper[R any] func(index int, scan func(dest ...any) error) (*R, error)
+type DestMapper[R any] func(index int, scan func(dest ...any) error) (*R, error)
 
-func mapRows[R any](rows *sql.Rows, mapper destMapper[R]) (result []*R, err error) {
+func MapRows[R any](rows *sql.Rows, mapper DestMapper[R]) (result []*R, err error) {
 	defer func() {
 		rows.Close()
 		if rows.Err() != nil {
@@ -32,7 +32,7 @@ func mapRows[R any](rows *sql.Rows, mapper destMapper[R]) (result []*R, err erro
 	return result, nil
 }
 
-func mapRowsToObject(rows *sql.Rows, mapper func(scan func(dest ...any) error) error) (err error) {
+func MapRowsToObject(rows *sql.Rows, mapper func(scan func(dest ...any) error) error) (err error) {
 	defer func() {
 		rows.Close()
 		if rows.Err() != nil {

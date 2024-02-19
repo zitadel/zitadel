@@ -6,19 +6,19 @@ import (
 
 	"github.com/zitadel/logging"
 
-	v2_db "github.com/zitadel/zitadel/internal/v2/database"
+	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // Push implements eventstore.Pusher.
 func (s *Storage) Push(ctx context.Context, pushIntents ...eventstore.PushIntent) (err error) {
-	tx, err := s.client.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable, ReadOnly: false})
+	tx, err := s.client.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted, ReadOnly: false})
 	if err != nil {
 		return err
 	}
 	defer func() {
-		err = closeTx(tx, err)
+		err = database.CloseTx(tx, err)
 	}()
 
 	intents, err := lockAggregates(ctx, tx, pushIntents)
@@ -48,7 +48,7 @@ func (s *Storage) Push(ctx context.Context, pushIntents ...eventstore.PushIntent
 }
 
 func lockAggregates(ctx context.Context, tx *sql.Tx, pushIntents []eventstore.PushIntent) ([]*intent, error) {
-	var stmt v2_db.Statement
+	var stmt database.Statement
 
 	stmt.WriteString("WITH existing AS (")
 	for i, intent := range pushIntents {
@@ -73,7 +73,7 @@ func lockAggregates(ctx context.Context, tx *sql.Tx, pushIntents []eventstore.Pu
 
 	res := makeIntents(pushIntents)
 
-	err = mapRowsToObject(rows, func(scan func(dest ...any) error) error {
+	err = database.MapRowsToObject(rows, func(scan func(dest ...any) error) error {
 		var sequence sql.Null[uint32]
 		agg := new(eventstore.Aggregate)
 
@@ -100,7 +100,7 @@ func lockAggregates(ctx context.Context, tx *sql.Tx, pushIntents []eventstore.Pu
 }
 
 func push(ctx context.Context, tx *sql.Tx, commands []*command) error {
-	var stmt v2_db.Statement
+	var stmt database.Statement
 
 	stmt.WriteString(`INSERT INTO eventstore.events2 (instance_id, "owner", aggregate_type, aggregate_id, revision, creator, event_type, payload, "sequence", in_tx_order, created_at, "position") VALUES `)
 	for i, cmd := range commands {
@@ -120,7 +120,7 @@ func push(ctx context.Context, tx *sql.Tx, commands []*command) error {
 	}
 
 	var i int
-	return mapRowsToObject(rows, func(scan func(dest ...any) error) error {
+	return database.MapRowsToObject(rows, func(scan func(dest ...any) error) error {
 		err := scan(
 			&commands[i].event.createdAt,
 			&commands[i].event.position,
@@ -138,7 +138,7 @@ func push(ctx context.Context, tx *sql.Tx, commands []*command) error {
 }
 
 func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) error {
-	var stmt v2_db.Statement
+	var stmt database.Statement
 
 	for _, cmd := range commands {
 		if len(cmd.uniqueConstraints) == 0 {

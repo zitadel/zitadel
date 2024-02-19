@@ -3,52 +3,93 @@ package command
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/v2/org"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
-	_ eventstore.Reducer    = (*RemoveOrg)(nil)
-	_ eventstore.PushIntent = (*RemoveOrg)(nil)
+	_ eventstore.PushReducerIntent = (*RemoveOrg)(nil)
 )
 
 type RemoveOrg struct {
 	aggregate *eventstore.Aggregate
 	commands  []eventstore.Command
 
-	ID string
+	id       string
+	sequence uint32
+	state    org.State
 }
 
 func NewRemoveOrg(id string) *RemoveOrg {
 	return &RemoveOrg{
-		ID: id,
+		id: id,
 	}
 }
 
-func (c *RemoveOrg) ToPushIntent(ctx context.Context) (eventstore.PushIntent, error) {
-	c.aggregate = org.NewAggregate(ctx, c.ID)
-	c.commands = append(c.commands, org.NewRemovedEvent(ctx))
+func (i *RemoveOrg) ToPushIntent(ctx context.Context, querier eventstore.Querier) (eventstore.PushIntent, error) {
+	i.aggregate = org.NewAggregate(ctx, i.id)
 
-	return c, nil
+	if i.id == authz.GetInstance(ctx).DefaultOrganisationID() {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-wG9p1", "Errors.Org.DefaultOrgNotDeletable")
+	}
+
+	err := querier.Query(
+		ctx,
+		eventstore.NewFilter(
+			ctx,
+			eventstore.FilterEventQuery(
+				eventstore.FilterAggregateTypes(org.AggregateType),
+				eventstore.FilterAggregateIDs(i.id),
+				eventstore.FilterEventTypes(
+					org.Added.Type(),
+					org.Removed.Type(),
+				),
+			),
+		),
+		i,
+	)
+	// TODO: check if ZITADEL project exists on this org
+	if err != nil {
+		return nil, err
+	}
+
+	if i.state.IsValidState(org.RemovedState) {
+		// org is already removed, nothing to do
+		return nil, nil
+	}
+
+	i.commands = append(i.commands, org.NewRemovedEvent(ctx))
+
+	return i, nil
 }
 
 // Aggregate implements [eventstore.PushIntent].
-func (c *RemoveOrg) Aggregate() *eventstore.Aggregate {
-	return c.aggregate
+func (i *RemoveOrg) Aggregate() *eventstore.Aggregate {
+	return i.aggregate
 }
 
 // Commands implements [eventstore.PushIntent].
-func (c *RemoveOrg) Commands() []eventstore.Command {
-	return c.commands
+func (i *RemoveOrg) Commands() []eventstore.Command {
+	return i.commands
 }
 
 // CurrentSequence implements [eventstore.PushIntent].
-func (*RemoveOrg) CurrentSequence() eventstore.CurrentSequence {
-	// TODO: implement after filter works
-	return eventstore.SequenceAtLeast(1)
+func (i *RemoveOrg) CurrentSequence() eventstore.CurrentSequence {
+	return eventstore.SequenceAtLeast(i.sequence)
 }
 
 // Reduce implements [eventstore.Reducer].
-func (*RemoveOrg) Reduce(events ...eventstore.Event) error {
-	panic("unimplemented")
+func (i *RemoveOrg) Reduce(events ...eventstore.Event) error {
+	for _, event := range events {
+		switch event.Type() {
+		case org.Added.Type():
+			i.state = org.ActiveState
+		case org.Removed.Type():
+			i.state = org.RemovedState
+		}
+	}
+
+	return nil
 }

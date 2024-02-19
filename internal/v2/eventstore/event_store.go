@@ -17,12 +17,24 @@ func NewEventstore(push Pusher, query Querier) *EventStore {
 	}
 }
 
+type one interface {
+	Pusher
+	Querier
+}
+
+func NewEventstoreFromOne(o one) *EventStore {
+	return NewEventstore(o, o)
+}
+
 type healther interface {
 	Health(ctx context.Context) error
 }
 
 type Pusher interface {
 	healther
+	// Push writes the intents to the storage
+	// if an intent implements [PushReducerIntent] [PushReducerIntent.Reduce] is called after
+	// the intent was stored
 	Push(ctx context.Context, intents ...PushIntent) error
 }
 
@@ -107,8 +119,6 @@ type action interface {
 	// Revision of the action
 	Revision() uint16
 }
-
-type Filter struct{}
 
 type Reducer interface {
 	Reduce(events ...Event) error

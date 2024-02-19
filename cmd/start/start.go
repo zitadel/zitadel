@@ -377,7 +377,7 @@ func startAPIs(
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
 
-	es := es_v4.NewEventstore(postgres.New(dbClient), nil)
+	es := es_v4.NewEventstoreFromOne(postgres.New(dbClient))
 
 	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain), tlsConfig); err != nil {
 		return err

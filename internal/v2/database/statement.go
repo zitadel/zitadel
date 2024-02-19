@@ -29,6 +29,7 @@ func (stmt *Statement) Reset() {
 	stmt.args = nil
 }
 
+// AppendArgs appends the args without writing it to [stmt.Builder]
 func (stmt *Statement) AppendArgs(args ...any) {
 	stmt.copyCheck()
 	for _, arg := range args {
@@ -40,17 +41,20 @@ func (stmt *Statement) AppendArgs(args ...any) {
 	}
 }
 
+// AppendArgs appends the args and adds the placeholders comma separated to [stmt.Builder]
 func (stmt *Statement) WriteArgs(args ...any) {
 	stmt.copyCheck()
 	for i, arg := range args {
-		stmt.WritePlaceholder(arg)
+		stmt.AppendArg(arg)
 		if i < len(args)-1 {
 			stmt.Builder.WriteString(", ")
 		}
 	}
 }
 
-func (stmt *Statement) WritePlaceholder(arg any) {
+// AppendArg appends the arg and adds the placeholder to [stmt.Builder]
+// TODO: if arg is a list the placeholder is wrapped in ANY($n)
+func (stmt *Statement) AppendArg(arg any) {
 	if namedArg, ok := arg.(sql.NamedArg); ok {
 		stmt.writeNamedPlaceholder(namedArg)
 		return
