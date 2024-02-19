@@ -52,7 +52,7 @@ func (*systemFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceInstanceResetFeatures,
 			},
 			{
-				Event:  feature_v2.SystemDefaultLoginInstanceEventType,
+				Event:  feature_v2.SystemLoginDefaultOrgEventType,
 				Reduce: reduceInstanceSetFeature[bool],
 			},
 			{

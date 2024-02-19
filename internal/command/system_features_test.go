@@ -41,7 +41,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 				expectPush(
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
-						feature_v2.SystemDefaultLoginInstanceEventType, true,
+						feature_v2.SystemLoginDefaultOrgEventType, true,
 					),
 				),
 			),
@@ -107,7 +107,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 				expectPush(
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
-						feature_v2.SystemDefaultLoginInstanceEventType, true,
+						feature_v2.SystemLoginDefaultOrgEventType, true,
 					),
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,

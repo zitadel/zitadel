@@ -32,17 +32,17 @@ func TestSetEvent_FeatureJSON(t *testing.T) {
 			name: "marshal error",
 			e: &SetEvent[float64]{
 				BaseEvent: &eventstore.BaseEvent{
-					EventType: SystemDefaultLoginInstanceEventType,
+					EventType: SystemLoginDefaultOrgEventType,
 				},
 				Value: math.NaN(),
 			},
-			wantErr: zerrors.ThrowInternalf(nil, "FEAT-go9Ji", "reduce.wrong.event.type %s", SystemDefaultLoginInstanceEventType),
+			wantErr: zerrors.ThrowInternalf(nil, "FEAT-go9Ji", "reduce.wrong.event.type %s", SystemLoginDefaultOrgEventType),
 		},
 		{
 			name: "success",
 			e: &SetEvent[float64]{
 				BaseEvent: &eventstore.BaseEvent{
-					EventType: SystemDefaultLoginInstanceEventType,
+					EventType: SystemLoginDefaultOrgEventType,
 				},
 				Value: 555,
 			},
@@ -100,7 +100,7 @@ func TestSetEvent_FeatureInfo(t *testing.T) {
 			name: "success",
 			e: &SetEvent[bool]{
 				BaseEvent: &eventstore.BaseEvent{
-					EventType: SystemDefaultLoginInstanceEventType,
+					EventType: SystemLoginDefaultOrgEventType,
 				},
 			},
 			want:  feature.LevelSystem,

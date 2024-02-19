@@ -75,7 +75,7 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 				expectFilter(
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
-						feature_v2.SystemDefaultLoginInstanceEventType, false,
+						feature_v2.SystemLoginDefaultOrgEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
@@ -112,7 +112,7 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 				expectFilter(
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
-						feature_v2.SystemDefaultLoginInstanceEventType, false,
+						feature_v2.SystemLoginDefaultOrgEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
@@ -157,7 +157,7 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 				expectFilter(
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
-						feature_v2.SystemDefaultLoginInstanceEventType, false,
+						feature_v2.SystemLoginDefaultOrgEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,

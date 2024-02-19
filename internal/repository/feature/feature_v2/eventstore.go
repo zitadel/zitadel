@@ -6,7 +6,7 @@ import (
 
 func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, SystemResetEventType, eventstore.GenericEventMapper[ResetEvent])
-	eventstore.RegisterFilterEventMapper(AggregateType, SystemDefaultLoginInstanceEventType, eventstore.GenericEventMapper[SetEvent[bool]])
+	eventstore.RegisterFilterEventMapper(AggregateType, SystemLoginDefaultOrgEventType, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, SystemTriggerIntrospectionProjectionsEventType, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, SystemLegacyIntrospectionEventType, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceResetEventType, eventstore.GenericEventMapper[ResetEvent])

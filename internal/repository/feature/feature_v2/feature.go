@@ -12,7 +12,7 @@ import (
 
 var (
 	SystemResetEventType                           = resetEventTypeFromFeature(feature.LevelSystem)
-	SystemDefaultLoginInstanceEventType            = setEventTypeFromFeature(feature.LevelSystem, feature.KeyLoginDefaultOrg)
+	SystemLoginDefaultOrgEventType                 = setEventTypeFromFeature(feature.LevelSystem, feature.KeyLoginDefaultOrg)
 	SystemTriggerIntrospectionProjectionsEventType = setEventTypeFromFeature(feature.LevelSystem, feature.KeyTriggerIntrospectionProjections)
 	SystemLegacyIntrospectionEventType             = setEventTypeFromFeature(feature.LevelSystem, feature.KeyLegacyIntrospection)
 

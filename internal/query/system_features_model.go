@@ -48,7 +48,7 @@ func (m *SystemFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(m.AggregateID).
 		EventTypes(
 			feature_v2.SystemResetEventType,
-			feature_v2.SystemDefaultLoginInstanceEventType,
+			feature_v2.SystemLoginDefaultOrgEventType,
 			feature_v2.SystemTriggerIntrospectionProjectionsEventType,
 			feature_v2.SystemLegacyIntrospectionEventType,
 		).

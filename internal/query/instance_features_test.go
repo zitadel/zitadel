@@ -86,7 +86,7 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(eventFromEventPusher(feature_v2.NewSetEvent[bool](
 					context.Background(), aggregate,
-					feature_v2.SystemDefaultLoginInstanceEventType, true,
+					feature_v2.SystemLoginDefaultOrgEventType, true,
 				))),
 				expectFilter(
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
@@ -127,7 +127,7 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilter(eventFromEventPusher(feature_v2.NewSetEvent[bool](
 					context.Background(), aggregate,
-					feature_v2.SystemDefaultLoginInstanceEventType, true,
+					feature_v2.SystemLoginDefaultOrgEventType, true,
 				))),
 				expectFilter(
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
