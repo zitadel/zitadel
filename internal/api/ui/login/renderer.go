@@ -526,7 +526,7 @@ func (l *Login) getOrgID(r *http.Request, authReq *domain.AuthRequest) string {
 func (l *Login) getPrivateLabelingID(r *http.Request, authReq *domain.AuthRequest) string {
 	instance := authz.GetInstance(r.Context())
 	defaultID := instance.DefaultOrganisationID()
-	if instance.Features().LoginDefaultOrg {
+	if !instance.Features().LoginDefaultOrg {
 		defaultID = instance.InstanceID()
 	}
 

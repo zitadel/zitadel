@@ -660,7 +660,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 	}
 	if orgID == "" {
 		orgID = authz.GetInstance(ctx).DefaultOrganisationID()
-		if instance.Features().LoginDefaultOrg {
+		if !instance.Features().LoginDefaultOrg {
 			orgID = instance.InstanceID()
 		}
 	}
