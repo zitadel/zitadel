@@ -94,7 +94,7 @@ type Event interface {
 }
 
 type action interface {
-	// Creator is the userid of the user which created the action
+	// Creator is the user id of the user which created the action
 	Creator() string
 	// Type describes the action it's in the past (e.g. user.created)
 	Type() string
