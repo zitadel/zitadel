@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_SetSystemFeatures(t *testing.T) {
@@ -30,14 +29,27 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 		wantErr    error
 	}{
 		{
-			name:       "all nil, No Change",
-			eventstore: expectEventstore(),
-			args:       args{context.Background(), &SystemFeatures{}},
-			wantErr:    zerrors.ThrowInvalidArgument(nil, "COMMAND-Dul8I", "Errors.NoChangesFound"),
+			name: "filter error",
+			eventstore: expectEventstore(
+				expectFilterError(io.ErrClosedPipe),
+			),
+			args:    args{context.Background(), &SystemFeatures{}},
+			wantErr: io.ErrClosedPipe,
+		},
+		{
+			name: "all nil, No Change",
+			eventstore: expectEventstore(
+				expectFilter(),
+			),
+			args: args{context.Background(), &SystemFeatures{}},
+			want: &domain.ObjectDetails{
+				ResourceOwner: "SYSTEM",
+			},
 		},
 		{
 			name: "set LoginDefaultOrg",
 			eventstore: expectEventstore(
+				expectFilter(),
 				expectPush(
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
@@ -55,6 +67,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 		{
 			name: "set TriggerIntrospectionProjections",
 			eventstore: expectEventstore(
+				expectFilter(),
 				expectPush(
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
@@ -72,6 +85,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 		{
 			name: "set LegacyIntrospection",
 			eventstore: expectEventstore(
+				expectFilter(),
 				expectPush(
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
@@ -89,6 +103,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 		{
 			name: "push error",
 			eventstore: expectEventstore(
+				expectFilter(),
 				expectPushFailed(io.ErrClosedPipe,
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
@@ -104,6 +119,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 		{
 			name: "set all",
 			eventstore: expectEventstore(
+				expectFilter(),
 				expectPush(
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
@@ -116,6 +132,52 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
 						feature_v2.SystemLegacyIntrospectionEventType, true,
+					),
+				),
+			),
+			args: args{context.Background(), &SystemFeatures{
+				LoginDefaultOrg:                 gu.Ptr(true),
+				TriggerIntrospectionProjections: gu.Ptr(false),
+				LegacyIntrospection:             gu.Ptr(true),
+			}},
+			want: &domain.ObjectDetails{
+				ResourceOwner: "SYSTEM",
+			},
+		},
+		{
+			name: "set only updated",
+			eventstore: expectEventstore(
+				// throw in some set events, reset and set again.
+				expectFilter(
+					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.SystemLoginDefaultOrgEventType, true,
+					)),
+					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.SystemTriggerIntrospectionProjectionsEventType, false,
+					)),
+					eventFromEventPusher(feature_v2.NewResetEvent(
+						context.Background(), aggregate,
+						feature_v2.SystemResetEventType,
+					)),
+					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.SystemLoginDefaultOrgEventType, false,
+					)),
+					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.SystemLegacyIntrospectionEventType, true,
+					)),
+				),
+				expectPush(
+					feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.SystemLoginDefaultOrgEventType, true,
+					),
+					feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.SystemTriggerIntrospectionProjectionsEventType, false,
 					),
 				),
 			),
@@ -150,8 +212,21 @@ func TestCommands_ResetSystemFeatures(t *testing.T) {
 		wantErr    error
 	}{
 		{
+			name: "filter error",
+			eventstore: expectEventstore(
+				expectFilterError(io.ErrClosedPipe),
+			),
+			wantErr: io.ErrClosedPipe,
+		},
+		{
 			name: "push error",
 			eventstore: expectEventstore(
+				expectFilter(
+					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.SystemLoginDefaultOrgEventType, true,
+					)),
+				),
 				expectPushFailed(io.ErrClosedPipe,
 					feature_v2.NewResetEvent(context.Background(), aggregate, feature_v2.SystemResetEventType),
 				),
@@ -161,9 +236,42 @@ func TestCommands_ResetSystemFeatures(t *testing.T) {
 		{
 			name: "success",
 			eventstore: expectEventstore(
+				expectFilter(
+					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.SystemLoginDefaultOrgEventType, true,
+					)),
+				),
 				expectPush(
 					feature_v2.NewResetEvent(context.Background(), aggregate, feature_v2.SystemResetEventType),
 				),
+			),
+			want: &domain.ObjectDetails{
+				ResourceOwner: "SYSTEM",
+			},
+		},
+		{
+			name: "no change after previous reset",
+			eventstore: expectEventstore(
+				expectFilter(
+					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.SystemLoginDefaultOrgEventType, true,
+					)),
+					eventFromEventPusher(feature_v2.NewResetEvent(
+						context.Background(), aggregate,
+						feature_v2.SystemResetEventType,
+					)),
+				),
+			),
+			want: &domain.ObjectDetails{
+				ResourceOwner: "SYSTEM",
+			},
+		},
+		{
+			name: "no change without previous events",
+			eventstore: expectEventstore(
+				expectFilter(),
 			),
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",

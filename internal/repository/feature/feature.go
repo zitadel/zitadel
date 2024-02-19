@@ -3,6 +3,7 @@
 package feature
 
 import (
+	"context"
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -58,4 +59,17 @@ type Boolean struct {
 
 func (b Boolean) FeatureType() domain.FeatureType {
 	return domain.FeatureTypeBoolean
+}
+
+func NewSetEvent[T SetEventType](
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	eventType eventstore.EventType,
+	setType T,
+) *SetEvent[T] {
+	return &SetEvent[T]{
+		eventstore.NewBaseEventForPush(
+			ctx, aggregate, eventType),
+		setType,
+	}
 }

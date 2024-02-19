@@ -12,8 +12,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	feature_v1 "github.com/zitadel/zitadel/internal/repository/feature"
 	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_SetInstanceFeatures(t *testing.T) {
@@ -32,14 +32,56 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 		wantErr    error
 	}{
 		{
-			name:       "all nil, No Change",
-			eventstore: expectEventstore(),
-			args:       args{ctx, &InstanceFeatures{}},
-			wantErr:    zerrors.ThrowInvalidArgument(nil, "COMMAND-Gie6U", "Errors.NoChangesFound"),
+			name: "filter error",
+			eventstore: expectEventstore(
+				expectFilterError(io.ErrClosedPipe),
+			),
+			args:    args{ctx, &InstanceFeatures{}},
+			wantErr: io.ErrClosedPipe,
+		},
+		{
+			name: "all nil, No Change",
+			eventstore: expectEventstore(
+				expectFilter(),
+			),
+			args: args{ctx, &InstanceFeatures{}},
+			want: &domain.ObjectDetails{
+				ResourceOwner: "instance1",
+			},
 		},
 		{
 			name: "set LoginDefaultOrg",
 			eventstore: expectEventstore(
+				expectFilter(),
+				expectPush(
+					feature_v2.NewSetEvent[bool](
+						ctx, aggregate,
+						feature_v2.InstanceLoginDefaultOrgEventType, true,
+					),
+				),
+			),
+			args: args{ctx, &InstanceFeatures{
+				LoginDefaultOrg: gu.Ptr(true),
+			}},
+			want: &domain.ObjectDetails{
+				ResourceOwner: "instance1",
+			},
+		},
+		{
+			name: "set LoginDefaultOrg, update from v1",
+			eventstore: expectEventstore(
+				expectFilter(
+					eventFromEventPusher(feature_v1.NewSetEvent[feature_v1.Boolean](
+						ctx, &eventstore.Aggregate{
+							ID:            "instance1",
+							ResourceOwner: "instance1",
+						},
+						feature_v1.DefaultLoginInstanceEventType,
+						feature_v1.Boolean{
+							Boolean: false,
+						},
+					)),
+				),
 				expectPush(
 					feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
@@ -57,6 +99,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 		{
 			name: "set TriggerIntrospectionProjections",
 			eventstore: expectEventstore(
+				expectFilter(),
 				expectPush(
 					feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
@@ -74,6 +117,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 		{
 			name: "set LegacyIntrospection",
 			eventstore: expectEventstore(
+				expectFilter(),
 				expectPush(
 					feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
@@ -91,6 +135,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 		{
 			name: "push error",
 			eventstore: expectEventstore(
+				expectFilter(),
 				expectPushFailed(io.ErrClosedPipe,
 					feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
@@ -106,6 +151,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 		{
 			name: "set all",
 			eventstore: expectEventstore(
+				expectFilter(),
 				expectPush(
 					feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
@@ -118,6 +164,52 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 					feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
 						feature_v2.InstanceLegacyIntrospectionEventType, true,
+					),
+				),
+			),
+			args: args{ctx, &InstanceFeatures{
+				LoginDefaultOrg:                 gu.Ptr(true),
+				TriggerIntrospectionProjections: gu.Ptr(false),
+				LegacyIntrospection:             gu.Ptr(true),
+			}},
+			want: &domain.ObjectDetails{
+				ResourceOwner: "instance1",
+			},
+		},
+		{
+			name: "set only updated",
+			eventstore: expectEventstore(
+				// throw in some set events, reset and set again.
+				expectFilter(
+					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+						ctx, aggregate,
+						feature_v2.InstanceLoginDefaultOrgEventType, true,
+					)),
+					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+						ctx, aggregate,
+						feature_v2.InstanceTriggerIntrospectionProjectionsEventType, false,
+					)),
+					eventFromEventPusher(feature_v2.NewResetEvent(
+						ctx, aggregate,
+						feature_v2.InstanceResetEventType,
+					)),
+					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+						ctx, aggregate,
+						feature_v2.InstanceLoginDefaultOrgEventType, false,
+					)),
+					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+						ctx, aggregate,
+						feature_v2.InstanceLegacyIntrospectionEventType, true,
+					)),
+				),
+				expectPush(
+					feature_v2.NewSetEvent[bool](
+						ctx, aggregate,
+						feature_v2.InstanceLoginDefaultOrgEventType, true,
+					),
+					feature_v2.NewSetEvent[bool](
+						ctx, aggregate,
+						feature_v2.InstanceTriggerIntrospectionProjectionsEventType, false,
 					),
 				),
 			),
@@ -153,8 +245,21 @@ func TestCommands_ResetInstanceFeatures(t *testing.T) {
 		wantErr    error
 	}{
 		{
+			name: "filter error",
+			eventstore: expectEventstore(
+				expectFilterError(io.ErrClosedPipe),
+			),
+			wantErr: io.ErrClosedPipe,
+		},
+		{
 			name: "push error",
 			eventstore: expectEventstore(
+				expectFilter(
+					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+						ctx, aggregate,
+						feature_v2.InstanceLoginDefaultOrgEventType, true,
+					)),
+				),
 				expectPushFailed(io.ErrClosedPipe,
 					feature_v2.NewResetEvent(ctx, aggregate, feature_v2.InstanceResetEventType),
 				),
@@ -164,9 +269,42 @@ func TestCommands_ResetInstanceFeatures(t *testing.T) {
 		{
 			name: "success",
 			eventstore: expectEventstore(
+				expectFilter(
+					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+						ctx, aggregate,
+						feature_v2.InstanceLoginDefaultOrgEventType, true,
+					)),
+				),
 				expectPush(
 					feature_v2.NewResetEvent(ctx, aggregate, feature_v2.InstanceResetEventType),
 				),
+			),
+			want: &domain.ObjectDetails{
+				ResourceOwner: "instance1",
+			},
+		},
+		{
+			name: "no change after previous reset",
+			eventstore: expectEventstore(
+				expectFilter(
+					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+						ctx, aggregate,
+						feature_v2.InstanceLoginDefaultOrgEventType, true,
+					)),
+					eventFromEventPusher(feature_v2.NewResetEvent(
+						ctx, aggregate,
+						feature_v2.InstanceResetEventType,
+					)),
+				),
+			),
+			want: &domain.ObjectDetails{
+				ResourceOwner: "instance1",
+			},
+		},
+		{
+			name: "no change without previous events",
+			eventstore: expectEventstore(
+				expectFilter(),
 			),
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
