@@ -36,8 +36,8 @@ type CreatedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
 	SchemaType             string                     `json:"schemaType"`
-	Schema                 map[string]any             `json:"schema"`
-	PossibleAuthenticators []domain.AuthenticatorType `json:"possibleAuthenticators"`
+	Schema                 map[string]any             `json:"schema,omitempty"`
+	PossibleAuthenticators []domain.AuthenticatorType `json:"possibleAuthenticators,omitempty"`
 }
 
 func (e *CreatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {

@@ -24,7 +24,7 @@ func (s *CreateUserSchema) Valid() error {
 	}
 	for _, authenticator := range s.PossibleAuthenticators {
 		if authenticator == domain.AuthenticatorTypeUnspecified {
-			return zerrors.ThrowInvalidArgument(nil, "COMMA-DGFj3", "Errors.UserSchema.Authenticator.Invalid") // TODO: i18n
+			return zerrors.ThrowInvalidArgument(nil, "COMMA-Gh652", "Errors.UserSchema.Authenticator.Invalid") // TODO: i18n
 		}
 	}
 	return nil
@@ -38,8 +38,11 @@ type UpdateUserSchema struct {
 }
 
 func (s *UpdateUserSchema) Valid() error {
+	if s.ID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMA-H5421", "Errors.IDMissing")
+	}
 	if s.Type != nil && *s.Type == "" {
-		return zerrors.ThrowInvalidArgument(nil, "COMMA-DG3gn", "Errors.UserSchema.Type.Missing") // TODO: i18n
+		return zerrors.ThrowInvalidArgument(nil, "COMMA-G43gn", "Errors.UserSchema.Type.Missing") // TODO: i18n
 	}
 	if err := validateUserSchema(s.Schema); err != nil {
 		return err
@@ -101,6 +104,9 @@ func (c *Commands) UpdateUserSchema(ctx context.Context, userSchema *UpdateUserS
 }
 
 func (c *Commands) DeactivateUserSchema(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+	if id == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-Vvf3w", "Errors.IDMissing")
+	}
 	writeModel := NewUserSchemaWriteModel(id, "")
 	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 		return nil, err
@@ -118,12 +124,15 @@ func (c *Commands) DeactivateUserSchema(ctx context.Context, id string) (*domain
 }
 
 func (c *Commands) ReactivateUserSchema(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+	if id == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-wq3Gw", "Errors.IDMissing")
+	}
 	writeModel := NewUserSchemaWriteModel(id, "")
 	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 		return nil, err
 	}
 	if writeModel.State != domain.UserSchemaStateInactive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-DGzh53", "Errors.UserSchema.NotInactive") // TODO: i18n
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-DGzh5", "Errors.UserSchema.NotInactive") // TODO: i18n
 	}
 	err := c.pushAppendAndReduce(ctx, writeModel,
 		schema.NewReactivatedEvent(ctx, UserSchemaAggregateFromWriteModel(&writeModel.WriteModel)),
@@ -135,6 +144,9 @@ func (c *Commands) ReactivateUserSchema(ctx context.Context, id string) (*domain
 }
 
 func (c *Commands) DeleteUserSchema(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+	if id == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-E22gg", "Errors.IDMissing")
+	}
 	writeModel := NewUserSchemaWriteModel(id, "")
 	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 		return nil, err
