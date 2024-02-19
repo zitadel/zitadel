@@ -526,13 +526,13 @@ module.exports = {
       items: [
         {
           type: "category",
-          label: "Service Based (V1)",
+          label: "V1 (General Available)",
           collapsed: false,
           link: {
             type: "generated-index",
-            title: "Service Based APIs (V1)",
+            title: "APIs V1 (GA)",
             slug: "/apis/services/",
-            description: "Service APIs (V1) organize access by context (authenticated user, organisation, instance, system), unlike resource-specific V2 APIs.",
+            description: "APIs V1 organize access by context (authenticated user, organisation, instance, system), unlike resource-specific V2 APIs.",
           },
           items: [
             {
@@ -589,11 +589,11 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Resource Based (V2)",
+          label: "V2 (Beta)",
           collapsed: false,
           link: {
             type: "doc",
-            id: "apis/resource_based_v2",
+            id: "apis/v2",
           },
           items: [
             {
@@ -656,11 +656,11 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Resource Based (V3)",
+          label: "V3 (Preview)",
           collapsed: false,
           link: {
             type: "doc",
-            id: "apis/resource_based_v3",
+            id: "apis/v3",
           },
           items: [
             {
