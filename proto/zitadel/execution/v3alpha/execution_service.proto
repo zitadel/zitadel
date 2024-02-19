@@ -17,8 +17,8 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha;execu
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Execution Service";
-    version: "3.0-alpha";
-    description: "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current actions.";
+    version: "3.0-preview";
+    description: "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance. This project is in preview state. It can AND will continue breaking until the services provide the same functionality as the current actions.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
