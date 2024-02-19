@@ -195,18 +195,34 @@ module.exports = {
       items: [
         {
           type: "category",
-          label: "Authenticate Users",
-          collapsed: true,
+          label: "Login Users",
           link: {
             type: "generated-index",
-            title: "Authenticate Human Users",
-            slug: "guides/integrate/human-users",
-            description: "How to authenticate human users with OpenID Connect",
+            title: "Integrate",
+            slug: "guides/integrate/login",
+            description:
+              "Integrate your users and application with ZITADEL. In this section you will find resource on how to authenticate your users, configure external identity providers, access the ZITADEL APIs to manage resources, and integrate with third party services and tools.",
           },
           items: [
-            "guides/integrate/login-users",
-            "guides/integrate/oauth-recommended-flows",
-            "guides/integrate/logout",
+            'guides/integrate/login/introduction',
+            'guides/integrate/login/default-login-ui',
+            {
+              type: "category",
+              label: "Openid Connect",
+              collapsed: true,
+              link: {
+                type: "generated-index",
+                title: "Authenticate users with openid connect (OIDC)",
+                slug: "guides/integrate/login/oidc",
+                description: "In this guides dedicated to utilizing ZITADEL for user authentication within your applications using OpenID Connect (OIDC). Here, we offer comprehensive guidance on seamlessly integrating ZITADEL's authentication features, ensuring both security and user experience excellence. Throughout this documentation, we'll cover the setup process for ZITADEL authentication, including the recommended OIDC flows tailored to different application types. Additionally, we'll provide clear instructions on securely signing out or logging out users from your application, ensuring data security and user privacy. With our guidance, you'll be equipped to leverage ZITADEL's authentication capabilities effectively, enhancing your application's security posture while delivering a seamless login experience for your users.",
+              },
+              items: [
+                "guides/integrate/login/oidc/login-users",
+                "guides/integrate/login/oidc/oauth-recommended-flows",
+                "guides/integrate/login/oidc/logout",
+              ],
+            },
+            'guides/integrate/login/saml',
           ],
         },
         {
@@ -216,7 +232,7 @@ module.exports = {
             type: "generated-index",
             title: "Token Introspection",
             slug: "/guides/integrate/token-introspection",
-            description:
+            description: 
               "Token introspection is the process of checking whether an access token is valid and can be used to access protected resources. You have an API that acts as an OAuth resource server and can be accessed by user-facing applications. To validate an access token by calling the ZITADEL introspection API, you can use the JSON Web Token (JWT) Profile (recommended) or Basic Authentication for token introspection. It's crucial to understand that the API is entirely separate from the front end. The API shouldn’t concern itself with the token type received. Instead, it's about how the API chooses to call the introspection endpoint, either through JWT Profile or Basic Authentication. Many APIs assume they might receive a JWT and attempt to verify it based on signature or expiration. However, with ZITADEL, you can send either a JWT or an opaque Bearer token from the client end to the API. This flexibility is one of ZITADEL's standout features.",
           },
           collapsed: true,
