@@ -43,7 +43,7 @@
     }
   },
   "ONBOARDING": {
-    "DESCRIPTION": "Your onboarding process",
+    "DESCRIPTION": "Your next steps",
     "MOREDESCRIPTION": "more shortcuts",
     "COMPLETED": "completed",
     "DISMISS": "No thanks, I'm a pro.",
@@ -118,6 +118,12 @@
     "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboard shortcuts",
     "SETTINGS": "Settings",
     "CUSTOMERPORTAL": "Customer Portal"
+  },
+  "QUICKSTART": {
+    "TITLE": "Integrate ZITADEL into your application",
+    "DESCRIPTION": "Integrate ZITADEL into your application or use one of our samples to get started in minutes.",
+    "BTN_START": "Create Application",
+    "BTN_LEARNMORE": "Learn More"
   },
   "ACTIONS": {
     "ACTIONS": "Actions",

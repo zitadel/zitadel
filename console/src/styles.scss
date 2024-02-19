@@ -400,6 +400,7 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
 
   $background: map-get($caos-light-app-theme, background);
   $foreground: map-get($caos-light-app-theme, foreground);
+  $primary: map-get($caos-light-app-theme, primary);
 
   --warn: #cd3d56;
   --success: #10b981;
@@ -408,6 +409,10 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   --mat-select-enabled-trigger-text-color: #000;
   --mat-table-row-item-label-text-size: 14px;
   --mat-menu-item-label-text-size: 14px;
+
+  a {
+    color: map-get($primary, 500);
+  }
 
   .progress {
     --mdc-linear-progress-track-color: #00000010;
@@ -477,6 +482,7 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
 .dark-theme {
   $background: map-get($caos-dark-app-theme, background);
   $foreground: map-get($caos-dark-app-theme, foreground);
+  $primary: map-get($caos-dark-app-theme, primary);
 
   --warn: #ff3b5b;
   --success: #10b981;
@@ -485,6 +491,10 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   --mat-select-enabled-trigger-text-color: #fff;
   --mat-table-row-item-label-text-size: 14px;
   --mat-menu-item-label-text-size: 14px;
+
+  a {
+    color: map-get($primary, 400);
+  }
 
   .progress {
     --mdc-linear-progress-track-color: #ffffff20;

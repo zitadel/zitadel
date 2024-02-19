@@ -70,6 +70,7 @@ import { StorageService } from './services/storage.service';
 import { ThemeService } from './services/theme.service';
 import { ToastService } from './services/toast.service';
 import { LanguagesService } from './services/languages.service';
+import { QuickstartComponent } from './components/quickstart/quickstart.component';
 
 registerLocaleData(localeDe);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/de.json'));
