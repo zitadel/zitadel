@@ -1,0 +1,175 @@
+h1 {
+  font-weight: 500;
+  font-size: 1.5rem;
+}
+
+p.desc {
+  font-size: 14px;
+}
+
+.proswitch {
+  margin-bottom: 2rem;
+  display: block;
+}
+
+.name-formfield {
+  max-width: 400px;
+  display: block;
+}
+
+.app-create-container {
+  padding-top: 2rem;
+
+  .progress-bar {
+    margin-bottom: 1rem;
+  }
+}
+
+.margin-right {
+  margin-right: 0.5rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.stepper {
+  background: inherit !important;
+  margin: 0 -1.5rem;
+
+  .formfield {
+    max-width: 400px;
+  }
+
+  .step-title {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .step-description {
+    font-size: 0.9rem;
+  }
+
+  .mat-step-icon-content {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    top: 50%;
+    left: 50%;
+  }
+}
+
+.checkbox-container {
+  display: flex;
+  flex-direction: column;
+
+  .checkbox {
+    margin: 0.5rem 0;
+  }
+}
+
+.cnsl-app-or {
+  margin-right: 1rem;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+
+  .left,
+  .right {
+    margin-bottom: 0.5rem;
+    font-size: 14px;
+  }
+}
+
+.saml-xml {
+  margin-top: 2rem;
+
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+.app-create-actions {
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .bck-button {
+    margin-right: 1rem;
+  }
+
+  .create-button {
+    height: 3.5rem;
+    padding: 0 4rem;
+  }
+}
+
+.dev {
+  .content {
+    display: flex;
+    margin: 0 -0.5rem;
+    flex-wrap: wrap;
+    flex-direction: row;
+
+    .formfield {
+      flex: 1;
+      box-sizing: border-box;
+      margin: 0 0.5rem;
+
+      &.full-width {
+        flex-basis: 80%;
+      }
+    }
+
+    .saml {
+      display: block;
+      width: 100%;
+      margin: 0 0.5rem;
+
+      .formfield {
+        margin: 0;
+      }
+    }
+  }
+
+  .continue-button {
+    margin-top: 3rem;
+    display: block;
+    height: 3.5rem;
+    padding: 0 4rem;
+  }
+}
+
+.metadata-option {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+
+  .upload-button {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    width: 25%;
+  }
+
+  .saml-config-option {
+    font-size: 14px;
+  }
+}
+
+.cert {
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  font-family: inherit;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

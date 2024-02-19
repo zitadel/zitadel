@@ -35,9 +35,6 @@ import { AppCreateComponent } from './app-create.component';
     HasRolePipeModule,
     TranslateModule,
     HasRoleModule,
-    MatCheckboxModule,
-    PasswordComplexityViewModule,
-    MatSlideToggleModule,
   ],
 })
 export default class AppCreateModule {}

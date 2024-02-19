@@ -5,21 +5,28 @@
     <cnsl-search-project-autocomplete
       class="block"
       [autocompleteType]="ProjectAutocompleteType.PROJECT_OWNED"
-      (selectionChanged)="selectProject($any($event.project))"
+      (selectionChanged)="selectProject($any($event))"
+      (valueChanged)="projectName = $any($event)"
     >
     </cnsl-search-project-autocomplete>
 
-    <div [innerHtml]="'APP.PAGES.CREATE_NEW_PROJECT' | translate: { url: '/projects/create' }"></div>
+    <p>{{ 'APP.PAGES.CREATE_NEW_PROJECT' | translate }}</p>
 
     <div class="app-create-btn-container">
       <button
         color="primary"
         mat-raised-button
         class="continue-button"
-        [disabled]="!projectId"
-        (click)="goToAppCreatePage()"
+        [disabled]="!project && !projectName"
+        (click)="project ? goToAppIntegratePage() : createProjectAndContinue()"
       >
-        {{ 'ACTIONS.CONTINUE' | translate }}
+        {{ projectName && project && project.name === projectName | json }}
+        {{
+          !projectName && !project
+            ? ('ACTIONS.CONTINUE' | translate)
+            : ('ACTIONS.CONTINUEWITH'
+              | translate: { value: projectName && project && project.name === projectName ? projectName : project.name })
+        }}
       </button>
     </div>
   </div>

@@ -1,0 +1,208 @@
+<cnsl-create-layout
+  title="{{ 'APP.PAGES.CREATE' | translate }}"
+  class="app-create-wrapper"
+  [createSteps]="2"
+  [currentCreateStep]="currentCreateStep"
+  (closed)="close()"
+>
+  <h1>{{ 'APP.PAGES.CREATE_DESC_TITLE' | translate }}</h1>
+  <mat-progress-bar class="progress-bar" color="primary" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+
+  <!-- <mat-horizontal-stepper
+    class="stepper {{ 'last-edited-step-' + stepper.selectedIndex }}"
+    linear
+    #stepper
+    labelPosition="bottom"
+    (selectionChange)="changeStep($event)"
+  >
+    <mat-step [stepControl]="firstFormGroup" [editable]="true"> -->
+  <form [formGroup]="firstFormGroup">
+    <!-- <ng-template matStepLabel>{{ 'APP.NAMEANDTYPESECTION' | translate }}</ng-template> -->
+
+    <p class="step-title">{{ 'APP.TITLEFIRST' | translate }}</p>
+    <cnsl-form-field class="name-formfield">
+      <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>
+      <input cnslInput cdkFocusInitial formControlName="name" />
+    </cnsl-form-field>
+
+    <p class="step-title">{{ 'APP.TYPETITLE' | translate }}</p>
+
+    <!-- <cnsl-type-radio [types]="appTypes" (selectedType)="appType?.setValue($event)" [selected]="appType?.value">
+        </cnsl-type-radio> -->
+    <div class="app-create-actions">
+      <button mat-raised-button [disabled]="firstFormGroup.invalid" color="primary" data-e2e="continue-button-nameandtype">
+        {{ 'ACTIONS.CONTINUE' | translate }}
+      </button>
+    </div>
+  </form>
+  <!-- </mat-step> -->
+
+  <!-- <mat-step *ngIf="authMethod?.value !== 'DEVICECODE'" [editable]="true">
+      <ng-template matStepLabel>{{ 'APP.OIDC.REDIRECTSECTION' | translate }}</ng-template>
+
+      <p class="step-title">{{ 'APP.OIDC.REDIRECTTITLE' | translate }}</p>
+      <p
+        class="step-description cnsl-secondary-text"
+        *ngIf="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+      >
+        {{ 'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate }}
+      </p>
+      <p class="step-description cnsl-secondary-text" *ngIf="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_WEB">
+        {{ 'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate }}
+      </p>
+
+      <cnsl-redirect-uris
+        class="redirect-section"
+        [disabled]="false"
+        [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+        [(ngModel)]="redirectUris"
+        [getValues]="requestRedirectValuesSubject$"
+        title="{{ 'APP.OIDC.REDIRECT' | translate }}"
+        [devMode]="devMode"
+        data-e2e="redirect-uris"
+      >
+      </cnsl-redirect-uris>
+
+      <p class="step-title">{{ 'APP.OIDC.POSTREDIRECTTITLE' | translate }}</p>
+      <p
+        class="step-description cnsl-secondary-text"
+        *ngIf="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+      >
+        {{ 'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate }}
+      </p>
+      <p
+        class="step-description cnsl-secondary-text"
+        *ngIf="
+          appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_WEB ||
+          appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_USER_AGENT
+        "
+      >
+        {{ 'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate }}
+      </p>
+
+      <cnsl-redirect-uris
+        class="redirect-section"
+        [disabled]="false"
+        [(ngModel)]="postLogoutUrisList"
+        [getValues]="requestRedirectValuesSubject$"
+        title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
+        [isNative]="appType?.value.oidcAppType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+        [devMode]="devMode"
+        data-e2e="postlogout-uris"
+      >
+      </cnsl-redirect-uris>
+
+      <div class="app-create-actions">
+        <button mat-stroked-button class="bck-button" matStepperPrevious>{{ 'ACTIONS.BACK' | translate }}</button>
+        <button mat-raised-button color="primary" matStepperNext data-e2e="continue-button-redirecturis">
+          {{ 'ACTIONS.CONTINUE' | translate }}
+        </button>
+      </div>
+    </mat-step> -->
+
+  <!-- <mat-step> -->
+  <!-- <ng-template matStepLabel>{{ 'APP.OIDC.OVERVIEWSECTION' | translate }}</ng-template> -->
+  <p class="step-title">{{ 'APP.OIDC.OVERVIEWTITLE' | translate }}</p>
+  <div class="row">
+    <span class="left cnsl-secondary-text">
+      {{ 'APP.NAME' | translate }}
+    </span>
+    <span class="right">
+      {{ name?.value }}
+    </span>
+  </div>
+
+  <div class="row">
+    <span class="left cnsl-secondary-text">
+      {{ 'APP.TYPE' | translate }}
+    </span>
+    <span class="right">
+      {{ 'APP.OIDC.APPTYPE.' + oidcAppRequest.toObject().appType | translate }}
+    </span>
+  </div>
+  <div class="row">
+    <span class="left cnsl-secondary-text">
+      {{ 'APP.GRANT' | translate }}
+    </span>
+    <span
+      class="right"
+      *ngIf="oidcAppRequest.toObject().grantTypesList && oidcAppRequest.toObject().grantTypesList.length > 0"
+    >
+      [<span *ngFor="let element of oidcAppRequest.toObject().grantTypesList; index as i">
+        {{ 'APP.OIDC.GRANT.' + element | translate }}
+        {{ i < oidcAppRequest.toObject().grantTypesList.length - 1 ? ', ' : '' }} </span
+      >]
+    </span>
+  </div>
+  <div class="row">
+    <span class="left cnsl-secondary-text">
+      {{ 'APP.OIDC.RESPONSETYPE' | translate }}
+    </span>
+    <span
+      class="right"
+      *ngIf="oidcAppRequest.toObject().responseTypesList && oidcAppRequest.toObject().responseTypesList.length > 0"
+    >
+      [<span *ngFor="let element of oidcAppRequest.toObject().responseTypesList; index as i">
+        {{ 'APP.OIDC.RESPONSE.' + element | translate }}
+        {{ i < oidcAppRequest.toObject().responseTypesList.length - 1 ? ', ' : '' }} </span
+      >]
+    </span>
+  </div>
+
+  <div class="row">
+    <span class="left cnsl-secondary-text">
+      {{ 'APP.AUTHMETHOD' | translate }}
+    </span>
+    <span class="right">
+      <span>
+        {{ 'APP.OIDC.AUTHMETHOD.' + oidcAppRequest.toObject().authMethodType | translate }}
+      </span>
+    </span>
+  </div>
+
+  <div class="row">
+    <span class="left cnsl-secondary-text">
+      {{ 'APP.OIDC.REDIRECT' | translate }}
+    </span>
+    <span
+      class="right"
+      *ngIf="oidcAppRequest.toObject().redirectUrisList && oidcAppRequest.toObject().redirectUrisList.length > 0"
+    >
+      [<span *ngFor="let redirect of oidcAppRequest.toObject().redirectUrisList; index as i">
+        {{ redirect }}
+        {{ i < oidcAppRequest.toObject().redirectUrisList.length - 1 ? ', ' : '' }} </span
+      >]
+    </span>
+  </div>
+
+  <div class="row">
+    <span class="left cnsl-secondary-text">
+      {{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}
+    </span>
+    <span
+      class="right"
+      *ngIf="
+        oidcAppRequest.toObject().postLogoutRedirectUrisList &&
+        oidcAppRequest.toObject().postLogoutRedirectUrisList.length > 0
+      "
+    >
+      [<span *ngFor="let redirect of oidcAppRequest.toObject().postLogoutRedirectUrisList; index as i">
+        {{ redirect }}
+        {{ i < oidcAppRequest.toObject().postLogoutRedirectUrisList.length - 1 ? ', ' : '' }} </span
+      >]
+    </span>
+  </div>
+
+  <div class="app-create-actions">
+    <button mat-stroked-button class="bck-button">{{ 'ACTIONS.BACK' | translate }}</button>
+    <button mat-raised-button class="create-button" color="primary" (click)="createApp()" data-e2e="create-button">
+      {{ 'ACTIONS.CREATE' | translate }}
+    </button>
+  </div>
+  <!-- </mat-step>
+
+    <ng-template matStepperIcon="edit">
+      <mat-icon>check</mat-icon>
+    </ng-template>
+  </mat-horizontal-stepper> -->
+</cnsl-create-layout>

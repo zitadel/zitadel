@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
 import { ProjectAutocompleteType } from 'src/app/modules/search-project-autocomplete/search-project-autocomplete.component';
-import { Project } from 'src/app/proto/generated/zitadel/project_pb';
+import { GrantedProject, Project } from 'src/app/proto/generated/zitadel/project_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 
 @Component({
@@ -10,8 +11,13 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
   styleUrls: ['./app-create.component.scss'],
 })
 export class AppCreateComponent {
-  public projectId: string = '';
+  public project?: {
+    project: Project.AsObject | GrantedProject.AsObject;
+    type: ProjectType;
+    name: string;
+  } = undefined;
   public ProjectAutocompleteType: any = ProjectAutocompleteType;
+  public projectName: string = '';
 
   constructor(
     private router: Router,
@@ -24,17 +30,31 @@ export class AppCreateComponent {
     breadcrumbService.setBreadcrumb([bread]);
   }
 
-  public goToAppCreatePage(): void {
-    this.router.navigate(['/projects', this.projectId, 'apps', 'create']);
+  public goToAppIntegratePage(): void {
+    if (this.project) {
+      const id = (this.project.project as Project.AsObject).id
+        ? (this.project.project as Project.AsObject).id
+        : (this.project.project as GrantedProject.AsObject).projectId
+          ? (this.project.project as GrantedProject.AsObject).projectId
+          : '';
+
+      this.router.navigate(['/projects', id, 'apps', 'integrate']);
+    }
   }
 
   public close(): void {
     window.history.back();
   }
 
-  public selectProject(project: Project.AsObject): void {
-    if (project.id) {
-      this.projectId = project.id;
+  public selectProject(project: {
+    project: Project.AsObject | GrantedProject.AsObject;
+    type: ProjectType;
+    name: string;
+  }): void {
+    if (project) {
+      this.project = project;
     }
   }
+
+  public createProjectAndContinue(): void {}
 }
