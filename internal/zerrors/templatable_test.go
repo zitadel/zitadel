@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -67,8 +68,8 @@ func TestTemplatableError_GetVars(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			templErr := new(TemplatableError)
 			require.True(t, errors.As(tt.fields.withVariables(errors.New("test")), &templErr))
-			require.Equal(t, "test", templErr.Error(), "templErr error should not print anything")
-			require.Equal(t, templErr.GetVars(), tt.want, "templErr.GetVars()")
+			assert.Equal(t, "test", templErr.Error(), "templErr error should not print anything")
+			assert.Equal(t, templErr.GetVars(), tt.want, "templErr.GetVars()")
 		})
 	}
 }
