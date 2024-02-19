@@ -417,6 +417,7 @@ module.exports = {
         "guides/solution-scenarios/configurations",
         "guides/solution-scenarios/frontend-calling-backend-API",
         "guides/solution-scenarios/device-authorization",
+        "guides/solution-scenarios/restrict-console",
         {
           type: "category",
           label: "Onboarding Customers and Users",
