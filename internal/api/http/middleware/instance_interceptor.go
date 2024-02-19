@@ -63,8 +63,11 @@ func (a *instanceInterceptor) handleInstance(w http.ResponseWriter, r *http.Requ
 		zitadelErr := new(zerrors.NotFoundError)
 		if errors.As(err, &zitadelErr) {
 			templErr := new(zerrors.TemplatableError)
-			errors.As(err, &templErr)
-			zitadelErr.Message = a.translator.LocalizeFromRequest(r, zitadelErr.GetMessage(), templErr.GetVars())
+			var vars = map[string]interface{}{}
+			if errors.As(err, &templErr) {
+				vars = templErr.GetVars()
+			}
+			zitadelErr.Message = a.translator.LocalizeFromRequest(r, zitadelErr.GetMessage(), vars)
 		}
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return

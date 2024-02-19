@@ -65,8 +65,11 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 		notFoundErr := new(zerrors.NotFoundError)
 		if errors.As(err, &notFoundErr) {
 			templErr := new(zerrors.TemplatableError)
-			errors.As(err, &templErr)
-			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), templErr.GetVars())
+			var vars map[string]interface{}
+			if errors.As(err, &templErr) {
+				vars = templErr.GetVars()
+			}
+			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), vars)
 		}
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
