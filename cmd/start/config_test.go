@@ -1,44 +1,106 @@
 package start
 
 import (
-	"reflect"
+	"encoding/base64"
+	"fmt"
+	"net"
+	"net/http"
 	"strings"
 	"testing"
 
 	"github.com/spf13/viper"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
 func TestMustNewConfig(t *testing.T) {
+	encodedKey := "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF6aStGRlNKTDdmNXl3NEtUd3pnTQpQMzRlUEd5Y20vTStrVDBNN1Y0Q2d4NVYzRWFESXZUUUtUTGZCYUVCNDV6YjlMdGpJWHpEdzByWFJvUzJoTzZ0CmgrQ1lRQ3ozS0N2aDA5QzBJenhaaUIySVMzSC9hVCs1Qng5RUZZK3ZuQWtaamNjYnlHNVlOUnZtdE9sbnZJZUkKSDdxWjB0RXdrUGZGNUdFWk5QSlB0bXkzVUdWN2lvZmRWUVMxeFJqNzMrYU13NXJ2SDREOElkeWlBQzNWZWtJYgpwdDBWajBTVVgzRHdLdG9nMzM3QnpUaVBrM2FYUkYwc2JGaFFvcWRKUkk4TnFnWmpDd2pxOXlmSTV0eXhZc3duCitKR3pIR2RIdlczaWRPRGxtd0V0NUsycGFzaVJJV0syT0dmcSt3MEVjbHRRSGFidXFFUGdabG1oQ2tSZE5maXgKQndJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg=="
+	decodedKey, err := base64.StdEncoding.DecodeString(encodedKey)
+	if err != nil {
+		t.Fatal(err)
+	}
 	type args struct {
 		yaml string
 	}
 	tests := []struct {
 		name string
 		args args
-		want *Config
+		want func(*testing.T, *Config)
 	}{{
+		name: "actions deny list ok",
+		args: args{
+			yaml: `
+Actions:
+  HTTP:
+    DenyList:
+    - localhost
+    - 127.0.0.1
+    - foobar
+Log:
+  Level: info
+`},
+		want: func(t *testing.T, config *Config) {
+			assert.Equal(t, config.Actions.HTTP.DenyList, []actions.AddressChecker{
+				&actions.DomainChecker{Domain: "localhost"},
+				&actions.IPChecker{IP: net.ParseIP("127.0.0.1")},
+				&actions.DomainChecker{Domain: "foobar"}})
+		},
+	}, {
+		name: "actions deny list string ok",
+		args: args{
+			yaml: `
+Actions:
+  HTTP:
+    DenyList: localhost,127.0.0.1,foobar
+Log:
+  Level: info
+`},
+		want: func(t *testing.T, config *Config) {
+			assert.Equal(t, config.Actions.HTTP.DenyList, []actions.AddressChecker{
+				&actions.DomainChecker{Domain: "localhost"},
+				&actions.IPChecker{IP: net.ParseIP("127.0.0.1")},
+				&actions.DomainChecker{Domain: "foobar"}})
+		},
+	}, {
 		name: "features ok",
 		args: args{yaml: `
 DefaultInstance:
   Features:
   - FeatureLoginDefaultOrg: true
+Log:
+  Level: info
+Actions:
+  HTTP:
+    DenyList: []
 `},
-		want: &Config{
-			DefaultInstance: command.InstanceSetup{
-				Features: map[domain.Feature]any{
-					domain.FeatureLoginDefaultOrg: true,
-				},
-			},
+		want: func(t *testing.T, config *Config) {
+			assert.Equal(t, config.DefaultInstance.Features, map[domain.Feature]any{
+				domain.FeatureLoginDefaultOrg: true,
+			})
 		},
 	}, {
-		name: "membership types ok",
+		name: "features string ok",
+		args: args{yaml: `
+DefaultInstance:
+  Features: >
+    [{"featureLoginDefaultOrg": true}]
+Log:
+  Level: info
+Actions:
+  HTTP:
+    DenyList: []
+`},
+		want: func(t *testing.T, config *Config) {
+			assert.Equal(t, config.DefaultInstance.Features, map[domain.Feature]any{
+				domain.FeatureLoginDefaultOrg: true,
+			})
+		},
+	}, {
+		name: "system api users ok",
 		args: args{yaml: `
 SystemAPIUsers:
 - superuser:
@@ -46,9 +108,14 @@ SystemAPIUsers:
     - MemberType: System
     - MemberType: Organization
     - MemberType: IAM
+Log:
+  Level: info
+Actions:
+  HTTP:
+    DenyList: []
 `},
-		want: &Config{
-			SystemAPIUsers: map[string]*authz.SystemAPIUser{
+		want: func(t *testing.T, config *Config) {
+			assert.Equal(t, config.SystemAPIUsers, map[string]*authz.SystemAPIUser{
 				"superuser": {
 					Memberships: authz.Memberships{{
 						MemberType: authz.MemberTypeSystem,
@@ -58,27 +125,121 @@ SystemAPIUsers:
 						MemberType: authz.MemberTypeIAM,
 					}},
 				},
-			},
+			})
+		},
+	}, {
+		name: "system api users string ok",
+		args: args{yaml: fmt.Sprintf(`
+SystemAPIUsers: >
+  {"systemuser": {"path": "/path/to/superuser/key.pem"}, "systemuser2": {"keyData": "%s"}}
+Log:
+  Level: info
+Actions:
+  HTTP:
+    DenyList: []
+`, encodedKey)},
+		want: func(t *testing.T, config *Config) {
+			assert.Equal(t, config.SystemAPIUsers, map[string]*authz.SystemAPIUser{
+				"systemuser": {
+					Path: "/path/to/superuser/key.pem",
+				},
+				"systemuser2": {
+					KeyData: decodedKey,
+				},
+			})
+		},
+	}, {
+		name: "headers ok",
+		args: args{yaml: `
+Telemetry:
+  Headers:
+    single-value: single-value
+    multi-value:
+    - multi-value1
+    - multi-value2
+Log:
+  Level: info
+Actions:
+  HTTP:
+    DenyList: []
+`},
+		want: func(t *testing.T, config *Config) {
+			assert.Equal(t, config.Telemetry.Headers, http.Header{
+				"single-value": []string{"single-value"},
+				"multi-value":  []string{"multi-value1", "multi-value2"},
+			})
+		},
+	}, {
+		name: "headers string ok",
+		args: args{yaml: `
+Telemetry:
+  Headers: >
+    {"single-value": "single-value", "multi-value": ["multi-value1", "multi-value2"]}
+Log:
+  Level: info
+Actions:
+  HTTP:
+    DenyList: []
+`},
+		want: func(t *testing.T, config *Config) {
+			assert.Equal(t, config.Telemetry.Headers, http.Header{
+				"single-value": []string{"single-value"},
+				"multi-value":  []string{"multi-value1", "multi-value2"},
+			})
+		},
+	}, {
+		name: "message texts ok",
+		args: args{yaml: `
+DefaultInstance:
+  MessageTexts:
+  - MessageTextType: InitCode
+    Title: foo
+  - MessageTextType: PasswordReset
+    Greeting: bar
+Log:
+  Level: info
+Actions:
+  HTTP:
+    DenyList: []
+`},
+		want: func(t *testing.T, config *Config) {
+			assert.Equal(t, config.DefaultInstance.MessageTexts, []*domain.CustomMessageText{{
+				MessageTextType: "InitCode",
+				Title:           "foo",
+			}, {
+				MessageTextType: "PasswordReset",
+				Greeting:        "bar",
+			}})
+		},
+	}, {
+		name: "message texts string ok",
+		args: args{yaml: `
+DefaultInstance:
+  MessageTexts: >
+    [{"messageTextType": "InitCode", "title": "foo"}, {"messageTextType": "PasswordReset", "greeting": "bar"}]
+Log:
+  Level: info
+Actions:
+  HTTP:
+    DenyList: []
+`},
+		want: func(t *testing.T, config *Config) {
+			assert.Equal(t, config.DefaultInstance.MessageTexts, []*domain.CustomMessageText{{
+				MessageTextType: "InitCode",
+				Title:           "foo",
+			}, {
+				MessageTextType: "PasswordReset",
+				Greeting:        "bar",
+			}})
 		},
 	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := viper.New()
 			v.SetConfigType("yaml")
-			err := v.ReadConfig(strings.NewReader(`Log:
-  Level: info
-Actions:
-  HTTP:
-    DenyList: []
-` + tt.args.yaml))
-			require.NoError(t, err)
-			tt.want.Log = &logging.Config{Level: "info"}
-			tt.want.Actions = &actions.Config{HTTP: actions.HTTPConfig{DenyList: []actions.AddressChecker{}}}
-			require.NoError(t, tt.want.Log.SetLogger())
+			require.NoError(t, v.ReadConfig(strings.NewReader(tt.args.yaml)))
 			got := MustNewConfig(v)
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("MustNewConfig() = %v, want %v", got, tt.want)
-			}
+			tt.want(t, got)
 		})
 	}
 }
