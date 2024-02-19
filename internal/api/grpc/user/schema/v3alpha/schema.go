@@ -3,16 +3,14 @@ package schema
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/zerrors"
 	schema "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha"
 )
 
 func (s *Server) CreateUserSchema(ctx context.Context, req *schema.CreateUserSchemaRequest) (*schema.CreateUserSchemaResponse, error) {
-	userSchema := createUserSchemaToCommand(ctx, req)
+	userSchema := createUserSchemaToCommand(req)
 	id, details, err := s.command.CreateUserSchema(ctx, userSchema)
 	if err != nil {
 		return nil, err
@@ -24,22 +22,55 @@ func (s *Server) CreateUserSchema(ctx context.Context, req *schema.CreateUserSch
 }
 
 func (s *Server) UpdateUserSchema(ctx context.Context, req *schema.UpdateUserSchemaRequest) (*schema.UpdateUserSchemaResponse, error) {
-	return nil, zerrors.ThrowUnimplemented(nil, "", "")
+	userSchema := updateUserSchemaToCommand(req)
+	details, err := s.command.UpdateUserSchema(ctx, userSchema)
+	if err != nil {
+		return nil, err
+	}
+	return &schema.UpdateUserSchemaResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
 }
 func (s *Server) DeactivateUserSchema(ctx context.Context, req *schema.DeactivateUserSchemaRequest) (*schema.DeactivateUserSchemaResponse, error) {
-	return nil, zerrors.ThrowUnimplemented(nil, "", "")
+	details, err := s.command.DeactivateUserSchema(ctx, req.GetId())
+	if err != nil {
+		return nil, err
+	}
+	return &schema.DeactivateUserSchemaResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
 }
 func (s *Server) ReactivateUserSchema(ctx context.Context, req *schema.ReactivateUserSchemaRequest) (*schema.ReactivateUserSchemaResponse, error) {
-	return nil, zerrors.ThrowUnimplemented(nil, "", "")
+	details, err := s.command.ReactivateUserSchema(ctx, req.GetId())
+	if err != nil {
+		return nil, err
+	}
+	return &schema.ReactivateUserSchemaResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
 }
 func (s *Server) DeleteUserSchema(ctx context.Context, req *schema.DeleteUserSchemaRequest) (*schema.DeleteUserSchemaResponse, error) {
-	return nil, zerrors.ThrowUnimplemented(nil, "", "")
+	details, err := s.command.DeleteUserSchema(ctx, req.GetId())
+	if err != nil {
+		return nil, err
+	}
+	return &schema.DeleteUserSchemaResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
 }
 
-func createUserSchemaToCommand(ctx context.Context, req *schema.CreateUserSchemaRequest) *command.CreateUserSchema {
+func createUserSchemaToCommand(req *schema.CreateUserSchemaRequest) *command.CreateUserSchema {
 	return &command.CreateUserSchema{
-		ResourceOwner:          authz.GetInstance(ctx).InstanceID(),
 		Type:                   req.GetType(),
+		Schema:                 req.GetSchema().AsMap(),
+		PossibleAuthenticators: authenticatorsToDomain(req.GetPossibleAuthenticators()),
+	}
+}
+
+func updateUserSchemaToCommand(req *schema.UpdateUserSchemaRequest) *command.UpdateUserSchema {
+	return &command.UpdateUserSchema{
+		ID:                     req.GetId(),
+		Type:                   req.Type,
 		Schema:                 req.GetSchema().AsMap(),
 		PossibleAuthenticators: authenticatorsToDomain(req.GetPossibleAuthenticators()),
 	}

@@ -1,6 +1,11 @@
 package command
 
 import (
+	"context"
+	"maps"
+
+	"golang.org/x/exp/slices"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user/schema"
@@ -9,7 +14,7 @@ import (
 type UserSchemaWriteModel struct {
 	eventstore.WriteModel
 
-	Type                   string
+	SchemaType             string
 	Schema                 map[string]any
 	PossibleAuthenticators []domain.AuthenticatorType
 	State                  domain.UserSchemaState
@@ -28,14 +33,26 @@ func (wm *UserSchemaWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *schema.CreatedEvent:
-			wm.Type = e.SchemaType
+			wm.SchemaType = e.SchemaType
 			wm.Schema = e.Schema
 			wm.PossibleAuthenticators = e.PossibleAuthenticators
 			wm.State = domain.UserSchemaStateActive
-			//case *user.PersonalAccessTokenRemovedEvent:
-			//	wm.State = domain.PersonalAccessTokenStateRemoved
-			//case *user.UserRemovedEvent:
-			//	wm.State = domain.PersonalAccessTokenStateRemoved
+		case *schema.UpdatedEvent:
+			if e.SchemaType != nil {
+				wm.SchemaType = *e.SchemaType
+			}
+			if len(e.Schema) > 0 {
+				wm.Schema = e.Schema
+			}
+			if len(e.PossibleAuthenticators) > 0 {
+				wm.PossibleAuthenticators = e.PossibleAuthenticators
+			}
+		case *schema.DeactivatedEvent:
+			wm.State = domain.UserSchemaStateInactive
+		case *schema.ReactivatedEvent:
+			wm.State = domain.UserSchemaStateActive
+		case *schema.DeletedEvent:
+			wm.State = domain.UserSchemaStateDeleted
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -49,11 +66,46 @@ func (wm *UserSchemaWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			schema.CreatedType,
+			schema.UpdatedType,
+			schema.DeactivatedType,
+			schema.ReactivatedType,
+			schema.DeletedType,
 		).
 		Builder()
 }
+func (wm *UserSchemaWriteModel) NewUpdatedEvent(
+	ctx context.Context,
+	agg *eventstore.Aggregate,
+	schemaType *string,
+	userSchema map[string]any,
+	possibleAuthenticators []domain.AuthenticatorType,
+) *schema.UpdatedEvent {
+	changes := make([]schema.Changes, 0)
+	if schemaType != nil && wm.SchemaType != *schemaType {
+		changes = append(changes, schema.ChangeSchemaType(wm.SchemaType, *schemaType))
+	}
+	if len(userSchema) > 0 && !maps.Equal(wm.Schema, userSchema) {
+		changes = append(changes, schema.ChangeSchema(userSchema))
+	}
+	if len(possibleAuthenticators) > 0 && slices.Compare(wm.PossibleAuthenticators, possibleAuthenticators) != 0 {
+		changes = append(changes, schema.ChangePossibleAuthenticators(possibleAuthenticators))
+	}
+	if len(changes) == 0 {
+		return nil
+	}
+	return schema.NewUpdatedEvent(ctx, agg, changes)
+}
 
-//
-//func (wm *UserSchemaWriteModel) Exists() bool {
-//	return wm.State != domain.PersonalAccessTokenStateUnspecified && wm.State != domain.PersonalAccessTokenStateRemoved
-//}
+func UserSchemaAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return &eventstore.Aggregate{
+		ID:            wm.AggregateID,
+		Type:          schema.AggregateType,
+		ResourceOwner: wm.ResourceOwner,
+		InstanceID:    wm.InstanceID,
+		Version:       schema.AggregateVersion,
+	}
+}
+
+func (wm *UserSchemaWriteModel) Exists() bool {
+	return wm.State != domain.UserSchemaStateUnspecified && wm.State != domain.UserSchemaStateDeleted
+}

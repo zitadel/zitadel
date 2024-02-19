@@ -6,6 +6,7 @@ const (
 	UserSchemaStateUnspecified UserSchemaState = iota
 	UserSchemaStateActive
 	UserSchemaStateInactive
+	UserSchemaStateDeleted
 	userSchemaStateCount
 )
 
