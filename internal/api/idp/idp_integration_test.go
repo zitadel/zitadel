@@ -292,10 +292,7 @@ func TestServer_SAMLACS(t *testing.T) {
 			if tt.args.response != "" {
 				response = tt.args.response
 			}
-			req := httpPostFormRequest(t, callbackURL, relayState, response)
-
-			//do request to callback URL and check redirect to either success or failure url
-			location, err := integration.CheckRedirect(req)
+			location, err := integration.CheckPost(callbackURL, httpPostFormRequest(relayState, response))
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
@@ -474,15 +471,9 @@ func httpGETRequest(t *testing.T, callbackURL string, relayState, response, sig,
 	return req
 }
 
-func httpPostFormRequest(t *testing.T, callbackURL, relayState, response string) *http.Request {
-	body := url.Values{
+func httpPostFormRequest(relayState, response string) url.Values {
+	return url.Values{
 		"SAMLResponse": {response},
 		"RelayState":   {relayState},
 	}
-
-	req, err := http.NewRequest("POST", callbackURL, strings.NewReader(body.Encode()))
-	assert.NoError(t, err)
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.ParseForm()
-	return req
 }

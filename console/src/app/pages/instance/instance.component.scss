@@ -11,6 +11,23 @@
   margin-top: 2rem;
 }
 
+.instance-action-wrapper {
+  display: flex;
+  align-items: center;
+
+  .portal-link {
+    margin-right: 1rem;
+
+    .portal-span {
+      margin-right: 0.5rem;
+    }
+  }
+}
+
 .instance-table-desc {
   font-size: 14px;
+}
+
+.instance-settings-wrapper {
+  margin-top: 2rem;
 }

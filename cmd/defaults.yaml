@@ -1,7 +1,7 @@
 Log:
   Level: info # ZITADEL_LOG_LEVEL
   Formatter:
-    Format: text # ZITADEL_LOG_LEVEL
+    Format: text # ZITADEL_LOG_FORMATTER_FORMAT
 
 # Exposes metrics on /debug/metrics
 Metrics:
@@ -29,7 +29,7 @@ Telemetry:
   # As long as Enabled is true, ZITADEL tries to send usage data to the configured Telemetry.Endpoints.
   # Data is projected by ZITADEL even if Enabled is false.
   # This means that switching this to true makes ZITADEL try to send past data.
-  Enabled: false
+  Enabled: false # ZITADEL_TELEMETRY_ENABLED
   # Push telemetry data to all these endpoints at least once using an HTTP POST request.
   # If one endpoint returns an unsuccessful response code or times out,
   # ZITADEL retries to push the data point to all configured endpoints until it succeeds.
@@ -40,7 +40,9 @@ Telemetry:
   Endpoints:
     - https://httpbin.org/post
   # These headers are sent with every request to the configured endpoints.
-  Headers:
+  # Configure headers by environment variable using a JSON string with header values as arrays, like this:
+  # ZITADEL_TELEMETRY_HEADERS='{"header1": ["value1"], "header2": ["value2", "value3"]}'
+  Headers: # ZITADEL_TELEMETRY_HEADERS
   # single-value: "single-value"
   # multi-value:
   #   - "multi-value-1"
@@ -85,7 +87,7 @@ HTTP2HostHeader: ":authority" # ZITADEL_HTTP2HOSTHEADER
 # Header name of HTTP1 calls from which the instance will be matched
 HTTP1HostHeader: "host" # ZITADEL_HTTP1HOSTHEADER
 
-WebAuthNName: ZITADEL # ZITADEL_WEBAUTHN_NAME
+WebAuthNName: ZITADEL # ZITADEL_WEBAUTHNNAME
 
 Database:
   # ZITADEL manages three database connection pools.
@@ -170,7 +172,7 @@ Machine:
       Enabled: true # ZITADEL_MACHINE_IDENTIFICATION_WEBHOOK_ENABLED
       Url: "http://metadata.google.internal/computeMetadata/v1/instance/id" # ZITADEL_MACHINE_IDENTIFICATION_WEBHOOK_URL
       Headers:
-        "Metadata-Flavor": "Google" # ZITADEL_MACHINE_IDENTIFICATION_WEBHOOK_HEADERS
+        "Metadata-Flavor": "Google"
     #
     # AWS EC2 IMDSv1 Configuration: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-data-retrieval.html
     # Webhook:
@@ -205,7 +207,7 @@ Projections:
   # Time interval between scheduled projections
   RequeueEvery: 60s # ZITADEL_PROJECTIONS_REQUEUEEVERY
   # Time between retried database statements resulting from projected events
-  RetryFailedAfter: 1s # ZITADEL_PROJECTIONS_RETRYFAILED
+  RetryFailedAfter: 1s # ZITADEL_PROJECTIONS_RETRYFAILEDAFTER
   # Retried execution number of database statements resulting from projected events
   MaxFailureCount: 5 # ZITADEL_PROJECTIONS_MAXFAILURECOUNT
   # Limit of returned events per query
@@ -373,28 +375,28 @@ Console:
 EncryptionKeys:
   DomainVerification:
     EncryptionKeyID: "domainVerificationKey" # ZITADEL_ENCRYPTIONKEYS_DOMAINVERIFICATION_ENCRYPTIONKEYID
-    DecryptionKeyIDs:
+    DecryptionKeyIDs: # ZITADEL_ENCRYPTIONKEYS_DOMAINVERIFICATION_DECRYPTIONKEYIDS (comma separated list)
   IDPConfig:
     EncryptionKeyID: "idpConfigKey" # ZITADEL_ENCRYPTIONKEYS_IDPCONFIG_ENCRYPTIONKEYID
-    DecryptionKeyIDs:
+    DecryptionKeyIDs: # ZITADEL_ENCRYPTIONKEYS_IDPCONFIG_DECRYPTIONKEYIDS (comma separated list)
   OIDC:
     EncryptionKeyID: "oidcKey" # ZITADEL_ENCRYPTIONKEYS_OIDC_ENCRYPTIONKEYID
-    DecryptionKeyIDs:
+    DecryptionKeyIDs: # ZITADEL_ENCRYPTIONKEYS_OIDC_DECRYPTIONKEYIDS (comma separated list)
   SAML:
     EncryptionKeyID: "samlKey" # ZITADEL_ENCRYPTIONKEYS_SAML_ENCRYPTIONKEYID
-    DecryptionKeyIDs:
+    DecryptionKeyIDs: # ZITADEL_ENCRYPTIONKEYS_SAML_DECRYPTIONKEYIDS (comma separated list)
   OTP:
     EncryptionKeyID: "otpKey" # ZITADEL_ENCRYPTIONKEYS_OTP_ENCRYPTIONKEYID
-    DecryptionKeyIDs:
+    DecryptionKeyIDs: # ZITADEL_ENCRYPTIONKEYS_OTP_DECRYPTIONKEYIDS (comma separated list)
   SMS:
     EncryptionKeyID: "smsKey" # ZITADEL_ENCRYPTIONKEYS_SMS_ENCRYPTIONKEYID
-    DecryptionKeyIDs:
+    DecryptionKeyIDs: # ZITADEL_ENCRYPTIONKEYS_SMS_DECRYPTIONKEYIDS (comma separated list)
   SMTP:
     EncryptionKeyID: "smtpKey" # ZITADEL_ENCRYPTIONKEYS_SMTP_ENCRYPTIONKEYID
-    DecryptionKeyIDs:
+    DecryptionKeyIDs: # ZITADEL_ENCRYPTIONKEYS_SMTP_DECRYPTIONKEYIDS (comma separated list)
   User:
     EncryptionKeyID: "userKey" # ZITADEL_ENCRYPTIONKEYS_USER_ENCRYPTIONKEYID
-    DecryptionKeyIDs:
+    DecryptionKeyIDs: # ZITADEL_ENCRYPTIONKEYS_USER_DECRYPTIONKEYIDS (comma separated list)
   CSRFCookieKeyID: "csrfCookieKey" # ZITADEL_ENCRYPTIONKEYS_CSRFCOOKIEKEYID
   UserAgentCookieKeyID: "userAgentCookieKey" # ZITADEL_ENCRYPTIONKEYS_USERAGENTCOOKIEKEYID
 
@@ -421,6 +423,8 @@ SystemAPIUsers:
 # - superuser2:
 #     # If no memberships are specified, the user has a membership of type System with the role "SYSTEM_OWNER"
 #     KeyData: <base64 encoded key>     # or you can directly embed it as base64 encoded value
+# Configure the SystemAPIUsers by environment variable using JSON notation:
+# ZITADEL_SYSTEMAPIUSERS='{"systemuser":{"Path":"/path/to/superuser/key.pem"},"systemuser2":{"KeyData":"<base64 encoded key>"}}'
 
 SystemDefaults:
   SecretGenerators:
@@ -451,13 +455,13 @@ SystemDefaults:
     #   Threads: 4 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_THREADS
 
     # Hasher:
-    #   Algorithm: "scrypt"
-    #   Cost: 15
+    #   Algorithm: "scrypt" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
+    #   Cost: 15 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_COST
 
     # Hasher:
-    #   Algorithm: "pbkdf2"
-    #   Rounds: 290000
-    #   Hash: "sha256" # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
+    #   Algorithm: "pbkdf2" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
+    #   Rounds: 290000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ROUNDS
+    #   Hash: "sha256" # Can be "sha1", "sha224", "sha256", "sha384" or "sha512" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_HASH
 
     # Verifiers enable the possibility of verifying
     # passwords that are previously hashed using another
@@ -513,7 +517,7 @@ SystemDefaults:
 Actions:
   HTTP:
     # Wildcard sub domains are currently unsupported
-    DenyList:
+    DenyList: # ZITADEL_ACTIONS_HTTP_DENYLIST (comma separated list)
       - localhost
       - "127.0.0.1"
 
@@ -731,6 +735,9 @@ DefaultInstance:
     From: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_FROM
     FromName: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_FROMNAME
     ReplyToAddress: # ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_REPLYTOADDRESS
+  # Configure the MessageTexts by environment variable using JSON notation:
+  # ZITADEL_DEFAULTINSTANCE_MESSAGETEXTS='[{"messageTextType": "InitCode", "title": "My custom title"},{"messageTextType": "PasswordReset", "greeting": "Hi there!"}]'
+  # Beware that if you configure the MessageTexts by environment variable, all the default MessageTexts are lost.
   MessageTexts:
     - MessageTextType: InitCode
       Language: de
@@ -865,7 +872,9 @@ DefaultInstance:
 
     # "actions.all.runs.seconds"
     # The sum of all actions run durations in seconds
-    Items:
+    # Configure the Items by environment variable using JSON notation:
+    # ZITADEL_DEFAULTINSTANCE_QUOTAS_ITEMS='[{"unit": "requests.all.authenticated", "notifications": [{"percent": 100}]}]'
+    Items: # ZITADEL_DEFAULTINSTANCE_QUOTAS_ITEMS
 #      - Unit: "requests.all.authenticated"
 #        # From defines the starting time from which the current quota period is calculated.
 #        # This is relevant for querying the current usage.
@@ -892,6 +901,9 @@ DefaultInstance:
 AuditLogRetention: 0s # ZITADEL_AUDITLOGRETENTION
 
 InternalAuthZ:
+  # Configure the RolePermissionMappings by environment variable using JSON notation:
+  # ZITADEL_INTERNALAUTHZ_ROLEPERMISSIONMAPPINGS='[{"role": "IAM_OWNER", "permissions": ["iam.read", "iam.write"]}]'
+  # Beware that if you configure the RolePermissionMappings by environment variable, all the default RolePermissionMappings are lost.
   RolePermissionMappings:
     - Role: "SYSTEM_OWNER"
       Permissions:
@@ -990,6 +1002,8 @@ InternalAuthZ:
         - "events.read"
         - "milestones.read"
         - "session.delete"
+        - "execution.target.write"
+        - "execution.target.delete"
     - Role: "IAM_OWNER_VIEWER"
       Permissions:
         - "iam.read"

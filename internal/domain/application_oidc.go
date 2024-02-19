@@ -141,7 +141,7 @@ func (a *OIDCApp) IsValid() bool {
 
 func (a *OIDCApp) OriginsValid() bool {
 	for _, origin := range a.AdditionalOrigins {
-		if !http_util.IsOrigin(origin) {
+		if !http_util.IsOrigin(strings.TrimSpace(origin)) {
 			return false
 		}
 	}

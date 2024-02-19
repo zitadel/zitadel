@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/encryption"
-	"github.com/zitadel/zitadel/cmd/systemapi"
+	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
@@ -23,6 +23,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/network"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/logstore"
@@ -60,7 +61,7 @@ type Config struct {
 	EncryptionKeys    *encryption.EncryptionKeyConfig
 	DefaultInstance   command.InstanceSetup
 	AuditLogRetention time.Duration
-	SystemAPIUsers    systemapi.Users
+	SystemAPIUsers    map[string]*internal_authz.SystemAPIUser
 	CustomerPortal    string
 	Machine           *id.Config
 	Actions           *actions.Config
@@ -83,6 +84,12 @@ func MustNewConfig(v *viper.Viper) *Config {
 
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
+			hooks.SliceTypeStringDecode[*domain.CustomMessageText],
+			hooks.SliceTypeStringDecode[*command.SetQuota],
+			hooks.SliceTypeStringDecode[internal_authz.RoleMapping],
+			hooks.MapTypeStringDecode[string, *internal_authz.SystemAPIUser],
+			hooks.MapTypeStringDecode[domain.Feature, any],
+			hooks.MapHTTPHeaderStringDecode,
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
@@ -90,7 +97,6 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
 			actions.HTTPConfigDecodeHook,
-			systemapi.UsersDecodeHook,
 			hook.EnumHookFunc(internal_authz.MemberTypeString),
 		)),
 	)
