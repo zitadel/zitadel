@@ -104,6 +104,12 @@ func (wm *IAMSMTPConfigWriteModel) Reduce() error {
 }
 
 func (wm *IAMSMTPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
+	// If ID equals ResourceOwner we're dealing with the old and unique smtp settings
+	// Let's set the empty ID for the query
+	if wm.ID == wm.ResourceOwner {
+		wm.ID = ""
+	}
+
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
@@ -175,6 +181,13 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigAddedEvent(e *instance.SMTPCo
 	wm.SenderName = e.SenderName
 	wm.ReplyToAddress = e.ReplyToAddress
 	wm.State = domain.SMTPConfigStateInactive
+	// If ID has empty value we're dealing with the old and unique smtp settings
+	// These would be the default values for ID and State
+	if e.ID == "" {
+		wm.Description = "generic"
+		wm.ID = e.Aggregate().ResourceOwner
+		wm.State = domain.SMTPConfigStateActive
+	}
 }
 
 func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigChangedEvent(e *instance.SMTPConfigChangedEvent) {
@@ -202,6 +215,14 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigChangedEvent(e *instance.SMTP
 	if e.ReplyToAddress != nil {
 		wm.ReplyToAddress = *e.ReplyToAddress
 	}
+
+	// If ID has empty value we're dealing with the old and unique smtp settings
+	// These would be the default values for ID and State
+	if e.ID == "" {
+		wm.Description = "generic"
+		wm.ID = e.Aggregate().ResourceOwner
+		wm.State = domain.SMTPConfigStateActive
+	}
 }
 
 func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigRemovedEvent(e *instance.SMTPConfigRemovedEvent) {
@@ -214,4 +235,10 @@ func (wm *IAMSMTPConfigWriteModel) reduceSMTPConfigRemovedEvent(e *instance.SMTP
 	wm.User = ""
 	wm.Password = nil
 	wm.State = domain.SMTPConfigStateRemoved
+
+	// If ID has empty value we're dealing with the old and unique smtp settings
+	// These would be the default values for ID and State
+	if e.ID == "" {
+		wm.ID = e.Aggregate().ResourceOwner
+	}
 }

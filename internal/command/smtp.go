@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"strings"
 
@@ -17,7 +16,6 @@ import (
 )
 
 func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config *smtp.Config) (string, *domain.ObjectDetails, error) {
-	fmt.Println("Here", config)
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
@@ -56,7 +54,6 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config 
 	}
 
 	iamAgg := InstanceAggregateFromWriteModel(ctx, &smtpConfigWriteModel.WriteModel)
-	fmt.Println("Here2", id, config)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigAddedEvent(
 		ctx,
 		iamAgg,
@@ -298,8 +295,8 @@ func checkSenderAddress(writeModel *IAMSMTPConfigWriteModel) error {
 	return nil
 }
 
-func (c *Commands) getSMTPConfig(ctx context.Context, instanceID, id, domain string) (_ *IAMSMTPConfigWriteModel, err error) {
-	writeModel := NewIAMSMTPConfigWriteModel(instanceID, id, domain)
+func (c *Commands) getSMTPConfig(ctx context.Context, instanceID, id, domain string) (writeModel *IAMSMTPConfigWriteModel, err error) {
+	writeModel = NewIAMSMTPConfigWriteModel(instanceID, id, domain)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

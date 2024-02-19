@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -21,15 +22,16 @@ const (
 type SMTPConfigAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID             string              `json:"id,omitempty"`
-	Description    string              `json:"description,omitempty"`
-	SenderAddress  string              `json:"senderAddress,omitempty"`
-	SenderName     string              `json:"senderName,omitempty"`
-	ReplyToAddress string              `json:"replyToAddress,omitempty"`
-	TLS            bool                `json:"tls,omitempty"`
-	Host           string              `json:"host,omitempty"`
-	User           string              `json:"user,omitempty"`
-	Password       *crypto.CryptoValue `json:"password,omitempty"`
+	ID             string                 `json:"id,omitempty"`
+	Description    string                 `json:"description,omitempty"`
+	SenderAddress  string                 `json:"senderAddress,omitempty"`
+	SenderName     string                 `json:"senderName,omitempty"`
+	ReplyToAddress string                 `json:"replyToAddress,omitempty"`
+	TLS            bool                   `json:"tls,omitempty"`
+	Host           string                 `json:"host,omitempty"`
+	User           string                 `json:"user,omitempty"`
+	Password       *crypto.CryptoValue    `json:"password,omitempty"`
+	State          domain.SMTPConfigState `json:"state,omitempty"`
 }
 
 func NewSMTPConfigAddedEvent(

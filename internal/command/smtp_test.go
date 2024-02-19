@@ -61,7 +61,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
 				smtp: &smtp.Config{
-					Description: "test",
+					From: "from@domain.ch",
 					SMTP: smtp.SMTP{
 						Host:     "host:587",
 						User:     "user",
@@ -73,7 +73,6 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 				err: zerrors.IsErrorInvalidArgument,
 			},
 		},
-
 		{
 			name: "add smtp config, ok",
 			fields: fields{
@@ -553,7 +552,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								"ID",
-								"test",
+								"",
 								true,
 								"from@domain.ch",
 								"name",
@@ -675,7 +674,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 								context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								"ID",
-								"test",
+								"",
 								true,
 								"from@domain.ch",
 								"name",
@@ -800,6 +799,13 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 								"host:587",
 								"user",
 								&crypto.CryptoValue{},
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMTPConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"ID",
 							),
 						),
 					),
