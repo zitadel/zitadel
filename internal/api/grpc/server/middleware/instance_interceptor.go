@@ -61,12 +61,12 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 	}
 	instance, err := verifier.InstanceByHost(interceptorCtx, host)
 	if err != nil {
-		err = zerrors.Describe(err, map[string]interface{}{"ExternalDomain": externalDomain})
+		err = zerrors.WithTemplateVariables(err, map[string]interface{}{"ExternalDomain": externalDomain})
 		notFoundErr := new(zerrors.NotFoundError)
 		if errors.As(err, &notFoundErr) {
-			descErr := new(zerrors.DescriptiveError)
-			errors.As(err, &descErr)
-			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), descErr.GetVars())
+			templErr := new(zerrors.TemplatableError)
+			errors.As(err, &templErr)
+			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), templErr.GetVars())
 		}
 		return nil, status.Error(codes.NotFound, err.Error())
 	}

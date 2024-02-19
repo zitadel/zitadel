@@ -56,15 +56,15 @@ func (a *instanceInterceptor) handleInstance(w http.ResponseWriter, r *http.Requ
 	}
 	ctx, err := setInstance(r, a.verifier, a.headerName)
 	if err != nil {
-		err = zerrors.Describe(err, map[string]interface{}{
+		err = zerrors.WithTemplateVariables(err, map[string]interface{}{
 			"Origin":         zitadel_http.ComposedOrigin(r.Context()),
 			"ExternalDomain": a.externalDomain,
 		})
 		zitadelErr := new(zerrors.NotFoundError)
 		if errors.As(err, &zitadelErr) {
-			descErr := new(zerrors.DescriptiveError)
-			errors.As(err, &descErr)
-			zitadelErr.Message = a.translator.LocalizeFromRequest(r, zitadelErr.GetMessage(), descErr.GetVars())
+			templErr := new(zerrors.TemplatableError)
+			errors.As(err, &templErr)
+			zitadelErr.Message = a.translator.LocalizeFromRequest(r, zitadelErr.GetMessage(), templErr.GetVars())
 		}
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -80,7 +80,7 @@ func setInstance(r *http.Request, verifier authz.InstanceVerifier, headerName st
 
 	host, err := HostFromRequest(r, headerName)
 	defer func() {
-		err = zerrors.Describe(err, map[string]interface{}{
+		err = zerrors.WithTemplateVariables(err, map[string]interface{}{
 			"Host": host,
 		})
 	}()
