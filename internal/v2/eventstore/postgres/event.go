@@ -35,6 +35,7 @@ func intentToCommands(intent *intent) (commands []*command, err error) {
 				// always add at least 1 to the currently stored sequence
 				sequence: intent.sequence + uint32(i) + 1,
 			},
+			intent:            intent,
 			uniqueConstraints: cmd.UniqueConstraints(),
 		}
 	}
@@ -45,6 +46,7 @@ func intentToCommands(intent *intent) (commands []*command, err error) {
 type command struct {
 	*event
 
+	intent            *intent
 	uniqueConstraints []*eventstore.UniqueConstraint
 }
 

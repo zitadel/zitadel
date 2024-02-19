@@ -122,11 +122,18 @@ func push(ctx context.Context, tx *sql.Tx, commands []*command) error {
 	var i int
 	return mapRowsToObject(rows, func(scan func(dest ...any) error) error {
 		err := scan(
-			&commands[i].createdAt,
-			&commands[i].position,
+			&commands[i].event.createdAt,
+			&commands[i].event.position,
 		)
+		if err != nil {
+			return err
+		}
 		i++
-		return err
+		reducer, ok := commands[i].intent.PushIntent.(eventstore.PushReducerIntent)
+		if !ok {
+			return nil
+		}
+		return reducer.Reduce(commands[i].event)
 	})
 }
 
