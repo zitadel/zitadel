@@ -3,6 +3,7 @@ package i18n
 import (
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -156,6 +157,9 @@ func localize(localizer *i18n.Localizer, id string, args map[string]interface{})
 	s, err := localizer.Localize(&i18n.LocalizeConfig{
 		MessageID:    id,
 		TemplateData: args,
+		Funcs: map[string]any{
+			"hasPrefix": strings.HasPrefix,
+		},
 	})
 	if err != nil {
 		logging.WithFields("id", id, "args", args).WithError(err).Warnf("missing translation")

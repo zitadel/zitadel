@@ -328,7 +328,7 @@ Errors:
       NotActive: Projekt Grant ist nicht aktiv
       NotInactive: Projekt Grant ist nicht inaktiv
   IAM:
-    NotFound: Instanz nicht gefunden. Schau dir https://zitadel.com/docs/self-hosting/manage/custom-domain an
+    NotFound: Instanz nicht gefunden{{ if .Host }} durch Ursprung {{ .Origin }} und Host {{ .Host }}. {{ if ( not ( hasPrefix .Host .ExternalDomain ) ) }}Versuchen Sie es mit der Domain {{ .ExternalDomain }} oder schauen Sie unter https://zitadel.com/docs/self-hosting/manage/custom-domain {{ end }}{{ end }}
     Member:
       RolesNotChanged: Rollen wurden nicht verändert
     MemberInvalid: Member ist ungültig

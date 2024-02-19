@@ -49,7 +49,8 @@ func New(
 	queries *query.Queries,
 	verifier internal_authz.APITokenVerifier,
 	authZ internal_authz.Config,
-	tlsConfig *tls.Config, http2HostName, http1HostName string,
+	tlsConfig *tls.Config,
+	http2HostName, http1HostName, externalDomain string,
 	accessInterceptor *http_mw.AccessInterceptor,
 ) (_ *API, err error) {
 	api := &API{
@@ -62,7 +63,7 @@ func New(
 		accessInterceptor: accessInterceptor,
 	}
 
-	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig, accessInterceptor.AccessService())
+	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, externalDomain, tlsConfig, accessInterceptor.AccessService())
 	api.grpcGateway, err = server.CreateGateway(ctx, port, http1HostName, accessInterceptor, tlsConfig)
 	if err != nil {
 		return nil, err

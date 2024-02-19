@@ -23,15 +23,15 @@ const (
 	HTTP1Host = "x-zitadel-http1-host"
 )
 
-func InstanceInterceptor(verifier authz.InstanceVerifier, headerName string, explicitInstanceIdServices ...string) grpc.UnaryServerInterceptor {
+func InstanceInterceptor(verifier authz.InstanceVerifier, headerName, externalDomain string, explicitInstanceIdServices ...string) grpc.UnaryServerInterceptor {
 	translator, err := i18n.NewZitadelTranslator(language.English)
 	logging.OnError(err).Panic("unable to get translator")
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		return setInstance(ctx, req, info, handler, verifier, headerName, translator, explicitInstanceIdServices...)
+		return setInstance(ctx, req, info, handler, verifier, headerName, externalDomain, translator, explicitInstanceIdServices...)
 	}
 }
 
-func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, headerName string, translator *i18n.Translator, idFromRequestsServices ...string) (_ interface{}, err error) {
+func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, headerName, externalDomain string, translator *i18n.Translator, idFromRequestsServices ...string) (_ interface{}, err error) {
 	interceptorCtx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	for _, service := range idFromRequestsServices {
@@ -55,16 +55,18 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 			return handler(authz.WithInstance(ctx, instance), req)
 		}
 	}
-
 	host, err := hostFromContext(interceptorCtx, headerName)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, err.Error())
 	}
 	instance, err := verifier.InstanceByHost(interceptorCtx, host)
 	if err != nil {
+		err = zerrors.Describe(err, map[string]interface{}{"ExternalDomain": externalDomain})
 		notFoundErr := new(zerrors.NotFoundError)
 		if errors.As(err, &notFoundErr) {
-			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
+			descErr := new(zerrors.DescriptiveError)
+			errors.As(err, &descErr)
+			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), descErr.GetVars())
 		}
 		return nil, status.Error(codes.NotFound, err.Error())
 	}

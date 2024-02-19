@@ -31,7 +31,9 @@ func translateError(ctx context.Context, err error, translator *i18n.Translator)
 	}
 	caosErr := new(zerrors.ZitadelError)
 	if errors.As(err, &caosErr) {
-		caosErr.SetMessage(translator.LocalizeFromCtx(ctx, caosErr.GetMessage(), nil))
+		descErr := new(zerrors.DescriptiveError)
+		errors.As(err, &descErr)
+		caosErr.SetMessage(translator.LocalizeFromCtx(ctx, caosErr.GetMessage(), descErr.GetVars()))
 	}
 	return err
 }
