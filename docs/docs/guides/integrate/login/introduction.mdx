@@ -2,14 +2,67 @@
 title: Login users into your application
 sidebar_label: Overview
 ---
+
+ZITADEL is a comprehensive identity and access management platform designed to streamline user authentication, authorization, and management processes for your application. It offers a range of features, including single sign-on (SSO), multi-factor authentication (MFA), and centralized user management.
+
+With ZITADEL, you can securely authenticate users using industry-standard protocols such as OpenID Connect and SAML. This enables seamless integration with various applications and services, providing a unified authentication experience for your users.
+
+Besides federated authentication with OpenID Connect and SAML, ZITADEL offers an API to authenticate users allowing you to create your own login process and user interface.
+
+In this guide we will walk through the different protocols, features and concepts that can be used to login users securely into your applications.
+
+## Using industry standard protocols
+
+### Authenticate users with OpenID Connect 1.0
+
+OpenID Connect (OIDC) offers a modern and lightweight authentication protocol built on top of OAuth 2.0, providing flexible authentication flows and easy integration with web and mobile applications.
+ZITADEL offers a certified compliant implementation of the OpenID Connect Standard, ensuring compliance with proven security best practices.
+
+Authenticating users through the OpenID Connect protocol, typically requires an application to redirect the user with an [Auth Request](/docs/apis/openidoauth/authrequest) to the identity provider.
+The identity provider is not part of the original application, but a standalone service like ZITADEL that may run under the [same domain](/docs/concepts/features/custom-domain.md)
+
+### Authenticate users with SAML
+
+SAML (Security Assertion Markup Language) is a widely adopted standard for exchanging authentication and authorization data between identity providers and service providers.
+
+- enterprise applications
+- often used in single-sign-on
+- applications might need to get users before authentication
+- not suitable for mobile apps
+
+link to blog
+
+## Use ZITADEL Login to login users
+
+ZITADEL provides a hosted login page to securely sign-in users to your applications.
+
+- redirect to that login
+- authenticate
+- redirect back to the application
+- "federation"
+
+## Build a custom Login UI to authenticate users
+
+## Single sign-on
+
+Federated authentication also facilitates Single Sign-On (SSO), a crucial aspect of user authentication in modern applications.
+Single Sign-On allows users to access multiple applications and services with just one set of credentials, eliminating the need to repeatedly enter login information.
+With OpenID Connect and SAML, federated authentication becomes even more powerful, enabling seamless and secure access to resources across different identity providers and service providers.
+
+By combining OpenID Connect and SAML, organizations can establish federated identity solutions that offer interoperability, scalability, and enhanced user experiences, ultimately improving security and productivity for both users and applications.
+
+## Further reference
+
+- Register & Onboarding
+
 - username & password
 - username: domain, uniqueness, email & phone number
 - 2fa, passkeys
 - SAML
+- SAML vs. OIDC
 - Enterprise SSO
 - Social Login
 - Custom login UI
-- Branding
+- Branding & Customization
 - Domain discovery
 - Playground
-- Register & Onboarding
