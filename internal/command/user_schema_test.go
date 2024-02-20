@@ -50,7 +50,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 			},
 		},
 		{
-			"invalid authenticator, error",
+			"no schema, error",
 			fields{
 				eventstore: expectEventstore(),
 			},
@@ -58,6 +58,22 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
 					Type: "type",
+				},
+			},
+			res{
+				err: zerrors.ThrowInvalidArgument(nil, "COMMA-W21tg", "Errors.UserSchema.Schema.Invalid"),
+			},
+		},
+		{
+			"invalid authenticator, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				userSchema: &CreateUserSchema{
+					Type:   "type",
+					Schema: map[string]any{},
 					PossibleAuthenticators: []domain.AuthenticatorType{
 						domain.AuthenticatorTypeUnspecified,
 					},
@@ -86,7 +102,8 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
-					Type: "type",
+					Type:   "type",
+					Schema: map[string]any{},
 					PossibleAuthenticators: []domain.AuthenticatorType{
 						domain.AuthenticatorTypeUsername,
 					},
@@ -162,7 +179,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 		},
 		{
-			"invalid authenticator, error",
+			"no schema, error",
 			fields{
 				eventstore: expectEventstore(),
 			},
@@ -170,6 +187,45 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &UpdateUserSchema{
 					ID: "id1",
+				},
+			},
+			res{
+				err: zerrors.ThrowInvalidArgument(nil, "COMMA-W21tg", "Errors.UserSchema.Schema.Invalid"),
+			},
+		},
+		{
+			"invalid schema, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				userSchema: &UpdateUserSchema{
+					ID: "id1",
+					Schema: map[string]any{
+						"properties": map[string]any{
+							"name": map[string]any{
+								"type":     "string",
+								"required": true,
+							},
+						},
+					},
+				},
+			},
+			res{
+				err: zerrors.ThrowInvalidArgument(nil, "COMMA-W21tg", "Errors.UserSchema.Schema.Invalid"),
+			},
+		},
+		{
+			"invalid authenticator, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				userSchema: &UpdateUserSchema{
+					ID:     "id1",
+					Schema: map[string]any{},
 					PossibleAuthenticators: []domain.AuthenticatorType{
 						domain.AuthenticatorTypeUnspecified,
 					},
@@ -189,8 +245,9 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &UpdateUserSchema{
-					ID:   "id1",
-					Type: gu.Ptr("type"),
+					ID:     "id1",
+					Type:   gu.Ptr("type"),
+					Schema: map[string]any{},
 					PossibleAuthenticators: []domain.AuthenticatorType{
 						domain.AuthenticatorTypeUsername,
 					},
@@ -220,8 +277,9 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &UpdateUserSchema{
-					ID:   "id1",
-					Type: gu.Ptr("type"),
+					ID:     "id1",
+					Type:   gu.Ptr("type"),
+					Schema: map[string]any{},
 					PossibleAuthenticators: []domain.AuthenticatorType{
 						domain.AuthenticatorTypeUsername,
 					},
@@ -260,8 +318,9 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &UpdateUserSchema{
-					ID:   "id1",
-					Type: gu.Ptr("newType"),
+					ID:     "id1",
+					Schema: map[string]any{},
+					Type:   gu.Ptr("newType"),
 				},
 			},
 			res{
@@ -300,7 +359,8 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &UpdateUserSchema{
-					ID: "id1",
+					ID:     "id1",
+					Schema: map[string]any{},
 					PossibleAuthenticators: []domain.AuthenticatorType{
 						domain.AuthenticatorTypeUsername,
 						domain.AuthenticatorTypePassword,

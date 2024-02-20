@@ -1,7 +1,11 @@
 package command
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+
+	"github.com/santhosh-tekuri/jsonschema"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -165,5 +169,18 @@ func (c *Commands) DeleteUserSchema(ctx context.Context, id string) (*domain.Obj
 }
 
 func validateUserSchema(schema map[string]any) error {
-	return nil // TODO: impl
+	jsonSchema, err := json.Marshal(schema)
+	if err != nil {
+		return zerrors.ThrowInvalidArgument(err, "COMMA-SFerg", "Errors.UserSchema.Schema.Invalid")
+	}
+	c := jsonschema.NewCompiler()
+	err = c.AddResource("", bytes.NewReader(jsonSchema))
+	if err != nil {
+		return zerrors.ThrowInvalidArgument(err, "COMMA-Frh42", "Errors.UserSchema.Schema.Invalid")
+	}
+	_, err = c.Compile("")
+	if err != nil {
+		return zerrors.ThrowInvalidArgument(err, "COMMA-W21tg", "Errors.UserSchema.Schema.Invalid")
+	}
+	return nil
 }
