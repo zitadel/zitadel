@@ -7,7 +7,7 @@ import (
 )
 
 type TextFilter[T text] struct {
-	Filter[textCompare, T]
+	filter[textCompare, T]
 }
 
 func NewTextEqual[T text](t T) *TextFilter[T] {
@@ -37,19 +37,19 @@ func NewTextContainsInsensitive[T text](t T) *TextFilter[T] {
 
 func newTextFilter[T text](comp textCompare, t T) *TextFilter[T] {
 	return &TextFilter[T]{
-		Filter: Filter[textCompare, T]{
+		filter: filter[textCompare, T]{
 			comp:  comp,
 			value: t,
 		},
 	}
 }
 
-func (f *TextFilter[T]) Write(stmt *Statement, columnName string) {
+func (f TextFilter[T]) Write(stmt *Statement, columnName string) {
 	if f.comp.isInsensitive() {
 		f.writeCaseInsensitive(stmt, columnName)
 		return
 	}
-	f.Filter.Write(stmt, columnName)
+	f.filter.Write(stmt, columnName)
 }
 
 func (f *TextFilter[T]) writeCaseInsensitive(stmt *Statement, columnName string) {

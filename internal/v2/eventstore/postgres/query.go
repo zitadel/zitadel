@@ -3,9 +3,6 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"fmt"
-
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
@@ -73,42 +70,78 @@ func filterQuery(stmt *database.Statement, filter *eventstore.Filter) {
 	stmt.WriteString(selectEvents)
 	writeFilterClauses(stmt, filter)
 
-	for queryIdx, query := range filter.EventQueries {
-		stmt.Builder.WriteString(" AND ")
-
-		if len(filter.EventQueries) > 1 {
-			stmt.Builder.WriteRune('(')
-		}
-
-		for extIdx, ext := range query.Exts {
-			extToFilter(stmt, ext)
-			if extIdx < len(query.Exts)-1 {
-				stmt.Builder.WriteString(" AND ")
-			}
-		}
-
-		if len(filter.EventQueries) > 1 {
-			stmt.Builder.WriteRune(')')
-		}
-
-		if queryIdx < len(filter.EventQueries)-1 {
-			stmt.Builder.WriteString(" OR ")
-		}
-	}
+	writeEventFilters(stmt, filter.EventFilters)
 
 	writeOrdering(stmt, filter.Descending)
 }
 
 func writeFilterClauses(stmt *database.Statement, filter *eventstore.Filter) {
-	writeInstanceFilter(stmt, filter.Instances)
+	filter.Instances.Write(stmt, "instance_id")
+	if filter.Position != nil {
+		stmt.WriteString(" AND ")
+		filter.Position.Write(stmt, "position")
+	}
 }
 
-func writeInstanceFilter(stmt *database.Statement, instances []string) {
-	if len(instances) == 1 {
-		database.NewTextEqual(instances[0]).Write(stmt, "instance_id")
+func writeEventFilters(stmt *database.Statement, filters []*eventstore.EventFilter) {
+	if len(filters) == 0 {
 		return
 	}
-	database.NewListContains(instances).Write(stmt, "instance_id")
+
+	stmt.Builder.WriteString(" AND ")
+
+	if len(filters) > 1 {
+		stmt.Builder.WriteRune('(')
+	}
+	for queryIdx, eventFilter := range filters {
+		writeEventFilter(stmt, eventFilter)
+
+		if queryIdx < len(filters)-1 {
+			stmt.Builder.WriteString(" OR ")
+		}
+	}
+	if len(filters) > 1 {
+		stmt.Builder.WriteRune(')')
+	}
+}
+
+func writeEventFilter(stmt *database.Statement, filter *eventstore.EventFilter) {
+	filters := filter.Filters()
+
+	if len(filters) > 1 {
+		stmt.Builder.WriteRune('(')
+	}
+
+	var mustAddAnd bool
+
+	if filter.AggregateTypes != nil {
+		filter.AggregateTypes.Write(stmt, "aggregate_type")
+		mustAddAnd = true
+	}
+	if filter.AggregateIDs != nil {
+		if mustAddAnd {
+			stmt.WriteString(" AND ")
+		}
+		filter.AggregateIDs.Write(stmt, "aggregate_id")
+		mustAddAnd = true
+	}
+	if filter.EventTypes != nil {
+		if mustAddAnd {
+			stmt.WriteString(" AND ")
+		}
+		filter.EventTypes.Write(stmt, "event_type")
+		mustAddAnd = true
+	}
+	if filter.Sequence != nil {
+		if mustAddAnd {
+			stmt.WriteString(" AND ")
+		}
+		filter.Sequence.Write(stmt, "sequence")
+	}
+
+	if len(filters) > 1 {
+		stmt.Builder.WriteRune(')')
+	}
 }
 
 func writeOrdering(stmt *database.Statement, descending bool) {
@@ -123,31 +156,26 @@ func writeOrdering(stmt *database.Statement, descending bool) {
 	}
 }
 
-func extToFilter(stmt *database.Statement, ext eventstore.EventQueryExt) {
-	switch filter := ext.(type) {
-	case *eventstore.AggregateTypesFilter:
-		if len(filter.Types()) == 1 {
-			database.NewTextEqual(filter.Types()[0]).Write(stmt, "aggregate_type")
-			return
-		}
-		database.NewListContains(filter.Types()).Write(stmt, "aggregate_type")
-	case *eventstore.EventTypesFilter:
-		if len(filter.Types()) == 1 {
-			database.NewTextEqual(filter.Types()[0]).Write(stmt, "event_type")
-			return
-		}
-		database.NewListContains(filter.Types()).Write(stmt, "event_type")
-	case *eventstore.AggregateIDsFilter:
-		if len(filter.IDs()) == 1 {
-			database.NewTextEqual(filter.IDs()[0]).Write(stmt, "aggregate_id")
-			return
-		}
-		database.NewListContains(filter.IDs()).Write(stmt, "aggregate_id")
-	case *eventstore.SequenceFilter[eventstore.SequenceBetweenType]:
-		filter.Filter().Write(stmt, "sequence")
-	case *eventstore.SequenceFilter[eventstore.SequenceEqualsType]:
-		filter.Filter().Write(stmt, "sequence")
-	default:
-		logging.WithFields("ext_type", fmt.Sprintf("%T", ext)).Panic("event filter not implemented")
-	}
-}
+// func writeEventFilter(stmt *database.Statement, filter database.Filter) {
+// 	var columnName string
+// 	switch filter.(type) {
+// 	case *eventstore.AggregateTypesFilter:
+// 		columnName = "aggregate_type"
+// 	case *eventstore.EventTypesFilter:
+// 		columnName = "event_type"
+// 	case *eventstore.AggregateIDsFilter:
+// 		columnName = "aggregate_id"
+// 	case *eventstore.SequenceFilter[eventstore.SequenceEqualsType],
+// 		*eventstore.SequenceFilter[eventstore.SequenceAtLeastType],
+// 		*eventstore.SequenceFilter[eventstore.SequenceGreaterType],
+// 		*eventstore.SequenceFilter[eventstore.SequenceAtMostType],
+// 		*eventstore.SequenceFilter[eventstore.SequenceLessType],
+// 		*eventstore.SequenceFilter[eventstore.SequenceBetweenType]:
+// 		columnName = "sequence"
+// 	default:
+// 		logging.WithFields("ext_type", fmt.Sprintf("%T", filter)).
+// 			Panic("event filter not implemented")
+// 	}
+
+// 	filter.Write(stmt, columnName)
+// }

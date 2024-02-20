@@ -1,11 +1,15 @@
 package database
 
-type Filter[C compare, V value] struct {
+type Filter interface {
+	Write(stmt *Statement, columnName string)
+}
+
+type filter[C compare, V value] struct {
 	comp  C
 	value V
 }
 
-func (f *Filter[C, V]) Write(stmt *Statement, columnName string) {
+func (f filter[C, V]) Write(stmt *Statement, columnName string) {
 	stmt.Builder.WriteString(columnName)
 	stmt.Builder.WriteRune(' ')
 	stmt.Builder.WriteString(f.comp.String())

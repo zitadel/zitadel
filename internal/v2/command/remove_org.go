@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/v2/org"
+	"github.com/zitadel/zitadel/internal/v2/projection"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -19,12 +20,13 @@ type RemoveOrg struct {
 
 	id       string
 	sequence uint32
-	state    org.State
+	state    projection.OrgState
 }
 
 func NewRemoveOrg(id string) *RemoveOrg {
 	return &RemoveOrg{
-		id: id,
+		id:    id,
+		state: *projection.NewStateProjection(id),
 	}
 }
 
@@ -37,16 +39,19 @@ func (i *RemoveOrg) ToPushIntent(ctx context.Context, querier eventstore.Querier
 
 	err := querier.Query(
 		ctx,
-		eventstore.NewFilter(
-			ctx,
-			eventstore.FilterEventQuery(
-				eventstore.FilterAggregateTypes(org.AggregateType),
-				eventstore.FilterAggregateIDs(i.id),
-				eventstore.FilterEventTypes(
-					org.Added.Type(),
-					org.Removed.Type(),
+		eventstore.MergeFilters(
+			eventstore.NewFilter(
+				ctx,
+				eventstore.FilterEventQuery(
+					eventstore.FilterAggregateTypes(org.AggregateType),
+					eventstore.FilterAggregateIDs(i.id),
+					eventstore.FilterEventTypes(
+						org.Added.Type(),
+						org.Removed.Type(),
+					),
 				),
 			),
+			i.state.Filter(ctx),
 		),
 		i,
 	)
@@ -82,14 +87,6 @@ func (i *RemoveOrg) CurrentSequence() eventstore.CurrentSequence {
 
 // Reduce implements [eventstore.Reducer].
 func (i *RemoveOrg) Reduce(events ...eventstore.Event) error {
-	for _, event := range events {
-		switch event.Type() {
-		case org.Added.Type():
-			i.state = org.ActiveState
-		case org.Removed.Type():
-			i.state = org.RemovedState
-		}
-	}
-
-	return nil
+	i.sequence = events[len(events)-1].Sequence()
+	return i.state.Reduce(events...)
 }

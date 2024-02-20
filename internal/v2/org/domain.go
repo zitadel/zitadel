@@ -29,7 +29,7 @@ func NewDomainAddedEvent(ctx context.Context, name string) (*DomainAddedEvent, e
 
 // Type implements [eventstore.action].
 func (e *DomainAddedEvent) Type() string {
-	return string(append([]byte(eventTypePrefix), e.AddedEvent.Type()...))
+	return string(append([]byte(eventTypePrefix), new(domain.AddedEvent).Type()...))
 }
 
 // UniqueConstraints implements [eventstore.Command].
@@ -57,7 +57,7 @@ func NewDomainVerifiedEvent(ctx context.Context, name string) (*DomainVerifiedEv
 
 // Type implements [eventstore.action].
 func (e *DomainVerifiedEvent) Type() string {
-	return string(append([]byte(eventTypePrefix), e.VerifiedEvent.Type()...))
+	return string(append([]byte(eventTypePrefix), new(domain.VerifiedEvent).Type()...))
 }
 
 // UniqueConstraints implements [eventstore.Command].
@@ -87,7 +87,7 @@ func NewSetDomainPrimaryEvent(ctx context.Context, name string) (*SetDomainPrima
 
 // Type implements [eventstore.action].
 func (e *SetDomainPrimaryEvent) Type() string {
-	return string(append([]byte(eventTypePrefix), e.PrimarySetEvent.Type()...))
+	return string(append([]byte(eventTypePrefix), new(domain.PrimarySetEvent).Type()...))
 }
 
 // UniqueConstraints implements [eventstore.Command].

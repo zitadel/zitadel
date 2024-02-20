@@ -22,7 +22,7 @@ func newListFilter[V value](comp listCompare, list []V) *ListFilter[V] {
 	}
 }
 
-func (f *ListFilter[V]) Write(stmt *Statement, columnName string) {
+func (f ListFilter[V]) Write(stmt *Statement, columnName string) {
 	stmt.Builder.WriteString(columnName)
 	stmt.Builder.WriteRune(' ')
 	stmt.Builder.WriteString(f.comp.String())

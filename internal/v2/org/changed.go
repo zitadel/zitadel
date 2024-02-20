@@ -10,6 +10,8 @@ var (
 
 type ChangedEvent struct {
 	creator string
+
+	Name *string `json:"name,omitempty"`
 }
 
 func NewChangedEvent() *ChangedEvent {

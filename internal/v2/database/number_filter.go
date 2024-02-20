@@ -6,7 +6,7 @@ import (
 )
 
 type NumberFilter[N number] struct {
-	Filter[numberCompare, N]
+	filter[numberCompare, N]
 }
 
 func NewNumberEquals[N number](n N) *NumberFilter[N] {
@@ -35,7 +35,7 @@ func NewNumberUnequal[N number](n N) *NumberFilter[N] {
 
 func newNumberFilter[N number](comp numberCompare, n N) *NumberFilter[N] {
 	return &NumberFilter[N]{
-		Filter: Filter[numberCompare, N]{
+		filter: filter[numberCompare, N]{
 			comp:  comp,
 			value: n,
 		},
@@ -47,7 +47,7 @@ type NumberBetweenFilter[N number] struct {
 	min, max *NumberFilter[N]
 }
 
-func (f *NumberBetweenFilter[N]) Write(stmt *Statement, columnName string) {
+func (f NumberBetweenFilter[N]) Write(stmt *Statement, columnName string) {
 	f.min.Write(stmt, columnName)
 	stmt.Builder.WriteString(" AND ")
 	f.max.Write(stmt, columnName)
