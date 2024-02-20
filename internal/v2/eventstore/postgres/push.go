@@ -13,7 +13,7 @@ import (
 
 // Push implements eventstore.Pusher.
 func (s *Storage) Push(ctx context.Context, pushIntents ...eventstore.PushIntent) (err error) {
-	tx, err := s.client.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted, ReadOnly: false})
+	tx, err := s.client.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable, ReadOnly: false})
 	if err != nil {
 		return err
 	}
