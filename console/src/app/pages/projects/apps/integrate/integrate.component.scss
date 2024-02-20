@@ -3,173 +3,105 @@ h1 {
   font-size: 1.5rem;
 }
 
-p.desc {
-  font-size: 14px;
-}
+@mixin app-integrate-theme($theme) {
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: map-get($primary, 500);
 
-.proswitch {
-  margin-bottom: 2rem;
-  display: block;
-}
+  $warn-color: map-get($warn, 500);
+  $accent-color: map-get($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
 
-.name-formfield {
-  max-width: 400px;
-  display: block;
-}
+  $list-background-color: map-get($background, 300);
+  $card-background-color: map-get($background, cards);
+  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+  $border-selected-color: if($is-dark-theme, #fff, #000);
 
-.app-create-container {
-  padding-top: 2rem;
-
-  .progress-bar {
-    margin-bottom: 1rem;
-  }
-}
-
-.margin-right {
-  margin-right: 0.5rem;
-}
-
-.full-width {
-  width: 100%;
-}
-
-.stepper {
-  background: inherit !important;
-  margin: 0 -1.5rem;
-
-  .formfield {
-    max-width: 400px;
-  }
-
-  .step-title {
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .step-description {
-    font-size: 0.9rem;
-  }
-
-  .mat-step-icon-content {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    display: flex;
-    top: 50%;
-    left: 50%;
-  }
-}
-
-.checkbox-container {
-  display: flex;
-  flex-direction: column;
-
-  .checkbox {
-    margin: 0.5rem 0;
-  }
-}
-
-.cnsl-app-or {
-  margin-right: 1rem;
-}
-
-.row {
-  display: flex;
-  justify-content: space-between;
-
-  .left,
-  .right {
-    margin-bottom: 0.5rem;
+  .review-description {
     font-size: 14px;
-  }
-}
-
-.saml-xml {
-  margin-top: 2rem;
-
-  &.disabled {
-    opacity: 0.5;
-    pointer-events: none;
-  }
-}
-
-.app-create-actions {
-  margin-top: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  .bck-button {
-    margin-right: 1rem;
-  }
-
-  .create-button {
-    height: 3.5rem;
-    padding: 0 4rem;
-  }
-}
-
-.dev {
-  .content {
-    display: flex;
-    margin: 0 -0.5rem;
-    flex-wrap: wrap;
-    flex-direction: row;
-
-    .formfield {
-      flex: 1;
-      box-sizing: border-box;
-      margin: 0 0.5rem;
-
-      &.full-width {
-        flex-basis: 80%;
-      }
-    }
-
-    .saml {
-      display: block;
-      width: 100%;
-      margin: 0 0.5rem;
-
-      .formfield {
-        margin: 0;
-      }
-    }
-  }
-
-  .continue-button {
-    margin-top: 3rem;
+    margin: 0.25rem 0 0 0;
     display: block;
-    height: 3.5rem;
-    padding: 0 4rem;
-  }
-}
-
-.metadata-option {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-  display: flex;
-  flex-direction: column;
-
-  .upload-button {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-    width: 25%;
   }
 
-  .saml-config-option {
-    font-size: 14px;
+  .app-create-actions {
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .bck-button {
+      margin-right: 1rem;
+    }
+
+    .create-button {
+      height: 3.5rem;
+      padding: 0 4rem;
+    }
   }
-}
 
-.cert {
-  font-size: 14px;
-  cursor: pointer;
-  text-decoration: none;
-  color: inherit;
-  font-family: inherit;
+  .framework-card-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 
-  &:hover {
-    text-decoration: underline;
+    .framework-card {
+      position: relative;
+      flex-shrink: 0;
+      text-decoration: none;
+      border-radius: 0.5rem;
+      box-sizing: border-box;
+      transition: all 0.1s ease-in;
+      display: flex;
+      flex-direction: row;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      // background-color: if($is-dark-theme, map-get($background, state), #e4e7e4);
+      // box-shadow: 0 0 3px #0000001a;
+      border: 1px solid rgba(#8795a1, 0.2);
+      padding: 0 0.5rem;
+
+      img {
+        width: 100%;
+        height: 100%;
+        max-width: 40px;
+        max-height: 40px;
+        object-fit: contain;
+        object-position: center;
+      }
+
+      .dark-only {
+        display: if($is-dark-theme, block, none);
+      }
+
+      .light-only {
+        display: if($is-dark-theme, none, block);
+      }
+
+      span {
+        margin: 0.5rem;
+        text-align: center;
+        color: map-get($foreground, text);
+      }
+
+      .action-row {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        font-size: 14px;
+        margin-bottom: 0.5rem;
+        color: map-get($primary, 400);
+
+        .icon {
+          margin-left: 0rem;
+        }
+      }
+    }
   }
 }

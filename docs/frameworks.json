@@ -1,5 +1,6 @@
 [
   {
+    "id": "angular",
     "title": "Angular",
     "imgSrcLight": "/docs/img/tech/angular.svg",
     "imgSrcDark": "/docs/img/tech/angular.svg",
@@ -26,6 +27,7 @@
     "docsLink": "/docs/sdk-examples/nestjs"
   },
   {
+    "id": "next",
     "title": "Next.js",
     "imgSrcDark": "/docs/img/tech/nextjs.svg",
     "imgSrcLight": "/docs/img/tech/nextjslight.svg",

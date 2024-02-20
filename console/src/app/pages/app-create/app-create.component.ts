@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnDestroy, signal } from '@angular/core';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
 import { ProjectAutocompleteType } from 'src/app/modules/search-project-autocomplete/search-project-autocomplete.component';
@@ -7,13 +8,14 @@ import { AddProjectRequest, AddProjectResponse } from 'src/app/proto/generated/z
 import { GrantedProject, Project } from 'src/app/proto/generated/zitadel/project_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { Framework } from 'src/app/components/quickstart/quickstart.component';
 
 @Component({
   selector: 'cnsl-app-create',
   templateUrl: './app-create.component.html',
   styleUrls: ['./app-create.component.scss'],
 })
-export class AppCreateComponent {
+export class AppCreateComponent implements OnDestroy {
   public InfoSectionType: any = InfoSectionType;
   public project?: {
     project: Project.AsObject | GrantedProject.AsObject;
@@ -24,6 +26,10 @@ export class AppCreateComponent {
   public projectName: string = '';
 
   public error = signal('');
+  public framework = signal<Framework | undefined>(undefined);
+  public showFrameworkAutocomplete = signal<boolean>(false);
+
+  public destroy$: Subject<void> = new Subject();
 
   constructor(
     private router: Router,
@@ -35,6 +41,11 @@ export class AppCreateComponent {
       routerLink: ['/org'],
     };
     breadcrumbService.setBreadcrumb([bread]);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   public goToAppIntegratePage(): void {

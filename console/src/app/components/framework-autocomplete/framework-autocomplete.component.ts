@@ -1,27 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import frameworkDefinition from '../../../../../docs/frameworks.json';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Observable, map, startWith, switchMap, tap } from 'rxjs';
-
-type FrameworkDefinition = {
-  title: string;
-  imgSrcDark: string;
-  imgSrcLight?: string;
-  docsLink: string;
-  external?: boolean;
-};
-
-type Framework = FrameworkDefinition & {
-  fragment: string;
-};
+import { Observable, map, of, startWith, switchMap, tap } from 'rxjs';
+import { Framework } from '../quickstart/quickstart.component';
 
 @Component({
   standalone: true,
@@ -41,39 +29,38 @@ type Framework = FrameworkDefinition & {
     InputModule,
   ],
 })
-export class FrameworkAutocompleteComponent {
+export class FrameworkAutocompleteComponent implements OnInit {
   public isLoading = signal(false);
-  public frameworks: Framework[] = frameworkDefinition.map((f) => {
-    return {
-      ...f,
-      fragment: '',
-      imgSrcDark: `assets${f.imgSrcDark}`,
-      imgSrcLight: `assets${f.imgSrcLight ? f.imgSrcLight : f.imgSrcDark}`,
-    };
-  });
+  @Input() public frameworks: Framework[] = [];
   public myControl: FormControl = new FormControl();
-  @Output() public selectionChanged: EventEmitter<Framework> = new EventEmitter();
-  filteredOptions: Observable<Framework[]>;
+  @Output() public selectionChanged: EventEmitter<string> = new EventEmitter();
+  public filteredOptions: Observable<Framework[]> = of([]);
 
-  constructor() {
+  constructor() {}
+
+  public ngOnInit() {
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
-      map((value) => this._filter(value || '')),
+      map((value) => {
+        console.log(value);
+        return this._filter(value || '');
+      }),
     );
   }
 
   private _filter(value: string): Framework[] {
     const filterValue = value.toLowerCase();
-
-    return this.frameworks.filter((option) => option.title.toLowerCase().includes(filterValue));
+    console.log(filterValue, this.frameworks);
+    return this.frameworks
+      .filter((option) => option.id)
+      .filter((option) => option.title.toLowerCase().includes(filterValue));
   }
 
-  public displayFn(project?: any): string {
-    return project && project.projectName ? `${project.projectName}` : project && project.name ? `${project.name}` : '';
+  public displayFn(framework?: Framework): string {
+    return framework?.title ?? '';
   }
 
   public selected(event: MatAutocompleteSelectedEvent): void {
-    const f: Framework = event.option.value;
-    this.selectionChanged.emit(f);
+    this.selectionChanged.emit(event.option.value);
   }
 }

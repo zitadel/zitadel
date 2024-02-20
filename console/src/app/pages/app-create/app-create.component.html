@@ -1,5 +1,7 @@
 <cnsl-create-layout title="{{ 'APP.PAGES.CREATE' | translate }}" (closed)="close()">
   <div class="app-create-main-content">
+    <cnsl-framework-change (frameworkChanged)="framework.set($event)"></cnsl-framework-change>
+
     <h1>{{ 'APP.PAGES.CREATE_SELECT_PROJECT' | translate }}</h1>
 
     <cnsl-search-project-autocomplete

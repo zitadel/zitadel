@@ -1,17 +1,19 @@
 <form>
   <cnsl-form-field class="full-width">
-    <cnsl-label>{{ 'USER.GRANTS.PROJECTNAME' | translate }}</cnsl-label>
-    <input cnslInput type="text" placeholder="Project XY" #nameInput [formControl]="myControl" [matAutocomplete]="auto" />
+    <cnsl-label>{{ 'QUICKSTART.FRAMEWORK' | translate }}</cnsl-label>
+    <input cnslInput type="text" placeholder="" #nameInput [formControl]="myControl" [matAutocomplete]="auto" />
 
     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
       <mat-option *ngIf="isLoading()" class="is-loading">
         <mat-spinner diameter="30"></mat-spinner>
       </mat-option>
-      <mat-option *ngFor="let framework of frameworks" [value]="framework">
-        <div class="project-option">
-          <div class="project-option-column">
-            <img class="dark-only" *ngIf="framework.imgSrcDark" [src]="framework.imgSrcDark" />
-            <img class="light-only" *ngIf="framework.imgSrcLight" [src]="framework.imgSrcLight" />
+      <mat-option *ngFor="let framework of filteredOptions | async" [value]="framework.id">
+        <div class="framework-option">
+          <div class="framework-option-column">
+            <div class="img-wrapper">
+              <img class="dark-only" *ngIf="framework.imgSrcDark" [src]="framework.imgSrcDark" />
+              <img class="light-only" *ngIf="framework.imgSrcLight" [src]="framework.imgSrcLight" />
+            </div>
             <span class="fill-space"></span>
 
             <span>{{ framework.title }}</span>

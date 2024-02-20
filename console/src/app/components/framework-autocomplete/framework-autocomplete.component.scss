@@ -16,108 +16,53 @@
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
   $border-selected-color: if($is-dark-theme, #fff, #000);
 
-  .quickstart-header {
+  .full-width {
+    width: 100%;
+  }
+
+  input {
+    max-width: 500px;
+  }
+
+  .framework-option {
     display: flex;
-    flex-direction: row;
-    margin: 0 -2rem;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    gap: 5rem;
-    justify-content: space-between;
-    background-color: map-get($background, metadata-section);
-    // background-image: repeating-radial-gradient(circle at 100 100, transparent 0, #00000020 10px),
-    //   repeating-linear-gradient(#00000010, #00000010);
+    align-items: center;
 
-    .quickstart-left {
+    .framework-option-column {
       display: flex;
-      flex-direction: column;
-      max-width: 400px;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
 
-      .btn-wrapper {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 1rem;
-        margin: 1rem 0;
+      span {
+        line-height: normal;
       }
-    }
 
-    .quickstart-card-wrapper {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      grid-column-gap: 1rem;
-      grid-row-gap: 1rem;
-      grid-auto-columns: 0;
-      overflow-x: hidden;
-      box-sizing: border-box;
-      max-width: 600px;
-      margin-left: auto;
+      .fill-space {
+        flex: 1;
+      }
 
-      .quickstart-card {
-        position: relative;
-        flex-shrink: 0;
-        text-decoration: none;
-        cursor: pointer;
-        border-radius: 0.5rem;
-        box-sizing: border-box;
-        transition: all 0.1s ease-in;
-        display: flex;
-        flex-direction: column;
-        height: 60px;
-        width: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        // background-color: if($is-dark-theme, map-get($background, state), #e4e7e4);
-        box-shadow: 0 0 3px #0000001a;
-        border: 1px solid rgba(#8795a1, 0.2);
-        color: var(--success);
-        opacity: 0.8;
-
-        &:hover {
-          border: 2px solid var(--success);
-          opacity: 1;
-        }
+      .img-wrapper {
+        width: 50px;
+        margin-right: 1rem;
 
         img {
           width: 100%;
           height: 100%;
-          max-width: 40px;
-          max-height: 40px;
+          max-width: 30px;
+          max-height: 30px;
           object-fit: contain;
           object-position: center;
         }
+      }
 
-        .dark-only {
-          display: if($is-dark-theme, block, none);
-        }
+      .dark-only {
+        display: if($is-dark-theme, block, none);
+      }
 
-        .light-only {
-          display: if($is-dark-theme, none, block);
-        }
-
-        span {
-          margin: 0.5rem;
-          text-align: center;
-          color: map-get($foreground, text);
-        }
-
-        .action-row {
-          display: flex;
-          align-items: center;
-          justify-content: flex-end;
-          font-size: 14px;
-          margin-bottom: 0.5rem;
-          color: map-get($primary, 400);
-
-          .icon {
-            margin-left: 0rem;
-          }
-        }
-
-        &:hover {
-          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
-        }
+      .light-only {
+        display: if($is-dark-theme, none, block);
       }
     }
   }

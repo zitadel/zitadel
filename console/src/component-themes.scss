@@ -29,6 +29,7 @@
 @import 'src/app/modules/top-view/top-view.component';
 @import 'src/app/pages/projects/projects.component';
 @import 'src/app/modules/edit-text/edit-text.component.scss';
+@import 'src/app/pages/projects/apps/integrate/integrate.component.scss';
 @import 'src/app/modules/providers/providers.scss';
 @import 'src/app/pages/users/user-detail/auth-user-detail/auth-user-detail.component';
 @import 'src/app/pages/users/user-detail/user-detail/user-detail.component';
@@ -45,10 +46,12 @@
 @import 'src/app/modules/string-list/string-list.component.scss';
 @import 'src/app/components/quickstart/quickstart.component.scss';
 @import 'src/app/components/framework-autocomplete/framework-autocomplete.component.scss';
+@import 'src/app/components/framework-change/framework-change.component.scss';
 @import 'src/app/modules/meta-layout/meta.scss';
 @import 'src/app/pages/projects/owned-projects/project-grant-detail/project-grant-illustration/project-grant-illustration.component';
 @import 'src/app/modules/accounts-card/accounts-card.component.scss';
 @import 'src/app/modules/onboarding-card/onboarding-card.component.scss';
+@import 'src/app/pages/app-create/app-create.component.scss';
 @import 'src/app/modules/onboarding/onboarding.component.scss';
 @import 'src/app/modules/filter/filter.component.scss';
 @import 'src/app/modules/policies/message-texts/message-texts.component.scss';
@@ -85,6 +88,7 @@
   @include info-overlay-theme($theme);
   @include app-auth-method-radio-theme($theme);
   @include security-policy-theme($theme);
+  @include framework-change-theme($theme);
   @include search-user-autocomplete-theme($theme);
   @include quickstart-theme($theme);
   @include project-role-chips-theme($theme);
@@ -135,11 +139,12 @@
   @include project-grid-theme($theme);
   @include granted-project-detail-theme($theme);
   @include user-grants-theme($theme);
+  @include app-create-theme($theme);
   @include info-row-theme($theme);
   @include redirect-uris-theme($theme);
   @include action-keys-theme($theme);
   @include codemirror-theme($theme);
   @include contact-theme($theme);
-  @include app-create-theme($theme);
+  @include app-integrate-theme($theme);
   @include domain-verification-theme($theme);
 }

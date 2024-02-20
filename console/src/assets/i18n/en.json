@@ -124,7 +124,10 @@
     "DESCRIPTION": "Integrate ZITADEL into your application or use one of our samples to get started in minutes.",
     "BTN_START": "Create Application",
     "BTN_LEARNMORE": "Learn More",
-    "CREATEPROJECTFORAPP": "Create Project {{value}}"
+    "CREATEPROJECTFORAPP": "Create Project {{value}}",
+    "FRAMEWORK": "Framework",
+    "REVIEWCONFIGURATION": "Review Configuration",
+    "REVIEWCONFIGURATION_DESCRIPTION": "We've created a basic configuration for {{value}} applications. You can adapt this configuration to your needs after creation."
   },
   "ACTIONS": {
     "ACTIONS": "Actions",

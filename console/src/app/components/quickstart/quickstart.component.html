@@ -13,15 +13,14 @@
     </div>
   </div>
   <div class="quickstart-card-wrapper">
-    <ng-container *ngFor="let framework of frameworks.slice(0, 17)">
-      <a [routerLink]="['/app-create']" [queryParams]="{ id: framework.docsLink }" class="quickstart-card card">
-        <img class="dark-only" *ngIf="framework.imgSrcDark" [src]="framework.imgSrcDark" />
-        <img class="light-only" *ngIf="framework.imgSrcLight" [src]="framework.imgSrcLight" />
-        <!-- <span>{{ framework.title }}</span> -->
+    <ng-container *ngFor="let framework of frameworks.slice(0, 18)">
+      <a [routerLink]="['/projects', 'app-create']" [queryParams]="{ framework: framework.id }" class="quickstart-card card">
+        <img class="dark-only" *ngIf="framework.imgSrcDark" [src]="framework.imgSrcDark" alt="{{ framework.title }}" />
+        <img class="light-only" *ngIf="framework.imgSrcLight" [src]="framework.imgSrcLight" alt="{{ framework.title }}" />
       </a>
     </ng-container>
-    <a href="https://zitadel.com/docs/sdk-examples/introduction" target="_blank" class="quickstart-card card">
+    <!-- <a href="https://zitadel.com/docs/sdk-examples/introduction" target="_blank" class="quickstart-card card">
       <span>and more</span>
-    </a>
+    </a> -->
   </div>
 </div>
