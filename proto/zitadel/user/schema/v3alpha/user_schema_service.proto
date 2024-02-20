@@ -407,7 +407,7 @@ message UpdateUserSchemaRequest {
   //
   // Removal of an authenticator does not remove the authenticator on a user.
   repeated AuthenticatorType possible_authenticators = 4 [
-    (validate.rules).repeated = {unique: true, items: {enum: {defined_only: true}}},
+    (validate.rules).repeated = {unique: true, items: {enum: {defined_only: true, not_in: [0]}}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[\"AUTHENTICATOR_TYPE_USERNAME\",\"AUTHENTICATOR_TYPE_PASSWORD\",\"AUTHENTICATOR_TYPE_WEBAUTHN\"]";
     }
