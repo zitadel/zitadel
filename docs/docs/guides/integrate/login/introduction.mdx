@@ -18,28 +18,87 @@ In this guide we will walk through the different protocols, features and concept
 OpenID Connect (OIDC) offers a modern and lightweight authentication protocol built on top of OAuth 2.0, providing flexible authentication flows and easy integration with web and mobile applications.
 ZITADEL offers a certified compliant implementation of the OpenID Connect Standard, ensuring compliance with proven security best practices.
 
-Authenticating users through the OpenID Connect protocol, typically requires an application to redirect the user with an [Auth Request](/docs/apis/openidoauth/authrequest) to the identity provider.
+Authenticating users through the OpenID Connect protocol, typically requires an application to redirect the user with an [Auth Request](/docs/apis/openidoauth/authrequest) to the identity provider that contains information such as the requesting application, [scopes](https://zitadel.com/docs/apis/openidoauth/scopes), and redirect url.
 The identity provider is not part of the original application, but a standalone service like ZITADEL that may run under the [same domain](/docs/concepts/features/custom-domain.md)
+The user will authenticate using their credentials.
+After successful authentication the user will be redirected back to the original application.
 
 ### Authenticate users with SAML
 
 SAML (Security Assertion Markup Language) is a widely adopted standard for exchanging authentication and authorization data between identity providers and service providers.
 
-- enterprise applications
-- often used in single-sign-on
-- applications might need to get users before authentication
-- not suitable for mobile apps
+Authentication with SAML (Security Assertion Markup Language) involves a series of exchanges between a service provider (SP), an identity provider (IdP), and the user. Here's an overview of how the process typically works:
 
-link to blog
+1. **User Attempts to Access a Service**: The user tries to access a service or application that requires authentication, such as logging into a web application.
 
-## Use ZITADEL Login to login users
+2. **Service Provider Redirects to Identity Provider**: The service provider (SP) detects that the user needs to be authenticated and redirects the user's browser to the designated identity provider (IdP) for authentication. This redirection often occurs via a SAML request, which includes information about the service provider and a request for authentication.
+
+3. **User Authenticates with Identity Provider**: The user is presented with the identity provider's login page, where they enter their credentials (username and password). Alternatively, depending on the IdP's configuration, the user might be authenticated using single sign-on (SSO) mechanisms such as a pre-existing session or multi-factor authentication.
+
+4. **Identity Provider Generates SAML Assertion**: Upon successful authentication, the identity provider creates a SAML assertion containing information about the user, such as their identity and attributes. This assertion is digitally signed by the identity provider to ensure its integrity and authenticity.
+
+5. **SAML Assertion Sent to Service Provider**: The identity provider sends the SAML assertion back to the user's browser as a response to the original SAML request. The browser then forwards the assertion to the service provider.
+
+6. **Service Provider Validates SAML Assertion**: The service provider receives the SAML assertion and validates it to ensure its integrity and authenticity. This typically involves verifying the digital signature of the assertion and checking that it originated from a trusted identity provider.
+
+7. **User Granted Access**: If the SAML assertion is successfully validated, the service provider considers the user authenticated and grants them access to the requested service or application. The user can now interact with the service without needing to reauthenticate until their session expires or they log out.
+
+Overall, authentication with SAML provides a secure and standardized method for enabling single sign-on (SSO) and federated identity management across different applications and systems.
+It allows users to access multiple services with a single set of credentials, streamlining the authentication process while maintaining strong security measures.
+
+Note that SAML might not be suitable for mobile applications.
+In case you want to integrate a mobile application, use OpenID Connect or our Session API.
+
+There are more [differences between SAML and OIDC](/blog/saml-vs-oidc) that you might want to consider.
+
+## Use the Hosted Login to sign-in users
 
 ZITADEL provides a hosted login page to securely sign-in users to your applications.
 
-- redirect to that login
-- authenticate
-- redirect back to the application
-- "federation"
+ZITADEL's hosted login page serves as a centralized authentication interface provided for applications that integrate ZITADEL. As a developer, understanding the hosted login page is essential for seamlessly integrating authentication into your application. Here's how it works:
+
+### Centralized authentication endpoint
+
+ZITADEL's hosted login page acts as a centralized authentication endpoint where users are redirected to authenticate themselves. When users attempt to access a protected resource within your application, you can redirect them to the hosted login page to authenticate using their loginnames and credentials or through Single-sign-on (SSO).
+
+### Flexible user names and identities
+
+Different login name formats can be used on ZITADEL's hosted login page to select a user.
+Login names can be a user's username, containing the username and an [organization domain](/docs/guides/manage/console/organizations#domain-verification-and-primary-domain), their email addresses, or their phone numbers.
+By default all of these login names are allowed and can be adjusted by [Managers](/docs/concepts/structure/managers) to meet their requirements.
+
+### Support for multiple authentication methods
+
+The hosted login page supports various authentication methods, including traditional username/password authentication, social login options, multi-factor authentication (MFA), and passwordless authentication methods like [passkeys](/docs/concepts/features/passkeys.md).
+Available second factor (2FA) and multi-factor authentication methods (MFA) include OTP via authenticator app, OTP via SMS, OTP via email, and U2F.
+
+Developers can configure the authentication methods offered on the login page based on their application's security and usability requirements.
+
+### Multi-tenant enterprise single-sign-on
+
+With the hosted login page from ZITADEL developers will get the best support for multi-tenancy single-sign-on with third party identity providers.
+ZITADEL acts as [identity broker](/docs/concepts/features/identity-brokering)
+
+- Identity providers per tenant
+- Domain discovery
+- Available templates [Okta](/docs/guides/integrate/identity-providers/okta) or [Entra ID](/docs/guides/integrate/identity-providers/azure-ad) 
+- [LDAP](/docs/guides/integrate/identity-providers/ldap)
+
+### Customization Options
+
+While the hosted login page provides a default authentication interface out-of-the-box, ZITADEL offers customization options to tailor the login page to match your application's branding and user experience requirements. Developers can customize elements such as logos, colors, and messaging to ensure a seamless integration with their application's user interface.
+
+### Security and Compliance
+
+ZITADEL's hosted login page prioritizes security and compliance with industry standards and regulations. It employs best practices for securing authentication processes, such as encryption, token-based authentication, and adherence to protocols like OAuth 2.0, OpenID Connect, and SAML. Additionally, ZITADEL ensures compliance with regulations such as GDPR (General Data Protection Regulation) and provides features like consent management to enhance user privacy and data protection.
+
+- opaque vs. jwt tokens
+
+### Developer-Friendly Integration
+
+Integrating the hosted login page into your application is straightforward, thanks to ZITADEL's developer-friendly documentation, SDKs, and APIs. Developers can easily implement authentication flows, handle authentication callbacks, and customize the user experience to seamlessly integrate authentication with their application's workflow.
+
+Overall, ZITADEL's hosted login page simplifies the authentication process for developers by providing a secure, customizable, and developer-friendly authentication interface. By leveraging this centralized authentication endpoint, developers can enhance their application's security, user experience, and compliance with industry standards and regulations.
 
 ## Build a custom Login UI to authenticate users
 
