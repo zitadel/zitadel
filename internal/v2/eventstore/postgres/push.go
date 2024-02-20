@@ -129,7 +129,7 @@ func push(ctx context.Context, tx *sql.Tx, commands []*command) error {
 			return err
 		}
 		i++
-		reducer, ok := commands[i].intent.PushIntent.(eventstore.PushReducerIntent)
+		reducer, ok := commands[i].intent.PushIntent.(eventstore.PushIntentReducer)
 		if !ok {
 			return nil
 		}

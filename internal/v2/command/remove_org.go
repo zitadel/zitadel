@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	_ eventstore.PushReducerIntent = (*RemoveOrg)(nil)
+	_ eventstore.PushIntentReducer = (*RemoveOrg)(nil)
 )
 
 type RemoveOrg struct {

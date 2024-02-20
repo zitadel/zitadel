@@ -73,8 +73,8 @@ type PushIntent interface {
 	CurrentSequence() CurrentSequence
 }
 
-// PushReducerIntent calls the [Reducer.Reduce] method after the events got created
-type PushReducerIntent interface {
+// PushIntentReducer calls the [Reducer.Reduce] method after the events got created
+type PushIntentReducer interface {
 	PushIntent
 	Reducer
 }

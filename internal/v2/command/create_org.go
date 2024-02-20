@@ -11,8 +11,7 @@ import (
 )
 
 var (
-	_ eventstore.Reducer    = (*CreateOrg)(nil)
-	_ eventstore.PushIntent = (*CreateOrg)(nil)
+	_ eventstore.PushIntentReducer = (*CreateOrg)(nil)
 )
 
 type CreateOrg struct {
