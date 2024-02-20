@@ -47,8 +47,8 @@ export class SearchProjectAutocompleteComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.unsubscribed$),
         tap((value) => {
-          console.log(value);
-          this.valueChanged.emit(value);
+          const name = typeof value === 'string' ? value : value.name ? value.name : '';
+          this.valueChanged.emit(name);
         }),
         debounceTime(200),
         tap(() => (this.isLoading = true)),

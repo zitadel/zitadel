@@ -12,20 +12,24 @@
 
     <p>{{ 'APP.PAGES.CREATE_NEW_PROJECT' | translate }}</p>
 
+    <cnsl-info-section *ngIf="error()" [type]="InfoSectionType.WARN"
+      ><span class="error-msg">{{ error() }}</span></cnsl-info-section
+    >
+
     <div class="app-create-btn-container">
       <button
         color="primary"
         mat-raised-button
         class="continue-button"
         [disabled]="!project && !projectName"
-        (click)="project ? goToAppIntegratePage() : createProjectAndContinue()"
+        (click)="project && project.name === projectName ? goToAppIntegratePage() : createProjectAndContinue()"
       >
-        {{ projectName && project && project.name === projectName | json }}
         {{
-          !projectName && !project
+          !project && !projectName
             ? ('ACTIONS.CONTINUE' | translate)
-            : ('ACTIONS.CONTINUEWITH'
-              | translate: { value: projectName && project && project.name === projectName ? projectName : project.name })
+            : project && project.name === projectName
+              ? ('ACTIONS.CONTINUEWITH' | translate: { value: project.name })
+              : ('QUICKSTART.CREATEPROJECTFORAPP' | translate: { value: projectName })
         }}
       </button>
     </div>

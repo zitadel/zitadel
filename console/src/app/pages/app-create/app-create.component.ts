@@ -1,9 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
 import { ProjectAutocompleteType } from 'src/app/modules/search-project-autocomplete/search-project-autocomplete.component';
+import { AddProjectRequest, AddProjectResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { GrantedProject, Project } from 'src/app/proto/generated/zitadel/project_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 
 @Component({
   selector: 'cnsl-app-create',
@@ -11,6 +14,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
   styleUrls: ['./app-create.component.scss'],
 })
 export class AppCreateComponent {
+  public InfoSectionType: any = InfoSectionType;
   public project?: {
     project: Project.AsObject | GrantedProject.AsObject;
     type: ProjectType;
@@ -19,8 +23,11 @@ export class AppCreateComponent {
   public ProjectAutocompleteType: any = ProjectAutocompleteType;
   public projectName: string = '';
 
+  public error = signal('');
+
   constructor(
     private router: Router,
+    private mgmtService: ManagementService,
     breadcrumbService: BreadcrumbService,
   ) {
     const bread: Breadcrumb = {
@@ -56,5 +63,19 @@ export class AppCreateComponent {
     }
   }
 
-  public createProjectAndContinue(): void {}
+  public createProjectAndContinue() {
+    const project = new AddProjectRequest();
+    project.setName(this.projectName);
+
+    return this.mgmtService
+      .addProject(project.toObject())
+      .then((resp: AddProjectResponse.AsObject) => {
+        this.error.set('');
+        this.router.navigate(['/projects', resp.id, 'apps', 'integrate']);
+      })
+      .catch((error) => {
+        const { message } = error;
+        this.error.set(message);
+      });
+  }
 }

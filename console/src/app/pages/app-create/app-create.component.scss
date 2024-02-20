@@ -5,6 +5,11 @@ h1 {
 .app-create-main-content {
   max-width: 35rem;
 
+  .error-msg {
+    margin-top: 0.25rem;
+    display: block;
+  }
+
   .app-create-btn-container {
     display: flex;
     align-items: center;

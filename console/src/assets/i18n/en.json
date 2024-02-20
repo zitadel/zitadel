@@ -123,7 +123,8 @@
     "TITLE": "Integrate ZITADEL into your application",
     "DESCRIPTION": "Integrate ZITADEL into your application or use one of our samples to get started in minutes.",
     "BTN_START": "Create Application",
-    "BTN_LEARNMORE": "Learn More"
+    "BTN_LEARNMORE": "Learn More",
+    "CREATEPROJECTFORAPP": "Create Project {{value}}"
   },
   "ACTIONS": {
     "ACTIONS": "Actions",
