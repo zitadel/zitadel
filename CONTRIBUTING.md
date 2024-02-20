@@ -163,14 +163,33 @@ You can now run and debug the binary in .artifacts/zitadel/zitadel using your fa
 You can test if ZITADEL does what you expect by using the UI at http://localhost:8080/ui/console.
 Also, you can verify the data by running `cockroach sql --database zitadel --insecure` and running SQL queries.
 
-As soon as you are ready to battle test your changes, run the end-to-end tests.
+#### Run Local Unit Tests
 
-#### Running the tests
-
-Running the tests with docker doesn't require you to take care of other dependencies than docker and make.
+To test the code without dependencies, run the unit tests:
 
 ```bash
-# Build the production binary (unit tests are executed, too)
+make core_unit_test
+```
+
+#### Run Local Integration Tests
+
+To test the database-connected gRPC API, run PostgreSQL and CockroachDB, set up a ZITADEL instance and run the tests including integration tests:
+
+```bash
+export INTEGRATION_DB_FLAVOR="postgres" ZITADEL_MASTERKEY="MasterkeyNeedsToHave32Characters"
+docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait ${INTEGRATION_DB_FLAVOR}
+make core_integration_test
+docker compose -f internal/integration/config/docker-compose.yaml down
+```
+
+Repeat the above with `INTEGRATION_DB_FLAVOR="postgres"`.
+
+#### Run Local End-to-End Tests
+
+To test the whole system, including the console UI and the login UI, run the E2E tests.
+
+```bash
+# Build the production binary
 make core_build console_build
 GOOS=linux make compile_pipeline
 
@@ -191,7 +210,7 @@ When you are happy with your changes, you can cleanup your environment.
 docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml down
 ```
 
-#### Running the tests without docker
+#### Run Local End-to-End Tests Against Your Dev Server Console
 
 If you also make [changes to the console](#console), you can run the test suite against your locally built backend code and frontend server.
 But you will have to install the relevant node dependencies.
@@ -213,19 +232,6 @@ When you are happy with your changes, you can cleanup your environment.
 # Stop and remove the docker containers for zitadel and the database
 docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml down
 ```
-
-#### Integration tests
-
-In order to run the integrations tests for the gRPC API, PostgreSQL and CockroachDB must be started and initialized:
-
-```bash
-export INTEGRATION_DB_FLAVOR="postgres" ZITADEL_MASTERKEY="MasterkeyNeedsToHave32Characters"
-docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait ${INTEGRATION_DB_FLAVOR}
-make core_integration_test
-docker compose -f internal/integration/config/docker-compose.yaml down
-```
-
-The above can be repeated with `INTEGRATION_DB_FLAVOR="postgres"`.
 
 ### Console
 
