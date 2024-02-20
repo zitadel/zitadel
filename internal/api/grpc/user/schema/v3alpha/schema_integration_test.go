@@ -73,6 +73,35 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "invalid schema, error",
+			ctx:  CTX,
+			req: &schema.CreateUserSchemaRequest{
+				Type: fmt.Sprint(time.Now().UnixNano() + 1),
+				DataType: &schema.CreateUserSchemaRequest_Schema{
+					Schema: func() *structpb.Struct {
+						s := new(structpb.Struct)
+						err := s.UnmarshalJSON([]byte(`
+							{
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string",
+										"required": true
+									},
+									"description": {
+										"type": "string"
+									}
+								}
+							}
+						`))
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+			},
+			wantErr: true,
+		},
+		{
 			name: "no authenticators, ok",
 			ctx:  CTX,
 			req: &schema.CreateUserSchemaRequest{
@@ -297,6 +326,41 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			},
 		},
 		{
+			name: "invalid schema, error",
+			prepare: func(request *schema.UpdateUserSchemaRequest) error {
+				schemaID := Tester.CreateUserSchema(CTX, t).GetId()
+				request.Id = schemaID
+				return nil
+			},
+			args: args{
+				ctx: CTX,
+				req: &schema.UpdateUserSchemaRequest{
+					DataType: &schema.UpdateUserSchemaRequest_Schema{
+						Schema: func() *structpb.Struct {
+							s := new(structpb.Struct)
+							err := s.UnmarshalJSON([]byte(`
+							{
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string",
+										"required": true
+									},
+									"description": {
+										"type": "string"
+									}
+								}
+							}
+						`))
+							require.NoError(t, err)
+							return s
+						}(),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
 			name: "update schema, ok",
 			prepare: func(request *schema.UpdateUserSchemaRequest) error {
 				schemaID := Tester.CreateUserSchema(CTX, t).GetId()
@@ -308,9 +372,21 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 				req: &schema.UpdateUserSchemaRequest{
 					DataType: &schema.UpdateUserSchemaRequest_Schema{
 						Schema: func() *structpb.Struct {
-							s, err := structpb.NewStruct(map[string]interface{}{
-								"name": "test",
-							})
+							s := new(structpb.Struct)
+							err := s.UnmarshalJSON([]byte(`
+								{
+									"type": "object",
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"description": {
+											"type": "string"
+										}
+									},
+									"required": ["name"]
+								}
+							`))
 							require.NoError(t, err)
 							return s
 						}(),
