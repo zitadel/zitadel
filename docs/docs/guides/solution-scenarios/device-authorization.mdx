@@ -1,11 +1,23 @@
 ---
-title: OAuth 2.0 Device Authorization Flow
+title: Integrating Your Application with Zitadel using RFC 8628 OAuth 2.0 Device Authorization Flow
 sidebar_label: Device Authorization
 ---
 
 ZITADEL implements device authorization as per [RFC 8628](https://datatracker.ietf.org/doc/html/rfc8628). This document demonstrates its use.
 
-## Setup in ZITADEL
+This documentation aims to guide you through the process of seamlessly integrating your application with ZITADEL, leveraging the capabilities of [RFC 8628](https://datatracker.ietf.org/doc/html/rfc8628). ZITADEL is a powerful identity and access management (IAM) solution that provides robust authentication and authorization services for your applications. RFC 8628, also known as "OAuth 2.0 Device Authorization Grant", offers a standardized protocol for devices with limited input capabilities to obtain user authorization. By following the steps outlined here, you'll be able to empower your application with secure authentication and access control mechanisms provided by ZITADEL, ensuring a smooth and secure user experience.
+
+## What is RFC 8628?
+
+[RFC 8628](https://datatracker.ietf.org/doc/html/rfc8628), or the OAuth 2.0 Device Authorization Grant, defines a protocol for OAuth 2.0 clients that have limited input capabilities, such as devices with no browser or low-power sensors. It allows such devices to obtain user consent for authorizing access to protected resources by directing the user to a device-friendly authentication endpoint.
+
+## Why Integrate with Zitadel?
+
+ZITADEL offers a comprehensive identity and access management solution, providing features like single sign-on (SSO), multi-factor authentication (MFA), user management, and more. By integrating your application with ZITADEL, you can leverage these powerful features to enhance the security and usability of your application without reinventing the wheel.
+
+## Getting Started
+
+To begin integrating your application with Zitadel using RFC 8628, follow the steps outlined in this documentation. We'll walk you through the process, from setting up your application in the Zitadel console to handling user authentication and access tokens in your application code.
 
 1. Go to “Organization”/”Projects”.
 2. Under “Applications” click the “New” button.
