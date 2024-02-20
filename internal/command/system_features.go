@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type SystemFeatures struct {
@@ -13,7 +14,16 @@ type SystemFeatures struct {
 	LegacyIntrospection             *bool
 }
 
+func (m *SystemFeatures) isEmpty() bool {
+	return m.LoginDefaultOrg == nil &&
+		m.TriggerIntrospectionProjections == nil &&
+		m.LegacyIntrospection == nil
+}
+
 func (c *Commands) SetSystemFeatures(ctx context.Context, f *SystemFeatures) (*domain.ObjectDetails, error) {
+	if f.isEmpty() {
+		return nil, zerrors.ThrowInternal(nil, "COMMAND-Oop8a", "Errors.NoChangesFound")
+	}
 	wm := NewSystemFeaturesWriteModel()
 	if err := c.eventstore.FilterToQueryReducer(ctx, wm); err != nil {
 		return nil, err
@@ -34,7 +44,7 @@ func (c *Commands) ResetSystemFeatures(ctx context.Context) (*domain.ObjectDetai
 	if err := c.eventstore.FilterToQueryReducer(ctx, wm); err != nil {
 		return nil, err
 	}
-	if wm.isDefault() {
+	if wm.isEmpty() {
 		return writeModelToObjectDetails(wm.WriteModel), nil
 	}
 	aggregate := feature_v2.NewAggregate("SYSTEM", "SYSTEM")

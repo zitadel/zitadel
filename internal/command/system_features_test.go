@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_SetSystemFeatures(t *testing.T) {
@@ -33,18 +34,16 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilterError(io.ErrClosedPipe),
 			),
-			args:    args{context.Background(), &SystemFeatures{}},
+			args: args{context.Background(), &SystemFeatures{
+				LoginDefaultOrg: gu.Ptr(true),
+			}},
 			wantErr: io.ErrClosedPipe,
 		},
 		{
-			name: "all nil, No Change",
-			eventstore: expectEventstore(
-				expectFilter(),
-			),
-			args: args{context.Background(), &SystemFeatures{}},
-			want: &domain.ObjectDetails{
-				ResourceOwner: "SYSTEM",
-			},
+			name:       "all nil, No Change",
+			eventstore: expectEventstore(),
+			args:       args{context.Background(), &SystemFeatures{}},
+			wantErr:    zerrors.ThrowInternal(nil, "COMMAND-Oop8a", "Errors.NoChangesFound"),
 		},
 		{
 			name: "set LoginDefaultOrg",

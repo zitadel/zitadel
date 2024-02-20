@@ -59,12 +59,6 @@ func (m *SystemFeaturesWriteModel) reduceReset() {
 	m.LegacyIntrospection = nil
 }
 
-func (m *SystemFeaturesWriteModel) isDefault() bool {
-	return m.LoginDefaultOrg == nil &&
-		m.TriggerIntrospectionProjections == nil &&
-		m.LegacyIntrospection == nil
-}
-
 func (m *SystemFeaturesWriteModel) reduceBoolFeature(event *feature_v2.SetEvent[bool]) error {
 	_, key, err := event.FeatureInfo()
 	if err != nil {

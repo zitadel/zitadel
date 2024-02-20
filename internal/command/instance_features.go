@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type InstanceFeatures struct {
@@ -16,7 +17,16 @@ type InstanceFeatures struct {
 	LegacyIntrospection             *bool
 }
 
+func (m *InstanceFeatures) isEmpty() bool {
+	return m.LoginDefaultOrg == nil &&
+		m.TriggerIntrospectionProjections == nil &&
+		m.LegacyIntrospection == nil
+}
+
 func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures) (*domain.ObjectDetails, error) {
+	if f.isEmpty() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Vigh1", "Errors.NoChangesFound")
+	}
 	wm := NewInstanceFeaturesWriteModel(authz.GetInstance(ctx).InstanceID())
 	if err := c.eventstore.FilterToQueryReducer(ctx, wm); err != nil {
 		return nil, err
@@ -47,7 +57,7 @@ func (c *Commands) ResetInstanceFeatures(ctx context.Context) (*domain.ObjectDet
 	if err := c.eventstore.FilterToQueryReducer(ctx, wm); err != nil {
 		return nil, err
 	}
-	if wm.isDefault() {
+	if wm.isEmpty() {
 		return writeModelToObjectDetails(wm.WriteModel), nil
 	}
 	aggregate := feature_v2.NewAggregate(instanceID, instanceID)

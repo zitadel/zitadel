@@ -64,6 +64,14 @@ func TestServer_SetSystemFeatures(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "no changes error",
+			args: args{
+				ctx: SystemCTX,
+				req: &feature.SetSystemFeaturesRequest{},
+			},
+			wantErr: true,
+		},
+		{
 			name: "success",
 			args: args{
 				ctx: SystemCTX,
@@ -285,6 +293,14 @@ func TestServer_SetInstanceFeatures(t *testing.T) {
 				req: &feature.SetInstanceFeaturesRequest{
 					OidcTriggerIntrospectionProjections: gu.Ptr(true),
 				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "no changes error",
+			args: args{
+				ctx: IamCTX,
+				req: &feature.SetInstanceFeaturesRequest{},
 			},
 			wantErr: true,
 		},

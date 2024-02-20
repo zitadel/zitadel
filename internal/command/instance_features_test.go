@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	feature_v1 "github.com/zitadel/zitadel/internal/repository/feature"
 	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_SetInstanceFeatures(t *testing.T) {
@@ -36,18 +37,16 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			eventstore: expectEventstore(
 				expectFilterError(io.ErrClosedPipe),
 			),
-			args:    args{ctx, &InstanceFeatures{}},
+			args: args{ctx, &InstanceFeatures{
+				LoginDefaultOrg: gu.Ptr(true),
+			}},
 			wantErr: io.ErrClosedPipe,
 		},
 		{
-			name: "all nil, No Change",
-			eventstore: expectEventstore(
-				expectFilter(),
-			),
-			args: args{ctx, &InstanceFeatures{}},
-			want: &domain.ObjectDetails{
-				ResourceOwner: "instance1",
-			},
+			name:       "all nil, No Change",
+			eventstore: expectEventstore(),
+			args:       args{ctx, &InstanceFeatures{}},
+			wantErr:    zerrors.ThrowInvalidArgument(nil, "COMMAND-Vigh1", "Errors.NoChangesFound"),
 		},
 		{
 			name: "set LoginDefaultOrg",
