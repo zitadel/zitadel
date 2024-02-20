@@ -52,8 +52,14 @@ func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner 
 			return nil, err
 		}
 	}
+	wm, err := c.getTargetWriteModelByID(ctx, add.AggregateID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if wm.State.Exists() {
+		return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-9axkz0jvzm", "Errors.Target.AlreadyExists")
+	}
 
-	wm := NewTargetWriteModel(add.AggregateID, resourceOwner)
 	pushedEvents, err := c.eventstore.Push(ctx, target.NewAddedEvent(
 		ctx,
 		TargetAggregateFromWriteModel(&wm.WriteModel),

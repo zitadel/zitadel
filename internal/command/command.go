@@ -74,6 +74,12 @@ type Commands struct {
 	defaultSecretGenerators *SecretGenerators
 
 	samlCertificateAndKeyGenerator func(id string) ([]byte, []byte, error)
+
+	grpcMethodExisting     func(method string) bool
+	grpcServiceExisting    func(method string) bool
+	actionFunctionExisting func(function string) bool
+	eventExisting          func(event string) bool
+	eventGroupExisting     func(group string) bool
 }
 
 func StartCommands(

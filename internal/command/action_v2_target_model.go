@@ -6,7 +6,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/target"
 )
 
@@ -62,7 +61,7 @@ func (wm *TargetWriteModel) Reduce() error {
 			if e.InterruptOnError != nil {
 				wm.InterruptOnError = *e.InterruptOnError
 			}
-		case *action.RemovedEvent:
+		case *target.RemovedEvent:
 			wm.State = domain.TargetRemoved
 		}
 	}
