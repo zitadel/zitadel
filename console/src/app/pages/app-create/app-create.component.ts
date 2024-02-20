@@ -27,8 +27,6 @@ export class AppCreateComponent implements OnDestroy {
 
   public error = signal('');
   public framework = signal<Framework | undefined>(undefined);
-  public showFrameworkAutocomplete = signal<boolean>(false);
-
   public destroy$: Subject<void> = new Subject();
 
   constructor(
@@ -56,7 +54,7 @@ export class AppCreateComponent implements OnDestroy {
           ? (this.project.project as GrantedProject.AsObject).projectId
           : '';
 
-      this.router.navigate(['/projects', id, 'apps', 'integrate']);
+      this.router.navigate(['/projects', id, 'apps', 'integrate'], { queryParams: { framework: this.framework()?.id } });
     }
   }
 
