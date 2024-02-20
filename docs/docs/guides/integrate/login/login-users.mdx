@@ -1,6 +1,6 @@
 ---
 title: Login users into your application
-sidebar_label: Overview
+sidebar_label: Login Users
 ---
 
 ZITADEL is a comprehensive identity and access management platform designed to streamline user authentication, authorization, and management processes for your application. It offers a range of features, including single sign-on (SSO), multi-factor authentication (MFA), and centralized user management.
@@ -10,6 +10,9 @@ With ZITADEL, you can securely authenticate users using industry-standard protoc
 Besides federated authentication with OpenID Connect and SAML, ZITADEL offers an API to authenticate users allowing you to create your own login process and user interface.
 
 In this guide we will walk through the different protocols, features and concepts that can be used to login users securely into your applications.
+
+![Screenshot of zitadel login screen](/img/guides/integrate/login/login-start.png)
+
 
 ## Using industry standard protocols
 
@@ -53,7 +56,7 @@ There are more [differences between SAML and OIDC](/blog/saml-vs-oidc) that you 
 
 ## Use the Hosted Login to sign-in users
 
-ZITADEL provides a hosted login page to securely sign-in users to your applications.
+ZITADEL provides a hosted single-sign-on page to securely sign-in users to your applications.
 
 ZITADEL's hosted login page serves as a centralized authentication interface provided for applications that integrate ZITADEL. As a developer, understanding the hosted login page is essential for seamlessly integrating authentication into your application. Here's how it works:
 
@@ -67,6 +70,18 @@ Different login name formats can be used on ZITADEL's hosted login page to selec
 Login names can be a user's username, containing the username and an [organization domain](/docs/guides/manage/console/organizations#domain-verification-and-primary-domain), their email addresses, or their phone numbers.
 By default all of these login names are allowed and can be adjusted by [Managers](/docs/concepts/structure/managers) to meet their requirements.
 
+### Multi-tenancy authentication
+
+With the hosted login page from ZITADEL developers will get the best support for multi-tenancy single-sign-on with third party identity providers.
+ZITADEL acts as [identity broker](/docs/concepts/features/identity-brokering) between your applications and different external identity providers, reducing the implementation effort for developers.
+
+Security policies as well as [Organizations](/docs/concepts/structure/organizations), acting as tenants, can
+
+- Identity providers per tenant
+- Security policies per tenant
+- Branding per tenant
+- Domain discovery
+
 ### Support for multiple authentication methods
 
 The hosted login page supports various authentication methods, including traditional username/password authentication, social login options, multi-factor authentication (MFA), and passwordless authentication methods like [passkeys](/docs/concepts/features/passkeys.md).
@@ -74,15 +89,15 @@ Available second factor (2FA) and multi-factor authentication methods (MFA) incl
 
 Developers can configure the authentication methods offered on the login page based on their application's security and usability requirements.
 
-### Multi-tenant enterprise single-sign-on
+### Enterprise single-sign-on
+
+![Screenshot of zitadel console showing different identity provider templates](/img/guides/integrate/login/login-external-idp-templates.png)
 
 With the hosted login page from ZITADEL developers will get the best support for multi-tenancy single-sign-on with third party identity providers.
-ZITADEL acts as [identity broker](/docs/concepts/features/identity-brokering)
+ZITADEL acts as [identity broker](/docs/concepts/features/identity-brokering) between your applications and different external identity providers, reducing the implementation effort for developers.
+External Identity providers can be configured for the whole instance or for each organization which represents a group of users such as a B2B customer or organizational unit.
 
-- Identity providers per tenant
-- Domain discovery
-- Available templates [Okta](/docs/guides/integrate/identity-providers/okta) or [Entra ID](/docs/guides/integrate/identity-providers/azure-ad) 
-- [LDAP](/docs/guides/integrate/identity-providers/ldap)
+ZITADEL offers various [identity provider templates](/docs/guides/integrate/identity-providers) to integrate providers such as [Okta](/docs/guides/integrate/identity-providers/okta), [Entra ID](/docs/guides/integrate/identity-providers/azure-ad) or on-premise [LDAP](/docs/guides/integrate/identity-providers/ldap).
 
 ### Customization Options
 
@@ -101,14 +116,6 @@ Integrating the hosted login page into your application is straightforward, than
 Overall, ZITADEL's hosted login page simplifies the authentication process for developers by providing a secure, customizable, and developer-friendly authentication interface. By leveraging this centralized authentication endpoint, developers can enhance their application's security, user experience, and compliance with industry standards and regulations.
 
 ## Build a custom Login UI to authenticate users
-
-## Single sign-on
-
-Federated authentication also facilitates Single Sign-On (SSO), a crucial aspect of user authentication in modern applications.
-Single Sign-On allows users to access multiple applications and services with just one set of credentials, eliminating the need to repeatedly enter login information.
-With OpenID Connect and SAML, federated authentication becomes even more powerful, enabling seamless and secure access to resources across different identity providers and service providers.
-
-By combining OpenID Connect and SAML, organizations can establish federated identity solutions that offer interoperability, scalability, and enhanced user experiences, ultimately improving security and productivity for both users and applications.
 
 ## Further reference
 

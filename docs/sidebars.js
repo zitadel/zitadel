@@ -204,7 +204,7 @@ module.exports = {
               "Integrate your users and application with ZITADEL. In this section you will find resource on how to authenticate your users, configure external identity providers, access the ZITADEL APIs to manage resources, and integrate with third party services and tools.",
           },
           items: [
-            'guides/integrate/login/introduction',
+            'guides/integrate/login/login-users',
             'guides/integrate/login/default-login-ui',
             {
               type: "category",
