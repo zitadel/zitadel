@@ -35,34 +35,37 @@ import (
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
+	schema "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 type Client struct {
-	CC          *grpc.ClientConn
-	Admin       admin.AdminServiceClient
-	Mgmt        mgmt.ManagementServiceClient
-	Auth        auth.AuthServiceClient
-	UserV2      user.UserServiceClient
-	SessionV2   session.SessionServiceClient
-	OIDCv2      oidc_pb.OIDCServiceClient
-	OrgV2       organisation.OrganizationServiceClient
-	System      system.SystemServiceClient
-	ExecutionV3 execution.ExecutionServiceClient
+	CC           *grpc.ClientConn
+	Admin        admin.AdminServiceClient
+	Mgmt         mgmt.ManagementServiceClient
+	Auth         auth.AuthServiceClient
+	UserV2       user.UserServiceClient
+	SessionV2    session.SessionServiceClient
+	OIDCv2       oidc_pb.OIDCServiceClient
+	OrgV2        organisation.OrganizationServiceClient
+	System       system.SystemServiceClient
+	ExecutionV3  execution.ExecutionServiceClient
+	UserSchemaV3 schema.UserSchemaServiceClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
 	return Client{
-		CC:          cc,
-		Admin:       admin.NewAdminServiceClient(cc),
-		Mgmt:        mgmt.NewManagementServiceClient(cc),
-		Auth:        auth.NewAuthServiceClient(cc),
-		UserV2:      user.NewUserServiceClient(cc),
-		SessionV2:   session.NewSessionServiceClient(cc),
-		OIDCv2:      oidc_pb.NewOIDCServiceClient(cc),
-		OrgV2:       organisation.NewOrganizationServiceClient(cc),
-		System:      system.NewSystemServiceClient(cc),
-		ExecutionV3: execution.NewExecutionServiceClient(cc),
+		CC:           cc,
+		Admin:        admin.NewAdminServiceClient(cc),
+		Mgmt:         mgmt.NewManagementServiceClient(cc),
+		Auth:         auth.NewAuthServiceClient(cc),
+		UserV2:       user.NewUserServiceClient(cc),
+		SessionV2:    session.NewSessionServiceClient(cc),
+		OIDCv2:       oidc_pb.NewOIDCServiceClient(cc),
+		OrgV2:        organisation.NewOrganizationServiceClient(cc),
+		System:       system.NewSystemServiceClient(cc),
+		ExecutionV3:  execution.NewExecutionServiceClient(cc),
+		UserSchemaV3: schema.NewUserSchemaServiceClient(cc),
 	}
 }
 
@@ -521,6 +524,15 @@ func (s *Tester) CreateTarget(ctx context.Context, t *testing.T) *execution.Crea
 		ExecutionType: &execution.CreateTargetRequest_InterruptOnError{
 			InterruptOnError: true,
 		},
+	})
+	require.NoError(t, err)
+	return target
+}
+
+func (s *Tester) CreateUserSchema(ctx context.Context, t *testing.T) *schema.CreateUserSchemaResponse {
+	target, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &schema.CreateUserSchemaRequest{
+		Type:     fmt.Sprint(time.Now().UnixNano() + 1),
+		DataType: &schema.CreateUserSchemaRequest_Schema{},
 	})
 	require.NoError(t, err)
 	return target
