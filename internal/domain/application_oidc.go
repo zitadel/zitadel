@@ -127,6 +127,9 @@ func (a *OIDCApp) IsValid() bool {
 		return false
 	}
 	grantTypes := a.getRequiredGrantTypes()
+	if len(grantTypes) == 0 {
+		return false
+	}
 	for _, grantType := range grantTypes {
 		ok := containsOIDCGrantType(a.GrantTypes, grantType)
 		if !ok {
@@ -159,6 +162,8 @@ func RequiredOIDCGrantTypes(responseTypes []OIDCResponseType, grantTypesSet []OI
 			// #5684 when "Device Code" is selected, "Authorization Code" is no longer a hard requirement
 			if !containsOIDCGrantType(grantTypesSet, OIDCGrantTypeDeviceCode) {
 				grantTypes = append(grantTypes, OIDCGrantTypeAuthorizationCode)
+			} else {
+				grantTypes = append(grantTypes, OIDCGrantTypeDeviceCode)
 			}
 		case OIDCResponseTypeIDToken, OIDCResponseTypeIDTokenToken:
 			if !implicit {
