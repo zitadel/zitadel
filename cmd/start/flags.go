@@ -5,13 +5,12 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/tls"
 )
 
 var (
-	tlsMode *string
-
 	startFlagSet = &pflag.FlagSet{}
 )
 
@@ -23,7 +22,9 @@ func init() {
 
 func startFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlagSet(startFlagSet)
-	viper.BindPFlags(startFlagSet)
+	logging.OnError(
+		viper.BindPFlags(startFlagSet),
+	).Fatal("start flags")
 
 	tls.AddTLSModeFlag(cmd)
 	key.AddMasterKeyFlag(cmd)
