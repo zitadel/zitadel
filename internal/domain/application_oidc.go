@@ -127,9 +127,6 @@ func (a *OIDCApp) IsValid() bool {
 		return false
 	}
 	grantTypes := a.getRequiredGrantTypes()
-	if len(grantTypes) == 0 {
-		return false
-	}
 	for _, grantType := range grantTypes {
 		ok := containsOIDCGrantType(a.GrantTypes, grantType)
 		if !ok {
@@ -149,17 +146,20 @@ func (a *OIDCApp) OriginsValid() bool {
 }
 
 func ContainsRequiredGrantTypes(responseTypes []OIDCResponseType, grantTypes []OIDCGrantType) bool {
-	required := RequiredOIDCGrantTypes(responseTypes)
+	required := RequiredOIDCGrantTypes(responseTypes, grantTypes)
 	return ContainsOIDCGrantTypes(required, grantTypes)
 }
 
-func RequiredOIDCGrantTypes(responseTypes []OIDCResponseType) (grantTypes []OIDCGrantType) {
+func RequiredOIDCGrantTypes(responseTypes []OIDCResponseType, grantTypesSet []OIDCGrantType) (grantTypes []OIDCGrantType) {
 	var implicit bool
 
 	for _, r := range responseTypes {
 		switch r {
 		case OIDCResponseTypeCode:
-			grantTypes = append(grantTypes, OIDCGrantTypeAuthorizationCode)
+			// #5684 when "Device Code" is selected, "Authorization Code" is no longer a hard requirement
+			if !containsOIDCGrantType(grantTypesSet, OIDCGrantTypeDeviceCode) {
+				grantTypes = append(grantTypes, OIDCGrantTypeAuthorizationCode)
+			}
 		case OIDCResponseTypeIDToken, OIDCResponseTypeIDTokenToken:
 			if !implicit {
 				implicit = true
@@ -172,7 +172,7 @@ func RequiredOIDCGrantTypes(responseTypes []OIDCResponseType) (grantTypes []OIDC
 }
 
 func (a *OIDCApp) getRequiredGrantTypes() []OIDCGrantType {
-	return RequiredOIDCGrantTypes(a.ResponseTypes)
+	return RequiredOIDCGrantTypes(a.ResponseTypes, a.GrantTypes)
 }
 
 func ContainsOIDCGrantTypes(shouldContain, list []OIDCGrantType) bool {
@@ -229,7 +229,8 @@ func checkGrantTypesCombination(compliance *Compliance, grantTypes []OIDCGrantTy
 }
 
 func checkRedirectURIs(compliance *Compliance, grantTypes []OIDCGrantType, appType OIDCApplicationType, redirectUris []string) {
-	if len(redirectUris) == 0 {
+	// See #5684 for OIDCGrantTypeDeviceCode and redirectUris further explanation
+	if len(redirectUris) == 0 && (!containsOIDCGrantType(grantTypes, OIDCGrantTypeDeviceCode) || (containsOIDCGrantType(grantTypes, OIDCGrantTypeDeviceCode) && containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode))) {
 		compliance.NoneCompliant = true
 		compliance.Problems = append([]string{"Application.OIDC.V1.NoRedirectUris"}, compliance.Problems...)
 	}
