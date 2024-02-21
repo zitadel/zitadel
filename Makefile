@@ -108,7 +108,7 @@ core_integration_setup:
 
 .PHONY: core_integration_test
 core_integration_test: core_integration_setup
-	go test -tags=integration -race -p 1 -coverprofile=profile.cov -coverpkg=./internal/...,./cmd/... ./internal/integration ./internal/api/grpc/...  ./internal/notification/handlers/... ./internal/api/oidc/...
+	go test -tags=integration -race -p 1 -coverprofile=profile.cov -coverpkg=./internal/...,./cmd/... ./...
 
 .PHONY: console_lint
 console_lint:

@@ -293,6 +293,7 @@ module.exports = {
             "guides/integrate/identity-providers/migrate",
             "guides/integrate/identity-providers/okta",
             "guides/integrate/identity-providers/keycloak",
+            "guides/integrate/identity-providers/mocksaml",
             "guides/integrate/identity-providers/additional-information",
           ],
         },
@@ -416,6 +417,7 @@ module.exports = {
         "guides/solution-scenarios/configurations",
         "guides/solution-scenarios/frontend-calling-backend-API",
         "guides/solution-scenarios/device-authorization",
+        "guides/solution-scenarios/restrict-console",
         {
           type: "category",
           label: "Onboarding Customers and Users",
@@ -519,38 +521,19 @@ module.exports = {
       label: "Core Resources",
       collapsed: false,
       link: {
-        type: "generated-index",
-        title: "Core Resources",
-        slug: "/apis/apis/",
-        description:
-            "ZITADEL provides multiple APIs to manage the system, instances and resources such as users, projects and more.\n" +
-            "\n" +
-            "There are multiple different versions and multiple services available:"+
-            "\n" +
-            "The resource based APIs are, as the name suggests, organized by resources such as users, session, settings and more.\n" +
-            "These services are the future of the ZITADEL APIS and the best way to start integrating ZITADEL.\n" +
-            "\n"+
-            "The service based APIs are organized by UseCase/Context, such as Auth API for authenticated users,"+
-            "Management API for organization managers, Admin API for instance managers and a System API for system managers.",
+        type: "doc",
+        id: "apis/apis/index",
       },
       items: [
         {
           type: "category",
-          label: "Service Based (V1)",
+          label: "V1 (General Available)",
           collapsed: false,
           link: {
             type: "generated-index",
-            title: "Service Based APIs (V1)",
+            title: "APIs V1 (GA)",
             slug: "/apis/services/",
-            description:
-                "The service based APIs are organized by UseCase/Context, such as Auth API for authenticated users,"+
-                "Management API for organization managers, Admin API for instance managers and a System API for system managers.\n"+
-                "\n"+
-                "To improve the developer experience in managing the different resources, ZITADEL also offers Resource Based APIs (v2 and v3). "+
-                "Those APIs focus on the resources themselves. For example they offer a User Service, which will give you the possibility " +
-                "to search for users across multiple organizations.\n"+
-                "Note that the Resource Based APIs are not yet generally available. Please check the corresponding service" +
-                "for their state and functionality.",
+            description: "APIs V1 organize access by context (authenticated user, organisation, instance, system), unlike resource-specific V2 APIs.",
           },
           items: [
             {
@@ -607,24 +590,11 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Resource Based (V2)",
+          label: "V2 (Beta)",
           collapsed: false,
           link: {
-            type: "generated-index",
-            title: "Resource Based APIs (V2)",
-            slug: "/apis/resources/",
-            description:
-                "The resource based APIs are, as the name suggest, organized by resources such as users, session, settings and more. "+
-                "Check the list below to get an overview of all available resources.\n"+
-                "\n"+
-                "While the service based APIs (V1) work great for use cases in a specific context such as a single organization, " +
-                "it's sometime difficult to know which API to use, particularly for resources across multiple organizations. "+
-                "For instance, SearchUsers on an Instance level or on an Organization level.\n"+
-                "This is exactly where the resource based APIs come in place, e.g. with the User Service, " +
-                "where you're able to search all users and can provide the context (organization) yourself if needed or just search the whole instance.\n"+
-                "\n"+
-                "Note that these APIs are not yet generally available and therefore breaking changes might still occur.\n"+
-                "Please check the corresponding service for more information on the state and availability.",
+            type: "doc",
+            id: "apis/v2",
           },
           items: [
             {
@@ -687,68 +657,52 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Resource Based (V3)",
+          label: "V3 (Preview)",
           collapsed: false,
           link: {
-            type: "generated-index",
-            title: "Resource Based APIs (V3)",
-            slug: "/apis/resources_v3/",
-            description:
-                "The resource based APIs are, as the name suggests, organized by resources such as users, session, settings and more.\n"+
-                "\n"+
-                "While the service based APIs (V1) work great for use cases in a specific context such as a single organization, " +
-                "it's sometime difficult to know which API to use, particularly for resources across multiple organizations. "+
-                "For instance, SearchUsers on an Instance level or on an Organization level.\n"+
-                "This is exactly where the resource based APIs come in place, e.g. with the User Service, " +
-                "where you're able to search all users and can provide the context (organization) yourself if needed or just search the whole instance.\n"+
-                "\n"+
-                "Version 3 offers more customization than the V2 resource bases APIs. You can define your own user schema "+
-                "to be able to manage users based on these schemas and customize various behaviors, such as manipulating "+
-                "inbound API calls, call webhooks on different event and more with the execution service.\n"+
-                "\n"+
-                "Note that these APIs are not yet generally available and therefore breaking changes might still occur.\n"+
-                "Please check the corresponding service for more information on the state and availability.",
+            type: "doc",
+            id: "apis/v3",
           },
           items: [
             {
               type: "category",
-              label: "User Schema Lifecycle (Alpha)",
+              label: "User Schema Lifecycle (Preview)",
               link: {
                 type: "generated-index",
-                title: "User Schema Service API (Aplha)",
+                title: "User Schema Service API (Preview)",
                 slug: "/apis/resources/user_schema_service",
                 description:
                     "This API is intended to manage data schemas for users in a ZITADEL instance.\n" +
                     "\n" +
-                    "This project is in alpha state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.",
+                    "This project is in Preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.",
               },
               items: require("./docs/apis/resources/user_schema_service_v3/sidebar.js"),
             },
             {
               type: "category",
-              label: "User Lifecycle (Alpha)",
+              label: "User Lifecycle (Preview)",
               link: {
                 type: "generated-index",
-                title: "User Service API (Aplha)",
+                title: "User Service API (Preview)",
                 slug: "/apis/resources/user_service_v3",
                 description:
                     "This API is intended to manage users with your own data schema in a ZITADEL instance.\n"+
                     "\n"+
-                    "This project is in alpha state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services."
+                    "This project is in Preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services."
               },
               items: require("./docs/apis/resources/user_service_v3/sidebar.js"),
             },
             {
               type: "category",
-              label: "Execution Lifecycle (Alpha)",
+              label: "Execution Lifecycle (Preview)",
               link: {
                 type: "generated-index",
-                title: "Execution Service API (Alpha)",
+                title: "Execution Service API (Preview)",
                 slug: "/apis/resources/execution_service_v3",
                 description:
                     "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance.\n"+
                     "\n"+
-                    "This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
+                    "This project is in Preview state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
               },
               items: require("./docs/apis/resources/execution_service_v3/sidebar.js"),
             },
