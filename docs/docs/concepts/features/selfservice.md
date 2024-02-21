@@ -68,7 +68,7 @@ Given an external identity provider is configured on the instance or on the orga
 ### Machines
 
 Machine accounts can't use an interactive login but require other means of authentication, such as privately-signed JWT or personal access tokens.
-Read more about [Service Users](/guides/integrate/serviceusers) and recommended [OpenID Connect Flows](/guides/integrate/oauth-recommended-flows#different-client-profiles).
+Read more about [Service Users](/guides/integrate/serviceusers) and recommended [OpenID Connect Flows](/guides/integrate/login/oidc/oauth-recommended-flows#different-client-profiles).
 
 ## Logout
 
