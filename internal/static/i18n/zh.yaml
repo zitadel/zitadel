@@ -128,6 +128,7 @@ Errors:
       NotFound: 验证码不存在
       Expired: 验证码已过期
       GeneratorAlgNotSupported: 不支持的生成器算法
+      Invalid: 代码无效
     Password:
       NotFound: 未找到密码
       Empty: 密码为空
@@ -534,6 +535,11 @@ Errors:
     NotExisting: 功能不存在
     TypeNotSupported: 不支持功能类型
     InvalidValue: 此功能的值无效
+  Target:
+    Invalid: 目标无效
+    NoTimeout: 目标没有超时
+    InvalidURL: 目标的 URL 无效
+    NotFound: 未找到目标
 
 AggregateTypes:
   action: 动作
@@ -545,8 +551,13 @@ AggregateTypes:
   usergrant: 用户授权
   quota: 配额
   feature: 特征
+  target: 靶
 
 EventTypes:
+  target:
+    added: 目标已创建
+    changed: 目标改变
+    removed: 目标已删除
   user:
     added: 已添加用户
     selfregistered: 自注册用户
