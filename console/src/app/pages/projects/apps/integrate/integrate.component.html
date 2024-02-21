@@ -5,7 +5,9 @@
   <mat-progress-bar class="progress-bar" color="primary" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 
   <cnsl-info-section [type]="InfoSectionType.INFO">
-    <p class="review-description">{{ 'QUICKSTART.REVIEWCONFIGURATION_DESCRIPTION' | translate }}</p>
+    <p class="review-description">
+      {{ 'QUICKSTART.REVIEWCONFIGURATION_DESCRIPTION' | translate: { value: framework()?.title } }}
+    </p>
   </cnsl-info-section>
 
   <div>

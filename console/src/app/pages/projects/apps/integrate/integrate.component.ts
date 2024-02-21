@@ -58,9 +58,12 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
   public framework = signal<Framework | undefined>(undefined);
   public oidcAppRequest: Signal<AddOIDCAppRequest> = computed(() => {
     const fwId = this.framework()?.id;
-    console.log(this.framework());
-    if (fwId) {
-      return OIDC_CONFIGURATIONS[fwId];
+    const fw = this.framework();
+    if (fw && fwId) {
+      const request = OIDC_CONFIGURATIONS[fwId];
+      request.setProjectId(this.projectId);
+      request.setName(fw.title);
+      return request;
     } else {
       return new AddOIDCAppRequest();
     }
@@ -98,6 +101,7 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
           isZitadel: false,
         }),
       ];
+      this.projectId = projectId;
       this.breadcrumbService.setBreadcrumb(breadcrumbs);
     }
   }
