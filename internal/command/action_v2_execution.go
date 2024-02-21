@@ -60,6 +60,16 @@ func (c *Commands) SetExecutionRequest(ctx context.Context, cond *ExecutionAPICo
 }
 
 func (c *Commands) SetExecutionResponse(ctx context.Context, cond *ExecutionAPICondition, set *SetExecution, resourceOwner string) (_ *domain.ObjectDetails, err error) {
+	if err := cond.IsValid(); err != nil {
+		return nil, err
+	}
+	if cond.Method != "" && !c.grpcMethodExisting(cond.Method) {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-j0ggz6nana", "Errors.Execution.ConditionInvalid")
+	}
+	if cond.Service != "" && !c.grpcServiceExisting(cond.Service) {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-h9s9hbz87n", "Errors.Execution.ConditionInvalid")
+	}
+
 	if set.AggregateID == "" {
 		set.AggregateID = cond.ID()
 	}
@@ -108,6 +118,15 @@ func (e *ExecutionEventCondition) ID() string {
 }
 
 func (c *Commands) SetExecutionEvent(ctx context.Context, cond *ExecutionEventCondition, set *SetExecution, resourceOwner string) (_ *domain.ObjectDetails, err error) {
+	if err := cond.IsValid(); err != nil {
+		return nil, err
+	}
+	if cond.Event != "" && !c.eventExisting(cond.Event) {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-74aaqj8fv9", "Errors.Execution.ConditionInvalid")
+	}
+	if cond.Group != "" && !c.eventGroupExisting(cond.Group) {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-er5oneb5lz", "Errors.Execution.ConditionInvalid")
+	}
 	if set.AggregateID == "" {
 		set.AggregateID = cond.ID()
 	}
