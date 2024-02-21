@@ -1,6 +1,6 @@
 <div class="framework-change-wrapper">
   <div class="framework-card-wrapper">
-    <div class="framework-card card" *ngIf="framework() as framework">
+    <div class="framework-card card" *ngIf="framework | async as framework">
       <div [routerLink]="['/app-create']" [queryParams]="{ id: framework.docsLink }" class="">
         <img class="dark-only" *ngIf="framework.imgSrcDark" [src]="framework.imgSrcDark" />
         <img class="light-only" *ngIf="framework.imgSrcLight" [src]="framework.imgSrcLight" />

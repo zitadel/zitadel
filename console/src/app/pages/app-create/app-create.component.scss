@@ -2,48 +2,24 @@ h1 {
   font-weight: 500;
 }
 
-@mixin app-create-theme($theme) {
-  $primary: map-get($theme, primary);
-  $warn: map-get($theme, warn);
-  $background: map-get($theme, background);
-  $accent: map-get($theme, accent);
-  $primary-color: map-get($primary, 500);
+.app-create-main-content {
+  max-width: 35rem;
 
-  $warn-color: map-get($warn, 500);
-  $accent-color: map-get($accent, 500);
-  $foreground: map-get($theme, foreground);
-  $is-dark-theme: map-get($theme, is-dark);
-  $back: map-get($background, background);
+  .error-msg {
+    margin-top: 0.25rem;
+    display: block;
+  }
 
-  $list-background-color: map-get($background, 300);
-  $card-background-color: map-get($background, cards);
-  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
-  $border-selected-color: if($is-dark-theme, #fff, #000);
+  .app-create-btn-container {
+    display: flex;
+    align-items: center;
+    margin-top: 3rem;
 
-  .app-create-main-content {
-    max-width: 35rem;
-
-    .error-msg {
-      margin-top: 0.25rem;
-      display: block;
-    }
-
-    .app-create-btn-container {
-      display: flex;
-      align-items: center;
+    .continue-button {
       margin-top: 3rem;
-
-      .continue-button {
-        margin-top: 3rem;
-        display: block;
-        height: 3.5rem;
-        padding: 0 4rem;
-      }
-    }
-
-    .complexity-view {
-      width: 100%;
-      margin: 0 0.5rem;
+      display: block;
+      height: 3.5rem;
+      padding: 0 4rem;
     }
   }
 }

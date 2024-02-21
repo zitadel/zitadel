@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, OnDestroy, Output, effect, signal } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output, effect, signal } from '@angular/core';
 import { ActivatedRoute, Params, RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import frameworkDefinition from '../../../../../docs/frameworks.json';
@@ -8,7 +8,7 @@ import { listFrameworks, hasFramework, getFramework } from '@netlify/framework-i
 import { FrameworkName } from '@netlify/framework-info/lib/generated/frameworkNames';
 import { FrameworkAutocompleteComponent } from '../framework-autocomplete/framework-autocomplete.component';
 import { Framework } from '../quickstart/quickstart.component';
-import { Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 
 @Component({
   standalone: true,
@@ -17,9 +17,9 @@ import { Subject, takeUntil } from 'rxjs';
   styleUrls: ['./framework-change.component.scss'],
   imports: [TranslateModule, RouterModule, CommonModule, MatButtonModule, FrameworkAutocompleteComponent],
 })
-export class FrameworkChangeComponent implements OnDestroy {
+export class FrameworkChangeComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject();
-  public framework = signal<Framework | undefined>(undefined);
+  public framework: BehaviorSubject<Framework | undefined> = new BehaviorSubject<Framework | undefined>(undefined);
   public showFrameworkAutocomplete = signal<boolean>(false);
   @Output() public frameworkChanged: EventEmitter<Framework> = new EventEmitter();
   public frameworks: Framework[] = frameworkDefinition.map((f) => {
@@ -31,14 +31,18 @@ export class FrameworkChangeComponent implements OnDestroy {
     };
   });
 
-  constructor(activatedRoute: ActivatedRoute) {
-    effect(() => {
-      this.frameworkChanged.emit(this.framework());
+  constructor(private activatedRoute: ActivatedRoute) {
+    this.framework.pipe(takeUntil(this.destroy$)).subscribe((value) => {
+      this.frameworkChanged.emit(value);
     });
+  }
 
-    activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params: Params) => {
+  public ngOnInit() {
+    this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params: Params) => {
       const { framework } = params;
+      console.log(framework);
       if (framework) {
+        console.log(this.frameworks);
         this.findFramework(framework);
       }
     });
@@ -51,6 +55,7 @@ export class FrameworkChangeComponent implements OnDestroy {
 
   public findFramework(id: string) {
     const temp = this.frameworks.find((f) => f.id === id);
-    this.framework.set(temp);
+    this.framework.next(temp);
+    this.frameworkChanged.emit(temp);
   }
 }

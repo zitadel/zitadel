@@ -1,7 +1,7 @@
-import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
+import { C, COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, Signal, computed, effect, signal } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -43,6 +43,7 @@ import { API_TYPE, AppCreateType, NATIVE_TYPE, RadioItemAppType, SAML_TYPE, USER
 import { EnvironmentService } from 'src/app/services/environment.service';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { Framework } from 'src/app/components/quickstart/quickstart.component';
+import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
 
 @Component({
   selector: 'cnsl-integrate',
@@ -53,9 +54,18 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject();
   public projectId: string = '';
   public loading: boolean = false;
-  public oidcAppRequest: AddOIDCAppRequest = new AddOIDCAppRequest();
   public InfoSectionType: any = InfoSectionType;
   public framework = signal<Framework | undefined>(undefined);
+  public oidcAppRequest: Signal<AddOIDCAppRequest> = computed(() => {
+    const fwId = this.framework()?.id;
+    console.log(this.framework());
+    if (fwId) {
+      return OIDC_CONFIGURATIONS[fwId];
+    } else {
+      return new AddOIDCAppRequest();
+    }
+  });
+  // public oidcAppRequest = signal(new AddOIDCAppRequest());
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -66,6 +76,11 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
   ) {}
+
+  public setFramework(framework: Framework | undefined) {
+    console.log(framework);
+    this.framework.set(framework);
+  }
 
   public ngOnInit(): void {
     const projectId = this.activatedRoute.snapshot.paramMap.get('projectid');
@@ -101,7 +116,7 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
 
     this.loading = true;
     this.mgmtService
-      .addOIDCApp(this.oidcAppRequest)
+      .addOIDCApp(this.oidcAppRequest())
       .then((resp) => {
         this.loading = false;
         this.toast.showInfo('APP.TOAST.CREATED', true);

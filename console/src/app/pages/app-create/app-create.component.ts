@@ -47,13 +47,13 @@ export class AppCreateComponent implements OnDestroy {
   }
 
   public goToAppIntegratePage(): void {
-    if (this.project) {
+    if (this.project && this.framework()) {
       const id = (this.project.project as Project.AsObject).id
         ? (this.project.project as Project.AsObject).id
         : (this.project.project as GrantedProject.AsObject).projectId
           ? (this.project.project as GrantedProject.AsObject).projectId
           : '';
-
+      console.log(this.framework());
       this.router.navigate(['/projects', id, 'apps', 'integrate'], { queryParams: { framework: this.framework()?.id } });
     }
   }

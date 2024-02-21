@@ -1,5 +1,5 @@
 <cnsl-create-layout title="{{ 'APP.PAGES.CREATE' | translate }}" class="app-create-wrapper" (closed)="close()">
-  <cnsl-framework-change (frameworkChanged)="framework.set($event)"></cnsl-framework-change>
+  <cnsl-framework-change (frameworkChanged)="setFramework($event)"></cnsl-framework-change>
 
   <h1>{{ 'QUICKSTART.REVIEWCONFIGURATION' | translate }}</h1>
   <mat-progress-bar class="progress-bar" color="primary" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
@@ -11,11 +11,11 @@
   <div>
     <cnsl-oidc-configuration
       [name]="framework()?.title"
-      [configuration]="oidcAppRequest.toObject()"
+      [configuration]="oidcAppRequest().toObject()"
     ></cnsl-oidc-configuration>
   </div>
 
-  <div class="app-create-actions">
+  <div class="app-integrate-actions">
     <button mat-stroked-button class="bck-button">{{ 'ACTIONS.BACK' | translate }}</button>
     <button mat-raised-button class="create-button" color="primary" (click)="createApp()" data-e2e="create-button">
       {{ 'ACTIONS.CREATE' | translate }}

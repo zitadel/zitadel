@@ -105,3 +105,19 @@ h1 {
     }
   }
 }
+
+.app-integrate-actions {
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .bck-button {
+    margin-right: 1rem;
+  }
+
+  .create-button {
+    height: 3.5rem;
+    padding: 0 4rem;
+  }
+}
