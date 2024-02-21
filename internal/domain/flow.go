@@ -25,6 +25,15 @@ const (
 	flowTypeCount
 )
 
+func AllFlowTypes() []FlowType {
+	return []FlowType{
+		FlowTypeExternalAuthentication,
+		FlowTypeCustomiseToken,
+		FlowTypeInternalAuthentication,
+		FlowTypeCustomizeSAMLResponse,
+	}
+}
+
 func (s FlowType) Valid() bool {
 	return s > 0 && s < flowTypeCount
 }

@@ -75,8 +75,8 @@ type Commands struct {
 
 	samlCertificateAndKeyGenerator func(id string) ([]byte, []byte, error)
 
-	grpcMethodExisting     func(method string) bool
-	grpcServiceExisting    func(method string) bool
+	GrpcMethodExisting     func(method string) bool
+	GrpcServiceExisting    func(method string) bool
 	actionFunctionExisting func(function string) bool
 	eventExisting          func(event string) bool
 	eventGroupExisting     func(group string) bool
@@ -138,6 +138,13 @@ func StartCommands(
 		defaultRefreshTokenIdleLifetime: defaultRefreshTokenIdleLifetime,
 		defaultSecretGenerators:         defaultSecretGenerators,
 		samlCertificateAndKeyGenerator:  samlCertificateAndKeyGenerator(defaults.KeyConfig.Size),
+		// always true for now until we can check with an eventlist
+		eventExisting: func(event string) bool { return true },
+		// always true for now until we can check with an eventlist
+		eventGroupExisting:     func(group string) bool { return true },
+		GrpcServiceExisting:    func(service string) bool { return false },
+		GrpcMethodExisting:     func(method string) bool { return false },
+		actionFunctionExisting: executionFunctionExists(),
 	}
 
 	repo.codeAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
@@ -158,6 +165,23 @@ func StartCommands(
 	repo.domainVerificationGenerator = crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, repo.domainVerificationAlg)
 	repo.domainVerificationValidator = api_http.ValidateDomain
 	return repo, nil
+}
+
+func executionFunctionExists() func(string) bool {
+	functions := make([]string, 0)
+	for _, flowType := range domain.AllFlowTypes() {
+		for _, triggerType := range flowType.TriggerTypes() {
+			functions = append(functions, flowType.LocalizationKey()+"."+triggerType.LocalizationKey())
+		}
+	}
+	return func(s string) bool {
+		for _, function := range functions {
+			if function == s {
+				return true
+			}
+		}
+		return false
+	}
 }
 
 type AppendReducer interface {

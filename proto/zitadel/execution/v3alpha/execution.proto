@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package zitadel.execution.v3alpha;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/object/v2beta/object.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha;execution";
+
+message SetConditions{
+  oneof condition_type {
+    option (validate.required) = true;
+
+    SetRequestExecution request = 1;
+    SetResponseExecution response = 2;
+    string function = 3;
+    SetEventExecution event = 4;
+  }
+}
+
+message SetRequestExecution{
+  oneof condition{
+    string method = 1 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (google.api.field_behavior) = REQUIRED,
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"/zitadel.session.v2beta.SessionService/ListSessions\"";
+      }
+    ];
+    string service = 2 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (google.api.field_behavior) = REQUIRED,
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"zitadel.session.v2beta.SessionService\"";
+      }
+    ];
+    bool all = 3;
+  }
+}
+
+message SetResponseExecution{
+  oneof condition{
+    string method = 1 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"/zitadel.session.v2beta.SessionService/ListSessions\"";
+      }
+    ];
+    string service = 2 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"zitadel.session.v2beta.SessionService\"";
+      }
+    ];
+    bool all = 3;
+  }
+}
+
+message SetEventExecution{
+  oneof condition{
+    string event = 1 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"user.human.added\"";
+      }
+    ];
+    string group = 2 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"user.human\"";
+      }
+    ];
+    bool all = 3;
+  }
+}
+

@@ -45,10 +45,10 @@ func (c *Commands) SetExecutionRequest(ctx context.Context, cond *ExecutionAPICo
 	if err := cond.IsValid(); err != nil {
 		return nil, err
 	}
-	if cond.Method != "" && !c.grpcMethodExisting(cond.Method) {
+	if cond.Method != "" && !c.GrpcMethodExisting(cond.Method) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-vysplsevt8", "Errors.Execution.ConditionInvalid")
 	}
-	if cond.Service != "" && !c.grpcServiceExisting(cond.Service) {
+	if cond.Service != "" && !c.GrpcServiceExisting(cond.Service) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-qu6dfhiioq", "Errors.Execution.ConditionInvalid")
 	}
 
@@ -63,10 +63,10 @@ func (c *Commands) SetExecutionResponse(ctx context.Context, cond *ExecutionAPIC
 	if err := cond.IsValid(); err != nil {
 		return nil, err
 	}
-	if cond.Method != "" && !c.grpcMethodExisting(cond.Method) {
+	if cond.Method != "" && !c.GrpcMethodExisting(cond.Method) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-j0ggz6nana", "Errors.Execution.ConditionInvalid")
 	}
-	if cond.Service != "" && !c.grpcServiceExisting(cond.Service) {
+	if cond.Service != "" && !c.GrpcServiceExisting(cond.Service) {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-h9s9hbz87n", "Errors.Execution.ConditionInvalid")
 	}
 

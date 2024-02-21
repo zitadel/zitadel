@@ -9,6 +9,7 @@ import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 import "zitadel/execution/v3alpha/target.proto";
+import "zitadel/execution/v3alpha/execution.proto";
 import "zitadel/object/v2beta/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
@@ -185,6 +186,53 @@ service ExecutionService {
       };
     };
   }
+  // Set an execution
+  //
+  // Set an execution of a call to specified targets.
+  rpc SetExecution (SetExecutionRequest) returns (SetExecutionResponse) {
+    option (google.api.http) = {
+      post: "/v3alpha/executions"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Execution successfully set";
+        };
+      };
+    };
+  }
+
+  // Delete an execution
+  //
+  // Delete an existing execution.
+  rpc DeleteExecution (DeleteExecutionRequest) returns (DeleteExecutionResponse) {
+    option (google.api.http) = {
+      delete: "/v3alpha/executions"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.delete"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Execution successfully deleted";
+        };
+      };
+    };
+  }
 }
 
 message CreateTargetRequest {
@@ -289,5 +337,28 @@ message DeleteTargetRequest {
 
 message DeleteTargetResponse {
   // Details provide some base information (such as the last change date) of the target.
+  zitadel.object.v2beta.Details details = 1;
+}
+
+message SetExecutionRequest {
+  // Defines the condition type and content of the condition for execution.
+  SetConditions condition = 1;
+  // Defines the execution targets and which executions should be included.
+  repeated string targets = 2;
+  repeated string includes = 3;
+}
+
+message SetExecutionResponse {
+  // Details provide some base information (such as the last change date) of the execution.
+  zitadel.object.v2beta.Details details = 2;
+}
+
+message DeleteExecutionRequest {
+  // unique identifier of the execution.
+  SetConditions condition = 1;
+}
+
+message DeleteExecutionResponse {
+  // Details provide some base information (such as the last change date) of the execution.
   zitadel.object.v2beta.Details details = 1;
 }

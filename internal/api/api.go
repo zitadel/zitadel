@@ -38,6 +38,32 @@ type API struct {
 	queries           *query.Queries
 }
 
+func (a *API) GrpcServiceExists(service string) bool {
+	_, ok := a.grpcServer.GetServiceInfo()[service]
+	if ok {
+		return true
+	}
+	return false
+}
+
+func (a *API) GrpcMethodExists(method string) bool {
+	// content: "/"+"servicename"+"/"+"method"
+	parts := strings.Split(method, "/")
+	serviceName := parts[1]
+	methodName := parts[2]
+
+	serviceDesc, ok := a.grpcServer.GetServiceInfo()[serviceName]
+	if !ok {
+		return false
+	}
+	for _, methodDesc := range serviceDesc.Methods {
+		if methodDesc.Name == methodName {
+			return true
+		}
+	}
+	return false
+}
+
 type healthCheck interface {
 	Health(ctx context.Context) error
 }
