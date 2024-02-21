@@ -220,11 +220,24 @@ module.exports = {
               items: [
                 "guides/integrate/login/oidc/login-users",
                 "guides/integrate/login/oidc/oauth-recommended-flows",
+                "guides/integrate/login/oidc/device-authorization",
                 "guides/integrate/login/oidc/logout",
               ],
             },
-            "guides/solution-scenarios/device-authorization",
-            'guides/integrate/login/saml',
+            {
+              type: "category",
+              label: "SAML",
+              collapsed: true,
+              link: {
+                type: "generated-index",
+                title: "Authenticate users with openid connect (OIDC)",
+                slug: "guides/integrate/login/saml",
+                description: ".",
+              },
+              items: [
+                "guides/integrate/login/saml/login-users",
+              ],
+            },
           ],
         },
         {
@@ -233,15 +246,15 @@ module.exports = {
           link: {
             type: "generated-index",
             title: "Onboarding Customers and Users",
-            slug: "/guides/solution-scenarios/onboarding",
+            slug: "/guides/integrate/onboarding",
             description:
                 "When building your own application, one of the first questions you have to face, is 'How do my customers onboard to my application?'\n" +
                 "This guide will show you the built-in solution you have, within ZITADEL and how you can use ZITADEL when you have more advanced needs.",
           },
           collapsed: true,
           items: [
-            "guides/solution-scenarios/onboarding/b2b",
-            "guides/solution-scenarios/onboarding/end-users",
+            "guides/integrate/onboarding/b2b",
+            "guides/integrate/onboarding/end-users",
           ],
         },
         {

@@ -1,6 +1,6 @@
 ---
-title: Login users into your application
-sidebar_label: Login Users
+title: Login users into your application with a hosted or custom login UI
+sidebar_label: Hosted vs. Custom Login UI
 ---
 
 ZITADEL is a comprehensive identity and access management platform designed to streamline user authentication, authorization, and management processes for your application. It offers a range of features, including single sign-on (SSO), multi-factor authentication (MFA), and centralized user management.
@@ -52,6 +52,25 @@ Note that SAML might not be suitable for mobile applications.
 In case you want to integrate a mobile application, use OpenID Connect or our Session API.
 
 There are more [differences between SAML and OIDC](/blog/saml-vs-oidc) that you might want to consider.
+
+### ZITADEL's Session API
+
+ZITADEL's [Session API](/docs/apis/resources/session_service) provides developers with a straightforward method to manage user sessions within their applications.
+The Session API is not an industry-standard and can be used instead of OpenID Connect or SAML to authenticate users by [building your own custom login user interface](/docs/guides/integrate/login-ui).
+
+These are some key features of the API:
+
+1. **Session Management**: The Session API allows you to create, retrieve, update, and delete sessions for users within your application. Sessions represent a user's active login session, providing temporary access to your application's resources.
+
+2. **Creating Sessions**: With the Session API, you can initiate a new session for a user after they successfully authenticate through ZITADEL. This typically involves generating a session token or ID, which is then associated with the user's identity and used to track their session activity.
+
+3. **Retrieving Sessions**: You can retrieve information about existing sessions using the Session API, such as session ID, user ID, creation time, and expiration time. This allows you to monitor active user sessions and retrieve session details as needed for auditing or troubleshooting purposes.
+
+4. **Updating Sessions**: The Session API enables you to update session attributes or extend session lifetimes based on specific application requirements. For example, you might want to refresh a session token periodically to prevent it from expiring prematurely or update session metadata to reflect changes in user permissions or settings.
+
+5. **Deleting Sessions**: When a user logs out or their session expires, you can use the Session API to delete the corresponding session from your application's records. This helps maintain data integrity and security by ensuring that inactive sessions are properly removed from the system.
+
+Overall, ZITADEL's Session API simplifies session management within your application, providing a convenient and secure way to track user sessions, enforce session policies, and maintain a seamless user experience. By integrating the Session API into your application, you can effectively manage user authentication and access control while ensuring data privacy and security.
 
 ## Use the Hosted Login to sign-in users
 
@@ -184,11 +203,14 @@ The user experience depends mainly on the used operating system and browser.
 
 ## Build a custom Login UI to authenticate users
 
-## Hosted login vs. custom login
-
 ZITADEL provides multiple 
 
-- When to chose what
+When to build your custom login ui
+
+- Actions
+- Branding: Only partially... open a ticket
+- Embedding (eg, Games, Mobile apps)
+- Don't want to use standards
 
 ## Further reference
 
