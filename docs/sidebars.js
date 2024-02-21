@@ -5,6 +5,7 @@ module.exports = {
       type: "category",
       label: "Get Started",
       collapsed: false,
+      link: { type: "doc", id: "guides/start/quickstart" },
       items: [
         "guides/start/quickstart",
         {
@@ -50,6 +51,7 @@ module.exports = {
     {
       type: "category",
       label: "Examples & SDKs",
+      link: {type: 'doc', id: 'sdk-examples/introduction'},
       items: [
         "sdk-examples/introduction",
         "sdk-examples/angular",
