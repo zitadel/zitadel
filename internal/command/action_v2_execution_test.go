@@ -1917,6 +1917,510 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 	}
 }
 
+func TestCommands_DeleteExecutionRequest(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx           context.Context
+		cond          *ExecutionAPICondition
+		resourceOwner string
+	}
+	type res struct {
+		details *domain.ObjectDetails
+		err     func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"no resourceowner, error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				cond:          &ExecutionAPICondition{},
+				resourceOwner: "",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"no cond, error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				cond:          &ExecutionAPICondition{},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"no valid cond, error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"notvalid",
+					"notvalid",
+					false,
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"push failed, error",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEvent(context.Background(),
+								execution.NewAggregate("grpc.valid", "org1"),
+								domain.ExecutionTypeRequest,
+								[]string{"target"},
+								nil,
+							),
+						),
+					),
+					expectPushFailed(
+						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("grpc.valid", "org1"),
+							domain.ExecutionTypeRequest,
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"valid",
+					"",
+					false,
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			"not found, error",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"method",
+					"",
+					false,
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			"push ok, method target",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEvent(context.Background(),
+								execution.NewAggregate("grpc.method", "org1"),
+								domain.ExecutionTypeRequest,
+								[]string{"target"},
+								nil,
+							),
+						),
+					),
+					expectPush(
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("grpc.method", "org1"),
+							domain.ExecutionTypeRequest,
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"method",
+					"",
+					false,
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			"push ok, service target",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEvent(context.Background(),
+								execution.NewAggregate("grpc.service", "org1"),
+								domain.ExecutionTypeRequest,
+								[]string{"target"},
+								nil,
+							),
+						),
+					),
+					expectPush(
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("grpc.service", "org1"),
+							domain.ExecutionTypeRequest,
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"",
+					"service",
+					false,
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			"push ok, all target",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEvent(context.Background(),
+								execution.NewAggregate("grpc", "org1"),
+								domain.ExecutionTypeRequest,
+								[]string{"target"},
+								nil,
+							),
+						),
+					),
+					expectPush(
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("grpc", "org1"),
+							domain.ExecutionTypeRequest,
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"",
+					"",
+					true,
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			details, err := c.DeleteExecutionRequest(tt.args.ctx, tt.args.cond, tt.args.resourceOwner)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.details, details)
+			}
+		})
+	}
+}
+
+func TestCommands_DeleteExecutionResponse(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx           context.Context
+		cond          *ExecutionAPICondition
+		resourceOwner string
+	}
+	type res struct {
+		details *domain.ObjectDetails
+		err     func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"no resourceowner, error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				cond:          &ExecutionAPICondition{},
+				resourceOwner: "",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"no cond, error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx:           context.Background(),
+				cond:          &ExecutionAPICondition{},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"no valid cond, error",
+			fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"notvalid",
+					"notvalid",
+					false,
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"push failed, error",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEvent(context.Background(),
+								execution.NewAggregate("grpc.valid", "org1"),
+								domain.ExecutionTypeResponse,
+								[]string{"target"},
+								nil,
+							),
+						),
+					),
+					expectPushFailed(
+						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("grpc.valid", "org1"),
+							domain.ExecutionTypeResponse,
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"valid",
+					"",
+					false,
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			"not found, error",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"method",
+					"",
+					false,
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			"push ok, method target",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEvent(context.Background(),
+								execution.NewAggregate("grpc.method", "org1"),
+								domain.ExecutionTypeResponse,
+								[]string{"target"},
+								nil,
+							),
+						),
+					),
+					expectPush(
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("grpc.method", "org1"),
+							domain.ExecutionTypeResponse,
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"method",
+					"",
+					false,
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			"push ok, service target",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEvent(context.Background(),
+								execution.NewAggregate("grpc.service", "org1"),
+								domain.ExecutionTypeResponse,
+								[]string{"target"},
+								nil,
+							),
+						),
+					),
+					expectPush(
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("grpc.service", "org1"),
+							domain.ExecutionTypeResponse,
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"",
+					"service",
+					false,
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			"push ok, all target",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEvent(context.Background(),
+								execution.NewAggregate("grpc", "org1"),
+								domain.ExecutionTypeResponse,
+								[]string{"target"},
+								nil,
+							),
+						),
+					),
+					expectPush(
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("grpc", "org1"),
+							domain.ExecutionTypeResponse,
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"",
+					"",
+					true,
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			details, err := c.DeleteExecutionResponse(tt.args.ctx, tt.args.cond, tt.args.resourceOwner)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.details, details)
+			}
+		})
+	}
+}
+
 func TestCommands_DeleteExecutionEvent(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
