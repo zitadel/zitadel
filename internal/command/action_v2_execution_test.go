@@ -384,114 +384,267 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				},
 			},
 		},
-		/*
-			// TODO: include checks
-			{
-				"push ok, method include",
-				fields{
-					eventstore: eventstoreExpect(t,
-						expectFilter(),
-						expectPush(
+		{
+			"push not found, method include",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectFilter(),
+				),
+				grpcMethodExists: existsMock(true),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"method",
+					"",
+					false,
+				},
+				set: &SetExecution{
+					Includes: []string{"grpc.include"},
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			"push ok, method include",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc.method", "org1"),
+								execution.NewAggregate("grpc.include", "org1"),
 								domain.ExecutionTypeRequest,
+								[]string{"target"},
 								nil,
-								[]string{"include"},
 							),
 						),
 					),
-					grpcMethodExists: existsMock(true),
+					expectPush(
+						execution.NewSetEvent(context.Background(),
+							execution.NewAggregate("grpc.method", "org1"),
+							domain.ExecutionTypeRequest,
+							nil,
+							[]string{"grpc.include"},
+						),
+					),
+				),
+				grpcMethodExists: existsMock(true),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"method",
+					"",
+					false,
 				},
-				args{
-					ctx: context.Background(),
-					cond: &ExecutionAPICondition{
-						"method",
-						"",
-						false,
-					},
-					set: &SetExecution{
-						Includes: []string{"include"},
-					},
-					resourceOwner: "org1",
+				set: &SetExecution{
+					Includes: []string{"grpc.include"},
 				},
-				res{
-					details: &domain.ObjectDetails{
-						ResourceOwner: "org1",
-					},
+				resourceOwner: "org1",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
-			{
-				"push ok, service include",
-				fields{
-					eventstore: eventstoreExpect(t,
-						expectFilter(),
-						expectPush(
+		},
+		{
+			"push not found, service include",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectFilter(),
+				),
+				grpcServiceExists: existsMock(true),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"",
+					"service",
+					false,
+				},
+				set: &SetExecution{
+					Includes: []string{"grpc.include"},
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			"push ok, service include",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc.service", "org1"),
+								execution.NewAggregate("grpc.include", "org1"),
 								domain.ExecutionTypeRequest,
+								[]string{"target"},
 								nil,
-								[]string{"include"},
 							),
 						),
 					),
-					grpcServiceExists: existsMock(true),
+					expectPush(
+						execution.NewSetEvent(context.Background(),
+							execution.NewAggregate("grpc.service", "org1"),
+							domain.ExecutionTypeRequest,
+							nil,
+							[]string{"grpc.include"},
+						),
+					),
+				),
+				grpcServiceExists: existsMock(true),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"",
+					"service",
+					false,
 				},
-				args{
-					ctx: context.Background(),
-					cond: &ExecutionAPICondition{
-						"",
-						"service",
-						false,
-					},
-					set: &SetExecution{
-						Includes: []string{"include"},
-					},
-					resourceOwner: "org1",
+				set: &SetExecution{
+					Includes: []string{"grpc.include"},
 				},
-				res{
-					details: &domain.ObjectDetails{
-						ResourceOwner: "org1",
-					},
+				resourceOwner: "org1",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
-			{
-				"push ok, all include",
-				fields{
-					eventstore: eventstoreExpect(t,
-						expectFilter(),
-						expectPush(
+		},
+		{
+			"push not found, all include",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectFilter(),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"",
+					"",
+					true,
+				},
+				set: &SetExecution{
+					Includes: []string{"grpc.include"},
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			"push ok, all include",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc", "org1"),
+								execution.NewAggregate("grpc.include", "org1"),
 								domain.ExecutionTypeRequest,
+								[]string{"target"},
 								nil,
-								[]string{"include"},
 							),
 						),
 					),
+					expectPush(
+						execution.NewSetEvent(context.Background(),
+							execution.NewAggregate("grpc", "org1"),
+							domain.ExecutionTypeRequest,
+							nil,
+							[]string{"grpc.include"},
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"",
+					"",
+					true,
 				},
-				args{
-					ctx: context.Background(),
-					cond: &ExecutionAPICondition{
-						"",
-						"",
-						true,
-					},
-					set: &SetExecution{
-						Includes: []string{"include"},
-					},
-					resourceOwner: "org1",
+				set: &SetExecution{
+					Includes: []string{"grpc.include"},
 				},
-				res{
-					details: &domain.ObjectDetails{
-						ResourceOwner: "org1",
-					},
+				resourceOwner: "org1",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
-			{
-				"push ok, all include reset",
-				fields{
-					eventstore: eventstoreExpect(t,
-						expectFilter(
+		},
+		{
+			"push ok, all include reset",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						execution.NewSetEvent(context.Background(),
+							execution.NewAggregate("grpc", "org1"),
+							domain.ExecutionTypeRequest,
+							[]string{"target"},
+							nil,
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEvent(context.Background(),
+								execution.NewAggregate("grpc.include", "org1"),
+								domain.ExecutionTypeRequest,
+								[]string{"target"},
+								nil,
+							),
+						),
+					),
+					expectPush(
+						execution.NewSetEvent(context.Background(),
+							execution.NewAggregate("grpc", "org1"),
+							domain.ExecutionTypeRequest,
+							nil,
+							[]string{"grpc.include"},
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"",
+					"",
+					true,
+				},
+				set: &SetExecution{
+					Includes: []string{"grpc.include"},
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			"push ok, all include remove set",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
 								execution.NewAggregate("grpc", "org1"),
 								domain.ExecutionTypeRequest,
@@ -499,78 +652,51 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 								nil,
 							),
 						),
-						expectPush(
-							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc", "org1"),
-								domain.ExecutionTypeRequest,
-								nil,
-								[]string{"include"},
-							),
-						),
-					),
-				},
-				args{
-					ctx: context.Background(),
-					cond: &ExecutionAPICondition{
-						"",
-						"",
-						true,
-					},
-					set: &SetExecution{
-						Includes: []string{"include"},
-					},
-					resourceOwner: "org1",
-				},
-				res{
-					details: &domain.ObjectDetails{
-						ResourceOwner: "org1",
-					},
-				},
-			},
-			{
-				"push ok, all include remove set",
-				fields{
-					eventstore: eventstoreExpect(t,
-						expectFilter(
-							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc", "org1"),
-								domain.ExecutionTypeRequest,
-								[]string{"target"},
-								nil,
-							),
+						eventFromEventPusher(
 							execution.NewRemovedEvent(context.Background(),
 								execution.NewAggregate("grpc", "org1"),
-							),
-						),
-						expectPush(
-							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc", "org1"),
 								domain.ExecutionTypeRequest,
-								nil,
-								[]string{"include"},
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEvent(context.Background(),
+								execution.NewAggregate("grpc.include", "org1"),
+								domain.ExecutionTypeRequest,
+								[]string{"target"},
+								nil,
+							),
+						),
+					),
+					expectPush(
+						execution.NewSetEvent(context.Background(),
+							execution.NewAggregate("grpc", "org1"),
+							domain.ExecutionTypeRequest,
+							nil,
+							[]string{"grpc.include"},
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"",
+					"",
+					true,
 				},
-				args{
-					ctx: context.Background(),
-					cond: &ExecutionAPICondition{
-						"",
-						"",
-						true,
-					},
-					set: &SetExecution{
-						Includes: []string{"include"},
-					},
-					resourceOwner: "org1",
+				set: &SetExecution{
+					Includes: []string{"grpc.include"},
 				},
-				res{
-					details: &domain.ObjectDetails{
-						ResourceOwner: "org1",
-					},
+				resourceOwner: "org1",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
-		*/
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
