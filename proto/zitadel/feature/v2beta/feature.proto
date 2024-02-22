@@ -23,7 +23,7 @@ message FeatureFlag {
   bool enabled = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "false";
-      description: "Wether a feature is enabled.";
+      description: "Whether a feature is enabled.";
     }
   ];
 
