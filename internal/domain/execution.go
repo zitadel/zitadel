@@ -15,3 +15,18 @@ const (
 
 	executionTypeStateCount
 )
+
+func (e ExecutionType) String() string {
+	switch e {
+	case ExecutionTypeRequest:
+		return "request"
+	case ExecutionTypeResponse:
+		return "response"
+	case ExecutionTypeFunction:
+		return "function"
+	case ExecutionTypeEvent:
+		return "event"
+	default:
+		return ""
+	}
+}

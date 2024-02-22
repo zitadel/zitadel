@@ -1,7 +1,6 @@
 package command
 
 import (
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/execution"
 )
@@ -9,23 +8,21 @@ import (
 type ExecutionWriteModel struct {
 	eventstore.WriteModel
 
-	ExecutionType domain.ExecutionType
-	Targets       []string
-	Includes      []string
+	Targets  []string
+	Includes []string
 }
 
 func (e *ExecutionWriteModel) Exists() bool {
 	return len(e.Targets) > 0 || len(e.Includes) > 0
 }
 
-func NewExecutionWriteModel(id string, resourceOwner string, executionType domain.ExecutionType) *ExecutionWriteModel {
+func NewExecutionWriteModel(id string, resourceOwner string) *ExecutionWriteModel {
 	return &ExecutionWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   id,
 			ResourceOwner: resourceOwner,
 			InstanceID:    resourceOwner,
 		},
-		ExecutionType: executionType,
 	}
 }
 
@@ -51,7 +48,6 @@ func (wm *ExecutionWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(execution.SetEventType,
 			execution.RemovedEventType).
-		EventData(map[string]interface{}{"executionType": wm.ExecutionType}).
 		Builder()
 }
 

@@ -5,7 +5,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -37,7 +36,6 @@ func (e *SetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 func NewSetEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	executionType domain.ExecutionType,
 	targets []string,
 	includes []string,
 ) *SetEvent {
@@ -45,17 +43,13 @@ func NewSetEvent(
 		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx, aggregate, SetEventType,
 		),
-		ExecutionType: executionType,
-		Targets:       targets,
-		Includes:      includes,
+		Targets:  targets,
+		Includes: includes,
 	}
 }
 
-
 type RemovedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
-
-	ExecutionType domain.ExecutionType `json:"executionType"`
 }
 
 func (e *RemovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -70,10 +64,8 @@ func (e *RemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, executionType domain.ExecutionType) *RemovedEvent {
+func NewRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *RemovedEvent {
 	return &RemovedEvent{
 		eventstore.NewBaseEventForPush(ctx, aggregate, RemovedEventType),
-		executionType,
 	}
 }
-

@@ -28,15 +28,15 @@ func (e *ExecutionAPICondition) IsValid() error {
 	return nil
 }
 
-func (e *ExecutionAPICondition) ID() string {
+func (e *ExecutionAPICondition) ID(executionType domain.ExecutionType) string {
 	if e.Method != "" {
-		return execution.IDFromGRPC(e.Method)
+		return execution.ID(executionType, e.Method)
 	}
 	if e.Service != "" {
-		return execution.IDFromGRPC(e.Service)
+		return execution.ID(executionType, e.Service)
 	}
 	if e.All {
-		return execution.IDFromGRPCAll()
+		return execution.IDAll(executionType)
 	}
 	return ""
 }
@@ -59,9 +59,8 @@ func (c *Commands) SetExecutionRequest(ctx context.Context, cond *ExecutionAPICo
 		return nil, err
 	}
 	if set.AggregateID == "" {
-		set.AggregateID = cond.ID()
+		set.AggregateID = cond.ID(domain.ExecutionTypeRequest)
 	}
-	set.ExecutionType = domain.ExecutionTypeRequest
 	return c.setExecution(ctx, set, resourceOwner)
 }
 
@@ -73,9 +72,8 @@ func (c *Commands) SetExecutionResponse(ctx context.Context, cond *ExecutionAPIC
 		return nil, err
 	}
 	if set.AggregateID == "" {
-		set.AggregateID = cond.ID()
+		set.AggregateID = cond.ID(domain.ExecutionTypeResponse)
 	}
-	set.ExecutionType = domain.ExecutionTypeResponse
 	return c.setExecution(ctx, set, resourceOwner)
 }
 
@@ -89,7 +87,7 @@ func (e ExecutionFunctionCondition) IsValid() error {
 }
 
 func (e ExecutionFunctionCondition) ID() string {
-	return execution.IDFromFunction(string(e))
+	return execution.ID(domain.ExecutionTypeFunction, string(e))
 }
 
 func (e ExecutionFunctionCondition) Existing(c *Commands) error {
@@ -109,7 +107,6 @@ func (c *Commands) SetExecutionFunction(ctx context.Context, cond ExecutionFunct
 	if set.AggregateID == "" {
 		set.AggregateID = cond.ID()
 	}
-	set.ExecutionType = domain.ExecutionTypeFunction
 	return c.setExecution(ctx, set, resourceOwner)
 }
 
@@ -134,13 +131,13 @@ func (e *ExecutionEventCondition) IsValid() error {
 
 func (e *ExecutionEventCondition) ID() string {
 	if e.Event != "" {
-		return execution.IDFromEvent(e.Event)
+		return execution.ID(domain.ExecutionTypeEvent, e.Event)
 	}
 	if e.Group != "" {
-		return execution.IDFromEvent(e.Group)
+		return execution.ID(domain.ExecutionTypeEvent, e.Group)
 	}
 	if e.All {
-		return execution.IDFromEventAll()
+		return execution.IDAll(domain.ExecutionTypeEvent)
 	}
 	return ""
 }
@@ -165,22 +162,17 @@ func (c *Commands) SetExecutionEvent(ctx context.Context, cond *ExecutionEventCo
 	if set.AggregateID == "" {
 		set.AggregateID = cond.ID()
 	}
-	set.ExecutionType = domain.ExecutionTypeEvent
 	return c.setExecution(ctx, set, resourceOwner)
 }
 
 type SetExecution struct {
 	models.ObjectRoot
 
-	ExecutionType domain.ExecutionType
-	Targets       []string
-	Includes      []string
+	Targets  []string
+	Includes []string
 }
 
 func (e *SetExecution) IsValid() error {
-	if !e.ExecutionType.Valid() {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-wf8juv9lut", "Errors.Execution.Invalid")
-	}
 	if len(e.Targets) == 0 && len(e.Includes) == 0 {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-56bteot2uj", "Errors.Execution.NoTargets")
 	}
@@ -197,7 +189,7 @@ func (e *SetExecution) Existing(c *Commands, ctx context.Context, resourceOwner 
 		}
 	}
 	for _, include := range e.Includes {
-		if !c.existsExecutionByIDAndType(ctx, include, resourceOwner, e.ExecutionType) {
+		if !c.existsExecutionByIDAndType(ctx, include, resourceOwner) {
 			return zerrors.ThrowNotFound(nil, "COMMAND-slgj0l4cdz", "Errors.Execution.IncludeNotFound")
 		}
 	}
@@ -212,7 +204,7 @@ func (c *Commands) setExecution(ctx context.Context, set *SetExecution, resource
 		return nil, err
 	}
 
-	wm, err := c.getExecutionWriteModelByIDAndType(ctx, set.AggregateID, resourceOwner, set.ExecutionType)
+	wm, err := c.getExecutionWriteModelByID(ctx, set.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +217,6 @@ func (c *Commands) setExecution(ctx context.Context, set *SetExecution, resource
 	if err := c.pushAppendAndReduce(ctx, wm, execution.NewSetEvent(
 		ctx,
 		ExecutionAggregateFromWriteModel(&wm.WriteModel),
-		wm.ExecutionType,
 		set.Targets,
 		set.Includes,
 	)); err != nil {
@@ -238,36 +229,36 @@ func (c *Commands) DeleteExecutionRequest(ctx context.Context, cond *ExecutionAP
 	if err := cond.IsValid(); err != nil {
 		return nil, err
 	}
-	return c.deleteExecution(ctx, cond.ID(), resourceOwner, domain.ExecutionTypeRequest)
+	return c.deleteExecution(ctx, cond.ID(domain.ExecutionTypeRequest), resourceOwner)
 }
 
 func (c *Commands) DeleteExecutionResponse(ctx context.Context, cond *ExecutionAPICondition, resourceOwner string) (_ *domain.ObjectDetails, err error) {
 	if err := cond.IsValid(); err != nil {
 		return nil, err
 	}
-	return c.deleteExecution(ctx, cond.ID(), resourceOwner, domain.ExecutionTypeResponse)
+	return c.deleteExecution(ctx, cond.ID(domain.ExecutionTypeResponse), resourceOwner)
 }
 
 func (c *Commands) DeleteExecutionFunction(ctx context.Context, cond ExecutionFunctionCondition, resourceOwner string) (_ *domain.ObjectDetails, err error) {
 	if err := cond.IsValid(); err != nil {
 		return nil, err
 	}
-	return c.deleteExecution(ctx, cond.ID(), resourceOwner, domain.ExecutionTypeFunction)
+	return c.deleteExecution(ctx, cond.ID(), resourceOwner)
 }
 
 func (c *Commands) DeleteExecutionEvent(ctx context.Context, cond *ExecutionEventCondition, resourceOwner string) (_ *domain.ObjectDetails, err error) {
 	if err := cond.IsValid(); err != nil {
 		return nil, err
 	}
-	return c.deleteExecution(ctx, cond.ID(), resourceOwner, domain.ExecutionTypeEvent)
+	return c.deleteExecution(ctx, cond.ID(), resourceOwner)
 }
 
-func (c *Commands) deleteExecution(ctx context.Context, aggID string, resourceOwner string, executionType domain.ExecutionType) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) deleteExecution(ctx context.Context, aggID string, resourceOwner string) (_ *domain.ObjectDetails, err error) {
 	if resourceOwner == "" || aggID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-cnic97c0g3", "Errors.IDMissing")
 	}
 
-	wm, err := c.getExecutionWriteModelByIDAndType(ctx, aggID, resourceOwner, executionType)
+	wm, err := c.getExecutionWriteModelByID(ctx, aggID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -277,14 +268,13 @@ func (c *Commands) deleteExecution(ctx context.Context, aggID string, resourceOw
 	if err := c.pushAppendAndReduce(ctx, wm, execution.NewRemovedEvent(
 		ctx,
 		ExecutionAggregateFromWriteModel(&wm.WriteModel),
-		executionType,
 	)); err != nil {
 		return nil, err
 	}
 	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
-func (c *Commands) existsExecutionByIDAndType(ctx context.Context, id string, resourceOwner string, executionType domain.ExecutionType) bool {
-	wm, err := c.getExecutionWriteModelByIDAndType(ctx, id, resourceOwner, executionType)
+func (c *Commands) existsExecutionByIDAndType(ctx context.Context, id string, resourceOwner string) bool {
+	wm, err := c.getExecutionWriteModelByID(ctx, id, resourceOwner)
 	if err != nil {
 		return false
 	}
@@ -294,8 +284,8 @@ func (c *Commands) existsExecutionByIDAndType(ctx context.Context, id string, re
 	return false
 }
 
-func (c *Commands) getExecutionWriteModelByIDAndType(ctx context.Context, id string, resourceOwner string, executionType domain.ExecutionType) (*ExecutionWriteModel, error) {
-	wm := NewExecutionWriteModel(id, resourceOwner, executionType)
+func (c *Commands) getExecutionWriteModelByID(ctx context.Context, id string, resourceOwner string) (*ExecutionWriteModel, error) {
+	wm := NewExecutionWriteModel(id, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, wm)
 	if err != nil {
 		return nil, err

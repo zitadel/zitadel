@@ -175,8 +175,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("grpc.valid", "org1"),
-							domain.ExecutionTypeRequest,
+							execution.NewAggregate("request.valid", "org1"),
 							[]string{"target"},
 							nil,
 						),
@@ -264,8 +263,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("grpc.method", "org1"),
-							domain.ExecutionTypeRequest,
+							execution.NewAggregate("request.method", "org1"),
 							[]string{"target"},
 							nil,
 						),
@@ -311,8 +309,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("grpc.service", "org1"),
-							domain.ExecutionTypeRequest,
+							execution.NewAggregate("request.service", "org1"),
 							[]string{"target"},
 							nil,
 						),
@@ -358,8 +355,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("grpc", "org1"),
-							domain.ExecutionTypeRequest,
+							execution.NewAggregate("request", "org1"),
 							[]string{"target"},
 							nil,
 						),
@@ -401,7 +397,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					false,
 				},
 				set: &SetExecution{
-					Includes: []string{"grpc.include"},
+					Includes: []string{"request.include"},
 				},
 				resourceOwner: "org1",
 			},
@@ -417,8 +413,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc.include", "org1"),
-								domain.ExecutionTypeRequest,
+								execution.NewAggregate("request.include", "org1"),
 								[]string{"target"},
 								nil,
 							),
@@ -426,10 +421,9 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("grpc.method", "org1"),
-							domain.ExecutionTypeRequest,
+							execution.NewAggregate("request.method", "org1"),
 							nil,
-							[]string{"grpc.include"},
+							[]string{"request.include"},
 						),
 					),
 				),
@@ -443,7 +437,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					false,
 				},
 				set: &SetExecution{
-					Includes: []string{"grpc.include"},
+					Includes: []string{"request.include"},
 				},
 				resourceOwner: "org1",
 			},
@@ -470,7 +464,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					false,
 				},
 				set: &SetExecution{
-					Includes: []string{"grpc.include"},
+					Includes: []string{"request.include"},
 				},
 				resourceOwner: "org1",
 			},
@@ -486,8 +480,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc.include", "org1"),
-								domain.ExecutionTypeRequest,
+								execution.NewAggregate("request.include", "org1"),
 								[]string{"target"},
 								nil,
 							),
@@ -495,10 +488,9 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("grpc.service", "org1"),
-							domain.ExecutionTypeRequest,
+							execution.NewAggregate("request.service", "org1"),
 							nil,
-							[]string{"grpc.include"},
+							[]string{"request.include"},
 						),
 					),
 				),
@@ -512,7 +504,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					false,
 				},
 				set: &SetExecution{
-					Includes: []string{"grpc.include"},
+					Includes: []string{"request.include"},
 				},
 				resourceOwner: "org1",
 			},
@@ -538,7 +530,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					true,
 				},
 				set: &SetExecution{
-					Includes: []string{"grpc.include"},
+					Includes: []string{"request.include"},
 				},
 				resourceOwner: "org1",
 			},
@@ -554,8 +546,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc.include", "org1"),
-								domain.ExecutionTypeRequest,
+								execution.NewAggregate("request.include", "org1"),
 								[]string{"target"},
 								nil,
 							),
@@ -563,10 +554,9 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("grpc", "org1"),
-							domain.ExecutionTypeRequest,
+							execution.NewAggregate("request", "org1"),
 							nil,
-							[]string{"grpc.include"},
+							[]string{"request.include"},
 						),
 					),
 				),
@@ -579,7 +569,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					true,
 				},
 				set: &SetExecution{
-					Includes: []string{"grpc.include"},
+					Includes: []string{"request.include"},
 				},
 				resourceOwner: "org1",
 			},
@@ -595,8 +585,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("grpc", "org1"),
-							domain.ExecutionTypeRequest,
+							execution.NewAggregate("request", "org1"),
 							[]string{"target"},
 							nil,
 						),
@@ -604,8 +593,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc.include", "org1"),
-								domain.ExecutionTypeRequest,
+								execution.NewAggregate("request.include", "org1"),
 								[]string{"target"},
 								nil,
 							),
@@ -613,10 +601,9 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("grpc", "org1"),
-							domain.ExecutionTypeRequest,
+							execution.NewAggregate("request", "org1"),
 							nil,
-							[]string{"grpc.include"},
+							[]string{"request.include"},
 						),
 					),
 				),
@@ -629,7 +616,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					true,
 				},
 				set: &SetExecution{
-					Includes: []string{"grpc.include"},
+					Includes: []string{"request.include"},
 				},
 				resourceOwner: "org1",
 			},
@@ -646,24 +633,21 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc", "org1"),
-								domain.ExecutionTypeRequest,
+								execution.NewAggregate("request", "org1"),
 								[]string{"target"},
 								nil,
 							),
 						),
 						eventFromEventPusher(
 							execution.NewRemovedEvent(context.Background(),
-								execution.NewAggregate("grpc", "org1"),
-								domain.ExecutionTypeRequest,
+								execution.NewAggregate("request", "org1"),
 							),
 						),
 					),
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc.include", "org1"),
-								domain.ExecutionTypeRequest,
+								execution.NewAggregate("request.include", "org1"),
 								[]string{"target"},
 								nil,
 							),
@@ -671,10 +655,9 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("grpc", "org1"),
-							domain.ExecutionTypeRequest,
+							execution.NewAggregate("request", "org1"),
 							nil,
-							[]string{"grpc.include"},
+							[]string{"request.include"},
 						),
 					),
 				),
@@ -687,7 +670,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					true,
 				},
 				set: &SetExecution{
-					Includes: []string{"grpc.include"},
+					Includes: []string{"request.include"},
 				},
 				resourceOwner: "org1",
 			},
@@ -872,8 +855,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("grpc.valid", "org1"),
-							domain.ExecutionTypeResponse,
+							execution.NewAggregate("response.valid", "org1"),
 							[]string{"target"},
 							nil,
 						),
@@ -961,8 +943,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("grpc.method", "org1"),
-							domain.ExecutionTypeResponse,
+							execution.NewAggregate("response.method", "org1"),
 							[]string{"target"},
 							nil,
 						),
@@ -1008,8 +989,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("grpc.service", "org1"),
-							domain.ExecutionTypeResponse,
+							execution.NewAggregate("response.service", "org1"),
 							[]string{"target"},
 							nil,
 						),
@@ -1055,8 +1035,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("grpc", "org1"),
-							domain.ExecutionTypeResponse,
+							execution.NewAggregate("response", "org1"),
 							[]string{"target"},
 							nil,
 						),
@@ -1100,7 +1079,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 						),
 						expectPush(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc.method", "org1"),
+								execution.NewAggregate("response.method", "org1"),
 								domain.ExecutionTypeResponse,
 								nil,
 								[]string{"include"},
@@ -1146,7 +1125,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 						),
 						expectPush(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc.service", "org1"),
+								execution.NewAggregate("response.service", "org1"),
 								domain.ExecutionTypeResponse,
 								nil,
 								[]string{"include"},
@@ -1396,7 +1375,6 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						execution.NewSetEvent(context.Background(),
 							execution.NewAggregate("event.valid", "org1"),
-							domain.ExecutionTypeEvent,
 							[]string{"target"},
 							nil,
 						),
@@ -1485,7 +1463,6 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 					expectPush(
 						execution.NewSetEvent(context.Background(),
 							execution.NewAggregate("event.event", "org1"),
-							domain.ExecutionTypeEvent,
 							[]string{"target"},
 							nil,
 						),
@@ -1532,7 +1509,6 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 					expectPush(
 						execution.NewSetEvent(context.Background(),
 							execution.NewAggregate("event.group", "org1"),
-							domain.ExecutionTypeEvent,
 							[]string{"target"},
 							nil,
 						),
@@ -1579,7 +1555,6 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 					expectPush(
 						execution.NewSetEvent(context.Background(),
 							execution.NewAggregate("event", "org1"),
-							domain.ExecutionTypeEvent,
 							[]string{"target"},
 							nil,
 						),
@@ -1853,8 +1828,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("func.function", "org1"),
-							domain.ExecutionTypeFunction,
+							execution.NewAggregate("function.function", "org1"),
 							[]string{"target"},
 							nil,
 						),
@@ -1932,8 +1906,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("func.function", "org1"),
-							domain.ExecutionTypeFunction,
+							execution.NewAggregate("function.function", "org1"),
 							[]string{"target"},
 							nil,
 						),
@@ -1964,7 +1937,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 							expectFilter(),
 							expectPush(
 								execution.NewSetEvent(context.Background(),
-									execution.NewAggregate("func.function1", "org1"),
+									execution.NewAggregate("function.function1", "org1"),
 									domain.ExecutionTypeFunction,
 									nil,
 									[]string{"include"},
@@ -1991,7 +1964,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 						expectFilter(),
 						expectFilter(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("func.function2", "org1"),
+								execution.NewAggregate("function.function2", "org1"),
 								domain.ExecutionTypeFunction,
 								nil,
 								[]string{"include"},
@@ -1999,7 +1972,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 						),
 						expectPush(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("func.function1", "org1"),
+								execution.NewAggregate("function.function1", "org1"),
 								domain.ExecutionTypeFunction,
 								nil,
 								[]string{"include"},
@@ -2115,8 +2088,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc.valid", "org1"),
-								domain.ExecutionTypeRequest,
+								execution.NewAggregate("request.valid", "org1"),
 								[]string{"target"},
 								nil,
 							),
@@ -2125,8 +2097,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("grpc.valid", "org1"),
-							domain.ExecutionTypeRequest,
+							execution.NewAggregate("request.valid", "org1"),
 						),
 					),
 				),
@@ -2171,8 +2142,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc.method", "org1"),
-								domain.ExecutionTypeRequest,
+								execution.NewAggregate("request.method", "org1"),
 								[]string{"target"},
 								nil,
 							),
@@ -2180,8 +2150,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("grpc.method", "org1"),
-							domain.ExecutionTypeRequest,
+							execution.NewAggregate("request.method", "org1"),
 						),
 					),
 				),
@@ -2208,8 +2177,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc.service", "org1"),
-								domain.ExecutionTypeRequest,
+								execution.NewAggregate("request.service", "org1"),
 								[]string{"target"},
 								nil,
 							),
@@ -2217,8 +2185,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("grpc.service", "org1"),
-							domain.ExecutionTypeRequest,
+							execution.NewAggregate("request.service", "org1"),
 						),
 					),
 				),
@@ -2245,8 +2212,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc", "org1"),
-								domain.ExecutionTypeRequest,
+								execution.NewAggregate("request", "org1"),
 								[]string{"target"},
 								nil,
 							),
@@ -2254,8 +2220,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("grpc", "org1"),
-							domain.ExecutionTypeRequest,
+							execution.NewAggregate("request", "org1"),
 						),
 					),
 				),
@@ -2367,8 +2332,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc.valid", "org1"),
-								domain.ExecutionTypeResponse,
+								execution.NewAggregate("response.valid", "org1"),
 								[]string{"target"},
 								nil,
 							),
@@ -2377,8 +2341,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("grpc.valid", "org1"),
-							domain.ExecutionTypeResponse,
+							execution.NewAggregate("response.valid", "org1"),
 						),
 					),
 				),
@@ -2423,8 +2386,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc.method", "org1"),
-								domain.ExecutionTypeResponse,
+								execution.NewAggregate("response.method", "org1"),
 								[]string{"target"},
 								nil,
 							),
@@ -2432,8 +2394,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("grpc.method", "org1"),
-							domain.ExecutionTypeResponse,
+							execution.NewAggregate("response.method", "org1"),
 						),
 					),
 				),
@@ -2460,8 +2421,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc.service", "org1"),
-								domain.ExecutionTypeResponse,
+								execution.NewAggregate("response.service", "org1"),
 								[]string{"target"},
 								nil,
 							),
@@ -2469,8 +2429,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("grpc.service", "org1"),
-							domain.ExecutionTypeResponse,
+							execution.NewAggregate("response.service", "org1"),
 						),
 					),
 				),
@@ -2497,8 +2456,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc", "org1"),
-								domain.ExecutionTypeResponse,
+								execution.NewAggregate("response", "org1"),
 								[]string{"target"},
 								nil,
 							),
@@ -2506,8 +2464,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("grpc", "org1"),
-							domain.ExecutionTypeResponse,
+							execution.NewAggregate("response", "org1"),
 						),
 					),
 				),
@@ -2602,7 +2559,6 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
 								execution.NewAggregate("event.valid", "org1"),
-								domain.ExecutionTypeEvent,
 								[]string{"target"},
 								nil,
 							),
@@ -2612,7 +2568,6 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						execution.NewRemovedEvent(context.Background(),
 							execution.NewAggregate("event.valid", "org1"),
-							domain.ExecutionTypeEvent,
 						),
 					),
 				),
@@ -2678,7 +2633,6 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
 								execution.NewAggregate("event.valid", "org1"),
-								domain.ExecutionTypeEvent,
 								[]string{"target"},
 								nil,
 							),
@@ -2687,7 +2641,6 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
 							execution.NewAggregate("event.valid", "org1"),
-							domain.ExecutionTypeEvent,
 						),
 					),
 				),
@@ -2735,7 +2688,6 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
 								execution.NewAggregate("event.group", "org1"),
-								domain.ExecutionTypeEvent,
 								[]string{"target"},
 								nil,
 							),
@@ -2744,7 +2696,6 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
 							execution.NewAggregate("event.group", "org1"),
-							domain.ExecutionTypeEvent,
 						),
 					),
 				),
@@ -2792,7 +2743,6 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
 								execution.NewAggregate("event", "org1"),
-								domain.ExecutionTypeEvent,
 								[]string{"target"},
 								nil,
 							),
@@ -2801,7 +2751,6 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
 							execution.NewAggregate("event", "org1"),
-							domain.ExecutionTypeEvent,
 						),
 					),
 				),
@@ -2894,8 +2843,7 @@ func TestCommands_DeleteExecutionFunction(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("func.function", "org1"),
-								domain.ExecutionTypeFunction,
+								execution.NewAggregate("function.function", "org1"),
 								[]string{"target"},
 								nil,
 							),
@@ -2904,8 +2852,7 @@ func TestCommands_DeleteExecutionFunction(t *testing.T) {
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("func.function", "org1"),
-							domain.ExecutionTypeFunction,
+							execution.NewAggregate("function.function", "org1"),
 						),
 					),
 				),
@@ -2942,8 +2889,7 @@ func TestCommands_DeleteExecutionFunction(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("func.function", "org1"),
-								domain.ExecutionTypeFunction,
+								execution.NewAggregate("function.function", "org1"),
 								[]string{"target"},
 								nil,
 							),
@@ -2951,8 +2897,7 @@ func TestCommands_DeleteExecutionFunction(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("func.function", "org1"),
-							domain.ExecutionTypeFunction,
+							execution.NewAggregate("function.function", "org1"),
 						),
 					),
 				),

@@ -168,6 +168,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 
 func TestServer_SetExecution_Request_Include(t *testing.T) {
 	targetResp := Tester.CreateTarget(CTX, t)
+	executionCond := "request"
 	Tester.SetExecution(CTX, t,
 		&execution.SetConditions{
 			ConditionType: &execution.SetConditions_Request{
@@ -201,7 +202,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 						},
 					},
 				},
-				Includes: []string{"grpc"},
+				Includes: []string{executionCond},
 			},
 			want: &execution.SetExecutionResponse{
 				Details: &object.Details{
@@ -223,7 +224,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 						},
 					},
 				},
-				Includes: []string{"grpc"},
+				Includes: []string{executionCond},
 			},
 			want: &execution.SetExecutionResponse{
 				Details: &object.Details{
@@ -245,7 +246,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 						},
 					},
 				},
-				Includes: []string{"grpc"},
+				Includes: []string{executionCond},
 			},
 			want: &execution.SetExecutionResponse{
 				Details: &object.Details{

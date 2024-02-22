@@ -186,9 +186,10 @@ service ExecutionService {
       };
     };
   }
+
   // Set an execution
   //
-  // Set an execution of a call to specified targets.
+  // Set an execution to call a previously defined target or include the targets of a previously defined execution.
   rpc SetExecution (SetExecutionRequest) returns (SetExecutionResponse) {
     option (google.api.http) = {
       post: "/v3alpha/executions"
@@ -343,8 +344,9 @@ message DeleteTargetResponse {
 message SetExecutionRequest {
   // Defines the condition type and content of the condition for execution.
   SetConditions condition = 1;
-  // Defines the execution targets and which executions should be included.
+  // Defines the execution targets which are defined as a different resource, which are called in the defined conditions.
   repeated string targets = 2;
+  // Defines other executions as included with the same condition-types.
   repeated string includes = 3;
 }
 
@@ -354,7 +356,7 @@ message SetExecutionResponse {
 }
 
 message DeleteExecutionRequest {
-  // unique identifier of the execution.
+  // Unique identifier of the execution.
   SetConditions condition = 1;
 }
 

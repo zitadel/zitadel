@@ -3,6 +3,7 @@ package execution
 import (
 	"strings"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -21,28 +22,10 @@ func NewAggregate(aggrID, instanceID string) *eventstore.Aggregate {
 	}
 }
 
-const (
-	grpcPrefix     = "grpc"
-	eventPrefix    = "event"
-	functionPrefix = "func"
-)
-
-func IDFromGRPC(method string) string {
-	return strings.Join([]string{grpcPrefix, method}, ".")
+func ID(executionType domain.ExecutionType, value string) string {
+	return strings.Join([]string{executionType.String(), value}, ".")
 }
 
-func IDFromGRPCAll() string {
-	return grpcPrefix
-}
-
-func IDFromEvent(event string) string {
-	return strings.Join([]string{eventPrefix, event}, ".")
-}
-
-func IDFromEventAll() string {
-	return eventPrefix
-}
-
-func IDFromFunction(name string) string {
-	return strings.Join([]string{functionPrefix, name}, ".")
+func IDAll(executionType domain.ExecutionType) string {
+	return executionType.String()
 }
