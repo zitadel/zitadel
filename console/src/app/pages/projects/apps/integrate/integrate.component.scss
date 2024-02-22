@@ -1,6 +1,94 @@
 h1 {
   font-weight: 500;
-  font-size: 1.5rem;
+  font-size: 2rem;
+}
+
+.integrate-layout-container {
+  margin: 0 -2rem 2rem -2rem;
+  padding: 3rem 2rem 14rem 2rem;
+
+  .top-control {
+    display: flex;
+    align-items: center;
+
+    .abort {
+      font-size: 1.2rem;
+      margin-left: 1.5rem;
+      text-transform: uppercase;
+      font-size: 14px;
+      opacity: 0.8;
+      letter-spacing: 0.05em;
+    }
+
+    .progress-spinner {
+      margin-left: 2rem;
+    }
+  }
+}
+
+.offset-content {
+  margin-top: -14rem;
+}
+
+.grid-layout {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: [first] 300px [second] auto;
+  grid-column-gap: 5rem;
+
+  .framework-selector {
+    margin-bottom: 2rem;
+    display: block;
+  }
+
+  .steps {
+    margin-top: 0.5rem;
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      padding: 1rem 0;
+
+      .step-title {
+        font-weight: 700;
+        font-size: 12px;
+        opacity: 0.8;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  .redirect-p {
+    margin-top: 0;
+  }
+
+  .redirect-description {
+    font-size: 14px;
+    margin: 0.25rem 0 0 0;
+    display: block;
+  }
+}
+
+@media only screen and (max-width: 900px) {
+  .integrate-layout-container {
+    margin: 0 -2rem 2rem -2rem;
+    background: transparent;
+    padding: 3rem 2rem 14rem 2rem;
+  }
+
+  .grid-layout {
+    display: flex;
+    flex-direction: column;
+
+    .steps {
+      display: none;
+    }
+  }
+}
+
+.card-wrapper {
+  margin-top: -1rem;
 }
 
 @mixin app-integrate-theme($theme) {
@@ -21,29 +109,21 @@ h1 {
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
   $border-selected-color: if($is-dark-theme, #fff, #000);
 
+  .integrate-layout-container {
+    background: map-get($background, metadata-section);
+  }
+
   .review-description {
     font-size: 14px;
     margin: 0.25rem 0 0 0;
     display: block;
   }
 
-  .oidc-configuration {
-    margin-top: 1rem;
-  }
-
-  .app-create-actions {
-    margin-top: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    .bck-button {
-      margin-right: 1rem;
-    }
-
-    .create-button {
-      height: 3.5rem;
-      padding: 0 4rem;
+  .grid-layout {
+    .step {
+      &.top-border {
+        border-top: 2px solid $border-color;
+      }
     }
   }
 
@@ -114,11 +194,7 @@ h1 {
   margin-top: 2rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-
-  .bck-button {
-    margin-right: 1rem;
-  }
+  justify-content: flex-end;
 
   .create-button {
     height: 3.5rem;

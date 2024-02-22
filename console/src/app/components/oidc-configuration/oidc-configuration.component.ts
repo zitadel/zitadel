@@ -23,7 +23,7 @@ export type Framework = FrameworkDefinition & {
 
 @Component({
   standalone: true,
-  selector: 'cnsl-oidc-configuration',
+  selector: 'cnsl-oidc-app-configuration',
   templateUrl: './oidc-configuration.component.html',
   styleUrls: ['./oidc-configuration.component.scss'],
   imports: [TranslateModule, RouterModule, CommonModule],

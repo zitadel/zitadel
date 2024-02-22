@@ -49,31 +49,4 @@
       </span>
     </span>
   </div>
-
-  <div class="row">
-    <span class="left cnsl-secondary-text">
-      {{ 'APP.OIDC.REDIRECT' | translate }}
-    </span>
-    <span class="right" *ngIf="configuration.redirectUrisList && configuration.redirectUrisList.length > 0">
-      [<span *ngFor="let redirect of configuration.redirectUrisList ?? []; index as i">
-        {{ redirect }}
-        {{ i < configuration.redirectUrisList.length - 1 ? ', ' : '' }} </span
-      >]
-    </span>
-  </div>
-
-  <div class="row">
-    <span class="left cnsl-secondary-text">
-      {{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}
-    </span>
-    <span
-      class="right"
-      *ngIf="configuration.postLogoutRedirectUrisList && configuration.postLogoutRedirectUrisList.length > 0"
-    >
-      [<span *ngFor="let redirect of configuration.postLogoutRedirectUrisList; index as i">
-        {{ redirect }}
-        {{ i < configuration.postLogoutRedirectUrisList.length - 1 ? ', ' : '' }} </span
-      >]
-    </span>
-  </div>
 </div>

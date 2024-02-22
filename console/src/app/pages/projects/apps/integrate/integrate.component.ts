@@ -6,7 +6,7 @@ import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGro
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Buffer } from 'buffer';
-import { Subject, Subscription } from 'rxjs';
+import { Subject, Subscription, combineLatest } from 'rxjs';
 import { debounceTime, map, takeUntil } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
@@ -44,6 +44,7 @@ import { EnvironmentService } from 'src/app/services/environment.service';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { Framework } from 'src/app/components/quickstart/quickstart.component';
 import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
+import { NavigationService } from 'src/app/services/navigation.service';
 
 @Component({
   selector: 'cnsl-integrate',
@@ -56,19 +57,10 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
   public loading: boolean = false;
   public InfoSectionType: any = InfoSectionType;
   public framework = signal<Framework | undefined>(undefined);
-  public oidcAppRequest: Signal<AddOIDCAppRequest> = computed(() => {
-    const fwId = this.framework()?.id;
-    const fw = this.framework();
-    if (fw && fwId) {
-      const request = OIDC_CONFIGURATIONS[fwId];
-      request.setProjectId(this.projectId);
-      request.setName(fw.title);
-      return request;
-    } else {
-      return new AddOIDCAppRequest();
-    }
-  });
-  // public oidcAppRequest = signal(new AddOIDCAppRequest());
+  public oidcAppRequest = signal<AddOIDCAppRequest>(new AddOIDCAppRequest());
+
+  public OIDCAppType: any = OIDCAppType;
+  public requestRedirectValuesSubject$: Subject<void> = new Subject();
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -78,7 +70,35 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
     private mgmtService: ManagementService,
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
-  ) {}
+    public navigation: NavigationService,
+  ) {
+    effect(() => {
+      const fwId = this.framework()?.id;
+      const fw = this.framework();
+      if (fw && fwId) {
+        const request = OIDC_CONFIGURATIONS[fwId];
+        request.setProjectId(this.projectId);
+        request.setName(fw.title);
+        request.setDevMode(true);
+        this.requestRedirectValuesSubject$.next();
+        return request;
+      } else {
+        return new AddOIDCAppRequest();
+      }
+    });
+  }
+
+  public projectName$ = combineLatest([this.mgmtService.ownedProjects, this.mgmtService.grantedProjects]).pipe(
+    map(([projects, grantedProjects]) => {
+      const project = projects.find((project) => project.id === this.activatedRoute.snapshot.paramMap.get('projectid'));
+
+      const grantedproject = grantedProjects.find(
+        (grantedproject) => grantedproject.projectId === this.activatedRoute.snapshot.paramMap.get('projectid'),
+      );
+
+      return project?.name ?? grantedproject?.projectName ?? '';
+    }),
+  );
 
   public setFramework(framework: Framework | undefined) {
     console.log(framework);
@@ -112,7 +132,9 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
   }
 
   public close(): void {
-    this._location.back();
+    if (this.navigation.isBackPossible) {
+      this._location.back();
+    }
   }
 
   public createApp(): void {
@@ -155,5 +177,25 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(() => {
       this.router.navigate(['projects', this.projectId, 'apps', added.appId], { queryParams: { new: true } });
     });
+  }
+
+  public get redirectUris() {
+    return this.oidcAppRequest().toObject().redirectUrisList;
+  }
+
+  public set redirectUris(value: string[]) {
+    const request = this.oidcAppRequest();
+    request.setRedirectUrisList(value);
+    this.oidcAppRequest.set(request);
+  }
+
+  public get postLogoutUrisList() {
+    return this.oidcAppRequest().toObject().postLogoutRedirectUrisList;
+  }
+
+  public set postLogoutUrisList(value: string[]) {
+    const request = this.oidcAppRequest();
+    request.setPostLogoutRedirectUrisList(value);
+    this.oidcAppRequest.set(request);
   }
 }
