@@ -51,17 +51,6 @@ func NewSetEvent(
 	}
 }
 
-func SetEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	set := &SetEvent{
-		BaseEvent: eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(set)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "EXEC-r8e2e6hawz", "unable to unmarshal execution set")
-	}
-
-	return set, nil
-}
 
 type RemovedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
@@ -88,14 +77,3 @@ func NewRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, execu
 	}
 }
 
-func RemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	removed := &RemovedEvent{
-		BaseEvent: eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(removed)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "EXEC-rsg1cnt5am", "unable to unmarshal execution removed")
-	}
-
-	return removed, nil
-}
