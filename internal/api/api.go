@@ -46,7 +46,10 @@ func (a *API) GrpcServiceExists(service string) bool {
 func (a *API) GrpcMethodExists(method string) bool {
 	// content: "/"+"servicename"+"/"+"method"
 	parts := strings.Split(method, "/")
-	serviceName := parts[1]
+	if len(parts) < 3 {
+        return false
+    }
+    serviceName := parts[1]
 	methodName := parts[2]
 
 	serviceDesc, ok := a.grpcServer.GetServiceInfo()[serviceName]
