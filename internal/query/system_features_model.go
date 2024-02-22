@@ -91,6 +91,8 @@ func (m *SystemFeaturesReadModel) reduceBoolFeature(event *feature_v2.SetEvent[b
 	var dst *FeatureSource[bool]
 
 	switch key {
+	case feature.KeyUnspecified:
+		return nil
 	case feature.KeyLoginDefaultOrg:
 		dst = &m.system.LoginDefaultOrg
 	case feature.KeyTriggerIntrospectionProjections:

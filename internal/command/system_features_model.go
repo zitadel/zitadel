@@ -65,6 +65,8 @@ func (m *SystemFeaturesWriteModel) reduceBoolFeature(event *feature_v2.SetEvent[
 		return err
 	}
 	switch key {
+	case feature.KeyUnspecified:
+		return nil
 	case feature.KeyLoginDefaultOrg:
 		m.LoginDefaultOrg = &event.Value
 	case feature.KeyTriggerIntrospectionProjections:
