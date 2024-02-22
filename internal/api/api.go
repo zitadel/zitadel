@@ -40,10 +40,7 @@ type API struct {
 
 func (a *API) GrpcServiceExists(service string) bool {
 	_, ok := a.grpcServer.GetServiceInfo()[service]
-	if ok {
-		return true
-	}
-	return false
+	return ok
 }
 
 func (a *API) GrpcMethodExists(method string) bool {
