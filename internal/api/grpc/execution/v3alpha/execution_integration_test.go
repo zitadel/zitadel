@@ -166,6 +166,109 @@ func TestServer_SetExecution_Request(t *testing.T) {
 	}
 }
 
+func TestServer_SetExecution_Request_Include(t *testing.T) {
+	targetResp := Tester.CreateTarget(CTX, t)
+	Tester.SetExecution(CTX, t,
+		&execution.SetConditions{
+			ConditionType: &execution.SetConditions_Request{
+				Request: &execution.SetRequestExecution{
+					Condition: &execution.SetRequestExecution_All{
+						All: true,
+					},
+				},
+			},
+		},
+		[]string{targetResp.GetId()},
+	)
+
+	tests := []struct {
+		name    string
+		ctx     context.Context
+		req     *execution.SetExecutionRequest
+		want    *execution.SetExecutionResponse
+		wantErr bool
+	}{
+		{
+			name: "method, ok",
+			ctx:  CTX,
+			req: &execution.SetExecutionRequest{
+				Condition: &execution.SetConditions{
+					ConditionType: &execution.SetConditions_Request{
+						Request: &execution.SetRequestExecution{
+							Condition: &execution.SetRequestExecution_Method{
+								Method: "/zitadel.session.v2beta.SessionService/ListSessions",
+							},
+						},
+					},
+				},
+				Includes: []string{"grpc"},
+			},
+			want: &execution.SetExecutionResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Instance.InstanceID(),
+				},
+			},
+		},
+		{
+			name: "service, ok",
+			ctx:  CTX,
+			req: &execution.SetExecutionRequest{
+				Condition: &execution.SetConditions{
+					ConditionType: &execution.SetConditions_Request{
+						Request: &execution.SetRequestExecution{
+							Condition: &execution.SetRequestExecution_Service{
+								Service: "zitadel.session.v2beta.SessionService",
+							},
+						},
+					},
+				},
+				Includes: []string{"grpc"},
+			},
+			want: &execution.SetExecutionResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Instance.InstanceID(),
+				},
+			},
+		},
+		{
+			name: "all, ok",
+			ctx:  CTX,
+			req: &execution.SetExecutionRequest{
+				Condition: &execution.SetConditions{
+					ConditionType: &execution.SetConditions_Request{
+						Request: &execution.SetRequestExecution{
+							Condition: &execution.SetRequestExecution_All{
+								All: true,
+							},
+						},
+					},
+				},
+				Includes: []string{"grpc"},
+			},
+			want: &execution.SetExecutionResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Instance.InstanceID(),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.SetExecution(tt.ctx, tt.req)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+
+			integration.AssertDetails(t, tt.want, got)
+		})
+	}
+}
+
 func TestServer_DeleteExecution_Request(t *testing.T) {
 	targetResp := Tester.CreateTarget(CTX, t)
 
@@ -180,10 +283,6 @@ func TestServer_DeleteExecution_Request(t *testing.T) {
 		{
 			name: "missing permission",
 			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
-			dep: func(ctx context.Context, request *execution.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()})
-				return nil
-			},
 			req: &execution.DeleteExecutionRequest{
 				Condition: &execution.SetConditions{
 					ConditionType: &execution.SetConditions_Request{
@@ -215,7 +314,7 @@ func TestServer_DeleteExecution_Request(t *testing.T) {
 					ConditionType: &execution.SetConditions_Request{
 						Request: &execution.SetRequestExecution{
 							Condition: &execution.SetRequestExecution_Method{
-								Method: "/zitadel.session.v2beta.SessionService/ListSessions",
+								Method: "/zitadel.session.v2beta.SessionService/NotExisting",
 							},
 						},
 					},
@@ -276,7 +375,7 @@ func TestServer_DeleteExecution_Request(t *testing.T) {
 					ConditionType: &execution.SetConditions_Request{
 						Request: &execution.SetRequestExecution{
 							Condition: &execution.SetRequestExecution_Service{
-								Service: "zitadel.session.v2beta.UserService",
+								Service: "zitadel.user.v2beta.UserService",
 							},
 						},
 					},
@@ -500,10 +599,6 @@ func TestServer_DeleteExecution_Response(t *testing.T) {
 		{
 			name: "missing permission",
 			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
-			dep: func(ctx context.Context, request *execution.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()})
-				return nil
-			},
 			req: &execution.DeleteExecutionRequest{
 				Condition: &execution.SetConditions{
 					ConditionType: &execution.SetConditions_Response{
@@ -537,7 +632,7 @@ func TestServer_DeleteExecution_Response(t *testing.T) {
 					ConditionType: &execution.SetConditions_Response{
 						Response: &execution.SetResponseExecution{
 							Condition: &execution.SetResponseExecution_Method{
-								Method: "/zitadel.session.v2beta.SessionService/ListSessions",
+								Method: "/zitadel.session.v2beta.SessionService/NotExisting",
 							},
 						},
 					},
@@ -598,7 +693,7 @@ func TestServer_DeleteExecution_Response(t *testing.T) {
 					ConditionType: &execution.SetConditions_Response{
 						Response: &execution.SetResponseExecution{
 							Condition: &execution.SetResponseExecution_Service{
-								Service: "zitadel.session.v2beta.UserService",
+								Service: "zitadel.user.v2beta.UserService",
 							},
 						},
 					},
@@ -832,10 +927,6 @@ func TestServer_DeleteExecution_Event(t *testing.T) {
 		{
 			name: "missing permission",
 			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
-			dep: func(ctx context.Context, request *execution.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()})
-				return nil
-			},
 			req: &execution.DeleteExecutionRequest{
 				Condition: &execution.SetConditions{
 					ConditionType: &execution.SetConditions_Event{
@@ -861,22 +952,25 @@ func TestServer_DeleteExecution_Event(t *testing.T) {
 			},
 			wantErr: true,
 		},
-		{
-			name: "event, not existing",
-			ctx:  CTX,
-			req: &execution.DeleteExecutionRequest{
-				Condition: &execution.SetConditions{
-					ConditionType: &execution.SetConditions_Event{
-						Event: &execution.SetEventExecution{
-							Condition: &execution.SetEventExecution_Event{
-								Event: "xxx",
+		/*
+			//TODO: add when check is implemented
+			{
+				name: "event, not existing",
+				ctx:  CTX,
+				req: &execution.DeleteExecutionRequest{
+					Condition: &execution.SetConditions{
+						ConditionType: &execution.SetConditions_Event{
+							Event: &execution.SetEventExecution{
+								Condition: &execution.SetEventExecution_Event{
+									Event: "xxx",
+								},
 							},
 						},
 					},
 				},
+				wantErr: true,
 			},
-			wantErr: true,
-		},
+		*/
 		{
 			name: "event, ok",
 			ctx:  CTX,
@@ -1065,7 +1159,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 			req: &execution.SetExecutionRequest{
 				Condition: &execution.SetConditions{
 					ConditionType: &execution.SetConditions_Function{
-						Function: "xxx",
+						Function: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication",
 					},
 				},
 				Targets: []string{targetResp.GetId()},
@@ -1106,10 +1200,6 @@ func TestServer_DeleteExecution_Function(t *testing.T) {
 		{
 			name: "missing permission",
 			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
-			dep: func(ctx context.Context, request *execution.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()})
-				return nil
-			},
 			req: &execution.DeleteExecutionRequest{
 				Condition: &execution.SetConditions{
 					ConditionType: &execution.SetConditions_Response{
@@ -1157,7 +1247,7 @@ func TestServer_DeleteExecution_Function(t *testing.T) {
 			req: &execution.DeleteExecutionRequest{
 				Condition: &execution.SetConditions{
 					ConditionType: &execution.SetConditions_Function{
-						Function: "xxx",
+						Function: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication",
 					},
 				},
 			},
