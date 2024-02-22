@@ -58,6 +58,17 @@ There are more [differences between SAML and OIDC](https://zitadel.com/blog/saml
 ZITADEL's [Session API](/docs/apis/resources/session_service) provides developers with a straightforward method to manage user sessions within their applications.
 The Session API is not an industry-standard and can be used instead of OpenID Connect or SAML to authenticate users by [building your own custom login user interface](/docs/guides/integrate/login-ui).
 
+#### Tokens in the Session API
+
+The session API will return a session token that can be used to authenticate users from your application.
+This token should not be confused with am access or id tokens in opaque or JWT form that is issued during OpenID connect flows.
+
+:::info Token exchange
+Token exchange between Session API and OIDC / SAML tokens is not possible at this moment.
+:::
+
+#### Key features of the Session API
+
 These are some key features of the API:
 
 1. **Session Management**: The Session API allows you to create, retrieve, update, and delete sessions for users within your application. Sessions represent a user's active login session, providing temporary access to your application's resources.
@@ -74,7 +85,7 @@ Overall, ZITADEL's Session API simplifies session management within your applica
 
 ## Use the Hosted Login to sign-in users
 
-ZITADEL provides a hosted single-sign-on page to securely sign-in users to your applications. 
+ZITADEL provides a hosted single-sign-on page to securely sign-in users to your applications.
 ZITADEL's hosted login page serves as a centralized authentication interface provided for applications that integrate ZITADEL.
 As a developer, understanding the hosted login page is essential for seamlessly integrating authentication into your application.
 
@@ -84,7 +95,7 @@ ZITADEL's hosted login page acts as a centralized authentication endpoint where 
 When users attempt to access a protected resource within your application, you can redirect them to the hosted login page to authenticate using their login methods and credentials or through Single-sign-on (SSO).
 After successful authentication, the user will be redirected back to the originating application.
 
-### Security and Compliance
+### Security and compliance
 
 ZITADEL's hosted login page prioritizes security and compliance with industry standards and regulations.
 It employs best practices for securing authentication processes, such as encryption, token-based authentication, and adherence to protocols like OAuth 2.0, [OpenID Connect](/docs/guides/integrate/login/oidc), and [SAML](/docs/guides/integrate/login/saml).
@@ -94,7 +105,7 @@ One of the measures we apply is setting the necessary security heads thus minimi
 Put your current login to the test and compare the results with our hosted login page.
 Tools like [Mozilla's Observatory](https://observatory.mozilla.org/) can give you a good first impression your security posture.
 
-### Developer-Friendly Integration
+### Developer-friendly integration
 
 Integrating the hosted login page into your application is straightforward, thanks to ZITADEL's developer-friendly documentation, SDKs, and APIs. Developers can easily implement authentication flows, handle authentication callbacks, and customize the user experience to seamlessly integrate authentication with their application's workflow.
 
@@ -128,15 +139,16 @@ ZITADEL offers various [identity provider templates](/docs/guides/integrate/iden
 ### Multi-tenancy authentication
 
 ZITADEL simplifies multi-tenancy authentication by securely managing authentication for multiple tenants, called [Organizations](/docs/concepts/structure/organizations), within a single [instance](/docs/concepts/structure/instance).
+
 Key features include:
 
 1. **Secure Tenant Isolation**: Ensures robust security measures to prevent unauthorized access between tenants, maintaining data privacy and compliance. [Managers](/docs/concepts/structure/managers) for an organization have only access to data and configuration within their Organization.
 2. **Custom Authentication Configurations**: Allows tailored [authentication settings](/docs/guides/manage/console/instance-settings#login-behavior-and-access), [branding](/docs/guides/manage/customize/branding), and policies for each tenant.
 3. **Centralized Management**: Provides [centralized administration](/docs/guides/manage/console/managers) for efficient management across all tenants.
 4. **Scalability and Flexibility**: Scales seamlessly to accommodate growing organizations of all sizes.
-5. **Domain Discovery**: Starting on a central login page, route users to their tenant based on their email-address or other user attributes. Authentication settings will be applied automatically based on the organization's policies, this includes routing users seamlessly to third party identity providers like [Entra ID](/docs/guides/integrate/identity-providers/azure-ad)
+5. **Domain Discovery**: Starting on a central login page, route users to their tenant based on their email-address or other user attributes. Authentication settings will be applied automatically based on the organization's policies, this includes routing users seamlessly to third party identity providers like [Entra ID](/docs/guides/integrate/identity-providers/azure-ad).
 
-### Customization Options
+### Customization options
 
 While the hosted login page provides a default authentication interface out-of-the-box, ZITADEL offers [customization options](/docs/guides/manage/customize/branding) to tailor the login page to match your application's branding and user experience requirements.
 Developers can customize elements such as logos, colors, and messaging to ensure a seamless integration with their application's user interface.
@@ -203,14 +215,23 @@ The user experience depends mainly on the used operating system and browser.
 
 ## Build a custom Login UI to authenticate users
 
-ZITADEL provides multiple 
+In certain cases you want to build your own login UI to optimize your user experience.
+We have dedicated guides on [how to build your custom login UI](http://localhost:3000/docs/guides/integrate/login-ui) with ZITADEL.
 
-When to build your custom login ui
+When building your own login UI, you will leverage the [Session API](#zitadels-session-api) to authenticate users and manage user sessions.
 
-- Actions
-- Branding: Only partially... open a ticket
-- Embedding (eg, Games, Mobile apps)
-- Don't want to use standards
+:::info Session API support for OIDC amd SAML
+At the moment developers can only integrate with ZITADEL's Session API and not with standard compliant OpenID Connect or SAML flows.
+:::
+
+### When to build your custom Login UI
+
+Main reasons on why developers might want to build their own login UI include:
+
+1. **Embedding Login in your application**: From a security standpoint you should follow the best practice recommendation to open a browser and then redirect to your application. For certain applications, such as games or mobile apps, you might want to embed the login for a better user experience
+2. **Customize business process**: You might want to change existing flows that are provided by the hosted login to fit your business process. Make sure to validate that your customization can't be handled by [Actions](/docs/guides/manage/customize/behavior) instead.
+3. **Customize branding**: We designed the hosted login with security in mind, which limits the [customization capabilities](/docs/guides/manage/customize/branding). Besides that we might not be able to handle all requirements for custom branding. If you believe your customization should be part of the hosted login instead, please open an [improvement idea](https://github.com/zitadel/zitadel/issues/new/choose).
+4. **Independence of standards** You don't want or need to rely on industry standards for authentication such as OpenID Connect or SAML for authenticating users.
 
 ## Further reference
 
