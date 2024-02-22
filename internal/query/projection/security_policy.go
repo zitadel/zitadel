@@ -69,7 +69,7 @@ func (p *securityPolicyProjection) reduceSecurityPolicySet(event eventstore.Even
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-D3g87", "reduce.wrong.event.type %s", instance.SecurityPolicySetEventType)
 	}
 	changes := []handler.Column{
-		handler.NewCol(SecurityPolicyColumnCreationDate, e.CreationDate()),
+		handler.NewCol(SecurityPolicyColumnCreationDate, handler.OnlySetValueOnInsert(SecurityPolicyProjectionTable, e.CreationDate())),
 		handler.NewCol(SecurityPolicyColumnChangeDate, e.CreationDate()),
 		handler.NewCol(SecurityPolicyColumnInstanceID, e.Aggregate().InstanceID),
 		handler.NewCol(SecurityPolicyColumnSequence, e.Sequence()),
