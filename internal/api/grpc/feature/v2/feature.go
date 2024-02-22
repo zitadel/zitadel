@@ -31,7 +31,7 @@ func (s *Server) ResetSystemFeatures(ctx context.Context, req *feature.ResetSyst
 }
 
 func (s *Server) GetSystemFeatures(ctx context.Context, req *feature.GetSystemFeaturesRequest) (_ *feature.GetSystemFeaturesResponse, err error) {
-	f, err := s.query.GetSystemFeatures(ctx, req.GetInheritance())
+	f, err := s.query.GetSystemFeatures(ctx)
 	if err != nil {
 		return nil, err
 	}

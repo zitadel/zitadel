@@ -503,16 +503,6 @@ SystemDefaults:
     PublicKeyLifetime: 30h # ZITADEL_SYSTEMDEFAULTS_KEYCONFIG_PUBLICKEYLIFETIME
     # 8766h are 1 year
     CertificateLifetime: 8766h # ZITADEL_SYSTEMDEFAULTS_KEYCONFIG_CERTIFICATELIFETIME
-  
-  # Setting any features here will affect the complete system and all instances,
-  # unless a feature was set over the API.
-  # API takes precedence over System Defaults.
-  Features:
-    LoginDefaultOrg: false # ZITADEL_SYSTEMDEFAULTS_FEATURES_LOGINDEFAULTORG
-    # Wheter projection triggers are used in the new Introspection implementation.
-    TriggerIntrospectionProjections: false # ZITADEL_SYSTEMDEFAULTS_FEATURES_TRIGGERINTROSPECTIONPROJECTIONS
-    # Allows fallback to the Legacy Introspection implementation
-    LegacyIntrospection: false # ZITADEL_SYSTEMDEFAULTS_FEATURES_LEGACYINTROSPECTION
 
 Actions:
   HTTP:

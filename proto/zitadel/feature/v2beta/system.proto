@@ -43,14 +43,7 @@ message ResetSystemFeaturesResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 
-message GetSystemFeaturesRequest {
-  bool inheritance = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Inherit unset features from the system defaults. If this option is disabled and the feature is not set on the system, it will be omitted from the response or Not Found is returned when the system has no features flags at all.";
-    }
-  ];
-}
+message GetSystemFeaturesRequest {}
 
 message GetSystemFeaturesResponse {
   zitadel.object.v2beta.Details details = 1;

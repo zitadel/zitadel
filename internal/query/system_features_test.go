@@ -17,13 +17,9 @@ import (
 func TestQueries_GetSystemFeatures(t *testing.T) {
 	aggregate := feature_v2.NewAggregate("SYSTEM", "SYSTEM")
 
-	type args struct {
-		cascade bool
-	}
 	tests := []struct {
 		name       string
 		eventstore func(*testing.T) *eventstore.Eventstore
-		args       args
 		want       *SystemFeatures
 		wantErr    error
 	}{
@@ -35,37 +31,13 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 			wantErr: io.ErrClosedPipe,
 		},
 		{
-			name: "no features set, not cascaded",
+			name: "no features set",
 			eventstore: expectEventstore(
 				expectFilter(),
 			),
 			want: &SystemFeatures{
 				Details: &domain.ObjectDetails{
 					ResourceOwner: "SYSTEM",
-				},
-			},
-		},
-		{
-			name: "no features set, cascaded",
-			eventstore: expectEventstore(
-				expectFilter(),
-			),
-			args: args{true},
-			want: &SystemFeatures{
-				Details: &domain.ObjectDetails{
-					ResourceOwner: "SYSTEM",
-				},
-				LoginDefaultOrg: FeatureSource[bool]{
-					Level: feature.LevelDefault,
-					Value: true,
-				},
-				TriggerIntrospectionProjections: FeatureSource[bool]{
-					Level: feature.LevelDefault,
-					Value: false,
-				},
-				LegacyIntrospection: FeatureSource[bool]{
-					Level: feature.LevelDefault,
-					Value: true,
 				},
 			},
 		},
@@ -87,7 +59,6 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					)),
 				),
 			),
-			args: args{true},
 			want: &SystemFeatures{
 				Details: &domain.ObjectDetails{
 					ResourceOwner: "SYSTEM",
@@ -107,7 +78,7 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 			},
 		},
 		{
-			name: "all features set, reset, set some feature, cascaded",
+			name: "all features set, reset, set some feature",
 			eventstore: expectEventstore(
 				expectFilter(
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
@@ -132,22 +103,21 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					)),
 				),
 			),
-			args: args{true},
 			want: &SystemFeatures{
 				Details: &domain.ObjectDetails{
 					ResourceOwner: "SYSTEM",
 				},
 				LoginDefaultOrg: FeatureSource[bool]{
-					Level: feature.LevelDefault,
-					Value: true,
+					Level: feature.LevelUnspecified,
+					Value: false,
 				},
 				TriggerIntrospectionProjections: FeatureSource[bool]{
 					Level: feature.LevelSystem,
 					Value: true,
 				},
 				LegacyIntrospection: FeatureSource[bool]{
-					Level: feature.LevelDefault,
-					Value: true,
+					Level: feature.LevelUnspecified,
+					Value: false,
 				},
 			},
 		},
@@ -177,7 +147,6 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					)),
 				),
 			),
-			args: args{false},
 			want: &SystemFeatures{
 				Details: &domain.ObjectDetails{
 					ResourceOwner: "SYSTEM",
@@ -201,13 +170,8 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			q := &Queries{
 				eventstore: tt.eventstore(t),
-				defaultFeatures: feature.Features{
-					LoginDefaultOrg:                 true,
-					TriggerIntrospectionProjections: false,
-					LegacyIntrospection:             true,
-				},
 			}
-			got, err := q.GetSystemFeatures(context.Background(), tt.args.cascade)
+			got, err := q.GetSystemFeatures(context.Background())
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})

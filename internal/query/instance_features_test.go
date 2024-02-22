@@ -68,16 +68,16 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					ResourceOwner: "instance1",
 				},
 				LoginDefaultOrg: FeatureSource[bool]{
-					Level: feature.LevelDefault,
-					Value: true,
+					Level: feature.LevelUnspecified,
+					Value: false,
 				},
 				TriggerIntrospectionProjections: FeatureSource[bool]{
-					Level: feature.LevelDefault,
+					Level: feature.LevelUnspecified,
 					Value: false,
 				},
 				LegacyIntrospection: FeatureSource[bool]{
-					Level: feature.LevelDefault,
-					Value: true,
+					Level: feature.LevelUnspecified,
+					Value: false,
 				},
 			},
 		},
@@ -166,8 +166,8 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					Value: true,
 				},
 				LegacyIntrospection: FeatureSource[bool]{
-					Level: feature.LevelDefault,
-					Value: true,
+					Level: feature.LevelUnspecified,
+					Value: false,
 				},
 			},
 		},
@@ -221,11 +221,6 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			q := &Queries{
 				eventstore: tt.eventstore(t),
-				defaultFeatures: feature.Features{
-					LoginDefaultOrg:                 true,
-					TriggerIntrospectionProjections: false,
-					LegacyIntrospection:             true,
-				},
 			}
 			got, err := q.GetInstanceFeatures(ctx, tt.args.cascade)
 			require.ErrorIs(t, err, tt.wantErr)

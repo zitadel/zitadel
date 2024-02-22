@@ -53,8 +53,6 @@ func featureLevelToSourcePb(level feature.Level) feature_pb.Source {
 	switch level {
 	case feature.LevelUnspecified:
 		return feature_pb.Source_SOURCE_UNSPECIFIED
-	case feature.LevelDefault:
-		return feature_pb.Source_SOURCE_DEFAULT
 	case feature.LevelSystem:
 		return feature_pb.Source_SOURCE_SYSTEM
 	case feature.LevelInstance:

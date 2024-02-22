@@ -167,7 +167,7 @@ func TestServer_GetSystemFeatures(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "defaults, no inheritance",
+			name: "nothing set",
 			args: args{
 				ctx: SystemCTX,
 				req: &feature.GetSystemFeaturesRequest{},
@@ -175,30 +175,7 @@ func TestServer_GetSystemFeatures(t *testing.T) {
 			want: &feature.GetSystemFeaturesResponse{},
 		},
 		{
-			name: "defaults, inheritance",
-			args: args{
-				ctx: SystemCTX,
-				req: &feature.GetSystemFeaturesRequest{
-					Inheritance: true,
-				},
-			},
-			want: &feature.GetSystemFeaturesResponse{
-				LoginDefaultOrg: &feature.FeatureFlag{
-					Enabled: false,
-					Source:  feature.Source_SOURCE_DEFAULT,
-				},
-				OidcTriggerIntrospectionProjections: &feature.FeatureFlag{
-					Enabled: false,
-					Source:  feature.Source_SOURCE_DEFAULT,
-				},
-				OidcLegacyIntrospection: &feature.FeatureFlag{
-					Enabled: false,
-					Source:  feature.Source_SOURCE_DEFAULT,
-				},
-			},
-		},
-		{
-			name: "some features, no inheritance",
+			name: "some features",
 			prepare: func(t *testing.T) {
 				_, err := Client.SetSystemFeatures(SystemCTX, &feature.SetSystemFeaturesRequest{
 					LoginDefaultOrg:                     gu.Ptr(true),
@@ -218,36 +195,6 @@ func TestServer_GetSystemFeatures(t *testing.T) {
 				OidcTriggerIntrospectionProjections: &feature.FeatureFlag{
 					Enabled: false,
 					Source:  feature.Source_SOURCE_SYSTEM,
-				},
-			},
-		},
-		{
-			name: "some features, inheritance",
-			prepare: func(t *testing.T) {
-				_, err := Client.SetSystemFeatures(SystemCTX, &feature.SetSystemFeaturesRequest{
-					LoginDefaultOrg:                     gu.Ptr(true),
-					OidcTriggerIntrospectionProjections: gu.Ptr(false),
-				})
-				require.NoError(t, err)
-			},
-			args: args{
-				ctx: SystemCTX,
-				req: &feature.GetSystemFeaturesRequest{
-					Inheritance: true,
-				},
-			},
-			want: &feature.GetSystemFeaturesResponse{
-				LoginDefaultOrg: &feature.FeatureFlag{
-					Enabled: true,
-					Source:  feature.Source_SOURCE_SYSTEM,
-				},
-				OidcTriggerIntrospectionProjections: &feature.FeatureFlag{
-					Enabled: false,
-					Source:  feature.Source_SOURCE_SYSTEM,
-				},
-				OidcLegacyIntrospection: &feature.FeatureFlag{
-					Enabled: false,
-					Source:  feature.Source_SOURCE_DEFAULT,
 				},
 			},
 		},
@@ -427,11 +374,11 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 			want: &feature.GetInstanceFeaturesResponse{
 				LoginDefaultOrg: &feature.FeatureFlag{
 					Enabled: false,
-					Source:  feature.Source_SOURCE_DEFAULT,
+					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
 				OidcTriggerIntrospectionProjections: &feature.FeatureFlag{
 					Enabled: false,
-					Source:  feature.Source_SOURCE_DEFAULT,
+					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
 				OidcLegacyIntrospection: &feature.FeatureFlag{
 					Enabled: true,
@@ -484,7 +431,7 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 				},
 				OidcTriggerIntrospectionProjections: &feature.FeatureFlag{
 					Enabled: false,
-					Source:  feature.Source_SOURCE_DEFAULT,
+					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
 				OidcLegacyIntrospection: &feature.FeatureFlag{
 					Enabled: true,

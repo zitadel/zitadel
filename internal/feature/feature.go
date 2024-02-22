@@ -15,7 +15,6 @@ type Level int
 
 const (
 	LevelUnspecified Level = iota
-	LevelDefault
 	LevelSystem
 	LevelInstance
 	LevelOrg

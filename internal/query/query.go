@@ -17,7 +17,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
@@ -39,7 +38,6 @@ type Queries struct {
 	zitadelRoles                        []authz.RoleMapping
 	multifactors                        domain.MultifactorConfigs
 	defaultAuditLogRetention            time.Duration
-	defaultFeatures                     feature.Features
 }
 
 func StartQueries(
@@ -73,7 +71,6 @@ func StartQueries(
 			},
 		},
 		defaultAuditLogRetention: defaultAuditLogRetention,
-		defaultFeatures:          defaults.Features,
 	}
 
 	repo.checkPermission = permissionCheck(repo)

@@ -39,7 +39,7 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			ResourceOwner: "SYSTEM",
 		},
 		LoginDefaultOrg: query.FeatureSource[bool]{
-			Level: feature.LevelDefault,
+			Level: feature.LevelSystem,
 			Value: true,
 		},
 		TriggerIntrospectionProjections: query.FeatureSource[bool]{
@@ -59,7 +59,7 @@ func Test_systemFeaturesToPb(t *testing.T) {
 		},
 		LoginDefaultOrg: &feature_pb.FeatureFlag{
 			Enabled: true,
-			Source:  feature_pb.Source_SOURCE_DEFAULT,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
 		OidcTriggerIntrospectionProjections: &feature_pb.FeatureFlag{
 			Enabled: false,
@@ -97,11 +97,11 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			ResourceOwner: "instance1",
 		},
 		LoginDefaultOrg: query.FeatureSource[bool]{
-			Level: feature.LevelDefault,
+			Level: feature.LevelSystem,
 			Value: true,
 		},
 		TriggerIntrospectionProjections: query.FeatureSource[bool]{
-			Level: feature.LevelSystem,
+			Level: feature.LevelUnspecified,
 			Value: false,
 		},
 		LegacyIntrospection: query.FeatureSource[bool]{
@@ -117,11 +117,11 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		},
 		LoginDefaultOrg: &feature_pb.FeatureFlag{
 			Enabled: true,
-			Source:  feature_pb.Source_SOURCE_DEFAULT,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
 		OidcTriggerIntrospectionProjections: &feature_pb.FeatureFlag{
 			Enabled: false,
-			Source:  feature_pb.Source_SOURCE_SYSTEM,
+			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
 		},
 		OidcLegacyIntrospection: &feature_pb.FeatureFlag{
 			Enabled: true,
@@ -142,11 +142,6 @@ func Test_featureLevelToSourcePb(t *testing.T) {
 			name:  "unspecified",
 			level: feature.LevelUnspecified,
 			want:  feature_pb.Source_SOURCE_UNSPECIFIED,
-		},
-		{
-			name:  "default",
-			level: feature.LevelDefault,
-			want:  feature_pb.Source_SOURCE_DEFAULT,
 		},
 		{
 			name:  "system",

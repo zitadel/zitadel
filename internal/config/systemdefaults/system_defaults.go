@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/feature"
 )
 
 type SystemDefaults struct {
@@ -14,7 +13,6 @@ type SystemDefaults struct {
 	DomainVerification DomainVerification
 	Notifications      Notifications
 	KeyConfig          KeyConfig
-	Features           feature.Features
 }
 
 type SecretGenerators struct {

@@ -8,20 +8,17 @@ import (
 
 type SystemFeaturesReadModel struct {
 	*eventstore.ReadModel
-	defaults *feature.Features
-	system   *SystemFeatures
+	system *SystemFeatures
 }
 
-func NewSystemFeaturesReadModel(defaults *feature.Features) *SystemFeaturesReadModel {
+func NewSystemFeaturesReadModel() *SystemFeaturesReadModel {
 	m := &SystemFeaturesReadModel{
 		ReadModel: &eventstore.ReadModel{
 			AggregateID:   "SYSTEM",
 			ResourceOwner: "SYSTEM",
 		},
-		defaults: defaults,
-		system:   new(SystemFeatures),
+		system: new(SystemFeatures),
 	}
-	m.populateFromDefaults()
 	return m
 }
 
@@ -56,31 +53,7 @@ func (m *SystemFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 func (m *SystemFeaturesReadModel) reduceReset() {
-	if m.populateFromDefaults() {
-		return
-	}
-	m.system.LoginDefaultOrg = FeatureSource[bool]{}
-	m.system.TriggerIntrospectionProjections = FeatureSource[bool]{}
-	m.system.LegacyIntrospection = FeatureSource[bool]{}
-}
-
-func (m *SystemFeaturesReadModel) populateFromDefaults() bool {
-	if m.defaults == nil {
-		return false
-	}
-	m.system.LoginDefaultOrg = FeatureSource[bool]{
-		Level: feature.LevelDefault,
-		Value: m.defaults.LoginDefaultOrg,
-	}
-	m.system.TriggerIntrospectionProjections = FeatureSource[bool]{
-		Level: feature.LevelDefault,
-		Value: m.defaults.TriggerIntrospectionProjections,
-	}
-	m.system.LegacyIntrospection = FeatureSource[bool]{
-		Level: feature.LevelDefault,
-		Value: m.defaults.LegacyIntrospection,
-	}
-	return true
+	m.system = new(SystemFeatures)
 }
 
 func (m *SystemFeaturesReadModel) reduceBoolFeature(event *feature_v2.SetEvent[bool]) error {

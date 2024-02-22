@@ -20,13 +20,8 @@ type SystemFeatures struct {
 	LegacyIntrospection             FeatureSource[bool]
 }
 
-func (q *Queries) GetSystemFeatures(ctx context.Context, cascade bool) (_ *SystemFeatures, err error) {
-	var defaults *feature.Features
-	if cascade {
-		defaults = new(feature.Features)
-		*defaults = q.defaultFeatures // make sure we copy the defaults.
-	}
-	m := NewSystemFeaturesReadModel(defaults)
+func (q *Queries) GetSystemFeatures(ctx context.Context) (_ *SystemFeatures, err error) {
+	m := NewSystemFeaturesReadModel()
 	if err := q.eventstore.FilterToQueryReducer(ctx, m); err != nil {
 		return nil, err
 	}

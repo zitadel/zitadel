@@ -16,7 +16,7 @@ type InstanceFeatures struct {
 func (q *Queries) GetInstanceFeatures(ctx context.Context, cascade bool) (_ *InstanceFeatures, err error) {
 	var system *SystemFeatures
 	if cascade {
-		system, err = q.GetSystemFeatures(ctx, cascade)
+		system, err = q.GetSystemFeatures(ctx)
 		if err != nil {
 			return nil, err
 		}

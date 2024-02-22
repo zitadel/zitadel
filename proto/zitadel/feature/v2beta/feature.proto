@@ -9,7 +9,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta;feature"
 
 enum Source {
   SOURCE_UNSPECIFIED = 0;
-  SOURCE_DEFAULT = 1;
+  reserved 1;             // in case we want to implement a "DEFAULT" level
   SOURCE_SYSTEM = 2;
   SOURCE_INSTANCE = 3;
   SOURCE_ORGANIZATION = 4;
