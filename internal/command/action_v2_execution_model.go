@@ -15,7 +15,7 @@ type ExecutionWriteModel struct {
 }
 
 func (e *ExecutionWriteModel) Exists() bool {
-	return len(e.Targets) == 0 && len(e.Includes) == 0
+	return len(e.Targets) > 0 || len(e.Includes) > 0
 }
 
 func NewExecutionWriteModel(id string, resourceOwner string, executionType domain.ExecutionType) *ExecutionWriteModel {

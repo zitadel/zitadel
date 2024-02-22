@@ -50,7 +50,7 @@ func (s *Server) SetExecution(ctx context.Context, req *execution.SetExecutionRe
 			return nil, err
 		}
 	case *execution.SetConditions_Function:
-		details, err = s.command.SetExecutionFunction(ctx, t.Function, set, authz.GetInstance(ctx).InstanceID())
+		details, err = s.command.SetExecutionFunction(ctx, command.ExecutionFunctionCondition(t.Function), set, authz.GetInstance(ctx).InstanceID())
 		if err != nil {
 			return nil, err
 		}
@@ -70,7 +70,7 @@ func (s *Server) DeleteExecution(ctx context.Context, req *execution.DeleteExecu
 			Service: t.Request.GetService(),
 			All:     t.Request.GetAll(),
 		}
-		details, err = s.command.RemoveExecutionRequest(ctx, cond, authz.GetInstance(ctx).InstanceID())
+		details, err = s.command.DeleteExecutionRequest(ctx, cond, authz.GetInstance(ctx).InstanceID())
 		if err != nil {
 			return nil, err
 		}
@@ -80,7 +80,7 @@ func (s *Server) DeleteExecution(ctx context.Context, req *execution.DeleteExecu
 			Service: t.Response.GetService(),
 			All:     t.Response.GetAll(),
 		}
-		details, err = s.command.RemoveExecutionResponse(ctx, cond, authz.GetInstance(ctx).InstanceID())
+		details, err = s.command.DeleteExecutionResponse(ctx, cond, authz.GetInstance(ctx).InstanceID())
 		if err != nil {
 			return nil, err
 		}
@@ -90,12 +90,12 @@ func (s *Server) DeleteExecution(ctx context.Context, req *execution.DeleteExecu
 			Group: t.Event.GetGroup(),
 			All:   t.Event.GetAll(),
 		}
-		details, err = s.command.RemoveExecutionEvent(ctx, cond, authz.GetInstance(ctx).InstanceID())
+		details, err = s.command.DeleteExecutionEvent(ctx, cond, authz.GetInstance(ctx).InstanceID())
 		if err != nil {
 			return nil, err
 		}
 	case *execution.SetConditions_Function:
-		details, err = s.command.RemoveExecutionFunction(ctx, t.Function, authz.GetInstance(ctx).InstanceID())
+		details, err = s.command.DeleteExecutionFunction(ctx, command.ExecutionFunctionCondition(t.Function), authz.GetInstance(ctx).InstanceID())
 		if err != nil {
 			return nil, err
 		}

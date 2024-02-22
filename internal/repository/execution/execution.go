@@ -18,8 +18,8 @@ type SetEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
 	ExecutionType domain.ExecutionType `json:"executionType"`
-	Targets       []string             `json:"target"`
-	Includes      []string             `json:"include"`
+	Targets       []string             `json:"targets"`
+	Includes      []string             `json:"includes"`
 }
 
 func (e *SetEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -42,28 +42,31 @@ func NewSetEvent(
 	includes []string,
 ) *SetEvent {
 	return &SetEvent{
-		eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx, aggregate, SetEventType,
 		),
-		executionType,
-		targets, includes,
+		ExecutionType: executionType,
+		Targets:       targets,
+		Includes:      includes,
 	}
 }
 
 func SetEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	added := &SetEvent{
+	set := &SetEvent{
 		BaseEvent: eventstore.BaseEventFromRepo(event),
 	}
-	err := event.Unmarshal(added)
+	err := event.Unmarshal(set)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "EXEC-r8e2e6hawz", "unable to unmarshal execution set")
 	}
 
-	return added, nil
+	return set, nil
 }
 
 type RemovedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
+
+	ExecutionType domain.ExecutionType `json:"executionType"`
 }
 
 func (e *RemovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -78,8 +81,11 @@ func (e *RemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *RemovedEvent {
-	return &RemovedEvent{eventstore.NewBaseEventForPush(ctx, aggregate, RemovedEventType)}
+func NewRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, executionType domain.ExecutionType) *RemovedEvent {
+	return &RemovedEvent{
+		eventstore.NewBaseEventForPush(ctx, aggregate, RemovedEventType),
+		executionType,
+	}
 }
 
 func RemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
