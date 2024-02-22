@@ -249,14 +249,14 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Onboarding Customers and Users",
+          label: "Onboard Customers and Users",
           link: {
             type: "generated-index",
-            title: "Onboarding Customers and Users",
+            title: "Onboard Customers and Users",
             slug: "/guides/integrate/onboarding",
             description:
                 "When building your own application, one of the first questions you have to face, is 'How do my customers onboard to my application?'\n" +
-                "This guide will show you the built-in solution you have, within ZITADEL and how you can use ZITADEL when you have more advanced needs.",
+                "These guides will explain the built-in solution for onboarding new tenants, customers, and users and how you can handle more advanced onboarding use cases. ",
           },
           collapsed: true,
           items: [
