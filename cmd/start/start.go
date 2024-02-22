@@ -264,7 +264,7 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	if err != nil {
 		return err
 	}
-	grpcMethodExists, grpcServiceExists, err := startAPIs(
+	api, err := startAPIs(
 		ctx,
 		clock,
 		router,
@@ -281,8 +281,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	if err != nil {
 		return err
 	}
-	commands.GrpcMethodExisting = grpcMethodExists
-	commands.GrpcServiceExisting = grpcServiceExists
+	commands.GrpcMethodExisting = api.GrpcMethodExists
+	commands.GrpcServiceExisting = api.GrpcServiceExists
 
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
@@ -321,7 +321,7 @@ func startAPIs(
 	authZRepo authz_repo.Repository,
 	keys *encryption.EncryptionKeys,
 	permissionCheck domain.PermissionCheck,
-) (func(string) bool, func(string) bool, error) {
+) (*api.API, error) {
 	repo := struct {
 		authz_repo.Repository
 		*query.Queries
@@ -334,22 +334,22 @@ func startAPIs(
 	router.Use(middleware.WithOrigin(config.ExternalSecure))
 	systemTokenVerifier, err := internal_authz.StartSystemTokenVerifierFromConfig(http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	accessTokenVerifer := internal_authz.StartAccessTokenVerifierFromRepo(repo)
 	verifier := internal_authz.StartAPITokenVerifier(repo, accessTokenVerifer, systemTokenVerifier)
 	tlsConfig, err := config.TLS.Config()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	accessStdoutEmitter, err := logstore.NewEmitter[*record.AccessLog](ctx, clock, &logstore.EmitterConfig{Enabled: config.LogStore.Access.Stdout.Enabled}, stdout.NewStdoutEmitter[*record.AccessLog]())
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	accessDBEmitter, err := logstore.NewEmitter[*record.AccessLog](ctx, clock, &config.Quotas.Access.EmitterConfig, access.NewDatabaseLogStorage(dbClient, commands, queries))
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	accessSvc := logstore.New[*record.AccessLog](queries, accessDBEmitter, accessStdoutEmitter)
@@ -361,50 +361,50 @@ func startAPIs(
 	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, exhaustedCookieHandler, &config.Quotas.Access.AccessConfig)
 	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, limitingAccessInterceptor)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error creating api %w", err)
+		return nil, fmt.Errorf("error creating api %w", err)
 	}
 
 	config.Auth.Spooler.Client = dbClient
 	config.Auth.Spooler.Eventstore = eventstore
 	authRepo, err := auth_es.Start(ctx, config.Auth, config.SystemDefaults, commands, queries, dbClient, eventstore, keys.OIDC, keys.User)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error starting auth repo: %w", err)
+		return nil, fmt.Errorf("error starting auth repo: %w", err)
 	}
 
 	config.Admin.Spooler.Client = dbClient
 	config.Admin.Spooler.Eventstore = eventstore
 	err = admin_es.Start(ctx, config.Admin, store, dbClient)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error starting admin repo: %w", err)
+		return nil, fmt.Errorf("error starting admin repo: %w", err)
 	}
 
 	if err := apis.RegisterServer(ctx, system.CreateServer(commands, queries, config.Database.DatabaseName(), config.DefaultInstance, config.ExternalDomain), tlsConfig); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if err := apis.RegisterServer(ctx, admin.CreateServer(config.Database.DatabaseName(), commands, queries, config.SystemDefaults, config.ExternalSecure, keys.User, config.AuditLogRetention), tlsConfig); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, keys.User, config.ExternalSecure), tlsConfig); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, keys.User, config.ExternalSecure), tlsConfig); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if err := apis.RegisterService(ctx, user_v2.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(config.ExternalSecure), idp.SAMLRootURL(config.ExternalSecure), assets.AssetAPI(config.ExternalSecure), permissionCheck)); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries)); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	if err := apis.RegisterService(ctx, settings.CreateServer(commands, queries, config.ExternalSecure)); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if err := apis.RegisterService(ctx, org.CreateServer(commands, queries, permissionCheck)); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if err := apis.RegisterService(ctx, execution_v3_alpha.CreateServer(commands, queries)); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)
 	assetsCache := middleware.AssetsCacheInterceptor(config.AssetStorage.Cache.MaxAge, config.AssetStorage.Cache.SharedMaxAge)
@@ -414,38 +414,38 @@ func startAPIs(
 
 	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keys.UserAgentCookieKey, id.SonyFlakeGenerator(), config.ExternalSecure, login.EndpointResources, login.EndpointExternalLoginCallbackFormPost, login.EndpointSAMLACS)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	// robots.txt handler
 	robotsTxtHandler, err := robots_txt.Start()
 	if err != nil {
-		return nil, nil, fmt.Errorf("unable to start robots txt handler: %w", err)
+		return nil, fmt.Errorf("unable to start robots txt handler: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(robots_txt.HandlerPrefix, robotsTxtHandler)
 
 	// TODO: Record openapi access logs?
 	openAPIHandler, err := openapi.Start()
 	if err != nil {
-		return nil, nil, fmt.Errorf("unable to start openapi handler: %w", err)
+		return nil, fmt.Errorf("unable to start openapi handler: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(openapi.HandlerPrefix, openAPIHandler)
 
 	oidcServer, err := oidc.NewServer(config.OIDC, login.DefaultLoggedOutPath, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.OIDCKey, eventstore, dbClient, userAgentInterceptor, instanceInterceptor.Handler, limitingAccessInterceptor, config.Log.Slog())
 	if err != nil {
-		return nil, nil, fmt.Errorf("unable to start oidc provider: %w", err)
+		return nil, fmt.Errorf("unable to start oidc provider: %w", err)
 	}
 	apis.RegisterHandlerPrefixes(oidcServer, oidcPrefixes...)
 
 	samlProvider, err := saml.NewProvider(config.SAML, config.ExternalSecure, commands, queries, authRepo, keys.OIDC, keys.SAML, eventstore, dbClient, instanceInterceptor.Handler, userAgentInterceptor, limitingAccessInterceptor)
 	if err != nil {
-		return nil, nil, fmt.Errorf("unable to start saml provider: %w", err)
+		return nil, fmt.Errorf("unable to start saml provider: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(saml.HandlerPrefix, samlProvider.HttpHandler())
 
 	c, err := console.Start(config.Console, config.ExternalSecure, oidcServer.IssuerFromRequest, middleware.CallDurationHandler, instanceInterceptor.Handler, limitingAccessInterceptor, config.CustomerPortal)
 	if err != nil {
-		return nil, nil, fmt.Errorf("unable to start console: %w", err)
+		return nil, fmt.Errorf("unable to start console: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(console.HandlerPrefix, c)
 	consolePath := console.HandlerPrefix + "/"
@@ -471,18 +471,18 @@ func startAPIs(
 		feature.NewCheck(eventstore),
 	)
 	if err != nil {
-		return nil, nil, fmt.Errorf("unable to start login: %w", err)
+		return nil, fmt.Errorf("unable to start login: %w", err)
 	}
 	apis.RegisterHandlerOnPrefix(login.HandlerPrefix, l.Handler())
 	apis.HandleFunc(login.EndpointDeviceAuth, login.RedirectDeviceAuthToPrefix)
 
 	// After OIDC provider so that the callback endpoint can be used
 	if err := apis.RegisterService(ctx, oidc_v2.CreateServer(commands, queries, oidcServer, config.ExternalSecure)); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	// handle grpc at last to be able to handle the root, because grpc and gateway require a lot of different prefixes
 	apis.RouteGRPC()
-	return apis.GrpcMethodExists, apis.GrpcServiceExists, nil
+	return apis, nil
 }
 
 func listen(ctx context.Context, router *mux.Router, port uint16, tlsConfig *tls.Config, shutdown <-chan os.Signal) error {
