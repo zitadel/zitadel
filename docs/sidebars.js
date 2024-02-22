@@ -128,6 +128,10 @@ module.exports = {
         {
           type: "category",
           label: "Console",
+          link: {
+            type: "doc",
+            id: "guides/manage/console/overview",
+          },
           items: [
             "guides/manage/console/overview",
             "guides/manage/console/instance-settings",
