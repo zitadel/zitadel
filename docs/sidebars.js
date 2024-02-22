@@ -228,6 +228,7 @@ module.exports = {
                 "guides/integrate/login/oidc/logout",
               ],
             },
+            /*
             {
               type: "category",
               label: "SAML",
@@ -244,7 +245,7 @@ module.exports = {
                   dirName: "guides/integrate/login/saml",
                 },
               ],
-            },
+            },*/
           ],
         },
         {
