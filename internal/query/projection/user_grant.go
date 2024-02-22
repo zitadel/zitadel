@@ -408,7 +408,6 @@ func getUserResourceOwner(ctx context.Context, es handler.EventStore, instanceID
 }
 
 func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, userID, projectID, grantID string) (userRO string, projectRO string, grantedOrg string, err error) {
-	eventCount := 1
 	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AwaitOpenTransactions().
 		InstanceID(instanceID).
@@ -419,7 +418,6 @@ func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, u
 
 	// if it's a project grant then we only need the resourceowner for the projectgrant, else the project
 	if grantID != "" {
-		eventCount++
 		builder = builder.Or().
 			AggregateTypes(project.AggregateType).
 			AggregateIDs(projectID).
@@ -428,7 +426,6 @@ func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, u
 				"grantId": grantID,
 			})
 	} else if projectID != "" {
-		eventCount++
 		builder = builder.Or().
 			AggregateTypes(project.AggregateType).
 			AggregateIDs(projectID).
