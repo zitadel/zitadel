@@ -2,11 +2,13 @@
   {
     "id": "angular",
     "title": "Angular",
+    "description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
     "imgSrcLight": "/docs/img/tech/angular.svg",
     "imgSrcDark": "/docs/img/tech/angular.svg",
     "docsLink": "/docs/sdk-examples/angular"
   },
   {
+    "id": "flutter",
     "title": "Flutter",
     "imgSrcDark": "/docs/img/tech/flutter.svg",
     "docsLink": "/docs/sdk-examples/flutter"

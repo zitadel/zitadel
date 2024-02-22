@@ -132,7 +132,7 @@
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Change Framework",
-        "DESCRIPTION": "Choose one the available Frameworks for quick setup of your application."
+        "DESCRIPTION": "Choose one of the available frameworks for quick setup of your application."
       }
     }
   },

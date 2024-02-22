@@ -58,13 +58,7 @@ export class FrameworkAutocompleteComponent implements OnInit {
       .filter((option) => option.title.toLowerCase().includes(filterValue));
   }
 
-  public displayFn(frameworkId?: string): string {
-    console.log(frameworkId, this.frameworks);
-    return this.frameworks?.find((f) => f.id === frameworkId)?.title ?? '';
-  }
-
   public selected(event: MatAutocompleteSelectedEvent): void {
-    const fw: Framework = event.option.value;
-    this.selectionChanged.emit(fw.id);
+    this.selectionChanged.emit(event.option.value);
   }
 }

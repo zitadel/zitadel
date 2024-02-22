@@ -4,13 +4,15 @@
   <h1>{{ 'QUICKSTART.REVIEWCONFIGURATION' | translate }}</h1>
   <mat-progress-bar class="progress-bar" color="primary" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 
-  <cnsl-info-section [type]="InfoSectionType.INFO">
+  <p>{{ 'QUICKSTART.REVIEWCONFIGURATION_DESCRIPTION' | translate: { value: framework()?.title } }}</p>
+
+  <cnsl-info-section *ngIf="framework()?.description as desc" [type]="InfoSectionType.SUCCESS">
     <p class="review-description">
-      {{ 'QUICKSTART.REVIEWCONFIGURATION_DESCRIPTION' | translate: { value: framework()?.title } }}
+      {{ desc }}
     </p>
   </cnsl-info-section>
 
-  <div>
+  <div class="oidc-configuration">
     <cnsl-oidc-configuration
       [name]="framework()?.title"
       [configuration]="oidcAppRequest().toObject()"

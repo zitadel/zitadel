@@ -1,9 +1,6 @@
 <cnsl-create-layout title="{{ 'APP.PAGES.CREATE' | translate }}" (closed)="close()">
   <div class="app-create-main-content">
-    <cnsl-framework-change
-      *ngIf="initialParam() && framework"
-      (frameworkChanged)="framework.set($event)"
-    ></cnsl-framework-change>
+    <cnsl-framework-change *ngIf="initialParam()" (frameworkChanged)="framework.set($event)"></cnsl-framework-change>
     <div class="content-wrapper" [ngClass]="{ reverse: initialParam() }">
       <div>
         <h1>{{ 'APP.PAGES.CREATE_SELECT_PROJECT' | translate }}</h1>
@@ -18,7 +15,8 @@
 
         <p>{{ 'APP.PAGES.CREATE_NEW_PROJECT' | translate }}</p>
       </div>
-      <div>
+
+      <div *ngIf="!initialParam()">
         <h1>{{ 'QUICKSTART.SELECT_FRAMEWORK' | translate }}</h1>
 
         <cnsl-framework-autocomplete

@@ -10,6 +10,7 @@ import { FrameworkName } from '@netlify/framework-info/lib/generated/frameworkNa
 export type FrameworkDefinition = {
   id?: FrameworkName | string;
   title: string;
+  description?: string;
   imgSrcDark: string;
   imgSrcLight?: string;
   docsLink: string;
@@ -28,13 +29,15 @@ export type Framework = FrameworkDefinition & {
   imports: [TranslateModule, RouterModule, CommonModule, MatButtonModule],
 })
 export class QuickstartComponent {
-  public frameworks: FrameworkDefinition[] = frameworkDefinition.map((f) => {
-    return {
-      ...f,
-      imgSrcDark: `assets${f.imgSrcDark}`,
-      imgSrcLight: `assets${f.imgSrcLight ? f.imgSrcLight : f.imgSrcDark}`,
-    };
-  });
+  public frameworks: FrameworkDefinition[] = frameworkDefinition
+    .filter((f) => f.id)
+    .map((f) => {
+      return {
+        ...f,
+        imgSrcDark: `assets${f.imgSrcDark}`,
+        imgSrcLight: `assets${f.imgSrcLight ? f.imgSrcLight : f.imgSrcDark}`,
+      };
+    });
 
   constructor() {
     // console.log(this.frameworks[0].title);

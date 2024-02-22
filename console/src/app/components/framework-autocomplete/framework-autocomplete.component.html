@@ -3,7 +3,7 @@
     <cnsl-label>{{ 'QUICKSTART.FRAMEWORK' | translate }}</cnsl-label>
     <input cnslInput type="text" placeholder="" #nameInput [formControl]="myControl" [matAutocomplete]="auto" />
 
-    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
       <mat-option *ngIf="isLoading()" class="is-loading">
         <mat-spinner diameter="30"></mat-spinner>
       </mat-option>
