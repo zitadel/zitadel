@@ -15,8 +15,8 @@ import (
 )
 
 var (
-	AdminCTX, SystemCTX context.Context
-	Tester              *integration.Tester
+	CTX, AdminCTX, SystemCTX context.Context
+	Tester                   *integration.Tester
 )
 
 func TestMain(m *testing.M) {
@@ -27,6 +27,7 @@ func TestMain(m *testing.M) {
 		Tester = integration.NewTester(ctx)
 		defer Tester.Done()
 
+		CTX = ctx
 		AdminCTX = Tester.WithAuthorization(ctx, integration.IAMOwner)
 		SystemCTX = Tester.WithAuthorization(ctx, integration.SystemUser)
 

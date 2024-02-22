@@ -1342,6 +1342,13 @@ InternalAuthZ:
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
+    - Role: "ADMIN_IMPERSONATOR"
+      Permissions:
+        - "admin.impersonation"
+        - "impersonation"
+    - Role: "END_USER_IMPERSONATOR"
+      Permissions:
+        - "impersonation"
 
 # If a new projection is introduced it will be prefilled during the setup process (if enabled)
 # This can prevent serving outdated data after a version upgrade, but might require a longer setup / upgrade process:
