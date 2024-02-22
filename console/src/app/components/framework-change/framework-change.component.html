@@ -7,14 +7,8 @@
       </div>
       <span>{{ framework.title }}</span>
     </div>
-    <button *ngIf="!showFrameworkAutocomplete()" (click)="showFrameworkAutocomplete.set(true)" mat-stroked-button>
+    <button (click)="openDialog()" mat-stroked-button>
       {{ 'ACTIONS.CHANGE' | translate }}
     </button>
   </div>
-
-  <cnsl-framework-autocomplete
-    *ngIf="showFrameworkAutocomplete()"
-    [frameworks]="frameworks"
-    (selectionChanged)="findFramework($event)"
-  ></cnsl-framework-autocomplete>
 </div>

@@ -32,6 +32,7 @@ import { Framework } from '../quickstart/quickstart.component';
 })
 export class FrameworkAutocompleteComponent implements OnInit {
   public isLoading = signal(false);
+  @Input() public frameworkId?: string;
   @Input() public frameworks: Framework[] = [];
   public myControl: FormControl = new FormControl();
   @Output() public selectionChanged: EventEmitter<string> = new EventEmitter();
@@ -40,6 +41,7 @@ export class FrameworkAutocompleteComponent implements OnInit {
   constructor() {}
 
   public ngOnInit() {
+    // this.myControl.setValue(this.frameworkId);
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
       map((value) => {
@@ -51,17 +53,18 @@ export class FrameworkAutocompleteComponent implements OnInit {
 
   private _filter(value: string): Framework[] {
     const filterValue = value.toLowerCase();
-    console.log(filterValue, this.frameworks);
     return this.frameworks
       .filter((option) => option.id)
       .filter((option) => option.title.toLowerCase().includes(filterValue));
   }
 
-  public displayFn(framework?: Framework): string {
-    return framework?.title ?? '';
+  public displayFn(frameworkId?: string): string {
+    console.log(frameworkId, this.frameworks);
+    return this.frameworks?.find((f) => f.id === frameworkId)?.title ?? '';
   }
 
   public selected(event: MatAutocompleteSelectedEvent): void {
-    this.selectionChanged.emit(event.option.value);
+    const fw: Framework = event.option.value;
+    this.selectionChanged.emit(fw.id);
   }
 }

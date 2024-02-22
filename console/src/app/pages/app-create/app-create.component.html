@@ -1,18 +1,34 @@
 <cnsl-create-layout title="{{ 'APP.PAGES.CREATE' | translate }}" (closed)="close()">
   <div class="app-create-main-content">
-    <cnsl-framework-change *ngIf="framework" (frameworkChanged)="framework.set($event)"></cnsl-framework-change>
+    <cnsl-framework-change
+      *ngIf="initialParam() && framework"
+      (frameworkChanged)="framework.set($event)"
+    ></cnsl-framework-change>
+    <div class="content-wrapper" [ngClass]="{ reverse: initialParam() }">
+      <div>
+        <h1>{{ 'APP.PAGES.CREATE_SELECT_PROJECT' | translate }}</h1>
 
-    <h1>{{ 'APP.PAGES.CREATE_SELECT_PROJECT' | translate }}</h1>
+        <cnsl-search-project-autocomplete
+          class="block"
+          [autocompleteType]="ProjectAutocompleteType.PROJECT_OWNED"
+          (selectionChanged)="selectProject($any($event))"
+          (valueChanged)="projectName = $any($event)"
+        >
+        </cnsl-search-project-autocomplete>
 
-    <cnsl-search-project-autocomplete
-      class="block"
-      [autocompleteType]="ProjectAutocompleteType.PROJECT_OWNED"
-      (selectionChanged)="selectProject($any($event))"
-      (valueChanged)="projectName = $any($event)"
-    >
-    </cnsl-search-project-autocomplete>
+        <p>{{ 'APP.PAGES.CREATE_NEW_PROJECT' | translate }}</p>
+      </div>
+      <div>
+        <h1>{{ 'QUICKSTART.SELECT_FRAMEWORK' | translate }}</h1>
 
-    <p>{{ 'APP.PAGES.CREATE_NEW_PROJECT' | translate }}</p>
+        <cnsl-framework-autocomplete
+          *ngIf="frameworks"
+          [frameworkId]="framework()?.id"
+          [frameworks]="frameworks"
+          (selectionChanged)="findFramework($event)"
+        ></cnsl-framework-autocomplete>
+      </div>
+    </div>
 
     <cnsl-info-section *ngIf="error()" [type]="InfoSectionType.WARN"
       ><span class="error-msg">{{ error() }}</span></cnsl-info-section

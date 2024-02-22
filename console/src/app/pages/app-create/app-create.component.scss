@@ -5,6 +5,15 @@ h1 {
 .app-create-main-content {
   max-width: 35rem;
 
+  .content-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    &.reverse {
+      flex-direction: column-reverse;
+    }
+  }
+
   .error-msg {
     margin-top: 0.25rem;
     display: block;

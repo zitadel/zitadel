@@ -9,6 +9,7 @@ import { GrantedProject, Project } from 'src/app/proto/generated/zitadel/project
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { Framework } from 'src/app/components/quickstart/quickstart.component';
+import frameworkDefinition from '../../../../../docs/frameworks.json';
 
 @Component({
   selector: 'cnsl-app-create',
@@ -27,18 +28,41 @@ export class AppCreateComponent implements OnDestroy {
 
   public error = signal('');
   public framework = signal<Framework | undefined>(undefined);
+  public initialParam = signal<string>('');
   public destroy$: Subject<void> = new Subject();
 
+  public frameworks: Framework[] = frameworkDefinition.map((f) => {
+    return {
+      ...f,
+      fragment: '',
+      imgSrcDark: `assets${f.imgSrcDark}`,
+      imgSrcLight: `assets${f.imgSrcLight ? f.imgSrcLight : f.imgSrcDark}`,
+    };
+  });
   constructor(
     private router: Router,
     private mgmtService: ManagementService,
     breadcrumbService: BreadcrumbService,
+    activatedRoute: ActivatedRoute,
   ) {
+    console.log(this.frameworks);
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
       routerLink: ['/org'],
     };
     breadcrumbService.setBreadcrumb([bread]);
+
+    activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params: Params) => {
+      const { framework } = params;
+      if (framework) {
+        this.initialParam.set(framework);
+      }
+    });
+  }
+
+  public findFramework(id: string) {
+    const temp = this.frameworks.find((f) => f.id === id);
+    this.framework.set(temp);
   }
 
   ngOnDestroy(): void {
@@ -53,7 +77,6 @@ export class AppCreateComponent implements OnDestroy {
         : (this.project.project as GrantedProject.AsObject).projectId
           ? (this.project.project as GrantedProject.AsObject).projectId
           : '';
-      console.log(this.framework());
       this.router.navigate(['/projects', id, 'apps', 'integrate'], { queryParams: { framework: this.framework()?.id } });
     }
   }

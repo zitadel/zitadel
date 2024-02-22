@@ -9,6 +9,16 @@ import { FrameworkName } from '@netlify/framework-info/lib/generated/frameworkNa
 import { FrameworkAutocompleteComponent } from '../framework-autocomplete/framework-autocomplete.component';
 import { Framework } from '../quickstart/quickstart.component';
 import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
+import {
+  MatDialog,
+  MatDialogActions,
+  MatDialogClose,
+  MatDialogContent,
+  MatDialogModule,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
+import { FrameworkChangeDialogComponent } from './framework-change-dialog.component';
 
 @Component({
   standalone: true,
@@ -31,7 +41,10 @@ export class FrameworkChangeComponent implements OnInit, OnDestroy {
     };
   });
 
-  constructor(private activatedRoute: ActivatedRoute) {
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private dialog: MatDialog,
+  ) {
     this.framework.pipe(takeUntil(this.destroy$)).subscribe((value) => {
       this.frameworkChanged.emit(value);
     });
@@ -40,7 +53,6 @@ export class FrameworkChangeComponent implements OnInit, OnDestroy {
   public ngOnInit() {
     this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params: Params) => {
       const { framework } = params;
-      console.log(framework);
       if (framework) {
         console.log(this.frameworks);
         this.findFramework(framework);
@@ -57,5 +69,21 @@ export class FrameworkChangeComponent implements OnInit, OnDestroy {
     const temp = this.frameworks.find((f) => f.id === id);
     this.framework.next(temp);
     this.frameworkChanged.emit(temp);
+  }
+
+  public openDialog(): void {
+    const ref = this.dialog.open(FrameworkChangeDialogComponent, {
+      width: '400px',
+      data: {
+        framework: this.framework.value,
+        frameworks: this.frameworks,
+      },
+    });
+
+    ref.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.framework.next(resp);
+      }
+    });
   }
 }
