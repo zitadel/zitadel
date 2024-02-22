@@ -64,6 +64,7 @@
             </p>
 
             <cnsl-redirect-uris
+              *ngIf="requestRedirectValuesSubject$"
               class="redirect-section"
               [disabled]="false"
               [isNative]="oidcAppRequest().toObject().appType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
@@ -93,6 +94,7 @@
             </cnsl-info-section>
 
             <cnsl-redirect-uris
+              *ngIf="requestRedirectValuesSubject$"
               class="redirect-section"
               [disabled]="false"
               [(ngModel)]="postLogoutUrisList"
