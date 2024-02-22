@@ -175,12 +175,7 @@ func executionFunctionExists() func(string) bool {
 		}
 	}
 	return func(s string) bool {
-		for _, function := range functions {
-			if function == s {
-				return true
-			}
-		}
-		return false
+		return slices.Contains(functions, s)
 	}
 }
 
