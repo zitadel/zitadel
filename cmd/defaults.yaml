@@ -1099,6 +1099,13 @@ InternalAuthZ:
         - "project.grant.delete"
         - "project.grant.member.read"
         - "session.delete"
+    - Role: "IAM_ADMIN_IMPERSONATOR"
+      Permissions:
+        - "admin.impersonation"
+        - "impersonation"
+    - Role: "IAM_END_USER_IMPERSONATOR"
+      Permissions:
+        - "impersonation"
     - Role: "ORG_OWNER"
       Permissions:
         - "org.read"
@@ -1234,6 +1241,13 @@ InternalAuthZ:
         - "policy.read"
         - "project.read:self"
         - "project.create"
+    - Role: "ORG_ADMIN_IMPERSONATOR"
+      Permissions:
+        - "admin.impersonation"
+        - "impersonation"
+    - Role: "ORG_END_USER_IMPERSONATOR"
+      Permissions:
+        - "impersonation"
     - Role: "PROJECT_OWNER"
       Permissions:
         - "org.global.read"
@@ -1342,13 +1356,6 @@ InternalAuthZ:
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
-    - Role: "ADMIN_IMPERSONATOR"
-      Permissions:
-        - "admin.impersonation"
-        - "impersonation"
-    - Role: "END_USER_IMPERSONATOR"
-      Permissions:
-        - "impersonation"
 
 # If a new projection is introduced it will be prefilled during the setup process (if enabled)
 # This can prevent serving outdated data after a version upgrade, but might require a longer setup / upgrade process:
