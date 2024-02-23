@@ -12,11 +12,13 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
 var (
 	CTX, AdminCTX, SystemCTX context.Context
 	Tester                   *integration.Tester
+	Client                   admin_pb.AdminServiceClient
 )
 
 func TestMain(m *testing.M) {
@@ -30,7 +32,7 @@ func TestMain(m *testing.M) {
 		CTX = ctx
 		AdminCTX = Tester.WithAuthorization(ctx, integration.IAMOwner)
 		SystemCTX = Tester.WithAuthorization(ctx, integration.SystemUser)
-
+		Client = Tester.Client.Admin
 		return m.Run()
 	}())
 }

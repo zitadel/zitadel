@@ -1,59 +1,64 @@
 //go:build integration
 
-package admin_test
+package management_test
 
 import (
 	"context"
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v6"
-	"google.golang.org/protobuf/types/known/timestamppb"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/zitadel/zitadel/internal/integration"
-	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
+	mgmt_pb "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/member"
 	"github.com/zitadel/zitadel/pkg/grpc/object"
 )
 
 var iamRoles = []string{
-	"IAM_OWNER",
-	"IAM_OWNER_VIEWER",
-	"IAM_ORG_MANAGER",
-	"IAM_USER_MANAGER",
-	"IAM_ADMIN_IMPERSONATOR",
-	"IAM_END_USER_IMPERSONATOR",
+	"SELF_MANAGEMENT_GLOBAL",
+	"ORG_OWNER",
+	"ORG_USER_MANAGER",
+	"ORG_OWNER_VIEWER",
+	"ORG_SETTINGS_MANAGER",
+	"ORG_USER_PERMISSION_EDITOR",
+	"ORG_PROJECT_PERMISSION_EDITOR",
+	"ORG_PROJECT_CREATOR",
+	"ORG_USER_SELF_MANAGER",
+	"ORG_ADMIN_IMPERSONATOR",
+	"ORG_END_USER_IMPERSONATOR",
 }
 
-func TestServer_ListIAMMemberRoles(t *testing.T) {
-	got, err := Client.ListIAMMemberRoles(AdminCTX, &admin_pb.ListIAMMemberRolesRequest{})
+func TestServer_ListOrgMemberRoles(t *testing.T) {
+	got, err := Client.ListOrgMemberRoles(OrgCTX, &mgmt_pb.ListOrgMemberRolesRequest{})
 	require.NoError(t, err)
-	assert.ElementsMatch(t, iamRoles, got.GetRoles())
+	assert.ElementsMatch(t, iamRoles, got.GetResult())
 }
 
-func TestServer_ListIAMMembers(t *testing.T) {
-	user := Tester.CreateHumanUserVerified(AdminCTX, Tester.Organisation.ID, gofakeit.Email())
-	_, err := Client.AddIAMMember(AdminCTX, &admin_pb.AddIAMMemberRequest{
+func TestServer_ListOrgMembers(t *testing.T) {
+	user := Tester.CreateHumanUserVerified(OrgCTX, Tester.Organisation.ID, gofakeit.Email())
+	_, err := Client.AddOrgMember(OrgCTX, &mgmt_pb.AddOrgMemberRequest{
 		UserId: user.GetUserId(),
-		Roles:  iamRoles,
+		Roles:  iamRoles[1:],
 	})
 	require.NoError(t, err)
 	type args struct {
 		ctx context.Context
-		req *admin_pb.ListIAMMembersRequest
+		req *mgmt_pb.ListOrgMembersRequest
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *admin_pb.ListIAMMembersResponse
+		want    *mgmt_pb.ListOrgMembersResponse
 		wantErr bool
 	}{
 		{
 			name: "permission error",
 			args: args{
-				ctx: Tester.WithAuthorization(CTX, integration.OrgOwner),
-				req: &admin_pb.ListIAMMembersRequest{
+				ctx: CTX,
+				req: &mgmt_pb.ListOrgMembersRequest{
 					Query: &object.ListQuery{},
 					Queries: []*member.SearchQuery{{
 						Query: &member.SearchQuery_UserIdQuery{
@@ -69,8 +74,8 @@ func TestServer_ListIAMMembers(t *testing.T) {
 		{
 			name: "success",
 			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.ListIAMMembersRequest{
+				ctx: OrgCTX,
+				req: &mgmt_pb.ListOrgMembersRequest{
 					Query: &object.ListQuery{},
 					Queries: []*member.SearchQuery{{
 						Query: &member.SearchQuery_UserIdQuery{
@@ -81,17 +86,17 @@ func TestServer_ListIAMMembers(t *testing.T) {
 					}},
 				},
 			},
-			want: &admin_pb.ListIAMMembersResponse{
+			want: &mgmt_pb.ListOrgMembersResponse{
 				Result: []*member.Member{{
 					UserId: user.GetUserId(),
-					Roles:  iamRoles,
+					Roles:  iamRoles[1:],
 				}},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.ListIAMMembers(tt.args.ctx, tt.args.req)
+			got, err := Client.ListOrgMembers(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
@@ -109,23 +114,23 @@ func TestServer_ListIAMMembers(t *testing.T) {
 	}
 }
 
-func TestServer_AddIAMMember(t *testing.T) {
-	user := Tester.CreateHumanUserVerified(AdminCTX, Tester.Organisation.ID, gofakeit.Email())
+func TestServer_AddOrgMember(t *testing.T) {
+	user := Tester.CreateHumanUserVerified(OrgCTX, Tester.Organisation.ID, gofakeit.Email())
 	type args struct {
 		ctx context.Context
-		req *admin_pb.AddIAMMemberRequest
+		req *mgmt_pb.AddOrgMemberRequest
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *admin_pb.AddIAMMemberResponse
+		want    *mgmt_pb.AddOrgMemberResponse
 		wantErr bool
 	}{
 		{
 			name: "permission error",
 			args: args{
-				ctx: Tester.WithAuthorization(CTX, integration.OrgOwner),
-				req: &admin_pb.AddIAMMemberRequest{
+				ctx: CTX,
+				req: &mgmt_pb.AddOrgMemberRequest{
 					UserId: user.GetUserId(),
 					Roles:  iamRoles,
 				},
@@ -135,23 +140,23 @@ func TestServer_AddIAMMember(t *testing.T) {
 		{
 			name: "success",
 			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.AddIAMMemberRequest{
+				ctx: OrgCTX,
+				req: &mgmt_pb.AddOrgMemberRequest{
 					UserId: user.GetUserId(),
-					Roles:  iamRoles,
+					Roles:  iamRoles[1:],
 				},
 			},
-			want: &admin_pb.AddIAMMemberResponse{
+			want: &mgmt_pb.AddOrgMemberResponse{
 				Details: &object.ObjectDetails{
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Organisation.ID,
 				},
 			},
 		},
 		{
 			name: "unknown roles error",
 			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.AddIAMMemberRequest{
+				ctx: OrgCTX,
+				req: &mgmt_pb.AddOrgMemberRequest{
 					UserId: user.GetUserId(),
 					Roles:  []string{"FOO", "BAR"},
 				},
@@ -159,12 +164,12 @@ func TestServer_AddIAMMember(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "org role error",
+			name: "iam role error",
 			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.AddIAMMemberRequest{
+				ctx: OrgCTX,
+				req: &mgmt_pb.AddOrgMemberRequest{
 					UserId: user.GetUserId(),
-					Roles:  []string{"ORG_OWNER"},
+					Roles:  []string{"IAM_OWNER"},
 				},
 			},
 			wantErr: true,
@@ -172,7 +177,7 @@ func TestServer_AddIAMMember(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.AddIAMMember(tt.args.ctx, tt.args.req)
+			got, err := Client.AddOrgMember(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
@@ -183,29 +188,29 @@ func TestServer_AddIAMMember(t *testing.T) {
 	}
 }
 
-func TestServer_UpdateIAMMember(t *testing.T) {
-	user := Tester.CreateHumanUserVerified(AdminCTX, Tester.Organisation.ID, gofakeit.Email())
-	_, err := Client.AddIAMMember(AdminCTX, &admin_pb.AddIAMMemberRequest{
+func TestServer_UpdateOrgMember(t *testing.T) {
+	user := Tester.CreateHumanUserVerified(OrgCTX, Tester.Organisation.ID, gofakeit.Email())
+	_, err := Client.AddOrgMember(OrgCTX, &mgmt_pb.AddOrgMemberRequest{
 		UserId: user.GetUserId(),
-		Roles:  []string{"IAM_OWNER"},
+		Roles:  []string{"ORG_OWNER"},
 	})
 	require.NoError(t, err)
 
 	type args struct {
 		ctx context.Context
-		req *admin_pb.UpdateIAMMemberRequest
+		req *mgmt_pb.UpdateOrgMemberRequest
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *admin_pb.UpdateIAMMemberResponse
+		want    *mgmt_pb.UpdateOrgMemberResponse
 		wantErr bool
 	}{
 		{
 			name: "permission error",
 			args: args{
-				ctx: Tester.WithAuthorization(CTX, integration.OrgOwner),
-				req: &admin_pb.UpdateIAMMemberRequest{
+				ctx: CTX,
+				req: &mgmt_pb.UpdateOrgMemberRequest{
 					UserId: user.GetUserId(),
 					Roles:  iamRoles,
 				},
@@ -215,15 +220,15 @@ func TestServer_UpdateIAMMember(t *testing.T) {
 		{
 			name: "success",
 			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.UpdateIAMMemberRequest{
+				ctx: OrgCTX,
+				req: &mgmt_pb.UpdateOrgMemberRequest{
 					UserId: user.GetUserId(),
-					Roles:  iamRoles,
+					Roles:  iamRoles[1:],
 				},
 			},
-			want: &admin_pb.UpdateIAMMemberResponse{
+			want: &mgmt_pb.UpdateOrgMemberResponse{
 				Details: &object.ObjectDetails{
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Organisation.ID,
 					ChangeDate:    timestamppb.Now(),
 				},
 			},
@@ -231,8 +236,8 @@ func TestServer_UpdateIAMMember(t *testing.T) {
 		{
 			name: "unknown roles error",
 			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.UpdateIAMMemberRequest{
+				ctx: OrgCTX,
+				req: &mgmt_pb.UpdateOrgMemberRequest{
 					UserId: user.GetUserId(),
 					Roles:  []string{"FOO", "BAR"},
 				},
@@ -240,12 +245,12 @@ func TestServer_UpdateIAMMember(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "org role error",
+			name: "iam role error",
 			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.UpdateIAMMemberRequest{
+				ctx: OrgCTX,
+				req: &mgmt_pb.UpdateOrgMemberRequest{
 					UserId: user.GetUserId(),
-					Roles:  []string{"ORG_OWNER"},
+					Roles:  []string{"IAM_OWNER"},
 				},
 			},
 			wantErr: true,
@@ -253,7 +258,7 @@ func TestServer_UpdateIAMMember(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.UpdateIAMMember(tt.args.ctx, tt.args.req)
+			got, err := Client.UpdateOrgMember(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
@@ -265,28 +270,28 @@ func TestServer_UpdateIAMMember(t *testing.T) {
 }
 
 func TestServer_RemoveIAMMember(t *testing.T) {
-	user := Tester.CreateHumanUserVerified(AdminCTX, Tester.Organisation.ID, gofakeit.Email())
-	_, err := Client.AddIAMMember(AdminCTX, &admin_pb.AddIAMMemberRequest{
+	user := Tester.CreateHumanUserVerified(OrgCTX, Tester.Organisation.ID, gofakeit.Email())
+	_, err := Client.AddOrgMember(OrgCTX, &mgmt_pb.AddOrgMemberRequest{
 		UserId: user.GetUserId(),
-		Roles:  []string{"IAM_OWNER"},
+		Roles:  []string{"ORG_OWNER"},
 	})
 	require.NoError(t, err)
 
 	type args struct {
 		ctx context.Context
-		req *admin_pb.RemoveIAMMemberRequest
+		req *mgmt_pb.RemoveOrgMemberRequest
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *admin_pb.RemoveIAMMemberResponse
+		want    *mgmt_pb.RemoveOrgMemberResponse
 		wantErr bool
 	}{
 		{
 			name: "permission error",
 			args: args{
-				ctx: Tester.WithAuthorization(CTX, integration.OrgOwner),
-				req: &admin_pb.RemoveIAMMemberRequest{
+				ctx: CTX,
+				req: &mgmt_pb.RemoveOrgMemberRequest{
 					UserId: user.GetUserId(),
 				},
 			},
@@ -295,14 +300,14 @@ func TestServer_RemoveIAMMember(t *testing.T) {
 		{
 			name: "success",
 			args: args{
-				ctx: AdminCTX,
-				req: &admin_pb.RemoveIAMMemberRequest{
+				ctx: OrgCTX,
+				req: &mgmt_pb.RemoveOrgMemberRequest{
 					UserId: user.GetUserId(),
 				},
 			},
-			want: &admin_pb.RemoveIAMMemberResponse{
+			want: &mgmt_pb.RemoveOrgMemberResponse{
 				Details: &object.ObjectDetails{
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Organisation.ID,
 					ChangeDate:    timestamppb.Now(),
 				},
 			},
@@ -310,7 +315,7 @@ func TestServer_RemoveIAMMember(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.RemoveIAMMember(tt.args.ctx, tt.args.req)
+			got, err := Client.RemoveOrgMember(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return

@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	"github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
+	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 )
 
 func (s *Server) GetLoginSettings(ctx context.Context, req *settings.GetLoginSettingsRequest) (*settings.GetLoginSettingsResponse, error) {
