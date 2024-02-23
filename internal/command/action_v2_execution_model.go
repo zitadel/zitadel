@@ -1,6 +1,8 @@
 package command
 
 import (
+	"slices"
+
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/execution"
 )
@@ -59,4 +61,56 @@ func ExecutionAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Agg
 		InstanceID:    wm.InstanceID,
 		Version:       execution.AggregateVersion,
 	}
+}
+
+type ExecutionsExistWriteModel struct {
+	eventstore.WriteModel
+
+	ids         []string
+	existingIDs []string
+}
+
+func (e *ExecutionsExistWriteModel) AllExists() bool {
+	if len(e.ids) == len(e.existingIDs) {
+		return true
+	}
+	return false
+}
+
+func NewExecutionsExistWriteModel(ids []string, resourceOwner string) *ExecutionsExistWriteModel {
+	return &ExecutionsExistWriteModel{
+		WriteModel: eventstore.WriteModel{
+			ResourceOwner: resourceOwner,
+			InstanceID:    resourceOwner,
+		},
+		ids: ids,
+	}
+}
+
+func (wm *ExecutionsExistWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *execution.SetEvent:
+			if !slices.Contains(wm.existingIDs, e.ID) {
+				wm.existingIDs = append(wm.existingIDs, e.ID)
+			}
+		case *execution.RemovedEvent:
+			i := slices.Index(wm.existingIDs, e.ID)
+			if i >= 0 {
+				wm.existingIDs = slices.Delete(wm.existingIDs, i, i)
+			}
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *ExecutionsExistWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(execution.AggregateType).
+		AggregateIDs(wm.ids...).
+		EventTypes(execution.SetEventType,
+			execution.RemovedEventType).
+		Builder()
 }

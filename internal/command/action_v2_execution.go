@@ -183,15 +183,11 @@ func (e *SetExecution) IsValid() error {
 }
 
 func (e *SetExecution) Existing(c *Commands, ctx context.Context, resourceOwner string) error {
-	for _, target := range e.Targets {
-		if !c.existsTargetByID(ctx, target, resourceOwner) {
-			return zerrors.ThrowNotFound(nil, "COMMAND-17e8fq1ggk", "Errors.Target.NotFound")
-		}
+	if len(e.Targets) > 0 && !c.existsTargetsByIDs(ctx, e.Targets, resourceOwner) {
+		return zerrors.ThrowNotFound(nil, "COMMAND-17e8fq1ggk", "Errors.Target.NotFound")
 	}
-	for _, include := range e.Includes {
-		if !c.existsExecutionByIDAndType(ctx, include, resourceOwner) {
-			return zerrors.ThrowNotFound(nil, "COMMAND-slgj0l4cdz", "Errors.Execution.IncludeNotFound")
-		}
+	if len(e.Includes) > 0 && !c.existsExecutionsByIDs(ctx, e.Includes, resourceOwner) {
+		return zerrors.ThrowNotFound(nil, "COMMAND-slgj0l4cdz", "Errors.Execution.IncludeNotFound")
 	}
 	return nil
 }
@@ -273,15 +269,14 @@ func (c *Commands) deleteExecution(ctx context.Context, aggID string, resourceOw
 	}
 	return writeModelToObjectDetails(&wm.WriteModel), nil
 }
-func (c *Commands) existsExecutionByIDAndType(ctx context.Context, id string, resourceOwner string) bool {
-	wm, err := c.getExecutionWriteModelByID(ctx, id, resourceOwner)
+
+func (c *Commands) existsExecutionsByIDs(ctx context.Context, ids []string, resourceOwner string) bool {
+	wm := NewExecutionsExistWriteModel(ids, resourceOwner)
+	err := c.eventstore.FilterToQueryReducer(ctx, wm)
 	if err != nil {
 		return false
 	}
-	if len(wm.Targets) > 0 || len(wm.Includes) > 0 {
-		return true
-	}
-	return false
+	return wm.AllExists()
 }
 
 func (c *Commands) getExecutionWriteModelByID(ctx context.Context, id string, resourceOwner string) (*ExecutionWriteModel, error) {

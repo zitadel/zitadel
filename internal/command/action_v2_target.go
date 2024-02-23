@@ -173,15 +173,13 @@ func (c *Commands) DeleteTarget(ctx context.Context, id, resourceOwner string) (
 	return writeModelToObjectDetails(&existing.WriteModel), nil
 }
 
-func (c *Commands) existsTargetByID(ctx context.Context, id string, resourceOwner string) bool {
-	wm, err := c.getTargetWriteModelByID(ctx, id, resourceOwner)
+func (c *Commands) existsTargetsByIDs(ctx context.Context, ids []string, resourceOwner string) bool {
+	wm := NewTargetsExistsWriteModel(ids, resourceOwner)
+	err := c.eventstore.FilterToQueryReducer(ctx, wm)
 	if err != nil {
 		return false
 	}
-	if wm.State.Exists() {
-		return true
-	}
-	return false
+	return wm.AllExists()
 }
 
 func (c *Commands) getTargetWriteModelByID(ctx context.Context, id string, resourceOwner string) (*TargetWriteModel, error) {
