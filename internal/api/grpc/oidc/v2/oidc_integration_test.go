@@ -13,6 +13,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
@@ -183,6 +184,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: regexp.QuoteMeta(`oidcintegrationtest://callback?error=access_denied&error_description=nope&error_uri=https%3A%2F%2Fexample.com%2Fdocs&state=state`),
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
@@ -206,6 +208,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
@@ -231,6 +234,7 @@ func TestServer_CreateCallback(t *testing.T) {
 			want: &oidc_pb.CreateCallbackResponse{
 				CallbackUrl: `http:\/\/localhost:9999\/callback#access_token=(.*)&expires_in=(.*)&id_token=(.*)&state=state&token_type=Bearer`,
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},

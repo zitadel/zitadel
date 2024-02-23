@@ -16,6 +16,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
@@ -158,6 +159,7 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
@@ -177,6 +179,7 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
@@ -205,6 +208,7 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
@@ -224,6 +228,7 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
