@@ -90,7 +90,7 @@ func (p *limitsProjection) reduceLimitsSet(event eventstore.Event) (*handler.Sta
 	updateCols := []handler.Column{
 		handler.NewCol(LimitsColumnInstanceID, e.Aggregate().InstanceID),
 		handler.NewCol(LimitsColumnResourceOwner, e.Aggregate().ResourceOwner),
-		handler.NewCol(LimitsColumnCreationDate, e.CreationDate()),
+		handler.NewCol(LimitsColumnCreationDate, handler.OnlySetValueOnInsert(LimitsProjectionTable, e.CreationDate())),
 		handler.NewCol(LimitsColumnChangeDate, e.CreationDate()),
 		handler.NewCol(LimitsColumnSequence, e.Sequence()),
 		handler.NewCol(LimitsColumnAggregateID, e.Aggregate().ID),
