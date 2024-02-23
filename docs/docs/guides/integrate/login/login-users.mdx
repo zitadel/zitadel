@@ -202,13 +202,7 @@ You can disable the prompt, in case multifactor authentication is not enforced b
 
 Users can select a button to initiate passwordless login or use a fall-back method (ie. login with username/password), if available.
 
-The passwordless login flow follows the FIDO2 / WebAuthN standard.
-Briefly explained the following happens:
-
-- User selects button
-- User's device will ask the user to provide a gesture (e.g., FaceID, Windows Hello, Fingerprint, PIN)
-- The user is being redirected to the application
-
+The passwordless with [passkeys](/docs/concepts/features/passkeys.md) login flow follows the FIDO2 / WebAuthN standard.
 With the introduction of passkeys the gesture can be provided on ANY of the user's devices.
 This is not strictly the device where the login flow is being executed (e.g., on a mobile device).
 The user experience depends mainly on the used operating system and browser.
