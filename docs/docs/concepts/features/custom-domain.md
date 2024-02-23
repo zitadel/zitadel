@@ -3,7 +3,6 @@ title: Custom domain
 sidebar_label: Custom domain
 ---
 
-
 A ZITADEL custom domain refers to the ability for organizations to personalize the authentication experience by using their own domain name rather than the default ZITADEL domain.
 
 This feature allows organizations to maintain their brand identity throughout the authentication process, providing a seamless and consistent user experience.

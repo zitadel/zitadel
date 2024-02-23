@@ -13,17 +13,17 @@ In this guide we will walk through the different protocols, features and concept
 
 ![Screenshot of zitadel login screen](/img/guides/integrate/login/login-start.png)
 
-## Using industry standard protocols
+## Using industry-standard protocols
 
 ### Authenticate users with OpenID Connect 1.0
 
 OpenID Connect (OIDC) offers a modern and lightweight authentication protocol built on top of OAuth 2.0, providing flexible authentication flows and easy integration with web and mobile applications.
 ZITADEL offers a certified compliant implementation of the OpenID Connect Standard, ensuring compliance with proven security best practices.
 
-Authenticating users through the OpenID Connect protocol, typically requires an application to redirect the user with an [Auth Request](/docs/apis/openidoauth/authrequest) to the identity provider that contains information such as the requesting application, [scopes](/docs/apis/openidoauth/scopes), and redirect url.
+Authenticating users through the OpenID Connect protocol typically requires an application to redirect the user with an [Auth Request](/docs/apis/openidoauth/authrequest) to the identity provider that contains information such as the requesting application, [scopes](/docs/apis/openidoauth/scopes), and redirect url.
 The identity provider is not part of the original application, but a standalone service like ZITADEL that may run under the [same domain](/docs/concepts/features/custom-domain.md)
 The user will authenticate using their credentials.
-After successful authentication the user will be redirected back to the original application.
+After successful authentication, the user will be redirected back to the original application.
 
 ### Authenticate users with SAML
 
@@ -100,10 +100,10 @@ After successful authentication, the user will be redirected back to the origina
 ZITADEL's hosted login page prioritizes security and compliance with industry standards and regulations.
 It employs best practices for securing authentication processes, such as encryption, token-based authentication, and adherence to protocols like OAuth 2.0, [OpenID Connect](/docs/guides/integrate/login/oidc), and [SAML](/docs/guides/integrate/login/).
 
-We make sure to harden your login UI an minimize the attack surface.
+We make sure to harden the login UI an minimize the attack surface.
 One of the measures we apply is setting the necessary security heads thus minimizing the risk of common vulnerabilities in login pages, such as XSS vulnerabilities.
 Put your current login to the test and compare the results with our hosted login page.
-Tools like [Mozilla's Observatory](https://observatory.mozilla.org/) can give you a good first impression your security posture.
+Tools like [Mozilla's Observatory](https://observatory.mozilla.org/) can give you a good first impression about the security posture.
 
 ### Developer-friendly integration
 
@@ -117,12 +117,12 @@ Overall, ZITADEL's hosted login page simplifies the authentication process for d
 
 Different login name formats can be used on ZITADEL's hosted login page to select a user.
 Login methods can be a user's username, containing the username and an [organization domain](/docs/guides/manage/console/organizations#domain-verification-and-primary-domain), their email addresses, or their phone numbers.
-By default all of these login methods are allowed and can be adjusted by [Managers](/docs/concepts/structure/managers) to meet their requirements.
+By default, all of these login methods are allowed and can be adjusted by [Managers](/docs/concepts/structure/managers) to meet their requirements.
 
 ### Support for multiple authentication methods
 
 The hosted login page supports various authentication methods, including traditional username/password authentication, social login options, multi-factor authentication (MFA), and passwordless authentication methods like [passkeys](/docs/concepts/features/passkeys.md).
-Available second factor (2FA) and multi-factor authentication methods (MFA) include OTP via authenticator app, TOTP via SMS, OTP via email, and U2F.
+Available second-factor (2FA) and multi-factor authentication methods (MFA) include OTP via an authenticator app, TOTP via SMS, OTP via email, and U2F.
 
 Developers can configure the authentication methods offered on the login page based on their application's security and usability requirements.
 
@@ -130,9 +130,9 @@ Developers can configure the authentication methods offered on the login page ba
 
 ![Screenshot of ZITADEL console showing different identity provider templates](/img/guides/integrate/login/login-external-idp-templates.png)
 
-With the hosted login page from ZITADEL developers will get the best support for multi-tenancy single-sign-on with third party identity providers.
-ZITADEL acts as [identity broker](/docs/concepts/features/identity-brokering) between your applications and different external identity providers, reducing the implementation effort for developers.
-External Identity providers can be configured for the whole instance or for each organization which represents a group of users such as a B2B customer or organizational unit.
+With the hosted login page from ZITADEL developers will get the best support for multi-tenancy single-sign-on with third-party identity providers.
+ZITADEL acts as an [identity broker](/docs/concepts/features/identity-brokering) between your applications and different external identity providers, reducing the implementation effort for developers.
+External Identity providers can be configured for the whole instance or for each organization that represents a group of users such as a B2B customer or organizational unit.
 
 ZITADEL offers various [identity provider templates](/docs/guides/integrate/identity-providers) to integrate providers such as [Okta](/docs/guides/integrate/identity-providers/okta), [Entra ID](/docs/guides/integrate/identity-providers/azure-ad) or on-premise [LDAP](/docs/guides/integrate/identity-providers/ldap).
 
@@ -146,7 +146,7 @@ Key features include:
 2. **Custom Authentication Configurations**: Allows tailored [authentication settings](/docs/guides/manage/console/instance-settings#login-behavior-and-access), [branding](/docs/guides/manage/customize/branding), and policies for each tenant.
 3. **Centralized Management**: Provides [centralized administration](/docs/guides/manage/console/managers) for efficient management across all tenants.
 4. **Scalability and Flexibility**: Scales seamlessly to accommodate growing organizations of all sizes.
-5. **Domain Discovery**: Starting on a central login page, route users to their tenant based on their email-address or other user attributes. Authentication settings will be applied automatically based on the organization's policies, this includes routing users seamlessly to third party identity providers like [Entra ID](/docs/guides/integrate/identity-providers/azure-ad).
+5. **Domain Discovery**: Starting on a central login page, route users to their tenant based on their email address or other user attributes. Authentication settings will be applied automatically based on the organization's policies, this includes routing users seamlessly to third party identity providers like [Entra ID](/docs/guides/integrate/identity-providers/azure-ad).
 
 ### Customization options
 
@@ -161,9 +161,9 @@ By default, the displayed branding is defined [based on the user's domain](/docs
 
 ### Fast account switching
 
-The hosted login page remembers users that have previously authenticated.
-In case a user has used multiple accounts, for example a private account and a work account, to authenticate, then all accounts will be shown on the Account Picker.
-Users can still login with a different user that is not in the list.
+The hosted login page remembers users who have previously authenticated.
+In case a user has used multiple accounts, for example, a private account and a work account, to authenticate, then all accounts will be shown on the Account Picker.
+Users can still login with a different user that is not on the list.
 This allows users to quickly switch between users and provide a better user experience.
 
 :::info
@@ -172,7 +172,7 @@ This behavior can be changed with the authorization request. Please refer to our
 
 ### Self-service for users
 
-ZITADEL's hosted login page offers [many self-service flows](/docs/concepts/features/selfservice) that allow users to setup authentication methods or recover their login information.
+ZITADEL's hosted login page offers [many self-service flows](/docs/concepts/features/selfservice) that allow users to set up authentication methods or recover their login information.
 Developers use the self-service functionalities to reduce manual tasks and improve user experience.
 Key features include:
 
@@ -184,15 +184,15 @@ Unauthenticated users can request a password reset after providing the loginname
 - An email will be sent to the verified email address
 - User opens a link and has to provide a new password
 
-#### Prompt users to setup multifactor authentication
+#### Prompt users to set up multifactor authentication
 
 Users are automatically prompted to provide a second factor, when
 
 - Instance or organization [login policy](/concepts/structure/policies#login-policy) is set
 - Requested by the client
-- A multi-factor is setup for the user
+- A multi-factor is set up for the user
 
-When a multi-factor is required, but not set-up, then the user is requested to set-up an additional factor.
+When a multi-factor is required, but not set up, then the user is requested to set up an additional factor.
 
 :::info Disabling multifactor prompt
 You can disable the prompt, in case multifactor authentication is not enforced by setting the [**Multifactor Init Lifetime**](/docs/guides/manage/console/instance-settings#login-lifetimes) to 0.
@@ -205,22 +205,22 @@ Users can select a button to initiate passwordless login or use a fall-back meth
 The passwordless with [passkeys](/docs/concepts/features/passkeys.md) login flow follows the FIDO2 / WebAuthN standard.
 With the introduction of passkeys the gesture can be provided on ANY of the user's devices.
 This is not strictly the device where the login flow is being executed (e.g., on a mobile device).
-The user experience depends mainly on the used operating system and browser.
+The user experience depends mainly on the operating system and browser.
 
 ## Build a custom Login UI to authenticate users
 
-In certain cases you want to build your own login UI to optimize your user experience.
+In certain cases, you want to build your own login UI to optimize your user experience.
 We have dedicated guides on [how to build your custom login UI](http://localhost:3000/docs/guides/integrate/login-ui) with ZITADEL.
 
 When building your own login UI, you will leverage the [Session API](#zitadels-session-api) to authenticate users and manage user sessions.
 
-:::info Session API support for OIDC amd SAML
+:::info Session API support for OIDC and SAML
 At the moment developers can only integrate with ZITADEL's Session API and not with standard compliant OpenID Connect or SAML flows.
 :::
 
 ### When to build your custom Login UI
 
-Main reasons on why developers might want to build their own login UI include:
+Main reasons why developers might want to build their own login UI include:
 
 1. **Embedding Login in your application**: From a security standpoint you should follow the best practice recommendation to open a browser and then redirect to your application. For certain applications, such as games or mobile apps, you might want to embed the login for a better user experience
 2. **Customize business process**: You might want to change existing flows that are provided by the hosted login to fit your business process. Make sure to validate that your customization can't be handled by [Actions](/docs/guides/manage/customize/behavior) instead.

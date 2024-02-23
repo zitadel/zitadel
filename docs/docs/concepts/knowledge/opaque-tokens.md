@@ -49,7 +49,7 @@ Two common types of tokens used in authentication protocols are opaque tokens an
 
 - **Opaque Tokens**: Since opaque tokens do not contain user information, they are inherently more secure in terms of protecting sensitive data. However, the reliance on server-side validation means there is an overhead associated with each token verification request, which can impact performance in high-throughput scenarios.
 
-- **JWT Tokens**: JWT tokens contain user information within the token itself, which can be convenient for clients as it eliminates the need for frequent interactions with the authorization server. However, this also means that JWT tokens can potentially expose sensitive information if not handled and secured properly. Additionally, JWT tokens tend to be larger in size compared to opaque tokens due to the encoded payload.
+- **JWT Tokens**: JWT tokens contain user information within the token itself, which can be convenient for clients as it eliminates the need for frequent interactions with the authorization server. However, this also means that JWT tokens can potentially expose sensitive information if not handled and secured properly. Additionally, JWT tokens tend to be larger compared to opaque tokens due to the encoded payload.
 
 ### Use cases and trade-offs
 

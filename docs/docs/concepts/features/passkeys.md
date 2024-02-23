@@ -32,6 +32,6 @@ Imagine signing in without passwords! Passkeys, replacing traditional passwords,
 
 * Passkey support is still evolving in browsers and platforms. Check compatibility for your target audience.
 * ZITADEL actively develops its passkey features. Stay updated with documentation and releases.
-* Passkeys are bound to your domain, thus we recommend to configure a [custom domain](/docs/concepts/features/custom-domain.md) before setting up passkeys.
+* Passkeys are bound to your domain, thus we recommend configuring a [custom domain](/docs/concepts/features/custom-domain.md) before setting up passkeys.
 
 Don't hesitate to ask if you have further questions about integrating passkeys in your ZITADEL application!
