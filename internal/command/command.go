@@ -8,7 +8,6 @@ import (
 	"encoding/pem"
 	"math/big"
 	"net/http"
-	"slices"
 	"strconv"
 	"sync"
 	"time"
@@ -145,7 +144,7 @@ func StartCommands(
 		EventGroupExisting:     func(group string) bool { return true },
 		GrpcServiceExisting:    func(service string) bool { return false },
 		GrpcMethodExisting:     func(method string) bool { return false },
-		ActionFunctionExisting: executionFunctionExists(),
+		ActionFunctionExisting: domain.FunctionExists(),
 	}
 
 	repo.codeAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
@@ -166,18 +165,6 @@ func StartCommands(
 	repo.domainVerificationGenerator = crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, repo.domainVerificationAlg)
 	repo.domainVerificationValidator = api_http.ValidateDomain
 	return repo, nil
-}
-
-func executionFunctionExists() func(string) bool {
-	functions := make([]string, 0)
-	for _, flowType := range domain.AllFlowTypes() {
-		for _, triggerType := range flowType.TriggerTypes() {
-			functions = append(functions, flowType.LocalizationKey()+"."+triggerType.LocalizationKey())
-		}
-	}
-	return func(s string) bool {
-		return slices.Contains(functions, s)
-	}
 }
 
 type AppendReducer interface {

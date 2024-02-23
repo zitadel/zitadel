@@ -10,6 +10,24 @@ import (
 	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
 )
 
+func (s *Server) ListExecutionFunctions(_ context.Context, _ *execution.ListExecutionFunctionsRequest) (*execution.ListExecutionFunctionsResponse, error) {
+	return &execution.ListExecutionFunctionsResponse{
+		Functions: s.ListActionFunctions(),
+	}, nil
+}
+
+func (s *Server) ListExecutionMethods(_ context.Context, _ *execution.ListExecutionMethodsRequest) (*execution.ListExecutionMethodsResponse, error) {
+	return &execution.ListExecutionMethodsResponse{
+		Methods: s.ListGRPCMethods(),
+	}, nil
+}
+
+func (s *Server) ListExecutionServices(_ context.Context, _ *execution.ListExecutionServicesRequest) (*execution.ListExecutionServicesResponse, error) {
+	return &execution.ListExecutionServicesResponse{
+		Services: s.ListGRPCServices(),
+	}, nil
+}
+
 func (s *Server) SetExecution(ctx context.Context, req *execution.SetExecutionRequest) (*execution.SetExecutionResponse, error) {
 	set := &command.SetExecution{
 		Targets:  req.GetTargets(),

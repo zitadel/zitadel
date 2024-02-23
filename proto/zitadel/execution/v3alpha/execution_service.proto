@@ -236,6 +236,75 @@ service ExecutionService {
       };
     };
   }
+  // List all available functions
+  //
+  // List all available functions which can be used as condition for executions.
+  rpc ListExecutionFunctions (ListExecutionFunctionsRequest) returns (ListExecutionFunctionsResponse) {
+    option (google.api.http) = {
+      get: "/v3alpha/executions/functions"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "List all functions successfully";
+        };
+      };
+    };
+  }
+  // List all available methods
+  //
+  // List all available methods which can be used as condition for executions.
+  rpc ListExecutionMethods (ListExecutionMethodsRequest) returns (ListExecutionMethodsResponse) {
+    option (google.api.http) = {
+      get: "/v3alpha/executions/methods"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "List all methods successfully";
+        };
+      };
+    };
+  }
+  // List all available service
+  //
+  // List all available services which can be used as condition for executions.
+  rpc ListExecutionServices (ListExecutionServicesRequest) returns (ListExecutionServicesResponse) {
+    option (google.api.http) = {
+      get: "/v3alpha/executions/services"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "List all services successfully";
+        };
+      };
+    };
+  }
 }
 
 message CreateTargetRequest {
@@ -365,4 +434,21 @@ message DeleteExecutionRequest {
 message DeleteExecutionResponse {
   // Details provide some base information (such as the last change date) of the execution.
   zitadel.object.v2beta.Details details = 1;
+}
+
+message ListExecutionFunctionsRequest{}
+message ListExecutionFunctionsResponse{
+  // All available methods
+  repeated string functions = 1;
+}
+message ListExecutionMethodsRequest{}
+message ListExecutionMethodsResponse{
+  // All available methods
+  repeated string methods = 1;
+}
+
+message ListExecutionServicesRequest{}
+message ListExecutionServicesResponse{
+  // All available methods
+  repeated string services = 1;
 }

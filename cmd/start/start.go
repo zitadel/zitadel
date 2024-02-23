@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"slices"
 	"syscall"
 	"time"
 
@@ -281,8 +282,8 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	if err != nil {
 		return err
 	}
-	commands.GrpcMethodExisting = api.GrpcMethodExists
-	commands.GrpcServiceExisting = api.GrpcServiceExists
+	commands.GrpcMethodExisting = checkExisting(api.ListGrpcMethods())
+	commands.GrpcServiceExisting = checkExisting(api.ListGrpcServices())
 
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
@@ -403,7 +404,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, org.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, execution_v3_alpha.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, execution_v3_alpha.CreateServer(commands, queries, domain.AllFunctions, apis.ListGrpcMethods, apis.ListGrpcServices)); err != nil {
 		return nil, err
 	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, login.IgnoreInstanceEndpoints...)
@@ -552,4 +553,10 @@ func showBasicInformation(startConfig *Config) {
 		fmt.Printf(" Visit: %s    \n", color.CyanString("https://zitadel.com/docs/self-hosting/manage/tls_modes"))
 	}
 	fmt.Printf("\n ===============================================================\n\n")
+}
+
+func checkExisting(values []string) func(string) bool {
+	return func(value string) bool {
+		return slices.Contains(values, value)
+	}
 }

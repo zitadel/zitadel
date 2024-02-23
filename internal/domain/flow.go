@@ -1,6 +1,9 @@
 package domain
 
-import "strconv"
+import (
+	"slices"
+	"strconv"
+)
 
 type FlowState int32
 
@@ -145,5 +148,22 @@ func (s TriggerType) LocalizationKey() string {
 		return "Action.TriggerType.PreSAMLResponseCreation"
 	default:
 		return "Action.TriggerType.Unspecified"
+	}
+}
+
+func AllFunctions() []string {
+	functions := make([]string, 0)
+	for _, flowType := range AllFlowTypes() {
+		for _, triggerType := range flowType.TriggerTypes() {
+			functions = append(functions, flowType.LocalizationKey()+"."+triggerType.LocalizationKey())
+		}
+	}
+	return functions
+}
+
+func FunctionExists() func(string) bool {
+	functions := AllFunctions()
+	return func(s string) bool {
+		return slices.Contains(functions, s)
 	}
 }

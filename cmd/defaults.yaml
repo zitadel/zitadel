@@ -996,6 +996,7 @@ InternalAuthZ:
         - "session.delete"
         - "execution.target.write"
         - "execution.target.delete"
+        - "execution.read"
         - "execution.write"
         - "execution.delete"
     - Role: "IAM_OWNER_VIEWER"

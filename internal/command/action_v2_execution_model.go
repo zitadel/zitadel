@@ -71,10 +71,7 @@ type ExecutionsExistWriteModel struct {
 }
 
 func (e *ExecutionsExistWriteModel) AllExists() bool {
-	if len(e.ids) == len(e.existingIDs) {
-		return true
-	}
-	return false
+	return len(e.ids) == len(e.existingIDs)
 }
 
 func NewExecutionsExistWriteModel(ids []string, resourceOwner string) *ExecutionsExistWriteModel {
