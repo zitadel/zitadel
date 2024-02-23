@@ -27,7 +27,7 @@ Roles can be requested via our auth and management APIs, from userinfo endpoint 
 
 ### Generate a token
 
-You must first of all generate a token for the user. If it’s a human user, he would be using a front-end application and logging in via the browser or device. An access token will be returned after they log in successfully. A machine user will use a script or other program to generate a token using the JWT profile or client credentials grant types. 
+You must first of all generate a token for the user. For human users, the typical approach involves using a front-end application and logging in through the browser or device. An access token will be returned after they log in successfully. A machine user will use a script or other program to generate a token using the JWT profile or client credentials grant types. 
 
 How to generate a token: 
 

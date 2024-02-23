@@ -11,7 +11,7 @@ This identity is known as federated identity and the pattern behind this is iden
 A service provider that specializes in brokering access control between multiple service providers (also referred to as relying parties) is called an identity broker.
 Federated identity management is an arrangement that is made between two or more such identity brokers across organizations.
 
-For example, if Google is configured as an identity provider in your organization, the user will get the option to use his Google Account on the Login Screen of ZITADEL. Because Google is registered as a trusted identity provider, the user will be able to login in with the Google account after the user is linked with an existing ZITADEL account (if he is already registered) or a new one with the claims provided by Google.
+For example, if Google is configured as an identity provider in your organization, the user will get the option to use his Google Account on the Login Screen of ZITADEL. Because Google is registered as a trusted identity provider, the user will be able to login in with the Google account after the user is linked with an existing ZITADEL account (if user is already registered) or a new one with the claims provided by Google.
 
 ![Identity Brokering](/img/guides/identity_brokering.png)
 

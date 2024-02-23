@@ -705,7 +705,7 @@ func TestServer_DeleteSession_own_session(t *testing.T) {
 	})
 	require.Error(t, err)
 
-	// delete the new (user1) session by himself
+	// delete the new (user1) session by themselves
 	_, err = Client.DeleteSession(Tester.WithAuthorizationToken(context.Background(), token1), &session.DeleteSessionRequest{
 		SessionId: createResp.GetSessionId(),
 	})

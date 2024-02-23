@@ -108,13 +108,13 @@ Please make sure you cover your changes with tests before marking a Pull Request
 
 The code consists of the following parts:
 
-| name            | description                                                        | language                                                                    | where to find                                      |
-| --------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------- | -------------------------------------------------- |
-| backend         | Service that serves the grpc(-web) and RESTful API                 | [go](https://go.dev)                                                        | [API implementation](./internal/api/grpc)          |
-| console         | Frontend the user interacts with after he is logged in             | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org) | [./console](./console)                             |
+| name            | description                                                     | language                                                                    | where to find                                      |
+| --------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------- |
+| backend         | Service that serves the grpc(-web) and RESTful API              | [go](https://go.dev)                                                        | [API implementation](./internal/api/grpc)          |
+| console         | Frontend the user interacts with after log in             | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org) | [./console](./console)                             |
 | login           | Server side rendered frontend the user interacts with during login | [go](https://go.dev), [go templates](https://pkg.go.dev/html/template)      | [./internal/api/ui/login](./internal/api/ui/login) |
-| API definitions | Specifications of the API                                          | [Protobuf](https://developers.google.com/protocol-buffers)                  | [./proto/zitadel](./proto/zitadel)                 |
-| docs            | Project documentation made with docusaurus                         | [Docusaurus](https://docusaurus.io/)                                        | [./docs](./docs)                                   |
+| API definitions | Specifications of the API                                       | [Protobuf](https://developers.google.com/protocol-buffers)                  | [./proto/zitadel](./proto/zitadel)                 |
+| docs            | Project documentation made with docusaurus                      | [Docusaurus](https://docusaurus.io/)                                        | [./docs](./docs)                                   |
 
 Please validate and test the code before you contribute.
 
