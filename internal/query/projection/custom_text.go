@@ -131,7 +131,7 @@ func (p *customTextProjection) reduceSet(event eventstore.Event) (*handler.State
 		[]handler.Column{
 			handler.NewCol(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
 			handler.NewCol(CustomTextInstanceIDCol, customTextEvent.Aggregate().InstanceID),
-			handler.NewCol(CustomTextCreationDateCol, customTextEvent.CreationDate()),
+			handler.NewCol(CustomTextCreationDateCol, handler.OnlySetValueOnInsert(CustomTextTable, customTextEvent.CreationDate())),
 			handler.NewCol(CustomTextChangeDateCol, customTextEvent.CreationDate()),
 			handler.NewCol(CustomTextSequenceCol, customTextEvent.Sequence()),
 			handler.NewCol(CustomTextIsDefaultCol, isDefault),
