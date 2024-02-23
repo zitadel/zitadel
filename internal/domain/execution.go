@@ -18,6 +18,8 @@ const (
 
 func (e ExecutionType) String() string {
 	switch e {
+	case ExecutionTypeUnspecified, executionTypeStateCount:
+		return ""
 	case ExecutionTypeRequest:
 		return "request"
 	case ExecutionTypeResponse:
@@ -26,7 +28,6 @@ func (e ExecutionType) String() string {
 		return "function"
 	case ExecutionTypeEvent:
 		return "event"
-	default:
-		return ""
 	}
+	return ""
 }
