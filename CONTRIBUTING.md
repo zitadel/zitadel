@@ -189,18 +189,15 @@ Repeat the above with `INTEGRATION_DB_FLAVOR="postgres"`.
 To test the whole system, including the console UI and the login UI, run the E2E tests.
 
 ```bash
-# Build the production binary
-make core_build console_build
-GOOS=linux make compile_pipeline
-
-# Pack the binary into a docker image
-DOCKER_BUILDKIT=1 docker build --file build/Dockerfile . -t zitadel:local
+# Build the production docker image
+export ZITADEL_IMAGE=zitadel:local GOOS=linux
+make docker_image
 
 # If you made changes in the e2e directory, make sure you reformat the files
 make console_lint
 
 # Run the tests
-ZITADEL_IMAGE=zitadel:local docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml run --service-ports e2e
+docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml run --service-ports e2e
 ```
 
 When you are happy with your changes, you can cleanup your environment.
