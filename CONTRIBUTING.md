@@ -123,6 +123,24 @@ We add the label "good first issue" for problems we think are a good starting po
 - [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 - [All issues](https://github.com/zitadel/zitadel/issues)
 
+### General Guidelines
+
+#### Gender Neutrality and Inclusive Language
+
+We are committed to creating a welcoming and inclusive community for all developers, regardless of their gender identity or expression. To achieve this, we are actively working to ensure that our contribution guidelines are gender-neutral and use inclusive language.
+
+**Use gender-neutral pronouns**: 
+Don't use gender-specific pronouns unless the person you're referring to is actually that gender.
+In particular, don't use he, him, his, she, or her as gender-neutral pronouns, and don't use he/she or (s)he or other such punctuational approaches. Instead, use the singular they.
+
+**Choose gender-neutral alternatives**: 
+Opt for gender-neutral terms instead of gendered ones whenever possible. 
+Replace "policeman" with "police officer," "manpower" with "workforce," and "businessman" with "entrepreneur" or "businessperson."
+
+**Avoid ableist language**:
+Ableist language includes words or phrases such as crazy, insane, blind to or blind eye to, cripple, dumb, and others.
+Choose alternative words depending on the context.
+
 ### Backend/login
 
 By executing the commands from this section, you run everything you need to develop the ZITADEL backend locally.

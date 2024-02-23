@@ -560,7 +560,7 @@ EventTypes:
     removed: Target deleted
   user:
     added: User added
-    selfregistered: User registered himself
+    selfregistered: User registered
     initialization:
       code:
         added: Initialization code generated
@@ -599,7 +599,7 @@ EventTypes:
           failed: Secret check failed
     human:
       added: Person added
-      selfregistered: Person registered himself
+      selfregistered: Person registered
       avatar:
         added: Avatar added
         removed: Avatar removed
