@@ -78,10 +78,8 @@ func writeFilters(stmt *database.Statement, instance string, filters []*eventsto
 }
 
 func writeFilter(stmt *database.Statement, instance string, filter *eventstore.Filter) {
-	// if filter.Pagination() != nil && filter.Pagination().Pagination() != nil {
 	stmt.WriteString(selectColumns)
 	stmt.WriteString(" FROM (")
-	// }
 
 	stmt.WriteString(selectColumns)
 	stmt.WriteString(from)
