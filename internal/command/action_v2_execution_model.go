@@ -88,13 +88,13 @@ func (wm *ExecutionsExistWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *execution.SetEvent:
-			if !slices.Contains(wm.existingIDs, e.ID) {
-				wm.existingIDs = append(wm.existingIDs, e.ID)
+			if !slices.Contains(wm.existingIDs, e.Aggregate().ID) {
+				wm.existingIDs = append(wm.existingIDs, e.Aggregate().ID)
 			}
 		case *execution.RemovedEvent:
-			i := slices.Index(wm.existingIDs, e.ID)
+			i := slices.Index(wm.existingIDs, e.Aggregate().ID)
 			if i >= 0 {
-				wm.existingIDs = slices.Delete(wm.existingIDs, i, i)
+				wm.existingIDs = slices.Delete(wm.existingIDs, i, i+1)
 			}
 		}
 	}
