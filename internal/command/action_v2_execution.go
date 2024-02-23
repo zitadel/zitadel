@@ -200,11 +200,7 @@ func (c *Commands) setExecution(ctx context.Context, set *SetExecution, resource
 		return nil, err
 	}
 
-	wm, err := c.getExecutionWriteModelByID(ctx, set.AggregateID, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
-
+	wm := NewExecutionWriteModel(set.AggregateID, resourceOwner)
 	// Check if targets and includes for execution are existing
 	if err := set.Existing(c, ctx, resourceOwner); err != nil {
 		return nil, err

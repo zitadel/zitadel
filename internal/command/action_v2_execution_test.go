@@ -158,7 +158,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push failed, error",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -247,7 +246,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, method target",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -293,7 +291,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, service target",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -339,7 +336,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, all target",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -385,7 +381,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
-					expectFilter(),
 				),
 				grpcMethodExists: existsMock(true),
 			},
@@ -409,7 +404,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, method include",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
@@ -452,7 +446,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
-					expectFilter(),
 				),
 				grpcServiceExists: existsMock(true),
 			},
@@ -476,7 +469,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, service include",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
@@ -519,7 +511,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
-					expectFilter(),
 				),
 			},
 			args{
@@ -542,108 +533,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, all include",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
-					expectFilter(
-						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("request.include", "org1"),
-								[]string{"target"},
-								nil,
-							),
-						),
-					),
-					expectPush(
-						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("request", "org1"),
-							nil,
-							[]string{"request.include"},
-						),
-					),
-				),
-			},
-			args{
-				ctx: context.Background(),
-				cond: &ExecutionAPICondition{
-					"",
-					"",
-					true,
-				},
-				set: &SetExecution{
-					Includes: []string{"request.include"},
-				},
-				resourceOwner: "org1",
-			},
-			res{
-				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-		{
-			"push ok, all include reset",
-			fields{
-				eventstore: eventstoreExpect(t,
-					expectFilter(
-						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("request", "org1"),
-							[]string{"target"},
-							nil,
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("request.include", "org1"),
-								[]string{"target"},
-								nil,
-							),
-						),
-					),
-					expectPush(
-						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("request", "org1"),
-							nil,
-							[]string{"request.include"},
-						),
-					),
-				),
-			},
-			args{
-				ctx: context.Background(),
-				cond: &ExecutionAPICondition{
-					"",
-					"",
-					true,
-				},
-				set: &SetExecution{
-					Includes: []string{"request.include"},
-				},
-				resourceOwner: "org1",
-			},
-			res{
-				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
-				},
-			},
-		},
-		{
-			"push ok, all include remove set",
-			fields{
-				eventstore: eventstoreExpect(t,
-					expectFilter(
-						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("request", "org1"),
-								[]string{"target"},
-								nil,
-							),
-						),
-						eventFromEventPusher(
-							execution.NewRemovedEvent(context.Background(),
-								execution.NewAggregate("request", "org1"),
-							),
-						),
-					),
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
@@ -840,7 +729,6 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			"push failed, error",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
 					expectFilter(
 						target.NewAddedEvent(context.Background(),
 							target.NewAggregate("target", "org1"),
@@ -927,7 +815,6 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			"push ok, method target",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -973,7 +860,6 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			"push ok, service target",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -1019,7 +905,6 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			"push ok, all target",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -1060,143 +945,6 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 				},
 			},
 		},
-		/*
-			{
-				"push ok, method include",
-				fields{
-					eventstore: eventstoreExpect(t,
-						expectFilter(),
-						expectFilter(
-							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("target", "org1"),
-								"name",
-								domain.TargetTypeWebhook,
-								"https://example.com",
-								time.Second,
-								true,
-								true,
-							),
-						),
-						expectPush(
-							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("response.method", "org1"),
-								domain.ExecutionTypeResponse,
-								nil,
-								[]string{"include"},
-							),
-						),
-					),
-					grpcMethodExists: existsMock(true),
-				},
-				args{
-					ctx: context.Background(),
-					cond: &ExecutionAPICondition{
-						"method",
-						"",
-						false,
-					},
-					set: &SetExecution{
-						Includes: []string{"include"},
-					},
-					resourceOwner: "org1",
-				},
-				res{
-					details: &domain.ObjectDetails{
-						ResourceOwner: "org1",
-					},
-				},
-			},
-			{
-				"push ok, service include",
-				fields{
-					eventstore: eventstoreExpect(t,
-						expectFilter(),
-
-						expectFilter(
-							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("target", "org1"),
-								"name",
-								domain.TargetTypeWebhook,
-								"https://example.com",
-								time.Second,
-								true,
-								true,
-							),
-						),
-						expectPush(
-							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("response.service", "org1"),
-								domain.ExecutionTypeResponse,
-								nil,
-								[]string{"include"},
-							),
-						),
-					),
-					grpcServiceExists: existsMock(true),
-				},
-				args{
-					ctx: context.Background(),
-					cond: &ExecutionAPICondition{
-						"",
-						"service",
-						false,
-					},
-					set: &SetExecution{
-						Includes: []string{"include"},
-					},
-					resourceOwner: "org1",
-				},
-				res{
-					details: &domain.ObjectDetails{
-						ResourceOwner: "org1",
-					},
-				},
-			},
-			{
-				"push ok, all include",
-				fields{
-					eventstore: eventstoreExpect(t,
-						expectFilter(),
-						expectFilter(
-							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("target", "org1"),
-								"name",
-								domain.TargetTypeWebhook,
-								"https://example.com",
-								time.Second,
-								true,
-								true,
-							),
-						),
-						expectPush(
-							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("grpc", "org1"),
-								domain.ExecutionTypeResponse,
-								nil,
-								[]string{"include"},
-							),
-						),
-					),
-				},
-				args{
-					ctx: context.Background(),
-					cond: &ExecutionAPICondition{
-						"",
-						"",
-						true,
-					},
-					set: &SetExecution{
-						Includes: []string{"include"},
-					},
-					resourceOwner: "org1",
-				},
-				res{
-					details: &domain.ObjectDetails{
-						ResourceOwner: "org1",
-					},
-				},
-			},
-		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1357,7 +1105,6 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			"push failed, error",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -1446,7 +1193,6 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			"push ok, event target",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -1492,7 +1238,6 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			"push ok, group target",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -1538,7 +1283,6 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			"push ok, all target",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -1579,109 +1323,6 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 				},
 			},
 		},
-		/*
-			{
-				"push ok, event include",
-				fields{
-					eventstore: eventstoreExpect(t,
-						expectFilter(),
-						expectPush(
-							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("event.event", "org1"),
-								domain.ExecutionTypeEvent,
-								nil,
-								[]string{"include"},
-							),
-						),
-					),
-					eventExists: existsMock(true),
-				},
-				args{
-					ctx: context.Background(),
-					cond: &ExecutionEventCondition{
-						"event",
-						"",
-						false,
-					},
-					set: &SetExecution{
-						Includes: []string{"include"},
-					},
-					resourceOwner: "org1",
-				},
-				res{
-					details: &domain.ObjectDetails{
-						ResourceOwner: "org1",
-					},
-				},
-			},
-			{
-				"push ok, group include",
-				fields{
-					eventstore: eventstoreExpect(t,
-						expectFilter(),
-						expectPush(
-							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("event.group", "org1"),
-								domain.ExecutionTypeEvent,
-								nil,
-								[]string{"include"},
-							),
-						),
-					),
-					eventGroupExists: existsMock(true),
-				},
-				args{
-					ctx: context.Background(),
-					cond: &ExecutionEventCondition{
-						"",
-						"group",
-						false,
-					},
-					set: &SetExecution{
-						Includes: []string{"include"},
-					},
-					resourceOwner: "org1",
-				},
-				res{
-					details: &domain.ObjectDetails{
-						ResourceOwner: "org1",
-					},
-				},
-			},
-			{
-				"push ok, all include",
-				fields{
-					eventstore: eventstoreExpect(t,
-						expectFilter(),
-						expectPush(
-							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("event", "org1"),
-								domain.ExecutionTypeEvent,
-								nil,
-								[]string{"include"},
-							),
-						),
-					),
-				},
-				args{
-					ctx: context.Background(),
-					cond: &ExecutionEventCondition{
-						"",
-						"",
-						true,
-					},
-					set: &SetExecution{
-						Includes: []string{"include"},
-					},
-					resourceOwner: "org1",
-				},
-				res{
-					details: &domain.ObjectDetails{
-						ResourceOwner: "org1",
-					},
-				},
-			},
-		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1811,7 +1452,6 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 			"push failed, error",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -1852,7 +1492,6 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
-					expectFilter(),
 				),
 				actionFunctionExists: existsMock(true),
 			},
@@ -1890,7 +1529,6 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 			"push ok, function target",
 			fields{
 				eventstore: eventstoreExpect(t,
-					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -1928,73 +1566,6 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 				},
 			},
 		},
-		/*
-			{
-					"push error, function include",
-					fields{
-						eventstore: eventstoreExpect(t,
-							expectFilter(),
-							expectFilter(),
-							expectPush(
-								execution.NewSetEvent(context.Background(),
-									execution.NewAggregate("function.function1", "org1"),
-									domain.ExecutionTypeFunction,
-									nil,
-									[]string{"include"},
-								),
-							),
-						),
-					},
-					args{
-						ctx:  context.Background(),
-						cond: "function1",
-						set: &SetExecution{
-							Includes: []string{"function2"},
-						},
-						resourceOwner: "org1",
-					},
-					res{
-						err: zerrors.IsNotFound,
-					},
-				},
-			{
-				"push ok, function include",
-				fields{
-					eventstore: eventstoreExpect(t,
-						expectFilter(),
-						expectFilter(
-							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("function.function2", "org1"),
-								domain.ExecutionTypeFunction,
-								nil,
-								[]string{"include"},
-							),
-						),
-						expectPush(
-							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("function.function1", "org1"),
-								domain.ExecutionTypeFunction,
-								nil,
-								[]string{"include"},
-							),
-						),
-					),
-				},
-				args{
-					ctx:  context.Background(),
-					cond: "function1",
-					set: &SetExecution{
-						Includes: []string{"function2"},
-					},
-					resourceOwner: "org1",
-				},
-				res{
-					details: &domain.ObjectDetails{
-						ResourceOwner: "org1",
-					},
-				},
-			},
-		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
