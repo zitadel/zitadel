@@ -21,6 +21,8 @@ func (s *Storage) Push(ctx context.Context, pushIntents ...eventstore.PushIntent
 		err = database.CloseTx(tx, err)
 	}()
 
+	// TODO: set app name
+
 	intents, err := lockAggregates(ctx, tx, pushIntents)
 	if err != nil {
 		return err

@@ -1,204 +1,301 @@
 package eventstore
 
 import (
-	"context"
-	"database/sql"
-	"slices"
+	"errors"
+	"time"
 
-	"github.com/zitadel/logging"
-
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/v2/database"
 )
 
-// TODO: improve instances, position, eventFilters
-func MergeFilters(filters ...*Filter) *Filter {
-	merged := new(Filter)
+var FilterMergeErr = errors.New("merge failed")
 
-	for _, filter := range filters {
-		if merged.Instances == nil {
-			merged.Instances = filter.Instances
-		}
-		if merged.Position == nil {
-			merged.Position = filter.Position
-		}
+// Merge returns an error if filters diverge
+func Merge(filters ...*Filter) (*Filter, error) {
+	// if len(filters) == 1 {
+	// 	return filters[0], nil
+	// }
 
-		if merged.Limit < filter.Limit {
-			merged.Limit = filter.Limit
-		}
-		if merged.Offset == 0 || merged.Offset > filter.Offset {
-			merged.Offset = filter.Offset
-		}
+	// merged := filters[0]
+	// for i := 1; i < len(filters); i++{
+	// 	filter := filters[i]
+	// 	if merged.desc != filter.desc {
+	// 		return nil, FilterMergeErr
+	// 	}
 
-		if merged.Tx == nil {
-			merged.Tx = filter.Tx
-		}
+	// }
 
-		if merged.Descending != filter.Descending {
-			logging.Panic("Filter: sort order of filter was not equal")
-		}
+	// return merged, nil
 
-		merged.EventFilters = mergeEventFilters(merged.EventFilters, filter.EventFilters)
-	}
-
-	return merged
-}
-
-// TODO: are there possibility to merge specific filters?
-func mergeEventFilters(existing []*EventFilter, additional []*EventFilter) []*EventFilter {
-	if len(existing) == 0 {
-		return additional
-	}
-
-	merged := slices.Clone(existing)
-	merged = append(merged, additional...)
-
-	return merged
+	return nil, FilterMergeErr
 }
 
 type Filter struct {
-	Instances database.Filter
-	Position  database.Filter
+	desc       bool
+	pagination *pagination
 
-	Limit  uint32
-	Offset uint32
-
-	Tx *sql.Tx
-
-	Descending bool
-
-	EventFilters []*EventFilter
+	aggregateFilters []*AggregateFilter
 }
 
-type filterOpt func(f *Filter) *Filter
+func (f *Filter) Desc() bool {
+	return f.desc
+}
 
-func NewFilter(ctx context.Context, opts ...filterOpt) *Filter {
+func (f *Filter) Pagination() *pagination {
+	return f.pagination
+}
+
+func (f *Filter) AggregateFilters() []*AggregateFilter {
+	return f.aggregateFilters
+}
+
+func NewFilter(opts ...FilterOpt) *Filter {
 	f := new(Filter)
 
-	opts = append(
-		[]filterOpt{
-			FilterInstances(authz.GetInstance(ctx).InstanceID()),
-		},
-		opts...,
-	)
-
 	for _, opt := range opts {
-		f = opt(f)
+		opt(f)
 	}
 
 	return f
 }
 
-func FilterLimit(limit uint32) filterOpt {
-	return func(f *Filter) *Filter {
-		f.Limit = limit
-		return f
+type FilterOpt func(f *Filter)
+
+func Descending() FilterOpt {
+	return func(f *Filter) {
+		f.desc = true
 	}
 }
 
-func FilterOffset(offset uint32) filterOpt {
-	return func(f *Filter) *Filter {
-		f.Offset = offset
-		return f
+func AppendAggregateFilter(typ string, opts ...AggregateFilterOpt) FilterOpt {
+	return AppendFilters(NewAggregateFilter(typ, opts...))
+}
+
+func AppendFilters(filters ...*AggregateFilter) FilterOpt {
+	return func(mf *Filter) {
+		mf.aggregateFilters = append(mf.aggregateFilters, filters...)
 	}
 }
 
-func FilterDescending() filterOpt {
-	return func(f *Filter) *Filter {
-		f.Descending = true
-		return f
+func WithLimit(limit uint32) FilterOpt {
+	return func(f *Filter) {
+		f.ensurePagination()
+		f.pagination.ensurePagination()
+
+		f.pagination.pagination.Limit = limit
 	}
 }
 
-func FilterInstances(instances ...string) filterOpt {
-	return func(f *Filter) *Filter {
-		// f.Instances = slices.Compact(append(f.Instances, instance...))
-		if len(instances) == 0 {
-			return f
+func WithOffset(offset uint32) FilterOpt {
+	return func(f *Filter) {
+		f.ensurePagination()
+		f.pagination.ensurePagination()
+
+		f.pagination.pagination.Offset = offset
+	}
+}
+
+// WithPosition prepares the condition as follows if inTxOrder is set:
+// * position > or >=: ((position AND in_tx_order) OR position >/>=)
+// * position < or <=: ((position AND in_tx_order) OR position </<=)
+// TODO: between
+func WithPosition(position database.NumberFilter[float64], inTxOrder database.NumberFilter[uint32]) FilterOpt {
+	return func(f *Filter) {
+		f.ensurePagination()
+		f.pagination.ensurePosition()
+
+		f.pagination.position.position = position
+		f.pagination.position.inTxOrder = inTxOrder
+	}
+}
+
+func WithPositionAtLeast(position float64, inTxOrder uint32) FilterOpt {
+	return func(f *Filter) {
+		f.ensurePagination()
+		f.pagination.ensurePosition()
+
+		f.pagination.position.position = database.NewNumberAtLeast(position)
+		if inTxOrder > 0 {
+			f.pagination.position.inTxOrder = database.NewNumberAtLeast(inTxOrder)
 		}
-		if len(instances) == 1 {
-			f.Instances = database.NewTextEqual(instances[0])
-			return f
-		}
-
-		f.Instances = database.NewListContains(instances)
-		return f
 	}
 }
 
-func FilterInTx(tx *sql.Tx) filterOpt {
-	return func(f *Filter) *Filter {
-		f.Tx = tx
-		return f
+func (f *Filter) ensurePagination() {
+	if f.pagination != nil {
+		return
+	}
+	f.pagination = new(pagination)
+}
+
+func (p *pagination) ensurePosition() {
+	if p.position != nil {
+		return
+	}
+	p.position = new(positionFilter)
+}
+
+func (p *pagination) ensurePagination() {
+	if p.pagination != nil {
+		return
+	}
+	p.pagination = new(database.Pagination)
+}
+
+type pagination struct {
+	pagination *database.Pagination
+	position   *positionFilter
+}
+
+func (p *pagination) Pagination() *database.Pagination {
+	return p.pagination
+}
+
+func (p *pagination) Position() *positionFilter {
+	return p.position
+}
+
+type positionFilter struct {
+	position  database.NumberFilter[float64]
+	inTxOrder database.NumberFilter[uint32]
+}
+
+func (f *positionFilter) Position() database.NumberFilter[float64] {
+	return f.position
+}
+
+func (f *positionFilter) InTxOrder() database.NumberFilter[uint32] {
+	return f.inTxOrder
+}
+
+func NewAggregateFilter(typ string, opts ...AggregateFilterOpt) *AggregateFilter {
+	f := &AggregateFilter{
+		typ: typ,
+	}
+
+	for _, opt := range opts {
+		opt(f)
+	}
+
+	return f
+}
+
+type AggregateFilter struct {
+	typ    string
+	id     database.Condition
+	events []*EventFilter
+}
+
+func (f *AggregateFilter) Type() *database.TextFilter[string] {
+	return database.NewTextEqual(f.typ)
+}
+
+func (f *AggregateFilter) ID() database.Condition {
+	return f.id
+}
+
+func (f *AggregateFilter) Events() []*EventFilter {
+	return f.events
+}
+
+type AggregateFilterOpt func(f *AggregateFilter)
+
+func WithAggregateID(id string) AggregateFilterOpt {
+	return func(f *AggregateFilter) {
+		f.id = database.NewTextEqual(id)
 	}
 }
 
-// FilterEventQuery creates a new sub clause for the given options
-// sub clauses allow filters on specific events
-// sub clauses are OR connected in the storage query
-func FilterEventQuery(opts ...eventFilterOpt) filterOpt {
-	return func(f *Filter) *Filter {
-		f.EventFilters = append(f.EventFilters, NewEventFilter(opts...))
-		return f
+func WithAggregateIDList(cond *database.ListFilter[string]) AggregateFilterOpt {
+	return func(f *AggregateFilter) {
+		f.id = cond
 	}
 }
 
-func FilterPositionEquals(pos float64) filterOpt {
-	return func(f *Filter) *Filter {
-		if pos == 0 {
-			return f
-		}
-		f.Position = database.NewNumberEquals(pos)
-		return f
+func AppendEvent(opts ...EventFilterOpt) AggregateFilterOpt {
+	return AppendEvents(NewEventFilter(opts...))
+}
+
+func AppendEvents(events ...*EventFilter) AggregateFilterOpt {
+	return func(f *AggregateFilter) {
+		f.events = append(f.events, events...)
 	}
 }
 
-func FilterPositionAtLeast(pos float64) filterOpt {
-	return func(f *Filter) *Filter {
-		if pos == 0 {
-			return f
-		}
-		f.Position = database.NewNumberAtLeast(pos)
-		return f
+func NewEventFilter(opts ...EventFilterOpt) *EventFilter {
+	f := new(EventFilter)
+
+	for _, opt := range opts {
+		opt(f)
+	}
+
+	return f
+}
+
+type EventFilter struct {
+	typ       *string
+	revision  database.NumberFilter[uint16]
+	createdAt database.NumberFilter[time.Time]
+	sequence  database.NumberFilter[uint32]
+	creator   database.Condition
+}
+
+func (f *EventFilter) Type() *database.TextFilter[string] {
+	if f.typ == nil {
+		return nil
+	}
+	return database.NewTextEqual(*f.typ)
+}
+
+func (f *EventFilter) Revision() database.NumberFilter[uint16] {
+	return f.revision
+}
+
+func (f *EventFilter) CreatedAt() database.NumberFilter[time.Time] {
+	return f.createdAt
+}
+
+func (f *EventFilter) Sequence() database.NumberFilter[uint32] {
+	return f.sequence
+}
+
+func (f *EventFilter) Creator() database.Condition {
+	return f.creator
+}
+
+type EventFilterOpt func(f *EventFilter)
+
+func WithEventType(typ string) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.typ = &typ
 	}
 }
 
-func FilterPositionGreater(pos float64) filterOpt {
-	return func(f *Filter) *Filter {
-		if pos == 0 {
-			return f
-		}
-		f.Position = database.NewNumberGreater(pos)
-		return f
+func WithRevision(revision database.NumberFilter[uint16]) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.revision = revision
 	}
 }
 
-func FilterPositionAtMost(pos float64) filterOpt {
-	return func(f *Filter) *Filter {
-		if pos == 0 {
-			return f
-		}
-		f.Position = database.NewNumberAtMost(pos)
-		return f
+func WithCreatedAt(createdAt database.NumberFilter[time.Time]) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.createdAt = createdAt
 	}
 }
 
-func FilterPositionLess(pos float64) filterOpt {
-	return func(f *Filter) *Filter {
-		if pos == 0 {
-			return f
-		}
-		f.Position = database.NewNumberLess(pos)
-		return f
+func WithSequence(sequence database.NumberFilter[uint32]) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.sequence = sequence
 	}
 }
 
-func FilterPositionBetween(min, max float64) filterOpt {
-	return func(f *Filter) *Filter {
-		if min == 0 && max == 0 {
-			return f
-		}
-		f.Position = database.NewNumberBetween(min, max)
-		return f
+func WithCreator(creator string) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.creator = database.NewTextEqual(creator)
+	}
+}
+
+func WithCreatorList(cond *database.ListFilter[string]) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.creator = cond
 	}
 }

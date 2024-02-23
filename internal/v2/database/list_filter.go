@@ -7,12 +7,16 @@ type ListFilter[V value] struct {
 	list []V
 }
 
-func NewListEquals[V value](list []V) *ListFilter[V] {
+func NewListEquals[V value](list ...V) *ListFilter[V] {
 	return newListFilter[V](listEqual, list)
 }
 
-func NewListContains[V value](list []V) *ListFilter[V] {
+func NewListContains[V value](list ...V) *ListFilter[V] {
 	return newListFilter[V](listContain, list)
+}
+
+func NewListNotContains[V value](list ...V) *ListFilter[V] {
+	return newListFilter[V](listNotContain, list)
 }
 
 func newListFilter[V value](comp listCompare, list []V) *ListFilter[V] {
@@ -23,12 +27,19 @@ func newListFilter[V value](comp listCompare, list []V) *ListFilter[V] {
 }
 
 func (f ListFilter[V]) Write(stmt *Statement, columnName string) {
-	stmt.Builder.WriteString(columnName)
-	stmt.Builder.WriteRune(' ')
-	stmt.Builder.WriteString(f.comp.String())
-	stmt.Builder.WriteString(" ANY(")
+	if len(f.list) == 0 {
+		logging.WithFields("column", columnName).Debug("skip list filter because no entries defined")
+	}
+	if f.comp == listNotContain {
+		stmt.WriteString("NOT(")
+	}
+	stmt.WriteString(columnName)
+	stmt.WriteString(" = ANY(")
 	stmt.AppendArg(f.list)
-	stmt.Builder.WriteString(")")
+	stmt.WriteString(")")
+	if f.comp == listNotContain {
+		stmt.WriteRune(')')
+	}
 }
 
 type listCompare uint8
@@ -36,14 +47,5 @@ type listCompare uint8
 const (
 	listEqual listCompare = iota
 	listContain
+	listNotContain
 )
-
-func (c listCompare) String() string {
-	switch c {
-	case listEqual, listContain:
-		return "="
-	default:
-		logging.WithFields("compare", c).Panic("comparison type not implemented")
-		return ""
-	}
-}

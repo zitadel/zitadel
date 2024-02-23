@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 	"unsafe"
 )
 
@@ -165,8 +166,8 @@ func (stmt *Statement) WriteArgs(args ...any) {
 }
 
 // AppendArg appends the arg and adds the placeholder to [stmt.Builder]
-// TODO: if arg is a list the placeholder is wrapped in ANY($n)
 func (stmt *Statement) AppendArg(arg any) {
+	stmt.copyCheck()
 	if namedArg, ok := arg.(sql.NamedArg); ok {
 		stmt.writeNamedPlaceholder(namedArg)
 		return
@@ -176,7 +177,7 @@ func (stmt *Statement) AppendArg(arg any) {
 	stmt.Builder.WriteString(strconv.Itoa(len(stmt.args)))
 }
 
-// builds the query and replaces placeholders starting with "@"
+// String builds the query and replaces placeholders starting with "@"
 // with the corresponding named arg placeholder
 func (stmt *Statement) String() string {
 	query := stmt.Builder.String()
@@ -184,6 +185,35 @@ func (stmt *Statement) String() string {
 		return query
 	}
 	return strings.NewReplacer(stmt.namedArgReplaces...).Replace(query)
+}
+
+// Debug builds the statement and replaces the placeholders with the parameters
+func (stmt *Statement) Debug() string {
+	query := stmt.String()
+
+	for i := len(stmt.args) - 1; i >= 0; i-- {
+		var argText string
+		switch arg := stmt.args[i].(type) {
+		case time.Time:
+			argText = "'" + arg.Format("2006-01-02 15:04:05Z07:00") + "'"
+		case string:
+			argText = "'" + arg + "'"
+		case []string:
+			argText = "ARRAY["
+			for i, a := range arg {
+				if i > 0 {
+					argText += ", "
+				}
+				argText += "'" + a + "'"
+			}
+			argText += "]"
+		default:
+			argText = fmt.Sprint(arg)
+		}
+		query = strings.ReplaceAll(query, "$"+strconv.Itoa(i+1), argText)
+	}
+
+	return query
 }
 
 func (stmt *Statement) writeNamedPlaceholder(arg sql.NamedArg) {

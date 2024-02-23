@@ -1,64 +1,75 @@
 package database
 
 import (
+	"time"
+
 	"github.com/zitadel/logging"
 	"golang.org/x/exp/constraints"
 )
 
-type NumberFilter[N number] struct {
-	filter[numberCompare, N]
+type NumberFilter[N number] interface {
+	Condition
+	implementsNumberFilter()
 }
 
-func NewNumberEquals[N number](n N) *NumberFilter[N] {
+type NumberCondition[N number] struct {
+	Filter[numberCompare, N]
+}
+
+func NewNumberEquals[N number](n N) *NumberCondition[N] {
 	return newNumberFilter(numberEqual, n)
 }
 
-func NewNumberAtLeast[N number](n N) *NumberFilter[N] {
+func NewNumberAtLeast[N number](n N) *NumberCondition[N] {
 	return newNumberFilter(numberAtLeast, n)
 }
 
-func NewNumberAtMost[N number](n N) *NumberFilter[N] {
+func NewNumberAtMost[N number](n N) *NumberCondition[N] {
 	return newNumberFilter(numberAtMost, n)
 }
 
-func NewNumberGreater[N number](n N) *NumberFilter[N] {
+func NewNumberGreater[N number](n N) *NumberCondition[N] {
 	return newNumberFilter(numberGreater, n)
 }
 
-func NewNumberLess[N number](n N) *NumberFilter[N] {
+func NewNumberLess[N number](n N) *NumberCondition[N] {
 	return newNumberFilter(numberLess, n)
 }
 
-func NewNumberUnequal[N number](n N) *NumberFilter[N] {
+func NewNumberUnequal[N number](n N) *NumberCondition[N] {
 	return newNumberFilter(numberUnequal, n)
 }
 
-func newNumberFilter[N number](comp numberCompare, n N) *NumberFilter[N] {
-	return &NumberFilter[N]{
-		filter: filter[numberCompare, N]{
+func (NumberCondition[N]) implementsNumberFilter() {}
+
+func newNumberFilter[N number](comp numberCompare, n N) *NumberCondition[N] {
+	return &NumberCondition[N]{
+		Filter: Filter[numberCompare, N]{
 			comp:  comp,
 			value: n,
 		},
 	}
 }
 
-// NumberBetweenFilter combines [AtLeast] and [AtMost] comparisons
-type NumberBetweenFilter[N number] struct {
-	min, max *NumberFilter[N]
+// NumberBetweenCondition combines [AtLeast] and [AtMost] comparisons
+type NumberBetweenCondition[N number] struct {
+	min, max N
 }
 
-func (f NumberBetweenFilter[N]) Write(stmt *Statement, columnName string) {
-	f.min.Write(stmt, columnName)
-	stmt.Builder.WriteString(" AND ")
-	f.max.Write(stmt, columnName)
-}
-
-func NewNumberBetween[N number](min, max N) *NumberBetweenFilter[N] {
-	return &NumberBetweenFilter[N]{
-		min: newNumberFilter(numberAtLeast, min),
-		max: newNumberFilter(numberAtMost, max),
+func NewNumberBetween[N number](min, max N) *NumberBetweenCondition[N] {
+	return &NumberBetweenCondition[N]{
+		min: min,
+		max: max,
 	}
 }
+
+func (f NumberBetweenCondition[N]) Write(stmt *Statement, columnName string) {
+	NewNumberAtLeast[N](f.min).Write(stmt, columnName)
+	stmt.Builder.WriteString(" AND ")
+	NewNumberAtMost[N](f.max).Write(stmt, columnName)
+}
+
+func (NumberBetweenCondition[N]) implementsNumberFilter() {}
 
 type numberCompare uint8
 
@@ -92,5 +103,5 @@ func (c numberCompare) String() string {
 }
 
 type number interface {
-	constraints.Integer | constraints.Float
+	constraints.Integer | constraints.Float | time.Time
 }

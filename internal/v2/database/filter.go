@@ -1,20 +1,31 @@
 package database
 
-type Filter interface {
+import "database/sql"
+
+type Condition interface {
 	Write(stmt *Statement, columnName string)
 }
 
-type filter[C compare, V value] struct {
+type Filter[C compare, V value] struct {
 	comp  C
 	value V
 }
 
-func (f filter[C, V]) Write(stmt *Statement, columnName string) {
-	stmt.Builder.WriteString(columnName)
-	stmt.Builder.WriteRune(' ')
-	stmt.Builder.WriteString(f.comp.String())
-	stmt.Builder.WriteRune(' ')
+func (f Filter[C, V]) Write(stmt *Statement, columnName string) {
+	prepareWrite(stmt, columnName, f.comp)
 	stmt.AppendArg(f.value)
+}
+
+func (f Filter[C, V]) WriteNamed(stmt *Statement, columnName string) {
+	prepareWrite(stmt, columnName, f.comp)
+	stmt.AppendArg(sql.Named(columnName, f.value))
+}
+
+func prepareWrite[C compare](stmt *Statement, columnName string, comp C) {
+	stmt.WriteString(columnName)
+	stmt.WriteRune(' ')
+	stmt.WriteString(comp.String())
+	stmt.WriteRune(' ')
 }
 
 type compare interface {
