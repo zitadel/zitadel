@@ -540,6 +540,12 @@ Errors:
     NoTimeout: Target has no timeout
     InvalidURL: Target has an invalid URL
     NotFound: Target not found
+  Execution:
+    ConditionInvalid: Execution condition is invalid
+    Invalid: Execution is invalid
+    NotFound: Execution not found
+    IncludeNotFound: Include not found
+    NoTargets: No targets defined
 
 AggregateTypes:
   action: Action
@@ -552,8 +558,12 @@ AggregateTypes:
   quota: Quota
   feature: Feature
   target: Target
+  execution: Execution
 
 EventTypes:
+  execution:
+    set: Execution set
+    removed: Execution deleted
   target:
     added: Target created
     changed: Target changed
