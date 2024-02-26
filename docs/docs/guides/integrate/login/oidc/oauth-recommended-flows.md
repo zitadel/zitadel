@@ -1,36 +1,11 @@
 ---
-title: Recommended Authorization Flows
+title: Recommended authorization flows with OpenID Connect (OIDC) and OAuth 2.x
+sidebar_label: Recommended authorization flows 
 ---
-
-<table className="table-wrapper">
-<tbody>
-    <tr>
-        <td>Description</td>
-        <td>Learn about the different authentication flows and which flow we recommend you should use for your application.</td>
-    </tr>
-    <tr>
-        <td>Learning Outcomes</td>
-        <td>
-            In this module you will:
-            <ul>
-              <li>Learn the basics of federated identities</li>
-              <li>Understand the basics of OAuth 2.x client profiles and their importance for authorization flows</li>
-              <li>Get a recommended flow for Web, Native, User-Agent, and API</li>
-            </ul>
-        </td>
-    </tr>
-     <tr>
-        <td>Prerequisites</td>
-        <td>
-            Basic knowledge about federated identities
-        </td>
-    </tr>
-    </tbody>
-</table>
 
 ## Introduction
 
-Before we get into setting up our first application within ZITADEL, we need to go through some basics on how to obtain an authorization with OpenID Connect 1.x and OAuth 2.x.
+In this guide we will go over some basics on how to obtain an authorization with OpenID Connect 1.x and OAuth 2.x.
 
 ZITADEL does not make assumptions about the application type you are about to integrate. Therefore you must qualify and define an appropriate method for your users to gain authorization to access your application (“authentication flow”). Your choice depends on the application’s ability to maintain the confidentiality of client credentials and the technological capabilities of your application. If you choose a deprecated or unfeasible flow to obtain authorization for your application, your users’ credentials may be compromised.
 
@@ -126,16 +101,3 @@ If you don’t have any technical limitations, you should prefer this method ove
 A JWT with a private key can also be used with client profile web to further enhance security.
 
 In case you need alternative flows and their advantages and drawbacks, there will be a module to outline more methods and our recommended fallback strategy per client profile that are available in ZITADEL.
-
-## Summary (3)
-
-- Federated Identities solve key problems and challenges with traditional server-client architecture
-- Use “Authorization Code with Proof Key of Code Exchange (PKCE)” for User-Agent, Native, and Web clients
-- “JWT bearer token with private key” for Machine-to-Machine clients
-- There are alternative flows and fallback strategies supported by ZITADEL, if these flows are technically not possible
-
-### Where to go from here
-
-- Applications
-- Service Accounts
-- Alternative authentication flows (aka. "The Zoo")
