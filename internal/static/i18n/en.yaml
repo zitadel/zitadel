@@ -560,7 +560,7 @@ EventTypes:
     removed: Target deleted
   user:
     added: User added
-    selfregistered: User registered
+    selfregistered: User registered themself
     initialization:
       code:
         added: Initialization code generated
