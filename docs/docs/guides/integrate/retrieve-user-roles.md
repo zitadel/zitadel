@@ -31,7 +31,7 @@ You must first of all generate a token for the user. If it’s a human user, he 
 
 How to generate a token: 
 
-- [Generate tokens for human users](/docs/guides/integrate/login-users)
+- [Generate tokens for human users](/docs/guides/integrate/login/oidc/login-users)
 - [Generate tokens for service users](/docs/guides/integrate/serviceusers)
 
 In order to access role information via the token you must include the right audience and the necessary role claims in the scope and/or select the required role settings in the ZITADEL console before requesting the token. 
