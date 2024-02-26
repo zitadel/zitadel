@@ -15,7 +15,7 @@ With this example configuration, you create a near production environment for ZI
 The stack consists of three long-running containers:
 - A [Traefik](https://doc.traefik.io/traefik/) reverse proxy with upstream HTTP/2 enabled, issuing a self-signed TLS certificate.
 - A secure ZITADEL container configured for a custom domain. As we terminate TLS with Traefik, we configure ZITADEL for `--tlsMode external`.
-- A secure [CockroachDB](https://www.cockroachlabs.com/docs/stable/).
+- An insecure [PostgreSQL](https://www.postgresql.org/docs/current/index.html).
 
 The setup is tested against Docker version 20.10.17 and Docker Compose version v2.2.3
 
@@ -70,7 +70,7 @@ This is the IAM admin users login according to your configuration in the [exampl
 - **username**: *root@<span></span>my-org.my.domain*
 - **password**: *RootPassword1!*
 
-Read more about [the login process](/guides/integrate/login-users).
+Read more about [the login process](/guides/integrate/login/oidc/login-users).
 
 <NoteInstanceNotFound/>
 
