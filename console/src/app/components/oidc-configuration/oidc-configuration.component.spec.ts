@@ -8,7 +8,7 @@ describe('QuickstartComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [QuickstartComponent]
+      declarations: [QuickstartComponent],
     });
     fixture = TestBed.createComponent(QuickstartComponent);
     component = fixture.componentInstance;
