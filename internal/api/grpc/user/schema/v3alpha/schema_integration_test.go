@@ -168,7 +168,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "with authenticator. ok",
+			name: "with authenticator, ok",
 			ctx:  CTX,
 			req: &schema.CreateUserSchemaRequest{
 				Type: fmt.Sprint(time.Now().UnixNano() + 1),
@@ -184,6 +184,80 @@ func TestServer_CreateUserSchema(t *testing.T) {
 									},
 									"description": {
 										"type": "string"
+									}
+								},
+								"required": ["name"]
+							}
+						`))
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+				PossibleAuthenticators: []schema.AuthenticatorType{
+					schema.AuthenticatorType_AUTHENTICATOR_TYPE_USERNAME,
+				},
+			},
+			want: &schema.CreateUserSchemaResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Instance.InstanceID(),
+				},
+			},
+		},
+		{
+			name: "with invalid permission, error",
+			ctx:  CTX,
+			req: &schema.CreateUserSchemaRequest{
+				Type: fmt.Sprint(time.Now().UnixNano() + 1),
+				DataType: &schema.CreateUserSchemaRequest_Schema{
+					Schema: func() *structpb.Struct {
+						s := new(structpb.Struct)
+						err := s.UnmarshalJSON([]byte(`
+							{
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									},
+									"description": {
+										"type": "string",
+										"urn:zitadel:schema:permission": "read"
+									}
+								},
+								"required": ["name"]
+							}
+						`))
+						require.NoError(t, err)
+						return s
+					}(),
+				},
+				PossibleAuthenticators: []schema.AuthenticatorType{
+					schema.AuthenticatorType_AUTHENTICATOR_TYPE_USERNAME,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "with valid permission, ok",
+			ctx:  CTX,
+			req: &schema.CreateUserSchemaRequest{
+				Type: fmt.Sprint(time.Now().UnixNano() + 1),
+				DataType: &schema.CreateUserSchemaRequest_Schema{
+					Schema: func() *structpb.Struct {
+						s := new(structpb.Struct)
+						err := s.UnmarshalJSON([]byte(`
+							{
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									},
+									"description": {
+										"type": "string",
+										"urn:zitadel:schema:permission": {
+											"owner": "rw",
+											"self": "r"
+										}
 									}
 								},
 								"required": ["name"]
