@@ -599,7 +599,7 @@ EventTypes:
           failed: Secret check failed
     human:
       added: Person added
-      selfregistered: Person registered
+      selfregistered: Person registered themself
       avatar:
         added: Avatar added
         removed: Avatar removed
