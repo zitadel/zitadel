@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-//go:embed zitadel.schema.json
+//go:embed zitadel.schema.v1.json
 var zitadelJSON string
 
 func TestPermissionExtension(t *testing.T) {
@@ -57,7 +57,7 @@ func TestPermissionExtension(t *testing.T) {
 								"name": {
 									"type": "string",
 									"urn:zitadel:schema:permission": {
-										"admin": "read"
+										"self": "read"
 									}
 								}
 							}
@@ -76,7 +76,7 @@ func TestPermissionExtension(t *testing.T) {
 								"name": {
 									"type": "string",
 									"urn:zitadel:schema:permission": {
-										"admin": true
+										"owner": true
 									}
 								}
 							}
@@ -87,7 +87,26 @@ func TestPermissionExtension(t *testing.T) {
 			},
 		},
 		{
-			"invalid permission, validation err",
+			"invalid role, compilation err",
+			args{
+				schema: `{
+							"type": "object",
+							"properties": {
+								"name": {
+									"type": "string",
+									"urn:zitadel:schema:permission": {
+										"IAM_OWNER": "rw"
+									}
+								}
+							}
+						}`,
+			},
+			want{
+				compilationErr: zerrors.ThrowInvalidArgument(nil, "SCHEMA-GFjio", "invalid permission role"),
+			},
+		},
+		{
+			"invalid permission self, validation err",
 			args{
 				role: roleSelf,
 				schema: `{
@@ -96,7 +115,7 @@ func TestPermissionExtension(t *testing.T) {
 								"name": {
 									"type": "string",
 									"urn:zitadel:schema:permission": {
-										"admin": "rw",
+										"owner": "rw",
 										"self": "r"
 									}
 								}
@@ -109,16 +128,60 @@ func TestPermissionExtension(t *testing.T) {
 			},
 		},
 		{
-			"valid permission, ok",
+			"invalid permission owner, validation err",
 			args{
-				role: roleAdmin,
+				role: roleOwner,
 				schema: `{
 							"type": "object",
 							"properties": {
 								"name": {
 									"type": "string",
 									"urn:zitadel:schema:permission": {
-										"admin": "rw",
+										"owner": "r",
+										"self": "r"
+									}
+								}
+							}
+						}`,
+				instance: `{ "name": "test"}`,
+			},
+			want{
+				validationErr: true,
+			},
+		},
+		{
+			"valid permission self, ok",
+			args{
+				role: roleSelf,
+				schema: `{
+							"type": "object",
+							"properties": {
+								"name": {
+									"type": "string",
+									"urn:zitadel:schema:permission": {
+										"owner": "r",
+										"self": "rw"
+									}
+								}
+							}
+						}`,
+				instance: `{ "name": "test"}`,
+			},
+			want{
+				validationErr: false,
+			},
+		},
+		{
+			"valid permission owner, ok",
+			args{
+				role: roleOwner,
+				schema: `{
+							"type": "object",
+							"properties": {
+								"name": {
+									"type": "string",
+									"urn:zitadel:schema:permission": {
+										"owner": "rw",
 										"self": "r"
 									}
 								}
@@ -131,7 +194,29 @@ func TestPermissionExtension(t *testing.T) {
 			},
 		},
 		{
-			"no permission, ok",
+			"no role, validation err",
+			args{
+				role: roleUnspecified,
+				schema: `{
+							"type": "object",
+							"properties": {
+								"name": {
+									"type": "string",
+									"urn:zitadel:schema:permission": {
+										"owner": "rw",
+										"self": "rw"
+									}
+								}
+							}
+						}`,
+				instance: `{ "name": "test"}`,
+			},
+			want{
+				validationErr: true,
+			},
+		},
+		{
+			"no permission required, ok",
 			args{
 				role: roleSelf,
 				schema: `{
@@ -152,11 +237,11 @@ func TestPermissionExtension(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := jsonschema.NewCompiler()
-			err := c.AddResource("urn:zitadel:schema:permission-schema", strings.NewReader(permissionJSON))
+			err := c.AddResource("urn:zitadel:schema:permission-schema:v1", strings.NewReader(permissionJSON))
 			require.NoError(t, err)
-			err = c.AddResource("urn:zitadel:schema", strings.NewReader(zitadelJSON))
+			err = c.AddResource("urn:zitadel:schema:v1", strings.NewReader(zitadelJSON))
 			require.NoError(t, err)
-			c.RegisterExtension("urn:zitadel:schema:permission-schema", permissionMeta, permissionExtension{
+			c.RegisterExtension("urn:zitadel:schema:permission-schema:v1", permissionSchema, permissionExtension{
 				tt.args.role,
 			})
 			err = c.AddResource("schema.json", strings.NewReader(tt.args.schema))

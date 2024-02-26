@@ -8,25 +8,34 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-//go:embed permission.schema.json
-var permissionJSON string
+var (
+	//go:embed permission.schema.v1.json
+	permissionJSON string
 
-var permissionMeta = jsonschema.MustCompileString("urn:zitadel:schema:permission-schema", permissionJSON)
+	permissionSchema = jsonschema.MustCompileString(permissionSchemaID, permissionJSON)
+)
+
+const (
+	permissionSchemaID = "urn:zitadel:schema:permission-schema:v1"
+	permissionProperty = "urn:zitadel:schema:permission"
+)
 
 type role int32
 
 const (
 	roleUnspecified role = iota
 	roleSelf
-	roleAdmin
+	roleOwner
 )
 
 type permissionExtension struct {
 	role role
 }
 
+// Compile implements the [jsonschema.ExtCompiler] interface.
+// It parses the permission schema extension / annotation of the passed field.
 func (c permissionExtension) Compile(ctx jsonschema.CompilerContext, m map[string]interface{}) (_ jsonschema.ExtSchema, err error) {
-	perm, ok := m["urn:zitadel:schema:permission"]
+	perm, ok := m[permissionProperty]
 	if !ok {
 		return nil, nil
 	}
@@ -42,13 +51,13 @@ func (c permissionExtension) Compile(ctx jsonschema.CompilerContext, m map[strin
 			if err != nil {
 				return
 			}
-		case "admin":
-			perms.admin, err = mapPermission(value)
+		case "owner":
+			perms.owner, err = mapPermission(value)
 			if err != nil {
 				return
 			}
 		default:
-			return nil, zerrors.ThrowInvalidArgument(nil, "SCHEMA-GFjio", "invalid permission")
+			return nil, zerrors.ThrowInvalidArgument(nil, "SCHEMA-GFjio", "invalid permission role")
 		}
 	}
 	return permissionExtensionConfig{c.role, perms}, nil
@@ -59,6 +68,8 @@ type permissionExtensionConfig struct {
 	permissions *permissions
 }
 
+// Validate implements the [jsonschema.ExtSchema] interface.
+// It validates the fields of the json instance according to the permission schema.
 func (s permissionExtensionConfig) Validate(ctx jsonschema.ValidationContext, v interface{}) error {
 	switch s.role {
 	case roleSelf:
@@ -66,11 +77,13 @@ func (s permissionExtensionConfig) Validate(ctx jsonschema.ValidationContext, v 
 			return ctx.Error("permission", "missing required permission")
 		}
 		return nil
-	case roleAdmin:
-		if s.permissions.admin == nil || !s.permissions.admin.write {
+	case roleOwner:
+		if s.permissions.owner == nil || !s.permissions.owner.write {
 			return ctx.Error("permission", "missing required permission")
 		}
 		return nil
+	case roleUnspecified:
+		fallthrough
 	default:
 		return ctx.Error("permission", "missing required permission")
 	}
@@ -98,7 +111,7 @@ func mapPermission(value any) (*permission, error) {
 
 type permissions struct {
 	self  *permission
-	admin *permission
+	owner *permission
 }
 
 type permission struct {

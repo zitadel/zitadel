@@ -1,5 +1,5 @@
 {
-  "$id": "urn:zitadel:schema",
+  "$id": "urn:zitadel:schema:v1",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "allOf": [
@@ -7,7 +7,7 @@
       "$ref": "https://json-schema.org/draft/2020-12/schema"
     },
     {
-      "$ref": "urn:zitadel:schema:permission-schema"
+      "$ref": "urn:zitadel:schema:permission-schema:v1"
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "$id": "urn:zitadel:schema:permission-schema",
+  "$id": "urn:zitadel:schema:permission-schema:v1",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$defs": {
     "urn:zitadel:schema:property-permission": {
@@ -16,7 +16,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "admin": {
+        "owner": {
           "$ref": "#/$defs/urn:zitadel:schema:property-permission"
         },
         "self": {
