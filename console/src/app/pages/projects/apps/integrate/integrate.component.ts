@@ -150,7 +150,7 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
       .then((resp) => {
         this.loading = false;
         this.toast.showInfo('APP.TOAST.CREATED', true);
-        if (resp.clientId || resp.clientSecret) {
+        if (resp.clientSecret) {
           this.showSavedDialog(resp);
         } else {
           this.router.navigate(['projects', this.projectId, 'apps', resp.appId], { queryParams: { new: true } });

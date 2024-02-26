@@ -6,6 +6,7 @@ import frameworkDefinition from '../../../../../docs/frameworks.json';
 import { MatButtonModule } from '@angular/material/button';
 import { listFrameworks, hasFramework, getFramework } from '@netlify/framework-info';
 import { FrameworkName } from '@netlify/framework-info/lib/generated/frameworkNames';
+import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
 
 export type FrameworkDefinition = {
   id?: FrameworkName | string;
@@ -30,7 +31,7 @@ export type Framework = FrameworkDefinition & {
 })
 export class QuickstartComponent {
   public frameworks: FrameworkDefinition[] = frameworkDefinition
-    .filter((f) => f.id)
+    .filter((f) => f.id && OIDC_CONFIGURATIONS[f.id])
     .map((f) => {
       return {
         ...f,

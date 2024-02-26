@@ -74,12 +74,6 @@
                 {{ 'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate }}
               </span>
             </cnsl-info-section>
-            <p
-              class="step-description cnsl-secondary-text"
-              *ngIf="(oidcAppRequest | async)?.toObject()?.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
-            >
-              {{ 'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate }}
-            </p>
 
             <cnsl-redirect-uris
               *ngIf="requestRedirectValuesSubject$"
@@ -93,8 +87,6 @@
               data-e2e="redirect-uris"
             >
             </cnsl-redirect-uris>
-
-            <!-- <p class="redirect-p">{{ 'APP.OIDC.POSTREDIRECTTITLE' | translate }}</p> -->
 
             <cnsl-redirect-uris
               *ngIf="requestRedirectValuesSubject$"

@@ -125,6 +125,10 @@ h1 {
         border-top: 2px solid $border-color;
       }
     }
+
+    a {
+      color: $primary-color;
+    }
   }
 
   .framework-card-wrapper {

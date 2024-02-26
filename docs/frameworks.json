@@ -19,6 +19,7 @@
     "docsLink": "/docs/sdk-examples/go"
   },
   {
+    "id": "java",
     "title": "Java",
     "imgSrcDark": "/docs/img/tech/java.svg",
     "docsLink": "/docs/sdk-examples/java"
@@ -36,6 +37,7 @@
     "docsLink": "/docs/sdk-examples/nextjs"
   },
   {
+    "id": "django",
     "title": "Python Django",
     "imgSrcDark": "/docs/img/tech/django.png",
     "docsLink": "/docs/sdk-examples/python-django"
@@ -47,6 +49,7 @@
     "docsLink": "/docs/sdk-examples/python-flask"
   },
   {
+    "id": "react",
     "title": "React",
     "imgSrcDark": "/docs/img/tech/react.png",
     "docsLink": "/docs/sdk-examples/react"
@@ -57,6 +60,7 @@
     "docsLink": "/docs/sdk-examples/symfony"
   },
   {
+    "id": "vue",
     "title": "Vue.js",
     "imgSrcDark": "/docs/img/tech/vue.svg",
     "docsLink": "/docs/sdk-examples/vue"

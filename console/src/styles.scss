@@ -410,10 +410,6 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   --mat-table-row-item-label-text-size: 14px;
   --mat-menu-item-label-text-size: 14px;
 
-  a {
-    color: map-get($primary, 500);
-  }
-
   .progress {
     --mdc-linear-progress-track-color: #00000010;
     --mdc-linear-progress-active-indicator-color: var(--success);
@@ -491,10 +487,6 @@ $caos-dark-app-theme: modify-palette($caos-dark-app-theme, foreground, $cnsl-dar
   --mat-select-enabled-trigger-text-color: #fff;
   --mat-table-row-item-label-text-size: 14px;
   --mat-menu-item-label-text-size: 14px;
-
-  a {
-    color: map-get($primary, 400);
-  }
 
   .progress {
     --mdc-linear-progress-track-color: #ffffff20;
