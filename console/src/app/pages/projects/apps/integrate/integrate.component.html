@@ -43,8 +43,9 @@
         <div class="card-wrapper">
           <cnsl-card class="review-card" title="{{ 'QUICKSTART.REVIEWCONFIGURATION' | translate }}">
             <cnsl-oidc-app-configuration
+              *ngIf="(oidcAppRequest | async)?.toObject() as config"
               [name]="framework()?.title"
-              [configuration]="oidcAppRequest().toObject()"
+              [configuration]="config"
             ></cnsl-oidc-app-configuration>
 
             <cnsl-info-section *ngIf="framework()?.description as desc" [type]="InfoSectionType.INFO">
@@ -54,11 +55,28 @@
             </cnsl-info-section>
           </cnsl-card>
 
-          <cnsl-card title="{{ 'QUICKSTART.REDIRECTS' | translate }}">
-            <p class="redirect-p">{{ 'APP.OIDC.REDIRECTTITLE' | translate }}</p>
+          <cnsl-card
+            title="{{ 'QUICKSTART.REDIRECTS' | translate }}"
+            description="{{ 'APP.OIDC.REDIRECTTITLE' | translate }}"
+          >
+            <cnsl-info-section *ngIf="(oidcAppRequest | async)?.toObject()?.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE">
+              <span class="redirect-description">
+                {{ 'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate }}
+              </span>
+            </cnsl-info-section>
+            <cnsl-info-section
+              *ngIf="
+                (oidcAppRequest | async)?.toObject()?.appType === OIDCAppType.OIDC_APP_TYPE_WEB ||
+                (oidcAppRequest | async)?.toObject()?.appType === OIDCAppType.OIDC_APP_TYPE_USER_AGENT
+              "
+            >
+              <span class="redirect-description">
+                {{ 'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate }}
+              </span>
+            </cnsl-info-section>
             <p
               class="step-description cnsl-secondary-text"
-              *ngIf="oidcAppRequest().toObject().appType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+              *ngIf="(oidcAppRequest | async)?.toObject()?.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
             >
               {{ 'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate }}
             </p>
@@ -67,7 +85,7 @@
               *ngIf="requestRedirectValuesSubject$"
               class="redirect-section"
               [disabled]="false"
-              [isNative]="oidcAppRequest().toObject().appType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+              [isNative]="(oidcAppRequest | async)?.toObject()?.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
               [(ngModel)]="redirectUris"
               [getValues]="requestRedirectValuesSubject$"
               title="{{ 'APP.OIDC.REDIRECT' | translate }}"
@@ -76,22 +94,7 @@
             >
             </cnsl-redirect-uris>
 
-            <p class="redirect-p">{{ 'APP.OIDC.POSTREDIRECTTITLE' | translate }}</p>
-            <cnsl-info-section *ngIf="oidcAppRequest().toObject().appType === OIDCAppType.OIDC_APP_TYPE_NATIVE">
-              <span class="redirect-description">
-                {{ 'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate }}
-              </span>
-            </cnsl-info-section>
-            <cnsl-info-section
-              *ngIf="
-                oidcAppRequest().toObject().appType === OIDCAppType.OIDC_APP_TYPE_WEB ||
-                oidcAppRequest().toObject().appType === OIDCAppType.OIDC_APP_TYPE_USER_AGENT
-              "
-            >
-              <span class="redirect-description">
-                {{ 'APP.OIDC.REDIRECTDESCRIPTIONWEB' | translate }}
-              </span>
-            </cnsl-info-section>
+            <!-- <p class="redirect-p">{{ 'APP.OIDC.POSTREDIRECTTITLE' | translate }}</p> -->
 
             <cnsl-redirect-uris
               *ngIf="requestRedirectValuesSubject$"
@@ -100,7 +103,7 @@
               [(ngModel)]="postLogoutUrisList"
               [getValues]="requestRedirectValuesSubject$"
               title="{{ 'APP.OIDC.POSTLOGOUTREDIRECT' | translate }}"
-              [isNative]="oidcAppRequest().toObject().appType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
+              [isNative]="(oidcAppRequest | async)?.toObject()?.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE"
               [devMode]="true"
               data-e2e="postlogout-uris"
             >

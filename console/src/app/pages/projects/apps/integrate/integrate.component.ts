@@ -6,7 +6,7 @@ import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGro
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Buffer } from 'buffer';
-import { Subject, Subscription, combineLatest } from 'rxjs';
+import { BehaviorSubject, Subject, Subscription, combineLatest } from 'rxjs';
 import { debounceTime, map, takeUntil } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import { requiredValidator } from 'src/app/modules/form-field/validators/validators';
@@ -57,7 +57,7 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
   public loading: boolean = false;
   public InfoSectionType: any = InfoSectionType;
   public framework = signal<Framework | undefined>(undefined);
-  public oidcAppRequest = signal<AddOIDCAppRequest>(new AddOIDCAppRequest());
+  public oidcAppRequest: BehaviorSubject<AddOIDCAppRequest> = new BehaviorSubject(new AddOIDCAppRequest());
 
   public OIDCAppType: any = OIDCAppType;
   public requestRedirectValuesSubject$: Subject<void> = new Subject();
@@ -81,9 +81,14 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
         request.setName(fw.title);
         request.setDevMode(true);
         this.requestRedirectValuesSubject$.next();
+
+        console.log(request.toObject());
+        this.oidcAppRequest.next(request);
         return request;
       } else {
-        return new AddOIDCAppRequest();
+        const request = new AddOIDCAppRequest();
+        this.oidcAppRequest.next(request);
+        return request;
       }
     });
   }
@@ -101,7 +106,6 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
   );
 
   public setFramework(framework: Framework | undefined) {
-    console.log(framework);
     this.framework.set(framework);
   }
 
@@ -142,7 +146,7 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
 
     this.loading = true;
     this.mgmtService
-      .addOIDCApp(this.oidcAppRequest())
+      .addOIDCApp(this.oidcAppRequest.getValue())
       .then((resp) => {
         this.loading = false;
         this.toast.showInfo('APP.TOAST.CREATED', true);
@@ -180,22 +184,22 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
   }
 
   public get redirectUris() {
-    return this.oidcAppRequest().toObject().redirectUrisList;
+    return this.oidcAppRequest.getValue().toObject().redirectUrisList;
   }
 
   public set redirectUris(value: string[]) {
-    const request = this.oidcAppRequest();
+    const request = this.oidcAppRequest.getValue();
     request.setRedirectUrisList(value);
-    this.oidcAppRequest.set(request);
+    this.oidcAppRequest.next(request);
   }
 
   public get postLogoutUrisList() {
-    return this.oidcAppRequest().toObject().postLogoutRedirectUrisList;
+    return this.oidcAppRequest.getValue().toObject().postLogoutRedirectUrisList;
   }
 
   public set postLogoutUrisList(value: string[]) {
-    const request = this.oidcAppRequest();
+    const request = this.oidcAppRequest.getValue();
     request.setPostLogoutRedirectUrisList(value);
-    this.oidcAppRequest.set(request);
+    this.oidcAppRequest.next(request);
   }
 }
