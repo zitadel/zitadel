@@ -119,6 +119,25 @@
     "SETTINGS": "Einstellungen",
     "CUSTOMERPORTAL": "Kundenportal"
   },
+  "QUICKSTART": {
+    "TITEL": "Integriere ZITADEL in deine Anwendung",
+    "DESCRIPTION": "Integriere ZITADEL in deine Anwendung oder verwende eines unserer Beispiele, um in wenigen Minuten loszulegen.",
+    "BTN_START": "Anwendung erstellen",
+    "BTN_LEARNMORE": "Mehr erfahren",
+    "CREATEPROJECTFORAPP": "Projekt erstellen {{value}}",
+    "SELECT_FRAMEWORK": "Framework auswählen",
+    "FRAMEWORK": "Framework",
+    "ALMOSTDONE": "Wir sind fast fertig.",
+    "REVIEWCONFIGURATION": "Konfiguration überprüfen",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Wir haben eine Grundkonfiguration für {{wert}}-Anwendungen erstellt. Du kannst diese Konfiguration nach der Erstellung an deine Bedürfnisse anpassen.",
+    "REDIRECTS": "Redirects konfigurieren",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Framework ändern",
+        "DESCRIPTION": "Wähle eines der verfügbaren Frameworks für die schnelle Einrichtung deiner Anwendung."
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "Aktionen",
     "FILTER": "Filter",
@@ -138,6 +157,7 @@
     "ADD": "Hinzufügen",
     "CREATE": "Erstellen",
     "CONTINUE": "Weiter",
+    "CONTINUEWITH": "Mit {{value}} fortfahren",
     "BACK": "Zurück",
     "CLOSE": "Schliessen",
     "CLEAR": "Zurücksetzen",

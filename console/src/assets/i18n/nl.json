@@ -119,6 +119,25 @@
     "SETTINGS": "Instellingen",
     "CUSTOMERPORTAL": "Klantenportaal"
   },
+  "QUICKSTART": {
+    "TITLE": "Integreer ZITADEL in uw toepassing",
+    "DESCRIPTION": "Integreer ZITADEL in uw toepassing of gebruik een van onze voorbeelden om binnen enkele minuten aan de slag te gaan.",
+    "BTN_START": "Applicatie maken",
+    "BTN_LEARNMORE": "Meer informatie",
+    "CREATEPROJECTFORAPP": "Creëer Project {{value}}",
+    "SELECT_FRAMEWORK": "Kies Framework",
+    "FRAMEWORK": "Framework",
+    "ALMOSTDONE": "Je bent bijna klaar",
+    "REVIEWCONFIGURATION": "Reviewconfiguratie",
+    "REVIEWCONFIGURATION_DESCRIPTION": "We hebben een basisconfiguratie gemaakt voor {{value}} toepassingen. Je kunt deze configuratie na het aanmaken aanpassen aan je behoeften.",
+    "REDIRECTS": "Configureer omleidingen",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Verander Framework",
+        "DESCRIPTION": "Kies een van de beschikbare frameworks voor het snel instellen van je applicatie."
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "Acties",
     "FILTER": "Filter",
@@ -138,6 +157,7 @@
     "ADD": "Toevoegen",
     "CREATE": "Aanmaken",
     "CONTINUE": "Doorgaan",
+    "CONTINUEWITH": "Ga verder met {{value}}",
     "BACK": "Terug",
     "CLOSE": "Sluiten",
     "CLEAR": "Leegmaken",

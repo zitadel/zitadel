@@ -119,6 +119,25 @@
     "SETTINGS": "Ajustes",
     "CUSTOMERPORTAL": "Portal del cliente"
   },
+  "QUICKSTART": {
+    "TITLE": "Integra ZITADEL en tu aplicación",
+    "DESCRIPTION": "Integra ZITADEL en tu aplicación o utiliza uno de nuestros ejemplos para empezar en cuestión de minutos",
+    "BTN_START": "Crear aplicación",
+    "BTN_LEARNMORE": "Aprende más",
+    "CREATEPROJECTFORAPP": "Crear proyecto {{value}}",
+    "SELECT_FRAMEWORK": "Seleccionar marco",
+    "FRAMEWORK": "Framework",
+    "ALMOSTDONE": "Ya casi has terminado",
+    "REVIEWCONFIGURATION": "Configuración de revisión",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Hemos creado una configuración básica para aplicaciones {{value}}. Puedes adaptar esta configuración a tus necesidades después de crearla.",
+    "REDIRECTS": "Configurar redirecciones",
+    "DIALOG": {
+      "CAMBIAR": {
+        "TITLE": "Cambio framework",
+        "DESCRIPTION": "Elige uno de los frameworks disponibles para configurar rápidamente tu aplicación."
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "Acciones",
     "FILTER": "Filtrar",
@@ -138,6 +157,7 @@
     "ADD": "Añadir",
     "CREATE": "Crear",
     "CONTINUE": "Continuar",
+    "CONTINUEWITH": "Continuar con {{value}}",
     "BACK": "Atrás",
     "CLOSE": "Cerrar",
     "CLEAR": "Limpiar",

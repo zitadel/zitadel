@@ -119,6 +119,25 @@
     "SETTINGS": "Nastavení",
     "CUSTOMERPORTAL": "Zákaznický portál"
   },
+  "QUICKSTART": {
+    "TITLE": "Integrovat ZITADEL do vaší aplikace",
+    "DESCRIPTION": "Integrujte ZITADEL do své aplikace nebo použijte některou z našich ukázek a začněte během několika minut.",
+    "BTN_START": "Vytvořit aplikaci",
+    "BTN_LEARNMORE": "Zjistěte více",
+    "CREATEPROJECTFORAPP": "Vytvořit projekt {{value}}",
+    "SELECT_FRAMEWORK": "Vybrat framework",
+    "FRAMEWORK": "Framework",
+    "ALMOSTDONE": "Jste téměř hotovi.",
+    "REVIEWCONFIGURATION": "Přezkoumání konfigurace",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Vytvořili jsme základní konfiguraci pro {{hodnota}} aplikace. Tuto konfiguraci můžete po vytvoření přizpůsobit svým potřebám.",
+    "REDIRECTS": "Konfigurace přesměrování",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Rámec změn",
+        "DESCRIPTION": "Vyberte si jeden z dostupných frameworků pro rychlé nastavení vaší aplikace."
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "Akce",
     "FILTER": "Filtr",
@@ -138,6 +157,7 @@
     "ADD": "Přidat",
     "CREATE": "Vytvořit",
     "CONTINUE": "Pokračovat",
+    "CONTINUEWITH": "Pokračovat s {{value}}",
     "BACK": "Zpět",
     "CLOSE": "Zavřít",
     "CLEAR": "Vyčistit",

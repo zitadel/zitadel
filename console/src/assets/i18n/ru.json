@@ -115,6 +115,25 @@
     "SETTINGS": "Настройки",
     "CUSTOMERPORTAL": "Клиентский портал"
   },
+  "QUICKSTART": {
+    "TITLE": "Integrați ZITADEL în aplicația dumneavoastră",
+    "DESCRIPTION": "Integrați ZITADEL în aplicația dvs. sau utilizați unul dintre exemplele noastre pentru a începe în câteva minute.",
+    "BTN_START": "Creați o aplicație",
+    "BTN_LEARNMORE": "Aflați mai mult",
+    "CREATEPROJECTFORAPP": "Creați un proiect {{value}}",
+    "SELECT_FRAMEWORK": "Selectați cadrul",
+    "FRAMEWORK": "Cadru",
+    "ALMOSTDONE": "Aproape ați terminat",
+    "REVIEWCONFIGURATION": "Revizuirea configurației",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Am creat o configurație de bază pentru aplicațiile {{valoare}}. Puteți adapta această configurație în funcție de nevoile dvs. după creare.",
+    "REDIRECTS": "Configurați redirecționările",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Cadrul de schimbare",
+        "DESCRIPTION": "Alegeți unul dintre cadrele disponibile pentru o configurare rapidă a aplicației dvs."
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "Действия",
     "FILTER": "Фильтр",
@@ -134,6 +153,7 @@
     "ADD": "Добавить",
     "CREATE": "Создать",
     "CONTINUE": "Продолжить",
+    "CONTINUEWITH": "Продолжить с {{value}}",
     "BACK": "Назад",
     "CLOSE": "Закрыть",
     "CLEAR": "Очистить",

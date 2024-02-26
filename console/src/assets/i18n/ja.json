@@ -119,6 +119,25 @@
     "SETTINGS": "設定",
     "CUSTOMERPORTAL": "カスタマーポータル"
   },
+  "QUICKSTART": {
+    "TITLE": "ZITADELをアプリケーションに統合する",
+    "DESCRIPTION": "あなたのアプリケーションにZITADELを組み込むか、当社のサンプルを使って数分で始められます。",
+    "BTN_START": "アプリケーションの作成",
+    "BTN_LEARNMORE": "さらに詳しく",
+    "CREATEPROJECTFORAPP": "プロジェクトの作成 {{value}}",
+    "SELECT_FRAMEWORK": "フレームワークを選択",
+    "FRAMEWORK": "フレームワーク",
+    "ALMOSTDONE": "あと少しだ。",
+    "REVIEWCONFIGURATION": "レビュー構成",
+    "REVIEWCONFIGURATION_DESCRIPTION": "ここでは{{value}}アプリケーションの基本設定を作成しました。この構成は作成後にあなたのニーズに合わせることができます。",
+    "REDIRECTS": "リダイレクトの設定",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "変更の枠組み",
+        "DESCRIPTION": "利用可能なフレームワークのいずれかを選択して、アプリケーションをすばやくセットアップできます。"
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "アクション",
     "FILTER": "絞り込み",
@@ -138,6 +157,7 @@
     "ADD": "追加",
     "CREATE": "作成",
     "CONTINUE": "次へ",
+    "CONTINUEWITH": "{{value}} に進みます",
     "BACK": "戻る",
     "CLOSE": "閉じる",
     "CLEAR": "消去する",
