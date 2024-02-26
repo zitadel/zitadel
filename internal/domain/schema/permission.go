@@ -30,30 +30,28 @@ func (c permissionExtension) Compile(ctx jsonschema.CompilerContext, m map[strin
 	if !ok {
 		return nil, nil
 	}
-	switch p := perm.(type) {
-	case map[string]interface{}:
-		perms := new(permissions)
-		for key, value := range p {
-			switch key {
-			case "self":
-				perms.self, err = mapPermission(value)
-				if err != nil {
-					return
-				}
-			case "admin":
-				perms.admin, err = mapPermission(value)
-				if err != nil {
-					return
-				}
-			default:
-				return nil, zerrors.ThrowInvalidArgument(nil, "SCHEMA-GFjio", "invalid permission")
-			}
-		}
-		return permissionExtensionConfig{c.role, perms}, nil
+	p, ok := perm.(map[string]interface{})
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgument(nil, "SCHEMA-WR5gs", "invalid permission")
 	}
-
-	// nothing to compile, return nil
-	return nil, nil
+	perms := new(permissions)
+	for key, value := range p {
+		switch key {
+		case "self":
+			perms.self, err = mapPermission(value)
+			if err != nil {
+				return
+			}
+		case "admin":
+			perms.admin, err = mapPermission(value)
+			if err != nil {
+				return
+			}
+		default:
+			return nil, zerrors.ThrowInvalidArgument(nil, "SCHEMA-GFjio", "invalid permission")
+		}
+	}
+	return permissionExtensionConfig{c.role, perms}, nil
 }
 
 type permissionExtensionConfig struct {

@@ -32,6 +32,23 @@ func TestPermissionExtension(t *testing.T) {
 		want want
 	}{
 		{
+			"invalid permission, compilation err",
+			args{
+				schema: `{
+							"type": "object",
+							"properties": {
+								"name": {
+									"type": "string",
+									"urn:zitadel:schema:permission": "read"
+								}
+							}
+						}`,
+			},
+			want{
+				compilationErr: zerrors.ThrowInvalidArgument(nil, "SCHEMA-WR5gs", "invalid permission"),
+			},
+		},
+		{
 			"invalid permission string, compilation err",
 			args{
 				schema: `{
