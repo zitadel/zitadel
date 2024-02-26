@@ -11,7 +11,7 @@ Besides federated authentication with OpenID Connect and SAML, ZITADEL offers an
 
 In this guide, we will walk through the different protocols, features and concepts that can be used to login users securely into your applications.
 
-![Screenshot of zitadel login screen](/img/guides/integrate/login/login-start.png)
+![Screenshot of ZITADEL login screen](/img/guides/integrate/login/login-start.png)
 
 ## Using industry-standard protocols
 
@@ -100,7 +100,7 @@ After successful authentication, the user will be redirected back to the origina
 ZITADEL's hosted login page prioritizes security and compliance with industry standards and regulations.
 It employs best practices for securing authentication processes, such as encryption, token-based authentication, and adherence to protocols like OAuth 2.0, [OpenID Connect](/docs/guides/integrate/login/oidc), and [SAML](/docs/guides/integrate/login/).
 
-We make sure to harden the login UI an minimize the attack surface.
+We make sure to harden the login UI and minimize the attack surface.
 One of the measures we apply is setting the necessary security heads thus minimizing the risk of common vulnerabilities in login pages, such as XSS vulnerabilities.
 Put your current login to the test and compare the results with our hosted login page.
 Tools like [Mozilla's Observatory](https://observatory.mozilla.org/) can give you a good first impression about the security posture.
@@ -122,7 +122,7 @@ By default, all of these login methods are allowed and can be adjusted by [Manag
 ### Support for multiple authentication methods
 
 The hosted login page supports various authentication methods, including traditional username/password authentication, social login options, multi-factor authentication (MFA), and passwordless authentication methods like [passkeys](/docs/concepts/features/passkeys.md).
-Available second-factor (2FA) and multi-factor authentication methods (MFA) include OTP via an authenticator app, TOTP via SMS, OTP via email, and U2F.
+The second factor (2FA) and multi-factor authentication methods (MFA) available in ZITADEL include OTP via an authenticator app, TOTP via SMS, OTP via email, and U2F.
 
 Developers can configure the authentication methods offered on the login page based on their application's security and usability requirements.
 
