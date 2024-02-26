@@ -64,7 +64,7 @@ Response Example:
 
 ### Verify TOTP Registration
 
-When the user has added the account to his authenticator app, he has to enter the code from the App to finish the registration.
+When the user has added the account to the authenticator app, the code from the App has to be entered to finish the registration.
 This code has to be sent to the verify endpoint in ZITADEL.
 
 More detailed information about the API: [Verify TOTP Documentation](/apis/resources/user_service/user-service-verify-totp-registration)
@@ -128,7 +128,7 @@ Example Response
 
 ### Check TOTP
 
-Now you can show the code field to the user, where he has to enter the code from the Authenticator App.
+Now you can show the code field to the user, where the code needs to be entered from the Authenticator App.
 With that code you have to update the existing session with a totp check.
 
 More detailed information about the API: [Update session Documentation](/apis/resources/session_service/session-service-set-session)
@@ -258,7 +258,7 @@ curl --request POST \
 
 ### Check SMS Code
 
-In the next step you should show the user a code field, where he can enter the code, he got as SMS.
+In the next step you should prompt the user to enter the SMS verification code in the provided field.
 The update session request has a check otpSMS where you should send the code, the user has entered.
 
 Example Request
@@ -347,7 +347,7 @@ curl --request POST \
 
 ### Check Email Code
 
-In the next step you should show the user a code field, where he can enter the code, he got per E-Mail.
+Next, display a code field for the user to enter the verification code they received via email.
 The update session request has a check otpEmail where you should send the code, the user has entered.
 
 Example Request
