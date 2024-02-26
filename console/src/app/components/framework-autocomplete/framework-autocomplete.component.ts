@@ -44,7 +44,6 @@ export class FrameworkAutocompleteComponent implements OnInit {
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
       map((value) => {
-        console.log(value);
         return this._filter(value || '');
       }),
     );

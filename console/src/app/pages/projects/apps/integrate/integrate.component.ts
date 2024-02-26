@@ -82,7 +82,6 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
         request.setDevMode(true);
         this.requestRedirectValuesSubject$.next();
 
-        console.log(request.toObject());
         this.oidcAppRequest.next(request);
         return request;
       } else {
