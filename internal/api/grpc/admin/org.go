@@ -52,7 +52,7 @@ func (s *Server) GetDefaultOrg(ctx context.Context, _ *admin_pb.GetDefaultOrgReq
 
 	org := readmodel.NewOrg(authz.GetInstance(ctx).DefaultOrganisationID())
 
-	if err := s.es.Query(ctx, org.Filter(ctx), org); err != nil {
+	if err := s.es.Query(ctx, authz.GetInstance(ctx).InstanceID(), org, org.Filter()...); err != nil {
 		return nil, err
 	}
 
@@ -62,7 +62,7 @@ func (s *Server) GetDefaultOrg(ctx context.Context, _ *admin_pb.GetDefaultOrgReq
 func (s *Server) GetOrgByID(ctx context.Context, req *admin_pb.GetOrgByIDRequest) (*admin_pb.GetOrgByIDResponse, error) {
 	org := readmodel.NewOrg(req.GetId())
 
-	if err := s.es.Query(ctx, org.Filter(ctx), org); err != nil {
+	if err := s.es.Query(ctx, authz.GetInstance(ctx).InstanceID(), org, org.Filter()...); err != nil {
 		return nil, err
 	}
 

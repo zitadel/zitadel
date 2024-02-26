@@ -78,6 +78,6 @@ func (*CreateOrg) CurrentSequence() eventstore.CurrentSequence {
 }
 
 // Reduce implements [eventstore.Reducer].
-func (*CreateOrg) Reduce(events ...eventstore.Event) error {
-	panic("unimplemented")
+func (c *CreateOrg) Reduce(events ...eventstore.Event) error {
+	return nil
 }

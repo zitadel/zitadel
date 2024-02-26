@@ -1,7 +1,6 @@
 package readmodel
 
 import (
-	"context"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
@@ -29,19 +28,24 @@ func NewOrg(id string) *Org {
 	}
 }
 
-func (rm *Org) Filter(ctx context.Context) *eventstore.Filter {
+func (rm *Org) Filter() []*eventstore.Filter {
 	return eventstore.MergeFilters(
-		rm.State.Filter(ctx),
-		rm.PrimaryDomain.Filter(ctx),
+		rm.filter,
+		rm.State.Filter,
+		rm.PrimaryDomain.Filter,
+	)
+}
+
+func (rm *Org) filter() []*eventstore.Filter {
+	return []*eventstore.Filter{
+		// we don't need the filters of the projections as we filter all events of the read model
 		eventstore.NewFilter(
-			ctx,
-			eventstore.FilterEventQuery(
-				eventstore.FilterAggregateTypes(org.AggregateType),
-				eventstore.FilterAggregateIDs(rm.ID),
-				eventstore.FilterEventTypes(), // filter for all event types
+			eventstore.AppendAggregateFilter(
+				org.AggregateType,
+				eventstore.WithAggregateID(rm.ID),
 			),
 		),
-	)
+	}
 }
 
 func (rm *Org) Reduce(events ...eventstore.Event) error {

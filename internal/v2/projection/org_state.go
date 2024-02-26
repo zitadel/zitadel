@@ -1,8 +1,6 @@
 package projection
 
 import (
-	"context"
-
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/v2/org"
 )
@@ -22,21 +20,29 @@ func NewStateProjection(id string) *OrgState {
 	}
 }
 
-func (p *OrgState) Filter(ctx context.Context) *eventstore.Filter {
-	return eventstore.NewFilter(
-		ctx,
-		eventstore.FilterPositionAtLeast(p.position),
-		eventstore.FilterEventQuery(
-			eventstore.FilterAggregateTypes(org.AggregateType),
-			eventstore.FilterAggregateIDs(p.id),
-			eventstore.FilterEventTypes(
-				org.Added.Type(),
-				org.Deactivated.Type(),
-				org.Reactivated.Type(),
-				org.Removed.Type(),
+func (p *OrgState) Filter() []*eventstore.Filter {
+	return []*eventstore.Filter{
+		eventstore.NewFilter(
+			eventstore.Descending(),
+			eventstore.WithPositionAtLeast(p.position, 0),
+			eventstore.AppendAggregateFilter(
+				org.AggregateType,
+				eventstore.WithAggregateID(p.id),
+				eventstore.AppendEvent(
+					eventstore.WithEventType(org.Added.Type()),
+				),
+				eventstore.AppendEvent(
+					eventstore.WithEventType(org.Deactivated.Type()),
+				),
+				eventstore.AppendEvent(
+					eventstore.WithEventType(org.Reactivated.Type()),
+				),
+				eventstore.AppendEvent(
+					eventstore.WithEventType(org.Removed.Type()),
+				),
 			),
 		),
-	)
+	}
 }
 
 func (p *OrgState) Reduce(events ...eventstore.Event) error {

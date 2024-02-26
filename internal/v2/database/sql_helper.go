@@ -39,7 +39,7 @@ func MapRowsToObject(rows *sql.Rows, mapper func(scan func(dest ...any) error) e
 			err = rows.Err()
 		}
 	}()
-	for i := 0; rows.Next(); i++ {
+	for rows.Next() {
 		err = mapper(rows.Scan)
 		if err != nil {
 			return err

@@ -1,27 +1,245 @@
 package projection
 
 import (
-	"context"
 	"time"
 
+	ms "github.com/zitadel/zitadel/internal/repository/milestone"
+	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/v2/instance"
 )
 
 type milestone struct {
 	reachedAt time.Time
 
-	position    float64
-	eventFilter []eventstore.EventFilterOpt
+	typ ms.Type
 }
 
-type instanceCreateMilestone struct {
+type InstanceCreatedMilestone struct {
 	milestone
 }
 
-func (p *instanceCreateMilestone) Filter(ctx context.Context) *eventstore.Filter {
-	return eventstore.NewFilter(
-		ctx,
-	)
+func NewInstanceCreatedMilestone() *InstanceCreatedMilestone {
+	return &InstanceCreatedMilestone{
+		milestone: milestone{
+			typ: ms.InstanceCreated,
+		},
+	}
+}
+
+func (p *InstanceCreatedMilestone) Filter() []*eventstore.Filter {
+	return []*eventstore.Filter{
+		eventstore.NewFilter(
+			eventstore.AppendAggregateFilter(
+				instance.AggregateType,
+				eventstore.AppendEvent(
+					eventstore.WithEventType("instance.added"),
+				),
+			),
+			eventstore.WithLimit(1),
+		),
+	}
+}
+
+func (p *InstanceCreatedMilestone) Reduce(events ...eventstore.Event) error {
+	for _, event := range events {
+		if event.Type() != "instance.added" {
+			continue
+		}
+		p.reachedAt = event.CreatedAt()
+	}
+	return nil
+}
+
+type InstanceRemovedMilestone struct {
+	milestone
+}
+
+func NewInstanceRemovedMilestone() *InstanceRemovedMilestone {
+	return &InstanceRemovedMilestone{
+		milestone: milestone{
+			typ: ms.InstanceDeleted,
+		},
+	}
+}
+
+func (p *InstanceRemovedMilestone) Filter() []*eventstore.Filter {
+	return []*eventstore.Filter{
+		eventstore.NewFilter(
+			eventstore.AppendAggregateFilter(
+				instance.AggregateType,
+				eventstore.AppendEvent(
+					eventstore.WithEventType("instance.removed"),
+				),
+			),
+			eventstore.WithLimit(1),
+		),
+	}
+}
+
+func (p *InstanceRemovedMilestone) Reduce(events ...eventstore.Event) error {
+	for _, event := range events {
+		if event.Type() != "instance.removed" {
+			continue
+		}
+
+		p.reachedAt = event.CreatedAt()
+	}
+	return nil
+}
+
+type AuthOnInstanceMilestone struct {
+	milestone
+}
+
+func NewAuthOnInstanceMilestone() *AuthOnInstanceMilestone {
+	return &AuthOnInstanceMilestone{
+		milestone: milestone{
+			typ: ms.AuthenticationSucceededOnInstance,
+		},
+	}
+}
+
+func (p *AuthOnInstanceMilestone) Filter() []*eventstore.Filter {
+	return []*eventstore.Filter{
+		eventstore.NewFilter(
+			eventstore.AppendAggregateFilter(
+				"user",
+				eventstore.AppendEvent(
+					eventstore.WithEventType("user.token.added"),
+				),
+			),
+			eventstore.WithLimit(1),
+		),
+	}
+}
+
+func (p *AuthOnInstanceMilestone) Reduce(events ...eventstore.Event) error {
+	for _, event := range events {
+		if event.Type() != "user.token.added" {
+			continue
+		}
+
+		p.reachedAt = event.CreatedAt()
+	}
+	return nil
+}
+
+type AuthOnAppMilestone struct {
+	milestone
+
+	position  float64
+	inTxOrder uint32
+}
+
+func NewAuthOnAppMilestone() *AuthOnAppMilestone {
+	return &AuthOnAppMilestone{
+		milestone: milestone{
+			typ: ms.AuthenticationSucceededOnApplication,
+		},
+	}
+}
+
+func (p *AuthOnAppMilestone) Filter() []*eventstore.Filter {
+	return []*eventstore.Filter{
+		eventstore.NewFilter(
+			eventstore.AppendAggregateFilter(
+				"user",
+				eventstore.AppendEvent(
+					eventstore.WithEventType("user.token.added"),
+				),
+			),
+			// used because we need to check for first login and an app which is not console
+			eventstore.WithPosition(database.NewNumberAtLeast(p.position), database.NewNumberGreater(p.inTxOrder)),
+		),
+	}
+}
+
+func (p *AuthOnAppMilestone) Reduce(events ...eventstore.Event) error {
+	for _, event := range events {
+		if event.Type() != "user.token.added" {
+			continue
+		}
+		// TODO: check if app id is set
+		p.reachedAt = event.CreatedAt()
+	}
+	return nil
+}
+
+type ProjectCreatedMilestone struct {
+	milestone
+}
+
+func NewProjectCreatedMilestone() *ProjectCreatedMilestone {
+	return &ProjectCreatedMilestone{
+		milestone: milestone{
+			typ: ms.InstanceDeleted,
+		},
+	}
+}
+
+func (p *ProjectCreatedMilestone) Filter() []*eventstore.Filter {
+	return []*eventstore.Filter{
+		eventstore.NewFilter(
+			eventstore.AppendAggregateFilter(
+				"project",
+				eventstore.AppendEvent(
+					eventstore.WithEventType("project.added"),
+					eventstore.WithCreatorList(database.NewListNotContains("", "SYSTEM")),
+				),
+			),
+			eventstore.WithLimit(1),
+		),
+	}
+}
+
+func (p *ProjectCreatedMilestone) Reduce(events ...eventstore.Event) error {
+	for _, event := range events {
+		if event.Type() != "project.added" {
+			continue
+		}
+
+		p.reachedAt = event.CreatedAt()
+	}
+	return nil
+}
+
+type AppCreatedMilestone struct {
+	milestone
+}
+
+func NewAppCreatedMilestone() *AppCreatedMilestone {
+	return &AppCreatedMilestone{
+		milestone: milestone{
+			typ: ms.InstanceDeleted,
+		},
+	}
+}
+
+func (p *AppCreatedMilestone) Filter() []*eventstore.Filter {
+	return []*eventstore.Filter{
+		eventstore.NewFilter(
+			eventstore.AppendAggregateFilter(
+				"project",
+				eventstore.AppendEvent(
+					eventstore.WithCreatorList(database.NewListNotContains("", "SYSTEM")),
+					eventstore.WithEventType("project.application.added"),
+				),
+			),
+			eventstore.WithLimit(1),
+		),
+	}
+}
+
+func (p *AppCreatedMilestone) Reduce(events ...eventstore.Event) error {
+	for _, event := range events {
+		if event.Type() != "project.application.added" {
+			continue
+		}
+
+		p.reachedAt = event.CreatedAt()
+	}
+	return nil
 }
 
 /*

@@ -39,21 +39,24 @@ func (i *RemoveOrg) ToPushIntent(ctx context.Context, querier eventstore.Querier
 
 	err := querier.Query(
 		ctx,
-		eventstore.MergeFilters(
+		authz.GetInstance(ctx).InstanceID(),
+		i,
+		append([]*eventstore.Filter{
 			eventstore.NewFilter(
-				ctx,
-				eventstore.FilterEventQuery(
-					eventstore.FilterAggregateTypes(org.AggregateType),
-					eventstore.FilterAggregateIDs(i.id),
-					eventstore.FilterEventTypes(
-						org.Added.Type(),
-						org.Removed.Type(),
+				eventstore.AppendAggregateFilter(
+					org.AggregateType,
+					eventstore.WithAggregateID(i.id),
+					eventstore.AppendEvent(
+						eventstore.WithEventType(org.Added.Type()),
+					),
+					eventstore.AppendEvent(
+						eventstore.WithEventType(org.Removed.Type()),
 					),
 				),
 			),
-			i.state.Filter(ctx),
-		),
-		i,
+		},
+			i.state.Filter()...,
+		)...,
 	)
 	// TODO: check if ZITADEL project exists on this org
 	if err != nil {

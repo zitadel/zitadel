@@ -9,11 +9,24 @@ import (
 
 var FilterMergeErr = errors.New("merge failed")
 
+type FilterCreator func() []*Filter
+
+func MergeFilters(creators ...FilterCreator) []*Filter {
+	filters := make([]*Filter, 0, len(creators))
+
+	for _, creator := range creators {
+		filters = append(filters, creator()...)
+	}
+
+	return filters
+}
+
 // Merge returns an error if filters diverge
-func Merge(filters ...*Filter) (*Filter, error) {
-	// if len(filters) == 1 {
-	// 	return filters[0], nil
-	// }
+func Merge(filters ...*Filter) []*Filter {
+	if len(filters) == 1 {
+		return filters
+	}
+	return filters
 
 	// merged := filters[0]
 	// for i := 1; i < len(filters); i++{
@@ -25,8 +38,6 @@ func Merge(filters ...*Filter) (*Filter, error) {
 	// }
 
 	// return merged, nil
-
-	return nil, FilterMergeErr
 }
 
 type Filter struct {
@@ -169,7 +180,7 @@ func (f *positionFilter) InTxOrder() database.NumberFilter[uint32] {
 
 func NewAggregateFilter(typ string, opts ...AggregateFilterOpt) *AggregateFilter {
 	f := &AggregateFilter{
-		typ: typ,
+		typ: database.NewTextEqual(typ),
 	}
 
 	for _, opt := range opts {
@@ -180,13 +191,13 @@ func NewAggregateFilter(typ string, opts ...AggregateFilterOpt) *AggregateFilter
 }
 
 type AggregateFilter struct {
-	typ    string
+	typ    *database.TextFilter[string]
 	id     database.Condition
 	events []*EventFilter
 }
 
 func (f *AggregateFilter) Type() *database.TextFilter[string] {
-	return database.NewTextEqual(f.typ)
+	return f.typ
 }
 
 func (f *AggregateFilter) ID() database.Condition {
@@ -232,7 +243,7 @@ func NewEventFilter(opts ...EventFilterOpt) *EventFilter {
 }
 
 type EventFilter struct {
-	typ       *string
+	typ       *database.TextFilter[string]
 	revision  database.NumberFilter[uint16]
 	createdAt database.NumberFilter[time.Time]
 	sequence  database.NumberFilter[uint32]
@@ -240,10 +251,7 @@ type EventFilter struct {
 }
 
 func (f *EventFilter) Type() *database.TextFilter[string] {
-	if f.typ == nil {
-		return nil
-	}
-	return database.NewTextEqual(*f.typ)
+	return f.typ
 }
 
 func (f *EventFilter) Revision() database.NumberFilter[uint16] {
@@ -266,7 +274,7 @@ type EventFilterOpt func(f *EventFilter)
 
 func WithEventType(typ string) EventFilterOpt {
 	return func(f *EventFilter) {
-		f.typ = &typ
+		f.typ = database.NewTextEqual(typ)
 	}
 }
 

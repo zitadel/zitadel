@@ -1,8 +1,6 @@
 package projection
 
 import (
-	"context"
-
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/v2/org"
 )
@@ -21,16 +19,19 @@ func NewOrgPrimaryDomain(id string) *OrgPrimaryDomain {
 	}
 }
 
-func (p *OrgPrimaryDomain) Filter(ctx context.Context) *eventstore.Filter {
-	return eventstore.NewFilter(
-		ctx,
-		eventstore.FilterPositionAtLeast(p.position),
-		eventstore.FilterEventQuery(
-			eventstore.FilterAggregateTypes(org.AggregateType),
-			eventstore.FilterAggregateIDs(p.id),
-			eventstore.FilterEventTypes(org.DomainSetPrimary.Type()),
+func (p *OrgPrimaryDomain) Filter() []*eventstore.Filter {
+	return []*eventstore.Filter{
+		eventstore.NewFilter(
+			eventstore.WithPositionAtLeast(p.position, 0),
+			eventstore.AppendAggregateFilter(
+				org.AggregateType,
+				eventstore.WithAggregateID(p.id),
+				eventstore.AppendEvent(
+					eventstore.WithEventType(org.DomainSetPrimary.Type()),
+				),
+			),
 		),
-	)
+	}
 }
 
 func (p *OrgPrimaryDomain) Reduce(events ...eventstore.Event) error {
