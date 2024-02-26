@@ -540,6 +540,12 @@ Errors:
     NoTimeout: Cel nie ma limitu czasu
     InvalidURL: Cel ma nieprawidłowy adres URL
     NotFound: Nie znaleziono celu
+  Execution:
+    ConditionInvalid: Warunek wykonania jest nieprawidłowy
+    Invalid: Wykonanie jest nieprawidłowe
+    NotFound: Nie znaleziono wykonania
+    IncludeNotFound: Nie znaleziono uwzględnienia
+    NoTargets: Nie zdefiniowano celów
 
 AggregateTypes:
   action: Działanie
@@ -552,8 +558,12 @@ AggregateTypes:
   quota: Limit
   feature: Funkcja
   target: Cel
+  execution: Wykonanie
 
 EventTypes:
+  execution:
+    set: Zestaw wykonawczy
+    removed: Wykonanie usunięte
   target:
     added: Cel został utworzony
     changed: Cel zmieniony
