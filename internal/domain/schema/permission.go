@@ -12,12 +12,12 @@ var (
 	//go:embed permission.schema.v1.json
 	permissionJSON string
 
-	permissionSchema = jsonschema.MustCompileString(permissionSchemaID, permissionJSON)
+	permissionSchema = jsonschema.MustCompileString(PermissionSchemaID, permissionJSON)
 )
 
 const (
-	permissionSchemaID = "urn:zitadel:schema:permission-schema:v1"
-	permissionProperty = "urn:zitadel:schema:permission"
+	PermissionSchemaID = "urn:zitadel:schema:permission-schema:v1"
+	PermissionProperty = "urn:zitadel:schema:permission"
 )
 
 type role int32
@@ -35,7 +35,7 @@ type permissionExtension struct {
 // Compile implements the [jsonschema.ExtCompiler] interface.
 // It parses the permission schema extension / annotation of the passed field.
 func (c permissionExtension) Compile(ctx jsonschema.CompilerContext, m map[string]interface{}) (_ jsonschema.ExtSchema, err error) {
-	perm, ok := m[permissionProperty]
+	perm, ok := m[PermissionProperty]
 	if !ok {
 		return nil, nil
 	}

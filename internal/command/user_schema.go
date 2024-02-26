@@ -5,10 +5,9 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/santhosh-tekuri/jsonschema/v5"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
+	domain_schema "github.com/zitadel/zitadel/internal/domain/schema"
 	"github.com/zitadel/zitadel/internal/repository/user/schema"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -168,17 +167,13 @@ func (c *Commands) DeleteUserSchema(ctx context.Context, id string) (*domain.Obj
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func validateUserSchema(schema map[string]any) error {
-	jsonSchema, err := json.Marshal(schema)
+func validateUserSchema(userSchema map[string]any) error {
+	jsonSchema, err := json.Marshal(userSchema)
 	if err != nil {
 		return zerrors.ThrowInvalidArgument(err, "COMMA-SFerg", "Errors.UserSchema.Schema.Invalid")
 	}
-	c := jsonschema.NewCompiler()
-	err = c.AddResource("", bytes.NewReader(jsonSchema))
-	if err != nil {
-		return zerrors.ThrowInvalidArgument(err, "COMMA-Frh42", "Errors.UserSchema.Schema.Invalid")
-	}
-	_, err = c.Compile("")
+
+	_, err = domain_schema.NewSchema(0, bytes.NewReader(jsonSchema))
 	if err != nil {
 		return zerrors.ThrowInvalidArgument(err, "COMMA-W21tg", "Errors.UserSchema.Schema.Invalid")
 	}

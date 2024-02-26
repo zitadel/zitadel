@@ -6,15 +6,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/santhosh-tekuri/jsonschema/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
-
-//go:embed zitadel.schema.v1.json
-var zitadelJSON string
 
 func TestPermissionExtension(t *testing.T) {
 	type args struct {
@@ -236,17 +232,7 @@ func TestPermissionExtension(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := jsonschema.NewCompiler()
-			err := c.AddResource("urn:zitadel:schema:permission-schema:v1", strings.NewReader(permissionJSON))
-			require.NoError(t, err)
-			err = c.AddResource("urn:zitadel:schema:v1", strings.NewReader(zitadelJSON))
-			require.NoError(t, err)
-			c.RegisterExtension("urn:zitadel:schema:permission-schema:v1", permissionSchema, permissionExtension{
-				tt.args.role,
-			})
-			err = c.AddResource("schema.json", strings.NewReader(tt.args.schema))
-			require.NoError(t, err)
-			sch, err := c.Compile("schema.json")
+			schema, err := NewSchema(tt.args.role, strings.NewReader(tt.args.schema))
 			require.ErrorIs(t, err, tt.want.compilationErr)
 			if tt.want.compilationErr != nil {
 				return
@@ -256,7 +242,7 @@ func TestPermissionExtension(t *testing.T) {
 			err = json.Unmarshal([]byte(tt.args.instance), &v)
 			require.NoError(t, err)
 
-			err = sch.Validate(v)
+			err = schema.Validate(v)
 			if tt.want.validationErr {
 				assert.Error(t, err)
 				return

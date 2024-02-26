@@ -9,6 +9,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
+	schema_domain "github.com/zitadel/zitadel/internal/domain/schema"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
@@ -84,7 +85,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 			},
 		},
 		{
-			"user schema created",
+			"empty user schema created",
 			fields{
 				eventstore: expectEventstore(
 					expectPush(
@@ -104,6 +105,133 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				userSchema: &CreateUserSchema{
 					Type:   "type",
 					Schema: map[string]any{},
+					PossibleAuthenticators: []domain.AuthenticatorType{
+						domain.AuthenticatorTypeUsername,
+					},
+				},
+			},
+			res{
+				id: "id1",
+				details: &domain.ObjectDetails{
+					ResourceOwner: "instanceID",
+				},
+			},
+		},
+		{
+			"user schema created",
+			fields{
+				eventstore: expectEventstore(
+					expectPush(
+						schema.NewCreatedEvent(
+							context.Background(),
+							&schema.NewAggregate("id1", "instanceID").Aggregate,
+							"type",
+							map[string]any{
+								"type": "object",
+								"properties": map[string]any{
+									"name": map[string]any{
+										"type": "string",
+									},
+								},
+							},
+							[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
+						),
+					),
+				),
+				idGenerator: mock.ExpectID(t, "id1"),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				userSchema: &CreateUserSchema{
+					Type: "type",
+					Schema: map[string]any{
+						"type": "object",
+						"properties": map[string]any{
+							"name": map[string]any{
+								"type": "string",
+							},
+						},
+					},
+					PossibleAuthenticators: []domain.AuthenticatorType{
+						domain.AuthenticatorTypeUsername,
+					},
+				},
+			},
+			res{
+				id: "id1",
+				details: &domain.ObjectDetails{
+					ResourceOwner: "instanceID",
+				},
+			},
+		},
+		{
+			"user schema with invalid permission, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				userSchema: &CreateUserSchema{
+					Type: "type",
+					Schema: map[string]any{
+						"type": "object",
+						"properties": map[string]any{
+							"name": map[string]any{
+								"type":                           "string",
+								schema_domain.PermissionProperty: true,
+							},
+						},
+					},
+					PossibleAuthenticators: []domain.AuthenticatorType{
+						domain.AuthenticatorTypeUsername,
+					},
+				},
+			},
+			res{
+				err: zerrors.ThrowInvalidArgument(nil, "COMMA-W21tg", "Errors.UserSchema.Schema.Invalid"),
+			},
+		},
+		{
+			"user schema with permission created",
+			fields{
+				eventstore: expectEventstore(
+					expectPush(
+						schema.NewCreatedEvent(
+							context.Background(),
+							&schema.NewAggregate("id1", "instanceID").Aggregate,
+							"type",
+							map[string]any{
+								"type": "object",
+								"properties": map[string]any{
+									"name": map[string]any{
+										"type": "string",
+										"urn:zitadel:schema:permission": map[string]any{
+											"self": "rw",
+										},
+									},
+								},
+							},
+							[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
+						),
+					),
+				),
+				idGenerator: mock.ExpectID(t, "id1"),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				userSchema: &CreateUserSchema{
+					Type: "type",
+					Schema: map[string]any{
+						"type": "object",
+						"properties": map[string]any{
+							"name": map[string]any{
+								"type": "string",
+								schema_domain.PermissionProperty: map[string]any{
+									"self": "rw",
+								},
+							},
+						},
+					},
 					PossibleAuthenticators: []domain.AuthenticatorType{
 						domain.AuthenticatorTypeUsername,
 					},
