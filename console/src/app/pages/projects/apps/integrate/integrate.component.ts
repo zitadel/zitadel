@@ -138,12 +138,12 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
   public close(): void {
     if (this.navigation.isBackPossible) {
       this._location.back();
+    } else {
+      this.router.navigate(['/projects', this.projectId]);
     }
   }
 
   public createApp(): void {
-    // this.requestRedirectValuesSubject$.next();
-
     this.loading = true;
     this.mgmtService
       .addOIDCApp(this.oidcAppRequest.getValue())

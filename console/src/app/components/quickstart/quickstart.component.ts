@@ -39,8 +39,4 @@ export class QuickstartComponent {
         imgSrcLight: `assets${f.imgSrcLight ? f.imgSrcLight : f.imgSrcDark}`,
       };
     });
-
-  constructor() {
-    // console.log(this.frameworks[0].title);
-  }
 }

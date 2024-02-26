@@ -1,5 +1,5 @@
 import { Component, OnDestroy, signal } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Navigation, Params, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
@@ -10,6 +10,8 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { Framework } from 'src/app/components/quickstart/quickstart.component';
 import frameworkDefinition from '../../../../../docs/frameworks.json';
+import { NavigationService } from 'src/app/services/navigation.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'cnsl-app-create',
@@ -44,8 +46,9 @@ export class AppCreateComponent implements OnDestroy {
     private mgmtService: ManagementService,
     breadcrumbService: BreadcrumbService,
     activatedRoute: ActivatedRoute,
+    private _location: Location,
+    private navigation: NavigationService,
   ) {
-    console.log(this.frameworks);
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
       routerLink: ['/org'],
@@ -82,7 +85,20 @@ export class AppCreateComponent implements OnDestroy {
   }
 
   public close(): void {
-    window.history.back();
+    if (this.navigation.isBackPossible) {
+      this._location.back();
+    } else {
+      if (this.project && this.framework()) {
+        const id = (this.project.project as Project.AsObject).id
+          ? (this.project.project as Project.AsObject).id
+          : (this.project.project as GrantedProject.AsObject).projectId
+            ? (this.project.project as GrantedProject.AsObject).projectId
+            : '';
+        this.router.navigate(['/projects', id]);
+      } else {
+        this.router.navigate(['/projects']);
+      }
+    }
   }
 
   public selectProject(project: {

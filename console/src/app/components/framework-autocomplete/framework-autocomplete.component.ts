@@ -41,7 +41,6 @@ export class FrameworkAutocompleteComponent implements OnInit {
   constructor() {}
 
   public ngOnInit() {
-    // this.myControl.setValue(this.frameworkId);
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
       map((value) => {

@@ -31,7 +31,6 @@ export class FrameworkChangeDialogComponent {
   }
 
   public findFramework(id: string) {
-    console.log(id);
     const temp = this.data.frameworks.find((f: Framework) => f.id === id);
     this.framework.set(temp);
   }
