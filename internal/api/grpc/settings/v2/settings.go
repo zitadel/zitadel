@@ -124,3 +124,23 @@ func (s *Server) GetGeneralSettings(ctx context.Context, _ *settings.GetGeneralS
 		DefaultLanguage:    instance.DefaultLanguage().String(),
 	}, nil
 }
+
+func (s *Server) GetSecuritySettings(ctx context.Context, req *settings.GetSecuritySettingsRequest) (*settings.GetSecuritySettingsResponse, error) {
+	policy, err := s.query.SecurityPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &settings.GetSecuritySettingsResponse{
+		Settings: securityPolicyToSettingsPb(policy),
+	}, nil
+}
+
+func (s *Server) SetSecuritySettings(ctx context.Context, req *settings.SetSecuritySettingsRequest) (*settings.SetSecuritySettingsResponse, error) {
+	details, err := s.command.SetSecurityPolicy(ctx, securitySettingsToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &settings.SetSecuritySettingsResponse{
+		Details: object.DomainToDetailsPb(details),
+	}, nil
+}
