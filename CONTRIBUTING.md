@@ -108,13 +108,13 @@ Please make sure you cover your changes with tests before marking a Pull Request
 
 The code consists of the following parts:
 
-| name            | description                                                        | language                                                                    | where to find                                      |
-| --------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------- | -------------------------------------------------- |
-| backend         | Service that serves the grpc(-web) and RESTful API                 | [go](https://go.dev)                                                        | [API implementation](./internal/api/grpc)          |
-| console         | Frontend the user interacts with after he is logged in             | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org) | [./console](./console)                             |
+| name            | description                                                     | language                                                                    | where to find                                      |
+| --------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------- |
+| backend         | Service that serves the grpc(-web) and RESTful API              | [go](https://go.dev)                                                        | [API implementation](./internal/api/grpc)          |
+| console         | Frontend the user interacts with after log in             | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org) | [./console](./console)                             |
 | login           | Server side rendered frontend the user interacts with during login | [go](https://go.dev), [go templates](https://pkg.go.dev/html/template)      | [./internal/api/ui/login](./internal/api/ui/login) |
-| API definitions | Specifications of the API                                          | [Protobuf](https://developers.google.com/protocol-buffers)                  | [./proto/zitadel](./proto/zitadel)                 |
-| docs            | Project documentation made with docusaurus                         | [Docusaurus](https://docusaurus.io/)                                        | [./docs](./docs)                                   |
+| API definitions | Specifications of the API                                       | [Protobuf](https://developers.google.com/protocol-buffers)                  | [./proto/zitadel](./proto/zitadel)                 |
+| docs            | Project documentation made with docusaurus                      | [Docusaurus](https://docusaurus.io/)                                        | [./docs](./docs)                                   |
 
 Please validate and test the code before you contribute.
 
@@ -122,6 +122,24 @@ We add the label "good first issue" for problems we think are a good starting po
 
 - [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 - [All issues](https://github.com/zitadel/zitadel/issues)
+
+### General Guidelines
+
+#### Gender Neutrality and Inclusive Language
+
+We are committed to creating a welcoming and inclusive community for all developers, regardless of their gender identity or expression. To achieve this, we are actively working to ensure that our contribution guidelines are gender-neutral and use inclusive language.
+
+**Use gender-neutral pronouns**: 
+Don't use gender-specific pronouns unless the person you're referring to is actually that gender.
+In particular, don't use he, him, his, she, or her as gender-neutral pronouns, and don't use he/she or (s)he or other such punctuational approaches. Instead, use the singular they.
+
+**Choose gender-neutral alternatives**: 
+Opt for gender-neutral terms instead of gendered ones whenever possible. 
+Replace "policeman" with "police officer," "manpower" with "workforce," and "businessman" with "entrepreneur" or "businessperson."
+
+**Avoid ableist language**:
+Ableist language includes words or phrases such as crazy, insane, blind to or blind eye to, cripple, dumb, and others.
+Choose alternative words depending on the context.
 
 ### Backend/login
 
@@ -163,14 +181,33 @@ You can now run and debug the binary in .artifacts/zitadel/zitadel using your fa
 You can test if ZITADEL does what you expect by using the UI at http://localhost:8080/ui/console.
 Also, you can verify the data by running `cockroach sql --database zitadel --insecure` and running SQL queries.
 
-As soon as you are ready to battle test your changes, run the end-to-end tests.
+#### Run Local Unit Tests
 
-#### Running the tests
-
-Running the tests with docker doesn't require you to take care of other dependencies than docker and make.
+To test the code without dependencies, run the unit tests:
 
 ```bash
-# Build the production binary (unit tests are executed, too)
+make core_unit_test
+```
+
+#### Run Local Integration Tests
+
+To test the database-connected gRPC API, run PostgreSQL and CockroachDB, set up a ZITADEL instance and run the tests including integration tests:
+
+```bash
+export INTEGRATION_DB_FLAVOR="postgres" ZITADEL_MASTERKEY="MasterkeyNeedsToHave32Characters"
+docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait ${INTEGRATION_DB_FLAVOR}
+make core_integration_test
+docker compose -f internal/integration/config/docker-compose.yaml down
+```
+
+Repeat the above with `INTEGRATION_DB_FLAVOR="postgres"`.
+
+#### Run Local End-to-End Tests
+
+To test the whole system, including the console UI and the login UI, run the E2E tests.
+
+```bash
+# Build the production binary
 make core_build console_build
 GOOS=linux make compile_pipeline
 
@@ -191,7 +228,7 @@ When you are happy with your changes, you can cleanup your environment.
 docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml down
 ```
 
-#### Running the tests without docker
+#### Run Local End-to-End Tests Against Your Dev Server Console
 
 If you also make [changes to the console](#console), you can run the test suite against your locally built backend code and frontend server.
 But you will have to install the relevant node dependencies.
@@ -213,19 +250,6 @@ When you are happy with your changes, you can cleanup your environment.
 # Stop and remove the docker containers for zitadel and the database
 docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml down
 ```
-
-#### Integration tests
-
-In order to run the integrations tests for the gRPC API, PostgreSQL and CockroachDB must be started and initialized:
-
-```bash
-export INTEGRATION_DB_FLAVOR="postgres" ZITADEL_MASTERKEY="MasterkeyNeedsToHave32Characters"
-docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait ${INTEGRATION_DB_FLAVOR}
-make core_integration_test
-docker compose -f internal/integration/config/docker-compose.yaml down
-```
-
-The above can be repeated with `INTEGRATION_DB_FLAVOR="postgres"`.
 
 ### Console
 

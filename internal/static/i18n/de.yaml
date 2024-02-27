@@ -128,6 +128,7 @@ Errors:
       NotFound: Code konnte nicht gefunden werden
       Expired: Code ist abgelaufen
       GeneratorAlgNotSupported: Generator Algorithmus wird nicht unterstützt
+      Invalid: Code ist nicht gültig
     Password:
       NotFound: Password nicht gefunden
       Empty: Passwort ist leer
@@ -534,6 +535,17 @@ Errors:
     NotExisting: Feature existiert nicht
     TypeNotSupported: Feature Typ wird nicht unterstützt
     InvalidValue: Ungültiger Wert für dieses Feature
+  Target:
+    Invalid: Ziel ist ungültig
+    NoTimeout: Ziel hat keinen Timeout
+    InvalidURL: Ziel hat eine ungültige URL
+    NotFound: Ziel nicht gefunden
+  Execution:
+    ConditionInvalid: Die Ausführungsbedingung ist ungültig
+    Invalid: Die Ausführung ist ungültig
+    NotFound: Ausführung nicht gefunden
+    IncludeNotFound: Einschließen nicht gefunden
+    NoTargets: Keine Ziele definiert
 
 AggregateTypes:
   action: Action
@@ -545,8 +557,17 @@ AggregateTypes:
   usergrant: Benutzerberechtigung
   quota: Kontingent
   feature: Feature
+  target: Ziel
+  execution: Ausführung
 
 EventTypes:
+  execution:
+    set: Ausführung gesetzt
+    removed: Ausführung gelöscht
+  target:
+    added: Ziel erstellt
+    changed: Ziel geändert
+    removed: Ziel gelöscht
   user:
     added: Benutzer hinzugefügt
     selfregistered: Benutzer hat sich selbst registriert

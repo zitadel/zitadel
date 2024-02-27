@@ -130,6 +130,7 @@ Errors:
       NotFound: Кодът не е намерен
       Expired: Кодът е изтекъл
       GeneratorAlgNotSupported: Неподдържан генераторен алгоритъм
+      Invalid: кодът е невалиден
     Password:
       NotFound: Паролата не е намерена
       Empty: Паролата е празна
@@ -551,6 +552,17 @@ Errors:
     NotExisting: Функцията не съществува
     TypeNotSupported: Типът функция не се поддържа
     InvalidValue: Невалидна стойност за тази функция
+  Target:
+    Invalid: Целта е невалидна
+    NoTimeout: Целта няма време за изчакване
+    InvalidURL: Целта има невалиден URL адрес
+    NotFound: Целта не е намерена
+  Execution:
+    ConditionInvalid: Условието за изпълнение е невалидно
+    Invalid: Изпълнението е невалидно
+    NotFound: Изпълнението не е намерено
+    IncludeNotFound: Включването не е намерено
+    NoTargets: Няма определени цели
 
 AggregateTypes:
   action: Действие
@@ -562,8 +574,17 @@ AggregateTypes:
   usergrant: Предоставяне на потребител
   quota: Квота
   feature: Особеност
+  target: Целта
+  execution: Екзекуция
 
 EventTypes:
+  execution:
+    set: Комплект за изпълнение
+    removed: Изпълнението е изтрито
+  target:
+    added: Целта е създадена
+    changed: Целта е променена
+    removed: Целта е изтрита
   user:
     added: Добавен потребител
     selfregistered: Потребителят се регистрира сам

@@ -128,6 +128,7 @@ Errors:
       NotFound: Código no encontrado
       Expired: El código ha caducado
       GeneratorAlgNotSupported: Algoritmo generador no soportado
+      Invalid: El código no es válido
     Password:
       NotFound: Contraseña no encontrada
       Empty: La contraseña está vacía
@@ -534,6 +535,17 @@ Errors:
     NotExisting: La característica no existe
     TypeNotSupported: El tipo de característica no es compatible
     InvalidValue: Valor no válido para esta característica
+  Target:
+    Invalid: El objetivo no es válido
+    NoTimeout: El objetivo no tiene tiempo de espera
+    InvalidURL: El objetivo tiene una URL no válida
+    NotFound: El objetivo no encontrado
+  Execution:
+    ConditionInvalid: La condición de ejecución no es válida
+    Invalid: La ejecución no es válida
+    NotFound: Ejecución no encontrada
+    IncludeNotFound: Incluir no encontrado
+    NoTargets: No hay objetivos definidos
 
 AggregateTypes:
   action: Acción
@@ -545,8 +557,17 @@ AggregateTypes:
   usergrant: Concesión de usuario
   quota: Cuota
   feature: Característica
+  target: Objectivo
+  execution: Ejecución
 
 EventTypes:
+  execution:
+    set: Conjunto de ejecución
+    removed: Ejecución eliminada
+  target:
+    added: Objetivo creado
+    changed: Objetivo cambiado
+    removed: Objetivo eliminado
   user:
     added: Usuario añadido
     selfregistered: El usuario se registró por sí mismo

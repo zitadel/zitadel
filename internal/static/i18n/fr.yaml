@@ -128,6 +128,7 @@ Errors:
       NotFound: Code non trouvé
       Expired: Le code est expiré
       GeneratorAlgNotSupported: Algorithme de générateur non pris en charge
+      Invalid: Le code n'est pas valide
     Password:
       NotFound: Mot de passe non trouvé
       Empty: Le mot de passe est vide
@@ -534,6 +535,17 @@ Errors:
     NotExisting: La fonctionnalité n'existe pas
     TypeNotSupported: Le type de fonctionnalité n'est pas pris en charge
     InvalidValue: Valeur non valide pour cette fonctionnalité
+  Target:
+    Invalid: La cible n'est pas valide
+    NoTimeout: La cible n'a pas de délai d'attente
+    InvalidURL: La cible a une URL non valide
+    NotFound: La cible introuvable
+  Execution:
+    ConditionInvalid: La condition d'exécution n'est pas valide
+    Invalid: L'exécution est invalide
+    NotFound: Exécution introuvable
+    IncludeNotFound: Inclure introuvable
+    NoTargets: Aucune cible définie
 
 AggregateTypes:
   action: Action
@@ -545,8 +557,17 @@ AggregateTypes:
   usergrant: Subvention de l'utilisateur
   quota: Contingent
   feature: Fonctionnalité
+  target: Cible
+  execution: Exécution
 
 EventTypes:
+  execution:
+    set: Ensemble d'exécution
+    removed: Exécution supprimée
+  target:
+    added: Cible créée
+    changed: Cible modifiée
+    removed: Cible supprimée
   user:
     added: Utilisateur ajouté
     selfregistered: L'utilisateur s'est enregistré lui-même
