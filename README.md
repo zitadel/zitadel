@@ -66,7 +66,6 @@ You can already use the current state, and extend it with your needs.
 - [ ] Password Change/Reset
 - [ ] Domain Discovery
 - [ ] Branding
-- [ ] 
 - OIDC Standard
    - [ ] Authorization Code Flow with PKCE
    - [ ] AuthRequest `hintUserId`
