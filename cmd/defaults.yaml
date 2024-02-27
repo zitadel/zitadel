@@ -828,11 +828,12 @@ DefaultInstance:
       Text: The password of your user has changed. If this change was not done by you, please be advised to immediately reset your password.
       ButtonText: Login
   
-  # See SystemDefaults.Features for all possible values.
   # Once a feature is set on the instance (true or false), system level feature settings
-  # will be ignored untill instance level features are reset.
+  # will be ignored until instance level features are reset.
   Features:
     LoginDefaultOrg: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINDEFAULTORG
+    # TriggerIntrospectionProjections: false # ZITADEL_DEFAULTINSTANCE_FEATURES_TRIGGERINTROSPECTIONPROJECTIONS
+    # LegacyIntrospection: false # ZITADEL_DEFAULTINSTANCE_FEATURES_LEGACYINTROSPECTION
   Limits:
     # AuditLogRetention limits the number of events that can be queried via the events API by their age.
     # A value of "0s" means that all events are available.
