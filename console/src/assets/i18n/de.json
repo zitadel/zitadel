@@ -132,6 +132,7 @@
     "REVIEWCONFIGURATION": "Konfiguration überprüfen",
     "REVIEWCONFIGURATION_DESCRIPTION": "Wir haben eine Grundkonfiguration für {{wert}}-Anwendungen erstellt. Du kannst diese Konfiguration nach der Erstellung an deine Bedürfnisse anpassen.",
     "REDIRECTS": "Redirects konfigurieren",
+    "DEVMODEWARN": "Der Dev-Modus ist standardmäßig aktiviert. Sie können Werte für die Produktion später aktualisieren.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Framework ändern",

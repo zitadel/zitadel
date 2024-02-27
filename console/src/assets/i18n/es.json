@@ -132,6 +132,7 @@
     "REVIEWCONFIGURATION": "Configuración de revisión",
     "REVIEWCONFIGURATION_DESCRIPTION": "Hemos creado una configuración básica para aplicaciones {{value}}. Puedes adaptar esta configuración a tus necesidades después de crearla.",
     "REDIRECTS": "Configurar redirecciones",
+    "DEVMODEWARN": "El modo de desarrollo está habilitado de forma predeterminada. Puede actualizar los valores para la producción más adelante.",
     "DIALOG": {
       "CAMBIAR": {
         "TITLE": "Cambio framework",

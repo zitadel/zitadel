@@ -59,6 +59,11 @@
             title="{{ 'QUICKSTART.REDIRECTS' | translate }}"
             description="{{ 'APP.OIDC.REDIRECTTITLE' | translate }}"
           >
+            <cnsl-info-section [type]="InfoSectionType.ALERT">
+              <span class="redirect-description">
+                {{ 'QUICKSTART.DEVMODEWARN' | translate }}
+              </span>
+            </cnsl-info-section>
             <cnsl-info-section *ngIf="(oidcAppRequest | async)?.toObject()?.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE">
               <span class="redirect-description">
                 {{ 'APP.OIDC.REDIRECTDESCRIPTIONNATIVE' | translate }}

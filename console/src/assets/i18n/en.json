@@ -132,6 +132,7 @@
     "REVIEWCONFIGURATION": "Review Configuration",
     "REVIEWCONFIGURATION_DESCRIPTION": "We've created a basic configuration for {{value}} applications. You can adapt this configuration to your needs after creation.",
     "REDIRECTS": "Configure redirects",
+    "DEVMODEWARN": "Dev Mode is enabled by default. You can update values for production later.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Change Framework",
@@ -2055,7 +2056,7 @@
       "REDIRECTSECTIONTITLE": "Redirect Settings",
       "REDIRECTTITLE": "Specify the URIs where the login will redirect to.",
       "POSTREDIRECTTITLE": "This is the redirect URI after logout.",
-      "REDIRECTDESCRIPTIONWEB": "Redirect URIs must begin with https://.",
+      "REDIRECTDESCRIPTIONWEB": "Redirect URIs must begin with https://. http:// is only valid with enabled development mode.",
       "REDIRECTDESCRIPTIONNATIVE": "Redirect URIs must begin with your own protocol, http://127.0.0.1, http://[::1] or http://localhost.",
       "REDIRECTNOTVALID": "This redirect URI is not valid.",
       "COMMAORENTERSEPERATION": "separate with ↵",

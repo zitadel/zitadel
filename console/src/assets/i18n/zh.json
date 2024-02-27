@@ -132,6 +132,7 @@
     "REVIEWCONFIGURATION": "审查配置",
     "REVIEWCONFIGURATION_DESCRIPTION": "我们为 {{value}} 应用程序创建了一个基本配置。创建后，您可以根据自己的需要调整该配置。",
     "REDIRECTS": "配置重定向",
+    "DEVMODEWARN": "默认情况下启用开发模式。您可以稍后更新生产值。",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "变革框架",
