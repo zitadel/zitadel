@@ -1157,9 +1157,13 @@
       "UPDATED": "Настройките обновени."
     },
     "SECURITY": {
-      "DESCRIPTION": "Тази настройка настройва CSP да позволява рамкиране от набор от разрешени домейни. ",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Тази настройка настройва CSP да позволява рамкиране от набор от разрешени домейни. ",
       "IFRAMEENABLED": "Разрешаване на iFrame",
-      "ALLOWEDORIGINS": "Разрешени URL адреси"
+      "ALLOWEDORIGINS": "Разрешени URL адреси",
+      "IMPERSONATIONTITLE": "Имитиране",
+      "IMPERSONATIONENABLED": "Разрешаване на имитация",
+      "IMPERSONATIONDESCRIPTION": "Тази настройка позволява да се използва имитация по принцип. Обърнете внимание, че имитаторът също се нуждае от присвоени подходящи роли `*_IMPERSONATOR`."
     },
     "DIALOG": {
       "RESET": {

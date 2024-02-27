@@ -1164,9 +1164,13 @@
       "UPDATED": "Nastavení aktualizováno."
     },
     "SECURITY": {
-      "DESCRIPTION": "Toto nastavení nastaví CSP tak, aby povolovalo vkládání ze sady povolených domén. Všimněte si, že povolením použití iFrame riskujete umožnění clickjackingu.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Toto nastavení nastaví CSP tak, aby povolovalo vkládání ze sady povolených domén. Všimněte si, že povolením použití iFrame riskujete umožnění clickjackingu.",
       "IFRAMEENABLED": "Povolit iFrame",
-      "ALLOWEDORIGINS": "Povolené URL"
+      "ALLOWEDORIGINS": "Povolené URL",
+      "IMPERSONATIONTITLE": "Předstírání jiné identity",
+      "IMPERSONATIONENABLED": "Povolit předstírání jiné identity",
+      "IMPERSONATIONDESCRIPTION": "Toto nastavení v zásadě umožňuje používat zosobnění. Všimněte si, že imitátor potřebuje také přiřazené příslušné role `*_IMPERSONATOR`."
     },
     "DIALOG": {
       "RESET": {

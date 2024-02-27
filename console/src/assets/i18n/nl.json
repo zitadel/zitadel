@@ -1164,9 +1164,13 @@
       "UPDATED": "Instellingen bijgewerkt."
     },
     "SECURITY": {
-      "DESCRIPTION": "Deze instelling stelt de CSP in om framing van een reeks toegestane domeinen toe te staan. Let op: door het gebruik van iFrames toe te staan, loopt u het risico om clickjacking toe te staan.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Deze instelling stelt de CSP in om framing van een reeks toegestane domeinen toe te staan. Let op: door het gebruik van iFrames toe te staan, loopt u het risico om clickjacking toe te staan.",
       "IFRAMEENABLED": "Sta iFrame toe",
-      "ALLOWEDORIGINS": "Toegestane URLs"
+      "ALLOWEDORIGINS": "Toegestane URLs",
+      "IMPERSONATIONTITLE": "Imitatie",
+      "IMPERSONATIONENABLED": "Imitatie toestaan",
+      "IMPERSONATIONDESCRIPTION": "Deze instelling maakt het in principe mogelijk om imitatie te gebruiken. Houd er rekening mee dat aan de imitator ook de juiste `*_IMPERSONATOR` rollen moeten worden toegewezen."
     },
     "DIALOG": {
       "RESET": {

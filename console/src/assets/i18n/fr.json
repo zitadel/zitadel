@@ -1163,9 +1163,13 @@
       "UPDATED": "Paramètres mis à jour."
     },
     "SECURITY": {
-      "DESCRIPTION": "Ce paramètre permet au CSP d'autoriser les iFrames à partir d'un ensemble de domaines autorisés. Notez qu'en autorisant l'utilisation des iFrames, vous courez le risque d'autoriser le clickjacking.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Ce paramètre permet au CSP d'autoriser les iFrames à partir d'un ensemble de domaines autorisés. Notez qu'en autorisant l'utilisation des iFrames, vous courez le risque d'autoriser le clickjacking.",
       "IFRAMEENABLED": "Autoriser iFrame",
-      "ALLOWEDORIGINS": "URL d'origine autorisées"
+      "ALLOWEDORIGINS": "URL d'origine autorisées",
+      "IMPERSONATIONTITLE": "Usuration d'identité",
+      "IMPERSONATIONENABLED": "Autoriser l'usurpation d'identité",
+      "IMPERSONATIONDESCRIPTION": "Ce paramètre permet en principe d'utiliser l'usurpation d'identité. Notez que l'usurpateur d'identité doit également recevoir les rôles `*_IMPERSONATOR` appropriés."
     },
     "DIALOG": {
       "RESET": {

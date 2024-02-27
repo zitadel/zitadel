@@ -1163,9 +1163,14 @@
       "UPDATED": "Ustawienia zaktualizowane."
     },
     "SECURITY": {
-      "DESCRIPTION": "To ustawienie ustawia CSP, aby pozwalało na osadzanie ramki z zestawu dozwolonych domen. Należy pamiętać, że włączenie używania iFrame oznacza ryzyko pozwolenia na clickjacking.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "To ustawienie ustawia CSP, aby pozwalało na osadzanie ramki z zestawu dozwolonych domen. Należy pamiętać, że włączenie używania iFrame oznacza ryzyko pozwolenia na clickjacking.",
       "IFRAMEENABLED": "Zezwól na iFrame",
-      "ALLOWEDORIGINS": "Dozwolone adresy URL"
+      "ALLOWEDORIGINS": "Dozwolone adresy URL",
+      "IMPERSONATIONTITLE": "Podszywanie się",
+      "IMPERSONATIONENABLED": "Zezwalaj na podszywanie się",
+      "IMPERSONATIONDESCRIPTION": "To ustawienie pozwala w zasadzie na użycie personifikacji. Należy pamiętać, że osoba personifikująca potrzebuje również przypisanych odpowiednich ról `*_IMPERSONATOR`."
+
     },
     "DIALOG": {
       "RESET": {

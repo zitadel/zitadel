@@ -1163,9 +1163,13 @@
       "UPDATED": "Impostazioni aggiornati"
     },
     "SECURITY": {
-      "DESCRIPTION": "Questa impostazione consente al CSP di consentire il framing da un insieme di domini consentiti. Si noti che abilitando l'uso di iFrames, si corre il rischio di consentire il clickjacking.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Questa impostazione consente al CSP di consentire il framing da un insieme di domini consentiti. Si noti che abilitando l'uso di iFrames, si corre il rischio di consentire il clickjacking.",
       "IFRAMEENABLED": "I Frame enabled",
-      "ALLOWEDORIGINS": "URL consentiti"
+      "ALLOWEDORIGINS": "URL consentiti",
+      "IMPERSONATIONTITLE": "Impersonificazione",
+      "IMPERSONATIONENABLED": "Consenti la rappresentazione",
+      "IMPERSONATIONDESCRIPTION": "Questa impostazione consente in linea di principio di utilizzare la rappresentazione. Tieni presente che il sosia ha bisogno anche dei ruoli `*_IMPERSONATOR` appropriati assegnati."
     },
     "DIALOG": {
       "RESET": {

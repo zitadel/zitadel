@@ -1164,9 +1164,13 @@
       "UPDATED": "設定が更新されました。"
     },
     "SECURITY": {
-      "DESCRIPTION": "この設定は、許可されたドメインのセットからのフレーミングを許可するように CSP を設定します。iFrameの使用を有効にすると、クリックジャッキングが許可される危険性があることに注意してください。",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "この設定は、許可されたドメインのセットからのフレーミングを許可するように CSP を設定します。iFrameの使用を有効にすると、クリックジャッキングが許可される危険性があることに注意してください。",
       "IFRAMEENABLED": "iFrameを許可する",
-      "ALLOWEDORIGINS": "許可されたURL"
+      "ALLOWEDORIGINS": "許可されたURL",
+      "IMPERSONATIONTITLE": "偽装",
+      "IMPERSONATIONENABLED": "偽装を許可します",
+      "IMPERSONATIONDESCRIPTION": "この設定では、原則として偽装を使用できます。偽装者には、適切な `*_IMPERSONATOR` ロールも割り当てられている必要があることに注意してください。"
     },
     "DIALOG": {
       "RESET": {

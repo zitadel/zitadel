@@ -1163,9 +1163,13 @@
       "UPDATED": "设置已更新。"
     },
     "SECURITY": {
-      "DESCRIPTION": "此设置将CSP设置为允许来自一组允许的域的框架。请注意，通过启用iFrames的使用，你会有允许点击劫持的风险。",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "此设置将CSP设置为允许来自一组允许的域的框架。请注意，通过启用iFrames的使用，你会有允许点击劫持的风险。",
       "IFRAMEENABLED": "允许 iFrame",
-      "ALLOWEDORIGINS": "允许的来源 URL"
+      "ALLOWEDORIGINS": "允许的来源 URL",
+      "IMPERSONATIONTITLE": "冒充",
+      "IMPERSONATIONENABLED": "允许模拟",
+      "IMPERSONATIONDESCRIPTION": "此设置原则上允许使用模拟。请注意，模拟者还需要分配适当的 `*_IMPERSONATOR` 角色。"
     },
     "DIALOG": {
       "RESET": {

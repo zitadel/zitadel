@@ -1165,9 +1165,13 @@
       "UPDATED": "Ajustes actualizados."
     },
     "SECURITY": {
-      "DESCRIPTION": "Este ajuste establece el CSP para permitir el uso de frames para un grupo de dominios permitidos. Ten en cuenta que habilitando el uso de iFrames, corres el riesgo de permitir ataques de clickjacking.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Este ajuste establece el CSP para permitir el uso de frames para un grupo de dominios permitidos. Ten en cuenta que habilitando el uso de iFrames, corres el riesgo de permitir ataques de clickjacking.",
       "IFRAMEENABLED": "Permitir iFrame",
-      "ALLOWEDORIGINS": "URLs permitidas"
+      "ALLOWEDORIGINS": "URLs permitidas",
+      "IMPERSONATIONTITLE": "Suplantación",
+      "IMPERSONATIONENABLED": "Permitir suplantación",
+      "IMPERSONATIONDESCRIPTION": "Esta configuración permite utilizar la suplantación en principio. Tenga en cuenta que el imitador también necesita que se le asignen los roles `*_IMPERSONATOR` apropiados."
     },
     "DIALOG": {
       "RESET": {

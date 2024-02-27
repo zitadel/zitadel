@@ -1164,9 +1164,13 @@
       "UPDATED": "Settings updated."
     },
     "SECURITY": {
-      "DESCRIPTION": "This setting sets the CSP to allow framing from a set of allowed domains. Note that by enabling the use of iFrames, you run the risk of allowing clickjacking.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "This setting sets the CSP to allow framing from a set of allowed domains. Note that by enabling the use of iFrames, you run the risk of allowing clickjacking.",
       "IFRAMEENABLED": "Allow iFrame",
-      "ALLOWEDORIGINS": "Allowed URLs"
+      "ALLOWEDORIGINS": "Allowed URLs",
+      "IMPERSONATIONTITLE": "Impersonation",
+      "IMPERSONATIONENABLED": "Allow Impersonation",
+      "IMPERSONATIONDESCRIPTION": "This setting allows to use impersonation in principle. Note that the impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well."
     },
     "DIALOG": {
       "RESET": {

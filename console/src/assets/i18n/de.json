@@ -1163,9 +1163,13 @@
       "UPDATED": "Einstellungen geändert"
     },
     "SECURITY": {
-      "DESCRIPTION": "Mit dieser Einstellung wird die CSP so eingestellt, dass Framing von einer Reihe zulässiger Domänen zugelassen wird. Beachten Sie, dass Sie durch die Aktivierung der Verwendung von iFrames das Risiko eingehen, Clickjacking zu ermöglichen.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Mit dieser Einstellung wird die CSP so eingestellt, dass Framing von einer Reihe zulässiger Domänen zugelassen wird. Beachten Sie, dass Sie durch die Aktivierung der Verwendung von iFrames das Risiko eingehen, Clickjacking zu ermöglichen.",
       "IFRAMEENABLED": "iFrame zulassen",
-      "ALLOWEDORIGINS": "Zulässige URLs"
+      "ALLOWEDORIGINS": "Zulässige URLs",
+      "IMPERSONATIONTITLE": "Identitätswechsel",
+      "IMPERSONATIONENABLED": "Identitätswechsel zulassen",
+      "IMPERSONATIONDESCRIPTION": "Diese Einstellung ermöglicht grundsätzlich die Verwendung von Identitätswechseln. Beachten Sie, dass dem Imitator auch die entsprechenden `*_IMPERSONATOR`-Rollen zugewiesen werden müssen."
     },
     "DIALOG": {
       "RESET": {
