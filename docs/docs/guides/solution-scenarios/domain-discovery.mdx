@@ -15,7 +15,7 @@ In the example there is a service provider with a ZITADEL instance running on a 
 By default all users login on the organization **CIAM** with their preferred social login provider.
 
 Users of the two business customers **Alpha** and **Beta** should login according to their organization login and access policy settings.
-In case of Alpha users will login via an external identity provider (eg, [AzureAD](/docs/guides/integrate/identity-providers/azure-ad)).
+In case of Alpha users will login via an external identity provider (eg, [Entra ID](/docs/guides/integrate/identity-providers/azure-ad)).
 Beta users must only login with username/password and MFA instead.
 
 For this scenario you need to route the user `alice@alpha.com` to the **Alpha Organization** and `bob@beta.com` to the **Beta Organization** respectively.
@@ -116,7 +116,7 @@ Chuck
 Alice
 
 1. Alice enters alice@alpha.com and clicks next
-1. Redirect to AzureAD Tenant (or any other IDP)
+1. Redirect to Entra ID Tenant (or any other IDP)
 1. Alice logs in with her company credentials
 1. Redirected back to your application
 

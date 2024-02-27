@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"net/http"
+	"sort"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -36,6 +37,30 @@ type API struct {
 	healthServer      *health.Server
 	accessInterceptor *http_mw.AccessInterceptor
 	queries           *query.Queries
+}
+
+func (a *API) ListGrpcServices() []string {
+	serviceInfo := a.grpcServer.GetServiceInfo()
+	services := make([]string, len(serviceInfo))
+	i := 0
+	for servicename := range serviceInfo {
+		services[i] = servicename
+		i++
+	}
+	sort.Strings(services)
+	return services
+}
+
+func (a *API) ListGrpcMethods() []string {
+	serviceInfo := a.grpcServer.GetServiceInfo()
+	methods := make([]string, 0)
+	for servicename, service := range serviceInfo {
+		for _, method := range service.Methods {
+			methods = append(methods, "/"+servicename+"/"+method.Name)
+		}
+	}
+	sort.Strings(methods)
+	return methods
 }
 
 type healthCheck interface {

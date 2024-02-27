@@ -52,8 +52,14 @@ func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner 
 			return nil, err
 		}
 	}
+	wm, err := c.getTargetWriteModelByID(ctx, add.AggregateID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if wm.State.Exists() {
+		return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-9axkz0jvzm", "Errors.Target.AlreadyExists")
+	}
 
-	wm := NewTargetWriteModel(add.AggregateID, resourceOwner)
 	pushedEvents, err := c.eventstore.Push(ctx, target.NewAddedEvent(
 		ctx,
 		TargetAggregateFromWriteModel(&wm.WriteModel),
@@ -165,6 +171,15 @@ func (c *Commands) DeleteTarget(ctx context.Context, id, resourceOwner string) (
 		return nil, err
 	}
 	return writeModelToObjectDetails(&existing.WriteModel), nil
+}
+
+func (c *Commands) existsTargetsByIDs(ctx context.Context, ids []string, resourceOwner string) bool {
+	wm := NewTargetsExistsWriteModel(ids, resourceOwner)
+	err := c.eventstore.FilterToQueryReducer(ctx, wm)
+	if err != nil {
+		return false
+	}
+	return wm.AllExists()
 }
 
 func (c *Commands) getTargetWriteModelByID(ctx context.Context, id string, resourceOwner string) (*TargetWriteModel, error) {
