@@ -23,6 +23,7 @@
           *ngIf="frameworks"
           [frameworkId]="framework()?.id"
           [frameworks]="frameworks"
+          [withCustom]="true"
           (selectionChanged)="findFramework($event)"
         ></cnsl-framework-autocomplete>
       </div>
@@ -37,7 +38,7 @@
         color="primary"
         mat-raised-button
         class="continue-button"
-        [disabled]="(!project && !projectName) || !framework()"
+        [disabled]="(!project && !projectName) || !(framework() || customFramework())"
         (click)="project && project.name === projectName ? goToAppIntegratePage() : createProjectAndContinue()"
       >
         {{

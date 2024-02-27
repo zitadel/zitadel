@@ -34,6 +34,7 @@ export class FrameworkAutocompleteComponent implements OnInit {
   public isLoading = signal(false);
   @Input() public frameworkId?: string;
   @Input() public frameworks: Framework[] = [];
+  @Input() public withCustom: boolean = false;
   public myControl: FormControl = new FormControl();
   @Output() public selectionChanged: EventEmitter<string> = new EventEmitter();
   public filteredOptions: Observable<Framework[]> = of([]);

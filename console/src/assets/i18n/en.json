@@ -127,6 +127,7 @@
     "CREATEPROJECTFORAPP": "Create Project {{value}}",
     "SELECT_FRAMEWORK": "Select Framework",
     "FRAMEWORK": "Framework",
+    "FRAMEWORK_OTHER": "Other (OIDC, SAML, API)",
     "ALMOSTDONE": "You're almost done.",
     "REVIEWCONFIGURATION": "Review Configuration",
     "REVIEWCONFIGURATION_DESCRIPTION": "We've created a basic configuration for {{value}} applications. You can adapt this configuration to your needs after creation.",

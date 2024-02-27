@@ -127,6 +127,7 @@
     "CREATEPROJECTFORAPP": "创建项目 {{value}}",
     "SELECT_FRAMEWORK": "选择框架",
     "FRAMEWORK": "框架",
+    "FRAMEWORK_OTHER": "其他 (OIDC, SAML, API)",
     "ALMOSTDONE": "就快好了",
     "REVIEWCONFIGURATION": "审查配置",
     "REVIEWCONFIGURATION_DESCRIPTION": "我们为 {{value}} 应用程序创建了一个基本配置。创建后，您可以根据自己的需要调整该配置。",

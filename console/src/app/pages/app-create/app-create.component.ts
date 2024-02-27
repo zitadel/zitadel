@@ -30,6 +30,7 @@ export class AppCreateComponent implements OnDestroy {
 
   public error = signal('');
   public framework = signal<Framework | undefined>(undefined);
+  public customFramework = signal<boolean>(false);
   public initialParam = signal<string>('');
   public destroy$: Subject<void> = new Subject();
 
@@ -64,8 +65,13 @@ export class AppCreateComponent implements OnDestroy {
   }
 
   public findFramework(id: string) {
-    const temp = this.frameworks.find((f) => f.id === id);
-    this.framework.set(temp);
+    if (id !== 'other') {
+      this.customFramework.set(false);
+      const temp = this.frameworks.find((f) => f.id === id);
+      this.framework.set(temp);
+    } else {
+      this.customFramework.set(true);
+    }
   }
 
   ngOnDestroy(): void {
@@ -74,7 +80,14 @@ export class AppCreateComponent implements OnDestroy {
   }
 
   public goToAppIntegratePage(): void {
-    if (this.project && this.framework()) {
+    if (this.project && this.customFramework()) {
+      const id = (this.project.project as Project.AsObject).id
+        ? (this.project.project as Project.AsObject).id
+        : (this.project.project as GrantedProject.AsObject).projectId
+          ? (this.project.project as GrantedProject.AsObject).projectId
+          : '';
+      this.router.navigate(['/projects', id, 'apps', 'create']);
+    } else if (this.project && this.framework()) {
       const id = (this.project.project as Project.AsObject).id
         ? (this.project.project as Project.AsObject).id
         : (this.project.project as GrantedProject.AsObject).projectId

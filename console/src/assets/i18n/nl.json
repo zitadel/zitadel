@@ -127,6 +127,7 @@
     "CREATEPROJECTFORAPP": "Creëer Project {{value}}",
     "SELECT_FRAMEWORK": "Kies Framework",
     "FRAMEWORK": "Framework",
+    "FRAMEWORK_OTHER": "Ander (OIDC, SAML, API)",
     "ALMOSTDONE": "Je bent bijna klaar",
     "REVIEWCONFIGURATION": "Reviewconfiguratie",
     "REVIEWCONFIGURATION_DESCRIPTION": "We hebben een basisconfiguratie gemaakt voor {{value}} toepassingen. Je kunt deze configuratie na het aanmaken aanpassen aan je behoeften.",

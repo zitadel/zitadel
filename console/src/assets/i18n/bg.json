@@ -127,6 +127,7 @@
     "CREATEPROJECTFORAPP": "Създаване на проект {{value}}",
     "SELECT_FRAMEWORK": "Изберете рамка",
     "FRAMEWORK": "Рамка",
+    "FRAMEWORK_OTHER": "други (OIDC, SAML, API)",
     "ALMOSTDONE": "Почти сте готови.",
     "REVIEWCONFIGURATION": "Конфигурация на прегледа",
     "REVIEWCONFIGURATION_DESCRIPTION": "Създадохме основна конфигурация за {{value}} приложения. След създаването можете да адаптирате тази конфигурация към вашите нужди.",

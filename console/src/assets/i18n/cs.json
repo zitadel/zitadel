@@ -127,6 +127,7 @@
     "CREATEPROJECTFORAPP": "Vytvořit projekt {{value}}",
     "SELECT_FRAMEWORK": "Vybrat framework",
     "FRAMEWORK": "Framework",
+    "FRAMEWORK_OTHER": "jiný (OIDC, SAML, API)",
     "ALMOSTDONE": "Jste téměř hotovi.",
     "REVIEWCONFIGURATION": "Přezkoumání konfigurace",
     "REVIEWCONFIGURATION_DESCRIPTION": "Vytvořili jsme základní konfiguraci pro {{hodnota}} aplikace. Tuto konfiguraci můžete po vytvoření přizpůsobit svým potřebám.",

@@ -116,21 +116,22 @@
     "CUSTOMERPORTAL": "Клиентский портал"
   },
   "QUICKSTART": {
-    "TITLE": "Integrați ZITADEL în aplicația dumneavoastră",
-    "DESCRIPTION": "Integrați ZITADEL în aplicația dvs. sau utilizați unul dintre exemplele noastre pentru a începe în câteva minute.",
-    "BTN_START": "Creați o aplicație",
-    "BTN_LEARNMORE": "Aflați mai mult",
-    "CREATEPROJECTFORAPP": "Creați un proiect {{value}}",
-    "SELECT_FRAMEWORK": "Selectați cadrul",
-    "FRAMEWORK": "Cadru",
-    "ALMOSTDONE": "Aproape ați terminat",
-    "REVIEWCONFIGURATION": "Revizuirea configurației",
-    "REVIEWCONFIGURATION_DESCRIPTION": "Am creat o configurație de bază pentru aplicațiile {{valoare}}. Puteți adapta această configurație în funcție de nevoile dvs. după creare.",
-    "REDIRECTS": "Configurați redirecționările",
+    "TITLE": "Интегрируйте ZITADEL в свое приложение",
+    "ОПИСАНИЕ": "Интегрируйте ZITADEL в свое приложение или воспользуйтесь одним из наших образцов, чтобы начать работу за считанные минуты",
+    "BTN_START": "Создать приложение",
+    "BTN_LEARNMORE": "Узнать больше",
+    "CREATEPROJECTFORAPP": "Создать проект {{value}}",
+    "SELECT_FRAMEWORK": "Выбрать фреймворк",
+    "FRAMEWORK": "Рамка",
+    "FRAMEWORK_OTHER": "Другое (OIDC, SAML, API)",
+    "ALMOSTDONE": "Вы почти закончили",
+    "REVIEWCONFIGURATION": "Конфигурация обзора",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Мы создали базовую конфигурацию для {{value}} приложений. После создания вы можете адаптировать эту конфигурацию под свои нужды.",
+    "REDIRECTS": "Настроить редиректы",
     "DIALOG": {
       "CHANGE": {
-        "TITLE": "Cadrul de schimbare",
-        "DESCRIPTION": "Alegeți unul dintre cadrele disponibile pentru o configurare rapidă a aplicației dvs."
+        "TITLE": "Рамки изменений",
+        "ОПИСАНИЕ": "Выберите один из доступных фреймворков для быстрой настройки вашего приложения"
       }
     }
   },

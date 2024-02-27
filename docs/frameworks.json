@@ -51,6 +51,7 @@
   {
     "id": "react",
     "title": "React",
+    "description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
     "imgSrcDark": "/docs/img/tech/react.png",
     "docsLink": "/docs/sdk-examples/react"
   },
@@ -62,6 +63,7 @@
   {
     "id": "vue",
     "title": "Vue.js",
+    "description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
     "imgSrcDark": "/docs/img/tech/vue.svg",
     "docsLink": "/docs/sdk-examples/vue"
   },

@@ -20,6 +20,16 @@
           </div>
         </div>
       </mat-option>
+      <mat-option *ngIf="withCustom" [value]="'other'">
+        <div class="framework-option">
+          <div class="framework-option-column">
+            <div class="img-wrapper"></div>
+            <span class="fill-space"></span>
+
+            <span>{{ 'QUICKSTART.FRAMEWORK_OTHER' | translate }}</span>
+          </div>
+        </div>
+      </mat-option>
     </mat-autocomplete>
   </cnsl-form-field>
 </form>

@@ -127,6 +127,7 @@
     "CREATEPROJECTFORAPP": "Utwórz projekt {{value}}",
     "SELECT_FRAMEWORK": "Wybierz Framework",
     "FRAMEWORK": "Ramy",
+    "FRAMEWORK_OTHER": "Inny (OIDC, SAML, API)",
     "ALMOSTDONE": "Już prawie skończyłeś",
     "REVIEWCONFIGURATION": "Konfiguracja recenzji",
     "REVIEWCONFIGURATION_DESCRIPTION": "Stworzyliśmy podstawową konfigurację dla aplikacji {{value}}. Możesz dostosować tę konfigurację do swoich potrzeb po jej utworzeniu.",
