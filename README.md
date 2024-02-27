@@ -48,9 +48,16 @@ You can already use the current state, and extend it with your needs.
 - [ ] User Registration and Login with external Provider 
   - [ ] Google
   - [ ] GitHub
+  - [ ] GitHub Enterprise
   - [ ] GitLab
+  - [ ] GitLab Enterprise
   - [ ] Azure
   - [ ] Apple
+  - [ ] Generic OIDC
+  - [ ] Generic OAuth
+  - [ ] Generic JWT
+  - [ ] LDAP
+  - [ ] SAML SP
 - Multifactor Registration an Login
   - [x] Passkeys
   - [ ] TOTP
