@@ -11,13 +11,14 @@ import (
 )
 
 const (
-	SecurityPolicyProjectionTable      = "projections.security_policies"
-	SecurityPolicyColumnInstanceID     = "instance_id"
-	SecurityPolicyColumnCreationDate   = "creation_date"
-	SecurityPolicyColumnChangeDate     = "change_date"
-	SecurityPolicyColumnSequence       = "sequence"
-	SecurityPolicyColumnEnabled        = "enabled"
-	SecurityPolicyColumnAllowedOrigins = "origins"
+	SecurityPolicyProjectionTable             = "projections.security_policies2"
+	SecurityPolicyColumnInstanceID            = "instance_id"
+	SecurityPolicyColumnCreationDate          = "creation_date"
+	SecurityPolicyColumnChangeDate            = "change_date"
+	SecurityPolicyColumnSequence              = "sequence"
+	SecurityPolicyColumnEnableIframeEmbedding = "enable_iframe_embedding"
+	SecurityPolicyColumnAllowedOrigins        = "origins"
+	SecurityPolicyColumnEnableImpersonation   = "enable_impersonation"
 )
 
 type securityPolicyProjection struct{}
@@ -37,7 +38,7 @@ func (*securityPolicyProjection) Init() *old_handler.Check {
 			handler.NewColumn(SecurityPolicyColumnChangeDate, handler.ColumnTypeTimestamp),
 			handler.NewColumn(SecurityPolicyColumnInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(SecurityPolicyColumnSequence, handler.ColumnTypeInt64),
-			handler.NewColumn(SecurityPolicyColumnEnabled, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(SecurityPolicyColumnEnableIframeEmbedding, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(SecurityPolicyColumnAllowedOrigins, handler.ColumnTypeTextArray, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(SecurityPolicyColumnInstanceID),
@@ -74,8 +75,10 @@ func (p *securityPolicyProjection) reduceSecurityPolicySet(event eventstore.Even
 		handler.NewCol(SecurityPolicyColumnInstanceID, e.Aggregate().InstanceID),
 		handler.NewCol(SecurityPolicyColumnSequence, e.Sequence()),
 	}
-	if e.Enabled != nil {
-		changes = append(changes, handler.NewCol(SecurityPolicyColumnEnabled, *e.Enabled))
+	if e.EnableIframeEmbedding != nil {
+		changes = append(changes, handler.NewCol(SecurityPolicyColumnEnableIframeEmbedding, *e.EnableIframeEmbedding))
+	} else if e.Enabled != nil {
+		changes = append(changes, handler.NewCol(SecurityPolicyColumnEnableIframeEmbedding, *e.Enabled))
 	}
 	if e.AllowedOrigins != nil {
 		changes = append(changes, handler.NewCol(SecurityPolicyColumnAllowedOrigins, e.AllowedOrigins))

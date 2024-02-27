@@ -21,6 +21,7 @@ type Instance interface {
 	DefaultLanguage() language.Tag
 	DefaultOrganisationID() string
 	SecurityPolicyAllowedOrigins() []string
+	SecurityPolicyEnableImpersonation() bool
 	Block() *bool
 	AuditLogRetention() *time.Duration
 }
@@ -81,6 +82,10 @@ func (i *instance) DefaultOrganisationID() string {
 
 func (i *instance) SecurityPolicyAllowedOrigins() []string {
 	return nil
+}
+
+func (i *instance) SecurityPolicyEnableImpersonation() bool {
+	return false
 }
 
 func GetInstance(ctx context.Context) Instance {

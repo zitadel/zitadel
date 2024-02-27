@@ -208,3 +208,7 @@ func (m *mockInstance) RequestedHost() string {
 func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 	return nil
 }
+
+func (m *mockInstance) SecurityPolicyEnableImpersonation() bool {
+	return false
+}

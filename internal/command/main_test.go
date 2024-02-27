@@ -215,6 +215,10 @@ func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 	return nil
 }
 
+func (m *mockInstance) SecurityPolicyEnableImpersonation() bool {
+	return false
+}
+
 func newMockPermissionCheckAllowed() domain.PermissionCheck {
 	return func(ctx context.Context, permission, orgID, resourceID string) (err error) {
 		return nil
