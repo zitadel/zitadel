@@ -20,14 +20,14 @@ type CreateUserSchema struct {
 
 func (s *CreateUserSchema) Valid() error {
 	if s.Type == "" {
-		return zerrors.ThrowInvalidArgument(nil, "COMMA-DGFj3", "Errors.UserSchema.Type.Missing") // TODO: i18n
+		return zerrors.ThrowInvalidArgument(nil, "COMMA-DGFj3", "Errors.UserSchema.Type.Missing")
 	}
 	if err := validateUserSchema(s.Schema); err != nil {
 		return err
 	}
 	for _, authenticator := range s.PossibleAuthenticators {
 		if authenticator == domain.AuthenticatorTypeUnspecified {
-			return zerrors.ThrowInvalidArgument(nil, "COMMA-Gh652", "Errors.UserSchema.Authenticator.Invalid") // TODO: i18n
+			return zerrors.ThrowInvalidArgument(nil, "COMMA-Gh652", "Errors.UserSchema.Authenticator.Invalid")
 		}
 	}
 	return nil
@@ -45,14 +45,14 @@ func (s *UpdateUserSchema) Valid() error {
 		return zerrors.ThrowInvalidArgument(nil, "COMMA-H5421", "Errors.IDMissing")
 	}
 	if s.Type != nil && *s.Type == "" {
-		return zerrors.ThrowInvalidArgument(nil, "COMMA-G43gn", "Errors.UserSchema.Type.Missing") // TODO: i18n
+		return zerrors.ThrowInvalidArgument(nil, "COMMA-G43gn", "Errors.UserSchema.Type.Missing")
 	}
 	if err := validateUserSchema(s.Schema); err != nil {
 		return err
 	}
 	for _, authenticator := range s.PossibleAuthenticators {
 		if authenticator == domain.AuthenticatorTypeUnspecified {
-			return zerrors.ThrowInvalidArgument(nil, "COMMA-WF4hg", "Errors.UserSchema.Authenticator.Invalid") // TODO: i18n
+			return zerrors.ThrowInvalidArgument(nil, "COMMA-WF4hg", "Errors.UserSchema.Authenticator.Invalid")
 		}
 	}
 	return nil
@@ -88,7 +88,7 @@ func (c *Commands) UpdateUserSchema(ctx context.Context, userSchema *UpdateUserS
 		return nil, err
 	}
 	if writeModel.State != domain.UserSchemaStateActive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-HB3e1", "Errors.UserSchema.NotActive") // TODO: i18n
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-HB3e1", "Errors.UserSchema.NotActive")
 	}
 	updatedEvent := writeModel.NewUpdatedEvent(
 		ctx,
@@ -115,7 +115,7 @@ func (c *Commands) DeactivateUserSchema(ctx context.Context, id string) (*domain
 		return nil, err
 	}
 	if writeModel.State != domain.UserSchemaStateActive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-E4t4z", "Errors.UserSchema.NotActive") // TODO: i18n
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-E4t4z", "Errors.UserSchema.NotActive")
 	}
 	err := c.pushAppendAndReduce(ctx, writeModel,
 		schema.NewDeactivatedEvent(ctx, UserSchemaAggregateFromWriteModel(&writeModel.WriteModel)),
@@ -135,7 +135,7 @@ func (c *Commands) ReactivateUserSchema(ctx context.Context, id string) (*domain
 		return nil, err
 	}
 	if writeModel.State != domain.UserSchemaStateInactive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-DGzh5", "Errors.UserSchema.NotInactive") // TODO: i18n
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-DGzh5", "Errors.UserSchema.NotInactive")
 	}
 	err := c.pushAppendAndReduce(ctx, writeModel,
 		schema.NewReactivatedEvent(ctx, UserSchemaAggregateFromWriteModel(&writeModel.WriteModel)),
@@ -155,9 +155,9 @@ func (c *Commands) DeleteUserSchema(ctx context.Context, id string) (*domain.Obj
 		return nil, err
 	}
 	if !writeModel.Exists() {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-Grg41", "Errors.UserSchema.NotExists") // TODO: i18n
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-Grg41", "Errors.UserSchema.NotExists")
 	}
-	// TODO: check for users based on that schema
+	// TODO: check for users based on that schema; this is only possible with / after https://github.com/zitadel/zitadel/issues/7308
 	err := c.pushAppendAndReduce(ctx, writeModel,
 		schema.NewDeletedEvent(ctx, UserSchemaAggregateFromWriteModel(&writeModel.WriteModel), writeModel.SchemaType),
 	)

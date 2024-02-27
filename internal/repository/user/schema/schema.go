@@ -15,14 +15,14 @@ const (
 	ReactivatedType = eventPrefix + "reactivated"
 	DeletedType     = eventPrefix + "deleted"
 
-	uniqueSchemaType = "user_schema_type" // TODO: naming?
+	uniqueSchemaType = "user_schema_type"
 )
 
 func NewAddSchemaTypeUniqueConstraint(schemaType string) *eventstore.UniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		uniqueSchemaType,
 		schemaType,
-		"Errors.UserSchema.Type.AlreadyExists") // TODO: i18n
+		"Errors.UserSchema.Type.AlreadyExists")
 }
 
 func NewRemoveSchemaTypeUniqueConstraint(schemaType string) *eventstore.UniqueConstraint {

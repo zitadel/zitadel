@@ -540,6 +540,15 @@ Errors:
     NoTimeout: Target has no timeout
     InvalidURL: Target has an invalid URL
     NotFound: Target not found
+  UserSchema:
+    Type:
+      Missing: User Schema Type missing
+      AlreadyExists: User Schema Type already exists
+    Authenticator:
+      Invalid: Invalid authenticator type
+    NotActive: User Schema not active
+    NotInactive: User Schema not inactive
+    NotExists: User Schema does not exist
 
 AggregateTypes:
   action: Action
@@ -552,6 +561,7 @@ AggregateTypes:
   quota: Quota
   feature: Feature
   target: Target
+  user_schema: User Schema
 
 EventTypes:
   target:
@@ -1226,6 +1236,12 @@ EventTypes:
         password:
           changed: Password of SMTP configuration changed
         removed: SMTP configuration removed
+  user_schema:
+    created: User Schema created
+    updated: User Schema updated
+    deactivated: User Schema deactivated
+    reactivated: User Schema reactivated
+    deleted: User Schema deleted
 
 Application:
   OIDC:
