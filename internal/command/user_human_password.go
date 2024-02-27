@@ -214,7 +214,7 @@ func (c *Commands) PasswordCodeSent(ctx context.Context, orgID, userID string) (
 	return err
 }
 
-// PasswordChangeSent notification sent that user changed his password
+// PasswordChangeSent notification sent that user changed password
 func (c *Commands) PasswordChangeSent(ctx context.Context, orgID, userID string) (err error) {
 	if userID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-pqlm2n", "Errors.User.UserIDMissing")
