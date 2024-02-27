@@ -537,6 +537,12 @@ Errors:
     NoTimeout: Cíl nemá časový limit
     InvalidURL: Cíl má neplatnou adresu URL
     NotFound: Cíl nenalezen
+  Execution:
+    ConditionInvalid: Podmínka provedení je neplatná
+    Invalid: Provedení je neplatné
+    NotFound: Provedení nenalezeno
+    IncludeNotFound: Zahrnout nenalezeno
+    NoTargets: Nejsou definovány žádné cíle
 
 AggregateTypes:
   action: Akce
@@ -549,8 +555,12 @@ AggregateTypes:
   quota: Kvóta
   feature: Funkce
   target: Cíl
+  execution: Provedení
 
 EventTypes:
+  execution:
+    set: Prováděcí sada
+    removed: Provedení smazáno
   target:
     added: Cíl vytvořen
     changed: Cíl změněn

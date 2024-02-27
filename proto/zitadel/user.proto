@@ -108,7 +108,7 @@ message Profile {
     ];
     string display_name = 4 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "a user can set his display name, if nothing is set ZITADEL computes \"first_name last_name\""
+            description: "a user can set the display name, if nothing is set ZITADEL computes \"first_name last_name\""
             example: "\"Gigi Giraffe\"";
         }
     ];
@@ -140,7 +140,7 @@ message Email {
     ];
     bool is_email_verified = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Is true if the user verified his email or if the email is managed outside ZITADEL"
+            description: "Is true if the user verified the email or if the email is managed outside ZITADEL"
         }
     ];
 }
@@ -154,7 +154,7 @@ message Phone {
     ];
     bool is_phone_verified = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Is true if the user verified his phone or if the phone is managed outside ZITADEL"
+            description: "Is true if the user verified the phone or if the phone is managed outside ZITADEL"
         }
     ];
 }
