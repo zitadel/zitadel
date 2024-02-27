@@ -44,24 +44,22 @@ In the first phase we want to have a MVP login ready with the OIDC Standard and 
 This list should show the current implementation state, and also what is missing.
 You can already use the current state, and extend it with your needs.
 
-- User Registeration
-  - [x] Email Password
-  - [x] Passkey
-- IDPs
+- [x] Local User Registration (with Password)
+- [ ] User Registration and Login with external Provider 
   - [ ] Google
   - [ ] GitHub
   - [ ] GitLab
   - [ ] Azure
   - [ ] Apple
-- Multifactor
+- Multifactor Registration an Login
   - [x] Passkeys
   - [ ] TOTP
-- Passwordless
-  - [x] Passkeys
-- Security Prompts
-  - [x] Setup Passkey as Passwordless method
-  - [ ] Setup TOTP as Multifactor
-  - [ ] Password Change
+  - [ ] OTP: Email Code
+  - [ ] OTP: SMS Code
+- [ ] Password Change/Reset
+- [ ] Domain Discovery
+- [ ] Branding
+- [ ] 
 - OIDC Standard
    - [ ] Authorization Code Flow with PKCE
    - [ ] AuthRequest `hintUserId`
@@ -78,10 +76,6 @@ You can already use the current state, and extend it with your needs.
      - [ ] `urn:zitadel:iam:org:project:id:zitadel:aud`
      - [ ] `urn:zitadel:iam:org:id:{orgid}`
    - [ ] AuthRequest UI locales
-- Security Prompts
-  - [x] Setup Passkey as Passwordless method
-  - [ ] Setup TOTP as Multifactor
-  - [ ] Password Change
 
 ## Tooling
 
