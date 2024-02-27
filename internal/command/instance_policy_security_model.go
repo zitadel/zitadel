@@ -62,7 +62,7 @@ func (wm *InstanceSecurityPolicyWriteModel) NewSetEvent(
 	if wm.EnableIframeEmbedding != policy.EnableIframeEmbedding {
 		changes = append(changes, instance.ChangeSecurityPolicyEnableIframeEmbedding(policy.EnableIframeEmbedding))
 	}
-	if policy.EnableIframeEmbedding && !slices.Equal(wm.AllowedOrigins, policy.AllowedOrigins) {
+	if !slices.Equal(wm.AllowedOrigins, policy.AllowedOrigins) {
 		changes = append(changes, instance.ChangeSecurityPolicyAllowedOrigins(policy.AllowedOrigins))
 	}
 	if wm.EnableImpersonation != policy.EnableImpersonation {

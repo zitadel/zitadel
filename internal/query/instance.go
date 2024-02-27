@@ -524,6 +524,7 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 			InstanceDomainSequenceCol.identifier(),
 			SecurityPolicyColumnEnableIframeEmbedding.identifier(),
 			SecurityPolicyColumnAllowedOrigins.identifier(),
+			SecurityPolicyColumnEnableImpersonation.identifier(),
 			LimitsColumnAuditLogRetention.identifier(),
 			LimitsColumnBlock.identifier(),
 		).
@@ -546,7 +547,8 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 					changeDate            sql.NullTime
 					creationDate          sql.NullTime
 					sequence              sql.NullInt64
-					securityPolicyEnabled sql.NullBool
+					enableIframeEmbedding sql.NullBool
+					enableImpersonation   sql.NullBool
 					auditLogRetention     database.NullDuration
 					block                 sql.NullBool
 				)
@@ -567,8 +569,9 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 					&changeDate,
 					&creationDate,
 					&sequence,
-					&securityPolicyEnabled,
+					&enableIframeEmbedding,
 					&instance.csp.allowedOrigins,
+					&enableImpersonation,
 					&auditLogRetention,
 					&block,
 				)
@@ -593,7 +596,8 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 				if block.Valid {
 					instance.block = &block.Bool
 				}
-				instance.csp.enableIframeEmbedding = securityPolicyEnabled.Bool
+				instance.csp.enableIframeEmbedding = enableIframeEmbedding.Bool
+				instance.csp.enableImpersonation = enableImpersonation.Bool
 			}
 			if instance.ID == "" {
 				return nil, zerrors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.IAM.NotFound")

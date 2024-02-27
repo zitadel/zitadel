@@ -40,6 +40,7 @@ func (*securityPolicyProjection) Init() *old_handler.Check {
 			handler.NewColumn(SecurityPolicyColumnSequence, handler.ColumnTypeInt64),
 			handler.NewColumn(SecurityPolicyColumnEnableIframeEmbedding, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(SecurityPolicyColumnAllowedOrigins, handler.ColumnTypeTextArray, handler.Nullable()),
+			handler.NewColumn(SecurityPolicyColumnEnableImpersonation, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(SecurityPolicyColumnInstanceID),
 		),
@@ -82,6 +83,9 @@ func (p *securityPolicyProjection) reduceSecurityPolicySet(event eventstore.Even
 	}
 	if e.AllowedOrigins != nil {
 		changes = append(changes, handler.NewCol(SecurityPolicyColumnAllowedOrigins, e.AllowedOrigins))
+	}
+	if e.EnableImpersonation != nil {
+		changes = append(changes, handler.NewCol(SecurityPolicyColumnEnableImpersonation, e.EnableImpersonation))
 	}
 	return handler.NewUpsertStatement(
 		e,
