@@ -49,19 +49,19 @@ func (*systemFeatureProjection) Reducers() []handler.AggregateReducer {
 		EventReducers: []handler.EventReducer{
 			{
 				Event:  feature_v2.SystemResetEventType,
-				Reduce: reduceInstanceResetFeatures,
+				Reduce: reduceSystemResetFeatures,
 			},
 			{
 				Event:  feature_v2.SystemLoginDefaultOrgEventType,
-				Reduce: reduceInstanceSetFeature[bool],
+				Reduce: reduceSystemSetFeature[bool],
 			},
 			{
 				Event:  feature_v2.SystemTriggerIntrospectionProjectionsEventType,
-				Reduce: reduceInstanceSetFeature[bool],
+				Reduce: reduceSystemSetFeature[bool],
 			},
 			{
 				Event:  feature_v2.SystemLegacyIntrospectionEventType,
-				Reduce: reduceInstanceSetFeature[bool],
+				Reduce: reduceSystemSetFeature[bool],
 			},
 		},
 	}}
