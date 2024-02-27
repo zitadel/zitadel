@@ -34,7 +34,7 @@ type ListDetailsMsg interface {
 // Dynamically generated values are not compared with expected.
 // Instead a sanity check is performed.
 // For the sequence a non-zero value is expected.
-// The change date is checked with a tolerance of 1 minute.
+// If the change date is populated, it is checked with a tolerance of 1 minute around Now.
 //
 // The resource owner is compared with expected.
 func AssertDetails[D Details, M DetailsMsg[D]](t testing.TB, expected, actual M) {
@@ -47,9 +47,11 @@ func AssertDetails[D Details, M DetailsMsg[D]](t testing.TB, expected, actual M)
 
 	assert.NotZero(t, gotDetails.GetSequence())
 
-	wantChangeDate := wantDetails.GetChangeDate().AsTime()
-	gotChangeDate := gotDetails.GetChangeDate().AsTime()
-	assert.WithinRange(t, gotChangeDate, wantChangeDate.Add(-time.Minute), wantChangeDate.Add(time.Minute))
+	if wantDetails.GetChangeDate() != nil {
+		wantChangeDate := time.Now()
+		gotChangeDate := gotDetails.GetChangeDate().AsTime()
+		assert.WithinRange(t, gotChangeDate, wantChangeDate.Add(-time.Minute), wantChangeDate.Add(time.Minute))
+	}
 
 	assert.Equal(t, wantDetails.GetResourceOwner(), gotDetails.GetResourceOwner())
 }
