@@ -79,7 +79,6 @@ logger.info("This is an info log.")
 logger.warn("This is a warn log.")
 
 logger.error("This is an error log.")
-
 ```
 
 #### Parameters
