@@ -97,7 +97,6 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
 			actions.HTTPConfigDecodeHook,
-			hook.EnumHookFunc(domain.FeatureString),
 			hook.EnumHookFunc(internal_authz.MemberTypeString),
 		)),
 	)
