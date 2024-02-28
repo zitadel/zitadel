@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import frameworkDefinition from '../../../../../docs/frameworks.json';
@@ -26,9 +26,10 @@ export type Framework = FrameworkDefinition & {
   selector: 'cnsl-oidc-app-configuration',
   templateUrl: './oidc-configuration.component.html',
   styleUrls: ['./oidc-configuration.component.scss'],
-  imports: [TranslateModule, RouterModule, CommonModule],
+  imports: [TranslateModule, RouterModule, CommonModule, MatButtonModule],
 })
 export class OIDCConfigurationComponent {
   @Input() public name?: string;
   @Input() public configuration: AddOIDCAppRequest.AsObject = new AddOIDCAppRequest().toObject();
+  @Output() public changeName: EventEmitter<string> = new EventEmitter();
 }

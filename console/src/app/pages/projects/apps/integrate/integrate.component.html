@@ -49,7 +49,8 @@
           <cnsl-card class="review-card" title="{{ 'QUICKSTART.REVIEWCONFIGURATION' | translate }}">
             <cnsl-oidc-app-configuration
               *ngIf="(oidcAppRequest | async)?.toObject() as config"
-              [name]="framework()?.title"
+              [name]="(oidcAppRequest | async)?.toObject()?.name"
+              (changeName)="editName()"
               [configuration]="config"
             ></cnsl-oidc-app-configuration>
 

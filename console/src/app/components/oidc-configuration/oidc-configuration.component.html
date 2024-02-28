@@ -3,8 +3,9 @@
     <span class="left cnsl-secondary-text">
       {{ 'APP.NAME' | translate }}
     </span>
-    <span class="right">
-      {{ name }}
+    <span class="right name">
+      <span>{{ name }}</span>
+      <button (click)="changeName.emit()" mat-icon-button><i class="las la-pen"></i></button>
     </span>
   </div>
 

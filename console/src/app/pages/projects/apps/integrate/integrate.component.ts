@@ -29,22 +29,11 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { AppSecretDialogComponent } from '../app-secret-dialog/app-secret-dialog.component';
-import {
-  BASIC_AUTH_METHOD,
-  CODE_METHOD,
-  DEVICE_CODE_METHOD,
-  getPartialConfigFromAuthMethod,
-  IMPLICIT_METHOD,
-  PKCE_METHOD,
-  PK_JWT_METHOD,
-  POST_METHOD,
-} from '../authmethods';
-import { API_TYPE, AppCreateType, NATIVE_TYPE, RadioItemAppType, SAML_TYPE, USER_AGENT_TYPE, WEB_TYPE } from '../authtypes';
-import { EnvironmentService } from 'src/app/services/environment.service';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { Framework } from 'src/app/components/quickstart/quickstart.component';
 import { OIDC_CONFIGURATIONS } from 'src/app/utils/framework';
 import { NavigationService } from 'src/app/services/navigation.service';
+import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.component';
 
 @Component({
   selector: 'cnsl-integrate',
@@ -159,6 +148,26 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
         this.loading = false;
         this.toast.showError(error);
       });
+  }
+
+  public editName() {
+    const dialogRef = this.dialog.open(NameDialogComponent, {
+      data: {
+        name: this.oidcAppRequest.getValue()?.getName() ?? '',
+        titleKey: 'APP.NAMEDIALOG.TITLE',
+        descKey: 'APP.NAMEDIALOG.DESCRIPTION',
+        labelKey: 'APP.NAMEDIALOG.NAME',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((name) => {
+      if (name && name !== this.framework()?.title) {
+        const request = this.oidcAppRequest.getValue();
+        request.setName(name);
+        this.oidcAppRequest.next(request);
+      }
+    });
   }
 
   public showSavedDialog(added: AddOIDCAppResponse.AsObject | AddAPIAppResponse.AsObject): void {
