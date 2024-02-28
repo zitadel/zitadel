@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
@@ -177,7 +178,16 @@ func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
 func SecurityPolicyToPb(policy *query.SecurityPolicy) *settings_pb.SecurityPolicy {
 	return &settings_pb.SecurityPolicy{
 		Details:               obj_grpc.ToViewDetailsPb(policy.Sequence, policy.CreationDate, policy.ChangeDate, policy.AggregateID),
-		EnableIframeEmbedding: policy.Enabled,
+		EnableIframeEmbedding: policy.EnableIframeEmbedding,
 		AllowedOrigins:        policy.AllowedOrigins,
+		EnableImpersonation:   policy.EnableImpersonation,
+	}
+}
+
+func securityPolicyToCommand(req *admin_pb.SetSecurityPolicyRequest) *command.SecurityPolicy {
+	return &command.SecurityPolicy{
+		EnableIframeEmbedding: req.GetEnableIframeEmbedding(),
+		AllowedOrigins:        req.GetAllowedOrigins(),
+		EnableImpersonation:   req.GetEnableImpersonation(),
 	}
 }

@@ -2,11 +2,11 @@ package command
 
 import (
 	"context"
+	"slices"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/target"
 )
 
@@ -62,7 +62,7 @@ func (wm *TargetWriteModel) Reduce() error {
 			if e.InterruptOnError != nil {
 				wm.InterruptOnError = *e.InterruptOnError
 			}
-		case *action.RemovedEvent:
+		case *target.RemovedEvent:
 			wm.State = domain.TargetRemoved
 		}
 	}
@@ -114,6 +114,54 @@ func (wm *TargetWriteModel) NewChangedEvent(
 		return nil
 	}
 	return target.NewChangedEvent(ctx, agg, changes)
+}
+
+type TargetsExistsWriteModel struct {
+	eventstore.WriteModel
+	ids         []string
+	existingIDs []string
+}
+
+func (e *TargetsExistsWriteModel) AllExists() bool {
+	return len(e.ids) == len(e.existingIDs)
+}
+
+func NewTargetsExistsWriteModel(ids []string, resourceOwner string) *TargetsExistsWriteModel {
+	return &TargetsExistsWriteModel{
+		WriteModel: eventstore.WriteModel{
+			ResourceOwner: resourceOwner,
+			InstanceID:    resourceOwner,
+		},
+		ids: ids,
+	}
+}
+
+func (wm *TargetsExistsWriteModel) Reduce() error {
+	for _, event := range wm.Events {
+		switch e := event.(type) {
+		case *target.AddedEvent:
+			if !slices.Contains(wm.existingIDs, e.Aggregate().ID) {
+				wm.existingIDs = append(wm.existingIDs, e.Aggregate().ID)
+			}
+		case *target.RemovedEvent:
+			i := slices.Index(wm.existingIDs, e.Aggregate().ID)
+			if i >= 0 {
+				wm.existingIDs = slices.Delete(wm.existingIDs, i, i+1)
+			}
+		}
+	}
+	return wm.WriteModel.Reduce()
+}
+
+func (wm *TargetsExistsWriteModel) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(wm.ResourceOwner).
+		AddQuery().
+		AggregateTypes(target.AggregateType).
+		AggregateIDs(wm.ids...).
+		EventTypes(target.AddedEventType,
+			target.RemovedEventType).
+		Builder()
 }
 
 func TargetAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {

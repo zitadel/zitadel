@@ -15,7 +15,7 @@ The [OpenID Connect & OAuth endpoints](/docs/apis/openidoauth/endpoints) and [SA
 ## Authentication & authorization
 
 ZITADEL implements industry standards such as OpenID Connect, OAuth 2.0, or SAML for authentication.
-Please refer to our guides how to [authenticate users](/docs/guides/integrate/human-users) through an interactive authentication process and how to [authenticate service users](/docs/guides/integrate/serviceusers) with a programmatic authentication.
+Please refer to our guides how to [authenticate users](/docs/guides/integrate/login/login-users) through an interactive authentication process and how to [authenticate service users](/docs/guides/integrate/serviceusers) with a programmatic authentication.
 
 ### OpenID Connect & OAuth
 
@@ -267,6 +267,8 @@ In the table below you can see the URI of those calls.
 ZITADEL hosts everything under a single domain: `{instance}.zitadel.cloud` or your custom domain `$ZITADEL_DOMAIN`
 
 The domain is used as the OIDC issuer and as the base url for the gRPC and REST APIs, the Login and Console UI, which you'll find under `{your_domain}/ui/console/`.
+
+Are you self-hosting and having troubles with *Instance not found* errors? [Check out this page](https://zitadel.com/docs/self-hosting/manage/custom-domain).
 
 ## API path prefixes
 

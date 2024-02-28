@@ -322,7 +322,7 @@ Errors:
       NotActive: Грант проекта не активен
       NotInactive: Грант проекта не неактивен
   IAM:
-    NotFound: Экземпляр не найден. Проверьте https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM не найден. Убедитесь, что у вас есть правильный домен. Смотрите на https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Роли не изменились
     MemberInvalid: Участник недействителен
@@ -529,6 +529,12 @@ Errors:
     NoTimeout: У цели нет тайм-аута
     InvalidURL: Цель имеет неверный URL-адрес
     NotFound: Цель не найдена
+  Execution:
+    ConditionInvalid: Недопустимое условие выполнения
+    Invalid: Исполнение недействительно
+    NotFound: Исполнение не найдено
+    IncludeNotFound: Включить не найдено
+    NoTargets: Цели не определены
 
 AggregateTypes:
   action: Действие
@@ -541,8 +547,12 @@ AggregateTypes:
   quota: Квота
   feature: Особенность
   target: мишень
+  execution: Исполнение
 
 EventTypes:
+  execution:
+    set: Набор исполнения
+    removed: Исполнение удалено
   target:
     added: Цель создана
     changed: Цель изменена

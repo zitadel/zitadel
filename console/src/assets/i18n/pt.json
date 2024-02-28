@@ -119,6 +119,30 @@
     "SETTINGS": "Configurações",
     "CUSTOMERPORTAL": "Portal do Cliente"
   },
+  "QUICKSTART": {
+    "TITLE": "Integrar a ZITADEL na sua aplicação",
+    "DESCRIÇÃO": "Integre a ZITADEL na sua aplicação ou utilize uma das nossas amostras para começar em minutos.",
+    "BTN_START": "Criar aplicação",
+    "BTN_LEARNMORE": "Saiba mais",
+    "CREATEPROJECTFORAPP": "Criar projeto {{value}}",
+    "SELECT_FRAMEWORK": "Selecionar estrutura",
+    "FRAMEWORK": "Estrutura",
+    "FRAMEWORK_OTHER": "Outro (OIDC, SAML, API)",
+    "ALMOSTDONE": "Está quase a terminar",
+    "REVIEWCONFIGURATION": "Configuração de revisão",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Criámos uma configuração básica para aplicações {{value}}. Pode adaptar esta configuração às suas necessidades após a criação.",
+    "REDIRECTS": "Configurar redireccionamentos",
+    "DEVMODEWARN": "O modo Dev está habilitado por padrão. Você pode atualizar os valores para produção posteriormente.",
+    "GUIDE": "Guia",
+    "BROWSEEXAMPLES": "Navegar por exemplos",
+    "DUPLICATEAPPRENAME": "Já existe um aplicativo com o mesmo neme. Escolha um nome diferente.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Alterar Quadro",
+        "DESCRIÇÃO": "Escolha uma das estruturas disponíveis para uma configuração rápida da sua aplicação."
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "Ações",
     "FILTER": "Filtrar",
@@ -138,6 +162,7 @@
     "ADD": "Adicionar",
     "CREATE": "Criar",
     "CONTINUE": "Continuar",
+    "CONTINUEWITH": "Continue com {{value}}",
     "BACK": "Voltar",
     "CLOSE": "Fechar",
     "CLEAR": "Limpar",
@@ -188,12 +213,16 @@
     "IAM_OWNER_VIEWER": "Tem permissão para revisar toda a instância, incluindo todas as organizações",
     "IAM_ORG_MANAGER": "Tem permissão para criar e gerenciar organizações",
     "IAM_USER_MANAGER": "Tem permissão para criar e gerenciar usuários",
+    "IAM_ADMIN_IMPERSONATOR": "Tem permissão para se passar por administradores e usuários finais de todas as organizações",
+    "IAM_END_USER_IMPERSONATOR": "Tem permissão para se passar por usuários finais de todas as organizações",
     "ORG_OWNER": "Tem permissão sobre toda a organização",
     "ORG_USER_MANAGER": "Tem permissão para criar e gerenciar usuários da organização",
     "ORG_OWNER_VIEWER": "Tem permissão para revisar toda a organização",
     "ORG_USER_PERMISSION_EDITOR": "Tem permissão para gerenciar concessões de usuários",
     "ORG_PROJECT_PERMISSION_EDITOR": "Tem permissão para gerenciar concessões de projetos",
     "ORG_PROJECT_CREATOR": "Tem permissão para criar seus próprios projetos e configurações subjacentes",
+    "ORG_ADMIN_IMPERSONATOR": "Tem permissão para se passar por administradores e usuários finais da organização",
+    "ORG_END_USER_IMPERSONATOR": "Tem permissão para se passar por usuários finais da organização",
     "PROJECT_OWNER": "Tem permissão sobre todo o projeto",
     "PROJECT_OWNER_VIEWER": "Tem permissão para revisar todo o projeto",
     "PROJECT_OWNER_GLOBAL": "Tem permissão sobre todo o projeto",
@@ -1163,9 +1192,13 @@
       "UPDATED": "Configurações atualizadas."
     },
     "SECURITY": {
-      "DESCRIPTION": "Essa configuração define o CSP para permitir o enquadramento de um conjunto de domínios permitidos. Observe que, ao permitir o uso de iFrames, você corre o risco de permitir ataques de clickjacking.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Essa configuração define o CSP para permitir o enquadramento de um conjunto de domínios permitidos. Observe que, ao permitir o uso de iFrames, você corre o risco de permitir ataques de clickjacking.",
       "IFRAMEENABLED": "Permitir iFrame",
-      "ALLOWEDORIGINS": "URLs permitidos"
+      "ALLOWEDORIGINS": "URLs permitidos",
+      "IMPERSONATIONTITLE": "Personificação",
+      "IMPERSONATIONENABLED": "Permitir representação",
+      "IMPERSONATIONDESCRIPTION": "Esta configuração permite usar a representação em princípio. Observe que o imitador também precisa das funções `*_IMPERSONATOR` apropriadas atribuídas."
     },
     "DIALOG": {
       "RESET": {
@@ -1993,6 +2026,7 @@
       "DATECHANGED": "Alterado",
       "URLS": "URLs",
       "DELETE": "Excluir App",
+      "JUMPTOPROJECT": "Para configurar funções, autorizações e muito mais, navegue até o projeto.",
       "DETAIL": {
         "TITLE": "Detalhe",
         "STATE": {

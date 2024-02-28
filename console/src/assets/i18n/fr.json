@@ -119,6 +119,30 @@
     "SETTINGS": "Paramètres",
     "CUSTOMERPORTAL": "Customer Portal"
   },
+  "QUICKSTART": {
+    "TITLE": "Intégrer ZITADEL dans votre application",
+    "DESCRIPTION": "Intégrez ZITADEL dans votre application ou utilisez l'un de nos échantillons pour démarrer en quelques minutes",
+    "BTN_START": "Créer une application",
+    "BTN_LEARNMORE": "En savoir plus",
+    "CREATEPROJECTFORAPP": "Créer un projet {{value}}",
+    "SELECT_FRAMEWORK": "Select Framework",
+    "FRAMEWORK": "Framework",
+    "FRAMEWORK_OTHER": "Autre (OIDC, SAML, API)",
+    "ALMOSTDONE": "Vous avez presque terminé",
+    "REVIEWCONFIGURATION": "Review Configuration",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Nous avons créé une configuration de base pour les applications {{value}}. Vous pouvez adapter cette configuration à vos besoins après sa création.",
+    "REDIRECTS": "Configurer les redirections",
+    "DEVMODEWARN": "Le mode développement est activé par défaut. Vous pouvez mettre à jour les valeurs pour la production ultérieurement.",
+    "GUIDE": "Guide",
+    "BROWSEEXAMPLES": "Parcourez les exemples",
+    "DUPLICATEAPPRENAME": "Une application avec ce nom existe déjà. Veuillez choisir un autre nom.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Cadre de changement",
+        "DESCRIPTION": "Choisissez l'un des frameworks disponibles pour une configuration rapide de votre application."
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "Actions",
     "FILTER": "Filtrer",
@@ -138,6 +162,7 @@
     "ADD": "Ajouter",
     "CREATE": "Créer",
     "CONTINUE": "Continuer",
+    "CONTINUEWITH": "Continuez avec {{value}}",
     "BACK": "Retour",
     "CLOSE": "Fermer",
     "CLEAR": "Effacer",
@@ -187,12 +212,16 @@
     "IAM_OWNER_VIEWER": "A le droit de passer en revue l'ensemble de l'instance, y compris toutes les organisations.",
     "IAM_ORG_MANAGER": "A le droit de créer et de gérer des organisations",
     "IAM_USER_MANAGER": "A le droit de créer et de gérer les utilisateurs",
+    "IAM_ADMIN_IMPERSONATOR": "A l'autorisation de se faire passer pour l'administrateur et les utilisateurs finaux de toutes les organisations",
+    "IAM_END_USER_IMPERSONATOR": "Est autorisé à usurper l'identité des utilisateurs finaux de toutes les organisations",
     "ORG_OWNER": "A le droit de contrôler l'ensemble de l'organisation",
     "ORG_USER_MANAGER": "A le droit de créer et de gérer les utilisateurs de l'organisation",
     "ORG_OWNER_VIEWER": "A le droit de passer en revue l'ensemble de l'organisation",
     "ORG_USER_PERMISSION_EDITOR": "A le droit de gérer les subventions aux utilisateurs",
     "ORG_PROJECT_PERMISSION_EDITOR": "A le droit de gérer les subventions aux projets",
     "ORG_PROJECT_CREATOR": "A le droit de créer ses propres projets et leurs paramètres sous-jacents.",
+    "ORG_ADMIN_IMPERSONATOR": "A l'autorisation de se faire passer pour l'administrateur et les utilisateurs finaux de l'organisation",
+    "ORG_END_USER_IMPERSONATOR": "Est autorisé à usurper l'identité des utilisateurs finaux de l'organisation",
     "PROJECT_OWNER": "A le droit de gérer l'ensemble du projet",
     "PROJECT_OWNER_VIEWER": "A le droit de passer en revue l'ensemble du projet",
     "PROJECT_OWNER_GLOBAL": "A le droit d'accéder à l'ensemble du projet",
@@ -1161,9 +1190,13 @@
       "UPDATED": "Paramètres mis à jour."
     },
     "SECURITY": {
-      "DESCRIPTION": "Ce paramètre permet au CSP d'autoriser les iFrames à partir d'un ensemble de domaines autorisés. Notez qu'en autorisant l'utilisation des iFrames, vous courez le risque d'autoriser le clickjacking.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Ce paramètre permet au CSP d'autoriser les iFrames à partir d'un ensemble de domaines autorisés. Notez qu'en autorisant l'utilisation des iFrames, vous courez le risque d'autoriser le clickjacking.",
       "IFRAMEENABLED": "Autoriser iFrame",
-      "ALLOWEDORIGINS": "URL d'origine autorisées"
+      "ALLOWEDORIGINS": "URL d'origine autorisées",
+      "IMPERSONATIONTITLE": "Usuration d'identité",
+      "IMPERSONATIONENABLED": "Autoriser l'usurpation d'identité",
+      "IMPERSONATIONDESCRIPTION": "Ce paramètre permet en principe d'utiliser l'usurpation d'identité. Notez que l'usurpateur d'identité doit également recevoir les rôles `*_IMPERSONATOR` appropriés."
     },
     "DIALOG": {
       "RESET": {
@@ -1998,6 +2031,7 @@
       "DATECHANGED": "Modifié",
       "URLS": "URLs",
       "DELETE": "Supprimer l'application",
+      "JUMPTOPROJECT": "Pour configurer des rôles, des autorisations et bien plus encore, accédez au projet.",
       "DETAIL": {
         "TITLE": "Détail",
         "STATE": {

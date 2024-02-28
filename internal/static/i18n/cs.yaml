@@ -328,7 +328,7 @@ Errors:
       NotActive: Grant projektu není aktivní
       NotInactive: Grant projektu není neaktivní
   IAM:
-    NotFound: Instance nenalezena. Podívejte se na https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: Instance nebyla nalezena. Ujistěte se, že jste získali správnou doménu. Podívejte se na https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Role nebyly změněny
     MemberInvalid: Člen je neplatný
@@ -538,6 +538,12 @@ Errors:
     NoTimeout: Cíl nemá časový limit
     InvalidURL: Cíl má neplatnou adresu URL
     NotFound: Cíl nenalezen
+  Execution:
+    ConditionInvalid: Podmínka provedení je neplatná
+    Invalid: Provedení je neplatné
+    NotFound: Provedení nenalezeno
+    IncludeNotFound: Zahrnout nenalezeno
+    NoTargets: Nejsou definovány žádné cíle
 
 AggregateTypes:
   action: Akce
@@ -550,8 +556,12 @@ AggregateTypes:
   quota: Kvóta
   feature: Funkce
   target: Cíl
+  execution: Provedení
 
 EventTypes:
+  execution:
+    set: Prováděcí sada
+    removed: Provedení smazáno
   target:
     added: Cíl vytvořen
     changed: Cíl změněn

@@ -10,6 +10,7 @@ import (
 	"github.com/pquerna/otp/totp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
@@ -60,6 +61,7 @@ func TestServer_RegisterTOTP(t *testing.T) {
 			},
 			want: &user.RegisterTOTPResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
 			},
@@ -136,6 +138,7 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 			},
 			want: &user.VerifyTOTPRegistrationResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ResourceOwner,
 				},
 			},

@@ -328,7 +328,7 @@ Errors:
       NotActive: Овластувањето за проектот не е активно
       NotInactive: Овластувањето за проектот не е неактивно
   IAM:
-    NotFound: Инстанцата не е пронајдена. Проверете https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM не е пронајден. Проверете дали имате точен домен. Погледнете на https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Улогите не се променети
     MemberInvalid: Членот е невалиден
@@ -540,6 +540,12 @@ Errors:
     NoTimeout: Целта нема тајмаут
     InvalidURL: Целта има неважечка URL-адреса
     NotFound: Целта не е пронајдена
+  Execution:
+    ConditionInvalid: Условот за извршување е неважечки
+    Invalid: Извршувањето е неважечко
+    NotFound: Извршувањето не е пронајдено
+    IncludeNotFound: Вклучете не е пронајден
+    NoTargets: Не се дефинирани цели
 
 AggregateTypes:
   action: Акција
@@ -552,8 +558,12 @@ AggregateTypes:
   quota: Квота
   feature: Карактеристика
   target: Цел
+  execution: Извршување
 
 EventTypes:
+  execution:
+    set: Комплет за извршување
+    removed: Извршувањето е избришано
   target:
     added: Целта е избришана
     changed: Целта е променета

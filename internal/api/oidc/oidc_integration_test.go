@@ -39,7 +39,7 @@ const (
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, errCtx, cancel := integration.Contexts(5 * time.Minute)
+		ctx, errCtx, cancel := integration.Contexts(10 * time.Minute)
 		defer cancel()
 
 		Tester = integration.NewTester(ctx)
@@ -74,7 +74,7 @@ func Test_ZITADEL_API_missing_audience_scope(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("%s %s", tokens.TokenType, tokens.AccessToken))
 
@@ -136,7 +136,7 @@ func Test_ZITADEL_API_missing_mfa(t *testing.T) {
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPassword, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPassword, startTime, changeTime)
 
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("%s %s", tokens.TokenType, tokens.AccessToken))
 
@@ -165,7 +165,7 @@ func Test_ZITADEL_API_success(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("%s %s", tokens.TokenType, tokens.AccessToken))
 
@@ -199,7 +199,7 @@ func Test_ZITADEL_API_glob_redirects(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("%s %s", tokens.TokenType, tokens.AccessToken))
 
@@ -228,7 +228,7 @@ func Test_ZITADEL_API_inactive_access_token(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	// make sure token works
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("%s %s", tokens.TokenType, tokens.AccessToken))
@@ -270,7 +270,7 @@ func Test_ZITADEL_API_terminated_session(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	// make sure token works
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("%s %s", tokens.TokenType, tokens.AccessToken))
@@ -278,7 +278,7 @@ func Test_ZITADEL_API_terminated_session(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, User.GetUserId(), myUserResp.GetUser().GetId())
 
-	// refresh token
+	// end session
 	postLogoutRedirect, err := rp.EndSession(CTX, provider, tokens.IDToken, logoutRedirectURI, "state")
 	require.NoError(t, err)
 	assert.Equal(t, logoutRedirectURI+"?state=state", postLogoutRedirect.String())
@@ -288,6 +288,77 @@ func Test_ZITADEL_API_terminated_session(t *testing.T) {
 	myUserResp, err = Tester.Client.Auth.GetMyUser(ctx, &auth.GetMyUserRequest{})
 	require.Error(t, err)
 	require.Nil(t, myUserResp)
+}
+
+func Test_ZITADEL_API_terminated_session_user_disabled(t *testing.T) {
+	clientID := createClient(t)
+	tests := []struct {
+		name    string
+		disable func(userID string) error
+	}{
+		{
+			name: "deactivated",
+			disable: func(userID string) error {
+				_, err := Tester.Client.UserV2.DeactivateUser(CTX, &user.DeactivateUserRequest{UserId: userID})
+				return err
+			},
+		},
+		{
+			name: "locked",
+			disable: func(userID string) error {
+				_, err := Tester.Client.UserV2.LockUser(CTX, &user.LockUserRequest{UserId: userID})
+				return err
+			},
+		},
+		{
+			name: "deleted",
+			disable: func(userID string) error {
+				_, err := Tester.Client.UserV2.DeleteUser(CTX, &user.DeleteUserRequest{UserId: userID})
+				return err
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			disabledUser := Tester.CreateHumanUser(CTX)
+			Tester.SetUserPassword(CTX, disabledUser.GetUserId(), integration.UserPassword)
+			authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess, zitadelAudienceScope)
+			sessionID, sessionToken, startTime, changeTime := Tester.CreatePasswordSession(t, CTXLOGIN, disabledUser.GetUserId(), integration.UserPassword)
+			linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+				AuthRequestId: authRequestID,
+				CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+					Session: &oidc_pb.Session{
+						SessionId:    sessionID,
+						SessionToken: sessionToken,
+					},
+				},
+			})
+			require.NoError(t, err)
+
+			// code exchange
+			code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+			tokens, err := exchangeTokens(t, clientID, code, redirectURI)
+			require.NoError(t, err)
+			assertTokens(t, tokens, true)
+			assertIDTokenClaims(t, tokens.IDTokenClaims, disabledUser.GetUserId(), armPassword, startTime, changeTime)
+
+			// make sure token works
+			ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("%s %s", tokens.TokenType, tokens.AccessToken))
+			myUserResp, err := Tester.Client.Auth.GetMyUser(ctx, &auth.GetMyUserRequest{})
+			require.NoError(t, err)
+			require.Equal(t, disabledUser.GetUserId(), myUserResp.GetUser().GetId())
+
+			// deactivate user
+			err = tt.disable(disabledUser.GetUserId())
+			require.NoError(t, err)
+
+			// use token from deactivated user
+			ctx = metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("%s %s", tokens.TokenType, tokens.AccessToken))
+			myUserResp, err = Tester.Client.Auth.GetMyUser(ctx, &auth.GetMyUserRequest{})
+			require.Error(t, err)
+			require.Nil(t, myUserResp)
+		})
+	}
 }
 
 func createClient(t testing.TB) string {

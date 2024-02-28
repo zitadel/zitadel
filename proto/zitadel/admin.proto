@@ -748,7 +748,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             summary: "Get Security Settings";
-            description: "Returns the security settings of the ZITADEL instance. The settings define if the iframe is allowed and from which origins."
+            description: "Returns the security settings of the ZITADEL instance."
         };
     }
 
@@ -765,7 +765,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             summary: "Set Security Settings";
-            description: "Set the security settings of the ZITADEL instance. The settings define if the iframe is allowed and from which origins."
+            description: "Set the security settings of the ZITADEL instance."
         };
     }
 
@@ -4420,6 +4420,8 @@ message SetSecurityPolicyRequest{
     bool enable_iframe_embedding = 1;
     // origins allowed loading ZITADEL in an iframe if enable_iframe_embedding is true
     repeated string allowed_origins = 2;
+    // allows users to impersonate other users. The impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well"
+    bool enable_impersonation = 3;
 }
 
 message SetSecurityPolicyResponse{
@@ -4565,7 +4567,7 @@ message SetUpOrgRequest {
             string display_name = 4 [
                 (validate.rules).string = {max_len: 200},
                 (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                    description: "a user can set his display name if nothing is set ZITADEL computes \"first_name last_name\"";
+                    description: "a user can set the display name if nothing is set ZITADEL computes \"first_name last_name\"";
                     max_length: 200;
                     example: "\"Gigi Giraffe\"";
                 }
@@ -6498,7 +6500,7 @@ message GetLoginPolicyResponse {
 message UpdateLoginPolicyRequest {
     bool allow_username_password = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if a user is allowed to log in with his username and password"
+            description: "defines if a user is allowed to log in with username and password"
         }
     ];
     bool allow_register = 2 [

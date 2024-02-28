@@ -329,7 +329,7 @@ Errors:
       NotActive: Projekt Grant ist nicht aktiv
       NotInactive: Projekt Grant ist nicht inaktiv
   IAM:
-    NotFound: Instanz nicht gefunden. Schau dir https://zitadel.com/docs/self-hosting/manage/custom-domain an
+    NotFound: Instanz nicht gefunden. Stelle sicher, dass Du die richtige Domain hast. Schau unter https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Rollen wurden nicht verändert
     MemberInvalid: Member ist ungültig
@@ -541,6 +541,12 @@ Errors:
     NoTimeout: Ziel hat keinen Timeout
     InvalidURL: Ziel hat eine ungültige URL
     NotFound: Ziel nicht gefunden
+  Execution:
+    ConditionInvalid: Die Ausführungsbedingung ist ungültig
+    Invalid: Die Ausführung ist ungültig
+    NotFound: Ausführung nicht gefunden
+    IncludeNotFound: Einschließen nicht gefunden
+    NoTargets: Keine Ziele definiert
 
 AggregateTypes:
   action: Action
@@ -553,8 +559,12 @@ AggregateTypes:
   quota: Kontingent
   feature: Feature
   target: Ziel
+  execution: Ausführung
 
 EventTypes:
+  execution:
+    set: Ausführung gesetzt
+    removed: Ausführung gelöscht
   target:
     added: Ziel erstellt
     changed: Ziel geändert

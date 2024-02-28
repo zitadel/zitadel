@@ -119,6 +119,30 @@
     "SETTINGS": "Instellingen",
     "CUSTOMERPORTAL": "Klantenportaal"
   },
+  "QUICKSTART": {
+    "TITLE": "Integreer ZITADEL in uw toepassing",
+    "DESCRIPTION": "Integreer ZITADEL in uw toepassing of gebruik een van onze voorbeelden om binnen enkele minuten aan de slag te gaan.",
+    "BTN_START": "Applicatie maken",
+    "BTN_LEARNMORE": "Meer informatie",
+    "CREATEPROJECTFORAPP": "Creëer Project {{value}}",
+    "SELECT_FRAMEWORK": "Kies Framework",
+    "FRAMEWORK": "Framework",
+    "FRAMEWORK_OTHER": "Ander (OIDC, SAML, API)",
+    "ALMOSTDONE": "Je bent bijna klaar",
+    "REVIEWCONFIGURATION": "Reviewconfiguratie",
+    "REVIEWCONFIGURATION_DESCRIPTION": "We hebben een basisconfiguratie gemaakt voor {{value}} toepassingen. Je kunt deze configuratie na het aanmaken aanpassen aan je behoeften.",
+    "REDIRECTS": "Configureer omleidingen",
+    "DEVMODEWARN": "Dev-modus is standaard ingeschakeld. U kunt waarden voor productie later bijwerken.",
+    "GUIDE": "Guide",
+    "BROWSEEXAMPLES": "Bekijk voorbeelden",
+    "DUPLICATEAPPRENAME": "Er bestaat al een app met dezelfde aartsvijand. Kies een andere naam.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Verander Framework",
+        "DESCRIPTION": "Kies een van de beschikbare frameworks voor het snel instellen van je applicatie."
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "Acties",
     "FILTER": "Filter",
@@ -138,6 +162,7 @@
     "ADD": "Toevoegen",
     "CREATE": "Aanmaken",
     "CONTINUE": "Doorgaan",
+    "CONTINUEWITH": "Ga verder met {{value}}",
     "BACK": "Terug",
     "CLOSE": "Sluiten",
     "CLEAR": "Leegmaken",
@@ -188,12 +213,16 @@
     "IAM_OWNER_VIEWER": "Heeft toestemming om de hele instantie te bekijken, inclusief alle organisaties",
     "IAM_ORG_MANAGER": "Heeft toestemming om organisaties aan te maken en te beheren",
     "IAM_USER_MANAGER": "Heeft toestemming om gebruikers aan te maken en te beheren",
+    "IAM_ADMIN_IMPERSONATOR": "Heeft toestemming om zich voor te doen als beheerder en eindgebruikers van alle organisaties",
+    "IAM_END_USER_IMPERSONATOR": "Heeft toestemming om eindgebruikers van alle organisaties na te bootsen",
     "ORG_OWNER": "Heeft toestemming over de hele organisatie",
     "ORG_USER_MANAGER": "Heeft toestemming om gebruikers van de organisatie aan te maken en te beheren",
     "ORG_OWNER_VIEWER": "Heeft toestemming om de hele organisatie te bekijken",
     "ORG_USER_PERMISSION_EDITOR": "Heeft toestemming om gebruikerstoegang te beheren",
     "ORG_PROJECT_PERMISSION_EDITOR": "Heeft toestemming om projecttoegang te beheren",
     "ORG_PROJECT_CREATOR": "Heeft toestemming om zijn eigen projecten en onderliggende instellingen aan te maken",
+    "ORG_ADMIN_IMPERSONATOR": "Heeft toestemming om de beheerder en eindgebruikers van de organisatie na te bootsen",
+    "ORG_END_USER_IMPERSONATOR": "Heeft toestemming om eindgebruikers van de organisatie na te bootsen",
     "PROJECT_OWNER": "Heeft toestemming over het hele project",
     "PROJECT_OWNER_VIEWER": "Heeft toestemming om het hele project te bekijken",
     "PROJECT_OWNER_GLOBAL": "Heeft toestemming over het hele project",
@@ -1162,9 +1191,13 @@
       "UPDATED": "Instellingen bijgewerkt."
     },
     "SECURITY": {
-      "DESCRIPTION": "Deze instelling stelt de CSP in om framing van een reeks toegestane domeinen toe te staan. Let op: door het gebruik van iFrames toe te staan, loopt u het risico om clickjacking toe te staan.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Deze instelling stelt de CSP in om framing van een reeks toegestane domeinen toe te staan. Let op: door het gebruik van iFrames toe te staan, loopt u het risico om clickjacking toe te staan.",
       "IFRAMEENABLED": "Sta iFrame toe",
-      "ALLOWEDORIGINS": "Toegestane URLs"
+      "ALLOWEDORIGINS": "Toegestane URLs",
+      "IMPERSONATIONTITLE": "Imitatie",
+      "IMPERSONATIONENABLED": "Imitatie toestaan",
+      "IMPERSONATIONDESCRIPTION": "Deze instelling maakt het in principe mogelijk om imitatie te gebruiken. Houd er rekening mee dat aan de imitator ook de juiste `*_IMPERSONATOR` rollen moeten worden toegewezen."
     },
     "DIALOG": {
       "RESET": {
@@ -2016,6 +2049,7 @@
       "DATECHANGED": "Gewijzigd",
       "URLS": "URL's",
       "DELETE": "Verwijder App",
+      "JUMPTOPROJECT": "Om rollen, autorisaties en meer te configureren, navigeert u naar het project.",
       "DETAIL": {
         "TITLE": "Detail",
         "STATE": {

@@ -56,7 +56,7 @@ func (s *Server) GetSecurityPolicy(ctx context.Context, req *admin_pb.GetSecurit
 }
 
 func (s *Server) SetSecurityPolicy(ctx context.Context, req *admin_pb.SetSecurityPolicyRequest) (*admin_pb.SetSecurityPolicyResponse, error) {
-	details, err := s.command.SetSecurityPolicy(ctx, req.EnableIframeEmbedding, req.AllowedOrigins)
+	details, err := s.command.SetSecurityPolicy(ctx, securityPolicyToCommand(req))
 	if err != nil {
 		return nil, err
 	}

@@ -15,7 +15,6 @@ import (
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
-	"github.com/zitadel/zitadel/internal/repository/feature"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/limits"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -110,7 +109,7 @@ type InstanceSetup struct {
 	SMTPConfiguration *smtp.Config
 	OIDCSettings      *OIDCSettings
 	Quotas            *SetQuotas
-	Features          map[domain.Feature]any
+	Features          *InstanceFeatures
 	Limits            *SetLimits
 	Restrictions      *SetRestrictions
 }
@@ -313,9 +312,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	setupCustomDomain(c, &validations, instanceAgg, setup.CustomDomain)
 	setupSMTPSettings(c, &validations, setup.SMTPConfiguration, instanceAgg)
 	setupOIDCSettings(c, &validations, setup.OIDCSettings, instanceAgg)
-	if err := setupFeatures(c, &validations, setup.Features, instanceID); err != nil {
-		return "", "", nil, nil, err
-	}
+	setupFeatures(&validations, setup.Features, instanceID)
 	setupLimits(c, &validations, limitsAgg, setup.Limits)
 	setupRestrictions(c, &validations, restrictionsAgg, setup.Restrictions)
 
@@ -368,20 +365,8 @@ func setupQuotas(commands *Commands, validations *[]preparation.Validation, setQ
 	return nil
 }
 
-func setupFeatures(commands *Commands, validations *[]preparation.Validation, enableFeatures map[domain.Feature]any, instanceID string) error {
-	for f, value := range enableFeatures {
-		switch v := value.(type) {
-		case bool:
-			wm, err := NewInstanceFeatureWriteModel[feature.Boolean](instanceID, f)
-			if err != nil {
-				return err
-			}
-			*validations = append(*validations, prepareSetFeature(wm, feature.Boolean{Boolean: v}, commands.idGenerator))
-		default:
-			return zerrors.ThrowInvalidArgument(nil, "INST-GE4tg", "Errors.Feature.TypeNotSupported")
-		}
-	}
-	return nil
+func setupFeatures(validations *[]preparation.Validation, features *InstanceFeatures, instanceID string) {
+	*validations = append(*validations, prepareSetFeatures(instanceID, features))
 }
 
 func setupOIDCSettings(commands *Commands, validations *[]preparation.Validation, oidcSettings *OIDCSettings, instanceAgg *instance.Aggregate) {

@@ -327,7 +327,7 @@ Errors:
       NotActive: A concessão do projeto não está ativa
       NotInactive: A concessão do projeto não está inativa
   IAM:
-    NotFound: Instância não encontrada. Confira https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM não encontrado. Verifique se você tem o domínio correto. Consulte https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: As funções não foram alteradas
     MemberInvalid: O membro é inválido
@@ -535,6 +535,12 @@ Errors:
     NoTimeout: O destino não tem tempo limite
     InvalidURL: O destino tem um URL inválido
     NotFound: Destino não encontrado
+  Execution:
+    ConditionInvalid: A condição de execução é inválida
+    Invalid: A execução é inválida
+    NotFound: Execução não encontrada
+    IncludeNotFound: Incluir não encontrado
+    NoTargets: Nenhuma meta definida
 
 AggregateTypes:
   action: Ação
@@ -546,9 +552,13 @@ AggregateTypes:
   usergrant: Concessão de usuário
   quota: Cota
   feature: Recurso
-  target: objetivo
+  target: Objetivo
+  execution: Execução
 
 EventTypes:
+  execution:
+    set: Conjunto de execução
+    removed: Execução excluída
   target:
     added: Destino criado
     changed: Destino alterada

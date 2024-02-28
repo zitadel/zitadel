@@ -119,6 +119,30 @@
     "SETTINGS": "Ustawienia",
     "CUSTOMERPORTAL": "Portal klienta"
   },
+  "QUICKSTART": {
+    "TITLE": "Zintegruj ZITADEL ze swoją aplikacją",
+    "DESCRIPTION": "Zintegruj ZITADEL ze swoją aplikacją lub skorzystaj z jednego z naszych przykładów, aby rozpocząć pracę w ciągu kilku minut",
+    "BTN_START": "Utwórz aplikację",
+    "BTN_LEARNMORE": "Dowiedz się więcej",
+    "CREATEPROJECTFORAPP": "Utwórz projekt {{value}}",
+    "SELECT_FRAMEWORK": "Wybierz Framework",
+    "FRAMEWORK": "Ramy",
+    "FRAMEWORK_OTHER": "Inny (OIDC, SAML, API)",
+    "ALMOSTDONE": "Już prawie skończyłeś",
+    "REVIEWCONFIGURATION": "Konfiguracja recenzji",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Stworzyliśmy podstawową konfigurację dla aplikacji {{value}}. Możesz dostosować tę konfigurację do swoich potrzeb po jej utworzeniu.",
+    "REDIRECTS": "Skonfiguruj przekierowania",
+    "DEVMODEWARN": "Tryb deweloperski jest domyślnie włączony. Możesz później zaktualizować wartości dla produkcji.",
+    "GUIDE": "Przewodnik",
+    "BROWSEEXAMPLES": "Przeglądaj przykłady",
+    "DUPLICATEAPPRENAME": "Aplikacja o tej samej nazwie już istnieje. Proszę wybrać inną nazwę.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Ramy zmian",
+        "DESCRIPTION": "Wybierz jeden z dostępnych frameworków, aby szybko skonfigurować swoją aplikację"
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "Akcje",
     "FILTER": "Filtruj",
@@ -138,6 +162,7 @@
     "ADD": "Dodaj",
     "CREATE": "Utwórz",
     "CONTINUE": "Kontynuuj",
+    "CONTINUEWITH": "Kontynuuj z {{value}}",
     "BACK": "Wstecz",
     "CLOSE": "Zamknij",
     "CLEAR": "Wyczyść",
@@ -187,12 +212,16 @@
     "IAM_OWNER_VIEWER": "Ma uprawnienie do przeglądania całej instancji, włącznie z wszystkimi organizacjami",
     "IAM_ORG_MANAGER": "Ma uprawnienie do tworzenia i zarządzania organizacjami",
     "IAM_USER_MANAGER": "Ma uprawnienie do tworzenia i zarządzania użytkownikami",
+    "IAM_ADMIN_IMPERSONATOR": "Ma uprawnienia do podszywania się pod administratora i użytkowników końcowych ze wszystkich organizacji",
+    "IAM_END_USER_IMPERSONATOR": "Ma uprawnienia do podszywania się pod użytkowników końcowych ze wszystkich organizacji",
     "ORG_OWNER": "Ma uprawnienie nad całą organizacją",
     "ORG_USER_MANAGER": "Ma uprawnienie do tworzenia i zarządzania użytkownikami organizacji",
     "ORG_OWNER_VIEWER": "Ma uprawnienie do przeglądania całej organizacji",
     "ORG_USER_PERMISSION_EDITOR": "Ma uprawnienie do zarządzania uprawnieniami użytkowników",
     "ORG_PROJECT_PERMISSION_EDITOR": "Ma uprawnienie do zarządzania uprawnieniami projektu",
     "ORG_PROJECT_CREATOR": "Ma uprawnienie do tworzenia własnych projektów i podstawowych ustawień",
+    "ORG_ADMIN_IMPERSONATOR": "Ma uprawnienia do podszywania się pod administratora i użytkowników końcowych z organizacji",
+    "ORG_END_USER_IMPERSONATOR": "Ma uprawnienia do podszywania się pod użytkowników końcowych z organizacji",
     "PROJECT_OWNER": "Ma uprawnienie nad całym projektem",
     "PROJECT_OWNER_VIEWER": "Ma uprawnienie do przeglądania całego projektu",
     "PROJECT_OWNER_GLOBAL": "Ma uprawnienia do całego projektu",
@@ -1161,9 +1190,13 @@
       "UPDATED": "Ustawienia zaktualizowane."
     },
     "SECURITY": {
-      "DESCRIPTION": "To ustawienie ustawia CSP, aby pozwalało na osadzanie ramki z zestawu dozwolonych domen. Należy pamiętać, że włączenie używania iFrame oznacza ryzyko pozwolenia na clickjacking.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "To ustawienie ustawia CSP, aby pozwalało na osadzanie ramki z zestawu dozwolonych domen. Należy pamiętać, że włączenie używania iFrame oznacza ryzyko pozwolenia na clickjacking.",
       "IFRAMEENABLED": "Zezwól na iFrame",
-      "ALLOWEDORIGINS": "Dozwolone adresy URL"
+      "ALLOWEDORIGINS": "Dozwolone adresy URL",
+      "IMPERSONATIONTITLE": "Podszywanie się",
+      "IMPERSONATIONENABLED": "Zezwalaj na podszywanie się",
+      "IMPERSONATIONDESCRIPTION": "To ustawienie pozwala w zasadzie na użycie personifikacji. Należy pamiętać, że osoba personifikująca potrzebuje również przypisanych odpowiednich ról `*_IMPERSONATOR`."
     },
     "DIALOG": {
       "RESET": {
@@ -1998,6 +2031,7 @@
       "DATECHANGED": "Zmienione",
       "URLS": "Adresy URL",
       "DELETE": "Usuń aplikację",
+      "JUMPTOPROJECT": "Aby skonfigurować role, uprawnienia i nie tylko, przejdź do projektu.",
       "DETAIL": {
         "TITLE": "Szczegóły",
         "STATE": {

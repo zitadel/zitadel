@@ -119,6 +119,30 @@
     "SETTINGS": "Einstellungen",
     "CUSTOMERPORTAL": "Kundenportal"
   },
+  "QUICKSTART": {
+    "TITEL": "Integriere ZITADEL in deine Anwendung",
+    "DESCRIPTION": "Integriere ZITADEL in deine Anwendung oder verwende eines unserer Beispiele, um in wenigen Minuten loszulegen.",
+    "BTN_START": "Anwendung erstellen",
+    "BTN_LEARNMORE": "Mehr erfahren",
+    "CREATEPROJECTFORAPP": "Projekt erstellen {{value}}",
+    "SELECT_FRAMEWORK": "Framework auswählen",
+    "FRAMEWORK": "Framework",
+    "FRAMEWORK_OTHER": "Andere (OIDC, SAML, API)",
+    "ALMOSTDONE": "Wir sind fast fertig.",
+    "REVIEWCONFIGURATION": "Konfiguration überprüfen",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Wir haben eine Grundkonfiguration für {{wert}}-Anwendungen erstellt. Du kannst diese Konfiguration nach der Erstellung an deine Bedürfnisse anpassen.",
+    "REDIRECTS": "Redirects konfigurieren",
+    "DEVMODEWARN": "Der Dev-Modus ist standardmäßig aktiviert. Sie können Werte für die Produktion später aktualisieren.",
+    "GUIDE": "Guide",
+    "BROWSEEXAMPLES": "Beispiele durchsuchen",
+    "DUPLICATEAPPRENAME": "Es gibt bereits eine App mit demselben Neme. Bitte wählen Sie einen anderen Namen.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Framework ändern",
+        "DESCRIPTION": "Wähle eines der verfügbaren Frameworks für die schnelle Einrichtung deiner Anwendung."
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "Aktionen",
     "FILTER": "Filter",
@@ -138,6 +162,7 @@
     "ADD": "Hinzufügen",
     "CREATE": "Erstellen",
     "CONTINUE": "Weiter",
+    "CONTINUEWITH": "Mit {{value}} fortfahren",
     "BACK": "Zurück",
     "CLOSE": "Schliessen",
     "CLEAR": "Zurücksetzen",
@@ -187,12 +212,16 @@
     "IAM_OWNER_VIEWER": "Hat die Leseberechtigung, die gesamte Instanz einschließlich aller Organisationen zu überprüfen",
     "IAM_ORG_MANAGER": "Hat die Berechtigung zum Erstellen und Verwalten von Organisationen",
     "IAM_USER_MANAGER": "Hat die Berechtigung zum Erstellen und Verwalten von Benutzern",
+    "IAM_ADMIN_IMPERSONATOR": "Hat die Berechtigung, sich als Administrator und Endbenutzer aller Organisationen auszugeben",
+    "IAM_END_USER_IMPERSONATOR": "Hat die Berechtigung, sich als Endbenutzer aller Organisationen auszugeben",
     "ORG_OWNER": "Hat die Berechtigung für die gesamte Organisation",
     "ORG_USER_MANAGER": "Hat die Berechtigung, Benutzer der Organisation zu erstellen und zu verwalten",
     "ORG_OWNER_VIEWER": "Hat die Leseberechtigung, die gesamte Organisation zu überprüfen",
     "ORG_USER_PERMISSION_EDITOR": "Verfügt über die Berechtigung zum Verwalten von User grants",
     "ORG_PROJECT_PERMISSION_EDITOR": "Hat die Berechtigung, Projektberechtigungen für externe Organisationen zu verwalten",
     "ORG_PROJECT_CREATOR": "Hat die Berechtigung, seine eigenen Projekte und zugrunde liegenden Einstellungen zu erstellen",
+    "ORG_ADMIN_IMPERSONATOR": "Hat die Berechtigung, sich als Administrator und Endbenutzer der Organisation auszugeben",
+    "ORG_END_USER_IMPERSONATOR": "Hat die Berechtigung, sich als Endbenutzer der Organisation auszugeben",
     "PROJECT_OWNER": "Hat die Berechtigung für das gesamte Projekt",
     "PROJECT_OWNER_VIEWER": "Hat die Leseberechtigung, das gesamte Projekt zu überprüfen",
     "PROJECT_OWNER_GLOBAL": "Hat die Berechtigung für das gesamte Projekt",
@@ -1161,9 +1190,13 @@
       "UPDATED": "Einstellungen geändert"
     },
     "SECURITY": {
-      "DESCRIPTION": "Mit dieser Einstellung wird die CSP so eingestellt, dass Framing von einer Reihe zulässiger Domänen zugelassen wird. Beachten Sie, dass Sie durch die Aktivierung der Verwendung von iFrames das Risiko eingehen, Clickjacking zu ermöglichen.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Mit dieser Einstellung wird die CSP so eingestellt, dass Framing von einer Reihe zulässiger Domänen zugelassen wird. Beachten Sie, dass Sie durch die Aktivierung der Verwendung von iFrames das Risiko eingehen, Clickjacking zu ermöglichen.",
       "IFRAMEENABLED": "iFrame zulassen",
-      "ALLOWEDORIGINS": "Zulässige URLs"
+      "ALLOWEDORIGINS": "Zulässige URLs",
+      "IMPERSONATIONTITLE": "Identitätswechsel",
+      "IMPERSONATIONENABLED": "Identitätswechsel zulassen",
+      "IMPERSONATIONDESCRIPTION": "Diese Einstellung ermöglicht grundsätzlich die Verwendung von Identitätswechseln. Beachten Sie, dass dem Imitator auch die entsprechenden `*_IMPERSONATOR`-Rollen zugewiesen werden müssen."
     },
     "DIALOG": {
       "RESET": {
@@ -1997,6 +2030,7 @@
       "DATECHANGED": "Geändert",
       "URLS": "URLs",
       "DELETE": "App löschen",
+      "JUMPTOPROJECT": "Um Rollen, Berechtigungen und mehr zu konfigurieren, navigieren Sie zum Projekt.",
       "DETAIL": {
         "TITLE": "Detail",
         "STATE": {

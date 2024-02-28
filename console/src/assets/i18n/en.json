@@ -43,7 +43,7 @@
     }
   },
   "ONBOARDING": {
-    "DESCRIPTION": "Your onboarding process",
+    "DESCRIPTION": "Your next steps",
     "MOREDESCRIPTION": "more shortcuts",
     "COMPLETED": "completed",
     "DISMISS": "No thanks, I'm a pro.",
@@ -119,6 +119,30 @@
     "SETTINGS": "Settings",
     "CUSTOMERPORTAL": "Customer Portal"
   },
+  "QUICKSTART": {
+    "TITLE": "Integrate ZITADEL into your application",
+    "DESCRIPTION": "Integrate ZITADEL into your application or use one of our samples to get started in minutes.",
+    "BTN_START": "Create Application",
+    "BTN_LEARNMORE": "Learn More",
+    "CREATEPROJECTFORAPP": "Create Project {{value}}",
+    "SELECT_FRAMEWORK": "Select Framework",
+    "FRAMEWORK": "Framework",
+    "FRAMEWORK_OTHER": "Other (OIDC, SAML, API)",
+    "ALMOSTDONE": "You're almost done.",
+    "REVIEWCONFIGURATION": "Review Configuration",
+    "REVIEWCONFIGURATION_DESCRIPTION": "We've created a basic configuration for {{value}} applications. You can adapt this configuration to your needs after creation.",
+    "REDIRECTS": "Configure redirects",
+    "DEVMODEWARN": "Dev Mode is enabled by default. You can update values for production later.",
+    "GUIDE": "Guide",
+    "BROWSEEXAMPLES": "Browse Examples and SDKs",
+    "DUPLICATEAPPRENAME": "An app with the same name exists already. Please choose a different name.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Change Framework",
+        "DESCRIPTION": "Choose one of the available frameworks for quick setup of your application."
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "Actions",
     "FILTER": "Filter",
@@ -138,6 +162,7 @@
     "ADD": "Add",
     "CREATE": "Create",
     "CONTINUE": "Continue",
+    "CONTINUEWITH": "Continue with {{value}}",
     "BACK": "Back",
     "CLOSE": "Close",
     "CLEAR": "Clear",
@@ -188,12 +213,16 @@
     "IAM_OWNER_VIEWER": "Has permission to review the whole instance, including all organizations",
     "IAM_ORG_MANAGER": "Has permission to create and manage organizations",
     "IAM_USER_MANAGER": "Has permission to create and manage users",
+    "IAM_ADMIN_IMPERSONATOR": "Has permission to impersonate admin and end users from all organizations",
+    "IAM_END_USER_IMPERSONATOR": "Has permission to impersonate end users from all organizations",
     "ORG_OWNER": "Has permission over the whole organization",
     "ORG_USER_MANAGER": "Has permission to create and manage users of the organization",
     "ORG_OWNER_VIEWER": "Has permission to review the whole organization",
     "ORG_USER_PERMISSION_EDITOR": "Has permission to manage user grants",
     "ORG_PROJECT_PERMISSION_EDITOR": "Has permission to manage project grants",
     "ORG_PROJECT_CREATOR": "Has permission to create his own projects and underlying settings",
+    "ORG_ADMIN_IMPERSONATOR": "Has permission to impersonate admin and end users from the organization",
+    "ORG_END_USER_IMPERSONATOR": "Has permission to impersonate end users from the organization",
     "PROJECT_OWNER": "Has permission over the whole project",
     "PROJECT_OWNER_VIEWER": "Has permission to review the whole project",
     "PROJECT_OWNER_GLOBAL": "Has permission over the whole project",
@@ -1162,9 +1191,13 @@
       "UPDATED": "Settings updated."
     },
     "SECURITY": {
-      "DESCRIPTION": "This setting sets the CSP to allow framing from a set of allowed domains. Note that by enabling the use of iFrames, you run the risk of allowing clickjacking.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "This setting sets the CSP to allow framing from a set of allowed domains. Note that by enabling the use of iFrames, you run the risk of allowing clickjacking.",
       "IFRAMEENABLED": "Allow iFrame",
-      "ALLOWEDORIGINS": "Allowed URLs"
+      "ALLOWEDORIGINS": "Allowed URLs",
+      "IMPERSONATIONTITLE": "Impersonation",
+      "IMPERSONATIONENABLED": "Allow Impersonation",
+      "IMPERSONATIONDESCRIPTION": "This setting allows to use impersonation in principle. Note that the impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well."
     },
     "DIALOG": {
       "RESET": {
@@ -2008,7 +2041,7 @@
       "DESCRIPTION": "Here you can edit your application data and it's configuration.",
       "CREATE": "Create application",
       "CREATE_SELECT_PROJECT": "Select your project first",
-      "CREATE_NEW_PROJECT": "or create a new one <a href='{{url}}' title='Create project'>here</a>.",
+      "CREATE_NEW_PROJECT": "or enter the name for your new project",
       "CREATE_DESC_TITLE": "Enter Your Application Details Step by Step",
       "CREATE_DESC_SUB": "A recommended configuration will be automatically generated.",
       "STATE": "Status",
@@ -2016,6 +2049,7 @@
       "DATECHANGED": "Changed",
       "URLS": "URLs",
       "DELETE": "Delete App",
+      "JUMPTOPROJECT": "To configure roles, authorizations and more, navigate to the project.",
       "DETAIL": {
         "TITLE": "Detail",
         "STATE": {

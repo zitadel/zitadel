@@ -119,6 +119,30 @@
     "SETTINGS": "Nastavení",
     "CUSTOMERPORTAL": "Zákaznický portál"
   },
+  "QUICKSTART": {
+    "TITLE": "Integrovat ZITADEL do vaší aplikace",
+    "DESCRIPTION": "Integrujte ZITADEL do své aplikace nebo použijte některou z našich ukázek a začněte během několika minut.",
+    "BTN_START": "Vytvořit aplikaci",
+    "BTN_LEARNMORE": "Zjistěte více",
+    "CREATEPROJECTFORAPP": "Vytvořit projekt {{value}}",
+    "SELECT_FRAMEWORK": "Vybrat framework",
+    "FRAMEWORK": "Framework",
+    "FRAMEWORK_OTHER": "jiný (OIDC, SAML, API)",
+    "ALMOSTDONE": "Jste téměř hotovi.",
+    "REVIEWCONFIGURATION": "Přezkoumání konfigurace",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Vytvořili jsme základní konfiguraci pro {{hodnota}} aplikace. Tuto konfiguraci můžete po vytvoření přizpůsobit svým potřebám.",
+    "REDIRECTS": "Konfigurace přesměrování",
+    "DEVMODEWARN": "Dev Mode je ve výchozím nastavení povolen. Hodnoty pro produkci můžete aktualizovat později.",
+    "GUIDE": "Guide",
+    "BROWSEEXAMPLES": "Procházet ukázky",
+    "DUPLICATEAPPRENAME": "Aplikace se stejným neme již existuje. Vyberte prosím jiný název.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Rámec změn",
+        "DESCRIPTION": "Vyberte si jeden z dostupných frameworků pro rychlé nastavení vaší aplikace."
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "Akce",
     "FILTER": "Filtr",
@@ -138,6 +162,7 @@
     "ADD": "Přidat",
     "CREATE": "Vytvořit",
     "CONTINUE": "Pokračovat",
+    "CONTINUEWITH": "Pokračovat s {{value}}",
     "BACK": "Zpět",
     "CLOSE": "Zavřít",
     "CLEAR": "Vyčistit",
@@ -188,12 +213,16 @@
     "IAM_OWNER_VIEWER": "Má oprávnění prohlížet celou instanci, včetně všech organizací",
     "IAM_ORG_MANAGER": "Má oprávnění vytvářet a spravovat organizace",
     "IAM_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele",
+    "IAM_ADMIN_IMPERSONATOR": "Má oprávnění vydávat se za správce a koncové uživatele ze všech organizací",
+    "IAM_END_USER_IMPERSONATOR": "Má oprávnění vydávat se za koncové uživatele ze všech organizací",
     "ORG_OWNER": "Má oprávnění nad celou organizací",
     "ORG_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele organizace",
     "ORG_OWNER_VIEWER": "Má oprávnění prohlížet celou organizaci",
     "ORG_USER_PERMISSION_EDITOR": "Má oprávnění spravovat uživatelská pověření",
     "ORG_PROJECT_PERMISSION_EDITOR": "Má oprávnění spravovat pověření projektu",
     "ORG_PROJECT_CREATOR": "Má oprávnění vytvářet své vlastní projekty a podřízená nastavení",
+    "ORG_ADMIN_IMPERSONATOR": "Má oprávnění vydávat se za správce a koncové uživatele z organizace",
+    "ORG_END_USER_IMPERSONATOR": "Má oprávnění vydávat se za koncové uživatele z organizace",
     "PROJECT_OWNER": "Má oprávnění nad celým projektem",
     "PROJECT_OWNER_VIEWER": "Má oprávnění prohlížet celý projekt",
     "PROJECT_OWNER_GLOBAL": "Má oprávnění nad celým projektem",
@@ -1162,9 +1191,13 @@
       "UPDATED": "Nastavení aktualizováno."
     },
     "SECURITY": {
-      "DESCRIPTION": "Toto nastavení nastaví CSP tak, aby povolovalo vkládání ze sady povolených domén. Všimněte si, že povolením použití iFrame riskujete umožnění clickjackingu.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Toto nastavení nastaví CSP tak, aby povolovalo vkládání ze sady povolených domén. Všimněte si, že povolením použití iFrame riskujete umožnění clickjackingu.",
       "IFRAMEENABLED": "Povolit iFrame",
-      "ALLOWEDORIGINS": "Povolené URL"
+      "ALLOWEDORIGINS": "Povolené URL",
+      "IMPERSONATIONTITLE": "Předstírání jiné identity",
+      "IMPERSONATIONENABLED": "Povolit předstírání jiné identity",
+      "IMPERSONATIONDESCRIPTION": "Toto nastavení v zásadě umožňuje používat zosobnění. Všimněte si, že imitátor potřebuje také přiřazené příslušné role `*_IMPERSONATOR`."
     },
     "DIALOG": {
       "RESET": {
@@ -2007,6 +2040,7 @@
       "DATECHANGED": "Změněno",
       "URLS": "URL adresy",
       "DELETE": "Smazat aplikaci",
+      "JUMPTOPROJECT": "Chcete-li nakonfigurovat role, oprávnění a další, přejděte do projektu.",
       "DETAIL": {
         "TITLE": "Detail",
         "STATE": {

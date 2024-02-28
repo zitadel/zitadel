@@ -329,7 +329,7 @@ Errors:
       NotActive: La subvention de projet n'est pas active
       NotInactive: La subvention du projet n'est pas inactive
   IAM:
-    NotFound: Instance non trouvée. Consultez https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM non trouvé. Assurez-vous que vous avez la bonne organisation. Vérifiez https://zitadel.com/docs/apis/introduction#organizations
     Member:
       RolesNotChanged: Les rôles n'ont pas été modifiés
     MemberInvalid: Le membre n'est pas valide
@@ -541,6 +541,12 @@ Errors:
     NoTimeout: La cible n'a pas de délai d'attente
     InvalidURL: La cible a une URL non valide
     NotFound: La cible introuvable
+  Execution:
+    ConditionInvalid: La condition d'exécution n'est pas valide
+    Invalid: L'exécution est invalide
+    NotFound: Exécution introuvable
+    IncludeNotFound: Inclure introuvable
+    NoTargets: Aucune cible définie
 
 AggregateTypes:
   action: Action
@@ -553,8 +559,12 @@ AggregateTypes:
   quota: Contingent
   feature: Fonctionnalité
   target: Cible
+  execution: Exécution
 
 EventTypes:
+  execution:
+    set: Ensemble d'exécution
+    removed: Exécution supprimée
   target:
     added: Cible créée
     changed: Cible modifiée

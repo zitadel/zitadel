@@ -108,13 +108,13 @@ Please make sure you cover your changes with tests before marking a Pull Request
 
 The code consists of the following parts:
 
-| name            | description                                                        | language                                                                    | where to find                                      |
-| --------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------- | -------------------------------------------------- |
-| backend         | Service that serves the grpc(-web) and RESTful API                 | [go](https://go.dev)                                                        | [API implementation](./internal/api/grpc)          |
-| console         | Frontend the user interacts with after he is logged in             | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org) | [./console](./console)                             |
+| name            | description                                                     | language                                                                    | where to find                                      |
+| --------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------- |
+| backend         | Service that serves the grpc(-web) and RESTful API              | [go](https://go.dev)                                                        | [API implementation](./internal/api/grpc)          |
+| console         | Frontend the user interacts with after log in             | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org) | [./console](./console)                             |
 | login           | Server side rendered frontend the user interacts with during login | [go](https://go.dev), [go templates](https://pkg.go.dev/html/template)      | [./internal/api/ui/login](./internal/api/ui/login) |
-| API definitions | Specifications of the API                                          | [Protobuf](https://developers.google.com/protocol-buffers)                  | [./proto/zitadel](./proto/zitadel)                 |
-| docs            | Project documentation made with docusaurus                         | [Docusaurus](https://docusaurus.io/)                                        | [./docs](./docs)                                   |
+| API definitions | Specifications of the API                                       | [Protobuf](https://developers.google.com/protocol-buffers)                  | [./proto/zitadel](./proto/zitadel)                 |
+| docs            | Project documentation made with docusaurus                      | [Docusaurus](https://docusaurus.io/)                                        | [./docs](./docs)                                   |
 
 Please validate and test the code before you contribute.
 
@@ -122,6 +122,24 @@ We add the label "good first issue" for problems we think are a good starting po
 
 - [Issues for first time contributors](https://github.com/zitadel/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 - [All issues](https://github.com/zitadel/zitadel/issues)
+
+### General Guidelines
+
+#### Gender Neutrality and Inclusive Language
+
+We are committed to creating a welcoming and inclusive community for all developers, regardless of their gender identity or expression. To achieve this, we are actively working to ensure that our contribution guidelines are gender-neutral and use inclusive language.
+
+**Use gender-neutral pronouns**: 
+Don't use gender-specific pronouns unless the person you're referring to is actually that gender.
+In particular, don't use he, him, his, she, or her as gender-neutral pronouns, and don't use he/she or (s)he or other such punctuational approaches. Instead, use the singular they.
+
+**Choose gender-neutral alternatives**: 
+Opt for gender-neutral terms instead of gendered ones whenever possible. 
+Replace "policeman" with "police officer," "manpower" with "workforce," and "businessman" with "entrepreneur" or "businessperson."
+
+**Avoid ableist language**:
+Ableist language includes words or phrases such as crazy, insane, blind to or blind eye to, cripple, dumb, and others.
+Choose alternative words depending on the context.
 
 ### Backend/login
 
@@ -189,18 +207,15 @@ Repeat the above with `INTEGRATION_DB_FLAVOR="postgres"`.
 To test the whole system, including the console UI and the login UI, run the E2E tests.
 
 ```bash
-# Build the production binary
-make core_build console_build
-GOOS=linux make compile_pipeline
-
-# Pack the binary into a docker image
-DOCKER_BUILDKIT=1 docker build --file build/Dockerfile . -t zitadel:local
+# Build the production docker image
+export ZITADEL_IMAGE=zitadel:local GOOS=linux
+make docker_image
 
 # If you made changes in the e2e directory, make sure you reformat the files
 make console_lint
 
 # Run the tests
-ZITADEL_IMAGE=zitadel:local docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml run --service-ports e2e
+docker compose --file ./e2e/config/host.docker.internal/docker-compose.yaml run --service-ports e2e
 ```
 
 When you are happy with your changes, you can cleanup your environment.
