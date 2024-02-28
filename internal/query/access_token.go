@@ -155,15 +155,17 @@ type sessionTerminatedModel struct {
 	sessionID string
 	userID    string
 
+	events     int
 	terminated bool
 }
 
 func (s *sessionTerminatedModel) Reduce() error {
+	s.terminated = s.events > 0
 	return nil
 }
 
 func (s *sessionTerminatedModel) AppendEvents(events ...eventstore.Event) {
-	s.terminated = len(events) > 0
+	s.events += len(events)
 }
 
 func (s *sessionTerminatedModel) Query() *eventstore.SearchQueryBuilder {
