@@ -93,6 +93,11 @@ h1 {
 
 .card-wrapper {
   margin-top: -1rem;
+
+  .duplicate-name-warning {
+    margin-top: 0.25rem;
+    display: block;
+  }
 }
 
 @mixin app-integrate-theme($theme) {

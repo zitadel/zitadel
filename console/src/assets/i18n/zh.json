@@ -135,6 +135,7 @@
     "DEVMODEWARN": "默认情况下启用开发模式。您可以稍后更新生产值。",
     "GUIDE": "指南",
     "BROWSEEXAMPLES": "浏览示例",
+    "DUPLICATEAPPRENAME": "具有相同 neme 的应用程序已经存在。请选择不同的名称。",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "变革框架",

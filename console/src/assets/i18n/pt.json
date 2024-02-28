@@ -135,6 +135,7 @@
     "DEVMODEWARN": "O modo Dev está habilitado por padrão. Você pode atualizar os valores para produção posteriormente.",
     "GUIDE": "Guia",
     "BROWSEEXAMPLES": "Navegar por exemplos",
+    "DUPLICATEAPPRENAME": "Já existe um aplicativo com o mesmo neme. Escolha um nome diferente.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Alterar Quadro",

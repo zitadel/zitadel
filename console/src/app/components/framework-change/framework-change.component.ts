@@ -54,7 +54,6 @@ export class FrameworkChangeComponent implements OnInit, OnDestroy {
     this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params: Params) => {
       const { framework } = params;
       if (framework) {
-        console.log(this.frameworks);
         this.findFramework(framework);
       }
     });

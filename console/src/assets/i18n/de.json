@@ -135,6 +135,7 @@
     "DEVMODEWARN": "Der Dev-Modus ist standardmäßig aktiviert. Sie können Werte für die Produktion später aktualisieren.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Beispiele durchsuchen",
+    "DUPLICATEAPPRENAME": "Es gibt bereits eine App mit demselben Neme. Bitte wählen Sie einen anderen Namen.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Framework ändern",

@@ -135,6 +135,7 @@
     "DEVMODEWARN": "El modo de desarrollo está habilitado de forma predeterminada. Puede actualizar los valores para la producción más adelante.",
     "GUIDE": "Guía",
     "BROWSEEXAMPLES": "Explora ejemplos",
+    "DUPLICATEAPPRENAME": "Ya existe una aplicación con el mismo nombre. Por favor, elige un nombre diferente.",
     "DIALOG": {
       "CAMBIAR": {
         "TITLE": "Cambio framework",

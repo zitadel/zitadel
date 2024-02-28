@@ -135,6 +135,7 @@
     "DEVMODEWARN": "開発モードはデフォルトで有効になっています。実稼働用の値は後で更新できます。",
     "GUIDE": "ガイド",
     "BROWSEEXAMPLES": "サンプルを見る",
+    "DUPLICATEAPPRENAME": "同じ名前のアプリがすでに存在します。別の名前を選択してください。",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "変更の枠組み",

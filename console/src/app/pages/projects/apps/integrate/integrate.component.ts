@@ -46,6 +46,7 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
   public loading: boolean = false;
   public InfoSectionType: any = InfoSectionType;
   public framework = signal<Framework | undefined>(undefined);
+  public showRenameWarning: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public oidcAppRequest: BehaviorSubject<AddOIDCAppRequest> = new BehaviorSubject(new AddOIDCAppRequest());
 
   public OIDCAppType: any = OIDCAppType;
@@ -70,6 +71,7 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
         request.setName(fw.title);
         request.setDevMode(true);
         this.requestRedirectValuesSubject$.next();
+        this.showRenameWarning.next(false);
 
         this.oidcAppRequest.next(request);
         return request;
@@ -137,6 +139,7 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
       .addOIDCApp(this.oidcAppRequest.getValue())
       .then((resp) => {
         this.loading = false;
+        this.showRenameWarning.next(false);
         this.toast.showInfo('APP.TOAST.CREATED', true);
         if (resp.clientSecret) {
           this.showSavedDialog(resp);
@@ -145,6 +148,9 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
         }
       })
       .catch((error) => {
+        if (error.code === 6) {
+          this.showRenameWarning.next(true);
+        }
         this.loading = false;
         this.toast.showError(error);
       });
@@ -165,6 +171,7 @@ export class IntegrateAppComponent implements OnInit, OnDestroy {
       if (name && name !== this.framework()?.title) {
         const request = this.oidcAppRequest.getValue();
         request.setName(name);
+        this.showRenameWarning.next(false);
         this.oidcAppRequest.next(request);
       }
     });

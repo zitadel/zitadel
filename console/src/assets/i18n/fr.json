@@ -135,6 +135,7 @@
     "DEVMODEWARN": "Le mode développement est activé par défaut. Vous pouvez mettre à jour les valeurs pour la production ultérieurement.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Parcourez les exemples",
+    "DUPLICATEAPPRENAME": "Une application avec ce nom existe déjà. Veuillez choisir un autre nom.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Cadre de changement",

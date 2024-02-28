@@ -135,6 +135,7 @@
     "DEVMODEWARN": "Dev Mode is enabled by default. You can update values for production later.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Browse Examples and SDKs",
+    "DUPLICATEAPPRENAME": "An app with the same name exists already. Please choose a different name.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Change Framework",

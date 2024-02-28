@@ -135,6 +135,7 @@
     "DEVMODEWARN": "Dev-modus is standaard ingeschakeld. U kunt waarden voor productie later bijwerken.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Bekijk voorbeelden",
+    "DUPLICATEAPPRENAME": "Er bestaat al een app met dezelfde aartsvijand. Kies een andere naam.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Verander Framework",

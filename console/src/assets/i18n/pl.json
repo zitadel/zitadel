@@ -135,6 +135,7 @@
     "DEVMODEWARN": "Tryb deweloperski jest domyślnie włączony. Możesz później zaktualizować wartości dla produkcji.",
     "GUIDE": "Przewodnik",
     "BROWSEEXAMPLES": "Przeglądaj przykłady",
+    "DUPLICATEAPPRENAME": "Aplikacja o tej samej nazwie już istnieje. Proszę wybrać inną nazwę.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Ramy zmian",

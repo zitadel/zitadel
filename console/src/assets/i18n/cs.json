@@ -135,6 +135,7 @@
     "DEVMODEWARN": "Dev Mode je ve výchozím nastavení povolen. Hodnoty pro produkci můžete aktualizovat později.",
     "GUIDE": "Guide",
     "BROWSEEXAMPLES": "Procházet ukázky",
+    "DUPLICATEAPPRENAME": "Aplikace se stejným neme již existuje. Vyberte prosím jiný název.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Rámec změn",

@@ -26,6 +26,7 @@
       <div class="grid-layout">
         <div>
           <cnsl-framework-change
+            *ngIf="framework"
             class="framework-selector"
             (frameworkChanged)="setFramework($event)"
           ></cnsl-framework-change>
@@ -47,6 +48,11 @@
         </div>
         <div class="card-wrapper">
           <cnsl-card class="review-card" title="{{ 'QUICKSTART.REVIEWCONFIGURATION' | translate }}">
+            <cnsl-info-section *ngIf="showRenameWarning | async" [type]="InfoSectionType.WARN"
+              ><span class="duplicate-name-warning">{{
+                'QUICKSTART.DUPLICATEAPPRENAME' | translate
+              }}</span></cnsl-info-section
+            >
             <cnsl-oidc-app-configuration
               *ngIf="(oidcAppRequest | async)?.toObject() as config"
               [name]="(oidcAppRequest | async)?.toObject()?.name"

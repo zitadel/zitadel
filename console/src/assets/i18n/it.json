@@ -135,6 +135,7 @@
     "DEVMODEWARN": "La modalità sviluppatore è abilitata per impostazione predefinita. È possibile aggiornare i valori per la produzione in un secondo momento.",
     "GUIDE": "Guida",
     "BROWSEEXAMPLES": "Esplora esempi e SDK",
+    "DUPLICATEAPPRENAME": "Un'app con lo stesso nome esiste già. Scegli un nome diverso.",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Modifica framework",
