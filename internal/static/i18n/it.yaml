@@ -541,6 +541,13 @@ Errors:
     NoTimeout: Il target non ha timeout
     InvalidURL: La destinazione ha un URL non valido
     NotFound: Obiettivo non trovato
+  Execution:
+    ConditionInvalid: La condizione di esecuzione non è valida
+    Invalid: L'esecuzione non è valida
+    NotFound: Esecuzione non trovata
+    IncludeNotFound: Includi non trovato
+    NoTargets: Nessun obiettivo definito
+
 
 AggregateTypes:
   action: Azione
@@ -553,8 +560,12 @@ AggregateTypes:
   quota: Quota
   feature: Funzionalità
   target: Bersaglio
+  execution: Esecuzione
 
 EventTypes:
+  execution:
+    set: Insieme di esecuzione
+    removed: Esecuzione cancellata
   target:
     added: Obiettivo creato
     changed: Obiettivo cambiato

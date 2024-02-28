@@ -557,6 +557,12 @@ Errors:
     NoTimeout: Целта няма време за изчакване
     InvalidURL: Целта има невалиден URL адрес
     NotFound: Целта не е намерена
+  Execution:
+    ConditionInvalid: Условието за изпълнение е невалидно
+    Invalid: Изпълнението е невалидно
+    NotFound: Изпълнението не е намерено
+    IncludeNotFound: Включването не е намерено
+    NoTargets: Няма определени цели
 
 AggregateTypes:
   action: Действие
@@ -569,8 +575,12 @@ AggregateTypes:
   quota: Квота
   feature: Особеност
   target: Целта
+  execution: Екзекуция
 
 EventTypes:
+  execution:
+    set: Комплект за изпълнение
+    removed: Изпълнението е изтрито
   target:
     added: Целта е създадена
     changed: Целта е променена

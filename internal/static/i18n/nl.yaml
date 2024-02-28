@@ -540,6 +540,12 @@ Errors:
     NoTimeout: Doel heeft geen time-out
     InvalidURL: Doel heeft een ongeldige URL
     NotFound: Doel niet gevonden
+  Execution:
+    ConditionInvalid: Uitvoeringsvoorwaarde is ongeldig
+    Invalid: Uitvoering is ongeldig
+    NotFound: Uitvoering niet gevonden
+    IncludeNotFound: Inclusief niet gevonden
+    NoTargets: Geen doelstellingen gedefinieerd
 
 AggregateTypes:
   action: Actie
@@ -552,8 +558,12 @@ AggregateTypes:
   quota: Quota
   feature: Functie
   target: Doel
+  execution: Executie
 
 EventTypes:
+  execution:
+    set: Uitvoering ingesteld
+    removed: Uitvoering verwijderd
   target:
     added: Doel gemaakt
     changed: Doel gewijzigd

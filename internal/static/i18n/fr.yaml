@@ -540,6 +540,12 @@ Errors:
     NoTimeout: La cible n'a pas de délai d'attente
     InvalidURL: La cible a une URL non valide
     NotFound: La cible introuvable
+  Execution:
+    ConditionInvalid: La condition d'exécution n'est pas valide
+    Invalid: L'exécution est invalide
+    NotFound: Exécution introuvable
+    IncludeNotFound: Inclure introuvable
+    NoTargets: Aucune cible définie
 
 AggregateTypes:
   action: Action
@@ -552,8 +558,12 @@ AggregateTypes:
   quota: Contingent
   feature: Fonctionnalité
   target: Cible
+  execution: Exécution
 
 EventTypes:
+  execution:
+    set: Ensemble d'exécution
+    removed: Exécution supprimée
   target:
     added: Cible créée
     changed: Cible modifiée

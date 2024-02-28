@@ -9,7 +9,7 @@ This guide shows you the different concepts and use cases of the logout process 
 
 ### Single Sign On (SSO) vs Single Logout (SLO)
 
-Single Sing On (SSO) allows a user to login once without the need for authentication across multiple applications.
+Single Sign On (SSO) allows a user to login once without the need for authentication across multiple applications.
 Single Logout (SLO) is the counterpart to SSO. With SLO a user can logout and terminate sessions across many applications, without actively logging out from them.
 
 The purpose of a logout is to terminate a user session.

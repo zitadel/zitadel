@@ -528,6 +528,12 @@ Errors:
     NoTimeout: У цели нет тайм-аута
     InvalidURL: Цель имеет неверный URL-адрес
     NotFound: Цель не найдена
+  Execution:
+    ConditionInvalid: Недопустимое условие выполнения
+    Invalid: Исполнение недействительно
+    NotFound: Исполнение не найдено
+    IncludeNotFound: Включить не найдено
+    NoTargets: Цели не определены
 
 AggregateTypes:
   action: Действие
@@ -540,8 +546,12 @@ AggregateTypes:
   quota: Квота
   feature: Особенность
   target: мишень
+  execution: Исполнение
 
 EventTypes:
+  execution:
+    set: Набор исполнения
+    removed: Исполнение удалено
   target:
     added: Цель создана
     changed: Цель изменена
