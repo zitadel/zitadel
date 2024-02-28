@@ -328,7 +328,7 @@ Errors:
       NotActive: Projecttoekenning is niet actief
       NotInactive: Projecttoekenning is niet gedeactiveerd
   IAM:
-    NotFound: Instance niet gevonden{{ if .Host }} door origin {{ .Origin }} en host {{ .Host }}. {{ if ( not ( hasPrefix .Host .ExternalDomain ) ) }}U zou het domein {{ .ExternalDomain }} kunnen proberen of kijken op https://zitadel.com/docs/self-hosting/manage/custom-domain {{ end }}{{ end }}
+    NotFound: IAM niet gevonden. Zorg ervoor dat u het juiste domein heeft. Kijk op https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Rollen zijn niet veranderd
     MemberInvalid: Lid is ongeldig

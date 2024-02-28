@@ -326,7 +326,7 @@ Errors:
       NotActive: A concessão do projeto não está ativa
       NotInactive: A concessão do projeto não está inativa
   IAM:
-    NotFound: Instância não encontrada{{ if .Host }} pela origem {{ .Origin }} e pelo host {{ .Host }}. {{ if ( not ( hasPrefix .Host .ExternalDomain ) ) }}Pode tentar o domínio {{ .ExternalDomain }} ou consultar https://zitadel.com/docs/self-hosting/manage/custom-domain {{ end }}{{ end }}
+    NotFound: IAM não encontrado. Verifique se você tem o domínio correto. Consulte https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: As funções não foram alteradas
     MemberInvalid: O membro é inválido

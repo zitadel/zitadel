@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -241,7 +242,12 @@ func (q *Queries) Instance(ctx context.Context, shouldTriggerBulk bool) (instanc
 
 func (q *Queries) InstanceByHost(ctx context.Context, host string) (instance authz.Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("unable to get instance by host %s: %w", host, err)
+		}
+		span.EndWithError(err)
+	}()
 
 	stmt, scan := prepareAuthzInstanceQuery(ctx, q.client, host)
 	host = strings.Split(host, ":")[0] //remove possible port

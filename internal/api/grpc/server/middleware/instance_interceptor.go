@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -61,15 +62,12 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 	}
 	instance, err := verifier.InstanceByHost(interceptorCtx, host)
 	if err != nil {
-		err = zerrors.WithTemplateVariables(err, map[string]interface{}{"ExternalDomain": externalDomain})
-		notFoundErr := new(zerrors.NotFoundError)
-		if errors.As(err, &notFoundErr) {
-			templErr := new(zerrors.TemplatableError)
-			var vars map[string]interface{}
-			if errors.As(err, &templErr) {
-				vars = templErr.GetVars()
-			}
-			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), vars)
+		err = fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s): %w", zitadel_http.ComposedOrigin(ctx), externalDomain, err)
+		zErr := new(zerrors.ZitadelError)
+		if errors.As(err, &zErr) {
+			zErr.SetMessage(translator.LocalizeFromCtx(ctx, zErr.GetMessage(), nil))
+			zErr.Parent = err
+			err = zErr
 		}
 		return nil, status.Error(codes.NotFound, err.Error())
 	}

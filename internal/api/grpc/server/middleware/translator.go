@@ -31,12 +31,7 @@ func translateError(ctx context.Context, err error, translator *i18n.Translator)
 	}
 	caosErr := new(zerrors.ZitadelError)
 	if errors.As(err, &caosErr) {
-		templErr := new(zerrors.TemplatableError)
-		var vars = map[string]interface{}{}
-		if errors.As(err, &templErr) {
-			vars = templErr.GetVars()
-		}
-		caosErr.SetMessage(translator.LocalizeFromCtx(ctx, caosErr.GetMessage(), vars))
+		caosErr.SetMessage(translator.LocalizeFromCtx(ctx, caosErr.GetMessage(), nil))
 	}
 	return err
 }

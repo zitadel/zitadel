@@ -56,18 +56,12 @@ func (a *instanceInterceptor) handleInstance(w http.ResponseWriter, r *http.Requ
 	}
 	ctx, err := setInstance(r, a.verifier, a.headerName)
 	if err != nil {
-		err = zerrors.WithTemplateVariables(err, map[string]interface{}{
-			"Origin":         zitadel_http.ComposedOrigin(r.Context()),
-			"ExternalDomain": a.externalDomain,
-		})
-		zitadelErr := new(zerrors.NotFoundError)
-		if errors.As(err, &zitadelErr) {
-			templErr := new(zerrors.TemplatableError)
-			var vars = map[string]interface{}{}
-			if errors.As(err, &templErr) {
-				vars = templErr.GetVars()
-			}
-			zitadelErr.Message = a.translator.LocalizeFromRequest(r, zitadelErr.GetMessage(), vars)
+		err = fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s): %w", zitadel_http.ComposedOrigin(r.Context()), a.externalDomain, err)
+		zErr := new(zerrors.ZitadelError)
+		if errors.As(err, &zErr) {
+			zErr.SetMessage(a.translator.LocalizeFromRequest(r, zErr.GetMessage(), nil))
+			zErr.Parent = err
+			err = zErr
 		}
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -82,11 +76,7 @@ func setInstance(r *http.Request, verifier authz.InstanceVerifier, headerName st
 	defer func() { span.EndWithError(err) }()
 
 	host, err := HostFromRequest(r, headerName)
-	defer func() {
-		err = zerrors.WithTemplateVariables(err, map[string]interface{}{
-			"Host": host,
-		})
-	}()
+
 	if err != nil {
 		return nil, zerrors.ThrowNotFound(err, "INST-zWq7X", "Errors.IAM.NotFound")
 	}
