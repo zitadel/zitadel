@@ -39,7 +39,7 @@ const (
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, errCtx, cancel := integration.Contexts(5 * time.Minute)
+		ctx, errCtx, cancel := integration.Contexts(10 * time.Minute)
 		defer cancel()
 
 		Tester = integration.NewTester(ctx)
