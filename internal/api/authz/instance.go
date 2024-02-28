@@ -23,6 +23,7 @@ type Instance interface {
 	DefaultLanguage() language.Tag
 	DefaultOrganisationID() string
 	SecurityPolicyAllowedOrigins() []string
+	EnableImpersonation() bool
 	Block() *bool
 	AuditLogRetention() *time.Duration
 	Features() feature.Features
@@ -85,6 +86,10 @@ func (i *instance) DefaultOrganisationID() string {
 
 func (i *instance) SecurityPolicyAllowedOrigins() []string {
 	return nil
+}
+
+func (i *instance) EnableImpersonation() bool {
+	return false
 }
 
 func (i *instance) Features() feature.Features {

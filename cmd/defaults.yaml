@@ -1126,6 +1126,13 @@ InternalAuthZ:
         - "project.grant.delete"
         - "project.grant.member.read"
         - "session.delete"
+    - Role: "IAM_ADMIN_IMPERSONATOR"
+      Permissions:
+        - "admin.impersonation"
+        - "impersonation"
+    - Role: "IAM_END_USER_IMPERSONATOR"
+      Permissions:
+        - "impersonation"
     - Role: "ORG_OWNER"
       Permissions:
         - "org.read"
@@ -1275,6 +1282,13 @@ InternalAuthZ:
         - "policy.read"
         - "project.read:self"
         - "project.create"
+    - Role: "ORG_ADMIN_IMPERSONATOR"
+      Permissions:
+        - "admin.impersonation"
+        - "impersonation"
+    - Role: "ORG_END_USER_IMPERSONATOR"
+      Permissions:
+        - "impersonation"
     - Role: "PROJECT_OWNER"
       Permissions:
         - "org.global.read"

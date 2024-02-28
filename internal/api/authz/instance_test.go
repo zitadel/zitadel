@@ -130,6 +130,10 @@ func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 	return nil
 }
 
+func (m *mockInstance) EnableImpersonation() bool {
+	return false
+}
+
 func (m *mockInstance) Features() feature.Features {
 	return feature.Features{}
 }

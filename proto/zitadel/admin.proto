@@ -681,7 +681,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             summary: "Get Security Settings";
-            description: "Returns the security settings of the ZITADEL instance. The settings define if the iframe is allowed and from which origins."
+            description: "Returns the security settings of the ZITADEL instance."
         };
     }
 
@@ -698,7 +698,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Settings";
             summary: "Set Security Settings";
-            description: "Set the security settings of the ZITADEL instance. The settings define if the iframe is allowed and from which origins."
+            description: "Set the security settings of the ZITADEL instance."
         };
     }
 
@@ -4295,6 +4295,8 @@ message SetSecurityPolicyRequest{
     bool enable_iframe_embedding = 1;
     // origins allowed loading ZITADEL in an iframe if enable_iframe_embedding is true
     repeated string allowed_origins = 2;
+    // allows users to impersonate other users. The impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well"
+    bool enable_impersonation = 3;
 }
 
 message SetSecurityPolicyResponse{

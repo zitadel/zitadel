@@ -411,23 +411,24 @@ func prepareInstanceDomainQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 }
 
 type authzInstance struct {
-	id                string
-	iamProjectID      string
-	consoleID         string
-	consoleAppID      string
-	host              string
-	domain            string
-	defaultLang       language.Tag
-	defaultOrgID      string
-	csp               csp
-	block             *bool
-	auditLogRetention *time.Duration
-	features          feature.Features
+	id                  string
+	iamProjectID        string
+	consoleID           string
+	consoleAppID        string
+	host                string
+	domain              string
+	defaultLang         language.Tag
+	defaultOrgID        string
+	csp                 csp
+	enableImpersonation bool
+	block               *bool
+	auditLogRetention   *time.Duration
+	features            feature.Features
 }
 
 type csp struct {
-	enabled        bool
-	allowedOrigins database.TextArray[string]
+	enableIframeEmbedding bool
+	allowedOrigins        database.TextArray[string]
 }
 
 func (i *authzInstance) InstanceID() string {
@@ -463,10 +464,14 @@ func (i *authzInstance) DefaultOrganisationID() string {
 }
 
 func (i *authzInstance) SecurityPolicyAllowedOrigins() []string {
-	if !i.csp.enabled {
+	if !i.csp.enableIframeEmbedding {
 		return nil
 	}
 	return i.csp.allowedOrigins
+}
+
+func (i *authzInstance) EnableImpersonation() bool {
+	return i.enableImpersonation
 }
 
 func (i *authzInstance) Block() *bool {
@@ -489,7 +494,8 @@ func scanAuthzInstance(host, domain string) (*authzInstance, func(row *sql.Row) 
 	return instance, func(row *sql.Row) error {
 		var (
 			lang                  string
-			securityPolicyEnabled sql.NullBool
+			enableIframeEmbedding sql.NullBool
+			enableImpersonation   sql.NullBool
 			auditLogRetention     database.NullDuration
 			block                 sql.NullBool
 			features              []byte
@@ -501,8 +507,9 @@ func scanAuthzInstance(host, domain string) (*authzInstance, func(row *sql.Row) 
 			&instance.consoleID,
 			&instance.consoleAppID,
 			&lang,
-			&securityPolicyEnabled,
+			&enableIframeEmbedding,
 			&instance.csp.allowedOrigins,
+			&enableImpersonation,
 			&auditLogRetention,
 			&block,
 			&features,
@@ -520,7 +527,8 @@ func scanAuthzInstance(host, domain string) (*authzInstance, func(row *sql.Row) 
 		if block.Valid {
 			instance.block = &block.Bool
 		}
-		instance.csp.enabled = securityPolicyEnabled.Bool
+		instance.csp.enableIframeEmbedding = enableIframeEmbedding.Bool
+		instance.enableImpersonation = enableImpersonation.Bool
 		if len(features) == 0 {
 			return nil
 		}

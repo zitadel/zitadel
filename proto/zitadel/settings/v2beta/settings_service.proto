@@ -10,6 +10,7 @@ import "zitadel/settings/v2beta/legal_settings.proto";
 import "zitadel/settings/v2beta/lockout_settings.proto";
 import "zitadel/settings/v2beta/login_settings.proto";
 import "zitadel/settings/v2beta/password_settings.proto";
+import "zitadel/settings/v2beta/security_settings.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -298,6 +299,45 @@ service SettingsService {
       };
     };
   }
+
+// Get the security settings
+  rpc GetSecuritySettings(GetSecuritySettingsRequest) returns (GetSecuritySettingsResponse) {
+    option (google.api.http) = {
+      get: "/v2beta/settings/security";
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Settings";
+      summary: "Get Security Settings";
+      description: "Returns the security settings of the ZITADEL instance."
+    };
+  }
+
+// Set the security settings
+  rpc SetSecuritySettings(SetSecuritySettingsRequest) returns (SetSecuritySettingsResponse) {
+    option (google.api.http) = {
+      put: "/v2beta/policies/security";
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.policy.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: "Settings";
+      summary: "Set Security Settings";
+      description: "Set the security settings of the ZITADEL instance."
+    };
+  }
 }
 
 message GetLoginSettingsRequest {
@@ -382,4 +422,25 @@ message GetGeneralSettingsResponse {
       example: "[\"en\", \"de\", \"it\"]"
     }
   ];
+}
+
+// This is an empty request
+message GetSecuritySettingsRequest{}
+
+message GetSecuritySettingsResponse{
+  zitadel.object.v2beta.Details details = 1;
+  SecuritySettings settings = 2;
+}
+
+message SetSecuritySettingsRequest{
+  EmbeddedIframeSettings embedded_iframe = 1;
+  bool enable_impersonation = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "allows users to impersonate other users. The impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well"
+    }
+  ];
+}
+
+message SetSecuritySettingsResponse{
+  zitadel.object.v2beta.Details details = 1;
 }
