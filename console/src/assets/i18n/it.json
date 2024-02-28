@@ -194,7 +194,7 @@
     "ORG_USER_PERMISSION_EDITOR": "Ha l'autorizzazione per gestire le autorizzazioni degli utenti",
     "ORG_PROJECT_PERMISSION_EDITOR": "Ha il permesso di gestire le sovvenzioni di progetto (Project Grant)",
     "ORG_PROJECT_CREATOR": "Ha il permesso di creare propri progetti e le impostazioni sottostanti",
-    "ORG_ADMIN_IMPERSONATOR": "Dispone dell'autorizzazione per rappresentare l'amministratore e gli utenti finali dell'organizzazione",
+    "ORG_ADMIN_IMPERSONATOR": "Ha il permesso per rappresentare l'amministratore e gli utenti finali dell'organizzazione",
     "ORG_END_USER_IMPERSONATOR": "Dispone dell'autorizzazione per rappresentare gli utenti finali dell'organizzazione",
     "PROJECT_OWNER": "Ha il permesso per l'intero progetto",
     "PROJECT_OWNER_VIEWER": "Ha il permesso di esaminare l'intero progetto",
