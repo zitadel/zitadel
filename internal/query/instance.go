@@ -97,17 +97,12 @@ type Instance struct {
 	Sequence     uint64
 	Name         string
 
-	DefaultOrgID        string
-	IAMProjectID        string
-	ConsoleID           string
-	ConsoleAppID        string
-	DefaultLang         language.Tag
-	Domains             []*InstanceDomain
-	host                string
-	csp                 csp
-	block               *bool
-	auditLogRetention   *time.Duration
-	enableImpersonation bool
+	DefaultOrgID string
+	IAMProjectID string
+	ConsoleID    string
+	ConsoleAppID string
+	DefaultLang  language.Tag
+	Domains      []*InstanceDomain
 }
 
 type Instances struct {
