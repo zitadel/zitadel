@@ -528,3 +528,12 @@ func (s *Tester) CreateTarget(ctx context.Context, t *testing.T) *execution.Crea
 	require.NoError(t, err)
 	return target
 }
+
+func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution.SetConditions, targets []string) *execution.SetExecutionResponse {
+	target, err := s.Client.ExecutionV3.SetExecution(ctx, &execution.SetExecutionRequest{
+		Condition: cond,
+		Targets:   targets,
+	})
+	require.NoError(t, err)
+	return target
+}

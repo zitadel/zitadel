@@ -4442,7 +4442,7 @@ message SetUpOrgRequest {
             string display_name = 4 [
                 (validate.rules).string = {max_len: 200},
                 (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                    description: "a user can set his display name if nothing is set ZITADEL computes \"first_name last_name\"";
+                    description: "a user can set the display name if nothing is set ZITADEL computes \"first_name last_name\"";
                     max_length: 200;
                     example: "\"Gigi Giraffe\"";
                 }
@@ -6375,7 +6375,7 @@ message GetLoginPolicyResponse {
 message UpdateLoginPolicyRequest {
     bool allow_username_password = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if a user is allowed to log in with his username and password"
+            description: "defines if a user is allowed to log in with username and password"
         }
     ];
     bool allow_register = 2 [

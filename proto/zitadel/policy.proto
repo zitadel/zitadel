@@ -159,7 +159,7 @@ message LoginPolicy {
     zitadel.v1.ObjectDetails details = 1;
     bool allow_username_password = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "defines if a user is allowed to log in with his username and password"
+            description: "defines if a user is allowed to log in with username and password"
         }
     ];
     bool allow_register = 3 [
