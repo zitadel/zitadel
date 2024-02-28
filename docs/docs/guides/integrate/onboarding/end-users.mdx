@@ -24,12 +24,15 @@ If you want to start automating the process of onboarding your users and let the
 
 #### Prompt registration form
 
-Normally a user starts in your application and either wants to do a login or a registration.
-Per default the login page is shown when you do a redirect from your application.
+When users first access your application, they'll typically need to either log in or register.
+By default, redirecting from your application displays the login page.
 
-With OpenID Connect (OIDC) you can send a [prompt](/docs/apis/openidoauth/endpoints#additional-parameters) in the authorization request, which tells what should be shown.
-With the `prompt=create` the registration will directly be shown to the user.
+OpenID Connect (OIDC) allows you to control the initial screen by sending a [prompt](/docs/apis/openidoauth/endpoints#additional-parameters) in the authorization request.
+With the `prompt=create` the registration form/options will directly be shown to the user.
 You can test the impact of the different prompts on your login UI in our [OIDC Playground](/docs/apis/openidoauth/authrequest).
+
+Unfortunately, SAML doesn't offer the same level of control over the initial screen.
+You won't be able to directly influence which page (login or registration) is shown through the SAML flow.
 
 #### Choose Registration Option
 
