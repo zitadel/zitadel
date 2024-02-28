@@ -27,6 +27,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
+	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
@@ -51,6 +52,7 @@ type Client struct {
 	OrgV2       organisation.OrganizationServiceClient
 	System      system.SystemServiceClient
 	ExecutionV3 execution.ExecutionServiceClient
+	FeatureV2   feature.FeatureServiceClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
@@ -66,6 +68,7 @@ func newClient(cc *grpc.ClientConn) Client {
 		OrgV2:       organisation.NewOrganizationServiceClient(cc),
 		System:      system.NewSystemServiceClient(cc),
 		ExecutionV3: execution.NewExecutionServiceClient(cc),
+		FeatureV2:   feature.NewFeatureServiceClient(cc),
 	}
 }
 

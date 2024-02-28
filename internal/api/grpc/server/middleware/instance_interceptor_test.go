@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/feature"
 )
 
 func Test_hostNameFromContext(t *testing.T) {
@@ -211,4 +212,8 @@ func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 
 func (m *mockInstance) EnableImpersonation() bool {
 	return false
+}
+
+func (m *mockInstance) Features() feature.Features {
+	return feature.Features{}
 }

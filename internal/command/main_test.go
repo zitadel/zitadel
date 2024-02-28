@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/eventstore/repository/mock"
+	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -217,6 +218,10 @@ func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 
 func (m *mockInstance) EnableImpersonation() bool {
 	return false
+}
+
+func (m *mockInstance) Features() feature.Features {
+	return feature.Features{}
 }
 
 func newMockPermissionCheckAllowed() domain.PermissionCheck {
