@@ -215,7 +215,7 @@ func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 	return nil
 }
 
-func (m *mockInstance) SecurityPolicyEnableImpersonation() bool {
+func (m *mockInstance) EnableImpersonation() bool {
 	return false
 }
 

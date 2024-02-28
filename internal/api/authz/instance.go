@@ -21,7 +21,7 @@ type Instance interface {
 	DefaultLanguage() language.Tag
 	DefaultOrganisationID() string
 	SecurityPolicyAllowedOrigins() []string
-	SecurityPolicyEnableImpersonation() bool
+	EnableImpersonation() bool
 	Block() *bool
 	AuditLogRetention() *time.Duration
 }
@@ -84,7 +84,7 @@ func (i *instance) SecurityPolicyAllowedOrigins() []string {
 	return nil
 }
 
-func (i *instance) SecurityPolicyEnableImpersonation() bool {
+func (i *instance) EnableImpersonation() bool {
 	return false
 }
 

@@ -94,22 +94,22 @@ type Instance struct {
 	Sequence     uint64
 	Name         string
 
-	DefaultOrgID      string
-	IAMProjectID      string
-	ConsoleID         string
-	ConsoleAppID      string
-	DefaultLang       language.Tag
-	Domains           []*InstanceDomain
-	host              string
-	csp               csp
-	block             *bool
-	auditLogRetention *time.Duration
+	DefaultOrgID        string
+	IAMProjectID        string
+	ConsoleID           string
+	ConsoleAppID        string
+	DefaultLang         language.Tag
+	Domains             []*InstanceDomain
+	host                string
+	csp                 csp
+	block               *bool
+	auditLogRetention   *time.Duration
+	enableImpersonation bool
 }
 
 type csp struct {
 	enableIframeEmbedding bool
 	allowedOrigins        database.TextArray[string]
-	enableImpersonation   bool
 }
 
 type Instances struct {
@@ -156,8 +156,8 @@ func (i *Instance) SecurityPolicyAllowedOrigins() []string {
 	return i.csp.allowedOrigins
 }
 
-func (i *Instance) SecurityPolicyEnableImpersonation() bool {
-	return i.csp.enableImpersonation
+func (i *Instance) EnableImpersonation() bool {
+	return i.enableImpersonation
 }
 
 func (i *Instance) Block() *bool {
@@ -597,7 +597,7 @@ func prepareAuthzInstanceQuery(ctx context.Context, db prepareDatabase, host str
 					instance.block = &block.Bool
 				}
 				instance.csp.enableIframeEmbedding = enableIframeEmbedding.Bool
-				instance.csp.enableImpersonation = enableImpersonation.Bool
+				instance.enableImpersonation = enableImpersonation.Bool
 			}
 			if instance.ID == "" {
 				return nil, zerrors.ThrowNotFound(nil, "QUERY-1kIjX", "Errors.IAM.NotFound")
