@@ -436,7 +436,7 @@ message SetSecuritySettingsRequest{
   EmbeddedIframeSettings embedded_iframe = 1;
   bool enable_impersonation = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "allows users to impersonate other users. The impersonator needs the appropiate `*_IMPERSONATOR` roles assigned as well"
+      description: "allows users to impersonate other users. The impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well"
     }
   ];
 }

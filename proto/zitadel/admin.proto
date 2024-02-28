@@ -4295,7 +4295,7 @@ message SetSecurityPolicyRequest{
     bool enable_iframe_embedding = 1;
     // origins allowed loading ZITADEL in an iframe if enable_iframe_embedding is true
     repeated string allowed_origins = 2;
-    // allows users to impersonate other users. The impersonator needs the appropiate `*_IMPERSONATOR` roles assigned as well"
+    // allows users to impersonate other users. The impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well"
     bool enable_impersonation = 3;
 }
 
