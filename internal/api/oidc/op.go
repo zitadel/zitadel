@@ -42,7 +42,6 @@ type Config struct {
 	DeviceAuth                        *DeviceAuthorizationConfig
 	DefaultLoginURLV2                 string
 	DefaultLogoutURLV2                string
-	Features                          Features
 	PublicKeyCacheMaxAge              time.Duration
 }
 
@@ -60,11 +59,6 @@ type EndpointConfig struct {
 type Endpoint struct {
 	Path string
 	URL  string
-}
-
-type Features struct {
-	TriggerIntrospectionProjections bool
-	LegacyIntrospection             bool
 }
 
 type OPStorage struct {
@@ -128,7 +122,6 @@ func NewServer(
 
 	server := &Server{
 		LegacyServer:               op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
-		features:                   config.Features,
 		repo:                       repo,
 		query:                      query,
 		command:                    command,
