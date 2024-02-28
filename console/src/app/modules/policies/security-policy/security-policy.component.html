@@ -18,7 +18,9 @@
   >
     {{ 'SETTING.SECURITY.IFRAMEENABLED' | translate }}
   </mat-checkbox>
-  <cnsl-info-section [type]="InfoSectionType.ALERT">{{ 'SETTING.SECURITY.IFRAMEDESCRIPTION' | translate }}</cnsl-info-section>
+  <cnsl-info-section [type]="InfoSectionType.ALERT">{{
+    'SETTING.SECURITY.IFRAMEDESCRIPTION' | translate
+  }}</cnsl-info-section>
 
   <form class="security-allowed-originsform" (ngSubmit)="add(redInput)">
     <cnsl-form-field class="formfield">
@@ -58,7 +60,9 @@
   >
     {{ 'SETTING.SECURITY.IMPERSONATIONENABLED' | translate }}
   </mat-checkbox>
-  <cnsl-info-section [type]="InfoSectionType.INFO">{{ 'SETTING.SECURITY.IMPERSONATIONDESCRIPTION' | translate }}</cnsl-info-section>
+  <cnsl-info-section [type]="InfoSectionType.INFO">{{
+    'SETTING.SECURITY.IMPERSONATIONDESCRIPTION' | translate
+  }}</cnsl-info-section>
 </div>
 
 <div class="general-btn-container">

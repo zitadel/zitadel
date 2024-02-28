@@ -1170,7 +1170,6 @@
       "IMPERSONATIONTITLE": "Podszywanie się",
       "IMPERSONATIONENABLED": "Zezwalaj na podszywanie się",
       "IMPERSONATIONDESCRIPTION": "To ustawienie pozwala w zasadzie na użycie personifikacji. Należy pamiętać, że osoba personifikująca potrzebuje również przypisanych odpowiednich ról `*_IMPERSONATOR`."
-
     },
     "DIALOG": {
       "RESET": {
