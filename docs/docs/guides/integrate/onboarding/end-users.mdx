@@ -22,6 +22,26 @@ If you want to start automating the process of onboarding your users and let the
 
 ### Built-in register form
 
+#### Prompt registration form
+
+Normally a user starts in your application and either wants to do a login or a registration.
+Per default the login page is shown when you do a redirect from your application.
+
+With OpenID Connect (OIDC) you can send a [prompt](/docs/apis/openidoauth/endpoints#additional-parameters) in the authorization request, which tells what should be shown.
+With the `prompt=create` the registration will directly be shown to the user.
+You can test the impact of the different prompts on your login UI in our [OIDC Playground](/docs/apis/openidoauth/authrequest).
+
+#### Choose Registration Option
+
+If an organization does allow local user registration as well as registration with a social or enterprise login, the user will have to choose the option.
+
+As soon as the user clicks the "register" button, the registration options screen will be shown.
+
+<img src="/docs/img/guides/solution-scenarios/register-options.png" alt="Register Options"/>
+
+The use can now select either local user registration or an external provider.
+By pressing the button of an external provider, the user will directly be redirected to the provider.
+
 #### Local User Registration
 
 To allow users to register themselves, you have to enable the "register allowed" in the login behavior settings.
