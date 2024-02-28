@@ -8,12 +8,14 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/muhlemmer/gu"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
@@ -70,7 +72,9 @@ Log:
 		args: args{yaml: `
 DefaultInstance:
   Features:
-  - FeatureLoginDefaultOrg: true
+    LoginDefaultOrg: true
+    LegacyIntrospection: true
+    TriggerIntrospectionProjections: true
 Log:
   Level: info
 Actions:
@@ -78,25 +82,10 @@ Actions:
     DenyList: []
 `},
 		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, config.DefaultInstance.Features, map[domain.Feature]any{
-				domain.FeatureLoginDefaultOrg: true,
-			})
-		},
-	}, {
-		name: "features string ok",
-		args: args{yaml: `
-DefaultInstance:
-  Features: >
-    [{"featureLoginDefaultOrg": true}]
-Log:
-  Level: info
-Actions:
-  HTTP:
-    DenyList: []
-`},
-		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, config.DefaultInstance.Features, map[domain.Feature]any{
-				domain.FeatureLoginDefaultOrg: true,
+			assert.Equal(t, config.DefaultInstance.Features, &command.InstanceFeatures{
+				LoginDefaultOrg:                 gu.Ptr(true),
+				LegacyIntrospection:             gu.Ptr(true),
+				TriggerIntrospectionProjections: gu.Ptr(true),
 			})
 		},
 	}, {

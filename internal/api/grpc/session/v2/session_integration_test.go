@@ -24,10 +24,12 @@ import (
 )
 
 var (
-	CTX    context.Context
-	Tester *integration.Tester
-	Client session.SessionServiceClient
-	User   *user.AddHumanUserResponse
+	CTX             context.Context
+	Tester          *integration.Tester
+	Client          session.SessionServiceClient
+	User            *user.AddHumanUserResponse
+	DeactivatedUser *user.AddHumanUserResponse
+	LockedUser      *user.AddHumanUserResponse
 )
 
 func TestMain(m *testing.M) {
@@ -51,6 +53,10 @@ func TestMain(m *testing.M) {
 		})
 		Tester.SetUserPassword(CTX, User.GetUserId(), integration.UserPassword)
 		Tester.RegisterUserPasskey(CTX, User.GetUserId())
+		DeactivatedUser = Tester.CreateHumanUser(CTX)
+		Tester.Client.UserV2.DeactivateUser(CTX, &user.DeactivateUserRequest{UserId: DeactivatedUser.GetUserId()})
+		LockedUser = Tester.CreateHumanUser(CTX)
+		Tester.Client.UserV2.LockUser(CTX, &user.LockUserRequest{UserId: LockedUser.GetUserId()})
 		return m.Run()
 	}())
 }
@@ -228,6 +234,32 @@ func TestServer_CreateSession(t *testing.T) {
 				},
 			},
 			wantFactors: []wantFactor{wantUserFactor},
+		},
+		{
+			name: "deactivated user",
+			req: &session.CreateSessionRequest{
+				Checks: &session.Checks{
+					User: &session.CheckUser{
+						Search: &session.CheckUser_UserId{
+							UserId: DeactivatedUser.GetUserId(),
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "locked user",
+			req: &session.CreateSessionRequest{
+				Checks: &session.Checks{
+					User: &session.CheckUser{
+						Search: &session.CheckUser_UserId{
+							UserId: LockedUser.GetUserId(),
+						},
+					},
+				},
+			},
+			wantErr: true,
 		},
 		{
 			name: "password without user error",
