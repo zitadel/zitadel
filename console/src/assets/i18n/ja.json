@@ -1967,6 +1967,7 @@
       "DATECHANGED": "更新日",
       "URLS": "URL",
       "DELETE": "アプリを削除する",
+      "JUMPTOPROJECT": "ロール、権限などを構成するには、プロジェクトに移動します。",
       "DETAIL": {
         "TITLE": "詳細",
         "STATE": {

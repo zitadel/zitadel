@@ -1975,6 +1975,7 @@
       "DATECHANGED": "修改于",
       "URLS": "URLs",
       "DELETE": "删除应用",
+      "JUMPTOPROJECT": "要配置角色、授权等，请导航到项目。",
       "DETAIL": {
         "TITLE": "详情",
         "STATE": {

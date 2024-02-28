@@ -1976,6 +1976,7 @@
       "DATECHANGED": "Zmienione",
       "URLS": "Adresy URL",
       "DELETE": "Usuń aplikację",
+      "JUMPTOPROJECT": "Aby skonfigurować role, uprawnienia i nie tylko, przejdź do projektu.",
       "DETAIL": {
         "TITLE": "Szczegóły",
         "STATE": {

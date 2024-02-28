@@ -1985,6 +1985,7 @@
       "DATECHANGED": "Změněno",
       "URLS": "URL adresy",
       "DELETE": "Smazat aplikaci",
+      "JUMPTOPROJECT": "Chcete-li nakonfigurovat role, oprávnění a další, přejděte do projektu.",
       "DETAIL": {
         "TITLE": "Detail",
         "STATE": {

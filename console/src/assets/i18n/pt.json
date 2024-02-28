@@ -1971,6 +1971,7 @@
       "DATECHANGED": "Alterado",
       "URLS": "URLs",
       "DELETE": "Excluir App",
+      "JUMPTOPROJECT": "Para configurar funções, autorizações e muito mais, navegue até o projeto.",
       "DETAIL": {
         "TITLE": "Detalhe",
         "STATE": {

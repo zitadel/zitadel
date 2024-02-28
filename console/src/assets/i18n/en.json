@@ -1994,6 +1994,7 @@
       "DATECHANGED": "Changed",
       "URLS": "URLs",
       "DELETE": "Delete App",
+      "JUMPTOPROJECT": "To configure roles, authorizations and more, navigate to the project.",
       "DETAIL": {
         "TITLE": "Detail",
         "STATE": {
