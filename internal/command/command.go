@@ -74,6 +74,12 @@ type Commands struct {
 	defaultSecretGenerators *SecretGenerators
 
 	samlCertificateAndKeyGenerator func(id string) ([]byte, []byte, error)
+
+	GrpcMethodExisting     func(method string) bool
+	GrpcServiceExisting    func(method string) bool
+	ActionFunctionExisting func(function string) bool
+	EventExisting          func(event string) bool
+	EventGroupExisting     func(group string) bool
 }
 
 func StartCommands(
@@ -132,6 +138,13 @@ func StartCommands(
 		defaultRefreshTokenIdleLifetime: defaultRefreshTokenIdleLifetime,
 		defaultSecretGenerators:         defaultSecretGenerators,
 		samlCertificateAndKeyGenerator:  samlCertificateAndKeyGenerator(defaults.KeyConfig.Size),
+		// always true for now until we can check with an eventlist
+		EventExisting: func(event string) bool { return true },
+		// always true for now until we can check with an eventlist
+		EventGroupExisting:     func(group string) bool { return true },
+		GrpcServiceExisting:    func(service string) bool { return false },
+		GrpcMethodExisting:     func(method string) bool { return false },
+		ActionFunctionExisting: domain.FunctionExists(),
 	}
 
 	repo.codeAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)

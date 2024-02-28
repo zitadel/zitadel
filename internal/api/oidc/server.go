@@ -21,7 +21,6 @@ import (
 type Server struct {
 	http.Handler
 	*op.LegacyServer
-	features Features
 
 	repo              repository.Repository
 	query             *query.Queries

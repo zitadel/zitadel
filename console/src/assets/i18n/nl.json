@@ -213,12 +213,16 @@
     "IAM_OWNER_VIEWER": "Heeft toestemming om de hele instantie te bekijken, inclusief alle organisaties",
     "IAM_ORG_MANAGER": "Heeft toestemming om organisaties aan te maken en te beheren",
     "IAM_USER_MANAGER": "Heeft toestemming om gebruikers aan te maken en te beheren",
+    "IAM_ADMIN_IMPERSONATOR": "Heeft toestemming om zich voor te doen als beheerder en eindgebruikers van alle organisaties",
+    "IAM_END_USER_IMPERSONATOR": "Heeft toestemming om eindgebruikers van alle organisaties na te bootsen",
     "ORG_OWNER": "Heeft toestemming over de hele organisatie",
     "ORG_USER_MANAGER": "Heeft toestemming om gebruikers van de organisatie aan te maken en te beheren",
     "ORG_OWNER_VIEWER": "Heeft toestemming om de hele organisatie te bekijken",
     "ORG_USER_PERMISSION_EDITOR": "Heeft toestemming om gebruikerstoegang te beheren",
     "ORG_PROJECT_PERMISSION_EDITOR": "Heeft toestemming om projecttoegang te beheren",
     "ORG_PROJECT_CREATOR": "Heeft toestemming om zijn eigen projecten en onderliggende instellingen aan te maken",
+    "ORG_ADMIN_IMPERSONATOR": "Heeft toestemming om de beheerder en eindgebruikers van de organisatie na te bootsen",
+    "ORG_END_USER_IMPERSONATOR": "Heeft toestemming om eindgebruikers van de organisatie na te bootsen",
     "PROJECT_OWNER": "Heeft toestemming over het hele project",
     "PROJECT_OWNER_VIEWER": "Heeft toestemming om het hele project te bekijken",
     "PROJECT_OWNER_GLOBAL": "Heeft toestemming over het hele project",
@@ -1185,9 +1189,13 @@
       "UPDATED": "Instellingen bijgewerkt."
     },
     "SECURITY": {
-      "DESCRIPTION": "Deze instelling stelt de CSP in om framing van een reeks toegestane domeinen toe te staan. Let op: door het gebruik van iFrames toe te staan, loopt u het risico om clickjacking toe te staan.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Deze instelling stelt de CSP in om framing van een reeks toegestane domeinen toe te staan. Let op: door het gebruik van iFrames toe te staan, loopt u het risico om clickjacking toe te staan.",
       "IFRAMEENABLED": "Sta iFrame toe",
-      "ALLOWEDORIGINS": "Toegestane URLs"
+      "ALLOWEDORIGINS": "Toegestane URLs",
+      "IMPERSONATIONTITLE": "Imitatie",
+      "IMPERSONATIONENABLED": "Imitatie toestaan",
+      "IMPERSONATIONDESCRIPTION": "Deze instelling maakt het in principe mogelijk om imitatie te gebruiken. Houd er rekening mee dat aan de imitator ook de juiste `*_IMPERSONATOR` rollen moeten worden toegewezen."
     },
     "DIALOG": {
       "RESET": {

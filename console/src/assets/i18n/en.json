@@ -213,12 +213,16 @@
     "IAM_OWNER_VIEWER": "Has permission to review the whole instance, including all organizations",
     "IAM_ORG_MANAGER": "Has permission to create and manage organizations",
     "IAM_USER_MANAGER": "Has permission to create and manage users",
+    "IAM_ADMIN_IMPERSONATOR": "Has permission to impersonate admin and end users from all organizations",
+    "IAM_END_USER_IMPERSONATOR": "Has permission to impersonate end users from all organizations",
     "ORG_OWNER": "Has permission over the whole organization",
     "ORG_USER_MANAGER": "Has permission to create and manage users of the organization",
     "ORG_OWNER_VIEWER": "Has permission to review the whole organization",
     "ORG_USER_PERMISSION_EDITOR": "Has permission to manage user grants",
     "ORG_PROJECT_PERMISSION_EDITOR": "Has permission to manage project grants",
     "ORG_PROJECT_CREATOR": "Has permission to create his own projects and underlying settings",
+    "ORG_ADMIN_IMPERSONATOR": "Has permission to impersonate admin and end users from the organization",
+    "ORG_END_USER_IMPERSONATOR": "Has permission to impersonate end users from the organization",
     "PROJECT_OWNER": "Has permission over the whole project",
     "PROJECT_OWNER_VIEWER": "Has permission to review the whole project",
     "PROJECT_OWNER_GLOBAL": "Has permission over the whole project",
@@ -1185,9 +1189,13 @@
       "UPDATED": "Settings updated."
     },
     "SECURITY": {
-      "DESCRIPTION": "This setting sets the CSP to allow framing from a set of allowed domains. Note that by enabling the use of iFrames, you run the risk of allowing clickjacking.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "This setting sets the CSP to allow framing from a set of allowed domains. Note that by enabling the use of iFrames, you run the risk of allowing clickjacking.",
       "IFRAMEENABLED": "Allow iFrame",
-      "ALLOWEDORIGINS": "Allowed URLs"
+      "ALLOWEDORIGINS": "Allowed URLs",
+      "IMPERSONATIONTITLE": "Impersonation",
+      "IMPERSONATIONENABLED": "Allow Impersonation",
+      "IMPERSONATIONDESCRIPTION": "This setting allows to use impersonation in principle. Note that the impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well."
     },
     "DIALOG": {
       "RESET": {

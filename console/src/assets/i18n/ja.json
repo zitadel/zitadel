@@ -213,12 +213,16 @@
     "IAM_OWNER_VIEWER": "すべての組織を含むインスタンス全体を閲覧する権限を持ちます",
     "IAM_ORG_MANAGER": "組織の作成および管理する権限を持ちます",
     "IAM_USER_MANAGER": "ユーザーの作成および管理する権限を持ちます",
+    "IAM_ADMIN_IMPERSONATOR": "すべての組織の管理者およびエンドユーザーになりすます権限を持っています",
+    "IAM_END_USER_IMPERSONATOR": "すべての組織のエンドユーザーになりすます権限を持っています",
     "ORG_OWNER": "組織全体に対する権限を持ちます",
     "ORG_USER_MANAGER": "組織のユーザーを作成および管理する権限を持ちます",
     "ORG_OWNER_VIEWER": "組織全体を閲覧する権限を持ちます",
     "ORG_USER_PERMISSION_EDITOR": "ユーザーグラントを管理する権限を持ちます",
     "ORG_PROJECT_PERMISSION_EDITOR": "プロジェクトグラントを管理する権限を持ちます",
     "ORG_PROJECT_CREATOR": "所有するプロジェクトと配下の設定を作成する権限を持ちます",
+    "ORG_ADMIN_IMPERSONATOR": "組織の管理者およびエンドユーザーになりすます権限がある",
+    "ORG_END_USER_IMPERSONATOR": "組織のエンドユーザーになりすます権限がある",
     "PROJECT_OWNER": "特定のプロジェクト全体を管理する権限を持ちます",
     "PROJECT_OWNER_VIEWER": "特定のプロジェクト全体を閲覧する権限を持ちます",
     "PROJECT_OWNER_GLOBAL": "全てのプロジェクトを管理する権限を持ちます",
@@ -1185,9 +1189,13 @@
       "UPDATED": "設定が更新されました。"
     },
     "SECURITY": {
-      "DESCRIPTION": "この設定は、許可されたドメインのセットからのフレーミングを許可するように CSP を設定します。iFrameの使用を有効にすると、クリックジャッキングが許可される危険性があることに注意してください。",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "この設定は、許可されたドメインのセットからのフレーミングを許可するように CSP を設定します。iFrameの使用を有効にすると、クリックジャッキングが許可される危険性があることに注意してください。",
       "IFRAMEENABLED": "iFrameを許可する",
-      "ALLOWEDORIGINS": "許可されたURL"
+      "ALLOWEDORIGINS": "許可されたURL",
+      "IMPERSONATIONTITLE": "偽装",
+      "IMPERSONATIONENABLED": "偽装を許可します",
+      "IMPERSONATIONDESCRIPTION": "この設定では、原則として偽装を使用できます。偽装者には、適切な `*_IMPERSONATOR` ロールも割り当てられている必要があることに注意してください。"
     },
     "DIALOG": {
       "RESET": {
