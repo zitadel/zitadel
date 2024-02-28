@@ -119,6 +119,30 @@
     "SETTINGS": "Instellingen",
     "CUSTOMERPORTAL": "Klantenportaal"
   },
+  "QUICKSTART": {
+    "TITLE": "Integreer ZITADEL in uw toepassing",
+    "DESCRIPTION": "Integreer ZITADEL in uw toepassing of gebruik een van onze voorbeelden om binnen enkele minuten aan de slag te gaan.",
+    "BTN_START": "Applicatie maken",
+    "BTN_LEARNMORE": "Meer informatie",
+    "CREATEPROJECTFORAPP": "Creëer Project {{value}}",
+    "SELECT_FRAMEWORK": "Kies Framework",
+    "FRAMEWORK": "Framework",
+    "FRAMEWORK_OTHER": "Ander (OIDC, SAML, API)",
+    "ALMOSTDONE": "Je bent bijna klaar",
+    "REVIEWCONFIGURATION": "Reviewconfiguratie",
+    "REVIEWCONFIGURATION_DESCRIPTION": "We hebben een basisconfiguratie gemaakt voor {{value}} toepassingen. Je kunt deze configuratie na het aanmaken aanpassen aan je behoeften.",
+    "REDIRECTS": "Configureer omleidingen",
+    "DEVMODEWARN": "Dev-modus is standaard ingeschakeld. U kunt waarden voor productie later bijwerken.",
+    "GUIDE": "Guide",
+    "BROWSEEXAMPLES": "Bekijk voorbeelden",
+    "DUPLICATEAPPRENAME": "Er bestaat al een app met dezelfde aartsvijand. Kies een andere naam.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Verander Framework",
+        "DESCRIPTION": "Kies een van de beschikbare frameworks voor het snel instellen van je applicatie."
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "Acties",
     "FILTER": "Filter",
@@ -138,6 +162,7 @@
     "ADD": "Toevoegen",
     "CREATE": "Aanmaken",
     "CONTINUE": "Doorgaan",
+    "CONTINUEWITH": "Ga verder met {{value}}",
     "BACK": "Terug",
     "CLOSE": "Sluiten",
     "CLEAR": "Leegmaken",
@@ -1980,6 +2005,7 @@
       "DATECHANGED": "Gewijzigd",
       "URLS": "URL's",
       "DELETE": "Verwijder App",
+      "JUMPTOPROJECT": "Om rollen, autorisaties en meer te configureren, navigeert u naar het project.",
       "DETAIL": {
         "TITLE": "Detail",
         "STATE": {

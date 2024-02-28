@@ -119,6 +119,30 @@
     "SETTINGS": "Einstellungen",
     "CUSTOMERPORTAL": "Kundenportal"
   },
+  "QUICKSTART": {
+    "TITEL": "Integriere ZITADEL in deine Anwendung",
+    "DESCRIPTION": "Integriere ZITADEL in deine Anwendung oder verwende eines unserer Beispiele, um in wenigen Minuten loszulegen.",
+    "BTN_START": "Anwendung erstellen",
+    "BTN_LEARNMORE": "Mehr erfahren",
+    "CREATEPROJECTFORAPP": "Projekt erstellen {{value}}",
+    "SELECT_FRAMEWORK": "Framework auswählen",
+    "FRAMEWORK": "Framework",
+    "FRAMEWORK_OTHER": "Andere (OIDC, SAML, API)",
+    "ALMOSTDONE": "Wir sind fast fertig.",
+    "REVIEWCONFIGURATION": "Konfiguration überprüfen",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Wir haben eine Grundkonfiguration für {{wert}}-Anwendungen erstellt. Du kannst diese Konfiguration nach der Erstellung an deine Bedürfnisse anpassen.",
+    "REDIRECTS": "Redirects konfigurieren",
+    "DEVMODEWARN": "Der Dev-Modus ist standardmäßig aktiviert. Sie können Werte für die Produktion später aktualisieren.",
+    "GUIDE": "Guide",
+    "BROWSEEXAMPLES": "Beispiele durchsuchen",
+    "DUPLICATEAPPRENAME": "Es gibt bereits eine App mit demselben Neme. Bitte wählen Sie einen anderen Namen.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Framework ändern",
+        "DESCRIPTION": "Wähle eines der verfügbaren Frameworks für die schnelle Einrichtung deiner Anwendung."
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "Aktionen",
     "FILTER": "Filter",
@@ -138,6 +162,7 @@
     "ADD": "Hinzufügen",
     "CREATE": "Erstellen",
     "CONTINUE": "Weiter",
+    "CONTINUEWITH": "Mit {{value}} fortfahren",
     "BACK": "Zurück",
     "CLOSE": "Schliessen",
     "CLEAR": "Zurücksetzen",
@@ -1961,6 +1986,7 @@
       "DATECHANGED": "Geändert",
       "URLS": "URLs",
       "DELETE": "App löschen",
+      "JUMPTOPROJECT": "Um Rollen, Berechtigungen und mehr zu konfigurieren, navigieren Sie zum Projekt.",
       "DETAIL": {
         "TITLE": "Detail",
         "STATE": {

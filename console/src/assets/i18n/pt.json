@@ -119,6 +119,30 @@
     "SETTINGS": "Configurações",
     "CUSTOMERPORTAL": "Portal do Cliente"
   },
+  "QUICKSTART": {
+    "TITLE": "Integrar a ZITADEL na sua aplicação",
+    "DESCRIÇÃO": "Integre a ZITADEL na sua aplicação ou utilize uma das nossas amostras para começar em minutos.",
+    "BTN_START": "Criar aplicação",
+    "BTN_LEARNMORE": "Saiba mais",
+    "CREATEPROJECTFORAPP": "Criar projeto {{value}}",
+    "SELECT_FRAMEWORK": "Selecionar estrutura",
+    "FRAMEWORK": "Estrutura",
+    "FRAMEWORK_OTHER": "Outro (OIDC, SAML, API)",
+    "ALMOSTDONE": "Está quase a terminar",
+    "REVIEWCONFIGURATION": "Configuração de revisão",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Criámos uma configuração básica para aplicações {{value}}. Pode adaptar esta configuração às suas necessidades após a criação.",
+    "REDIRECTS": "Configurar redireccionamentos",
+    "DEVMODEWARN": "O modo Dev está habilitado por padrão. Você pode atualizar os valores para produção posteriormente.",
+    "GUIDE": "Guia",
+    "BROWSEEXAMPLES": "Navegar por exemplos",
+    "DUPLICATEAPPRENAME": "Já existe um aplicativo com o mesmo neme. Escolha um nome diferente.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Alterar Quadro",
+        "DESCRIÇÃO": "Escolha uma das estruturas disponíveis para uma configuração rápida da sua aplicação."
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "Ações",
     "FILTER": "Filtrar",
@@ -138,6 +162,7 @@
     "ADD": "Adicionar",
     "CREATE": "Criar",
     "CONTINUE": "Continuar",
+    "CONTINUEWITH": "Continue com {{value}}",
     "BACK": "Voltar",
     "CLOSE": "Fechar",
     "CLEAR": "Limpar",
@@ -1957,6 +1982,7 @@
       "DATECHANGED": "Alterado",
       "URLS": "URLs",
       "DELETE": "Excluir App",
+      "JUMPTOPROJECT": "Para configurar funções, autorizações e muito mais, navegue até o projeto.",
       "DETAIL": {
         "TITLE": "Detalhe",
         "STATE": {

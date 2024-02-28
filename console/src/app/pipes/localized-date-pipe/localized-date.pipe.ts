@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Pipe, PipeTransform } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import * as moment from 'moment';
+import moment from 'moment';
 import { supportedLanguages } from 'src/app/utils/language';
 
 @Pipe({
