@@ -188,12 +188,16 @@
     "IAM_OWNER_VIEWER": "Má oprávnění prohlížet celou instanci, včetně všech organizací",
     "IAM_ORG_MANAGER": "Má oprávnění vytvářet a spravovat organizace",
     "IAM_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele",
+    "IAM_ADMIN_IMPERSONATOR": "Má oprávnění vydávat se za správce a koncové uživatele ze všech organizací",
+    "IAM_END_USER_IMPERSONATOR": "Má oprávnění vydávat se za koncové uživatele ze všech organizací",
     "ORG_OWNER": "Má oprávnění nad celou organizací",
     "ORG_USER_MANAGER": "Má oprávnění vytvářet a spravovat uživatele organizace",
     "ORG_OWNER_VIEWER": "Má oprávnění prohlížet celou organizaci",
     "ORG_USER_PERMISSION_EDITOR": "Má oprávnění spravovat uživatelská pověření",
     "ORG_PROJECT_PERMISSION_EDITOR": "Má oprávnění spravovat pověření projektu",
     "ORG_PROJECT_CREATOR": "Má oprávnění vytvářet své vlastní projekty a podřízená nastavení",
+    "ORG_ADMIN_IMPERSONATOR": "Má oprávnění vydávat se za správce a koncové uživatele z organizace",
+    "ORG_END_USER_IMPERSONATOR": "Má oprávnění vydávat se za koncové uživatele z organizace",
     "PROJECT_OWNER": "Má oprávnění nad celým projektem",
     "PROJECT_OWNER_VIEWER": "Má oprávnění prohlížet celý projekt",
     "PROJECT_OWNER_GLOBAL": "Má oprávnění nad celým projektem",
@@ -1160,9 +1164,13 @@
       "UPDATED": "Nastavení aktualizováno."
     },
     "SECURITY": {
-      "DESCRIPTION": "Toto nastavení nastaví CSP tak, aby povolovalo vkládání ze sady povolených domén. Všimněte si, že povolením použití iFrame riskujete umožnění clickjackingu.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Toto nastavení nastaví CSP tak, aby povolovalo vkládání ze sady povolených domén. Všimněte si, že povolením použití iFrame riskujete umožnění clickjackingu.",
       "IFRAMEENABLED": "Povolit iFrame",
-      "ALLOWEDORIGINS": "Povolené URL"
+      "ALLOWEDORIGINS": "Povolené URL",
+      "IMPERSONATIONTITLE": "Předstírání jiné identity",
+      "IMPERSONATIONENABLED": "Povolit předstírání jiné identity",
+      "IMPERSONATIONDESCRIPTION": "Toto nastavení v zásadě umožňuje používat zosobnění. Všimněte si, že imitátor potřebuje také přiřazené příslušné role `*_IMPERSONATOR`."
     },
     "DIALOG": {
       "RESET": {

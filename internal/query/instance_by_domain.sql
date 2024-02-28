@@ -18,13 +18,14 @@ select
     i.console_client_id,
     i.console_app_id,
     i.default_language,
-    s.enabled,
+    s.enable_iframe_embedding,
     s.origins,
+	s.enable_impersonation,
     l.audit_log_retention,
     l.block,
 	f.features
 from domain d
 join projections.instances i on i.id = d.instance_id
-left join projections.security_policies s on i.id = s.instance_id
+left join projections.security_policies2 s on i.id = s.instance_id
 left join projections.limits l on i.id = l.instance_id
 left join features f on i.id = f.instance_id;

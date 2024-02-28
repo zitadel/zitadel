@@ -3,6 +3,7 @@ package settings
 import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
@@ -203,5 +204,23 @@ func idpTypeToPb(idpType domain.IDPType) settings.IdentityProviderType {
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GOOGLE
 	default:
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_UNSPECIFIED
+	}
+}
+
+func securityPolicyToSettingsPb(policy *query.SecurityPolicy) *settings.SecuritySettings {
+	return &settings.SecuritySettings{
+		EmbeddedIframe: &settings.EmbeddedIframeSettings{
+			Enabled:        policy.EnableIframeEmbedding,
+			AllowedOrigins: policy.AllowedOrigins,
+		},
+		EnableImpersonation: policy.EnableImpersonation,
+	}
+}
+
+func securitySettingsToCommand(req *settings.SetSecuritySettingsRequest) *command.SecurityPolicy {
+	return &command.SecurityPolicy{
+		EnableIframeEmbedding: req.GetEmbeddedIframe().GetEnabled(),
+		AllowedOrigins:        req.GetEmbeddedIframe().GetAllowedOrigins(),
+		EnableImpersonation:   req.GetEnableImpersonation(),
 	}
 }
