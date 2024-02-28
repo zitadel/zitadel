@@ -188,12 +188,16 @@
     "IAM_OWNER_VIEWER": "Tiene permiso para revisar toda la instancia, incluyendo todas las organizaciones",
     "IAM_ORG_MANAGER": "Tiene permiso para crear y gestionar organizaciones",
     "IAM_USER_MANAGER": "Tiene permiso para crear y gestionar usuarios",
+    "IAM_ADMIN_IMPERSONATOR": "Tiene permiso para hacerse pasar por administradores y usuarios finales de todas las organizaciones",
+    "IAM_END_USER_IMPERSONATOR": "Tiene permiso para hacerse pasar por usuarios finales de todas las organizaciones",
     "ORG_OWNER": "Tiene permisos sobre toda la organización",
     "ORG_USER_MANAGER": "Tiene permiso para crear y gestionar usuarios de la organización",
     "ORG_OWNER_VIEWER": "TIene permiso para revisar toda la organización",
     "ORG_USER_PERMISSION_EDITOR": "Tiene permiso para gestionar concesiones de usuario",
     "ORG_PROJECT_PERMISSION_EDITOR": "Tiene permiso para gestionar concesiones de proyecto",
     "ORG_PROJECT_CREATOR": "Tiene permiso para crear sus propios proyectos y ajustes subyacentes",
+    "ORG_ADMIN_IMPERSONATOR": "Tiene permiso para hacerse pasar por administradores y usuarios finales de la organización",
+    "ORG_END_USER_IMPERSONATOR": "Tiene permiso para hacerse pasar por usuarios finales de la organización",
     "PROJECT_OWNER": "Tiene permiso sobre todo el proyecto",
     "PROJECT_OWNER_VIEWER": "Tiene permiso para revisar todo el proyecto",
     "PROJECT_OWNER_GLOBAL": "Tiene permiso sobre todo el proyecto",
@@ -1161,9 +1165,13 @@
       "UPDATED": "Ajustes actualizados."
     },
     "SECURITY": {
-      "DESCRIPTION": "Este ajuste establece el CSP para permitir el uso de frames para un grupo de dominios permitidos. Ten en cuenta que habilitando el uso de iFrames, corres el riesgo de permitir ataques de clickjacking.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Este ajuste establece el CSP para permitir el uso de frames para un grupo de dominios permitidos. Ten en cuenta que habilitando el uso de iFrames, corres el riesgo de permitir ataques de clickjacking.",
       "IFRAMEENABLED": "Permitir iFrame",
-      "ALLOWEDORIGINS": "URLs permitidas"
+      "ALLOWEDORIGINS": "URLs permitidas",
+      "IMPERSONATIONTITLE": "Suplantación",
+      "IMPERSONATIONENABLED": "Permitir suplantación",
+      "IMPERSONATIONDESCRIPTION": "Esta configuración permite utilizar la suplantación en principio. Tenga en cuenta que el imitador también necesita que se le asignen los roles `*_IMPERSONATOR` apropiados."
     },
     "DIALOG": {
       "RESET": {

@@ -334,11 +334,6 @@ OIDC:
       Path: /oauth/v2/device_authorization # ZITADEL_OIDC_CUSTOMENDPOINTS_DEVICEAUTH_PATH
   DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
   DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
-  Features:
-    # Wheter projection triggers are used in the new Introspection implementation.
-    TriggerIntrospectionProjections: false
-    # Allows fallback to the Legacy Introspection implementation
-    LegacyIntrospection: false
   PublicKeyCacheMaxAge: 24h # ZITADEL_OIDC_PUBLICKEYCACHEMAXAGE
 
 SAML:
@@ -431,7 +426,6 @@ SystemAPIUsers:
 # Configure the SystemAPIUsers by environment variable using JSON notation:
 # ZITADEL_SYSTEMAPIUSERS='{"systemuser":{"Path":"/path/to/superuser/key.pem"},"systemuser2":{"KeyData":"<base64 encoded key>"}}'
 
-#TODO: remove as soon as possible
 SystemDefaults:
   SecretGenerators:
     PasswordSaltCost: 14 # ZITADEL_SYSTEMDEFAULTS_SECRETGENERATORS_PASSWORDSALTCOST
@@ -833,8 +827,13 @@ DefaultInstance:
       Greeting: Hello {{.DisplayName}},
       Text: The password of your user has changed. If this change was not done by you, please be advised to immediately reset your password.
       ButtonText: Login
+  
+  # Once a feature is set on the instance (true or false), system level feature settings
+  # will be ignored until instance level features are reset.
   Features:
-    - FeatureLoginDefaultOrg: true
+    LoginDefaultOrg: true # ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINDEFAULTORG
+    # TriggerIntrospectionProjections: false # ZITADEL_DEFAULTINSTANCE_FEATURES_TRIGGERINTROSPECTIONPROJECTIONS
+    # LegacyIntrospection: false # ZITADEL_DEFAULTINSTANCE_FEATURES_LEGACYINTROSPECTION
   Limits:
     # AuditLogRetention limits the number of events that can be queried via the events API by their age.
     # A value of "0s" means that all events are available.
@@ -910,7 +909,9 @@ InternalAuthZ:
         - "system.debug.read"
         - "system.debug.write"
         - "system.debug.delete"
+        - "system.feature.read"
         - "system.feature.write"
+        - "system.feature.delete"
         - "system.limits.write"
         - "system.limits.delete"
         - "system.quota.write"
@@ -921,6 +922,7 @@ InternalAuthZ:
         - "system.instance.read"
         - "system.domain.read"
         - "system.debug.read"
+        - "system.feature.read"
         - "system.iam.member.read"
     - Role: "IAM_OWNER"
       Permissions:
@@ -941,7 +943,9 @@ InternalAuthZ:
         - "iam.flow.read"
         - "iam.flow.write"
         - "iam.flow.delete"
+        - "iam.feature.read"
         - "iam.feature.write"
+        - "iam.feature.delete"
         - "iam.restrictions.read"
         - "iam.restrictions.write"
         - "org.read"
@@ -961,6 +965,9 @@ InternalAuthZ:
         - "org.flow.read"
         - "org.flow.write"
         - "org.flow.delete"
+        - "org.feature.read"
+        - "org.feature.write"
+        - "org.feature.delete"
         - "user.read"
         - "user.global.read"
         - "user.write"
@@ -971,6 +978,9 @@ InternalAuthZ:
         - "user.membership.read"
         - "user.credential.write"
         - "user.passkey.write"
+        - "user.feature.read"
+        - "user.feature.write"
+        - "user.feature.delete"
         - "policy.read"
         - "policy.write"
         - "policy.delete"
@@ -1010,15 +1020,18 @@ InternalAuthZ:
         - "iam.action.read"
         - "iam.flow.read"
         - "iam.restrictions.read"
+        - "iam.feature.read"
         - "org.read"
         - "org.member.read"
         - "org.idp.read"
         - "org.action.read"
         - "org.flow.read"
+        - "org.feature.read"
         - "user.read"
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
+        - "user.feature.read"
         - "policy.read"
         - "project.read"
         - "project.member.read"
@@ -1047,6 +1060,9 @@ InternalAuthZ:
         - "org.flow.read"
         - "org.flow.write"
         - "org.flow.delete"
+        - "org.feature.read"
+        - "org.feature.write"
+        - "org.feature.delete"
         - "user.read"
         - "user.global.read"
         - "user.write"
@@ -1057,6 +1073,9 @@ InternalAuthZ:
         - "user.membership.read"
         - "user.credential.write"
         - "user.passkey.write"
+        - "user.feature.read"
+        - "user.feature.write"
+        - "user.feature.delete"
         - "policy.read"
         - "policy.write"
         - "policy.delete"
@@ -1095,6 +1114,9 @@ InternalAuthZ:
         - "user.grant.delete"
         - "user.membership.read"
         - "user.passkey.write"
+        - "user.feature.read"
+        - "user.feature.write"
+        - "user.feature.delete"
         - "project.read"
         - "project.member.read"
         - "project.role.read"
@@ -1104,6 +1126,13 @@ InternalAuthZ:
         - "project.grant.delete"
         - "project.grant.member.read"
         - "session.delete"
+    - Role: "IAM_ADMIN_IMPERSONATOR"
+      Permissions:
+        - "admin.impersonation"
+        - "impersonation"
+    - Role: "IAM_END_USER_IMPERSONATOR"
+      Permissions:
+        - "impersonation"
     - Role: "ORG_OWNER"
       Permissions:
         - "org.read"
@@ -1122,6 +1151,9 @@ InternalAuthZ:
         - "org.flow.read"
         - "org.flow.write"
         - "org.flow.delete"
+        - "org.feature.read"
+        - "org.feature.write"
+        - "org.feature.delete"
         - "user.read"
         - "user.global.read"
         - "user.write"
@@ -1132,6 +1164,9 @@ InternalAuthZ:
         - "user.membership.read"
         - "user.credential.write"
         - "user.passkey.write"
+        - "user.feature.read"
+        - "user.feature.write"
+        - "user.feature.delete"
         - "policy.read"
         - "policy.write"
         - "policy.delete"
@@ -1165,6 +1200,9 @@ InternalAuthZ:
         - "user.grant.write"
         - "user.grant.delete"
         - "user.membership.read"
+        - "user.feature.read"
+        - "user.feature.write"
+        - "user.feature.delete"
         - "policy.read"
         - "project.read"
         - "project.role.read"
@@ -1176,10 +1214,12 @@ InternalAuthZ:
         - "org.idp.read"
         - "org.action.read"
         - "org.flow.read"
+        - "org.feature.read"
         - "user.read"
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
+        - "user.feature.read"
         - "policy.read"
         - "project.read"
         - "project.member.read"
@@ -1196,6 +1236,9 @@ InternalAuthZ:
         - "org.idp.read"
         - "org.idp.write"
         - "org.idp.delete"
+        - "org.feature.read"
+        - "org.feature.write"
+        - "org.feature.delete"
         - "policy.read"
         - "policy.write"
         - "policy.delete"
@@ -1239,6 +1282,13 @@ InternalAuthZ:
         - "policy.read"
         - "project.read:self"
         - "project.create"
+    - Role: "ORG_ADMIN_IMPERSONATOR"
+      Permissions:
+        - "admin.impersonation"
+        - "impersonation"
+    - Role: "ORG_END_USER_IMPERSONATOR"
+      Permissions:
+        - "impersonation"
     - Role: "PROJECT_OWNER"
       Permissions:
         - "org.global.read"
