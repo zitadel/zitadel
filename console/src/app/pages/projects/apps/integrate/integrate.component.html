@@ -31,12 +31,17 @@
           ></cnsl-framework-change>
           <div class="steps">
             <div class="step">
-              <span class="step-title">Project</span>
+              <span class="step-title">{{ 'PROJECT.PAGES.TITLE' | translate }}</span>
               <span>{{ projectName$ | async }}</span>
             </div>
 
             <div class="step top-border">
-              <a href="https://zitadel.com/docs/sdk-examples/introduction" target="_blank">Browse Examples and SDKs</a>
+              <a *ngIf="framework()" [href]="'https://zitadel.com' + framework()?.docsLink" target="_blank"
+                >{{ framework()?.title }} {{ 'QUICKSTART.GUIDE' | translate }}</a
+              >
+              <a href="https://zitadel.com/docs/sdk-examples/introduction" target="_blank">{{
+                'QUICKSTART.BROWSEEXAMPLES' | translate
+              }}</a>
             </div>
           </div>
         </div>

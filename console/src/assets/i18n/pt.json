@@ -133,6 +133,8 @@
     "REVIEWCONFIGURATION_DESCRIPTION": "Criámos uma configuração básica para aplicações {{value}}. Pode adaptar esta configuração às suas necessidades após a criação.",
     "REDIRECTS": "Configurar redireccionamentos",
     "DEVMODEWARN": "O modo Dev está habilitado por padrão. Você pode atualizar os valores para produção posteriormente.",
+    "GUIDE": "Guia",
+    "BROWSEEXAMPLES": "Navegar por exemplos",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Alterar Quadro",

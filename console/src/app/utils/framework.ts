@@ -45,6 +45,13 @@ export const OIDC_CONFIGURATIONS: OidcAppConfigurations = {
     .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
     .setRedirectUrisList(['http://localhost:18080/webapp/login/oauth2/code/zitadel'])
     .setPostLogoutRedirectUrisList(['http://localhost:18080/webapp']),
+  ['symfony']: new AddOIDCAppRequest()
+    .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
+    .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC)
+    .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
+    .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
+    .setRedirectUrisList(['http://localhost:8000/login_check'])
+    .setPostLogoutRedirectUrisList(['http://localhost:8000/logout']),
   ['django']: new AddOIDCAppRequest()
     .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)
     .setAuthMethodType(OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE)

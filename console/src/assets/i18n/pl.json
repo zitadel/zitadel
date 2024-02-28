@@ -133,6 +133,8 @@
     "REVIEWCONFIGURATION_DESCRIPTION": "Stworzyliśmy podstawową konfigurację dla aplikacji {{value}}. Możesz dostosować tę konfigurację do swoich potrzeb po jej utworzeniu.",
     "REDIRECTS": "Skonfiguruj przekierowania",
     "DEVMODEWARN": "Tryb deweloperski jest domyślnie włączony. Możesz później zaktualizować wartości dla produkcji.",
+    "GUIDE": "Przewodnik",
+    "BROWSEEXAMPLES": "Przeglądaj przykłady",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Ramy zmian",

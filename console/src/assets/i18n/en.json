@@ -133,6 +133,8 @@
     "REVIEWCONFIGURATION_DESCRIPTION": "We've created a basic configuration for {{value}} applications. You can adapt this configuration to your needs after creation.",
     "REDIRECTS": "Configure redirects",
     "DEVMODEWARN": "Dev Mode is enabled by default. You can update values for production later.",
+    "GUIDE": "Guide",
+    "BROWSEEXAMPLES": "Browse Examples and SDKs",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Change Framework",

@@ -133,6 +133,8 @@
     "REVIEWCONFIGURATION_DESCRIPTION": "ここでは{{value}}アプリケーションの基本設定を作成しました。この構成は作成後にあなたのニーズに合わせることができます。",
     "REDIRECTS": "リダイレクトの設定",
     "DEVMODEWARN": "開発モードはデフォルトで有効になっています。実稼働用の値は後で更新できます。",
+    "GUIDE": "ガイド",
+    "BROWSEEXAMPLES": "サンプルを見る",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "変更の枠組み",

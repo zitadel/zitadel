@@ -133,6 +133,8 @@
     "REVIEWCONFIGURATION_DESCRIPTION": "We hebben een basisconfiguratie gemaakt voor {{value}} toepassingen. Je kunt deze configuratie na het aanmaken aanpassen aan je behoeften.",
     "REDIRECTS": "Configureer omleidingen",
     "DEVMODEWARN": "Dev-modus is standaard ingeschakeld. U kunt waarden voor productie later bijwerken.",
+    "GUIDE": "Guide",
+    "BROWSEEXAMPLES": "Bekijk voorbeelden",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Verander Framework",

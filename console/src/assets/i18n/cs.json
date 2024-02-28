@@ -133,6 +133,8 @@
     "REVIEWCONFIGURATION_DESCRIPTION": "Vytvořili jsme základní konfiguraci pro {{hodnota}} aplikace. Tuto konfiguraci můžete po vytvoření přizpůsobit svým potřebám.",
     "REDIRECTS": "Konfigurace přesměrování",
     "DEVMODEWARN": "Dev Mode je ve výchozím nastavení povolen. Hodnoty pro produkci můžete aktualizovat později.",
+    "GUIDE": "Guide",
+    "BROWSEEXAMPLES": "Procházet ukázky",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Rámec změn",

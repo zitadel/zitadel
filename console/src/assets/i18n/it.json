@@ -133,6 +133,8 @@
     "REVIEWCONFIGURATION_DESCRIPTION": "Abbiamo creato una configurazione base per le applicazioni {{value}}. Può adattare la configurazione alle proprie esigenze dopo la creazione.",
     "REDIRECTS": "Configura i reindirizzamenti",
     "DEVMODEWARN": "La modalità sviluppatore è abilitata per impostazione predefinita. È possibile aggiornare i valori per la produzione in un secondo momento.",
+    "GUIDE": "Guida",
+    "BROWSEEXAMPLES": "Esplora esempi e SDK",
     "DIALOG": {
       "CHANGE": {
         "TITLE": "Modifica framework",

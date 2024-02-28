@@ -56,6 +56,7 @@
     "docsLink": "/docs/sdk-examples/react"
   },
   {
+    "id": "symfony",
     "title": "Symfony",
     "imgSrcDark": "/docs/img/tech/php.svg",
     "docsLink": "/docs/sdk-examples/symfony"
