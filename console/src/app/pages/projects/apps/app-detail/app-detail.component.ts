@@ -1,6 +1,6 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation, signal } from '@angular/core';
 import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
@@ -150,6 +150,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public settingsList: SidenavSetting[] = [{ id: 'configuration', i18nKey: 'APP.CONFIGURATION' }];
   public currentSetting: string | undefined = this.settingsList[0].id;
 
+  public isNew = signal<boolean>(false);
   constructor(
     private envSvc: EnvironmentService,
     public translate: TranslateService,
@@ -246,6 +247,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     const projectId = this.route.snapshot.paramMap.get('projectid');
     const appId = this.route.snapshot.paramMap.get('appid');
+    const isNew = this.route.snapshot.queryParamMap.get('new');
+
+    this.isNew.set(isNew === 'true');
 
     if (projectId && appId) {
       this.projectId = projectId;

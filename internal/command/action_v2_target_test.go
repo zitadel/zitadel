@@ -122,6 +122,7 @@ func TestCommands_AddTarget(t *testing.T) {
 			"unique constraint failed, error",
 			fields{
 				eventstore: eventstoreExpect(t,
+					expectFilter(),
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						target.NewAddedEvent(context.Background(),
@@ -152,9 +153,42 @@ func TestCommands_AddTarget(t *testing.T) {
 			},
 		},
 		{
+			"already existing",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						target.NewAddedEvent(context.Background(),
+							target.NewAggregate("id1", "org1"),
+							"name",
+							domain.TargetTypeWebhook,
+							"https://example.com",
+							time.Second,
+							false,
+							false,
+						),
+					),
+				),
+				idGenerator: mock.ExpectID(t, "id1"),
+			},
+			args{
+				ctx: context.Background(),
+				add: &AddTarget{
+					Name:       "name",
+					TargetType: domain.TargetTypeWebhook,
+					Timeout:    time.Second,
+					URL:        "https://example.com",
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				err: zerrors.IsErrorAlreadyExists,
+			},
+		},
+		{
 			"push ok",
 			fields{
 				eventstore: eventstoreExpect(t,
+					expectFilter(),
 					expectPush(
 						target.NewAddedEvent(context.Background(),
 							target.NewAggregate("id1", "org1"),
@@ -190,6 +224,7 @@ func TestCommands_AddTarget(t *testing.T) {
 			"push full ok",
 			fields{
 				eventstore: eventstoreExpect(t,
+					expectFilter(),
 					expectPush(
 						target.NewAddedEvent(context.Background(),
 							target.NewAggregate("id1", "org1"),

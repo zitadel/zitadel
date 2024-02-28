@@ -311,6 +311,13 @@ module.exports = {
                 groupPathsBy: "tag",
             },
           },
+          feature_v2: {
+            specPath: ".artifacts/openapi/zitadel/feature/v2beta/feature_service.swagger.json",
+            outputDir: "docs/apis/resources/feature_service_v2",
+            sidebarOptions: {
+                groupPathsBy: "tag",
+            },
+          },
         },
       },
     ],

@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"net/http"
+	"sort"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -38,6 +39,30 @@ type API struct {
 	queries           *query.Queries
 }
 
+func (a *API) ListGrpcServices() []string {
+	serviceInfo := a.grpcServer.GetServiceInfo()
+	services := make([]string, len(serviceInfo))
+	i := 0
+	for servicename := range serviceInfo {
+		services[i] = servicename
+		i++
+	}
+	sort.Strings(services)
+	return services
+}
+
+func (a *API) ListGrpcMethods() []string {
+	serviceInfo := a.grpcServer.GetServiceInfo()
+	methods := make([]string, 0)
+	for servicename, service := range serviceInfo {
+		for _, method := range service.Methods {
+			methods = append(methods, "/"+servicename+"/"+method.Name)
+		}
+	}
+	sort.Strings(methods)
+	return methods
+}
+
 type healthCheck interface {
 	Health(ctx context.Context) error
 }
@@ -49,7 +74,8 @@ func New(
 	queries *query.Queries,
 	verifier internal_authz.APITokenVerifier,
 	authZ internal_authz.Config,
-	tlsConfig *tls.Config, http2HostName, http1HostName string,
+	tlsConfig *tls.Config,
+	http2HostName, http1HostName, externalDomain string,
 	accessInterceptor *http_mw.AccessInterceptor,
 ) (_ *API, err error) {
 	api := &API{
@@ -62,7 +88,7 @@ func New(
 		accessInterceptor: accessInterceptor,
 	}
 
-	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, tlsConfig, accessInterceptor.AccessService())
+	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, externalDomain, tlsConfig, accessInterceptor.AccessService())
 	api.grpcGateway, err = server.CreateGateway(ctx, port, http1HostName, accessInterceptor, tlsConfig)
 	if err != nil {
 		return nil, err

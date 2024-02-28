@@ -14,8 +14,11 @@ var _ execution.ExecutionServiceServer = (*Server)(nil)
 
 type Server struct {
 	execution.UnimplementedExecutionServiceServer
-	command *command.Commands
-	query   *query.Queries
+	command             *command.Commands
+	query               *query.Queries
+	ListActionFunctions func() []string
+	ListGRPCMethods     func() []string
+	ListGRPCServices    func() []string
 }
 
 type Config struct{}
@@ -23,10 +26,16 @@ type Config struct{}
 func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
+	listActionFunctions func() []string,
+	listGRPCMethods func() []string,
+	listGRPCServices func() []string,
 ) *Server {
 	return &Server{
-		command: command,
-		query:   query,
+		command:             command,
+		query:               query,
+		ListActionFunctions: listActionFunctions,
+		ListGRPCMethods:     listGRPCMethods,
+		ListGRPCServices:    listGRPCServices,
 	}
 }
 

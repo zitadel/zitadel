@@ -1,0 +1,35 @@
+<form>
+  <cnsl-form-field class="full-width">
+    <cnsl-label>{{ 'QUICKSTART.FRAMEWORK' | translate }}</cnsl-label>
+    <input cnslInput type="text" placeholder="" #nameInput [formControl]="myControl" [matAutocomplete]="auto" />
+
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+      <mat-option *ngIf="isLoading()" class="is-loading">
+        <mat-spinner diameter="30"></mat-spinner>
+      </mat-option>
+      <mat-option *ngFor="let framework of filteredOptions | async" [value]="framework.id">
+        <div class="framework-option">
+          <div class="framework-option-column">
+            <div class="img-wrapper">
+              <img class="dark-only" *ngIf="framework.imgSrcDark" [src]="framework.imgSrcDark" />
+              <img class="light-only" *ngIf="framework.imgSrcLight" [src]="framework.imgSrcLight" />
+            </div>
+            <span class="fill-space"></span>
+
+            <span>{{ framework.title }}</span>
+          </div>
+        </div>
+      </mat-option>
+      <mat-option *ngIf="withCustom" [value]="'other'">
+        <div class="framework-option">
+          <div class="framework-option-column">
+            <div class="img-wrapper"></div>
+            <span class="fill-space"></span>
+
+            <span>{{ 'QUICKSTART.FRAMEWORK_OTHER' | translate }}</span>
+          </div>
+        </div>
+      </mat-option>
+    </mat-autocomplete>
+  </cnsl-form-field>
+</form>
