@@ -227,7 +227,7 @@ func GetOIDCV1Compliance(appType OIDCApplicationType, grantTypes []OIDCGrantType
 }
 
 func checkGrantTypesCombination(compliance *Compliance, grantTypes []OIDCGrantType) {
-	if containsOIDCGrantType(grantTypes, OIDCGrantTypeRefreshToken) && !containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
+	if !containsOIDCGrantType(grantTypes, OIDCGrantTypeDeviceCode) && containsOIDCGrantType(grantTypes, OIDCGrantTypeRefreshToken) && !containsOIDCGrantType(grantTypes, OIDCGrantTypeAuthorizationCode) {
 		compliance.NoneCompliant = true
 		compliance.Problems = append(compliance.Problems, "Application.OIDC.V1.GrantType.Refresh.NoAuthCode")
 	}
