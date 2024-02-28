@@ -327,7 +327,7 @@ Errors:
       NotActive: Овластувањето за проектот не е активно
       NotInactive: Овластувањето за проектот не е неактивно
   IAM:
-    NotFound: Инстанцата не е пронајдена. Проверете https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM не е пронајден. Проверете дали имате точен домен. Погледнете на https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Улогите не се променети
     MemberInvalid: Членот е невалиден

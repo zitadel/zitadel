@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -196,7 +197,12 @@ var (
 
 func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("unable to get instance by host %s: %w", host, err)
+		}
+		span.EndWithError(err)
+	}()
 
 	domain := strings.Split(host, ":")[0] // remove possible port
 	instance, scan := scanAuthzInstance(host, domain)

@@ -328,7 +328,7 @@ Errors:
       NotActive: Project grant is not active
       NotInactive: Project grant is not inactive
   IAM:
-    NotFound: Instance not found. Check out https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: Instance not found. Make sure you got the domain right. Check out https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Roles have not been changed
     MemberInvalid: Member is invalid

@@ -19,16 +19,17 @@ import (
 )
 
 type instanceInterceptor struct {
-	verifier        authz.InstanceVerifier
-	headerName      string
-	ignoredPrefixes []string
-	translator      *i18n.Translator
+	verifier                   authz.InstanceVerifier
+	headerName, externalDomain string
+	ignoredPrefixes            []string
+	translator                 *i18n.Translator
 }
 
-func InstanceInterceptor(verifier authz.InstanceVerifier, headerName string, ignoredPrefixes ...string) *instanceInterceptor {
+func InstanceInterceptor(verifier authz.InstanceVerifier, headerName, externalDomain string, ignoredPrefixes ...string) *instanceInterceptor {
 	return &instanceInterceptor{
 		verifier:        verifier,
 		headerName:      headerName,
+		externalDomain:  externalDomain,
 		ignoredPrefixes: ignoredPrefixes,
 		translator:      newZitadelTranslator(),
 	}
@@ -55,9 +56,12 @@ func (a *instanceInterceptor) handleInstance(w http.ResponseWriter, r *http.Requ
 	}
 	ctx, err := setInstance(r, a.verifier, a.headerName)
 	if err != nil {
-		caosErr := new(zerrors.NotFoundError)
-		if errors.As(err, &caosErr) {
-			caosErr.Message = a.translator.LocalizeFromRequest(r, caosErr.GetMessage(), nil)
+		err = fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s): %w", zitadel_http.ComposedOrigin(r.Context()), a.externalDomain, err)
+		zErr := new(zerrors.ZitadelError)
+		if errors.As(err, &zErr) {
+			zErr.SetMessage(a.translator.LocalizeFromRequest(r, zErr.GetMessage(), nil))
+			zErr.Parent = err
+			err = zErr
 		}
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -68,13 +72,13 @@ func (a *instanceInterceptor) handleInstance(w http.ResponseWriter, r *http.Requ
 
 func setInstance(r *http.Request, verifier authz.InstanceVerifier, headerName string) (_ context.Context, err error) {
 	ctx := r.Context()
-
 	authCtx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	host, err := HostFromRequest(r, headerName)
+
 	if err != nil {
-		return nil, zerrors.ThrowNotFound(err, "INST-zWq7X", "Errors.Instance.NotFound")
+		return nil, zerrors.ThrowNotFound(err, "INST-zWq7X", "Errors.IAM.NotFound")
 	}
 
 	instance, err := verifier.InstanceByHost(authCtx, host)

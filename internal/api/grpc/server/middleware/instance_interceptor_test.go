@@ -137,7 +137,7 @@ func Test_setInstance(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := setInstance(tt.args.ctx, tt.args.req, tt.args.info, tt.args.handler, tt.args.verifier, tt.args.headerName, nil)
+			got, err := setInstance(tt.args.ctx, tt.args.req, tt.args.info, tt.args.handler, tt.args.verifier, tt.args.headerName, "", nil)
 			if (err != nil) != tt.res.err {
 				t.Errorf("setInstance() error = %v, wantErr %v", err, tt.res.err)
 				return
