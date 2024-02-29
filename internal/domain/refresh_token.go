@@ -31,7 +31,7 @@ func FromRefreshToken(refreshToken string, algorithm crypto.EncryptionAlgorithm)
 	}
 	split := strings.Split(string(decrypted), ":")
 	if len(split) != 3 {
-		return "", "", "", zerrors.ThrowInternal(nil, "DOMAIN-BGDhn", "Errors.User.RefreshToken.Invalid")
+		return "", "", "", zerrors.ThrowInvalidArgument(nil, "DOMAIN-BGDhn", "Errors.User.RefreshToken.Invalid")
 	}
 	return split[0], split[1], split[2], nil
 }

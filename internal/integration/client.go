@@ -27,12 +27,14 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
+	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	organisation "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
+	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
@@ -45,10 +47,12 @@ type Client struct {
 	Auth        auth.AuthServiceClient
 	UserV2      user.UserServiceClient
 	SessionV2   session.SessionServiceClient
+	SettingsV2  settings.SettingsServiceClient
 	OIDCv2      oidc_pb.OIDCServiceClient
 	OrgV2       organisation.OrganizationServiceClient
 	System      system.SystemServiceClient
 	ExecutionV3 execution.ExecutionServiceClient
+	FeatureV2   feature.FeatureServiceClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
@@ -59,10 +63,12 @@ func newClient(cc *grpc.ClientConn) Client {
 		Auth:        auth.NewAuthServiceClient(cc),
 		UserV2:      user.NewUserServiceClient(cc),
 		SessionV2:   session.NewSessionServiceClient(cc),
+		SettingsV2:  settings.NewSettingsServiceClient(cc),
 		OIDCv2:      oidc_pb.NewOIDCServiceClient(cc),
 		OrgV2:       organisation.NewOrganizationServiceClient(cc),
 		System:      system.NewSystemServiceClient(cc),
 		ExecutionV3: execution.NewExecutionServiceClient(cc),
+		FeatureV2:   feature.NewFeatureServiceClient(cc),
 	}
 }
 
@@ -521,6 +527,15 @@ func (s *Tester) CreateTarget(ctx context.Context, t *testing.T) *execution.Crea
 		ExecutionType: &execution.CreateTargetRequest_InterruptOnError{
 			InterruptOnError: true,
 		},
+	})
+	require.NoError(t, err)
+	return target
+}
+
+func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution.SetConditions, targets []string) *execution.SetExecutionResponse {
+	target, err := s.Client.ExecutionV3.SetExecution(ctx, &execution.SetExecutionRequest{
+		Condition: cond,
+		Targets:   targets,
 	})
 	require.NoError(t, err)
 	return target

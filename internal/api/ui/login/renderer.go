@@ -524,12 +524,12 @@ func (l *Login) getOrgID(r *http.Request, authReq *domain.AuthRequest) string {
 }
 
 func (l *Login) getPrivateLabelingID(r *http.Request, authReq *domain.AuthRequest) string {
-	defaultID := authz.GetInstance(r.Context()).DefaultOrganisationID()
-	f, err := l.featureCheck.CheckInstanceBooleanFeature(r.Context(), domain.FeatureLoginDefaultOrg)
-	logging.OnError(err).Warnf("could not check feature %s", domain.FeatureLoginDefaultOrg)
-	if !f.Boolean {
-		defaultID = authz.GetInstance(r.Context()).InstanceID()
+	instance := authz.GetInstance(r.Context())
+	defaultID := instance.DefaultOrganisationID()
+	if !instance.Features().LoginDefaultOrg {
+		defaultID = instance.InstanceID()
 	}
+
 	if authReq != nil {
 		return authReq.PrivateLabelingOrgID(defaultID)
 	}

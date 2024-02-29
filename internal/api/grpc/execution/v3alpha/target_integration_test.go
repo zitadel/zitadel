@@ -5,7 +5,6 @@ package execution_test
 import (
 	"context"
 	"fmt"
-	"os"
 	"testing"
 	"time"
 
@@ -19,26 +18,6 @@ import (
 	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 )
-
-var (
-	CTX    context.Context
-	Tester *integration.Tester
-	Client execution.ExecutionServiceClient
-)
-
-func TestMain(m *testing.M) {
-	os.Exit(func() int {
-		ctx, errCtx, cancel := integration.Contexts(5 * time.Minute)
-		defer cancel()
-
-		Tester = integration.NewTester(ctx)
-		defer Tester.Done()
-		Client = Tester.Client.ExecutionV3
-
-		CTX, _ = Tester.WithAuthorization(ctx, integration.IAMOwner), errCtx
-		return m.Run()
-	}())
-}
 
 func TestServer_CreateTarget(t *testing.T) {
 	tests := []struct {
