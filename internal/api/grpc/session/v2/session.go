@@ -351,6 +351,9 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 		if err != nil {
 			return nil, err
 		}
+		if !user.State.IsEnabled() {
+			return nil, zerrors.ThrowPreconditionFailed(nil, "SESSION-Gj4ko", "Errors.User.NotActive")
+		}
 		sessionChecks = append(sessionChecks, command.CheckUser(user.ID, user.ResourceOwner))
 	}
 	if password := checks.GetPassword(); password != nil {

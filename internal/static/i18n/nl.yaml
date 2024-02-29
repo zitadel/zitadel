@@ -328,7 +328,7 @@ Errors:
       NotActive: Projecttoekenning is niet actief
       NotInactive: Projecttoekenning is niet gedeactiveerd
   IAM:
-    NotFound: Instantie niet gevonden. Bekijk https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM niet gevonden. Zorg ervoor dat u het juiste domein heeft. Kijk op https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Rollen zijn niet veranderd
     MemberInvalid: Lid is ongeldig
@@ -540,6 +540,12 @@ Errors:
     NoTimeout: Doel heeft geen time-out
     InvalidURL: Doel heeft een ongeldige URL
     NotFound: Doel niet gevonden
+  Execution:
+    ConditionInvalid: Uitvoeringsvoorwaarde is ongeldig
+    Invalid: Uitvoering is ongeldig
+    NotFound: Uitvoering niet gevonden
+    IncludeNotFound: Inclusief niet gevonden
+    NoTargets: Geen doelstellingen gedefinieerd
 
 AggregateTypes:
   action: Actie
@@ -552,8 +558,12 @@ AggregateTypes:
   quota: Quota
   feature: Functie
   target: Doel
+  execution: Executie
 
 EventTypes:
+  execution:
+    set: Uitvoering ingesteld
+    removed: Uitvoering verwijderd
   target:
     added: Doel gemaakt
     changed: Doel gewijzigd

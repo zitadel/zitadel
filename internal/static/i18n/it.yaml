@@ -329,7 +329,7 @@ Errors:
       NotActive: Grant del progetto non è attivo
       NotInactive: Grant del progetto non è inattivo
   IAM:
-    NotFound: Istanza non trovata. Controlla https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM non trovato. Assicurati di avere il dominio corretto. Guarda su https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: I ruoli non sono stati cambiati
     MemberInvalid: Il membro non è valido
@@ -541,6 +541,13 @@ Errors:
     NoTimeout: Il target non ha timeout
     InvalidURL: La destinazione ha un URL non valido
     NotFound: Obiettivo non trovato
+  Execution:
+    ConditionInvalid: La condizione di esecuzione non è valida
+    Invalid: L'esecuzione non è valida
+    NotFound: Esecuzione non trovata
+    IncludeNotFound: Includi non trovato
+    NoTargets: Nessun obiettivo definito
+
 
 AggregateTypes:
   action: Azione
@@ -553,8 +560,12 @@ AggregateTypes:
   quota: Quota
   feature: Funzionalità
   target: Bersaglio
+  execution: Esecuzione
 
 EventTypes:
+  execution:
+    set: Insieme di esecuzione
+    removed: Esecuzione cancellata
   target:
     added: Obiettivo creato
     changed: Obiettivo cambiato

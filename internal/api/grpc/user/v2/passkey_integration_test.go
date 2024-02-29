@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
@@ -58,6 +59,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 			},
 			want: &user.RegisterPasskeyResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
 			},
@@ -109,6 +111,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 			},
 			want: &user.RegisterPasskeyResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
 			},
@@ -187,6 +190,7 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 			},
 			want: &user.VerifyPasskeyRegistrationResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
 			},
@@ -253,6 +257,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 			},
 			want: &user.CreatePasskeyRegistrationLinkResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
 			},
@@ -272,6 +277,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 			},
 			want: &user.CreatePasskeyRegistrationLinkResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
 			},
@@ -287,6 +293,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 			},
 			want: &user.CreatePasskeyRegistrationLinkResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
 			},
