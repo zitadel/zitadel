@@ -120,6 +120,7 @@ Errors:
       NotFound: コードが見つかりません
       Expired: 有効期限切れのコードです
       GeneratorAlgNotSupported: サポートされていない生成アルゴリズムです
+      Invalid: コードが無効
     Password:
       NotFound: パスワードが見つかりません
       Empty: パスワードは空です
@@ -316,7 +317,7 @@ Errors:
       NotActive: プロジェクトグラントはアクティブではありません
       NotInactive: プロジェクトグラントは非アクティブではありません
   IAM:
-    NotFound: インスタンスが見つかりません https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAMが見つかりません。正しいドメインを持っていることを確認してください。 https://zitadel.com/docs/apis/introduction#domains を参照してください
     Member:
       RolesNotChanged: ロールは変更されていません
     MemberInvalid: 無効なメンバーです
@@ -523,6 +524,17 @@ Errors:
     NotExisting: 機能が存在しません
     TypeNotSupported: 機能タイプはサポートされていません
     InvalidValue: この機能には無効な値です
+  Target:
+    Invalid: ターゲットが無効です
+    NoTimeout: ターゲットにはタイムアウトがありません
+    InvalidURL: ターゲットに無効な URL があります
+    NotFound: ターゲットが見つかりません
+  Execution:
+    ConditionInvalid: 実行条件が不正です
+    Invalid: 実行は無効です
+    NotFound: 実行が見つかりませんでした
+    IncludeNotFound: 見つからないものを含める
+    NoTargets: ターゲットが定義されていません
 
 AggregateTypes:
   action: アクション
@@ -534,8 +546,17 @@ AggregateTypes:
   usergrant: ユーザーグラント
   quota: クォータ
   feature: 特徴
+  target: 目標
+  execution: 実行
 
 EventTypes:
+  execution:
+    set: 実行セット
+    removed: 実行は削除されました
+  target:
+    added: ターゲットが作成されました
+    changed: ターゲットが変更されました
+    removed: ターゲットが削除されました
   user:
     added: ユーザーの追加
     selfregistered: ユーザー自身の登録

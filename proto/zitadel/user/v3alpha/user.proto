@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package zitadel.user.v3alpha;
+
+import "google/api/field_behavior.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/object/v2beta/object.proto";
+import "zitadel/user/v3alpha/authenticator.proto";
+import "zitadel/user/v3alpha/communication.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v3alpha";
+
+message User {
+
+  // ID is the read-only unique identifier of the user.
+  string user_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // Details provide some base information (such as the last change date) of the user.
+  zitadel.object.v2beta.Details details = 2;
+  // The user's authenticators. They are used to identify and authenticate the user
+  // during the authentication process.
+  Authenticators authenticators = 3;
+  // Contact information for the user. ZITADEL will use this in case of internal notifications.
+  Contact contact = 4;
+  // State of the user.
+  State state = 5;
+  // The schema the user and it's data is based on.
+  Schema schema = 6;
+  // The user's data based on the provided schema.
+  google.protobuf.Struct data = 7;
+}
+
+enum State {
+  USER_STATE_UNSPECIFIED = 0;
+  USER_STATE_ACTIVE = 1;
+  USER_STATE_INACTIVE = 2;
+  USER_STATE_DELETED = 3;
+  USER_STATE_LOCKED = 4;
+}
+
+message Schema {
+  // The unique identifier of the user schema.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629026806489455\""
+    }
+  ];
+  // The human readable name of the user schema.
+  string type = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"employees\"";
+    }
+  ];
+  // The revision the user's data is based on of the revision.
+  uint32 revision = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "7";
+    }
+  ];
+}

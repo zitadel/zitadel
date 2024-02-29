@@ -1,0 +1,23 @@
+.configuration-wrapper {
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .left,
+    .right {
+      margin-bottom: 0.5rem;
+      font-size: 14px;
+    }
+
+    .name {
+      display: flex;
+      align-items: center;
+
+      button {
+        margin-right: -0.5rem;
+        margin-left: 0.25rem;
+      }
+    }
+  }
+}

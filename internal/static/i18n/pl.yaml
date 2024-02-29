@@ -128,6 +128,7 @@ Errors:
       NotFound: Kod nie znaleziony
       Expired: Kod jest przedawniony
       GeneratorAlgNotSupported: Nieobsługiwany algorytm generatora
+      Invalid: Kod jest nieprawidłowy
     Password:
       NotFound: Hasło nie znalezione
       Empty: Hasło jest puste
@@ -327,7 +328,7 @@ Errors:
       NotActive: Grant projektu jest nieaktywny
       NotInactive: Grant projektu nie jest nieaktywny
   IAM:
-    NotFound: Instancja nie znaleziona. Sprawdź https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM nie znaleziony. Upewnij się, że masz poprawną domenę. Sprawdź https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Role nie zmienione
     MemberInvalid: Członek jest nieprawidłowy
@@ -534,6 +535,17 @@ Errors:
     NotExisting: Funkcja nie istnieje
     TypeNotSupported: Typ funkcji nie jest obsługiwany
     InvalidValue: Nieprawidłowa wartość dla tej funkcji
+  Target:
+    Invalid: Cel jest nieprawidłowy
+    NoTimeout: Cel nie ma limitu czasu
+    InvalidURL: Cel ma nieprawidłowy adres URL
+    NotFound: Nie znaleziono celu
+  Execution:
+    ConditionInvalid: Warunek wykonania jest nieprawidłowy
+    Invalid: Wykonanie jest nieprawidłowe
+    NotFound: Nie znaleziono wykonania
+    IncludeNotFound: Nie znaleziono uwzględnienia
+    NoTargets: Nie zdefiniowano celów
 
 AggregateTypes:
   action: Działanie
@@ -545,8 +557,17 @@ AggregateTypes:
   usergrant: Uprawnienie użytkownika
   quota: Limit
   feature: Funkcja
+  target: Cel
+  execution: Wykonanie
 
 EventTypes:
+  execution:
+    set: Zestaw wykonawczy
+    removed: Wykonanie usunięte
+  target:
+    added: Cel został utworzony
+    changed: Cel zmieniony
+    removed: Cel usunięty
   user:
     added: Użytkownik dodany
     selfregistered: Użytkownik zarejestrował się

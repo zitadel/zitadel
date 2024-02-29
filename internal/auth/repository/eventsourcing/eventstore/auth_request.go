@@ -7,7 +7,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	cache "github.com/zitadel/zitadel/internal/auth_request/repository"
@@ -49,8 +48,6 @@ type AuthRequestRepo struct {
 	ProjectProvider           projectProvider
 	ApplicationProvider       applicationProvider
 	CustomTextProvider        customTextProvider
-
-	FeatureCheck feature.Checker
 
 	IdGenerator id.Generator
 }
@@ -656,16 +653,15 @@ func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, 
 }
 
 func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.AuthRequest) error {
+	instance := authz.GetInstance(ctx)
 	orgID := request.RequestedOrgID
 	if orgID == "" {
 		orgID = request.UserOrgID
 	}
 	if orgID == "" {
 		orgID = authz.GetInstance(ctx).DefaultOrganisationID()
-		f, err := repo.FeatureCheck.CheckInstanceBooleanFeature(ctx, domain.FeatureLoginDefaultOrg)
-		logging.WithFields("authReq", request.ID).OnError(err).Warnf("could not check feature %s", domain.FeatureLoginDefaultOrg)
-		if !f.Boolean {
-			orgID = authz.GetInstance(ctx).InstanceID()
+		if !instance.Features().LoginDefaultOrg {
+			orgID = instance.InstanceID()
 		}
 	}
 
@@ -692,7 +688,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		return err
 	}
 	request.LabelPolicy = labelPolicy
-	defaultLoginTranslations, err := repo.getLoginTexts(ctx, authz.GetInstance(ctx).InstanceID())
+	defaultLoginTranslations, err := repo.getLoginTexts(ctx, instance.InstanceID())
 	if err != nil {
 		return err
 	}
@@ -724,10 +720,10 @@ func (repo *AuthRequestRepo) tryUsingOnlyUserSession(ctx context.Context, reques
 	return nil
 }
 
-func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain.AuthRequest, loginName string) (err error) {
+func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain.AuthRequest, loginNameInput string) (err error) {
 	var user *user_view_model.UserView
-	loginName = strings.TrimSpace(loginName)
-	preferredLoginName := loginName
+	loginNameInput = strings.TrimSpace(loginNameInput)
+	preferredLoginName := loginNameInput
 	if request.RequestedOrgID != "" {
 		if request.RequestedOrgDomain {
 			domainPolicy, err := repo.getDomainPolicy(ctx, request.RequestedOrgID)
@@ -738,22 +734,22 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 				preferredLoginName += "@" + request.RequestedPrimaryDomain
 			}
 		}
-		user, err = repo.checkLoginNameInputForResourceOwner(ctx, request, preferredLoginName)
+		user, err = repo.checkLoginNameInputForResourceOwner(ctx, request, loginNameInput, preferredLoginName)
 	} else {
-		user, err = repo.checkLoginNameInput(ctx, request, preferredLoginName)
+		user, err = repo.checkLoginNameInput(ctx, request, loginNameInput, preferredLoginName)
 	}
 	// return any error apart from not found ones directly
 	if err != nil && !zerrors.IsNotFound(err) {
 		return err
 	}
 	// if there's an active (human) user, let's use it
-	if user != nil && !user.HumanView.IsZero() && domain.UserState(user.State).NotDisabled() {
-		request.SetUserInfo(user.ID, loginName, user.PreferredLoginName, "", "", user.ResourceOwner)
+	if user != nil && !user.HumanView.IsZero() && domain.UserState(user.State).IsEnabled() {
+		request.SetUserInfo(user.ID, loginNameInput, user.PreferredLoginName, "", "", user.ResourceOwner)
 		return nil
 	}
 	// the user was either not found or not active
 	// so check if the loginname suffix matches a verified org domain
-	ok, errDomainDiscovery := repo.checkDomainDiscovery(ctx, request, loginName)
+	ok, errDomainDiscovery := repo.checkDomainDiscovery(ctx, request, loginNameInput)
 	if errDomainDiscovery != nil || ok {
 		return errDomainDiscovery
 	}
@@ -768,7 +764,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 	// let's just check if unknown usernames are ignored
 	if request.LoginPolicy != nil && request.LoginPolicy.IgnoreUnknownUsernames {
 		if request.LabelPolicy != nil && request.LabelPolicy.HideLoginNameSuffix {
-			preferredLoginName = loginName
+			preferredLoginName = loginNameInput
 		}
 		request.SetUserInfo(unknownUserID, preferredLoginName, preferredLoginName, preferredLoginName, "", request.RequestedOrgID)
 		return nil
@@ -783,7 +779,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 		return zerrors.ThrowPreconditionFailed(nil, "AUTH-DGV4g", "Errors.User.NotHuman")
 	}
 	// everything should be handled by now
-	logging.WithFields("authRequest", request.ID, "loginName", loginName).Error("unhandled state for checkLoginName")
+	logging.WithFields("authRequest", request.ID, "loginName", loginNameInput).Error("unhandled state for checkLoginName")
 	return zerrors.ThrowInternal(nil, "AUTH-asf3df", "Errors.Internal")
 }
 
@@ -817,13 +813,14 @@ func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *
 	return true, nil
 }
 
-func (repo *AuthRequestRepo) checkLoginNameInput(ctx context.Context, request *domain.AuthRequest, loginNameInput string) (*user_view_model.UserView, error) {
-	// always check the loginname first
-	user, err := repo.View.UserByLoginName(ctx, loginNameInput, request.InstanceID)
+func (repo *AuthRequestRepo) checkLoginNameInput(ctx context.Context, request *domain.AuthRequest, loginNameInput, preferredLoginName string) (*user_view_model.UserView, error) {
+	// always check the preferred / suffixed loginname first
+	user, err := repo.View.UserByLoginName(ctx, preferredLoginName, request.InstanceID)
 	if err == nil {
 		// and take the user regardless if there would be a user with that email or phone
 		return user, repo.checkLoginPolicyWithResourceOwner(ctx, request, user.ResourceOwner)
 	}
+	// for email and phone check we will use the loginname as provided by the user (without computed suffix)
 	user, emailErr := repo.View.UserByEmail(ctx, loginNameInput, request.InstanceID)
 	if emailErr == nil {
 		// if there was a single user with the specified email
@@ -855,13 +852,14 @@ func (repo *AuthRequestRepo) checkLoginNameInput(ctx context.Context, request *d
 	return nil, err
 }
 
-func (repo *AuthRequestRepo) checkLoginNameInputForResourceOwner(ctx context.Context, request *domain.AuthRequest, loginNameInput string) (*user_view_model.UserView, error) {
-	// always check the loginname first
-	user, err := repo.View.UserByLoginNameAndResourceOwner(ctx, loginNameInput, request.RequestedOrgID, request.InstanceID)
+func (repo *AuthRequestRepo) checkLoginNameInputForResourceOwner(ctx context.Context, request *domain.AuthRequest, loginNameInput, preferredLoginName string) (*user_view_model.UserView, error) {
+	// always check the preferred / suffixed loginname first
+	user, err := repo.View.UserByLoginNameAndResourceOwner(ctx, preferredLoginName, request.RequestedOrgID, request.InstanceID)
 	if err == nil {
 		// and take the user regardless if there would be a user with that email or phone
 		return user, nil
 	}
+	// for email and phone check we will use the loginname as provided by the user (without computed suffix)
 	if request.LoginPolicy != nil && !request.LoginPolicy.DisableLoginWithEmail {
 		// if login by email is allowed and there was a single user with the specified email
 		// take that user (and ignore possible phone number matches)

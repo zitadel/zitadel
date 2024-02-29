@@ -128,6 +128,7 @@ Errors:
       NotFound: 验证码不存在
       Expired: 验证码已过期
       GeneratorAlgNotSupported: 不支持的生成器算法
+      Invalid: 代码无效
     Password:
       NotFound: 未找到密码
       Empty: 密码为空
@@ -327,7 +328,7 @@ Errors:
       NotActive: 项目授权不是启用状态
       NotInactive: 项目授权不是停用状态
   IAM:
-    NotFound: 实例未找到。查看 https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM 未找到。确保您有正确的域。查看 https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: 角色没有改变
     MemberInvalid: 成员无效
@@ -534,6 +535,17 @@ Errors:
     NotExisting: 功能不存在
     TypeNotSupported: 不支持功能类型
     InvalidValue: 此功能的值无效
+  Target:
+    Invalid: 目标无效
+    NoTimeout: 目标没有超时
+    InvalidURL: 目标的 URL 无效
+    NotFound: 未找到目标
+  Execution:
+    ConditionInvalid: 执行条件无效
+    Invalid: 执行无效
+    NotFound: 未找到执行
+    IncludeNotFound: 包括未找到的内容
+    NoTargets: 没有定义目标
 
 AggregateTypes:
   action: 动作
@@ -545,8 +557,17 @@ AggregateTypes:
   usergrant: 用户授权
   quota: 配额
   feature: 特征
+  target: 靶
+  execution: 执行
 
 EventTypes:
+  execution:
+    set: 执行集
+    removed: 执行已删除
+  target:
+    added: 目标已创建
+    changed: 目标改变
+    removed: 目标已删除
   user:
     added: 已添加用户
     selfregistered: 自注册用户
