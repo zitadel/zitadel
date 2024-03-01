@@ -2,6 +2,8 @@
 title: Internal Authentication Flow
 ---
 
+This flow is executed if the user logs in using the login UI hosted by ZITADEL.
+
 ## Post Authentication
 
 A user has authenticated directly at ZITADEL.
