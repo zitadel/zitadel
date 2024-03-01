@@ -52,6 +52,12 @@ The object has the following fields and methods:
 - `text()` *string*  
   Returns the body
 
+### Example
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/make_api_call.js#L10-L20
+```
+
 ## Log
 
 The log module provides you with the functionality to log to stdout.
