@@ -1,0 +1,224 @@
+---
+title: Use Cases
+---
+
+Actions are a powerful tool to extend ZITADEL and you might wonder what use cases actions can be used for.
+
+This page provides a non-exhaustive list of possibilities which is provided by [examples](https://github.com/zitadel/actions/tree/main/examples). If a use case is missing feel free to contribute an issue or pull request to the repository, thanks in advance 🤗.
+
+## Customize OIDC response
+
+Append claims returned on OIDC requests.
+
+### Triggers
+
+- Complement token
+  - [Pre Userinfo creation](./complement-token#pre-userinfo-creation-id_token--userinfo--introspection-endpoint)
+  - [Pre access token creation](./complement-token#pre-access-token-creation)
+
+### Set hardcoded claim
+
+Extend the claims by a hardcoded value.
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/add_claim.js
+```
+
+### Set dynamic claim from user metadata
+
+Extend the claims by dynamically read metadata from a user and sets the `picture`-claim if `idpPicture`-metadata value is present.
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/add_picture_claim_from_idp_metadata.js
+```
+
+### Set dynamic claim from organization metadata
+
+Extend the claims by dynamically read metadata from an organization and sets the present metadata.
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/org_metadata_claim.js
+```
+
+### Custom role mapping in claims
+
+Some products require specific role mapping from ZITADEL, no worries we got you covered 😉
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/custom_roles.js
+```
+
+## Customize SAML response
+
+Append attributes returned on SAML requests.
+
+### Triggers
+
+- Complement SAMLResponse
+  - [Pre SAMLResponse creation](./customize-samlresponse#pre-samlresponse-creation)
+
+### Custom role mapping in attributes
+
+Some products require specific role mapping from ZITADEL, no worries we got you covered 😉
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/set_custom_attribute.js
+```
+
+### Set dynamic attribute from organization metadata
+
+Extend the attributes by dynamically read metadata from an organization and sets the present metadata.
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/org_metadata_attribute.js
+```
+
+## Manipulate user
+
+You can automate manual tasks like setting default grants during user creation.
+
+### Set email always verified
+
+Useful if you trust the provided information or don't want the users to verify their e-mail addresses.
+
+#### Triggers
+
+- Internal Authentication
+  - [Pre Creation](./internal-authentication#pre-creation)
+- External Authentication
+  - [Pre Creation](./external-authentication#pre-creation)
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/verify_email.js
+```
+
+### Add grants to users
+
+Adding grants to users allows you to set default roles on users.
+
+#### Triggers
+
+- Internal Authentication
+  - [Post Creation](./internal-authentication#post-creation)
+- External Authentication
+  - [Post Creation](./external-authentication#post-creation)
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/add_metadata.js
+```
+
+### Add metadata to users
+
+Adding metadata to users allows you to set default metadata on users.
+
+#### Triggers
+
+- Internal Authentication
+  - [Post Creation](./internal-authentication#post-creation)
+  - [Post Authentication](./internal-authentication#post-authentication)
+- External Authentication
+  - [Post Creation](./internal-authentication#post-creation)
+  - [Post Authentication](./internal-authentication#post-authentication)
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/add_user_grant.js
+```
+
+## Use provided fields of identity providers
+
+If you want to ensure that the data of a user are always update you can automatically update user fields during authentication and safe time of your customers and your team. 🤯
+
+### Trigger
+
+- External Authentication
+  - [Post Authentication](./external-authentication#post-authentication)
+
+### Fields provided by Okta
+
+If you use [Okta as an identity provider](/guides/integrate/identity-providers/okta) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/okta_identity_provider.js
+```
+
+### Fields provided by Gitlab
+
+If you use [Gitlab as an identity provider](/guides/integrate/identity-providers/gitlab) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/gitlab_identity_provider.js
+```
+
+### Fields provided by Github
+
+If you use [Github as an identity provider](/guides/integrate/identity-providers/github) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/github_identity_provider.js
+```
+
+### Claims provided by a generic OIDC identity provider
+
+If you use a [generic OIDC identity provider](/guides/integrate/identity-providers/migrate#migrate-generic-oidc-provider) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/set_idp_picture_metadata.js
+```
+
+### Attributes provided by a generic SAML identity provider
+
+If you use a [SAML identity provider like mocksaml](/guides/integrate/identity-providers/mocksaml) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/post_auth_saml.js
+```
+
+## Context aware execution
+
+Based on the context the execution path of an action can change. ZITADEL allows complex execution paths of course. 😎
+
+### Based on auth request information
+
+Execution paths might change based on the application initiating the authentication.
+
+### Triggers
+
+- Internal Authentication
+  - [Pre Creation](./internal-authentication#pre-creation)
+  - [Post Creation](./internal-authentication#post-creation)
+  - [Post Authentication](./internal-authentication#post-authentication)
+- External Authentication
+  - [Pre Creation](./external-authentication#pre-creation)
+  - [Post Creation](./external-authentication#post-creation)
+  - [Post Authentication](./external-authentication#post-authentication)
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/execute_action_on_specific_app.js
+```
+
+This example uses [zitadel's log module](./modules#log)
+
+### Check authentication error
+
+Your action can also check for errors during the login process.
+
+### Triggers
+
+- Internal Authentication
+  - [Post Authentication](./internal-authentication#post-authentication)
+- External Authentication
+  - [Post Authentication](./external-authentication#post-authentication)
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/post_auth_log.js
+```
+
+This example uses [zitadel's log module](./modules#log)
+
+### Throw an error
+
+If the execution path ends in an error ZITADEL handles the error based on the [configuration](/concepts/features/actions#how-it-works) of the action.
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/throw_error.js
+```

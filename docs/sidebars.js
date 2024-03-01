@@ -804,6 +804,7 @@ module.exports = {
       items: [
         "apis/actions/introduction",
         "apis/actions/modules",
+        "apis/actions/use-cases",
         "apis/actions/internal-authentication",
         "apis/actions/external-authentication",
         "apis/actions/complement-token",
