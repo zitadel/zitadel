@@ -2,10 +2,17 @@ package admin
 
 import (
 	"context"
+	"slices"
+	"strings"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/deviceauth"
+	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/session"
+	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/repository/usergrant"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -60,14 +67,21 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 	for i, eventType := range req.EventTypes {
 		eventTypes[i] = eventstore.EventType(eventType)
 	}
+
 	aggregateIDs := make([]string, 0, 1)
 	if req.AggregateId != "" {
 		aggregateIDs = append(aggregateIDs, req.AggregateId)
 	}
+
 	aggregateTypes := make([]eventstore.AggregateType, len(req.AggregateTypes))
 	for i, aggregateType := range req.AggregateTypes {
 		aggregateTypes[i] = eventstore.AggregateType(aggregateType)
 	}
+	if len(aggregateTypes) == 0 {
+		aggregateTypes = aggregateTypesFromEventTypes(eventTypes)
+	}
+	aggregateTypes = slices.Compact(aggregateTypes)
+
 	limit := uint64(req.Limit)
 	if limit == 0 || limit > maxLimit {
 		limit = maxLimit
@@ -99,4 +113,36 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 		builder.CreationDateBefore(fromTime)
 	}
 	return builder, nil
+}
+
+func aggregateTypesFromEventTypes(eventTypes []eventstore.EventType) []eventstore.AggregateType {
+	aggregateTypes := make([]eventstore.AggregateType, 0, len(eventTypes))
+
+	for _, eventType := range eventTypes {
+		if types, ok := specialEventTypeMappings[eventType]; ok {
+			aggregateTypes = append(aggregateTypes, types...)
+			continue
+		}
+		aggregateTypes = append(aggregateTypes, eventstore.AggregateType(strings.Split(string(eventType), ".")[0]))
+	}
+
+	return aggregateTypes
+}
+
+var specialEventTypeMappings = map[eventstore.EventType][]eventstore.AggregateType{
+	"device.authorization.added":                      []eventstore.AggregateType{deviceauth.AggregateType},
+	"device.authorization.approved":                   []eventstore.AggregateType{deviceauth.AggregateType},
+	"iam.idp.config.added":                            []eventstore.AggregateType{instance.AggregateType},
+	"iam.idp.config.changed":                          []eventstore.AggregateType{instance.AggregateType},
+	"iam.idp.config.deactivated":                      []eventstore.AggregateType{instance.AggregateType},
+	"iam.idp.config.reactivated":                      []eventstore.AggregateType{instance.AggregateType},
+	"iam.idp.config.removed":                          []eventstore.AggregateType{instance.AggregateType},
+	"iam.idp.oidc.config.added":                       []eventstore.AggregateType{instance.AggregateType},
+	"iam.idp.oidc.config.changed":                     []eventstore.AggregateType{instance.AggregateType},
+	"user.grant.added":                                []eventstore.AggregateType{usergrant.AggregateType},
+	"user.grant.cascade.changed":                      []eventstore.AggregateType{usergrant.AggregateType},
+	"user.grant.cascade.removed":                      []eventstore.AggregateType{usergrant.AggregateType},
+	"user.grant.changed":                              []eventstore.AggregateType{usergrant.AggregateType},
+	"user.grant.removed":                              []eventstore.AggregateType{usergrant.AggregateType},
+	"user.human.passwordless.token.signcount.changed": []eventstore.AggregateType{user.AggregateType, session.AggregateType},
 }
