@@ -11,7 +11,7 @@ import "google/protobuf/duration.proto";
 message LoginSettings {
   bool allow_username_password = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "defines if a user is allowed to log in with his username and password";
+      description: "defines if a user is allowed to log in with username and password";
     }
   ];
   bool allow_register = 2 [

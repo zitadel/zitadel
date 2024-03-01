@@ -1,6 +1,6 @@
 ---
-title: Configure Azure AD as an Identity Provider in ZITADEL
-sidebar_label: Azure AD
+title: Configure Entra ID as an Identity Provider in ZITADEL
+sidebar_label: Entra ID
 ---
 
 import GeneralConfigDescription from './_general_config_description.mdx';
@@ -10,11 +10,11 @@ import IDPsOverview from './_idps_overview.mdx';
 import TestSetup from './_test_setup.mdx';
 import Activate from './_activate.mdx';
 
-<Intro provider="Azure AD"/>
+<Intro provider="Entra ID (former Azure Active Directory)"/>
 
-## Azure AD Configuration
+## Entra ID Configuration
 
-You need to have access to an AzureAD Tenant. If you do not yet have one follow [this guide from Microsoft](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-create-new-tenant) to create one for free.
+You need to have access to an Entra ID Tenant. If you do not yet have one follow [this guide from Microsoft](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-create-new-tenant) to create one for free.
 
 ### Register a new client
 
@@ -69,7 +69,7 @@ To be able to get all the information that ZITADEL needs, you have to configure 
 
 <IDPsOverview templates="Microsoft"/>
 
-### Create a new Azure AD Provider
+### Create a new Entra ID Provider
 
 The Microsoft template has everything you need preconfigured.
 You only have to add the client ID and secret, you have created in the step before.
@@ -79,16 +79,16 @@ You can configure the following settings if you like, a useful default will be f
 **Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
 This information will be taken to create/update the user within ZITADEL. Make sure to also add `User.Read`. ZITADEL ensures that at least `openid` and `User.Read` scopes are always sent.
 
-**Email Verified**: Azure AD doesn't send the email verified claim in the users token, if you don't enable this setting.
+**Email Verified**: Entra ID doesn't send the email verified claim in the users token, if you don't enable this setting.
 The user is then created with an unverified email, which results in an email verification message.
 If you want to avoid that, make sure to enable "Email verified".
 In that case, the user is created with a verified email address.
 
-**Tenant Type**: Configure the tenant type according to what you have chosen in the settings of your Azure AD application previously.
+**Tenant Type**: Configure the tenant type according to what you have chosen in the settings of your Entra ID application previously.
 - Common: Choose common if you want all Microsoft accounts being able to login.
-In this case, configure "Accounts in any organizational directory and personal Microsoft accounts" in your Azure AD App.
-- Organizations: Choose organization if you have Azure AD Tenants and no personal accounts. (You have configured either "Accounts in this organization" or "Accounts in any organizational directory" on your Azure APP)
-- Consumers: Choose this if you want to allow public accounts. (In your Azure AD App you have configured "Personal Microsoft accounts only")
+In this case, configure "Accounts in any organizational directory and personal Microsoft accounts" in your Entra ID App.
+- Organizations: Choose organization if you have Entra ID Tenants and no personal accounts. (You have configured either "Accounts in this organization" or "Accounts in any organizational directory" on your Azure APP)
+- Consumers: Choose this if you want to allow public accounts. (In your Entra ID App you have configured "Personal Microsoft accounts only")
 
 **Tenant ID**: If you have selected *Tenant ID* as *Tenant Type*, you have to enter the *Directory (Tenant) ID* into the *Tenant ID* field, copied previously from the Azure App configuration.
 
@@ -100,12 +100,12 @@ In this case, configure "Accounts in any organizational directory and personal M
 
 <Activate/>
 
-![Activate Azure AD](/img/guides/zitadel_activate_azure.png)
+![Activate Entra ID](/img/guides/zitadel_activate_azure.png)
 
 ## Test the setup
 
 <TestSetup loginscreen="your Microsoft login"/>
 
-![Azure AD Button](/img/guides/zitadel_login_azure.png)
+![Entra ID Button](/img/guides/zitadel_login_azure.png)
 
-![Azure AD Login](/img/guides/microsoft_login.png)
+![Entra ID Login](/img/guides/microsoft_login.png)

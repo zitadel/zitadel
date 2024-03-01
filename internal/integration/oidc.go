@@ -238,6 +238,21 @@ func GetRequest(url string, headers map[string]string) (*http.Request, error) {
 	return req, nil
 }
 
+func CheckPost(url string, values url.Values) (*url.URL, error) {
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+	resp, err := client.PostForm(url, values)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	return resp.Location()
+}
+
 func CheckRedirect(req *http.Request) (*url.URL, error) {
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {

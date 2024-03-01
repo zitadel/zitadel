@@ -2,9 +2,13 @@ package eventstore
 
 import (
 	"context"
+	"errors"
 	"sort"
 	"sync"
 	"time"
+
+	"github.com/jackc/pgconn"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 )
@@ -13,6 +17,7 @@ import (
 // and filters the stored events
 type Eventstore struct {
 	PushTimeout time.Duration
+	maxRetries  int
 
 	pusher  Pusher
 	querier Querier
@@ -52,6 +57,7 @@ type eventTypeInterceptors struct {
 func NewEventstore(config *Config) *Eventstore {
 	return &Eventstore{
 		PushTimeout: config.PushTimeout,
+		maxRetries:  int(config.MaxRetries),
 
 		pusher:  config.Pusher,
 		querier: config.Querier,
@@ -77,7 +83,23 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 		ctx, cancel = context.WithTimeout(ctx, es.PushTimeout)
 		defer cancel()
 	}
-	events, err := es.pusher.Push(ctx, cmds...)
+	var (
+		events []Event
+		err    error
+	)
+
+	// Retry when there is a collision of the sequence as part of the primary key.
+	// "duplicate key value violates unique constraint \"events2_pkey\" (SQLSTATE 23505)"
+	// https://github.com/zitadel/zitadel/issues/7202
+retry:
+	for i := 0; i <= es.maxRetries; i++ {
+		events, err = es.pusher.Push(ctx, cmds...)
+		var pgErr *pgconn.PgError
+		if !errors.As(err, &pgErr) || pgErr.ConstraintName != "events2_pkey" || pgErr.SQLState() != "23505" {
+			break retry
+		}
+		logging.WithError(err).Info("eventstore push retry")
+	}
 	if err != nil {
 		return nil, err
 	}

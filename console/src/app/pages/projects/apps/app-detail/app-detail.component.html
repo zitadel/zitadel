@@ -57,6 +57,13 @@
 </cnsl-top-view>
 
 <div class="max-width-container">
+  <cnsl-info-section *ngIf="isNew()" class="problem" [type]="InfoSectionType.INFO">
+    <div class="jumptoproject-row">
+      <span class="jumptoproject">{{ 'APP.PAGES.JUMPTOPROJECT' | translate }}</span>
+      <a [routerLink]="['/projects', projectId]" color="primary" mat-raised-button>{{ 'ACTIONS.CONFIGURE' | translate }}</a>
+    </div>
+  </cnsl-info-section>
+
   <div
     class="compliance"
     *ngIf="app && app.oidcConfig && app.oidcConfig.complianceProblemsList && app.oidcConfig.complianceProblemsList?.length"
