@@ -46,9 +46,10 @@ Trigger types define the point during execution of request. Each trigger defines
 
 Currently ZITADEL provides the following flows:
 
-- [Internal Authentication](./internal-authentication.md)
-- [External Authentication](./external-authentication.md)
-- [Complement Token](./complement-token.md)
+- [Internal Authentication](./internal-authentication)
+- [External Authentication](./external-authentication)
+- [Complement Token](./complement-token)
+- [Customize SAML Response](./customize-samlresponse)
 
 ## Available Modules inside Javascript
 
