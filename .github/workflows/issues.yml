@@ -23,19 +23,20 @@ jobs:
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
       - uses: tspascoal/get-user-teams-membership@v3
         id: checkUserMember
+        if: github.actor != 'dependabot[bot]'
         with:
          username: ${{ github.actor }}
          GITHUB_TOKEN: ${{ secrets.ADD_TO_PROJECT_PAT }}
       - name: add pr
         uses: actions/add-to-project@v0.5.0
-        if: ${{ github.event_name == 'pull_request_target' && !contains(steps.checkUserMember.outputs.teams, 'engineers') && github.actor != 'app/dependabot'}}
+        if: ${{ github.event_name == 'pull_request_target' && github.actor != 'dependabot[bot]' && !contains(steps.checkUserMember.outputs.teams, 'engineers')}}
         with:
           # You can target a repository in a different organization
           # to the issue
           project-url: https://github.com/orgs/zitadel/projects/2
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
       - uses: actions-ecosystem/action-add-labels@v1.1.0
-        if: ${{ github.event_name == 'pull_request_target' && !contains(steps.checkUserMember.outputs.teams, 'staff') && github.actor != 'app/dependabot'}}
+        if: ${{ github.event_name == 'pull_request_target' && github.actor != 'dependabot[bot]' && !contains(steps.checkUserMember.outputs.teams, 'staff')}}
         with:
           github_token: ${{ secrets.ADD_TO_PROJECT_PAT }}
           labels: |
