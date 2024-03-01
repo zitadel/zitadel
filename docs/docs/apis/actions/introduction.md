@@ -53,3 +53,5 @@ Currently ZITADEL provides the following flows:
 ## Available Modules inside Javascript
 
 - [HTTP module](./modules#http) to call API's
+- [Logging module](./modules#log) logs information to stdout
+- [UUID module](./modules#uuid) generates uuids
