@@ -56,9 +56,9 @@ export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME="root"
 export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD="RootPassword1!"
 
 # A single ZITADEL instance always needs the same 32 characters long masterkey
-# If you haven't done so already, you can generate a new one
-# The key must be passed as argument
-export ZITADEL_MASTERKEY="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
+# To generate a new random string, you can for example use the following command:
+# tr -dc A-Za-z0-9 </dev/urandom | head -c 32
+export ZITADEL_MASTERKEY="MasterkeyNeedsToHave32Characters"
 
 # Let the zitadel binary read configuration from environment variables
 zitadel start-from-init --masterkey "${ZITADEL_MASTERKEY}" --tlsMode disabled
