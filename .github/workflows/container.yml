@@ -116,7 +116,7 @@ jobs:
           touch "/tmp/digests/scratch/${digest#sha256:}"
       -
         name: Upload digest
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: digests
           path: /tmp/digests
