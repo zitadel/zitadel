@@ -1,5 +1,7 @@
 ---
-title: Client Credentials with Service Users
+title: Configure client credential authentication for service users
+sidebar_label: Client credential authentication
+sidebar_position: 3
 ---
 
 This is a guide on how to use Client Credentials with service users in ZITADEL. You can read more about users [here](/concepts/structure/users.md).

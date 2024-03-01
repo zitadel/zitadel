@@ -1,6 +1,7 @@
 ---
-title: ZITADEL's Personal Access Tokens(PATs)
-sidebar_label: Personal Access Tokens(PATs)
+title: Configure personal access token authentication for service users
+sidebar_label: Personal access token authentication
+sidebar_position: 3
 ---
 
 

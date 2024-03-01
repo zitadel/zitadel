@@ -27,6 +27,10 @@
         { "source": "/docs/guides/integrate/logout", "destination": "/docs/guides/integrate/login/oidc/logout", "permanent": true },
         { "source": "/docs/guides/solution-scenarios/onboarding", "destination": "/docs/guides/integrate/onboarding", "permanent": true },
         { "source": "/docs/guides/solution-scenarios/onboarding/b2b", "destination": "/docs/guides/integrate/onboarding/b2b", "permanent": true },
-        { "source": "/docs/guides/solution-scenarios/onboarding/end-users", "destination": "/docs/guides/integrate/onboarding/end-users", "permanent": true }
+        { "source": "/docs/guides/solution-scenarios/onboarding/end-users", "destination": "/docs/guides/integrate/onboarding/end-users", "permanent": true },
+        { "source": "/docs/guides/integrate/serviceusers", "destination": "/docs/guides/integrate/service-users/authenticate-service-users", "permanent": true },
+        { "source": "/docs/guides/integrate/private-key-jwt", "destination": "/docs/guides/integrate/service-users/private-key-jwt", "permanent": true },
+        { "source": "/docs/guides/integrate/client-credentials", "destination": "/docs/guides/integrate/service-users/client-credentials", "permanent": true },
+        { "source": "/docs/guides/integrate/pat", "destination": "/docs/guides/integrate/service-users/private-access-token", "permanent": true }
     ]
 }
