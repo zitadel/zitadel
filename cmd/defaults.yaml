@@ -544,6 +544,7 @@ Eventstore:
   MaxRetries: 5 #ZITADEL_EVENTSTORE_MAXRETRIES
 
 # The DefaultInstance section defines the default values for each new virtual instance that is created.
+# Check out https://zitadel.com/docs/concepts/structure/instance#multiple-virtual-instances for more information about virtual instances.
 # For the initial setup, the default values are used to create the first instance.
 # However, you might want to have your first instance created by the setup job to have a different configuration.
 # To overwrite the default values for the initial setup, configure the FirstInstance yaml section and pass it using the --steps flag.
