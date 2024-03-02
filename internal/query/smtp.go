@@ -123,7 +123,7 @@ func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, resourceOwner str
 	stmt, scan := prepareSMTPConfigQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
 		SMTPConfigColumnResourceOwner.identifier(): resourceOwner,
-		SMTPConfigColumnInstanceID.identifier():    authz.GetInstance(ctx).InstanceID(),
+		SMTPConfigColumnInstanceID.identifier():    resourceOwner,
 		SMTPConfigColumnState.identifier():         domain.SMTPConfigStateActive,
 	}).ToSql()
 	if err != nil {
