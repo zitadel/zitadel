@@ -12,6 +12,7 @@ type SystemFeatures struct {
 	LoginDefaultOrg                 *bool
 	TriggerIntrospectionProjections *bool
 	LegacyIntrospection             *bool
+	TokenExchange                   *bool
 }
 
 func (m *SystemFeatures) isEmpty() bool {

@@ -13,6 +13,7 @@ func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) *command.
 		LoginDefaultOrg:                 req.LoginDefaultOrg,
 		TriggerIntrospectionProjections: req.OidcTriggerIntrospectionProjections,
 		LegacyIntrospection:             req.OidcLegacyIntrospection,
+		TokenExchange:                   req.OidcTokenExchange,
 	}
 }
 
@@ -30,6 +31,7 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) *comm
 		LoginDefaultOrg:                 req.LoginDefaultOrg,
 		TriggerIntrospectionProjections: req.OidcTriggerIntrospectionProjections,
 		LegacyIntrospection:             req.OidcLegacyIntrospection,
+		TokenExchange:                   req.OidcTokenExchange,
 	}
 }
 

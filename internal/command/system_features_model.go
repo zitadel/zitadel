@@ -83,6 +83,7 @@ func (wm *SystemFeaturesWriteModel) setCommands(ctx context.Context, f *SystemFe
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginDefaultOrg, f.LoginDefaultOrg, feature_v2.SystemLoginDefaultOrgEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TriggerIntrospectionProjections, f.TriggerIntrospectionProjections, feature_v2.SystemTriggerIntrospectionProjectionsEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LegacyIntrospection, f.LegacyIntrospection, feature_v2.SystemLegacyIntrospectionEventType)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LegacyIntrospection, f.TokenExchange, feature_v2.SystemTokenExchangeEventType)
 	return cmds
 }
 

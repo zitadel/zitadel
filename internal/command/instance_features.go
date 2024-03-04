@@ -15,6 +15,7 @@ type InstanceFeatures struct {
 	LoginDefaultOrg                 *bool
 	TriggerIntrospectionProjections *bool
 	LegacyIntrospection             *bool
+	TokenExchange                   *bool
 }
 
 func (m *InstanceFeatures) isEmpty() bool {
