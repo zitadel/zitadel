@@ -58,8 +58,7 @@ export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD="RootPassword1!"
 # A single ZITADEL instance always needs the same 32 bytes long masterkey
 # Generate one to a file if you haven't done so already and pass it as environment variable
 tr -dc A-Za-z0-9 </dev/urandom | head -c 32 > ./zitadel-masterkey
-export ZITADEL_MASTERKEY="$(cat ./zitadel-masterkey)"
 
 # Let the zitadel binary read configuration from environment variables
-zitadel start-from-init --masterkey "${ZITADEL_MASTERKEY}" --tlsMode disabled
+zitadel start-from-init --masterkey "${ZITADEL_MASTERKEY}" --tlsMode disabled --masterkeyFile ./zitadel-masterkey
 ```
