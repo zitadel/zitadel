@@ -1,10 +1,3 @@
-- [ ] Update ../access-zitadel-api
-- [ ] Add all three examples there
-- [ ] Link from this section to the access api section
-- [ ] Bundle accessing api into a folder
-- [ ] Check links from API to accessing API
-- [ ] Check accessing API guide link to API references!
-
 
 ## Accessing ZITADEL's Management API
 

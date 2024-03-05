@@ -1,6 +1,6 @@
 ---
-title: Integrate ZITADEL into a Go Application
-sidebar_label: Go
+title: Integrate ZITADEL APIs into a Go Application
+sidebar_label: Example Go
 ---
 
 This integration guide shows you how to integrate **ZITADEL** into your Go application.
