@@ -119,30 +119,8 @@ func aggregateTypesFromEventTypes(eventTypes []eventstore.EventType) []eventstor
 	aggregateTypes := make([]eventstore.AggregateType, 0, len(eventTypes))
 
 	for _, eventType := range eventTypes {
-		if types, ok := specialEventTypeMappings[eventType]; ok {
-			aggregateTypes = append(aggregateTypes, types...)
-			continue
-		}
-		aggregateTypes = append(aggregateTypes, eventstore.AggregateType(strings.Split(string(eventType), ".")[0]))
+		aggregateTypes = append(aggregateTypes, eventstore.AggregateTypeFromEventType(eventType))
 	}
 
 	return aggregateTypes
-}
-
-var specialEventTypeMappings = map[eventstore.EventType][]eventstore.AggregateType{
-	"device.authorization.added":                      []eventstore.AggregateType{deviceauth.AggregateType},
-	"device.authorization.approved":                   []eventstore.AggregateType{deviceauth.AggregateType},
-	"iam.idp.config.added":                            []eventstore.AggregateType{instance.AggregateType},
-	"iam.idp.config.changed":                          []eventstore.AggregateType{instance.AggregateType},
-	"iam.idp.config.deactivated":                      []eventstore.AggregateType{instance.AggregateType},
-	"iam.idp.config.reactivated":                      []eventstore.AggregateType{instance.AggregateType},
-	"iam.idp.config.removed":                          []eventstore.AggregateType{instance.AggregateType},
-	"iam.idp.oidc.config.added":                       []eventstore.AggregateType{instance.AggregateType},
-	"iam.idp.oidc.config.changed":                     []eventstore.AggregateType{instance.AggregateType},
-	"user.grant.added":                                []eventstore.AggregateType{usergrant.AggregateType},
-	"user.grant.cascade.changed":                      []eventstore.AggregateType{usergrant.AggregateType},
-	"user.grant.cascade.removed":                      []eventstore.AggregateType{usergrant.AggregateType},
-	"user.grant.changed":                              []eventstore.AggregateType{usergrant.AggregateType},
-	"user.grant.removed":                              []eventstore.AggregateType{usergrant.AggregateType},
-	"user.human.passwordless.token.signcount.changed": []eventstore.AggregateType{user.AggregateType, session.AggregateType},
 }
