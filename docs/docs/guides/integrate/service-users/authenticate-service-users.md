@@ -112,8 +112,8 @@ However, PATs also come with limitations:
 
 ## Choosing the Right Authentication Method
 
-For most service user scenarios in ZITADEL, **private key JWT authentication** is the recommended choice due to its benefits in security, performance, and control.
-However, **Client Credentials** might be considered in specific situations where simplicity and trust between servers are priorities.
+For most service user scenarios in ZITADEL, [private key JWT authentication](./private-key-jwt.md) is the recommended choice due to its benefits in security, performance, and control.
+However, [client credentials authentication](./client-credentials.md) might be considered in specific situations where simplicity and trust between servers are priorities.
 
 ## Further Resources
 

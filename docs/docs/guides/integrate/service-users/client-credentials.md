@@ -67,6 +67,12 @@ Content-Type: application/json
 }
 ```
 
+
+## Accessing ZITADEL's Management API with client credentials
+
+
+
+
 ## Call ZITADEL API with Token
 
 Because the received Token includes the `urn:zitadel:iam:org:project:id:zitadel:aud` scope, we can send it in your requests to the ZITADEL API as Authorization Header.
