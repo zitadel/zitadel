@@ -71,7 +71,7 @@ func TestInstanceFeaturesProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "INSERT INTO projections.instance_features2 (instance_id, key, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (instance_id, key) DO UPDATE SET (creation_date, change_date, sequence, value) = (projections.instance_features2.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
 							expectedArgs: []interface{}{
-								"agg-id",
+								"instance-id",
 								"login_default_org",
 								anyArg{},
 								anyArg{},
