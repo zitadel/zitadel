@@ -8,7 +8,7 @@ with domain as (
 	) features
 	from domain d
 	cross join projections.system_features s
-	full outer join projections.instance_features i using (key, instance_id)
+	full outer join projections.instance_features2 i using (key, instance_id)
 	group by instance_id
 )
 select
