@@ -126,10 +126,6 @@ func (q *Queries) GetTargetByID(ctx context.Context, id string, resourceOwner st
 	return genericGetByID[*Target](q, ctx, prepareTargetQuery, where(eq))
 }
 
-func NewTargetResourceOwnerQuery(id string) (SearchQuery, error) {
-	return NewTextQuery(TargetColumnResourceOwner, id, TextEquals)
-}
-
 func NewTargetNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery(TargetColumnName, value, method)
 }

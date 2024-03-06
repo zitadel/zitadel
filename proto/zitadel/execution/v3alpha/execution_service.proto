@@ -10,6 +10,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 import "zitadel/execution/v3alpha/target.proto";
 import "zitadel/execution/v3alpha/execution.proto";
+import "zitadel/execution/v3alpha/query.proto";
 import "zitadel/object/v2beta/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
@@ -183,6 +184,67 @@ service ExecutionService {
         value: {
           description: "Target successfully deleted";
         };
+      };
+    };
+  }
+
+  // List targets
+  //
+  // List all matching targets. By default, we will return all targets of your instance.
+  // Make sure to include a limit and sorting for pagination.
+  rpc ListTargets (ListTargetsRequest) returns (ListTargetsResponse) {
+    option (google.api.http) = {
+      post: "/v3alpha/targets/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.target.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all targets matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+
+  // Target by ID
+  //
+  // Returns the target identified by the requested ID.
+  rpc GetTargetByID (GetTargetByIDRequest) returns (GetTargetByIDResponse) {
+    option (google.api.http) = {
+      get: "/v3alpha/targets/{target_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.target.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Target successfully retrieved";
+        }
       };
     };
   }
@@ -410,6 +472,45 @@ message DeleteTargetRequest {
 message DeleteTargetResponse {
   // Details provide some base information (such as the last change date) of the target.
   zitadel.object.v2beta.Details details = 1;
+}
+
+message ListTargetsRequest {
+  // list limitations and ordering.
+  zitadel.object.v2beta.ListQuery query = 1;
+  // the field the result is sorted.
+  zitadel.execution.v3alpha.TargetFieldName sorting_column = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"FIELD_NAME_SCHEMA_TYPE\""
+    }
+  ];
+  // Define the criteria to query for.
+  repeated zitadel.execution.v3alpha.TargetSearchQuery queries = 3;
+}
+
+message ListTargetsResponse {
+  // Details provides information about the returned result including total amount found.
+  zitadel.object.v2beta.ListDetails details = 1;
+  // States by which field the results are sorted.
+  zitadel.execution.v3alpha.TargetFieldName sorting_column = 2;
+  // The result contains the user schemas, which matched the queries.
+  repeated zitadel.execution.v3alpha.Target result = 3;
+}
+
+message GetTargetByIDRequest {
+  // unique identifier of the target.
+  string target_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message GetTargetByIDResponse {
+  zitadel.execution.v3alpha.Target target = 1;
 }
 
 message SetExecutionRequest {

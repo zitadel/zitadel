@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package zitadel.execution.v3alpha;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha;execution";
+
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/object/v2beta/object.proto";
+
+message TargetSearchQuery {
+  oneof query {
+    option (validate.required) = true;
+
+    TargetNameQuery target_name_query = 1;
+  }
+}
+
+message TargetNameQuery {
+  // Defines the name of the target to query for.
+  string target_name = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"gigi-giraffe\"";
+    }
+  ];
+  // Defines which text comparison method used for the name query.
+  zitadel.object.v2beta.TextQueryMethod method = 2 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines which text equality method is used";
+    }
+  ];
+}
+
+enum TargetFieldName {
+  FIELD_NAME_UNSPECIFIED = 0;
+  FIELD_NAME_ID = 1;
+  FIELD_NAME_CREATION_DATE = 2;
+  FIELD_NAME_CHANGE_DATE = 3;
+  FIELD_NAME_NAME = 4;
+  FIELD_NAME_TARGET_TYPE = 5;
+  FIELD_NAME_URL = 6;
+  FIELD_NAME_TIMEOUT = 7;
+  FIELD_NAME_ASYNC = 8;
+  FIELD_NAME_INTERRUPT_ON_ERROR = 9;
+}
