@@ -15,18 +15,12 @@ By integrating ZITADEL with external systems, you gain valuable insights into us
 
 ZITADEL does provide different solutions how to send events to external systems, the solution you choose might differ depending on your use case, database and environment (ZITADEL Cloud, Self-hosting) you are using.
 
-## Change Log / Events
-
-ZITADEL is based on an [event sourcing architecture](https://zitadel.com/docs/concepts/eventstore/overview), which means that each change happening on a resource is stored as event. 
-This allowed you to get the change track of all resources.
-
-There are different solutions how to get/send events to external systems, the solution you choose might differ depending on your use case, database and environment (ZITADEL Cloud, Self-hosting) you are using.
-
-|                               | Self-hosting | ZITADEL Cloud |
-|-------------------------------|--------------|---------------|
-| Events-API                    | yes          | yes           |
-| Cockroach Change Data Capture | yes          | no            |
-| Postgres whatever             | yes          | no            |
+|                                     | Description                                                                                                    | Self-hosting | ZITADEL Cloud |
+|-------------------------------------|----------------------------------------------------------------------------------------------------------------|-------------|---------------|
+| Events-API                          | Pulling events of all ZITADEL resources such as Users, Projects, Apps, etc. (Events = Change Log of Resources) | ✅           | ✅             |
+| Cockroach Change Data Capture       | Sending events of all ZITADEL resources such as Users, Projects, Apps, etc. (Events = Change Log of Resources) | ✅           | ❌             |
+| ZITADEL Actions Log to Stdout       | Custom log to messages possible on predefined Triggers during login / register Flow                            | ✅           | ❌             |
+| ZITADEL Actions trigger API/Webhook | Custom API/Webhook request on predefined triggers during login / register                                      | ✅           | ✅             |
 
 ### Events API
 
@@ -36,7 +30,7 @@ This API offers granular control through various filters, enabling you to:
 - **Target Aggregates**: Narrow down the data scope by filtering for events related to particular organizations, projects, or users.
 - **Define Time Frames**: Retrieve audit logs for precise time periods, allowing you to schedule data retrieval at desired intervals (e.g., hourly) and analyze activity within specific windows.
 
-You can find a comprehensive guide on how to use the events api for different use cases here: [Get Events from ZITADEL](/docs/guides/integrate/event-api)
+You can find a comprehensive guide on how to use the events API for different use cases here: [Get Events from ZITADEL](/docs/guides/integrate/event-api)
 
 ### Cockroach Change Data Capture
 
@@ -48,9 +42,9 @@ CDC captures row-level changes in your database and streams them as messages to 
 
 This approach is limited to self-hosted deployments using CockroachDB and requires expertise in managing the database and CDC configuration.
 
-#### Sending events to Google Big Query
+#### Sending events to Google Cloud Storage
 
-This example will show you how you can utilize CDC for sending all ZITADEL events to Google Big Query.
+This example will show you how you can utilize CDC for sending all ZITADEL events to Google Cloud Storage.
 For a detailed description please read the [Get Started Guide](https://www.cockroachlabs.com/docs/v23.2/create-and-configure-changefeeds) and [Cloud Storage Authentication](https://www.cockroachlabs.com/docs/v23.2/cloud-storage-authentication?filters=gcs#set-up-google-cloud-storage-assume-role) from Cockroach.
 
 You will need a Google Cloud Storage Bucket and a service account.
@@ -88,3 +82,49 @@ Example Output:
 ```json lines
 {"aggregate_id": "26553987123463875", "aggregate_type": "user", "created_at": "2023-12-25T10:01:45.600913Z", "event_type": "user.human.added", "instance_id": "123456789012345667", "payload": null, "sequence": 1}
 ```
+
+## ZITADEL Actions
+
+ZITADEL actions offer a powerful mechanism for extending the platform's capabilities and integrating with external systems tailored to your specific requirements. 
+These actions are essentially custom JavaScript snippets that execute at predefined triggers during the registration or login flow of a user.
+
+In the future ZITADEL actions will be extended to allow to not only define them during the login and register flow, but also on each API Request, Event or Predefined Functions.
+
+### Log to stdout
+
+With the [log module](/docs/apis/actions/modules#log) you can log any custom message to stdout.
+Those logs in stdout can be collected by your external system.
+
+Example Use Case:
+In my external system for example Splunk I want to be able to get an information each time a user has authenticated.
+
+1. Define an action that logs successful and failed login to your stdout.
+   Make sure the name of the action is the same as of the function in the script.
+   ```ts reference
+   https://github.com/zitadel/actions/blob/main/examples/post_auth_log.js
+   ```
+2. Add the action to the following Flows and Triggers
+   - Flow: Internal Authentication - Trigger: Post Authentication
+   - Flow: External Authentication - Trigger: Post Authentication
+3. Authenticate User
+4. Collect Data from stdout
+
+### Webhook/API Request
+
+The [http module](/docs/apis/actions/modules#http) allows you to make a request to a REST API. 
+This allows you to send a request at a specific point during the login or registration flow with the data you defined in your action.
+
+Example Use Case:
+I want to send a request to an endpoint each time after an authentication (successful or not).
+
+1. Define an action that calls API Endpoint.
+   Make sure the name of the action is the same as of the function in the script.
+   Example how to call an API Endpoint:
+   ```ts reference
+   https://github.com/zitadel/actions/blob/main/examples/make_api_call.js
+   ```
+2. Add the action to the following Flows and Triggers
+   - Flow: Internal Authentication - Trigger: Post Authentication
+   - Flow: External Authentication - Trigger: Post Authentication
+3. Authenticate User
+4. Get data on your API
