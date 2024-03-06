@@ -79,7 +79,8 @@ export default function SessionItem({
             new URLSearchParams(
               authRequestId
                 ? {
-                    loginName: session.factors?.user?.loginName as string,
+                    // loginName: session.factors?.user?.loginName as string,
+                    sessionId: session.id,
                     authRequestId,
                   }
                 : {
