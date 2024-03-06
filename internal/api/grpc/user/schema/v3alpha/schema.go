@@ -3,13 +3,18 @@ package schema
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	schema "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha"
 )
 
 func (s *Server) CreateUserSchema(ctx context.Context, req *schema.CreateUserSchemaRequest) (*schema.CreateUserSchemaResponse, error) {
+	if err := checkUserSchemaEnabled(ctx); err != nil {
+		return nil, err
+	}
 	userSchema := createUserSchemaToCommand(req)
 	id, details, err := s.command.CreateUserSchema(ctx, userSchema)
 	if err != nil {
@@ -22,6 +27,9 @@ func (s *Server) CreateUserSchema(ctx context.Context, req *schema.CreateUserSch
 }
 
 func (s *Server) UpdateUserSchema(ctx context.Context, req *schema.UpdateUserSchemaRequest) (*schema.UpdateUserSchemaResponse, error) {
+	if err := checkUserSchemaEnabled(ctx); err != nil {
+		return nil, err
+	}
 	userSchema := updateUserSchemaToCommand(req)
 	details, err := s.command.UpdateUserSchema(ctx, userSchema)
 	if err != nil {
@@ -32,6 +40,9 @@ func (s *Server) UpdateUserSchema(ctx context.Context, req *schema.UpdateUserSch
 	}, nil
 }
 func (s *Server) DeactivateUserSchema(ctx context.Context, req *schema.DeactivateUserSchemaRequest) (*schema.DeactivateUserSchemaResponse, error) {
+	if err := checkUserSchemaEnabled(ctx); err != nil {
+		return nil, err
+	}
 	details, err := s.command.DeactivateUserSchema(ctx, req.GetId())
 	if err != nil {
 		return nil, err
@@ -41,6 +52,9 @@ func (s *Server) DeactivateUserSchema(ctx context.Context, req *schema.Deactivat
 	}, nil
 }
 func (s *Server) ReactivateUserSchema(ctx context.Context, req *schema.ReactivateUserSchemaRequest) (*schema.ReactivateUserSchemaResponse, error) {
+	if err := checkUserSchemaEnabled(ctx); err != nil {
+		return nil, err
+	}
 	details, err := s.command.ReactivateUserSchema(ctx, req.GetId())
 	if err != nil {
 		return nil, err
@@ -50,6 +64,9 @@ func (s *Server) ReactivateUserSchema(ctx context.Context, req *schema.Reactivat
 	}, nil
 }
 func (s *Server) DeleteUserSchema(ctx context.Context, req *schema.DeleteUserSchemaRequest) (*schema.DeleteUserSchemaResponse, error) {
+	if err := checkUserSchemaEnabled(ctx); err != nil {
+		return nil, err
+	}
 	details, err := s.command.DeleteUserSchema(ctx, req.GetId())
 	if err != nil {
 		return nil, err
@@ -57,6 +74,13 @@ func (s *Server) DeleteUserSchema(ctx context.Context, req *schema.DeleteUserSch
 	return &schema.DeleteUserSchemaResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
+}
+
+func checkUserSchemaEnabled(ctx context.Context) error {
+	if authz.GetInstance(ctx).Features().UserSchema {
+		return nil
+	}
+	return zerrors.ThrowPreconditionFailed(nil, "SCHEMA-SFjk3", "Errors.UserSchema.NotEnabled")
 }
 
 func createUserSchemaToCommand(req *schema.CreateUserSchemaRequest) *command.CreateUserSchema {

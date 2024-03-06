@@ -57,6 +57,7 @@ func (m *SystemFeaturesWriteModel) reduceReset() {
 	m.LoginDefaultOrg = nil
 	m.TriggerIntrospectionProjections = nil
 	m.LegacyIntrospection = nil
+	m.UserSchema = nil
 }
 
 func (m *SystemFeaturesWriteModel) reduceBoolFeature(event *feature_v2.SetEvent[bool]) error {
@@ -73,6 +74,8 @@ func (m *SystemFeaturesWriteModel) reduceBoolFeature(event *feature_v2.SetEvent[
 		m.TriggerIntrospectionProjections = &event.Value
 	case feature.KeyLegacyIntrospection:
 		m.LegacyIntrospection = &event.Value
+	case feature.KeyUserSchema:
+		m.UserSchema = &event.Value
 	}
 	return nil
 }
@@ -83,6 +86,7 @@ func (wm *SystemFeaturesWriteModel) setCommands(ctx context.Context, f *SystemFe
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginDefaultOrg, f.LoginDefaultOrg, feature_v2.SystemLoginDefaultOrgEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TriggerIntrospectionProjections, f.TriggerIntrospectionProjections, feature_v2.SystemTriggerIntrospectionProjectionsEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LegacyIntrospection, f.LegacyIntrospection, feature_v2.SystemLegacyIntrospectionEventType)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.UserSchema, f.UserSchema, feature_v2.SystemUserSchemaEventType)
 	return cmds
 }
 

@@ -16,6 +16,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	schema "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha"
 )
@@ -36,8 +37,40 @@ func TestMain(m *testing.M) {
 
 		CTX = Tester.WithAuthorization(ctx, integration.IAMOwner)
 		Client = Tester.Client.UserSchemaV3
+
 		return m.Run()
 	}())
+}
+
+func ensureFeatureEnabled(t *testing.T) {
+	f, err := Tester.Client.FeatureV2.GetInstanceFeatures(CTX, &feature.GetInstanceFeaturesRequest{
+		Inheritance: true,
+	})
+	require.NoError(t, err)
+	if f.UserSchema.GetEnabled() {
+		return
+	}
+	_, err = Tester.Client.FeatureV2.SetInstanceFeatures(CTX, &feature.SetInstanceFeaturesRequest{
+		UserSchema: gu.Ptr(true),
+	})
+	require.NoError(t, err)
+	retryDuration := time.Minute
+	if ctxDeadline, ok := CTX.Deadline(); ok {
+		retryDuration = time.Until(ctxDeadline)
+	}
+	require.EventuallyWithT(t,
+		func(ttt *assert.CollectT) {
+			f, err := Tester.Client.FeatureV2.GetInstanceFeatures(CTX, &feature.GetInstanceFeaturesRequest{
+				Inheritance: true,
+			})
+			require.NoError(ttt, err)
+			if f.UserSchema.GetEnabled() {
+				return
+			}
+		},
+		retryDuration,
+		100*time.Millisecond,
+		"timed out waiting for ensuring instance feature")
 }
 
 func TestServer_CreateUserSchema(t *testing.T) {
@@ -281,6 +314,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ensureFeatureEnabled(t)
 			got, err := Client.CreateUserSchema(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
@@ -516,6 +550,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ensureFeatureEnabled(t)
 			err := tt.prepare(tt.args.req)
 			require.NoError(t, err)
 
@@ -590,6 +625,7 @@ func TestServer_DeactivateUserSchema(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ensureFeatureEnabled(t)
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
 
@@ -664,6 +700,7 @@ func TestServer_ReactivateUserSchema(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ensureFeatureEnabled(t)
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
 
@@ -738,6 +775,7 @@ func TestServer_DeleteUserSchema(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ensureFeatureEnabled(t)
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
 
