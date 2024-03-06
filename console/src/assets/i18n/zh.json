@@ -119,6 +119,30 @@
     "SETTINGS": "设置",
     "CUSTOMERPORTAL": "客户门户网站"
   },
+  "QUICKSTART": {
+    "TITLE": "将 ZITADEL 集成到您的应用程序中",
+    "DESCRIPTION": "将 ZITADEL 集成到您的应用程序中，或使用我们的示例，几分钟内即可开始使用。",
+    "BTN_START": "创建应用程序",
+    "BTN_LEARNMORE": "了解更多",
+    "CREATEPROJECTFORAPP": "创建项目 {{value}}",
+    "SELECT_FRAMEWORK": "选择框架",
+    "FRAMEWORK": "框架",
+    "FRAMEWORK_OTHER": "其他 (OIDC, SAML, API)",
+    "ALMOSTDONE": "就快好了",
+    "REVIEWCONFIGURATION": "审查配置",
+    "REVIEWCONFIGURATION_DESCRIPTION": "我们为 {{value}} 应用程序创建了一个基本配置。创建后，您可以根据自己的需要调整该配置。",
+    "REDIRECTS": "配置重定向",
+    "DEVMODEWARN": "默认情况下启用开发模式。您可以稍后更新生产值。",
+    "GUIDE": "指南",
+    "BROWSEEXAMPLES": "浏览示例",
+    "DUPLICATEAPPRENAME": "具有相同 neme 的应用程序已经存在。请选择不同的名称。",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "变革框架",
+        "DESCRIPTION": "从可用的框架中选择一个，快速设置您的应用程序。"
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "操作",
     "FILTER": "过滤",
@@ -138,6 +162,7 @@
     "ADD": "添加",
     "CREATE": "创建",
     "CONTINUE": "继续",
+    "CONTINUEWITH": "继续 {{value}}",
     "BACK": "返回",
     "CLOSE": "关闭",
     "CLEAR": "清除",
@@ -1961,6 +1986,7 @@
       "DATECHANGED": "修改于",
       "URLS": "URLs",
       "DELETE": "删除应用",
+      "JUMPTOPROJECT": "要配置角色、授权等，请导航到项目。",
       "DETAIL": {
         "TITLE": "详情",
         "STATE": {

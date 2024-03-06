@@ -1,0 +1,214 @@
+h1 {
+  font-weight: 500;
+  font-size: 2rem;
+}
+
+.integrate-layout-container {
+  margin: 0 -2rem 2rem -2rem;
+  padding: 3rem 2rem 14rem 2rem;
+
+  .top-control {
+    display: flex;
+    align-items: center;
+
+    .abort {
+      font-size: 1.2rem;
+      margin-left: 1.5rem;
+      text-transform: uppercase;
+      font-size: 14px;
+      opacity: 0.8;
+      letter-spacing: 0.05em;
+    }
+
+    .progress-spinner {
+      margin-left: 2rem;
+    }
+  }
+}
+
+.offset-content {
+  margin-top: -14rem;
+}
+
+.grid-layout {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: [first] 300px [second] auto;
+  grid-column-gap: 5rem;
+
+  .framework-selector {
+    margin-bottom: 2rem;
+    display: block;
+  }
+
+  .steps {
+    margin-top: 0.5rem;
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      padding: 1rem 0;
+
+      .step-title {
+        font-weight: 700;
+        font-size: 12px;
+        opacity: 0.8;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+      }
+
+      a {
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+
+  .redirect-p {
+    margin-top: 0;
+  }
+
+  .redirect-description {
+    font-size: 14px;
+    margin: 0.25rem 0 0 0;
+    display: block;
+  }
+}
+
+@media only screen and (max-width: 900px) {
+  .integrate-layout-container {
+    margin: 0 -2rem 2rem -2rem;
+    background: transparent;
+    padding: 3rem 2rem 14rem 2rem;
+  }
+
+  .grid-layout {
+    display: flex;
+    flex-direction: column;
+
+    .steps {
+      display: none;
+    }
+  }
+}
+
+.card-wrapper {
+  margin-top: -1rem;
+
+  .duplicate-name-warning {
+    margin-top: 0.25rem;
+    display: block;
+  }
+}
+
+@mixin app-integrate-theme($theme) {
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: map-get($primary, 500);
+
+  $warn-color: map-get($warn, 500);
+  $accent-color: map-get($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+
+  $list-background-color: map-get($background, 300);
+  $card-background-color: map-get($background, cards);
+  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+  $border-selected-color: if($is-dark-theme, #fff, #000);
+
+  .integrate-layout-container {
+    background: map-get($background, metadata-section);
+  }
+
+  .review-description {
+    font-size: 14px;
+    margin: 0.25rem 0 0 0;
+    display: block;
+  }
+
+  .grid-layout {
+    .step {
+      &.top-border {
+        border-top: 2px solid $border-color;
+      }
+    }
+
+    a {
+      color: $primary-color;
+    }
+  }
+
+  .framework-card-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .framework-card {
+      position: relative;
+      flex-shrink: 0;
+      text-decoration: none;
+      border-radius: 0.5rem;
+      box-sizing: border-box;
+      transition: all 0.1s ease-in;
+      display: flex;
+      flex-direction: row;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      border: 1px solid rgba(#8795a1, 0.2);
+      padding: 0 0.5rem;
+
+      img {
+        width: 100%;
+        height: 100%;
+        max-width: 40px;
+        max-height: 40px;
+        object-fit: contain;
+        object-position: center;
+      }
+
+      .dark-only {
+        display: if($is-dark-theme, block, none);
+      }
+
+      .light-only {
+        display: if($is-dark-theme, none, block);
+      }
+
+      span {
+        margin: 0.5rem;
+        text-align: center;
+        color: map-get($foreground, text);
+      }
+
+      .action-row {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        font-size: 14px;
+        margin-bottom: 0.5rem;
+        color: map-get($primary, 400);
+
+        .icon {
+          margin-left: 0rem;
+        }
+      }
+    }
+  }
+}
+
+.app-integrate-actions {
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  .create-button {
+    height: 3.5rem;
+    padding: 0 4rem;
+  }
+}

@@ -95,7 +95,7 @@ export const DEVICE_CODE_METHOD: RadioItemAuthType = {
   prefix: 'DEVICECODE',
   background: 'linear-gradient(40deg, rgb(56 189 248) 30%, rgb(14 165 233))',
   responseType: OIDCResponseType.OIDC_RESPONSE_TYPE_CODE,
-  grantType: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE, OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE],
+  grantType: [OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE],
   authMethod: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
   recommended: false,
 };
@@ -133,7 +133,7 @@ export function getPartialConfigFromAuthMethod(authMethod: string):
       config = {
         oidc: {
           responseTypesList: [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
-          grantTypesList: [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE, OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE],
+          grantTypesList: [OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE],
           authMethodType: OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
         },
       };

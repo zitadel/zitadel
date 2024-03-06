@@ -119,6 +119,30 @@
     "SETTINGS": "Paramètres",
     "CUSTOMERPORTAL": "Customer Portal"
   },
+  "QUICKSTART": {
+    "TITLE": "Intégrer ZITADEL dans votre application",
+    "DESCRIPTION": "Intégrez ZITADEL dans votre application ou utilisez l'un de nos échantillons pour démarrer en quelques minutes",
+    "BTN_START": "Créer une application",
+    "BTN_LEARNMORE": "En savoir plus",
+    "CREATEPROJECTFORAPP": "Créer un projet {{value}}",
+    "SELECT_FRAMEWORK": "Select Framework",
+    "FRAMEWORK": "Framework",
+    "FRAMEWORK_OTHER": "Autre (OIDC, SAML, API)",
+    "ALMOSTDONE": "Vous avez presque terminé",
+    "REVIEWCONFIGURATION": "Review Configuration",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Nous avons créé une configuration de base pour les applications {{value}}. Vous pouvez adapter cette configuration à vos besoins après sa création.",
+    "REDIRECTS": "Configurer les redirections",
+    "DEVMODEWARN": "Le mode développement est activé par défaut. Vous pouvez mettre à jour les valeurs pour la production ultérieurement.",
+    "GUIDE": "Guide",
+    "BROWSEEXAMPLES": "Parcourez les exemples",
+    "DUPLICATEAPPRENAME": "Une application avec ce nom existe déjà. Veuillez choisir un autre nom.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Cadre de changement",
+        "DESCRIPTION": "Choisissez l'un des frameworks disponibles pour une configuration rapide de votre application."
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "Actions",
     "FILTER": "Filtrer",
@@ -138,6 +162,7 @@
     "ADD": "Ajouter",
     "CREATE": "Créer",
     "CONTINUE": "Continuer",
+    "CONTINUEWITH": "Continuez avec {{value}}",
     "BACK": "Retour",
     "CLOSE": "Fermer",
     "CLEAR": "Effacer",
@@ -1962,6 +1987,7 @@
       "DATECHANGED": "Modifié",
       "URLS": "URLs",
       "DELETE": "Supprimer l'application",
+      "JUMPTOPROJECT": "Pour configurer des rôles, des autorisations et bien plus encore, accédez au projet.",
       "DETAIL": {
         "TITLE": "Détail",
         "STATE": {
