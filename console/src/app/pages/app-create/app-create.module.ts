@@ -17,11 +17,15 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { SearchProjectAutocompleteModule } from 'src/app/modules/search-project-autocomplete/search-project-autocomplete.module';
 import { AppCreateRoutingModule } from './app-create-routing.module';
 import { AppCreateComponent } from './app-create.component';
+import { FrameworkAutocompleteComponent } from 'src/app/components/framework-autocomplete/framework-autocomplete.component';
+import { FrameworkChangeComponent } from 'src/app/components/framework-change/framework-change.component';
 
 @NgModule({
   declarations: [AppCreateComponent],
   imports: [
+    FrameworkChangeComponent,
     AppCreateRoutingModule,
+    FrameworkAutocompleteComponent,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
@@ -35,9 +39,6 @@ import { AppCreateComponent } from './app-create.component';
     HasRolePipeModule,
     TranslateModule,
     HasRoleModule,
-    MatCheckboxModule,
-    PasswordComplexityViewModule,
-    MatSlideToggleModule,
   ],
 })
 export default class AppCreateModule {}

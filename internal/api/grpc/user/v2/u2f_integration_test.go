@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
@@ -60,6 +61,7 @@ func TestServer_RegisterU2F(t *testing.T) {
 			},
 			want: &user.RegisterU2FResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
 			},
@@ -134,6 +136,7 @@ func TestServer_VerifyU2FRegistration(t *testing.T) {
 			},
 			want: &user.VerifyU2FRegistrationResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
 			},

@@ -63,7 +63,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - 
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: .artifacts
           name: zitadel-linux-${{ matrix.arch }}
@@ -116,7 +116,7 @@ jobs:
           touch "/tmp/digests/scratch/${digest#sha256:}"
       -
         name: Upload digest
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: digests
           path: /tmp/digests
@@ -139,7 +139,7 @@ jobs:
     steps:
       -
         name: Download digests
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: digests
           path: /tmp/digests

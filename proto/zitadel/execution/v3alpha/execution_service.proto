@@ -9,6 +9,7 @@ import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 import "zitadel/execution/v3alpha/target.proto";
+import "zitadel/execution/v3alpha/execution.proto";
 import "zitadel/object/v2beta/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
@@ -17,8 +18,8 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha;execu
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Execution Service";
-    version: "3.0-alpha";
-    description: "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance. This project is in alpha state. It can AND will continue breaking until the services provide the same functionality as the current actions.";
+    version: "3.0-preview";
+    description: "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance. This project is in preview state. It can AND will continue breaking until the services provide the same functionality as the current actions.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -185,6 +186,125 @@ service ExecutionService {
       };
     };
   }
+
+  // Set an execution
+  //
+  // Set an execution to call a previously defined target or include the targets of a previously defined execution.
+  rpc SetExecution (SetExecutionRequest) returns (SetExecutionResponse) {
+    option (google.api.http) = {
+      post: "/v3alpha/executions"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Execution successfully set";
+        };
+      };
+    };
+  }
+
+  // Delete an execution
+  //
+  // Delete an existing execution.
+  rpc DeleteExecution (DeleteExecutionRequest) returns (DeleteExecutionResponse) {
+    option (google.api.http) = {
+      delete: "/v3alpha/executions"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.delete"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Execution successfully deleted";
+        };
+      };
+    };
+  }
+  // List all available functions
+  //
+  // List all available functions which can be used as condition for executions.
+  rpc ListExecutionFunctions (ListExecutionFunctionsRequest) returns (ListExecutionFunctionsResponse) {
+    option (google.api.http) = {
+      get: "/v3alpha/executions/functions"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "List all functions successfully";
+        };
+      };
+    };
+  }
+  // List all available methods
+  //
+  // List all available methods which can be used as condition for executions.
+  rpc ListExecutionMethods (ListExecutionMethodsRequest) returns (ListExecutionMethodsResponse) {
+    option (google.api.http) = {
+      get: "/v3alpha/executions/methods"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "List all methods successfully";
+        };
+      };
+    };
+  }
+  // List all available service
+  //
+  // List all available services which can be used as condition for executions.
+  rpc ListExecutionServices (ListExecutionServicesRequest) returns (ListExecutionServicesResponse) {
+    option (google.api.http) = {
+      get: "/v3alpha/executions/services"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "List all services successfully";
+        };
+      };
+    };
+  }
 }
 
 message CreateTargetRequest {
@@ -290,4 +410,45 @@ message DeleteTargetRequest {
 message DeleteTargetResponse {
   // Details provide some base information (such as the last change date) of the target.
   zitadel.object.v2beta.Details details = 1;
+}
+
+message SetExecutionRequest {
+  // Defines the condition type and content of the condition for execution.
+  SetConditions condition = 1;
+  // Defines the execution targets which are defined as a different resource, which are called in the defined conditions.
+  repeated string targets = 2;
+  // Defines other executions as included with the same condition-types.
+  repeated string includes = 3;
+}
+
+message SetExecutionResponse {
+  // Details provide some base information (such as the last change date) of the execution.
+  zitadel.object.v2beta.Details details = 2;
+}
+
+message DeleteExecutionRequest {
+  // Unique identifier of the execution.
+  SetConditions condition = 1;
+}
+
+message DeleteExecutionResponse {
+  // Details provide some base information (such as the last change date) of the execution.
+  zitadel.object.v2beta.Details details = 1;
+}
+
+message ListExecutionFunctionsRequest{}
+message ListExecutionFunctionsResponse{
+  // All available methods
+  repeated string functions = 1;
+}
+message ListExecutionMethodsRequest{}
+message ListExecutionMethodsResponse{
+  // All available methods
+  repeated string methods = 1;
+}
+
+message ListExecutionServicesRequest{}
+message ListExecutionServicesResponse{
+  // All available methods
+  repeated string services = 1;
 }

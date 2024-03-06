@@ -72,6 +72,8 @@ var (
 	QuotaProjection                     *quotaProjection
 	LimitsProjection                    *handler.Handler
 	RestrictionsProjection              *handler.Handler
+	SystemFeatureProjection             *handler.Handler
+	InstanceFeatureProjection           *handler.Handler
 )
 
 type projection interface {
@@ -148,6 +150,8 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	QuotaProjection = newQuotaProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["quotas"]))
 	LimitsProjection = newLimitsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["limits"]))
 	RestrictionsProjection = newRestrictionsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["restrictions"]))
+	SystemFeatureProjection = newSystemFeatureProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["system_features"]))
+	InstanceFeatureProjection = newInstanceFeatureProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_features"]))
 	newProjectionsList()
 	return nil
 }
@@ -257,5 +261,7 @@ func newProjectionsList() {
 		QuotaProjection.handler,
 		LimitsProjection,
 		RestrictionsProjection,
+		SystemFeatureProjection,
+		InstanceFeatureProjection,
 	}
 }

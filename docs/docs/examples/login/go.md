@@ -78,11 +78,11 @@ router.Handle("/auth/", z.Authentication)
 ***Authentication checks***
 
 To ensure the user is authenticated before they are able to use your application, the middleware provides two options:
-- You can either require the user to be authenticated. If he's not yet, he will be automatically redirected to the Login UI:
+- You can either require the user to be authenticated. If they haven't already, they will be automatically redirected to the Login UI:
     ```go
     mw.RequireAuthentication()(handler)
     ```
-- You can just check if he already is, but still continue serving the page:
+- You can just check the user's authentication status, but still continue serving the page:
     ```go
     mw.CheckAuthentication()(handler)
     ```

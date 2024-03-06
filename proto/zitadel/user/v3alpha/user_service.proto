@@ -21,8 +21,8 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v3alpha";
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "User Service";
-    version: "3.0-alpha";
-    description: "This API is intended to manage users with your own data schema in a ZITADEL instance. This project is in alpha state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.";
+    version: "3.0-preview";
+    description: "This API is intended to manage users with your own data schema in a ZITADEL instance. This project is in preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
