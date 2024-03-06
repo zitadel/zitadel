@@ -10,4 +10,4 @@ By configuring a custom domain within ZITADEL, organizations can replace the def
 
 This not only enhances the overall user experience but also reinforces the organization's brand presence. Additionally, custom domains can contribute to trust and credibility, as users are more likely to recognize and trust URLs associated with the organization rather than generic domains. Overall, ZITADEL's custom domain feature empowers organizations to tailor the authentication process to align with their brand identity and user expectations.
 
-Learn how to [configure a custom domain in ZITADEL Cloud](http://localhost:3000/docs/guides/manage/cloud/instances#add-custom-domain) or how to configure [custom domain when self-hosting](http://localhost:3000/docs/self-hosting/manage/custom-domain).
+Learn how to [configure a custom domain in ZITADEL Cloud](/docs/guides/manage/cloud/instances#add-custom-domain) or how to configure [custom domain when self-hosting](/docs/self-hosting/manage/custom-domain).
