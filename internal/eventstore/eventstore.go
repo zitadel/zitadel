@@ -31,6 +31,7 @@ var (
 	eventInterceptors map[EventType]eventTypeInterceptors
 	eventTypes        []string
 	aggregateTypes    []string
+	eventTypeMapping  = map[EventType]AggregateType{}
 )
 
 // RegisterFilterEventMapper registers a function for mapping an eventstore event to an event
@@ -45,9 +46,11 @@ func RegisterFilterEventMapper(aggregateType AggregateType, eventType EventType,
 	if eventInterceptors == nil {
 		eventInterceptors = make(map[EventType]eventTypeInterceptors)
 	}
+
 	interceptor := eventInterceptors[eventType]
 	interceptor.eventMapper = mapper
 	eventInterceptors[eventType] = interceptor
+	eventTypeMapping[eventType] = aggregateType
 }
 
 type eventTypeInterceptors struct {
@@ -110,6 +113,10 @@ retry:
 	}
 	es.notify(mappedEvents)
 	return mappedEvents, nil
+}
+
+func AggregateTypeFromEventType(typ EventType) AggregateType {
+	return eventTypeMapping[typ]
 }
 
 func (es *Eventstore) EventTypes() []string {

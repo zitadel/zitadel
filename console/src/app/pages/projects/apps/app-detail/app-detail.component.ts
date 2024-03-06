@@ -77,6 +77,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public authMethods: RadioItemAuthType[] = [];
   private subscription?: Subscription;
   public projectId: string = '';
+  public appId: string = '';
   public app?: App.AsObject;
 
   public environmentMap$ = this.envSvc.env.pipe(
@@ -252,6 +253,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     if (projectId && appId) {
       this.projectId = projectId;
+      this.appId = appId;
       this.getData(projectId, appId);
     }
   }
@@ -639,6 +641,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               this.currentAuthMethod = this.authMethodFromPartialConfig(config);
             }
             this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
+            setTimeout(() => {
+              this.getData(this.projectId, this.appId);
+            }, 1000);
           })
           .catch((error) => {
             this.toast.showError(error);
