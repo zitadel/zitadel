@@ -48,7 +48,6 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AwaitOpenTransactions().
 		AddQuery().
 		AggregateTypes(feature_v2.AggregateType).
-		AggregateIDs(m.AggregateID).
 		EventTypes(
 			feature_v1.DefaultLoginInstanceEventType,
 			feature_v2.InstanceResetEventType,
