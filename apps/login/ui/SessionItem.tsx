@@ -40,6 +40,32 @@ export default function SessionItem({
     }
   }
 
+  // async function loginSession(authRequestId: string, sessionId: string) {
+  //   setLoading(true);
+  //   const res = await fetch(
+  //     "/api/login?" + new URLSearchParams({ sessionId, authRequestId }),
+  //     {
+  //       method: "DELETE",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         id: id,
+  //       }),
+  //     }
+  //   );
+
+  //   const response = await res.json();
+
+  //   setLoading(false);
+  //   if (!res.ok) {
+  //     //   setError(response.details);
+  //     return Promise.reject(response);
+  //   } else {
+  //     return response;
+  //   }
+  // }
+
   const validPassword = session?.factors?.password?.verifiedAt;
   const validPasskey = session?.factors?.webAuthN?.verifiedAt;
 
@@ -49,7 +75,7 @@ export default function SessionItem({
     <Link
       href={
         validUser
-          ? `/signedin?` +
+          ? `/login?` +
             new URLSearchParams(
               authRequestId
                 ? {

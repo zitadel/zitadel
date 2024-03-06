@@ -38,10 +38,25 @@ function findSession(
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const authRequestId = searchParams.get("authRequest");
+  const sessionId = searchParams.get("sessionId");
 
+  const sessionCookies: SessionCookie[] = await getAllSessions();
+
+  if (authRequestId && sessionId) {
+    const cookie = sessionCookies.find((cookie) => cookie.id === sessionId);
+
+    const session = {
+      sessionId: cookie?.id,
+      sessionToken: cookie?.token,
+    };
+    const { callbackUrl } = await createCallback(server, {
+      authRequestId,
+      session,
+    });
+    return NextResponse.redirect(callbackUrl);
+  }
   if (authRequestId) {
     const { authRequest } = await getAuthRequest(server, { authRequestId });
-    const sessionCookies: SessionCookie[] = await getAllSessions();
     const ids = sessionCookies.map((s) => s.id);
 
     let sessions: Session[] = [];
@@ -57,7 +72,8 @@ export async function GET(request: NextRequest) {
       // if some accounts are available for selection and select_account is set
       if (
         authRequest &&
-        authRequest.prompt.includes(Prompt.PROMPT_SELECT_ACCOUNT)
+        (authRequest.prompt.includes(Prompt.PROMPT_SELECT_ACCOUNT) ||
+          authRequest.prompt.includes(Prompt.PROMPT_LOGIN))
       ) {
         const accountsUrl = new URL("/accounts", request.url);
         if (authRequest?.id) {
