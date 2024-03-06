@@ -76,19 +76,29 @@ export default function PasswordForm({
             })
         );
       } else {
-        return router.push(
-          `/signedin?` +
-            new URLSearchParams(
-              authRequestId
-                ? {
-                    loginName: resp.factors.user.loginName,
-                    authRequestId,
-                  }
-                : {
-                    loginName: resp.factors.user.loginName,
-                  }
-            )
-        );
+        if (authRequestId && resp && resp.sessionId) {
+          return router.push(
+            `/login?` +
+              new URLSearchParams({
+                sessionId: resp.sessionId,
+                authRequest: authRequestId,
+              })
+          );
+        } else {
+          return router.push(
+            `/signedin?` +
+              new URLSearchParams(
+                authRequestId
+                  ? {
+                      loginName: resp.factors.user.loginName,
+                      authRequestId,
+                    }
+                  : {
+                      loginName: resp.factors.user.loginName,
+                    }
+              )
+          );
+        }
       }
     });
   }
