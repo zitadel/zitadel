@@ -45,15 +45,21 @@ export async function GET(request: NextRequest) {
   if (authRequestId && sessionId) {
     const cookie = sessionCookies.find((cookie) => cookie.id === sessionId);
 
-    const session = {
-      sessionId: cookie?.id,
-      sessionToken: cookie?.token,
-    };
-    const { callbackUrl } = await createCallback(server, {
-      authRequestId,
-      session,
-    });
-    return NextResponse.redirect(callbackUrl);
+    if (cookie && cookie.id && cookie.token) {
+      const session = {
+        sessionId: cookie?.id,
+        sessionToken: cookie?.token,
+      };
+      const { callbackUrl } = await createCallback(server, {
+        authRequestId,
+        session,
+      });
+      return NextResponse.redirect(callbackUrl);
+    } else {
+      const accountsUrl = new URL("/accounts", request.url);
+      accountsUrl.searchParams.set("authRequestId", authRequestId);
+      return NextResponse.redirect(accountsUrl);
+    }
   }
   if (authRequestId) {
     const { authRequest } = await getAuthRequest(server, { authRequestId });
@@ -85,10 +91,6 @@ export async function GET(request: NextRequest) {
         // check for loginHint, userId hint sessions
         let selectedSession = findSession(sessions, authRequest);
 
-        // if (!selectedSession) {
-        //   selectedSession = sessions[0]; // TODO: remove
-        // }
-
         if (selectedSession && selectedSession.id) {
           const cookie = sessionCookies.find(
             (cookie) => cookie.id === selectedSession?.id
@@ -106,17 +108,13 @@ export async function GET(request: NextRequest) {
             return NextResponse.redirect(callbackUrl);
           } else {
             const accountsUrl = new URL("/accounts", request.url);
-            if (authRequest?.id) {
-              accountsUrl.searchParams.set("authRequestId", authRequest?.id);
-            }
+            accountsUrl.searchParams.set("authRequestId", authRequestId);
 
             return NextResponse.redirect(accountsUrl);
           }
         } else {
           const accountsUrl = new URL("/accounts", request.url);
-          if (authRequest?.id) {
-            accountsUrl.searchParams.set("authRequestId", authRequest?.id);
-          }
+          accountsUrl.searchParams.set("authRequestId", authRequestId);
 
           return NextResponse.redirect(accountsUrl);
           // return NextResponse.error();
