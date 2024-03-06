@@ -30,9 +30,11 @@ function findSession(
       (s) => s.factors?.user?.loginName === authRequest.loginHint
     );
   }
+  if (sessions.length) {
+    return sessions[0];
+  }
   return undefined;
 }
-
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const authRequestId = searchParams.get("authRequest");
