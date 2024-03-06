@@ -13,7 +13,7 @@ export default function Page() {
     <div className="space-y-8">
       <h1 className="text-xl font-medium">Headers</h1>
       {hds.map((h) => (
-        <p>
+        <p key={h}>
           {h}:{headersList.get(h)}
         </p>
       ))}
