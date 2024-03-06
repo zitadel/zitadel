@@ -51,7 +51,7 @@ jobs:
         key: ${{ inputs.core_cache_key }}
         fail-on-cache-miss: true
     -
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ inputs.go_version }}
     - 
