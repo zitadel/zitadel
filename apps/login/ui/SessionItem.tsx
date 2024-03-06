@@ -55,7 +55,7 @@ export default function SessionItem({
                 ? {
                     // loginName: session.factors?.user?.loginName as string,
                     sessionId: session.id,
-                    authRequestId,
+                    authRequest: authRequestId,
                   }
                 : {
                     loginName: session.factors?.user?.loginName as string,

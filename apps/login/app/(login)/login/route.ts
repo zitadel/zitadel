@@ -37,7 +37,7 @@ function findSession(
 }
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const authRequestId = searchParams.get("authRequestId");
+  const authRequestId = searchParams.get("authRequest");
   const sessionId = searchParams.get("sessionId");
 
   const sessionCookies: SessionCookie[] = await getAllSessions();
