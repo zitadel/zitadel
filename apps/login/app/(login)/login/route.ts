@@ -43,25 +43,42 @@ export async function GET(request: NextRequest) {
   const sessionCookies: SessionCookie[] = await getAllSessions();
 
   if (authRequestId && sessionId) {
-    const cookie = sessionCookies.find((cookie) => cookie.id === sessionId);
+    console.log(
+      `Login with session: ${sessionId} and authRequest: ${authRequestId}`
+    );
+    const ids = sessionCookies.map((s) => s.id);
 
-    if (cookie && cookie.id && cookie.token) {
-      const session = {
-        sessionId: cookie?.id,
-        sessionToken: cookie?.token,
-      };
-      const { callbackUrl } = await createCallback(server, {
-        authRequestId,
-        session,
-      });
-      return NextResponse.redirect(callbackUrl);
-    } else {
-      const accountsUrl = new URL("/accounts", request.url);
-      accountsUrl.searchParams.set("authRequestId", authRequestId);
-      return NextResponse.redirect(accountsUrl);
+    let sessions: Session[] = [];
+    if (ids && ids.length) {
+      sessions = await loadSessions(ids);
+    }
+
+    let selectedSession = sessions.find((s) => s.id === sessionId);
+
+    if (selectedSession && selectedSession.id) {
+      console.log(`Found session ${selectedSession.id}`);
+      const cookie = sessionCookies.find(
+        (cookie) => cookie.id === selectedSession?.id
+      );
+
+      if (cookie && cookie.id && cookie.token) {
+        console.log(`Found sessioncookie ${cookie.id}`);
+
+        const session = {
+          sessionId: cookie?.id,
+          sessionToken: cookie?.token,
+        };
+
+        const { callbackUrl } = await createCallback(server, {
+          authRequestId,
+          session,
+        });
+        return NextResponse.redirect(callbackUrl);
+      }
     }
   }
   if (authRequestId) {
+    console.log(`Login with authRequest: ${authRequestId}`);
     const { authRequest } = await getAuthRequest(server, { authRequestId });
     const ids = sessionCookies.map((s) => s.id);
 
@@ -122,17 +139,19 @@ export async function GET(request: NextRequest) {
       }
     } else {
       const loginNameUrl = new URL("/loginname", request.url);
-      if (authRequest?.id) {
-        loginNameUrl.searchParams.set("authRequestId", authRequest?.id);
-        if (authRequest.loginHint) {
-          loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
-          loginNameUrl.searchParams.set("submit", "true"); // autosubmit
-        }
+
+      loginNameUrl.searchParams.set("authRequestId", authRequestId);
+      if (authRequest?.loginHint) {
+        loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
+        loginNameUrl.searchParams.set("submit", "true"); // autosubmit
       }
 
       return NextResponse.redirect(loginNameUrl);
     }
   } else {
-    return NextResponse.error();
+    return NextResponse.json(
+      { error: "No authRequestId provided" },
+      { status: 500 }
+    );
   }
 }
