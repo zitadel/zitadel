@@ -3,7 +3,6 @@ package execution
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -16,9 +15,8 @@ const (
 type SetEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	ExecutionType domain.ExecutionType `json:"executionType"`
-	Targets       []string             `json:"targets"`
-	Includes      []string             `json:"includes"`
+	Targets  []string `json:"targets"`
+	Includes []string `json:"includes"`
 }
 
 func (e *SetEvent) SetBaseEvent(b *eventstore.BaseEvent) {

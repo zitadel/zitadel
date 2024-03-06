@@ -211,7 +211,7 @@ func exists(ctx context.Context, filter preparation.FilterToQueryReducer, wm exi
 	return wm.Exists(), nil
 }
 
-func samlCertificateAndKeyGenerator(keySize int) func(id string) ([]byte, []byte, error) {
+func asamlCertificateAndKeyGenerator(keySize int) func(id string) ([]byte, []byte, error) {
 	return func(id string) ([]byte, []byte, error) {
 		priv, pub, err := crypto.GenerateKeyPair(keySize)
 		if err != nil {

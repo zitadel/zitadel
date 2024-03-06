@@ -311,6 +311,7 @@ func (s *Tester) Done() {
 //
 // Note: the database must already be setup and initialized before
 // using NewTester. See the CONTRIBUTING.md document for details.
+
 func NewTester(ctx context.Context, zitadelConfigYAML ...string) *Tester {
 	args := strings.Split(commandLine, " ")
 

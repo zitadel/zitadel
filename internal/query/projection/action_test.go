@@ -99,7 +99,7 @@ func TestActionProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(
 					testEvent(
-						action.ChangedEventType,
+						action.DeactivatedEventType,
 						action.AggregateType,
 						[]byte(`{}`),
 					),
@@ -131,7 +131,7 @@ func TestActionProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(
 					testEvent(
-						action.ChangedEventType,
+						action.ReactivatedEventType,
 						action.AggregateType,
 						[]byte(`{}`),
 					),
@@ -163,7 +163,7 @@ func TestActionProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(
 					testEvent(
-						action.ChangedEventType,
+						action.RemovedEventType,
 						action.AggregateType,
 						[]byte(`{}`),
 					),
