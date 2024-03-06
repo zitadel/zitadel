@@ -45,7 +45,7 @@ func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	// test actual userinfo
 	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
@@ -154,7 +154,7 @@ func TestServer_Introspect(t *testing.T) {
 			tokens, err := exchangeTokens(t, app.GetClientId(), code, redirectURI)
 			require.NoError(t, err)
 			assertTokens(t, tokens, true)
-			assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 			// test actual introspection
 			introspection, err := rs.Introspect[*oidc.IntrospectionResponse](context.Background(), resourceServer, tokens.AccessToken)
@@ -360,7 +360,7 @@ func TestServer_VerifyClient(t *testing.T) {
 			}
 			require.NoError(t, err)
 			assertTokens(t, tokens, false)
-			assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 		})
 	}
 }

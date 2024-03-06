@@ -32,6 +32,7 @@ func TestAssertDetails(t *testing.T) {
 			exptected: myMsg{
 				details: &object.Details{
 					ResourceOwner: "me",
+					ChangeDate:    timestamppb.Now(),
 				},
 			},
 			actual: myMsg{

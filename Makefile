@@ -5,9 +5,14 @@ gen_zitadel_path := "$(go_bin)/protoc-gen-zitadel"
 now := $(shell date --rfc-3339=seconds | sed 's/ /T/')
 VERSION ?= development-$(now)
 COMMIT_SHA ?= $(shell git rev-parse HEAD)
+ZITADEL_IMAGE ?= zitadel:local
 
 .PHONY: compile
 compile: core_build console_build compile_pipeline
+
+.PHONY: docker_image
+docker_image: compile
+	DOCKER_BUILDKIT=1 docker build -f build/Dockerfile -t $(ZITADEL_IMAGE) .
 
 .PHONY: compile_pipeline
 compile_pipeline: console_move
@@ -108,14 +113,14 @@ core_integration_setup:
 
 .PHONY: core_integration_test
 core_integration_test: core_integration_setup
-	go test -tags=integration -race -p 1 -coverprofile=profile.cov -coverpkg=./internal/...,./cmd/... ./internal/integration ./internal/api/grpc/...  ./internal/notification/handlers/... ./internal/api/oidc/...
+	go test -tags=integration -race -p 1 -coverprofile=profile.cov -coverpkg=./internal/...,./cmd/... ./...
 
 .PHONY: console_lint
 console_lint:
 	cd console && \
 	yarn lint
 
-.PHONE: core_lint
+.PHONY: core_lint
 core_lint:
 	golangci-lint run \
 		--timeout 10m \
