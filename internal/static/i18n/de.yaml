@@ -547,6 +547,7 @@ Errors:
     IncludeNotFound: Einschließen nicht gefunden
     NoTargets: Keine Ziele definiert
   UserSchema:
+    NotEnabled: Funktion Benutzerschema ist nicht aktiviert
     Type:
       Missing: Benutzer Schema Typ fehlt
       AlreadyExists: Benutzer Schema Typ existiert bereits
