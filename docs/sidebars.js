@@ -452,12 +452,7 @@ module.exports = {
             "examples/identity-proxy/oauth2-proxy",
           ],
         },
-        {
-          type: "category",
-          label: "Export Audit Logs",
-          collapsed: true,
-          items: ["guides/integrate/external-audit-log"],
-        },
+        "guides/integrate/external-audit-log",
       ],
     },
     {
