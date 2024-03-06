@@ -23,7 +23,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   // later only shown with dev mode enabled
-  const showNav = true;
+  const showNav = process.env.DEBUG === "true" ? true : false;
 
   const branding = await getBrandingSettings(server);
   let partial: Partial<BrandingSettings> | undefined;
@@ -47,8 +47,12 @@ export default async function RootLayout({
               <div className="h-screen overflow-y-scroll bg-background-light-600 dark:bg-background-dark-600  bg-[url('/grid-light.svg')] dark:bg-[url('/grid-dark.svg')]">
                 {showNav && <GlobalNav />}
 
-                <div className={`${showNav ? "lg:pl-72" : ""} pb-4`}>
-                  <div className="mx-auto max-w-[440px] space-y-8 pt-20 lg:py-8">
+                <div
+                  className={`${
+                    showNav ? "lg:pl-72" : ""
+                  } pb-4 flex flex-col justify-center h-full`}
+                >
+                  <div className="mx-auto max-w-[440px] space-y-8 pt-20 lg:py-8 w-full">
                     {showNav && (
                       <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
                         <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500">
