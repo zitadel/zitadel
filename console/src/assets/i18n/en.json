@@ -1,5 +1,26 @@
 {
   "APP_NAME": "ZITADEL",
+  "DESCRIPTIONS":{
+    "HOME": {
+      "TITLE": "Get started with ZITADEL",
+      "NEXT": {
+        "TITLE": "Your next steps",
+        "DESCRIPTION": "Complete the following steps to secure your application.",
+        "CREATE_PROJECT": {
+          "TITLE": "Create a project",
+          "DESCRIPTION": "Add a project and define its roles and authorizations."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Organization",
+      "DESCRIPTION": "An organization hosts <a href=\"/users\" class=\"desc-link\">users<a/>, <a href=\"/projects\" class=\"desc-link\">projects and apps<a/>, <a href=\"/org-settings?id=idp\" class=\"desc-link\">identity providers<a/> and settings like <a href=\"/org-settings?id=branding\" class=\"desc-link\">branding<a/>. Do you want to share settings across multiple organizations? Go to <a href=\"/instance\" class=\"desc-link\">default settings<a/>.",
+      "METADATA": {
+        "TITLE": "Metadata",
+        "DESCRIPTION": "Extend your data model. Add attributes not covered by the core fields, like for example the organizations industrial market segment or its location."
+      }
+    }
+  },
   "PAGINATOR": {
     "PREVIOUS": "Previous",
     "NEXT": "Next",

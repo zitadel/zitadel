@@ -1,8 +1,21 @@
+.org-title-row {
+  display: flex;
+  align-items: center;
+
 h2 {
   font-size: 1.2rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  margin-top: 2rem;
+  margin: 0;
+}
+
+  a {
+    .icon {
+      font-size: 1.2rem;
+      height: 1.2rem;
+      width: 1.2rem;
+    }
+  }
 }
 
 .top-desc {
