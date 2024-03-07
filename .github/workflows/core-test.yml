@@ -40,11 +40,11 @@ jobs:
       - 
         uses: actions/checkout@v3
       -
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ inputs.go_version }}
       - 
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         timeout-minutes: 1
         name: restore core
         id: restore-core
@@ -57,7 +57,7 @@ jobs:
         name: set cache path
         run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
       - 
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         id: cache
         timeout-minutes: 1
         continue-on-error: true
@@ -110,11 +110,11 @@ jobs:
   #     - 
   #       uses: actions/checkout@v3
   #     -
-  #       uses: actions/setup-go@v4
+  #       uses: actions/setup-go@v5
   #       with:
   #         go-version: ${{ inputs.go_version }}
   #     - 
-  #       uses: actions/cache/restore@v3
+  #       uses: actions/cache/restore@v4
   #       timeout-minutes: 1
   #       name: restore core
   #       with:
@@ -126,7 +126,7 @@ jobs:
   #       name: set cache path
   #       run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
   #     - 
-  #       uses: actions/cache/restore@v3
+  #       uses: actions/cache/restore@v4
   #       timeout-minutes: 1
   #       name: restore previous results
   #       cache: id
