@@ -40,7 +40,7 @@ At the moment the username only allows e-mail formatted input. (This will be cha
 ### User Loginname must contain orgdomain
 
 If this behavior is not suitable for you, ZITADEL has the option to suffix the usernames with the organization domain.
-This setting is called **User Loginname must contain orgdomain** and is part of your [Domain settings](./instance-settings#domain-settings).
+This setting is called **User Loginname must contain orgdomain** and is part of your [Domain settings](./default-settings#domain-settings).
 
 Those loginnames consist of the format `{username}@{domainname}.{zitadeldomain}`.
 If your user had the username `john.doe`, the generated loginname would be `john.doe@acme.zitadel.cloud`.
@@ -58,7 +58,7 @@ Once you have successfully registered your organization, ZITADEL will automatica
 Users that you create within your organization will be suffixed with this domain name.
 
 You can improve the user experience, by suffixing users with a domain name that is in your control.
-If the "validate org domains" settings in the [Domain Settings](./instance-settings#domain-settings) is set to true, you have to prove the ownership of your domain, by DNS or HTTP challenge.
+If the "validate org domains" settings in the [Domain Settings](./default-settings#domain-settings) is set to true, you have to prove the ownership of your domain, by DNS or HTTP challenge.
 If the setting is set to false, the created domain will automatically be set to verifed.
 
 An organization can have multiple domain names, but only one domain can be primary.
@@ -71,7 +71,7 @@ ZITADEL will notify users affected by this change.
 ## Verify your domain name
 
 :::info
-You can also disable domain verification with DNS challenge in the [instance settings](/docs/guides/manage/console/instance-settings#domain-settings).
+You can also disable domain verification with DNS challenge in the [instance settings](/docs/guides/manage/console/default-settings#domain-settings).
 :::
 
 1. Browse to your organization settings
@@ -105,16 +105,16 @@ Those settings are the same as on your instance.
 
 > Note: that the following links, redirect to instance settings to omit redundancy.
 
-- [**Login Behavior and Access**](./instance-settings#login-behaviour-and-access): Multifactor Authentication Options and Enforcement, Define whether Passwordless authentication methods are allowed or not, Set Login Lifetimes and advanced behavour for the login interface.
-- [**Identity Providers**](./instance-settings#identity-providers): Define IDPs which are available for all organizations
-- [**Password Complexity**](./instance-settings#password-complexity): Requirements for Passwords ex. Symbols, Numbers, min length and more.
-- [**Lockout**](./instance-settings#lockout): Set the maximum attempts a user can try to enter the password. When the number is exceeded, the user gets locked out and has to be unlocked.
+- [**Login Behavior and Access**](./default-settings#login-behaviour-and-access): Multifactor Authentication Options and Enforcement, Define whether Passwordless authentication methods are allowed or not, Set Login Lifetimes and advanced behavour for the login interface.
+- [**Identity Providers**](./default-settings#identity-providers): Define IDPs which are available for all organizations
+- [**Password Complexity**](./default-settings#password-complexity): Requirements for Passwords ex. Symbols, Numbers, min length and more.
+- [**Lockout**](./default-settings#lockout): Set the maximum attempts a user can try to enter the password. When the number is exceeded, the user gets locked out and has to be unlocked.
 - [**Verified domains**](/docs/guides/manage/console/organizations#verify-your-domain-name): This is where you manage your organization specific domains which can be used to build usernames
-- [**Domain settings**](./instance-settings#domain-settings): Whether users use their email or the generated username to login. Other Validation, SMTP settings
-- [**Branding**](./instance-settings#branding): Appearance of the login interface.
-- [**Message Texts**](./instance-settings#message-texts): Text and internationalization for emails
-- [**Login Interface Texts**](./instance-settings#login-interface-texts): Text and internationalization for the login interface
-- [**Privacy Policy**](./instance-settings#privacy-policy-and-tos): Links to your own Terms of Service and Privacy Policy regulations. Link to Help Page.
+- [**Domain settings**](./default-settings#domain-settings): Whether users use their email or the generated username to login. Other Validation, SMTP settings
+- [**Branding**](./default-settings#branding): Appearance of the login interface.
+- [**Message Texts**](./default-settings#message-texts): Text and internationalization for emails
+- [**Login Interface Texts**](./default-settings#login-interface-texts): Text and internationalization for the login interface
+- [**Privacy Policy**](./default-settings#privacy-policy-and-tos): Links to your own Terms of Service and Privacy Policy regulations. Link to Help Page.
 
 If you need custom branding on a organization (for example in a B2B scenario, where organizations are allowed to use their custom design), navigate back to the home page, choose your organization in the header above, navigate to the organization settings and set the custom design here.
 
@@ -123,7 +123,7 @@ The behavior of the login page, applying custom design, is then defined on your 
 ## Show Organization Login
 
 As you should know by now ZITADEL knows the concept of Organizations.
-You can define [default settings](/docs/guides/manage/console/instance-settings) for your ZITADEL, or you can overwrite them for an [Organization](#organization-settings).
+You can define [default settings](/docs/guides/manage/console/default-settings) for your ZITADEL, or you can overwrite them for an [Organization](#organization-settings).
 Per default the ZITADEL Login will always show what is defined per default. As soon as the Organization context is given, the settings defined on the specific organization can be triggered.
 This means when you want to trigger the settings of an organization directly, make sure to send the organization scope in the authentication request.
 

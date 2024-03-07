@@ -55,11 +55,10 @@ export ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable
 export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME="root"
 export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD="RootPassword1!"
 
-# A single ZITADEL instance always needs the same 32 characters long masterkey
-# If you haven't done so already, you can generate a new one
-# The key must be passed as argument
-export ZITADEL_MASTERKEY="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
+# A single ZITADEL instance always needs the same 32 bytes long masterkey
+# Generate one to a file if you haven't done so already and pass it as environment variable
+tr -dc A-Za-z0-9 </dev/urandom | head -c 32 > ./zitadel-masterkey
 
 # Let the zitadel binary read configuration from environment variables
-zitadel start-from-init --masterkey "${ZITADEL_MASTERKEY}" --tlsMode disabled
+zitadel start-from-init --masterkey "${ZITADEL_MASTERKEY}" --tlsMode disabled --masterkeyFile ./zitadel-masterkey
 ```

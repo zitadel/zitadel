@@ -1,6 +1,10 @@
 with domain as (
 	select instance_id from projections.instance_domains
 	where domain = $1
+), instance_features as (
+	select i.*
+	from domain d
+	join projections.instance_features2 i on d.instance_id = i.instance_id
 ), features as (
 	select instance_id, json_object_agg(
 		coalesce(i.key, s.key),
@@ -8,7 +12,7 @@ with domain as (
 	) features
 	from domain d
 	cross join projections.system_features s
-	full outer join projections.instance_features i using (key, instance_id)
+	full outer join instance_features i using (instance_id, key)
 	group by instance_id
 )
 select
