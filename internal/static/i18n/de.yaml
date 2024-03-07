@@ -549,8 +549,8 @@ Errors:
   UserSchema:
     NotEnabled: Funktion Benutzerschema ist nicht aktiviert
     Type:
-      Missing: Benutzer Schema Typ fehlt
-      AlreadyExists: Benutzer Schema Typ existiert bereits
+      Missing: Benutzerschematyp fehlt
+      AlreadyExists: Benutzerschematyp existiert bereits
     Authenticator:
       Invalid: Ungültiger Authentifizierungstyp
     NotActive: Benutzerschema nicht aktiv
