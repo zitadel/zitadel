@@ -14,7 +14,7 @@ import (
 
 type CreateUserSchema struct {
 	Type                   string
-	Schema                 map[string]any
+	Schema                 json.RawMessage
 	PossibleAuthenticators []domain.AuthenticatorType
 }
 
@@ -36,7 +36,7 @@ func (s *CreateUserSchema) Valid() error {
 type UpdateUserSchema struct {
 	ID                     string
 	Type                   *string
-	Schema                 map[string]any
+	Schema                 json.RawMessage
 	PossibleAuthenticators []domain.AuthenticatorType
 }
 
@@ -167,13 +167,13 @@ func (c *Commands) DeleteUserSchema(ctx context.Context, id string) (*domain.Obj
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func validateUserSchema(userSchema map[string]any) error {
-	jsonSchema, err := json.Marshal(userSchema)
-	if err != nil {
-		return zerrors.ThrowInvalidArgument(err, "COMMA-SFerg", "Errors.UserSchema.Schema.Invalid")
-	}
+func validateUserSchema(userSchema json.RawMessage) error {
+	//jsonSchema, err := json.Marshal(userSchema)
+	//if err != nil {
+	//	return zerrors.ThrowInvalidArgument(err, "COMMA-SFerg", "Errors.UserSchema.Schema.Invalid")
+	//}
 
-	_, err = domain_schema.NewSchema(0, bytes.NewReader(jsonSchema))
+	_, err := domain_schema.NewSchema(0, bytes.NewReader(userSchema))
 	if err != nil {
 		return zerrors.ThrowInvalidArgument(err, "COMMA-W21tg", "Errors.UserSchema.Schema.Invalid")
 	}

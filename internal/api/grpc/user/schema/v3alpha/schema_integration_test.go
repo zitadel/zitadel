@@ -448,6 +448,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 							s := new(structpb.Struct)
 							err := s.UnmarshalJSON([]byte(`
 							{
+								"$schema": "urn:zitadel:schema:v1",
 								"type": "object",
 								"properties": {
 									"name": {
@@ -483,6 +484,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 							s := new(structpb.Struct)
 							err := s.UnmarshalJSON([]byte(`
 								{
+									"$schema": "urn:zitadel:schema:v1",
 									"type": "object",
 									"properties": {
 										"name": {
@@ -546,6 +548,25 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
+		},
+		{
+			name: "inactive, error",
+			prepare: func(request *schema.UpdateUserSchemaRequest) error {
+				schemaID := Tester.CreateUserSchema(CTX, t).GetId()
+				_, err := Client.DeactivateUserSchema(CTX, &schema.DeactivateUserSchemaRequest{
+					Id: schemaID,
+				})
+				require.NoError(t, err)
+				request.Id = schemaID
+				return nil
+			},
+			args: args{
+				ctx: CTX,
+				req: &schema.UpdateUserSchemaRequest{
+					Type: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
+				},
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {

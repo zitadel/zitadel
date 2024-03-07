@@ -1,8 +1,9 @@
 package command
 
 import (
+	"bytes"
 	"context"
-	"maps"
+	"encoding/json"
 
 	"golang.org/x/exp/slices"
 
@@ -15,7 +16,7 @@ type UserSchemaWriteModel struct {
 	eventstore.WriteModel
 
 	SchemaType             string
-	Schema                 map[string]any
+	Schema                 json.RawMessage
 	PossibleAuthenticators []domain.AuthenticatorType
 	State                  domain.UserSchemaState
 }
@@ -77,14 +78,14 @@ func (wm *UserSchemaWriteModel) NewUpdatedEvent(
 	ctx context.Context,
 	agg *eventstore.Aggregate,
 	schemaType *string,
-	userSchema map[string]any,
+	userSchema json.RawMessage,
 	possibleAuthenticators []domain.AuthenticatorType,
 ) *schema.UpdatedEvent {
 	changes := make([]schema.Changes, 0)
 	if schemaType != nil && wm.SchemaType != *schemaType {
 		changes = append(changes, schema.ChangeSchemaType(wm.SchemaType, *schemaType))
 	}
-	if len(userSchema) > 0 && !maps.Equal(wm.Schema, userSchema) {
+	if bytes.Compare(wm.Schema, userSchema) != 0 {
 		changes = append(changes, schema.ChangeSchema(userSchema))
 	}
 	if len(possibleAuthenticators) > 0 && slices.Compare(wm.PossibleAuthenticators, possibleAuthenticators) != 0 {

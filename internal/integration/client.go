@@ -16,6 +16,7 @@ import (
 	"golang.org/x/text/language"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
@@ -545,9 +546,18 @@ func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution
 }
 
 func (s *Tester) CreateUserSchema(ctx context.Context, t *testing.T) *schema.CreateUserSchemaResponse {
+	userSchema := new(structpb.Struct)
+	err := userSchema.UnmarshalJSON([]byte(`{
+		"$schema": "urn:zitadel:schema:v1",
+		"type": "object",
+		"properties": {}
+	}`))
+	require.NoError(t, err)
 	target, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &schema.CreateUserSchemaRequest{
-		Type:     fmt.Sprint(time.Now().UnixNano() + 1),
-		DataType: &schema.CreateUserSchemaRequest_Schema{},
+		Type: fmt.Sprint(time.Now().UnixNano() + 1),
+		DataType: &schema.CreateUserSchemaRequest_Schema{
+			Schema: userSchema,
+		},
 	})
 	require.NoError(t, err)
 	return target

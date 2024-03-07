@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 
 	"github.com/muhlemmer/gu"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	schema_domain "github.com/zitadel/zitadel/internal/domain/schema"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
@@ -74,7 +74,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
 					Type:   "type",
-					Schema: map[string]any{},
+					Schema: json.RawMessage(`{}`),
 					PossibleAuthenticators: []domain.AuthenticatorType{
 						domain.AuthenticatorTypeUnspecified,
 					},
@@ -93,7 +93,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 							context.Background(),
 							&schema.NewAggregate("id1", "instanceID").Aggregate,
 							"type",
-							map[string]any{},
+							json.RawMessage(`{}`),
 							[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
 						),
 					),
@@ -104,7 +104,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
 					Type:   "type",
-					Schema: map[string]any{},
+					Schema: json.RawMessage(`{}`),
 					PossibleAuthenticators: []domain.AuthenticatorType{
 						domain.AuthenticatorTypeUsername,
 					},
@@ -126,14 +126,15 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 							context.Background(),
 							&schema.NewAggregate("id1", "instanceID").Aggregate,
 							"type",
-							map[string]any{
+							json.RawMessage(`{
+								"$schema": "urn:zitadel:schema:v1",
 								"type": "object",
-								"properties": map[string]any{
-									"name": map[string]any{
-										"type": "string",
-									},
-								},
-							},
+								"properties": {
+									"name": {
+										"type": "string"
+									}
+								}
+							}`),
 							[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
 						),
 					),
@@ -144,14 +145,15 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
 					Type: "type",
-					Schema: map[string]any{
+					Schema: json.RawMessage(`{
+						"$schema": "urn:zitadel:schema:v1",
 						"type": "object",
-						"properties": map[string]any{
-							"name": map[string]any{
-								"type": "string",
-							},
-						},
-					},
+						"properties": {
+							"name": {
+								"type": "string"
+							}
+						}
+					}`),
 					PossibleAuthenticators: []domain.AuthenticatorType{
 						domain.AuthenticatorTypeUsername,
 					},
@@ -173,15 +175,16 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
 					Type: "type",
-					Schema: map[string]any{
+					Schema: json.RawMessage(`{
+						"$schema": "urn:zitadel:schema:v1",
 						"type": "object",
-						"properties": map[string]any{
-							"name": map[string]any{
-								"type":                           "string",
-								schema_domain.PermissionProperty: true,
-							},
-						},
-					},
+						"properties": {
+							"name": {
+								"type": "string",
+								"urn:zitadel:schema:permission": true
+							}
+						}
+					}`),
 					PossibleAuthenticators: []domain.AuthenticatorType{
 						domain.AuthenticatorTypeUsername,
 					},
@@ -200,17 +203,18 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 							context.Background(),
 							&schema.NewAggregate("id1", "instanceID").Aggregate,
 							"type",
-							map[string]any{
+							json.RawMessage(`{
+								"$schema": "urn:zitadel:schema:v1",
 								"type": "object",
-								"properties": map[string]any{
-									"name": map[string]any{
+								"properties": {
+									"name": {
 										"type": "string",
-										"urn:zitadel:schema:permission": map[string]any{
-											"self": "rw",
-										},
-									},
-								},
-							},
+										"urn:zitadel:schema:permission": {
+											"self": "rw"
+										}
+									}
+								}
+							}`),
 							[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
 						),
 					),
@@ -221,17 +225,18 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
 					Type: "type",
-					Schema: map[string]any{
+					Schema: json.RawMessage(`{
+						"$schema": "urn:zitadel:schema:v1",
 						"type": "object",
-						"properties": map[string]any{
-							"name": map[string]any{
+						"properties": {
+							"name": {
 								"type": "string",
-								schema_domain.PermissionProperty: map[string]any{
-									"self": "rw",
-								},
-							},
-						},
-					},
+								"urn:zitadel:schema:permission": {
+									"self": "rw"
+								}
+							}
+						}
+					}`),
 					PossibleAuthenticators: []domain.AuthenticatorType{
 						domain.AuthenticatorTypeUsername,
 					},
@@ -330,14 +335,14 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &UpdateUserSchema{
 					ID: "id1",
-					Schema: map[string]any{
-						"properties": map[string]any{
-							"name": map[string]any{
+					Schema: json.RawMessage(`{
+						"properties": {
+							"name": {
 								"type":     "string",
 								"required": true,
-							},
-						},
-					},
+							}
+						}
+					}`),
 				},
 			},
 			res{
@@ -353,7 +358,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &UpdateUserSchema{
 					ID:     "id1",
-					Schema: map[string]any{},
+					Schema: json.RawMessage(`{}`),
 					PossibleAuthenticators: []domain.AuthenticatorType{
 						domain.AuthenticatorTypeUnspecified,
 					},
@@ -375,7 +380,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 				userSchema: &UpdateUserSchema{
 					ID:     "id1",
 					Type:   gu.Ptr("type"),
-					Schema: map[string]any{},
+					Schema: json.RawMessage(`{}`),
 					PossibleAuthenticators: []domain.AuthenticatorType{
 						domain.AuthenticatorTypeUsername,
 					},
@@ -395,7 +400,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 								context.Background(),
 								&schema.NewAggregate("id1", "instanceID").Aggregate,
 								"type",
-								map[string]any{},
+								json.RawMessage(`{}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
 							),
 						),
@@ -407,7 +412,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 				userSchema: &UpdateUserSchema{
 					ID:     "id1",
 					Type:   gu.Ptr("type"),
-					Schema: map[string]any{},
+					Schema: json.RawMessage(`{}`),
 					PossibleAuthenticators: []domain.AuthenticatorType{
 						domain.AuthenticatorTypeUsername,
 					},
@@ -429,7 +434,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 								context.Background(),
 								&schema.NewAggregate("id1", "instanceID").Aggregate,
 								"type",
-								map[string]any{},
+								json.RawMessage(`{}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
 							),
 						),
@@ -447,8 +452,91 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &UpdateUserSchema{
 					ID:     "id1",
-					Schema: map[string]any{},
+					Schema: json.RawMessage(`{}`),
 					Type:   gu.Ptr("newType"),
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "instanceID",
+				},
+			},
+		},
+		{
+			"update schema",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schema.NewCreatedEvent(
+								context.Background(),
+								&schema.NewAggregate("id1", "instanceID").Aggregate,
+								"type",
+								json.RawMessage(`{
+									"$schema": "urn:zitadel:schema:v1",
+									"type": "object",
+									"properties": {
+										"name": {
+											"type": "string",
+											"urn:zitadel:schema:permission": {
+												"self": "rw"
+											}
+										}
+									}
+								}`),
+								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
+							),
+						),
+					),
+					expectPush(
+						schema.NewUpdatedEvent(
+							context.Background(),
+							&schema.NewAggregate("id1", "instanceID").Aggregate,
+							[]schema.Changes{schema.ChangeSchema(json.RawMessage(`{
+								"$schema": "urn:zitadel:schema:v1",
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string",
+										"urn:zitadel:schema:permission": {
+											"self": "rw"
+										}
+									},
+									"description": {
+										"type": "string",
+										"urn:zitadel:schema:permission": {
+											"self": "rw"
+										}
+									}
+								}
+							}`))},
+						),
+					),
+				),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				userSchema: &UpdateUserSchema{
+					ID: "id1",
+					Schema: json.RawMessage(`{
+						"$schema": "urn:zitadel:schema:v1",
+						"type": "object",
+						"properties": {
+							"name": {
+								"type": "string",
+								"urn:zitadel:schema:permission": {
+									"self": "rw"
+								}
+							},
+							"description": {
+								"type": "string",
+								"urn:zitadel:schema:permission": {
+									"self": "rw"
+								}
+							}
+						}
+					}`),
+					Type: nil,
 				},
 			},
 			res{
@@ -467,7 +555,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 								context.Background(),
 								&schema.NewAggregate("id1", "instanceID").Aggregate,
 								"type",
-								map[string]any{},
+								json.RawMessage(`{}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
 							),
 						),
@@ -488,7 +576,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &UpdateUserSchema{
 					ID:     "id1",
-					Schema: map[string]any{},
+					Schema: json.RawMessage(`{}`),
 					PossibleAuthenticators: []domain.AuthenticatorType{
 						domain.AuthenticatorTypeUsername,
 						domain.AuthenticatorTypePassword,
@@ -570,7 +658,7 @@ func TestCommands_DeactivateUserSchema(t *testing.T) {
 								context.Background(),
 								&schema.NewAggregate("id1", "instanceID").Aggregate,
 								"type",
-								map[string]any{},
+								json.RawMessage(`{}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
 							),
 						),
@@ -662,7 +750,7 @@ func TestCommands_ReactivateUserSchema(t *testing.T) {
 								context.Background(),
 								&schema.NewAggregate("id1", "instanceID").Aggregate,
 								"type",
-								map[string]any{},
+								json.RawMessage(`{}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
 							),
 						),
@@ -760,7 +848,7 @@ func TestCommands_DeleteUserSchema(t *testing.T) {
 								context.Background(),
 								&schema.NewAggregate("id1", "instanceID").Aggregate,
 								"type",
-								map[string]any{},
+								json.RawMessage(`{}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
 							),
 						),

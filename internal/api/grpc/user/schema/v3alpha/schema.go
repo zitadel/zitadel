@@ -84,18 +84,22 @@ func checkUserSchemaEnabled(ctx context.Context) error {
 }
 
 func createUserSchemaToCommand(req *schema.CreateUserSchemaRequest) *command.CreateUserSchema {
+	schema, err := req.GetSchema().MarshalJSON()
+	_ = err
 	return &command.CreateUserSchema{
 		Type:                   req.GetType(),
-		Schema:                 req.GetSchema().AsMap(),
+		Schema:                 schema,
 		PossibleAuthenticators: authenticatorsToDomain(req.GetPossibleAuthenticators()),
 	}
 }
 
 func updateUserSchemaToCommand(req *schema.UpdateUserSchemaRequest) *command.UpdateUserSchema {
+	schema, err := req.GetSchema().MarshalJSON()
+	_ = err
 	return &command.UpdateUserSchema{
 		ID:                     req.GetId(),
 		Type:                   req.Type,
-		Schema:                 req.GetSchema().AsMap(),
+		Schema:                 schema,
 		PossibleAuthenticators: authenticatorsToDomain(req.GetPossibleAuthenticators()),
 	}
 }

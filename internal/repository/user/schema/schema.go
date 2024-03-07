@@ -2,6 +2,7 @@ package schema
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -36,7 +37,7 @@ type CreatedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
 	SchemaType             string                     `json:"schemaType"`
-	Schema                 map[string]any             `json:"schema,omitempty"`
+	Schema                 json.RawMessage            `json:"schema,omitempty"`
 	PossibleAuthenticators []domain.AuthenticatorType `json:"possibleAuthenticators,omitempty"`
 }
 
@@ -57,7 +58,7 @@ func NewCreatedEvent(
 	aggregate *eventstore.Aggregate,
 
 	schemaType string,
-	schema map[string]any,
+	schema json.RawMessage,
 	possibleAuthenticators []domain.AuthenticatorType,
 ) *CreatedEvent {
 	return &CreatedEvent{
@@ -76,7 +77,7 @@ type UpdatedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
 	SchemaType             *string                    `json:"schemaType,omitempty"`
-	Schema                 map[string]any             `json:"schema,omitempty"`
+	Schema                 json.RawMessage            `json:"schema,omitempty"`
 	PossibleAuthenticators []domain.AuthenticatorType `json:"possibleAuthenticators,omitempty"`
 	oldSchemaType          string
 }
@@ -126,7 +127,7 @@ func ChangeSchemaType(oldSchemaType, schemaType string) func(event *UpdatedEvent
 	}
 }
 
-func ChangeSchema(schema map[string]any) func(event *UpdatedEvent) {
+func ChangeSchema(schema json.RawMessage) func(event *UpdatedEvent) {
 	return func(e *UpdatedEvent) {
 		e.Schema = schema
 	}
