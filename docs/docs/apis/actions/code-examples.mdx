@@ -1,0 +1,111 @@
+---
+title: Code examples
+---
+
+Actions are a powerful tool to extend ZITADEL and you might wonder what use cases actions can be used for.
+
+This page provides a non-exhaustive list of possibilities which is provided by [examples](https://github.com/zitadel/actions/tree/main/examples). If a use case is missing feel free to contribute an issue or pull request to the repository, thanks in advance 🤗.
+
+## Customize OIDC response
+
+Append claims returned on OIDC requests.
+
+### Triggers
+
+- Complement token
+  - [Pre Userinfo creation](./complement-token#pre-userinfo-creation-id_token--userinfo--introspection-endpoint)
+  - [Pre access token creation](./complement-token#pre-access-token-creation)
+
+import ClaimHardCoded from './examples/claim_hard_coded.mdx';
+
+<ClaimHardCoded codeCollapsed></ClaimHardCoded>
+
+import ClaimDynamicFromUserMd from './examples/claim_dynamic_from_user_md.mdx';
+
+<ClaimDynamicFromUserMd codeCollapsed />
+
+import ClaimDynamicFromOrgMd from './examples/claim_dynamic_from_org_md.mdx';
+
+<ClaimDynamicFromOrgMd codeCollapsed />
+
+import ClaimCustomRoleMapping from './examples/claim_custom_role_mapping.mdx';
+
+<ClaimCustomRoleMapping codeCollapsed />
+
+## Customize SAML response
+
+Append attributes returned on SAML requests.
+
+### Triggers
+
+- Complement SAMLResponse
+  - [Pre SAMLResponse creation](./customize-samlresponse#pre-samlresponse-creation)
+
+import AttributeCustomRoleMapping from './examples/attribute_custom_role_mapping.mdx';
+
+<AttributeCustomRoleMapping codeCollapsed />
+
+import AttributeDynamicFromOrgMd from './examples/attribute_dynamic_from_org_md.mdx';
+
+<AttributeDynamicFromOrgMd codeCollapsed />
+
+## Manipulate user
+
+You can automate manual tasks like setting default grants during user creation.
+
+import UserEmailVerified from './examples/user_email_verified.mdx';
+
+<UserEmailVerified codeCollapsed />
+
+import UserAddGrants from './examples/user_add_grants.mdx';
+
+<UserAddGrants codeCollapsed />
+
+import UserAddMetadata from './examples/user_add_metadata.mdx';
+
+<UserAddMetadata codeCollapsed />
+
+## Use provided fields of identity providers
+
+If you want to ensure that the data of a user are always update you can automatically update user fields during authentication and safe time of your customers and your team. 🤯
+
+### Trigger
+
+- External Authentication
+  - [Post Authentication](./external-authentication#post-authentication)
+
+import IdpOkta from './examples/idp_okta.mdx';
+
+<IdpOkta codeCollapsed />
+
+import IdpGitlab from './examples/idp_gitlab.mdx';
+
+<IdpGitlab codeCollapsed />
+
+import IdpGithub from './examples/idp_github.mdx';
+
+<IdpGithub codeCollapsed />
+
+import IdpGenericOidc from './examples/idp_generic_oidc.mdx';
+
+<IdpGenericOidc codeCollapsed />
+
+import IdpGenericSaml from './examples/idp_generic_saml.mdx';
+
+<IdpGenericSaml codeCollapsed />
+
+## Context aware execution
+
+Based on the context the execution path of an action can change. ZITADEL allows complex execution paths of course. 😎
+
+import AuthRequest from './examples/auth_request.mdx';
+
+<AuthRequest codeCollapsed />
+
+import AuthError from './examples/auth_error.mdx';
+
+<AuthError codeCollapsed />
+
+import ThrowError from './examples/throw_error.mdx';
+
+<ThrowError codeCollapsed />
