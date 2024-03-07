@@ -26,7 +26,7 @@ Do not use it for production yet. To test it out, you need to enable the `UserSc
 Let's create the first very simple schema `user`, which defines a `givenName` and `familyName` for a user and allows them to
 authenticate with username and password.
 
-We can do so by calling the [user schema endpoint](/docs/apis/resources/user_schema_service_v3/user-schema-service-create-user-schema)
+We can do so by calling the [create user schema endpoint](/docs/apis/resources/user_schema_service_v3/user-schema-service-create-user-schema)
 with the following data. Make sure to provide an access_token with an IAM_OWNER role.
 
 ```bash
@@ -87,6 +87,9 @@ to see the `profileUri` value, but cannot update it.
 
 Maybe we also have some `customerId`, which the user should not even know about. We therefore can simply omit the `self` permission
 and only set `owner` to `rw`, so admins are able to read and change the id if needed.
+
+Finally, we call the [update user schema endpoint](/docs/apis/resources/user_schema_service_v3/user-schema-service-update-user-schema)
+with the following data. Be sure to provide the id of the previously created schema.
 
 ```bash
 curl -X PUT "https://$CUSTOM-DOMAIN/v3alpha/user_schemas/$SCHEMA_ID" \
