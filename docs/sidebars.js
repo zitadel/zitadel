@@ -165,6 +165,7 @@ module.exports = {
           items: [
             "guides/manage/user/reg-create-user",
             "guides/manage/customize/user-metadata",
+            "guides/manage/customize/user-schema",
           ],
         },
       ],
