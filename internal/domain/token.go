@@ -20,6 +20,8 @@ type Token struct {
 	Expiration        time.Time
 	Scopes            []string
 	PreferredLanguage string
+	Reason            TokenReason
+	Actor             *TokenActor
 }
 
 func AddAudScopeToAudience(ctx context.Context, audience, scopes []string) []string {
@@ -43,4 +45,24 @@ func addProjectID(audience []string, projectID string) []string {
 		}
 	}
 	return append(audience, projectID)
+}
+
+//go:generate enumer -type TokenReason -transform snake -trimprefix TokenReason -json
+type TokenReason int
+
+const (
+	TokenReasonUnspecified TokenReason = iota
+	TokenReasonAuthRequest
+	TokenReasonRefresh
+	TokenReasonJWTProfile
+	TokenReasonClientCredentials
+	TokenReasonImpersonation
+	TokenReasonDelegation
+)
+
+type TokenActor struct {
+	Actor         *TokenActor `json:"actor,omitempty"`
+	UserID        string      `json:"user_id,omitempty"`
+	Issuer        string      `json:"issuer,omitempty"`
+	ResourceOwner string      `json:"resource_owner,omitempty"`
 }

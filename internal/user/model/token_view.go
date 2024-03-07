@@ -22,6 +22,8 @@ type TokenView struct {
 	PreferredLanguage string
 	RefreshTokenID    string
 	IsPAT             bool
+	Reason            domain.TokenReason
+	Actor             *domain.TokenActor
 }
 
 type TokenSearchRequest struct {

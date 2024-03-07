@@ -209,14 +209,16 @@ func UserRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 type UserTokenAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	TokenID           string    `json:"tokenId"`
-	ApplicationID     string    `json:"applicationId"`
-	UserAgentID       string    `json:"userAgentId"`
-	RefreshTokenID    string    `json:"refreshTokenID,omitempty"`
-	Audience          []string  `json:"audience"`
-	Scopes            []string  `json:"scopes"`
-	Expiration        time.Time `json:"expiration"`
-	PreferredLanguage string    `json:"preferredLanguage"`
+	TokenID           string             `json:"tokenId,omitempty"`
+	ApplicationID     string             `json:"applicationId,omitempty"`
+	UserAgentID       string             `json:"userAgentId,omitempty"`
+	RefreshTokenID    string             `json:"refreshTokenID,omitempty"`
+	Audience          []string           `json:"audience,omitempty"`
+	Scopes            []string           `json:"scopes,omitempty"`
+	Expiration        time.Time          `json:"expiration,omitempty"`
+	PreferredLanguage string             `json:"preferredLanguage,omitempty"`
+	Reason            domain.TokenReason `json:"reason,omitempty"`
+	Actor             *domain.TokenActor `json:"actor,omitempty"`
 }
 
 func (e *UserTokenAddedEvent) Payload() interface{} {
@@ -238,6 +240,8 @@ func NewUserTokenAddedEvent(
 	audience,
 	scopes []string,
 	expiration time.Time,
+	reason domain.TokenReason,
+	actor *domain.TokenActor,
 ) *UserTokenAddedEvent {
 	return &UserTokenAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -253,6 +257,8 @@ func NewUserTokenAddedEvent(
 		Scopes:            scopes,
 		Expiration:        expiration,
 		PreferredLanguage: preferredLanguage,
+		Reason:            reason,
+		Actor:             actor,
 	}
 }
 

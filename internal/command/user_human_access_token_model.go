@@ -19,6 +19,8 @@ type UserAccessTokenWriteModel struct {
 	Scopes            []string
 	Expiration        time.Time
 	PreferredLanguage string
+	Reason            domain.TokenReason
+	Actor             *domain.TokenActor
 
 	UserState domain.UserState
 }
@@ -71,6 +73,8 @@ func (wm *UserAccessTokenWriteModel) Reduce() error {
 			wm.Expiration = e.Expiration
 			wm.PreferredLanguage = e.PreferredLanguage
 			wm.UserState = domain.UserStateActive
+			wm.Reason = e.Reason
+			wm.Actor = e.Actor
 			if e.Expiration.Before(time.Now()) {
 				wm.UserState = domain.UserStateDeleted
 			}

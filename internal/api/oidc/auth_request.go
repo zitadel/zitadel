@@ -207,27 +207,18 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 		err = oidcError(err)
 		span.EndWithError(err)
 	}()
-
-	var userAgentID, applicationID, userOrgID string
-	switch authReq := req.(type) {
-	case *AuthRequest:
-		userAgentID = authReq.AgentID
-		applicationID = authReq.ApplicationID
-		userOrgID = authReq.UserOrgID
-	case *AuthRequestV2:
-		// trigger activity log for authentication for user
+	if authReq, ok := req.(*AuthRequestV2); ok {
 		activity.Trigger(ctx, "", authReq.CurrentAuthRequest.UserID, activity.OIDCAccessToken)
 		return o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.GetID())
-	case op.IDTokenRequest:
-		applicationID = authReq.GetClientID()
 	}
 
+	userAgentID, applicationID, userOrgID, _, _, reason := getInfoFromRequest(req)
 	accessTokenLifetime, _, _, _, err := o.getOIDCSettings(ctx)
 	if err != nil {
 		return "", time.Time{}, err
 	}
 
-	resp, err := o.command.AddUserToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), accessTokenLifetime) //PLANNED: lifetime from client
+	resp, err := o.command.AddUserToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), accessTokenLifetime, reason, nil) //PLANNED: lifetime from client
 	if err != nil {
 		return "", time.Time{}, err
 	}
@@ -256,7 +247,7 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 		return o.command.ExchangeOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.OIDCSessionWriteModel.AggregateID, refreshToken, tokenReq.RequestedScopes)
 	}
 
-	userAgentID, applicationID, userOrgID, authTime, authMethodsReferences := getInfoFromRequest(req)
+	userAgentID, applicationID, userOrgID, authTime, authMethodsReferences, reason := getInfoFromRequest(req)
 	scopes, err := o.assertProjectRoleScopes(ctx, applicationID, req.GetScopes())
 	if err != nil {
 		return "", "", time.Time{}, zerrors.ThrowPreconditionFailed(err, "OIDC-Df2fq", "Errors.Internal")
@@ -272,7 +263,7 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 
 	resp, token, err := o.command.AddAccessAndRefreshToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(),
 		refreshToken, req.GetAudience(), scopes, authMethodsReferences, accessTokenLifetime,
-		refreshTokenIdleExpiration, refreshTokenExpiration, authTime) //PLANNED: lifetime from client
+		refreshTokenIdleExpiration, refreshTokenExpiration, authTime, reason, nil) //PLANNED: lifetime from client
 	if err != nil {
 		if zerrors.IsErrorInvalidArgument(err) {
 			err = oidc.ErrInvalidGrant().WithParent(err)
@@ -285,16 +276,20 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 	return resp.TokenID, token, resp.Expiration, nil
 }
 
-func getInfoFromRequest(req op.TokenRequest) (string, string, string, time.Time, []string) {
+func getInfoFromRequest(req op.TokenRequest) (agentID string, clientID string, userOrgID string, authTime time.Time, amr []string, reason domain.TokenReason) {
 	switch r := req.(type) {
 	case *AuthRequest:
-		return r.AgentID, r.ApplicationID, r.UserOrgID, r.AuthTime, r.GetAMR()
+		return r.AgentID, r.ApplicationID, r.UserOrgID, r.AuthTime, r.GetAMR(), domain.TokenReasonAuthRequest
 	case *RefreshTokenRequest:
-		return r.UserAgentID, r.ClientID, "", r.AuthTime, r.AuthMethodsReferences
+		return r.UserAgentID, r.ClientID, "", r.AuthTime, r.AuthMethodsReferences, domain.TokenReasonRefresh
 	case op.IDTokenRequest:
-		return "", r.GetClientID(), "", r.GetAuthTime(), r.GetAMR()
+		return "", r.GetClientID(), "", r.GetAuthTime(), r.GetAMR(), domain.TokenReasonAuthRequest
+	case *oidc.JWTTokenRequest:
+		return "", "", "", r.GetAuthTime(), nil, domain.TokenReasonJWTProfile
+	case *clientCredentialsRequest:
+		return "", "", "", time.Time{}, nil, domain.TokenReasonClientCredentials
 	default:
-		return "", "", "", time.Time{}, nil
+		return "", "", "", time.Time{}, nil, domain.TokenReasonAuthRequest
 	}
 }
 

@@ -24,9 +24,11 @@ func (c *Commands) AddAccessAndRefreshToken(
 	refreshIdleExpiration,
 	refreshExpiration time.Duration,
 	authTime time.Time,
+	reason domain.TokenReason,
+	actor *domain.TokenActor,
 ) (accessToken *domain.Token, newRefreshToken string, err error) {
 	if refreshToken == "" {
-		return c.AddNewRefreshTokenAndAccessToken(ctx, userID, orgID, agentID, clientID, audience, scopes, authMethodsReferences, refreshExpiration, accessLifetime, refreshIdleExpiration, authTime)
+		return c.AddNewRefreshTokenAndAccessToken(ctx, userID, orgID, agentID, clientID, audience, scopes, authMethodsReferences, refreshExpiration, accessLifetime, refreshIdleExpiration, authTime, reason, actor)
 	}
 	return c.RenewRefreshTokenAndAccessToken(ctx, userID, orgID, refreshToken, agentID, clientID, audience, scopes, refreshIdleExpiration, accessLifetime)
 }
@@ -44,6 +46,8 @@ func (c *Commands) AddNewRefreshTokenAndAccessToken(
 	accessLifetime,
 	refreshIdleExpiration time.Duration,
 	authTime time.Time,
+	reason domain.TokenReason,
+	actor *domain.TokenActor,
 ) (accessToken *domain.Token, newRefreshToken string, err error) {
 	if userID == "" || clientID == "" {
 		return nil, "", zerrors.ThrowInvalidArgument(nil, "COMMAND-adg4r", "Errors.IDMissing")
@@ -53,7 +57,7 @@ func (c *Commands) AddNewRefreshTokenAndAccessToken(
 	if err != nil {
 		return nil, "", err
 	}
-	accessTokenEvent, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, refreshTokenID, audience, scopes, accessLifetime)
+	accessTokenEvent, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, refreshTokenID, audience, scopes, accessLifetime, reason, actor)
 	if err != nil {
 		return nil, "", err
 	}
@@ -85,7 +89,7 @@ func (c *Commands) RenewRefreshTokenAndAccessToken(
 		return nil, "", err
 	}
 	userWriteModel := NewUserWriteModel(userID, orgID)
-	accessTokenEvent, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, refreshTokenID, audience, scopes, accessLifetime)
+	accessTokenEvent, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, refreshTokenID, audience, scopes, accessLifetime, domain.TokenReasonRefresh, nil)
 	if err != nil {
 		return nil, "", err
 	}

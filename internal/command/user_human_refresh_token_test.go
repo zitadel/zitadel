@@ -40,6 +40,8 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 		authTime              time.Time
 		refreshIdleExpiration time.Duration
 		refreshExpiration     time.Duration
+		reason                domain.TokenReason
+		actor                 *domain.TokenActor
 	}
 	type res struct {
 		token        *domain.Token
@@ -292,7 +294,7 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
 			got, gotRefresh, err := c.AddAccessAndRefreshToken(tt.args.ctx, tt.args.orgID, tt.args.agentID, tt.args.clientID, tt.args.userID, tt.args.refreshToken,
-				tt.args.audience, tt.args.scopes, tt.args.authMethodsReferences, tt.args.lifetime, tt.args.refreshIdleExpiration, tt.args.refreshExpiration, tt.args.authTime)
+				tt.args.audience, tt.args.scopes, tt.args.authMethodsReferences, tt.args.lifetime, tt.args.refreshIdleExpiration, tt.args.refreshExpiration, tt.args.authTime, tt.args.reason, tt.args.actor)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

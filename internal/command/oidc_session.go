@@ -11,6 +11,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
@@ -35,7 +36,7 @@ func (c *Commands) AddOIDCSessionAccessToken(ctx context.Context, authRequestID 
 		return "", time.Time{}, err
 	}
 	cmd.AddSession(ctx)
-	if err = cmd.AddAccessToken(ctx, cmd.authRequestWriteModel.Scope); err != nil {
+	if err = cmd.AddAccessToken(ctx, cmd.authRequestWriteModel.Scope, domain.TokenReasonAuthRequest, nil); err != nil {
 		return "", time.Time{}, err
 	}
 	cmd.SetAuthRequestSuccessful(ctx)
@@ -52,7 +53,7 @@ func (c *Commands) AddOIDCSessionRefreshAndAccessToken(ctx context.Context, auth
 		return "", "", time.Time{}, err
 	}
 	cmd.AddSession(ctx)
-	if err = cmd.AddAccessToken(ctx, cmd.authRequestWriteModel.Scope); err != nil {
+	if err = cmd.AddAccessToken(ctx, cmd.authRequestWriteModel.Scope, domain.TokenReasonAuthRequest, nil); err != nil {
 		return "", "", time.Time{}, err
 	}
 	if err = cmd.AddRefreshToken(ctx); err != nil {
@@ -69,7 +70,7 @@ func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context,
 	if err != nil {
 		return "", "", time.Time{}, err
 	}
-	if err = cmd.AddAccessToken(ctx, scope); err != nil {
+	if err = cmd.AddAccessToken(ctx, scope, domain.TokenReasonRefresh, nil); err != nil {
 		return "", "", time.Time{}, err
 	}
 	if err = cmd.RenewRefreshToken(ctx); err != nil {
@@ -290,13 +291,13 @@ func (c *OIDCSessionEvents) SetAuthRequestSuccessful(ctx context.Context) {
 	c.events = append(c.events, authrequest.NewSucceededEvent(ctx, c.authRequestWriteModel.aggregate))
 }
 
-func (c *OIDCSessionEvents) AddAccessToken(ctx context.Context, scope []string) error {
+func (c *OIDCSessionEvents) AddAccessToken(ctx context.Context, scope []string, reason domain.TokenReason, actor *domain.TokenActor) error {
 	accessTokenID, err := c.idGenerator.Next()
 	if err != nil {
 		return err
 	}
 	c.accessTokenID = AccessTokenPrefix + accessTokenID
-	c.events = append(c.events, oidcsession.NewAccessTokenAddedEvent(ctx, c.oidcSessionWriteModel.aggregate, c.accessTokenID, scope, c.accessTokenLifetime))
+	c.events = append(c.events, oidcsession.NewAccessTokenAddedEvent(ctx, c.oidcSessionWriteModel.aggregate, c.accessTokenID, scope, c.accessTokenLifetime, reason, actor))
 	return nil
 }
 
