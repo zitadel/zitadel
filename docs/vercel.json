@@ -32,10 +32,10 @@
         { "source": "/docs/guides/integrate/private-key-jwt", "destination": "/docs/guides/integrate/service-users/private-key-jwt", "permanent": true },
         { "source": "/docs/guides/integrate/client-credentials", "destination": "/docs/guides/integrate/service-users/client-credentials", "permanent": true },
         { "source": "/docs/guides/integrate/pat", "destination": "/docs/guides/integrate/service-users/private-access-token", "permanent": true },
-        { "source": "/docs/guides/integrate/access-zitadel-apis", "destination": "", "permanent": true },
-        { "source": "/docs/guides/integrate/access-zitadel-system-api", "destination": "", "permanent": true },
+        { "source": "/docs/guides/integrate/access-zitadel-apis", "destination": "/docs/guides/integrate/zitadel-apis/access-zitadel-apis", "permanent": true },
+        { "source": "/docs/guides/integrate/access-zitadel-system-api", "destination": "/docs/guides/integrate/zitadel-apis/access-zitadel-system-api", "permanent": true },
         { "source": "/docs/guides/integrate/event-api", "destination": "", "permanent": true },
-        { "source": "/docs/examples/call-zitadel-api/go", "destination": "/docs/guides/integrate/zitadel-api/example-zitadel-api-with-go", "permanent": true },
-        { "source": "/docs/examples/call-zitadel-api/dot-net", "destination": "/docs/guides/integrate/zitadel-api/example-zitadel-api-with-dot-net", "permanent": true }
+        { "source": "/docs/examples/call-zitadel-api/go", "destination": "/docs/guides/integrate/zitadel-apis/example-zitadel-api-with-go", "permanent": true },
+        { "source": "/docs/examples/call-zitadel-api/dot-net", "destination": "/docs/guides/integrate/zitadel-apis/example-zitadel-api-with-dot-net", "permanent": true }
     ]
 }

@@ -1,5 +1,5 @@
 
-## Accessing ZITADEL's Management API
+## Accessing ZITADEL APIs
 
 In this step we will authenticate a service user and receive an access_token to use against the ZITADEL API.
 

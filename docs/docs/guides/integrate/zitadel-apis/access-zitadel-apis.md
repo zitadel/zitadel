@@ -2,9 +2,46 @@
 title: Access ZITADEL APIs
 ---
 
-:::note
-This guide focuses on the Admin, Auth and Management APIs. To access the ZITADEL System API, please checkout [this guide](./access-zitadel-system-api).
+This guide explains what ZITADEL APIs are and how to access ZITADEL APIs using a service user to manage all types of resources and settings.
+
+## What are the ZITADEL APIs
+
+ZITADEL exposes a variety of APIs that allow you to interact with its functionalities programmatically.
+These APIs are offered through different protocols including gRPC and REST.
+Additionally, ZITADEL provides [SDKs for popular languages](../../../sdk-examples/) and frameworks to simplify integration.
+
+Here's a breakdown of some key points about ZITADEL APIs:
+
+* **Auth API:** Used by authenticated users for tasks related to their accounts.
+* **Management API:** Used by organization managers for administrative tasks.
+* **Admin API:** Used for administrative functions on the ZITADEL instance itself (may require separate user setup).  
+* **System API:** For ZITADEL self-hosted deployments only, providing superordinate control (requires specific configuration).
+
+:::note Migration
+ZITADEL is transitioning from a use-case based API structure to a resource-based one, aiming to simplify API usage.
 :::
+
+For further details and in-depth exploration, you can refer to the [Zitadel API documentation](/docs/apis/introduction).
+
+## How to access ZITADEL APIs
+
+Accessing ZITADEL APIs, except for the Auth API and the System API, requires these basic steps:
+
+1. **Create a service user**: A service user is a special type of account used to grant programmatic access to ZITADEL's functionalities. Unlike regular users who log in with a username and password, [service users rely on a more secure mechanism involving digital keys and tokens](../service-users/authenticate-service-users).
+2. **Give permission to access ZITADEL APIs**: Assign a Manager role to the service  user, giving it permission to make changes to certain resources in ZITADEL.
+3. **Authenticate the service user**: Like human users, service users must authenticate and request a OAuth token with the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to access ZITADEL APIs.
+4. **Access ZITADEL APIs with the token**: The OAuth token must be included in the Authorization Header of calls to ZITADEL APIs.
+
+### Auth API
+
+The Auth API can be used for all operations on the requesting user, meaning the user id in the sub claim of the used token.
+Using this API doesn't require a service user to be authenticated.
+Instead you call the Auth API with the token of the user.
+
+### System API
+
+With the System API developers can manage different ZITADEL instances.
+The System API can't be accessed with service users and requires a special configuration and authentication that can be found in our [guide to access ZITADEL's System API](./access-zitadel-system-api).
 
 ## ZITADEL Managers
 
@@ -79,3 +116,9 @@ With this token you are allowed to access the [ZITADEL APIs](/apis/introduction)
 Where to go from here:
 
 - [ZITADEL API Documentation](/apis/introduction)
+
+## Notes
+
+- Example Go
+- Example DotNet
+
