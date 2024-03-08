@@ -134,7 +134,7 @@ module.exports = {
           },
           items: [
             "guides/manage/console/overview",
-            "guides/manage/console/instance-settings",
+            "guides/manage/console/default-settings",
             "guides/manage/console/organizations",
             "guides/manage/console/projects",
             "guides/manage/console/roles",
