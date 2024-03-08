@@ -87,18 +87,25 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 		}
 	}
 
-	var resp oidc.TokenExchangeResponse
+	resp := &oidc.TokenExchangeResponse{
+		Scopes: scopes,
+	}
 
 	switch tokenType {
 	case oidc.AccessTokenType:
 		resp.AccessToken, resp.RefreshToken, err = s.createExchangeAccessToken(ctx, zClient, resourceOwner, userID, audience, scopes, authMethods, authTime, reason, actor)
+		resp.TokenType = oidc.BearerToken
+		resp.IssuedTokenType = oidc.AccessTokenType
+
 	case oidc.JWTTokenType:
 		resp.AccessToken, resp.RefreshToken, err = s.createExchangeJWT(ctx, signer, zClient, resourceOwner, userID, audience, scopes, authMethods, authTime, reason, actor, userInfo.Claims)
+		resp.TokenType = oidc.BearerToken
+		resp.IssuedTokenType = oidc.JWTTokenType
 	}
 	if err != nil {
 		return nil, err
 	}
-	return &resp, nil
+	return resp, nil
 }
 
 func (s *Server) createExchangeAccessToken(ctx context.Context, client *Client, resourceOwner, userID string, audience, scopes []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (accessToken string, refreshToken string, err error) {
@@ -144,7 +151,7 @@ func (s *Server) createAccessTokenCommands(ctx context.Context, client *Client, 
 		settings.AccessTokenLifetime,
 		authTime, reason, actor,
 	)
-	return tokenInfo, "", nil
+	return tokenInfo, "", err
 }
 
 func (s *Server) getSigner(ctx context.Context) (jose.Signer, error) {
