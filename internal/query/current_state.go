@@ -21,7 +21,7 @@ import (
 )
 
 type Stateful interface {
-	Set(*State)
+	SetState(*State)
 }
 
 type State struct {
@@ -32,15 +32,6 @@ type State struct {
 	AggregateID    string
 	AggregateType  eventstore.AggregateType
 	Sequence       uint64
-}
-
-func (s *State) Set(state *State) {
-	s.LastRun = state.LastRun
-	s.Position = state.Position
-	s.EventCreatedAt = state.EventCreatedAt
-	s.AggregateID = state.AggregateID
-	s.AggregateType = state.AggregateType
-	s.Sequence = state.Sequence
 }
 
 type CurrentStates struct {

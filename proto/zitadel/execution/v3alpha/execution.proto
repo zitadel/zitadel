@@ -13,7 +13,21 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha;execution";
 
-message SetConditions{
+message Execution {
+  string execution_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"request.zitadel.session.v2beta.SessionService\"";
+    }
+  ];
+  // Details provide some base information (such as the last change date) of the target.
+  zitadel.object.v2beta.Details details = 2;
+  // Targets which are called in the defined conditions.
+  repeated string targets = 3;
+  // Included executions with the same condition-types.
+  repeated string includes = 4;
+}
+
+message SetConditions {
   // Condition-types under which conditions the execution should happen, only one possible.
   oneof condition_type {
     option (validate.required) = true;
@@ -29,7 +43,7 @@ message SetConditions{
   }
 }
 
-message SetRequestExecution{
+message SetRequestExecution {
   // Condition for the request execution, only one possible.
   oneof condition{
     // GRPC-method as condition.
@@ -55,7 +69,7 @@ message SetRequestExecution{
   }
 }
 
-message SetResponseExecution{
+message SetResponseExecution {
   // Condition for the response execution, only one possible.
   oneof condition{
     // GRPC-method as condition.

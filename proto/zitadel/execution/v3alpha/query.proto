@@ -8,12 +8,61 @@ import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 import "zitadel/object/v2beta/object.proto";
+import "zitadel/execution/v3alpha/execution.proto";
+
+message SearchQuery {
+  oneof query {
+    option (validate.required) = true;
+
+    ConditionQuery condition_query = 1;
+    InConditionsQuery in_conditions_query = 2;
+    ExecutionTypeQuery execution_type_query = 3;
+    TargetQuery target_query = 4;
+    IncludeQuery include_query = 5;
+  }
+}
+
+message ConditionQuery {
+  // Defines the condition to query for.
+  SetConditions condition = 1;
+}
+
+message InConditionsQuery {
+  // Defines the conditions to query for.
+  repeated SetConditions conditions = 1;
+}
+
+message ExecutionTypeQuery {
+  // Defines the type to query for.
+  ExecutionType execution_type = 1;
+}
+
+message TargetQuery {
+  // Defines the id to query for.
+  string target_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the id of the targets to include"
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
+
+message IncludeQuery {
+  // Defines the include to query for.
+  string include = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the id of the include"
+      example: "\"request.zitadel.session.v2beta.SessionService\"";
+    }
+  ];
+}
 
 message TargetSearchQuery {
   oneof query {
     option (validate.required) = true;
 
     TargetNameQuery target_name_query = 1;
+    InTargetIDsQuery in_target_ids_query = 2;
   }
 }
 
@@ -33,6 +82,24 @@ message TargetNameQuery {
       description: "defines which text equality method is used";
     }
   ];
+}
+
+message InTargetIDsQuery {
+  // Defines the ids to query for.
+  repeated string target_ids = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the ids of the targets to include"
+      example: "[\"69629023906488334\",\"69622366012355662\"]";
+    }
+  ];
+}
+
+enum ExecutionType {
+  EXECUTION_TYPE_UNSPECIFIED = 0;
+  EXECUTION_TYPE_REQUEST = 1;
+  EXECUTION_TYPE_RESPONSE = 2;
+  EXECUTION_TYPE_EVENT = 3;
+  EXECUTION_TYPE_FUNCTION = 4;
 }
 
 enum TargetFieldName {

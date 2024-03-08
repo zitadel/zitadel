@@ -516,7 +516,7 @@ func (s *Tester) CreateProjectMembership(t *testing.T, ctx context.Context, proj
 }
 
 func (s *Tester) CreateTarget(ctx context.Context, t *testing.T) *execution.CreateTargetResponse {
-	target, err := s.Client.ExecutionV3.CreateTarget(ctx, &execution.CreateTargetRequest{
+	req := &execution.CreateTargetRequest{
 		Name: fmt.Sprint(time.Now().UnixNano() + 1),
 		TargetType: &execution.CreateTargetRequest_RestWebhook{
 			RestWebhook: &execution.SetRESTWebhook{
@@ -524,18 +524,42 @@ func (s *Tester) CreateTarget(ctx context.Context, t *testing.T) *execution.Crea
 			},
 		},
 		Timeout: durationpb.New(10 * time.Second),
-		ExecutionType: &execution.CreateTargetRequest_InterruptOnError{
-			InterruptOnError: true,
-		},
-	})
+	}
+	target, err := s.Client.ExecutionV3.CreateTarget(ctx, req)
 	require.NoError(t, err)
 	return target
 }
 
-func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution.SetConditions, targets []string) *execution.SetExecutionResponse {
+func (s *Tester) CreateTargetWithNameAndType(ctx context.Context, t *testing.T, name string, async bool, interrupt bool) *execution.CreateTargetResponse {
+	req := &execution.CreateTargetRequest{
+		Name: name,
+		TargetType: &execution.CreateTargetRequest_RestWebhook{
+			RestWebhook: &execution.SetRESTWebhook{
+				Url: "https://example.com",
+			},
+		},
+		Timeout: durationpb.New(10 * time.Second),
+	}
+	if async {
+		req.ExecutionType = &execution.CreateTargetRequest_IsAsync{
+			IsAsync: true,
+		}
+	}
+	if interrupt {
+		req.ExecutionType = &execution.CreateTargetRequest_InterruptOnError{
+			InterruptOnError: true,
+		}
+	}
+	target, err := s.Client.ExecutionV3.CreateTarget(ctx, req)
+	require.NoError(t, err)
+	return target
+}
+
+func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution.SetConditions, targets []string, includes []string) *execution.SetExecutionResponse {
 	target, err := s.Client.ExecutionV3.SetExecution(ctx, &execution.SetExecutionRequest{
 		Condition: cond,
 		Targets:   targets,
+		Includes:  includes,
 	})
 	require.NoError(t, err)
 	return target

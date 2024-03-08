@@ -4,13 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -59,12 +59,13 @@ type Executions struct {
 	Executions []*Execution
 }
 
+func (e *Executions) SetState(s *State) {
+	e.State = s
+}
+
 type Execution struct {
-	ID            string
-	CreationDate  time.Time
-	ChangeDate    time.Time
-	ResourceOwner string
-	Sequence      uint64
+	ID string
+	*domain.ObjectDetails
 
 	Targets  database.TextArray[string]
 	Includes database.TextArray[string]
@@ -99,18 +100,29 @@ func (q *Queries) GetExecutionByID(ctx context.Context, id string, resourceOwner
 	return genericGetByID[*Execution](q, ctx, prepareExecutionQuery, where(eq))
 }
 
-func NewExecutionResourceOwnerQuery(id string) (SearchQuery, error) {
-	return NewTextQuery(ExecutionColumnResourceOwner, id, TextEquals)
-}
-
 func NewExecutionIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(ExecutionColumnID, id, TextEquals)
+}
+
+func NewExecutionInIDsSearchQuery(values []string) (SearchQuery, error) {
+	return NewInTextQuery(ExecutionColumnID, values)
+}
+
+func NewExecutionTypeSearchQuery(t domain.ExecutionType) (SearchQuery, error) {
+	return NewTextQuery(ExecutionColumnID, t.String(), TextStartsWith)
+}
+
+func NewExecutionTargetSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(ExecutionColumnTargets, value, TextListContains)
+}
+
+func NewExecutionIncludeSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(ExecutionColumnIncludes, value, TextListContains)
 }
 
 func prepareExecutionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*Executions, error)) {
 	return sq.Select(
 			ExecutionColumnID.identifier(),
-			ExecutionColumnCreationDate.identifier(),
 			ExecutionColumnChangeDate.identifier(),
 			ExecutionColumnResourceOwner.identifier(),
 			ExecutionColumnSequence.identifier(),
@@ -124,10 +136,10 @@ func prepareExecutionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			var count uint64
 			for rows.Next() {
 				execution := new(Execution)
+				execution.ObjectDetails = new(domain.ObjectDetails)
 				err := rows.Scan(
 					&execution.ID,
-					&execution.CreationDate,
-					&execution.ChangeDate,
+					&execution.EventDate,
 					&execution.ResourceOwner,
 					&execution.Sequence,
 					&execution.Targets,
@@ -156,7 +168,6 @@ func prepareExecutionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 func prepareExecutionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(row *sql.Row) (*Execution, error)) {
 	return sq.Select(
 			ExecutionColumnID.identifier(),
-			ExecutionColumnCreationDate.identifier(),
 			ExecutionColumnChangeDate.identifier(),
 			ExecutionColumnResourceOwner.identifier(),
 			ExecutionColumnSequence.identifier(),
@@ -166,10 +177,10 @@ func prepareExecutionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Execution, error) {
 			execution := new(Execution)
+			execution.ObjectDetails = new(domain.ObjectDetails)
 			err := row.Scan(
 				&execution.ID,
-				&execution.CreationDate,
-				&execution.ChangeDate,
+				&execution.EventDate,
 				&execution.ResourceOwner,
 				&execution.Sequence,
 				&execution.Targets,

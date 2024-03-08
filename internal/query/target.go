@@ -8,7 +8,6 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -75,12 +74,13 @@ type Targets struct {
 	Targets []*Target
 }
 
+func (t *Targets) SetState(s *State) {
+	t.State = s
+}
+
 type Target struct {
-	ID            string
-	CreationDate  time.Time
-	ChangeDate    time.Time
-	ResourceOwner string
-	Sequence      uint64
+	ID string
+	*domain.ObjectDetails
 
 	Name             string
 	TargetType       domain.TargetType
@@ -110,9 +110,10 @@ func (q *TargetSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (q *Queries) SearchTargets(ctx context.Context, queries *TargetSearchQueries) (targets *Targets, err error) {
+func (q *Queries) SearchTargets(ctx context.Context, queries *TargetSearchQueries, resourceOwner string) (targets *Targets, err error) {
 	eq := sq.Eq{
-		TargetColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+		TargetColumnInstanceID.identifier():    resourceOwner,
+		TargetColumnResourceOwner.identifier(): resourceOwner,
 	}
 	return genericSearch[*Targets](q, ctx, targetTable, prepareTargetsQuery, whereWrapper(queries.toQuery, eq))
 }
@@ -130,14 +131,13 @@ func NewTargetNameSearchQuery(method TextComparison, value string) (SearchQuery,
 	return NewTextQuery(TargetColumnName, value, method)
 }
 
-func NewTargetIDSearchQuery(id string) (SearchQuery, error) {
-	return NewTextQuery(TargetColumnID, id, TextEquals)
+func NewTargetInIDsSearchQuery(values []string) (SearchQuery, error) {
+	return NewInTextQuery(TargetColumnID, values)
 }
 
 func prepareTargetsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, error)) {
 	return sq.Select(
 			TargetColumnID.identifier(),
-			TargetColumnCreationDate.identifier(),
 			TargetColumnChangeDate.identifier(),
 			TargetColumnResourceOwner.identifier(),
 			TargetColumnSequence.identifier(),
@@ -155,10 +155,10 @@ func prepareTargetsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			var count uint64
 			for rows.Next() {
 				target := new(Target)
+				target.ObjectDetails = new(domain.ObjectDetails)
 				err := rows.Scan(
 					&target.ID,
-					&target.CreationDate,
-					&target.ChangeDate,
+					&target.EventDate,
 					&target.ResourceOwner,
 					&target.Sequence,
 					&target.Name,
@@ -191,7 +191,6 @@ func prepareTargetsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 func prepareTargetQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(row *sql.Row) (*Target, error)) {
 	return sq.Select(
 			TargetColumnID.identifier(),
-			TargetColumnCreationDate.identifier(),
 			TargetColumnChangeDate.identifier(),
 			TargetColumnResourceOwner.identifier(),
 			TargetColumnSequence.identifier(),
@@ -205,10 +204,10 @@ func prepareTargetQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Target, error) {
 			target := new(Target)
+			target.ObjectDetails = new(domain.ObjectDetails)
 			err := row.Scan(
 				&target.ID,
-				&target.CreationDate,
-				&target.ChangeDate,
+				&target.EventDate,
 				&target.ResourceOwner,
 				&target.Sequence,
 				&target.Name,

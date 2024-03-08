@@ -12,7 +12,7 @@ import (
 
 type SearchResponses interface {
 	*Targets | *Executions
-	Set(*State)
+	Stateful
 }
 
 func genericSearch[R SearchResponses](
@@ -41,7 +41,7 @@ func genericSearch[R SearchResponses](
 	if err != nil {
 		return nil, err
 	}
-	resp.Set(state)
+	resp.SetState(state)
 	return resp, err
 }
 

@@ -15,7 +15,6 @@ import (
 
 var (
 	prepareTargetsStmt = `SELECT projections.targets.id,` +
-		` projections.targets.creation_date,` +
 		` projections.targets.change_date,` +
 		` projections.targets.resource_owner,` +
 		` projections.targets.sequence,` +
@@ -29,7 +28,6 @@ var (
 		` FROM projections.targets`
 	prepareTargetsCols = []string{
 		"id",
-		"creation_date",
 		"change_date",
 		"resource_owner",
 		"sequence",
@@ -43,7 +41,6 @@ var (
 	}
 
 	prepareTargetStmt = `SELECT projections.targets.id,` +
-		` projections.targets.creation_date,` +
 		` projections.targets.change_date,` +
 		` projections.targets.resource_owner,` +
 		` projections.targets.sequence,` +
@@ -56,7 +53,6 @@ var (
 		` FROM projections.targets`
 	prepareTargetCols = []string{
 		"id",
-		"creation_date",
 		"change_date",
 		"resource_owner",
 		"sequence",
@@ -103,7 +99,6 @@ func Test_TargetPrepares(t *testing.T) {
 						{
 							"id",
 							testNow,
-							testNow,
 							"ro",
 							uint64(20211109),
 							"target-name",
@@ -122,11 +117,12 @@ func Test_TargetPrepares(t *testing.T) {
 				},
 				Targets: []*Target{
 					{
-						ID:               "id",
-						CreationDate:     testNow,
-						ChangeDate:       testNow,
-						ResourceOwner:    "ro",
-						Sequence:         20211109,
+						ID: "id",
+						ObjectDetails: &domain.ObjectDetails{
+							EventDate:     testNow,
+							ResourceOwner: "ro",
+							Sequence:      20211109,
+						},
 						Name:             "target-name",
 						TargetType:       domain.TargetTypeWebhook,
 						timeout:          1 * time.Second,
@@ -148,7 +144,6 @@ func Test_TargetPrepares(t *testing.T) {
 						{
 							"id-1",
 							testNow,
-							testNow,
 							"ro",
 							uint64(20211109),
 							"target-name1",
@@ -160,7 +155,6 @@ func Test_TargetPrepares(t *testing.T) {
 						},
 						{
 							"id-2",
-							testNow,
 							testNow,
 							"ro",
 							uint64(20211110),
@@ -180,11 +174,12 @@ func Test_TargetPrepares(t *testing.T) {
 				},
 				Targets: []*Target{
 					{
-						ID:               "id-1",
-						CreationDate:     testNow,
-						ChangeDate:       testNow,
-						ResourceOwner:    "ro",
-						Sequence:         20211109,
+						ID: "id-1",
+						ObjectDetails: &domain.ObjectDetails{
+							EventDate:     testNow,
+							ResourceOwner: "ro",
+							Sequence:      20211109,
+						},
 						Name:             "target-name1",
 						TargetType:       domain.TargetTypeWebhook,
 						timeout:          1 * time.Second,
@@ -193,11 +188,12 @@ func Test_TargetPrepares(t *testing.T) {
 						InterruptOnError: false,
 					},
 					{
-						ID:               "id-2",
-						CreationDate:     testNow,
-						ChangeDate:       testNow,
-						ResourceOwner:    "ro",
-						Sequence:         20211110,
+						ID: "id-2",
+						ObjectDetails: &domain.ObjectDetails{
+							EventDate:     testNow,
+							ResourceOwner: "ro",
+							Sequence:      20211110,
+						},
 						Name:             "target-name2",
 						TargetType:       domain.TargetTypeWebhook,
 						timeout:          1 * time.Second,
@@ -253,7 +249,6 @@ func Test_TargetPrepares(t *testing.T) {
 					[]driver.Value{
 						"id",
 						testNow,
-						testNow,
 						"ro",
 						uint64(20211109),
 						"target-name",
@@ -266,11 +261,12 @@ func Test_TargetPrepares(t *testing.T) {
 				),
 			},
 			object: &Target{
-				ID:               "id",
-				CreationDate:     testNow,
-				ChangeDate:       testNow,
-				ResourceOwner:    "ro",
-				Sequence:         20211109,
+				ID: "id",
+				ObjectDetails: &domain.ObjectDetails{
+					EventDate:     testNow,
+					ResourceOwner: "ro",
+					Sequence:      20211109,
+				},
 				Name:             "target-name",
 				TargetType:       domain.TargetTypeWebhook,
 				timeout:          1 * time.Second,

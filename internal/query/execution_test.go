@@ -9,12 +9,12 @@ import (
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
 	prepareExecutionsStmt = `SELECT projections.executions.id,` +
-		` projections.executions.creation_date,` +
 		` projections.executions.change_date,` +
 		` projections.executions.resource_owner,` +
 		` projections.executions.sequence,` +
@@ -24,7 +24,6 @@ var (
 		` FROM projections.executions`
 	prepareExecutionsCols = []string{
 		"id",
-		"creation_date",
 		"change_date",
 		"resource_owner",
 		"sequence",
@@ -34,7 +33,6 @@ var (
 	}
 
 	prepareExecutionStmt = `SELECT projections.executions.id,` +
-		` projections.executions.creation_date,` +
 		` projections.executions.change_date,` +
 		` projections.executions.resource_owner,` +
 		` projections.executions.sequence,` +
@@ -43,7 +41,6 @@ var (
 		` FROM projections.executions`
 	prepareExecutionCols = []string{
 		"id",
-		"creation_date",
 		"change_date",
 		"resource_owner",
 		"sequence",
@@ -86,7 +83,6 @@ func Test_ExecutionPrepares(t *testing.T) {
 						{
 							"id",
 							testNow,
-							testNow,
 							"ro",
 							uint64(20211109),
 							database.TextArray[string]{"target"},
@@ -101,13 +97,14 @@ func Test_ExecutionPrepares(t *testing.T) {
 				},
 				Executions: []*Execution{
 					{
-						ID:            "id",
-						CreationDate:  testNow,
-						ChangeDate:    testNow,
-						ResourceOwner: "ro",
-						Sequence:      20211109,
-						Targets:       database.TextArray[string]{"target"},
-						Includes:      database.TextArray[string]{"include"},
+						ID: "id",
+						ObjectDetails: &domain.ObjectDetails{
+							EventDate:     testNow,
+							ResourceOwner: "ro",
+							Sequence:      20211109,
+						},
+						Targets:  database.TextArray[string]{"target"},
+						Includes: database.TextArray[string]{"include"},
 					},
 				},
 			},
@@ -123,7 +120,6 @@ func Test_ExecutionPrepares(t *testing.T) {
 						{
 							"id-1",
 							testNow,
-							testNow,
 							"ro",
 							uint64(20211109),
 							database.TextArray[string]{"target1"},
@@ -131,7 +127,6 @@ func Test_ExecutionPrepares(t *testing.T) {
 						},
 						{
 							"id-2",
-							testNow,
 							testNow,
 							"ro",
 							uint64(20211110),
@@ -147,22 +142,24 @@ func Test_ExecutionPrepares(t *testing.T) {
 				},
 				Executions: []*Execution{
 					{
-						ID:            "id-1",
-						CreationDate:  testNow,
-						ChangeDate:    testNow,
-						ResourceOwner: "ro",
-						Sequence:      20211109,
-						Targets:       database.TextArray[string]{"target1"},
-						Includes:      database.TextArray[string]{"include1"},
+						ID: "id-1",
+						ObjectDetails: &domain.ObjectDetails{
+							EventDate:     testNow,
+							ResourceOwner: "ro",
+							Sequence:      20211109,
+						},
+						Targets:  database.TextArray[string]{"target1"},
+						Includes: database.TextArray[string]{"include1"},
 					},
 					{
-						ID:            "id-2",
-						CreationDate:  testNow,
-						ChangeDate:    testNow,
-						ResourceOwner: "ro",
-						Sequence:      20211110,
-						Targets:       database.TextArray[string]{"target2"},
-						Includes:      database.TextArray[string]{"include2"},
+						ID: "id-2",
+						ObjectDetails: &domain.ObjectDetails{
+							EventDate:     testNow,
+							ResourceOwner: "ro",
+							Sequence:      20211110,
+						},
+						Targets:  database.TextArray[string]{"target2"},
+						Includes: database.TextArray[string]{"include2"},
 					},
 				},
 			},
@@ -212,7 +209,6 @@ func Test_ExecutionPrepares(t *testing.T) {
 					[]driver.Value{
 						"id",
 						testNow,
-						testNow,
 						"ro",
 						uint64(20211109),
 						database.TextArray[string]{"target"},
@@ -221,13 +217,14 @@ func Test_ExecutionPrepares(t *testing.T) {
 				),
 			},
 			object: &Execution{
-				ID:            "id",
-				CreationDate:  testNow,
-				ChangeDate:    testNow,
-				ResourceOwner: "ro",
-				Sequence:      20211109,
-				Targets:       database.TextArray[string]{"target"},
-				Includes:      database.TextArray[string]{"include"},
+				ID: "id",
+				ObjectDetails: &domain.ObjectDetails{
+					EventDate:     testNow,
+					ResourceOwner: "ro",
+					Sequence:      20211109,
+				},
+				Targets:  database.TextArray[string]{"target"},
+				Includes: database.TextArray[string]{"include"},
 			},
 		},
 		{

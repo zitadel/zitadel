@@ -254,7 +254,7 @@ service ExecutionService {
   // Set an execution to call a previously defined target or include the targets of a previously defined execution.
   rpc SetExecution (SetExecutionRequest) returns (SetExecutionResponse) {
     option (google.api.http) = {
-      post: "/v3alpha/executions"
+      put: "/v3alpha/executions"
       body: "*"
     };
 
@@ -298,6 +298,44 @@ service ExecutionService {
       };
     };
   }
+
+  // List executions
+  //
+  // List all matching executions. By default, we will return all executions of your instance.
+  // Make sure to include a limit and sorting for pagination.
+  rpc ListExecutions (ListExecutionsRequest) returns (ListExecutionsResponse) {
+    option (google.api.http) = {
+      post: "/v3alpha/executions/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all executions matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+
   // List all available functions
   //
   // List all available functions which can be used as condition for executions.
@@ -535,6 +573,20 @@ message DeleteExecutionRequest {
 message DeleteExecutionResponse {
   // Details provide some base information (such as the last change date) of the execution.
   zitadel.object.v2beta.Details details = 1;
+}
+
+message ListExecutionsRequest {
+  // list limitations and ordering.
+  zitadel.object.v2beta.ListQuery query = 1;
+  // Define the criteria to query for.
+  repeated zitadel.execution.v3alpha.SearchQuery queries = 2;
+}
+
+message ListExecutionsResponse {
+  // Details provides information about the returned result including total amount found.
+  zitadel.object.v2beta.ListDetails details = 1;
+  // The result contains the executions, which matched the queries.
+  repeated zitadel.execution.v3alpha.Execution result = 2;
 }
 
 message ListExecutionFunctionsRequest{}

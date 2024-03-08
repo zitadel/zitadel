@@ -1011,6 +1011,7 @@ InternalAuthZ:
         - "events.read"
         - "milestones.read"
         - "session.delete"
+        - "execution.target.read"
         - "execution.target.write"
         - "execution.target.delete"
         - "execution.read"
@@ -1046,6 +1047,8 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "events.read"
         - "milestones.read"
+        - "execution.target.read"
+        - "execution.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"

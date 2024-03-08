@@ -267,5 +267,7 @@ func newProjectionsList() {
 		RestrictionsProjection,
 		SystemFeatureProjection,
 		InstanceFeatureProjection,
+		ExecutionProjection,
+		TargetProjection,
 	}
 }
