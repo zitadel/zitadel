@@ -24,7 +24,7 @@ If you lose it, you will have to generate a new one.
 
 ![Create new service user](/img/console_serviceusers_secret.gif)
 
-## Grant role for ZITADEL
+## Grant a manager role to the service user
 
 To be able to access the ZITADEL APIs your service user needs permissions to ZITADEL.
 

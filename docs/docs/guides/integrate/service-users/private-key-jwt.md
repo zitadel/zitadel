@@ -10,36 +10,31 @@ In ZITADEL we use the `urn:ietf:params:oauth:grant-type:jwt-bearer` (**“JWT be
 
 ## Prerequisites
 
-* A ZITADEL account with a [service user created](../../manage/console/users).
-* A code library/framework supporting JWT generation and verification (e.g., `pyjwt` for Python, `jsonwebtoken` for Node.js).
+A code library/framework supporting JWT generation and verification (e.g., `pyjwt` for Python, `jsonwebtoken` for Node.js).
 
-## Create a Service User with a client secret
+## Steps to authenticate a Service User with private JWT
+
+You need to follow these steps to authenticate a service user and receive an access token that can be used in subsequent requests.
+
+### 1. Create a Service User
 
 1. Navigate to Service Users
 2. Click on **New**
 3. Enter a username and a display name
 4. Click on **Create**
-5. Open **Actions** in the top right corner and click on **Generate Client Secret**
-6. Copy the **ClientID** and **ClientSecret** from the dialog
 
+### 2. Generate a private key file
 
-7. **Generate JWT:**
-    * Use your chosen library to generate a JWT with the following claims:
-        * **iss (issuer):** The unique identifier of your ZITADEL instance (found in the web console).
-        * **sub (subject):** The service user's ID.
-        * **aud (audience):** The ZITADEL API URL (e.g., `https://api.zitadel.cloud/v1`).
-        * **exp (expiration):** A timestamp representing the JWT's expiry time (e.g., using `datetime.utcnow() + datetime.timedelta(minutes=5)` for 5 minutes).
-        * **iat (issued at):** The timestamp of JWT creation (e.g., using `datetime.utcnow()`).
-    * Sign the JWT using the service user's private key and the appropriate signing algorithm (e.g., RS256).
+1. Access the ZITADEL web console and navigate to the service user details.
+2. Click on the **Keys** menu point in the detail of your new service user
+3. Click on **New**
+4. You can either set an expiration date or leave it empty if you don't want it to expire
+5. Click on **Download** and save the key file
 
-## Steps to authenticate with private JWT
-
-You need to follow these steps to authenticate a service user and receive an access token that can be used in subsequent requests.
-
-### 1. Obtain credentials
-
-Access the ZITADEL web console and navigate to the service user details.
-Locate the **Private Key** associated with the service user. **Store this securely!**
+:::note
+Make sure to save the key file. You won't be able to retrieve it again.
+If you lose it, you will have to generate a new one.
+:::
 
 ![Create private key](/img/console_serviceusers_new_key.gif)
 
@@ -54,7 +49,7 @@ The downloaded json should look something like outlined below. The value of `key
 }
 ```
 
-### 2. Create a JWT and sign with private key
+### 3. Create a JWT and sign with private key
 
 You need to create a JWT with the following header and payload and sign it with the RS256 algorithm.
 
@@ -119,7 +114,7 @@ encoded_jwt = jwt.encode(payload, private_key, algorithm="RS256")
 print(f"Generated JWT: {encoded_jwt}")
 ```
 
-### 3. With this JWT, request an OAuth token from ZITADEL
+### 4. With this JWT, request an OAuth token from ZITADEL
 
 With the encoded JWT from the prior step, you will need to craft a POST request to ZITADEL's token endpoint:
 
@@ -132,7 +127,7 @@ curl --request POST \
   --data assertion=eyJ0eXAiOiJKV1QiL...
 ```
 
-### 4. Include the access token in the authorization header
+### 5. Include the access token in the authorization header
 
 When making API requests to ZITADEL on behalf of the service user, include the generated JWT in the "Authorization" header with the "Bearer" prefix.
 

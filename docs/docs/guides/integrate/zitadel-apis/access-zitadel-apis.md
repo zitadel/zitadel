@@ -54,7 +54,16 @@ ZITADEL Managers are Users who have permission to manage ZITADEL itself. There a
 
 On each level we have some different Roles. Here you can find more about the different roles: [ZITADEL Manager Roles](/guides/manage/console/managers#roles)
 
-## Add ORG_OWNER to Service User
+## Grant a Manager role to the service user
+
+To be able to access the ZITADEL APIs your service user needs permissions to ZITADEL.
+
+1. Go to the detail page of your organization
+2. Click in the top right corner the "+" button
+3. Search for your service user
+4. Give the user the role you need, for the example we choose Org Owner (More about [ZITADEL Permissions](/guides/manage/console/managers))
+
+![Add org owner to service user](/img/guides/console-service-user-org-owner.gif)
 
 Make sure you have a Service User with a Key. (For more detailed information about creating a service user go to [Service User](serviceusers))
 
