@@ -49,6 +49,7 @@ func (m *SystemFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemLoginDefaultOrgEventType,
 			feature_v2.SystemTriggerIntrospectionProjectionsEventType,
 			feature_v2.SystemLegacyIntrospectionEventType,
+			feature_v2.SystemUserSchemaEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }

@@ -54,6 +54,7 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceLoginDefaultOrgEventType,
 			feature_v2.InstanceTriggerIntrospectionProjectionsEventType,
 			feature_v2.InstanceLegacyIntrospectionEventType,
+			feature_v2.InstanceUserSchemaEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }

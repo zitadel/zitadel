@@ -386,8 +386,8 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Source:  feature.Source_SOURCE_SYSTEM,
 				},
 				UserSchema: &feature.FeatureFlag{
-					Enabled: true,
-					Source:  feature.Source_SOURCE_SYSTEM,
+					Enabled: false,
+					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
 			},
 		},
