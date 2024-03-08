@@ -14,26 +14,26 @@ They are ideal for scenarios involving secure communication between applications
 Service users in combination with [Manager](/concepts/structure/managers) permissions are used to access ZITADEL's APIs, for example to manage user resources.
 Unlike regular human users, service users don't rely on traditional login methods (e.g., username/password) and require alternative authentication mechanisms.
 
-## Benefits of Using Service Users
+## Benefits of using Service Users
 
-### Enhanced Security
+### Enhanced security
 
 * **Principle of Least Privilege:** Grant service users only the minimum permissions they need, minimizing potential damage in case of compromise.
 * **Distinct Credentials:** Avoid embedding sensitive credentials like API keys directly in code. Service user credentials can be rotated independently.
 
-### Segregated Authorization
+### Segregated authorization
 
 Manage authorization for service users separately from human users, providing an extra layer of control.
 
-### API and Backend Access
+### API and backend access
 
 Service users offer a secure way to authenticate and access various API endpoints and protected backend services.
 
-### Improved Auditability
+### Improved auditability
 
 Actions performed by service users are clearly identifiable in logs, facilitating easier auditing and tracing.
 
-## Authentication Methods
+## Authentication methods
 
 ZITADEL supports two primary authentication methods for service users:
 
@@ -104,18 +104,18 @@ However, PATs also come with limitations:
     * **For PATs:** Include the PAT directly in the "Authorization" header of your API request.
 4. ZITADEL Verifies the credentials and authorizes the service user to perform the requested action based on its granted permissions.
 
-## Important Considerations
+## Important considerations
 
 * **Secure Credentials:** Treat service user credentials (private keys, client secrets) with utmost care. Store them securely, similar to any other sensitive information like API keys or passwords.
 * **Expiry Management:** Set appropriate expiration dates for JWTs and regularly rotate all credentials to maintain strong security practices.
 * **Permission Granting:** Adhere to the principle of least privilege by granting only the specific permissions required for a service user's function.
 
-## Choosing the Right Authentication Method
+## Choosing the right authentication method
 
 For most service user scenarios in ZITADEL, [private key JWT authentication](./private-key-jwt.md) is the recommended choice due to its benefits in security, performance, and control.
 However, [client credentials authentication](./client-credentials.md) might be considered in specific situations where simplicity and trust between servers are priorities.
 
-## Further Resources
+## Further resources
 
 import DocCardList from '@theme/DocCardList';
 
