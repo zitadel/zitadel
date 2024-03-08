@@ -1,6 +1,6 @@
 ---
-title: Streaming Audit Logs to External Systems (SIEM/SOC)
-sidebar_label: Streaming Audit Logs to External Systems
+title: Streaming audit logs to external systems (SIEM/SOC)
+sidebar_label: Audit Logs (SIEM / SOC)
 ---
 
 This document details integrating ZITADEL with external systems for streaming events and audit logs. 
@@ -13,18 +13,20 @@ Integrating ZITADEL with external systems offers several advantages:
 
 By integrating ZITADEL with external systems, you gain valuable insights into user behavior, system activity, and potential security threats, ultimately strengthening your overall security posture and regulatory compliance.
 
-ZITADEL does provide different solutions how to send events to external systems, the solution you choose might differ depending on your use case, database and environment (ZITADEL Cloud, Self-hosting) you are using.
+ZITADEL provides different solutions how to send events to external systems, the solution you choose might differ depending on your use case, your database and your environment (ZITADEL Cloud, Self-hosting) you are using.
+
+The following table shows the available integration patterns for streaming audit logs to external systems.
 
 |                                     | Description                                                                                                    | Self-hosting | ZITADEL Cloud |
 |-------------------------------------|----------------------------------------------------------------------------------------------------------------|-------------|---------------|
 | Events-API                          | Pulling events of all ZITADEL resources such as Users, Projects, Apps, etc. (Events = Change Log of Resources) | ✅           | ✅             |
 | Cockroach Change Data Capture       | Sending events of all ZITADEL resources such as Users, Projects, Apps, etc. (Events = Change Log of Resources) | ✅           | ❌             |
-| ZITADEL Actions Log to Stdout       | Custom log to messages possible on predefined Triggers during login / register Flow                            | ✅           | ❌             |
+| ZITADEL Actions Log to Stdout       | Custom log to messages possible on predefined triggers during login / register Flow                            | ✅           | ❌             |
 | ZITADEL Actions trigger API/Webhook | Custom API/Webhook request on predefined triggers during login / register                                      | ✅           | ✅             |
 
 ### Events API
 
-The ZITADEL Event API empowers you to proactively pull audit logs for comprehensive security and compliance monitoring, regardless of your deployment model (cloud or self-hosted). 
+The ZITADEL Event API empowers you to proactively pull audit logs for comprehensive security and compliance monitoring, regardless of your environment (cloud or self-hosted). 
 This API offers granular control through various filters, enabling you to:
 - **Specify Event Types**: Focus on specific events of interest, such as user token created, password changed, or project added.
 - **Target Aggregates**: Narrow down the data scope by filtering for events related to particular organizations, projects, or users.
@@ -42,10 +44,10 @@ CDC captures row-level changes in your database and streams them as messages to 
 
 This approach is limited to self-hosted deployments using CockroachDB and requires expertise in managing the database and CDC configuration.
 
-#### Sending events to Google Cloud Storage
+#### Sending events to Google Cloud Storage using Change Data Capture
 
 This example will show you how you can utilize CDC for sending all ZITADEL events to Google Cloud Storage.
-For a detailed description please read the [Get Started Guide](https://www.cockroachlabs.com/docs/v23.2/create-and-configure-changefeeds) and [Cloud Storage Authentication](https://www.cockroachlabs.com/docs/v23.2/cloud-storage-authentication?filters=gcs#set-up-google-cloud-storage-assume-role) from Cockroach.
+For a detailed description please read [CockroachLab's Get Started Guide](https://www.cockroachlabs.com/docs/v23.2/create-and-configure-changefeeds) and [Cloud Storage Authentication](https://www.cockroachlabs.com/docs/v23.2/cloud-storage-authentication?filters=gcs#set-up-google-cloud-storage-assume-role) from Cockroach.
 
 You will need a Google Cloud Storage Bucket and a service account.
 1. [Create Google Cloud Storage Bucket](https://cloud.google.com/storage/docs/creating-buckets)
@@ -64,14 +66,20 @@ Now we need to enable and create the changefeed in the cockroach DB.
    The following example sends all events without payload to Google Cloud Storage
    Per default we do not want to send the payload of the events, as this could potentially include personally identifiable information (PII)
    If you want to include the payload, you can just add `payload` to the select list in the query.  
-```bash
-  CREATE CHANGEFEED INTO 'gs://gc-storage-zitadel-data/events?partition_format=flat&AUTH=specified&CREDENTIALS=base64encodedkey' AS SELECT instance_id, aggregate_type, aggregate_id, owner, event_type, sequence, created_at FROM eventstore.events2;
+```sql
+    CREATE CHANGEFEED INTO 'gs://gc-storage-zitadel-data/events?partition_format=flat&AUTH=specified&CREDENTIALS=base64encodedkey' 
+    AS SELECT instance_id, aggregate_type, aggregate_id, owner, event_type, sequence, created_at 
+    FROM eventstore.events2;
   ```
 
 In some cases you might want the payload of only some specific events.
 This example shows you how to get all events and the instance domain events with the payload:
-```bash
-CREATE CHANGEFEED INTO 'gs://gc-storage-zitadel-data/events?partition_format=flat&AUTH=specified&CREDENTIALS=base64encodedkey' AS SELECT instance_id, aggregate_type, aggregate_id, owner, event_type, sequence, created_at CASE WHEN event_type IN ('instance.domain.added', 'instance.domain.removed', 'instance.domain.primary.set' ) THEN payload END AS payload FROM eventstore.events2;
+```sql
+    CREATE CHANGEFEED INTO 'gs://gc-storage-zitadel-data/events?partition_format=flat&AUTH=specified&CREDENTIALS=base64encodedkey' 
+    AS SELECT instance_id, aggregate_type, aggregate_id, owner, event_type, sequence, created_at 
+    CASE WHEN event_type IN ('instance.domain.added', 'instance.domain.removed', 'instance.domain.primary.set' ) 
+    THEN payload END AS payload 
+    FROM eventstore.events2;
 ```
 
 The partition format in the example above is flat, this means that all files for each timestamp will be created in the same folder.
@@ -80,15 +88,23 @@ Each event is represented as a json row.
 
 Example Output:
 ```json lines
-{"aggregate_id": "26553987123463875", "aggregate_type": "user", "created_at": "2023-12-25T10:01:45.600913Z", "event_type": "user.human.added", "instance_id": "123456789012345667", "payload": null, "sequence": 1}
+{
+   "aggregate_id": "26553987123463875", 
+   "aggregate_type": "user",
+   "created_at": "2023-12-25T10:01:45.600913Z",
+   "event_type": "user.human.added",
+   "instance_id": "123456789012345667", 
+   "payload": null,
+   "sequence": 1
+}
 ```
 
 ## ZITADEL Actions
 
-ZITADEL actions offer a powerful mechanism for extending the platform's capabilities and integrating with external systems tailored to your specific requirements. 
-These actions are essentially custom JavaScript snippets that execute at predefined triggers during the registration or login flow of a user.
+ZITADEL [Actions](/docs/concepts/features/actions) offer a powerful mechanism for extending the platform's capabilities and integrating with external systems tailored to your specific requirements. 
+Actions are essentially custom JavaScript snippets that execute at predefined triggers during the registration or login flow of a user.
 
-In the future ZITADEL actions will be extended to allow to not only define them during the login and register flow, but also on each API Request, Event or Predefined Functions.
+In the future ZITADEL Actions will be extended to allow to not only define them during the login and register flow, but also on each API Request, Event or Predefined Functions.
 
 ### Log to stdout
 
@@ -109,22 +125,22 @@ In my external system for example Splunk I want to be able to get an information
 3. Authenticate User
 4. Collect Data from stdout
 
-### Webhook/API Request
+### Webhook/API request
 
 The [http module](/docs/apis/actions/modules#http) allows you to make a request to a REST API. 
 This allows you to send a request at a specific point during the login or registration flow with the data you defined in your action.
 
-Example Use Case:
-I want to send a request to an endpoint each time after an authentication (successful or not).
+Example use case:
+You want to send a request to an endpoint each time after an authentication (successful or not).
 
-1. Define an action that calls API Endpoint.
+1. Define an action that calls API endpoint.
    Make sure the name of the action is the same as of the function in the script.
-   Example how to call an API Endpoint:
+   Example how to call an API endpoint:
    ```ts reference
    https://github.com/zitadel/actions/blob/main/examples/make_api_call.js
    ```
-2. Add the action to the following Flows and Triggers
+2. Add the action to the following flows and triggers
    - Flow: Internal Authentication - Trigger: Post Authentication
    - Flow: External Authentication - Trigger: Post Authentication
-3. Authenticate User
+3. Authenticate user
 4. Get data on your API
