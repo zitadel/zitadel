@@ -68,6 +68,6 @@ func AssertListDetails[D ListDetailsMsg](t testing.TB, expected, actual D) {
 		gotCD := gotDetails.GetTimestamp().AsTime()
 		assert.WithinRange(t, gotCD, wantDetails.Timestamp.AsTime(), wantDetails.Timestamp.AsTime().Add(time.Minute))
 		// Not possible as sequence is not filled in latestState function
-		//assert.NotZero(t, gotDetails.GetProcessedSequence())
+		// assert.NotZero(t, gotDetails.GetProcessedSequence())
 	}
 }

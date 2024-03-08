@@ -48,6 +48,8 @@ func listTargetsRequestToModel(req *execution.ListTargetsRequest) (*query.Target
 
 func targetFieldNameToSortingColumn(field execution.TargetFieldName) query.Column {
 	switch field {
+	case execution.TargetFieldName_FIELD_NAME_UNSPECIFIED:
+		return query.TargetColumnID
 	case execution.TargetFieldName_FIELD_NAME_ID:
 		return query.TargetColumnID
 	case execution.TargetFieldName_FIELD_NAME_CREATION_DATE:
@@ -139,6 +141,8 @@ func targetToPb(t *query.Target) *execution.Target {
 	case domain.TargetTypeRequestResponse:
 		target.TargetType = &execution.Target_RestRequestResponse{RestRequestResponse: &execution.SetRESTRequestResponse{Url: t.URL}}
 	case domain.TargetTypeUnspecified:
+		target.TargetType = nil
+	default:
 		target.TargetType = nil
 	}
 	return target
