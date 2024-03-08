@@ -78,13 +78,14 @@ Payload
 
 * `iss` represents the requesting party, i.e. the owner of the private key. In this case the value of `userId` from the downloaded JSON.
 * `sub` represents the application. Set the value also to the value of `userId`
-* `aud` must be ZITADEL's issuing domain
+* `aud` must be your [Custom Domain](../../../concepts/features/custom-domain)
 * `iat` is a unix timestamp of the creation signing time of the JWT, e.g. now and must not be older than 1 hour ago
 * `exp` is the unix timestamp of expiry of this assertion
 
-Please refer to [JWT_with_Private_Key](/apis/openidoauth/authn-methods#jwt-with-private-key) in the documentation for further information.
+Please refer to [JWT with private key](/apis/openidoauth/authn-methods#jwt-with-private-key) API reference for further information.
 
-If you use Go, you might want to use the [provided tool](https://github.com/zitadel/zitadel-tools) to generate a JWT from the downloaded json. There are many [libraries](https://jwt.io/#libraries-io) to generate and sign JWT.
+If you use Go, you might want to use the [provided tool](https://github.com/zitadel/zitadel-tools) to generate a JWT from the downloaded json.
+There are many [libraries](https://jwt.io/#libraries-io) to generate and sign JWT.
 
 **Code Example (Python using `pyjwt`):**
 
@@ -97,7 +98,7 @@ service_user_id = "your_service_user_id"
 private_key = "-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY\n-----END PRIVATE KEY-----"
 
 # ZITADEL API URL (replace if needed)
-api_url = "https://api.zitadel.cloud/v1"
+api_url = "your_custom_domain"
 
 # Generate JWT claims
 payload = {
@@ -114,7 +115,7 @@ encoded_jwt = jwt.encode(payload, private_key, algorithm="RS256")
 print(f"Generated JWT: {encoded_jwt}")
 ```
 
-### 4. With this JWT, request an OAuth token from ZITADEL
+### 4. Request an OAuth token with the generated JWT
 
 With the encoded JWT from the prior step, you will need to craft a POST request to ZITADEL's token endpoint:
 
@@ -127,39 +128,12 @@ curl --request POST \
   --data assertion=eyJ0eXAiOiJKV1QiL...
 ```
 
-### 5. Include the access token in the authorization header
-
-When making API requests to ZITADEL on behalf of the service user, include the generated JWT in the "Authorization" header with the "Bearer" prefix.
-
-For this example let's call the userinfo endpoint to verify that our access token works.
-
-```bash
-curl --request POST \
-  --url $CUSTOM-DOMAIN/oidc/v1/userinfo \
-  --header 'Content-Type: application/x-www-form-urlencoded' \
-  --header 'Authorization: Bearer MtjHodGy4zxKylDOhg6kW90WeEQs2q...'
-```
-
-You should receive a response with your service user's information.
-
-```bash
-HTTP/1.1 200 OK
-Content-Type: application/json
-
-{
-  "name": "MyServiceUser",
-  "preferred_username": "service_user@$CUSTOM-DOMAIN",
-  "updated_at": 1616417938
-}
-```
-
-## Accessing ZITADEL's Management API
-
-If you want to access the ZITADEL API with this access token, you have to add `urn:zitadel:iam:org:project:id:zitadel:aud` to the list of scopes.
-
 * `grant_type` should be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
 * `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile` and `email`
 * `assertion` is the encoded value of the JWT that was signed with your private key from the prior step
+
+If you want to access ZITADEL APIs, make sure to include the required scopes `urn:zitadel:iam:org:project:id:zitadel:aud`.
+Read our guide [how to access ZITADEL APIs](../zitadel-apis/) to learn more.
 
 You should receive a successful response with `access_token`,  `token_type` and time to expiry in seconds as `expires_in`.
 
@@ -173,6 +147,28 @@ Content-Type: application/json
   "expires_in": 43199
 }
 ```
+
+### 5. Include the access token in the authorization header
+
+When making API requests on behalf of the service user, include the generated JWT in the "Authorization" header with the "Bearer" prefix.
+
+```bash
+curl --request POST \
+  --url $YOUR_API_ENDOINT \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --header 'Authorization: Bearer MtjHodGy4zxKylDOhg6kW90WeEQs2q...'
+```
+
+## Accessing ZITADEL APIs
+
+You might want to access ZITADEL APIs to manage resources, such as users, or to validate tokens sent to your backend service.
+Follow our guides on [how to access ZITADEL API](../zitadel-apis/access-zitadel-apis) to use the ZITADEL APIs with your service user.
+
+### Token introspection
+
+Your API endpoint might receive tokens from users and need to validate the token with ZITADEL.
+In this case your API needs to authenticate with ZITADEL and then do a token introspection.
+Follow our [guide on token introspection with private key JWT](../token-introspection/private-key-jwt) to learn more.
 
 ## Client Application Authentication
 
@@ -188,3 +184,9 @@ Refer to ZITADEL documentation for details on this alternative method.
 
 By following these steps and adhering to security best practices, you can effectively secure service user and client application communication within ZITADEL using private key JWT authentication.
 Remember to consult the official ZITADEL documentation for detailed information and potential changes in the future.
+
+## Notes
+
+* [JWT with private key](/apis/openidoauth/authn-methods#jwt-with-private-key) API reference
+* [Accessing ZITADEL API](../zitadel-apis/access-zitadel-apis)
+* [Token introspection with private key JWT](../token-introspection/private-key-jwt)
