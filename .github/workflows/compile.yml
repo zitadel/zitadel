@@ -35,7 +35,7 @@ jobs:
     - 
       uses: actions/checkout@v3
     - 
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       timeout-minutes: 1
       name: restore console
       with:
@@ -43,7 +43,7 @@ jobs:
         key: ${{ inputs.console_cache_key }}
         fail-on-cache-miss: true
     - 
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       timeout-minutes: 1
       name: restore core
       with:
@@ -51,7 +51,7 @@ jobs:
         key: ${{ inputs.core_cache_key }}
         fail-on-cache-miss: true
     -
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ inputs.go_version }}
     - 
