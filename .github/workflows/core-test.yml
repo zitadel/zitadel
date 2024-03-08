@@ -82,7 +82,7 @@ jobs:
           name: core-integration-tests-postgres
           flags: core-integration-tests-postgres
       - 
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@v4
         name: cache results
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         with:
@@ -150,7 +150,7 @@ jobs:
   #         name: core-integration-tests-cockroach
   #         flags: core-integration-tests-cockroach
   #     - 
-  #       uses: actions/cache/save@v3
+  #       uses: actions/cache/save@v4
   #       name: cache results
   #       if: ${{ steps.cache.outputs.cache-hit != 'true' }}
   #       with:
