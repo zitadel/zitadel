@@ -41,17 +41,16 @@ export async function GET(request: NextRequest) {
   const sessionId = searchParams.get("sessionId");
 
   const sessionCookies: SessionCookie[] = await getAllSessions();
+  const ids = sessionCookies.map((s) => s.id);
+  let sessions: Session[] = [];
+  if (ids && ids.length) {
+    sessions = await loadSessions(ids);
+  }
 
   if (authRequestId && sessionId) {
     console.log(
       `Login with session: ${sessionId} and authRequest: ${authRequestId}`
     );
-    const ids = sessionCookies.map((s) => s.id);
-
-    let sessions: Session[] = [];
-    if (ids && ids.length) {
-      sessions = await loadSessions(ids);
-    }
 
     let selectedSession = sessions.find((s) => s.id === sessionId);
 
@@ -77,6 +76,7 @@ export async function GET(request: NextRequest) {
       }
     }
   }
+
   if (authRequestId) {
     console.log(`Login with authRequest: ${authRequestId}`);
     const { authRequest } = await getAuthRequest(server, { authRequestId });
@@ -89,32 +89,58 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.redirect(registerUrl);
     }
-    const ids = sessionCookies.map((s) => s.id);
-
-    let sessions: Session[] = [];
-    if (ids && ids.length) {
-      sessions = await loadSessions(ids);
-    } else {
-      console.info("No session cookie found.");
-      sessions = [];
-    }
 
     // use existing session and hydrate it for oidc
     if (authRequest && sessions.length) {
       // if some accounts are available for selection and select_account is set
-      if (
-        authRequest &&
-        (authRequest.prompt.includes(Prompt.PROMPT_SELECT_ACCOUNT) ||
-          authRequest.prompt.includes(Prompt.PROMPT_LOGIN))
-      ) {
+      if (authRequest.prompt.includes(Prompt.PROMPT_SELECT_ACCOUNT)) {
         const accountsUrl = new URL("/accounts", request.url);
         if (authRequest?.id) {
           accountsUrl.searchParams.set("authRequestId", authRequest?.id);
         }
 
         return NextResponse.redirect(accountsUrl);
-      } else {
+      } else if (authRequest.prompt.includes(Prompt.PROMPT_LOGIN)) {
+        // if prompt is login
+        const loginNameUrl = new URL("/loginname", request.url);
+        if (authRequest?.id) {
+          loginNameUrl.searchParams.set("authRequestId", authRequest?.id);
+        }
+
+        return NextResponse.redirect(loginNameUrl);
+      } else if (authRequest.prompt.includes(Prompt.PROMPT_NONE)) {
         // NONE prompt - silent authentication
+
+        let selectedSession = findSession(sessions, authRequest);
+
+        if (selectedSession && selectedSession.id) {
+          const cookie = sessionCookies.find(
+            (cookie) => cookie.id === selectedSession?.id
+          );
+
+          if (cookie && cookie.id && cookie.token) {
+            const session = {
+              sessionId: cookie?.id,
+              sessionToken: cookie?.token,
+            };
+            const { callbackUrl } = await createCallback(server, {
+              authRequestId,
+              session,
+            });
+            return NextResponse.redirect(callbackUrl);
+          } else {
+            return NextResponse.json(
+              { error: "No active session found" },
+              { status: 500 } // TODO: check for correct status code
+            );
+          }
+        } else {
+          return NextResponse.json(
+            { error: "No active session found" },
+            { status: 500 } // TODO: check for correct status code
+          );
+        }
+      } else {
         // check for loginHint, userId hint sessions
         let selectedSession = findSession(sessions, authRequest);
 
@@ -144,7 +170,6 @@ export async function GET(request: NextRequest) {
           accountsUrl.searchParams.set("authRequestId", authRequestId);
 
           return NextResponse.redirect(accountsUrl);
-          // return NextResponse.error();
         }
       }
     } else {
