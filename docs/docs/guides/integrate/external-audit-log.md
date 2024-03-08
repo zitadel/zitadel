@@ -13,7 +13,7 @@ Integrating ZITADEL with external systems offers several advantages:
 
 By integrating ZITADEL with external systems, you gain valuable insights into user behavior, system activity, and potential security threats, ultimately strengthening your overall security posture and regulatory compliance.
 
-ZITADEL provides different solutions how to send events to external systems, the solution you choose might differ depending on your use case, your database and your environment (ZITADEL Cloud, Self-hosting) you are using.
+ZITADEL provides different solutions how to send events to external systems, the solution you choose might differ depending on your use case, your database and your environment (ZITADEL Cloud, Self-hosting).
 
 The following table shows the available integration patterns for streaming audit logs to external systems.
 
