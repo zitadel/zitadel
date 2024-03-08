@@ -8,7 +8,7 @@ This is a guide on how to use Client Credentials with service users in ZITADEL. 
 
 In ZITADEL, the Client Credentials grant can be used for this non-interactive authentication as alternative to the [JWT profile authentication](serviceusers).
 
-## Create a Service User with a Secret
+## Create a Service User with a client secret
 
 1. Navigate to Service Users
 2. Click on **New**

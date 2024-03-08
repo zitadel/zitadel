@@ -12,7 +12,6 @@ It is an alternative to the JWT profile authentication where the service user ha
 
 ## Create a Service User with a PAT
 
-
 1. Navigate to Service Users
 2. Click on **New**
 3. Enter a user name and a display name

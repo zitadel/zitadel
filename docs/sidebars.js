@@ -356,7 +356,7 @@ module.exports = {
           label: "ZITADEL APIs",
           link: {
             type: "doc",
-            id: "guides/integrate/zitadel-apis/index"
+            id: "guides/integrate/zitadel-apis/access-zitadel-apis"
           },
           collapsed: true,
           items: [

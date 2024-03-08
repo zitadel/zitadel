@@ -17,11 +17,11 @@ Here's a breakdown of some key points about ZITADEL APIs:
 * **Admin API:** Used for administrative functions on the ZITADEL instance itself (may require separate user setup).  
 * **System API:** For ZITADEL self-hosted deployments only, providing superordinate control (requires specific configuration).
 
-:::note Migration
+:::note Resource-based APIs
 ZITADEL is transitioning from a use-case based API structure to a resource-based one, aiming to simplify API usage.
 :::
 
-For further details and in-depth exploration, you can refer to the [Zitadel API documentation](/docs/apis/introduction).
+For further details and in-depth exploration, you can refer to the [ZITADEL API documentation](/docs/apis/introduction).
 
 ## How to access ZITADEL APIs
 
@@ -56,7 +56,7 @@ On each level we have some different Roles. Here you can find more about the dif
 
 ## Add ORG_OWNER to Service User
 
-Make sure you have a Service User with a Key. (For more detailed informations about creating a service user go to [Service User](serviceusers))
+Make sure you have a Service User with a Key. (For more detailed information about creating a service user go to [Service User](serviceusers))
 
 1. Navigate to Organization Detail
 2. Click the **+** button in the right part of console, in the managers part of details
@@ -119,6 +119,6 @@ Where to go from here:
 
 ## Notes
 
-- Example Go
-- Example DotNet
-
+- [Example application in Go](./example-zitadel-api-with-go) to access ZITADEL APIs
+- [Example application in .NET](./example-zitadel-api-with-dot-net) to access ZITADEL APIs
+- Learn how to use the [Event API](./event-api) to retrieve your audit trail

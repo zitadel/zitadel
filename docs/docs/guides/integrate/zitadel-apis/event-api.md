@@ -1,6 +1,6 @@
 ---
 title: Get Events from ZITADEL
-sidebar_label: Events
+sidebar_label: Event API
 ---
 
 ZITADEL leverages the power of eventsourcing, meaning every action and change within the system generates a corresponding event that is stored in the database. 

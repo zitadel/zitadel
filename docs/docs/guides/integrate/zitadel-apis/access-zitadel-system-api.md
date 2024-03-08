@@ -1,5 +1,6 @@
 ---
 title: Access ZITADEL System API
+sidebar_label: System API
 ---
 :::note
 This guide focuses on the ZITADEL System API. To access the other APIs (Admin, Auth, Management), please checkout [this guide](./access-zitadel-apis). 

@@ -29,9 +29,14 @@ Manage authorization for service users separately from human users, providing an
 
 Service users offer a secure way to authenticate and access various API endpoints and protected backend services.
 
+You can [use service users to access ZITADEL APIs](../zitadel-apis/), follow the guides to learn how to access the different ZITADEL APIs.
+While you can define the scopes and required information in your requests for your applications API endpoints, when using the ZITADEL APIs, you must include the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to gain access.
+
 ### Improved auditability
 
 Actions performed by service users are clearly identifiable in logs, facilitating easier auditing and tracing.
+
+Using the [Event API](../zitadel-apis/event-api) you can use these logs for further analysis or to integrate the logs with [external SOC / SIEM](../external-audit-log) systems.
 
 ## Authentication methods
 
@@ -104,6 +109,12 @@ However, PATs also come with limitations:
     * **For PATs:** Include the PAT directly in the "Authorization" header of your API request.
 4. ZITADEL Verifies the credentials and authorizes the service user to perform the requested action based on its granted permissions.
 
+We have guides for the different authentication methods:
+
+- [Private key JWT authentication](private-key-jwt)
+- [Client credential authentication](client-credentials)
+- [Personal access token authentication](personal-access-token)
+
 ## Important considerations
 
 * **Secure Credentials:** Treat service user credentials (private keys, client secrets) with utmost care. Store them securely, similar to any other sensitive information like API keys or passwords.
@@ -116,6 +127,9 @@ For most service user scenarios in ZITADEL, [private key JWT authentication](./p
 However, [client credentials authentication](./client-credentials.md) might be considered in specific situations where simplicity and trust between servers are priorities.
 
 ## Further resources
+
+- [Service User API reference](/docs/category/apis/resources/mgmt/user-machine)
+- [Access ZITADEL APIs](../zitadel-apis/)
 
 import DocCardList from '@theme/DocCardList';
 

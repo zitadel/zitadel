@@ -13,7 +13,17 @@ In ZITADEL we use the `urn:ietf:params:oauth:grant-type:jwt-bearer` (**“JWT be
 * A ZITADEL account with a [service user created](../../manage/console/users).
 * A code library/framework supporting JWT generation and verification (e.g., `pyjwt` for Python, `jsonwebtoken` for Node.js).
 
-1. **Generate JWT:**
+## Create a Service User with a client secret
+
+1. Navigate to Service Users
+2. Click on **New**
+3. Enter a username and a display name
+4. Click on **Create**
+5. Open **Actions** in the top right corner and click on **Generate Client Secret**
+6. Copy the **ClientID** and **ClientSecret** from the dialog
+
+
+7. **Generate JWT:**
     * Use your chosen library to generate a JWT with the following claims:
         * **iss (issuer):** The unique identifier of your ZITADEL instance (found in the web console).
         * **sub (subject):** The service user's ID.
