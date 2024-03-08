@@ -2,6 +2,7 @@ package projection
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"golang.org/x/text/language"
@@ -25,7 +26,28 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 		args   args
 		reduce func(event eventstore.Event) (*handler.Statement, error)
 		want   wantReduce
-	}{
+	}{{
+		name: "org MemberAddedType, error user not found",
+		args: args{
+			event: getEvent(
+				testEvent(
+					org.MemberAddedEventType,
+					org.AggregateType,
+					[]byte(`{
+					"userId": "user-id",
+					"roles": ["role"]
+				}`),
+				), org.MemberAddedEventMapper),
+		},
+		reduce: (&orgMemberProjection{
+			es: newMockEventStore().appendFilterResponse([]eventstore.Event{}),
+		}).reduceAdded,
+		want: wantReduce{
+			err: func(err error) bool {
+				return errors.Is(err, zerrors.ThrowNotFound(nil, "PROJ-uahkkord22", "Errors.NotFound"))
+			},
+		},
+	},
 		{
 			name: "org MemberAddedType",
 			args: args{
@@ -41,6 +63,70 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 			},
 			reduce: (&orgMemberProjection{
 				es: newMockEventStore().appendFilterResponse([]eventstore.Event{
+					user.NewHumanAddedEvent(context.Background(),
+						&user.NewAggregate("user-id", "org1").Aggregate,
+						"username1",
+						"firstname1",
+						"lastname1",
+						"nickname1",
+						"displayname1",
+						language.German,
+						domain.GenderMale,
+						"email1",
+						true,
+					),
+				}),
+			}).reduceAdded,
+			want: wantReduce{
+				aggregateType: org.AggregateType,
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO projections.org_members4 (user_id, user_resource_owner, roles, creation_date, change_date, sequence, resource_owner, instance_id, org_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedArgs: []interface{}{
+								"user-id",
+								"org1",
+								database.TextArray[string]{"role"},
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"instance-id",
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org MemberAddedType, import",
+			args: args{
+				event: getEvent(
+					testEvent(
+						org.MemberAddedEventType,
+						org.AggregateType,
+						[]byte(`{
+					"userId": "user-id",
+					"roles": ["role"]
+				}`),
+					), org.MemberAddedEventMapper),
+			},
+			reduce: (&orgMemberProjection{
+				es: newMockEventStore().appendFilterResponse([]eventstore.Event{
+					user.NewHumanAddedEvent(context.Background(),
+						&user.NewAggregate("user-id", "org2").Aggregate,
+						"username1",
+						"firstname1",
+						"lastname1",
+						"nickname1",
+						"displayname1",
+						language.German,
+						domain.GenderMale,
+						"email1",
+						true,
+					),
 					user.NewHumanAddedEvent(context.Background(),
 						&user.NewAggregate("user-id", "org1").Aggregate,
 						"username1",
