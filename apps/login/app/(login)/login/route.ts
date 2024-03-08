@@ -80,6 +80,15 @@ export async function GET(request: NextRequest) {
   if (authRequestId) {
     console.log(`Login with authRequest: ${authRequestId}`);
     const { authRequest } = await getAuthRequest(server, { authRequestId });
+
+    if (authRequest && authRequest.prompt.includes(Prompt.PROMPT_CREATE)) {
+      const registerUrl = new URL("/register", request.url);
+      if (authRequest?.id) {
+        registerUrl.searchParams.set("authRequestId", authRequest?.id);
+      }
+
+      return NextResponse.redirect(registerUrl);
+    }
     const ids = sessionCookies.map((s) => s.id);
 
     let sessions: Session[] = [];
@@ -105,6 +114,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.redirect(accountsUrl);
       } else {
+        // NONE prompt - silent authentication
         // check for loginHint, userId hint sessions
         let selectedSession = findSession(sessions, authRequest);
 
