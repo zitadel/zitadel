@@ -66,21 +66,21 @@ Now we need to enable and create the changefeed in the cockroach DB.
    The following example sends all events without payload to Google Cloud Storage
    Per default we do not want to send the payload of the events, as this could potentially include personally identifiable information (PII)
    If you want to include the payload, you can just add `payload` to the select list in the query.  
-```sql
+   ```sql
     CREATE CHANGEFEED INTO 'gs://gc-storage-zitadel-data/events?partition_format=flat&AUTH=specified&CREDENTIALS=base64encodedkey' 
     AS SELECT instance_id, aggregate_type, aggregate_id, owner, event_type, sequence, created_at 
     FROM eventstore.events2;
-  ```
+   ```
 
 In some cases you might want the payload of only some specific events.
 This example shows you how to get all events and the instance domain events with the payload:
-```sql
+   ```sql
     CREATE CHANGEFEED INTO 'gs://gc-storage-zitadel-data/events?partition_format=flat&AUTH=specified&CREDENTIALS=base64encodedkey' 
     AS SELECT instance_id, aggregate_type, aggregate_id, owner, event_type, sequence, created_at 
     CASE WHEN event_type IN ('instance.domain.added', 'instance.domain.removed', 'instance.domain.primary.set' ) 
     THEN payload END AS payload 
     FROM eventstore.events2;
-```
+   ```
 
 The partition format in the example above is flat, this means that all files for each timestamp will be created in the same folder.
 You will have files for different timestamps including the output for the events created in that time.
