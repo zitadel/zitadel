@@ -9,6 +9,7 @@ import { getBrandingSettings } from "#/lib/zitadel";
 import { server } from "../lib/zitadel";
 import { BrandingSettings } from "@zitadel/server";
 import ThemeProvider from "#/ui/ThemeProvider";
+import Theme from "#/ui/Theme";
 
 const lato = Lato({
   weight: ["400", "700", "900"],
@@ -44,8 +45,20 @@ export default async function RootLayout({
         <ThemeWrapper branding={partial}>
           <ThemeProvider>
             <LayoutProviders>
-              <div className="h-screen overflow-y-scroll bg-background-light-600 dark:bg-background-dark-600  bg-[url('/grid-light.svg')] dark:bg-[url('/grid-dark.svg')]">
-                {showNav && <GlobalNav />}
+              <div
+                className={`h-screen overflow-y-scroll bg-background-light-600 dark:bg-background-dark-600 ${
+                  showNav
+                    ? "bg-[url('/grid-light.svg')] dark:bg-[url('/grid-dark.svg')]"
+                    : ""
+                }`}
+              >
+                {showNav ? (
+                  <GlobalNav />
+                ) : (
+                  <div className="absolute bottom-0 right-0 flex flex-row p-4">
+                    <Theme />
+                  </div>
+                )}
 
                 <div
                   className={`${
