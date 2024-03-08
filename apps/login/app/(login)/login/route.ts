@@ -106,7 +106,9 @@ export async function GET(request: NextRequest) {
         if (authRequest?.id) {
           loginNameUrl.searchParams.set("authRequestId", authRequest?.id);
         }
-
+        if (authRequest.loginHint) {
+          loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
+        }
         return NextResponse.redirect(loginNameUrl);
       } else if (authRequest.prompt.includes(Prompt.PROMPT_NONE)) {
         // NONE prompt - silent authentication
