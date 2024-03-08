@@ -535,6 +535,8 @@ Errors:
     NotExisting: Feature does not exist
     TypeNotSupported: Feature type is not supported
     InvalidValue: Invalid value for this feature
+    Disabled:
+      TokenExchange: Token Exchange feature is disabled for your instance. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
   Target:
     Invalid: Target is invalid
     NoTimeout: Target has no timeout
@@ -546,6 +548,15 @@ Errors:
     NotFound: Execution not found
     IncludeNotFound: Include not found
     NoTargets: No targets defined
+  TokenExchange:
+    Token:
+      Missing: Token is missing
+      Invalid: Token is invalid
+      TypeMissing: Token type is missing
+      TypeNotAllowed: Token type is not allowed
+      TypeNotSupported: Token type is not supported
+    Impersonation:
+      PolicyDisabled: Impersonation is disabled in the instance security policy
 
 AggregateTypes:
   action: Action

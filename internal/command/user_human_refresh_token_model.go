@@ -15,10 +15,13 @@ type HumanRefreshTokenWriteModel struct {
 	TokenID      string
 	RefreshToken string
 
-	UserState      domain.UserState
-	IdleExpiration time.Time
-	Expiration     time.Time
-	UserAgentID    string
+	UserState             domain.UserState
+	AuthTime              time.Time
+	IdleExpiration        time.Time
+	Expiration            time.Time
+	UserAgentID           string
+	AuthMethodsReferences []string
+	Actor                 *domain.TokenActor
 }
 
 func NewHumanRefreshTokenWriteModel(userID, resourceOwner, tokenID string) *HumanRefreshTokenWriteModel {
@@ -64,7 +67,10 @@ func (wm *HumanRefreshTokenWriteModel) Reduce() error {
 			wm.IdleExpiration = e.CreationDate().Add(e.IdleExpiration)
 			wm.Expiration = e.CreationDate().Add(e.Expiration)
 			wm.UserState = domain.UserStateActive
+			wm.AuthTime = e.AuthTime
 			wm.UserAgentID = e.UserAgentID
+			wm.AuthMethodsReferences = e.AuthMethodsReferences
+			wm.Actor = e.Actor
 		case *user.HumanRefreshTokenRenewedEvent:
 			if wm.UserState == domain.UserStateActive {
 				wm.RefreshToken = e.RefreshToken

@@ -29,7 +29,7 @@ func (s *Server) userInfo(ctx context.Context, userID, projectID string, scope, 
 	return userInfo, s.userinfoFlows(ctx, qu, userInfo)
 }
 
-// prepareRoles scans the requested scopes, appends to roleAudiendce and returns the requestedRoles.
+// prepareRoles scans the requested scopes, appends to roleAudience and returns the requestedRoles.
 //
 // When [ScopeProjectsRoles] is present and roleAudience was empty,
 // project IDs with the [domain.ProjectIDScope] prefix are added to the roleAudience.

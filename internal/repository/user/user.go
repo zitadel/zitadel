@@ -209,16 +209,18 @@ func UserRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 type UserTokenAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	TokenID           string             `json:"tokenId,omitempty"`
-	ApplicationID     string             `json:"applicationId,omitempty"`
-	UserAgentID       string             `json:"userAgentId,omitempty"`
-	RefreshTokenID    string             `json:"refreshTokenID,omitempty"`
-	Audience          []string           `json:"audience,omitempty"`
-	Scopes            []string           `json:"scopes,omitempty"`
-	Expiration        time.Time          `json:"expiration,omitempty"`
-	PreferredLanguage string             `json:"preferredLanguage,omitempty"`
-	Reason            domain.TokenReason `json:"reason,omitempty"`
-	Actor             *domain.TokenActor `json:"actor,omitempty"`
+	TokenID               string             `json:"tokenId,omitempty"`
+	ApplicationID         string             `json:"applicationId,omitempty"`
+	UserAgentID           string             `json:"userAgentId,omitempty"`
+	RefreshTokenID        string             `json:"refreshTokenID,omitempty"`
+	Audience              []string           `json:"audience,omitempty"`
+	Scopes                []string           `json:"scopes,omitempty"`
+	AuthMethodsReferences []string           `json:"authMethodsReferences,omitempty"`
+	AuthTime              time.Time          `json:"authTime,omitempty"`
+	Expiration            time.Time          `json:"expiration,omitempty"`
+	PreferredLanguage     string             `json:"preferredLanguage,omitempty"`
+	Reason                domain.TokenReason `json:"reason,omitempty"`
+	Actor                 *domain.TokenActor `json:"actor,omitempty"`
 }
 
 func (e *UserTokenAddedEvent) Payload() interface{} {
@@ -238,7 +240,9 @@ func NewUserTokenAddedEvent(
 	preferredLanguage,
 	refreshTokenID string,
 	audience,
-	scopes []string,
+	scopes,
+	authMethodsReferences []string,
+	authTime,
 	expiration time.Time,
 	reason domain.TokenReason,
 	actor *domain.TokenActor,

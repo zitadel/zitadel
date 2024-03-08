@@ -57,11 +57,11 @@ func (c *Commands) AddNewRefreshTokenAndAccessToken(
 	if err != nil {
 		return nil, "", err
 	}
-	accessTokenEvent, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, refreshTokenID, audience, scopes, accessLifetime, reason, actor)
+	accessTokenEvent, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, refreshTokenID, audience, scopes, authMethodsReferences, accessLifetime, authTime, reason, actor)
 	if err != nil {
 		return nil, "", err
 	}
-	refreshTokenEvent, newRefreshToken, err := c.addRefreshToken(ctx, accessToken, authMethodsReferences, authTime, refreshIdleExpiration, refreshExpiration)
+	refreshTokenEvent, newRefreshToken, err := c.addRefreshToken(ctx, accessToken, authMethodsReferences, authTime, refreshIdleExpiration, refreshExpiration, actor)
 	if err != nil {
 		return nil, "", err
 	}
@@ -84,16 +84,16 @@ func (c *Commands) RenewRefreshTokenAndAccessToken(
 	idleExpiration,
 	accessLifetime time.Duration,
 ) (accessToken *domain.Token, newRefreshToken string, err error) {
-	refreshTokenEvent, refreshTokenID, newRefreshToken, err := c.renewRefreshToken(ctx, userID, orgID, refreshToken, idleExpiration)
+	renewed, err := c.renewRefreshToken(ctx, userID, orgID, refreshToken, idleExpiration)
 	if err != nil {
 		return nil, "", err
 	}
 	userWriteModel := NewUserWriteModel(userID, orgID)
-	accessTokenEvent, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, refreshTokenID, audience, scopes, accessLifetime, domain.TokenReasonRefresh, nil)
+	accessTokenEvent, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, renewed.tokenID, audience, scopes, renewed.authMethodsReferences, accessLifetime, renewed.authTime, domain.TokenReasonRefresh, nil)
 	if err != nil {
 		return nil, "", err
 	}
-	_, err = c.eventstore.Push(ctx, accessTokenEvent, refreshTokenEvent)
+	_, err = c.eventstore.Push(ctx, accessTokenEvent, renewed.event)
 	if err != nil {
 		return nil, "", err
 	}
@@ -132,7 +132,7 @@ func (c *Commands) RevokeRefreshTokens(ctx context.Context, userID, orgID string
 	return err
 }
 
-func (c *Commands) addRefreshToken(ctx context.Context, accessToken *domain.Token, authMethodsReferences []string, authTime time.Time, idleExpiration, expiration time.Duration) (*user.HumanRefreshTokenAddedEvent, string, error) {
+func (c *Commands) addRefreshToken(ctx context.Context, accessToken *domain.Token, authMethodsReferences []string, authTime time.Time, idleExpiration, expiration time.Duration, actor *domain.TokenActor) (*user.HumanRefreshTokenAddedEvent, string, error) {
 	refreshToken, err := domain.NewRefreshToken(accessToken.AggregateID, accessToken.RefreshTokenID, c.keyAlgorithm)
 	if err != nil {
 		return nil, "", err
@@ -140,46 +140,60 @@ func (c *Commands) addRefreshToken(ctx context.Context, accessToken *domain.Toke
 	refreshTokenWriteModel := NewHumanRefreshTokenWriteModel(accessToken.AggregateID, accessToken.ResourceOwner, accessToken.RefreshTokenID)
 	userAgg := UserAggregateFromWriteModel(&refreshTokenWriteModel.WriteModel)
 	return user.NewHumanRefreshTokenAddedEvent(ctx, userAgg, accessToken.RefreshTokenID, accessToken.ApplicationID, accessToken.UserAgentID,
-			accessToken.PreferredLanguage, accessToken.Audience, accessToken.Scopes, authMethodsReferences, authTime, idleExpiration, expiration),
+			accessToken.PreferredLanguage, accessToken.Audience, accessToken.Scopes, authMethodsReferences, authTime, idleExpiration, expiration, actor),
 		refreshToken, nil
 }
 
-func (c *Commands) renewRefreshToken(ctx context.Context, userID, orgID, refreshToken string, idleExpiration time.Duration) (event *user.HumanRefreshTokenRenewedEvent, refreshTokenID, newRefreshToken string, err error) {
+type renewedRefreshToken struct {
+	event                 *user.HumanRefreshTokenRenewedEvent
+	authTime              time.Time
+	authMethodsReferences []string
+	tokenID               string
+	token                 string
+}
+
+func (c *Commands) renewRefreshToken(ctx context.Context, userID, orgID, refreshToken string, idleExpiration time.Duration) (*renewedRefreshToken, error) {
 	if refreshToken == "" {
-		return nil, "", "", zerrors.ThrowInvalidArgument(nil, "COMMAND-DHrr3", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-DHrr3", "Errors.IDMissing")
 	}
 
 	tokenUserID, tokenID, token, err := domain.FromRefreshToken(refreshToken, c.keyAlgorithm)
 	if err != nil {
-		return nil, "", "", err
+		return nil, err
 	}
 	if tokenUserID != userID {
-		return nil, "", "", zerrors.ThrowInvalidArgument(nil, "COMMAND-Ht2g2", "Errors.User.RefreshToken.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Ht2g2", "Errors.User.RefreshToken.Invalid")
 	}
 	refreshTokenWriteModel := NewHumanRefreshTokenWriteModel(userID, orgID, tokenID)
 	err = c.eventstore.FilterToQueryReducer(ctx, refreshTokenWriteModel)
 	if err != nil {
-		return nil, "", "", err
+		return nil, err
 	}
 	if refreshTokenWriteModel.UserState != domain.UserStateActive {
-		return nil, "", "", zerrors.ThrowInvalidArgument(nil, "COMMAND-BHnhs", "Errors.User.RefreshToken.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-BHnhs", "Errors.User.RefreshToken.Invalid")
 	}
 	if refreshTokenWriteModel.RefreshToken != token ||
 		refreshTokenWriteModel.IdleExpiration.Before(time.Now()) ||
 		refreshTokenWriteModel.Expiration.Before(time.Now()) {
-		return nil, "", "", zerrors.ThrowInvalidArgument(nil, "COMMAND-Vr43e", "Errors.User.RefreshToken.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Vr43e", "Errors.User.RefreshToken.Invalid")
 	}
 
 	newToken, err := c.idGenerator.Next()
 	if err != nil {
-		return nil, "", "", err
+		return nil, err
 	}
-	newRefreshToken, err = domain.RefreshToken(userID, tokenID, newToken, c.keyAlgorithm)
+	newRefreshToken, err := domain.RefreshToken(userID, tokenID, newToken, c.keyAlgorithm)
 	if err != nil {
-		return nil, "", "", err
+		return nil, err
 	}
 	userAgg := UserAggregateFromWriteModel(&refreshTokenWriteModel.WriteModel)
-	return user.NewHumanRefreshTokenRenewedEvent(ctx, userAgg, tokenID, newToken, idleExpiration), tokenID, newRefreshToken, nil
+	return &renewedRefreshToken{
+		event:                 user.NewHumanRefreshTokenRenewedEvent(ctx, userAgg, tokenID, newToken, idleExpiration),
+		authTime:              refreshTokenWriteModel.AuthTime,
+		authMethodsReferences: refreshTokenWriteModel.AuthMethodsReferences,
+		tokenID:               tokenID,
+		token:                 newRefreshToken,
+	}, nil
 }
 
 func (c *Commands) removeRefreshToken(ctx context.Context, userID, orgID, tokenID string) (*user.HumanRefreshTokenRemovedEvent, *HumanRefreshTokenWriteModel, error) {

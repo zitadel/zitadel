@@ -311,7 +311,7 @@ func (o *OPStorage) SigningKey(ctx context.Context) (key op.SigningKey, err erro
 			return err
 		}
 		if key == nil {
-			return zerrors.ThrowInternal(nil, "test", "test")
+			return zerrors.ThrowNotFound(nil, "OIDC-ve4Qu", "Errors.Internal")
 		}
 		return nil
 	})

@@ -212,13 +212,13 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 		return o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.GetID())
 	}
 
-	userAgentID, applicationID, userOrgID, _, _, reason := getInfoFromRequest(req)
+	userAgentID, applicationID, userOrgID, authTime, amr, reason := getInfoFromRequest(req)
 	accessTokenLifetime, _, _, _, err := o.getOIDCSettings(ctx)
 	if err != nil {
 		return "", time.Time{}, err
 	}
 
-	resp, err := o.command.AddUserToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), accessTokenLifetime, reason, nil) //PLANNED: lifetime from client
+	resp, err := o.command.AddUserToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), amr, accessTokenLifetime, authTime, reason, nil)
 	if err != nil {
 		return "", time.Time{}, err
 	}
