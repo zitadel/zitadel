@@ -81,6 +81,7 @@ jobs:
           file: profile.cov
           name: core-integration-tests-postgres
           flags: core-integration-tests-postgres
+          token: ${{ secrets.CODECOV_TOKEN }}
       - 
         uses: actions/cache/save@v4
         name: cache results
