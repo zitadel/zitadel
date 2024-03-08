@@ -147,7 +147,7 @@ func (c *Commands) renewRefreshToken(ctx context.Context, userID, orgID, refresh
 
 	tokenUserID, tokenID, token, err := domain.FromRefreshToken(refreshToken, c.keyAlgorithm)
 	if err != nil {
-		return nil, "", "", zerrors.ThrowInvalidArgument(err, "COMMAND-Dbfe4", "Errors.User.RefreshToken.Invalid")
+		return nil, "", "", err
 	}
 	if tokenUserID != userID {
 		return nil, "", "", zerrors.ThrowInvalidArgument(nil, "COMMAND-Ht2g2", "Errors.User.RefreshToken.Invalid")

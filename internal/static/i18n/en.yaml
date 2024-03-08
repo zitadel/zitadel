@@ -128,6 +128,7 @@ Errors:
       NotFound: Code not found
       Expired: Code is expired
       GeneratorAlgNotSupported: Unsupported generator algorithm
+      Invalid: Code is invalid
     Password:
       NotFound: Password not found
       Empty: Password is empty
@@ -327,7 +328,7 @@ Errors:
       NotActive: Project grant is not active
       NotInactive: Project grant is not inactive
   IAM:
-    NotFound: Instance not found. Check out https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: Instance not found. Make sure you got the domain right. Check out https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Roles have not been changed
     MemberInvalid: Member is invalid
@@ -534,6 +535,17 @@ Errors:
     NotExisting: Feature does not exist
     TypeNotSupported: Feature type is not supported
     InvalidValue: Invalid value for this feature
+  Target:
+    Invalid: Target is invalid
+    NoTimeout: Target has no timeout
+    InvalidURL: Target has an invalid URL
+    NotFound: Target not found
+  Execution:
+    ConditionInvalid: Execution condition is invalid
+    Invalid: Execution is invalid
+    NotFound: Execution not found
+    IncludeNotFound: Include not found
+    NoTargets: No targets defined
 
 AggregateTypes:
   action: Action
@@ -545,11 +557,20 @@ AggregateTypes:
   usergrant: User grant
   quota: Quota
   feature: Feature
+  target: Target
+  execution: Execution
 
 EventTypes:
+  execution:
+    set: Execution set
+    removed: Execution deleted
+  target:
+    added: Target created
+    changed: Target changed
+    removed: Target deleted
   user:
     added: User added
-    selfregistered: User registered himself
+    selfregistered: User registered themself
     initialization:
       code:
         added: Initialization code generated
@@ -588,7 +609,7 @@ EventTypes:
           failed: Secret check failed
     human:
       added: Person added
-      selfregistered: Person registered himself
+      selfregistered: Person registered themself
       avatar:
         added: Avatar added
         removed: Avatar removed

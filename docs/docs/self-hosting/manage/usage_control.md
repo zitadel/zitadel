@@ -31,7 +31,7 @@ DefaultInstance:
 
 You can restrict the maximum age of events returned by the following APIs:
 
-- [Events Search](/apis/resources/admin/admin-service-list-events), See also the [Event API guide](guides/integrate/event-api)
+- [Events Search](/apis/resources/admin/admin-service-list-events), See also the [Event API guide](/guides/integrate/event-api)
 - [My User History](/apis/resources/auth/auth-service-list-my-user-changes)
 - [A Users History](/apis/resources/mgmt/management-service-list-user-changes)
 - [An Applications History](/apis/resources/mgmt/management-service-list-app-changes)

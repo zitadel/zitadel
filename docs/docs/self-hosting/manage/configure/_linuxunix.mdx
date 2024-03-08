@@ -19,13 +19,13 @@ By executing the commands below, you will download the following files:
 
 ```bash
 # Download and adjust the example configuration file containing standard configuration
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/production/example-zitadel-config.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/configure/example-zitadel-config.yaml
 
 # Download and adjust the example configuration file containing secret configuration
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/production/example-zitadel-secrets.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/configure/example-zitadel-secrets.yaml
 
 # Download and adjust the example configuration file containing database initialization configuration
-wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/production/example-zitadel-init-steps.yaml
+wget https://raw.githubusercontent.com/zitadel/zitadel/main/docs/docs/self-hosting/manage/configure/example-zitadel-init-steps.yaml
 
 # A single ZITADEL instance always needs the same 32 characters long masterkey
 # If you haven't done so already, you can generate a new one
@@ -44,17 +44,21 @@ zitadel start-from-init \
 
 ```bash
 # Set runtime environment variables
-export ZITADEL_DATABASE_COCKROACH_HOST="my.database"
-export ZITADEL_DATABASE_COCKROACH_USER_USERNAME="my_zitadel_db_user"
-export ZITADEL_DATABASE_COCKROACH_USER_PASSWORD="Secret_DB_User_Password"
+export ZITADEL_DATABASE_POSTGRES_HOST=my.database 
+export ZITADEL_DATABASE_POSTGRES_PORT=5432 
+export ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel 
+export ZITADEL_DATABASE_POSTGRES_USER_USERNAME=my_zitadel_db_user 
+export ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=Secret_DB_User_Password 
+export ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable 
+export ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=root 
+export ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable
 export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME="root"
 export ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD="RootPassword1!"
 
-# A single ZITADEL instance always needs the same 32 characters long masterkey
-# If you haven't done so already, you can generate a new one
-# The key must be passed as argument
-export ZITADEL_MASTERKEY="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 32)"
+# A single ZITADEL instance always needs the same 32 bytes long masterkey
+# Generate one to a file if you haven't done so already and pass it as environment variable
+tr -dc A-Za-z0-9 </dev/urandom | head -c 32 > ./zitadel-masterkey
 
 # Let the zitadel binary read configuration from environment variables
-zitadel start-from-init --masterkey "${ZITADEL_MASTERKEY}" --tlsMode disabled
+zitadel start-from-init --masterkey "${ZITADEL_MASTERKEY}" --tlsMode disabled --masterkeyFile ./zitadel-masterkey
 ```

@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/encryption"
-	"github.com/zitadel/zitadel/cmd/systemapi"
+	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/oidc"
@@ -19,7 +19,6 @@ import (
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
@@ -47,7 +46,7 @@ type Config struct {
 	Login           login.Config
 	WebAuthNName    string
 	Telemetry       *handlers.TelemetryPusherConfig
-	SystemAPIUsers  systemapi.Users
+	SystemAPIUsers  map[string]*authz.SystemAPIUser
 }
 
 type InitProjections struct {
@@ -67,9 +66,9 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
-			hook.EnumHookFunc(domain.FeatureString),
 			hook.EnumHookFunc(authz.MemberTypeString),
 			actions.HTTPConfigDecodeHook,
+			hooks.MapTypeStringDecode[string, *authz.SystemAPIUser],
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")
@@ -126,8 +125,6 @@ func MustNewSteps(v *viper.Viper) *Steps {
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
-			hook.EnumHookFunc(domain.FeatureString),
-			systemapi.UsersDecodeHook,
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read steps")

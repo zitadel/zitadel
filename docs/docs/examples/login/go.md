@@ -28,7 +28,7 @@ We recommend that you use [Proof Key for Code Exchange (PKCE)](/apis/openidoauth
 The Redirect URIs field tells ZITADEL where it's allowed to redirect users after authentication. For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 The Post-logout redirect send the users back to a route on your application after they have logged out.
 
-> If you are following along with the [example](https://github.com/zitadel/zitadel-go), set the dev mode to `true`, the Redirect URIs to <http://localhost:8089/auth/callback> and Post redirect URI to <http://localhost:8089/>.
+> If you are following along with the [example](https://github.com/zitadel/zitadel-go), set the dev mode to `true`, the Redirect URIs to <http://localhost:8089/auth/callback> and Post-logout redirect URI to <http://localhost:8089/>.
 
 ![Create app in console - set redirectURI](/img/go/app-create-redirect.png)
 
@@ -70,7 +70,7 @@ The SDK itself will then register three routes on that to be able to:
  - start the authentication process and redirect to the Login UI (`/auth/login`)
  - continue with the authentication process after the login UI (`/auth/callback`)
  - terminate the session (`/auth/logout`)
- - 
+
 ```go
 router.Handle("/auth/", z.Authentication)
 ```
@@ -78,11 +78,11 @@ router.Handle("/auth/", z.Authentication)
 ***Authentication checks***
 
 To ensure the user is authenticated before they are able to use your application, the middleware provides two options:
-- You can either require the user to be authenticated. If he's not yet, he will be automatically redirected to the Login UI:
+- You can either require the user to be authenticated. If they haven't already, they will be automatically redirected to the Login UI:
     ```go
     mw.RequireAuthentication()(handler)
     ```
-- You can just check if he already is, but still continue serving the page:
+- You can just check the user's authentication status, but still continue serving the page:
     ```go
     mw.CheckAuthentication()(handler)
     ```
@@ -119,7 +119,7 @@ https://github.com/zitadel/zitadel-go/blob/next/example/app/templates/profile.ht
 
 You will need to provide some values for the program to run:
 - `domain`: Your ZITADEL instance domain, e.g. my-domain.zitadel.cloud
-- `key`: The path to the downloaded key.json
+- `key`: Random secret string. Used for symmetric encryption of state parameters, cookies and PCKE. 
 - `clientID`: The clientID provided by ZITADEL
 - `redirectURI`: The redirectURI registered at ZITADEL
 - `port`: The port on which the API will be accessible, default it 8089

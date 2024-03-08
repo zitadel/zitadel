@@ -27,11 +27,11 @@ Roles can be requested via our auth and management APIs, from userinfo endpoint 
 
 ### Generate a token
 
-You must first of all generate a token for the user. If it’s a human user, he would be using a front-end application and logging in via the browser or device. An access token will be returned after they log in successfully. A machine user will use a script or other program to generate a token using the JWT profile or client credentials grant types. 
+You must first of all generate a token for the user. For human users, the typical approach involves using a front-end application and logging in through the browser or device. An access token will be returned after they log in successfully. A machine user will use a script or other program to generate a token using the JWT profile or client credentials grant types. 
 
 How to generate a token: 
 
-- [Generate tokens for human users](/docs/guides/integrate/login-users)
+- [Generate tokens for human users](/docs/guides/integrate/login/oidc/login-users)
 - [Generate tokens for service users](/docs/guides/integrate/serviceusers)
 
 In order to access role information via the token you must include the right audience and the necessary role claims in the scope and/or select the required role settings in the ZITADEL console before requesting the token. 
@@ -146,7 +146,7 @@ This request can be tested out in the following way:
 
 **2. Scope used:** `openid email profile urn:zitadel:iam:org:project:id:{projectId}:aud urn:iam:org:project:roles urn:zitadel:iam:org:projects:roles`
 
-:::note
+:::important
 In order to stay up-to-date with the latest ZITADEL standards, we recommend that you use the roles from the identifier `urn:zitadel:iam:org:project:{projectId}:roles` rather than `urn:zitadel:iam:org:project:roles`. While both identifiers are maintained for backwards compatibility, the format which includes the specific ID represents our more recent model.
 :::
 
