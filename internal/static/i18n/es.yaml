@@ -328,7 +328,7 @@ Errors:
       NotActive: La concesión del proyecto no está activa
       NotInactive: La concesión del proyecto no está inactiva
   IAM:
-    NotFound: Instancia no encontrada. Consulta https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: Instancia no encontrada. Asegúrate de que tienes el dominio correcto. Consulta https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Los roles no han cambiado
     MemberInvalid: El miembro no es válido

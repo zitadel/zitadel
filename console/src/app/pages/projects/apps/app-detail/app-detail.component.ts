@@ -1,6 +1,6 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation, signal } from '@angular/core';
 import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
@@ -77,6 +77,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public authMethods: RadioItemAuthType[] = [];
   private subscription?: Subscription;
   public projectId: string = '';
+  public appId: string = '';
   public app?: App.AsObject;
 
   public environmentMap$ = this.envSvc.env.pipe(
@@ -149,6 +150,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public settingsList: SidenavSetting[] = [{ id: 'configuration', i18nKey: 'APP.CONFIGURATION' }];
   public currentSetting: string | undefined = this.settingsList[0].id;
 
+  public isNew = signal<boolean>(false);
   constructor(
     private envSvc: EnvironmentService,
     public translate: TranslateService,
@@ -245,9 +247,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     const projectId = this.route.snapshot.paramMap.get('projectid');
     const appId = this.route.snapshot.paramMap.get('appid');
+    const isNew = this.route.snapshot.queryParamMap.get('new');
+
+    this.isNew.set(isNew === 'true');
 
     if (projectId && appId) {
       this.projectId = projectId;
+      this.appId = appId;
       this.getData(projectId, appId);
     }
   }
@@ -635,6 +641,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               this.currentAuthMethod = this.authMethodFromPartialConfig(config);
             }
             this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
+            setTimeout(() => {
+              this.getData(this.projectId, this.appId);
+            }, 1000);
           })
           .catch((error) => {
             this.toast.showError(error);

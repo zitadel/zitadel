@@ -143,7 +143,7 @@ ZITADEL simplifies multi-tenancy authentication by securely managing authenticat
 Key features include:
 
 1. **Secure Tenant Isolation**: Ensures robust security measures to prevent unauthorized access between tenants, maintaining data privacy and compliance. [Managers](/docs/concepts/structure/managers) for an organization have only access to data and configuration within their Organization.
-2. **Custom Authentication Configurations**: Allows tailored [authentication settings](/docs/guides/manage/console/instance-settings#login-behavior-and-access), [branding](/docs/guides/manage/customize/branding), and policies for each tenant.
+2. **Custom Authentication Configurations**: Allows tailored [authentication settings](/docs/guides/manage/console/default-settings#login-behavior-and-access), [branding](/docs/guides/manage/customize/branding), and policies for each tenant.
 3. **Centralized Management**: Provides [centralized administration](/docs/guides/manage/console/managers) for efficient management across all tenants.
 4. **Scalability and Flexibility**: Scales seamlessly to accommodate growing organizations of all sizes.
 5. **Domain Discovery**: Starting on a central login page, route users to their tenant based on their email address or other user attributes. Authentication settings will be applied automatically based on the organization's policies, this includes routing users seamlessly to third party identity providers like [Entra ID](/docs/guides/integrate/identity-providers/azure-ad).
@@ -195,7 +195,7 @@ Users are automatically prompted to provide a second factor, when
 When a multi-factor is required, but not set up, then the user is requested to set up an additional factor.
 
 :::info Disabling multifactor prompt
-You can disable the prompt, in case multifactor authentication is not enforced by setting the [**Multifactor Init Lifetime**](/docs/guides/manage/console/instance-settings#login-lifetimes) to 0.
+You can disable the prompt, in case multifactor authentication is not enforced by setting the [**Multifactor Init Lifetime**](/docs/guides/manage/console/default-settings#login-lifetimes) to 0.
 :::
 
 #### Enroll passkeys
@@ -210,7 +210,7 @@ The user experience depends mainly on the operating system and browser.
 ## Build a custom Login UI to authenticate users
 
 In certain cases, you want to build your own login UI to optimize your user experience.
-We have dedicated guides on [how to build your custom login UI](http://localhost:3000/docs/guides/integrate/login-ui) with ZITADEL.
+We have dedicated guides on [how to build your custom login UI](/docs/guides/integrate/login-ui) with ZITADEL.
 
 When building your own login UI, you will leverage the [Session API](#zitadels-session-api) to authenticate users and manage user sessions.
 

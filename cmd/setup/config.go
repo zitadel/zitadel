@@ -19,7 +19,6 @@ import (
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
@@ -67,7 +66,6 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
-			hook.EnumHookFunc(domain.FeatureString),
 			hook.EnumHookFunc(authz.MemberTypeString),
 			actions.HTTPConfigDecodeHook,
 			hooks.MapTypeStringDecode[string, *authz.SystemAPIUser],
@@ -84,25 +82,26 @@ func MustNewConfig(v *viper.Viper) *Config {
 }
 
 type Steps struct {
-	s1ProjectionTable               *ProjectionTable
-	s2AssetsTable                   *AssetTable
-	FirstInstance                   *FirstInstance
-	s5LastFailed                    *LastFailed
-	s6OwnerRemoveColumns            *OwnerRemoveColumns
-	s7LogstoreTables                *LogstoreTables
-	s8AuthTokens                    *AuthTokenIndexes
-	CorrectCreationDate             *CorrectCreationDate
-	s12AddOTPColumns                *AddOTPColumns
-	s13FixQuotaProjection           *FixQuotaConstraints
-	s14NewEventsTable               *NewEventsTable
-	s15CurrentStates                *CurrentProjectionState
-	s16UniqueConstraintsLower       *UniqueConstraintToLower
-	s17AddOffsetToUniqueConstraints *AddOffsetToCurrentStates
-	s18AddLowerFieldsToLoginNames   *AddLowerFieldsToLoginNames
-	s19AddCurrentStatesIndex        *AddCurrentSequencesIndex
-	s20AddByUserSessionIndex        *AddByUserIndexToSession
-	s21AddBlockFieldToLimits        *AddBlockFieldToLimits
-	s22ActiveInstancesIndex         *ActiveInstanceEvents
+	s1ProjectionTable                 *ProjectionTable
+	s2AssetsTable                     *AssetTable
+	FirstInstance                     *FirstInstance
+	s5LastFailed                      *LastFailed
+	s6OwnerRemoveColumns              *OwnerRemoveColumns
+	s7LogstoreTables                  *LogstoreTables
+	s8AuthTokens                      *AuthTokenIndexes
+	CorrectCreationDate               *CorrectCreationDate
+	s12AddOTPColumns                  *AddOTPColumns
+	s13FixQuotaProjection             *FixQuotaConstraints
+	s14NewEventsTable                 *NewEventsTable
+	s15CurrentStates                  *CurrentProjectionState
+	s16UniqueConstraintsLower         *UniqueConstraintToLower
+	s17AddOffsetToUniqueConstraints   *AddOffsetToCurrentStates
+	s18AddLowerFieldsToLoginNames     *AddLowerFieldsToLoginNames
+	s19AddCurrentStatesIndex          *AddCurrentSequencesIndex
+	s20AddByUserSessionIndex          *AddByUserIndexToSession
+	s21AddBlockFieldToLimits          *AddBlockFieldToLimits
+	s22ActiveInstancesIndex           *ActiveInstanceEvents
+	s23CorrectGlobalUniqueConstraints *CorrectGlobalUniqueConstraints
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
@@ -127,7 +126,6 @@ func MustNewSteps(v *viper.Viper) *Steps {
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
-			hook.EnumHookFunc(domain.FeatureString),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read steps")

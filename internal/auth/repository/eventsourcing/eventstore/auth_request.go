@@ -7,7 +7,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	cache "github.com/zitadel/zitadel/internal/auth_request/repository"
@@ -49,8 +48,6 @@ type AuthRequestRepo struct {
 	ProjectProvider           projectProvider
 	ApplicationProvider       applicationProvider
 	CustomTextProvider        customTextProvider
-
-	FeatureCheck feature.Checker
 
 	IdGenerator id.Generator
 }
@@ -656,16 +653,15 @@ func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, 
 }
 
 func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.AuthRequest) error {
+	instance := authz.GetInstance(ctx)
 	orgID := request.RequestedOrgID
 	if orgID == "" {
 		orgID = request.UserOrgID
 	}
 	if orgID == "" {
 		orgID = authz.GetInstance(ctx).DefaultOrganisationID()
-		f, err := repo.FeatureCheck.CheckInstanceBooleanFeature(ctx, domain.FeatureLoginDefaultOrg)
-		logging.WithFields("authReq", request.ID).OnError(err).Warnf("could not check feature %s", domain.FeatureLoginDefaultOrg)
-		if !f.Boolean {
-			orgID = authz.GetInstance(ctx).InstanceID()
+		if !instance.Features().LoginDefaultOrg {
+			orgID = instance.InstanceID()
 		}
 	}
 
@@ -692,7 +688,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		return err
 	}
 	request.LabelPolicy = labelPolicy
-	defaultLoginTranslations, err := repo.getLoginTexts(ctx, authz.GetInstance(ctx).InstanceID())
+	defaultLoginTranslations, err := repo.getLoginTexts(ctx, instance.InstanceID())
 	if err != nil {
 		return err
 	}
@@ -747,7 +743,7 @@ func (repo *AuthRequestRepo) checkLoginName(ctx context.Context, request *domain
 		return err
 	}
 	// if there's an active (human) user, let's use it
-	if user != nil && !user.HumanView.IsZero() && domain.UserState(user.State).NotDisabled() {
+	if user != nil && !user.HumanView.IsZero() && domain.UserState(user.State).IsEnabled() {
 		request.SetUserInfo(user.ID, loginNameInput, user.PreferredLoginName, "", "", user.ResourceOwner)
 		return nil
 	}

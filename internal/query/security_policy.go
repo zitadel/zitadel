@@ -36,12 +36,16 @@ var (
 		name:  projection.SecurityPolicyColumnSequence,
 		table: securityPolicyTable,
 	}
-	SecurityPolicyColumnEnabled = Column{
-		name:  projection.SecurityPolicyColumnEnabled,
+	SecurityPolicyColumnEnableIframeEmbedding = Column{
+		name:  projection.SecurityPolicyColumnEnableIframeEmbedding,
 		table: securityPolicyTable,
 	}
 	SecurityPolicyColumnAllowedOrigins = Column{
 		name:  projection.SecurityPolicyColumnAllowedOrigins,
+		table: securityPolicyTable,
+	}
+	SecurityPolicyColumnEnableImpersonation = Column{
+		name:  projection.SecurityPolicyColumnEnableImpersonation,
 		table: securityPolicyTable,
 	}
 )
@@ -53,8 +57,9 @@ type SecurityPolicy struct {
 	ResourceOwner string
 	Sequence      uint64
 
-	Enabled        bool
-	AllowedOrigins database.TextArray[string]
+	EnableIframeEmbedding bool
+	AllowedOrigins        database.TextArray[string]
+	EnableImpersonation   bool
 }
 
 func (q *Queries) SecurityPolicy(ctx context.Context) (policy *SecurityPolicy, err error) {
@@ -80,8 +85,9 @@ func prepareSecurityPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 			SecurityPolicyColumnChangeDate.identifier(),
 			SecurityPolicyColumnInstanceID.identifier(),
 			SecurityPolicyColumnSequence.identifier(),
-			SecurityPolicyColumnEnabled.identifier(),
-			SecurityPolicyColumnAllowedOrigins.identifier()).
+			SecurityPolicyColumnEnableIframeEmbedding.identifier(),
+			SecurityPolicyColumnAllowedOrigins.identifier(),
+			SecurityPolicyColumnEnableImpersonation.identifier()).
 			From(securityPolicyTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SecurityPolicy, error) {
@@ -92,8 +98,9 @@ func prepareSecurityPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Sel
 				&securityPolicy.ChangeDate,
 				&securityPolicy.ResourceOwner,
 				&securityPolicy.Sequence,
-				&securityPolicy.Enabled,
+				&securityPolicy.EnableIframeEmbedding,
 				&securityPolicy.AllowedOrigins,
+				&securityPolicy.EnableImpersonation,
 			)
 			if err != nil && !errors.Is(err, sql.ErrNoRows) { // ignore not found errors
 				return nil, zerrors.ThrowInternal(err, "QUERY-Dfrt2", "Errors.Internal")

@@ -1,3 +1,5 @@
+// Package feature implements the v1 feature repository.
+// DEPRECATED: use ./feature_v2 instead.
 package feature
 
 import (
@@ -6,14 +8,26 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
 )
 
 var (
-	DefaultLoginInstanceEventType = EventTypeFromFeature(domain.FeatureLoginDefaultOrg)
+	DefaultLoginInstanceEventType = eventTypePrefix + eventstore.EventType(strings.ToLower("FeatureLoginDefaultOrg")) + setSuffix
 )
 
-func EventTypeFromFeature(feature domain.Feature) eventstore.EventType {
-	return eventTypePrefix + eventstore.EventType(strings.ToLower(feature.String())) + setSuffix
+// DefaultLoginInstanceEventToV2 upgrades the SetEvent to a V2 SetEvent so that
+// the v2 reducers can handle the V1 events.
+func DefaultLoginInstanceEventToV2(e *SetEvent[Boolean]) *feature_v2.SetEvent[bool] {
+	v2e := &feature_v2.SetEvent[bool]{
+		BaseEvent: e.BaseEvent,
+		Value:     e.Value.Boolean,
+	}
+
+	// v1 used a random aggregate ID.
+	// v2 uses the instance ID as aggregate ID.
+	v2e.BaseEvent.Agg.ID = e.Agg.InstanceID
+	v2e.BaseEvent.EventType = feature_v2.InstanceLoginDefaultOrgEventType
+	return v2e
 }
 
 type SetEvent[T SetEventType] struct {

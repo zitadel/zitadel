@@ -119,6 +119,30 @@
     "SETTINGS": "设置",
     "CUSTOMERPORTAL": "客户门户网站"
   },
+  "QUICKSTART": {
+    "TITLE": "将 ZITADEL 集成到您的应用程序中",
+    "DESCRIPTION": "将 ZITADEL 集成到您的应用程序中，或使用我们的示例，几分钟内即可开始使用。",
+    "BTN_START": "创建应用程序",
+    "BTN_LEARNMORE": "了解更多",
+    "CREATEPROJECTFORAPP": "创建项目 {{value}}",
+    "SELECT_FRAMEWORK": "选择框架",
+    "FRAMEWORK": "框架",
+    "FRAMEWORK_OTHER": "其他 (OIDC, SAML, API)",
+    "ALMOSTDONE": "就快好了",
+    "REVIEWCONFIGURATION": "审查配置",
+    "REVIEWCONFIGURATION_DESCRIPTION": "我们为 {{value}} 应用程序创建了一个基本配置。创建后，您可以根据自己的需要调整该配置。",
+    "REDIRECTS": "配置重定向",
+    "DEVMODEWARN": "默认情况下启用开发模式。您可以稍后更新生产值。",
+    "GUIDE": "指南",
+    "BROWSEEXAMPLES": "浏览示例",
+    "DUPLICATEAPPRENAME": "具有相同 neme 的应用程序已经存在。请选择不同的名称。",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "变革框架",
+        "DESCRIPTION": "从可用的框架中选择一个，快速设置您的应用程序。"
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "操作",
     "FILTER": "过滤",
@@ -138,6 +162,7 @@
     "ADD": "添加",
     "CREATE": "创建",
     "CONTINUE": "继续",
+    "CONTINUEWITH": "继续 {{value}}",
     "BACK": "返回",
     "CLOSE": "关闭",
     "CLEAR": "清除",
@@ -187,12 +212,16 @@
     "IAM_OWNER_VIEWER": "有权审查整个实例，包括所有组织",
     "IAM_ORG_MANAGER": "有权创建和管理组织",
     "IAM_USER_MANAGER": "有权创建和管理用户",
+    "IAM_ADMIN_IMPERSONATOR": "有权模拟所有组织的管理员和最终用户",
+    "IAM_END_USER_IMPERSONATOR": "有权模拟所有组织的最终用户",
     "ORG_OWNER": "拥有整个组织的权限",
     "ORG_USER_MANAGER": "有权创建和管理组织的用户",
     "ORG_OWNER_VIEWER": "有权审查整个组织",
     "ORG_USER_PERMISSION_EDITOR": "有权管理用户授权",
     "ORG_PROJECT_PERMISSION_EDITOR": "有权管理项目授权",
     "ORG_PROJECT_CREATOR": "有权创建自己的项目和基础设置",
+    "ORG_ADMIN_IMPERSONATOR": "有权模拟组织的管理员和最终用户",
+    "ORG_END_USER_IMPERSONATOR": "有权模拟组织的最终用户",
     "PROJECT_OWNER": "拥有整个项目的权限",
     "PROJECT_OWNER_VIEWER": "有权审查整个项目",
     "PROJECT_OWNER_GLOBAL": "拥有整个项目的权限",
@@ -1159,9 +1188,13 @@
       "UPDATED": "设置已更新。"
     },
     "SECURITY": {
-      "DESCRIPTION": "此设置将CSP设置为允许来自一组允许的域的框架。请注意，通过启用iFrames的使用，你会有允许点击劫持的风险。",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "此设置将CSP设置为允许来自一组允许的域的框架。请注意，通过启用iFrames的使用，你会有允许点击劫持的风险。",
       "IFRAMEENABLED": "允许 iFrame",
-      "ALLOWEDORIGINS": "允许的来源 URL"
+      "ALLOWEDORIGINS": "允许的来源 URL",
+      "IMPERSONATIONTITLE": "冒充",
+      "IMPERSONATIONENABLED": "允许模拟",
+      "IMPERSONATIONDESCRIPTION": "此设置原则上允许使用模拟。请注意，模拟者还需要分配适当的 `*_IMPERSONATOR` 角色。"
     },
     "DIALOG": {
       "RESET": {
@@ -1953,6 +1986,7 @@
       "DATECHANGED": "修改于",
       "URLS": "URLs",
       "DELETE": "删除应用",
+      "JUMPTOPROJECT": "要配置角色、授权等，请导航到项目。",
       "DETAIL": {
         "TITLE": "详情",
         "STATE": {

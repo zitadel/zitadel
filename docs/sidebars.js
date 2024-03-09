@@ -134,7 +134,7 @@ module.exports = {
           },
           items: [
             "guides/manage/console/overview",
-            "guides/manage/console/instance-settings",
+            "guides/manage/console/default-settings",
             "guides/manage/console/organizations",
             "guides/manage/console/projects",
             "guides/manage/console/roles",
@@ -677,6 +677,20 @@ module.exports = {
                   "This project is in beta state. It can AND will continue to break until the services provide the same functionality as the current login.",
               },
               items: require("./docs/apis/resources/settings_service/sidebar.js"),
+            },
+            {
+              type: "category",
+              label: "Feature Lifecycle (Beta)",
+              link: {
+                type: "generated-index",
+                title: "Feature Service API (Beta)",
+                slug: "/apis/resources/feature_service",
+                description:
+                  "This API is intended to manage features for ZITADEL. Feature settings that are available on multiple \"levels\", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.\n" +
+                  "\n" +
+                  "This project is in beta state. It can AND will continue breaking until a stable version is released.",
+              },
+              items: require("./docs/apis/resources/feature_service_v2/sidebar.js"),
             },
           ]
         },

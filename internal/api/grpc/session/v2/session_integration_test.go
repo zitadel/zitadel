@@ -16,6 +16,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
@@ -24,10 +25,12 @@ import (
 )
 
 var (
-	CTX    context.Context
-	Tester *integration.Tester
-	Client session.SessionServiceClient
-	User   *user.AddHumanUserResponse
+	CTX             context.Context
+	Tester          *integration.Tester
+	Client          session.SessionServiceClient
+	User            *user.AddHumanUserResponse
+	DeactivatedUser *user.AddHumanUserResponse
+	LockedUser      *user.AddHumanUserResponse
 )
 
 func TestMain(m *testing.M) {
@@ -51,6 +54,10 @@ func TestMain(m *testing.M) {
 		})
 		Tester.SetUserPassword(CTX, User.GetUserId(), integration.UserPassword)
 		Tester.RegisterUserPasskey(CTX, User.GetUserId())
+		DeactivatedUser = Tester.CreateHumanUser(CTX)
+		Tester.Client.UserV2.DeactivateUser(CTX, &user.DeactivateUserRequest{UserId: DeactivatedUser.GetUserId()})
+		LockedUser = Tester.CreateHumanUser(CTX)
+		Tester.Client.UserV2.LockUser(CTX, &user.LockUserRequest{UserId: LockedUser.GetUserId()})
 		return m.Run()
 	}())
 }
@@ -158,6 +165,7 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
@@ -177,6 +185,7 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
@@ -205,6 +214,7 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
@@ -224,10 +234,37 @@ func TestServer_CreateSession(t *testing.T) {
 			},
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 			},
 			wantFactors: []wantFactor{wantUserFactor},
+		},
+		{
+			name: "deactivated user",
+			req: &session.CreateSessionRequest{
+				Checks: &session.Checks{
+					User: &session.CheckUser{
+						Search: &session.CheckUser_UserId{
+							UserId: DeactivatedUser.GetUserId(),
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "locked user",
+			req: &session.CreateSessionRequest{
+				Checks: &session.Checks{
+					User: &session.CheckUser{
+						Search: &session.CheckUser_UserId{
+							UserId: LockedUser.GetUserId(),
+						},
+					},
+				},
+			},
+			wantErr: true,
 		},
 		{
 			name: "password without user error",

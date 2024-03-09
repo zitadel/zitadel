@@ -328,7 +328,7 @@ Errors:
       NotActive: Projecttoekenning is niet actief
       NotInactive: Projecttoekenning is niet gedeactiveerd
   IAM:
-    NotFound: Instantie niet gevonden. Bekijk https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM niet gevonden. Zorg ervoor dat u het juiste domein heeft. Kijk op https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Rollen zijn niet veranderd
     MemberInvalid: Lid is ongeldig

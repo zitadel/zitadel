@@ -237,6 +237,11 @@ func Test_checkGrantTypesCombination(t *testing.T) {
 			grantTypes: []OIDCGrantType{OIDCGrantTypeImplicit, OIDCGrantTypeRefreshToken},
 		},
 		{
+			name:       "device code flow and refresh token doesnt require OIDCGrantTypeImplicit",
+			want:       &Compliance{},
+			grantTypes: []OIDCGrantType{OIDCGrantTypeDeviceCode, OIDCGrantTypeRefreshToken},
+		},
+		{
 			name:       "refresh token and authorization code",
 			want:       &Compliance{},
 			grantTypes: []OIDCGrantType{OIDCGrantTypeAuthorizationCode, OIDCGrantTypeRefreshToken},
