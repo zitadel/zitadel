@@ -4,7 +4,6 @@ sidebar_label: Authenticate service users
 sidebar_position: 1
 ---
 
-
 This guide explains ZITADEL service users and their role in facilitating secure machine-to-machine communication within your applications.
 
 ## What are Service Users?
@@ -128,8 +127,11 @@ However, [client credentials authentication](./client-credentials.md) might be c
 
 ## Further resources
 
-- [Service User API reference](/docs/category/apis/resources/mgmt/user-machine)
-- [Access ZITADEL APIs](../zitadel-apis/)
+* Read about the [different methods to authenticate service users](./authenticate-service-users)
+* [Service User API reference](/docs/category/apis/resources/mgmt/user-machine)
+* [OIDC JWT with private key](/docs/apis/openidoauth/authn-methods#jwt-with-private-key) authentication method reference
+* [Access ZITADEL APIs](../zitadel-apis/)
+* Validate access tokens with [token introspection with private key jwt](../token-introspection/private-key-jwt.mdx)
 
 import DocCardList from '@theme/DocCardList';
 

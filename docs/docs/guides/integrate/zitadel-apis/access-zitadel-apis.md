@@ -122,12 +122,9 @@ With this token you are allowed to access the [ZITADEL APIs](/apis/introduction)
 - Because there is no interactive logon, you need to use a JWT signed with your private key to authorize the user
 - With a custom scope (`urn:zitadel:iam:org:project:id:zitadel:aud`) you can access ZITADEL APIs
 
-Where to go from here:
-
-- [ZITADEL API Documentation](/apis/introduction)
-
 ## Notes
 
 - [Example application in Go](./example-zitadel-api-with-go) to access ZITADEL APIs
 - [Example application in .NET](./example-zitadel-api-with-dot-net) to access ZITADEL APIs
 - Learn how to use the [Event API](./event-api) to retrieve your audit trail
+- Read about the [different methods to authenticate service users](./authenticate-service-users)

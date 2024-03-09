@@ -4,9 +4,9 @@ sidebar_label: Client credential authentication
 sidebar_position: 3
 ---
 
-This is a guide on how to use Client Credentials with service users in ZITADEL. You can read more about users [here](/concepts/structure/users.md).
+This guide demonstrates how developers can leverage Client Credential authentication to secure communication between [service users](/concepts/structure/users) and client applications within ZITADEL.
 
-In ZITADEL, the Client Credentials grant can be used for this non-interactive authentication as alternative to the [JWT profile authentication](serviceusers).
+In ZITADEL, the Client Credentials grant can be used for this [non-interactive authentication](authenticate-service-users) as alternative to the [JWT profile authentication](serviceusers).
 
 ## Create a Service User with a client secret
 
@@ -18,22 +18,13 @@ In ZITADEL, the Client Credentials grant can be used for this non-interactive au
 6. Copy the **ClientID** and **ClientSecret** from the dialog
 
 :::note
-Be sure to copy in particular the ClientSecret. You won't be able to retrieve it again.
+Make sure to copy in particular the ClientSecret. You won't be able to retrieve it again.
 If you lose it, you will have to generate a new one.
 :::
 
 ![Create new service user](/img/console_serviceusers_secret.gif)
 
 ## Grant a manager role to the service user
-
-To be able to access the ZITADEL APIs your service user needs permissions to ZITADEL.
-
-1. Go to the detail page of your organization
-2. Click in the top right corner the "+" button
-3. Search for your service user
-4. Give the user the role you need, for the example we choose Org Owner (More about [ZITADEL Permissions](/guides/manage/console/managers))
-
-![Add org owner to service user](/img/guides/console-service-user-org-owner.gif)
 
 ## Authenticating a service user
 
@@ -90,7 +81,10 @@ curl --request GET \
 * Client Credentials provide an alternative way to JWT Profile for service user authentication
 * After successful authorization you can use an access token like for human users
 
-Where to go from here:
+## Notes
 
-* Management API
-* Securing backend API
+* Read about the [different methods to authenticate service users](./authenticate-service-users)
+* [Service User API reference](/docs/category/apis/resources/mgmt/user-machine)
+* [OIDC client secret basic](/docs/apis/openidoauth/authn-methods#client-secret-basic) authentication method reference
+* [Access ZITADEL APIs](../zitadel-apis/)
+* Validate access tokens with [token introspection with basic auth](../token-introspection/basic-auth)
