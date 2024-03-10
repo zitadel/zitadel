@@ -49,10 +49,10 @@ jobs:
             type=sha,prefix=,suffix=-debug,format=long
       - 
         name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - 
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
         with:
           driver-opts: 'image=moby/buildkit:v0.11.6'
       -
@@ -63,7 +63,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - 
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: .artifacts
           name: zitadel-linux-${{ matrix.arch }}
@@ -75,7 +75,7 @@ jobs:
       - 
         name: Debug
         id: build-debug
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         timeout-minutes: 3
         with:
           context: .
@@ -90,7 +90,7 @@ jobs:
       - 
         name: Scratch
         id: build-scratch
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         timeout-minutes: 3
         with:
           context: .
@@ -116,7 +116,7 @@ jobs:
           touch "/tmp/digests/scratch/${digest#sha256:}"
       -
         name: Upload digest
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: digests
           path: /tmp/digests
@@ -139,13 +139,13 @@ jobs:
     steps:
       -
         name: Download digests
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: digests
           path: /tmp/digests
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
         with:
           driver-opts: 'image=moby/buildkit:v0.11.6'
       -
