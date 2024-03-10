@@ -57,7 +57,7 @@ Depending on the authentication and authorization flow of your application you m
 for most application types. The playground appends automatically a code challenge
 for PKCE flows.
 
-You need to append a "Code Challenge" by providing a random <span className="text-teal-600">Code Verifier</span> that is being hashed and encoded in the request to the token endpoint, please see our [guide](/guides/integrate/login-users#token-request) for more details.
+You need to append a "Code Challenge" by providing a random <span className="text-teal-600">Code Verifier</span> that is being hashed and encoded in the request to the token endpoint, please see our [guide](/guides/integrate/login/oidc/login-users#token-request) for more details.
 
 More in the [documentation](/apis/openidoauth/authn-methods) about authentication methods.
 
@@ -123,6 +123,6 @@ This can be achieved by adding the scope `urn:zitadel:iam:org:project:id:zitadel
 
 ## How to use ZITADEL in your project
 
-Please refer to our [guide](/guides/integrate/login-users) on how to login users.
+Please refer to our [guide](/guides/integrate/login/oidc/login-users) on how to login users.
 
-OpenID Connect certified libraries should allow you to customize the parameters and define scopes for the authorization request. You can also continue by using one of our [example applications](/examples/introduction).
+OpenID Connect certified libraries should allow you to customize the parameters and define scopes for the authorization request. You can also continue by using one of our [example applications](/docs/sdk-examples/introduction).

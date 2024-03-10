@@ -9,7 +9,6 @@ import (
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 
-	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -39,7 +38,6 @@ type Login struct {
 	samlAuthCallbackURL func(context.Context, string) string
 	idpConfigAlg        crypto.EncryptionAlgorithm
 	userCodeAlg         crypto.EncryptionAlgorithm
-	featureCheck        feature.Checker
 }
 
 type Config struct {
@@ -76,7 +74,6 @@ func CreateLogin(config Config,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	idpConfigAlg crypto.EncryptionAlgorithm,
 	csrfCookieKey []byte,
-	featureCheck feature.Checker,
 ) (*Login, error) {
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
@@ -89,7 +86,6 @@ func CreateLogin(config Config,
 		authRepo:            authRepo,
 		idpConfigAlg:        idpConfigAlg,
 		userCodeAlg:         userCodeAlg,
-		featureCheck:        featureCheck,
 	}
 	csrfInterceptor := createCSRFInterceptor(config.CSRFCookieName, csrfCookieKey, externalSecure, login.csrfErrorHandler())
 	cacheInterceptor := createCacheInterceptor(config.Cache.MaxAge, config.Cache.SharedMaxAge, assetCache)
@@ -105,7 +101,7 @@ func csp() *middleware.CSP {
 	csp := middleware.DefaultSCP
 	csp.ObjectSrc = middleware.CSPSourceOptsSelf()
 	csp.StyleSrc = csp.StyleSrc.AddNonce()
-	csp.ScriptSrc = csp.ScriptSrc.AddNonce()
+	csp.ScriptSrc = csp.ScriptSrc.AddNonce().AddHash("sha256", "AjPdJSbZmeWHnEc5ykvJFay8FTWeTeRbs9dutfZ0HqE=")
 	return &csp
 }
 

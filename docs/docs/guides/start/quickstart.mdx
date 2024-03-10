@@ -3,11 +3,11 @@ title: The ZITADEL Quick Start Guide
 sidebar_label: Quick Start Guide
 ---
 
-import VSCodeFolderView from "../../../static/img/guides/quickstart/vscode1.png";
-
-## Introduction
+import { ResponsivePlayer } from "../../../src/components/player";
 
 In this quick start guide, we will be learning some fundamentals on how to set up ZITADEL for user management and application security. Thereafter, we will secure a React-based Single Page Application (SPA) using ZITADEL.
+
+<ResponsivePlayer playing controls url='https://www.youtube.com/watch?v=5THbQljoPKg' />
 
 The sample application allows users to securely log in to ZITADEL using the OIDC Proof Key for Code Exchange (PKCE) flow. This flow ensures that the authentication process is secure by using a code verifier and a code challenge, which are sent to ZITADEL to obtain an access token. The access token is then used by the app to access the userinfo endpoint to retrieve and display information about the logged-in user. The app also has a logout feature that allows users to end their session and clear their access token. Overall, the app provides a simple and secure way for users to authenticate and access protected resources within ZITADEL.
 
@@ -71,103 +71,69 @@ The order of creation for the above components may vary depending on the specifi
 
 ![Home Page](/img/guides/quickstart/v3_1.png)
 
-
 2. You can sign up by entering your email address or via social login, e.g., Google. Let's sign up using an email address. Enter your email address and click "Sign in with Email".
 
 ![Registration Page](/img/guides/quickstart/v3_2.png)
-
 
 3. Next, complete your details and click "Continue".
 
 ![Congratulations Page](/img/guides/quickstart/v3_3.png)
 
-
 4. Add a password as shown below. Adhere to the password requirements, agree to the terms of service and privacy policy by selecting the checkbox, and click the "Get started" button.
 
 ![Code](/img/guides/quickstart/v3_4.png)
 
-
-5. Enter your login data. Provide the password you just created. Click "next". 
+5. Enter your login data. Provide the password you just created. Click "next".
 
 ![Inbox](/img/guides/quickstart/v3_5.png)
-
 
 6. You will now have to verify your email address.
 
 ![Verify Email](/img/guides/quickstart/v3_17.png)
 
-
 6. Go to your inbox and open the email from ZITADEL and click the "Verify email" button.
 
 ![Code](/img/guides/quickstart/v3_6.png)
-
 
 7. The user is now activated. Click the "login" button.
 
 ![User Activated](/img/guides/quickstart/v3_7.png)
 
-
-8. Now you will have to log in with the username and password that you provided. Click “Sign in with Email”.
+8. Now you will have to log in with the username and password that you provided. Click “Sign in with Email”, then provide a name for your team or organization and continue.
 
 ![Login](/img/guides/quickstart/v3_8.png)
 
-
-9. You will now be asked to create an instance. 
-
-![2-factor Authentication](/img/guides/quickstart/v3_9.png)
-
-
 ### 2. Create your first instance
 
-As a user of the ZITADEL Cloud Customer Portal, you now can create multiple instances to suit your specific needs. This includes instances for development, production, or user acceptance testing, as well as instances for different clients or applications. For example, you might create an instance for each product in a B2C scenario, or an instance for each tenant or customer in a B2B scenario. The possibilities are endless. You can create a pay-as-you-go instance for production purposes.
+As a user of the ZITADEL Cloud Customer Portal, you now can create multiple instances to suit your specific needs. This includes instances for development, production, or user acceptance testing, as well as instances for different clients or applications. For example, you might create an instance for each product in a B2C scenario, or an instance for each tenant or customer in a B2B scenario. The possibilities are endless. You can create your first instance for free.
 
 1. Let’s create an instance. Click on “Create new instance”.
 
 ![2-factor Authentication](/img/guides/quickstart/v3_9.png)
 
-
-
-2. Provide a name for your instance, select the “Free” plan and click on the “Continue” button at the bottom of this screen.
+2. Provide a name for your instance and click on the “Continue” button at the bottom of this screen.
 
 ![Select Tier](/img/guides/quickstart/v3_10.png)
 
-
 3. Next, you should see the following screen. Add a username and password for the instance manager and click "Create".
-
 
 ![Instance Details](/img/guides/quickstart/v3_11.png)
 
-
-4. The instance creation process will take a few seconds.
+3. Now you will see the details of your first instance. You can click on "Visit" at the top right to go to your instance.
 
 ![Instance Details](/img/guides/quickstart/v3_12.png)
 
-
-5. Now you will see the details of your first instance. You can click on "Visit" at the top right to go to your instance.
-
-![Instance Details](/img/guides/quickstart/v3_13.png)
-
-
-6. To log in to your instance, provide the username and password, and click “next”.
-
-![Instance Details](/img/guides/quickstart/v3_14.png)
-
+6. To log in to your instance, provide the username and password you set in the instance creation, and click “next”.
 
 7. Skip the 2-factor authentication for now by clicking “skip”.
-
-![Instance Details](/img/guides/quickstart/v3_15.png)
 
 8. And there you go! You now have access to your instance.
 
 ![Instance Details](/img/guides/quickstart/v3_16.png)
 
-
 ### 3. Create your first project
 
-1. To create a project in the instance you just created, click on “Create a project”.
-
-![Create Project](/img/guides/quickstart/v3_16.png)
-
+1. To create a project in the instance you just created, click on "Projects" in the navigation and then “Create a project”.
 
 2. Insert “Project1” (or any name of your choice) as the project’s name and click the “Continue” button.
 
@@ -261,7 +227,7 @@ We will now create an application in the project, which will allow our React cli
 
 ![Add Application](/img/guides/quickstart/41.png)
 
-4. Select “PKCE” because we recommend the use of [Authorization Code](https://zitadel.com/docs/apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](https://zitadel.com/docs/apis/openidoauth/grant-types#authorization-code) for all web applications. More about the different app types can be found [here](https://zitadel.com/docs/guides/integrate/oauth-recommended-flows#different-client-profiles). Click on "Continue".
+4. Select “PKCE” because we recommend the use of [Authorization Code](/docs/apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](/docs/apis/openidoauth/grant-types#authorization-code) for all web applications. More about the different app types can be found [here](/docs/guides/integrate/login/oidc/oauth-recommended-flows#different-client-profiles). Click on "Continue".
 
 ![Add Application](/img/guides/quickstart/42.png)
 
@@ -343,315 +309,84 @@ To install Visual Studio Code, go to their [website](https://code.visualstudio.c
 2. Navigate to the folder where you want to create the React app.
 3. Run the following command to create a new React app named "react-oidc-zitadel":
 
-   `npx create-react-app react-oidc-zitadel`
+   `yarn create react-app react-oidc-zitadel --template typescript`
 
 4. Navigate to the "react-oidc-zitadel" folder:
 
    `cd react-oidc-zitadel`
 
-This will create the following files in your project:
+5. The dependencies for this project include @zitadel/react and react-router-dom. To include them in your React application, you will need to run the following command in your terminal:
 
-<img src={VSCodeFolderView} width="40%" height="40%" />
-
-5. The dependencies for this project include react-router-dom and oidc-client-ts. To include them in your React application, you will need to run the following command in your terminal:
-
-   `npm install react-router-dom oidc-client-ts`
+   `yarn add @zitadel/react react-router-dom`
 
 #### 2. Add source files
 
-The code needed to run this project can be found [here](https://github.com/zitadel/react-user-authentication).
+The code needed to run this project can be found [here](https://github.com/zitadel/zitadel-react).
 
 1. Replace the content in your App.js file with the one provided below:
 
-[src/App.js](https://github.com/zitadel/react-user-authentication/blob/main/src/App.js):
+[src/App.tsx](https://github.com/zitadel/zitadel-react/blob/main/src/App.tsx):
 
 ```
-import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./components/Login";
-import Callback from "./components/Callback";
-import authConfig from "./authConfig";
-import { UserManager, WebStorageStateStore } from "oidc-client-ts";
+  const config: ZitadelConfig = {
+    authority: "[YOUR-INSTANCE-URL]",
+    client_id: "[YOUR-CLIENT-ID]",
+  };
 
-function App() {
-  const userManager = new UserManager({
-    userStore: new WebStorageStateStore({ store: window.localStorage }),
-    ...authConfig,
-  });
-
-  function authorize() {
-    userManager.signinRedirect({ state: "a2123a67ff11413fa19217a9ea0fbad5" });
-  }
-
-  function clearAuth() {
-    userManager.signoutRedirect();
-  }
-
-  const [authenticated, setAuthenticated] = useState(null);
-  const [userInfo, setUserInfo] = useState(null);
-
-  useEffect(() => {
-    userManager.getUser().then((user) => {
-      if (user) {
-        setAuthenticated(true);
-      } else {
-        setAuthenticated(false);
-      }
-    });
-  }, [userManager]);
-
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path="/"
-          element={<Login auth={authenticated} handleLogin={authorize} />}
-        />
-        <Route
-          path="/callback"
-          element={
-            <Callback
-              auth={authenticated}
-              setAuth={setAuthenticated}
-              userInfo={userInfo}
-              setUserInfo={setUserInfo}
-              handleLogout={clearAuth}
-              userManager={userManager}
-            />
-          }
-        />
-      </Routes>
-    </BrowserRouter>
-  );
-}
-
-export default App;
+  const zitadel = createZitadelAuth(config);
+  ...
 ```
 
-The App.js file is the root component of the React app that initializes the OIDC flow and manages the user's session. It does this by:
+The App.tsx file is the root component of the React app that initializes the OIDC flow and manages the user's session. It does this by:
 
-- Importing the necessary libraries and components from the dependencies, including the `oidc-client-ts` library, the `authConfig` file with the OIDC configuration values, and the Login and Callback components.
-- Initializing a new `UserManager` instance with the OIDC configuration values from the authConfig file. The ` UserManager` instance manages the OIDC flow and stores the user's session information.
-- Defining two functions: `authorize` and `clearAuth`. The `authorize` function initiates the OIDC flow when the user clicks the `login` button, while the `clearAuth` function ends the user's session when the user clicks the `logout` button.
-- Defining two state variables: `authenticated` and `userInfo`. The authenticated variable is a boolean that indicates whether the user is authenticated or not, while the `userInfo` variable stores the user's information when they are authenticated.
-- Using the `useEffect` hook to retrieve the user's session information from the `UserManager` instance and updating the `authenticated` and `userInfo` state variables accordingly.
+- Importing the necessary libraries and components from the dependencies, including the `@zitadel/react` library and the Login and Callback components.
+- Initializing a new `zitadel` instance with the OIDC configuration values. The `zitadel` instance manages the OIDC flow and stores the user's session information.
+- Defining two functions: `authorize` and `signout`. The `authorize` function initiates the OIDC flow when the user clicks the `login` button, while the `signout` function ends the user's session when the user clicks the `logout` button.
+- Defining state variable: `authenticated`. The authenticated variable is a boolean that indicates whether the user is authenticated or not.
+- Using the `useEffect` hook to retrieve the user's session information from the `UserManager` instance and updating the `authenticated` state variable accordingly.
 - Defining the routes for the app using the `react-router-dom` library, including the `/` and `/callback` routes for the login and callback pages, respectively. The `Login` and `Callback` components handle the login and callback processes, respectively.
+
+The provided config extends the `UserManagerSettings` of the `oidc-client-ts` library. Take a look at some of the available configuration options:
+
+- authority (the URL of your instance ending with /).
+- client\*id (the unique identifier for the client application).
+- redirect_uri (the URL to redirect to after the authorization flow is complete)
+- post_logout_redirect_uri (the URL to redirect to after the user logs out)
+- scope (the permissions requested from the user)
+- project_resource_id (To add a ZITADEL project scope. `urn:zitadel:iam:org:project:id:[projectId]:aud` and `urn:zitadel:iam:org:projects:roles` [scopes](https://zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes).)
+- prompt ([the OIDC prompt parameter](/apis/openidoauth/endpoints#additional-parameters))
 
 2. Create a folder named components in the src directory. Create two files named Login.js and Callback.js.
 
-3. Paste the following code to Login.js.
+3. Paste the following code to Login.tsx.
 
-[src/components/Login.js](https://github.com/zitadel/react-user-authentication/blob/main/src/components/Login.js)
-
-```
-import { Navigate } from "react-router-dom";
-
-const Login = ({ auth, handleLogin, userManager }) => {
-  return (
-    <div>
-      {auth === null && <div>Loading...</div>}
-      {auth === false && (
-        <div>
-          <h1>Welcome!</h1>
-          <button
-            onClick={() => {
-              // Perform the authorization request, including the code challenge
-              handleLogin();
-            }}
-          >
-            Please log in.
-          </button>
-        </div>
-      )}
-      {auth && <Navigate to="/callback" />}
-    </div>
-  );
-};
-
-export default Login;
+```ts reference
+https://github.com/zitadel/zitadel-react/blob/main/src/components/Login.tsx
 ```
 
-The `/` route corresponds to the login page, which is rendered by the Login component. The Login(Login.js) component is a functional component that displays the login button and calls the `handleLogin` function (which corresponds to the `authorize` function defined in the App component) when the button is clicked. This initiates the OIDC flow by redirecting the user to the authorization endpoint.
+The `/` route corresponds to the login page, which is rendered by the Login component. The Login(Login.tsx) component is a functional component that displays the login button and calls the `handleLogin` function (which corresponds to the `authorize` function defined in the App component) when the button is clicked. This initiates the OIDC flow by redirecting the user to the authorization endpoint.
 
 4. Paste the following code to Callback.js.
 
-[src/components/Callback.js](https://github.com/zitadel/react-user-authentication/blob/main/src/components/Callback.js)
-
-```
-import React, { useEffect } from 'react';
-import authConfig from '../authConfig';
-
-const Callback = ({ auth, setAuth, userManager, userInfo, setUserInfo, handleLogout }) => {
-
-  useEffect(() => {
-    if (auth === null) {
-      userManager.signinRedirectCallback().then((user) => {
-        if (user) {
-          setAuth(true);
-          const access_token = user.access_token;
-          // Make a request to the user info endpoint using the access token
-          fetch(authConfig.userinfo_endpoint, {
-            headers: {
-              'Authorization': `Bearer ${access_token}`
-            }
-          })
-            .then(response => response.json())
-            .then(userInfo => {
-              setUserInfo(userInfo);
-            });
-        } else {
-          setAuth(false);
-        }
-      }).catch((error) => {
-        setAuth(false);
-      });
-    } else if (auth === true && !userInfo) {
-      userManager.getUser().then((user) => {
-        const access_token = user.access_token;
-
-        fetch(authConfig.userinfo_endpoint, {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        })
-          .then((response) => response.json())
-          .then((userInfo) => {
-            setUserInfo(userInfo);
-          });
-      });
-    }
-  }, [auth, userManager, setAuth]);
-
-
-  if (auth === true && userInfo) {
-    return (
-      <div>
-        <h1>Welcome, {userInfo.name}!</h1>
-        <h2>Your ZITADEL Profile Information</h2>
-        <h3>Name:  {userInfo.name}</h3>
-        <h3>Email: {userInfo.email}</h3>
-        <h3>Email Verified: {userInfo.email_verified? "Yes": "No"}</h3>
-        <h3>Locale: {userInfo.locale}</h3>
-
-        <button onClick={handleLogout}>Log out</button>
-      </div>
-    );
-  }
-  else {
-      return <div>Loading...</div>;
-    }
-
-};
-
-export default Callback;
+```ts reference
+https://github.com/zitadel/zitadel-react/blob/main/src/components/Callback.tsx
 ```
 
-The `/callback` route corresponds to the callback page, which is rendered by the Callback(Callback.js) component. The Callback component is also a functional component that handles the callback from the authorization server after the user logs in. It retrieves the authorization code from the URL, exchanges it for an access token and id token, and retrieves the user's information from the userinfo endpoint. It also sets the `authenticated` and `userInfo` state variables in the App(App.js) component and displays the `logout` button. When the `logout` button is clicked, the `clearAuth` function is called and the user's session is ended. The `clearAuth` function is defined in the App component and is called with no arguments. It initiates the end session flow by redirecting the user to the end session endpoint.
+The `/callback` route corresponds to the callback page, which is rendered by the Callback (Callback.tsx) component.
+The Callback component is also a functional component that handles the callback from the authorization server after the user logs in.
+It retrieves the authorization code from the URL, exchanges it for an access token and id token, and retrieves the user's information from the userinfo endpoint.
+It also sets the `authenticated` state variable in the App (App.tsx) component and displays the `logout` button.
+When the `logout` button is clicked, the `clearAuth` function is called and the user's session is ended. The `clearAuth` function is defined in the App component and is called with no arguments. It initiates the end session flow by redirecting the user to the end session endpoint.
 
-5.  Create a new file in the src folder named authConfig.js and paste the following code to it.
-
-[src/authConfig.js](https://github.com/zitadel/react-user-authentication/blob/main/src/authConfig.js)
-
-```
-const authConfig = {
-    authority: 'https://some_text.zitadel.cloud/', //Replace with your issuer URL
-    client_id: 'ABC123@Project', //Replace with your client id
-    redirect_uri: 'http://localhost:3000/callback',
-    response_type: 'code',
-    scope: 'openid profile email',
-    post_logout_redirect_uri: 'http://localhost:3000/',
-    userinfo_endpoint: 'https://instance-some_text.zitadel.cloud/oidc/v1/userinfo', //Replace with your user-info endpoint
-    response_mode: 'query',
-    code_challenge_method: 'S256',
-  };
-
- export default authConfig;
-```
-
-The authConfig.js file exports an object with configuration values for the OIDC flow. These values are used to initialize the `UserManager` instance in the App component. The configuration values include the:
-
-- authority (the URL of the authorization server). **_Don’t forget to replace the `authority` value with the “issuer URL” that you obtained from this [step](#referred1)._**
-- client_id (the unique identifier for the client application). **_Don’t forget to replace the `client_id` with your “ClientId” that you obtained from this [step](#referred1)._**
-- redirect_uri (the URL to redirect to after the authorization flow is complete)
-- response_type (the type of response expected from the authorization server)
-- scope (the permissions requested from the user)
-- post_logout_redirect_uri (the URL to redirect to after the user logs out)
-- userinfo_endpoint (the URL of the endpoint to retrieve the user's information). **_Don’t forget to replace the `userinfo_endoint` with your “userinfo_endpoint” that you obtained from this [step](#referred1)._**
-- response_mode (the method to use to send the authorization response)
-- code_challenge_method (the method to use to generate the code challenge).
-
-Note that the oidc-client-ts library automatically handles the generation of the code verifier and code challenge when the user clicks on the login button, eliminating the need for the application to manually generate and include these values in the requests.
+Note that the @zitadel/react library automatically handles the generation of the code verifier and code challenge when the user clicks on the login button, eliminating the need for the application to manually generate and include these values in the requests.
 
 In the PKCE flow, the code verifier is a random string generated by the client application, and the code challenge is a transformed version of the code verifier using the SHA-256 hashing algorithm.
 
-6.  Add a file called style.css to the src folder to apply CSS styling to the pages.
+5. Now you can think about styling your application. Edit the `index.css` and `App.css` to apply CSS styling to the pages.
 
-[src/style.css](https://github.com/zitadel/react-user-authentication/blob/main/src/style.css)
+### 3. Running the application
 
-```
-/* The body element covers the entire page, so setting the background color here
-   will set the background color for the whole page */
-   body {
-    font-family: 'Open Sans', sans-serif;
-    /* The hex code for the light blue color from the image is #9fd3e0 */
-    background-color: #9fd3e0;
-    /* Center the text in the body element */
-    text-align: center;
-  }
-
-  /* The h1, h2, and h3 elements are used for headings */
-  h1, h2, h3 {
-    /* The hex code for the dark blue color from the image is #2c3e50 */
-    color: #2c3e50;
-    text-align: center;
-  }
-
-  /* The button element represents a clickable button */
-  button {
-    /* The hex code for the light purple color from the image is #9b59b6 */
-    background-color: #9b59b6;
-    /* The hex code for the white color is #ffffff */
-    color: #ffffff;
-    /* Add some padding and a border to the button */
-    padding: 10px 20px;
-    border: none;
-    /* Add some hover effect to the button */
-    cursor: pointer;
-  }
-
-  button:hover {
-    /* The hex code for the dark purple color from the image is #8e44ad */
-    background-color: #8e44ad;
-  }
-```
-
-7. Go to index.js and replace `import './index.css';` with `import './style.css'`. Your index.js file should look like this:
-
-[src/index.js](https://github.com/zitadel/react-user-authentication/blob/main/src/index.js)
-
-```
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './style.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
-```
-
-### 4. Running the application
-
-1. Run `npm start` to start the development server.
+1. Run `yarn start` to start the development server.
 2. Open your browser and navigate to `http://localhost:3000/` to view the app.
 3. You will see the login page, which is the landing page of the app, when you run the application. Click on the “Please log in” button.
 
@@ -672,14 +407,6 @@ reportWebVitals();
 7. You can click on “Log out” to log out of the application and you will be taken to the landing page.
 
 ![Redirect](/img/guides/quickstart/login1.png)
-
-8. To see if the user has been successfully logged out and the user session has been terminated, click on “Please log in”, which brings you to the following page. Select the same user you logged in with earlier.
-
-![Redirect](/img/guides/quickstart/login5.png)
-
-9. You will see that since the login session was terminated after logging out, the user has to enter his password again.
-
-![Redirect](/img/guides/quickstart/login6.png)
 
 And this brings us to the end of this quick start guide!
 

@@ -41,18 +41,9 @@ jobs:
       console_cache_path: ${{ needs.console.outputs.cache_path }}
       version: ${{ needs.version.outputs.version }}
 
-  core-unit-test:
+  core-test:
     needs: core
-    uses: ./.github/workflows/core-unit-test.yml
-    with:
-      go_version: "1.21"
-      core_cache_key: ${{ needs.core.outputs.cache_key }}
-      core_cache_path: ${{ needs.core.outputs.cache_path }}
-      crdb_version: "23.1.13"
-
-  core-integration-test:
-    needs: core
-    uses: ./.github/workflows/core-integration-test.yml
+    uses: ./.github/workflows/core-test.yml
     with:
       go_version: "1.21"
       core_cache_key: ${{ needs.core.outputs.cache_key }}
@@ -91,7 +82,7 @@ jobs:
       issues: write
       pull-requests: write
     needs:
-      [version, core-unit-test, core-integration-test, lint, container, e2e]
+      [version, core-test, lint, container, e2e]
     if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}

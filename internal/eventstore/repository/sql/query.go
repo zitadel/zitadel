@@ -221,7 +221,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 }
 
 func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bool) (string, []any) {
-	clauses, args := prepareQuery(criteria, useV1, query.InstanceID, query.ExcludedInstances)
+	clauses, args := prepareQuery(criteria, useV1, query.InstanceID, query.InstanceIDs, query.ExcludedInstances)
 	if clauses != "" && len(query.SubQueries) > 0 {
 		clauses += " AND "
 	}

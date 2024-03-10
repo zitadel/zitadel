@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
@@ -449,4 +450,36 @@ func Test_idpTypeToPb(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Test_securityPolicyToSettingsPb(t *testing.T) {
+	want := &settings.SecuritySettings{
+		EmbeddedIframe: &settings.EmbeddedIframeSettings{
+			Enabled:        true,
+			AllowedOrigins: []string{"foo", "bar"},
+		},
+		EnableImpersonation: true,
+	}
+	got := securityPolicyToSettingsPb(&query.SecurityPolicy{
+		EnableIframeEmbedding: true,
+		AllowedOrigins:        []string{"foo", "bar"},
+		EnableImpersonation:   true,
+	})
+	assert.Equal(t, want, got)
+}
+
+func Test_securitySettingsToCommand(t *testing.T) {
+	want := &command.SecurityPolicy{
+		EnableIframeEmbedding: true,
+		AllowedOrigins:        []string{"foo", "bar"},
+		EnableImpersonation:   true,
+	}
+	got := securitySettingsToCommand(&settings.SetSecuritySettingsRequest{
+		EmbeddedIframe: &settings.EmbeddedIframeSettings{
+			Enabled:        true,
+			AllowedOrigins: []string{"foo", "bar"},
+		},
+		EnableImpersonation: true,
+	})
+	assert.Equal(t, want, got)
 }

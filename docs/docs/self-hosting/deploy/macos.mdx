@@ -8,15 +8,16 @@ import DefaultUser from './_defaultuser.mdx'
 import Next from './_next.mdx'
 import NoteInstanceNotFound from './troubleshooting/_note_instance_not_found.mdx';
 
-## Install CockroachDB
+## Install PostgreSQL
 
-Download a `cockroach` binary as described [in the CockroachDB docs](https://www.cockroachlabs.com/docs/stable/install-cockroachdb).
-ZITADEL is tested against CockroachDB latest stable tag.
+Download a `postgresql` binary as described [in the PostgreSQL docs](https://www.postgresql.org/download/macosx/).
+ZITADEL is tested against PostgreSQL and CockroachDB latest stable tag and Ubuntu 20.04.
 
-## Run CockroachDB
+## Run PostgreSQL
 
 ```bash
-cockroach start-single-node --insecure --background --http-addr :9090 --listen-addr=localhost
+sudo pg_ctl init -D /tmp/postgresql
+sudo pg_ctl start -D /tmp/postgresql
 ```
 
 ## Install ZITADEL
@@ -42,7 +43,7 @@ LATEST=$(curl -i https://github.com/zitadel/zitadel/releases/latest | grep locat
 ## Run ZITADEL
 
 ```bash
-ZITADEL_EXTERNALSECURE=false zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+ZITADEL_DATABASE_POSTGRES_HOST=localhost ZITADEL_DATABASE_POSTGRES_PORT=5432 ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=$(whoami) ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable ZITADEL_EXTERNALSECURE=false zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
 ```
 
 <DefaultUser components={props.components} />
@@ -54,7 +55,7 @@ ZITADEL_EXTERNALSECURE=false zitadel start-from-init --masterkey "MasterkeyNeeds
 ### Setup ZITADEL with a service account
 
 ```bash
-ZITADEL_EXTERNALSECURE=false ZITADEL_FIRSTINSTANCE_MACHINEKEYPATH=/tmp/zitadel-admin-sa.json ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME=zitadel-admin-sa ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME=Admin ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINEKEY_TYPE=1 zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
+ZITADEL_DATABASE_POSTGRES_HOST=localhost ZITADEL_DATABASE_POSTGRES_PORT=5432 ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=$(whoami) ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable ZITADEL_EXTERNALSECURE=false ZITADEL_FIRSTINSTANCE_MACHINEKEYPATH=/tmp/zitadel-admin-sa.json ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME=zitadel-admin-sa ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME=Admin ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINEKEY_TYPE=1 zitadel start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled
 
 # then you can move your machine key
 mv /tmp/zitadel-admin-sa.json $HOME/zitadel-admin-sa.json

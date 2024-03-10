@@ -90,7 +90,7 @@
     }
   },
   "MENU": {
-    "INSTANCE": "Istanza",
+    "INSTANCE": "Impostazioni default",
     "DASHBOARD": "Pagina iniziale",
     "PERSONAL_INFO": "Informazioni personali",
     "DOCUMENTATION": "Documentazione",
@@ -119,6 +119,30 @@
     "SETTINGS": "Impostazioni",
     "CUSTOMERPORTAL": "Customer Portal"
   },
+  "QUICKSTART": {
+    "TITLE": "Integra ZITADEL nella tua applicazione",
+    "DESCRIPTION": "Integra ZITADEL nella tua applicazione o utilizza uno dei nostri esempi per iniziare in pochi minuti",
+    "BTN_START": "Crea applicazione",
+    "BTN_LEARNMORE": "Mostra di più",
+    "CREATEPROJECTFORAPP": "Crea progetto {{value}}",
+    "SELECT_FRAMEWORK": "Seleziona Framework",
+    "FRAMEWORK": "Framework",
+    "FRAMEWORK_OTHER": "Altro (OIDC, SAML, API)",
+    "ALMOSTDONE": "Hai quasi finito",
+    "REVIEWCONFIGURATION": "Controlla la configurazione",
+    "REVIEWCONFIGURATION_DESCRIPTION": "Abbiamo creato una configurazione base per le applicazioni {{value}}. Può adattare la configurazione alle proprie esigenze dopo la creazione.",
+    "REDIRECTS": "Configura i reindirizzamenti",
+    "DEVMODEWARN": "La modalità sviluppatore è abilitata per impostazione predefinita. È possibile aggiornare i valori per la produzione in un secondo momento.",
+    "GUIDE": "Guida",
+    "BROWSEEXAMPLES": "Esplora esempi e SDK",
+    "DUPLICATEAPPRENAME": "Un'app con lo stesso nome esiste già. Scegli un nome diverso.",
+    "DIALOG": {
+      "CHANGE": {
+        "TITLE": "Modifica framework",
+        "DESCRIPTION": "Scegliere uno dei framework disponibili per configurare rapidamente la propria applicazione"
+      }
+    }
+  },
   "ACTIONS": {
     "ACTIONS": "Azioni",
     "FILTER": "Filtra",
@@ -138,6 +162,7 @@
     "ADD": "Aggiungi",
     "CREATE": "Crea",
     "CONTINUE": "Continua",
+    "CONTINUEWITH": "Continue con {{value}}",
     "BACK": "Indietro",
     "CLOSE": "chiudi",
     "CLEAR": "Resetta",
@@ -186,12 +211,16 @@
     "IAM_OWNER_VIEWER": "Ha l'autorizzazione per esaminare l'intera istanza, comprese tutte le organizzazioni",
     "IAM_ORG_MANAGER": "Ha il permesso di creare e gestire organizzazioni",
     "IAM_USER_MANAGER": "Ha l'autorizzazione per creare e gestire utenti",
+    "IAM_ADMIN_IMPERSONATOR": "Dispone dell'autorizzazione per rappresentare l'amministratore e gli utenti finali di tutte le organizzazioni",
+    "IAM_END_USER_IMPERSONATOR": "Dispone dell'autorizzazione per rappresentare gli utenti finali di tutte le organizzazioni",
     "ORG_OWNER": "Ha il permesso su tutta l'organizzazione",
     "ORG_USER_MANAGER": "Ha l'autorizzazione per creare e gestire gli utenti dell'organizzazione",
     "ORG_OWNER_VIEWER": "Ha il permesso di esaminare l'intera organizzazione",
     "ORG_USER_PERMISSION_EDITOR": "Ha l'autorizzazione per gestire le autorizzazioni degli utenti",
     "ORG_PROJECT_PERMISSION_EDITOR": "Ha il permesso di gestire le sovvenzioni di progetto (Project Grant)",
     "ORG_PROJECT_CREATOR": "Ha il permesso di creare propri progetti e le impostazioni sottostanti",
+    "ORG_ADMIN_IMPERSONATOR": "Ha il permesso per rappresentare l'amministratore e gli utenti finali dell'organizzazione",
+    "ORG_END_USER_IMPERSONATOR": "Ha il permesso per rappresentare gli utenti finali dell'organizzazione",
     "PROJECT_OWNER": "Ha il permesso per l'intero progetto",
     "PROJECT_OWNER_VIEWER": "Ha il permesso di esaminare l'intero progetto",
     "PROJECT_OWNER_GLOBAL": "Ha il permesso per l'intero progetto",
@@ -1023,6 +1052,7 @@
       "DESCRIPTION": "Queste impostazioni si applicheranno alla organizzazione corrente."
     },
     "LIST": {
+      "ORGS": "Organizzazioni",
       "LANGUAGES": "Lingue",
       "LOGIN": "Comportamento login e sicurezza",
       "LOCKOUT": "Meccanismi di bloccaggio",
@@ -1040,15 +1070,20 @@
       "PRIVACYPOLICY": "Informativa sulla privacy e TOS",
       "OIDC": "OIDC Token lifetime e scadenza",
       "SECRETS": "Aspetto dei segreti",
-      "SECURITY": "Impostazioni di sicurezza"
+      "SECURITY": "Impostazioni di sicurezza",
+      "EVENTS": "Eventi",
+      "FAILEDEVENTS": "Eventi falliti",
+      "VIEWS": "Views"
     },
     "GROUPS": {
+      "GENERAL": "Generale",
       "NOTIFICATIONS": "Notifiche",
       "LOGIN": "Accesso e login",
       "DOMAIN": "Dominio",
       "TEXTS": "Testi e lingue",
       "APPEARANCE": "Aspetto",
-      "OTHER": "Altro"
+      "OTHER": "Altro",
+      "STORAGE": "Dati"
     }
   },
   "SETTING": {
@@ -1153,9 +1188,13 @@
       "UPDATED": "Impostazioni aggiornati"
     },
     "SECURITY": {
-      "DESCRIPTION": "Questa impostazione consente al CSP di consentire il framing da un insieme di domini consentiti. Si noti che abilitando l'uso di iFrames, si corre il rischio di consentire il clickjacking.",
+      "IFRAMETITLE": "iFrame",
+      "IFRAMEDESCRIPTION": "Questa impostazione consente al CSP di consentire il framing da un insieme di domini consentiti. Si noti che abilitando l'uso di iFrames, si corre il rischio di consentire il clickjacking.",
       "IFRAMEENABLED": "I Frame enabled",
-      "ALLOWEDORIGINS": "URL consentiti"
+      "ALLOWEDORIGINS": "URL consentiti",
+      "IMPERSONATIONTITLE": "Impersonificazione",
+      "IMPERSONATIONENABLED": "Consenti la rappresentazione",
+      "IMPERSONATIONDESCRIPTION": "Questa impostazione consente in linea di principio di utilizzare la rappresentazione. Tieni presente che il sosia ha bisogno anche dei ruoli `*_IMPERSONATOR` appropriati assegnati."
     },
     "DIALOG": {
       "RESET": {
@@ -1948,6 +1987,7 @@
       "DATECHANGED": "Cambiato",
       "URLS": "URLs",
       "DELETE": "Rimuovi App",
+      "JUMPTOPROJECT": "Per configurare ruoli, autorizzazioni e altro, vai al progetto.",
       "DETAIL": {
         "TITLE": "Dettagli",
         "STATE": {

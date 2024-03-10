@@ -2,6 +2,8 @@
   <h1 class="home-title" data-e2e="authenticated-welcome">{{ 'HOME.WELCOME' | translate }}</h1>
 
   <div class="home-wrapper enlarged-container">
+    <cnsl-quickstart></cnsl-quickstart>
+
     <ng-container *ngIf="['iam.read$'] | hasRole | async; else defaultHome">
       <cnsl-onboarding></cnsl-onboarding>
     </ng-container>
@@ -56,7 +58,7 @@
         <span>{{ 'HOME.GETSTARTED.TITLE' | translate }}</span>
       </a>
 
-      <a href="https://zitadel.com/docs/examples/introduction" target="_blank" rel="noreferrer" class="grid-item">
+      <a href="https://zitadel.com/docs/sdk-examples/introduction" target="_blank" rel="noreferrer" class="grid-item">
         <div
           class="icon-wrapper"
           [ngStyle]="{
