@@ -1,8 +1,8 @@
 <h1 mat-dialog-title>
   <span class="title">{{ 'USER.SENDEMAILDIALOG.TITLE' | translate }} {{ data?.number }}</span>
 </h1>
-<p class="desc cnsl-secondary-text">{{ 'USER.SENDEMAILDIALOG.DESCRIPTION' | translate }}</p>
 <div mat-dialog-content>
+  <p class="desc cnsl-secondary-text">{{ 'USER.SENDEMAILDIALOG.DESCRIPTION' | translate }}</p>
   <cnsl-form-field class="formfield">
     <cnsl-label>{{ 'USER.SENDEMAILDIALOG.NEWEMAIL' | translate }}</cnsl-label>
     <input cnslInput [(ngModel)]="email" />

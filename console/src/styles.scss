@@ -634,3 +634,9 @@ i {
   align-items: center;
   font-size: 14px !important;
 }
+
+// See https://github.com/angular/components/issues/26000 discussion about dropdown to be wider
+// than parent form-field like before v15 and flags use case
+.cdk-overlay-pane:has(> .select-flag) {
+  width: initial !important;
+}

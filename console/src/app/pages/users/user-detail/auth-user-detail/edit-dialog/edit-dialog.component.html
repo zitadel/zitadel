@@ -1,13 +1,19 @@
 <h1 mat-dialog-title>
   <span class="title">{{ data.titleKey | translate }}</span>
 </h1>
-<p class="desc cnsl-secondary-text">{{ data.descriptionKey | translate }}</p>
+
 <div mat-dialog-content>
+  <p class="desc cnsl-secondary-text">{{ data.descriptionKey | translate }}</p>
   <form [formGroup]="dialogForm" (ngSubmit)="closeDialogWithValue()">
     <div class="phone-grid">
       <cnsl-form-field *ngIf="isPhone">
         <cnsl-label>{{ 'USER.PROFILE.COUNTRY' | translate }}</cnsl-label>
-        <mat-select [(value)]="selected" [compareWith]="compareCountries" (selectionChange)="setCountryCallingCode()">
+        <mat-select
+          panelClass="select-flag"
+          [(value)]="selected"
+          [compareWith]="compareCountries"
+          (selectionChange)="setCountryCallingCode()"
+        >
           <mat-select-trigger> <span class="fi fi-{{ selected?.countryCode | lowercase }}"></span></mat-select-trigger>
           <mat-option *ngFor="let country of countryPhoneCodes" [value]="country">
             <span class="fi fi-{{ country.countryCode | lowercase }}"></span>
@@ -44,7 +50,6 @@
 
   <button
     [disabled]="dialogForm.invalid"
-    cdkFocusInitial
     color="primary"
     mat-raised-button
     class="ok-button"
