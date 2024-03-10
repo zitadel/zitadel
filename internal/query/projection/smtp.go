@@ -13,13 +13,12 @@ import (
 
 const (
 	SMTPConfigProjectionTable      = "projections.smtp_configs2"
+	SMTPConfigColumnInstanceID     = "instance_id"
+	SMTPConfigColumnResourceOwner  = "resource_owner"
 	SMTPConfigColumnID             = "id"
-	SMTPConfigColumnAggregateID    = "aggregate_id"
 	SMTPConfigColumnCreationDate   = "creation_date"
 	SMTPConfigColumnChangeDate     = "change_date"
 	SMTPConfigColumnSequence       = "sequence"
-	SMTPConfigColumnResourceOwner  = "resource_owner"
-	SMTPConfigColumnInstanceID     = "instance_id"
 	SMTPConfigColumnTLS            = "tls"
 	SMTPConfigColumnSenderAddress  = "sender_address"
 	SMTPConfigColumnSenderName     = "sender_name"
@@ -45,7 +44,6 @@ func (*smtpConfigProjection) Init() *old_handler.Check {
 	return handler.NewTableCheck(
 		handler.NewTable([]*handler.InitColumn{
 			handler.NewColumn(SMTPConfigColumnID, handler.ColumnTypeText),
-			handler.NewColumn(SMTPConfigColumnAggregateID, handler.ColumnTypeText),
 			handler.NewColumn(SMTPConfigColumnCreationDate, handler.ColumnTypeTimestamp),
 			handler.NewColumn(SMTPConfigColumnChangeDate, handler.ColumnTypeTimestamp),
 			handler.NewColumn(SMTPConfigColumnSequence, handler.ColumnTypeInt64),
@@ -123,7 +121,6 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 	return handler.NewCreateStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(SMTPConfigColumnAggregateID, e.Aggregate().ID),
 			handler.NewCol(SMTPConfigColumnCreationDate, e.CreationDate()),
 			handler.NewCol(SMTPConfigColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SMTPConfigColumnResourceOwner, e.Aggregate().ResourceOwner),

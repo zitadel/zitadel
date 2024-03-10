@@ -170,7 +170,7 @@ func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
 		ReplyToAddress: smtp.ReplyToAddress,
 		Host:           smtp.Host,
 		User:           smtp.User,
-		Details:        obj_grpc.ToViewDetailsPb(smtp.Sequence, smtp.CreationDate, smtp.ChangeDate, smtp.AggregateID),
+		Details:        obj_grpc.ToViewDetailsPb(smtp.Sequence, smtp.CreationDate, smtp.ChangeDate, smtp.ResourceOwner),
 	}
 	return mapped
 }

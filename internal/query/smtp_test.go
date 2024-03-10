@@ -14,8 +14,7 @@ import (
 )
 
 var (
-	prepareSMTPConfigStmt = `SELECT projections.smtp_configs2.aggregate_id,` +
-		` projections.smtp_configs2.creation_date,` +
+	prepareSMTPConfigStmt = `SELECT projections.smtp_configs2.creation_date,` +
 		` projections.smtp_configs2.change_date,` +
 		` projections.smtp_configs2.resource_owner,` +
 		` projections.smtp_configs2.sequence,` +
@@ -32,7 +31,6 @@ var (
 		` FROM projections.smtp_configs2` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	prepareSMTPConfigCols = []string{
-		"aggregate_id",
 		"creation_date",
 		"change_date",
 		"resource_owner",
@@ -87,7 +85,6 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 					regexp.QuoteMeta(prepareSMTPConfigStmt),
 					prepareSMTPConfigCols,
 					[]driver.Value{
-						"agg-id",
 						testNow,
 						testNow,
 						"ro",
@@ -106,7 +103,6 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 				),
 			},
 			object: &SMTPConfig{
-				AggregateID:    "agg-id",
 				CreationDate:   testNow,
 				ChangeDate:     testNow,
 				ResourceOwner:  "ro",

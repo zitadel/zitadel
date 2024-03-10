@@ -100,9 +100,8 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.smtp_configs2 (aggregate_id, creation_date, change_date, resource_owner, instance_id, sequence, id, tls, sender_address, sender_name, reply_to_address, host, username, password, state, description) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)",
+							expectedStmt: "INSERT INTO projections.smtp_configs2 (creation_date, change_date, resource_owner, instance_id, sequence, id, tls, sender_address, sender_name, reply_to_address, host, username, password, state, description) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)",
 							expectedArgs: []interface{}{
-								"agg-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",

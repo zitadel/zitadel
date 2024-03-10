@@ -32,10 +32,6 @@ var (
 		name:          projection.SMTPConfigProjectionTable,
 		instanceIDCol: projection.SMTPConfigColumnInstanceID,
 	}
-	SMTPConfigColumnAggregateID = Column{
-		name:  projection.SMTPConfigColumnAggregateID,
-		table: smtpConfigsTable,
-	}
 	SMTPConfigColumnCreationDate = Column{
 		name:  projection.SMTPConfigColumnCreationDate,
 		table: smtpConfigsTable,
@@ -99,7 +95,6 @@ var (
 )
 
 type SMTPConfig struct {
-	AggregateID    string
 	CreationDate   time.Time
 	ChangeDate     time.Time
 	ResourceOwner  string
@@ -116,7 +111,7 @@ type SMTPConfig struct {
 	Description    string
 }
 
-func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, resourceOwner string) (config *SMTPConfig, err error) {
+func (q *Queries) SMTPConfigActive(ctx context.Context, resourceOwner string) (config *SMTPConfig, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -137,15 +132,15 @@ func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, resourceOwner str
 	return config, err
 }
 
-func (q *Queries) SMTPConfigByID(ctx context.Context, aggregateID, id string) (config *SMTPConfig, err error) {
+func (q *Queries) SMTPConfigByID(ctx context.Context, instanceID, resourceOwner, id string) (config *SMTPConfig, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	stmt, scan := prepareSMTPConfigQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
-		SMTPConfigColumnAggregateID.identifier(): aggregateID,
-		SMTPConfigColumnInstanceID.identifier():  authz.GetInstance(ctx).InstanceID(),
-		SMTPConfigColumnID.identifier():          id,
+		SMTPConfigColumnResourceOwner.identifier(): resourceOwner,
+		SMTPConfigColumnInstanceID.identifier():    instanceID,
+		SMTPConfigColumnID.identifier():            id,
 	}).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-8f8gw", "Errors.Query.SQLStatement")
@@ -162,7 +157,6 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 	password := new(crypto.CryptoValue)
 
 	return sq.Select(
-			SMTPConfigColumnAggregateID.identifier(),
 			SMTPConfigColumnCreationDate.identifier(),
 			SMTPConfigColumnChangeDate.identifier(),
 			SMTPConfigColumnResourceOwner.identifier(),
@@ -182,7 +176,6 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 		func(row *sql.Row) (*SMTPConfig, error) {
 			config := new(SMTPConfig)
 			err := row.Scan(
-				&config.AggregateID,
 				&config.CreationDate,
 				&config.ChangeDate,
 				&config.ResourceOwner,
@@ -211,7 +204,6 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 
 func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*SMTPConfigs, error)) {
 	return sq.Select(
-			SMTPConfigColumnAggregateID.identifier(),
 			SMTPConfigColumnCreationDate.identifier(),
 			SMTPConfigColumnChangeDate.identifier(),
 			SMTPConfigColumnResourceOwner.identifier(),
@@ -234,7 +226,6 @@ func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			for rows.Next() {
 				config := new(SMTPConfig)
 				err := rows.Scan(
-					&config.AggregateID,
 					&config.CreationDate,
 					&config.ChangeDate,
 					&config.ResourceOwner,
