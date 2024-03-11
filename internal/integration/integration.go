@@ -252,6 +252,13 @@ func (s *Tester) WithInstanceAuthorization(ctx context.Context, u UserType, inst
 	return s.WithAuthorizationToken(ctx, s.Users.Get(instanceID, u).Token)
 }
 
+func (s *Tester) GetUserID(u UserType) string {
+	if u == SystemUser {
+		s.ensureSystemUser()
+	}
+	return s.Users.Get(FirstInstanceUsersKey, u).ID
+}
+
 func (s *Tester) WithAuthorizationToken(ctx context.Context, token string) context.Context {
 	md, ok := metadata.FromOutgoingContext(ctx)
 	if !ok {
