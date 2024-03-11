@@ -90,7 +90,7 @@ jobs:
           key: integration-test-postgres-${{ inputs.core_cache_key }}
           path: ${{ steps.go-cache-path.outputs.GO_CACHE_PATH }}
 
-  # TODO: enable as soon as cockroach allows `COCKROACH_ARGS`
+  # TODO: produces the following output: ERROR: unknown command "cockroach start-single-node --insecure" for "cockroach"
   # cockroach:
   #   runs-on: ubuntu-latest
   #   services:
@@ -98,11 +98,11 @@ jobs:
   #       image: cockroachdb/cockroach:latest
   #       ports:
   #         - 26257:26257
-  #         - 9090:9090
+  #         - 8080:8080
   #       env:
-  #         COCKROACH_ARGS: start-single-node --insecure --http-addr :9090
+  #         COCKROACH_ARGS: "start-single-node --insecure"
   #       options: >-
-  #         --health-cmd "curl http://localhost:9090/health?ready=1 || exit 1"
+  #         --health-cmd "curl http://localhost:8080/health?ready=1 || exit 1"
   #         --health-interval 10s
   #         --health-timeout 5s
   #         --health-retries 5
@@ -128,9 +128,9 @@ jobs:
   #       run: echo "GO_CACHE_PATH=$(go env GOCACHE)" >> $GITHUB_OUTPUT
   #     - 
   #       uses: actions/cache/restore@v4
+  #       id: cache
   #       timeout-minutes: 1
   #       name: restore previous results
-  #       cache: id
   #       with:
   #         key: integration-test-crdb-${{ inputs.core_cache_key }}
   #         restore-keys: |
