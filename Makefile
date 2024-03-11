@@ -65,7 +65,7 @@ core_grpc_dependencies:
 	go install github.com/bufbuild/buf/cmd/buf@v1.28.1										# https://pkg.go.dev/github.com/bufbuild/buf/cmd/buf?tab=versions
 
 .PHONY: core_api
-core_api: core_api_generator core_grpc_dependencies
+core_api: # core_api_generator core_grpc_dependencies
 	buf generate
 	mkdir -p pkg/grpc
 	cp -r .artifacts/grpc/github.com/zitadel/zitadel/pkg/grpc/* pkg/grpc/

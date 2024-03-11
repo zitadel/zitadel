@@ -18,6 +18,8 @@ import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
+import "adlerhurst/cli/v1alpha/cli.proto";
+
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2beta;user";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
@@ -110,8 +112,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 service UserService {
 
+  option (adlerhurst.cli.v1alpha.command).name = "user";
+
   // Create a new human user
   rpc AddHumanUser (AddHumanUserRequest) returns (AddHumanUserResponse) {
+    option (adlerhurst.cli.v1alpha.sub_command).name = "human add";
+
     option (google.api.http) = {
       post: "/v2beta/users/human"
       body: "*"
