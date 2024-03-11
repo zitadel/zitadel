@@ -13019,7 +13019,6 @@ message SetTriggerActionsRequest {
     string flow_type = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"1\"";
-            // description: "At the moment you have to send the ID of the Flow Type: ExternalAuthentication=1, CustomiseToken=2, InternalAuthentication=3, PreUserinfoCreation=3";
         }
     ];
     /* id of the trigger type.
