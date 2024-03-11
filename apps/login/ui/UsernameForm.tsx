@@ -68,7 +68,7 @@ export default function UsernameForm({
       if (response.authMethodTypes.length == 1) {
         const method = response.authMethodTypes[0];
         switch (method) {
-          case 1: //AuthenticationMethodType.AUTHENTICATION_METHOD_TYPE_PASSWORD:
+          case 1: // user has only password as auth method
             const paramsPassword: any = { loginName: values.loginName };
 
             if (loginSettings?.passkeysType === 1) {
@@ -126,6 +126,21 @@ export default function UsernameForm({
 
           return router.push(
             "/passkey/login?" + new URLSearchParams(passkeyParams)
+          );
+        } else {
+          // user has no passkey setup and login settings allow passkeys
+          const paramsPasswordDefault: any = { loginName: values.loginName };
+
+          if (loginSettings?.passkeysType === 1) {
+            paramsPasswordDefault.promptPasswordless = `true`; // PasskeysType.PASSKEYS_TYPE_ALLOWED,
+          }
+
+          if (authRequestId) {
+            paramsPasswordDefault.authRequestId = authRequestId;
+          }
+
+          return router.push(
+            "/password?" + new URLSearchParams(paramsPasswordDefault)
           );
         }
       }
