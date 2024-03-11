@@ -173,7 +173,7 @@ export class AuthUserDetailComponent implements OnDestroy {
         descriptionKey: 'USER.PROFILE.CHANGEUSERNAME_DESC',
         value: this.user?.userName,
       },
-      width: '400px',
+      // width: '400px',
     });
 
     dialogRef.afterClosed().subscribe((resp: { value: string }) => {

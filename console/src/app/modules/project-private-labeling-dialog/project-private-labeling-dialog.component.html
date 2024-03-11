@@ -1,6 +1,8 @@
-<h1 class="title">{{ 'PROJECT.PAGES.PRIVATELABEL.DIALOG.TITLE' | translate }} {{ data?.number }}</h1>
-<p class="desc cnsl-secondary-text">{{ 'PROJECT.PAGES.PRIVATELABEL.DIALOG.DESCRIPTION' | translate }}</p>
+<h1 mat-dialog-title class="title">{{ 'PROJECT.PAGES.PRIVATELABEL.DIALOG.TITLE' | translate }} {{ data?.number }}</h1>
+
 <div mat-dialog-content>
+  <p class="desc cnsl-secondary-text">{{ 'PROJECT.PAGES.PRIVATELABEL.DIALOG.DESCRIPTION' | translate }}</p>
+
   <mat-radio-group class="project-radio-group" [(ngModel)]="setting">
     <mat-radio-button class="radio-button" *ngFor="let selection of settings" [value]="selection">
       <span class="label">{{ 'PROJECT.PAGES.PRIVATELABEL.' + selection + '.TITLE' | translate }}</span>
