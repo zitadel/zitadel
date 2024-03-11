@@ -26,7 +26,7 @@ jobs:
     steps:
     -
       name: Source checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     -
       uses: actions/download-artifact@v3
       if: ${{ !inputs.dry_run }}

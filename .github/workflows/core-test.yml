@@ -38,7 +38,7 @@ jobs:
           --health-start-period 10s
     steps:
       - 
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         uses: actions/setup-go@v5
         with:
@@ -109,7 +109,7 @@ jobs:
   #         --health-start-period 10s
   #   steps:
   #     - 
-  #       uses: actions/checkout@v3
+  #       uses: actions/checkout@v4
   #     -
   #       uses: actions/setup-go@v5
   #       with:
