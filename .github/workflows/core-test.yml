@@ -100,7 +100,7 @@ jobs:
           - 26257:26257
           - 8080:8080
         env:
-          COCKROACH_ARGS: "start-single-node --insecure"
+          COCKROACH_ARGS: "cockroach start-single-node --insecure"
         options: >-
           --health-cmd "curl http://localhost:8080/health?ready=1 || exit 1"
           --health-interval 10s
