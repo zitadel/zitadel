@@ -13041,7 +13041,6 @@ message SetTriggerActionsRequest {
     string trigger_type = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"1\"";
-            // description: "At the moment you have to send the ID of the Trigger Type: PostAuthentication=1, PreCreation=2, PostCreation=3, PreUserinfoCreation=4, PreAccessTokenCreation=5";
          }
     ];
     repeated string action_ids = 3;
