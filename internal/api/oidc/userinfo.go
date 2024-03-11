@@ -153,9 +153,9 @@ func setUserInfoMetadata(metadata []query.UserMetadata, out *oidc.UserInfo) {
 
 func setUserInfoOrgClaims(user *query.OIDCUserInfo, out *oidc.UserInfo) {
 	if org := user.Org; org != nil {
-		out.AppendClaims(ClaimResourceOwner+"id", org.ID)
-		out.AppendClaims(ClaimResourceOwner+"name", org.Name)
-		out.AppendClaims(ClaimResourceOwner+"primary_domain", org.PrimaryDomain)
+		out.AppendClaims(ClaimResourceOwnerID, org.ID)
+		out.AppendClaims(ClaimResourceOwnerName, org.Name)
+		out.AppendClaims(ClaimResourceOwnerPrimaryDomain, org.PrimaryDomain)
 	}
 }
 

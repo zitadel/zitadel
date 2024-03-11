@@ -55,3 +55,33 @@ func AuthMethodTypesToAMR(methodTypes []domain.UserAuthMethodType) []string {
 	}
 	return amr
 }
+
+func AMRToAuthMethodTypes(amr []string) []domain.UserAuthMethodType {
+	authMethods := make([]domain.UserAuthMethodType, 0, len(amr))
+	var (
+		userPresence bool
+		mfa          bool
+	)
+
+	for _, entry := range amr {
+		switch entry {
+		case Password, PWD:
+			authMethods = append(authMethods, domain.UserAuthMethodTypePassword)
+		case OTP:
+			authMethods = append(authMethods, domain.UserAuthMethodTypeOTP)
+		case UserPresence:
+			userPresence = true
+		case MFA:
+			mfa = true
+		}
+	}
+
+	if userPresence {
+		if mfa {
+			authMethods = append(authMethods, domain.UserAuthMethodTypePasswordless)
+		} else {
+			authMethods = append(authMethods, domain.UserAuthMethodTypeU2F)
+		}
+	}
+	return authMethods
+}

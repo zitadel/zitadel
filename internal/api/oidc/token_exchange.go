@@ -29,7 +29,14 @@ func (s *Server) TokenExchange(ctx context.Context, r *op.ClientRequest[oidc.Tok
 	if len(r.Data.Resource) > 0 {
 		return nil, oidc.ErrInvalidTarget().WithDescription("resource parameter not supported")
 	}
-	subjectToken, err := s.verifyExchangeToken(ctx, r.Data.SubjectToken, r.Data.SubjectTokenType)
+
+	client, ok := r.Client.(*Client)
+	if !ok {
+		// not supposed to happen, but just preventing a panic if it does.
+		return nil, zerrors.ThrowInternal(nil, "OIDC-eShi5", "Error.Internal")
+	}
+
+	subjectToken, err := s.verifyExchangeToken(ctx, client, r.Data.SubjectToken, r.Data.SubjectTokenType)
 	if err != nil {
 		return nil, oidc.ErrInvalidRequest().WithParent(err).WithDescription("subject_token invalid")
 	}
@@ -39,7 +46,7 @@ func (s *Server) TokenExchange(ctx context.Context, r *op.ClientRequest[oidc.Tok
 		if !authz.GetInstance(ctx).EnableImpersonation() {
 			return nil, zerrors.ThrowPermissionDenied(nil, "OIDC-Fae5w", "Errors.TokenExchange.Impersonation.PolicyDisabled")
 		}
-		actorToken, err = s.verifyExchangeToken(ctx, r.Data.ActorToken, r.Data.ActorTokenType)
+		actorToken, err = s.verifyExchangeToken(ctx, client, r.Data.ActorToken, r.Data.ActorTokenType)
 		if err != nil {
 			return nil, oidc.ErrInvalidRequest().WithParent(err).WithDescription("actor_token invalid")
 		}
@@ -49,12 +56,12 @@ func (s *Server) TokenExchange(ctx context.Context, r *op.ClientRequest[oidc.Tok
 	if err != nil {
 		return nil, err
 	}
-	scopes, err := validateTokenExchangeScopes(r.Client, r.Data.Scopes, subjectToken.scopes, actorToken.scopes)
+	scopes, err := validateTokenExchangeScopes(client, r.Data.Scopes, subjectToken.scopes, actorToken.scopes)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := s.createExchangeTokens(ctx, r.Data.RequestedTokenType, r.Client, subjectToken, actorToken, audience, scopes)
+	resp, err := s.createExchangeTokens(ctx, r.Data.RequestedTokenType, client, subjectToken, actorToken, audience, scopes)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +69,7 @@ func (s *Server) TokenExchange(ctx context.Context, r *op.ClientRequest[oidc.Tok
 	return op.NewResponse(resp), nil
 }
 
-func validateTokenExchangeScopes(client op.Client, requestedScopes, subjectScopes, actorScopes []string) ([]string, error) {
+func validateTokenExchangeScopes(client *Client, requestedScopes, subjectScopes, actorScopes []string) ([]string, error) {
 	scopes := requestedScopes
 	if len(scopes) == 0 {
 		scopes = subjectScopes
@@ -99,18 +106,13 @@ func validateTokenExchangeAudience(requestedAudience, subjectAudience, actorAudi
 // The actorToken is used to set the new token's auth time AMR and actor.
 // Both tokens may point to the same object (subjectToken) in case of a regular Token Exchange.
 // When the subject and actor Tokens point to different objects, the new tokens will be for impersonation / delegation.
-func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenType, client op.Client, subjectToken, actorToken *exchangeToken, audience, scopes []string) (_ *oidc.TokenExchangeResponse, err error) {
-	zClient, ok := client.(*Client)
-	if !ok {
-		// not supposed to happen, but just preventing a panic if it does.
-		return nil, zerrors.ThrowInternal(nil, "OIDC-eShi5", "Error.Internal")
-	}
+func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenType, client *Client, subjectToken, actorToken *exchangeToken, audience, scopes []string) (_ *oidc.TokenExchangeResponse, err error) {
 	var (
 		userInfo *oidc.UserInfo
 		signer   jose.Signer
 	)
 	if slices.Contains(scopes, oidc.ScopeOpenID) || tokenType == oidc.JWTTokenType || tokenType == oidc.IDTokenType {
-		projectID := zClient.client.ProjectID
+		projectID := client.client.ProjectID
 		userInfo, err = s.userInfo(ctx, subjectToken.userID, projectID, scopes, []string{projectID})
 		if err != nil {
 			return nil, err
@@ -134,12 +136,12 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 
 	switch tokenType {
 	case oidc.AccessTokenType:
-		resp.AccessToken, resp.RefreshToken, err = s.createExchangeAccessToken(ctx, zClient, subjectToken.resourceOwner, subjectToken.userID, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor)
+		resp.AccessToken, resp.RefreshToken, err = s.createExchangeAccessToken(ctx, client, subjectToken.resourceOwner, subjectToken.userID, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor)
 		resp.TokenType = oidc.BearerToken
 		resp.IssuedTokenType = oidc.AccessTokenType
 
 	case oidc.JWTTokenType:
-		resp.AccessToken, resp.RefreshToken, err = s.createExchangeJWT(ctx, signer, zClient, subjectToken.resourceOwner, subjectToken.userID, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor, userInfo.Claims)
+		resp.AccessToken, resp.RefreshToken, err = s.createExchangeJWT(ctx, signer, client, subjectToken.resourceOwner, subjectToken.userID, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor, userInfo.Claims)
 		resp.TokenType = oidc.BearerToken
 		resp.IssuedTokenType = oidc.JWTTokenType
 	}
@@ -238,6 +240,45 @@ func accessToExchangeToken(token *accessToken, issuer string) *exchangeToken {
 	}
 }
 
+func idTokenClaimsToExchangeToken(claims *oidc.IDTokenClaims) *exchangeToken {
+	resourceOwner, _ := claims.Claims[ClaimResourceOwnerID].(string)
+	return &exchangeToken{
+		tokenType:     oidc.IDTokenType,
+		userID:        claims.Subject,
+		issuer:        claims.Issuer,
+		resourceOwner: resourceOwner,
+		authTime:      claims.GetAuthTime(),
+		authMethods:   AMRToAuthMethodTypes(claims.AuthenticationMethodsReferences),
+		actor:         actorClaimsToDomain(claims.Actor),
+		audience:      claims.Audience,
+	}
+}
+
+func actorClaimsToDomain(actor *oidc.ActorClaims) *domain.TokenActor {
+	if actor == nil {
+		return nil
+	}
+	resourceOwner, _ := actor.Claims[ClaimResourceOwnerID].(string)
+	return &domain.TokenActor{
+		Actor:         actorClaimsToDomain(actor.Actor),
+		UserID:        actor.Subject,
+		Issuer:        actor.Issuer,
+		ResourceOwner: resourceOwner,
+	}
+}
+
+func jwtToExchangeToken(jwt *oidc.JWTTokenRequest, resourceOwner string) *exchangeToken {
+	return &exchangeToken{
+		tokenType:     oidc.JWTTokenType,
+		userID:        jwt.Subject,
+		issuer:        jwt.Issuer,
+		resourceOwner: resourceOwner,
+		scopes:        jwt.Scopes,
+		authTime:      jwt.IssuedAt.AsTime(),
+		// audience omitted as we don't thrust audiences not signed by us
+	}
+}
+
 func userToExchangeToken(user *query.User) *exchangeToken {
 	return &exchangeToken{
 		tokenType:     UserIDTokenType,
@@ -246,7 +287,7 @@ func userToExchangeToken(user *query.User) *exchangeToken {
 	}
 }
 
-func (s *Server) verifyExchangeToken(ctx context.Context, token string, tokenType oidc.TokenType, allowed ...oidc.TokenType) (*exchangeToken, error) {
+func (s *Server) verifyExchangeToken(ctx context.Context, client *Client, token string, tokenType oidc.TokenType, allowed ...oidc.TokenType) (*exchangeToken, error) {
 	if token == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "OIDC-lei0O", "Errors.TokenExchange.Token.Missing")
 	}
@@ -265,6 +306,23 @@ func (s *Server) verifyExchangeToken(ctx context.Context, token string, tokenTyp
 		}
 		return accessToExchangeToken(token, op.IssuerFromContext(ctx)), nil
 
+	case oidc.IDTokenType:
+		verifier := op.NewIDTokenHintVerifier(op.IssuerFromContext(ctx), s.idTokenHintKeySet)
+		claims, err := op.VerifyIDTokenHint[*oidc.IDTokenClaims](ctx, token, verifier)
+		if err != nil {
+			return nil, zerrors.ThrowPermissionDenied(err, "OIDC-Rei0f", "Errors.TokenExchange.Token.Invalid")
+		}
+		return idTokenClaimsToExchangeToken(claims), nil
+
+	case oidc.JWTTokenType:
+		resourceOwner := new(string)
+		verifier := op.NewJWTProfileVerifierKeySet(keySetMap(client.client.PublicKeys), op.IssuerFromContext(ctx), time.Hour, client.client.ClockSkew, s.jwtProfileUserCheck(ctx, resourceOwner))
+		jwt, err := op.VerifyJWTAssertion(ctx, token, verifier)
+		if err != nil {
+			return nil, zerrors.ThrowPermissionDenied(err, "OIDC-eiS6o", "Errors.TokenExchange.Token.Invalid")
+		}
+		return jwtToExchangeToken(jwt, *resourceOwner), nil
+
 	case UserIDTokenType:
 		user, err := s.query.GetUserByID(ctx, false, token)
 		if err != nil {
@@ -272,9 +330,20 @@ func (s *Server) verifyExchangeToken(ctx context.Context, token string, tokenTyp
 		}
 		return userToExchangeToken(user), nil
 
-	case oidc.IDTokenType, oidc.RefreshTokenType, oidc.JWTTokenType:
+	case oidc.RefreshTokenType:
 		fallthrough
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "OIDC-oda4R", "Errors.TokenExchange.Token.TypeNotSupported")
 	}
+}
+
+func (s *Server) jwtProfileUserCheck(ctx context.Context, resourceOwner *string) op.JWTProfileVerifierOption {
+	return op.SubjectCheck(func(request *oidc.JWTTokenRequest) error {
+		user, err := s.query.GetUserByID(ctx, false, request.Subject)
+		if err != nil {
+			return zerrors.ThrowPermissionDenied(err, "OIDC-Nee6r", "Errors.TokenExchange.Token.Invalid")
+		}
+		*resourceOwner = user.ResourceOwner
+		return nil
+	})
 }
