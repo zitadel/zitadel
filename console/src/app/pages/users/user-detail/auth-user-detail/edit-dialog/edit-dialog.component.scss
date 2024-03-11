@@ -23,7 +23,6 @@
   width: 100%;
 
   .phone-grid {
-    max-width: 22rem;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     column-gap: 1rem;
