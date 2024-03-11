@@ -98,11 +98,11 @@ jobs:
         image: cockroachdb/cockroach:latest
         ports:
           - 26257:26257
-          - 9090:9090
+          - 8080:8080
         env:
-          COCKROACH_ARGS: start-single-node --insecure --http-addr :9090
+          COCKROACH_ARGS: start-single-node --insecure
         options: >-
-          --health-cmd "curl http://localhost:9090/health?ready=1 || exit 1"
+          --health-cmd "curl http://localhost:8080/health?ready=1 || exit 1"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
