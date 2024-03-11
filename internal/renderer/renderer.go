@@ -2,10 +2,10 @@ package renderer
 
 import (
 	"context"
+	"html/template"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"text/template"
 
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
