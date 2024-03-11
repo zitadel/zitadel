@@ -32,7 +32,7 @@ jobs:
       -
         name: Scratch meta
         id: scratch-meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: ${{ inputs.build_image_name }}
           labels: ${{ env.default_labels}}
@@ -41,7 +41,7 @@ jobs:
       -
         name: Debug meta
         id: debug-meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: ${{ inputs.build_image_name }}
           labels: ${{ env.default_labels}}
@@ -158,7 +158,7 @@ jobs:
       -
         name: Docker meta
         id: build-meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: '${{ inputs.build_image_name }}'
           tags: |
