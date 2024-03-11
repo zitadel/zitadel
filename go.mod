@@ -24,7 +24,7 @@ require (
 	github.com/drone/envsubst v1.0.3
 	github.com/envoyproxy/protoc-gen-validate v1.0.3
 	github.com/fatih/color v1.16.0
-	github.com/go-jose/go-jose/v3 v3.0.2
+	github.com/go-jose/go-jose/v3 v3.0.3
 	github.com/go-ldap/ldap/v3 v3.4.6
 	github.com/go-webauthn/webauthn v0.10.0
 	github.com/gorilla/csrf v1.7.2
@@ -61,7 +61,7 @@ require (
 	github.com/superseriousbusiness/exifremove v0.0.0-20210330092427-6acd27eac203
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/zitadel/logging v0.6.0
-	github.com/zitadel/oidc/v3 v3.14.0
+	github.com/zitadel/oidc/v3 v3.14.1-0.20240311073656-f675939dfb6c
 	github.com/zitadel/passwap v0.5.0
 	github.com/zitadel/saml v0.1.3
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.46.1
