@@ -24,7 +24,7 @@ func (p *OrgState) Filter() []*eventstore.Filter {
 	return []*eventstore.Filter{
 		eventstore.NewFilter(
 			eventstore.Descending(),
-			eventstore.WithPositionAtLeast(p.position, 0),
+			eventstore.WithPositionAtLeast(p.position),
 			eventstore.AppendAggregateFilter(
 				org.AggregateType,
 				eventstore.WithAggregateID(p.id),

@@ -57,7 +57,7 @@ type event struct {
 	typ       string
 	createdAt time.Time
 	sequence  uint32
-	position  float64
+	position  eventstore.GlobalPosition
 	payload   []byte
 }
 
@@ -91,8 +91,8 @@ func (e *event) Sequence() uint32 {
 	return e.sequence
 }
 
-// Sequence implements [eventstore.Event].
-func (e *event) Position() float64 {
+// Position implements [eventstore.Event].
+func (e *event) Position() eventstore.GlobalPosition {
 	return e.position
 }
 

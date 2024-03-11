@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	selectColumns = `SELECT created_at, event_type, "sequence", "position", payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision`
+	selectColumns = `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision`
 	from          = " FROM eventstore.events2"
 )
 
@@ -49,7 +49,8 @@ func query(ctx context.Context, tx *sql.Tx, stmt *database.Statement, reducer ev
 			&e.createdAt,
 			&e.typ,
 			&e.sequence,
-			&e.position,
+			&e.position.Position,
+			&e.position.InPositionOrder,
 			&payload,
 			&e.creator,
 			&e.aggregate.Owner,

@@ -21,7 +21,18 @@ func (s *Storage) Push(ctx context.Context, pushIntents ...eventstore.PushIntent
 		err = database.CloseTx(tx, err)
 	}()
 
-	// TODO: set app name
+	var previousAppName string
+	if err := tx.QueryRowContext(ctx, "select current_setting('application_name')").Scan(&previousAppName); err != nil {
+		logging.WithError(err).Debug("getting app name failed")
+		return zerrors.ThrowInternal(err, "POSTG-qkGKk", "Errors.Internal")
+	}
+	if err := setAppName(ctx, tx, "es_pusher"); err != nil {
+		return err
+	}
+	defer func() {
+		setErr := setAppName(ctx, tx, previousAppName)
+		logging.OnError(setErr).Warn("resetting the app name failed")
+	}()
 
 	intents, err := lockAggregates(ctx, tx, pushIntents)
 	if err != nil {
@@ -47,6 +58,16 @@ func (s *Storage) Push(ctx context.Context, pushIntents ...eventstore.PushIntent
 	}
 
 	return push(ctx, tx, commands)
+}
+
+func setAppName(ctx context.Context, tx *sql.Tx, name string) error {
+	_, err := tx.ExecContext(ctx, "select current_setting('application_name')")
+	if err != nil {
+		logging.WithFields("name", name).WithError(err).Debug("setting app name failed")
+		return zerrors.ThrowInternal(err, "POSTG-G3OmZ", "Errors.Internal")
+	}
+
+	return nil
 }
 
 func lockAggregates(ctx context.Context, tx *sql.Tx, pushIntents []eventstore.PushIntent) ([]*intent, error) {
@@ -106,6 +127,7 @@ func push(ctx context.Context, tx *sql.Tx, commands []*command) error {
 
 	stmt.WriteString(`INSERT INTO eventstore.events2 (instance_id, "owner", aggregate_type, aggregate_id, revision, creator, event_type, payload, "sequence", in_tx_order, created_at, "position") VALUES `)
 	for i, cmd := range commands {
+		cmd.event.position.InPositionOrder = uint32(i)
 		stmt.WriteString(`(`)
 		stmt.WriteArgs(cmd.aggregate.Instance, cmd.aggregate.Owner, cmd.aggregate.Type, cmd.aggregate.ID, cmd.revision, cmd.creator, cmd.typ, cmd.payload, cmd.sequence, i)
 		stmt.WriteString(", statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())")
@@ -127,7 +149,7 @@ func push(ctx context.Context, tx *sql.Tx, commands []*command) error {
 
 		err := scan(
 			&commands[i].event.createdAt,
-			&commands[i].event.position,
+			&commands[i].event.position.Position,
 		)
 		if err != nil {
 			return err
@@ -149,19 +171,23 @@ func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) err
 		}
 		for _, constraint := range cmd.uniqueConstraints {
 			stmt.Reset()
+			instance := cmd.aggregate.Instance
+			if constraint.IsGlobal {
+				instance = ""
+			}
 			switch constraint.Action {
 			case eventstore.UniqueConstraintAdd:
 				stmt.WriteString(`INSERT INTO eventstore.unique_constraints (instance_id, unique_type, unique_field) VALUES (`)
-				stmt.WriteArgs(cmd.aggregate.Instance, constraint.UniqueType, constraint.UniqueField)
+				stmt.WriteArgs(instance, constraint.UniqueType, constraint.UniqueField)
 				stmt.WriteString(`)`)
 			case eventstore.UniqueConstraintInstanceRemove:
 				stmt.WriteString(`DELETE FROM eventstore.unique_constraints WHERE instance_id = `)
-				stmt.WriteArgs(cmd.aggregate.Instance)
+				stmt.WriteArgs(instance)
 			case eventstore.UniqueConstraintRemove:
 				stmt.WriteString(`DELETE FROM eventstore.unique_constraints WHERE `)
 				stmt.WriteString(deleteUniqueConstraintClause)
 				stmt.AppendArgs(
-					sql.Named("@instanceId", cmd.aggregate.Instance),
+					sql.Named("@instanceId", instance),
 					sql.Named("@uniqueType", constraint.UniqueType),
 					sql.Named("@uniqueField", constraint.UniqueField),
 				)

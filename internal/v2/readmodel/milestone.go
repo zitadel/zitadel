@@ -15,8 +15,7 @@ type Milestone struct {
 	projection.ProjectCreatedMilestone
 	projection.AppCreatedMilestone
 
-	position  float64
-	inTxOrder uint32
+	position eventstore.GlobalPosition
 }
 
 func NewMilestone(instance string) *Milestone {
@@ -43,32 +42,31 @@ func (rm *Milestone) Filter(ctx context.Context) []*eventstore.Filter {
 
 func (rm *Milestone) Reduce(events ...eventstore.Event) error {
 	for _, event := range events {
+		if err := rm.InstanceCreatedMilestone.Reduce(event); err != nil {
+			return err
+		}
+
+		if err := rm.InstanceRemovedMilestone.Reduce(event); err != nil {
+			return err
+		}
+
+		if err := rm.AuthOnInstanceMilestone.Reduce(event); err != nil {
+			return err
+		}
+
+		if err := rm.AuthOnAppMilestone.Reduce(event); err != nil {
+			return err
+		}
+
+		if err := rm.ProjectCreatedMilestone.Reduce(event); err != nil {
+			return err
+		}
+
+		if err := rm.AppCreatedMilestone.Reduce(event); err != nil {
+			return err
+		}
+
 		rm.position = event.Position()
-		//TODO: rm.inTxOrder = event.InTxOrder()
-	}
-
-	if err := rm.InstanceCreatedMilestone.Reduce(events...); err != nil {
-		return err
-	}
-
-	if err := rm.InstanceRemovedMilestone.Reduce(events...); err != nil {
-		return err
-	}
-
-	if err := rm.AuthOnInstanceMilestone.Reduce(events...); err != nil {
-		return err
-	}
-
-	if err := rm.AuthOnAppMilestone.Reduce(events...); err != nil {
-		return err
-	}
-
-	if err := rm.ProjectCreatedMilestone.Reduce(events...); err != nil {
-		return err
-	}
-
-	if err := rm.AppCreatedMilestone.Reduce(events...); err != nil {
-		return err
 	}
 
 	return nil

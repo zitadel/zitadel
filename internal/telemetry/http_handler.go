@@ -25,10 +25,13 @@ func TelemetryHandler(handler http.Handler, ignoredEndpoints ...string) http.Han
 		"zitadel",
 		otelhttp.WithFilter(shouldNotIgnore(ignoredEndpoints...)),
 		otelhttp.WithPublicEndpoint(),
+		otelhttp.WithMeterProvider(metrics.GetMetricsProvider()),
+		otelhttp.WithServerName("ZITADEL"),
 		otelhttp.WithSpanNameFormatter(spanNameFormatter),
-		otelhttp.WithMeterProvider(metrics.GetMetricsProvider()))
+		otelhttp.WithPublicEndpoint(),
+	)
 }
 
 func spanNameFormatter(_ string, r *http.Request) string {
-	return r.Host + r.URL.EscapedPath()
+	return r.URL.EscapedPath()
 }

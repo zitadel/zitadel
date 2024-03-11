@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/v2/database"
 )
 
-var FilterMergeErr = errors.New("merge failed")
+var ErrFilterMerge = errors.New("merge failed")
 
 type FilterCreator func() []*Filter
 
@@ -119,14 +119,14 @@ func WithPosition(position database.NumberFilter[float64], inTxOrder database.Nu
 	}
 }
 
-func WithPositionAtLeast(position float64, inTxOrder uint32) FilterOpt {
+func WithPositionAtLeast(position GlobalPosition) FilterOpt {
 	return func(f *Filter) {
 		f.ensurePagination()
 		f.pagination.ensurePosition()
 
-		f.pagination.position.position = database.NewNumberAtLeast(position)
-		if inTxOrder > 0 {
-			f.pagination.position.inTxOrder = database.NewNumberAtLeast(inTxOrder)
+		f.pagination.position.position = database.NewNumberAtLeast(position.Position)
+		if position.InPositionOrder > 0 {
+			f.pagination.position.inTxOrder = database.NewNumberAtLeast(position.InPositionOrder)
 		}
 	}
 }

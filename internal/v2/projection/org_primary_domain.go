@@ -22,7 +22,7 @@ func NewOrgPrimaryDomain(id string) *OrgPrimaryDomain {
 func (p *OrgPrimaryDomain) Filter() []*eventstore.Filter {
 	return []*eventstore.Filter{
 		eventstore.NewFilter(
-			eventstore.WithPositionAtLeast(p.position, 0),
+			eventstore.WithPositionAtLeast(p.position),
 			eventstore.AppendAggregateFilter(
 				org.AggregateType,
 				eventstore.WithAggregateID(p.id),

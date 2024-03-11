@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/v2/instance"
+	"github.com/zitadel/zitadel/internal/v2/user"
 )
 
 type milestone struct {
@@ -28,6 +29,10 @@ func NewInstanceCreatedMilestone() *InstanceCreatedMilestone {
 }
 
 func (p *InstanceCreatedMilestone) Filter() []*eventstore.Filter {
+	if !p.reachedAt.IsZero() {
+		return nil
+	}
+
 	return []*eventstore.Filter{
 		eventstore.NewFilter(
 			eventstore.AppendAggregateFilter(
@@ -64,6 +69,10 @@ func NewInstanceRemovedMilestone() *InstanceRemovedMilestone {
 }
 
 func (p *InstanceRemovedMilestone) Filter() []*eventstore.Filter {
+	if !p.reachedAt.IsZero() {
+		return nil
+	}
+
 	return []*eventstore.Filter{
 		eventstore.NewFilter(
 			eventstore.AppendAggregateFilter(
@@ -101,6 +110,10 @@ func NewAuthOnInstanceMilestone() *AuthOnInstanceMilestone {
 }
 
 func (p *AuthOnInstanceMilestone) Filter() []*eventstore.Filter {
+	if !p.reachedAt.IsZero() {
+		return nil
+	}
+
 	return []*eventstore.Filter{
 		eventstore.NewFilter(
 			eventstore.AppendAggregateFilter(
@@ -128,8 +141,9 @@ func (p *AuthOnInstanceMilestone) Reduce(events ...eventstore.Event) error {
 type AuthOnAppMilestone struct {
 	milestone
 
-	position  float64
-	inTxOrder uint32
+	consoleAppID string
+
+	position eventstore.GlobalPosition
 }
 
 func NewAuthOnAppMilestone() *AuthOnAppMilestone {
@@ -141,6 +155,10 @@ func NewAuthOnAppMilestone() *AuthOnAppMilestone {
 }
 
 func (p *AuthOnAppMilestone) Filter() []*eventstore.Filter {
+	if !p.reachedAt.IsZero() {
+		return nil
+	}
+
 	return []*eventstore.Filter{
 		eventstore.NewFilter(
 			eventstore.AppendAggregateFilter(
@@ -150,7 +168,7 @@ func (p *AuthOnAppMilestone) Filter() []*eventstore.Filter {
 				),
 			),
 			// used because we need to check for first login and an app which is not console
-			eventstore.WithPosition(database.NewNumberAtLeast(p.position), database.NewNumberGreater(p.inTxOrder)),
+			eventstore.WithPosition(database.NewNumberAtLeast(p.position.Position), database.NewNumberGreater(p.position.InPositionOrder)),
 		),
 	}
 }
@@ -160,7 +178,16 @@ func (p *AuthOnAppMilestone) Reduce(events ...eventstore.Event) error {
 		if event.Type() != "user.token.added" {
 			continue
 		}
-		// TODO: check if app id is set
+		tokenAdded, err := eventstore.Unmarshal[user.TokenAdded](event)
+		if err != nil {
+			return err
+		}
+
+		p.position = event.Position()
+
+		if tokenAdded.ApplicationID == p.consoleAppID {
+			continue
+		}
 		p.reachedAt = event.CreatedAt()
 	}
 	return nil
@@ -179,6 +206,10 @@ func NewProjectCreatedMilestone() *ProjectCreatedMilestone {
 }
 
 func (p *ProjectCreatedMilestone) Filter() []*eventstore.Filter {
+	if !p.reachedAt.IsZero() {
+		return nil
+	}
+
 	return []*eventstore.Filter{
 		eventstore.NewFilter(
 			eventstore.AppendAggregateFilter(
@@ -217,6 +248,10 @@ func NewAppCreatedMilestone() *AppCreatedMilestone {
 }
 
 func (p *AppCreatedMilestone) Filter() []*eventstore.Filter {
+	if !p.reachedAt.IsZero() {
+		return nil
+	}
+
 	return []*eventstore.Filter{
 		eventstore.NewFilter(
 			eventstore.AppendAggregateFilter(
