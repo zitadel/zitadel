@@ -4,9 +4,13 @@ title: Complement Token Flow
 
 This flow is executed during the creation of tokens and token introspection.
 
+The flow is represented by the following Ids in the API: `2`
+
 ## Pre Userinfo creation (id_token / userinfo / introspection endpoint)
 
 This trigger is called before userinfo are set in the id_token or userinfo and introspection endpoint response.
+
+The trigger is represented by the following Ids in the API: `4`
 
 ### Parameters of Pre Userinfo creation
 
@@ -37,6 +41,8 @@ This trigger is called before userinfo are set in the id_token or userinfo and i
 ## Pre access token creation
 
 This trigger is called before the claims are set in the access token and the token type is `jwt`.
+
+The trigger is represented by the following Ids in the API: `5`
 
 ### Parameters of Pre access token creation
 
