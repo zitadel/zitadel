@@ -5,7 +5,7 @@ import {
   server,
 } from "#/lib/zitadel";
 import { SessionCookie, getAllSessions } from "#/utils/cookies";
-import { Session, AuthRequest, Prompt } from "@zitadel/server";
+import { Session, AuthRequest, Prompt, login } from "@zitadel/server";
 import { NextRequest, NextResponse } from "next/server";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
@@ -82,25 +82,29 @@ export async function GET(request: NextRequest) {
   if (authRequestId) {
     console.log(`Login with authRequest: ${authRequestId}`);
     const { authRequest } = await getAuthRequest(server, { authRequestId });
+    let organization;
+
+    if (
+      authRequest?.scope &&
+      authRequest.scope.find((s) => ORG_SCOPE_REGEX.test(s))
+    ) {
+      const orgId = authRequest.scope.find((s) => ORG_SCOPE_REGEX.test(s));
+
+      if (orgId) {
+        const matched = orgId.replace("urn:zitadel:iam:org:id:", "");
+        organization = matched;
+      }
+    }
 
     if (authRequest && authRequest.prompt.includes(Prompt.PROMPT_CREATE)) {
       const registerUrl = new URL("/register", request.url);
       if (authRequest?.id) {
         registerUrl.searchParams.set("authRequestId", authRequest?.id);
       }
-
-      if (
-        authRequest.scope &&
-        authRequest.scope.find((s) => ORG_SCOPE_REGEX.test(s))
-      ) {
-        const orgId = authRequest.scope
-          .find((s) => ORG_SCOPE_REGEX.test(s))
-          ?.match(ORG_SCOPE_REGEX)?.[1];
-        console.log(orgId);
-        if (orgId) {
-          registerUrl.searchParams.set("orgId", orgId);
-        }
+      if (organization) {
+        registerUrl.searchParams.set("organization", organization);
       }
+
       return NextResponse.redirect(registerUrl);
     }
 
@@ -112,6 +116,9 @@ export async function GET(request: NextRequest) {
         if (authRequest?.id) {
           accountsUrl.searchParams.set("authRequestId", authRequest?.id);
         }
+        if (organization) {
+          accountsUrl.searchParams.set("organization", organization);
+        }
 
         return NextResponse.redirect(accountsUrl);
       } else if (authRequest.prompt.includes(Prompt.PROMPT_LOGIN)) {
@@ -122,6 +129,9 @@ export async function GET(request: NextRequest) {
         }
         if (authRequest.loginHint) {
           loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
+        }
+        if (organization) {
+          loginNameUrl.searchParams.set("organization", organization);
         }
         return NextResponse.redirect(loginNameUrl);
       } else if (authRequest.prompt.includes(Prompt.PROMPT_NONE)) {
@@ -178,13 +188,17 @@ export async function GET(request: NextRequest) {
           } else {
             const accountsUrl = new URL("/accounts", request.url);
             accountsUrl.searchParams.set("authRequestId", authRequestId);
-
+            if (organization) {
+              accountsUrl.searchParams.set("organization", organization);
+            }
             return NextResponse.redirect(accountsUrl);
           }
         } else {
           const accountsUrl = new URL("/accounts", request.url);
           accountsUrl.searchParams.set("authRequestId", authRequestId);
-
+          if (organization) {
+            accountsUrl.searchParams.set("organization", organization);
+          }
           return NextResponse.redirect(accountsUrl);
         }
       }
@@ -195,6 +209,10 @@ export async function GET(request: NextRequest) {
       if (authRequest?.loginHint) {
         loginNameUrl.searchParams.set("loginName", authRequest.loginHint);
         loginNameUrl.searchParams.set("submit", "true"); // autosubmit
+      }
+
+      if (organization) {
+        loginNameUrl.searchParams.set("organization", organization);
       }
 
       return NextResponse.redirect(loginNameUrl);

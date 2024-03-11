@@ -3,11 +3,14 @@ import React from "react";
 import { getBrandingSettings, server } from "#/lib/zitadel";
 import { Logo } from "#/ui/Logo";
 
-export default async function Template({
+export default async function Layout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: any;
 }) {
+  console.log(params);
   const branding = await getBrandingSettings(server);
   let partial: Partial<BrandingSettings> | undefined;
   if (branding) {
