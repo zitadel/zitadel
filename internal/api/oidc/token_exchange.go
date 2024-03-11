@@ -5,14 +5,12 @@ import (
 	"slices"
 	"time"
 
-	"github.com/go-jose/go-jose/v3"
 	"github.com/zitadel/oidc/v3/pkg/crypto"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -108,8 +106,8 @@ func validateTokenExchangeAudience(requestedAudience, subjectAudience, actorAudi
 // When the subject and actor Tokens point to different objects, the new tokens will be for impersonation / delegation.
 func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenType, client *Client, subjectToken, actorToken *exchangeToken, audience, scopes []string) (_ *oidc.TokenExchangeResponse, err error) {
 	var (
-		userInfo *oidc.UserInfo
-		signer   jose.Signer
+		userInfo   *oidc.UserInfo
+		signingKey op.SigningKey
 	)
 	if slices.Contains(scopes, oidc.ScopeOpenID) || tokenType == oidc.JWTTokenType || tokenType == oidc.IDTokenType {
 		projectID := client.client.ProjectID
@@ -117,7 +115,7 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 		if err != nil {
 			return nil, err
 		}
-		signer, err = s.getSigner(ctx)
+		signingKey, err = s.Provider().Storage().SigningKey(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -141,13 +139,26 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 		resp.IssuedTokenType = oidc.AccessTokenType
 
 	case oidc.JWTTokenType:
-		resp.AccessToken, resp.RefreshToken, err = s.createExchangeJWT(ctx, signer, client, subjectToken.resourceOwner, subjectToken.userID, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor, userInfo.Claims)
+		resp.AccessToken, resp.RefreshToken, err = s.createExchangeJWT(ctx, signingKey, client, subjectToken.resourceOwner, subjectToken.userID, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor, userInfo.Claims)
 		resp.TokenType = oidc.BearerToken
 		resp.IssuedTokenType = oidc.JWTTokenType
+
+	case oidc.IDTokenType:
+		resp.AccessToken, err = s.createExchangeIDToken(ctx, signingKey, client, subjectToken.resourceOwner, subjectToken.userID, "", audience, userInfo, actorToken.authMethods, actorToken.authTime, reason, actor)
+		resp.TokenType = "N_A"
+		resp.IssuedTokenType = oidc.IDTokenType
 	}
 	if err != nil {
 		return nil, err
 	}
+
+	if slices.Contains(scopes, oidc.ScopeOpenID) && tokenType != oidc.IDTokenType {
+		resp.IDToken, err = s.createExchangeIDToken(ctx, signingKey, client, subjectToken.resourceOwner, subjectToken.userID, resp.AccessToken, audience, userInfo, actorToken.authMethods, actorToken.authTime, reason, actor)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return resp, nil
 }
 
@@ -163,7 +174,7 @@ func (s *Server) createExchangeAccessToken(ctx context.Context, client *Client, 
 	return accessToken, refreshToken, nil
 }
 
-func (s *Server) createExchangeJWT(ctx context.Context, signer jose.Signer, client *Client, resourceOwner, userID string, audience, scopes []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor, privateClaims map[string]any) (accessToken string, refreshToken string, err error) {
+func (s *Server) createExchangeJWT(ctx context.Context, signingKey op.SigningKey, client *Client, resourceOwner, userID string, audience, scopes []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor, privateClaims map[string]any) (accessToken string, refreshToken string, err error) {
 	tokenInfo, refreshToken, err := s.createAccessTokenCommands(ctx, client, resourceOwner, userID, audience, scopes, authMethods, authTime, reason, actor)
 	if err != nil {
 		return "", "", err
@@ -173,11 +184,33 @@ func (s *Server) createExchangeJWT(ctx context.Context, signer jose.Signer, clie
 	claims := oidc.NewAccessTokenClaims(op.IssuerFromContext(ctx), userID, tokenInfo.Audience, exp, tokenInfo.TokenID, client.GetID(), client.ClockSkew())
 	claims.Claims = privateClaims
 
+	signer, err := op.SignerFromKey(signingKey)
+	if err != nil {
+		return "", "", err
+	}
+
 	accessToken, err = crypto.Sign(claims, signer)
 	if err != nil {
 		return "", "", nil
 	}
 	return accessToken, refreshToken, nil
+}
+
+func (s *Server) createExchangeIDToken(ctx context.Context, signingKey op.SigningKey, client *Client, resourceOwner, userID, accessToken string, audience []string, userInfo *oidc.UserInfo, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (idToken string, err error) {
+	exp := time.Now().Add(client.IDTokenLifetime()).Add(client.ClockSkew())
+	claims := oidc.NewIDTokenClaims(op.IssuerFromContext(ctx), userID, audience, exp, authTime, "", "", AuthMethodTypesToAMR(authMethods), client.GetID(), client.ClockSkew())
+	claims.SetUserInfo(userInfo)
+	if accessToken != "" {
+		claims.AccessTokenHash, err = oidc.ClaimHash(accessToken, signingKey.SignatureAlgorithm())
+		if err != nil {
+			return "", err
+		}
+	}
+	signer, err := op.SignerFromKey(signingKey)
+	if err != nil {
+		return "", err
+	}
+	return crypto.Sign(claims, signer)
 }
 
 func (s *Server) createAccessTokenCommands(ctx context.Context, client *Client, resourceOwner, userID string, audience, scopes []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (tokenInfo *domain.Token, refreshToken string, err error) {
@@ -196,95 +229,6 @@ func (s *Server) createAccessTokenCommands(ctx context.Context, client *Client, 
 		authTime, reason, actor,
 	)
 	return tokenInfo, "", err
-}
-
-func (s *Server) getSigner(ctx context.Context) (jose.Signer, error) {
-	key, err := s.Provider().Storage().SigningKey(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return op.SignerFromKey(key)
-}
-
-type exchangeToken struct {
-	tokenType     oidc.TokenType
-	userID        string
-	issuer        string
-	resourceOwner string
-	authTime      time.Time
-	authMethods   []domain.UserAuthMethodType
-	actor         *domain.TokenActor
-	audience      []string
-	scopes        []string
-}
-
-func (et *exchangeToken) nestedActor() *domain.TokenActor {
-	return &domain.TokenActor{
-		Actor:         et.actor,
-		UserID:        et.userID,
-		Issuer:        et.issuer,
-		ResourceOwner: et.resourceOwner,
-	}
-}
-
-func accessToExchangeToken(token *accessToken, issuer string) *exchangeToken {
-	return &exchangeToken{
-		tokenType:     oidc.AccessTokenType,
-		userID:        token.userID,
-		issuer:        issuer,
-		resourceOwner: token.resourceOwner,
-		authMethods:   token.authMethods,
-		actor:         token.actor,
-		audience:      token.audience,
-		scopes:        token.scope,
-	}
-}
-
-func idTokenClaimsToExchangeToken(claims *oidc.IDTokenClaims) *exchangeToken {
-	resourceOwner, _ := claims.Claims[ClaimResourceOwnerID].(string)
-	return &exchangeToken{
-		tokenType:     oidc.IDTokenType,
-		userID:        claims.Subject,
-		issuer:        claims.Issuer,
-		resourceOwner: resourceOwner,
-		authTime:      claims.GetAuthTime(),
-		authMethods:   AMRToAuthMethodTypes(claims.AuthenticationMethodsReferences),
-		actor:         actorClaimsToDomain(claims.Actor),
-		audience:      claims.Audience,
-	}
-}
-
-func actorClaimsToDomain(actor *oidc.ActorClaims) *domain.TokenActor {
-	if actor == nil {
-		return nil
-	}
-	resourceOwner, _ := actor.Claims[ClaimResourceOwnerID].(string)
-	return &domain.TokenActor{
-		Actor:         actorClaimsToDomain(actor.Actor),
-		UserID:        actor.Subject,
-		Issuer:        actor.Issuer,
-		ResourceOwner: resourceOwner,
-	}
-}
-
-func jwtToExchangeToken(jwt *oidc.JWTTokenRequest, resourceOwner string) *exchangeToken {
-	return &exchangeToken{
-		tokenType:     oidc.JWTTokenType,
-		userID:        jwt.Subject,
-		issuer:        jwt.Issuer,
-		resourceOwner: resourceOwner,
-		scopes:        jwt.Scopes,
-		authTime:      jwt.IssuedAt.AsTime(),
-		// audience omitted as we don't thrust audiences not signed by us
-	}
-}
-
-func userToExchangeToken(user *query.User) *exchangeToken {
-	return &exchangeToken{
-		tokenType:     UserIDTokenType,
-		userID:        user.ID,
-		resourceOwner: user.ResourceOwner,
-	}
 }
 
 func (s *Server) verifyExchangeToken(ctx context.Context, client *Client, token string, tokenType oidc.TokenType, allowed ...oidc.TokenType) (*exchangeToken, error) {
