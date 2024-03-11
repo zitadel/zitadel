@@ -140,8 +140,6 @@ func targetToPb(t *query.Target) *execution.Target {
 		target.TargetType = &execution.Target_RestWebhook{RestWebhook: &execution.SetRESTWebhook{Url: t.URL}}
 	case domain.TargetTypeRequestResponse:
 		target.TargetType = &execution.Target_RestRequestResponse{RestRequestResponse: &execution.SetRESTRequestResponse{Url: t.URL}}
-	case domain.TargetTypeUnspecified:
-		target.TargetType = nil
 	default:
 		target.TargetType = nil
 	}

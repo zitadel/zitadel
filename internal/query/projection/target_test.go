@@ -29,7 +29,7 @@ func TestTargetProjection_reduces(t *testing.T) {
 					testEvent(
 						target.AddedEventType,
 						target.AggregateType,
-						[]byte(`{"name": "name", "targetType":1, "url":"https://example.com", "timeout": 3000000000, "async": true, "interruptOnError": true}`),
+						[]byte(`{"name": "name", "targetType":0, "url":"https://example.com", "timeout": 3000000000, "async": true, "interruptOnError": true}`),
 					),
 					eventstore.GenericEventMapper[target.AddedEvent],
 				),
@@ -68,7 +68,7 @@ func TestTargetProjection_reduces(t *testing.T) {
 					testEvent(
 						target.ChangedEventType,
 						target.AggregateType,
-						[]byte(`{"name": "name2", "targetType":1, "url":"https://example.com", "timeout": 3000000000, "async": true, "interruptOnError": true}`),
+						[]byte(`{"name": "name2", "targetType":0, "url":"https://example.com", "timeout": 3000000000, "async": true, "interruptOnError": true}`),
 					),
 					eventstore.GenericEventMapper[target.ChangedEvent],
 				),
