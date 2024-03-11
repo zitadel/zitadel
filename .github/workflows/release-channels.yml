@@ -30,13 +30,13 @@ jobs:
           fetch-depth: 0
           ref: ${{ env.STABLE_RELEASE }}
       - name: GitHub Container Registry Login
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Google Artifact Registry Login
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: europe-docker.pkg.dev
           username: _json_key_base64

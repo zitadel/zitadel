@@ -57,7 +57,7 @@ jobs:
           driver-opts: 'image=moby/buildkit:v0.11.6'
       -
         name: Login to Docker registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -150,7 +150,7 @@ jobs:
           driver-opts: 'image=moby/buildkit:v0.11.6'
       -
         name: Login to Docker registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
