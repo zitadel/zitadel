@@ -67,6 +67,12 @@ module.exports = {
       items: [
         {
           type: "doc",
+          label: "🚀 Quick Start",
+          docId: "guides/start/quickstart",
+          position: "left",
+        }, 
+        {
+          type: "doc",
           label: "Documentation",
           docId: "guides/overview",
           position: "left",
