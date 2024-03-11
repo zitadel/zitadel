@@ -16,6 +16,8 @@ async function loadSessions(ids: string[]): Promise<Session[]> {
   return response?.sessions ?? [];
 }
 
+const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]*)/g;
+
 function findSession(
   sessions: Session[],
   authRequest: AuthRequest
@@ -87,6 +89,18 @@ export async function GET(request: NextRequest) {
         registerUrl.searchParams.set("authRequestId", authRequest?.id);
       }
 
+      if (
+        authRequest.scope &&
+        authRequest.scope.find((s) => ORG_SCOPE_REGEX.test(s))
+      ) {
+        const orgId = authRequest.scope
+          .find((s) => ORG_SCOPE_REGEX.test(s))
+          ?.match(ORG_SCOPE_REGEX)?.[1];
+        console.log(orgId);
+        if (orgId) {
+          registerUrl.searchParams.set("orgId", orgId);
+        }
+      }
       return NextResponse.redirect(registerUrl);
     }
 

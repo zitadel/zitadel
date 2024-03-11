@@ -3,7 +3,7 @@ import React from "react";
 import { getBrandingSettings, server } from "#/lib/zitadel";
 import { Logo } from "#/ui/Logo";
 
-export default async function Layout({
+export default async function Template({
   children,
 }: {
   children: React.ReactNode;
