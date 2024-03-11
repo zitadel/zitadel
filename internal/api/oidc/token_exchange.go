@@ -27,57 +27,91 @@ func (s *Server) TokenExchange(ctx context.Context, r *op.ClientRequest[oidc.Tok
 		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-oan4I", "Errors.Feature.Disabled.TokenExchange")
 	}
 	if len(r.Data.Resource) > 0 {
-		return nil, zerrors.ThrowUnimplemented(nil, "OIDC-aeCh6", "Errors.TokenExchange.Unimplemented.Resource")
+		return nil, oidc.ErrInvalidTarget().WithDescription("resource parameter not supported")
 	}
 	subjectToken, err := s.verifyExchangeToken(ctx, r.Data.SubjectToken, r.Data.SubjectTokenType)
 	if err != nil {
-		return nil, zerrors.ThrowUnauthenticated(err, "OIDC-phiX5", "Errors.TokenExchange.InvalidSubjectToken")
+		return nil, oidc.ErrInvalidRequest().WithParent(err).WithDescription("subject_token invalid")
 	}
 
-	audience := r.Data.Audience // TODO
-	scopes := r.Data.Scopes     // TODO
-
+	actorToken := subjectToken // see [createExchangeTokens] comment.
 	if subjectToken.tokenType == UserIDTokenType || r.Data.ActorToken != "" {
-		return s.tokenExchangeImpersonation(ctx, r, subjectToken, audience, scopes)
+		if !authz.GetInstance(ctx).EnableImpersonation() {
+			return nil, zerrors.ThrowPermissionDenied(nil, "OIDC-Fae5w", "Errors.TokenExchange.Impersonation.PolicyDisabled")
+		}
+		actorToken, err = s.verifyExchangeToken(ctx, r.Data.ActorToken, r.Data.ActorTokenType)
+		if err != nil {
+			return nil, oidc.ErrInvalidRequest().WithParent(err).WithDescription("actor_token invalid")
+		}
 	}
 
-	return s.LegacyServer.TokenExchange(ctx, r)
-}
-
-func (s *Server) tokenExchangeImpersonation(ctx context.Context, r *op.ClientRequest[oidc.TokenExchangeRequest], subjectToken *exchangeToken, audience, scope []string) (_ *op.Response, err error) {
-	if !authz.GetInstance(ctx).EnableImpersonation() {
-		return nil, zerrors.ThrowPermissionDenied(nil, "OIDC-Fae5w", "Errors.TokenExchange.Impersonation.PolicyDisabled")
-	}
-	token, err := s.verifyExchangeToken(ctx, r.Data.ActorToken, r.Data.ActorTokenType)
+	audience, err := validateTokenExchangeAudience(r.Data.Audience, subjectToken.audience, actorToken.audience)
 	if err != nil {
-		return nil, oidc.ErrInvalidRequest().WithParent(err).WithDescription("actor_token actor_token_type=%s", r.Data.ActorTokenType)
+		return nil, err
 	}
-	// TODO: permission check
-
-	resp, err := s.createExchangeTokens(ctx, r.Data.RequestedTokenType, r.Client, subjectToken.resourceOwner, subjectToken.userID, audience, scope, token.authMethods, token.authTime, domain.TokenReasonImpersonation, token.nestActor())
+	scopes, err := validateTokenExchangeScopes(r.Client, r.Data.Scopes, subjectToken.scopes, actorToken.scopes)
 	if err != nil {
 		return nil, err
 	}
 
-	return &op.Response{
-		Data: resp,
-	}, nil
+	resp, err := s.createExchangeTokens(ctx, r.Data.RequestedTokenType, r.Client, subjectToken, actorToken, audience, scopes)
+	if err != nil {
+		return nil, err
+	}
+
+	return op.NewResponse(resp), nil
 }
 
-func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenType, client op.Client, resourceOwner, userID string, audience, scopes []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (_ *oidc.TokenExchangeResponse, err error) {
+func validateTokenExchangeScopes(client op.Client, requestedScopes, subjectScopes, actorScopes []string) ([]string, error) {
+	scopes := requestedScopes
+	if len(scopes) == 0 {
+		scopes = subjectScopes
+	}
+	if len(scopes) == 0 {
+		scopes = actorScopes
+	}
+	return op.ValidateAuthReqScopes(client, scopes)
+}
+
+func validateTokenExchangeAudience(requestedAudience, subjectAudience, actorAudience []string) ([]string, error) {
+	if len(requestedAudience) == 0 {
+		if len(subjectAudience) > 0 {
+			return subjectAudience, nil
+		}
+		if len(actorAudience) > 0 {
+			return actorAudience, nil
+		}
+	}
+	if slices.Equal(requestedAudience, subjectAudience) || slices.Equal(requestedAudience, actorAudience) {
+		return requestedAudience, nil
+	}
+	allowedAudience := append(subjectAudience, actorAudience...)
+	for _, a := range requestedAudience {
+		if !slices.Contains(allowedAudience, a) {
+			return nil, oidc.ErrInvalidTarget().WithDescription("audience %q not found in subject or actor token", a)
+		}
+	}
+	return requestedAudience, nil
+}
+
+// createExchangeTokens prepares the final tokens to be returned to the client.
+// The subjectToken is used to set the new token's subject and resource owner.
+// The actorToken is used to set the new token's auth time AMR and actor.
+// Both tokens may point to the same object (subjectToken) in case of a regular Token Exchange.
+// When the subject and actor Tokens point to different objects, the new tokens will be for impersonation / delegation.
+func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenType, client op.Client, subjectToken, actorToken *exchangeToken, audience, scopes []string) (_ *oidc.TokenExchangeResponse, err error) {
 	zClient, ok := client.(*Client)
 	if !ok {
 		// not supposed to happen, but just preventing a panic if it does.
 		return nil, zerrors.ThrowInternal(nil, "OIDC-eShi5", "Error.Internal")
 	}
-
 	var (
 		userInfo *oidc.UserInfo
 		signer   jose.Signer
 	)
 	if slices.Contains(scopes, oidc.ScopeOpenID) || tokenType == oidc.JWTTokenType || tokenType == oidc.IDTokenType {
 		projectID := zClient.client.ProjectID
-		userInfo, err = s.userInfo(ctx, userID, projectID, scopes, []string{projectID})
+		userInfo, err = s.userInfo(ctx, subjectToken.userID, projectID, scopes, []string{projectID})
 		if err != nil {
 			return nil, err
 		}
@@ -91,14 +125,21 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 		Scopes: scopes,
 	}
 
+	reason := domain.TokenReasonExchange
+	actor := actorToken.actor
+	if subjectToken != actorToken {
+		reason = domain.TokenReasonImpersonation
+		actor = actorToken.nestedActor()
+	}
+
 	switch tokenType {
 	case oidc.AccessTokenType:
-		resp.AccessToken, resp.RefreshToken, err = s.createExchangeAccessToken(ctx, zClient, resourceOwner, userID, audience, scopes, authMethods, authTime, reason, actor)
+		resp.AccessToken, resp.RefreshToken, err = s.createExchangeAccessToken(ctx, zClient, subjectToken.resourceOwner, subjectToken.userID, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor)
 		resp.TokenType = oidc.BearerToken
 		resp.IssuedTokenType = oidc.AccessTokenType
 
 	case oidc.JWTTokenType:
-		resp.AccessToken, resp.RefreshToken, err = s.createExchangeJWT(ctx, signer, zClient, resourceOwner, userID, audience, scopes, authMethods, authTime, reason, actor, userInfo.Claims)
+		resp.AccessToken, resp.RefreshToken, err = s.createExchangeJWT(ctx, signer, zClient, subjectToken.resourceOwner, subjectToken.userID, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor, userInfo.Claims)
 		resp.TokenType = oidc.BearerToken
 		resp.IssuedTokenType = oidc.JWTTokenType
 	}
@@ -138,6 +179,7 @@ func (s *Server) createExchangeJWT(ctx context.Context, signer jose.Signer, clie
 }
 
 func (s *Server) createAccessTokenCommands(ctx context.Context, client *Client, resourceOwner, userID string, audience, scopes []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (tokenInfo *domain.Token, refreshToken string, err error) {
+	// TODO: permission check
 	settings := client.client.Settings
 	if slices.Contains(scopes, oidc.ScopeOfflineAccess) {
 		return s.command.AddAccessAndRefreshToken(
@@ -170,9 +212,11 @@ type exchangeToken struct {
 	authTime      time.Time
 	authMethods   []domain.UserAuthMethodType
 	actor         *domain.TokenActor
+	audience      []string
+	scopes        []string
 }
 
-func (et *exchangeToken) nestActor() *domain.TokenActor {
+func (et *exchangeToken) nestedActor() *domain.TokenActor {
 	return &domain.TokenActor{
 		Actor:         et.actor,
 		UserID:        et.userID,
@@ -189,6 +233,8 @@ func accessToExchangeToken(token *accessToken, issuer string) *exchangeToken {
 		resourceOwner: token.resourceOwner,
 		authMethods:   token.authMethods,
 		actor:         token.actor,
+		audience:      token.audience,
+		scopes:        token.scope,
 	}
 }
 

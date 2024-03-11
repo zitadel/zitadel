@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _TokenReasonName = "unspecifiedauth_requestrefreshjwt_profileclient_credentialsimpersonationdelegation"
+const _TokenReasonName = "unspecifiedauth_requestrefreshjwt_profileclient_credentialsexchangeimpersonation"
 
-var _TokenReasonIndex = [...]uint8{0, 11, 23, 30, 41, 59, 72, 82}
+var _TokenReasonIndex = [...]uint8{0, 11, 23, 30, 41, 59, 67, 80}
 
-const _TokenReasonLowerName = "unspecifiedauth_requestrefreshjwt_profileclient_credentialsimpersonationdelegation"
+const _TokenReasonLowerName = "unspecifiedauth_requestrefreshjwt_profileclient_credentialsexchangeimpersonation"
 
 func (i TokenReason) String() string {
 	if i < 0 || i >= TokenReason(len(_TokenReasonIndex)-1) {
@@ -30,11 +30,11 @@ func _TokenReasonNoOp() {
 	_ = x[TokenReasonRefresh-(2)]
 	_ = x[TokenReasonJWTProfile-(3)]
 	_ = x[TokenReasonClientCredentials-(4)]
-	_ = x[TokenReasonImpersonation-(5)]
-	_ = x[TokenReasonDelegation-(6)]
+	_ = x[TokenReasonExchange-(5)]
+	_ = x[TokenReasonImpersonation-(6)]
 }
 
-var _TokenReasonValues = []TokenReason{TokenReasonUnspecified, TokenReasonAuthRequest, TokenReasonRefresh, TokenReasonJWTProfile, TokenReasonClientCredentials, TokenReasonImpersonation, TokenReasonDelegation}
+var _TokenReasonValues = []TokenReason{TokenReasonUnspecified, TokenReasonAuthRequest, TokenReasonRefresh, TokenReasonJWTProfile, TokenReasonClientCredentials, TokenReasonExchange, TokenReasonImpersonation}
 
 var _TokenReasonNameToValueMap = map[string]TokenReason{
 	_TokenReasonName[0:11]:       TokenReasonUnspecified,
@@ -47,10 +47,10 @@ var _TokenReasonNameToValueMap = map[string]TokenReason{
 	_TokenReasonLowerName[30:41]: TokenReasonJWTProfile,
 	_TokenReasonName[41:59]:      TokenReasonClientCredentials,
 	_TokenReasonLowerName[41:59]: TokenReasonClientCredentials,
-	_TokenReasonName[59:72]:      TokenReasonImpersonation,
-	_TokenReasonLowerName[59:72]: TokenReasonImpersonation,
-	_TokenReasonName[72:82]:      TokenReasonDelegation,
-	_TokenReasonLowerName[72:82]: TokenReasonDelegation,
+	_TokenReasonName[59:67]:      TokenReasonExchange,
+	_TokenReasonLowerName[59:67]: TokenReasonExchange,
+	_TokenReasonName[67:80]:      TokenReasonImpersonation,
+	_TokenReasonLowerName[67:80]: TokenReasonImpersonation,
 }
 
 var _TokenReasonNames = []string{
@@ -59,8 +59,8 @@ var _TokenReasonNames = []string{
 	_TokenReasonName[23:30],
 	_TokenReasonName[30:41],
 	_TokenReasonName[41:59],
-	_TokenReasonName[59:72],
-	_TokenReasonName[72:82],
+	_TokenReasonName[59:67],
+	_TokenReasonName[67:80],
 }
 
 // TokenReasonString retrieves an enum value from the enum constants string name.

@@ -56,8 +56,8 @@ const (
 	TokenReasonRefresh
 	TokenReasonJWTProfile
 	TokenReasonClientCredentials
+	TokenReasonExchange
 	TokenReasonImpersonation
-	TokenReasonDelegation
 )
 
 type TokenActor struct {
