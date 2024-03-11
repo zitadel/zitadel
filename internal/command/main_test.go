@@ -23,6 +23,7 @@ import (
 
 type expect func(mockRepository *mock.MockRepository)
 
+// DEPRECATED: use expectEventstore
 func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	m := mock.NewRepo(t)
 	for _, e := range expects {
@@ -37,6 +38,9 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	return es
 }
 
+// expectEventstore defines expectations for the Eventstore and is initialized within the scope of a (sub) test.
+// This allows proper reporting of the test name, instead of reporting on the top-level
+// of the Test function being run.
 func expectEventstore(expects ...expect) func(*testing.T) *eventstore.Eventstore {
 	return func(t *testing.T) *eventstore.Eventstore {
 		return eventstoreExpect(t, expects...)

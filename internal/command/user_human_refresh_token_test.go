@@ -1034,8 +1034,9 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 					"refreshToken1",
 					1*time.Hour,
 				),
-				tokenID: "tokenID",
-				token:   base64.RawURLEncoding.EncodeToString([]byte("userID:tokenID:refreshToken1")),
+				authMethodsReferences: []string{"password"},
+				tokenID:               "tokenID",
+				token:                 base64.RawURLEncoding.EncodeToString([]byte("userID:tokenID:refreshToken1")),
 			},
 		},
 	}
@@ -1052,7 +1053,10 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 			}
 			if tt.wantErr == nil {
 				require.NoError(t, err)
-				assert.Equal(t, tt.want, got)
+				assert.Equal(t, tt.want.event, got.event)
+				assert.Equal(t, tt.want.authMethodsReferences, got.authMethodsReferences)
+				assert.Equal(t, tt.want.tokenID, got.tokenID)
+				assert.Equal(t, tt.want.token, got.token)
 			}
 		})
 	}
