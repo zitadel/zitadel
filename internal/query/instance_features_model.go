@@ -60,6 +60,7 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceLoginDefaultOrgEventType,
 			feature_v2.InstanceTriggerIntrospectionProjectionsEventType,
 			feature_v2.InstanceLegacyIntrospectionEventType,
+			feature_v2.InstanceTokenExchangeEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -99,6 +100,8 @@ func (m *InstanceFeaturesReadModel) reduceBoolFeature(event *feature_v2.SetEvent
 		dst = &m.instance.TriggerIntrospectionProjections
 	case feature.KeyLegacyIntrospection:
 		dst = &m.instance.LegacyIntrospection
+	case feature.KeyTokenExchange:
+		dst = &m.instance.TokenExchange
 	}
 	*dst = FeatureSource[bool]{
 		Level: level,

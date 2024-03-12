@@ -21,7 +21,8 @@ type InstanceFeatures struct {
 func (m *InstanceFeatures) isEmpty() bool {
 	return m.LoginDefaultOrg == nil &&
 		m.TriggerIntrospectionProjections == nil &&
-		m.LegacyIntrospection == nil
+		m.LegacyIntrospection == nil &&
+		m.TokenExchange == nil
 }
 
 func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures) (*domain.ObjectDetails, error) {

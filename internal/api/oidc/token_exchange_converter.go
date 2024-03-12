@@ -69,6 +69,18 @@ func actorClaimsToDomain(actor *oidc.ActorClaims) *domain.TokenActor {
 	}
 }
 
+func actorDomainToClaims(actor *domain.TokenActor) *oidc.ActorClaims {
+	if actor == nil {
+		return nil
+	}
+	return &oidc.ActorClaims{
+		Actor:   actorDomainToClaims(actor.Actor),
+		Subject: actor.UserID,
+		Issuer:  actor.Issuer,
+		Claims:  map[string]any{ClaimResourceOwnerID: actor.ResourceOwner},
+	}
+}
+
 func jwtToExchangeToken(jwt *oidc.JWTTokenRequest, resourceOwner string) *exchangeToken {
 	return &exchangeToken{
 		tokenType:     oidc.JWTTokenType,

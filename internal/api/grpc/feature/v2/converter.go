@@ -23,6 +23,7 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		LoginDefaultOrg:                     featureSourceToFlagPb(&f.LoginDefaultOrg),
 		OidcTriggerIntrospectionProjections: featureSourceToFlagPb(&f.TriggerIntrospectionProjections),
 		OidcLegacyIntrospection:             featureSourceToFlagPb(&f.LegacyIntrospection),
+		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
 	}
 }
 
@@ -41,6 +42,7 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		LoginDefaultOrg:                     featureSourceToFlagPb(&f.LoginDefaultOrg),
 		OidcTriggerIntrospectionProjections: featureSourceToFlagPb(&f.TriggerIntrospectionProjections),
 		OidcLegacyIntrospection:             featureSourceToFlagPb(&f.LegacyIntrospection),
+		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
 	}
 }
 

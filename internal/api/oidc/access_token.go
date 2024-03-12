@@ -104,7 +104,7 @@ func accessTokenV2(tokenID, subject string, token *query.OIDCSessionAccessTokenR
 }
 
 func (s *Server) assertClientScopesForPAT(ctx context.Context, token *accessToken, clientID, projectID string) error {
-	token.audience = append(token.audience, clientID)
+	token.audience = append(token.audience, clientID, projectID)
 	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(projectID)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")

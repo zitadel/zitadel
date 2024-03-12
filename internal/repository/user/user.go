@@ -20,6 +20,7 @@ const (
 	UserRemovedType           = userEventTypePrefix + "removed"
 	UserTokenAddedType        = userEventTypePrefix + "token.added"
 	UserTokenRemovedType      = userEventTypePrefix + "token.removed"
+	UserImpersonatedType      = userEventTypePrefix + "impersonated"
 	UserDomainClaimedType     = userEventTypePrefix + "domain.claimed"
 	UserDomainClaimedSentType = userEventTypePrefix + "domain.claimed.sent"
 	UserUserNameChangedType   = userEventTypePrefix + "username.changed"
@@ -276,6 +277,42 @@ func UserTokenAddedEventMapper(event eventstore.Event) (eventstore.Event, error)
 	}
 
 	return tokenAdded, nil
+}
+
+type UserImpersonatedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	ApplicationID string             `json:"applicationId,omitempty"`
+	Actor         *domain.TokenActor `json:"actor,omitempty"`
+}
+
+func (e *UserImpersonatedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *UserImpersonatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *UserImpersonatedEvent) SetBaseEvent(base *eventstore.BaseEvent) {
+	e.BaseEvent = *base
+}
+
+func NewUserImpersonatedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	applicationID string,
+	actor *domain.TokenActor,
+) *UserTokenAddedEvent {
+	return &UserTokenAddedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			UserImpersonatedType,
+		),
+		ApplicationID: applicationID,
+		Actor:         actor,
+	}
 }
 
 type UserTokenRemovedEvent struct {

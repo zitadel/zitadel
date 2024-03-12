@@ -23,13 +23,16 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
-func (s *Tester) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, appType app.OIDCAppType, authMethod app.OIDCAuthMethodType, devMode bool) (*management.AddOIDCAppResponse, error) {
+func (s *Tester) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, appType app.OIDCAppType, authMethod app.OIDCAuthMethodType, devMode bool, grantTypes ...app.OIDCGrantType) (*management.AddOIDCAppResponse, error) {
+	if len(grantTypes) == 0 {
+		grantTypes = []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN}
+	}
 	return s.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
 		ProjectId:                projectID,
 		Name:                     fmt.Sprintf("app-%d", time.Now().UnixNano()),
 		RedirectUris:             []string{redirectURI},
 		ResponseTypes:            []app.OIDCResponseType{app.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE},
-		GrantTypes:               []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN},
+		GrantTypes:               grantTypes,
 		AppType:                  appType,
 		AuthMethodType:           authMethod,
 		PostLogoutRedirectUris:   []string{logoutRedirectURI},
@@ -53,8 +56,8 @@ func (s *Tester) CreateOIDCWebClientBasic(ctx context.Context, redirectURI, logo
 	return s.CreateOIDCClient(ctx, redirectURI, logoutRedirectURI, projectID, app.OIDCAppType_OIDC_APP_TYPE_WEB, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC, false)
 }
 
-func (s *Tester) CreateOIDCWebClientJWT(ctx context.Context, redirectURI, logoutRedirectURI, projectID string) (client *management.AddOIDCAppResponse, keyData []byte, err error) {
-	client, err = s.CreateOIDCClient(ctx, redirectURI, logoutRedirectURI, projectID, app.OIDCAppType_OIDC_APP_TYPE_WEB, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT, false)
+func (s *Tester) CreateOIDCWebClientJWT(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, grantTypes ...app.OIDCGrantType) (client *management.AddOIDCAppResponse, keyData []byte, err error) {
+	client, err = s.CreateOIDCClient(ctx, redirectURI, logoutRedirectURI, projectID, app.OIDCAppType_OIDC_APP_TYPE_WEB, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT, false, grantTypes...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -111,6 +114,16 @@ func (s *Tester) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI s
 		AdditionalOrigins:        nil,
 		SkipNativeAppSuccessPage: false,
 	})
+}
+
+func (s *Tester) CreateOIDCTokenExchangeClient(ctx context.Context) (client *management.AddOIDCAppResponse, keyData []byte, err error) {
+	project, err := s.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
+		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+	return s.CreateOIDCWebClientJWT(ctx, "", "", project.GetId(), app.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE, app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE)
 }
 
 func (s *Tester) CreateProject(ctx context.Context) (*management.AddProjectResponse, error) {

@@ -250,11 +250,11 @@ func (c *Commands) AddUserToken(
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Dbge4", "Errors.IDMissing")
 	}
 	userWriteModel := NewUserWriteModel(userID, orgID)
-	event, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, "", audience, scopes, authMethodsReferences, lifetime, authTime, reason, actor)
+	cmds, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, "", audience, scopes, authMethodsReferences, lifetime, authTime, reason, actor)
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.eventstore.Push(ctx, event)
+	_, err = c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -277,13 +277,22 @@ func (c *Commands) RevokeAccessToken(ctx context.Context, userID, orgID, tokenID
 	return writeModelToObjectDetails(&accessTokenWriteModel.WriteModel), nil
 }
 
-func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteModel, agentID, clientID, refreshTokenID string, audience, scopes, authMethodsReferences []string, lifetime time.Duration, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (*user.UserTokenAddedEvent, *domain.Token, error) {
+func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteModel, agentID, clientID, refreshTokenID string, audience, scopes, authMethodsReferences []string, lifetime time.Duration, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) ([]eventstore.Command, *domain.Token, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, userWriteModel)
 	if err != nil {
 		return nil, nil, err
 	}
 	if userWriteModel.UserState != domain.UserStateActive {
 		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-1d6Gg", "Errors.User.NotFound")
+	}
+	userAgg := UserAggregateFromWriteModel(&userWriteModel.WriteModel)
+
+	var cmds []eventstore.Command
+	if reason == domain.TokenReasonImpersonation {
+		if err := c.checkPermission(ctx, "impersonation", userWriteModel.ResourceOwner, userWriteModel.AggregateID); err != nil {
+			return nil, nil, err
+		}
+		cmds = append(cmds, user.NewUserImpersonatedEvent(ctx, userAgg, clientID, actor))
 	}
 
 	audience = domain.AddAudScopeToAudience(ctx, audience, scopes)
@@ -302,23 +311,25 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 		return nil, nil, err
 	}
 
-	userAgg := UserAggregateFromWriteModel(&userWriteModel.WriteModel)
-	return user.NewUserTokenAddedEvent(ctx, userAgg, tokenID, clientID, agentID, preferredLanguage, refreshTokenID, audience, scopes, authMethodsReferences, authTime, expiration, reason, actor),
-		&domain.Token{
-			ObjectRoot: models.ObjectRoot{
-				AggregateID: userWriteModel.AggregateID,
-			},
-			TokenID:           tokenID,
-			UserAgentID:       agentID,
-			ApplicationID:     clientID,
-			RefreshTokenID:    refreshTokenID,
-			Audience:          audience,
-			Scopes:            scopes,
-			Expiration:        expiration,
-			PreferredLanguage: preferredLanguage,
-			Reason:            reason,
-			Actor:             actor,
-		}, nil
+	cmds = append(cmds,
+		user.NewUserTokenAddedEvent(ctx, userAgg, tokenID, clientID, agentID, preferredLanguage, refreshTokenID, audience, scopes, authMethodsReferences, authTime, expiration, reason, actor),
+	)
+
+	return cmds, &domain.Token{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: userWriteModel.AggregateID,
+		},
+		TokenID:           tokenID,
+		UserAgentID:       agentID,
+		ApplicationID:     clientID,
+		RefreshTokenID:    refreshTokenID,
+		Audience:          audience,
+		Scopes:            scopes,
+		Expiration:        expiration,
+		PreferredLanguage: preferredLanguage,
+		Reason:            reason,
+		Actor:             actor,
+	}, nil
 }
 
 func (c *Commands) removeAccessToken(ctx context.Context, userID, orgID, tokenID string) (*user.UserTokenRemovedEvent, *UserAccessTokenWriteModel, error) {

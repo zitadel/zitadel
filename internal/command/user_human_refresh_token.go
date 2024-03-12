@@ -57,7 +57,7 @@ func (c *Commands) AddNewRefreshTokenAndAccessToken(
 	if err != nil {
 		return nil, "", err
 	}
-	accessTokenEvent, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, refreshTokenID, audience, scopes, authMethodsReferences, accessLifetime, authTime, reason, actor)
+	cmds, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, refreshTokenID, audience, scopes, authMethodsReferences, accessLifetime, authTime, reason, actor)
 	if err != nil {
 		return nil, "", err
 	}
@@ -65,7 +65,8 @@ func (c *Commands) AddNewRefreshTokenAndAccessToken(
 	if err != nil {
 		return nil, "", err
 	}
-	_, err = c.eventstore.Push(ctx, accessTokenEvent, refreshTokenEvent)
+	cmds = append(cmds, refreshTokenEvent)
+	_, err = c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, "", err
 	}
@@ -89,11 +90,11 @@ func (c *Commands) RenewRefreshTokenAndAccessToken(
 		return nil, "", err
 	}
 	userWriteModel := NewUserWriteModel(userID, orgID)
-	accessTokenEvent, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, renewed.tokenID, audience, scopes, renewed.authMethodsReferences, accessLifetime, renewed.authTime, domain.TokenReasonRefresh, nil)
+	cmds, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, renewed.tokenID, audience, scopes, renewed.authMethodsReferences, accessLifetime, renewed.authTime, domain.TokenReasonRefresh, nil)
 	if err != nil {
 		return nil, "", err
 	}
-	_, err = c.eventstore.Push(ctx, accessTokenEvent, renewed.event)
+	_, err = c.eventstore.Push(ctx, append(cmds, renewed.event)...)
 	if err != nil {
 		return nil, "", err
 	}
