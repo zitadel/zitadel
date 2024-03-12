@@ -100,6 +100,24 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 			},
 		},
 		{
+			name: "set UserSchema",
+			eventstore: expectEventstore(
+				expectFilter(),
+				expectPush(
+					feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.SystemUserSchemaEventType, true,
+					),
+				),
+			),
+			args: args{context.Background(), &SystemFeatures{
+				UserSchema: gu.Ptr(true),
+			}},
+			want: &domain.ObjectDetails{
+				ResourceOwner: "SYSTEM",
+			},
+		},
+		{
 			name: "push error",
 			eventstore: expectEventstore(
 				expectFilter(),
@@ -132,12 +150,17 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 						context.Background(), aggregate,
 						feature_v2.SystemLegacyIntrospectionEventType, true,
 					),
+					feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.SystemUserSchemaEventType, true,
+					),
 				),
 			),
 			args: args{context.Background(), &SystemFeatures{
 				LoginDefaultOrg:                 gu.Ptr(true),
 				TriggerIntrospectionProjections: gu.Ptr(false),
 				LegacyIntrospection:             gu.Ptr(true),
+				UserSchema:                      gu.Ptr(true),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",
@@ -178,12 +201,17 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 						context.Background(), aggregate,
 						feature_v2.SystemTriggerIntrospectionProjectionsEventType, false,
 					),
+					feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.SystemUserSchemaEventType, true,
+					),
 				),
 			),
 			args: args{context.Background(), &SystemFeatures{
 				LoginDefaultOrg:                 gu.Ptr(true),
 				TriggerIntrospectionProjections: gu.Ptr(false),
 				LegacyIntrospection:             gu.Ptr(true),
+				UserSchema:                      gu.Ptr(true),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",

@@ -546,6 +546,16 @@ Errors:
     NotFound: Ejecución no encontrada
     IncludeNotFound: Incluir no encontrado
     NoTargets: No hay objetivos definidos
+  UserSchema:
+    NotEnabled: La función "Esquema de usuario" no está habilitada
+    Type:
+      Missing: Falta el tipo de esquema de usuario
+      AlreadyExists: El tipo de esquema de usuario ya existe
+    Authenticator:
+      Invalid: Tipo de autenticador no válido
+    NotActive: Esquema de usuario no activo
+    NotInactive: Esquema de usuario no inactivo
+    NotExists: El esquema de usuario no existe
 
 AggregateTypes:
   action: Acción
@@ -559,6 +569,7 @@ AggregateTypes:
   feature: Característica
   target: Objectivo
   execution: Ejecución
+  user_schema: Esquema de usuario
 
 EventTypes:
   execution:
@@ -1236,6 +1247,12 @@ EventTypes:
         password:
           changed: Contraseña de configuración SMTP modificada
         removed: Configuración SMTP eliminada
+  user_schema:
+    created: Esquema de usuario creado
+    updated: Esquema de usuario actualizado
+    deactivated: Esquema de usuario desactivado
+    reactivated: Esquema de usuario reactivado
+    deleted: Esquema de usuario eliminado
 
 Application:
   OIDC:
