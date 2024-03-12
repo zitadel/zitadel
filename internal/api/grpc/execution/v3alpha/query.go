@@ -5,7 +5,6 @@ import (
 
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -19,7 +18,7 @@ func (s *Server) ListTargets(ctx context.Context, req *execution.ListTargetsRequ
 	if err != nil {
 		return nil, err
 	}
-	resp, err := s.query.SearchTargets(ctx, queries, authz.GetInstance(ctx).InstanceID())
+	resp, err := s.query.SearchTargets(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +103,7 @@ func targetInTargetIdsQueryToQuery(q *execution.InTargetIDsQuery) (query.SearchQ
 }
 
 func (s *Server) GetTargetByID(ctx context.Context, req *execution.GetTargetByIDRequest) (_ *execution.GetTargetByIDResponse, err error) {
-	resp, err := s.query.GetTargetByID(ctx, req.GetTargetId(), authz.GetInstance(ctx).InstanceID())
+	resp, err := s.query.GetTargetByID(ctx, req.GetTargetId())
 	if err != nil {
 		return nil, err
 	}

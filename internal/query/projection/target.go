@@ -52,7 +52,7 @@ func (*targetProjection) Init() *old_handler.Check {
 			handler.NewColumn(TargetAsyncCol, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(TargetInterruptOnErrorCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
-			handler.NewPrimaryKey(TargetInstanceIDCol, TargetResourceOwnerCol, TargetIDCol),
+			handler.NewPrimaryKey(TargetInstanceIDCol, TargetIDCol),
 		),
 	)
 }

@@ -91,11 +91,10 @@ func (q *Queries) SearchExecutions(ctx context.Context, queries *ExecutionSearch
 	return genericSearch[*Executions](q, ctx, executionTable, prepareExecutionsQuery, combineToWhereStmt(queries.toQuery, eq))
 }
 
-func (q *Queries) GetExecutionByID(ctx context.Context, id string, resourceOwner string) (execution *Execution, err error) {
+func (q *Queries) GetExecutionByID(ctx context.Context, id string) (execution *Execution, err error) {
 	eq := sq.Eq{
-		ExecutionColumnID.identifier():            id,
-		ExecutionColumnResourceOwner.identifier(): resourceOwner,
-		ExecutionColumnInstanceID.identifier():    resourceOwner,
+		ExecutionColumnID.identifier():         id,
+		ExecutionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	return genericGetByID[*Execution](q, ctx, prepareExecutionQuery, queryToWhereStmt(eq))
 }

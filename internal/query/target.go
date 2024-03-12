@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -102,19 +103,17 @@ func (q *TargetSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (q *Queries) SearchTargets(ctx context.Context, queries *TargetSearchQueries, resourceOwner string) (targets *Targets, err error) {
+func (q *Queries) SearchTargets(ctx context.Context, queries *TargetSearchQueries) (targets *Targets, err error) {
 	eq := sq.Eq{
-		TargetColumnInstanceID.identifier():    resourceOwner,
-		TargetColumnResourceOwner.identifier(): resourceOwner,
+		TargetColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	return genericSearch[*Targets](q, ctx, targetTable, prepareTargetsQuery, combineToWhereStmt(queries.toQuery, eq))
 }
 
-func (q *Queries) GetTargetByID(ctx context.Context, id string, resourceOwner string) (target *Target, err error) {
+func (q *Queries) GetTargetByID(ctx context.Context, id string) (target *Target, err error) {
 	eq := sq.Eq{
-		TargetColumnID.identifier():            id,
-		TargetColumnResourceOwner.identifier(): resourceOwner,
-		TargetColumnInstanceID.identifier():    resourceOwner,
+		TargetColumnID.identifier():         id,
+		TargetColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 	return genericGetByID[*Target](q, ctx, prepareTargetQuery, queryToWhereStmt(eq))
 }

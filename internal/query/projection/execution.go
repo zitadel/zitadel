@@ -44,7 +44,7 @@ func (*executionProjection) Init() *old_handler.Check {
 			handler.NewColumn(ExecutionTargetsCol, handler.ColumnTypeTextArray, handler.Nullable()),
 			handler.NewColumn(ExecutionIncludesCol, handler.ColumnTypeTextArray, handler.Nullable()),
 		},
-			handler.NewPrimaryKey(ExecutionInstanceIDCol, ExecutionResourceOwnerCol, ExecutionIDCol),
+			handler.NewPrimaryKey(ExecutionInstanceIDCol, ExecutionIDCol),
 		),
 	)
 }
