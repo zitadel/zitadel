@@ -4,7 +4,6 @@
 <h2>{{ 'DESCRIPTIONS.SETTINGS.OIDC.TITLE' | translate }}</h2>
 <p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.OIDC.DESCRIPTION' | translate }}</p>
 <form (ngSubmit)="savePolicy()" [formGroup]="form" autocomplete="off" class="lifetime-form">
-
   <cnsl-card
     [title]="'DESCRIPTIONS.SETTINGS.OIDC.ACCESS_TOKEN.TITLE' | translate"
     [description]="'DESCRIPTIONS.SETTINGS.OIDC.ACCESS_TOKEN.DESCRIPTION' | translate"
@@ -19,32 +18,31 @@
     [title]="'DESCRIPTIONS.SETTINGS.OIDC.ID_TOKEN.TITLE' | translate"
     [description]="'DESCRIPTIONS.SETTINGS.OIDC.ID_TOKEN.DESCRIPTION' | translate"
   >
-  <cnsl-form-field class="oidc-form-field" label="Sender Name" required="true">
-    <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.OIDC.LABEL_HOURS' | translate }}</cnsl-label>
-    <input cnslInput type="number" name="idTokenLifetime" formControlName="idTokenLifetime" />
-  </cnsl-form-field>
+    <cnsl-form-field class="oidc-form-field" label="Sender Name" required="true">
+      <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.OIDC.LABEL_HOURS' | translate }}</cnsl-label>
+      <input cnslInput type="number" name="idTokenLifetime" formControlName="idTokenLifetime" />
+    </cnsl-form-field>
   </cnsl-card>
 
   <cnsl-card
     [title]="'DESCRIPTIONS.SETTINGS.OIDC.REFRESH_TOKEN.TITLE' | translate"
     [description]="'DESCRIPTIONS.SETTINGS.OIDC.REFRESH_TOKEN.DESCRIPTION' | translate"
   >
-  <cnsl-form-field class="oidc-form-field" label="Sender Address" required="true">
-    <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.OIDC.LABEL_DAYS' | translate }}</cnsl-label>
-    <input cnslInput type="number" name="refreshTokenExpiration" formControlName="refreshTokenExpiration" />
-  </cnsl-form-field>
+    <cnsl-form-field class="oidc-form-field" label="Sender Address" required="true">
+      <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.OIDC.LABEL_DAYS' | translate }}</cnsl-label>
+      <input cnslInput type="number" name="refreshTokenExpiration" formControlName="refreshTokenExpiration" />
+    </cnsl-form-field>
   </cnsl-card>
 
   <cnsl-card
     [title]="'DESCRIPTIONS.SETTINGS.OIDC.REFRESH_TOKEN_IDLE.TITLE' | translate"
     [description]="'DESCRIPTIONS.SETTINGS.OIDC.REFRESH_TOKEN_IDLE.DESCRIPTION' | translate"
   >
-  <cnsl-form-field class="oidc-form-field" label="Sender Name" required="true">
-    <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.OIDC.LABEL_DAYS' | translate }}</cnsl-label>
-    <input cnslInput type="number" name="refreshTokenIdleExpiration" formControlName="refreshTokenIdleExpiration" />
-  </cnsl-form-field>
+    <cnsl-form-field class="oidc-form-field" label="Sender Name" required="true">
+      <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.OIDC.LABEL_DAYS' | translate }}</cnsl-label>
+      <input cnslInput type="number" name="refreshTokenIdleExpiration" formControlName="refreshTokenIdleExpiration" />
+    </cnsl-form-field>
   </cnsl-card>
-
 </form>
 <div class="oidc-btn-container">
   <button

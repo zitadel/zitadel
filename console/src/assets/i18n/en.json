@@ -1,6 +1,6 @@
 {
   "APP_NAME": "ZITADEL",
-  "DESCRIPTIONS":{
+  "DESCRIPTIONS": {
     "METADATA_TITLE": "Metadata",
     "HOME": {
       "TITLE": "Get started with ZITADEL",
@@ -48,10 +48,10 @@
       "TITLE": "Users",
       "DESCRIPTION": "A user is a human or a machine that can access your applications.",
       "HUMANS": {
-          "TITLE": "Humans",
-          "DESCRIPTION": "Humans authenticate interactively in a browser session with a login prompt.",
-          "METADATA": "Add custom attributes to the user like the department. You can use this information in your actions."
-        },
+        "TITLE": "Humans",
+        "DESCRIPTION": "Humans authenticate interactively in a browser session with a login prompt.",
+        "METADATA": "Add custom attributes to the user like the department. You can use this information in your actions."
+      },
       "MACHINES": {
         "TITLE": "Machines",
         "DESCRIPTION": "Machines authenticate non-interactively using a JWT bearer token signed with a private key. They can also use a personal access token.",
@@ -139,22 +139,22 @@
         "DESCRIPTION": "Configure your OIDC token lifetimes. Use shorter lifetimes to increase your users security, use longer lifetimes to increase your users convenience.",
         "LABEL_HOURS": "Maximum Lifetime in hours",
         "LABEL_DAYS": "Maximum Lifetime in days",
-          "ACCESS_TOKEN": {
-            "TITLE": "Access Token",
-            "DESCRIPTION": "The access token is used to authenticate a user. It is a short-lived token that is used to access the user's data. Use a short lifetime to minimize the risk of unauthorized access. Access tokens can automatically be refreshed using a refresh token."
-          },
-          "ID_TOKEN": {
-            "TITLE": "ID Token",
-            "DESCRIPTION": "The ID token is a JSON Web Token (JWT) that contains claims about the user. The ID token lifetime should not exceed the access token lifetime."
-          },
-          "REFRESH_TOKEN": {
-            "TITLE": "Refresh Token",
-            "DESCRIPTION": "The refresh token is used to obtain a new access token. It is a long-lived token that is used to refresh the access token. A user has to manually re-authenticate when the refresh token expires."
-          },
-          "REFRESH_TOKEN_IDLE": {
-            "TITLE": "Idle Refresh Token",
-            "DESCRIPTION": "The idle refresh token lifetime is the maximum time a refresh token can be unused."
-          }
+        "ACCESS_TOKEN": {
+          "TITLE": "Access Token",
+          "DESCRIPTION": "The access token is used to authenticate a user. It is a short-lived token that is used to access the user's data. Use a short lifetime to minimize the risk of unauthorized access. Access tokens can automatically be refreshed using a refresh token."
+        },
+        "ID_TOKEN": {
+          "TITLE": "ID Token",
+          "DESCRIPTION": "The ID token is a JSON Web Token (JWT) that contains claims about the user. The ID token lifetime should not exceed the access token lifetime."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Refresh Token",
+          "DESCRIPTION": "The refresh token is used to obtain a new access token. It is a long-lived token that is used to refresh the access token. A user has to manually re-authenticate when the refresh token expires."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Idle Refresh Token",
+          "DESCRIPTION": "The idle refresh token lifetime is the maximum time a refresh token can be unused."
+        }
       },
       "MESSAGE_TEXTS": {
         "TITLE": "Message Texts",

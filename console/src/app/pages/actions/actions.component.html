@@ -13,7 +13,10 @@
     </cnsl-info-section>
 
     <ng-template cnslHasRole [hasRole]="['org.action.read']">
-      <cnsl-card title="{{ 'DESCRIPTIONS.ACTIONS.SCRIPTS.TITLE' | translate }}" description="{{ 'DESCRIPTIONS.ACTIONS.SCRIPTS.DESCRIPTION' | translate }}">
+      <cnsl-card
+        title="{{ 'DESCRIPTIONS.ACTIONS.SCRIPTS.TITLE' | translate }}"
+        description="{{ 'DESCRIPTIONS.ACTIONS.SCRIPTS.DESCRIPTION' | translate }}"
+      >
         <cnsl-action-table (changedSelection)="selection = $event"></cnsl-action-table>
       </cnsl-card>
     </ng-template>

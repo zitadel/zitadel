@@ -6,7 +6,10 @@
         <mat-icon class="icon">info_outline</mat-icon>
       </a>
     </div>
-    <p class="sub cnsl-secondary-text max-width-description" [innerHTML]="'DESCRIPTIONS.PROJECTS.DESCRIPTION' | translate"></p>
+    <p
+      class="sub cnsl-secondary-text max-width-description"
+      [innerHTML]="'DESCRIPTIONS.PROJECTS.DESCRIPTION' | translate"
+    ></p>
     <div class="projects-controls">
       <div class="project-toggle-group">
         <cnsl-nav-toggle
@@ -28,7 +31,14 @@
         <i *ngIf="!grid" class="las la-border-all"></i>
       </button>
     </div>
-    <p class="sub cnsl-secondary-text max-width-description">{{ ( (projectType$ | async) === ProjectType.PROJECTTYPE_OWNED ? 'DESCRIPTIONS.PROJECTS.OWNED.DESCRIPTION' : 'DESCRIPTIONS.PROJECTS.GRANTED.DESCRIPTION' ) | translate }}</p>
+    <p class="sub cnsl-secondary-text max-width-description">
+      {{
+        ((projectType$ | async) === ProjectType.PROJECTTYPE_OWNED
+          ? 'DESCRIPTIONS.PROJECTS.OWNED.DESCRIPTION'
+          : 'DESCRIPTIONS.PROJECTS.GRANTED.DESCRIPTION'
+        ) | translate
+      }}
+    </p>
     <cnsl-project-grid
       *ngIf="grid"
       [projectType$]="projectType$"

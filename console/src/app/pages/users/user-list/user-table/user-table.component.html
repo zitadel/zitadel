@@ -22,7 +22,12 @@
       data-e2e="list-machines"
     ></cnsl-nav-toggle>
   </div>
-  <p class="user-list-sub cnsl-secondary-text">{{ ( type === Type.TYPE_HUMAN ? 'DESCRIPTIONS.USERS.HUMANS.DESCRIPTION' : 'DESCRIPTIONS.USERS.MACHINES.DESCRIPTION') | translate }}</p>
+  <p class="user-list-sub cnsl-secondary-text">
+    {{
+      (type === Type.TYPE_HUMAN ? 'DESCRIPTIONS.USERS.HUMANS.DESCRIPTION' : 'DESCRIPTIONS.USERS.MACHINES.DESCRIPTION')
+        | translate
+    }}
+  </p>
   <ng-template cnslHasRole [hasRole]="['user.write']" actions>
     <button
       (click)="deactivateSelectedUsers()"
