@@ -8,9 +8,10 @@ export default async function Page({
 }) {
   const loginName = searchParams?.loginName;
   const authRequestId = searchParams?.authRequestId;
+  const organization = searchParams?.organization;
   const submit: boolean = searchParams?.submit === "true";
 
-  const loginSettings = await getLoginSettings(server);
+  const loginSettings = await getLoginSettings(server, organization);
 
   return (
     <div className="flex flex-col items-center space-y-4">
@@ -21,6 +22,7 @@ export default async function Page({
         loginSettings={loginSettings}
         loginName={loginName}
         authRequestId={authRequestId}
+        organization={organization}
         submit={submit}
       />
     </div>

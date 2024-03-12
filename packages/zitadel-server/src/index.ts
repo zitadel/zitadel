@@ -63,6 +63,7 @@ export {
   GetActiveIdentityProvidersResponse,
   GetActiveIdentityProvidersRequest,
 } from "./proto/server/zitadel/settings/v2beta/settings_service";
+export { TextQueryMethod } from "./proto/server/zitadel/object/v2beta/object";
 export {
   AddHumanUserResponse,
   AddHumanUserRequest,
@@ -80,6 +81,8 @@ export {
   StartIdentityProviderIntentResponse,
   RetrieveIdentityProviderIntentRequest,
   RetrieveIdentityProviderIntentResponse,
+  ListUsersRequest,
+  ListUsersResponse,
 } from "./proto/server/zitadel/user/v2beta/user_service";
 export {
   SetHumanPasswordResponse,

@@ -21,6 +21,8 @@ import {
   VerifyEmailResponse,
   SetSessionResponse,
   SetSessionRequest,
+  ListUsersResponse,
+  ListUsersRequest,
   DeleteSessionResponse,
   VerifyPasskeyRegistrationResponse,
   LoginSettings,
@@ -35,6 +37,7 @@ import {
   CreateCallbackRequest,
   CreateCallbackResponse,
   RequestChallenges,
+  TextQueryMethod,
   AddHumanUserRequest,
 } from "@zitadel/server";
 
@@ -61,11 +64,12 @@ export async function getBrandingSettings(
 }
 
 export async function getLoginSettings(
-  server: ZitadelServer
+  server: ZitadelServer,
+  orgId?: string
 ): Promise<LoginSettings | undefined> {
   const settingsService = settings.getSettings(server);
   return settingsService
-    .getLoginSettings({}, {})
+    .getLoginSettings({ ctx: orgId ? { orgId } : { instance: true } }, {})
     .then((resp: GetLoginSettingsResponse) => resp.settings);
 }
 
@@ -209,6 +213,25 @@ export async function addHumanUser(
     .then((resp: AddHumanUserResponse) => {
       return resp.userId;
     });
+}
+
+export async function listUsers(userName: string): Promise<ListUsersResponse> {
+  // TODO limit for organization
+  const userService = user.getUser(server);
+
+  return userService.listUsers(
+    {
+      queries: [
+        {
+          userNameQuery: {
+            userName,
+            method: TextQueryMethod.TEXT_QUERY_METHOD_EQUALS,
+          },
+        },
+      ],
+    },
+    {}
+  );
 }
 
 export async function startIdentityProviderFlow(

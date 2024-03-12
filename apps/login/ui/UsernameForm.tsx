@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button, ButtonVariants } from "./Button";
 import { TextInput } from "./Input";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import { LoginSettings } from "@zitadel/server";
@@ -17,6 +17,7 @@ type Props = {
   loginSettings: LoginSettings | undefined;
   loginName: string | undefined;
   authRequestId: string | undefined;
+  organization?: string;
   submit: boolean;
 };
 
@@ -24,6 +25,7 @@ export default function UsernameForm({
   loginSettings,
   loginName,
   authRequestId,
+  organization,
   submit,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
@@ -38,12 +40,16 @@ export default function UsernameForm({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  async function submitLoginName(values: Inputs) {
+  async function submitLoginName(values: Inputs, organization?: string) {
     setLoading(true);
 
-    const body = {
+    let body: any = {
       loginName: values.loginName,
     };
+
+    if (organization) {
+      body.organization = organization;
+    }
 
     const res = await fetch("/api/loginname", {
       method: "POST",
@@ -63,8 +69,11 @@ export default function UsernameForm({
     return res.json();
   }
 
-  async function setLoginNameAndGetAuthMethods(values: Inputs) {
-    return submitLoginName(values).then((response) => {
+  function setLoginNameAndGetAuthMethods(
+    values: Inputs,
+    organization?: string
+  ) {
+    return submitLoginName(values, organization).then((response) => {
       if (response.authMethodTypes.length == 1) {
         const method = response.authMethodTypes[0];
         switch (method) {
@@ -152,7 +161,7 @@ export default function UsernameForm({
   useEffect(() => {
     if (submit && loginName) {
       // When we navigate to this page, we always want to be redirected if submit is true and the parameters are valid.
-      setLoginNameAndGetAuthMethods({ loginName });
+      setLoginNameAndGetAuthMethods({ loginName }, organization);
     }
   }, []);
 
@@ -180,7 +189,9 @@ export default function UsernameForm({
           className="self-end"
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid}
-          onClick={handleSubmit(setLoginNameAndGetAuthMethods)}
+          onClick={handleSubmit((e) =>
+            setLoginNameAndGetAuthMethods(e, organization)
+          )}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           continue

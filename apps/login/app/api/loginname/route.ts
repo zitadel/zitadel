@@ -1,12 +1,15 @@
-import { listAuthenticationMethodTypes } from "#/lib/zitadel";
+import { listAuthenticationMethodTypes, listUsers } from "#/lib/zitadel";
 import { createSessionAndUpdateCookie } from "#/utils/session";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
   if (body) {
-    const { loginName, authRequestId } = body;
-
+    const { loginName, authRequestId, organization } = body;
+    // TODO - search for users with org
+    // return listUsers(loginName).then((users) => {
+    //   if (users.details && users.details.totalResult == 1) {
+    //   }
     return createSessionAndUpdateCookie(
       loginName,
       undefined,
@@ -33,6 +36,7 @@ export async function POST(request: NextRequest) {
       .catch((error) => {
         return NextResponse.json(error, { status: 500 });
       });
+    // });
   } else {
     return NextResponse.error();
   }
