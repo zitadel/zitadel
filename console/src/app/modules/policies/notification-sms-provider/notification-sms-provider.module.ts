@@ -16,10 +16,10 @@ import { InputModule } from '../../input/input.module';
 import { WarnDialogModule } from '../../warn-dialog/warn-dialog.module';
 import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-add-sms-provider.component';
 import { NotificationSMSProviderComponent } from './notification-sms-provider.component';
-import { MatDialogModule } from '@angular/material/dialog';
+import { PasswordDialogComponent } from './password-dialog-sms-provider/password-dialog.component';
 
 @NgModule({
-  declarations: [NotificationSMSProviderComponent, DialogAddSMSProviderComponent],
+  declarations: [NotificationSMSProviderComponent, DialogAddSMSProviderComponent, PasswordDialogComponent],
   imports: [
     CommonModule,
     CardModule,
@@ -34,7 +34,6 @@ import { MatDialogModule } from '@angular/material/dialog';
     FormFieldModule,
     WarnDialogModule,
     MatSelectModule,
-    MatDialogModule,
     MatProgressSpinnerModule,
     MatSelectModule,
     TranslateModule,

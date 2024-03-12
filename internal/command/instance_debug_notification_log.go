@@ -13,7 +13,7 @@ import (
 
 func (c *Commands) AddDebugNotificationProviderLog(ctx context.Context, fileSystemProvider *fs.Config) (*domain.ObjectDetails, error) {
 	writeModel := NewInstanceDebugNotificationLogWriteModel(ctx)
-	instanceAgg := InstanceAggregateFromWriteModel(&writeModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &writeModel.WriteModel)
 	events, err := c.addDefaultDebugNotificationLog(ctx, instanceAgg, writeModel, fileSystemProvider)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (c *Commands) addDefaultDebugNotificationLog(ctx context.Context, instanceA
 
 func (c *Commands) ChangeDefaultNotificationLog(ctx context.Context, fileSystemProvider *fs.Config) (*domain.ObjectDetails, error) {
 	writeModel := NewInstanceDebugNotificationLogWriteModel(ctx)
-	instanceAgg := InstanceAggregateFromWriteModel(&writeModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &writeModel.WriteModel)
 	event, err := c.changeDefaultDebugNotificationProviderLog(ctx, instanceAgg, writeModel, fileSystemProvider)
 	if err != nil {
 		return nil, err
@@ -83,7 +83,7 @@ func (c *Commands) changeDefaultDebugNotificationProviderLog(ctx context.Context
 
 func (c *Commands) RemoveDefaultNotificationLog(ctx context.Context) (*domain.ObjectDetails, error) {
 	existingProvider := NewInstanceDebugNotificationLogWriteModel(ctx)
-	instanceAgg := InstanceAggregateFromWriteModel(&existingProvider.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingProvider.WriteModel)
 	err := c.defaultDebugNotificationProviderLogWriteModelByID(ctx, existingProvider)
 	if err != nil {
 		return nil, err

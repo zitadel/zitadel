@@ -32,6 +32,15 @@ const routes: Routes = [
       serviceType: PolicyComponentServiceType.ADMIN,
     },
   },
+  {
+    path: 'smtpprovider',
+    canActivate: [AuthGuard, RoleGuard],
+    loadChildren: () => import('src/app/modules/smtp-provider/smtp-provider.module'),
+    data: {
+      roles: ['iam.idp.read'],
+      serviceType: PolicyComponentServiceType.ADMIN,
+    },
+  },
 ];
 
 @NgModule({

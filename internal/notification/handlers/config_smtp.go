@@ -10,7 +10,7 @@ import (
 
 // GetSMTPConfig reads the iam SMTP provider config
 func (n *NotificationQueries) GetSMTPConfig(ctx context.Context) (*smtp.Config, error) {
-	config, err := n.SMTPConfigByAggregateID(ctx, authz.GetInstance(ctx).InstanceID())
+	config, err := n.SMTPConfigActive(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -19,6 +19,7 @@ func (n *NotificationQueries) GetSMTPConfig(ctx context.Context) (*smtp.Config, 
 		return nil, err
 	}
 	return &smtp.Config{
+		Description:    config.Description,
 		From:           config.SenderAddress,
 		FromName:       config.SenderName,
 		ReplyToAddress: config.ReplyToAddress,

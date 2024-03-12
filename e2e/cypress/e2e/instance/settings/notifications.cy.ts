@@ -17,27 +17,124 @@ describe('instance notifications', () => {
   describe('smtp settings', () => {
     it(`should show SMTP provider settings`, () => {
       cy.visit(smtpPath);
-      cy.contains('SMTP Settings');
+      cy.contains('SMTP Provider');
     });
-    it(`should add SMTP provider settings`, () => {
+    it(`should add Mailgun SMTP provider settings`, () => {
+      let rowSelector = `a:contains('Mailgun')`;
       cy.visit(smtpPath);
-      cy.get('[formcontrolname="senderAddress"]').clear().type('sender@example.com');
-      cy.get('[formcontrolname="senderName"]').clear().type('Zitadel');
-      cy.get('[formcontrolname="hostAndPort"]').clear().type('smtp.mailtrap.io:2525');
+      cy.get(rowSelector).click();
+      cy.get('[formcontrolname="hostAndPort"]').should('have.value', 'smtp.mailgun.org:587');
       cy.get('[formcontrolname="user"]').clear().type('user@example.com');
-      cy.get('[data-e2e="save-smtp-settings-button"]').click();
+      cy.get('[formcontrolname="password"]').clear().type('password');
+      cy.get('[data-e2e="continue-button"]').click();
+      cy.get('[formcontrolname="senderAddress"]').clear().type('sender1@example.com');
+      cy.get('[formcontrolname="senderName"]').clear().type('Test1');
+      cy.get('[formcontrolname="replyToAddress"]').clear().type('replyto1@example.com');
+      cy.get('[data-e2e="create-button"]').click();
       cy.shouldConfirmSuccess();
-      cy.get('[formcontrolname="senderAddress"]').should('have.value', 'sender@example.com');
-      cy.get('[formcontrolname="senderName"]').should('have.value', 'Zitadel');
-      cy.get('[formcontrolname="hostAndPort"]').should('have.value', 'smtp.mailtrap.io:2525');
-      cy.get('[formcontrolname="user"]').should('have.value', 'user@example.com');
+      rowSelector = `tr:contains('Test1')`;
+      cy.get('tr').contains('Mailgun');
+      cy.get('tr').contains('smtp.mailgun.org:587');
+      cy.get('tr').contains('Test1');
+      cy.get('tr').contains('sender1@example.com');
     });
-    it(`should add SMTP provider password`, () => {
+    it(`should change Mailgun SMTP provider settings`, () => {
+      let rowSelector = `tr:contains('Test1')`;
       cy.visit(smtpPath);
-      cy.get('[data-e2e="add-smtp-password-button"]').click();
-      cy.get('[data-e2e="notification-setting-password"]').clear().type('dummy@example.com');
-      cy.get('[data-e2e="save-notification-setting-password-button"]').click();
+      cy.get(rowSelector).click();
+      cy.get('[formcontrolname="hostAndPort"]').should('have.value', 'smtp.mailgun.org:587');
+      cy.get('[formcontrolname="user"]').should('have.value', 'user@example.com');
+      cy.get('[formcontrolname="user"]').clear().type('change@example.com');
+      cy.get('[data-e2e="continue-button"]').click();
+      cy.get('[formcontrolname="senderAddress"]').should('have.value', 'sender1@example.com');
+      cy.get('[formcontrolname="senderName"]').should('have.value', 'Test1');
+      cy.get('[formcontrolname="replyToAddress"]').should('have.value', 'replyto1@example.com');
+      cy.get('[formcontrolname="senderAddress"]').clear().type('senderchange1@example.com');
+      cy.get('[formcontrolname="senderName"]').clear().type('Change1');
+      cy.get('[data-e2e="create-button"]').click();
       cy.shouldConfirmSuccess();
+      rowSelector = `tr:contains('Change1')`;
+      cy.get(rowSelector).contains('Mailgun');
+      cy.get(rowSelector).contains('smtp.mailgun.org:587');
+      cy.get(rowSelector).contains('Change1');
+      cy.get(rowSelector).contains('senderchange1@example.com');
+    });
+    it(`should activate Mailgun SMTP provider settings`, () => {
+      let rowSelector = `tr:contains('Change1')`;
+      cy.visit(smtpPath);
+      cy.get(rowSelector).find('[data-e2e="activate-provider-button"]').click({ force: true });
+      cy.get('[data-e2e="confirm-dialog-button"]').click();
+      cy.shouldConfirmSuccess();
+      rowSelector = `tr:contains('Change1')`;
+      cy.get(rowSelector).find('[data-e2e="active-provider"]');
+      cy.get(rowSelector).contains('Mailgun');
+      cy.get(rowSelector).contains('smtp.mailgun.org:587');
+      cy.get(rowSelector).contains('Change1');
+      cy.get(rowSelector).contains('senderchange1@example.com');
+    });
+    it(`should add Mailjet SMTP provider settings`, () => {
+      let rowSelector = `a:contains('Mailjet')`;
+      cy.visit(smtpPath);
+      cy.get(rowSelector).click();
+      cy.get('[formcontrolname="hostAndPort"]').should('have.value', 'in-v3.mailjet.com:587');
+      cy.get('[formcontrolname="user"]').clear().type('user@example.com');
+      cy.get('[formcontrolname="password"]').clear().type('password');
+      cy.get('[data-e2e="continue-button"]').click();
+      cy.get('[formcontrolname="senderAddress"]').clear().type('sender2@example.com');
+      cy.get('[formcontrolname="senderName"]').clear().type('Test2');
+      cy.get('[formcontrolname="replyToAddress"]').clear().type('replyto2@example.com');
+      cy.get('[data-e2e="create-button"]').click();
+      cy.shouldConfirmSuccess();
+      rowSelector = `tr:contains('Mailjet')`;
+      cy.get(rowSelector).contains('Mailjet');
+      cy.get(rowSelector).contains('in-v3.mailjet.com:587');
+      cy.get(rowSelector).contains('Test2');
+      cy.get(rowSelector).contains('sender2@example.com');
+    });
+    it(`should activate Mailjet SMTP provider settings an disable Mailgun`, () => {
+      let rowSelector = `tr:contains('Test2')`;
+      cy.visit(smtpPath);
+      cy.get(rowSelector).find('[data-e2e="activate-provider-button"]').click({ force: true });
+      cy.get('[data-e2e="confirm-dialog-button"]').click();
+      cy.shouldConfirmSuccess();
+      cy.get(rowSelector).find('[data-e2e="active-provider"]');
+      cy.get(rowSelector).contains('Mailjet');
+      cy.get(rowSelector).contains('in-v3.mailjet.com:587');
+      cy.get(rowSelector).contains('Test2');
+      cy.get(rowSelector).contains('sender2@example.com');
+      rowSelector = `tr:contains('Change1')`;
+      cy.get(rowSelector).find('[data-e2e="active-provider"]').should('not.exist');
+    });
+    it(`should deactivate Mailjet SMTP provider`, () => {
+      let rowSelector = `tr:contains('Test2')`;
+      cy.visit(smtpPath);
+      cy.get(rowSelector).find('[data-e2e="deactivate-provider-button"]').click({ force: true });
+      cy.get('[data-e2e="confirm-dialog-button"]').click();
+      cy.shouldConfirmSuccess();
+      rowSelector = `tr:contains('Test2')`;
+      cy.get(rowSelector).find('[data-e2e="active-provider"]').should('not.exist');
+      rowSelector = `tr:contains('Change1')`;
+      cy.get(rowSelector).find('[data-e2e="active-provider"]').should('not.exist');
+    });
+    it(`should delete Mailjet SMTP provider`, () => {
+      let rowSelector = `tr:contains('Test2')`;
+      cy.visit(smtpPath);
+      cy.get(rowSelector).find('[data-e2e="delete-provider-button"]').click({ force: true });
+      cy.get('[data-e2e="confirm-dialog-input"]').focus().type('Test2');
+      cy.get('[data-e2e="confirm-dialog-button"]').click();
+      cy.shouldConfirmSuccess();
+      rowSelector = `tr:contains('Test2')`;
+      cy.get(rowSelector).should('not.exist');
+    });
+    it(`should delete Mailgun SMTP provider`, () => {
+      let rowSelector = `tr:contains('Change1')`;
+      cy.visit(smtpPath);
+      cy.get(rowSelector).find('[data-e2e="delete-provider-button"]').click({ force: true });
+      cy.get('[data-e2e="confirm-dialog-input"]').focus().type('Change1');
+      cy.get('[data-e2e="confirm-dialog-button"]').click();
+      cy.shouldConfirmSuccess();
+      rowSelector = `tr:contains('Change1')`;
+      cy.get(rowSelector).should('not.exist');
     });
   });
 

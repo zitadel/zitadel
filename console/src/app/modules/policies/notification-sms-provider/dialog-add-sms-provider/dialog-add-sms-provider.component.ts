@@ -10,7 +10,7 @@ import {
 import { SMSProvider, TwilioConfig } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { PasswordDialogComponent } from '../password-dialog/password-dialog.component';
+import { PasswordDialogComponent } from '../password-dialog-sms-provider/password-dialog.component';
 
 enum SMSProviderType {
   Twilio = 1,

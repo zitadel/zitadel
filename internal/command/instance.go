@@ -391,6 +391,7 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 	*validations = append(*validations,
 		commands.prepareAddSMTPConfig(
 			instanceAgg,
+			smtpConfig.Description,
 			smtpConfig.From,
 			smtpConfig.FromName,
 			smtpConfig.ReplyToAddress,

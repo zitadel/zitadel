@@ -159,6 +159,8 @@ export class AppComponent implements OnDestroy {
 
     this.matIconRegistry.addSvgIcon('mdi_jwt', this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/jwt.svg'));
 
+    this.matIconRegistry.addSvgIcon('mdi_smtp', this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/mail.svg'));
+
     this.matIconRegistry.addSvgIcon('mdi_symbol', this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/symbol.svg'));
 
     this.matIconRegistry.addSvgIcon(

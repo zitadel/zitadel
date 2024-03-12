@@ -1,0 +1,37 @@
+<h2>{{ 'SMTP.LIST.TITLE' | translate }}</h2>
+<p class="cnsl-secondary-text">{{ 'SMTP.LIST.DESCRIPTION' | translate }}</p>
+
+<div class="cnsl-snmp-table-wrapper">
+  <cnsl-smtp-table></cnsl-smtp-table>
+</div>
+
+<h2>{{ 'SMTP.CREATE.TITLE' | translate }}</h2>
+<p class="cnsl-secondary-text">{{ 'SMTP.CREATE.DESCRIPTION' | translate }}</p>
+
+<div class="new-smtp-wrapper">
+  <div *ngFor="let provider of providers">
+    <a
+      class="item card"
+      [routerLink]="['/instance', 'smtpprovider', provider.routerLinkElement, 'create']"
+      *ngIf="provider.name !== 'generic'"
+    >
+      <img class="smtp-logo" src="{{ provider.image }}" alt="{{ provider.name }}" />
+      <div class="text-container">
+        <span class="title">{{ provider.name | titlecase }} </span>
+      </div>
+    </a>
+
+    <a
+      class="item card"
+      [routerLink]="['/instance', 'smtpprovider', provider.routerLinkElement, 'create']"
+      *ngIf="provider.name === 'generic'"
+    >
+      <div class="smtp-icon">
+        <mat-icon class="icon" svgIcon="mdi_smtp" />
+      </div>
+      <div class="text-container">
+        <span class="title">Generic SMTP</span>
+      </div>
+    </a>
+  </div>
+</div>
