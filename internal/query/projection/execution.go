@@ -83,15 +83,15 @@ func (p *executionProjection) reduceExecutionSet(event eventstore.Event) (*handl
 	}
 	columns := []handler.Column{
 		handler.NewCol(ExecutionInstanceIDCol, e.Aggregate().InstanceID),
-		handler.NewCol(ExecutionResourceOwnerCol, e.Aggregate().ResourceOwner),
 		handler.NewCol(ExecutionIDCol, e.Aggregate().ID),
+		handler.NewCol(ExecutionResourceOwnerCol, e.Aggregate().ResourceOwner),
 		handler.NewCol(ExecutionCreationDateCol, handler.OnlySetValueOnInsert(ExecutionTable, e.CreationDate())),
 		handler.NewCol(ExecutionChangeDateCol, e.CreationDate()),
 		handler.NewCol(ExecutionSequenceCol, e.Sequence()),
 		handler.NewCol(ExecutionTargetsCol, e.Targets),
 		handler.NewCol(ExecutionIncludesCol, e.Includes),
 	}
-	return handler.NewUpsertStatement(e, columns[0:3], columns), nil
+	return handler.NewUpsertStatement(e, columns[0:2], columns), nil
 }
 
 func (p *executionProjection) reduceExecutionRemoved(event eventstore.Event) (*handler.Statement, error) {
@@ -103,7 +103,6 @@ func (p *executionProjection) reduceExecutionRemoved(event eventstore.Event) (*h
 		e,
 		[]handler.Condition{
 			handler.NewCond(ExecutionInstanceIDCol, e.Aggregate().InstanceID),
-			handler.NewCond(ExecutionResourceOwnerCol, e.Aggregate().ResourceOwner),
 			handler.NewCond(ExecutionIDCol, e.Aggregate().ID),
 		},
 	), nil

@@ -39,11 +39,11 @@ func TestExecutionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.executions (instance_id, resource_owner, id, creation_date, change_date, sequence, targets, includes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (instance_id, resource_owner, id) DO UPDATE SET (creation_date, change_date, sequence, targets, includes) = (projections.executions.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.targets, EXCLUDED.includes)",
+							expectedStmt: "INSERT INTO projections.executions (instance_id, id, resource_owner, creation_date, change_date, sequence, targets, includes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (instance_id, id) DO UPDATE SET (resource_owner, creation_date, change_date, sequence, targets, includes) = (EXCLUDED.resource_owner, projections.executions.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.targets, EXCLUDED.includes)",
 							expectedArgs: []interface{}{
 								"instance-id",
-								"ro-id",
 								"agg-id",
+								"ro-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -74,10 +74,9 @@ func TestExecutionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.executions WHERE (instance_id = $1) AND (resource_owner = $2) AND (id = $3)",
+							expectedStmt: "DELETE FROM projections.executions WHERE (instance_id = $1) AND (id = $2)",
 							expectedArgs: []interface{}{
 								"instance-id",
-								"ro-id",
 								"agg-id",
 							},
 						},

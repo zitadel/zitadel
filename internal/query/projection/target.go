@@ -120,6 +120,7 @@ func (p *targetProjection) reduceTargetChanged(event eventstore.Event) (*handler
 	values := []handler.Column{
 		handler.NewCol(TargetChangeDateCol, e.CreationDate()),
 		handler.NewCol(TargetSequenceCol, e.Sequence()),
+		handler.NewCol(TargetResourceOwnerCol, e.Aggregate().ResourceOwner),
 	}
 	if e.Name != nil {
 		values = append(values, handler.NewCol(TargetNameCol, *e.Name))
@@ -144,7 +145,6 @@ func (p *targetProjection) reduceTargetChanged(event eventstore.Event) (*handler
 		values,
 		[]handler.Condition{
 			handler.NewCond(TargetInstanceIDCol, e.Aggregate().InstanceID),
-			handler.NewCond(TargetResourceOwnerCol, e.Aggregate().ResourceOwner),
 			handler.NewCond(TargetIDCol, e.Aggregate().ID),
 		},
 	), nil
@@ -159,7 +159,6 @@ func (p *targetProjection) reduceTargetRemoved(event eventstore.Event) (*handler
 		e,
 		[]handler.Condition{
 			handler.NewCond(TargetInstanceIDCol, e.Aggregate().InstanceID),
-			handler.NewCond(TargetResourceOwnerCol, e.Aggregate().ResourceOwner),
 			handler.NewCond(TargetIDCol, e.Aggregate().ID),
 		},
 	), nil

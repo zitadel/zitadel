@@ -80,10 +80,11 @@ func TestTargetProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.targets SET (change_date, sequence, name, target_type, url, timeout, async, interrupt_on_error) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (instance_id = $9) AND (resource_owner = $10) AND (id = $11)",
+							expectedStmt: "UPDATE projections.targets SET (change_date, sequence, resource_owner, name, target_type, url, timeout, async, interrupt_on_error) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (instance_id = $10) AND (id = $11)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
+								"ro-id",
 								"name2",
 								domain.TargetTypeWebhook,
 								"https://example.com",
@@ -91,7 +92,6 @@ func TestTargetProjection_reduces(t *testing.T) {
 								true,
 								true,
 								"instance-id",
-								"ro-id",
 								"agg-id",
 							},
 						},
@@ -99,7 +99,6 @@ func TestTargetProjection_reduces(t *testing.T) {
 				},
 			},
 		},
-
 		{
 			name: "reduceTargetRemoved",
 			args: args{
@@ -119,10 +118,9 @@ func TestTargetProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.targets WHERE (instance_id = $1) AND (resource_owner = $2) AND (id = $3)",
+							expectedStmt: "DELETE FROM projections.targets WHERE (instance_id = $1) AND (id = $2)",
 							expectedArgs: []interface{}{
 								"instance-id",
-								"ro-id",
 								"agg-id",
 							},
 						},
