@@ -103,5 +103,5 @@ func (c numberCompare) String() string {
 }
 
 type number interface {
-	constraints.Integer | constraints.Float | time.Time
+	constraints.Integer | constraints.Float | time.Time | placeholder
 }

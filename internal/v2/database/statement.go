@@ -7,132 +7,23 @@ import (
 	"strings"
 	"time"
 	"unsafe"
+
+	"github.com/zitadel/logging"
 )
-
-type Query struct {
-	Columns  []Column
-	From     From
-	Join     Join
-	Where    Where
-	Limit    uint32
-	Offset   uint32
-	GroupBy  GroupBy
-	Having   Having
-	Ordering Ordering
-}
-
-type Column interface {
-	Write(stmt *Statement)
-	WriteIdentifier(stmt *Statement)
-}
-
-type column struct {
-	Name string
-	As   string
-}
-
-type function struct {
-	Name   string
-	Column Column
-}
-
-func (f *function) Write(stmt *Statement) {
-	stmt.Builder.WriteString(f.Name)
-	stmt.Builder.WriteRune('(')
-	f.Column.WriteIdentifier(stmt)
-	stmt.Builder.WriteRune(')')
-}
-
-type From interface {
-	Write(stmt *Statement)
-}
-
-type Join interface {
-	Write(stmt *Statement)
-}
-
-type Where interface {
-	Write(stmt *Statement)
-}
-
-type where struct{}
-
-type condition struct{}
-
-type Ordering interface {
-	Write(stmt *Statement)
-}
-
-type orderBy struct {
-	Fields []*orderByField
-}
-
-func (ob *orderBy) Write(stmt *Statement) {
-	for i, field := range ob.Fields {
-		field.Write(stmt)
-		if i < len(ob.Fields)-1 {
-			stmt.Builder.WriteString(", ")
-		}
-	}
-}
-
-type orderByField struct {
-	Identifier string
-	Desc       bool
-}
-
-func (f *orderByField) Write(stmt *Statement) {
-	stmt.Builder.WriteString(f.Identifier)
-	if f.Desc {
-		stmt.Builder.WriteString(" DESC")
-	}
-}
-
-type GroupBy interface {
-	Write(stmt *Statement)
-}
-
-type groupBy struct {
-	Fields []*groupByField
-}
-
-func (gb *groupBy) Write(stmt *Statement) {
-	for i, field := range gb.Fields {
-		field.Write(stmt)
-		if i < len(gb.Fields)-1 {
-			stmt.Builder.WriteString(", ")
-		}
-	}
-}
-
-type groupByField struct {
-	Identifier string
-}
-
-func (f *groupByField) Write(stmt *Statement) {
-	stmt.Builder.WriteString(f.Identifier)
-}
-
-type Having interface {
-	Write(stmt *Statement)
-}
-
-type from interface {
-	~string | *Query
-}
 
 type Statement struct {
 	addr *Statement
 	strings.Builder
 
 	args []any
-	// key is the name of the arg and value the placeholder
-	namedArgs        map[string]string
-	namedArgReplaces []string
+	// key is the name of the arg and value is the placeholder
+	namedArgs map[placeholder]string
 }
 
 func (stmt *Statement) Args() []any {
-	stmt.copyCheck()
+	if stmt == nil {
+		return nil
+	}
 	return stmt.args
 }
 
@@ -142,34 +33,62 @@ func (stmt *Statement) Reset() {
 	stmt.args = nil
 }
 
-// AppendArgs appends the args without writing it to [stmt.Builder]
+// SetNamedArg sets the arg and makes it available for query construction
+func (stmt *Statement) SetNamedArg(name placeholder, value any) (placeholder string) {
+	stmt.copyCheck()
+	stmt.args = append(stmt.args, value)
+	placeholder = fmt.Sprintf("$%d", len(stmt.args))
+	stmt.namedArgs[name] = placeholder
+	return placeholder
+}
+
+// AppendArgs appends the args without writing it to Builder
+// if any arg is a [placeholder] it's replaced with the placeholders parameter
 func (stmt *Statement) AppendArgs(args ...any) {
 	stmt.copyCheck()
 	for _, arg := range args {
-		if namedArg, ok := arg.(sql.NamedArg); ok {
-			stmt.appendNamedArg(namedArg)
-			continue
-		}
-		stmt.args = append(stmt.args, arg)
+		stmt.AppendArg(arg)
 	}
 }
 
-// AppendArgs appends the args and adds the placeholders comma separated to [stmt.Builder]
+// AppendArg appends the arg without writing it to Builder
+// if the arg is a [placeholder] it's replaced with the placeholders parameter
+func (stmt *Statement) AppendArg(arg any) {
+	stmt.copyCheck()
+
+	if namedArg, ok := arg.(sql.NamedArg); ok {
+		stmt.SetNamedArg(placeholder{namedArg.Name}, namedArg.Value)
+		return
+	}
+	stmt.args = append(stmt.args, arg)
+}
+
+func Placeholder(name string) placeholder {
+	return placeholder{name}
+}
+
+type placeholder struct {
+	string
+}
+
+// WriteArgs appends the args and adds the placeholders comma separated to [stmt.Builder]
+// if any arg is a [placeholder] it's replaced with the placeholders parameter
 func (stmt *Statement) WriteArgs(args ...any) {
 	stmt.copyCheck()
 	for i, arg := range args {
-		stmt.AppendArg(arg)
+		stmt.WriteArg(arg)
 		if i < len(args)-1 {
 			stmt.Builder.WriteString(", ")
 		}
 	}
 }
 
-// AppendArg appends the arg and adds the placeholder to [stmt.Builder]
-func (stmt *Statement) AppendArg(arg any) {
+// WriteArg appends the arg and adds the placeholder to [stmt.Builder]
+// if the arg is a [placeholder] it's replaced with the placeholders parameter
+func (stmt *Statement) WriteArg(arg any) {
 	stmt.copyCheck()
-	if namedArg, ok := arg.(sql.NamedArg); ok {
-		stmt.writeNamedPlaceholder(namedArg)
+	if namedPlaceholder, ok := arg.(placeholder); ok {
+		stmt.writeNamedPlaceholder(namedPlaceholder)
 		return
 	}
 	stmt.args = append(stmt.args, arg)
@@ -180,11 +99,7 @@ func (stmt *Statement) AppendArg(arg any) {
 // String builds the query and replaces placeholders starting with "@"
 // with the corresponding named arg placeholder
 func (stmt *Statement) String() string {
-	query := stmt.Builder.String()
-	if len(stmt.namedArgs) == 0 {
-		return query
-	}
-	return strings.NewReplacer(stmt.namedArgReplaces...).Replace(query)
+	return stmt.Builder.String()
 }
 
 // Debug builds the statement and replaces the placeholders with the parameters
@@ -216,24 +131,12 @@ func (stmt *Statement) Debug() string {
 	return query
 }
 
-func (stmt *Statement) writeNamedPlaceholder(arg sql.NamedArg) {
-	placeholder, ok := stmt.namedArgs[arg.Name]
+func (stmt *Statement) writeNamedPlaceholder(arg placeholder) {
+	placeholder, ok := stmt.namedArgs[arg]
 	if !ok {
-		placeholder = stmt.appendNamedArg(arg)
+		logging.WithFields("named_placeholder", arg).Fatal("named placeholder not defined")
 	}
 	stmt.Builder.WriteString(placeholder)
-}
-
-func (stmt *Statement) appendNamedArg(arg sql.NamedArg) (placeholder string) {
-	stmt.args = append(stmt.args, arg.Value)
-	placeholder = fmt.Sprintf("$%d", len(stmt.args))
-	stmt.namedArgs[arg.Name] = placeholder
-	if !strings.HasPrefix(arg.Name, "@") {
-		arg.Name = fmt.Sprintf("@%s", arg.Name)
-	}
-	stmt.namedArgReplaces = append(stmt.namedArgReplaces, arg.Name, placeholder)
-
-	return placeholder
 }
 
 // copyCheck allows uninitialized usage of stmt
@@ -245,7 +148,7 @@ func (stmt *Statement) copyCheck() {
 		// TODO: once issue 7921 is fixed, this should be reverted to
 		// just "stmt.addr = stmt".
 		stmt.addr = (*Statement)(noescape(unsafe.Pointer(stmt)))
-		stmt.namedArgs = make(map[string]string)
+		stmt.namedArgs = make(map[placeholder]string)
 	} else if stmt.addr != stmt {
 		panic("statement: illegal use of non-zero Builder copied by value")
 	}

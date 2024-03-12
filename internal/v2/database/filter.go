@@ -1,7 +1,5 @@
 package database
 
-import "database/sql"
-
 type Condition interface {
 	Write(stmt *Statement, columnName string)
 }
@@ -13,12 +11,7 @@ type Filter[C compare, V value] struct {
 
 func (f Filter[C, V]) Write(stmt *Statement, columnName string) {
 	prepareWrite(stmt, columnName, f.comp)
-	stmt.AppendArg(f.value)
-}
-
-func (f Filter[C, V]) WriteNamed(stmt *Statement, columnName string) {
-	prepareWrite(stmt, columnName, f.comp)
-	stmt.AppendArg(sql.Named(columnName, f.value))
+	stmt.WriteArg(f.value)
 }
 
 func prepareWrite[C compare](stmt *Statement, columnName string, comp C) {
@@ -34,5 +27,5 @@ type compare interface {
 }
 
 type value interface {
-	number | text
+	number | text | placeholder
 }

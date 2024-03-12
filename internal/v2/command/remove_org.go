@@ -37,31 +37,31 @@ func (i *RemoveOrg) ToPushIntent(ctx context.Context, querier eventstore.Querier
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-wG9p1", "Errors.Org.DefaultOrgNotDeletable")
 	}
 
-	err := querier.Query(
-		ctx,
-		authz.GetInstance(ctx).InstanceID(),
-		i,
-		append([]*eventstore.Filter{
-			eventstore.NewFilter(
-				eventstore.AppendAggregateFilter(
-					org.AggregateType,
-					eventstore.WithAggregateID(i.id),
-					eventstore.AppendEvent(
-						eventstore.WithEventType(org.Added.Type()),
-					),
-					eventstore.AppendEvent(
-						eventstore.WithEventType(org.Removed.Type()),
-					),
-				),
-			),
-		},
-			i.state.Filter()...,
-		)...,
-	)
-	// TODO: check if ZITADEL project exists on this org
-	if err != nil {
-		return nil, err
-	}
+	// err := querier.Query(
+	// 	ctx,
+	// 	authz.GetInstance(ctx).InstanceID(),
+	// 	i,
+	// 	append([]*eventstore.Filter{
+	// 		eventstore.NewFilter(
+	// 			eventstore.AppendAggregateFilter(
+	// 				org.AggregateType,
+	// 				eventstore.WithAggregateID(i.id),
+	// 				eventstore.AppendEvent(
+	// 					eventstore.WithEventType(org.Added.Type()),
+	// 				),
+	// 				eventstore.AppendEvent(
+	// 					eventstore.WithEventType(org.Removed.Type()),
+	// 				),
+	// 			),
+	// 		),
+	// 	},
+	// 		i.state.Filter()...,
+	// 	)...,
+	// )
+	// // TODO: check if ZITADEL project exists on this org
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	if i.state.IsValidState(org.RemovedState) {
 		// org is already removed, nothing to do

@@ -24,45 +24,51 @@ func TestNewFilter(t *testing.T) {
 						AppendAggregateFilter(
 							"instance",
 							AppendEvent(
-								WithEventType("instance.added"),
+								EventType("instance.added"),
 							),
 						),
-						WithLimit(1),
+						FilterPagination(
+							Limit(1),
+						),
 					),
 					NewFilter(
 						AppendAggregateFilter(
 							"instance",
 							AppendEvent(
-								WithEventType("instance.removed"),
+								EventType("instance.removed"),
 							),
 						),
-						WithLimit(1),
+						FilterPagination(
+							Limit(1),
+						),
 					),
 					NewFilter(
 						AppendAggregateFilter(
 							"instance",
 							AppendEvent(
-								WithEventType("instance.domain.primary.set"),
-								WithCreatorList(database.NewListNotContains("", "SYSTEM")),
+								EventType("instance.domain.primary.set"),
+								EventCreatorList(database.NewListNotContains("", "SYSTEM")),
 							),
 						),
-						WithLimit(1),
-					),
-					NewFilter(
-						AppendAggregateFilter(
-							"project",
-							AppendEvent(
-								WithEventType("project.added"),
-								WithCreatorList(database.NewListNotContains("", "SYSTEM")),
-							),
+						FilterPagination(
+							Limit(1),
 						),
 					),
 					NewFilter(
 						AppendAggregateFilter(
 							"project",
 							AppendEvent(
-								WithCreatorList(database.NewListNotContains("", "SYSTEM")),
-								WithEventType("project.application.added"),
+								EventType("project.added"),
+								EventCreatorList(database.NewListNotContains("", "SYSTEM")),
+							),
+						),
+					),
+					NewFilter(
+						AppendAggregateFilter(
+							"project",
+							AppendEvent(
+								EventCreatorList(database.NewListNotContains("", "SYSTEM")),
+								EventType("project.application.added"),
 							),
 						),
 					),
@@ -70,123 +76,131 @@ func TestNewFilter(t *testing.T) {
 						AppendAggregateFilter(
 							"user",
 							AppendEvent(
-								WithEventType("user.token.added"),
+								EventType("user.token.added"),
 							),
 						),
-						// used because we need to check for first login and an app which is not console
-						WithPosition(database.NewNumberAtLeast(12), database.NewNumberGreater(4)),
+						FilterPagination(
+							// used because we need to check for first login and an app which is not console
+							PositionGreater(12, 4),
+						),
 					),
 					NewFilter(
 						AppendAggregateFilter(
 							"instance",
 							AppendEvent(
-								WithEventType("instance.idp.config.added"),
+								EventType("instance.idp.config.added"),
 							),
 							AppendEvent(
-								WithEventType("instance.idp.oauth.added"),
+								EventType("instance.idp.oauth.added"),
 							),
 							AppendEvent(
-								WithEventType("instance.idp.oidc.added"),
+								EventType("instance.idp.oidc.added"),
 							),
 							AppendEvent(
-								WithEventType("instance.idp.jwt.added"),
+								EventType("instance.idp.jwt.added"),
 							),
 							AppendEvent(
-								WithEventType("instance.idp.azure.added"),
+								EventType("instance.idp.azure.added"),
 							),
 							AppendEvent(
-								WithEventType("instance.idp.github.added"),
+								EventType("instance.idp.github.added"),
 							),
 							AppendEvent(
-								WithEventType("instance.idp.github.enterprise.added"),
+								EventType("instance.idp.github.enterprise.added"),
 							),
 							AppendEvent(
-								WithEventType("instance.idp.gitlab.added"),
+								EventType("instance.idp.gitlab.added"),
 							),
 							AppendEvent(
-								WithEventType("instance.idp.gitlab.selfhosted.added"),
+								EventType("instance.idp.gitlab.selfhosted.added"),
 							),
 							AppendEvent(
-								WithEventType("instance.idp.google.added"),
+								EventType("instance.idp.google.added"),
 							),
 							AppendEvent(
-								WithEventType("instance.idp.ldap.added"),
+								EventType("instance.idp.ldap.added"),
 							),
 							AppendEvent(
-								WithEventType("instance.idp.config.apple.added"),
+								EventType("instance.idp.config.apple.added"),
 							),
 							AppendEvent(
-								WithEventType("instance.idp.saml.added"),
+								EventType("instance.idp.saml.added"),
 							),
 						),
 						AppendAggregateFilter(
 							"org",
 							AppendEvent(
-								WithEventType("org.idp.config.added"),
+								EventType("org.idp.config.added"),
 							),
 							AppendEvent(
-								WithEventType("org.idp.oauth.added"),
+								EventType("org.idp.oauth.added"),
 							),
 							AppendEvent(
-								WithEventType("org.idp.oidc.added"),
+								EventType("org.idp.oidc.added"),
 							),
 							AppendEvent(
-								WithEventType("org.idp.jwt.added"),
+								EventType("org.idp.jwt.added"),
 							),
 							AppendEvent(
-								WithEventType("org.idp.azure.added"),
+								EventType("org.idp.azure.added"),
 							),
 							AppendEvent(
-								WithEventType("org.idp.github.added"),
+								EventType("org.idp.github.added"),
 							),
 							AppendEvent(
-								WithEventType("org.idp.github.enterprise.added"),
+								EventType("org.idp.github.enterprise.added"),
 							),
 							AppendEvent(
-								WithEventType("org.idp.gitlab.added"),
+								EventType("org.idp.gitlab.added"),
 							),
 							AppendEvent(
-								WithEventType("org.idp.gitlab.selfhosted.added"),
+								EventType("org.idp.gitlab.selfhosted.added"),
 							),
 							AppendEvent(
-								WithEventType("org.idp.google.added"),
+								EventType("org.idp.google.added"),
 							),
 							AppendEvent(
-								WithEventType("org.idp.ldap.added"),
+								EventType("org.idp.ldap.added"),
 							),
 							AppendEvent(
-								WithEventType("org.idp.config.apple.added"),
+								EventType("org.idp.config.apple.added"),
 							),
 							AppendEvent(
-								WithEventType("org.idp.saml.added"),
+								EventType("org.idp.saml.added"),
 							),
 						),
-						WithLimit(1),
+						FilterPagination(
+							Limit(1),
+						),
 					),
 					NewFilter(
 						AppendAggregateFilter(
 							"instance",
 							AppendEvent(
-								WithEventType("instance.login.policy.idp.added"),
+								EventType("instance.login.policy.idp.added"),
 							),
 						),
 						AppendAggregateFilter(
 							"org",
 							AppendEvent(
-								WithEventType("org.login.policy.idp.added"),
+								EventType("org.login.policy.idp.added"),
 							),
 						),
-						WithLimit(1),
+						FilterPagination(
+							Limit(1),
+						),
 					),
 					NewFilter(
 						AppendAggregateFilter(
 							"instance",
 							AppendEvent(
-								WithEventType("instance.smtp.config.added"),
-								WithCreatorList(database.NewListNotContains("", "SYSTEM", "<SYSTEM-USER>")),
+								EventType("instance.smtp.config.added"),
+								EventCreatorList(database.NewListNotContains("", "SYSTEM", "<SYSTEM-USER>")),
 							),
 						),
-						WithLimit(1),
+						FilterPagination(
+							Limit(1),
+						),
 					),
 				},
 			},

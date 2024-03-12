@@ -35,7 +35,7 @@ func (f ListFilter[V]) Write(stmt *Statement, columnName string) {
 	}
 	stmt.WriteString(columnName)
 	stmt.WriteString(" = ANY(")
-	stmt.AppendArg(f.list)
+	stmt.WriteArg(f.list)
 	stmt.WriteString(")")
 	if f.comp == listNotContain {
 		stmt.WriteRune(')')

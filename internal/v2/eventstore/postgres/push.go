@@ -6,6 +6,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -26,7 +27,8 @@ func (s *Storage) Push(ctx context.Context, pushIntents ...eventstore.PushIntent
 		logging.WithError(err).Debug("getting app name failed")
 		return zerrors.ThrowInternal(err, "POSTG-qkGKk", "Errors.Internal")
 	}
-	if err := setAppName(ctx, tx, "es_pusher"); err != nil {
+	// allows smaller wait times on query side for instances which are not actively writing
+	if err := setAppName(ctx, tx, "es_pusher_"+authz.GetInstance(ctx).InstanceID()); err != nil {
 		return err
 	}
 	defer func() {

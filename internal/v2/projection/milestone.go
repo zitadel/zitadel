@@ -38,10 +38,12 @@ func (p *InstanceCreatedMilestone) Filter() []*eventstore.Filter {
 			eventstore.AppendAggregateFilter(
 				instance.AggregateType,
 				eventstore.AppendEvent(
-					eventstore.WithEventType("instance.added"),
+					eventstore.EventType("instance.added"),
 				),
 			),
-			eventstore.WithLimit(1),
+			eventstore.FilterPagination(
+				eventstore.Limit(1),
+			),
 		),
 	}
 }
@@ -78,10 +80,12 @@ func (p *InstanceRemovedMilestone) Filter() []*eventstore.Filter {
 			eventstore.AppendAggregateFilter(
 				instance.AggregateType,
 				eventstore.AppendEvent(
-					eventstore.WithEventType("instance.removed"),
+					eventstore.EventType("instance.removed"),
 				),
 			),
-			eventstore.WithLimit(1),
+			eventstore.FilterPagination(
+				eventstore.Limit(1),
+			),
 		),
 	}
 }
@@ -119,10 +123,12 @@ func (p *AuthOnInstanceMilestone) Filter() []*eventstore.Filter {
 			eventstore.AppendAggregateFilter(
 				"user",
 				eventstore.AppendEvent(
-					eventstore.WithEventType("user.token.added"),
+					eventstore.EventType("user.token.added"),
 				),
 			),
-			eventstore.WithLimit(1),
+			eventstore.FilterPagination(
+				eventstore.Limit(1),
+			),
 		),
 	}
 }
@@ -164,11 +170,13 @@ func (p *AuthOnAppMilestone) Filter() []*eventstore.Filter {
 			eventstore.AppendAggregateFilter(
 				"user",
 				eventstore.AppendEvent(
-					eventstore.WithEventType("user.token.added"),
+					eventstore.EventType("user.token.added"),
 				),
 			),
-			// used because we need to check for first login and an app which is not console
-			eventstore.WithPosition(database.NewNumberAtLeast(p.position.Position), database.NewNumberGreater(p.position.InPositionOrder)),
+			eventstore.FilterPagination(
+				// used because we need to check for first login and an app which is not console
+				eventstore.PositionGreater(p.position.Position, p.position.InPositionOrder),
+			),
 		),
 	}
 }
@@ -215,11 +223,13 @@ func (p *ProjectCreatedMilestone) Filter() []*eventstore.Filter {
 			eventstore.AppendAggregateFilter(
 				"project",
 				eventstore.AppendEvent(
-					eventstore.WithEventType("project.added"),
-					eventstore.WithCreatorList(database.NewListNotContains("", "SYSTEM")),
+					eventstore.EventType("project.added"),
+					eventstore.EventCreatorList(database.NewListNotContains("", "SYSTEM")),
 				),
 			),
-			eventstore.WithLimit(1),
+			eventstore.FilterPagination(
+				eventstore.Limit(1),
+			),
 		),
 	}
 }
@@ -257,11 +267,13 @@ func (p *AppCreatedMilestone) Filter() []*eventstore.Filter {
 			eventstore.AppendAggregateFilter(
 				"project",
 				eventstore.AppendEvent(
-					eventstore.WithCreatorList(database.NewListNotContains("", "SYSTEM")),
-					eventstore.WithEventType("project.application.added"),
+					eventstore.EventCreatorList(database.NewListNotContains("", "SYSTEM")),
+					eventstore.EventType("project.application.added"),
 				),
 			),
-			eventstore.WithLimit(1),
+			eventstore.FilterPagination(
+				eventstore.Limit(1),
+			),
 		),
 	}
 }

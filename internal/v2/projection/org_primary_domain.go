@@ -22,12 +22,14 @@ func NewOrgPrimaryDomain(id string) *OrgPrimaryDomain {
 func (p *OrgPrimaryDomain) Filter() []*eventstore.Filter {
 	return []*eventstore.Filter{
 		eventstore.NewFilter(
-			eventstore.WithPositionAtLeast(p.position),
+			eventstore.FilterPagination(
+				eventstore.GlobalPositionGreater(&p.position),
+			),
 			eventstore.AppendAggregateFilter(
 				org.AggregateType,
-				eventstore.WithAggregateID(p.id),
+				eventstore.AggregateID(p.id),
 				eventstore.AppendEvent(
-					eventstore.WithEventType(org.DomainSetPrimary.Type()),
+					eventstore.EventType(org.DomainSetPrimary.Type()),
 				),
 			),
 		),

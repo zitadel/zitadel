@@ -40,7 +40,7 @@ type Pusher interface {
 
 type Querier interface {
 	healther
-	Query(ctx context.Context, instance string, reducer Reducer, filters ...*Filter) error
+	Query(ctx context.Context, query *Query) error
 }
 
 type Aggregate struct {
@@ -113,6 +113,20 @@ type GlobalPosition struct {
 	Position        float64
 	InPositionOrder uint32
 }
+
+// func (gp *GlobalPosition) GetPosition() float64 {
+// 	if gp == nil {
+// 		return 0
+// 	}
+// 	return gp.Position
+// }
+
+// func (gp *GlobalPosition) GetInPositionOrder() uint32 {
+// 	if gp == nil {
+// 		return 0
+// 	}
+// 	return gp.InPositionOrder
+// }
 
 type Event interface {
 	action

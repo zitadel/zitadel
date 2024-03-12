@@ -42,7 +42,7 @@ func (rm *Org) filter() []*eventstore.Filter {
 		eventstore.NewFilter(
 			eventstore.AppendAggregateFilter(
 				org.AggregateType,
-				eventstore.WithAggregateID(rm.ID),
+				eventstore.AggregateID(rm.ID),
 			),
 		),
 	}

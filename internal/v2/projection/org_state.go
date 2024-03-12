@@ -23,22 +23,24 @@ func NewStateProjection(id string) *OrgState {
 func (p *OrgState) Filter() []*eventstore.Filter {
 	return []*eventstore.Filter{
 		eventstore.NewFilter(
-			eventstore.Descending(),
-			eventstore.WithPositionAtLeast(p.position),
+			eventstore.FilterPagination(
+				eventstore.Descending(),
+				eventstore.GlobalPositionGreater(&p.position),
+			),
 			eventstore.AppendAggregateFilter(
 				org.AggregateType,
-				eventstore.WithAggregateID(p.id),
+				eventstore.AggregateID(p.id),
 				eventstore.AppendEvent(
-					eventstore.WithEventType(org.Added.Type()),
+					eventstore.EventType(org.Added.Type()),
 				),
 				eventstore.AppendEvent(
-					eventstore.WithEventType(org.Deactivated.Type()),
+					eventstore.EventType(org.Deactivated.Type()),
 				),
 				eventstore.AppendEvent(
-					eventstore.WithEventType(org.Reactivated.Type()),
+					eventstore.EventType(org.Reactivated.Type()),
 				),
 				eventstore.AppendEvent(
-					eventstore.WithEventType(org.Removed.Type()),
+					eventstore.EventType(org.Removed.Type()),
 				),
 			),
 		),
