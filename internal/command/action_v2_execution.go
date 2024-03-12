@@ -283,3 +283,37 @@ func (c *Commands) getExecutionWriteModelByID(ctx context.Context, id string, re
 	}
 	return wm, nil
 }
+
+var includes map[string][]string
+
+func (c *Commands) getExecutionIncludes(ctx context.Context, id string, resourceOwner string) (*ExecutionWriteModel, error) {
+	included, ok := includes[id]
+	if !ok {
+		included, err := c.getExecutionWriteModelByID(ctx, id, resourceOwner)
+		if err != nil {
+			return nil, err
+		}
+		includes[id] = included.Includes
+		return included, nil
+	}
+	wm := NewExecutionWriteModel(id, resourceOwner)
+	wm.Includes = included
+	return wm, nil
+}
+
+func (c *Commands) checkForIncludeCircular(ctx context.Context, ids []string, resourceOwner string, include string) error {
+	included, err := c.getExecutionWriteModelByID(ctx, include, resourceOwner)
+	if err != nil {
+		return err
+	}
+	for _, includedInclude := range included.Includes {
+		for _, id := range ids {
+			if includedInclude == id {
+				return zerrors.ThrowPreconditionFailed(nil, "COMMAND-819opvhgjv", "Errors.Execution.CircularInclude")
+			} else {
+				return c.checkForIncludeCircular(ctx, append(ids, include), resourceOwner, includedInclude)
+			}
+		}
+	}
+	return nil
+}

@@ -123,10 +123,10 @@ func targetsToPb(targets []*query.Target) []*execution.Target {
 
 func targetToPb(t *query.Target) *execution.Target {
 	target := &execution.Target{
-		Details:  object.DomainToDetailsPb(t.ObjectDetails),
+		Details:  object.DomainToDetailsPb(&t.ObjectDetails),
 		TargetId: t.ID,
 		Name:     t.Name,
-		Timeout:  durationpb.New(t.Timeout()),
+		Timeout:  durationpb.New(t.Timeout),
 	}
 	if t.Async {
 		target.ExecutionType = &execution.Target_IsAsync{IsAsync: t.Async}
@@ -190,8 +190,6 @@ func executionQueriesToQuery(queries []*execution.SearchQuery) (_ []query.Search
 
 func executionQueryToQuery(searchQuery *execution.SearchQuery) (query.SearchQuery, error) {
 	switch q := searchQuery.Query.(type) {
-	case *execution.SearchQuery_ConditionQuery:
-		return conditionQueryToQuery(q.ConditionQuery)
 	case *execution.SearchQuery_InConditionsQuery:
 		return inConditionsQueryToQuery(q.InConditionsQuery)
 	case *execution.SearchQuery_ExecutionTypeQuery:
@@ -234,38 +232,30 @@ func inConditionsQueryToQuery(q *execution.InConditionsQuery) (query.SearchQuery
 	return query.NewExecutionInIDsSearchQuery(values)
 }
 
-func conditionQueryToQuery(q *execution.ConditionQuery) (query.SearchQuery, error) {
-	id, err := conditionToID(q.GetCondition())
-	if err != nil {
-		return nil, err
-	}
-	return query.NewExecutionIDSearchQuery(id)
-}
-
-func conditionToID(q *execution.SetConditions) (string, error) {
+func conditionToID(q *execution.Condition) (string, error) {
 	switch t := q.GetConditionType().(type) {
-	case *execution.SetConditions_Request:
+	case *execution.Condition_Request:
 		cond := &command.ExecutionAPICondition{
 			Method:  t.Request.GetMethod(),
 			Service: t.Request.GetService(),
 			All:     t.Request.GetAll(),
 		}
 		return cond.ID(domain.ExecutionTypeRequest), nil
-	case *execution.SetConditions_Response:
+	case *execution.Condition_Response:
 		cond := &command.ExecutionAPICondition{
 			Method:  t.Response.GetMethod(),
 			Service: t.Response.GetService(),
 			All:     t.Response.GetAll(),
 		}
 		return cond.ID(domain.ExecutionTypeResponse), nil
-	case *execution.SetConditions_Event:
+	case *execution.Condition_Event:
 		cond := &command.ExecutionEventCondition{
 			Event: t.Event.GetEvent(),
 			Group: t.Event.GetGroup(),
 			All:   t.Event.GetAll(),
 		}
 		return cond.ID(), nil
-	case *execution.SetConditions_Function:
+	case *execution.Condition_Function:
 		return t.Function, nil
 	default:
 		return "", zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
@@ -289,7 +279,7 @@ func executionToPb(e *query.Execution) *execution.Execution {
 		includes = e.Includes
 	}
 	return &execution.Execution{
-		Details:     object.DomainToDetailsPb(e.ObjectDetails),
+		Details:     object.DomainToDetailsPb(&e.ObjectDetails),
 		ExecutionId: e.ID,
 		Targets:     targets,
 		Includes:    includes,

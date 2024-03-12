@@ -555,7 +555,7 @@ func (s *Tester) CreateTargetWithNameAndType(ctx context.Context, t *testing.T, 
 	return target
 }
 
-func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution.SetConditions, targets []string, includes []string) *execution.SetExecutionResponse {
+func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution.Condition, targets []string, includes []string) *execution.SetExecutionResponse {
 	target, err := s.Client.ExecutionV3.SetExecution(ctx, &execution.SetExecutionRequest{
 		Condition: cond,
 		Targets:   targets,

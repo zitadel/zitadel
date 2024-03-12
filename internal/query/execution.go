@@ -65,7 +65,7 @@ func (e *Executions) SetState(s *State) {
 
 type Execution struct {
 	ID string
-	*domain.ObjectDetails
+	domain.ObjectDetails
 
 	Targets  database.TextArray[string]
 	Includes database.TextArray[string]
@@ -88,7 +88,7 @@ func (q *Queries) SearchExecutions(ctx context.Context, queries *ExecutionSearch
 	eq := sq.Eq{
 		ExecutionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	return genericSearch[*Executions](q, ctx, executionTable, prepareExecutionsQuery, whereWrapper(queries.toQuery, eq))
+	return genericSearch[*Executions](q, ctx, executionTable, prepareExecutionsQuery, combineToWhereStmt(queries.toQuery, eq))
 }
 
 func (q *Queries) GetExecutionByID(ctx context.Context, id string, resourceOwner string) (execution *Execution, err error) {
@@ -97,7 +97,7 @@ func (q *Queries) GetExecutionByID(ctx context.Context, id string, resourceOwner
 		ExecutionColumnResourceOwner.identifier(): resourceOwner,
 		ExecutionColumnInstanceID.identifier():    resourceOwner,
 	}
-	return genericGetByID[*Execution](q, ctx, prepareExecutionQuery, where(eq))
+	return genericGetByID[*Execution](q, ctx, prepareExecutionQuery, queryToWhereStmt(eq))
 }
 
 func NewExecutionIDSearchQuery(id string) (SearchQuery, error) {
@@ -136,7 +136,6 @@ func prepareExecutionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			var count uint64
 			for rows.Next() {
 				execution := new(Execution)
-				execution.ObjectDetails = new(domain.ObjectDetails)
 				err := rows.Scan(
 					&execution.ID,
 					&execution.EventDate,
@@ -177,7 +176,6 @@ func prepareExecutionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Execution, error) {
 			execution := new(Execution)
-			execution.ObjectDetails = new(domain.ObjectDetails)
 			err := row.Scan(
 				&execution.ID,
 				&execution.EventDate,

@@ -8,7 +8,6 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -80,21 +79,14 @@ func (t *Targets) SetState(s *State) {
 
 type Target struct {
 	ID string
-	*domain.ObjectDetails
+	domain.ObjectDetails
 
 	Name             string
 	TargetType       domain.TargetType
 	URL              string
-	timeout          time.Duration
+	Timeout          time.Duration
 	Async            bool
 	InterruptOnError bool
-}
-
-func (a *Target) Timeout() time.Duration {
-	if a.timeout > 0 && a.timeout < maxTimeout {
-		return a.timeout
-	}
-	return maxTimeout
 }
 
 type TargetSearchQueries struct {
@@ -115,7 +107,7 @@ func (q *Queries) SearchTargets(ctx context.Context, queries *TargetSearchQuerie
 		TargetColumnInstanceID.identifier():    resourceOwner,
 		TargetColumnResourceOwner.identifier(): resourceOwner,
 	}
-	return genericSearch[*Targets](q, ctx, targetTable, prepareTargetsQuery, whereWrapper(queries.toQuery, eq))
+	return genericSearch[*Targets](q, ctx, targetTable, prepareTargetsQuery, combineToWhereStmt(queries.toQuery, eq))
 }
 
 func (q *Queries) GetTargetByID(ctx context.Context, id string, resourceOwner string) (target *Target, err error) {
@@ -124,7 +116,7 @@ func (q *Queries) GetTargetByID(ctx context.Context, id string, resourceOwner st
 		TargetColumnResourceOwner.identifier(): resourceOwner,
 		TargetColumnInstanceID.identifier():    resourceOwner,
 	}
-	return genericGetByID[*Target](q, ctx, prepareTargetQuery, where(eq))
+	return genericGetByID[*Target](q, ctx, prepareTargetQuery, queryToWhereStmt(eq))
 }
 
 func NewTargetNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
@@ -148,14 +140,13 @@ func prepareTargetsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			TargetColumnAsync.identifier(),
 			TargetColumnInterruptOnError.identifier(),
 			countColumn.identifier(),
-		).From(targetTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(targetTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Targets, error) {
 			targets := make([]*Target, 0)
 			var count uint64
 			for rows.Next() {
 				target := new(Target)
-				target.ObjectDetails = new(domain.ObjectDetails)
 				err := rows.Scan(
 					&target.ID,
 					&target.EventDate,
@@ -163,7 +154,7 @@ func prepareTargetsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 					&target.Sequence,
 					&target.Name,
 					&target.TargetType,
-					&target.timeout,
+					&target.Timeout,
 					&target.URL,
 					&target.Async,
 					&target.InterruptOnError,
@@ -200,11 +191,10 @@ func prepareTargetQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 			TargetColumnURL.identifier(),
 			TargetColumnAsync.identifier(),
 			TargetColumnInterruptOnError.identifier(),
-		).From(targetTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(targetTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Target, error) {
 			target := new(Target)
-			target.ObjectDetails = new(domain.ObjectDetails)
 			err := row.Scan(
 				&target.ID,
 				&target.EventDate,
@@ -212,7 +202,7 @@ func prepareTargetQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 				&target.Sequence,
 				&target.Name,
 				&target.TargetType,
-				&target.timeout,
+				&target.Timeout,
 				&target.URL,
 				&target.Async,
 				&target.InterruptOnError,

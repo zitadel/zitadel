@@ -49,25 +49,17 @@ message Target {
 
   // Unique name of the target.
   string name = 3 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1,
-      max_length: 200,
       example: "\"ip_allow_list\"";
     }
   ];
   // Defines the target type and how the response of the target is treated.
   oneof target_type {
-    option (validate.required) = true;
-
     SetRESTWebhook rest_webhook = 4;
     SetRESTRequestResponse rest_request_response = 5;
   }
   // Timeout defines the duration until ZITADEL cancels the execution.
-  google.protobuf.Duration timeout = 56[
-    (validate.rules).duration = {gt: {seconds: 0}, required: true},
-    (google.api.field_behavior) = REQUIRED,
+  google.protobuf.Duration timeout = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"10s\"";
     }

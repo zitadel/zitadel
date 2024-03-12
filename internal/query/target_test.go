@@ -118,14 +118,14 @@ func Test_TargetPrepares(t *testing.T) {
 				Targets: []*Target{
 					{
 						ID: "id",
-						ObjectDetails: &domain.ObjectDetails{
+						ObjectDetails: domain.ObjectDetails{
 							EventDate:     testNow,
 							ResourceOwner: "ro",
 							Sequence:      20211109,
 						},
 						Name:             "target-name",
 						TargetType:       domain.TargetTypeWebhook,
-						timeout:          1 * time.Second,
+						Timeout:          1 * time.Second,
 						URL:              "https://example.com",
 						Async:            true,
 						InterruptOnError: true,
@@ -175,28 +175,28 @@ func Test_TargetPrepares(t *testing.T) {
 				Targets: []*Target{
 					{
 						ID: "id-1",
-						ObjectDetails: &domain.ObjectDetails{
+						ObjectDetails: domain.ObjectDetails{
 							EventDate:     testNow,
 							ResourceOwner: "ro",
 							Sequence:      20211109,
 						},
 						Name:             "target-name1",
 						TargetType:       domain.TargetTypeWebhook,
-						timeout:          1 * time.Second,
+						Timeout:          1 * time.Second,
 						URL:              "https://example.com",
 						Async:            true,
 						InterruptOnError: false,
 					},
 					{
 						ID: "id-2",
-						ObjectDetails: &domain.ObjectDetails{
+						ObjectDetails: domain.ObjectDetails{
 							EventDate:     testNow,
 							ResourceOwner: "ro",
 							Sequence:      20211110,
 						},
 						Name:             "target-name2",
 						TargetType:       domain.TargetTypeWebhook,
-						timeout:          1 * time.Second,
+						Timeout:          1 * time.Second,
 						URL:              "https://example.com",
 						Async:            false,
 						InterruptOnError: true,
@@ -262,14 +262,14 @@ func Test_TargetPrepares(t *testing.T) {
 			},
 			object: &Target{
 				ID: "id",
-				ObjectDetails: &domain.ObjectDetails{
+				ObjectDetails: domain.ObjectDetails{
 					EventDate:     testNow,
 					ResourceOwner: "ro",
 					Sequence:      20211109,
 				},
 				Name:             "target-name",
 				TargetType:       domain.TargetTypeWebhook,
-				timeout:          1 * time.Second,
+				Timeout:          1 * time.Second,
 				URL:              "https://example.com",
 				Async:            true,
 				InterruptOnError: false,

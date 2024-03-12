@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	exec "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -78,9 +77,9 @@ func (p *executionProjection) Reducers() []handler.AggregateReducer {
 }
 
 func (p *executionProjection) reduceExecutionSet(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*exec.SetEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-jiozfjitr5", "reduce.wrong.event.type% s", exec.SetEventType)
+	e, err := assertEvent[*exec.SetEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	columns := []handler.Column{
 		handler.NewCol(ExecutionInstanceIDCol, e.Aggregate().InstanceID),
@@ -96,9 +95,9 @@ func (p *executionProjection) reduceExecutionSet(event eventstore.Event) (*handl
 }
 
 func (p *executionProjection) reduceExecutionRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*exec.RemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-t51ipx55r2", "reduce.wrong.event.type %s", exec.RemovedEventType)
+	e, err := assertEvent[*exec.RemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewDeleteStatement(
 		e,

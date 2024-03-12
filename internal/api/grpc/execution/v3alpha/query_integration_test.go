@@ -447,8 +447,8 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				dep: func(ctx context.Context, request *execution.ListExecutionsRequest, response *execution.ListExecutionsResponse) error {
-					cond := request.Queries[0].GetConditionQuery()
-					resp := Tester.SetExecution(ctx, t, cond.GetCondition(), []string{targetResp.GetId()}, []string{})
+					cond := request.Queries[0].GetInConditionsQuery()
+					resp := Tester.SetExecution(ctx, t, cond.GetConditions()[0], []string{targetResp.GetId()}, []string{})
 
 					response.Details.Timestamp = resp.GetDetails().GetChangeDate()
 					response.Details.ProcessedSequence = resp.GetDetails().GetSequence()
@@ -459,16 +459,17 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 				},
 				req: &execution.ListExecutionsRequest{
 					Queries: []*execution.SearchQuery{{
-						Query: &execution.SearchQuery_ConditionQuery{
-							ConditionQuery: &execution.ConditionQuery{
-								Condition: &execution.SetConditions{
-									ConditionType: &execution.SetConditions_Request{
-										Request: &execution.SetRequestExecution{
-											Condition: &execution.SetRequestExecution_Method{
+						Query: &execution.SearchQuery_InConditionsQuery{
+							InConditionsQuery: &execution.InConditionsQuery{
+								Conditions: []*execution.Condition{{
+									ConditionType: &execution.Condition_Request{
+										Request: &execution.RequestExecution{
+											Condition: &execution.RequestExecution_Method{
 												Method: "/zitadel.session.v2beta.SessionService/GetSession",
 											},
 										},
 									},
+								},
 								},
 							},
 						},
@@ -504,10 +505,10 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 							},
 						},
 					}
-					resp := Tester.SetExecution(ctx, t, &execution.SetConditions{
-						ConditionType: &execution.SetConditions_Request{
-							Request: &execution.SetRequestExecution{
-								Condition: &execution.SetRequestExecution_Method{
+					resp := Tester.SetExecution(ctx, t, &execution.Condition{
+						ConditionType: &execution.Condition_Request{
+							Request: &execution.RequestExecution{
+								Condition: &execution.RequestExecution_Method{
 									Method: "/zitadel.management.v1.ManagementService/UpdateAction",
 								},
 							},
@@ -545,19 +546,19 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				dep: func(ctx context.Context, request *execution.ListExecutionsRequest, response *execution.ListExecutionsResponse) error {
-					Tester.SetExecution(ctx, t, &execution.SetConditions{
-						ConditionType: &execution.SetConditions_Request{
-							Request: &execution.SetRequestExecution{
-								Condition: &execution.SetRequestExecution_Method{
+					Tester.SetExecution(ctx, t, &execution.Condition{
+						ConditionType: &execution.Condition_Request{
+							Request: &execution.RequestExecution{
+								Condition: &execution.RequestExecution_Method{
 									Method: "/zitadel.management.v1.ManagementService/GetAction",
 								},
 							},
 						},
 					}, []string{targetResp.GetId()}, []string{})
-					resp2 := Tester.SetExecution(ctx, t, &execution.SetConditions{
-						ConditionType: &execution.SetConditions_Request{
-							Request: &execution.SetRequestExecution{
-								Condition: &execution.SetRequestExecution_Method{
+					resp2 := Tester.SetExecution(ctx, t, &execution.Condition{
+						ConditionType: &execution.Condition_Request{
+							Request: &execution.RequestExecution{
+								Condition: &execution.RequestExecution_Method{
 									Method: "/zitadel.management.v1.ManagementService/ListActions",
 								},
 							},
@@ -619,29 +620,29 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 					Queries: []*execution.SearchQuery{{
 						Query: &execution.SearchQuery_InConditionsQuery{
 							InConditionsQuery: &execution.InConditionsQuery{
-								Conditions: []*execution.SetConditions{
+								Conditions: []*execution.Condition{
 									{
-										ConditionType: &execution.SetConditions_Request{
-											Request: &execution.SetRequestExecution{
-												Condition: &execution.SetRequestExecution_Method{
+										ConditionType: &execution.Condition_Request{
+											Request: &execution.RequestExecution{
+												Condition: &execution.RequestExecution_Method{
 													Method: "/zitadel.session.v2beta.SessionService/GetSession",
 												},
 											},
 										},
 									},
 									{
-										ConditionType: &execution.SetConditions_Request{
-											Request: &execution.SetRequestExecution{
-												Condition: &execution.SetRequestExecution_Method{
+										ConditionType: &execution.Condition_Request{
+											Request: &execution.RequestExecution{
+												Condition: &execution.RequestExecution_Method{
 													Method: "/zitadel.session.v2beta.SessionService/CreateSession",
 												},
 											},
 										},
 									},
 									{
-										ConditionType: &execution.SetConditions_Request{
-											Request: &execution.SetRequestExecution{
-												Condition: &execution.SetRequestExecution_Method{
+										ConditionType: &execution.Condition_Request{
+											Request: &execution.RequestExecution{
+												Condition: &execution.RequestExecution_Method{
 													Method: "/zitadel.session.v2beta.SessionService/SetSession",
 												},
 											},

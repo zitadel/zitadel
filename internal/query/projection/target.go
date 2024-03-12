@@ -8,7 +8,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/target"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -90,9 +89,9 @@ func (p *targetProjection) Reducers() []handler.AggregateReducer {
 }
 
 func (p *targetProjection) reduceTargetAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*target.AddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-2i7tb34fbv", "reduce.wrong.event.type% s", target.AddedEventType)
+	e, err := assertEvent[*target.AddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewCreateStatement(
 		e,
@@ -114,9 +113,9 @@ func (p *targetProjection) reduceTargetAdded(event eventstore.Event) (*handler.S
 }
 
 func (p *targetProjection) reduceTargetChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*target.ChangedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-tyr9irah4l", "reduce.wrong.event.type %s", target.ChangedEventType)
+	e, err := assertEvent[*target.ChangedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	values := []handler.Column{
 		handler.NewCol(TargetChangeDateCol, e.CreationDate()),
@@ -152,9 +151,9 @@ func (p *targetProjection) reduceTargetChanged(event eventstore.Event) (*handler
 }
 
 func (p *targetProjection) reduceTargetRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*target.RemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-5xy8ssr3ic", "reduce.wrong.event.type %s", target.RemovedEventType)
+	e, err := assertEvent[*target.RemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 	return handler.NewDeleteStatement(
 		e,

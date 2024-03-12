@@ -553,7 +553,7 @@ message GetTargetByIDResponse {
 
 message SetExecutionRequest {
   // Defines the condition type and content of the condition for execution.
-  SetConditions condition = 1;
+  Condition condition = 1;
   // Defines the execution targets which are defined as a different resource, which are called in the defined conditions.
   repeated string targets = 2;
   // Defines other executions as included with the same condition-types.
@@ -567,7 +567,7 @@ message SetExecutionResponse {
 
 message DeleteExecutionRequest {
   // Unique identifier of the execution.
-  SetConditions condition = 1;
+  Condition condition = 1;
 }
 
 message DeleteExecutionResponse {

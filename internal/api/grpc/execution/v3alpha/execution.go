@@ -37,7 +37,7 @@ func (s *Server) SetExecution(ctx context.Context, req *execution.SetExecutionRe
 	var err error
 	var details *domain.ObjectDetails
 	switch t := req.GetCondition().GetConditionType().(type) {
-	case *execution.SetConditions_Request:
+	case *execution.Condition_Request:
 		cond := &command.ExecutionAPICondition{
 			Method:  t.Request.GetMethod(),
 			Service: t.Request.GetService(),
@@ -47,7 +47,7 @@ func (s *Server) SetExecution(ctx context.Context, req *execution.SetExecutionRe
 		if err != nil {
 			return nil, err
 		}
-	case *execution.SetConditions_Response:
+	case *execution.Condition_Response:
 		cond := &command.ExecutionAPICondition{
 			Method:  t.Response.GetMethod(),
 			Service: t.Response.GetService(),
@@ -57,7 +57,7 @@ func (s *Server) SetExecution(ctx context.Context, req *execution.SetExecutionRe
 		if err != nil {
 			return nil, err
 		}
-	case *execution.SetConditions_Event:
+	case *execution.Condition_Event:
 		cond := &command.ExecutionEventCondition{
 			Event: t.Event.GetEvent(),
 			Group: t.Event.GetGroup(),
@@ -67,7 +67,7 @@ func (s *Server) SetExecution(ctx context.Context, req *execution.SetExecutionRe
 		if err != nil {
 			return nil, err
 		}
-	case *execution.SetConditions_Function:
+	case *execution.Condition_Function:
 		details, err = s.command.SetExecutionFunction(ctx, command.ExecutionFunctionCondition(t.Function), set, authz.GetInstance(ctx).InstanceID())
 		if err != nil {
 			return nil, err
@@ -82,7 +82,7 @@ func (s *Server) DeleteExecution(ctx context.Context, req *execution.DeleteExecu
 	var err error
 	var details *domain.ObjectDetails
 	switch t := req.GetCondition().GetConditionType().(type) {
-	case *execution.SetConditions_Request:
+	case *execution.Condition_Request:
 		cond := &command.ExecutionAPICondition{
 			Method:  t.Request.GetMethod(),
 			Service: t.Request.GetService(),
@@ -92,7 +92,7 @@ func (s *Server) DeleteExecution(ctx context.Context, req *execution.DeleteExecu
 		if err != nil {
 			return nil, err
 		}
-	case *execution.SetConditions_Response:
+	case *execution.Condition_Response:
 		cond := &command.ExecutionAPICondition{
 			Method:  t.Response.GetMethod(),
 			Service: t.Response.GetService(),
@@ -102,7 +102,7 @@ func (s *Server) DeleteExecution(ctx context.Context, req *execution.DeleteExecu
 		if err != nil {
 			return nil, err
 		}
-	case *execution.SetConditions_Event:
+	case *execution.Condition_Event:
 		cond := &command.ExecutionEventCondition{
 			Event: t.Event.GetEvent(),
 			Group: t.Event.GetGroup(),
@@ -112,7 +112,7 @@ func (s *Server) DeleteExecution(ctx context.Context, req *execution.DeleteExecu
 		if err != nil {
 			return nil, err
 		}
-	case *execution.SetConditions_Function:
+	case *execution.Condition_Function:
 		details, err = s.command.DeleteExecutionFunction(ctx, command.ExecutionFunctionCondition(t.Function), authz.GetInstance(ctx).InstanceID())
 		if err != nil {
 			return nil, err

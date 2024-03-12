@@ -14,22 +14,16 @@ message SearchQuery {
   oneof query {
     option (validate.required) = true;
 
-    ConditionQuery condition_query = 1;
-    InConditionsQuery in_conditions_query = 2;
-    ExecutionTypeQuery execution_type_query = 3;
-    TargetQuery target_query = 4;
-    IncludeQuery include_query = 5;
+    InConditionsQuery in_conditions_query = 1;
+    ExecutionTypeQuery execution_type_query = 2;
+    TargetQuery target_query = 3;
+    IncludeQuery include_query = 4;
   }
-}
-
-message ConditionQuery {
-  // Defines the condition to query for.
-  SetConditions condition = 1;
 }
 
 message InConditionsQuery {
   // Defines the conditions to query for.
-  repeated SetConditions conditions = 1;
+  repeated Condition conditions = 1;
 }
 
 message ExecutionTypeQuery {
@@ -72,7 +66,7 @@ message TargetNameQuery {
     (validate.rules).string = {max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       max_length: 200;
-      example: "\"gigi-giraffe\"";
+      example: "\"ip_allow_list\"";
     }
   ];
   // Defines which text comparison method used for the name query.

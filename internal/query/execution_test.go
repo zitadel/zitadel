@@ -98,7 +98,7 @@ func Test_ExecutionPrepares(t *testing.T) {
 				Executions: []*Execution{
 					{
 						ID: "id",
-						ObjectDetails: &domain.ObjectDetails{
+						ObjectDetails: domain.ObjectDetails{
 							EventDate:     testNow,
 							ResourceOwner: "ro",
 							Sequence:      20211109,
@@ -143,7 +143,7 @@ func Test_ExecutionPrepares(t *testing.T) {
 				Executions: []*Execution{
 					{
 						ID: "id-1",
-						ObjectDetails: &domain.ObjectDetails{
+						ObjectDetails: domain.ObjectDetails{
 							EventDate:     testNow,
 							ResourceOwner: "ro",
 							Sequence:      20211109,
@@ -153,7 +153,7 @@ func Test_ExecutionPrepares(t *testing.T) {
 					},
 					{
 						ID: "id-2",
-						ObjectDetails: &domain.ObjectDetails{
+						ObjectDetails: domain.ObjectDetails{
 							EventDate:     testNow,
 							ResourceOwner: "ro",
 							Sequence:      20211110,
@@ -218,7 +218,7 @@ func Test_ExecutionPrepares(t *testing.T) {
 			},
 			object: &Execution{
 				ID: "id",
-				ObjectDetails: &domain.ObjectDetails{
+				ObjectDetails: domain.ObjectDetails{
 					EventDate:     testNow,
 					ResourceOwner: "ro",
 					Sequence:      20211109,
