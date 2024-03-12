@@ -215,6 +215,8 @@ func grantTypeToOIDC(grantType domain.OIDCGrantType) oidc.GrantType {
 		return oidc.GrantTypeRefreshToken
 	case domain.OIDCGrantTypeDeviceCode:
 		return oidc.GrantTypeDeviceCode
+	case domain.OIDCGrantTypeTokenExchange:
+		return oidc.GrantTypeTokenExchange
 	default:
 		return oidc.GrantTypeCode
 	}

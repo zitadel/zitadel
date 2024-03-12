@@ -158,6 +158,8 @@ func OIDCGrantTypesToDomain(grantTypes []app_pb.OIDCGrantType) []domain.OIDCGran
 			oidcGrantTypes[i] = domain.OIDCGrantTypeRefreshToken
 		case app_pb.OIDCGrantType_OIDC_GRANT_TYPE_DEVICE_CODE:
 			oidcGrantTypes[i] = domain.OIDCGrantTypeDeviceCode
+		case app_pb.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE:
+			oidcGrantTypes[i] = domain.OIDCGrantTypeTokenExchange
 		}
 	}
 	return oidcGrantTypes
