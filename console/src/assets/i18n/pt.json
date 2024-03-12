@@ -22,16 +22,13 @@
     "DISCLAIMER": "A ZITADEL trata seus dados confidencialmente e com segurança.",
     "DISCLAIMERLINK": "Mais informações",
     "DOCUMENTATION": {
-      "TITLE": "Documentação",
       "DESCRIPTION": "Comece rapidamente com ZITADEL."
     },
     "GETSTARTED": {
-      "TITLE": "Comece com ZITADEL",
       "DESCRIPTION": "Comece rapidamente com ZITADEL."
     },
     "QUICKSTARTS": {
       "LABEL": "Primeiros Passos",
-      "TITLE": "Início Rápido",
       "DESCRIPTION": "Comece rapidamente com ZITADEL."
     },
     "SHORTCUTS": {
@@ -326,11 +323,7 @@
     "TITLE": "Informações Pessoais",
     "DESCRIPTION": "Gerencie suas informações e configurações de segurança.",
     "PAGES": {
-      "LIST": "Usuários",
       "TITLE": "Usuário",
-      "DESCRIPTION": "Crie novos usuários em sua organização e gerencie os existentes.",
-      "LISTMACHINE": "Usuários de Serviço",
-      "DESCRIPTIONMACHINE": "Crie e gerencie Usuários de Serviço de sua organização",
       "DETAIL": "Detalhes",
       "CREATE": "Criar",
       "MY": "Minhas Informações",
@@ -380,10 +373,6 @@
       "ACTIVATE": "Ativar",
       "CHANGEDATE": "Última Modificação",
       "CREATIONDATE": "Criado Em",
-      "TYPES": {
-        "HUMAN": "Usuários",
-        "MACHINE": "Usuários de Serviço"
-      },
       "FILTER": {
         "0": "Filtrar por Nome de Exibição",
         "1": "Filtrar por Nome de Usuário",
@@ -757,12 +746,6 @@
     "REMOVESUCCESS": "Elemento excluído com sucesso"
   },
   "FLOWS": {
-    "TITLE": "Ações e Fluxos",
-    "DESCRIPTION": "Defina scripts para executar em determinado evento.",
-    "ACTIONSTITLE": "Ações",
-    "ACTIONSDESCRIPTION": "Esses são seus scripts que você pode executar nos fluxos.",
-    "FLOWSTITLE": "Fluxos",
-    "FLOWSDESCRIPTION": "Fluxos de um determinado tipo executam ações no momento de um gatilho.",
     "ID": "ID",
     "NAME": "Nome",
     "STATE": "Estado",
@@ -814,8 +797,6 @@
     }
   },
   "IAM": {
-    "TITLE": "Instância",
-    "DESCRIPTION": "Gerencie as configurações da sua instância e organizações",
     "POLICIES": {
       "TITLE": "Políticas do sistema e configurações de acesso",
       "DESCRIPTION": "Gerencie as políticas globais e configurações de acesso à gerência."
@@ -840,8 +821,6 @@
       "4": "Parado"
     },
     "VIEWS": {
-      "TITLE": "Visualizações",
-      "DESCRIPTION": "Este cartão mostra as visualizações do ZITADEL.",
       "VIEWNAME": "Nome",
       "DATABASE": "Banco de Dados",
       "SEQUENCE": "Sequência",
@@ -856,8 +835,6 @@
       }
     },
     "FAILEDEVENTS": {
-      "TITLE": "Eventos com falha",
-      "DESCRIPTION": "Este cartão mostra os eventos com falha.",
       "VIEWNAME": "Nome",
       "DATABASE": "Banco de Dados",
       "FAILEDSEQUENCE": "Sequência com falha",
@@ -869,8 +846,6 @@
       "DELETESUCCESS": "Eventos com falha removidos."
     },
     "EVENTS": {
-      "TITLE": "Eventos",
-      "DESCRIPTION": "Esta visualização mostra todos os eventos ocorridos.",
       "EDITOR": "Editor",
       "EDITORID": "ID do Editor",
       "AGGREGATE": "Agregado",
@@ -1049,10 +1024,6 @@
       "TITLE": "Configurações da Instância",
       "DESCRIPTION": "Essas configurações serão aplicadas a todas as suas organizações, a menos que tenham sido substituídas."
     },
-    "ORG": {
-      "TITLE": "Configurações da Organização",
-      "DESCRIPTION": "Essas configurações estendem e sobrescrevem as configurações da sua instância."
-    },
     "LIST": {
       "ORGS": "Organizações",
       "LANGUAGES": "Idiomas",
@@ -1090,7 +1061,6 @@
   },
   "SETTING": {
     "LANGUAGES": {
-      "TITLE": "Configurações de Idioma",
       "DEFAULT": "Idioma Padrão",
       "ALLOWED": "Idiomas Permitidos",
       "NOT_ALLOWED": "Idiomas Não Permitidos",
@@ -1117,7 +1087,6 @@
       }
     },
     "SMTP": {
-      "TITLE": "Configurações SMTP",
       "SENDERADDRESS": "Endereço de e-mail do remetente",
       "SENDERNAME": "Nome do remetente",
       "REPLYTOADDRESS": "Endereço Reply-To",
@@ -1131,7 +1100,6 @@
       "REQUIREDWARN": "Para enviar notificações do seu domínio, você precisa inserir seus dados SMTP."
     },
     "SMS": {
-      "TITLE": "Configurações de SMS",
       "PROVIDERS": "Provedores",
       "PROVIDER": "Provedor de SMS",
       "ADDPROVIDER": "Adicionar provedor de SMS",
@@ -1157,17 +1125,7 @@
         "TOKENSET": "Token definido com sucesso."
       }
     },
-    "OIDC": {
-      "TITLE": "Configurações OIDC",
-      "ACCESSTOKENLIFETIME": "Tempo de vida do token de acesso",
-      "IDTOKENLIFETIME": "Tempo de vida do token de ID",
-      "REFRESHTOKENEXPIRATION": "Expiração do token de atualização",
-      "REFRESHTOKENIDLEEXPIRATION": "Expiração inativa do token de atualização",
-      "INHOURS": "horas",
-      "INDAYS": "dias"
-    },
     "SECRETS": {
-      "TITLE": "Aparência de segredos",
       "TYPES": "Tipos de segredos",
       "TYPE": {
         "1": "Email de inicialização",
@@ -1207,8 +1165,6 @@
     }
   },
   "POLICY": {
-    "TITLE": "Explorar configurações",
-    "DESCRIPTION": "Configurações pré-embaladas que melhoram sua segurança.",
     "APPLIEDTO": "Aplicado a",
     "PWD_COMPLEXITY": {
       "TITLE": "Complexidade da senha",
@@ -1224,7 +1180,6 @@
       "PASSWORDCHANGE": "Mudança de senha"
     },
     "PRIVATELABELING": {
-      "TITLE": "Marca",
       "DESCRIPTION": "Dê ao login o seu estilo personalizado e modifique seu comportamento.",
       "PREVIEW_DESCRIPTION": "As alterações da política serão automaticamente aplicadas ao ambiente de visualização.",
       "BTN": "Selecionar arquivo",
@@ -1276,9 +1231,6 @@
       "TITLE": "Política de bloqueio",
       "DESCRIPTION": "Defina um número máximo de tentativas de senha, após as quais as contas serão bloqueadas."
     },
-    "DOMAIN_POLICY": {
-      "TITLE": "Configurações de domínio"
-    },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Marca",
       "BTN": "Selecionar arquivo",
@@ -1290,13 +1242,10 @@
       "DESCRIPTION": "Defina como os usuários podem ser autenticados e configure provedores de identidade",
       "DESCRIPTIONCREATEADMIN": "Os usuários podem escolher entre os provedores de identidade disponíveis abaixo.",
       "DESCRIPTIONCREATEMGMT": "Os usuários podem escolher entre os provedores de identidade disponíveis abaixo. Observação: você também pode usar provedores definidos pelo sistema e provedores definidos apenas para sua organização.",
-      "ADVANCED": "Avançado",
-      "LIFETIMEDURATIONS": "Duração do login",
       "LIFETIME_INVALID": "O formulário contém valores inválidos.",
       "SAVED": "Salvo com sucesso!"
     },
     "PRIVACY_POLICY": {
-      "TITLE": "Política de privacidade e TOS",
       "DESCRIPTION": "Defina os links para a sua Política de Privacidade e Termos de Serviço",
       "TOSLINK": "Link para os Termos de Serviço",
       "POLICYLINK": "Link para a Política de Privacidade",
@@ -1375,8 +1324,6 @@
       }
     },
     "MESSAGE_TEXTS": {
-      "TITLE": "Textos de mensagem",
-      "DESCRIPTION": "Defina seus textos para os emails de notificação.",
       "TYPE": "Notificação",
       "TYPES": {
         "INIT": "Inicialização",
@@ -1430,36 +1377,20 @@
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Se você habilitar essa configuração, todos os nomes de login serão sufixados com o domínio da organização. Se essa configuração estiver desabilitada, você deve garantir que os nomes de usuário sejam exclusivos em todas as organizações.",
       "VALIDATEORGDOMAINS": "Verificação de domínio da organização necessária (desafio DNS ou HTTP)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "O endereço do remetente do SMTP corresponde ao domínio da Instância",
-      "ALLOWUSERNAMEPASSWORD": "Permitir usuário e senha",
-      "ALLOWEXTERNALIDP": "Permitir provedor de ID externo",
-      "ALLOWREGISTERUSERS": "Permitir registro de usuários",
-      "ALLOWREGISTERORGS": "Permitir registro de organizações",
       "ALLOWUSERNAMEPASSWORD_DESC": "O login convencional com nome de usuário e senha é permitido.",
       "ALLOWEXTERNALIDP_DESC": "O login é permitido para os provedores de identidade subjacentes",
       "ALLOWREGISTER_DESC": "Se a opção estiver selecionada, uma etapa adicional para registrar um usuário aparecerá no login.",
       "FORCEMFA": "Forçar MFA",
-      "FORCEMFA_DESC": "Se a opção estiver selecionada, os usuários deverão configurar um segundo fator para o login.",
-      "HIDEPASSWORDRESET": "Ocultar redefinição de senha",
       "HIDEPASSWORDRESET_DESC": "Se a opção estiver selecionada, o usuário não poderá redefinir sua senha no processo de login.",
       "HIDELOGINNAMESUFFIX": "Ocultar sufixo do nome de login",
       "HIDELOGINNAMESUFFIX_DESC": "Oculta o sufixo do nome de login na interface de login",
-      "IGNOREUNKNOWNUSERNAMES": "Ignorar nomes de usuário desconhecidos",
       "IGNOREUNKNOWNUSERNAMES_DESC": "Se a opção estiver selecionada, a tela de senha será exibida no processo de login, mesmo se o usuário não for encontrado. O erro na verificação de senha não revelará se o nome de usuário ou a senha estavam incorretos.",
-      "ALLOWDOMAINDISCOVERY": "Permitir descoberta de domínio",
       "ALLOWDOMAINDISCOVERY_DESC": "Se a opção estiver selecionada, o sufixo (@domain.com) de um nome de usuário desconhecido inserido na tela de login será comparado com os domínios da organização e será redirecionado para o registro dessa organização em caso de sucesso.",
-      "DISABLELOGINWITHEMAIL": "Desativar login com endereço de email",
-      "DISABLELOGINWITHPHONE": "Desativar login com número de telefone",
       "DEFAULTREDIRECTURI": "URI de redirecionamento padrão",
       "DEFAULTREDIRECTURI_DESC": "Define para onde o usuário será redirecionado se o login for iniciado sem um contexto de aplicativo (por exemplo, a partir do e-mail)",
       "ERRORMSGPOPUP": "Mostrar Erro em Diálogo",
       "DISABLEWATERMARK": "Ocultar Marca d'água",
-      "DISABLEWATERMARK_DESC": "Ocultar a marca d'água Powered by ZITADEL na interface de login",
-      "PASSWORDCHECKLIFETIME": "Vida Útil da Verificação de Senha",
-      "EXTERNALLOGINCHECKLIFETIME": "Vida Útil da Verificação de Login Externo",
-      "MFAINITSKIPLIFETIME": "Vida Útil da Inicialização de Multifator",
-      "SECONDFACTORCHECKLIFETIME": "Vida Útil da Verificação de Segundo Fator",
-      "MULTIFACTORCHECKLIFETIME": "Vida Útil da Verificação de Multifator",
-      "INHOURS": "horas"
+      "DISABLEWATERMARK_DESC": "Ocultar a marca d'água Powered by ZITADEL na interface de login"
     },
     "RESET": "Redefinir para o padrão da instância",
     "CREATECUSTOM": "Criar Política Personalizada",
@@ -1508,8 +1439,6 @@
       "TITLE": "Projeto",
       "DESCRIPTION": "Aqui você pode definir aplicativos, gerenciar funções e conceder acesso a outras organizações para usar o seu projeto.",
       "DELETE": "Excluir Projeto",
-      "LIST": "Projetos",
-      "LISTDESCRIPTION": "Se você não consegue encontrar um projeto, entre em contato com o proprietário do projeto ou alguém com os direitos correspondentes para obter acesso ao projeto.",
       "DETAIL": "Detalhes",
       "CREATE": "Criar Projeto",
       "CREATE_DESC": "Insira o nome do seu projeto.",
@@ -1518,7 +1447,6 @@
       "ZITADELPROJECT": "Isto pertence ao projeto ZITADEL. Atenção: Se você fizer alterações, o ZITADEL pode não funcionar como o esperado.",
       "TYPE": {
         "OWNED": "Projetos Próprios",
-        "GRANTED": "Projetos Concedidos",
         "OWNED_SINGULAR": "Projeto Próprio",
         "GRANTED_SINGULAR": "Projeto Concedido"
       },
@@ -1740,8 +1668,6 @@
   },
   "IDP": {
     "LIST": {
-      "TITLE": "Provedores de Identidade",
-      "DESCRIPTION": "Gerencie a configuração do seu Provedor de Identidade, que pode ser ativado nas suas Configurações de Login.",
       "ACTIVETITLE": "Provedores de Identidade Ativos"
     },
     "CREATE": {

@@ -22,16 +22,13 @@
     "DISCLAIMER": "ZITADEL 对您的数据进行保密和安全处理。",
     "DISCLAIMERLINK": "更多的信息",
     "DOCUMENTATION": {
-      "TITLE": "文档",
       "DESCRIPTION": "快速开始使用 ZITADEL。"
     },
     "GETSTARTED": {
-      "TITLE": "开始使用 ZITADEL",
       "DESCRIPTION": "快速开始使用 ZITADEL。"
     },
     "QUICKSTARTS": {
       "LABEL": "第一步",
-      "TITLE": "快速入门",
       "DESCRIPTION": "快速开始使用 ZITADEL。"
     },
     "SHORTCUTS": {
@@ -325,11 +322,7 @@
     "TITLE": "个人信息",
     "DESCRIPTION": "管理您的信息和安全设置。",
     "PAGES": {
-      "LIST": "用户列表",
       "TITLE": "用户",
-      "DESCRIPTION": "在您的组织中创建新用户并管理现有用户。",
-      "LISTMACHINE": "服务用户",
-      "DESCRIPTIONMACHINE": "创建和管理组织的服务用户",
       "DETAIL": "详情",
       "CREATE": "创建",
       "MY": "我的信息",
@@ -379,10 +372,6 @@
       "ACTIVATE": "启用",
       "CHANGEDATE": "最后修改于",
       "CREATIONDATE": "创建于",
-      "TYPES": {
-        "HUMAN": "用户",
-        "MACHINE": "服务用户"
-      },
       "FILTER": {
         "0": "筛选展示名称",
         "1": "筛选用户名",
@@ -756,12 +745,6 @@
     "REMOVESUCCESS": "键值对删除成功"
   },
   "FLOWS": {
-    "TITLE": "动作和流程",
-    "DESCRIPTION": "定义要在特定事件上需要执行的脚本。",
-    "ACTIONSTITLE": "动作",
-    "ACTIONSDESCRIPTION": "这些是您可以在流程中运行的脚本。",
-    "FLOWSTITLE": "流程",
-    "FLOWSDESCRIPTION": "某种类型的流在触发时执行动作。",
     "ID": "ID",
     "NAME": "名称",
     "STATE": "状态",
@@ -813,8 +796,6 @@
     }
   },
   "IAM": {
-    "TITLE": "实例",
-    "DESCRIPTION": "管理您的实例设置和组织",
     "POLICIES": {
       "TITLE": "系统策略和访问设置",
       "DESCRIPTION": "管理您的全局策略和管理访问设置。"
@@ -839,8 +820,6 @@
       "4": "已停止"
     },
     "VIEWS": {
-      "TITLE": "数据表",
-      "DESCRIPTION": "此卡片显示您的 ZITADEL 数据表。",
       "VIEWNAME": "名称",
       "DATABASE": "数据库",
       "SEQUENCE": "序列",
@@ -855,8 +834,6 @@
       }
     },
     "FAILEDEVENTS": {
-      "TITLE": "失败事件",
-      "DESCRIPTION": "这里显示了你失败的事件。",
       "VIEWNAME": "名称",
       "DATABASE": "数据库",
       "FAILEDSEQUENCE": "失败的序列",
@@ -868,8 +845,6 @@
       "DELETESUCCESS": "失败的事件被移除。"
     },
     "EVENTS": {
-      "TITLE": "活动",
-      "DESCRIPTION": "该视图显示所有传入的事件",
       "EDITOR": "编辑",
       "EDITORID": "编者号",
       "AGGREGATE": "总数",
@@ -1047,10 +1022,6 @@
       "TITLE": "实例设置",
       "DESCRIPTION": "这些设置将应用于您的所有组织，除非它们已被覆盖。"
     },
-    "ORG": {
-      "TITLE": "组织设置",
-      "DESCRIPTION": "这些设置将扩展或覆盖您的实例设置。"
-    },
     "LIST": {
       "ORGS": "组织",
       "LANGUAGES": "语言",
@@ -1088,7 +1059,6 @@
   },
   "SETTING": {
     "LANGUAGES": {
-      "TITLE": "语言设置",
       "DEFAULT": "默认语言",
       "ALLOWED": "允许的语言",
       "NOT_ALLOWED": "不允许的语言",
@@ -1115,7 +1085,6 @@
       }
     },
     "SMTP": {
-      "TITLE": "SMTP 设置",
       "SENDERADDRESS": "发件人地址",
       "SENDERNAME": "发件人名称",
       "REPLYTOADDRESS": "Reply-to 地址",
@@ -1129,7 +1098,6 @@
       "REQUIREDWARN": "要从您的域发送通知，您必须输入您的 SMTP 数据。"
     },
     "SMS": {
-      "TITLE": "SMS 设置",
       "PROVIDERS": "服务商",
       "PROVIDER": "SMS 服务商",
       "ADDPROVIDER": "添加 SMS 服务商",
@@ -1155,17 +1123,7 @@
         "TOKENSET": "令牌设置成功。"
       }
     },
-    "OIDC": {
-      "TITLE": "OIDC 设置",
-      "ACCESSTOKENLIFETIME": "访问令牌有效时间",
-      "IDTOKENLIFETIME": "Id Token 有效时间",
-      "REFRESHTOKENEXPIRATION": "Refresh Token 有效期",
-      "REFRESHTOKENIDLEEXPIRATION": "Refresh Token 闲置有效期",
-      "INHOURS": "小时",
-      "INDAYS": "天"
-    },
     "SECRETS": {
-      "TITLE": "验证码外观",
       "TYPES": "验证码类型",
       "TYPE": {
         "1": "初始化邮件",
@@ -1205,8 +1163,6 @@
     }
   },
   "POLICY": {
-    "TITLE": "探索设置",
-    "DESCRIPTION": "增强安全性的预设置。",
     "APPLIEDTO": "应用于",
     "PWD_COMPLEXITY": {
       "TITLE": "密码复杂性",
@@ -1222,7 +1178,6 @@
       "PASSWORDCHANGE": "更改密码"
     },
     "PRIVATELABELING": {
-      "TITLE": "品牌标识",
       "DESCRIPTION": "为登录提供您的个性化风格并修改其行为。",
       "PREVIEW_DESCRIPTION": "策略的更改将自动部署到预览环境。",
       "BTN": "选择文件",
@@ -1273,9 +1228,6 @@
       "TITLE": "锁定策略",
       "DESCRIPTION": "设置密码重试的最大次数，之后帐户将被阻止。"
     },
-    "DOMAIN_POLICY": {
-      "TITLE": "域设置"
-    },
     "PRIVATELABELING_POLICY": {
       "TITLE": "品牌标识",
       "BTN": "选择文件",
@@ -1287,13 +1239,10 @@
       "DESCRIPTION": "定义如何对用户进行身份验证和配置身份提供者",
       "DESCRIPTIONCREATEADMIN": "用户可以从以下可用的身份提供者中进行选择。",
       "DESCRIPTIONCREATEMGMT": "用户可以从以下可用的身份提供者中进行选择。注意：您可为系统设置提供者也可以仅为您的组织单独设置提供者。",
-      "ADVANCED": "高级设置",
-      "LIFETIMEDURATIONS": "登录状态有效期",
       "LIFETIME_INVALID": "表单包含无效值。",
       "SAVED": "保存成功！"
     },
     "PRIVACY_POLICY": {
-      "TITLE": "隐私政策和服务条款",
       "DESCRIPTION": "设置您的隐私政策和服务条款链接",
       "TOSLINK": "链接到服务条款",
       "POLICYLINK": "链接到隐私政策",
@@ -1372,8 +1321,6 @@
       }
     },
     "MESSAGE_TEXTS": {
-      "TITLE": "消息文本",
-      "DESCRIPTION": "定义通知邮件的文本。",
       "TYPE": "通知",
       "TYPES": {
         "INIT": "初始化",
@@ -1427,38 +1374,22 @@
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "如果启用此设置，所有登录名都将以组织域为后缀。如果禁用此设置，您必须确保用户名在所有组织中都是唯一的。",
       "VALIDATEORGDOMAINS": "组织域名验证需要 (DNS 或 HTTP 挑战)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP 发件人地址与实例域名匹配",
-      "ALLOWUSERNAMEPASSWORD": "允许用户名密码",
-      "ALLOWEXTERNALIDP": "允许外部身份提供者",
-      "ALLOWREGISTERUSERS": "允许注册用户",
-      "ALLOWREGISTERORGS": "允许注册组织",
       "ALLOWUSERNAMEPASSWORD_DESC": "允许使用用户名和密码进行登录。",
       "ALLOWEXTERNALIDP_DESC": "允许外部身份提供者进行登录",
       "ALLOWREGISTER_DESC": "如果选择了该选项，登录中会出现一个用于注册用户的附加步骤。",
       "FORCEMFA": "强制使用 MFA",
-      "FORCEMFA_DESC": "如果选择该选项，用户必须配置第二身份认证登录因素。",
       "FORCEMFALOCALONLY": "对本地用户强制执行 MFA",
       "FORCEMFALOCALONLY_DESC": "如果选择该选项，本地经过身份验证的用户必须配置第二个登录因素。",
-      "HIDEPASSWORDRESET": "隐藏密码重置按钮",
       "HIDEPASSWORDRESET_DESC": "如果选择该选项，则用户无法在登录过程中重置其密码。",
       "HIDELOGINNAMESUFFIX": "隐藏登录名后缀",
       "HIDELOGINNAMESUFFIX_DESC": "在登录界面隐藏登录名后缀",
-      "IGNOREUNKNOWNUSERNAMES": "忽略未知用户名",
       "IGNOREUNKNOWNUSERNAMES_DESC": "如果选择该选项，即使未找到用户，登录过程中也会显示密码屏幕。如果用户名或密码错误，密码检查的错误不会透露。",
-      "ALLOWDOMAINDISCOVERY": "允许域名发现",
       "ALLOWDOMAINDISCOVERY_DESC": "如果选择该选项，在登录屏幕上输入的未知用户名的后缀（@domain.com）将与组织的域名进行匹配，成功后将重定向到组织的注册。",
-      "DISABLELOGINWITHEMAIL": "禁止用电子邮件地址登录",
-      "DISABLELOGINWITHPHONE": "禁止用电话号码登录",
       "DEFAULTREDIRECTURI": "默认重定向 URI",
       "DEFAULTREDIRECTURI_DESC": "定义如果在没有应用程序上下文的情况下开始登录（例如来自邮件），用户将被重定向到哪里。",
       "ERRORMSGPOPUP": "在对话框中显示错误",
       "DISABLEWATERMARK": "隐藏水印",
-      "DISABLEWATERMARK_DESC": "登录界面隐藏 Powered by ZITADEL 水印",
-      "PASSWORDCHECKLIFETIME": "密码登录状态有效期",
-      "EXTERNALLOGINCHECKLIFETIME": "外部身份提供者登录状态有效期",
-      "MFAINITSKIPLIFETIME": "多因素身份认证初始化有效期",
-      "SECONDFACTORCHECKLIFETIME": "第二因素身份认证有效期",
-      "MULTIFACTORCHECKLIFETIME": "多因素身份认证有效期",
-      "INHOURS": "小时"
+      "DISABLEWATERMARK_DESC": "登录界面隐藏 Powered by ZITADEL 水印"
     },
     "RESET": "重置为实例默认值",
     "CREATECUSTOM": "创建自定义策略",
@@ -1507,8 +1438,6 @@
       "TITLE": "项目",
       "DESCRIPTION": "在这里，您可以定义应用程序、管理角色并授权其他组织使用您的项目。",
       "DELETE": "删除项目",
-      "LIST": "项目列表",
-      "LISTDESCRIPTION": "如果找不到项目，请联系项目所有者或具有相应权限的人员以获取项目访问权限。",
       "DETAIL": "详情",
       "CREATE": "创建项目",
       "CREATE_DESC": "插入您的项目名称。",
@@ -1517,7 +1446,6 @@
       "ZITADELPROJECT": "这属于 ZITADEL 项目。注意：如果您修改了设置，ZITADEL 可能无法正常运行。",
       "TYPE": {
         "OWNED": "拥有的项目",
-        "GRANTED": "被授权的项目",
         "OWNED_SINGULAR": "拥有项目",
         "GRANTED_SINGULAR": "被授予的项目"
       },
@@ -1737,8 +1665,6 @@
   },
   "IDP": {
     "LIST": {
-      "TITLE": "身份提供者",
-      "DESCRIPTION": "管理您的身份提供者配置，然后可以在您的登录设置中激活。",
       "ACTIVETITLE": "启用的身份提供者"
     },
     "CREATE": {

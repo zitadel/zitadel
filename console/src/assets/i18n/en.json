@@ -286,16 +286,13 @@
     "DISCLAIMER": "ZITADEL treats your data confidentially and securely.",
     "DISCLAIMERLINK": "Further information",
     "DOCUMENTATION": {
-      "TITLE": "Documentation",
       "DESCRIPTION": "Get started with ZITADEL quickly."
     },
     "GETSTARTED": {
-      "TITLE": "Get started with ZITADEL",
       "DESCRIPTION": "Get started with ZITADEL quickly."
     },
     "QUICKSTARTS": {
       "LABEL": "First Steps",
-      "TITLE": "Quickstarts",
       "DESCRIPTION": "Get started with ZITADEL quickly."
     },
     "SHORTCUTS": {
@@ -590,11 +587,7 @@
     "TITLE": "Personal Information",
     "DESCRIPTION": "Manage your information and security settings.",
     "PAGES": {
-      "LIST": "Users",
       "TITLE": "User",
-      "DESCRIPTION": "Create new users in your organization and manage existing ones.",
-      "LISTMACHINE": "Service Users",
-      "DESCRIPTIONMACHINE": "Create and manage Service Users of your organization",
       "DETAIL": "Detail",
       "CREATE": "Create",
       "MY": "My Information",
@@ -644,10 +637,6 @@
       "ACTIVATE": "Activate",
       "CHANGEDATE": "Last Modified",
       "CREATIONDATE": "Created At",
-      "TYPES": {
-        "HUMAN": "Users",
-        "MACHINE": "Service Users"
-      },
       "FILTER": {
         "0": "Filter for DisplayName",
         "1": "Filter for Username",
@@ -1021,12 +1010,6 @@
     "REMOVESUCCESS": "Element deleted successfully"
   },
   "FLOWS": {
-    "TITLE": "Actions and Flows",
-    "DESCRIPTION": "Define scripts to execute on a certain event.",
-    "ACTIONSTITLE": "Actions",
-    "ACTIONSDESCRIPTION": "These are your scripts that you can run in the flows.",
-    "FLOWSTITLE": "Flows",
-    "FLOWSDESCRIPTION": "Flows of a certain type execute actions at the time of a trigger.",
     "ID": "ID",
     "NAME": "Name",
     "STATE": "State",
@@ -1078,8 +1061,6 @@
     }
   },
   "IAM": {
-    "TITLE": "Instance",
-    "DESCRIPTION": "Manage your instance settings and Organizations",
     "POLICIES": {
       "TITLE": "System Policies and Access Settings",
       "DESCRIPTION": "Manage your global Policies and Management Access Settings."
@@ -1104,8 +1085,6 @@
       "4": "Stopped"
     },
     "VIEWS": {
-      "TITLE": "Views",
-      "DESCRIPTION": "This card shows your ZITADEL views.",
       "VIEWNAME": "Name",
       "DATABASE": "Database",
       "SEQUENCE": "Sequence",
@@ -1120,8 +1099,6 @@
       }
     },
     "FAILEDEVENTS": {
-      "TITLE": "Failed Events",
-      "DESCRIPTION": "This card shows your failed events.",
       "VIEWNAME": "Name",
       "DATABASE": "Database",
       "FAILEDSEQUENCE": "Failed Sequence",
@@ -1133,8 +1110,6 @@
       "DELETESUCCESS": "Failed events removed."
     },
     "EVENTS": {
-      "TITLE": "Events",
-      "DESCRIPTION": "This view shows all occured events.",
       "EDITOR": "Editor",
       "EDITORID": "Editor ID",
       "AGGREGATE": "Aggregate",
@@ -1312,10 +1287,6 @@
       "TITLE": "Instance Settings",
       "DESCRIPTION": "These settings will apply to all your organizations unless they have been overridden."
     },
-    "ORG": {
-      "TITLE": "Organization Settings",
-      "DESCRIPTION": "These settings extend and overwrite your instance settings."
-    },
     "LIST": {
       "ORGS": "Organizations",
       "LANGUAGES": "Languages",
@@ -1353,7 +1324,6 @@
   },
   "SETTING": {
     "LANGUAGES": {
-      "TITLE": "Language Settings",
       "DEFAULT": "Default Language",
       "ALLOWED": "Allowed Languages",
       "NOT_ALLOWED": "Not Allowed Languages",
@@ -1380,7 +1350,6 @@
       }
     },
     "SMTP": {
-      "TITLE": "SMTP Settings",
       "SENDERADDRESS": "Sender Email Address",
       "SENDERNAME": "Sender Name",
       "REPLYTOADDRESS": "Reply-to Address",
@@ -1394,7 +1363,6 @@
       "REQUIREDWARN": "To send notifications from your domain, you have to enter your SMTP data."
     },
     "SMS": {
-      "TITLE": "SMS Settings",
       "PROVIDERS": "Providers",
       "PROVIDER": "SMS Provider",
       "ADDPROVIDER": "Add SMS Provider",
@@ -1420,17 +1388,7 @@
         "TOKENSET": "Token successfully set."
       }
     },
-    "OIDC": {
-      "TITLE": "OIDC Settings",
-      "ACCESSTOKENLIFETIME": "Access Token Lifetime",
-      "IDTOKENLIFETIME": "Id Token Lifetime",
-      "REFRESHTOKENEXPIRATION": "Refresh Token Expiration",
-      "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
-      "INHOURS": "hours",
-      "INDAYS": "Days"
-    },
     "SECRETS": {
-      "TITLE": "Secret Generator",
       "TYPES": "Secret Types",
       "TYPE": {
         "1": "Initialization Mail",
@@ -1470,8 +1428,6 @@
     }
   },
   "POLICY": {
-    "TITLE": "Explore Settings",
-    "DESCRIPTION": "Pre-packaged settings that enhance your security.",
     "APPLIEDTO": "Applied to",
     "PWD_COMPLEXITY": {
       "TITLE": "Password Complexity",
@@ -1487,7 +1443,6 @@
       "PASSWORDCHANGE": "Password change"
     },
     "PRIVATELABELING": {
-      "TITLE": "Branding",
       "DESCRIPTION": "Give the login your personalized style and modify its behavior.",
       "PREVIEW_DESCRIPTION": "Changes of the policy will automatically deployed to preview environment.",
       "BTN": "Select File",
@@ -1539,9 +1494,6 @@
       "TITLE": "Lockout Policy",
       "DESCRIPTION": "Set a maximum number of password-retries, after which accounts will be blocked."
     },
-    "DOMAIN_POLICY": {
-      "TITLE": "Domain Settings"
-    },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Branding",
       "BTN": "Select File",
@@ -1553,13 +1505,10 @@
       "DESCRIPTION": "Define how Users can be authenticated and configure Identity Providers",
       "DESCRIPTIONCREATEADMIN": "Users can choose from the available identity providers below.",
       "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organization only.",
-      "ADVANCED": "Advanced",
-      "LIFETIMEDURATIONS": "Login Lifetimes",
       "LIFETIME_INVALID": "Form contains invalid value(s).",
       "SAVED": "Saved successfully!"
     },
     "PRIVACY_POLICY": {
-      "TITLE": "Privacy Policy and TOS",
       "DESCRIPTION": "Set your Privacy Policy and Terms of Service Links",
       "TOSLINK": "Link to Terms of Service",
       "POLICYLINK": "Link to Privacy Policy",
@@ -1638,8 +1587,6 @@
       }
     },
     "MESSAGE_TEXTS": {
-      "TITLE": "Message Texts",
-      "DESCRIPTION": "Define your texts for your notification mails.",
       "TYPE": "Notification",
       "TYPES": {
         "INIT": "Initialization",
@@ -1693,38 +1640,22 @@
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
       "VALIDATEORGDOMAINS": "Organization domain verification required (DNS or HTTP challenge)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
-      "ALLOWUSERNAMEPASSWORD": "Username Password allowed",
-      "ALLOWEXTERNALIDP": "External IDP allowed",
-      "ALLOWREGISTERUSERS": "Register users allowed",
-      "ALLOWREGISTERORGS": "Register organizations allowed",
       "ALLOWUSERNAMEPASSWORD_DESC": "The conventional login with user name and password is allowed.",
       "ALLOWEXTERNALIDP_DESC": "The login is allowed for the underlying identity providers",
       "ALLOWREGISTER_DESC": "If the option is selected, an additional step for registering a user appears in the login.",
       "FORCEMFA": "Force MFA",
-      "FORCEMFA_DESC": "If the option is selected, users have to configure a second factor for login.",
       "FORCEMFALOCALONLY": "Force MFA for local authenticated users",
       "FORCEMFALOCALONLY_DESC": "If the option is selected, local authenticated users have to configure a second factor for login.",
-      "HIDEPASSWORDRESET": "Hide Password reset",
       "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process.",
       "HIDELOGINNAMESUFFIX": "Hide Loginname suffix",
       "HIDELOGINNAMESUFFIX_DESC": "Hides the login name suffix in the login interface",
-      "IGNOREUNKNOWNUSERNAMES": "Ignore unknown usernames",
       "IGNOREUNKNOWNUSERNAMES_DESC": "If the option is selected, the password screen will be displayed in the login process even if the user was not found. The error on the password check will not disclose if the username or password was wrong.",
-      "ALLOWDOMAINDISCOVERY": "Domain discovery allowed",
       "ALLOWDOMAINDISCOVERY_DESC": "If the option is selected, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the organization domains and will redirect to the registration of that organisation on success.",
-      "DISABLELOGINWITHEMAIL": "Disable login with email address",
-      "DISABLELOGINWITHPHONE": "Disable login with phone number",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
       "DEFAULTREDIRECTURI_DESC": "Defines where the user will be redirected to if the login has started without an app context (e.g. from mail)",
       "ERRORMSGPOPUP": "Show Error in Dialog",
       "DISABLEWATERMARK": "Hide Watermark",
-      "DISABLEWATERMARK_DESC": "Hide Powered by ZITADEL watermark in the login interface",
-      "PASSWORDCHECKLIFETIME": "Password Check Lifetime",
-      "EXTERNALLOGINCHECKLIFETIME": "External Login Check Lifetime",
-      "MFAINITSKIPLIFETIME": "Multifactor Init Lifetime",
-      "SECONDFACTORCHECKLIFETIME": "Second Factor Check Lifetime",
-      "MULTIFACTORCHECKLIFETIME": "Multifactor Check Lifetime",
-      "INHOURS": "hours"
+      "DISABLEWATERMARK_DESC": "Hide Powered by ZITADEL watermark in the login interface"
     },
     "RESET": "Reset to Instance default",
     "CREATECUSTOM": "Create Custom Policy",
@@ -1773,8 +1704,6 @@
       "TITLE": "Project",
       "DESCRIPTION": "Here you can define applications, manage roles and grant other organizations to use your project.",
       "DELETE": "Delete Project",
-      "LIST": "Projects",
-      "LISTDESCRIPTION": "If you can't find a project, contact a project owner or someone with the corresponding rights to gain project access.",
       "DETAIL": "Detail",
       "CREATE": "Create Project",
       "CREATE_DESC": "Insert your project's name.",
@@ -1783,7 +1712,6 @@
       "ZITADELPROJECT": "This belongs to the ZITADEL project. Beware: If you make changes ZITADEL may not behave as intended.",
       "TYPE": {
         "OWNED": "Owned Projects",
-        "GRANTED": "Granted Projects",
         "OWNED_SINGULAR": "Owned Project",
         "GRANTED_SINGULAR": "Granted Project"
       },
@@ -2003,8 +1931,6 @@
   },
   "IDP": {
     "LIST": {
-      "TITLE": "Identity Providers",
-      "DESCRIPTION": "Manage your Identity Provider configuration, which can then be activated in your Login Settings.",
       "ACTIVETITLE": "Active Identity Providers"
     },
     "CREATE": {

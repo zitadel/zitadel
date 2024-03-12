@@ -22,16 +22,13 @@
     "DISCLAIMER": "ZITADELはあなたのデータを機密かつ安全に扱います。",
     "DISCLAIMERLINK": "さらに詳しく",
     "DOCUMENTATION": {
-      "TITLE": "ドキュメント",
       "DESCRIPTION": "ZITADELをすぐにはじめる。"
     },
     "GETSTARTED": {
-      "TITLE": "ZITADELをはじめる",
       "DESCRIPTION": "ZITADELをすぐにはじめる。"
     },
     "QUICKSTARTS": {
       "LABEL": "最初のステップ",
-      "TITLE": "クイックスタート",
       "DESCRIPTION": "ZITADELをすぐにはじめる。"
     },
     "SHORTCUTS": {
@@ -326,11 +323,7 @@
     "TITLE": "個人情報",
     "DESCRIPTION": "情報とセキュリティ設定を管理します。",
     "PAGES": {
-      "LIST": "ユーザー",
       "TITLE": "ユーザー",
-      "DESCRIPTION": "組織内の新しいユーザーを作成し、既存のユーザーを管理します。",
-      "LISTMACHINE": "サービスユーザー",
-      "DESCRIPTIONMACHINE": "組織のサービスユーザーを作成・管理します。",
       "DETAIL": "詳細",
       "CREATE": "作成",
       "MY": "自分の情報",
@@ -380,10 +373,6 @@
       "ACTIVATE": "アクティベート",
       "CHANGEDATE": "最終更新日",
       "CREATIONDATE": "作成日",
-      "TYPES": {
-        "HUMAN": "ユーザー",
-        "MACHINE": "サービスユーザー"
-      },
       "FILTER": {
         "0": "表示名で絞り込み",
         "1": "ユーザー名で絞り込み",
@@ -757,12 +746,6 @@
     "REMOVESUCCESS": "要素が正常に削除されました"
   },
   "FLOWS": {
-    "TITLE": "アクションとフロー",
-    "DESCRIPTION": "特定のイベントで実行するスクリプトを定義します。",
-    "ACTIONSTITLE": "アクション",
-    "ACTIONSDESCRIPTION": "これらはフロー内で実行できるスクリプトです。",
-    "FLOWSTITLE": "フロー",
-    "FLOWSDESCRIPTION": "特定タイプのフローは、トリガーされるとアクションを実行します。",
     "ID": "ID",
     "NAME": "名前",
     "STATE": "ステート",
@@ -814,8 +797,6 @@
     }
   },
   "IAM": {
-    "TITLE": "インスタンス",
-    "DESCRIPTION": "インスタンスの設定と組織を管理します。",
     "POLICIES": {
       "TITLE": "システムポリシーとアクセス設定",
       "DESCRIPTION": "グローバルポリシーと管理アクセス設定を管理します。"
@@ -840,8 +821,6 @@
       "4": "停止"
     },
     "VIEWS": {
-      "TITLE": "ビュー",
-      "DESCRIPTION": "あなたのZITADELビュー数が表示されます。",
       "VIEWNAME": "名前",
       "DATABASE": "データベース",
       "SEQUENCE": "シーケンス",
@@ -856,8 +835,6 @@
       }
     },
     "FAILEDEVENTS": {
-      "TITLE": "失敗したイベント",
-      "DESCRIPTION": "失敗したイベントが表示されます。",
       "VIEWNAME": "名前",
       "DATABASE": "データベース",
       "FAILEDSEQUENCE": "失敗したシーケンス",
@@ -869,8 +846,6 @@
       "DELETESUCCESS": "失敗したイベントが削除されました。"
     },
     "EVENTS": {
-      "TITLE": "イベント",
-      "DESCRIPTION": "発生したすべてのイベントが表示されます。",
       "EDITOR": "編集者",
       "EDITORID": "編集者ID",
       "AGGREGATE": "集計",
@@ -1048,10 +1023,6 @@
       "TITLE": "インスタンス設定",
       "DESCRIPTION": "これらの設定は上書きされていない限り、すべての組織に適用されます。"
     },
-    "ORG": {
-      "TITLE": "組織設定",
-      "DESCRIPTION": "これらの設定は、インスタンス設定を拡張・上書きします。"
-    },
     "LIST": {
       "ORGS": "組織",
       "LANGUAGES": "一般設定",
@@ -1089,7 +1060,6 @@
   },
   "SETTING": {
     "LANGUAGES": {
-      "TITLE": "言語設定",
       "DEFAULT": "デフォルト言語",
       "ALLOWED": "許可された言語",
       "NOT_ALLOWED": "許可されていない言語",
@@ -1116,7 +1086,6 @@
       }
     },
     "SMTP": {
-      "TITLE": "SMTP設定",
       "SENDERADDRESS": "送信者のメールアドレス",
       "SENDERNAME": "送信者名",
       "REPLYTOADDRESS": "返信先アドレス",
@@ -1130,7 +1099,6 @@
       "REQUIREDWARN": "ドメインから通知を送信するには、SMTP情報を入力する必要があります。"
     },
     "SMS": {
-      "TITLE": "SMS設定",
       "PROVIDERS": "プロバイダー",
       "PROVIDER": "SMSプロバイダー",
       "ADDPROVIDER": "SMSプロバイダーを追加する",
@@ -1156,17 +1124,7 @@
         "TOKENSET": "トークンは正常に設定されています。"
       }
     },
-    "OIDC": {
-      "TITLE": "OIDC設定",
-      "ACCESSTOKENLIFETIME": "トークンのライフタイムにアクセスする",
-      "IDTOKENLIFETIME": "IDトークンのライフタイム",
-      "REFRESHTOKENEXPIRATION": "トークンの有効期限を更新する",
-      "REFRESHTOKENIDLEEXPIRATION": "トークンのアイドルの有効期限を更新する",
-      "INHOURS": "時",
-      "INDAYS": "日"
-    },
     "SECRETS": {
-      "TITLE": "シークレットの設定",
       "TYPES": "シークレットの種類",
       "TYPE": {
         "1": "初期設定メール",
@@ -1206,8 +1164,6 @@
     }
   },
   "POLICY": {
-    "TITLE": "設定一覧",
-    "DESCRIPTION": "事前にパッケージ化された設定でセキュリティを強化できます。",
     "APPLIEDTO": "適用先",
     "PWD_COMPLEXITY": {
       "TITLE": "パスワードの複雑さ",
@@ -1223,7 +1179,6 @@
       "PASSWORDCHANGE": "パスワードの変更"
     },
     "PRIVATELABELING": {
-      "TITLE": "ブランディング",
       "DESCRIPTION": "ログインをパーソナライズされた動作に変更します。",
       "PREVIEW_DESCRIPTION": "ポリシーの変更は、環境をプレビューするために自動的に適用されます。",
       "BTN": "ファイルを選択",
@@ -1271,9 +1226,6 @@
       "TITLE": "ロックアウトポリシー",
       "DESCRIPTION": "パスワードリトライの最大数を設定し、その後アカウントがブロックされます。"
     },
-    "DOMAIN_POLICY": {
-      "TITLE": "ドメイン設定"
-    },
     "PRIVATELABELING_POLICY": {
       "TITLE": "ブランディング",
       "BTN": "ファイルの選択",
@@ -1285,13 +1237,10 @@
       "DESCRIPTION": "ユーザーを認証する方法を定義し、IDプロバイダーを構成します。",
       "DESCRIPTIONCREATEADMIN": "ユーザーは、以下の利用可能なIDプロバイダーから選択できます。",
       "DESCRIPTIONCREATEMGMT": "ユーザーは、以下の利用可能なIDプロバイダーから選択できます。注：システムセットプロバイダーと、組織用に設定されたプロバイダーのみを使用できます。",
-      "ADVANCED": "高度",
-      "LIFETIMEDURATIONS": "ログインライフタイム",
       "LIFETIME_INVALID": "フォームに無効な値が含まれています。",
       "SAVED": "正常に保存されました！"
     },
     "PRIVACY_POLICY": {
-      "TITLE": "プライバシーポリシーとTOS",
       "DESCRIPTION": "プライバシーポリシーと利用規約リンクを設定します。",
       "TOSLINK": "利用規約へのリンク",
       "POLICYLINK": "プライバシーポリシーへのリンク",
@@ -1369,8 +1318,6 @@
       }
     },
     "MESSAGE_TEXTS": {
-      "TITLE": "メッセージテキスト",
-      "DESCRIPTION": "通知メールのテキストを定義します。",
       "TYPE": "通知",
       "TYPES": {
         "INIT": "初期セットアップ",
@@ -1424,38 +1371,22 @@
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "この設定を有効にすると、すべてのログイン名が組織ドメインで接尾辞が付けられます。この設定が無効になっている場合、ユーザー名がすべての組織で一意であることを確認する必要があります。",
       "VALIDATEORGDOMAINS": "組織のドメイン検証が必要です (DNSまたはHTTPチャレンジ)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP送信者アドレスはインスタンスドメインに一致しています",
-      "ALLOWUSERNAMEPASSWORD": "ユーザー名とパスワードを許可",
-      "ALLOWEXTERNALIDP": "外部IDPを許可",
-      "ALLOWREGISTERUSERS": "ユーザーの登録を許可",
-      "ALLOWREGISTERORGS": "組織の登録を許可",
       "ALLOWUSERNAMEPASSWORD_DESC": "ユーザー名とパスワードを使用した従来のログインを許可します。",
       "ALLOWEXTERNALIDP_DESC": "基礎となるIDプロバイダーにログインを許可します。",
       "ALLOWREGISTER_DESC": "このオプションが選択されている場合、ユーザーを登録するための追加のステップがログインに表示されます。",
       "FORCEMFA": "MFAを強制する",
-      "FORCEMFA_DESC": "このオプションが選択されている場合、ユーザーはログイン用の二要素認証を構成する必要があります。",
       "FORCEMFALOCALONLY": "ローカル ユーザーに MFA を強制する",
       "FORCEMFALOCALONLY_DESC": "オプションが選択されている場合、ローカル認証されたユーザーはログインの 2 番目の要素を構成する必要があります。",
-      "HIDEPASSWORDRESET": "パスワードリセットを非表示にする",
       "HIDEPASSWORDRESET_DESC": "このオプションが選択されている場合、ユーザーはログイン過程ででパスワードをリセットできません。",
       "HIDELOGINNAMESUFFIX": "ログイン名の接尾辞を非表示にする",
       "HIDELOGINNAMESUFFIX_DESC": "ログイン画面のログイン名の接尾辞を非表示にします。",
-      "IGNOREUNKNOWNUSERNAMES": "不明なユーザー名を無視する",
       "IGNOREUNKNOWNUSERNAMES_DESC": "このオプションが選択されている場合、ユーザーが見つからない場合でも、パスワード画面がログインプロセスに表示されます。パスワードチェックのエラーは、ユーザー名またはパスワードが間違っているかどうかを開示しません。",
-      "ALLOWDOMAINDISCOVERY": "ドメイン検出を許可する",
       "ALLOWDOMAINDISCOVERY_DESC": "このオプションを選択すると、ログイン画面で入力された不明なユーザー名のサフィックス（@domain.com）が組織のドメインと照合され、成功するとその組織の登録にリダイレクトされます。",
-      "DISABLELOGINWITHEMAIL": "メールアドレスでログインを無効にする",
-      "DISABLELOGINWITHPHONE": "電話番号でログインを無効にする",
       "DEFAULTREDIRECTURI": "デフォルトのリダイレクトURI",
       "DEFAULTREDIRECTURI_DESC": "アプリのコンテキストなしでログインが開始された場合（例：メール）、ユーザーがどこにリダイレクトされるかを定義します。",
       "ERRORMSGPOPUP": "ダイアログにエラーを表示する",
       "DISABLEWATERMARK": "ウォーターマークを非表示にする",
-      "DISABLEWATERMARK_DESC": "ログイン画面上のZITADELのウォーターマークを非表示にします。",
-      "PASSWORDCHECKLIFETIME": "パスワード確認ライフタイム",
-      "EXTERNALLOGINCHECKLIFETIME": "外部ログイン確認ライフタイム",
-      "MFAINITSKIPLIFETIME": "マルチファクター初期化ライフタイム",
-      "SECONDFACTORCHECKLIFETIME": "二要素認証確認ライフタイム",
-      "MULTIFACTORCHECKLIFETIME": "マルチファクター確認ライフタイム",
-      "INHOURS": "時間"
+      "DISABLEWATERMARK_DESC": "ログイン画面上のZITADELのウォーターマークを非表示にします。"
     },
     "RESET": "インスタンスデフォルトにリセットする",
     "CREATECUSTOM": "カスタムポリシーを作成する",
@@ -1504,8 +1435,6 @@
       "TITLE": "プロジェクト",
       "DESCRIPTION": "ここでは、アプリケーションの定義や、ロールの管理、他の組織にプロジェクトのグラントができます。",
       "DELETE": "プロジェクトを削除する",
-      "LIST": "プロジェクト",
-      "LISTDESCRIPTION": "プロジェクトが見つからない場合は、プロジェクトの所有者または該当する権利を持つ人に連絡して、プロジェクトにアクセスできるようにしてください。",
       "DETAIL": "詳細",
       "CREATE": "プロジェクトを作成する",
       "CREATE_DESC": "プロジェクトの名前を入力します。",
@@ -1514,7 +1443,6 @@
       "ZITADELPROJECT": "これはZITADELプロジェクトに属します。注意：変更した場合、ZITADELは意図したとおりに動作しないことがあります。",
       "TYPE": {
         "OWNED": "所有プロジェクト",
-        "GRANTED": "グラントされたプロジェクト",
         "OWNED_SINGULAR": "所有プロジェクト",
         "GRANTED_SINGULAR": "グラントされたプロジェクト"
       },
@@ -1734,8 +1662,6 @@
   },
   "IDP": {
     "LIST": {
-      "TITLE": "IDプロバイダー",
-      "DESCRIPTION": "IDプロバイダーの構成を管理し、ログイン設定で有効にすることができます。",
       "ACTIVETITLE": "アクティブなIDプロバイダー"
     },
     "CREATE": {

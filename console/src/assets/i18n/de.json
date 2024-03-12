@@ -22,16 +22,13 @@
     "DISCLAIMER": "ZITADEL behandelt Deine Daten vertraulich und sicher.",
     "DISCLAIMERLINK": "Mehr Informationen zur Sicherheit",
     "DOCUMENTATION": {
-      "TITLE": "Dokumentation",
       "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
     },
     "GETSTARTED": {
-      "TITLE": "Starten mit ZITADEL",
       "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
     },
     "QUICKSTARTS": {
       "LABEL": "Erste Schritte",
-      "TITLE": "Quickstarts",
       "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
     },
     "SHORTCUTS": {
@@ -325,11 +322,7 @@
     "TITLE": "Persönliche Informationen",
     "DESCRIPTION": "Verwalte Deine persönlichen Informationen und Sicherheitseinstellungen",
     "PAGES": {
-      "LIST": "Benutzer",
       "TITLE": "Benutzer",
-      "DESCRIPTION": "Erfasse und verwalte die Benutzer in Deiner Organisation.",
-      "LISTMACHINE": "Service-Benutzer",
-      "DESCRIPTIONMACHINE": "Erfasse und verwalte die Service-Benutzer in Deiner Organisation.",
       "DETAIL": "Detail",
       "CREATE": "Erstellen",
       "MY": "Meine Informationen",
@@ -379,10 +372,6 @@
       "ACTIVATE": "Aktivieren",
       "CHANGEDATE": "Letzte Änderung",
       "CREATIONDATE": "Erstelldatum",
-      "TYPES": {
-        "HUMAN": "Benutzer",
-        "MACHINE": "Service User"
-      },
       "FILTER": {
         "0": "Nach Anzeigename filtern",
         "1": "Nach Username filtern",
@@ -756,12 +745,6 @@
     "REMOVESUCCESS": "Element erfolgreich gelöscht"
   },
   "FLOWS": {
-    "TITLE": "Aktionen und Abläufe",
-    "DESCRIPTION": "Hinterlege scripts die bei einem bestimmten Event ausgeführt werden.",
-    "ACTIONSTITLE": "Aktionen",
-    "ACTIONSDESCRIPTION": "Dies sind Ihre Scripts, die sie in den Abläufen ausführen können.",
-    "FLOWSTITLE": "Abläufe",
-    "FLOWSDESCRIPTION": "Abläufe eines bestimmten Typs führen Aktionen zum Zeitpunkt eines Triggers aus.",
     "ID": "ID",
     "NAME": "Name",
     "STATE": "State",
@@ -813,8 +796,6 @@
     }
   },
   "IAM": {
-    "TITLE": "Instanz",
-    "DESCRIPTION": "Verwalten Sie Ihre Instanzeinstellungen und Organisationen",
     "POLICIES": {
       "TITLE": "System Administration",
       "DESCRIPTION": "Verwalte die globalen Richtlinien und Zugangseinstellungen."
@@ -839,8 +820,6 @@
       "4": "Gestoppt"
     },
     "VIEWS": {
-      "TITLE": "Views",
-      "DESCRIPTION": "Diese Ansicht zeigt die Anzeigen von ZITADEL. Diese können bei Bedarf zurückgesetzt werden.",
       "VIEWNAME": "Name",
       "DATABASE": "Datenbank",
       "SEQUENCE": "Sequenz",
@@ -855,8 +834,6 @@
       }
     },
     "FAILEDEVENTS": {
-      "TITLE": "Gescheiterte Events",
-      "DESCRIPTION": "Das sind die gescheiterten Events.",
       "VIEWNAME": "Name",
       "DATABASE": "Datenbank",
       "FAILEDSEQUENCE": "betroffene Sequenz",
@@ -868,8 +845,6 @@
       "DELETESUCCESS": "Gescheiterte Events entfernt."
     },
     "EVENTS": {
-      "TITLE": "Events",
-      "DESCRIPTION": "Diese Ansicht zeigt alle vorhandenen Events.",
       "EDITOR": "Editor",
       "EDITORID": "Editor ID",
       "AGGREGATE": "Aggregate",
@@ -1047,10 +1022,6 @@
       "TITLE": "Instanz Einstellungen",
       "DESCRIPTION": "Diese Einstellungen werden auf all Ihren Organisationen angewandt sofern die Einstellung nicht überschrieben wurde."
     },
-    "ORG": {
-      "TITLE": "Organisation Einstellungen",
-      "DESCRIPTION": "Diese Einstellungen erweitern bzw. überschreiben die Einstellungen Ihrer Instanz."
-    },
     "LIST": {
       "ORGS": "Organisationen",
       "LANGUAGES": "Sprachen",
@@ -1088,7 +1059,6 @@
   },
   "SETTING": {
     "LANGUAGES": {
-      "TITLE": "Spracheinstellungen",
       "DEFAULT": "Standardsprache",
       "ALLOWED": "Erlaubte Sprachen",
       "NOT_ALLOWED": "Nicht erlaubte Sprachen",
@@ -1115,7 +1085,6 @@
       }
     },
     "SMTP": {
-      "TITLE": "SMTP Einstellungen",
       "SENDERADDRESS": "Sender Email-Adresse",
       "SENDERNAME": "Sender Name",
       "REPLYTOADDRESS": "Reply-to-Adresse",
@@ -1129,7 +1098,6 @@
       "REQUIREDWARN": "Damit Mails von Ihrer Domain verschickt werden können, müssen Sie Ihre SMTP Einstellungen konfigurieren."
     },
     "SMS": {
-      "TITLE": "SMS Einstellungen",
       "PROVIDERS": "Anbieter",
       "PROVIDER": "SMS Anbieter",
       "ADDPROVIDER": "Anbieter hinzufügen",
@@ -1155,17 +1123,7 @@
         "TOKENSET": "Token erfolgreich gesetzt."
       }
     },
-    "OIDC": {
-      "TITLE": "OIDC Einstellungen",
-      "ACCESSTOKENLIFETIME": "Access Token Lifetime",
-      "IDTOKENLIFETIME": "Id Token Lifetime",
-      "REFRESHTOKENEXPIRATION": "Refresh Token Expiration",
-      "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
-      "INHOURS": "Stunden",
-      "INDAYS": "Tage"
-    },
     "SECRETS": {
-      "TITLE": "Passwort Generator",
       "TYPES": "Schlüsseltypen",
       "TYPE": {
         "1": "Email Initialisierungscode",
@@ -1205,8 +1163,6 @@
     }
   },
   "POLICY": {
-    "TITLE": "Richtlinien entdecken",
-    "DESCRIPTION": "Vorgefertigte Richtlinien, die Dir Zeit sparen und die Sicherheit erhöhen.",
     "APPLIEDTO": "Angewendet auf",
     "PWD_COMPLEXITY": {
       "TITLE": "Passwortkomplexität",
@@ -1222,7 +1178,6 @@
       "PASSWORDCHANGE": "Passwortänderung"
     },
     "PRIVATELABELING": {
-      "TITLE": "Branding",
       "DESCRIPTION": "Verleihen Sie dem Login Ihren benutzerdefinierten Style und passen Sie das Verhalten an.",
       "PREVIEW_DESCRIPTION": "Änderungen dieser Richtlinie werden automatisch in der Preview Umgebung verfügbar.",
       "BTN": "Datei auswählen",
@@ -1274,9 +1229,6 @@
       "TITLE": "Passwortsperre",
       "DESCRIPTION": "Lege eine maximale Anzahl an Passwordwiederholungen fest, nachdem Accounts gesperrt werden sollen."
     },
-    "DOMAIN_POLICY": {
-      "TITLE": "Domain Einstellungen"
-    },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Branding",
       "BTN": "Datei auswählen",
@@ -1288,13 +1240,10 @@
       "DESCRIPTION": "Definiere die Loginmethoden für Benutzer",
       "DESCRIPTIONCREATEADMIN": "Nutzer können sich mit den verfügbaren Idps authentifizieren.",
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
-      "ADVANCED": "Erweitert",
-      "LIFETIMEDURATIONS": "Login Lifetimes",
       "LIFETIME_INVALID": "Login Lifetimes sind ungültig.",
       "SAVED": "Erfolgreich gespeichert."
     },
     "PRIVACY_POLICY": {
-      "TITLE": "Datenschutzbestimmungen und AGB",
       "DESCRIPTION": "Legen Sie Ihre Datenschutzrichtlinien und Nutzungsbedingungen fest",
       "TOSLINK": "Link zu den Allgemeinen Geschäftsbedingungen",
       "POLICYLINK": "Link zur den Datenschutzrichtlinien",
@@ -1373,8 +1322,6 @@
       }
     },
     "MESSAGE_TEXTS": {
-      "TITLE": "Email Texte",
-      "DESCRIPTION": "Definiere die Texte für deine Benachrichtigungsmails",
       "TYPE": "Benachrichtigung",
       "TYPES": {
         "INIT": "Initialisierung",
@@ -1428,38 +1375,22 @@
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
       "VALIDATEORGDOMAINS": "Verifizierung des Organisations Domain erforderlich (DNS- oder HTTP-Herausforderung)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Adresse entspricht Instanzdomain",
-      "ALLOWUSERNAMEPASSWORD": "Benutzername Passwort erlaubt",
-      "ALLOWEXTERNALIDP": "Externer IDP erlaubt",
-      "ALLOWREGISTERUSERS": "Benutzerregistrierung erlaubt",
-      "ALLOWREGISTERORGS": "Organisationsregistrierung erlaubt",
       "ALLOWUSERNAMEPASSWORD_DESC": "Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
       "ALLOWEXTERNALIDP_DESC": "Der Login wird für die darunter liegenden Identitätsanbieter erlaubt.",
       "ALLOWREGISTER_DESC": "Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",
       "FORCEMFA": "MFA erzwingen",
-      "FORCEMFA_DESC": "Ist die Option gewählt, müssen Benutzer einen zweiten Faktor für den Login verwenden.",
       "FORCEMFALOCALONLY": "MFA für lokale Users erzwingen",
       "FORCEMFALOCALONLY_DESC": "Ist die Option gewählt, müssen lokal authentifizierte Benutzer einen zweiten Faktor für den Login verwenden.",
-      "HIDEPASSWORDRESET": "Passwort vergessen ausblenden",
       "HIDEPASSWORDRESET_DESC": "Ist die Option gewählt, ist es nicht möglich im Login das Passwort zurück zusetzen via Passwort vergessen Link.",
       "HIDELOGINNAMESUFFIX": "Loginname Suffix ausblenden",
       "HIDELOGINNAMESUFFIX_DESC": "Blendet das Suffix des Login-Namens in der Login-Oberfläche aus",
-      "IGNOREUNKNOWNUSERNAMES": "Unbekannte Usernamen ignorieren",
       "IGNOREUNKNOWNUSERNAMES_DESC": "Ist die Option gewählt, wird der Passwort Schritt im Login auch angezeigt wenn der User nicht gefunden wurde. Dem Benutzer wird auf bei der Passwortprüfung nicht angezeigt ob der Username oder das Passwort falsch war.",
-      "ALLOWDOMAINDISCOVERY": "Domänenentdeckung erlauben",
       "ALLOWDOMAINDISCOVERY_DESC": "Ist die Option gewählt, wird die Endung (@domain.com) eines unbekannten Benutzernamens im Login mit den Organisationsdomänen verglichen. Bei Übereinstimmung wird der Benutzer auf die Registrierung dieser Organisation weitergeleitet.",
-      "DISABLELOGINWITHEMAIL": "Login mittels E-Mailadresse deaktivieren",
-      "DISABLELOGINWITHPHONE": "Login mittels Telefonnummer deaktivieren",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
       "DEFAULTREDIRECTURI_DESC": "Definiert, wohin der Benutzer umgeleitet wird, wenn die Anmeldung ohne App-Kontext gestartet wurde (z. B. von Mail)",
       "ERRORMSGPOPUP": "Fehler als Dialog Fenster",
       "DISABLEWATERMARK": "Wasserzeichen ausblenden",
-      "DISABLEWATERMARK_DESC": "Powered by ZITADEL Wasserzeichen in der Login-Oberfläche ausblenden",
-      "PASSWORDCHECKLIFETIME": "Passwort Check Lifetime",
-      "EXTERNALLOGINCHECKLIFETIME": "Externer Login Check Lifetime",
-      "MFAINITSKIPLIFETIME": "Multifaktor Init Lifetime",
-      "SECONDFACTORCHECKLIFETIME": "Zweitfaktor Check Lifetime",
-      "MULTIFACTORCHECKLIFETIME": "Multifaktor Check Lifetime",
-      "INHOURS": "Stunden"
+      "DISABLEWATERMARK_DESC": "Powered by ZITADEL Wasserzeichen in der Login-Oberfläche ausblenden"
     },
     "RESET": "Auf Instanzeinstellung zurücksetzen",
     "CREATECUSTOM": "Benutzerdefinierte Richtlinie erstellen",
@@ -1508,8 +1439,6 @@
       "TITLE": "Projekt",
       "DESCRIPTION": "Hier kannst Du wichtige Einstellungen prüfen und die Daten einsehen, mit denen das Projekt konfiguriert worden ist.",
       "DELETE": "Projekt löschen",
-      "LIST": "Projekte",
-      "LISTDESCRIPTION": "Wenn Du Dein Projekt nicht finden kannst, wende Dich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
       "DETAIL": "Details",
       "CREATE": "Projekt erstellen",
       "CREATE_DESC": "Gebe den Namen ein.",
@@ -1518,7 +1447,6 @@
       "ZITADELPROJECT": "Diese Einstellungen gehören zum ZITADEL-Projekt. Wenn Du diese änderst, verhält sich ZITADEL möglicherweise nicht wie beabsichtigt.",
       "TYPE": {
         "OWNED": "Eigene Projekte",
-        "GRANTED": "Berechtigte Projekte",
         "OWNED_SINGULAR": "Eigenes Projekt",
         "GRANTED_SINGULAR": "Berechtigtes Projekt"
       },
@@ -1738,8 +1666,6 @@
   },
   "IDP": {
     "LIST": {
-      "TITLE": "Identitäts Provider",
-      "DESCRIPTION": "Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können.",
       "ACTIVETITLE": "Aktive Identitäts Provider"
     },
     "CREATE": {

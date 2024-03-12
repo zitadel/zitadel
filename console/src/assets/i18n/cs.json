@@ -22,16 +22,13 @@
     "DISCLAIMER": "ZITADEL zachází s vašimi daty důvěrně a bezpečně.",
     "DISCLAIMERLINK": "Další informace",
     "DOCUMENTATION": {
-      "TITLE": "Dokumentace",
       "DESCRIPTION": "Rychlý start se ZITADEL."
     },
     "GETSTARTED": {
-      "TITLE": "Začněte s ZITADEL",
       "DESCRIPTION": "Rychlý start se ZITADEL."
     },
     "QUICKSTARTS": {
       "LABEL": "První kroky",
-      "TITLE": "Rychlý start",
       "DESCRIPTION": "Rychlý start se ZITADEL."
     },
     "SHORTCUTS": {
@@ -326,11 +323,7 @@
     "TITLE": "Osobní informace",
     "DESCRIPTION": "Správa osobních informací a nastavení zabezpečení.",
     "PAGES": {
-      "LIST": "Uživatelé",
       "TITLE": "Uživatel",
-      "DESCRIPTION": "Vytvořte nové uživatele ve vaší organizaci a spravujte stávající.",
-      "LISTMACHINE": "Systémoví uživatelé",
-      "DESCRIPTIONMACHINE": "Vytvořte a spravujte systémové uživatele vaší organizace",
       "DETAIL": "Detail",
       "CREATE": "Vytvořit",
       "MY": "Moje informace",
@@ -380,10 +373,6 @@
       "ACTIVATE": "Aktivovat",
       "CHANGEDATE": "Poslední změna",
       "CREATIONDATE": "Vytvořeno",
-      "TYPES": {
-        "HUMAN": "Uživatelé",
-        "MACHINE": "Systémoví uživatelé"
-      },
       "FILTER": {
         "0": "Filtr pro Zobrazované jméno",
         "1": "Filtr pro Uživatelské jméno",
@@ -757,12 +746,6 @@
     "REMOVESUCCESS": "Prvek byl úspěšně smazán"
   },
   "FLOWS": {
-    "TITLE": "Akce a Toky",
-    "DESCRIPTION": "Definice skriptů, které se mají vykonat při určité události.",
-    "ACTIONSTITLE": "Akce",
-    "ACTIONSDESCRIPTION": "Toto jsou vaše skripty, které můžete spustit v tocích.",
-    "FLOWSTITLE": "Toky",
-    "FLOWSDESCRIPTION": "Toky určitého typu spouštějí akce v čase spouštěče.",
     "ID": "ID",
     "NAME": "Název",
     "STATE": "Stav",
@@ -814,8 +797,6 @@
     }
   },
   "IAM": {
-    "TITLE": "Instance",
-    "DESCRIPTION": "Spravujte nastavení vaší instance a organizace",
     "POLICIES": {
       "TITLE": "Systémové politiky a nastavení přístupu",
       "DESCRIPTION": "Spravujte vaše globální politiky a nastavení přístupu k managementu."
@@ -840,8 +821,6 @@
       "4": "Zastavený"
     },
     "VIEWS": {
-      "TITLE": "Pohledy",
-      "DESCRIPTION": "Tato karta zobrazuje vaše ZITADEL pohledy.",
       "VIEWNAME": "Název",
       "DATABASE": "Databáze",
       "SEQUENCE": "Sekvence",
@@ -856,8 +835,6 @@
       }
     },
     "FAILEDEVENTS": {
-      "TITLE": "Selhané Události",
-      "DESCRIPTION": "Tato karta zobrazuje vaše selhané události.",
       "VIEWNAME": "Název",
       "DATABASE": "Databáze",
       "FAILEDSEQUENCE": "dotčená sekvence",
@@ -869,8 +846,6 @@
       "DELETESUCCESS": "Selhané události byly odstraněny."
     },
     "EVENTS": {
-      "TITLE": "Události",
-      "DESCRIPTION": "Tento pohled zobrazuje všechny nastalé události.",
       "EDITOR": "Editor",
       "EDITORID": "ID editora",
       "AGGREGATE": "Agregát",
@@ -1048,10 +1023,6 @@
       "TITLE": "Nastavení instance",
       "DESCRIPTION": "Tato nastavení se budou aplikovat na všechny vaše organizace, pokud nebyla přepsána."
     },
-    "ORG": {
-      "TITLE": "Nastavení organizace",
-      "DESCRIPTION": "Tato nastavení rozšiřují a přepisují nastavení vaší instance."
-    },
     "LIST": {
       "ORGS": "Organizace",
       "LANGUAGES": "Jazyky",
@@ -1089,7 +1060,6 @@
   },
   "SETTING": {
     "LANGUAGES": {
-      "TITLE": "Nastavení jazyka",
       "DEFAULT": "Výchozí jazyk",
       "ALLOWED": "Povolené jazyky",
       "NOT_ALLOWED": "Nepovolené jazyky",
@@ -1116,7 +1086,6 @@
       }
     },
     "SMTP": {
-      "TITLE": "Nastavení SMTP",
       "SENDERADDRESS": "E-mailová adresa odesílatele",
       "SENDERNAME": "Jméno odesílatele",
       "REPLYTOADDRESS": "Adresa pro odpovědi",
@@ -1130,7 +1099,6 @@
       "REQUIREDWARN": "Pro odesílání oznámení z vaší domény musíte zadat vaše SMTP údaje."
     },
     "SMS": {
-      "TITLE": "Nastavení SMS",
       "PROVIDERS": "Poskytovatelé",
       "PROVIDER": "Poskytovatel SMS",
       "ADDPROVIDER": "Přidat poskytovatele SMS",
@@ -1156,17 +1124,7 @@
         "TOKENSET": "Token byl úspěšně nastaven."
       }
     },
-    "OIDC": {
-      "TITLE": "Nastavení OIDC",
-      "ACCESSTOKENLIFETIME": "Životnost přístupového tokenu",
-      "IDTOKENLIFETIME": "Životnost ID tokenu",
-      "REFRESHTOKENEXPIRATION": "Expirace obnovovacího tokenu",
-      "REFRESHTOKENIDLEEXPIRATION": "Expirace nečinného obnovovacího tokenu",
-      "INHOURS": "hodin",
-      "INDAYS": "Dnů"
-    },
     "SECRETS": {
-      "TITLE": "Generátor tajemství",
       "TYPES": "Typy tajemství",
       "TYPE": {
         "1": "Inicializační e-mail",
@@ -1206,8 +1164,6 @@
     }
   },
   "POLICY": {
-    "TITLE": "Prozkoumat nastavení",
-    "DESCRIPTION": "Přednastavené konfigurace, které zlepšují vaši bezpečnost.",
     "APPLIEDTO": "Aplikováno na",
     "PWD_COMPLEXITY": {
       "TITLE": "Složitost hesla",
@@ -1223,7 +1179,6 @@
       "PASSWORDCHANGE": "Změna hesla"
     },
     "PRIVATELABELING": {
-      "TITLE": "Branding",
       "DESCRIPTION": "Upravte si přihlašovací stránku podle svého stylu a změňte její chování.",
       "PREVIEW_DESCRIPTION": "Změny politiky budou automaticky nasazeny v náhledovém prostředí.",
       "BTN": "Vybrat soubor",
@@ -1275,9 +1230,6 @@
       "TITLE": "Politika uzamčení",
       "DESCRIPTION": "Nastavte maximální počet pokusů o zadání hesla, po kterém budou účty zablokovány."
     },
-    "DOMAIN_POLICY": {
-      "TITLE": "Nastavení domény"
-    },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Branding",
       "BTN": "Vybrat soubor",
@@ -1289,13 +1241,10 @@
       "DESCRIPTION": "Definujte, jak mohou být uživatelé ověřováni a nakonfigurujte poskytovatele identity",
       "DESCRIPTIONCREATEADMIN": "Uživatelé si mohou vybrat z dostupných poskytovatelů identity níže.",
       "DESCRIPTIONCREATEMGMT": "Uživatelé si mohou vybrat z dostupných poskytovatelů identity níže. Poznámka: Můžete použít poskytovatele nastavené systémem, jakož i poskytovatele nastavené pouze pro vaši organizaci.",
-      "ADVANCED": "Pokročilé",
-      "LIFETIMEDURATIONS": "Doba trvání přihlášení",
       "LIFETIME_INVALID": "Formulář obsahuje neplatné hodnoty.",
       "SAVED": "Úspěšně uloženo!"
     },
     "PRIVACY_POLICY": {
-      "TITLE": "Zásady ochrany osobních údajů a Podmínky služby",
       "DESCRIPTION": "Nastavte odkazy na vaše Zásady ochrany osobních údajů a Podmínky služby",
       "TOSLINK": "Odkaz na Podmínky služby",
       "POLICYLINK": "Odkaz na Zásady ochrany osobních údajů",
@@ -1374,8 +1323,6 @@
       }
     },
     "MESSAGE_TEXTS": {
-      "TITLE": "Texty zpráv",
-      "DESCRIPTION": "Definujte své texty pro notifikační e-maily.",
       "TYPE": "Notifikace",
       "TYPES": {
         "INIT": "Inicializace",
@@ -1429,39 +1376,23 @@
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Pokud povolíte toto nastavení, všechna přihlašovací jména budou doplněna o doménu organizace. Pokud je toto nastavení zakázáno, musíte zajistit, aby byla uživatelská jména jedinečná napříč všemi organizacemi.",
       "VALIDATEORGDOMAINS": "Požadováno ověření domény organizace (DNS nebo HTTP výzva)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "Adresa odesílatele SMTP odpovídá doméně instance",
-      "ALLOWUSERNAMEPASSWORD": "Povoleno uživatelské jméno a heslo",
-      "ALLOWEXTERNALIDP": "Povoleno externí IDP",
       "ALLOWREGISTER": "Registrace povolena",
-      "ALLOWREGISTERUSERS": "Registrace uživatelů povolena",
-      "ALLOWREGISTERORGS": "Registrace organizací povolena",
       "ALLOWUSERNAMEPASSWORD_DESC": "Je povoleno klasické přihlášení s uživatelským jménem a heslem.",
       "ALLOWEXTERNALIDP_DESC": "Přihlášení je povoleno pro níže uvedené poskytovatele identity.",
       "ALLOWREGISTER_DESC": "Pokud je možnost vybrána, objeví se při přihlášení další krok pro registraci uživatele.",
       "FORCEMFA": "Vynutit MFA",
-      "FORCEMFA_DESC": "Pokud je možnost vybrána, uživatelé musí pro přihlášení nastavit druhý faktor.",
       "FORCEMFALOCALONLY": "Vynutit MFA pouze pro lokálně ověřené uživatele",
       "FORCEMFALOCALONLY_DESC": "Pokud je možnost vybrána, lokálně ověření uživatelé musí pro přihlášení nastavit druhý faktor.",
-      "HIDEPASSWORDRESET": "Skrýt reset hesla",
       "HIDEPASSWORDRESET_DESC": "Pokud je možnost vybrána, uživatel nemůže během přihlašovacího procesu resetovat své heslo.",
       "HIDELOGINNAMESUFFIX": "Skrýt příponu přihlašovacího jména",
       "HIDELOGINNAMESUFFIX_DESC": "Skryje příponu přihlašovacího jména v přihlašovacím rozhraní",
-      "IGNOREUNKNOWNUSERNAMES": "Ignorovat neznámá uživatelská jména",
       "IGNOREUNKNOWNUSERNAMES_DESC": "Pokud je možnost vybrána, obrazovka pro zadání hesla se zobrazí během přihlašovacího procesu i v případě, že nebyl uživatel nalezen. Chyba při kontrole hesla neodhalí, zda bylo špatné uživatelské jméno nebo heslo.",
-      "ALLOWDOMAINDISCOVERY": "Povolit objevování domény",
       "ALLOWDOMAINDISCOVERY_DESC": "Pokud je možnost vybrána, přípona (@domain.com) neznámého uživatelského jména zadávaného na přihlašovací obrazovce bude porovnána s doménami organizace a při úspěchu dojde k přesměrování na registraci dané organizace.",
-      "DISABLELOGINWITHEMAIL": "Zakázat přihlášení s e-mailovou adresou",
-      "DISABLELOGINWITHPHONE": "Zakázat přihlášení s telefonním číslem",
       "DEFAULTREDIRECTURI": "Výchozí URI přesměrování",
       "DEFAULTREDIRECTURI_DESC": "Definuje, kam bude uživatel přesměrován, pokud bylo přihlášení zahájeno bez kontextu aplikace (např. z e-mailu)",
       "ERRORMSGPOPUP": "Zobrazit chybu v dialogovém okně",
       "DISABLEWATERMARK": "Skrýt vodoznak",
-      "DISABLEWATERMARK_DESC": "Skrýt vodoznak Powered by ZITADEL v přihlašovacím rozhraní",
-      "PASSWORDCHECKLIFETIME": "Životnost kontroly hesla",
-      "EXTERNALLOGINCHECKLIFETIME": "Životnost kontroly externího přihlášení",
-      "MFAINITSKIPLIFETIME": "Životnost počáteční MFA",
-      "SECONDFACTORCHECKLIFETIME": "Životnost kontroly druhého faktoru",
-      "MULTIFACTORCHECKLIFETIME": "Životnost kontroly vícefaktorové autentizace",
-      "INHOURS": "hodin"
+      "DISABLEWATERMARK_DESC": "Skrýt vodoznak Powered by ZITADEL v přihlašovacím rozhraní"
     },
     "RESET": "Resetovat na výchozí hodnoty instance",
     "CREATECUSTOM": "Vytvořit vlastní pravidlo",
@@ -1510,8 +1441,6 @@
       "TITLE": "Projekt",
       "DESCRIPTION": "Zde můžete definovat aplikace, spravovat role a umožnit jiným organizacím používat váš projekt.",
       "DELETE": "Odstranit projekt",
-      "LIST": "Projekty",
-      "LISTDESCRIPTION": "Pokud nenajdete projekt, kontaktujte vlastníka projektu nebo někoho s příslušnými právy pro získání přístupu k projektu.",
       "DETAIL": "Detail",
       "CREATE": "Vytvořit projekt",
       "CREATE_DESC": "Vložte název vašeho projektu.",
@@ -1520,7 +1449,6 @@
       "ZITADELPROJECT": "Tato nastavení jsou základní nastavení instance projektu ZITADEL. Pozor: Pokud provedete změny, ZITADEL se nemusí chovat podle očekávání.",
       "TYPE": {
         "OWNED": "Vlastní projekty",
-        "GRANTED": "Přidělené projekty",
         "OWNED_SINGULAR": "Vlastní projekt",
         "GRANTED_SINGULAR": "Přidělený projekt"
       },
@@ -1740,8 +1668,6 @@
   },
   "IDP": {
     "LIST": {
-      "TITLE": "Poskytovatelé identity",
-      "DESCRIPTION": "Spravujte konfiguraci poskytovatele identity, která pak může být aktivována ve vašem nastavení přihlášení.",
       "ACTIVETITLE": "Aktivní poskytovatelé identity"
     },
     "CREATE": {

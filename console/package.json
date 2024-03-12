@@ -8,7 +8,10 @@
     "prelint": "npm run generate",
     "lint": "ng lint && prettier --check src",
     "lint:fix": "prettier --write src",
-    "generate": "buf generate ../proto --include-imports --include-wkt"
+    "generate": "buf generate ../proto --include-imports --include-wkt",
+    "potentially-unused-keys": "git diff main -- ./src/app | grep -E '^-.*$' | grep -oh -E '([[:upper:]]|_)+(\\.([[:upper:]]|[[:digit:]]|_)+)+' | sort | uniq > /tmp/potentially-used-keys.txt",
+    "used-keys": "grep -ohr --exclude-dir=proto -E '([[:upper:]]|_)+(\\.([[:upper:]]|[[:digit:]]|_)+)+' src/app/ | sort | uniq > /tmp/used-keys.txt",
+    "cleanup-translations": "for file in src/assets/i18n/*.json; do jq \"del($(comm -23 /tmp/potentially-used-keys.txt /tmp/used-keys.txt | sed 's/^/./g' | tr '\\n' ',' | sed 's/.$//')) | del(..|select(. == {}))\" $file > ${file}.tmp && mv ${file}.tmp $file; done"
   },
   "private": true,
   "dependencies": {
@@ -84,6 +87,7 @@
     "karma-coverage-istanbul-reporter": "^3.0.3",
     "karma-jasmine": "^5.1.0",
     "karma-jasmine-html-reporter": "^2.1.0",
+    "node-jq": "^4.3.1",
     "prettier": "^3.1.1",
     "prettier-plugin-organize-imports": "^3.2.4",
     "protractor": "~7.0.0",

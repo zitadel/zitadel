@@ -22,16 +22,13 @@
     "DISCLAIMER": "ZITADEL behandelt uw gegevens vertrouwelijk en veilig.",
     "DISCLAIMERLINK": "Meer informatie",
     "DOCUMENTATION": {
-      "TITLE": "Documentatie",
       "DESCRIPTION": "Begin snel met ZITADEL."
     },
     "GETSTARTED": {
-      "TITLE": "Begin met ZITADEL",
       "DESCRIPTION": "Begin snel met ZITADEL."
     },
     "QUICKSTARTS": {
       "LABEL": "Eerste stappen",
-      "TITLE": "Quickstarts",
       "DESCRIPTION": "Begin snel met ZITADEL."
     },
     "SHORTCUTS": {
@@ -326,11 +323,7 @@
     "TITLE": "Persoonlijke informatie",
     "DESCRIPTION": "Beheer uw informatie en beveiligingsinstellingen.",
     "PAGES": {
-      "LIST": "Gebruikers",
       "TITLE": "Gebruiker",
-      "DESCRIPTION": "Maak nieuwe gebruikers aan in uw organisatie en beheer bestaande.",
-      "LISTMACHINE": "Servicegebruikers",
-      "DESCRIPTIONMACHINE": "Maak en beheer Servicegebruikers van uw organisatie",
       "DETAIL": "Detail",
       "CREATE": "Aanmaken",
       "MY": "Mijn informatie",
@@ -380,10 +373,6 @@
       "ACTIVATE": "Activeren",
       "CHANGEDATE": "Laatst gewijzigd",
       "CREATIONDATE": "Aangemaakt op",
-      "TYPES": {
-        "HUMAN": "Gebruikers",
-        "MACHINE": "Servicegebruikers"
-      },
       "FILTER": {
         "0": "Filter op weergavenaam",
         "1": "Filter op gebruikersnaam",
@@ -757,12 +746,6 @@
     "REMOVESUCCESS": "Element succesvol verwijderd"
   },
   "FLOWS": {
-    "TITLE": "Acties en Flows",
-    "DESCRIPTION": "Definieer scripts om uit te voeren bij een bepaalde gebeurtenis.",
-    "ACTIONSTITLE": "Acties",
-    "ACTIONSDESCRIPTION": "Dit zijn uw scripts die u kunt uitvoeren in de flows.",
-    "FLOWSTITLE": "Flows",
-    "FLOWSDESCRIPTION": "Flows van een bepaald type voeren acties uit op het moment van een trigger.",
     "ID": "ID",
     "NAME": "Naam",
     "STATE": "Status",
@@ -814,8 +797,6 @@
     }
   },
   "IAM": {
-    "TITLE": "Instantie",
-    "DESCRIPTION": "Beheer uw instantie-instellingen en organisaties",
     "POLICIES": {
       "TITLE": "Systeembeleid en toegangsinstellingen",
       "DESCRIPTION": "Beheer uw wereldwijde beleid en beheer toegangsinstellingen."
@@ -840,8 +821,6 @@
       "4": "Gestopt"
     },
     "VIEWS": {
-      "TITLE": "Weergaven",
-      "DESCRIPTION": "Dit paneel toont uw ZITADEL-weergaven.",
       "VIEWNAME": "Naam",
       "DATABASE": "Database",
       "SEQUENCE": "Reeks",
@@ -856,8 +835,6 @@
       }
     },
     "FAILEDEVENTS": {
-      "TITLE": "Mislukte Evenementen",
-      "DESCRIPTION": "Deze kaart toont uw mislukte evenementen.",
       "VIEWNAME": "Naam",
       "DATABASE": "Database",
       "FAILEDSEQUENCE": "Mislukte Reeks",
@@ -869,8 +846,6 @@
       "DELETESUCCESS": "Mislukte evenementen verwijderd."
     },
     "EVENTS": {
-      "TITLE": "Evenementen",
-      "DESCRIPTION": "Deze weergave toont alle voorgekomen evenementen.",
       "EDITOR": "Editor",
       "EDITORID": "Editor ID",
       "AGGREGATE": "Aggregaat",
@@ -1048,10 +1023,6 @@
       "TITLE": "Instantie Instellingen",
       "DESCRIPTION": "Deze instellingen zijn van toepassing op al uw organisaties, tenzij ze zijn overschreven."
     },
-    "ORG": {
-      "TITLE": "Organisatie Instellingen",
-      "DESCRIPTION": "Deze instellingen breiden uw instantie instellingen uit en overschrijven deze."
-    },
     "LIST": {
       "ORGS": "Organisaties",
       "LANGUAGES": "Talen",
@@ -1089,7 +1060,6 @@
   },
   "SETTING": {
     "LANGUAGES": {
-      "TITLE": "Taalinstellingen",
       "DEFAULT": "Standaardtaal",
       "ALLOWED": "Toegestane Talen",
       "NOT_ALLOWED": "Niet Toegestane Talen",
@@ -1116,7 +1086,6 @@
       }
     },
     "SMTP": {
-      "TITLE": "SMTP Instellingen",
       "SENDERADDRESS": "Afzender Email Adres",
       "SENDERNAME": "Afzender Naam",
       "REPLYTOADDRESS": "Antwoord-naar Adres",
@@ -1130,7 +1099,6 @@
       "REQUIREDWARN": "Om notificaties te kunnen versturen vanaf uw domein, moet u uw SMTP-gegevens invoeren."
     },
     "SMS": {
-      "TITLE": "SMS Instellingen",
       "PROVIDERS": "Providers",
       "PROVIDER": "SMS Provider",
       "ADDPROVIDER": "Voeg SMS Provider toe",
@@ -1156,17 +1124,7 @@
         "TOKENSET": "Token succesvol ingesteld."
       }
     },
-    "OIDC": {
-      "TITLE": "OIDC Instellingen",
-      "ACCESSTOKENLIFETIME": "Toegangstoken Levensduur",
-      "IDTOKENLIFETIME": "ID Token Levensduur",
-      "REFRESHTOKENEXPIRATION": "Vernieuw Token Vervaldatum",
-      "REFRESHTOKENIDLEEXPIRATION": "Vernieuw Token Inactieve Vervaldatum",
-      "INHOURS": "uren",
-      "INDAYS": "Dagen"
-    },
     "SECRETS": {
-      "TITLE": "Secret Generator",
       "TYPES": "Secret Types",
       "TYPE": {
         "1": "Initialisatie Mail",
@@ -1206,8 +1164,6 @@
     }
   },
   "POLICY": {
-    "TITLE": "Bekijk Instellingen",
-    "DESCRIPTION": "Vooringestelde instellingen die uw beveiliging versterken.",
     "APPLIEDTO": "Toegepast op",
     "PWD_COMPLEXITY": {
       "TITLE": "Wachtwoord Complexiteit",
@@ -1223,7 +1179,6 @@
       "PASSWORDCHANGE": "Wachtwoord wijziging"
     },
     "PRIVATELABELING": {
-      "TITLE": "Branding",
       "DESCRIPTION": "Geef de login uw gepersonaliseerde stijl en wijzig zijn gedrag.",
       "PREVIEW_DESCRIPTION": "Wijzigingen aan het beleid worden automatisch toegepast op de voorbeeldomgeving.",
       "BTN": "Selecteer Bestand",
@@ -1275,9 +1230,6 @@
       "TITLE": "Lockout Beleid",
       "DESCRIPTION": "Stel een maximum aantal wachtwoordpogingen in, waarna accounts worden geblokkeerd."
     },
-    "DOMAIN_POLICY": {
-      "TITLE": "Domein Instellingen"
-    },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Branding",
       "BTN": "Selecteer Bestand",
@@ -1289,13 +1241,10 @@
       "DESCRIPTION": "Definieer hoe Gebruikers kunnen worden geauthenticeerd en configureer Identiteitsproviders",
       "DESCRIPTIONCREATEADMIN": "Gebruikers kunnen kiezen uit de beschikbare identiteitsproviders hieronder.",
       "DESCRIPTIONCREATEMGMT": "Gebruikers kunnen kiezen uit de beschikbare identiteitsproviders hieronder. Opmerking: U kunt systeem ingestelde providers gebruiken evenals providers die alleen voor uw organisatie zijn ingesteld.",
-      "ADVANCED": "Geavanceerd",
-      "LIFETIMEDURATIONS": "Login Levensduur",
       "LIFETIME_INVALID": "Formulier bevat ongeldige waarde(n).",
       "SAVED": "Succesvol opgeslagen!"
     },
     "PRIVACY_POLICY": {
-      "TITLE": "Privacybeleid en TOS",
       "DESCRIPTION": "Stel uw Privacybeleid en Algemene Voorwaarden Links in",
       "TOSLINK": "Link naar Algemene Voorwaarden",
       "POLICYLINK": "Link naar Privacybeleid",
@@ -1374,8 +1323,6 @@
       }
     },
     "MESSAGE_TEXTS": {
-      "TITLE": "Bericht Teksten",
-      "DESCRIPTION": "Definieer uw teksten voor uw notificatie mails.",
       "TYPE": "Notificatie",
       "TYPES": {
         "INIT": "Initialisatie",
@@ -1429,38 +1376,22 @@
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Als u deze instelling inschakelt, worden alle inlognamen voorzien van een achtervoegsel met het domein van de organisatie. Als deze instelling is uitgeschakeld, moet u ervoor zorgen dat gebruikersnamen uniek zijn over alle organisaties.",
       "VALIDATEORGDOMAINS": "Verificatie van organisatiedomeinen vereist (DNS of HTTP-uitdaging)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Afzender Adres komt overeen met Instantie Domein",
-      "ALLOWUSERNAMEPASSWORD": "Gebruikersnaam Wachtwoord toegestaan",
-      "ALLOWEXTERNALIDP": "Externe IDP toegestaan",
-      "ALLOWREGISTERUSERS": "Gebruikersregistratie toegestaan",
-      "ALLOWREGISTERORGS": "Organisatieregistratie toegestaan",
       "ALLOWUSERNAMEPASSWORD_DESC": "De conventionele login met gebruikersnaam en wachtwoord is toegestaan.",
       "ALLOWEXTERNALIDP_DESC": "De login is toegestaan voor de onderliggende identiteitsproviders",
       "ALLOWREGISTER_DESC": "Als de optie is geselecteerd, verschijnt er een extra stap voor het registreren van een gebruiker in het login proces.",
       "FORCEMFA": "Forceer MFA",
-      "FORCEMFA_DESC": "Als de optie is geselecteerd, moeten gebruikers een tweede factor configureren voor login.",
       "FORCEMFALOCALONLY": "Forceer MFA voor lokaal geauthenticeerde gebruikers",
       "FORCEMFALOCALONLY_DESC": "Als de optie is geselecteerd, moeten lokaal geauthenticeerde gebruikers een tweede factor configureren voor login.",
-      "HIDEPASSWORDRESET": "Verberg Wachtwoord reset",
       "HIDEPASSWORDRESET_DESC": "Als de optie is geselecteerd, kan de gebruiker zijn wachtwoord niet resetten in het login proces.",
       "HIDELOGINNAMESUFFIX": "Verberg Inlognaam achtervoegsel",
       "HIDELOGINNAMESUFFIX_DESC": "Verbergt het inlognaam achtervoegsel in de login interface",
-      "IGNOREUNKNOWNUSERNAMES": "Negeer onbekende gebruikersnamen",
       "IGNOREUNKNOWNUSERNAMES_DESC": "Als de optie is geselecteerd, zal het wachtwoordscherm worden weergegeven in het login proces, zelfs als de gebruiker niet is gevonden. De fout bij de wachtwoordcontrole zal niet onthullen of de gebruikersnaam of het wachtwoord verkeerd was.",
-      "ALLOWDOMAINDISCOVERY": "Domein ontdekking toegestaan",
       "ALLOWDOMAINDISCOVERY_DESC": "Als de optie is geselecteerd, zal het achtervoegsel (@domein.com) van een onbekende gebruikersnaam invoer op het login scherm worden gematcht tegen de organisatie domeinen en zal bij succes doorverwijzen naar de registratie van die organisatie.",
-      "DISABLELOGINWITHEMAIL": "Deactiveer login met e-mailadres",
-      "DISABLELOGINWITHPHONE": "Deactiveer login met telefoonnummer",
       "DEFAULTREDIRECTURI": "Standaard Doorverwijs URI",
       "DEFAULTREDIRECTURI_DESC": "Definieert waar de gebruiker naar wordt doorverwezen als de login is gestart zonder een app context (bijv. vanuit mail)",
       "ERRORMSGPOPUP": "Toon Fout in Dialoog",
       "DISABLEWATERMARK": "Verberg Watermerk",
-      "DISABLEWATERMARK_DESC": "Verberg Powered by ZITADEL watermerk in de login interface",
-      "PASSWORDCHECKLIFETIME": "Wachtwoord Controle Levensduur",
-      "EXTERNALLOGINCHECKLIFETIME": "Externe Login Controle Levensduur",
-      "MFAINITSKIPLIFETIME": "Multifactor Init Levensduur",
-      "SECONDFACTORCHECKLIFETIME": "Tweede Factor Controle Levensduur",
-      "MULTIFACTORCHECKLIFETIME": "Multifactor Controle Levensduur",
-      "INHOURS": "uren"
+      "DISABLEWATERMARK_DESC": "Verberg Powered by ZITADEL watermerk in de login interface"
     },
     "RESET": "Reset naar Instantie standaard",
     "CREATECUSTOM": "Maak Aangepast Beleid",
@@ -1509,8 +1440,6 @@
       "TITLE": "Project",
       "DESCRIPTION": "Hier kunt u toepassingen definiëren, rollen beheren en andere organisaties toestaan uw project te gebruiken.",
       "DELETE": "Verwijder Project",
-      "LIST": "Projecten",
-      "LISTDESCRIPTION": "Als u geen project kunt vinden, neem dan contact op met een projecteigenaar of iemand met de bijbehorende rechten om toegang te krijgen tot het project.",
       "DETAIL": "Detail",
       "CREATE": "Maak Project",
       "CREATE_DESC": "Voer de naam van uw project in.",
@@ -1519,7 +1448,6 @@
       "ZITADELPROJECT": "Dit behoort tot het ZITADEL-project. Pas op: Als u wijzigingen aanbrengt, werkt ZITADEL mogelijk niet zoals bedoeld.",
       "TYPE": {
         "OWNED": "Eigen Projecten",
-        "GRANTED": "Verleende Projecten",
         "OWNED_SINGULAR": "Eigen Project",
         "GRANTED_SINGULAR": "Verleend Project"
       },
@@ -1739,8 +1667,6 @@
   },
   "IDP": {
     "LIST": {
-      "TITLE": "Identiteitsproviders",
-      "DESCRIPTION": "Beheer uw identiteitsprovider configuratie, die vervolgens kan worden geactiveerd in uw Login-instellingen.",
       "ACTIVETITLE": "Actieve identiteitsproviders"
     },
     "CREATE": {
