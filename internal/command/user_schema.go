@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	domain_schema "github.com/zitadel/zitadel/internal/domain/schema"
 	"github.com/zitadel/zitadel/internal/repository/user/schema"
@@ -13,6 +12,7 @@ import (
 )
 
 type CreateUserSchema struct {
+	ResourceOwner          string
 	Type                   string
 	Schema                 json.RawMessage
 	PossibleAuthenticators []domain.AuthenticatorType
@@ -35,6 +35,7 @@ func (s *CreateUserSchema) Valid() error {
 
 type UpdateUserSchema struct {
 	ID                     string
+	ResourceOwner          string
 	Type                   *string
 	Schema                 json.RawMessage
 	PossibleAuthenticators []domain.AuthenticatorType
@@ -62,11 +63,14 @@ func (c *Commands) CreateUserSchema(ctx context.Context, userSchema *CreateUserS
 	if err := userSchema.Valid(); err != nil {
 		return "", nil, err
 	}
+	if userSchema.ResourceOwner == "" {
+		return "", nil, zerrors.ThrowInvalidArgument(nil, "COMMA-J3hhj", "Errors.ResourceOwnerMissing")
+	}
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return "", nil, err
 	}
-	writeModel := NewUserSchemaWriteModel(id, authz.GetInstance(ctx).InstanceID())
+	writeModel := NewUserSchemaWriteModel(id, userSchema.ResourceOwner)
 	err = c.pushAppendAndReduce(ctx, writeModel,
 		schema.NewCreatedEvent(ctx,
 			UserSchemaAggregateFromWriteModel(&writeModel.WriteModel),
@@ -83,7 +87,7 @@ func (c *Commands) UpdateUserSchema(ctx context.Context, userSchema *UpdateUserS
 	if err := userSchema.Valid(); err != nil {
 		return nil, err
 	}
-	writeModel := NewUserSchemaWriteModel(userSchema.ID, "")
+	writeModel := NewUserSchemaWriteModel(userSchema.ID, userSchema.ResourceOwner)
 	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 		return nil, err
 	}
@@ -106,11 +110,11 @@ func (c *Commands) UpdateUserSchema(ctx context.Context, userSchema *UpdateUserS
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) DeactivateUserSchema(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) DeactivateUserSchema(ctx context.Context, id, resourceOwner string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-Vvf3w", "Errors.IDMissing")
 	}
-	writeModel := NewUserSchemaWriteModel(id, "")
+	writeModel := NewUserSchemaWriteModel(id, resourceOwner)
 	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 		return nil, err
 	}
@@ -126,11 +130,11 @@ func (c *Commands) DeactivateUserSchema(ctx context.Context, id string) (*domain
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) ReactivateUserSchema(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) ReactivateUserSchema(ctx context.Context, id, resourceOwner string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-wq3Gw", "Errors.IDMissing")
 	}
-	writeModel := NewUserSchemaWriteModel(id, "")
+	writeModel := NewUserSchemaWriteModel(id, resourceOwner)
 	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 		return nil, err
 	}
@@ -146,11 +150,11 @@ func (c *Commands) ReactivateUserSchema(ctx context.Context, id string) (*domain
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) DeleteUserSchema(ctx context.Context, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) DeleteUserSchema(ctx context.Context, id, resourceOwner string) (*domain.ObjectDetails, error) {
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-E22gg", "Errors.IDMissing")
 	}
-	writeModel := NewUserSchemaWriteModel(id, "")
+	writeModel := NewUserSchemaWriteModel(id, resourceOwner)
 	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 		return nil, err
 	}
@@ -168,11 +172,6 @@ func (c *Commands) DeleteUserSchema(ctx context.Context, id string) (*domain.Obj
 }
 
 func validateUserSchema(userSchema json.RawMessage) error {
-	//jsonSchema, err := json.Marshal(userSchema)
-	//if err != nil {
-	//	return zerrors.ThrowInvalidArgument(err, "COMMA-SFerg", "Errors.UserSchema.Schema.Invalid")
-	//}
-
 	_, err := domain_schema.NewSchema(0, bytes.NewReader(userSchema))
 	if err != nil {
 		return zerrors.ThrowInvalidArgument(err, "COMMA-W21tg", "Errors.UserSchema.Schema.Invalid")

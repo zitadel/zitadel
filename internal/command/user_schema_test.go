@@ -85,6 +85,25 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 			},
 		},
 		{
+			"no resourceOwner, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				userSchema: &CreateUserSchema{
+					Type:   "type",
+					Schema: json.RawMessage(`{}`),
+					PossibleAuthenticators: []domain.AuthenticatorType{
+						domain.AuthenticatorTypeUsername,
+					},
+				},
+			},
+			res{
+				err: zerrors.ThrowInvalidArgument(nil, "COMMA-J3hhj", "Errors.ResourceOwnerMissing"),
+			},
+		},
+		{
 			"empty user schema created",
 			fields{
 				eventstore: expectEventstore(
@@ -103,8 +122,9 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
-					Type:   "type",
-					Schema: json.RawMessage(`{}`),
+					ResourceOwner: "instanceID",
+					Type:          "type",
+					Schema:        json.RawMessage(`{}`),
 					PossibleAuthenticators: []domain.AuthenticatorType{
 						domain.AuthenticatorTypeUsername,
 					},
@@ -144,7 +164,8 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
-					Type: "type",
+					ResourceOwner: "instanceID",
+					Type:          "type",
 					Schema: json.RawMessage(`{
 						"$schema": "urn:zitadel:schema:v1",
 						"type": "object",
@@ -174,7 +195,8 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
-					Type: "type",
+					ResourceOwner: "instanceID",
+					Type:          "type",
 					Schema: json.RawMessage(`{
 						"$schema": "urn:zitadel:schema:v1",
 						"type": "object",
@@ -224,7 +246,8 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
 				userSchema: &CreateUserSchema{
-					Type: "type",
+					ResourceOwner: "instanceID",
+					Type:          "type",
 					Schema: json.RawMessage(`{
 						"$schema": "urn:zitadel:schema:v1",
 						"type": "object",
@@ -607,8 +630,9 @@ func TestCommands_DeactivateUserSchema(t *testing.T) {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx context.Context
-		id  string
+		ctx           context.Context
+		id            string
+		resourceOwner string
 	}
 	type res struct {
 		details *domain.ObjectDetails
@@ -687,7 +711,7 @@ func TestCommands_DeactivateUserSchema(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := c.DeactivateUserSchema(tt.args.ctx, tt.args.id)
+			got, err := c.DeactivateUserSchema(tt.args.ctx, tt.args.id, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.details, got)
 		})
@@ -699,8 +723,9 @@ func TestCommands_ReactivateUserSchema(t *testing.T) {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx context.Context
-		id  string
+		ctx           context.Context
+		id            string
+		resourceOwner string
 	}
 	type res struct {
 		details *domain.ObjectDetails
@@ -785,7 +810,7 @@ func TestCommands_ReactivateUserSchema(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := c.ReactivateUserSchema(tt.args.ctx, tt.args.id)
+			got, err := c.ReactivateUserSchema(tt.args.ctx, tt.args.id, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.details, got)
 		})
@@ -797,8 +822,9 @@ func TestCommands_DeleteUserSchema(t *testing.T) {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx context.Context
-		id  string
+		ctx           context.Context
+		id            string
+		resourceOwner string
 	}
 	type res struct {
 		details *domain.ObjectDetails
@@ -878,7 +904,7 @@ func TestCommands_DeleteUserSchema(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := c.DeleteUserSchema(tt.args.ctx, tt.args.id)
+			got, err := c.DeleteUserSchema(tt.args.ctx, tt.args.id, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.details, got)
 		})

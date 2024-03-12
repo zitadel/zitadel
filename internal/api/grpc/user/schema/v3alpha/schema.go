@@ -15,7 +15,10 @@ func (s *Server) CreateUserSchema(ctx context.Context, req *schema.CreateUserSch
 	if err := checkUserSchemaEnabled(ctx); err != nil {
 		return nil, err
 	}
-	userSchema := createUserSchemaToCommand(req)
+	userSchema, err := createUserSchemaToCommand(req, authz.GetInstance(ctx).InstanceID())
+	if err != nil {
+		return nil, err
+	}
 	id, details, err := s.command.CreateUserSchema(ctx, userSchema)
 	if err != nil {
 		return nil, err
@@ -30,7 +33,10 @@ func (s *Server) UpdateUserSchema(ctx context.Context, req *schema.UpdateUserSch
 	if err := checkUserSchemaEnabled(ctx); err != nil {
 		return nil, err
 	}
-	userSchema := updateUserSchemaToCommand(req)
+	userSchema, err := updateUserSchemaToCommand(req, authz.GetInstance(ctx).InstanceID())
+	if err != nil {
+		return nil, err
+	}
 	details, err := s.command.UpdateUserSchema(ctx, userSchema)
 	if err != nil {
 		return nil, err
@@ -43,7 +49,7 @@ func (s *Server) DeactivateUserSchema(ctx context.Context, req *schema.Deactivat
 	if err := checkUserSchemaEnabled(ctx); err != nil {
 		return nil, err
 	}
-	details, err := s.command.DeactivateUserSchema(ctx, req.GetId())
+	details, err := s.command.DeactivateUserSchema(ctx, req.GetId(), authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +61,7 @@ func (s *Server) ReactivateUserSchema(ctx context.Context, req *schema.Reactivat
 	if err := checkUserSchemaEnabled(ctx); err != nil {
 		return nil, err
 	}
-	details, err := s.command.ReactivateUserSchema(ctx, req.GetId())
+	details, err := s.command.ReactivateUserSchema(ctx, req.GetId(), authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +73,7 @@ func (s *Server) DeleteUserSchema(ctx context.Context, req *schema.DeleteUserSch
 	if err := checkUserSchemaEnabled(ctx); err != nil {
 		return nil, err
 	}
-	details, err := s.command.DeleteUserSchema(ctx, req.GetId())
+	details, err := s.command.DeleteUserSchema(ctx, req.GetId(), authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -83,25 +89,31 @@ func checkUserSchemaEnabled(ctx context.Context) error {
 	return zerrors.ThrowPreconditionFailed(nil, "SCHEMA-SFjk3", "Errors.UserSchema.NotEnabled")
 }
 
-func createUserSchemaToCommand(req *schema.CreateUserSchemaRequest) *command.CreateUserSchema {
+func createUserSchemaToCommand(req *schema.CreateUserSchemaRequest, resourceOwner string) (*command.CreateUserSchema, error) {
 	schema, err := req.GetSchema().MarshalJSON()
-	_ = err
+	if err != nil {
+		return nil, err
+	}
 	return &command.CreateUserSchema{
+		ResourceOwner:          resourceOwner,
 		Type:                   req.GetType(),
 		Schema:                 schema,
 		PossibleAuthenticators: authenticatorsToDomain(req.GetPossibleAuthenticators()),
-	}
+	}, nil
 }
 
-func updateUserSchemaToCommand(req *schema.UpdateUserSchemaRequest) *command.UpdateUserSchema {
+func updateUserSchemaToCommand(req *schema.UpdateUserSchemaRequest, resourceOwner string) (*command.UpdateUserSchema, error) {
 	schema, err := req.GetSchema().MarshalJSON()
-	_ = err
+	if err != nil {
+		return nil, err
+	}
 	return &command.UpdateUserSchema{
 		ID:                     req.GetId(),
+		ResourceOwner:          resourceOwner,
 		Type:                   req.Type,
 		Schema:                 schema,
 		PossibleAuthenticators: authenticatorsToDomain(req.GetPossibleAuthenticators()),
-	}
+	}, nil
 }
 
 func authenticatorsToDomain(authenticators []schema.AuthenticatorType) []domain.AuthenticatorType {
