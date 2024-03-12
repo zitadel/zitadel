@@ -46,7 +46,6 @@ export default defineConfig({
     html: true,
     json: true,
   },
-
   trashAssetsBeforeRuns: false,
   defaultCommandTimeout: 10000,
 
@@ -55,6 +54,24 @@ export default defineConfig({
     BACKEND_URL: backendUrl(),
     WEBHOOK_HANDLER_PORT: webhookHandlerPort(),
     WEBHOOK_HANDLER_HOST: process.env.CYPRESS_WEBHOOK_HANDLER_HOST || 'localhost',
+  },
+
+  hosts: {
+    "mytestinstance1.e2e": "127.0.0.1",
+    "mytestinstance2.e2e": "127.0.0.1",
+    "mytestinstance3.e2e": "127.0.0.1",
+    "mytestinstance4.e2e": "127.0.0.1",
+    "mytestinstance5.e2e": "127.0.0.1",
+    "mytestinstance6.e2e": "127.0.0.1",
+    "mytestinstance7.e2e": "127.0.0.1",
+    "mytestinstance8.e2e": "127.0.0.1",
+    "mytestinstance9.e2e": "127.0.0.1",
+    "mytestinstance10.e2e": "127.0.0.1",
+    "mytestinstance11.e2e": "127.0.0.1",
+    "mytestinstance12.e2e": "127.0.0.1",
+    "mytestinstance13.e2e": "127.0.0.1",
+    "mytestinstance14.e2e": "127.0.0.1",
+    "mytestinstance15.e2e": "127.0.0.1",
   },
 
   e2e: {

@@ -30,7 +30,7 @@ declare global {
       /**
        * Custom command that ensures a reliable testing context and returns it
        */
-      context(): Cypress.Chainable<Context>;
+      context(instanceDomain?: string): Cypress.Chainable<Context>;
 
       /**
        * Custom command that asserts success is printed after a change.
@@ -98,34 +98,14 @@ Cypress.Commands.add('shouldConfirmSuccess', { prevSubject: false }, () => {
   cy.get('.data-e2e-success');
 });
 
-Cypress.Commands.add('context', { prevSubject: false }, () => {
+Cypress.Commands.add('context', { prevSubject: false }, (instanceDomain?: string) => {
   return systemAuth().then((system) => {
-    return instanceUnderTest(system).then((instanceId) => {
-      return ensureQuotaIsRemoved(
-        {
-          system: system,
-          api: null,
-          instanceId: instanceId,
-        },
-        Unit.AuthenticatedRequests,
-      ).then(() => {
-        return ensureQuotaIsRemoved(
-          {
-            system: system,
-            api: null,
-            instanceId: instanceId,
-          },
-          Unit.ExecutionSeconds,
-        ).then(() => {
-          return apiAuth().then((api) => {
+          return apiAuth(instanceDomain).then((api) => {
             return {
               system: system,
               api: api,
-              instanceId: instanceId,
+              instanceId: "",
             };
           });
         });
       });
-    });
-  });
-});
