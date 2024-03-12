@@ -85,7 +85,7 @@ func (wm *UserSchemaWriteModel) NewUpdatedEvent(
 	if schemaType != nil && wm.SchemaType != *schemaType {
 		changes = append(changes, schema.ChangeSchemaType(wm.SchemaType, *schemaType))
 	}
-	if bytes.Compare(wm.Schema, userSchema) != 0 {
+	if !bytes.Equal(wm.Schema, userSchema) {
 		changes = append(changes, schema.ChangeSchema(userSchema))
 	}
 	if len(possibleAuthenticators) > 0 && slices.Compare(wm.PossibleAuthenticators, possibleAuthenticators) != 0 {
