@@ -704,5 +704,5 @@ type mfaDoneData struct {
 type totpData struct {
 	Url    string
 	Secret string
-	QrCode string
+	QrCode template.HTML
 }
