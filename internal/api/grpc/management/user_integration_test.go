@@ -3,8 +3,6 @@
 package management_test
 
 import (
-	"context"
-	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -19,26 +17,6 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/user"
 )
-
-var (
-	CTX    context.Context
-	Tester *integration.Tester
-	Client management.ManagementServiceClient
-)
-
-func TestMain(m *testing.M) {
-	os.Exit(func() int {
-		ctx, errCtx, cancel := integration.Contexts(3 * time.Minute)
-		defer cancel()
-
-		Tester = integration.NewTester(ctx)
-		defer Tester.Done()
-
-		CTX, _ = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
-		Client = Tester.Client.Mgmt
-		return m.Run()
-	}())
-}
 
 // TestImport_and_Get reproduces https://github.com/zitadel/zitadel/issues/5808
 // which led to consistency issues due the call timestamp not being
@@ -57,7 +35,7 @@ func TestImport_and_Get(t *testing.T) {
 			userName := strings.Join([]string{firstName, lastName}, "_")
 			email := strings.Join([]string{userName, "example.com"}, "@")
 
-			res, err := Client.ImportHumanUser(CTX, &management.ImportHumanUserRequest{
+			res, err := Client.ImportHumanUser(OrgCTX, &management.ImportHumanUserRequest{
 				UserName: userName,
 				Profile: &management.ImportHumanUserRequest_Profile{
 					FirstName:         firstName,
@@ -72,7 +50,7 @@ func TestImport_and_Get(t *testing.T) {
 			})
 			require.NoError(t, err)
 
-			_, err = Client.GetUserByID(CTX, &management.GetUserByIDRequest{Id: res.GetUserId()})
+			_, err = Client.GetUserByID(OrgCTX, &management.GetUserByIDRequest{Id: res.GetUserId()})
 
 			s, ok := status.FromError(err)
 			if ok && s != nil && s.Code() == codes.NotFound {
@@ -85,7 +63,7 @@ func TestImport_and_Get(t *testing.T) {
 
 func TestImport_UnparsablePreferredLanguage(t *testing.T) {
 	random := integration.RandString(5)
-	_, err := Client.ImportHumanUser(CTX, &management.ImportHumanUserRequest{
+	_, err := Client.ImportHumanUser(OrgCTX, &management.ImportHumanUserRequest{
 		UserName: random,
 		Profile: &management.ImportHumanUserRequest_Profile{
 			FirstName:         random,

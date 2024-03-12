@@ -532,6 +532,12 @@ func NewIsNullCond(column string) Condition {
 	}
 }
 
+func NewIsNotNullCond(column string) Condition {
+	return func(string) (string, []any) {
+		return column + " IS NOT NULL", nil
+	}
+}
+
 // NewTextArrayContainsCond returns a Condition that checks if the column that stores an array of text contains the given value
 func NewTextArrayContainsCond(column string, value string) Condition {
 	return func(param string) (string, []any) {

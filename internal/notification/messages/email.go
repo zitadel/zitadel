@@ -2,6 +2,7 @@ package messages
 
 import (
 	"fmt"
+	"mime"
 	"regexp"
 	"strings"
 	"time"
@@ -54,7 +55,7 @@ func (msg *Email) GetContent() (string, error) {
 	if !isHTML(msg.Content) {
 		mime = "MIME-version: 1.0;" + lineBreak + "Content-Type: text/plain; charset=\"UTF-8\";" + lineBreak + lineBreak
 	}
-	subject := "Subject: " + qEncodeSubject(msg.Subject) + lineBreak
+	subject := "Subject: " + bEncodeSubject(msg.Subject) + lineBreak
 	message += subject + mime + lineBreak + msg.Content
 
 	return message, nil
@@ -68,7 +69,7 @@ func isHTML(input string) bool {
 	return isHTMLRgx.MatchString(input)
 }
 
-// returns a RFC1342 "Q" encoded string to allow non-ascii characters
-func qEncodeSubject(subject string) string {
-	return "=?utf-8?q?" + subject + "?="
+// returns a RFC1342 "B" encoded string to allow non-ascii characters
+func bEncodeSubject(subject string) string {
+	return mime.BEncoding.Encode("UTF-8", subject)
 }

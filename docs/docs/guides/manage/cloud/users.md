@@ -16,7 +16,7 @@ For the moment all users with access to the Customer Portal will have the role "
 3. Fill in the Firstname, Lastname, Email and the username
 4. Click create
 
-The user will get a verification email, by clicking the button in the mail, he will get to the user activation screen and has to enter a password.
+The user will receive a verification email. Clicking the button in the email will lead to the user activation screen where password creation is required.
 
 ![Create user](/img/manuals/portal/customer_portal_add_admin.png)
 

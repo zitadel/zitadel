@@ -2,13 +2,13 @@ package oidc
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
-	"golang.org/x/exp/slog"
 
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"
@@ -21,7 +21,6 @@ import (
 type Server struct {
 	http.Handler
 	*op.LegacyServer
-	features Features
 
 	repo              repository.Repository
 	query             *query.Queries

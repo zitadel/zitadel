@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -23,10 +24,11 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		span.EndWithError(err)
 	}()
 
-	if s.features.LegacyIntrospection {
+	features := authz.GetFeatures(ctx)
+	if features.LegacyIntrospection {
 		return s.LegacyServer.Introspect(ctx, r)
 	}
-	if s.features.TriggerIntrospectionProjections {
+	if features.TriggerIntrospectionProjections {
 		// Execute all triggers in one concurrent sweep.
 		query.TriggerIntrospectionProjections(ctx)
 	}
