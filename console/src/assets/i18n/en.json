@@ -1,6 +1,7 @@
 {
   "APP_NAME": "ZITADEL",
   "DESCRIPTIONS":{
+    "METADATA_TITLE": "Metadata",
     "HOME": {
       "TITLE": "Get started with ZITADEL",
       "NEXT": {
@@ -10,14 +11,256 @@
           "TITLE": "Create a project",
           "DESCRIPTION": "Add a project and define its roles and authorizations."
         }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Get Started",
+          "DESCRIPTION": "Follow the quick start step-by-step guide and start building immediately."
+        },
+        "DOCS": {
+          "TITLE": "Documentation",
+          "DESCRIPTION": "Explore ZITADELs knowledge base to familiarize yourself with core concepts and ideas. Learn how ZITADEL works and how to use it."
+        },
+        "EXAMPLES": {
+          "TITLE": "Examples and Software Development Kits",
+          "DESCRIPTION": "Browse our examples and SDKs to use ZITADEL together with your favorite programming languages and tools."
+        }
       }
     },
     "ORG": {
       "TITLE": "Organization",
-      "DESCRIPTION": "An organization hosts <a href=\"/users\" class=\"desc-link\">users<a/>, <a href=\"/projects\" class=\"desc-link\">projects and apps<a/>, <a href=\"/org-settings?id=idp\" class=\"desc-link\">identity providers<a/> and settings like <a href=\"/org-settings?id=branding\" class=\"desc-link\">branding<a/>. Do you want to share settings across multiple organizations? Go to <a href=\"/instance\" class=\"desc-link\">default settings<a/>.",
-      "METADATA": {
-        "TITLE": "Metadata",
-        "DESCRIPTION": "Extend your data model. Add attributes not covered by the core fields, like for example the organizations industrial market segment or its location."
+      "DESCRIPTION": "An organization hosts users, projects with apps, identity providers and settings like company branding. Do you want to share settings across multiple organizations? Configure default settings.",
+      "METADATA": "Add custom attributes to the organization like its location or an identifier in another system. You can use this information in your actions."
+    },
+    "PROJECTS": {
+      "TITLE": "Projects",
+      "DESCRIPTION": "A project hosts one or more applications, that you can use to authenticate your users. Also you can authorize your users with projects. To allow users from other organizations to log in to your applications, grant them access to your project.<br/><br/>If you can't find a project, contact the projects owner or someone with the corresponding rights to gain access.",
+      "OWNED": {
+        "TITLE": "Owned Projects",
+        "DESCRIPTION": "These are the projects you own. You can manage theses projects settings, authorizations and applications."
+      },
+      "GRANTED": {
+        "TITLE": "Granted Projects",
+        "DESCRIPTION": "These are the projects that other organizations granted to you. With granted projects you can give your users access to other organisations applications."
+      }
+    },
+    "USERS": {
+      "TITLE": "Users",
+      "DESCRIPTION": "A user is a human or a machine that can access your applications.",
+      "HUMANS": {
+          "TITLE": "Humans",
+          "DESCRIPTION": "Humans authenticate interactively in a browser session with a login prompt.",
+          "METADATA": "Add custom attributes to the user like the department. You can use this information in your actions."
+        },
+      "MACHINES": {
+        "TITLE": "Machines",
+        "DESCRIPTION": "Machines authenticate non-interactively using a JWT bearer token signed with a private key. They can also use a personal access token.",
+        "METADATA": "Add custom attributes to the user like the authenticating system. You can use this information in your actions."
+      },
+      "SELF": {
+        "METADATA": "Add custom attributes to your user like your department. You can use this information in your organizations actions."
+      }
+    },
+    "AUTHORIZATIONS": {
+      "TITLE": "Authorizations",
+      "DESCRIPTION": "Authorizations define the access rights of a user to a project. You can grant a user access to a project and define the users roles within that project."
+    },
+    "ACTIONS": {
+      "TITLE": "Actions",
+      "DESCRIPTION": "Run custom code on events that happen as your users authenticate at ZITADEL. Automate your processes, enrich your users metadata and their tokens or notify external systems.",
+      "SCRIPTS": {
+        "TITLE": "Scripts",
+        "DESCRIPTION": "Write your JavaScript code once and trigger it in multiple flows."
+      },
+      "FLOWS": {
+        "TITLE": "Flows",
+        "DESCRIPTION": "Choose an authentication flow and trigger your action on a specific event within this flow."
+      }
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Instance Settings",
+        "DESCRIPTION": "The instance settings are the default settings for all organizations. With the right permissions, some of them are overridable in organization settings."
+      },
+      "ORG": {
+        "TITLE": "Organization Settings",
+        "DESCRIPTION": "Customize the settings of your organization."
+      },
+      "IDPS": {
+        "TITLE": "Identity Providers",
+        "DESCRIPTION": "Create and activate external identity providers. Choose a well-known provider or configure any other OIDC, OAuth or SAML compatible provider of your choice. You can even use your existing JWT tokens as federated identities by configuring a JWT identity provider."
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Password Complexity",
+        "DESCRIPTION": "Ensure your users use strong passwords by defining complexity rules."
+      },
+      "BRANDING": {
+        "TITLE": "Branding",
+        "DESCRIPTION": "Customize the look and feel of your login form. Remember to apply your configuration when you are done."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "External Links",
+        "DESCRIPTION": "Guide your users to custom external resources shown on the login page. Users need to accept the Terms of Service and Privacy Policy before they can sign up."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "SMTP Settings",
+        "DESCRIPTION": "Configure your SMTP server to use a domain for the sender address that your users know and trust."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "SMS Settings",
+        "DESCRIPTION": "To unlock all ZITADEL features, configure Twilio to send SMS messages to your users."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Events",
+        "DESCRIPTION": "This page show all state changes in your instance as far back as your instances audit trail limit. Filter the list by time range for debugging purposes or filter it by an aggregate for auditing purposes."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Failed Events",
+        "DESCRIPTION": "This page shows all failed events in your instance. If ZITADEL doesn't behave as you expect, always check this this list first."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Views",
+        "DESCRIPTION": "This page shows all your database views and when they processed their latest event. If you miss some data, check if the view is up to date."
+      },
+      "LANGUAGES": {
+        "TITLE": "Languages",
+        "DESCRIPTION": "Restrict the languages that the login form and the notification messages are translated to. If you want to disable some of the languages, drag them to the Not Allowed Languages section. You can specify an allowed language as the default language. If a users preferred language is not allowed, the default language is used."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Secret Generators",
+        "DESCRIPTION": "Define your secrets complexities and lifetimes. A higher complexity and lifetime improves security, a lower complexity and lifetime improves decryption performance."
+      },
+      "SECURITY": {
+        "TITLE": "Security Settings",
+        "DESCRIPTION": "Enable ZITADEL features that can have security impacts. You really should know what you are doing before you change these settings."
+      },
+      "OIDC": {
+        "TITLE": "OpenID Connect Settings",
+        "DESCRIPTION": "Configure your OIDC token lifetimes. Use shorter lifetimes to increase your users security, use longer lifetimes to increase your users convenience.",
+        "LABEL_HOURS": "Maximum Lifetime in hours",
+        "LABEL_DAYS": "Maximum Lifetime in days",
+          "ACCESS_TOKEN": {
+            "TITLE": "Access Token",
+            "DESCRIPTION": "The access token is used to authenticate a user. It is a short-lived token that is used to access the user's data. Use a short lifetime to minimize the risk of unauthorized access. Access tokens can automatically be refreshed using a refresh token."
+          },
+          "ID_TOKEN": {
+            "TITLE": "ID Token",
+            "DESCRIPTION": "The ID token is a JSON Web Token (JWT) that contains claims about the user. The ID token lifetime should not exceed the access token lifetime."
+          },
+          "REFRESH_TOKEN": {
+            "TITLE": "Refresh Token",
+            "DESCRIPTION": "The refresh token is used to obtain a new access token. It is a long-lived token that is used to refresh the access token. A user has to manually re-authenticate when the refresh token expires."
+          },
+          "REFRESH_TOKEN_IDLE": {
+            "TITLE": "Idle Refresh Token",
+            "DESCRIPTION": "The idle refresh token lifetime is the maximum time a refresh token can be unused."
+          }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Message Texts",
+        "DESCRIPTION": "Customize the texts of your notification email or SMS messages. If you want to disable some of the languages, restrict them in your instances language settings.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "When you claim a domain for your organization, users who don't use this domain in their login name will be prompted to change their login name to match the claimed domain.",
+          "INIT": "When a user is created, they will receive an email with a link to set their password.",
+          "PC": "When a user changes their password, they will receive a notification about the change if you have enabled this in the notification settings.",
+          "PL": "When a user adds a passwordless authentication method, they need to activate it by clicking a link in an email.",
+          "PR": "When a user resets their password, they will receive an email with a link to set a new password.",
+          "VE": "When a user changes their email address, they will receive an email with a link to verify the new address.",
+          "VP": "When a user changes their phone number, they will receive an SMS with a code to verify the new number.",
+          "VEO": "When a user adds a One-Time Password via email method, they need to activate it by entering a code sent to their email address.",
+          "VSO": "When a user adds a One-Time Password via SMS method, they need to activate it by entering a code sent to their phone number."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Login Interface Texts",
+        "DESCRIPTION": "Customize the texts of your login form. If a text is empty, the placeholder shows the default value. If you want to disable some of the languages, restrict them in your instances language settings."
+      },
+      "DOMAINS": {
+        "TITLE": "Domain Settings",
+        "DESCRIPTION": "Define restrictions on your domains and configure your login name patterns.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Require custom domains to be be verified",
+          "DESCRIPTION": "If this is activated, organization domains have to be verified before they can be used for domain discovery or username suffixing."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Login Name Pattern",
+          "DESCRIPTION": "Control the pattern of your users login names. ZITADEL selects your users organization as soon as they enter their login name. Therefore the loginnames need to be unique across all organizations. If you have users that have an account in multiple domains, you can ensure uniqueness by suffixing your login names with the organization domain."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Domain Verification",
+          "DESCRIPTION": "Only allow your organization to use the domains they actually control. If activated, organization domains are periodically verified by DNS or HTTP challenge before they can be used. This is a security feature to prevent domain hijacking."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "SMTP Sender Address",
+          "DESCRIPTION": "Only allow an SMTP sender address if it matches one of your instance domains."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Login Lifetimes",
+          "DESCRIPTION": "Harden your security by reducing some login-related maximum lifetimes.",
+          "LABEL": "Maximum Lifetime in hours",
+          "PW_CHECK": {
+            "TITLE": "Password Check",
+            "DESCRIPTION": "Your users have to change their passwords in these periods."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "External Login Check",
+            "DESCRIPTION": "Your users are redirected to their external identity proviers in theses periods."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Multifactor Init Check",
+            "DESCRIPTION": "Your users will be prompted to set up a second factor or a Multifactor in these periods, if they haven't done so already. A lifetime of 0 deactivates this prompt."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Second Factor Check",
+            "DESCRIPTION": "Your users have to revalidate their second factor in these periods."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Multifactor Check",
+            "DESCRIPTION": "Your users have to revalidate their Multifactor in these periods."
+          }
+        },
+        "FORM": {
+          "TITLE": "Login Form",
+          "DESCRIPTION": "Customize the login form.",
+          "USERNAME_PASSWORD_ALLOWED": {
+            "TITLE": "Username and Password allowed",
+            "DESCRIPTION": "Allow your users to log in with their username and password. If this is deactivated, your users can only log in using passwordless authentication or with an external identity provider."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "User Registration allowed",
+            "DESCRIPTION": "Allow anonymous users to create an account."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Organization Registration allowed",
+            "DESCRIPTION": "Allow anonymous users to create an organization."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "External Login allowed",
+            "DESCRIPTION": "Allow your users to log in with an external identity provider instead of using the ZITADEL user to log in."
+          },
+          "PASSWORD_RESET_ALLOWED": {
+            "TITLE": "Password Reset allowed",
+            "DESCRIPTION": "Allow your users to reset their password."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Domain Discovery allowed",
+            "DESCRIPTION": "Find your users organizations depending on their login names domain, for example their email address."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Ignore unknown Usernames",
+            "DESCRIPTION": "If this is activated, the login form will not show an error message if the username is unknown. This helps to prevent username guessing."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Disable Email Login",
+            "DESCRIPTION": "If this is activated, your users can't use their email addresses to log in. Beware that if you deactivate this, your users email addresses must be unique accross all organizations in order to log in."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Disable Phone Login",
+            "DESCRIPTION": "If this is activated, your users can't use their phone numbers to log in. Beware that if you deactivate this, your users phone numbers must be unique accross all organizations in order to log in."
+          }
+        }
       }
     }
   },
@@ -1437,11 +1680,11 @@
     "BTN_EDIT": "Modify",
     "DATA": {
       "DESCRIPTION": "Description",
-      "MINLENGTH": "minimum length",
-      "HASNUMBER": "has number",
-      "HASSYMBOL": "has symbol",
-      "HASLOWERCASE": "has lowercase",
-      "HASUPPERCASE": "has uppercase",
+      "MINLENGTH": "must have minimum length",
+      "HASNUMBER": "must include a number",
+      "HASSYMBOL": "must include a symbol",
+      "HASLOWERCASE": "must include a lowercase letter",
+      "HASUPPERCASE": "must include an uppercase letter",
       "SHOWLOCKOUTFAILURES": "show lockout failures",
       "MAXATTEMPTS": "Password maximum Attempts",
       "EXPIREWARNDAYS": "Expiration Warning after day",
