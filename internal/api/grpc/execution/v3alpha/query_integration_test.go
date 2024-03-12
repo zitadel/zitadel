@@ -447,8 +447,7 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				dep: func(ctx context.Context, request *execution.ListExecutionsRequest, response *execution.ListExecutionsResponse) error {
-					cond := request.Queries[0].GetInConditionsQuery()
-					resp := Tester.SetExecution(ctx, t, cond.GetConditions()[0], []string{targetResp.GetId()}, []string{})
+					resp := Tester.SetExecution(ctx, t, request.Queries[0].GetInConditionsQuery().GetConditions()[0], []string{targetResp.GetId()}, []string{})
 
 					response.Details.Timestamp = resp.GetDetails().GetChangeDate()
 					response.Details.ProcessedSequence = resp.GetDetails().GetSequence()

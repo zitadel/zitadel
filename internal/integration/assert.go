@@ -64,12 +64,9 @@ func AssertListDetails[D ListDetailsMsg](t testing.TB, expected, actual D) {
 	}
 
 	assert.Equal(t, wantDetails.GetTotalResult(), gotDetails.GetTotalResult())
-	// only check timestamp and sequence if result is greater than 0, as it could also be empty
-	if expected.GetDetails().TotalResult > 0 {
-		gotCD := gotDetails.GetTimestamp().AsTime()
-		wantCD := time.Now()
-		assert.WithinRange(t, gotCD, wantCD.Add(-time.Minute), wantCD.Add(time.Minute))
-		// Not possible as sequence is not filled in latestState function
-		// assert.NotZero(t, gotDetails.GetProcessedSequence())
-	}
+	assert.NotZero(t, gotDetails.GetProcessedSequence())
+
+	gotCD := gotDetails.GetTimestamp().AsTime()
+	wantCD := time.Now()
+	assert.WithinRange(t, gotCD, wantCD.Add(-time.Minute), wantCD.Add(time.Minute))
 }
