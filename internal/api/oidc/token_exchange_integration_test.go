@@ -31,12 +31,14 @@ func setTokenExchangeFeature(t *testing.T, value bool) {
 		OidcTokenExchange: proto.Bool(value),
 	})
 	require.NoError(t, err)
+	time.Sleep(time.Second)
 }
 
 func resetFeatures(t *testing.T) {
 	iamCTX := Tester.WithAuthorization(CTX, integration.IAMOwner)
 	_, err := Tester.Client.FeatureV2.ResetInstanceFeatures(iamCTX, &feature.ResetInstanceFeaturesRequest{})
 	require.NoError(t, err)
+	time.Sleep(time.Second)
 }
 
 func setImpersonationPolicy(t *testing.T, value bool) {
@@ -50,6 +52,7 @@ func setImpersonationPolicy(t *testing.T, value bool) {
 		})
 		require.NoError(t, err)
 	}
+	time.Sleep(time.Second)
 }
 
 func createMachineUserPATWithMembership(t *testing.T, roles ...string) (userID, pat string) {
