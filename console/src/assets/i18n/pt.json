@@ -155,6 +155,112 @@
           "TITLE": "Token de Atualização Inativo",
           "DESCRIPTION": "A vida útil do token de atualização inativo é o tempo máximo que um token de atualização pode ficar sem uso."
         }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Textos de Mensagens",
+        "DESCRIPTION": "Personalize os textos do seu e-mail de notificação ou mensagens SMS. Se desejar desativar alguns idiomas, restrinja-os nas configurações de idioma da sua instância.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Quando você reivindica um domínio para sua organização, usuários que não usam este domínio em seu nome de login serão solicitados a mudar seu nome de login para corresponder ao domínio reivindicado.",
+          "INIT": "Quando um usuário é criado, ele receberá um e-mail com um link para definir sua senha.",
+          "PC": "Quando um usuário muda sua senha, ele receberá uma notificação sobre a mudança se você habilitou isso nas configurações de notificação.",
+          "PL": "Quando um usuário adiciona um método de autenticação sem senha, ele precisa ativá-lo clicando em um link em um e-mail.",
+          "PR": "Quando um usuário reseta sua senha, ele receberá um e-mail com um link para definir uma nova senha.",
+          "VE": "Quando um usuário muda seu endereço de e-mail, ele receberá um e-mail com um link para verificar o novo endereço.",
+          "VP": "Quando um usuário muda seu número de telefone, ele receberá um SMS com um código para verificar o novo número.",
+          "VEO": "Quando um usuário adiciona um método de Senha Única via e-mail, ele precisa ativá-lo inserindo um código enviado para seu endereço de e-mail.",
+          "VSO": "Quando um usuário adiciona um método de Senha Única via SMS, ele precisa ativá-lo inserindo um código enviado para seu número de telefone."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Textos da Interface de Login",
+        "DESCRIPTION": "Personalize os textos do seu formulário de login. Se um texto estiver vazio, o placeholder mostra o valor padrão. Se desejar desativar alguns idiomas, restrinja-os nas configurações de idioma da sua instância."
+      },
+      "DOMAINS": {
+        "TITLE": "Configurações de Domínio",
+        "DESCRIPTION": "Defina restrições para seus domínios e configure seus padrões de nome de login. O ZITADEL seleciona a organização do seu usuário assim que eles inserem seu nome de login. Portanto, os nomes de login precisam ser únicos em todas as organizações. Se você tem usuários que possuem contas em vários domínios, você pode garantir a unicidade adicionando o domínio da organização aos seus nomes de login.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Exigir verificação de domínios personalizados",
+          "DESCRIPTION": "Se ativado, os domínios da organização precisam ser verificados antes que possam ser usados para descoberta de domínio ou sufixação de nome de usuário."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Padrão de Nome de Login",
+          "DESCRIPTION": "Controle o padrão dos nomes de login dos seus usuários."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Verificação de Domínio",
+          "DESCRIPTION": "Permita apenas que sua organização use os domínios que ela realmente controla. Se ativado, os domínios da organização são periodicamente verificados por desafio DNS ou HTTP antes que possam ser usados. Esta é uma característica de segurança para prevenir a tomada de domínio."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "Endereço do Remetente SMTP",
+          "DESCRIPTION": "Permita apenas um endereço de remetente SMTP se ele corresponder a um dos domínios da sua instância."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Duração do Login",
+          "DESCRIPTION": "Reforce sua segurança reduzindo algumas durações máximas relacionadas ao login.",
+          "LABEL": "Duração Máxima em horas",
+          "PW_CHECK": {
+            "TITLE": "Verificação de Senha",
+            "DESCRIPTION": "Seus usuários devem mudar suas senhas nesses períodos."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Verificação de Login Externo",
+            "DESCRIPTION": "Seus usuários serão redirecionados para seus provedores de identidade externos nesses períodos."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Verificação de Iniciação Multifator",
+            "DESCRIPTION": "Seus usuários serão solicitados a configurar um segundo fator ou Multifator nesses períodos, caso ainda não o tenham feito. Uma duração de 0 desativa este aviso."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Verificação de Segundo Fator",
+            "DESCRIPTION": "Seus usuários devem revalidar seu segundo fator nesses períodos."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Verificação Multifator",
+            "DESCRIPTION": "Seus usuários devem revalidar seu Multifator nesses períodos."
+          }
+        },
+        "FORM": {
+          "TITLE": "Formulário de Login",
+          "DESCRIPTION": "Personalize o formulário de login.",
+          "USERNAME_PASSWORD_ALLOWED": {
+            "TITLE": "Usuário e Senha permitidos",
+            "DESCRIPTION": "Permite que seus usuários façam login com seu nome de usuário e senha. Se isto for desativado, seus usuários só poderão fazer login usando autenticação sem senha ou com um provedor de identidade externo."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Registro de Usuário permitido",
+            "DESCRIPTION": "Permite que usuários anônimos criem uma conta."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Registro de Organização permitido",
+            "DESCRIPTION": "Permite que usuários anônimos criem uma organização."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Login Externo permitido",
+            "DESCRIPTION": "Permite que seus usuários façam login com um provedor de identidade externo em vez de usar o usuário ZITADEL para fazer login."
+          },
+          "PASSWORD_RESET_ALLOWED": {
+            "TITLE": "Redefinição de Senha permitida",
+            "DESCRIPTION": "Permite que seus usuários redefinam sua senha."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Descoberta de Domínio permitida",
+            "DESCRIPTION": "Encontre as organizações dos seus usuários dependendo do domínio de seus nomes de login, por exemplo, seu endereço de email."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Ignorar Nomes de Usuário desconhecidos",
+            "DESCRIPTION": "Se isto for ativado, o formulário de login não mostrará uma mensagem de erro se o nome de usuário for desconhecido. Isso ajuda a prevenir a adivinhação de nomes de usuário."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Desativar Login por Email",
+            "DESCRIPTION": "Se isto for ativado, seus usuários não poderão usar seus endereços de email para fazer login. Tenha cuidado que se você desativar isso, os endereços de email dos seus usuários devem ser únicos entre todas as organizações para poderem fazer login."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Desativar Login por Telefone",
+            "DESCRIPTION": "Se isto for ativado, seus usuários não poderão usar seus números de telefone para fazer login. Tenha cuidado que se você desativar isso, os números de telefone dos seus usuários devem ser únicos entre todas as organizações para poderem fazer login."
+          }
+        }
       }
     }
   },

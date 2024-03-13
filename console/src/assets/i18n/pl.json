@@ -155,6 +155,112 @@
           "TITLE": "Bezczynny Token Odświeżania",
           "DESCRIPTION": "Czas życia bezczynnego tokena odświeżania to maksymalny czas, przez który token odświeżania może pozostać nieużywany."
         }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Teksty wiadomości",
+        "DESCRIPTION": "Dostosuj teksty swoich e-maili lub wiadomości SMS z powiadomieniami. Jeśli chcesz wyłączyć niektóre języki, ogranicz je w ustawieniach językowych swoich instancji.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Gdy zgłosisz domenę dla swojej organizacji, użytkownicy, którzy nie używają tej domeny w swojej nazwie logowania, zostaną poproszeni o zmianę swojej nazwy logowania, aby pasowała do zgłoszonej domeny.",
+          "INIT": "Gdy użytkownik zostanie utworzony, otrzyma e-mail z linkiem do ustawienia swojego hasła.",
+          "PC": "Gdy użytkownik zmieni swoje hasło, otrzyma powiadomienie o tej zmianie, jeśli włączyłeś to w ustawieniach powiadomień.",
+          "PL": "Gdy użytkownik doda metodę uwierzytelniania bez hasła, musi ją aktywować, klikając link w e-mailu.",
+          "PR": "Gdy użytkownik zresetuje swoje hasło, otrzyma e-mail z linkiem do ustawienia nowego hasła.",
+          "VE": "Gdy użytkownik zmieni swój adres e-mail, otrzyma e-mail z linkiem do weryfikacji nowego adresu.",
+          "VP": "Gdy użytkownik zmieni swój numer telefonu, otrzyma SMS z kodem do weryfikacji nowego numeru.",
+          "VEO": "Gdy użytkownik doda metodę jednorazowego hasła przez e-mail, musi ją aktywować, wprowadzając kod wysłany na jego adres e-mail.",
+          "VSO": "Gdy użytkownik doda metodę jednorazowego hasła przez SMS, musi ją aktywować, wprowadzając kod wysłany na jego numer telefonu."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Teksty interfejsu logowania",
+        "DESCRIPTION": "Dostosuj teksty swojego formularza logowania. Jeśli tekst jest pusty, symbol zastępczy pokazuje domyślną wartość. Jeśli chcesz wyłączyć niektóre języki, ogranicz je w ustawieniach językowych swoich instancji."
+      },
+      "DOMAINS": {
+        "TITLE": "Ustawienia domen",
+        "DESCRIPTION": "Zdefiniuj ograniczenia dla swoich domen i skonfiguruj wzorce nazw logowania. ZITADEL wybiera organizację użytkownika, jak tylko wpisze swoją nazwę logowania. Dlatego nazwy logowania muszą być unikalne we wszystkich organizacjach. Jeśli masz użytkowników, którzy mają konta w wielu domenach, możesz zapewnić unikalność, dodając do nazw logowania domenę organizacji.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Wymagaj weryfikacji własnych domen",
+          "DESCRIPTION": "Jeśli to jest włączone, domeny organizacji muszą być zweryfikowane, zanim będą mogły być używane do odkrywania domen lub dodawania sufiksu do nazwy użytkownika."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Wzorzec nazwy logowania",
+          "DESCRIPTION": "Kontroluj wzorzec nazw logowania swoich użytkowników."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Weryfikacja domeny",
+          "DESCRIPTION": "Pozwól swojej organizacji używać tylko domen, które faktycznie kontroluje. Jeśli to jest aktywowane, domeny organizacji są okresowo weryfikowane przez DNS lub wyzwanie HTTP, zanim będą mogły być używane. Jest to funkcja bezpieczeństwa mająca na celu zapobieganie przejęciu domeny."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "Adres nadawcy SMTP",
+          "DESCRIPTION": "Zezwalaj tylko na adres nadawcy SMTP, jeśli pasuje do jednej z domen twojej instancji."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Czas Życia Logowania",
+          "DESCRIPTION": "Wzmocnij swoje bezpieczeństwo, redukując niektóre maksymalne czasy życia związane z logowaniem.",
+          "LABEL": "Maksymalny czas życia w godzinach",
+          "PW_CHECK": {
+            "TITLE": "Sprawdzenie Hasła",
+            "DESCRIPTION": "Twoi użytkownicy muszą zmienić swoje hasła w tych okresach."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Sprawdzenie Logowania Zewnętrznego",
+            "DESCRIPTION": "Twoi użytkownicy są przekierowywani do ich zewnętrznych dostawców tożsamości w tych okresach."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Inicjacja Wieloskładnikowa",
+            "DESCRIPTION": "Twoi użytkownicy zostaną poproszeni o ustawienie drugiego czynnika lub autoryzacji wieloskładnikowej w tych okresach, jeśli nie zrobili tego już wcześniej. Czas życia równy 0 deaktywuje to monit."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Sprawdzenie Drugiego Czynnika",
+            "DESCRIPTION": "Twoi użytkownicy muszą ponownie zweryfikować swój drugi czynnik w tych okresach."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Sprawdzenie Wieloskładnikowe",
+            "DESCRIPTION": "Twoi użytkownicy muszą ponownie zweryfikować swoją autoryzację wieloskładnikową w tych okresach."
+          }
+        },
+        "FORM": {
+          "TITLE": "Formularz Logowania",
+          "DESCRIPTION": "Dostosuj formularz logowania.",
+          "USERNAME_PASSWORD_ALLOWED": {
+            "TITLE": "Dozwolone użytkownik i hasło",
+            "DESCRIPTION": "Pozwól swoim użytkownikom logować się za pomocą nazwy użytkownika i hasła. Jeśli to zostanie dezaktywowane, użytkownicy mogą logować się tylko za pomocą uwierzytelniania bez hasła lub z zewnętrznym dostawcą tożsamości."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Dozwolona rejestracja użytkownika",
+            "DESCRIPTION": "Pozwól anonimowym użytkownikom na tworzenie konta."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Dozwolona rejestracja organizacji",
+            "DESCRIPTION": "Pozwól anonimowym użytkownikom na tworzenie organizacji."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Dozwolone logowanie zewnętrzne",
+            "DESCRIPTION": "Pozwól swoim użytkownikom logować się za pomocą zewnętrznego dostawcy tożsamości zamiast używać użytkownika ZITADEL do logowania."
+          },
+          "PASSWORD_RESET_ALLOWED": {
+            "TITLE": "Dozwolone resetowanie hasła",
+            "DESCRIPTION": "Pozwól swoim użytkownikom na resetowanie ich hasła."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Dozwolone odkrywanie domen",
+            "DESCRIPTION": "Znajdź organizacje twoich użytkowników w zależności od domeny ich nazwy logowania, na przykład ich adresu e-mail."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Ignoruj nieznane nazwy użytkowników",
+            "DESCRIPTION": "Jeśli to zostanie aktywowane, formularz logowania nie pokaże komunikatu o błędzie, jeśli nazwa użytkownika jest nieznana. Pomaga to zapobiegać zgadywaniu nazw użytkowników."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Wyłącz logowanie e-mail",
+            "DESCRIPTION": "Jeśli to zostanie aktywowane, użytkownicy nie mogą logować się za pomocą adresów e-mail. Uważaj, jeśli to dezaktywujesz, adresy e-mail twoich użytkowników muszą być unikalne we wszystkich organizacjach, aby móc się zalogować."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Wyłącz logowanie telefoniczne",
+            "DESCRIPTION": "Jeśli to zostanie aktywowane, użytkownicy nie mogą logować się za pomocą numerów telefonów. Uważaj, jeśli to dezaktywujesz, numery telefonów twoich użytkowników muszą być unikalne we wszystkich organizacjach, aby móc się zalogować."
+          }
+        }
       }
     }
   },

@@ -155,6 +155,112 @@
           "TITLE": "Inactief Vernieuwingstoken",
           "DESCRIPTION": "De levensduur van het inactieve vernieuwingstoken is de maximale tijd dat een vernieuwingstoken ongebruikt kan zijn."
         }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Berichtteksten",
+        "DESCRIPTION": "Pas de teksten van je notificatie-e-mail of SMS-berichten aan. Als je sommige talen wilt uitschakelen, beperk ze dan in de taalinstellingen van je instanties.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Wanneer je een domein voor je organisatie claimt, worden gebruikers die dit domein niet in hun inlognaam gebruiken, gevraagd om hun inlognaam te wijzigen om overeen te komen met het geclaimde domein.",
+          "INIT": "Wanneer een gebruiker wordt aangemaakt, ontvangen ze een e-mail met een link om hun wachtwoord in te stellen.",
+          "PC": "Wanneer een gebruiker zijn wachtwoord wijzigt, ontvangt hij een melding over de wijziging als je dit hebt ingeschakeld in de notificatie-instellingen.",
+          "PL": "Wanneer een gebruiker een wachtwoordloze authenticatiemethode toevoegt, moeten ze deze activeren door op een link in een e-mail te klikken.",
+          "PR": "Wanneer een gebruiker zijn wachtwoord reset, ontvangt hij een e-mail met een link om een nieuw wachtwoord in te stellen.",
+          "VE": "Wanneer een gebruiker zijn e-mailadres wijzigt, ontvangt hij een e-mail met een link om het nieuwe adres te verifiëren.",
+          "VP": "Wanneer een gebruiker zijn telefoonnummer wijzigt, ontvangt hij een SMS met een code om het nieuwe nummer te verifiëren.",
+          "VEO": "Wanneer een gebruiker een eenmalig wachtwoord via e-mailmethode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun e-mailadres is verzonden.",
+          "VSO": "Wanneer een gebruiker een eenmalig wachtwoord via SMS-methode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun telefoonnummer is verzonden."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Teksten voor inloginterface",
+        "DESCRIPTION": "Pas de teksten van je inlogformulier aan. Als een tekst leeg is, toont de placeholder de standaardwaarde. Als je sommige talen wilt uitschakelen, beperk ze dan in de taalinstellingen van je instanties."
+      },
+      "DOMAINS": {
+        "TITLE": "Domeininstellingen",
+        "DESCRIPTION": "Definieer beperkingen op je domeinen en configureer je inlognaampatronen. ZITADEL selecteert de organisatie van je gebruikers zodra ze hun inlognaam invoeren. Daarom moeten de inlognamen uniek zijn over alle organisaties. Als je gebruikers hebt die accounts hebben in meerdere domeinen, kun je uniciteit waarborgen door je inlognamen te suffixen met het domein van de organisatie.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Verificatie van aangepaste domeinen vereisen",
+          "DESCRIPTION": "Als dit is geactiveerd, moeten organisatiedomeinen worden geverifieerd voordat ze kunnen worden gebruikt voor domeinontdekking of gebruikersnaamtoevoeging."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Patroon van inlognaam",
+          "DESCRIPTION": "Beheer het patroon van de inlognamen van je gebruikers."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Domeinverificatie",
+          "DESCRIPTION": "Sta alleen je organisatie toe om de domeinen te gebruiken die ze daadwerkelijk beheersen. Als dit is geactiveerd, worden organisatiedomeinen periodiek geverifieerd door DNS of HTTP-uitdaging voordat ze kunnen worden gebruikt. Dit is een beveiligingsfunctie om domeinkaping te voorkomen."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "SMTP-afzenderadres",
+          "DESCRIPTION": "Sta alleen een SMTP-afzenderadres toe als dit overeenkomt met een van je instantiedomeinen."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Login Levensduur",
+          "DESCRIPTION": "Versterk je beveiliging door sommige login-gerelateerde maximale levensduren te verminderen.",
+          "LABEL": "Maximale Levensduur in uren",
+          "PW_CHECK": {
+            "TITLE": "Wachtwoord Controle",
+            "DESCRIPTION": "Je gebruikers moeten hun wachtwoorden in deze perioden wijzigen."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Externe Login Controle",
+            "DESCRIPTION": "Je gebruikers worden in deze perioden omgeleid naar hun externe identiteitsproviders."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Multifactor Init Controle",
+            "DESCRIPTION": "Je gebruikers worden gevraagd om een tweede factor of een Multifactor in te stellen in deze perioden, als ze dat nog niet gedaan hebben. Een levensduur van 0 deactiveert deze prompt."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Tweede Factor Controle",
+            "DESCRIPTION": "Je gebruikers moeten hun tweede factor in deze perioden opnieuw valideren."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Multifactor Controle",
+            "DESCRIPTION": "Je gebruikers moeten hun Multifactor in deze perioden opnieuw valideren."
+          }
+        },
+        "FORM": {
+          "TITLE": "Inlogformulier",
+          "DESCRIPTION": "Pas het inlogformulier aan.",
+          "USERNAME_PASSWORD_ALLOWED": {
+            "TITLE": "Gebruikersnaam en wachtwoord toegestaan",
+            "DESCRIPTION": "Sta je gebruikers toe om in te loggen met hun gebruikersnaam en wachtwoord. Als dit is gedeactiveerd, kunnen je gebruikers alleen inloggen met wachtwoordloze authenticatie of met een externe identiteitsprovider."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Gebruikersregistratie toegestaan",
+            "DESCRIPTION": "Sta anonieme gebruikers toe om een account aan te maken."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Organisatieregistratie toegestaan",
+            "DESCRIPTION": "Sta anonieme gebruikers toe om een organisatie aan te maken."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Extern inloggen toegestaan",
+            "DESCRIPTION": "Sta je gebruikers toe om in te loggen met een externe identiteitsprovider in plaats van het gebruik van de ZITADEL gebruiker om in te loggen."
+          },
+          "PASSWORD_RESET_ALLOWED": {
+            "TITLE": "Wachtwoord resetten toegestaan",
+            "DESCRIPTION": "Sta je gebruikers toe om hun wachtwoord te resetten."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Domeinontdekking toegestaan",
+            "DESCRIPTION": "Vind de organisaties van je gebruikers afhankelijk van hun loginnaams domein, bijvoorbeeld hun e-mailadres."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Negeer onbekende gebruikersnamen",
+            "DESCRIPTION": "Als dit geactiveerd is, zal het inlogformulier geen foutmelding weergeven als de gebruikersnaam onbekend is. Dit helpt om het raden van gebruikersnamen te voorkomen."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Inloggen met e-mail uitschakelen",
+            "DESCRIPTION": "Als dit geactiveerd is, kunnen je gebruikers niet inloggen met hun e-mailadressen. Let op dat als je dit deactiveert, de e-mailadressen van je gebruikers uniek moeten zijn over alle organisaties om in te kunnen loggen."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Inloggen met telefoon uitschakelen",
+            "DESCRIPTION": "Als dit geactiveerd is, kunnen je gebruikers niet inloggen met hun telefoonnummers. Let op dat als je dit deactiveert, de telefoonnummers van je gebruikers uniek moeten zijn over alle organisaties om in te kunnen loggen."
+          }
+        }
       }
     }
   },
