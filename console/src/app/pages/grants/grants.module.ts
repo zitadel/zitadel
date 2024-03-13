@@ -8,6 +8,7 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { GrantsRoutingModule } from './grants-routing.module';
 import { GrantsComponent } from './grants.component';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   declarations: [GrantsComponent],
@@ -18,6 +19,7 @@ import { MatIconModule } from '@angular/material/icon';
     TranslateModule,
     HasRoleModule,
     HasRolePipeModule,
+    MatButtonModule,
     MatIconModule,
   ],
 })

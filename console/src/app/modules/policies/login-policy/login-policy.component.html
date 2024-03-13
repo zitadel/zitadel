@@ -147,7 +147,7 @@
 <br />
 
 <h3>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.TITLE' | translate }}</h3>
-<p>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.DESCRIPTION' | translate }}</p>
+<p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.DESCRIPTION' | translate }}</p>
 <form class="lifetime-form" (ngSubmit)="savePolicy()" [formGroup]="lifetimeForm" autocomplete="off">
   <cnsl-card
     [title]="'DESCRIPTIONS.SETTINGS.LOGIN.LIFETIMES.PW_CHECK.TITLE' | translate"
@@ -199,7 +199,7 @@
 <br />
 
 <h3>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.TITLE' | translate }}</h3>
-<p>{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DESCRIPTION' | translate }}</p>
+<p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.DESCRIPTION' | translate }}</p>
 
 <div class="max-card-width login-policy-content" *ngIf="loginData">
   <div class="login-policy-row">
