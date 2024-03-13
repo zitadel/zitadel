@@ -1,5 +1,269 @@
 {
   "APP_NAME": "ZITADEL",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Metadaten",
+    "HOME": {
+      "TITLE": "Leg los mit ZITADEL",
+      "NEXT": {
+        "TITLE": "Deine nächsten Schritte",
+        "DESCRIPTION": "Führe die folgenden Schritte durch, um deine Anwendung zu sichern.",
+        "CREATE_PROJECT": {
+          "TITLE": "Erstelle ein Projekt",
+          "DESCRIPTION": "Füge ein Projekt hinzu und definiere seine Rollen und Berechtigungen."
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Erste Schritte",
+          "DESCRIPTION": "Folge dem Schritt-für-Schritt Schnellstart-Leitfaden und beginne sofort mit dem Aufbau."
+        },
+        "DOCS": {
+          "TITLE": "Dokumentation",
+          "DESCRIPTION": "Erkunde die Wissensbasis von ZITADEL, um dich mit den Kernkonzepten und Ideen vertraut zu machen. Lerne, wie ZITADEL funktioniert und wie du es nutzen kannst."
+        },
+        "EXAMPLES": {
+          "TITLE": "Beispiele und Software Development Kits",
+          "DESCRIPTION": "Durchstöbere unsere Beispiele und SDKs, um ZITADEL zusammen mit deinen bevorzugten Programmiersprachen und Werkzeugen zu nutzen."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Organisation",
+      "DESCRIPTION": "Eine Organisation beherbergt Benutzer, Projekte mit Apps, Identitätsanbieter und Einstellungen wie Unternehmensbranding. Möchtest du Einstellungen über mehrere Organisationen hinweg teilen? Konfiguriere Standardeinstellungen.",
+      "METADATA": "Füge der Organisation benutzerdefinierte Attribute hinzu, wie ihren Standort oder einen Identifikator in einem anderen System. Du kannst diese Informationen in deinen Aktionen nutzen."
+    },
+    "PROJECTS": {
+      "TITLE": "Projekte",
+      "DESCRIPTION": "Ein Projekt beherbergt eine oder mehrere Anwendungen, die du nutzen kannst, um deine Benutzer zu authentifizieren. Außerdem kannst du deine Benutzer mit Projekten autorisieren. Um Benutzern aus anderen Organisationen das Einloggen in deine Anwendungen zu erlauben, gewähre ihnen Zugriff auf dein Projekt.<br/><br/>Wenn du ein Projekt nicht finden kannst, kontaktiere den Projekteigentümer oder jemanden mit den entsprechenden Rechten, um Zugang zu erhalten.",
+      "OWNED": {
+        "TITLE": "Eigene Projekte",
+        "DESCRIPTION": "Dies sind die Projekte, die du besitzt. Du kannst die Einstellungen, Berechtigungen und Anwendungen dieser Projekte verwalten."
+      },
+      "GRANTED": {
+        "TITLE": "Gewährte Projekte",
+        "DESCRIPTION": "Dies sind die Projekte, die andere Organisationen dir gewährt haben. Mit gewährten Projekten kannst du deinen Benutzern Zugang zu Anwendungen anderer Organisationen geben."
+      }
+    },
+    "USERS": {
+      "TITLE": "Benutzer",
+      "DESCRIPTION": "Ein Benutzer ist ein Mensch oder eine Maschine, die auf deine Anwendungen zugreifen kann.",
+      "HUMANS": {
+        "TITLE": "Menschen",
+        "DESCRIPTION": "Menschen authentifizieren sich interaktiv in einer Browsersitzung mit einer Anmeldeaufforderung.",
+        "METADATA": "Füge dem Benutzer benutzerdefinierte Attribute hinzu, wie die Abteilung. Du kannst diese Informationen in deinen Aktionen nutzen."
+      },
+      "MACHINES": {
+        "TITLE": "Maschinen",
+        "DESCRIPTION": "Maschinen authentifizieren sich nicht-interaktiv mit einem JWT Bearer-Token, das mit einem privaten Schlüssel signiert ist. Sie können auch ein persönliches Zugangstoken verwenden.",
+        "METADATA": "Füge dem Benutzer benutzerdefinierte Attribute hinzu, wie das authentifizierende System. Du kannst diese Informationen in deinen Aktionen nutzen."
+      },
+      "SELF": {
+        "METADATA": "Füge deinem Benutzer benutzerdefinierte Attribute hinzu, wie deine Abteilung. Du kannst diese Informationen in den Aktionen deiner Organisation nutzen."
+      }
+    },
+    "AUTHORIZATIONS": {
+      "TITLE": "Berechtigungen",
+      "DESCRIPTION": "Berechtigungen definieren die Zugriffsrechte eines Benutzers auf ein Projekt. Du kannst einem Benutzer Zugriff auf ein Projekt gewähren und die Rollen des Benutzers innerhalb dieses Projekts definieren."
+    },
+    "ACTIONS": {
+      "TITLE": "Aktionen",
+      "DESCRIPTION": "Führe benutzerdefinierten Code bei Ereignissen aus, die auftreten, während sich deine Benutzer bei ZITADEL authentifizieren. Automatisiere deine Prozesse, bereichere die Metadaten deiner Benutzer und deren Token oder benachrichtige externe Systeme.",
+      "SCRIPTS": {
+        "TITLE": "Skripte",
+        "DESCRIPTION": "Schreibe deinen JavaScript-Code einmal und löse ihn in mehreren Flows aus."
+      },
+      "FLOWS": {
+        "TITLE": "Flows",
+        "DESCRIPTION": "Wähle einen Authentifizierungsflow und löse deine Aktion bei einem spezifischen Ereignis innerhalb dieses Flows aus."
+      }
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Instanzeinstellungen",
+        "DESCRIPTION": "Die Instanzeinstellungen sind die Standardeinstellungen für alle Organisationen. Mit den richtigen Berechtigungen sind einige davon in den Organisationseinstellungen überschreibbar."
+      },
+      "ORG": {
+        "TITLE": "Organisationseinstellungen",
+        "DESCRIPTION": "Passe die Einstellungen deiner Organisation an."
+      },
+      "IDPS": {
+        "TITLE": "Identitätsanbieter",
+        "DESCRIPTION": "Erstelle und aktiviere externe Identitätsanbieter. Wähle einen bekannten Anbieter oder konfiguriere jeden anderen OIDC-, OAuth- oder SAML-kompatiblen Anbieter deiner Wahl. Du kannst sogar deine bestehenden JWT-Token als föderierte Identitäten verwenden, indem du einen JWT-Identitätsanbieter konfigurierst."
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Passwortkomplexität",
+        "DESCRIPTION": "Stelle sicher, dass deine Benutzer starke Passwörter verwenden, indem du Komplexitätsregeln definierst."
+      },
+      "BRANDING": {
+        "TITLE": "Branding",
+        "DESCRIPTION": "Passe das Aussehen deines Anmeldeformulars an. Denke daran, deine Konfiguration anzuwenden, wenn du fertig bist."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Externe Links",
+        "DESCRIPTION": "Leite deine Benutzer zu benutzerdefinierten externen Ressourcen, die auf der Anmeldeseite angezeigt werden. Benutzer müssen die Allgemeinen Geschäftsbedingungen und die Datenschutzrichtlinie akzeptieren, bevor sie sich anmelden können."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "SMTP-Einstellungen",
+        "DESCRIPTION": "Konfiguriere deinen SMTP-Server, um eine Absenderadresse zu verwenden, die deine Benutzer kennen und vertrauen."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "SMS-Einstellungen",
+        "DESCRIPTION": "Um alle ZITADEL-Funktionen freizuschalten, konfiguriere Twilio, um SMS-Nachrichten an deine Benutzer zu senden."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Ereignisse",
+        "DESCRIPTION": "Diese Seite zeigt alle Zustandsänderungen in deiner Instanz so weit zurück, wie das Audit-Trail-Limit deiner Instanz reicht. Filtere die Liste nach Zeitraum zu Debugging-Zwecken oder filtere sie nach einem Aggregat zu Auditing-Zwecken."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Fehlgeschlagene Ereignisse",
+        "DESCRIPTION": "Diese Seite zeigt alle fehlgeschlagenen Ereignisse in deiner Instanz. Wenn ZITADEL sich nicht wie erwartet verhält, überprüfe immer zuerst diese Liste."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Ansichten",
+        "DESCRIPTION": "Diese Seite zeigt alle deine Datenbankansichten und wann sie ihr letztes Ereignis verarbeitet haben. Wenn dir einige Daten fehlen, überprüfe, ob die Ansicht aktuell ist."
+      },
+      "LANGUAGES": {
+        "TITLE": "Sprachen",
+        "DESCRIPTION": "Beschränke die Sprachen, in die das Anmeldeformular und die Benachrichtigungsnachrichten übersetzt werden. Wenn du einige der Sprachen deaktivieren möchtest, ziehe sie in den Abschnitt Nicht erlaubte Sprachen. Du kannst eine erlaubte Sprache als Standardsprache festlegen. Wenn die bevorzugte Sprache eines Benutzers nicht erlaubt ist, wird die Standardsprache verwendet."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Secret Generators",
+        "DESCRIPTION": "Definiere die Komplexität und Lebensdauer deiner Geheimnisse. Eine höhere Komplexität und Lebensdauer verbessert die Sicherheit, eine niedrigere Komplexität und Lebensdauer verbessert die Entschlüsselungsleistung."
+      },
+      "SECURITY": {
+        "TITLE": "Sicherheitseinstellungen",
+        "DESCRIPTION": "Aktiviere ZITADEL-Funktionen, die Sicherheitsauswirkungen haben können. Du solltest wirklich wissen, was du tust, bevor du diese Einstellungen änderst."
+      },
+      "OIDC": {
+        "TITLE": "OpenID Connect Einstellungen",
+        "DESCRIPTION": "Konfiguriere die Lebensdauer deiner OIDC-Token. Verwende kürzere Lebensdauern, um die Sicherheit deiner Benutzer zu erhöhen, verwende längere Lebensdauern, um die Bequemlichkeit deiner Benutzer zu erhöhen.",
+        "LABEL_HOURS": "Maximale Lebensdauer in Stunden",
+        "LABEL_DAYS": "Maximale Lebensdauer in Tagen",
+        "ACCESS_TOKEN": {
+          "TITLE": "Zugangstoken",
+          "DESCRIPTION": "Das Zugangstoken wird verwendet, um einen Benutzer zu authentifizieren. Es ist ein kurzlebiges Token, das verwendet wird, um auf die Daten des Benutzers zuzugreifen. Verwende eine kurze Lebensdauer, um das Risiko eines unbefugten Zugriffs zu minimieren. Zugangstoken können automatisch mit einem Aktualisierungstoken erneuert werden."
+        },
+        "ID_TOKEN": {
+          "TITLE": "ID-Token",
+          "DESCRIPTION": "Das ID-Token ist ein JSON Web Token (JWT), das Ansprüche über den Benutzer enthält. Die Lebensdauer des ID-Tokens sollte die Lebensdauer des Zugangstokens nicht überschreiten."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Aktualisierungstoken",
+          "DESCRIPTION": "Das Aktualisierungstoken wird verwendet, um ein neues Zugangstoken zu erhalten. Es ist ein langfristiges Token, das verwendet wird, um das Zugangstoken zu erneuern. Ein Benutzer muss sich manuell neu authentifizieren, wenn das Aktualisierungstoken abläuft."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Inaktives Aktualisierungstoken",
+          "DESCRIPTION": "Die maximale Inaktivitätsdauer eines Aktualisierungstokens ist die maximale Zeit, in der ein Aktualisierungstoken unbenutzt sein kann."
+        }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Nachrichtentexte",
+        "DESCRIPTION": "Passe die Texte deiner Benachrichtigungs-E-Mails oder SMS-Nachrichten an. Wenn du einige der Sprachen deaktivieren möchtest, beschränke sie in den Spracheinstellungen deiner Instanz.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Wenn du eine Domain für deine Organisation beanspruchst, werden Benutzer, die diese Domain nicht in ihrem Anmeldenamen verwenden, aufgefordert, ihren Anmeldenamen zu ändern, um ihn an die beanspruchte Domain anzupassen.",
+          "INIT": "Wenn ein Benutzer erstellt wird, erhält er eine E-Mail mit einem Link, um sein Passwort festzulegen.",
+          "PC": "Wenn ein Benutzer sein Passwort ändert, erhält er eine Benachrichtigung über die Änderung, wenn du dies in den Benachrichtigungseinstellungen aktiviert hast.",
+          "PL": "Wenn ein Benutzer eine passwortlose Authentifizierungsmethode hinzufügt, muss er sie aktivieren, indem er auf einen Link in einer E-Mail klickt.",
+          "PR": "Wenn ein Benutzer sein Passwort zurücksetzt, erhält er eine E-Mail mit einem Link, um ein neues Passwort festzulegen.",
+          "VE": "Wenn ein Benutzer seine E-Mail-Adresse ändert, erhält er eine E-Mail mit einem Link zur Verifizierung der neuen Adresse.",
+          "VP": "Wenn ein Benutzer seine Telefonnummer ändert, erhält er eine SMS mit einem Code zur Verifizierung der neuen Nummer.",
+          "VEO": "Wenn ein Benutzer eine Einmalpasswort-Methode per E-Mail hinzufügt, muss er sie aktivieren, indem er einen Code eingibt, der an seine E-Mail-Adresse gesendet wurde.",
+          "VSO": "Wenn ein Benutzer eine Einmalpasswort-Methode per SMS hinzufügt, muss er sie aktivieren, indem er einen Code eingibt, der an seine Telefonnummer gesendet wurde."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Texte der Anmeldeoberfläche",
+        "DESCRIPTION": "Passe die Texte deines Anmeldeformulars an. Wenn ein Text leer ist, zeigt der Platzhalter den Standardwert an. Wenn du einige der Sprachen deaktivieren möchtest, beschränke sie in den Spracheinstellungen deiner Instanz."
+      },
+      "DOMAINS": {
+        "TITLE": "Domain-Einstellungen",
+        "DESCRIPTION": "Definiere Einschränkungen für deine Domains und konfiguriere deine Anmeldenamen-Muster.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Verifizierung benutzerdefinierter Domains erforderlich",
+          "DESCRIPTION": "Wenn dies aktiviert ist, müssen Organisationsdomänen verifiziert werden, bevor sie für die Domainerkennung oder die Benutzernamenergänzung verwendet werden können."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Muster für Anmeldenamen",
+          "DESCRIPTION": "Steuere das Muster der Anmeldenamen deiner Benutzer. ZITADEL wählt die Organisation deiner Benutzer aus, sobald sie ihren Anmeldenamen eingeben. Daher müssen die Anmeldenamen über alle Organisationen hinweg einzigartig sein. Wenn du Benutzer hast, die Konten in mehreren Domains haben, kannst du die Einzigartigkeit sicherstellen, indem du deine Anmeldenamen mit der Organisationsdomain ergänzt."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Domain-Verifizierung",
+          "DESCRIPTION": "Erlaube deiner Organisation nur die Verwendung der Domains, die sie tatsächlich kontrolliert. Wenn aktiviert, werden Organisationsdomänen periodisch durch DNS- oder HTTP-Challenge verifiziert, bevor sie verwendet werden können. Dies ist eine Sicherheitsfunktion, um Domain-Hijacking zu verhindern."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "SMTP-Absenderadresse",
+          "DESCRIPTION": "Erlaube eine SMTP-Absenderadresse nur, wenn sie einer deiner Instanzdomains entspricht."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Login-Lebensdauern",
+          "DESCRIPTION": "Verbessere deine Sicherheit, indem du einige maximale Lebensdauern im Zusammenhang mit dem Login reduzierst.",
+          "LABEL": "Maximale Lebensdauer in Stunden",
+          "PW_CHECK": {
+            "TITLE": "Passwortüberprüfung",
+            "DESCRIPTION": "Deine Benutzer müssen ihre Passwörter in diesen Zeiträumen ändern."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Externe Login-Überprüfung",
+            "DESCRIPTION": "Deine Benutzer werden in diesen Zeiträumen zu ihren externen Identitätsanbietern umgeleitet."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Multifaktor-Initialisierungsüberprüfung",
+            "DESCRIPTION": "Deine Benutzer werden aufgefordert, in diesen Zeiträumen einen zweiten Faktor oder einen Multifaktor einzurichten, falls sie dies noch nicht getan haben. Eine Lebensdauer von 0 deaktiviert diese Aufforderung."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Zweiter-Faktor-Überprüfung",
+            "DESCRIPTION": "Deine Benutzer müssen ihren zweiten Faktor in diesen Zeiträumen erneut validieren."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Multifaktor-Überprüfung",
+            "DESCRIPTION": "Deine Benutzer müssen ihren Multifaktor in diesen Zeiträumen erneut validieren."
+          }
+        },
+        "FORM": {
+          "TITLE": "Login-Formular",
+          "DESCRIPTION": "Passe das Login-Formular an.",
+          "USERNAME_PASSWORD_ALLOWED": {
+            "TITLE": "Benutzername und Passwort erlaubt",
+            "DESCRIPTION": "Erlaube deinen Benutzern, sich mit ihrem Benutzernamen und Passwort einzuloggen. Ist dies deaktiviert, können sich deine Benutzer nur mit passwortloser Authentifizierung oder einem externen Identitätsanbieter einloggen."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Benutzerregistrierung erlaubt",
+            "DESCRIPTION": "Erlaube anonymen Benutzern, ein Konto zu erstellen."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Organisationsregistrierung erlaubt",
+            "DESCRIPTION": "Erlaube anonymen Benutzern, eine Organisation zu erstellen."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Externer Login erlaubt",
+            "DESCRIPTION": "Erlaube deinen Benutzern, sich mit einem externen Identitätsanbieter einzuloggen, anstatt den ZITADEL-Benutzer zum Einloggen zu verwenden."
+          },
+          "PASSWORD_RESET_ALLOWED": {
+            "TITLE": "Passwort-Reset erlaubt",
+            "DESCRIPTION": "Erlaube deinen Benutzern, ihr Passwort zurückzusetzen."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Domänenentdeckung erlaubt",
+            "DESCRIPTION": "Finde die Organisationen deiner Benutzer anhand des Domänennamens ihrer Login-Namen, zum Beispiel ihrer E-Mail-Adresse."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Unbekannte Benutzernamen ignorieren",
+            "DESCRIPTION": "Ist dies aktiviert, zeigt das Login-Formular keine Fehlermeldung an, wenn der Benutzername unbekannt ist. Dies hilft, das Raten von Benutzernamen zu verhindern."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "E-Mail-Login deaktivieren",
+            "DESCRIPTION": "Ist dies aktiviert, können deine Benutzer sich nicht mit ihren E-Mail-Adressen einloggen. Beachte, dass, wenn du dies deaktivierst, die E-Mail-Adressen deiner Benutzer einzigartig über alle Organisationen hinweg sein müssen, um sich einzuloggen."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Telefon-Login deaktivieren",
+            "DESCRIPTION": "Ist dies aktiviert, können deine Benutzer sich nicht mit ihren Telefonnummern einloggen. Beachte, dass, wenn du dies deaktivierst, die Telefonnummern deiner Benutzer einzigartig über alle Organisationen hinweg sein müssen, um sich einzuloggen."
+          }
+        }
+      }
+    }
+  },
   "PAGINATOR": {
     "PREVIOUS": "Zurück",
     "NEXT": "Weiter",
@@ -22,16 +286,13 @@
     "DISCLAIMER": "ZITADEL behandelt Deine Daten vertraulich und sicher.",
     "DISCLAIMERLINK": "Mehr Informationen zur Sicherheit",
     "DOCUMENTATION": {
-      "TITLE": "Dokumentation",
       "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
     },
     "GETSTARTED": {
-      "TITLE": "Starten mit ZITADEL",
       "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
     },
     "QUICKSTARTS": {
       "LABEL": "Erste Schritte",
-      "TITLE": "Quickstarts",
       "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
     },
     "SHORTCUTS": {
@@ -325,11 +586,7 @@
     "TITLE": "Persönliche Informationen",
     "DESCRIPTION": "Verwalte Deine persönlichen Informationen und Sicherheitseinstellungen",
     "PAGES": {
-      "LIST": "Benutzer",
       "TITLE": "Benutzer",
-      "DESCRIPTION": "Erfasse und verwalte die Benutzer in Deiner Organisation.",
-      "LISTMACHINE": "Service-Benutzer",
-      "DESCRIPTIONMACHINE": "Erfasse und verwalte die Service-Benutzer in Deiner Organisation.",
       "DETAIL": "Detail",
       "CREATE": "Erstellen",
       "MY": "Meine Informationen",
@@ -379,10 +636,6 @@
       "ACTIVATE": "Aktivieren",
       "CHANGEDATE": "Letzte Änderung",
       "CREATIONDATE": "Erstelldatum",
-      "TYPES": {
-        "HUMAN": "Benutzer",
-        "MACHINE": "Service User"
-      },
       "FILTER": {
         "0": "Nach Anzeigename filtern",
         "1": "Nach Username filtern",
@@ -756,12 +1009,6 @@
     "REMOVESUCCESS": "Element erfolgreich gelöscht"
   },
   "FLOWS": {
-    "TITLE": "Aktionen und Abläufe",
-    "DESCRIPTION": "Hinterlege scripts die bei einem bestimmten Event ausgeführt werden.",
-    "ACTIONSTITLE": "Aktionen",
-    "ACTIONSDESCRIPTION": "Dies sind Ihre Scripts, die sie in den Abläufen ausführen können.",
-    "FLOWSTITLE": "Abläufe",
-    "FLOWSDESCRIPTION": "Abläufe eines bestimmten Typs führen Aktionen zum Zeitpunkt eines Triggers aus.",
     "ID": "ID",
     "NAME": "Name",
     "STATE": "State",
@@ -813,8 +1060,6 @@
     }
   },
   "IAM": {
-    "TITLE": "Instanz",
-    "DESCRIPTION": "Verwalten Sie Ihre Instanzeinstellungen und Organisationen",
     "POLICIES": {
       "TITLE": "System Administration",
       "DESCRIPTION": "Verwalte die globalen Richtlinien und Zugangseinstellungen."
@@ -839,8 +1084,6 @@
       "4": "Gestoppt"
     },
     "VIEWS": {
-      "TITLE": "Views",
-      "DESCRIPTION": "Diese Ansicht zeigt die Anzeigen von ZITADEL. Diese können bei Bedarf zurückgesetzt werden.",
       "VIEWNAME": "Name",
       "DATABASE": "Datenbank",
       "SEQUENCE": "Sequenz",
@@ -855,8 +1098,6 @@
       }
     },
     "FAILEDEVENTS": {
-      "TITLE": "Gescheiterte Events",
-      "DESCRIPTION": "Das sind die gescheiterten Events.",
       "VIEWNAME": "Name",
       "DATABASE": "Datenbank",
       "FAILEDSEQUENCE": "betroffene Sequenz",
@@ -868,8 +1109,6 @@
       "DELETESUCCESS": "Gescheiterte Events entfernt."
     },
     "EVENTS": {
-      "TITLE": "Events",
-      "DESCRIPTION": "Diese Ansicht zeigt alle vorhandenen Events.",
       "EDITOR": "Editor",
       "EDITORID": "Editor ID",
       "AGGREGATE": "Aggregate",
@@ -1047,10 +1286,6 @@
       "TITLE": "Instanz Einstellungen",
       "DESCRIPTION": "Diese Einstellungen werden auf all Ihren Organisationen angewandt sofern die Einstellung nicht überschrieben wurde."
     },
-    "ORG": {
-      "TITLE": "Organisation Einstellungen",
-      "DESCRIPTION": "Diese Einstellungen erweitern bzw. überschreiben die Einstellungen Ihrer Instanz."
-    },
     "LIST": {
       "ORGS": "Organisationen",
       "LANGUAGES": "Sprachen",
@@ -1088,7 +1323,6 @@
   },
   "SETTING": {
     "LANGUAGES": {
-      "TITLE": "Spracheinstellungen",
       "DEFAULT": "Standardsprache",
       "ALLOWED": "Erlaubte Sprachen",
       "NOT_ALLOWED": "Nicht erlaubte Sprachen",
@@ -1115,7 +1349,6 @@
       }
     },
     "SMTP": {
-      "TITLE": "SMTP Einstellungen",
       "SENDERADDRESS": "Sender Email-Adresse",
       "SENDERNAME": "Sender Name",
       "REPLYTOADDRESS": "Reply-to-Adresse",
@@ -1129,7 +1362,6 @@
       "REQUIREDWARN": "Damit Mails von Ihrer Domain verschickt werden können, müssen Sie Ihre SMTP Einstellungen konfigurieren."
     },
     "SMS": {
-      "TITLE": "SMS Einstellungen",
       "PROVIDERS": "Anbieter",
       "PROVIDER": "SMS Anbieter",
       "ADDPROVIDER": "Anbieter hinzufügen",
@@ -1155,17 +1387,7 @@
         "TOKENSET": "Token erfolgreich gesetzt."
       }
     },
-    "OIDC": {
-      "TITLE": "OIDC Einstellungen",
-      "ACCESSTOKENLIFETIME": "Access Token Lifetime",
-      "IDTOKENLIFETIME": "Id Token Lifetime",
-      "REFRESHTOKENEXPIRATION": "Refresh Token Expiration",
-      "REFRESHTOKENIDLEEXPIRATION": "Refresh Token Idle Expiration",
-      "INHOURS": "Stunden",
-      "INDAYS": "Tage"
-    },
     "SECRETS": {
-      "TITLE": "Passwort Generator",
       "TYPES": "Schlüsseltypen",
       "TYPE": {
         "1": "Email Initialisierungscode",
@@ -1205,8 +1427,6 @@
     }
   },
   "POLICY": {
-    "TITLE": "Richtlinien entdecken",
-    "DESCRIPTION": "Vorgefertigte Richtlinien, die Dir Zeit sparen und die Sicherheit erhöhen.",
     "APPLIEDTO": "Angewendet auf",
     "PWD_COMPLEXITY": {
       "TITLE": "Passwortkomplexität",
@@ -1222,7 +1442,6 @@
       "PASSWORDCHANGE": "Passwortänderung"
     },
     "PRIVATELABELING": {
-      "TITLE": "Branding",
       "DESCRIPTION": "Verleihen Sie dem Login Ihren benutzerdefinierten Style und passen Sie das Verhalten an.",
       "PREVIEW_DESCRIPTION": "Änderungen dieser Richtlinie werden automatisch in der Preview Umgebung verfügbar.",
       "BTN": "Datei auswählen",
@@ -1274,9 +1493,6 @@
       "TITLE": "Passwortsperre",
       "DESCRIPTION": "Lege eine maximale Anzahl an Passwordwiederholungen fest, nachdem Accounts gesperrt werden sollen."
     },
-    "DOMAIN_POLICY": {
-      "TITLE": "Domain Einstellungen"
-    },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Branding",
       "BTN": "Datei auswählen",
@@ -1288,13 +1504,10 @@
       "DESCRIPTION": "Definiere die Loginmethoden für Benutzer",
       "DESCRIPTIONCREATEADMIN": "Nutzer können sich mit den verfügbaren Idps authentifizieren.",
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
-      "ADVANCED": "Erweitert",
-      "LIFETIMEDURATIONS": "Login Lifetimes",
       "LIFETIME_INVALID": "Login Lifetimes sind ungültig.",
       "SAVED": "Erfolgreich gespeichert."
     },
     "PRIVACY_POLICY": {
-      "TITLE": "Datenschutzbestimmungen und AGB",
       "DESCRIPTION": "Legen Sie Ihre Datenschutzrichtlinien und Nutzungsbedingungen fest",
       "TOSLINK": "Link zu den Allgemeinen Geschäftsbedingungen",
       "POLICYLINK": "Link zur den Datenschutzrichtlinien",
@@ -1373,8 +1586,6 @@
       }
     },
     "MESSAGE_TEXTS": {
-      "TITLE": "Email Texte",
-      "DESCRIPTION": "Definiere die Texte für deine Benachrichtigungsmails",
       "TYPE": "Benachrichtigung",
       "TYPES": {
         "INIT": "Initialisierung",
@@ -1428,38 +1639,22 @@
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
       "VALIDATEORGDOMAINS": "Verifizierung des Organisations Domain erforderlich (DNS- oder HTTP-Herausforderung)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Adresse entspricht Instanzdomain",
-      "ALLOWUSERNAMEPASSWORD": "Benutzername Passwort erlaubt",
-      "ALLOWEXTERNALIDP": "Externer IDP erlaubt",
-      "ALLOWREGISTERUSERS": "Benutzerregistrierung erlaubt",
-      "ALLOWREGISTERORGS": "Organisationsregistrierung erlaubt",
       "ALLOWUSERNAMEPASSWORD_DESC": "Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
       "ALLOWEXTERNALIDP_DESC": "Der Login wird für die darunter liegenden Identitätsanbieter erlaubt.",
       "ALLOWREGISTER_DESC": "Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",
       "FORCEMFA": "MFA erzwingen",
-      "FORCEMFA_DESC": "Ist die Option gewählt, müssen Benutzer einen zweiten Faktor für den Login verwenden.",
       "FORCEMFALOCALONLY": "MFA für lokale Users erzwingen",
       "FORCEMFALOCALONLY_DESC": "Ist die Option gewählt, müssen lokal authentifizierte Benutzer einen zweiten Faktor für den Login verwenden.",
-      "HIDEPASSWORDRESET": "Passwort vergessen ausblenden",
       "HIDEPASSWORDRESET_DESC": "Ist die Option gewählt, ist es nicht möglich im Login das Passwort zurück zusetzen via Passwort vergessen Link.",
       "HIDELOGINNAMESUFFIX": "Loginname Suffix ausblenden",
       "HIDELOGINNAMESUFFIX_DESC": "Blendet das Suffix des Login-Namens in der Login-Oberfläche aus",
-      "IGNOREUNKNOWNUSERNAMES": "Unbekannte Usernamen ignorieren",
       "IGNOREUNKNOWNUSERNAMES_DESC": "Ist die Option gewählt, wird der Passwort Schritt im Login auch angezeigt wenn der User nicht gefunden wurde. Dem Benutzer wird auf bei der Passwortprüfung nicht angezeigt ob der Username oder das Passwort falsch war.",
-      "ALLOWDOMAINDISCOVERY": "Domänenentdeckung erlauben",
       "ALLOWDOMAINDISCOVERY_DESC": "Ist die Option gewählt, wird die Endung (@domain.com) eines unbekannten Benutzernamens im Login mit den Organisationsdomänen verglichen. Bei Übereinstimmung wird der Benutzer auf die Registrierung dieser Organisation weitergeleitet.",
-      "DISABLELOGINWITHEMAIL": "Login mittels E-Mailadresse deaktivieren",
-      "DISABLELOGINWITHPHONE": "Login mittels Telefonnummer deaktivieren",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
       "DEFAULTREDIRECTURI_DESC": "Definiert, wohin der Benutzer umgeleitet wird, wenn die Anmeldung ohne App-Kontext gestartet wurde (z. B. von Mail)",
       "ERRORMSGPOPUP": "Fehler als Dialog Fenster",
       "DISABLEWATERMARK": "Wasserzeichen ausblenden",
-      "DISABLEWATERMARK_DESC": "Powered by ZITADEL Wasserzeichen in der Login-Oberfläche ausblenden",
-      "PASSWORDCHECKLIFETIME": "Passwort Check Lifetime",
-      "EXTERNALLOGINCHECKLIFETIME": "Externer Login Check Lifetime",
-      "MFAINITSKIPLIFETIME": "Multifaktor Init Lifetime",
-      "SECONDFACTORCHECKLIFETIME": "Zweitfaktor Check Lifetime",
-      "MULTIFACTORCHECKLIFETIME": "Multifaktor Check Lifetime",
-      "INHOURS": "Stunden"
+      "DISABLEWATERMARK_DESC": "Powered by ZITADEL Wasserzeichen in der Login-Oberfläche ausblenden"
     },
     "RESET": "Auf Instanzeinstellung zurücksetzen",
     "CREATECUSTOM": "Benutzerdefinierte Richtlinie erstellen",
@@ -1508,8 +1703,6 @@
       "TITLE": "Projekt",
       "DESCRIPTION": "Hier kannst Du wichtige Einstellungen prüfen und die Daten einsehen, mit denen das Projekt konfiguriert worden ist.",
       "DELETE": "Projekt löschen",
-      "LIST": "Projekte",
-      "LISTDESCRIPTION": "Wenn Du Dein Projekt nicht finden kannst, wende Dich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
       "DETAIL": "Details",
       "CREATE": "Projekt erstellen",
       "CREATE_DESC": "Gebe den Namen ein.",
@@ -1518,7 +1711,6 @@
       "ZITADELPROJECT": "Diese Einstellungen gehören zum ZITADEL-Projekt. Wenn Du diese änderst, verhält sich ZITADEL möglicherweise nicht wie beabsichtigt.",
       "TYPE": {
         "OWNED": "Eigene Projekte",
-        "GRANTED": "Berechtigte Projekte",
         "OWNED_SINGULAR": "Eigenes Projekt",
         "GRANTED_SINGULAR": "Berechtigtes Projekt"
       },
@@ -1738,8 +1930,6 @@
   },
   "IDP": {
     "LIST": {
-      "TITLE": "Identitäts Provider",
-      "DESCRIPTION": "Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können.",
       "ACTIVETITLE": "Aktive Identitäts Provider"
     },
     "CREATE": {
@@ -2245,7 +2435,8 @@
     "DIALOG": {
       "DELETE_TITLE": "Manager entfernen",
       "DELETE_DESCRIPTION": "Sie sind im Begriff einen Manager zu entfernen. Wollen Sie fortfahren?"
-    }
+    },
+    "SHOWDETAILS": "Details anzeigen"
   },
   "ROLESLABEL": "Rollen",
   "GRANTS": {

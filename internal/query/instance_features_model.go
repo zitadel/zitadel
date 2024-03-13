@@ -54,13 +54,13 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 		AwaitOpenTransactions().
 		AddQuery().
 		AggregateTypes(feature_v2.AggregateType).
-		AggregateIDs(m.AggregateID).
 		EventTypes(
 			feature_v1.DefaultLoginInstanceEventType,
 			feature_v2.InstanceResetEventType,
 			feature_v2.InstanceLoginDefaultOrgEventType,
 			feature_v2.InstanceTriggerIntrospectionProjectionsEventType,
 			feature_v2.InstanceLegacyIntrospectionEventType,
+			feature_v2.InstanceUserSchemaEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -72,6 +72,7 @@ func (m *InstanceFeaturesReadModel) reduceReset() {
 	m.instance.LoginDefaultOrg = FeatureSource[bool]{}
 	m.instance.TriggerIntrospectionProjections = FeatureSource[bool]{}
 	m.instance.LegacyIntrospection = FeatureSource[bool]{}
+	m.instance.UserSchema = FeatureSource[bool]{}
 }
 
 func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
@@ -81,6 +82,7 @@ func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
 	m.instance.LoginDefaultOrg = m.system.LoginDefaultOrg
 	m.instance.TriggerIntrospectionProjections = m.system.TriggerIntrospectionProjections
 	m.instance.LegacyIntrospection = m.system.LegacyIntrospection
+	m.instance.UserSchema = m.system.UserSchema
 	return true
 }
 
@@ -100,6 +102,8 @@ func (m *InstanceFeaturesReadModel) reduceBoolFeature(event *feature_v2.SetEvent
 		dst = &m.instance.TriggerIntrospectionProjections
 	case feature.KeyLegacyIntrospection:
 		dst = &m.instance.LegacyIntrospection
+	case feature.KeyUserSchema:
+		dst = &m.instance.UserSchema
 	}
 	*dst = FeatureSource[bool]{
 		Level: level,

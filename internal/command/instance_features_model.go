@@ -48,13 +48,13 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AwaitOpenTransactions().
 		AddQuery().
 		AggregateTypes(feature_v2.AggregateType).
-		AggregateIDs(m.AggregateID).
 		EventTypes(
 			feature_v1.DefaultLoginInstanceEventType,
 			feature_v2.InstanceResetEventType,
 			feature_v2.InstanceLoginDefaultOrgEventType,
 			feature_v2.InstanceTriggerIntrospectionProjectionsEventType,
 			feature_v2.InstanceLegacyIntrospectionEventType,
+			feature_v2.InstanceUserSchemaEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -63,6 +63,7 @@ func (m *InstanceFeaturesWriteModel) reduceReset() {
 	m.LoginDefaultOrg = nil
 	m.TriggerIntrospectionProjections = nil
 	m.LegacyIntrospection = nil
+	m.UserSchema = nil
 }
 
 func (m *InstanceFeaturesWriteModel) reduceBoolFeature(event *feature_v2.SetEvent[bool]) error {
@@ -79,6 +80,8 @@ func (m *InstanceFeaturesWriteModel) reduceBoolFeature(event *feature_v2.SetEven
 		m.TriggerIntrospectionProjections = &event.Value
 	case feature.KeyLegacyIntrospection:
 		m.LegacyIntrospection = &event.Value
+	case feature.KeyUserSchema:
+		m.UserSchema = &event.Value
 	}
 	return nil
 }
@@ -89,5 +92,6 @@ func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *Instan
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginDefaultOrg, f.LoginDefaultOrg, feature_v2.InstanceLoginDefaultOrgEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TriggerIntrospectionProjections, f.TriggerIntrospectionProjections, feature_v2.InstanceTriggerIntrospectionProjectionsEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LegacyIntrospection, f.LegacyIntrospection, feature_v2.InstanceLegacyIntrospectionEventType)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.UserSchema, f.UserSchema, feature_v2.InstanceUserSchemaEventType)
 	return cmds
 }

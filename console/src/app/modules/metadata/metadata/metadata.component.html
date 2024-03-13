@@ -1,4 +1,4 @@
-<cnsl-card class="metadata-details" title="{{ 'METADATA.TITLE' | translate }}">
+<cnsl-card class="metadata-details" [title]="'DESCRIPTIONS.METADATA_TITLE' | translate" [description]="description">
   <mat-spinner card-actions class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
 
   <cnsl-refresh-table [loading]="loading$ | async" (refreshed)="refresh.emit()" [dataSize]="dataSource.data.length">

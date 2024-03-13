@@ -22,6 +22,10 @@ func DefaultLoginInstanceEventToV2(e *SetEvent[Boolean]) *feature_v2.SetEvent[bo
 		BaseEvent: e.BaseEvent,
 		Value:     e.Value.Boolean,
 	}
+
+	// v1 used a random aggregate ID.
+	// v2 uses the instance ID as aggregate ID.
+	v2e.BaseEvent.Agg.ID = e.Agg.InstanceID
 	v2e.BaseEvent.EventType = feature_v2.InstanceLoginDefaultOrgEventType
 	return v2e
 }
