@@ -67,7 +67,7 @@
     },
     "ACTIONS": {
       "TITLE": "Azioni",
-      "DESCRIPTION": "Esegui codice personalizzato sugli eventi che si verificano quando i tuoi utenti si autenticano su ZITADEL. Automatizza i tuoi processi, arricchisci i metadati dei tuoi utenti e i loro token o notifica sistemi esterni.",
+      "DESCRIPTION": "Esegui script sugli eventi che si verificano quando i tuoi utenti si autenticano su ZITADEL. Automatizza i tuoi processi, arricchisci i metadati dei tuoi utenti e i loro token o notifica sistemi esterni.",
       "SCRIPTS": {
         "TITLE": "Scripts",
         "DESCRIPTION": "Scrivi il tuo codice JavaScript una volta e attivalo in più flussi."
