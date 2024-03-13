@@ -50,6 +50,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Level: feature.LevelSystem,
 			Value: true,
 		},
+		TokenExchange: query.FeatureSource[bool]{
+			Level: feature.LevelSystem,
+			Value: false,
+		},
 	}
 	want := &feature_pb.GetSystemFeaturesResponse{
 		Details: &object.Details{
@@ -67,6 +71,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 		},
 		OidcLegacyIntrospection: &feature_pb.FeatureFlag{
 			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
+		OidcTokenExchange: &feature_pb.FeatureFlag{
+			Enabled: false,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
 	}
@@ -108,6 +116,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Level: feature.LevelInstance,
 			Value: true,
 		},
+		TokenExchange: query.FeatureSource[bool]{
+			Level: feature.LevelSystem,
+			Value: false,
+		},
 	}
 	want := &feature_pb.GetInstanceFeaturesResponse{
 		Details: &object.Details{
@@ -126,6 +138,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		OidcLegacyIntrospection: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
+		},
+		OidcTokenExchange: &feature_pb.FeatureFlag{
+			Enabled: false,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
 	}
 	got := instanceFeaturesToPb(arg)

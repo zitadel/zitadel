@@ -31,7 +31,12 @@ func setTokenExchangeFeature(t *testing.T, value bool) {
 		OidcTokenExchange: proto.Bool(value),
 	})
 	require.NoError(t, err)
-	time.Sleep(time.Second)
+}
+
+func resetFeatures(t *testing.T) {
+	iamCTX := Tester.WithAuthorization(CTX, integration.IAMOwner)
+	_, err := Tester.Client.FeatureV2.ResetInstanceFeatures(iamCTX, &feature.ResetInstanceFeaturesRequest{})
+	require.NoError(t, err)
 }
 
 func setImpersonationPolicy(t *testing.T, value bool) {
@@ -44,7 +49,6 @@ func setImpersonationPolicy(t *testing.T, value bool) {
 			EnableImpersonation: value,
 		})
 		require.NoError(t, err)
-		time.Sleep(time.Second)
 	}
 }
 
@@ -85,6 +89,11 @@ func refreshTokenVerifier(ctx context.Context, provider rp.RelyingParty) func(t 
 }
 
 func TestServer_TokenExchange(t *testing.T) {
+	t.Cleanup(func() {
+		resetFeatures(t)
+		setImpersonationPolicy(t, false)
+	})
+
 	client, keyData, err := Tester.CreateOIDCTokenExchangeClient(CTX)
 	require.NoError(t, err)
 	signer, err := rp.SignerFromKeyFile(keyData)()
@@ -99,6 +108,7 @@ func TestServer_TokenExchange(t *testing.T) {
 	serviceUserID, noPermPAT := createMachineUserPATWithMembership(t)
 
 	// exchange some tokens for later use
+	setTokenExchangeFeature(t, true)
 	teResp, err := tokenexchange.ExchangeToken(CTX, exchanger, noPermPAT, oidc.AccessTokenType, "", "", nil, nil, nil, oidc.AccessTokenType)
 	require.NoError(t, err)
 
@@ -518,7 +528,10 @@ func TestImpersonation_API_Call(t *testing.T) {
 
 	setTokenExchangeFeature(t, true)
 	setImpersonationPolicy(t, true)
-	time.Sleep(10 * time.Second)
+	t.Cleanup(func() {
+		resetFeatures(t)
+		setImpersonationPolicy(t, false)
+	})
 
 	_, iamImpersonatorPAT := createMachineUserPATWithMembership(t, "IAM_ADMIN_IMPERSONATOR")
 	iamOwner := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.IAMOwner)

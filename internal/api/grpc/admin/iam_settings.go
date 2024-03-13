@@ -3,8 +3,12 @@ package admin
 import (
 	"context"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -123,6 +127,10 @@ func (s *Server) SetSecurityPolicy(ctx context.Context, req *admin_pb.SetSecurit
 	if err != nil {
 		return nil, err
 	}
+
+	_, err = projection.SecurityPolicyProjection.Trigger(ctx, handler.WithAwaitRunning())
+	logging.OnError(err).Warn("trigger security policy projection")
+
 	return &admin_pb.SetSecurityPolicyResponse{
 		Details: object.DomainToChangeDetailsPb(details),
 	}, nil
