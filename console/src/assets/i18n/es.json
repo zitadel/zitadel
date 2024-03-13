@@ -1,5 +1,269 @@
 {
   "APP_NAME": "ZITADEL",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Metadatos",
+    "HOME": {
+      "TITLE": "Comienza con ZITADEL",
+      "NEXT": {
+        "TITLE": "Tus próximos pasos",
+        "DESCRIPTION": "Completa los siguientes pasos para asegurar tu aplicación.",
+        "CREATE_PROJECT": {
+          "TITLE": "Crear un proyecto",
+          "DESCRIPTION": "Agrega un proyecto y define sus roles y autorizaciones."
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Empezar",
+          "DESCRIPTION": "Sigue la guía de inicio rápido paso a paso y comienza a construir inmediatamente."
+        },
+        "DOCS": {
+          "TITLE": "Documentación",
+          "DESCRIPTION": "Explora la base de conocimientos de ZITADEL para familiarizarte con conceptos e ideas fundamentales. Aprende cómo funciona ZITADEL y cómo usarlo."
+        },
+        "EXAMPLES": {
+          "TITLE": "Ejemplos y Kits de Desarrollo de Software",
+          "DESCRIPTION": "Explora nuestros ejemplos y SDKs para usar ZITADEL junto con tus lenguajes de programación y herramientas favoritas."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Organización",
+      "DESCRIPTION": "Una organización alberga usuarios, proyectos con aplicaciones, proveedores de identidad y configuraciones como la marca de la compañía. ¿Quieres compartir configuraciones a través de múltiples organizaciones? Configura los ajustes predeterminados.",
+      "METADATA": "Añade atributos personalizados a la organización como su ubicación o un identificador en otro sistema. Puedes usar esta información en tus acciones."
+    },
+    "PROJECTS": {
+      "TITLE": "Proyectos",
+      "DESCRIPTION": "Un proyecto alberga una o más aplicaciones, que puedes usar para autenticar a tus usuarios. También puedes autorizar a tus usuarios con proyectos. Para permitir que usuarios de otras organizaciones se registren en tus aplicaciones, otórgales acceso a tu proyecto.<br/><br/>Si no encuentras un proyecto, contacta al dueño del proyecto o alguien con los derechos correspondientes para obtener acceso.",
+      "OWNED": {
+        "TITLE": "Proyectos Propios",
+        "DESCRIPTION": "Estos son los proyectos que posees. Puedes gestionar los ajustes de estos proyectos, autorizaciones y aplicaciones."
+      },
+      "GRANTED": {
+        "TITLE": "Proyectos Concedidos",
+        "DESCRIPTION": "Estos son los proyectos que otras organizaciones te han concedido. Con los proyectos concedidos puedes dar acceso a tus usuarios a aplicaciones de otras organizaciones."
+      }
+    },
+    "USERS": {
+      "TITLE": "Usuarios",
+      "DESCRIPTION": "Un usuario es un humano o una máquina que puede acceder a tus aplicaciones.",
+      "HUMANS": {
+        "TITLE": "Humanos",
+        "DESCRIPTION": "Los humanos se autentican de manera interactiva en una sesión de navegador con una solicitud de inicio de sesión.",
+        "METADATA": "Añade atributos personalizados al usuario como el departamento. Puedes usar esta información en tus acciones."
+      },
+      "MACHINES": {
+        "TITLE": "Máquinas",
+        "DESCRIPTION": "Las máquinas se autentican de manera no interactiva usando un token portador JWT firmado con una clave privada. También pueden usar un token de acceso personal.",
+        "METADATA": "Añade atributos personalizados al usuario como el sistema autenticador. Puedes usar esta información en tus acciones."
+      },
+      "SELF": {
+        "METADATA": "Añade atributos personalizados a tu usuario como tu departamento. Puedes usar esta información en las acciones de tu organización."
+      }
+    },
+    "AUTHORIZATIONS": {
+      "TITLE": "Autorizaciones",
+      "DESCRIPTION": "Las autorizaciones definen los derechos de acceso de un usuario a un proyecto. Puedes otorgar acceso a un usuario a un proyecto y definir los roles del usuario dentro de ese proyecto."
+    },
+    "ACTIONS": {
+      "TITLE": "Acciones",
+      "DESCRIPTION": "Ejecuta código personalizado en eventos que sucedan mientras tus usuarios se autentican en ZITADEL. Automatiza tus procesos, enriquece los metadatos de tus usuarios y sus tokens o notifica a sistemas externos.",
+      "SCRIPTS": {
+        "TITLE": "Scripts",
+        "DESCRIPTION": "Escribe tu código JavaScript una vez y actívalo en múltiples flujos."
+      },
+      "FLOWS": {
+        "TITLE": "Flujos",
+        "DESCRIPTION": "Elige un flujo de autenticación y activa tu acción en un evento específico dentro de este flujo."
+      }
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Configuración de la Instancia",
+        "DESCRIPTION": "Las configuraciones de la instancia son las configuraciones predeterminadas para todas las organizaciones. Con los permisos adecuados, algunas de ellas pueden ser sobrescritas en la configuración de la organización."
+      },
+      "ORG": {
+        "TITLE": "Configuración de la Organización",
+        "DESCRIPTION": "Personaliza la configuración de tu organización."
+      },
+      "IDPS": {
+        "TITLE": "Proveedores de Identidad",
+        "DESCRIPTION": "Crea y activa proveedores de identidad externos. Elige un proveedor conocido o configura cualquier otro proveedor compatible con OIDC, OAuth o SAML de tu elección. Incluso puedes usar tus tokens JWT existentes como identidades federadas configurando un proveedor de identidad JWT."
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Complejidad de la Contraseña",
+        "DESCRIPTION": "Asegura que tus usuarios usen contraseñas fuertes definiendo reglas de complejidad."
+      },
+      "BRANDING": {
+        "TITLE": "Branding",
+        "DESCRIPTION": "Personaliza la apariencia de tu formulario de inicio de sesión. Recuerda aplicar tu configuración cuando hayas terminado."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Enlaces Externos",
+        "DESCRIPTION": "Guía a tus usuarios hacia recursos externos personalizados mostrados en la página de inicio de sesión. Los usuarios necesitan aceptar los Términos de Servicio y la Política de Privacidad antes de que puedan registrarse."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "Configuración de SMTP",
+        "DESCRIPTION": "Configura tu servidor SMTP para usar un dominio para la dirección del remitente que tus usuarios conozcan y en el que confíen."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "Configuración de SMS",
+        "DESCRIPTION": "Para desbloquear todas las características de ZITADEL, configura Twilio para enviar mensajes SMS a tus usuarios."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Eventos",
+        "DESCRIPTION": "Esta página muestra todos los cambios de estado en tu instancia hasta el límite del historial de auditoría de tus instancias. Filtra la lista por rango de tiempo para propósitos de depuración o fíltrala por un agregado para propósitos de auditoría."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Eventos Fallidos",
+        "DESCRIPTION": "Esta página muestra todos los eventos fallidos en tu instancia. Si ZITADEL no se comporta como esperas, siempre revisa esta lista primero."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Vistas",
+        "DESCRIPTION": "Esta página muestra todas tus vistas de base de datos y cuándo procesaron su último evento. Si te falta algún dato, verifica si la vista está actualizada."
+      },
+      "LANGUAGES": {
+        "TITLE": "Idiomas",
+        "DESCRIPTION": "Restringe los idiomas a los que se traducen el formulario de inicio de sesión y los mensajes de notificación. Si quieres deshabilitar algunos de los idiomas, arrástralos a la sección de Idiomas No Permitidos. Puedes especificar un idioma permitido como el idioma predeterminado. Si el idioma preferido de un usuario no está permitido, se utiliza el idioma predeterminado."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Generadores de Secretos",
+        "DESCRIPTION": "Define las complejidades y la vida útil de tus secretos. Una mayor complejidad y vida útil mejora la seguridad, una menor complejidad y vida útil mejora el rendimiento de descifrado."
+      },
+      "SECURITY": {
+        "TITLE": "Configuración de Seguridad",
+        "DESCRIPTION": "Habilita características de ZITADEL que pueden tener impactos en la seguridad. Realmente deberías saber lo que estás haciendo antes de cambiar estas configuraciones."
+      },
+      "OIDC": {
+        "TITLE": "Configuración de OpenID Connect",
+        "DESCRIPTION": "Configura la duración de vida de tus tokens OIDC. Utiliza duraciones más cortas para aumentar la seguridad de tus usuarios, utiliza duraciones más largas para aumentar la conveniencia de tus usuarios.",
+        "LABEL_HOURS": "Duración máxima en horas",
+        "LABEL_DAYS": "Duración máxima en días",
+        "ACCESS_TOKEN": {
+          "TITLE": "Token de Acceso",
+          "DESCRIPTION": "El token de acceso se utiliza para autenticar a un usuario. Es un token de corta duración que se utiliza para acceder a los datos del usuario. Utiliza una duración corta para minimizar el riesgo de acceso no autorizado. Los tokens de acceso pueden ser actualizados automáticamente utilizando un token de actualización."
+        },
+        "ID_TOKEN": {
+          "TITLE": "Token de ID",
+          "DESCRIPTION": "El token de ID es un JSON Web Token (JWT) que contiene afirmaciones sobre el usuario. La duración de vida del token de ID no debe exceder la duración de vida del token de acceso."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Token de Actualización",
+          "DESCRIPTION": "El token de actualización se utiliza para obtener un nuevo token de acceso. Es un token de larga duración que se utiliza para actualizar el token de acceso. Un usuario tiene que volver a autenticarse manualmente cuando el token de actualización expira."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Token de Actualización en Espera",
+          "DESCRIPTION": "La duración de vida del token de actualización en espera es el tiempo máximo que un token de actualización puede estar sin usar."
+        }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Textos de Mensajes",
+        "DESCRIPTION": "Personaliza los textos de tus mensajes de correo electrónico de notificación o mensajes SMS. Si deseas desactivar algunos de los idiomas, restríngelos en la configuración de idiomas de tus instancias.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Cuando reclamas un dominio para tu organización, a los usuarios que no utilicen este dominio en su nombre de inicio de sesión se les solicitará cambiar su nombre de inicio de sesión para que coincida con el dominio reclamado.",
+          "INIT": "Cuando se crea un usuario, recibirá un correo electrónico con un enlace para establecer su contraseña.",
+          "PC": "Cuando un usuario cambia su contraseña, recibirá una notificación sobre el cambio si has habilitado esto en la configuración de notificaciones.",
+          "PL": "Cuando un usuario agrega un método de autenticación sin contraseña, necesita activarlo haciendo clic en un enlace en un correo electrónico.",
+          "PR": "Cuando un usuario restablece su contraseña, recibirá un correo electrónico con un enlace para establecer una nueva contraseña.",
+          "VE": "Cuando un usuario cambia su dirección de correo electrónico, recibirá un correo electrónico con un enlace para verificar la nueva dirección.",
+          "VP": "Cuando un usuario cambia su número de teléfono, recibirá un SMS con un código para verificar el nuevo número.",
+          "VEO": "Cuando un usuario agrega una Contraseña de Un Solo Uso mediante correo electrónico, necesita activarla ingresando un código enviado a su dirección de correo electrónico.",
+          "VSO": "Cuando un usuario agrega una Contraseña de Un Solo Uso mediante SMS, necesita activarla ingresando un código enviado a su número de teléfono."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Textos de la Interfaz de Inicio de Sesión",
+        "DESCRIPTION": "Personaliza los textos de tu formulario de inicio de sesión. Si un texto está vacío, el marcador de posición muestra el valor predeterminado. Si deseas desactivar algunos de los idiomas, restríngelos en la configuración de idiomas de tus instancias."
+      },
+      "DOMAINS": {
+        "TITLE": "Configuración de Dominios",
+        "DESCRIPTION": "Define restricciones en tus dominios y configura los patrones de nombre de inicio de sesión.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Requerir que los dominios personalizados sean verificados",
+          "DESCRIPTION": "Si esto está activado, los dominios de la organización tienen que ser verificados antes de que puedan ser utilizados para el descubrimiento de dominios o el sufijo de nombre de usuario."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Patrón de Nombre de Inicio de Sesión",
+          "DESCRIPTION": "Controla el patrón de los nombres de inicio de sesión de tus usuarios. ZITADEL selecciona la organización de tus usuarios tan pronto como ingresan su nombre de inicio de sesión. Por lo tanto, los nombres de inicio de sesión necesitan ser únicos en todas las organizaciones. Si tienes usuarios que tienen una cuenta en múltiples dominios, puedes asegurar la unicidad añadiendo el dominio de la organización a tus nombres de inicio de sesión."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Verificación de Dominio",
+          "DESCRIPTION": "Permite solamente que tu organización use los dominios que realmente controla. Si está activado, los dominios de la organización son verificados periódicamente por DNS o desafío HTTP antes de que puedan ser utilizados. Esta es una característica de seguridad para prevenir la usurpación de dominios."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "Dirección del Remitente SMTP",
+          "DESCRIPTION": "Permite una dirección del remitente SMTP solo si coincide con uno de los dominios de tu instancia."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Duraciones de Inicio de Sesión",
+          "DESCRIPTION": "Refuerza tu seguridad reduciendo algunas duraciones máximas relacionadas con el inicio de sesión.",
+          "LABEL": "Duración Máxima en horas",
+          "PW_CHECK": {
+            "TITLE": "Verificación de Contraseña",
+            "DESCRIPTION": "Tus usuarios tienen que cambiar sus contraseñas en estos períodos."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Verificación de Inicio de Sesión Externo",
+            "DESCRIPTION": "Tus usuarios son redirigidos a sus proveedores de identidad externos en estos períodos."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Verificación de Inicio de Multifactor",
+            "DESCRIPTION": "Se solicitará a tus usuarios configurar un segundo factor o un Multifactor en estos períodos, si aún no lo han hecho. Una duración de 0 desactiva este aviso."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Verificación de Segundo Factor",
+            "DESCRIPTION": "Tus usuarios tienen que revalidar su segundo factor en estos períodos."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Verificación de Multifactor",
+            "DESCRIPTION": "Tus usuarios tienen que revalidar su Multifactor en estos períodos."
+          }
+        },
+        "FORM": {
+          "TITLE": "Formulario de Inicio de Sesión",
+          "DESCRIPTION": "Personaliza el formulario de inicio de sesión.",
+          "USERNAME_PASSWORD_ALLOWED": {
+            "TITLE": "Permitido Nombre de Usuario y Contraseña",
+            "DESCRIPTION": "Permite a tus usuarios iniciar sesión con su nombre de usuario y contraseña. Si esto está desactivado, tus usuarios solo pueden iniciar sesión utilizando autenticación sin contraseña o con un proveedor de identidad externo."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Permitida la Registración de Usuarios",
+            "DESCRIPTION": "Permite a los usuarios anónimos crear una cuenta."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Permitida la Registración de Organizaciones",
+            "DESCRIPTION": "Permite a los usuarios anónimos crear una organización."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Permitido Inicio de Sesión Externo",
+            "DESCRIPTION": "Permite a tus usuarios iniciar sesión con un proveedor de identidad externo en lugar de usar el usuario de ZITADEL para iniciar sesión."
+          },
+          "PASSWORD_RESET_ALLOWED": {
+            "TITLE": "Permitido Restablecimiento de Contraseña",
+            "DESCRIPTION": "Permite a tus usuarios restablecer su contraseña."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Permitido Descubrimiento de Dominio",
+            "DESCRIPTION": "Encuentra las organizaciones de tus usuarios dependiendo del dominio de sus nombres de inicio de sesión, por ejemplo, su dirección de correo electrónico."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Ignorar Nombres de Usuario Desconocidos",
+            "DESCRIPTION": "Si esto está activado, el formulario de inicio de sesión no mostrará un mensaje de error si el nombre de usuario es desconocido. Esto ayuda a prevenir la adivinación de nombres de usuario."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Desactivar Inicio de Sesión con Email",
+            "DESCRIPTION": "Si esto está activado, tus usuarios no pueden usar sus direcciones de correo electrónico para iniciar sesión. Ten en cuenta que si desactivas esto, las direcciones de correo electrónico de tus usuarios deben ser únicas en todas las organizaciones para poder iniciar sesión."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Desactivar Inicio de Sesión con Teléfono",
+            "DESCRIPTION": "Si esto está activado, tus usuarios no pueden usar sus números de teléfono para iniciar sesión. Ten en cuenta que si desactivas esto, los números de teléfono de tus usuarios deben ser únicos en todas las organizaciones para poder iniciar sesión."
+          }
+        }
+      }
+    }
+  },
   "PAGINATOR": {
     "PREVIOUS": "Anterior",
     "NEXT": "Siguiente",

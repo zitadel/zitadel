@@ -1,5 +1,269 @@
 {
   "APP_NAME": "ZITADEL",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Metadati",
+    "HOME": {
+      "TITLE": "Inizia con ZITADEL",
+      "NEXT": {
+        "TITLE": "I tuoi prossimi passi",
+        "DESCRIPTION": "Completa i seguenti passaggi per proteggere la tua applicazione.",
+        "CREATE_PROJECT": {
+          "TITLE": "Crea un progetto",
+          "DESCRIPTION": "Aggiungi un progetto e definisci i suoi ruoli e autorizzazioni."
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Inizia",
+          "DESCRIPTION": "Segui la guida rapida passo dopo passo e inizia subito a costruire."
+        },
+        "DOCS": {
+          "TITLE": "Documentazione",
+          "DESCRIPTION": "Esplora la base di conoscenza di ZITADEL per familiarizzare con i concetti e le idee principali. Impara come funziona ZITADEL e come utilizzarlo."
+        },
+        "EXAMPLES": {
+          "TITLE": "Esempi e Kit di Sviluppo Software",
+          "DESCRIPTION": "Consulta i nostri esempi e SDK per utilizzare ZITADEL con i tuoi linguaggi di programmazione e strumenti preferiti."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Organizzazione",
+      "DESCRIPTION": "Un'organizzazione ospita utenti, progetti con app, provider di identità e impostazioni come il branding aziendale. Vuoi condividere le impostazioni tra più organizzazioni? Configura le impostazioni predefinite.",
+      "METADATA": "Aggiungi attributi personalizzati all'organizzazione come la sua posizione o un identificatore in un altro sistema. Puoi utilizzare queste informazioni nelle tue azioni."
+    },
+    "PROJECTS": {
+      "TITLE": "Progetti",
+      "DESCRIPTION": "Un progetto ospita una o più applicazioni, che puoi utilizzare per autenticare i tuoi utenti. Puoi anche autorizzare i tuoi utenti con i progetti. Per permettere agli utenti di altre organizzazioni di accedere alle tue applicazioni, concedi loro l'accesso al tuo progetto.<br/><br/>Se non riesci a trovare un progetto, contatta il proprietario del progetto o qualcuno con i diritti corrispondenti per ottenere l'accesso.",
+      "OWNED": {
+        "TITLE": "Progetti di Proprietà",
+        "DESCRIPTION": "Questi sono i progetti che possiedi. Puoi gestire le impostazioni di questi progetti, le autorizzazioni e le applicazioni."
+      },
+      "GRANTED": {
+        "TITLE": "Progetti Concessi",
+        "DESCRIPTION": "Questi sono i progetti che altre organizzazioni ti hanno concesso. Con i progetti concessi puoi dare ai tuoi utenti l'accesso alle applicazioni di altre organizzazioni."
+      }
+    },
+    "USERS": {
+      "TITLE": "Utenti",
+      "DESCRIPTION": "Un utente è un essere umano o una macchina che può accedere alle tue applicazioni.",
+      "HUMANS": {
+        "TITLE": "Umani",
+        "DESCRIPTION": "Gli umani si autenticano interattivamente in una sessione del browser con un prompt di login.",
+        "METADATA": "Aggiungi attributi personalizzati all'utente come il dipartimento. Puoi utilizzare queste informazioni nelle tue azioni."
+      },
+      "MACHINES": {
+        "TITLE": "Macchine",
+        "DESCRIPTION": "Le macchine si autenticano in modo non interattivo utilizzando un token JWT firmato con una chiave privata. Possono anche utilizzare un token di accesso personale.",
+        "METADATA": "Aggiungi attributi personalizzati all'utente come il sistema di autenticazione. Puoi utilizzare queste informazioni nelle tue azioni."
+      },
+      "SELF": {
+        "METADATA": "Aggiungi attributi personalizzati al tuo utente come il tuo dipartimento. Puoi utilizzare queste informazioni nelle azioni della tua organizzazione."
+      }
+    },
+    "AUTHORIZATIONS": {
+      "TITLE": "Autorizzazioni",
+      "DESCRIPTION": "Le autorizzazioni definiscono i diritti di accesso di un utente a un progetto. Puoi concedere a un utente l'accesso a un progetto e definire i ruoli degli utenti all'interno di quel progetto."
+    },
+    "ACTIONS": {
+      "TITLE": "Azioni",
+      "DESCRIPTION": "Esegui codice personalizzato sugli eventi che si verificano quando i tuoi utenti si autenticano su ZITADEL. Automatizza i tuoi processi, arricchisci i metadati dei tuoi utenti e i loro token o notifica sistemi esterni.",
+      "SCRIPTS": {
+        "TITLE": "Scripts",
+        "DESCRIPTION": "Scrivi il tuo codice JavaScript una volta e attivalo in più flussi."
+      },
+      "FLOWS": {
+        "TITLE": "Flussi",
+        "DESCRIPTION": "Scegli un flusso di autenticazione e attiva la tua azione su un evento specifico all'interno di questo flusso."
+      }
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Impostazioni dell'Istanza",
+        "DESCRIPTION": "Le impostazioni dell'istanza sono le impostazioni predefinite per tutte le organizzazioni. Con i permessi adeguati, alcune di esse possono essere sovrascritte nelle impostazioni dell'organizzazione."
+      },
+      "ORG": {
+        "TITLE": "Impostazioni dell'Organizzazione",
+        "DESCRIPTION": "Personalizza le impostazioni della tua organizzazione."
+      },
+      "IDPS": {
+        "TITLE": "Fornitori di Identità",
+        "DESCRIPTION": "Crea e attiva fornitori di identità esterni. Scegli un fornitore ben noto o configura qualsiasi altro fornitore compatibile con OIDC, OAuth o SAML della tua scelta. Puoi anche utilizzare i tuoi token JWT esistenti come identità federate configurando un fornitore di identità JWT."
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Complessità della Password",
+        "DESCRIPTION": "Assicurati che i tuoi utenti utilizzino password complesse definendo regole di complessità."
+      },
+      "BRANDING": {
+        "TITLE": "Branding",
+        "DESCRIPTION": "Personalizza l'aspetto e la sensazione del tuo modulo di login. Ricorda di applicare la tua configurazione quando hai finito."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Link Esterni",
+        "DESCRIPTION": "Guida i tuoi utenti verso risorse esterne personalizzate mostrate nella pagina di login. Gli utenti devono accettare i Termini di Servizio e la Politica sulla Privacy prima che possano iscriversi."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "Impostazioni SMTP",
+        "DESCRIPTION": "Configura il tuo server SMTP per utilizzare un dominio per l'indirizzo del mittente che i tuoi utenti conoscono e di cui si fidano."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "Impostazioni SMS",
+        "DESCRIPTION": "Per sbloccare tutte le funzionalità di ZITADEL, configura Twilio per inviare messaggi SMS ai tuoi utenti."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Eventi",
+        "DESCRIPTION": "Questa pagina mostra tutti i cambiamenti di stato nella tua istanza fino al limite dell'audit trail delle tue istanze. Filtra l'elenco per intervallo di tempo per scopi di debug o filtralo per un aggregato per scopi di audit."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Eventi Falliti",
+        "DESCRIPTION": "Questa pagina mostra tutti gli eventi falliti nella tua istanza. Se ZITADEL non si comporta come ti aspetti, controlla sempre prima questa lista."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Viste",
+        "DESCRIPTION": "Questa pagina mostra tutte le tue viste del database e quando hanno elaborato il loro ultimo evento. Se ti mancano alcuni dati, controlla se la vista è aggiornata."
+      },
+      "LANGUAGES": {
+        "TITLE": "Lingue",
+        "DESCRIPTION": "Limita le lingue in cui il modulo di login e i messaggi di notifica vengono tradotti. Se vuoi disabilitare alcune lingue, trascinale nella sezione Lingue Non Permesse. Puoi specificare una lingua consentita come lingua predefinita. Se la lingua preferita di un utente non è consentita, viene utilizzata la lingua predefinita."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Generatori di Segreti",
+        "DESCRIPTION": "Definisci la complessità e la durata dei tuoi segreti. Una maggiore complessità e durata migliorano la sicurezza, una minore complessità e durata migliorano la performance di decifratura."
+      },
+      "SECURITY": {
+        "TITLE": "Impostazioni di Sicurezza",
+        "DESCRIPTION": "Abilita le funzionalità di ZITADEL che possono avere impatti sulla sicurezza. Dovresti davvero sapere cosa stai facendo prima di cambiare queste impostazioni."
+      },
+      "OIDC": {
+        "TITLE": "Impostazioni OpenID Connect",
+        "DESCRIPTION": "Configura la durata dei tuoi token OIDC. Usa durate più corte per aumentare la sicurezza dei tuoi utenti, usa durate più lunghe per aumentare la loro comodità.",
+        "LABEL_HOURS": "Durata Massima in ore",
+        "LABEL_DAYS": "Durata Massima in giorni",
+        "ACCESS_TOKEN": {
+          "TITLE": "Token di Accesso",
+          "DESCRIPTION": "Il token di accesso è usato per autenticare un utente. È un token di breve durata che viene utilizzato per accedere ai dati dell'utente. Usa una durata breve per minimizzare il rischio di accesso non autorizzato. I token di accesso possono essere automaticamente rinnovati utilizzando un token di refresh."
+        },
+        "ID_TOKEN": {
+          "TITLE": "Token ID",
+          "DESCRIPTION": "Il token ID è un JSON Web Token (JWT) che contiene dichiarazioni sull'utente. La durata del token ID non dovrebbe superare quella del token di accesso."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Token di Refresh",
+          "DESCRIPTION": "Il token di refresh è usato per ottenere un nuovo token di accesso. È un token di lunga durata che viene utilizzato per rinnovare il token di accesso. Un utente deve ri-autenticarsi manualmente quando il token di refresh scade."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Token di Refresh Inattivo",
+          "DESCRIPTION": "La durata massima di un token di refresh inattivo è il tempo massimo in cui un token di refresh può rimanere inutilizzato."
+        }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Testi dei Messaggi",
+        "DESCRIPTION": "Personalizza i testi delle tue email di notifica o messaggi SMS. Se vuoi disabilitare alcune lingue, limitale nelle impostazioni lingua delle tue istanze.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Quando rivendichi un dominio per la tua organizzazione, agli utenti che non usano questo dominio nel loro nome di login verrà chiesto di cambiare il loro nome di login per corrispondere al dominio rivendicato.",
+          "INIT": "Quando viene creato un utente, riceverà un'email con un link per impostare la sua password.",
+          "PC": "Quando un utente cambia la sua password, riceverà una notifica del cambiamento se hai abilitato questo nelle impostazioni di notifica.",
+          "PL": "Quando un utente aggiunge un metodo di autenticazione senza password, deve attivarlo cliccando su un link in un'email.",
+          "PR": "Quando un utente reimposta la sua password, riceverà un'email con un link per impostare una nuova password.",
+          "VE": "Quando un utente cambia il suo indirizzo email, riceverà un'email con un link per verificare il nuovo indirizzo.",
+          "VP": "Quando un utente cambia il suo numero di telefono, riceverà un SMS con un codice per verificare il nuovo numero.",
+          "VEO": "Quando un utente aggiunge una Password Monouso tramite metodo email, deve attivarla inserendo un codice inviato al suo indirizzo email.",
+          "VSO": "Quando un utente aggiunge una Password Monouso tramite metodo SMS, deve attivarla inserendo un codice inviato al suo numero di telefono."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Testi dell'Interfaccia di Login",
+        "DESCRIPTION": "Personalizza i testi del tuo modulo di login. Se un testo è vuoto, il placeholder mostra il valore predefinito. Se vuoi disabilitare alcune lingue, limitale nelle impostazioni lingua delle tue istanze."
+      },
+      "DOMAINS": {
+        "TITLE": "Impostazioni dei Domini",
+        "DESCRIPTION": "Definisci restrizioni sui tuoi domini e configura i pattern dei nomi di login. Se questa opzione è attivata, i domini dell'organizzazione devono essere verificati prima che possano essere utilizzati per la scoperta di domini o il suffisso del nome utente.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Richiedi che i domini personalizzati siano verificati",
+          "DESCRIPTION": "Se questa opzione è attivata, i domini dell'organizzazione devono essere verificati prima che possano essere utilizzati per la scoperta di domini o il suffisso del nome utente."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Pattern del Nome di Login",
+          "DESCRIPTION": "Controlla il pattern dei nomi di login dei tuoi utenti. ZITADEL seleziona l'organizzazione dei tuoi utenti non appena inseriscono il loro nome di login. Pertanto, i nomi di login devono essere unici in tutte le organizzazioni. Se hai utenti che hanno un account in più domini, puoi garantire l'unicità aggiungendo il dominio dell'organizzazione ai tuoi nomi di login."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Verifica del Dominio",
+          "DESCRIPTION": "Permetti alla tua organizzazione di usare solo i domini che controlla effettivamente. Se attivata, i domini dell'organizzazione vengono verificati periodicamente tramite DNS o sfida HTTP prima che possano essere utilizzati. Questa è una funzionalità di sicurezza per prevenire il dirottamento dei domini."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "Indirizzo Mittente SMTP",
+          "DESCRIPTION": "Permetti un indirizzo mittente SMTP solo se corrisponde a uno dei domini della tua istanza."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Durate di Vita del Login",
+          "DESCRIPTION": "Rafforza la tua sicurezza riducendo alcune durate massime relative al login.",
+          "LABEL": "Durata Massima in ore",
+          "PW_CHECK": {
+            "TITLE": "Controllo Password",
+            "DESCRIPTION": "I tuoi utenti devono cambiare le loro password in questi periodi."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Controllo Login Esterno",
+            "DESCRIPTION": "I tuoi utenti vengono reindirizzati ai loro provider di identità esterni in questi periodi."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Controllo Inizializzazione Multifattore",
+            "DESCRIPTION": "Ai tuoi utenti verrà richiesto di impostare un secondo fattore o un Multifattore in questi periodi, se non lo hanno già fatto. Una durata di vita di 0 disattiva questo promemoria."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Controllo Secondo Fattore",
+            "DESCRIPTION": "I tuoi utenti devono rivalidare il loro secondo fattore in questi periodi."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Controllo Multifattore",
+            "DESCRIPTION": "I tuoi utenti devono rivalidare il loro Multifattore in questi periodi."
+          }
+        },
+        "FORM": {
+          "TITLE": "Modulo di Login",
+          "DESCRIPTION": "Personalizza il modulo di login.",
+          "USERNAME_PASSWORD_ALLOWED": {
+            "TITLE": "Username e Password consentiti",
+            "DESCRIPTION": "Permetti ai tuoi utenti di accedere con il loro username e password. Se questa opzione è disattivata, i tuoi utenti possono accedere solo utilizzando l'autenticazione senza password o con un provider di identità esterno."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Registrazione Utente consentita",
+            "DESCRIPTION": "Permetti agli utenti anonimi di creare un account."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Registrazione Organizzazione consentita",
+            "DESCRIPTION": "Permetti agli utenti anonimi di creare un'organizzazione."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Login Esterno consentito",
+            "DESCRIPTION": "Permetti ai tuoi utenti di accedere con un provider di identità esterno invece di utilizzare l'utente ZITADEL per accedere."
+          },
+          "PASSWORD_RESET_ALLOWED": {
+            "TITLE": "Reset Password consentito",
+            "DESCRIPTION": "Permetti ai tuoi utenti di reimpostare la loro password."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Scoperta Dominio consentita",
+            "DESCRIPTION": "Trova le organizzazioni dei tuoi utenti in base al dominio dei loro nomi di login, ad esempio il loro indirizzo email."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Ignora Username sconosciuti",
+            "DESCRIPTION": "Se questa opzione è attivata, il modulo di login non mostrerà un messaggio di errore se lo username è sconosciuto. Questo aiuta a prevenire il tentativo di indovinare gli username."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Disabilita Login Email",
+            "DESCRIPTION": "Se questa opzione è attivata, i tuoi utenti non possono utilizzare i loro indirizzi email per accedere. Attenzione se disattivi questa opzione, gli indirizzi email dei tuoi utenti devono essere unici in tutte le organizzazioni per poter accedere."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Disabilita Login Telefono",
+            "DESCRIPTION": "Se questa opzione è attivata, i tuoi utenti non possono utilizzare i loro numeri di telefono per accedere. Attenzione se disattivi questa opzione, i numeri di telefono dei tuoi utenti devono essere unici in tutte le organizzazioni per poter accedere."
+          }
+        }
+      }
+    }
+  },
   "PAGINATOR": {
     "PREVIOUS": "Precedente",
     "NEXT": "Avanti",
