@@ -3,7 +3,7 @@
   {{ 'QUICKSTART.DIALOG.CHANGE.DESCRIPTION' | translate }}
   <div class="framework-change-block">
     <cnsl-framework-autocomplete
-      [frameworkId]="data.framework.id"
+      [frameworkId]="data.framework?.id"
       [frameworks]="data.frameworks"
       (selectionChanged)="findFramework($event)"
     ></cnsl-framework-autocomplete>
