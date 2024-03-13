@@ -8,7 +8,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -88,7 +87,8 @@ func (q *Queries) SearchExecutions(ctx context.Context, queries *ExecutionSearch
 	eq := sq.Eq{
 		ExecutionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	return genericSearch[*Executions](q, ctx, executionTable, prepareExecutionsQuery, combineToWhereStmt(queries.toQuery, eq))
+	query, scan := prepareExecutionsQuery(ctx, q.client)
+	return genericRowsQueryWithState[*Executions](ctx, q.client, executionTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
 }
 
 func (q *Queries) GetExecutionByID(ctx context.Context, id string) (execution *Execution, err error) {
@@ -96,11 +96,8 @@ func (q *Queries) GetExecutionByID(ctx context.Context, id string) (execution *E
 		ExecutionColumnID.identifier():         id,
 		ExecutionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	return genericGetByID[*Execution](q, ctx, prepareExecutionQuery, queryToWhereStmt(eq))
-}
-
-func NewExecutionIDSearchQuery(id string) (SearchQuery, error) {
-	return NewTextQuery(ExecutionColumnID, id, TextEquals)
+	query, scan := prepareExecutionQuery(ctx, q.client)
+	return genericRowQuery[*Execution](ctx, q.client, query.Where(eq), scan)
 }
 
 func NewExecutionInIDsSearchQuery(values []string) (SearchQuery, error) {
@@ -128,7 +125,7 @@ func prepareExecutionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			ExecutionColumnTargets.identifier(),
 			ExecutionColumnIncludes.identifier(),
 			countColumn.identifier(),
-		).From(executionTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(executionTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Executions, error) {
 			executions := make([]*Execution, 0)
@@ -171,7 +168,7 @@ func prepareExecutionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			ExecutionColumnSequence.identifier(),
 			ExecutionColumnTargets.identifier(),
 			ExecutionColumnIncludes.identifier(),
-		).From(executionTable.identifier() + db.Timetravel(call.Took(ctx))).
+		).From(executionTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Execution, error) {
 			execution := new(Execution)

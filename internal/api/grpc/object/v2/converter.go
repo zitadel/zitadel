@@ -25,8 +25,9 @@ func DomainToDetailsPb(objectDetail *domain.ObjectDetails) *object.Details {
 func ToListDetails(response query.SearchResponse) *object.ListDetails {
 	details := &object.ListDetails{
 		TotalResult:       response.Count,
-		ProcessedSequence: uint64(response.Position),
+		ProcessedSequence: response.Sequence,
 		Timestamp:         timestamppb.New(response.EventCreatedAt),
+		Position:          uint64(response.Position),
 	}
 
 	return details

@@ -107,7 +107,8 @@ func (q *Queries) SearchTargets(ctx context.Context, queries *TargetSearchQuerie
 	eq := sq.Eq{
 		TargetColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	return genericSearch[*Targets](q, ctx, targetTable, prepareTargetsQuery, combineToWhereStmt(queries.toQuery, eq))
+	query, scan := prepareTargetsQuery(ctx, q.client)
+	return genericRowsQueryWithState[*Targets](ctx, q.client, targetTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
 }
 
 func (q *Queries) GetTargetByID(ctx context.Context, id string) (target *Target, err error) {
@@ -115,7 +116,8 @@ func (q *Queries) GetTargetByID(ctx context.Context, id string) (target *Target,
 		TargetColumnID.identifier():         id,
 		TargetColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	return genericGetByID[*Target](q, ctx, prepareTargetQuery, queryToWhereStmt(eq))
+	query, scan := prepareTargetQuery(ctx, q.client)
+	return genericRowQuery[*Target](ctx, q.client, query.Where(eq), scan)
 }
 
 func NewTargetNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
