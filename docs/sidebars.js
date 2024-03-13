@@ -317,6 +317,7 @@ module.exports = {
           },
           collapsed: true,
           items: [
+            "guides/integrate/login-ui/session-validation",
             "guides/integrate/login-ui/username-password",
             "guides/integrate/login-ui/external-login",
             "guides/integrate/login-ui/passkey",
