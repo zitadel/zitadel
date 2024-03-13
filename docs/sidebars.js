@@ -165,6 +165,7 @@ module.exports = {
           items: [
             "guides/manage/user/reg-create-user",
             "guides/manage/customize/user-metadata",
+            "guides/manage/customize/user-schema",
           ],
         },
       ],
@@ -317,6 +318,7 @@ module.exports = {
           },
           collapsed: true,
           items: [
+            "guides/integrate/login-ui/session-validation",
             "guides/integrate/login-ui/username-password",
             "guides/integrate/login-ui/external-login",
             "guides/integrate/login-ui/passkey",
