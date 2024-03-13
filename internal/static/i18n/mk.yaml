@@ -545,6 +545,16 @@ Errors:
     NotFound: Извршувањето не е пронајдено
     IncludeNotFound: Вклучете не е пронајден
     NoTargets: Не се дефинирани цели
+  UserSchema:
+    NotEnabled: Функцијата „Корисничка шема“ не е овозможена
+    Type:
+      Missing: Недостасува тип на корисничка шема
+      AlreadyExists: Тип на корисничка шема веќе постои
+    Authenticator:
+      Invalid: Неважечки тип на автентикатор
+    NotActive: Корисничката шема не е активна
+    NotInactive: Корисничката шема не е неактивна
+    NotExists: Корисничката шема не постои
 
 AggregateTypes:
   action: Акција
@@ -558,6 +568,7 @@ AggregateTypes:
   feature: Карактеристика
   target: Цел
   execution: Извршување
+  user_schema: Корисничка шема
 
 EventTypes:
   execution:
@@ -1234,6 +1245,12 @@ EventTypes:
         password:
           changed: Променета лозинка на SMTP конфигурацијата
         removed: Отстранета SMTP конфигурација
+  user_schema:
+    created: Создадена е корисничка шема
+    updated: Корисничката шема е ажурирана
+    deactivated: Корисничката шема е деактивирана
+    reactivated: Корисничката шема е реактивирана
+    deleted: Корисничката шема е избришана
 
 Application:
   OIDC:

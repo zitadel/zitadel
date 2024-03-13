@@ -54,6 +54,7 @@ require (
 	github.com/pquerna/otp v1.4.0
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.10.1
+	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/sony/sonyflake v1.2.0
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.2

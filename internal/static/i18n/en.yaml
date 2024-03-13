@@ -546,6 +546,16 @@ Errors:
     NotFound: Execution not found
     IncludeNotFound: Include not found
     NoTargets: No targets defined
+  UserSchema:
+    NotEnabled: Feature "User Schema" is not enabled
+    Type:
+      Missing: User Schema Type missing
+      AlreadyExists: User Schema Type already exists
+    Authenticator:
+      Invalid: Invalid authenticator type
+    NotActive: User Schema not active
+    NotInactive: User Schema not inactive
+    NotExists: User Schema does not exist
 
 AggregateTypes:
   action: Action
@@ -559,6 +569,7 @@ AggregateTypes:
   feature: Feature
   target: Target
   execution: Execution
+  user_schema: User Schema
 
 EventTypes:
   execution:
@@ -1236,6 +1247,12 @@ EventTypes:
         password:
           changed: Password of SMTP configuration changed
         removed: SMTP configuration removed
+  user_schema:
+    created: User Schema created
+    updated: User Schema updated
+    deactivated: User Schema deactivated
+    reactivated: User Schema reactivated
+    deleted: User Schema deleted
 
 Application:
   OIDC:
