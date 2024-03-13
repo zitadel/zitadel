@@ -3,10 +3,9 @@ package feature
 import (
 	"context"
 
+	"github.com/zitadel/logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"

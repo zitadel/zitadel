@@ -162,7 +162,7 @@ func validateTokenExchangeScopes(client *Client, requestedScopes, subjectScopes,
 	if len(scopes) == 0 {
 		scopes = actorScopes
 	}
-	//return op.ValidateAuthReqScopes(client, scopes)
+	// return op.ValidateAuthReqScopes(client, scopes)
 	return scopes, nil
 }
 
@@ -178,7 +178,8 @@ func validateTokenExchangeAudience(requestedAudience, subjectAudience, actorAudi
 	if slices.Equal(requestedAudience, subjectAudience) || slices.Equal(requestedAudience, actorAudience) {
 		return requestedAudience, nil
 	}
-	allowedAudience := append(subjectAudience, actorAudience...)
+	allowedAudience := subjectAudience
+	allowedAudience = append(subjectAudience, actorAudience...)
 	for _, a := range requestedAudience {
 		if !slices.Contains(allowedAudience, a) {
 			return nil, oidc.ErrInvalidTarget().WithDescription("audience %q not found in subject or actor token", a)
@@ -235,7 +236,8 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 		resp.AccessToken, resp.ExpiresIn, err = s.createExchangeIDToken(ctx, signingKey, client, subjectToken.userID, "", audience, userInfo, actorToken.authMethods, actorToken.authTime, reason, actor)
 		resp.TokenType = "N_A"
 		resp.IssuedTokenType = oidc.IDTokenType
-
+	case oidc.RefreshTokenType, UserIDTokenType:
+		fallthrough
 	default:
 		err = zerrors.ThrowInvalidArgument(nil, "OIDC-wai5E", "Errors.TokenExchange.Token.TypeNotSupported")
 	}

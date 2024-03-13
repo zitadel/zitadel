@@ -5,9 +5,10 @@ import (
 	"strings"
 	"time"
 
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (s *Tester) CreateMachineUserPATWithMembership(ctx context.Context, roles ...string) (id, pat string, err error) {

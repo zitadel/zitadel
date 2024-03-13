@@ -285,6 +285,8 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 	if userWriteModel.UserState != domain.UserStateActive {
 		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-1d6Gg", "Errors.User.NotFound")
 	}
+
+	//nolint:contextcheck
 	userAgg := UserAggregateFromWriteModel(&userWriteModel.WriteModel)
 
 	var cmds []eventstore.Command

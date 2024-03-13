@@ -23,7 +23,7 @@ import (
 
 type expect func(mockRepository *mock.MockRepository)
 
-// DEPRECATED: use expectEventstore
+// Deprecated: use expectEventstore
 func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	m := mock.NewRepo(t)
 	for _, e := range expects {
