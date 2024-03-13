@@ -75,6 +75,7 @@ DefaultInstance:
     LoginDefaultOrg: true
     LegacyIntrospection: true
     TriggerIntrospectionProjections: true
+    UserSchema: true
 Log:
   Level: info
 Actions:
@@ -86,6 +87,7 @@ Actions:
 				LoginDefaultOrg:                 gu.Ptr(true),
 				LegacyIntrospection:             gu.Ptr(true),
 				TriggerIntrospectionProjections: gu.Ptr(true),
+				UserSchema:                      gu.Ptr(true),
 			})
 		},
 	}, {

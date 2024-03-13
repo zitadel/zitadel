@@ -546,6 +546,16 @@ Errors:
     NotFound: Exécution introuvable
     IncludeNotFound: Inclure introuvable
     NoTargets: Aucune cible définie
+  UserSchema:
+    NotEnabled: La fonctionnalité "Schéma utilisateur" n'est pas activée
+    Type:
+      Missing: Type de schéma utilisateur manquant
+      AlreadyExists: Le type de schéma utilisateur existe déjà
+    Authenticator:
+      Invalid: Type d'authentificateur invalide
+    NotActive: Schéma utilisateur non actif
+    NotInactive: Le schéma utilisateur n'est pas inactif
+    NotExists: Le schéma utilisateur n'existe pas
 
 AggregateTypes:
   action: Action
@@ -559,6 +569,7 @@ AggregateTypes:
   feature: Fonctionnalité
   target: Cible
   execution: Exécution
+  user_schema: Schéma utilisateur
 
 EventTypes:
   execution:
@@ -1065,6 +1076,12 @@ EventTypes:
     deactivated: Action désactivée
     reactivated: Action réactivée
     removed: Action supprimée
+  user_schema:
+    created: Schéma utilisateur créé
+    updated: Schéma utilisateur mis à jour
+    deactivated: Schéma utilisateur désactivé
+    reactivated: Schéma utilisateur réactivé
+    deleted: Schéma utilisateur supprimé
 
 Application:
   OIDC:

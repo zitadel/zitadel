@@ -32,12 +32,20 @@ message SetSystemFeaturesRequest{
     }
   ];
 
-  optional bool oidc_token_exchange = 4 [
+  optional bool user_schema = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "User Schemas allow to manage data schemas of user. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
+    }
+  ];
+
+  optional bool oidc_token_exchange = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "Enable the experimental `urn:ietf:params:oauth:grant-type:token-exchange` grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.";
     }
   ];
+  
 }
 
 message SetSystemFeaturesResponse {
@@ -75,7 +83,14 @@ message GetSystemFeaturesResponse {
     }
   ];
 
-  FeatureFlag oidc_token_exchange = 5 [
+  FeatureFlag user_schema = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "User Schemas allow to manage data schemas of user. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
+    }
+  ];
+
+  FeatureFlag oidc_token_exchange = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "Enable the experimental `urn:ietf:params:oauth:grant-type:token-exchange` grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.";

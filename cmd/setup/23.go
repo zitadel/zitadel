@@ -10,18 +10,18 @@ import (
 
 var (
 	//go:embed 23.sql
-	addTokenActor string
+	correctGlobalUniqueConstraints string
 )
 
-type AddActorToAuthTokens struct {
+type CorrectGlobalUniqueConstraints struct {
 	dbClient *database.DB
 }
 
-func (mig *AddActorToAuthTokens) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, addTokenActor)
+func (mig *CorrectGlobalUniqueConstraints) Execute(ctx context.Context, _ eventstore.Event) error {
+	_, err := mig.dbClient.ExecContext(ctx, correctGlobalUniqueConstraints)
 	return err
 }
 
-func (mig *AddActorToAuthTokens) String() string {
-	return "23_add_actor_col_to_auth_tokens"
+func (mig *CorrectGlobalUniqueConstraints) String() string {
+	return "23_correct_global_unique_constraints"
 }

@@ -1,1 +1,1 @@
-ALTER TABLE auth.tokens ADD COLUMN actor jsonb;
+UPDATE eventstore.unique_constraints SET instance_id = '' WHERE unique_type = 'instance_domain';

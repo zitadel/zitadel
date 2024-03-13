@@ -21,11 +21,15 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 		LoginDefaultOrg:                     gu.Ptr(true),
 		OidcTriggerIntrospectionProjections: gu.Ptr(false),
 		OidcLegacyIntrospection:             nil,
+		UserSchema:                          gu.Ptr(true),
+		OidcTokenExchange:                   gu.Ptr(true),
 	}
 	want := &command.SystemFeatures{
 		LoginDefaultOrg:                 gu.Ptr(true),
 		TriggerIntrospectionProjections: gu.Ptr(false),
 		LegacyIntrospection:             nil,
+		UserSchema:                      gu.Ptr(true),
+		TokenExchange:                   gu.Ptr(true),
 	}
 	got := systemFeaturesToCommand(arg)
 	assert.Equal(t, want, got)
@@ -47,6 +51,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Value: false,
 		},
 		LegacyIntrospection: query.FeatureSource[bool]{
+			Level: feature.LevelSystem,
+			Value: true,
+		},
+		UserSchema: query.FeatureSource[bool]{
 			Level: feature.LevelSystem,
 			Value: true,
 		},
@@ -73,6 +81,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
+		UserSchema: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
 		OidcTokenExchange: &feature_pb.FeatureFlag{
 			Enabled: false,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
@@ -87,11 +99,15 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		LoginDefaultOrg:                     gu.Ptr(true),
 		OidcTriggerIntrospectionProjections: gu.Ptr(false),
 		OidcLegacyIntrospection:             nil,
+		UserSchema:                          gu.Ptr(true),
+		OidcTokenExchange:                   gu.Ptr(true),
 	}
 	want := &command.InstanceFeatures{
 		LoginDefaultOrg:                 gu.Ptr(true),
 		TriggerIntrospectionProjections: gu.Ptr(false),
 		LegacyIntrospection:             nil,
+		UserSchema:                      gu.Ptr(true),
+		TokenExchange:                   gu.Ptr(true),
 	}
 	got := instanceFeaturesToCommand(arg)
 	assert.Equal(t, want, got)
@@ -116,6 +132,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Level: feature.LevelInstance,
 			Value: true,
 		},
+		UserSchema: query.FeatureSource[bool]{
+			Level: feature.LevelInstance,
+			Value: true,
+		},
 		TokenExchange: query.FeatureSource[bool]{
 			Level: feature.LevelSystem,
 			Value: false,
@@ -136,6 +156,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
 		},
 		OidcLegacyIntrospection: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_INSTANCE,
+		},
+		UserSchema: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},

@@ -132,9 +132,13 @@ export class AppCreateComponent implements OnDestroy {
       .addProject(project.toObject())
       .then((resp: AddProjectResponse.AsObject) => {
         this.error.set('');
-        this.router.navigate(['/projects', resp.id, 'apps', 'integrate'], {
-          queryParams: { framework: this.framework()?.id },
-        });
+        if (this.customFramework()) {
+          this.router.navigate(['/projects', resp.id, 'apps', 'create']);
+        } else if (this.framework()) {
+          this.router.navigate(['/projects', resp.id, 'apps', 'integrate'], {
+            queryParams: { framework: this.framework()?.id },
+          });
+        }
       })
       .catch((error) => {
         const { message } = error;

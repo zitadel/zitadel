@@ -135,7 +135,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s20AddByUserSessionIndex = &AddByUserIndexToSession{dbClient: queryDBClient}
 	steps.s21AddBlockFieldToLimits = &AddBlockFieldToLimits{dbClient: queryDBClient}
 	steps.s22ActiveInstancesIndex = &ActiveInstanceEvents{dbClient: queryDBClient}
-	steps.s23AddActorToAuthTokens = &AddActorToAuthTokens{dbClient: queryDBClient}
+	steps.s23CorrectGlobalUniqueConstraints = &CorrectGlobalUniqueConstraints{dbClient: esPusherDBClient}
+	steps.s24AddActorToAuthTokens = &AddActorToAuthTokens{dbClient: queryDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -154,51 +155,40 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 		},
 	}
 
-	err = migration.Migrate(ctx, eventstoreClient, steps.s14NewEventsTable)
-	logging.WithFields("name", steps.s14NewEventsTable.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s1ProjectionTable)
-	logging.WithFields("name", steps.s1ProjectionTable.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s2AssetsTable)
-	logging.WithFields("name", steps.s2AssetsTable.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.FirstInstance)
-	logging.WithFields("name", steps.FirstInstance.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s5LastFailed)
-	logging.WithFields("name", steps.s5LastFailed.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s6OwnerRemoveColumns)
-	logging.WithFields("name", steps.s6OwnerRemoveColumns.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s7LogstoreTables)
-	logging.WithFields("name", steps.s7LogstoreTables.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s8AuthTokens)
-	logging.WithFields("name", steps.s8AuthTokens.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s12AddOTPColumns)
-	logging.WithFields("name", steps.s12AddOTPColumns.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s13FixQuotaProjection)
-	logging.WithFields("name", steps.s13FixQuotaProjection.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s15CurrentStates)
-	logging.WithFields("name", steps.s15CurrentStates.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s16UniqueConstraintsLower)
-	logging.WithFields("name", steps.s16UniqueConstraintsLower.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s17AddOffsetToUniqueConstraints)
-	logging.WithFields("name", steps.s17AddOffsetToUniqueConstraints.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s19AddCurrentStatesIndex)
-	logging.WithFields("name", steps.s19AddCurrentStatesIndex.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s20AddByUserSessionIndex)
-	logging.WithFields("name", steps.s20AddByUserSessionIndex.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s22ActiveInstancesIndex)
-	logging.WithFields("name", steps.s22ActiveInstancesIndex.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s23AddActorToAuthTokens)
-	logging.WithFields("name", steps.s23AddActorToAuthTokens.String()).OnError(err).Fatal("migration failed")
+	for _, step := range []migration.Migration{
+		steps.s14NewEventsTable,
+		steps.s1ProjectionTable,
+		steps.s2AssetsTable,
+		steps.FirstInstance,
+		steps.s5LastFailed,
+		steps.s6OwnerRemoveColumns,
+		steps.s7LogstoreTables,
+		steps.s8AuthTokens,
+		steps.s12AddOTPColumns,
+		steps.s13FixQuotaProjection,
+		steps.s15CurrentStates,
+		steps.s16UniqueConstraintsLower,
+		steps.s17AddOffsetToUniqueConstraints,
+		steps.s19AddCurrentStatesIndex,
+		steps.s20AddByUserSessionIndex,
+		steps.s22ActiveInstancesIndex,
+		steps.s23CorrectGlobalUniqueConstraints,
+		steps.s24AddActorToAuthTokens,
+	} {
+		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
+	}
 
 	for _, repeatableStep := range repeatableSteps {
-		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)
-		logging.OnError(err).Fatalf("unable to migrate repeatable step: %s", repeatableStep.String())
+		mustExecuteMigration(ctx, eventstoreClient, repeatableStep, "unable to migrate repeatable step")
 	}
 
 	// These steps are executed after the repeatable steps because they add fields projections
-	err = migration.Migrate(ctx, eventstoreClient, steps.s18AddLowerFieldsToLoginNames)
-	logging.WithFields("name", steps.s18AddLowerFieldsToLoginNames.String()).OnError(err).Fatal("migration failed")
-	err = migration.Migrate(ctx, eventstoreClient, steps.s21AddBlockFieldToLimits)
-	logging.WithFields("name", steps.s21AddBlockFieldToLimits.String()).OnError(err).Fatal("migration failed")
+	for _, step := range []migration.Migration{
+		steps.s18AddLowerFieldsToLoginNames,
+		steps.s21AddBlockFieldToLimits,
+	} {
+		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
+	}
 
 	// projection initialization must be done last, since the steps above might add required columns to the projections
 	if config.InitProjections.Enabled {
@@ -211,6 +201,11 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 			config,
 		)
 	}
+}
+
+func mustExecuteMigration(ctx context.Context, eventstoreClient *eventstore.Eventstore, step migration.Migration, errorMsg string) {
+	err := migration.Migrate(ctx, eventstoreClient, step)
+	logging.WithFields("name", step.String()).OnError(err).Fatal(errorMsg)
 }
 
 func readStmt(fs embed.FS, folder, typ, filename string) (string, error) {

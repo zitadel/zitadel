@@ -15,6 +15,7 @@ type InstanceFeatures struct {
 	LoginDefaultOrg                 *bool
 	TriggerIntrospectionProjections *bool
 	LegacyIntrospection             *bool
+	UserSchema                      *bool
 	TokenExchange                   *bool
 }
 
@@ -22,6 +23,7 @@ func (m *InstanceFeatures) isEmpty() bool {
 	return m.LoginDefaultOrg == nil &&
 		m.TriggerIntrospectionProjections == nil &&
 		m.LegacyIntrospection == nil &&
+		m.UserSchema == nil &&
 		m.TokenExchange == nil
 }
 
