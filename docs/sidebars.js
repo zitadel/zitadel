@@ -317,6 +317,7 @@ module.exports = {
           },
           collapsed: true,
           items: [
+            "guides/integrate/login-ui/session-validation",
             "guides/integrate/login-ui/username-password",
             "guides/integrate/login-ui/external-login",
             "guides/integrate/login-ui/passkey",
@@ -325,7 +326,6 @@ module.exports = {
             "guides/integrate/login-ui/password-reset",
             "guides/integrate/login-ui/logout",
             "guides/integrate/login-ui/oidc-standard",
-            "guides/integrate/login-ui/session-validation",
           ],
         },
         {
