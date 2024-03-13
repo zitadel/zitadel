@@ -17,6 +17,13 @@
       </p>
     </div>
 
+    <div class="row" *ngIf="expirationDate">
+      <p class="left cnsl-secondary-text">{{ 'USER.MACHINE.EXPIRATIONDATE' | translate }}</p>
+      <p class="right">
+        {{ expirationDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm' }}
+      </p>
+    </div>
+
     <button class="download-button" mat-stroked-button color="primary" (click)="saveFile()">Download</button>
   </ng-container>
 </div>

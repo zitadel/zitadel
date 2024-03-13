@@ -56,6 +56,7 @@
     </ng-container>
 
     <cnsl-metadata
+      [description]="'DESCRIPTIONS.ORG.METADATA' | translate"
       [metadata]="metadata"
       [disabled]="(['org.write'] | hasRole | async) === false"
       (editClicked)="editMetadata()"
