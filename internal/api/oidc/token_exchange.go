@@ -184,8 +184,9 @@ func validateTokenExchangeAudience(requestedAudience, subjectAudience, actorAudi
 	if slices.Equal(requestedAudience, subjectAudience) || slices.Equal(requestedAudience, actorAudience) {
 		return requestedAudience, nil
 	}
-	allowedAudience := subjectAudience
-	allowedAudience = append(subjectAudience, actorAudience...)
+
+	//nolint:gocritic
+	allowedAudience := append(subjectAudience, actorAudience...)
 	for _, a := range requestedAudience {
 		if !slices.Contains(allowedAudience, a) {
 			return nil, oidc.ErrInvalidTarget().WithDescription("audience %q not found in subject or actor token", a)
