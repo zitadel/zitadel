@@ -53,7 +53,7 @@ func (t TriggerMethod) String() string {
 
 // Trigger is used to log a specific events for a user (e.g. session or oidc token creation)
 func Trigger(ctx context.Context, orgID, userID string, trigger TriggerMethod, reducer func(ctx context.Context, r eventstore.QueryReducer) error) {
-	if orgID == "" {
+	if orgID == "" && userID != "" {
 		orgID = getOrgOfUser(ctx, userID, reducer)
 	}
 	ai := info.ActivityInfoFromContext(ctx)
