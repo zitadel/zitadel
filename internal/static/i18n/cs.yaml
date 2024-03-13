@@ -543,6 +543,16 @@ Errors:
     NotFound: Provedení nenalezeno
     IncludeNotFound: Zahrnout nenalezeno
     NoTargets: Nejsou definovány žádné cíle
+  UserSchema:
+    NotEnabled: Funkce "Uživatelské schéma" není povolena
+    Type:
+      Missing: Chybí typ uživatelského schématu
+      AlreadyExists: Typ uživatelského schématu již existuje
+    Authenticator:
+      Invalid: Neplatný typ ověřovače
+    NotActive: Uživatelské schéma není aktivní
+    NotInactive: Uživatelské schéma není neaktivní
+    NotExists: Uživatelské schéma neexistuje
 
 AggregateTypes:
   action: Akce
@@ -556,6 +566,7 @@ AggregateTypes:
   feature: Funkce
   target: Cíl
   execution: Provedení
+  user_schema: Uživatelské schéma
 
 EventTypes:
   execution:
@@ -1233,6 +1244,12 @@ EventTypes:
         password:
           changed: Heslo konfigurace SMTP změněno
         removed: Konfigurace SMTP odstraněna
+  user_schema:
+    created: Vytvořeno uživatelské schéma
+    updated: Uživatelské schéma bylo aktualizováno
+    deactivated: Uživatelské schéma deaktivováno
+    reactivated: Uživatelské schéma bylo znovu aktivováno
+    deleted: Uživatelské schéma bylo smazáno
 
 Application:
   OIDC:

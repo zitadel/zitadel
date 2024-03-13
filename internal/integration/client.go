@@ -16,6 +16,7 @@ import (
 	"golang.org/x/text/language"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
@@ -37,38 +38,41 @@ import (
 	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
+	schema "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 type Client struct {
-	CC          *grpc.ClientConn
-	Admin       admin.AdminServiceClient
-	Mgmt        mgmt.ManagementServiceClient
-	Auth        auth.AuthServiceClient
-	UserV2      user.UserServiceClient
-	SessionV2   session.SessionServiceClient
-	SettingsV2  settings.SettingsServiceClient
-	OIDCv2      oidc_pb.OIDCServiceClient
-	OrgV2       organisation.OrganizationServiceClient
-	System      system.SystemServiceClient
-	ExecutionV3 execution.ExecutionServiceClient
-	FeatureV2   feature.FeatureServiceClient
+	CC           *grpc.ClientConn
+	Admin        admin.AdminServiceClient
+	Mgmt         mgmt.ManagementServiceClient
+	Auth         auth.AuthServiceClient
+	UserV2       user.UserServiceClient
+	SessionV2    session.SessionServiceClient
+	SettingsV2   settings.SettingsServiceClient
+	OIDCv2       oidc_pb.OIDCServiceClient
+	OrgV2        organisation.OrganizationServiceClient
+	System       system.SystemServiceClient
+	ExecutionV3  execution.ExecutionServiceClient
+	FeatureV2    feature.FeatureServiceClient
+	UserSchemaV3 schema.UserSchemaServiceClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
 	return Client{
-		CC:          cc,
-		Admin:       admin.NewAdminServiceClient(cc),
-		Mgmt:        mgmt.NewManagementServiceClient(cc),
-		Auth:        auth.NewAuthServiceClient(cc),
-		UserV2:      user.NewUserServiceClient(cc),
-		SessionV2:   session.NewSessionServiceClient(cc),
-		SettingsV2:  settings.NewSettingsServiceClient(cc),
-		OIDCv2:      oidc_pb.NewOIDCServiceClient(cc),
-		OrgV2:       organisation.NewOrganizationServiceClient(cc),
-		System:      system.NewSystemServiceClient(cc),
-		ExecutionV3: execution.NewExecutionServiceClient(cc),
-		FeatureV2:   feature.NewFeatureServiceClient(cc),
+		CC:           cc,
+		Admin:        admin.NewAdminServiceClient(cc),
+		Mgmt:         mgmt.NewManagementServiceClient(cc),
+		Auth:         auth.NewAuthServiceClient(cc),
+		UserV2:       user.NewUserServiceClient(cc),
+		SessionV2:    session.NewSessionServiceClient(cc),
+		SettingsV2:   settings.NewSettingsServiceClient(cc),
+		OIDCv2:       oidc_pb.NewOIDCServiceClient(cc),
+		OrgV2:        organisation.NewOrganizationServiceClient(cc),
+		System:       system.NewSystemServiceClient(cc),
+		ExecutionV3:  execution.NewExecutionServiceClient(cc),
+		FeatureV2:    feature.NewFeatureServiceClient(cc),
+		UserSchemaV3: schema.NewUserSchemaServiceClient(cc),
 	}
 }
 
@@ -536,6 +540,24 @@ func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution
 	target, err := s.Client.ExecutionV3.SetExecution(ctx, &execution.SetExecutionRequest{
 		Condition: cond,
 		Targets:   targets,
+	})
+	require.NoError(t, err)
+	return target
+}
+
+func (s *Tester) CreateUserSchema(ctx context.Context, t *testing.T) *schema.CreateUserSchemaResponse {
+	userSchema := new(structpb.Struct)
+	err := userSchema.UnmarshalJSON([]byte(`{
+		"$schema": "urn:zitadel:schema:v1",
+		"type": "object",
+		"properties": {}
+	}`))
+	require.NoError(t, err)
+	target, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &schema.CreateUserSchemaRequest{
+		Type: fmt.Sprint(time.Now().UnixNano() + 1),
+		DataType: &schema.CreateUserSchemaRequest_Schema{
+			Schema: userSchema,
+		},
 	})
 	require.NoError(t, err)
 	return target

@@ -2,6 +2,7 @@ package login
 
 import (
 	"bytes"
+	"html/template"
 	"net/http"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -76,7 +77,7 @@ func (l *Login) renderMFAInitVerify(w http.ResponseWriter, r *http.Request, auth
 	if data.MFAType == domain.MFATypeTOTP {
 		code, err := generateQrCode(data.totpData.Url)
 		if err == nil {
-			data.totpData.QrCode = code
+			data.totpData.QrCode = template.HTML(code)
 		}
 	}
 

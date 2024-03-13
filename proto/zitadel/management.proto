@@ -13009,18 +13009,37 @@ message ClearFlowResponse {
 }
 
 message SetTriggerActionsRequest {
-    // id of the flow type
+    /* id of the flow type.
+    * Following flows are currently allowed:
+    * - External Authentication: FLOW_TYPE_EXTERNAL_AUTHENTICATION or 1
+    * - Internal Authentication: 3
+    * - Complement Token: 2
+    * - Complement SAML Response: 4
+    */ 
     string flow_type = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"1\"";
-            description: "At the moment you have to send the ID of the Flow Type: ExternalAuthentication=1, CustomiseToken=2, InternalAuthentication=3, PreUserinfoCreation=3";
         }
     ];
-    // id of the trigger type
+    /* id of the trigger type.
+    * Following triggers are currently allowed:
+    * - External Authentication:
+    *   - Post Authentication: TRIGGER_TYPE_POST_AUTHENTICATION or 1
+    *   - Pre Creation: TRIGGER_TYPE_PRE_CREATION or 2
+    *   - Post Creation: TRIGGER_TYPE_POST_CREATION or 3 
+    * - Internal Authentication:
+    *   - Post Authentication: TRIGGER_TYPE_POST_AUTHENTICATION or 1
+    *   - Pre Creation: TRIGGER_TYPE_PRE_CREATION or 2
+    *   - Post Creation: TRIGGER_TYPE_POST_CREATION or 3 
+    * - Complement Token:
+    *   - Pre Userinfo Creation: 4
+    *   - Pre Access Token Creation: 5
+    * - Complement SAML Response:
+    *   - Pre SAML Response Creation: 6
+    */
     string trigger_type = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"1\"";
-            description: "At the moment you have to send the ID of the Trigger Type: PostAuthentication=1, PreCreation=2, PostCreation=3, PreUserinfoCreation=4, PreAccessTokenCreation=5";
          }
     ];
     repeated string action_ids = 3;

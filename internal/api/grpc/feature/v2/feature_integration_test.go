@@ -218,6 +218,7 @@ func TestServer_GetSystemFeatures(t *testing.T) {
 			assertFeatureFlag(t, tt.want.LoginDefaultOrg, got.LoginDefaultOrg)
 			assertFeatureFlag(t, tt.want.OidcTriggerIntrospectionProjections, got.OidcTriggerIntrospectionProjections)
 			assertFeatureFlag(t, tt.want.OidcLegacyIntrospection, got.OidcLegacyIntrospection)
+			assertFeatureFlag(t, tt.want.UserSchema, got.UserSchema)
 		})
 	}
 }
@@ -384,6 +385,10 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Enabled: true,
 					Source:  feature.Source_SOURCE_SYSTEM,
 				},
+				UserSchema: &feature.FeatureFlag{
+					Enabled: false,
+					Source:  feature.Source_SOURCE_UNSPECIFIED,
+				},
 			},
 		},
 		{
@@ -392,6 +397,7 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 				_, err := Client.SetInstanceFeatures(IamCTX, &feature.SetInstanceFeaturesRequest{
 					LoginDefaultOrg:                     gu.Ptr(true),
 					OidcTriggerIntrospectionProjections: gu.Ptr(false),
+					UserSchema:                          gu.Ptr(true),
 				})
 				require.NoError(t, err)
 			},
@@ -406,6 +412,10 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 				},
 				OidcTriggerIntrospectionProjections: &feature.FeatureFlag{
 					Enabled: false,
+					Source:  feature.Source_SOURCE_INSTANCE,
+				},
+				UserSchema: &feature.FeatureFlag{
+					Enabled: true,
 					Source:  feature.Source_SOURCE_INSTANCE,
 				},
 			},
@@ -437,6 +447,10 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Enabled: true,
 					Source:  feature.Source_SOURCE_SYSTEM,
 				},
+				UserSchema: &feature.FeatureFlag{
+					Enabled: false,
+					Source:  feature.Source_SOURCE_UNSPECIFIED,
+				},
 			},
 		},
 	}
@@ -459,6 +473,7 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 			assertFeatureFlag(t, tt.want.LoginDefaultOrg, got.LoginDefaultOrg)
 			assertFeatureFlag(t, tt.want.OidcTriggerIntrospectionProjections, got.OidcTriggerIntrospectionProjections)
 			assertFeatureFlag(t, tt.want.OidcLegacyIntrospection, got.OidcLegacyIntrospection)
+			assertFeatureFlag(t, tt.want.UserSchema, got.UserSchema)
 		})
 	}
 }
