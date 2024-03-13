@@ -31,6 +31,13 @@ OpenID Connect (OIDC) allows you to control the initial screen by sending a [pro
 With the `prompt=create`, the registration form/options will directly be shown to the user.
 You can test the impact of the different prompts on your login UI in our [OIDC Playground](/docs/apis/openidoauth/authrequest).
 
+Per default a user will be registered to the default organization.
+By sending the scope below in your authorization request you can choose the organization to which the user will be added.
+```
+urn:zitadel:iam:org:id:{id}
+```
+
+
 Unfortunately, SAML doesn't offer the same level of control over the initial screen.
 You won't be able to directly influence which page (login or registration) is shown through the SAML flow.
 
