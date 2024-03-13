@@ -192,6 +192,19 @@ This request can be tested out in the following way:
 3. When you run the command, you will see the roles in the response.
 4. If you remove the role claims in the scope and run the command, you will not receive the roles.
 
+#### Customize roles using actions
+
+If your application requires a custom role structure, [ZITADEL actions](/docs/apis/actions/complement-token#pre-userinfo-creation-id_token--userinfo--introspection-endpoint) allow you to customize your claims.
+
+<details open="open">
+<summary>Example on github</summary>
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/custom_roles.js
+```
+
+</details>
+
 ### Retrieve roles using the auth API
 
 Now we will use the auth API to retrieve roles from a logged in user using the user’s token
