@@ -76,7 +76,7 @@ jobs:
           run: make core_build
         - 
           if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-          uses: actions/cache/save@v3
+          uses: actions/cache/save@v4
           with:
             key: ${{ steps.cache.outputs.cache-primary-key }}
             path: ${{ env.cache_path }}
