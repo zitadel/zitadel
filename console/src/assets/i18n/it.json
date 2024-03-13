@@ -120,7 +120,7 @@
       },
       "IAM_VIEWS": {
         "TITLE": "Views",
-        "DESCRIPTION": "Questa pagina mostra tutte le tue viste del database e quando hanno elaborato il loro ultimo evento. Se ti mancano alcuni dati, controlla se la vista è aggiornata."
+        "DESCRIPTION": "Questa pagina mostra tutte le tue views del database e quando hanno elaborato il loro ultimo evento. Se ti mancano alcuni dati, controlla se la view è aggiornata."
       },
       "LANGUAGES": {
         "TITLE": "Lingue",
