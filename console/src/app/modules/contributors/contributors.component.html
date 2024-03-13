@@ -30,7 +30,11 @@
         </ng-container>
       </ng-container>
       <ng-template #compact>
-        <div (click)="emitShowDetail()" class="contributor-avatar-circle" matTooltip="{{ 'MEMBER.SHOWDETAILS' | translate }}">
+        <div
+          (click)="emitShowDetail()"
+          class="contributor-avatar-circle"
+          matTooltip="{{ 'MEMBER.SHOWDETAILS' | translate }}"
+        >
           <span>{{ totalResult }}</span>
         </div>
       </ng-template>
