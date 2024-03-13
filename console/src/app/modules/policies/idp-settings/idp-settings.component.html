@@ -1,5 +1,10 @@
-<h2>{{ 'IDP.LIST.TITLE' | translate }}</h2>
-<p class="cnsl-secondary-text">{{ 'IDP.LIST.DESCRIPTION' | translate }}</p>
+<div class="idps-title-row">
+  <h2>{{ 'DESCRIPTIONS.SETTINGS.IDPS.TITLE' | translate }}</h2>
+  <a mat-icon-button href="https://zitadel.com/docs/guides/integrate/identity-providers" rel="noreferrer" target="_blank">
+    <mat-icon class="icon">info_outline</mat-icon>
+  </a>
+</div>
+<p class="idps-description cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.IDPS.DESCRIPTION' | translate }}</p>
 <div class="cnsl-idp-table-wrapper">
   <cnsl-idp-table [service]="service" [serviceType]="serviceType"></cnsl-idp-table>
 </div>

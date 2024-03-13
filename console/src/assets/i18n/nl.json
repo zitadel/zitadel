@@ -1,5 +1,269 @@
 {
   "APP_NAME": "ZITADEL",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Metadata",
+    "HOME": {
+      "TITLE": "Begin met ZITADEL",
+      "NEXT": {
+        "TITLE": "Je volgende stappen",
+        "DESCRIPTION": "Voltooi de volgende stappen om je applicatie te beveiligen.",
+        "CREATE_PROJECT": {
+          "TITLE": "Maak een project",
+          "DESCRIPTION": "Voeg een project toe en definieer de rollen en autorisaties."
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Start",
+          "DESCRIPTION": "Volg de snelstartgids stap voor stap en begin onmiddellijk met bouwen."
+        },
+        "DOCS": {
+          "TITLE": "Documentatie",
+          "DESCRIPTION": "Verken de kennisbasis van ZITADEL om vertrouwd te raken met de kernconcepten en ideeën. Leer hoe ZITADEL werkt en hoe je het gebruikt."
+        },
+        "EXAMPLES": {
+          "TITLE": "Voorbeelden en Software Development Kits",
+          "DESCRIPTION": "Bekijk onze voorbeelden en SDK's om ZITADEL te gebruiken met je favoriete programmeertalen en tools."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Organisatie",
+      "DESCRIPTION": "Een organisatie host gebruikers, projecten met apps, identiteitsproviders en instellingen zoals bedrijfsbranding. Wil je instellingen delen over meerdere organisaties? Configureer standaardinstellingen.",
+      "METADATA": "Voeg aangepaste attributen toe aan de organisatie zoals de locatie of een identificatie in een ander systeem. Je kunt deze informatie gebruiken in je acties."
+    },
+    "PROJECTS": {
+      "TITLE": "Projecten",
+      "DESCRIPTION": "Een project host een of meer applicaties, die je kunt gebruiken om je gebruikers te authenticeren. Ook kun je je gebruikers autoriseren met projecten. Om gebruikers van andere organisaties in staat te stellen in te loggen op je applicaties, geef ze toegang tot je project.<br/><br/>Als je een project niet kunt vinden, neem dan contact op met de eigenaar van het project of iemand met de bijbehorende rechten om toegang te krijgen.",
+      "OWNED": {
+        "TITLE": "Eigen Projecten",
+        "DESCRIPTION": "Dit zijn de projecten die je bezit. Je kunt de instellingen van deze projecten, autorisaties en applicaties beheren."
+      },
+      "GRANTED": {
+        "TITLE": "Toegekende Projecten",
+        "DESCRIPTION": "Dit zijn de projecten die door andere organisaties aan jou zijn toegekend. Met toegekende projecten kun je je gebruikers toegang geven tot applicaties van andere organisaties."
+      }
+    },
+    "USERS": {
+      "TITLE": "Gebruikers",
+      "DESCRIPTION": "Een gebruiker is een mens of een machine die toegang kan krijgen tot je applicaties.",
+      "HUMANS": {
+        "TITLE": "Mensen",
+        "DESCRIPTION": "Mensen authenticeren interactief in een browsersessie met een loginprompt.",
+        "METADATA": "Voeg aangepaste attributen toe aan de gebruiker zoals de afdeling. Je kunt deze informatie gebruiken in je acties."
+      },
+      "MACHINES": {
+        "TITLE": "Machines",
+        "DESCRIPTION": "Machines authenticeren niet-interactief met een JWT bearer token ondertekend met een privésleutel. Ze kunnen ook een persoonlijke toegangstoken gebruiken.",
+        "METADATA": "Voeg aangepaste attributen toe aan de gebruiker zoals het authenticatiesysteem. Je kunt deze informatie gebruiken in je acties."
+      },
+      "SELF": {
+        "METADATA": "Voeg aangepaste attributen toe aan je gebruiker zoals je afdeling. Je kunt deze informatie gebruiken in de acties van je organisatie."
+      }
+    },
+    "AUTHORIZATIONS": {
+      "TITLE": "Autorisaties",
+      "DESCRIPTION": "Autorisaties bepalen de toegangsrechten van een gebruiker tot een project. Je kunt een gebruiker toegang verlenen tot een project en de rollen van de gebruikers binnen dat project definiëren."
+    },
+    "ACTIONS": {
+      "TITLE": "Acties",
+      "DESCRIPTION": "Voer aangepaste code uit bij gebeurtenissen die plaatsvinden terwijl je gebruikers zich authentiseren bij ZITADEL. Automatiseer je processen, verrijk de metadata en tokens van je gebruikers of meld externe systemen.",
+      "SCRIPTS": {
+        "TITLE": "Scripts",
+        "DESCRIPTION": "Schrijf je JavaScript-code eenmaal en activeer deze in meerdere stromen."
+      },
+      "FLOWS": {
+        "TITLE": "Stromen",
+        "DESCRIPTION": "Kies een authenticatiestroom en activeer je actie bij een specifieke gebeurtenis binnen deze stroom."
+      }
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Instellingsinstellingen",
+        "DESCRIPTION": "De instellingsinstellingen zijn de standaardinstellingen voor alle organisaties. Met de juiste toestemmingen kunnen sommige hiervan worden overschreven in organisatie-instellingen."
+      },
+      "ORG": {
+        "TITLE": "Organisatie-instellingen",
+        "DESCRIPTION": "Pas de instellingen van je organisatie aan."
+      },
+      "IDPS": {
+        "TITLE": "Identiteitsproviders",
+        "DESCRIPTION": "Maak en activeer externe identiteitsproviders. Kies een bekende provider of configureer een andere OIDC, OAuth of SAML compatibele provider naar keuze. Je kunt zelfs je bestaande JWT-tokens gebruiken als gefedereerde identiteiten door een JWT-identiteitsprovider te configureren."
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Wachtwoordcomplexiteit",
+        "DESCRIPTION": "Zorg ervoor dat je gebruikers sterke wachtwoorden gebruiken door complexiteitsregels te definiëren."
+      },
+      "BRANDING": {
+        "TITLE": "Branding",
+        "DESCRIPTION": "Pas het uiterlijk en gevoel van je inlogformulier aan. Vergeet niet om je configuratie toe te passen wanneer je klaar bent."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Externe links",
+        "DESCRIPTION": "Leid je gebruikers naar aangepaste externe bronnen die worden getoond op de inlogpagina. Gebruikers moeten de Algemene Voorwaarden en het Privacybeleid accepteren voordat ze zich kunnen aanmelden."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "SMTP-instellingen",
+        "DESCRIPTION": "Configureer je SMTP-server om een domein voor het afzenderadres te gebruiken dat je gebruikers kennen en vertrouwen."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "SMS-instellingen",
+        "DESCRIPTION": "Om alle ZITADEL-functies te ontgrendelen, configureer Twilio om SMS-berichten naar je gebruikers te sturen."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Evenementen",
+        "DESCRIPTION": "Deze pagina toont alle statuswijzigingen in je instantie zo ver als de audittrail van je instanties reikt. Filter de lijst op tijdreeks voor debugdoeleinden of filter het op een aggregaat voor auditdoeleinden."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Mislukte Evenementen",
+        "DESCRIPTION": "Deze pagina toont alle mislukte evenementen in je instantie. Als ZITADEL zich niet gedraagt zoals je verwacht, controleer dan eerst deze lijst."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Weergaven",
+        "DESCRIPTION": "Deze pagina toont al je database weergaven en wanneer ze hun laatste evenement hebben verwerkt. Als je gegevens mist, controleer dan of de weergave up-to-date is."
+      },
+      "LANGUAGES": {
+        "TITLE": "Talen",
+        "DESCRIPTION": "Beperk de talen waarin het inlogformulier en de notificatieberichten worden vertaald. Als je sommige talen wilt uitschakelen, sleep ze dan naar de sectie Niet Toegestane Talen. Je kunt een toegestane taal specificeren als de standaardtaal. Als de voorkeurstaal van een gebruiker niet is toegestaan, wordt de standaardtaal gebruikt."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Geheime Generatoren",
+        "DESCRIPTION": "Definieer de complexiteiten en levensduur van je geheimen. Een hogere complexiteit en levensduur verbeteren de beveiliging, een lagere complexiteit en levensduur verbeteren de decryptieprestaties."
+      },
+      "SECURITY": {
+        "TITLE": "Beveiligingsinstellingen",
+        "DESCRIPTION": "Schakel ZITADEL-functies in die beveiligingsimpact kunnen hebben. Je moet echt weten wat je doet voordat je deze instellingen wijzigt."
+      },
+      "OIDC": {
+        "TITLE": "OpenID Connect Instellingen",
+        "DESCRIPTION": "Configureer de levensduur van je OIDC-tokens. Gebruik kortere levensduren om de beveiliging van je gebruikers te verhogen, gebruik langere levensduren om het gemak van je gebruikers te verhogen.",
+        "LABEL_HOURS": "Maximale Levensduur in uren",
+        "LABEL_DAYS": "Maximale Levensduur in dagen",
+        "ACCESS_TOKEN": {
+          "TITLE": "Toegangstoken",
+          "DESCRIPTION": "Het toegangstoken wordt gebruikt om een gebruiker te authenticeren. Het is een kortlevend token dat wordt gebruikt om toegang te krijgen tot de gegevens van de gebruiker. Gebruik een korte levensduur om het risico op ongeautoriseerde toegang te minimaliseren. Toegangstokens kunnen automatisch worden vernieuwd met behulp van een vernieuwingstoken."
+        },
+        "ID_TOKEN": {
+          "TITLE": "ID-token",
+          "DESCRIPTION": "Het ID-token is een JSON Web Token (JWT) dat claims over de gebruiker bevat. De levensduur van het ID-token mag de levensduur van het toegangstoken niet overschrijden."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Vernieuwingstoken",
+          "DESCRIPTION": "Het vernieuwingstoken wordt gebruikt om een nieuw toegangstoken te verkrijgen. Het is een langlevend token dat wordt gebruikt om het toegangstoken te vernieuwen. Een gebruiker moet handmatig opnieuw authenticeren wanneer het vernieuwingstoken verloopt."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Inactief Vernieuwingstoken",
+          "DESCRIPTION": "De levensduur van het inactieve vernieuwingstoken is de maximale tijd dat een vernieuwingstoken ongebruikt kan zijn."
+        }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Berichtteksten",
+        "DESCRIPTION": "Pas de teksten van je notificatie-e-mail of SMS-berichten aan. Als je sommige talen wilt uitschakelen, beperk ze dan in de taalinstellingen van je instanties.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Wanneer je een domein voor je organisatie claimt, worden gebruikers die dit domein niet in hun inlognaam gebruiken, gevraagd om hun inlognaam te wijzigen om overeen te komen met het geclaimde domein.",
+          "INIT": "Wanneer een gebruiker wordt aangemaakt, ontvangen ze een e-mail met een link om hun wachtwoord in te stellen.",
+          "PC": "Wanneer een gebruiker zijn wachtwoord wijzigt, ontvangt hij een melding over de wijziging als je dit hebt ingeschakeld in de notificatie-instellingen.",
+          "PL": "Wanneer een gebruiker een wachtwoordloze authenticatiemethode toevoegt, moeten ze deze activeren door op een link in een e-mail te klikken.",
+          "PR": "Wanneer een gebruiker zijn wachtwoord reset, ontvangt hij een e-mail met een link om een nieuw wachtwoord in te stellen.",
+          "VE": "Wanneer een gebruiker zijn e-mailadres wijzigt, ontvangt hij een e-mail met een link om het nieuwe adres te verifiëren.",
+          "VP": "Wanneer een gebruiker zijn telefoonnummer wijzigt, ontvangt hij een SMS met een code om het nieuwe nummer te verifiëren.",
+          "VEO": "Wanneer een gebruiker een eenmalig wachtwoord via e-mailmethode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun e-mailadres is verzonden.",
+          "VSO": "Wanneer een gebruiker een eenmalig wachtwoord via SMS-methode toevoegt, moeten ze dit activeren door een code in te voeren die naar hun telefoonnummer is verzonden."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Teksten voor inloginterface",
+        "DESCRIPTION": "Pas de teksten van je inlogformulier aan. Als een tekst leeg is, toont de placeholder de standaardwaarde. Als je sommige talen wilt uitschakelen, beperk ze dan in de taalinstellingen van je instanties."
+      },
+      "DOMAINS": {
+        "TITLE": "Domeininstellingen",
+        "DESCRIPTION": "Definieer beperkingen op je domeinen en configureer je inlognaampatronen. ZITADEL selecteert de organisatie van je gebruikers zodra ze hun inlognaam invoeren. Daarom moeten de inlognamen uniek zijn over alle organisaties. Als je gebruikers hebt die accounts hebben in meerdere domeinen, kun je uniciteit waarborgen door je inlognamen te suffixen met het domein van de organisatie.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Verificatie van aangepaste domeinen vereisen",
+          "DESCRIPTION": "Als dit is geactiveerd, moeten organisatiedomeinen worden geverifieerd voordat ze kunnen worden gebruikt voor domeinontdekking of gebruikersnaamtoevoeging."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Patroon van inlognaam",
+          "DESCRIPTION": "Beheer het patroon van de inlognamen van je gebruikers."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Domeinverificatie",
+          "DESCRIPTION": "Sta alleen je organisatie toe om de domeinen te gebruiken die ze daadwerkelijk beheersen. Als dit is geactiveerd, worden organisatiedomeinen periodiek geverifieerd door DNS of HTTP-uitdaging voordat ze kunnen worden gebruikt. Dit is een beveiligingsfunctie om domeinkaping te voorkomen."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "SMTP-afzenderadres",
+          "DESCRIPTION": "Sta alleen een SMTP-afzenderadres toe als dit overeenkomt met een van je instantiedomeinen."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Login Levensduur",
+          "DESCRIPTION": "Versterk je beveiliging door sommige login-gerelateerde maximale levensduren te verminderen.",
+          "LABEL": "Maximale Levensduur in uren",
+          "PW_CHECK": {
+            "TITLE": "Wachtwoord Controle",
+            "DESCRIPTION": "Je gebruikers moeten hun wachtwoorden in deze perioden wijzigen."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Externe Login Controle",
+            "DESCRIPTION": "Je gebruikers worden in deze perioden omgeleid naar hun externe identiteitsproviders."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Multifactor Init Controle",
+            "DESCRIPTION": "Je gebruikers worden gevraagd om een tweede factor of een Multifactor in te stellen in deze perioden, als ze dat nog niet gedaan hebben. Een levensduur van 0 deactiveert deze prompt."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Tweede Factor Controle",
+            "DESCRIPTION": "Je gebruikers moeten hun tweede factor in deze perioden opnieuw valideren."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Multifactor Controle",
+            "DESCRIPTION": "Je gebruikers moeten hun Multifactor in deze perioden opnieuw valideren."
+          }
+        },
+        "FORM": {
+          "TITLE": "Inlogformulier",
+          "DESCRIPTION": "Pas het inlogformulier aan.",
+          "USERNAME_PASSWORD_ALLOWED": {
+            "TITLE": "Gebruikersnaam en wachtwoord toegestaan",
+            "DESCRIPTION": "Sta je gebruikers toe om in te loggen met hun gebruikersnaam en wachtwoord. Als dit is gedeactiveerd, kunnen je gebruikers alleen inloggen met wachtwoordloze authenticatie of met een externe identiteitsprovider."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Gebruikersregistratie toegestaan",
+            "DESCRIPTION": "Sta anonieme gebruikers toe om een account aan te maken."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Organisatieregistratie toegestaan",
+            "DESCRIPTION": "Sta anonieme gebruikers toe om een organisatie aan te maken."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Extern inloggen toegestaan",
+            "DESCRIPTION": "Sta je gebruikers toe om in te loggen met een externe identiteitsprovider in plaats van het gebruik van de ZITADEL gebruiker om in te loggen."
+          },
+          "PASSWORD_RESET_ALLOWED": {
+            "TITLE": "Wachtwoord resetten toegestaan",
+            "DESCRIPTION": "Sta je gebruikers toe om hun wachtwoord te resetten."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Domeinontdekking toegestaan",
+            "DESCRIPTION": "Vind de organisaties van je gebruikers afhankelijk van hun loginnaams domein, bijvoorbeeld hun e-mailadres."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Negeer onbekende gebruikersnamen",
+            "DESCRIPTION": "Als dit geactiveerd is, zal het inlogformulier geen foutmelding weergeven als de gebruikersnaam onbekend is. Dit helpt om het raden van gebruikersnamen te voorkomen."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Inloggen met e-mail uitschakelen",
+            "DESCRIPTION": "Als dit geactiveerd is, kunnen je gebruikers niet inloggen met hun e-mailadressen. Let op dat als je dit deactiveert, de e-mailadressen van je gebruikers uniek moeten zijn over alle organisaties om in te kunnen loggen."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Inloggen met telefoon uitschakelen",
+            "DESCRIPTION": "Als dit geactiveerd is, kunnen je gebruikers niet inloggen met hun telefoonnummers. Let op dat als je dit deactiveert, de telefoonnummers van je gebruikers uniek moeten zijn over alle organisaties om in te kunnen loggen."
+          }
+        }
+      }
+    }
+  },
   "PAGINATOR": {
     "PREVIOUS": "Vorige",
     "NEXT": "Volgende",
@@ -22,16 +286,13 @@
     "DISCLAIMER": "ZITADEL behandelt uw gegevens vertrouwelijk en veilig.",
     "DISCLAIMERLINK": "Meer informatie",
     "DOCUMENTATION": {
-      "TITLE": "Documentatie",
       "DESCRIPTION": "Begin snel met ZITADEL."
     },
     "GETSTARTED": {
-      "TITLE": "Begin met ZITADEL",
       "DESCRIPTION": "Begin snel met ZITADEL."
     },
     "QUICKSTARTS": {
       "LABEL": "Eerste stappen",
-      "TITLE": "Quickstarts",
       "DESCRIPTION": "Begin snel met ZITADEL."
     },
     "SHORTCUTS": {
@@ -326,11 +587,7 @@
     "TITLE": "Persoonlijke informatie",
     "DESCRIPTION": "Beheer uw informatie en beveiligingsinstellingen.",
     "PAGES": {
-      "LIST": "Gebruikers",
       "TITLE": "Gebruiker",
-      "DESCRIPTION": "Maak nieuwe gebruikers aan in uw organisatie en beheer bestaande.",
-      "LISTMACHINE": "Servicegebruikers",
-      "DESCRIPTIONMACHINE": "Maak en beheer Servicegebruikers van uw organisatie",
       "DETAIL": "Detail",
       "CREATE": "Aanmaken",
       "MY": "Mijn informatie",
@@ -380,10 +637,6 @@
       "ACTIVATE": "Activeren",
       "CHANGEDATE": "Laatst gewijzigd",
       "CREATIONDATE": "Aangemaakt op",
-      "TYPES": {
-        "HUMAN": "Gebruikers",
-        "MACHINE": "Servicegebruikers"
-      },
       "FILTER": {
         "0": "Filter op weergavenaam",
         "1": "Filter op gebruikersnaam",
@@ -757,12 +1010,6 @@
     "REMOVESUCCESS": "Element succesvol verwijderd"
   },
   "FLOWS": {
-    "TITLE": "Acties en Flows",
-    "DESCRIPTION": "Definieer scripts om uit te voeren bij een bepaalde gebeurtenis.",
-    "ACTIONSTITLE": "Acties",
-    "ACTIONSDESCRIPTION": "Dit zijn uw scripts die u kunt uitvoeren in de flows.",
-    "FLOWSTITLE": "Flows",
-    "FLOWSDESCRIPTION": "Flows van een bepaald type voeren acties uit op het moment van een trigger.",
     "ID": "ID",
     "NAME": "Naam",
     "STATE": "Status",
@@ -814,8 +1061,6 @@
     }
   },
   "IAM": {
-    "TITLE": "Instantie",
-    "DESCRIPTION": "Beheer uw instantie-instellingen en organisaties",
     "POLICIES": {
       "TITLE": "Systeembeleid en toegangsinstellingen",
       "DESCRIPTION": "Beheer uw wereldwijde beleid en beheer toegangsinstellingen."
@@ -840,8 +1085,6 @@
       "4": "Gestopt"
     },
     "VIEWS": {
-      "TITLE": "Weergaven",
-      "DESCRIPTION": "Dit paneel toont uw ZITADEL-weergaven.",
       "VIEWNAME": "Naam",
       "DATABASE": "Database",
       "SEQUENCE": "Reeks",
@@ -856,8 +1099,6 @@
       }
     },
     "FAILEDEVENTS": {
-      "TITLE": "Mislukte Evenementen",
-      "DESCRIPTION": "Deze kaart toont uw mislukte evenementen.",
       "VIEWNAME": "Naam",
       "DATABASE": "Database",
       "FAILEDSEQUENCE": "Mislukte Reeks",
@@ -869,8 +1110,6 @@
       "DELETESUCCESS": "Mislukte evenementen verwijderd."
     },
     "EVENTS": {
-      "TITLE": "Evenementen",
-      "DESCRIPTION": "Deze weergave toont alle voorgekomen evenementen.",
       "EDITOR": "Editor",
       "EDITORID": "Editor ID",
       "AGGREGATE": "Aggregaat",
@@ -1048,10 +1287,6 @@
       "TITLE": "Instantie Instellingen",
       "DESCRIPTION": "Deze instellingen zijn van toepassing op al uw organisaties, tenzij ze zijn overschreven."
     },
-    "ORG": {
-      "TITLE": "Organisatie Instellingen",
-      "DESCRIPTION": "Deze instellingen breiden uw instantie instellingen uit en overschrijven deze."
-    },
     "LIST": {
       "ORGS": "Organisaties",
       "LANGUAGES": "Talen",
@@ -1089,7 +1324,6 @@
   },
   "SETTING": {
     "LANGUAGES": {
-      "TITLE": "Taalinstellingen",
       "DEFAULT": "Standaardtaal",
       "ALLOWED": "Toegestane Talen",
       "NOT_ALLOWED": "Niet Toegestane Talen",
@@ -1116,7 +1350,6 @@
       }
     },
     "SMTP": {
-      "TITLE": "SMTP Instellingen",
       "SENDERADDRESS": "Afzender Email Adres",
       "SENDERNAME": "Afzender Naam",
       "REPLYTOADDRESS": "Antwoord-naar Adres",
@@ -1130,7 +1363,6 @@
       "REQUIREDWARN": "Om notificaties te kunnen versturen vanaf uw domein, moet u uw SMTP-gegevens invoeren."
     },
     "SMS": {
-      "TITLE": "SMS Instellingen",
       "PROVIDERS": "Providers",
       "PROVIDER": "SMS Provider",
       "ADDPROVIDER": "Voeg SMS Provider toe",
@@ -1156,17 +1388,7 @@
         "TOKENSET": "Token succesvol ingesteld."
       }
     },
-    "OIDC": {
-      "TITLE": "OIDC Instellingen",
-      "ACCESSTOKENLIFETIME": "Toegangstoken Levensduur",
-      "IDTOKENLIFETIME": "ID Token Levensduur",
-      "REFRESHTOKENEXPIRATION": "Vernieuw Token Vervaldatum",
-      "REFRESHTOKENIDLEEXPIRATION": "Vernieuw Token Inactieve Vervaldatum",
-      "INHOURS": "uren",
-      "INDAYS": "Dagen"
-    },
     "SECRETS": {
-      "TITLE": "Secret Generator",
       "TYPES": "Secret Types",
       "TYPE": {
         "1": "Initialisatie Mail",
@@ -1206,8 +1428,6 @@
     }
   },
   "POLICY": {
-    "TITLE": "Bekijk Instellingen",
-    "DESCRIPTION": "Vooringestelde instellingen die uw beveiliging versterken.",
     "APPLIEDTO": "Toegepast op",
     "PWD_COMPLEXITY": {
       "TITLE": "Wachtwoord Complexiteit",
@@ -1223,7 +1443,6 @@
       "PASSWORDCHANGE": "Wachtwoord wijziging"
     },
     "PRIVATELABELING": {
-      "TITLE": "Branding",
       "DESCRIPTION": "Geef de login uw gepersonaliseerde stijl en wijzig zijn gedrag.",
       "PREVIEW_DESCRIPTION": "Wijzigingen aan het beleid worden automatisch toegepast op de voorbeeldomgeving.",
       "BTN": "Selecteer Bestand",
@@ -1275,9 +1494,6 @@
       "TITLE": "Lockout Beleid",
       "DESCRIPTION": "Stel een maximum aantal wachtwoordpogingen in, waarna accounts worden geblokkeerd."
     },
-    "DOMAIN_POLICY": {
-      "TITLE": "Domein Instellingen"
-    },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Branding",
       "BTN": "Selecteer Bestand",
@@ -1289,13 +1505,10 @@
       "DESCRIPTION": "Definieer hoe Gebruikers kunnen worden geauthenticeerd en configureer Identiteitsproviders",
       "DESCRIPTIONCREATEADMIN": "Gebruikers kunnen kiezen uit de beschikbare identiteitsproviders hieronder.",
       "DESCRIPTIONCREATEMGMT": "Gebruikers kunnen kiezen uit de beschikbare identiteitsproviders hieronder. Opmerking: U kunt systeem ingestelde providers gebruiken evenals providers die alleen voor uw organisatie zijn ingesteld.",
-      "ADVANCED": "Geavanceerd",
-      "LIFETIMEDURATIONS": "Login Levensduur",
       "LIFETIME_INVALID": "Formulier bevat ongeldige waarde(n).",
       "SAVED": "Succesvol opgeslagen!"
     },
     "PRIVACY_POLICY": {
-      "TITLE": "Privacybeleid en TOS",
       "DESCRIPTION": "Stel uw Privacybeleid en Algemene Voorwaarden Links in",
       "TOSLINK": "Link naar Algemene Voorwaarden",
       "POLICYLINK": "Link naar Privacybeleid",
@@ -1374,8 +1587,6 @@
       }
     },
     "MESSAGE_TEXTS": {
-      "TITLE": "Bericht Teksten",
-      "DESCRIPTION": "Definieer uw teksten voor uw notificatie mails.",
       "TYPE": "Notificatie",
       "TYPES": {
         "INIT": "Initialisatie",
@@ -1429,38 +1640,22 @@
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Als u deze instelling inschakelt, worden alle inlognamen voorzien van een achtervoegsel met het domein van de organisatie. Als deze instelling is uitgeschakeld, moet u ervoor zorgen dat gebruikersnamen uniek zijn over alle organisaties.",
       "VALIDATEORGDOMAINS": "Verificatie van organisatiedomeinen vereist (DNS of HTTP-uitdaging)",
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Afzender Adres komt overeen met Instantie Domein",
-      "ALLOWUSERNAMEPASSWORD": "Gebruikersnaam Wachtwoord toegestaan",
-      "ALLOWEXTERNALIDP": "Externe IDP toegestaan",
-      "ALLOWREGISTERUSERS": "Gebruikersregistratie toegestaan",
-      "ALLOWREGISTERORGS": "Organisatieregistratie toegestaan",
       "ALLOWUSERNAMEPASSWORD_DESC": "De conventionele login met gebruikersnaam en wachtwoord is toegestaan.",
       "ALLOWEXTERNALIDP_DESC": "De login is toegestaan voor de onderliggende identiteitsproviders",
       "ALLOWREGISTER_DESC": "Als de optie is geselecteerd, verschijnt er een extra stap voor het registreren van een gebruiker in het login proces.",
       "FORCEMFA": "Forceer MFA",
-      "FORCEMFA_DESC": "Als de optie is geselecteerd, moeten gebruikers een tweede factor configureren voor login.",
       "FORCEMFALOCALONLY": "Forceer MFA voor lokaal geauthenticeerde gebruikers",
       "FORCEMFALOCALONLY_DESC": "Als de optie is geselecteerd, moeten lokaal geauthenticeerde gebruikers een tweede factor configureren voor login.",
-      "HIDEPASSWORDRESET": "Verberg Wachtwoord reset",
       "HIDEPASSWORDRESET_DESC": "Als de optie is geselecteerd, kan de gebruiker zijn wachtwoord niet resetten in het login proces.",
       "HIDELOGINNAMESUFFIX": "Verberg Inlognaam achtervoegsel",
       "HIDELOGINNAMESUFFIX_DESC": "Verbergt het inlognaam achtervoegsel in de login interface",
-      "IGNOREUNKNOWNUSERNAMES": "Negeer onbekende gebruikersnamen",
       "IGNOREUNKNOWNUSERNAMES_DESC": "Als de optie is geselecteerd, zal het wachtwoordscherm worden weergegeven in het login proces, zelfs als de gebruiker niet is gevonden. De fout bij de wachtwoordcontrole zal niet onthullen of de gebruikersnaam of het wachtwoord verkeerd was.",
-      "ALLOWDOMAINDISCOVERY": "Domein ontdekking toegestaan",
       "ALLOWDOMAINDISCOVERY_DESC": "Als de optie is geselecteerd, zal het achtervoegsel (@domein.com) van een onbekende gebruikersnaam invoer op het login scherm worden gematcht tegen de organisatie domeinen en zal bij succes doorverwijzen naar de registratie van die organisatie.",
-      "DISABLELOGINWITHEMAIL": "Deactiveer login met e-mailadres",
-      "DISABLELOGINWITHPHONE": "Deactiveer login met telefoonnummer",
       "DEFAULTREDIRECTURI": "Standaard Doorverwijs URI",
       "DEFAULTREDIRECTURI_DESC": "Definieert waar de gebruiker naar wordt doorverwezen als de login is gestart zonder een app context (bijv. vanuit mail)",
       "ERRORMSGPOPUP": "Toon Fout in Dialoog",
       "DISABLEWATERMARK": "Verberg Watermerk",
-      "DISABLEWATERMARK_DESC": "Verberg Powered by ZITADEL watermerk in de login interface",
-      "PASSWORDCHECKLIFETIME": "Wachtwoord Controle Levensduur",
-      "EXTERNALLOGINCHECKLIFETIME": "Externe Login Controle Levensduur",
-      "MFAINITSKIPLIFETIME": "Multifactor Init Levensduur",
-      "SECONDFACTORCHECKLIFETIME": "Tweede Factor Controle Levensduur",
-      "MULTIFACTORCHECKLIFETIME": "Multifactor Controle Levensduur",
-      "INHOURS": "uren"
+      "DISABLEWATERMARK_DESC": "Verberg Powered by ZITADEL watermerk in de login interface"
     },
     "RESET": "Reset naar Instantie standaard",
     "CREATECUSTOM": "Maak Aangepast Beleid",
@@ -1509,8 +1704,6 @@
       "TITLE": "Project",
       "DESCRIPTION": "Hier kunt u toepassingen definiëren, rollen beheren en andere organisaties toestaan uw project te gebruiken.",
       "DELETE": "Verwijder Project",
-      "LIST": "Projecten",
-      "LISTDESCRIPTION": "Als u geen project kunt vinden, neem dan contact op met een projecteigenaar of iemand met de bijbehorende rechten om toegang te krijgen tot het project.",
       "DETAIL": "Detail",
       "CREATE": "Maak Project",
       "CREATE_DESC": "Voer de naam van uw project in.",
@@ -1519,7 +1712,6 @@
       "ZITADELPROJECT": "Dit behoort tot het ZITADEL-project. Pas op: Als u wijzigingen aanbrengt, werkt ZITADEL mogelijk niet zoals bedoeld.",
       "TYPE": {
         "OWNED": "Eigen Projecten",
-        "GRANTED": "Verleende Projecten",
         "OWNED_SINGULAR": "Eigen Project",
         "GRANTED_SINGULAR": "Verleend Project"
       },
@@ -1739,8 +1931,6 @@
   },
   "IDP": {
     "LIST": {
-      "TITLE": "Identiteitsproviders",
-      "DESCRIPTION": "Beheer uw identiteitsprovider configuratie, die vervolgens kan worden geactiveerd in uw Login-instellingen.",
       "ACTIVETITLE": "Actieve identiteitsproviders"
     },
     "CREATE": {
@@ -2264,7 +2454,8 @@
     "DIALOG": {
       "DELETE_TITLE": "Verwijder Manager",
       "DELETE_DESCRIPTION": "U staat op het punt om een manager te verwijderen. Weet u het zeker?"
-    }
+    },
+    "SHOWDETAILS": "Klik om details te tonen."
   },
   "ROLESLABEL": "Rollen",
   "GRANTS": {
