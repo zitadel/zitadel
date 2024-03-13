@@ -1,5 +1,269 @@
 {
   "APP_NAME": "ZITADEL",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Metadata",
+    "HOME": {
+      "TITLE": "Začněte s ZITADEL",
+      "NEXT": {
+        "TITLE": "Vaše další kroky",
+        "DESCRIPTION": "Dokončete následující kroky pro zabezpečení vaší aplikace.",
+        "CREATE_PROJECT": {
+          "TITLE": "Vytvořit projekt",
+          "DESCRIPTION": "Přidejte projekt a definujte jeho role a oprávnění."
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Začínáme",
+          "DESCRIPTION": "Postupujte podle průvodce rychlým startem krok za krokem a začněte okamžitě budovat."
+        },
+        "DOCS": {
+          "TITLE": "Dokumentace",
+          "DESCRIPTION": "Prozkoumejte znalostní bázi ZITADEL a seznámte se s klíčovými koncepty a nápady. Naučte se, jak ZITADEL funguje a jak jej používat."
+        },
+        "EXAMPLES": {
+          "TITLE": "Příklady a Software Development Kits",
+          "DESCRIPTION": "Procházejte naše příklady a SDK, abyste mohli používat ZITADEL společně s vašimi oblíbenými programovacími jazyky a nástroji."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Organizace",
+      "DESCRIPTION": "Organizace hostí uživatele, projekty s aplikacemi, poskytovatele identity a nastavení jako je firemní branding. Chcete sdílet nastavení napříč více organizacemi? Konfigurujte výchozí nastavení.",
+      "METADATA": "Přidejte vlastní atributy k organizaci, jako je její poloha nebo identifikátor v jiném systému. Tyto informace můžete využít ve vašich akcích."
+    },
+    "PROJECTS": {
+      "TITLE": "Projekty",
+      "DESCRIPTION": "Projekt hostí jednu nebo více aplikací, které můžete použít k autentizaci vašich uživatelů. Také můžete autorizovat vaše uživatele s projekty. Aby mohli uživatelé z jiných organizací přihlásit do vašich aplikací, udělte jim přístup k vašemu projektu.<br/><br/>Pokud nenajdete projekt, kontaktujte vlastníka projektu nebo někoho s odpovídajícími právy pro získání přístupu.",
+      "OWNED": {
+        "TITLE": "Vlastněné projekty",
+        "DESCRIPTION": "Toto jsou projekty, které vlastníte. Můžete spravovat nastavení těchto projektů, oprávnění a aplikace."
+      },
+      "GRANTED": {
+        "TITLE": "Přidělené projekty",
+        "DESCRIPTION": "Toto jsou projekty, které vám přidělily jiné organizace. S přidělenými projekty můžete dát vašim uživatelům přístup k aplikacím jiných organizací."
+      }
+    },
+    "USERS": {
+      "TITLE": "Uživatelé",
+      "DESCRIPTION": "Uživatel je člověk nebo stroj, který může přistupovat k vašim aplikacím.",
+      "HUMANS": {
+        "TITLE": "Lidé",
+        "DESCRIPTION": "Lidé se autentizují interaktivně v prohlížečové relaci s výzvou k přihlášení.",
+        "METADATA": "Přidejte vlastní atributy k uživateli, jako je oddělení. Tyto informace můžete využít ve vašich akcích."
+      },
+      "MACHINES": {
+        "TITLE": "Stroje",
+        "DESCRIPTION": "Stroje se autentizují neinteraktivně pomocí JWT bearer tokenu podepsaného soukromým klíčem. Mohou také používat osobní přístupový token.",
+        "METADATA": "Přidejte vlastní atributy k uživateli, jako je autentizační systém. Tyto informace můžete využít ve vašich akcích."
+      },
+      "SELF": {
+        "METADATA": "Přidejte vlastní atributy k vašemu uživateli, jako je vaše oddělení. Tyto informace můžete využít v akcích vaší organizace."
+      }
+    },
+    "AUTHORIZATIONS": {
+      "TITLE": "Autorizace",
+      "DESCRIPTION": "Autorizace definují přístupová práva uživatele k projektu. Můžete uživateli udělit přístup k projektu a definovat role uživatele v rámci toho projektu."
+    },
+    "ACTIONS": {
+      "TITLE": "Akce",
+      "DESCRIPTION": "Spusťte vlastní kód na událostech, které se stane, když se vaši uživatelé autentizují v ZITADEL. Automatizujte vaše procesy, obohaťte metadata vašich uživatelů a jejich tokeny nebo informujte externí systémy.",
+      "SCRIPTS": {
+        "TITLE": "Skripty",
+        "DESCRIPTION": "Napište svůj JavaScriptový kód jednou a spusťte jej v několika procesech."
+      },
+      "FLOWS": {
+        "TITLE": "Flows",
+        "DESCRIPTION": "Vyberte proces autentizace a spusťte vaši akci na konkrétní události v rámci tohoto procesu."
+      }
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Nastavení instance",
+        "DESCRIPTION": "Nastavení instance jsou výchozí nastavení pro všechny organizace. S odpovídajícími oprávněními jsou některá z nich přepisovatelná v nastavení organizace."
+      },
+      "ORG": {
+        "TITLE": "Nastavení organizace",
+        "DESCRIPTION": "Přizpůsobte nastavení vaší organizace."
+      },
+      "IDPS": {
+        "TITLE": "Poskytovatelé identity",
+        "DESCRIPTION": "Vytvořte a aktivujte externí poskytovatele identity. Vyberte známého poskytovatele nebo nakonfigurujte jakýkoliv jiný OIDC, OAuth nebo SAML kompatibilní poskytovatel podle vašeho výběru. Můžete dokonce použít vaše stávající JWT tokeny jako federované identity konfigurací JWT poskytovatele identity."
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Složitost hesla",
+        "DESCRIPTION": "Zajistěte, aby vaši uživatelé používali silná hesla definováním pravidel složitosti."
+      },
+      "BRANDING": {
+        "TITLE": "Branding",
+        "DESCRIPTION": "Přizpůsobte vzhled a pocit z vašeho formuláře pro přihlášení. Nezapomeňte aplikovat konfiguraci, až budete hotovi."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Externí odkazy",
+        "DESCRIPTION": "Navede vaše uživatele k vlastním externím zdrojům zobrazeným na přihlašovací stránce. Uživatelé musí přijmout Podmínky služby a Zásady ochrany osobních údajů, než se mohou zaregistrovat."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "Nastavení SMTP",
+        "DESCRIPTION": "Nakonfigurujte váš SMTP server tak, aby používal doménu pro adresu odesílatele, kterou vaši uživatelé znají a důvěřují."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "Nastavení SMS",
+        "DESCRIPTION": "Pro odemčení všech funkcí ZITADEL nakonfigurujte Twilio pro odesílání SMS zpráv vašim uživatelům."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Události",
+        "DESCRIPTION": "Tato stránka zobrazuje všechny změny stavu ve vaší instanci až do limitu auditování vaší instance. Filtrujte seznam podle časového rozmezí pro účely ladění nebo jej filtrujte podle agregace pro účely auditu."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Selhané události",
+        "DESCRIPTION": "Tato stránka zobrazuje všechny selhané události ve vaší instanci. Pokud se ZITADEL nechová tak, jak očekáváte, vždy nejdříve zkontrolujte tento seznam."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Pohledy",
+        "DESCRIPTION": "Tato stránka zobrazuje všechny vaše databázové pohledy a kdy zpracovaly svou poslední událost. Pokud vám chybí nějaká data, zkontrolujte, zda je pohled aktuální."
+      },
+      "LANGUAGES": {
+        "TITLE": "Jazyky",
+        "DESCRIPTION": "Omez možnosti jazyků pro přihlašovací formulář a notifikační zprávy. Pokud chceš některé z jazyků zakázat, přetáhni je do sekce Zakázané jazyky. Můžeš určit povolený jazyk jako výchozí jazyk. Pokud preferovaný jazyk uživatele není povolen, použije se výchozí jazyk."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Generátory tajemství",
+        "DESCRIPTION": "Definuj složitost a životnost svých tajemství. Vyšší složitost a životnost zlepšuje bezpečnost, nižší složitost a životnost zlepšuje výkon dešifrování."
+      },
+      "SECURITY": {
+        "TITLE": "Nastavení bezpečnosti",
+        "DESCRIPTION": "Povol funkce ZITADEL, které mohou mít dopad na bezpečnost. Skutečně bys měl vědět, co děláš, než tyto nastavení změníš."
+      },
+      "OIDC": {
+        "TITLE": "Nastavení OpenID Connect",
+        "DESCRIPTION": "Konfiguruj životnost svých OIDC tokenů. Použij kratší životnost pro zvýšení bezpečnosti uživatelů, použij delší životnost pro zvýšení pohodlí uživatelů.",
+        "LABEL_HOURS": "Maximální životnost v hodinách",
+        "LABEL_DAYS": "Maximální životnost ve dnech",
+        "ACCESS_TOKEN": {
+          "TITLE": "Přístupový token",
+          "DESCRIPTION": "Přístupový token se používá k autentizaci uživatele. Je to krátkodobý token, který se používá k přístupu k datům uživatele. Použij krátkou životnost, aby se minimalizovalo riziko neoprávněného přístupu. Přístupové tokeny mohou být automaticky obnoveny pomocí refresh tokenu."
+        },
+        "ID_TOKEN": {
+          "TITLE": "ID Token",
+          "DESCRIPTION": "ID token je JSON Web Token (JWT), který obsahuje tvrzení o uživateli. Životnost ID tokenu by neměla překročit životnost přístupového tokenu."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Refresh Token",
+          "DESCRIPTION": "Refresh token se používá k získání nového přístupového tokenu. Je to dlouhodobý token, který se používá k obnovení přístupového tokenu. Uživatel musí provést ruční re-autentizaci, když refresh token vyprší."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Nečinný Refresh Token",
+          "DESCRIPTION": "Životnost nečinného refresh tokenu je maximální doba, po kterou může být refresh token nepoužitý."
+        }
+      },
+      "MESSAGE_TEXTS": {
+        "TITLE": "Texty zpráv",
+        "DESCRIPTION": "Přizpůsob si texty svých e-mailových nebo SMS notifikací. Pokud chceš některé z jazyků zakázat, omez je ve svém nastavení jazyků instance.",
+        "TYPE_DESCRIPTIONS": {
+          "DC": "Když si pro svou organizaci nárokuješ doménu, uživatelé, kteří v názvu přihlášení nepoužívají tuto doménu, budou vyzváni ke změně svého přihlašovacího jména tak, aby odpovídalo nárokované doméně.",
+          "INIT": "Když je uživatel vytvořen, obdrží e-mail s odkazem na nastavení svého hesla.",
+          "PC": "Když uživatel změní své heslo, obdrží o tomto změně notifikaci, pokud máš tuto možnost povolenou v nastavení notifikací.",
+          "PL": "Když uživatel přidá metodu bezheslového přihlášení, musí ji aktivovat kliknutím na odkaz v e-mailu.",
+          "PR": "Když uživatel resetuje své heslo, obdrží e-mail s odkazem na nastavení nového hesla.",
+          "VE": "Když uživatel změní svou e-mailovou adresu, obdrží e-mail s odkazem na ověření nové adresy.",
+          "VP": "Když uživatel změní své telefonní číslo, obdrží SMS s kódem pro ověření nového čísla.",
+          "VEO": "Když uživatel přidá metodu jednorázového hesla přes e-mail, musí ji aktivovat zadáním kódu poslaného na jeho e-mailovou adresu.",
+          "VSO": "Když uživatel přidá metodu jednorázového hesla přes SMS, musí ji aktivovat zadáním kódu poslaného na jeho telefonní číslo."
+        }
+      },
+      "LOGIN_TEXTS": {
+        "TITLE": "Texty přihlašovacího rozhraní",
+        "DESCRIPTION": "Přizpůsob si texty svého přihlašovacího formuláře. Pokud je text prázdný, zobrazí se výchozí hodnota. Pokud chceš některé z jazyků zakázat, omez je ve svém nastavení jazyků instance."
+      },
+      "DOMAINS": {
+        "TITLE": "Nastavení domén",
+        "DESCRIPTION": "Definuj omezení pro své domény a konfiguruj vzory svých přihlašovacích jmen.",
+        "REQUIRE_VERIFICATION": {
+          "TITLE": "Vyžadovat ověření vlastních domén",
+          "DESCRIPTION": "Pokud je tato možnost aktivována, domény organizací musí být ověřeny předtím, než mohou být použity pro objevování domén nebo přípony uživatelských jmen."
+        },
+        "LOGIN_NAME_PATTERN": {
+          "TITLE": "Vzor přihlašovacího jména",
+          "DESCRIPTION": "Ovládej vzor přihlašovacích jmen svých uživatelů. ZITADEL vybere organizaci uživatele hned, jakmile zadá své přihlašovací jméno. Proto musí být přihlašovací jména jedinečná napříč všemi organizacemi. Pokud máš uživatele, kteří mají účet ve více doménách, můžeš zajistit jedinečnost přidáním přípony domény organizace k jejich přihlašovacím jménům."
+        },
+        "DOMAIN_VERIFICATION": {
+          "TITLE": "Ověření domény",
+          "DESCRIPTION": "Povolit používání domén organizace pouze v případě, že je skutečně ovládají. Pokud je aktivováno, domény organizací jsou pravidelně ověřovány pomocí DNS nebo HTTP výzvy předtím, než mohou být použity. Jedná se o bezpečnostní funkci, která má zabránit převzetí domény."
+        },
+        "SMTP_SENDER_ADDRESS": {
+          "TITLE": "Adresa odesílatele SMTP",
+          "DESCRIPTION": "Povolit adresu odesílatele SMTP pouze v případě, že odpovídá jedné z domén instance."
+        }
+      },
+      "LOGIN": {
+        "LIFETIMES": {
+          "TITLE": "Životnost přihlášení",
+          "DESCRIPTION": "Zvýši svou bezpečnost snížením některých maximálních dobových limitů souvisejících s přihlášením.",
+          "LABEL": "Maximální doba životnosti v hodinách",
+          "PW_CHECK": {
+            "TITLE": "Kontrola hesla",
+            "DESCRIPTION": "Tví uživatelé musí v těchto obdobích změnit svá hesla."
+          },
+          "EXT_LOGIN_CHECK": {
+            "TITLE": "Kontrola externího přihlášení",
+            "DESCRIPTION": "Tví uživatelé budou v těchto obdobích přesměrováni na své externí poskytovatele identity."
+          },
+          "MULTI_FACTOR_INIT": {
+            "TITLE": "Kontrola zavedení vícefaktorové autentizace",
+            "DESCRIPTION": "Tví uživatelé budou v těchto obdobích vyzváni k nastavení druhého faktoru nebo vícefaktorové autentizace, pokud tak již neučinili. Životnost 0 tuto výzvu deaktivuje."
+          },
+          "SECOND_FACTOR_CHECK": {
+            "TITLE": "Kontrola druhého faktoru",
+            "DESCRIPTION": "Tví uživatelé musí v těchto obdobích znovu ověřit svůj druhý faktor."
+          },
+          "MULTI_FACTOR_CHECK": {
+            "TITLE": "Kontrola vícefaktorové autentizace",
+            "DESCRIPTION": "Tví uživatelé musí v těchto obdobích znovu ověřit svou vícefaktorovou autentizaci."
+          }
+        },
+        "FORM": {
+          "TITLE": "Přihlašovací formulář",
+          "DESCRIPTION": "Přizpůsob si přihlašovací formulář.",
+          "USERNAME_PASSWORD_ALLOWED": {
+            "TITLE": "Povoleno přihlášení pomocí uživatelského jména a hesla",
+            "DESCRIPTION": "Umožni svým uživatelům přihlásit se pomocí uživatelského jména a hesla. Pokud je tato možnost deaktivována, tvoji uživatelé se mohou přihlásit pouze pomocí bezheslového přihlášení nebo pomocí externího poskytovatele identity."
+          },
+          "USER_REGISTRATION_ALLOWED": {
+            "TITLE": "Povolena registrace uživatelů",
+            "DESCRIPTION": "Umožni anonymním uživatelům vytvořit účet."
+          },
+          "ORG_REGISTRATION_ALLOWED": {
+            "TITLE": "Povolena registrace organizací",
+            "DESCRIPTION": "Umožni anonymním uživatelům vytvořit organizaci."
+          },
+          "EXTERNAL_LOGIN_ALLOWED": {
+            "TITLE": "Povoleno externí přihlášení",
+            "DESCRIPTION": "Umožni svým uživatelům přihlásit se pomocí externího poskytovatele identity namísto použití ZITADEL uživatele pro přihlášení."
+          },
+          "PASSWORD_RESET_ALLOWED": {
+            "TITLE": "Povoleno resetování hesla",
+            "DESCRIPTION": "Umožni svým uživatelům resetovat jejich heslo."
+          },
+          "DOMAIN_DISCOVERY_ALLOWED": {
+            "TITLE": "Povoleno objevování domén",
+            "DESCRIPTION": "Najdi organizace tvých uživatelů na základě domény jejich přihlašovacích jmen, například jejich e-mailové adresy."
+          },
+          "IGNORE_UNKNOWN_USERNAMES": {
+            "TITLE": "Ignorovat neznámá uživatelská jména",
+            "DESCRIPTION": "Pokud je tato možnost aktivována, přihlašovací formulář nezobrazí chybovou zprávu, pokud je uživatelské jméno neznámé. To pomáhá zabránit hádání uživatelských jmen."
+          },
+          "DISABLE_EMAIL_LOGIN": {
+            "TITLE": "Zakázat přihlášení e-mailem",
+            "DESCRIPTION": "Pokud je tato možnost aktivována, tvoji uživatelé nemohou použít své e-mailové adresy pro přihlášení. Pozor, pokud toto deaktivuješ, e-mailové adresy tvých uživatelů musí být jedinečné napříč všemi organizacemi, aby se mohli přihlásit."
+          },
+          "DISABLE_PHONE_LOGIN": {
+            "TITLE": "Zakázat přihlášení telefonem",
+            "DESCRIPTION": "Pokud je tato možnost aktivována, tvoji uživatelé nemohou použít svá telefonní čísla pro přihlášení. Pozor, pokud toto deaktivuješ, telefonní čísla tvých uživatelů musí být jedinečná napříč všemi organizacemi, aby se mohli přihlásit."
+          }
+        }
+      }
+    }
+  },
   "PAGINATOR": {
     "PREVIOUS": "Předchozí",
     "NEXT": "Další",
