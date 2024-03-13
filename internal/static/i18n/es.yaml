@@ -603,6 +603,7 @@ EventTypes:
     token:
       added: Token de acceso creado
       removed: Token de acceso eliminado
+    impersonated: Usuario suplantado
     username:
       reserved: Nombre de usuario reservado
       released: Nombre de usuario liberado

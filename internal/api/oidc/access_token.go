@@ -70,15 +70,13 @@ func (s *Server) verifyAccessToken(ctx context.Context, tkn string) (*accessToke
 
 func accessTokenV1(tokenID, subject string, token *model.TokenView) *accessToken {
 	return &accessToken{
-		tokenID:       tokenID,
-		userID:        token.UserID,
-		resourceOwner: token.ResourceOwner,
-		subject:       subject,
-		clientID:      token.ApplicationID,
-		audience:      token.Audience,
-		scope:         token.Scopes,
-		// TODO: authMethods: ,
-		// TODO: authTime: ,
+		tokenID:         tokenID,
+		userID:          token.UserID,
+		resourceOwner:   token.ResourceOwner,
+		subject:         subject,
+		clientID:        token.ApplicationID,
+		audience:        token.Audience,
+		scope:           token.Scopes,
 		tokenCreation:   token.CreationDate,
 		tokenExpiration: token.Expiration,
 		isPAT:           token.IsPAT,

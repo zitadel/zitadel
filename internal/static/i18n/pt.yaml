@@ -597,6 +597,7 @@ EventTypes:
     token:
       added: Token de acesso criado
       removed: Token de acesso removido
+    impersonated: Usuário personificado
     username:
       reserved: Nome de usuário reservado
       released: Nome de usuário liberado

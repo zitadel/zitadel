@@ -602,6 +602,7 @@ EventTypes:
         failed: 初始化检查失败
     token:
       added: 已创建访问令牌
+    impersonated: 用户冒充
     username:
       reserved: 保留用户名
       released: 用户名已发布

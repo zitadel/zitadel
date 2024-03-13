@@ -602,6 +602,7 @@ EventTypes:
         failed: La vérification de l'initialisation a échoué
     token:
       added: Jeton d'accès créé
+    impersonated: Utilisateur usurpé l'identité
     username:
       reserved: Nom d'utilisateur réservé
       released: Nom d'utilisateur libéré

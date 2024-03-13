@@ -602,6 +602,7 @@ EventTypes:
     token:
       added: Креиран е токен за пристап
       removed: Токенот за пристап е отстранет
+    impersonated: Корисникот имитиран
     username:
       reserved: Корисничкото име е резервирано
       released: Корисничкото име е ослободено

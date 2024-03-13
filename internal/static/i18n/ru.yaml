@@ -591,6 +591,7 @@ EventTypes:
     token:
       added: Маркер доступа создан
       removed: Удален маркер доступа
+    impersonated: Пользователь олицетворяет себя
     username:
       reserved: Имя пользователя зарезервировано
       released: Имя пользователя выпущено

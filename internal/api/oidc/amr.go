@@ -34,7 +34,8 @@ func AuthMethodTypesToAMR(methodTypes []domain.UserAuthMethodType) []string {
 		case domain.UserAuthMethodTypeU2F:
 			amr = append(amr, UserPresence)
 			factors++
-		case domain.UserAuthMethodTypeTOTP,
+		case domain.UserAuthMethodTypeOTP,
+			domain.UserAuthMethodTypeTOTP,
 			domain.UserAuthMethodTypeOTPSMS,
 			domain.UserAuthMethodTypeOTPEmail:
 			// a user could use multiple (t)otp, which is a factor, but still will be returned as a single `otp` entry

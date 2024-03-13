@@ -600,6 +600,7 @@ EventTypes:
     token:
       added: Přístupový token vytvořen
       removed: Přístupový token odstraněn
+    impersonated: Usuario suplantado
     username:
       reserved: Uživatelské jméno rezervováno
       released: Uživatelské jméno uvolněno

@@ -603,6 +603,7 @@ EventTypes:
         failed: Controllo dell'inizializzazione fallito
     token:
       added: Access Token creato
+    impersonated: Utente impersonificato
     username:
       reserved: Nome utente riservato
       released: Nome utente rilasciato

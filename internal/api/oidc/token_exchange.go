@@ -15,7 +15,14 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const UserIDTokenType oidc.TokenType = "urn:zitadel:params:oauth:token-type:user_id"
+const (
+	UserIDTokenType oidc.TokenType = "urn:zitadel:params:oauth:token-type:user_id"
+
+	// TokenTypeNA is set when the returned Token Exchange access token value can't be used as an access token.
+	// For example, when it is an ID Token.
+	// See [RFC 8693, section 2.2.1, token_type](https://www.rfc-editor.org/rfc/rfc8693#section-2.2.1)
+	TokenTypeNA = "N_A"
+)
 
 func init() {
 	oidc.AllTokenTypes = append(oidc.AllTokenTypes, UserIDTokenType)
@@ -234,7 +241,7 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 
 	case oidc.IDTokenType:
 		resp.AccessToken, resp.ExpiresIn, err = s.createExchangeIDToken(ctx, signingKey, client, subjectToken.userID, "", audience, userInfo, actorToken.authMethods, actorToken.authTime, reason, actor)
-		resp.TokenType = "N_A"
+		resp.TokenType = TokenTypeNA
 		resp.IssuedTokenType = oidc.IDTokenType
 	case oidc.RefreshTokenType, UserIDTokenType:
 		fallthrough

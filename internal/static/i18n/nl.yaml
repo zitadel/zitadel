@@ -603,6 +603,7 @@ EventTypes:
     token:
       added: Toegangstoken aangemaakt
       removed: Toegangstoken verwijderd
+    impersonated: Gebruiker nagebootst
     username:
       reserved: Gebruikersnaam gereserveerd
       released: Gebruikersnaam vrijgegeven

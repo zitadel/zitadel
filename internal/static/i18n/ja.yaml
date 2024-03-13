@@ -592,6 +592,7 @@ EventTypes:
     token:
       added: アクセストークンの作成
       removed: アクセストークンの削除
+    impersonated: ユーザーがなりすました
     username:
       reserved: ユーザー名の予約
       released: ユーザー名の解放

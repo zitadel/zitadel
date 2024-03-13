@@ -603,6 +603,7 @@ EventTypes:
     token:
       added: Access Token ausgestellt
       removed: Access Token gelöscht
+    impersonated: Benutzer hat sich als Benutzer ausgegeben
     username:
       reserved: Benutzername reserviert
       released: Benutzername freigegeben
