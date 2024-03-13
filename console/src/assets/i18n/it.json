@@ -119,7 +119,7 @@
         "DESCRIPTION": "Questa pagina mostra tutti gli eventi falliti nella tua istanza. Se ZITADEL non si comporta come ti aspetti, controlla sempre prima questa lista."
       },
       "IAM_VIEWS": {
-        "TITLE": "Viste",
+        "TITLE": "Views",
         "DESCRIPTION": "Questa pagina mostra tutte le tue viste del database e quando hanno elaborato il loro ultimo evento. Se ti mancano alcuni dati, controlla se la vista è aggiornata."
       },
       "LANGUAGES": {
