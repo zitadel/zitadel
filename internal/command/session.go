@@ -228,7 +228,7 @@ func (s *SessionCommands) OTPEmailChecked(ctx context.Context, checkedAt time.Ti
 
 func (s *SessionCommands) SetToken(ctx context.Context, tokenID string) {
 	// trigger activity log for session for user
-	activity.Trigger(ctx, s.sessionWriteModel.UserResourceOwner, s.sessionWriteModel.UserID, activity.SessionAPI)
+	activity.Trigger(ctx, s.sessionWriteModel.UserResourceOwner, s.sessionWriteModel.UserID, activity.SessionAPI, s.eventstore.FilterToQueryReducer)
 	s.eventCommands = append(s.eventCommands, session.NewTokenSetEvent(ctx, s.sessionWriteModel.aggregate, tokenID))
 }
 
