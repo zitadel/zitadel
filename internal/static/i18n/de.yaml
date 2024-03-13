@@ -546,6 +546,16 @@ Errors:
     NotFound: Ausführung nicht gefunden
     IncludeNotFound: Einschließen nicht gefunden
     NoTargets: Keine Ziele definiert
+  UserSchema:
+    NotEnabled: Funktion Benutzerschema ist nicht aktiviert
+    Type:
+      Missing: Benutzerschematyp fehlt
+      AlreadyExists: Benutzerschematyp existiert bereits
+    Authenticator:
+      Invalid: Ungültiger Authentifizierungstyp
+    NotActive: Benutzerschema nicht aktiv
+    NotInactive: Benutzerschema nicht inaktiv
+    NotExists: Benutzerschema existiert nicht
 
 AggregateTypes:
   action: Action
@@ -559,6 +569,7 @@ AggregateTypes:
   feature: Feature
   target: Ziel
   execution: Ausführung
+  user_schema: Benutzerschema
 
 EventTypes:
   execution:
@@ -1236,6 +1247,12 @@ EventTypes:
         password:
           changed: Passwort von SMTP Konfiguration geändert
         removed: SMTP Konfiguration gelöscht
+  user_schema:
+    created: Benutzerschema erstellt
+    updated: Benutzerschema geändert
+    deactivated: Benutzerschema deaktiviert
+    reactivated: Benutzerschema reaktiviert
+    deleted: Benutzerschema gelöscht
 
 Application:
   OIDC:

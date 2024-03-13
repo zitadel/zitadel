@@ -546,6 +546,16 @@ Errors:
     NotFound: Nie znaleziono wykonania
     IncludeNotFound: Nie znaleziono uwzględnienia
     NoTargets: Nie zdefiniowano celów
+  UserSchema:
+    NotEnabled: Funkcja „Schemat użytkownika” nie jest włączona
+    Type:
+      Missing: Brak typu schematu użytkownika
+      AlreadyExists: Typ schematu użytkownika już istnieje
+    Authenticator:
+      Invalid: Nieprawidłowy typ uwierzytelnienia
+    NotActive: Schemat użytkownika nieaktywny
+    NotInactive: Schemat użytkownika nie jest nieaktywny
+    NotExists: Schemat użytkownika nie istnieje
 
 AggregateTypes:
   action: Działanie
@@ -559,6 +569,7 @@ AggregateTypes:
   feature: Funkcja
   target: Cel
   execution: Wykonanie
+  user_schema: Schemat użytkownika
 
 EventTypes:
   execution:
@@ -1236,6 +1247,12 @@ EventTypes:
         password:
           changed: Hasło konfiguracji SMTP zmienione
         removed: Konfiguracja SMTP usunięta
+  user_schema:
+    created: Utworzono schemat użytkownika
+    updated: Schemat użytkownika zaktualizowany
+    deactivated: Schemat użytkownika dezaktywowany
+    reactivated: Schemat użytkownika został ponownie aktywowany
+    deleted: Schemat użytkownika został usunięty
 
 Application:
   OIDC:
