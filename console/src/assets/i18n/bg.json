@@ -2426,7 +2426,8 @@
     "DIALOG": {
       "DELETE_TITLE": "Премахване на мениджъра",
       "DELETE_DESCRIPTION": "На път сте да премахнете мениджър. "
-    }
+    },
+    "SHOWDETAILS": "Покажи подробности"
   },
   "ROLESLABEL": "Роли",
   "GRANTS": {

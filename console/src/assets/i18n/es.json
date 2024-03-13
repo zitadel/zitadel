@@ -2433,7 +2433,8 @@
     "DIALOG": {
       "DELETE_TITLE": "Eliminar Mánager",
       "DELETE_DESCRIPTION": "Estás a punto de eliminar un mánager. ¿Estás seguro?"
-    }
+    },
+    "SHOWDETAILS": "Mostrar detalles"
   },
   "ROLESLABEL": "Roles",
   "GRANTS": {

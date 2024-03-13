@@ -2325,7 +2325,8 @@
     "DIALOG": {
       "DELETE_TITLE": "Remover Gerente",
       "DELETE_DESCRIPTION": "Você está prestes a remover um gerente. Tem certeza?"
-    }
+    },
+    "SHOWDETAILS": "Clique para mostrar detalhes."
   },
   "ROLESLABEL": "Funções",
   "GRANTS": {

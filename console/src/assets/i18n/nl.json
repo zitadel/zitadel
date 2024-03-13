@@ -2348,7 +2348,8 @@
     "DIALOG": {
       "DELETE_TITLE": "Verwijder Manager",
       "DELETE_DESCRIPTION": "U staat op het punt om een manager te verwijderen. Weet u het zeker?"
-    }
+    },
+    "SHOWDETAILS": "Klik om details te tonen."
   },
   "ROLESLABEL": "Rollen",
   "GRANTS": {

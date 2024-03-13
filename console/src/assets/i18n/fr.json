@@ -2436,7 +2436,8 @@
     "DIALOG": {
       "DELETE_TITLE": "Supprimer un manager",
       "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer un manager. Vous êtes sûr ?"
-    }
+    },
+    "SHOWDETAILS": "Cliquez pour afficher les détails."
   },
   "ROLESLABEL": "Rôles",
   "GRANTS": {

@@ -2454,7 +2454,8 @@
     "DIALOG": {
       "DELETE_TITLE": "Remove Manager",
       "DELETE_DESCRIPTION": "You are about to remove a manager. Are you sure?"
-    }
+    },
+    "SHOWDETAILS": "Click to show details."
   },
   "ROLESLABEL": "Roles",
   "GRANTS": {

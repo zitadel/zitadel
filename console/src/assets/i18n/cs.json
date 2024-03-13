@@ -2445,7 +2445,8 @@
     "DIALOG": {
       "DELETE_TITLE": "Odebrat manažera",
       "DELETE_DESCRIPTION": "Chystáte se odebrat manažera. Jste si jisti?"
-    }
+    },
+    "SHOWDETAILS": "Zobrazit detaily"
   },
   "ROLESLABEL": "Role",
   "GRANTS": {

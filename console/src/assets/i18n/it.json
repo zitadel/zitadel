@@ -2436,7 +2436,8 @@
     "DIALOG": {
       "DELETE_TITLE": "Rimuovi manager",
       "DELETE_DESCRIPTION": "Stai per rimuovere un manager. Vuoi davvero continuare?"
-    }
+    },
+    "SHOWDETAILS": "Clicca per mostrare i dettagli."
   },
   "ROLESLABEL": "Ruoli",
   "GRANTS": {

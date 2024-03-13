@@ -2435,7 +2435,8 @@
     "DIALOG": {
       "DELETE_TITLE": "Manager entfernen",
       "DELETE_DESCRIPTION": "Sie sind im Begriff einen Manager zu entfernen. Wollen Sie fortfahren?"
-    }
+    },
+    "SHOWDETAILS": "Details anzeigen"
   },
   "ROLESLABEL": "Rollen",
   "GRANTS": {

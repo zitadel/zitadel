@@ -2329,7 +2329,8 @@
     "DIALOG": {
       "DELETE_TITLE": "删除管理者",
       "DELETE_DESCRIPTION": "您即将删除管理者。你确定吗？"
-    }
+    },
+    "SHOWDETAILS": "点击显示详情。"
   },
   "ROLESLABEL": "角色",
   "GRANTS": {

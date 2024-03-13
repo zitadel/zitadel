@@ -2321,7 +2321,8 @@
     "DIALOG": {
       "DELETE_TITLE": "マネージャーの削除",
       "DELETE_DESCRIPTION": "マネージャーを削除しようとしています。本当によろしいですか？"
-    }
+    },
+    "SHOWDETAILS": "クリックして詳細を表示します。"
   },
   "ROLESLABEL": "ロール",
   "GRANTS": {

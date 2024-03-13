@@ -2330,7 +2330,8 @@
     "DIALOG": {
       "DELETE_TITLE": "Usuń managera",
       "DELETE_DESCRIPTION": "Zamierzasz usunąć managera. Czy jesteś pewny?"
-    }
+    },
+    "SHOWDETAILS": "Kliknij, aby zobaczyć szczegóły."
   },
   "ROLESLABEL": "Role",
   "GRANTS": {
