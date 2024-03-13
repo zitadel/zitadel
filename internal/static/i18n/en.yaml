@@ -555,6 +555,7 @@ Errors:
       TypeMissing: Token type is missing
       TypeNotAllowed: Token type is not allowed
       TypeNotSupported: Token type is not supported
+      NotForAPI: Impersonated tokens not allowed for API
     Impersonation:
       PolicyDisabled: Impersonation is disabled in the instance security policy
 

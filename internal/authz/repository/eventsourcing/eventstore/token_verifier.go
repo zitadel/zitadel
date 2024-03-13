@@ -112,6 +112,9 @@ func (repo *TokenVerifierRepo) verifyAccessTokenV1(ctx context.Context, tokenID,
 
 	_, tokenSpan := tracing.NewNamedSpan(ctx, "token")
 	token, err := repo.tokenByID(ctx, tokenID, subject)
+	if token.Actor != nil {
+		return "", "", "", "", "", zerrors.ThrowPermissionDenied(nil, "APP-wai8O", "Errors.TokenExchange.Token.NotForAPI")
+	}
 	tokenSpan.EndWithError(err)
 	if err != nil {
 		return "", "", "", "", "", zerrors.ThrowUnauthenticated(err, "APP-BxUSiL", "invalid token")
@@ -135,6 +138,9 @@ func (repo *TokenVerifierRepo) verifyAccessTokenV2(ctx context.Context, token, v
 	activeToken, err := repo.Query.ActiveAccessTokenByToken(ctx, token)
 	if err != nil {
 		return "", "", "", err
+	}
+	if activeToken.Actor != nil {
+		return "", "", "", zerrors.ThrowPermissionDenied(nil, "APP-Shi0J", "Errors.TokenExchange.Token.NotForAPI")
 	}
 	if err = verifyAudience(activeToken.Audience, verifierClientID, projectID); err != nil {
 		return "", "", "", err

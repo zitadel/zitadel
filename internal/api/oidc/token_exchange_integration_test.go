@@ -19,22 +19,19 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 )
 
 func setTokenExchangeFeature(t *testing.T, value bool) {
 	iamCTX := Tester.WithAuthorization(CTX, integration.IAMOwner)
 
-	resp, err := Tester.Client.FeatureV2.GetInstanceFeatures(iamCTX, &feature.GetInstanceFeaturesRequest{})
+	_, err := Tester.Client.FeatureV2.SetInstanceFeatures(iamCTX, &feature.SetInstanceFeaturesRequest{
+		OidcTokenExchange: proto.Bool(value),
+	})
 	require.NoError(t, err)
-	if resp.GetOidcTokenExchange().GetEnabled() != value {
-		_, err = Tester.Client.FeatureV2.SetInstanceFeatures(iamCTX, &feature.SetInstanceFeaturesRequest{
-			OidcTokenExchange: proto.Bool(value),
-		})
-		require.NoError(t, err)
-		time.Sleep(time.Second)
-	}
-
+	time.Sleep(time.Second)
 }
 
 func setImpersonationPolicy(t *testing.T, value bool) {
@@ -505,4 +502,35 @@ func TestServer_TokenExchange(t *testing.T) {
 			}
 		})
 	}
+}
+
+// This test tries to call the zitadel API with an impersonated token,
+// which should fail.
+func TestImpersonation_API_Call(t *testing.T) {
+	client, keyData, err := Tester.CreateOIDCTokenExchangeClient(CTX)
+	require.NoError(t, err)
+	signer, err := rp.SignerFromKeyFile(keyData)()
+	require.NoError(t, err)
+	exchanger, err := tokenexchange.NewTokenExchangerJWTProfile(CTX, Tester.OIDCIssuer(), client.GetClientId(), signer)
+	require.NoError(t, err)
+	resourceServer, err := Tester.CreateResourceServerJWTProfile(CTX, keyData)
+	require.NoError(t, err)
+
+	setTokenExchangeFeature(t, true)
+	setImpersonationPolicy(t, true)
+	time.Sleep(10 * time.Second)
+
+	_, iamImpersonatorPAT := createMachineUserPATWithMembership(t, "IAM_ADMIN_IMPERSONATOR")
+	iamOwner := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.IAMOwner)
+
+	// impersonating the IAM owner!
+	resp, err := tokenexchange.ExchangeToken(CTX, exchanger, iamOwner.Token, oidc.AccessTokenType, iamImpersonatorPAT, oidc.AccessTokenType, nil, nil, nil, oidc.AccessTokenType)
+	require.NoError(t, err)
+	accessTokenVerifier(CTX, resourceServer, iamOwner.ID)
+
+	impersonatedCTX := Tester.WithAuthorizationToken(CTX, resp.AccessToken)
+	_, err = Tester.Client.Admin.GetAllowedLanguages(impersonatedCTX, &admin.GetAllowedLanguagesRequest{})
+	status := status.Convert(err)
+	assert.Equal(t, codes.PermissionDenied, status.Code())
+	assert.Equal(t, "Errors.TokenExchange.Token.NotForAPI (APP-wai8O)", status.Message())
 }

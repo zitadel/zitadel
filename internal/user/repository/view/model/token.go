@@ -1,11 +1,14 @@
 package model
 
 import (
+	"database/sql/driver"
+	"encoding/json"
 	"time"
 
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
@@ -40,6 +43,40 @@ type TokenView struct {
 	IsPAT             bool                       `json:"-" gorm:"is_pat"`
 	Deactivated       bool                       `json:"-" gorm:"-"`
 	InstanceID        string                     `json:"instanceID" gorm:"column:instance_id;primary_key"`
+	Actor             TokenActor                 `json:"actor" gorm:"column:actor"`
+}
+
+type TokenActor struct {
+	*domain.TokenActor
+}
+
+func (a *TokenActor) Scan(value any) error {
+	var data []byte
+	switch v := value.(type) {
+	case nil:
+		a.TokenActor = nil
+	case string:
+		data = []byte(v)
+	case []byte:
+		data = v
+	default:
+		return zerrors.ThrowInternalf(nil, "MODEL-yo8Ae", "cannot scan type %T into %T", v, a)
+	}
+	if err := json.Unmarshal(data, &a.TokenActor); err != nil {
+		return zerrors.ThrowInternal(nil, "MODEL-yo8Ae", "cannot unmarshal token actor")
+	}
+	return nil
+}
+
+func (a TokenActor) Value() (driver.Value, error) {
+	if a.TokenActor == nil {
+		return nil, nil
+	}
+	data, err := json.Marshal(a.TokenActor)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(nil, "MODEL-oD2mi", "cannot marshal token actor")
+	}
+	return data, nil
 }
 
 func TokenViewToModel(token *TokenView) *usr_model.TokenView {
@@ -58,6 +95,7 @@ func TokenViewToModel(token *TokenView) *usr_model.TokenView {
 		PreferredLanguage: token.PreferredLanguage,
 		RefreshTokenID:    token.RefreshTokenID,
 		IsPAT:             token.IsPAT,
+		Actor:             token.Actor.TokenActor,
 	}
 }
 

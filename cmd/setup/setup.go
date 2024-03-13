@@ -135,6 +135,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s20AddByUserSessionIndex = &AddByUserIndexToSession{dbClient: queryDBClient}
 	steps.s21AddBlockFieldToLimits = &AddBlockFieldToLimits{dbClient: queryDBClient}
 	steps.s22ActiveInstancesIndex = &ActiveInstanceEvents{dbClient: queryDBClient}
+	steps.s23AddActorToAuthTokens = &AddActorToAuthTokens{dbClient: queryDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -185,6 +186,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	logging.WithFields("name", steps.s20AddByUserSessionIndex.String()).OnError(err).Fatal("migration failed")
 	err = migration.Migrate(ctx, eventstoreClient, steps.s22ActiveInstancesIndex)
 	logging.WithFields("name", steps.s22ActiveInstancesIndex.String()).OnError(err).Fatal("migration failed")
+	err = migration.Migrate(ctx, eventstoreClient, steps.s23AddActorToAuthTokens)
+	logging.WithFields("name", steps.s23AddActorToAuthTokens.String()).OnError(err).Fatal("migration failed")
 
 	for _, repeatableStep := range repeatableSteps {
 		err = migration.Migrate(ctx, eventstoreClient, repeatableStep)

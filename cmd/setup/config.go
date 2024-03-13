@@ -101,6 +101,7 @@ type Steps struct {
 	s20AddByUserSessionIndex        *AddByUserIndexToSession
 	s21AddBlockFieldToLimits        *AddBlockFieldToLimits
 	s22ActiveInstancesIndex         *ActiveInstanceEvents
+	s23AddActorToAuthTokens         *AddActorToAuthTokens
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
