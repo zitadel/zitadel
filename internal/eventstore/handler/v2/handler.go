@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/jackc/pgconn"
-
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"

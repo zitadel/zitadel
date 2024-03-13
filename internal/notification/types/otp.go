@@ -4,10 +4,8 @@ import (
 	"context"
 	"time"
 
-	http_utils "github.com/zitadel/zitadel/internal/api/http"
-
 	"github.com/zitadel/zitadel/internal/api/authz"
-
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/domain"
 )
 

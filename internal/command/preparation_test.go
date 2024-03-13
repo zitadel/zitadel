@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
-//Want represents the expected values for each step
+// Want represents the expected values for each step
 type Want struct {
 	ValidationErr error
 	CreateErr     error
@@ -22,7 +22,7 @@ type CommandVerifier interface {
 	Validate(eventstore.Command) bool
 }
 
-//AssertValidation checks if the validation works as inteded
+// AssertValidation checks if the validation works as inteded
 func AssertValidation(t *testing.T, ctx context.Context, validation preparation.Validation, filter preparation.FilterToQueryReducer, want Want) {
 	t.Helper()
 

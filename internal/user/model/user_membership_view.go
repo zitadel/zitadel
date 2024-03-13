@@ -1,10 +1,10 @@
 package model
 
 import (
+	"time"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
-
-	"time"
 )
 
 type UserMembershipView struct {

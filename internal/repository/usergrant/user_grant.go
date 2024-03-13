@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 

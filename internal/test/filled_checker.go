@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-//testingT is a wrapper for testing.T
+// testingT is a wrapper for testing.T
 //
 // this wrapper is needed for internal testing
 type testingT interface {

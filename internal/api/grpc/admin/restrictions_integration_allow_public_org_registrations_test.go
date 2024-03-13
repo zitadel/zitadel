@@ -5,8 +5,6 @@ package admin_test
 import (
 	"bytes"
 	"context"
-	"github.com/muhlemmer/gu"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
@@ -14,6 +12,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/pkg/grpc/admin"

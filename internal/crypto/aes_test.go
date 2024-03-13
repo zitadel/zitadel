@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-//TODO: refactor test style
+// TODO: refactor test style
 func TestDecrypt_OK(t *testing.T) {
 	encryptedpw, err := EncryptAESString("ThisIsMySecretPw", "passphrasewhichneedstobe32bytes!")
 	assert.NoError(t, err)
