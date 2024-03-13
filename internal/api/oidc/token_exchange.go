@@ -169,8 +169,7 @@ func validateTokenExchangeScopes(client *Client, requestedScopes, subjectScopes,
 	if len(scopes) == 0 {
 		scopes = actorScopes
 	}
-	// return op.ValidateAuthReqScopes(client, scopes)
-	return scopes, nil
+	return op.ValidateAuthReqScopes(client, scopes)
 }
 
 func validateTokenExchangeAudience(requestedAudience, subjectAudience, actorAudience []string) ([]string, error) {
