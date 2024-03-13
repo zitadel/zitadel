@@ -65,6 +65,7 @@ func (m *InstanceFeaturesWriteModel) reduceReset() {
 	m.TriggerIntrospectionProjections = nil
 	m.LegacyIntrospection = nil
 	m.UserSchema = nil
+	m.TokenExchange = nil
 }
 
 func (m *InstanceFeaturesWriteModel) reduceBoolFeature(event *feature_v2.SetEvent[bool]) error {

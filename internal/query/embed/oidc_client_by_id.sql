@@ -29,7 +29,12 @@ keys as (
 	group by identifier
 ),
 settings as (
-	select instance_id, json_build_object('access_token_lifetime', access_token_lifetime, 'id_token_lifetime', id_token_lifetime) as settings
+	select instance_id, json_build_object(
+		'access_token_lifetime', access_token_lifetime,
+		'id_token_lifetime', id_token_lifetime,
+		'refresh_token_idle_expiration', refresh_token_idle_expiration,
+		'refresh_token_expiration', refresh_token_expiration
+	) as settings
 	from projections.oidc_settings2
 	where aggregate_id = $1
 		and instance_id = $1

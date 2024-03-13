@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zitadel/oidc/v3/pkg/client"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/client/rs"
 	"github.com/zitadel/oidc/v3/pkg/client/tokenexchange"
@@ -86,7 +87,9 @@ func idTokenVerifier(ctx context.Context, provider rp.RelyingParty, subject stri
 
 func refreshTokenVerifier(ctx context.Context, provider rp.RelyingParty) func(t *testing.T, token string) {
 	return func(t *testing.T, token string) {
-		_, err := rp.RefreshTokens[*oidc.IDTokenClaims](ctx, provider, token, "", "")
+		clientAssertion, err := client.SignedJWTProfileAssertion(provider.OAuthConfig().ClientID, []string{provider.Issuer()}, time.Hour, provider.Signer())
+		require.NoError(t, err)
+		_, err = rp.RefreshTokens[*oidc.IDTokenClaims](ctx, provider, token, clientAssertion, oidc.ClientAssertionTypeJWTAssertion)
 		require.NoError(t, err)
 	}
 }
@@ -284,7 +287,7 @@ func TestServer_TokenExchange(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "EXCHANGE: alternate scope for refresh token and without IDToken",
+			name: "EXCHANGE: alternate scope for refresh token",
 			settings: settings{
 				tokenExchangeFeature: true,
 				impersonationPolicy:  false,
@@ -293,21 +296,16 @@ func TestServer_TokenExchange(t *testing.T) {
 				SubjectToken:       noPermPAT,
 				SubjectTokenType:   oidc.AccessTokenType,
 				RequestedTokenType: oidc.AccessTokenType,
-				Scopes:             []string{oidc.ScopeOfflineAccess, "profile"},
+				Scopes:             []string{oidc.ScopeOpenID, oidc.ScopeOfflineAccess, "profile"},
 			},
 			want: result{
-				issuedTokenType:   oidc.AccessTokenType,
-				tokenType:         oidc.BearerToken,
-				expiresIn:         43100,
-				scopes:            []string{oidc.ScopeOfflineAccess, "profile"},
-				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, ""),
-				verifyIDToken: func(t *testing.T, token string) {
-					assert.Empty(t, token)
-				},
-				// verifyRefreshToken: refreshTokenVerifier(CTX, relyingParty),
-				verifyRefreshToken: func(t *testing.T, token string) {
-					assert.NotEmpty(t, token)
-				},
+				issuedTokenType:    oidc.AccessTokenType,
+				tokenType:          oidc.BearerToken,
+				expiresIn:          43100,
+				scopes:             []string{oidc.ScopeOpenID, oidc.ScopeOfflineAccess, "profile"},
+				verifyAccessToken:  accessTokenVerifier(CTX, resourceServer, serviceUserID),
+				verifyIDToken:      idTokenVerifier(CTX, relyingParty, serviceUserID),
+				verifyRefreshToken: refreshTokenVerifier(CTX, relyingParty),
 			},
 		},
 		{

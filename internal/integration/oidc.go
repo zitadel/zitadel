@@ -123,7 +123,7 @@ func (s *Tester) CreateOIDCTokenExchangeClient(ctx context.Context) (client *man
 	if err != nil {
 		return nil, nil, err
 	}
-	return s.CreateOIDCWebClientJWT(ctx, "", "", project.GetId(), app.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE, app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE)
+	return s.CreateOIDCWebClientJWT(ctx, "", "", project.GetId(), app.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE, app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN)
 }
 
 func (s *Tester) CreateProject(ctx context.Context) (*management.AddProjectResponse, error) {
