@@ -8,10 +8,7 @@
     "prelint": "npm run generate",
     "lint": "ng lint && prettier --check src",
     "lint:fix": "prettier --write src",
-    "generate": "buf generate ../proto --include-imports --include-wkt",
-    "potentially-unused-keys": "git diff main -- ./src/app | grep -E '^-.*$' | grep -oh -E '([[:upper:]]|_)+(\\.([[:upper:]]|[[:digit:]]|_)+)+' | sort | uniq > /tmp/potentially-used-keys.txt",
-    "used-keys": "grep -ohr --exclude-dir=proto -E '([[:upper:]]|_)+(\\.([[:upper:]]|[[:digit:]]|_)+)+' src/app/ | sort | uniq > /tmp/used-keys.txt",
-    "cleanup-translations": "for file in src/assets/i18n/*.json; do jq \"del($(comm -23 /tmp/potentially-used-keys.txt /tmp/used-keys.txt | sed 's/^/./g' | tr '\\n' ',' | sed 's/.$//')) | del(..|select(. == {}))\" $file > ${file}.tmp && mv ${file}.tmp $file; done"
+    "generate": "buf generate ../proto --include-imports --include-wkt"
   },
   "private": true,
   "dependencies": {
