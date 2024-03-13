@@ -47,9 +47,9 @@ As an alternative you can add the SAML identity provider through the API, either
 2. Click on "Create App Integration" and choose "SAML 2.0"
 3. Give the application a name
 4. Fill the configuration as following (Replace `your-domain` and `saml-idp-id` with your data):
- - Single sign-on URL {your-domain}/ui/login/login/externalidp/saml/acs
- - Audience URI (SP Entity ID): {your-domain}/idps/{saml-idp-id}/saml/metadata
- - Example redirect url for the domain `https://acme-gzoe4x.zitadel.cloud` would look like this:  `https://acme-gzoe4x.zitadel.cloud/idps/257372385775925924/saml/metadata`
+ - Single sign-on URL `{your-domain}/ui/login/login/externalidp/saml/acs`
+ - Audience URI (SP Entity ID): `{your-domain}/idps/{saml-idp-id}/saml/metadata`
+ - Example redirect url for the domain `https://acme.zitadel.cloud` would look like this:  `https://acme.zitadel.cloud/idps/257372385775925924/saml/metadata`
 5. Save the configuration
 6. Copy the metadata URL from the details
 
