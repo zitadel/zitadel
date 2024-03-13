@@ -556,6 +556,17 @@ Errors:
     NotActive: Schemat użytkownika nieaktywny
     NotInactive: Schemat użytkownika nie jest nieaktywny
     NotExists: Schemat użytkownika nie istnieje
+  TokenExchange:
+    FeatureDisabled: Funkcja wymiany tokenów jest wyłączona dla Twojej instancji. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Brak tokena
+      Invalid: Token jest nieprawidłowy
+      TypeMissing: Brak typu tokena
+      TypeNotAllowed: Typ tokenu jest niedozwolony
+      TypeNotSupported: Typ tokena nie jest obsługiwany
+      NotForAPI: Podrabiane tokeny nie są dozwolone w interfejsie API
+    Impersonation:
+      PolicyDisabled: Podszywanie się jest wyłączone w polityce bezpieczeństwa instancji
 
 AggregateTypes:
   action: Działanie

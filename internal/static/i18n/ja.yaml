@@ -545,6 +545,17 @@ Errors:
     NotActive: ユーザースキーマがアクティブではありません
     NotInactive: ユーザースキーマが非アクティブではありません
     NotExists: ユーザースキーマが存在しません
+  TokenExchange:
+    FeatureDisabled: インスタンスではトークン交換機能が無効になっています。 https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: トークンがありません
+      Invalid: トークンが無効です
+      TypeMissing: トークンの種類がありません
+      TypeNotAllowed: トークンの種類は許可されていません
+      TypeNotSupported: トークンタイプはサポートされていません
+      NotForAPI: 偽装されたトークンは API では許可されません
+    Impersonation:
+      PolicyDisabled: インスタンスのセキュリティ ポリシーで偽装が無効になっています
 
 AggregateTypes:
   action: アクション

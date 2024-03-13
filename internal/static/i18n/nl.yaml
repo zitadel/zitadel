@@ -556,6 +556,17 @@ Errors:
     NotActive: Gebruikersschema niet actief
     NotInactive: Gebruikersschema niet inactief
     NotExists: Gebruikersschema bestaat niet
+  TokenExchange:
+    FeatureDisabled: De Token Exchange-functie is uitgeschakeld voor uw instantie. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Token ontbreekt
+      Invalid: Token is ongeldig
+      TypeMissing: Tokentype ontbreekt
+      TypeNotAllowed: Tokentype is niet toegestaan
+      TypeNotSupported: Tokentype wordt niet ondersteund
+      NotForAPI: Nagebootste tokens zijn niet toegestaan voor API
+    Impersonation:
+      PolicyDisabled: Nabootsing van identiteit is uitgeschakeld in het beveiligingsbeleid van de instantie.
 
 AggregateTypes:
   action: Actie

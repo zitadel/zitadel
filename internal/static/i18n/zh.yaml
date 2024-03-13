@@ -556,6 +556,17 @@ Errors:
     NotActive: 用户架构未激活
     NotInactive: 用户架构未处于非活动状态
     NotExists: 用户架构不存在
+  TokenExchange:
+    FeatureDisabled: 您的实例已禁用令牌交换功能。 https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: 令牌丢失
+      Invalid: 令牌无效
+      TypeMissing: 缺少令牌类型
+      TypeNotAllowed: 不允许的令牌类型
+      TypeNotSupported: 不支持令牌类型
+      NotForAPI: API 不允许使用模拟令牌
+    Impersonation:
+      PolicyDisabled: 实例安全策略中禁用模拟
 
 AggregateTypes:
   action: 动作

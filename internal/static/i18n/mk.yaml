@@ -555,6 +555,17 @@ Errors:
     NotActive: Корисничката шема не е активна
     NotInactive: Корисничката шема не е неактивна
     NotExists: Корисничката шема не постои
+  TokenExchange:
+    FeatureDisabled: Функцијата за размена на токени е оневозможена на вашиот пример. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Недостасува токен
+      Invalid: Токенот е неважечки
+      TypeMissing: Недостасува тип на токен
+      TypeNotAllowed: Типот на токен не е дозволен
+      TypeNotSupported: Типот на токен не е поддржан
+      NotForAPI: Имитирани токени не се дозволени за API
+    Impersonation:
+      PolicyDisabled: Имитирањето е оневозможено во политиката за безбедност на примерот
 
 AggregateTypes:
   action: Акција

@@ -34,7 +34,7 @@ func (s *Server) tokenExchange(ctx context.Context, r *op.ClientRequest[oidc.Tok
 	defer func() { span.EndWithError(err) }()
 
 	if !authz.GetFeatures(ctx).TokenExchange {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-oan4I", "Errors.Feature.Disabled.TokenExchange")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-oan4I", "Errors.TokenExchange.FeatureDisabled")
 	}
 	if len(r.Data.Resource) > 0 {
 		return nil, oidc.ErrInvalidTarget().WithDescription("resource parameter not supported")

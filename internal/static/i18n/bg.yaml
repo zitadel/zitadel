@@ -573,6 +573,17 @@ Errors:
     NotActive: Потребителската схема не е активна
     NotInactive: Потребителската схема не е неактивна
     NotExists: Потребителската схема не съществува
+  TokenExchange:
+    FeatureDisabled: Функцията Token Exchange е деактивирана за вашето копие. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Токенът липсва
+      Invalid: Токенът е невалиден
+      TypeMissing: Липсва тип токен
+      TypeNotAllowed: Типът токен не е разрешен
+      TypeNotSupported: Типът токен не се поддържа
+      NotForAPI: Имитирани токени не са разрешени за API
+    Impersonation:
+      PolicyDisabled: Имитирането е деактивирано в политиката за сигурност на екземпляра
 
 AggregateTypes:
   action: Действие

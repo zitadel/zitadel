@@ -556,6 +556,17 @@ Errors:
     NotActive: Benutzerschema nicht aktiv
     NotInactive: Benutzerschema nicht inaktiv
     NotExists: Benutzerschema existiert nicht
+  TokenExchange:
+    FeatureDisabled: Die Token-Austauschfunktion ist für Ihre Instanz deaktiviert. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Token fehlt
+      Invalid: Token ist ungültig
+      TypeMissing: Der Tokentyp fehlt
+      TypeNotAllowed: Der Tokentyp ist nicht zulässig
+      TypeNotSupported: Der Tokentyp wird nicht unterstützt
+      NotForAPI: Imitierte Token sind für die API nicht zulässig
+    Impersonation:
+      PolicyDisabled: Der Identitätswechsel ist in der Sicherheitsrichtlinie der Instanz deaktiviert
 
 AggregateTypes:
   action: Action

@@ -553,6 +553,17 @@ Errors:
     NotActive: Uživatelské schéma není aktivní
     NotInactive: Uživatelské schéma není neaktivní
     NotExists: Uživatelské schéma neexistuje
+  TokenExchange:
+    FeatureDisabled: Funkce Token Exchange je pro vaši instanci zakázána. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Token chybí
+      Invalid: Token je neplatný
+      TypeMissing: Chybí typ tokenu
+      TypeNotAllowed: Typ tokenu není povolen
+      TypeNotSupported: Typ tokenu není podporován
+      NotForAPI: Zosobněné tokeny nejsou pro API povoleny
+    Impersonation:
+      PolicyDisabled: Zosobnění je zakázáno v zásadách zabezpečení instance
 
 AggregateTypes:
   action: Akce

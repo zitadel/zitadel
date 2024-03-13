@@ -556,6 +556,17 @@ Errors:
     NotActive: Schéma utilisateur non actif
     NotInactive: Le schéma utilisateur n'est pas inactif
     NotExists: Le schéma utilisateur n'existe pas
+  TokenExchange:
+    FeatureDisabled: La fonctionnalité Token Exchange est désactivée pour votre instance. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Le jeton est manquant
+      Invalid: Le jeton n'est pas valide
+      TypeMissing: Le type de jeton est manquantg
+      TypeNotAllowed: Le type de jeton n'est pas autorisé
+      TypeNotSupported: Le type de jeton n'est pas pris en charge
+      NotForAPI: Les jetons usurpés d'identité ne sont pas autorisés pour l'API
+    Impersonation:
+      PolicyDisabled: L'usurpation d'identité est désactivée dans la politique de sécurité de l'instance
 
 AggregateTypes:
   action: Action

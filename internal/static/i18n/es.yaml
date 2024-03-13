@@ -556,6 +556,17 @@ Errors:
     NotActive: Esquema de usuario no activo
     NotInactive: Esquema de usuario no inactivo
     NotExists: El esquema de usuario no existe
+  TokenExchange:
+    FeatureDisabled: La función de intercambio de tokens está deshabilitada para su instancia. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Falta la ficha
+      Invalid: El token no es válido
+      TypeMissing: Falta el tipo de token
+      TypeNotAllowed: El tipo de token no está permitido
+      TypeNotSupported: El tipo de token no es compatible
+      NotForAPI: Tokens suplantados no permitidos para API
+    Impersonation:
+      PolicyDisabled: La suplantación está deshabilitada en la política de seguridad de la instancia.
 
 AggregateTypes:
   action: Acción

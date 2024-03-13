@@ -550,6 +550,17 @@ Errors:
     NotActive: Esquema do usuário não ativo
     NotInactive: Esquema do usuário não inativo
     NotExists: O esquema do usuário não existe
+  TokenExchange:
+    FeatureDisabled: O recurso Token Exchange está desabilitado para sua instância. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: O token está faltando
+      Invalid: O token é inválido
+      TypeMissing: O tipo de token está faltando
+      TypeNotAllowed: O tipo de token não é permitido
+      TypeNotSupported: O tipo de token não é compatível
+      NotForAPI: Tokens personificados não permitidos para API
+    Impersonation:
+      PolicyDisabled: A representação está desativada na política de segurança da instância
 
 AggregateTypes:
   action: Ação

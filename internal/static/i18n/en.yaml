@@ -535,8 +535,6 @@ Errors:
     NotExisting: Feature does not exist
     TypeNotSupported: Feature type is not supported
     InvalidValue: Invalid value for this feature
-    Disabled:
-      TokenExchange: Token Exchange feature is disabled for your instance. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
   Target:
     Invalid: Target is invalid
     NoTimeout: Target has no timeout
@@ -559,6 +557,7 @@ Errors:
     NotInactive: User Schema not inactive
     NotExists: User Schema does not exist
   TokenExchange:
+    FeatureDisabled: Token Exchange feature is disabled for your instance. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
       Missing: Token is missing
       Invalid: Token is invalid

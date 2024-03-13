@@ -557,6 +557,17 @@ Errors:
     NotActive: Schema utente non attivo
     NotInactive: Schema utente non inattivo
     NotExists: Lo schema utente non esiste
+  TokenExchange:
+    FeatureDisabled: La funzionalità di scambio token è disabilitata per la tua istanza. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Manca il gettone
+      Invalid: Il token non è valido
+      TypeMissing: Manca il tipo di token
+      TypeNotAllowed: Il tipo di token non è consentito
+      TypeNotSupported: Il tipo di token non è supportato
+      NotForAPI: Token rappresentati non consentiti per l'API
+    Impersonation:
+      PolicyDisabled: La rappresentazione è disabilitata nella policy di sicurezza dell'istanza
 
 AggregateTypes:
   action: Azione
