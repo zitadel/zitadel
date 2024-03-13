@@ -1,5 +1,163 @@
 {
   "APP_NAME": "ZITADEL",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "元数据",
+    "HOME": {
+      "TITLE": "开始使用ZITADEL",
+      "NEXT": {
+        "TITLE": "你的下一步",
+        "DESCRIPTION": "完成以下步骤来保护你的应用程序。",
+        "CREATE_PROJECT": {
+          "TITLE": "创建项目",
+          "DESCRIPTION": "添加一个项目并定义其角色和权限。"
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "开始",
+          "DESCRIPTION": "跟随快速启动指南一步一步开始构建。"
+        },
+        "DOCS": {
+          "TITLE": "文档",
+          "DESCRIPTION": "探索ZITADEL的知识库，熟悉核心概念和思想。学习ZITADEL的工作原理和如何使用它。"
+        },
+        "EXAMPLES": {
+          "TITLE": "示例和软件开发工具包",
+          "DESCRIPTION": "浏览我们的示例和SDK，以你喜欢的编程语言和工具一起使用ZITADEL。"
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "组织",
+      "DESCRIPTION": "一个组织托管用户、带有应用的项目、身份提供者和设置，如公司品牌。你想跨多个组织共享设置吗？配置默认设置。",
+      "METADATA": "为组织添加自定义属性，如其位置或在其他系统中的标识符。你可以在你的行动中使用这些信息。"
+    },
+    "PROJECTS": {
+      "TITLE": "项目",
+      "DESCRIPTION": "一个项目托管一个或多个应用，你可以用它们来验证你的用户。你还可以通过项目对用户进行授权。为了允许其他组织的用户登录到你的应用，给予他们访问你的项目的权限。<br/><br/>如果你找不到一个项目，请联系项目所有者或拥有相应权利的人以获得访问权限。",
+      "OWNED": {
+        "TITLE": "所拥有的项目",
+        "DESCRIPTION": "这些是你拥有的项目。你可以管理这些项目的设置、权限和应用。"
+      },
+      "GRANTED": {
+        "TITLE": "授予的项目",
+        "DESCRIPTION": "这些是其他组织授予你的项目。通过授予的项目，你可以让你的用户访问其他组织的应用。"
+      }
+    },
+    "USERS": {
+      "TITLE": "用户",
+      "DESCRIPTION": "用户是可以访问你的应用的人或机器。",
+      "HUMANS": {
+        "TITLE": "人类",
+        "DESCRIPTION": "人类在浏览器会话中通过登录提示进行交互式认证。",
+        "METADATA": "为用户添加自定义属性，如部门。你可以在你的行动中使用这些信息。"
+      },
+      "MACHINES": {
+        "TITLE": "机器",
+        "DESCRIPTION": "机器使用私钥签名的JWT bearer令牌进行非交互式认证。它们也可以使用个人访问令牌。",
+        "METADATA": "为用户添加自定义属性，如认证系统。你可以在你的行动中使用这些信息。"
+      },
+      "SELF": {
+        "METADATA": "为你自己添加自定义属性，如你的部门。你可以在你的组织的行动中使用这些信息。"
+      }
+    },
+    "AUTHORIZATIONS": {
+      "TITLE": "授权",
+      "DESCRIPTION": "授权定义了用户对项目的访问权限。您可以授予用户访问项目的权限并在该项目内定义用户的角色。"
+    },
+    "ACTIONS": {
+      "TITLE": "操作",
+      "DESCRIPTION": "在用户在ZITADEL进行认证时发生的事件上运行自定义代码。自动化您的流程，丰富您用户的元数据和令牌或通知外部系统。",
+      "SCRIPTS": {
+        "TITLE": "脚本",
+        "DESCRIPTION": "编写一次JavaScript代码，并在多个流程中触发它。"
+      },
+      "FLOWS": {
+        "TITLE": "流程",
+        "DESCRIPTION": "选择一个认证流程，并在该流程中的特定事件上触发您的操作。"
+      }
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "实例设置",
+        "DESCRIPTION": "实例设置是所有组织的默认设置。有适当的权限，其中一些可以在组织设置中被覆盖。"
+      },
+      "ORG": {
+        "TITLE": "组织设置",
+        "DESCRIPTION": "自定义您的组织设置。"
+      },
+      "IDPS": {
+        "TITLE": "身份提供商",
+        "DESCRIPTION": "创建并激活外部身份提供商。选择一个知名提供商或根据您的选择配置任何其他兼容OIDC、OAuth或SAML的提供商。您甚至可以通过配置JWT身份提供商，使用您现有的JWT令牌作为联合身份。"
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "密码复杂度",
+        "DESCRIPTION": "通过定义复杂度规则，确保您的用户使用强密码。"
+      },
+      "BRANDING": {
+        "TITLE": "品牌",
+        "DESCRIPTION": "自定义登录表单的外观和感觉。完成时记得应用您的配置。"
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "外部链接",
+        "DESCRIPTION": "引导您的用户到登录页面上显示的自定义外部资源。用户需要在注册前接受服务条款和隐私政策。"
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "SMTP设置",
+        "DESCRIPTION": "配置您的SMTP服务器，使用您的用户知道并信任的域名作为发件人地址。"
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "SMS设置",
+        "DESCRIPTION": "为了解锁ZITADEL的所有功能，配置Twilio向您的用户发送SMS消息。"
+      },
+      "IAM_EVENTS": {
+        "TITLE": "事件",
+        "DESCRIPTION": "此页面显示您实例中的所有状态更改，直到您实例的审计跟踪限制为止。出于调试目的按时间范围过滤列表，或出于审计目的按汇总过滤列表。"
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "失败的事件",
+        "DESCRIPTION": "此页面显示您实例中的所有失败事件。如果ZITADEL的行为不符合您的预期，请始终首先检查此列表。"
+      },
+      "IAM_VIEWS": {
+        "TITLE": "视图",
+        "DESCRIPTION": "此页面显示您所有数据库视图以及它们处理最新事件的时间。如果您缺少某些数据，请检查视图是否是最新的。"
+      },
+      "LANGUAGES": {
+        "TITLE": "语言",
+        "DESCRIPTION": "限制登录表单和通知消息翻译到的语言。如果您想禁用某些语言，请将它们拖到不允许的语言部分。您可以指定一个允许的语言作为默认语言。如果用户偏好的语言不被允许，将使用默认语言。"
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "密钥生成器",
+        "DESCRIPTION": "定义您的密钥的复杂性和生命周期。更高的复杂性和生命周期可以提高安全性，较低的复杂性和生命周期可以提高解密性能。"
+      },
+      "SECURITY": {
+        "TITLE": "安全设置",
+        "DESCRIPTION": "启用可能会影响安全性的ZITADEL功能。在更改这些设置之前，您确实需要知道自己在做什么。"
+      },
+      "OIDC": {
+        "TITLE": "OpenID Connect设置",
+        "DESCRIPTION": "配置您的OIDC令牌寿命。使用更短的寿命来增加用户的安全性，使用更长的寿命来增加用户的便利性。",
+        "LABEL_HOURS": "最大生命周期（小时）",
+        "LABEL_DAYS": "最大生命周期（天）",
+        "ACCESS_TOKEN": {
+          "TITLE": "访问令牌",
+          "DESCRIPTION": "访问令牌用于认证用户。它是一个短期令牌，用于访问用户的数据。使用短的生命周期来最小化未授权访问的风险。访问令牌可以使用刷新令牌自动刷新。"
+        },
+        "ID_TOKEN": {
+          "TITLE": "ID令牌",
+          "DESCRIPTION": "ID令牌是一个包含用户声明的JSON Web令牌（JWT）。ID令牌的生命周期不应超过访问令牌的生命周期。"
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "刷新令牌",
+          "DESCRIPTION": "刷新令牌用于获取新的访问令牌。它是一个长期令牌，用于刷新访问令牌。当刷新令牌过期时，用户必须手动重新认证。"
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "空闲刷新令牌",
+          "DESCRIPTION": "空闲刷新令牌的生命周期是刷新令牌可以未使用的最长时间。"
+        }
+      }
+    }
+  },
   "PAGINATOR": {
     "PREVIOUS": "上一页",
     "NEXT": "下一页",

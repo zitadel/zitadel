@@ -1,5 +1,163 @@
 {
   "APP_NAME": "ZITADEL",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Metadane",
+    "HOME": {
+      "TITLE": "Rozpocznij pracę z ZITADEL",
+      "NEXT": {
+        "TITLE": "Twoje kolejne kroki",
+        "DESCRIPTION": "Wykonaj następujące kroki, aby zabezpieczyć swoją aplikację.",
+        "CREATE_PROJECT": {
+          "TITLE": "Utwórz projekt",
+          "DESCRIPTION": "Dodaj projekt i zdefiniuj jego role i uprawnienia."
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Rozpocznij",
+          "DESCRIPTION": "Śledź przewodnik szybkiego startu krok po kroku i zacznij budować od razu."
+        },
+        "DOCS": {
+          "TITLE": "Dokumentacja",
+          "DESCRIPTION": "Zapoznaj się z bazą wiedzy ZITADEL, aby zaznajomić się z podstawowymi pojęciami i pomysłami. Dowiedz się, jak działa ZITADEL i jak z niego korzystać."
+        },
+        "EXAMPLES": {
+          "TITLE": "Przykłady i zestawy narzędzi do tworzenia oprogramowania",
+          "DESCRIPTION": "Przeglądaj nasze przykłady i SDK, aby używać ZITADEL razem z ulubionymi językami programowania i narzędziami."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Organizacja",
+      "DESCRIPTION": "Organizacja gości użytkowników, projekty z aplikacjami, dostawców tożsamości i ustawienia, takie jak branding firmy. Chcesz udostępnić ustawienia między wieloma organizacjami? Skonfiguruj ustawienia domyślne.",
+      "METADATA": "Dodaj niestandardowe atrybuty do organizacji, takie jak jej lokalizacja lub identyfikator w innym systemie. Możesz użyć tych informacji w swoich działaniach."
+    },
+    "PROJECTS": {
+      "TITLE": "Projekty",
+      "DESCRIPTION": "Projekt gości jedną lub więcej aplikacji, których możesz użyć do uwierzytelniania swoich użytkowników. Możesz również autoryzować swoich użytkowników za pomocą projektów. Aby umożliwić użytkownikom z innych organizacji logowanie się do twoich aplikacji, udziel im dostępu do twojego projektu.<br/><br/>Jeśli nie możesz znaleźć projektu, skontaktuj się z właścicielem projektu lub osobą z odpowiednimi uprawnieniami, aby uzyskać dostęp.",
+      "OWNED": {
+        "TITLE": "Posiadane projekty",
+        "DESCRIPTION": "To są projekty, które posiadasz. Możesz zarządzać ustawieniami tych projektów, uprawnieniami i aplikacjami."
+      },
+      "GRANTED": {
+        "TITLE": "Przyznane projekty",
+        "DESCRIPTION": "To są projekty, które zostały ci przyznane przez inne organizacje. Dzięki przyznawaniu projektów możesz dać swoim użytkownikom dostęp do aplikacji innych organizacji."
+      }
+    },
+    "USERS": {
+      "TITLE": "Użytkownicy",
+      "DESCRIPTION": "Użytkownik to człowiek lub maszyna, która może uzyskać dostęp do twoich aplikacji.",
+      "HUMANS": {
+        "TITLE": "Ludzie",
+        "DESCRIPTION": "Ludzie uwierzytelniają się interaktywnie w sesji przeglądarki z monitem logowania.",
+        "METADATA": "Dodaj niestandardowe atrybuty do użytkownika, takie jak dział. Możesz użyć tych informacji w swoich działaniach."
+      },
+      "MACHINES": {
+        "TITLE": "Maszyny",
+        "DESCRIPTION": "Maszyny uwierzytelniają się nieinteraktywnie, używając tokena JWT podpisanego prywatnym kluczem. Mogą również używać osobistego tokena dostępu.",
+        "METADATA": "Dodaj niestandardowe atrybuty do użytkownika, takie jak system uwierzytelniający. Możesz użyć tych informacji w swoich działaniach."
+      },
+      "SELF": {
+        "METADATA": "Dodaj niestandardowe atrybuty do siebie, takie jak twój dział. Możesz użyć tych informacji w działaniach swojej organizacji."
+      }
+    },
+    "AUTHORIZATIONS": {
+      "TITLE": "Autoryzacje",
+      "DESCRIPTION": "Autoryzacje definiują prawa dostępu użytkownika do projektu. Możesz przyznać użytkownikowi dostęp do projektu i zdefiniować role użytkowników w tym projekcie."
+    },
+    "ACTIONS": {
+      "TITLE": "Akcje",
+      "DESCRIPTION": "Uruchom niestandardowy kod podczas zdarzeń, które mają miejsce, gdy użytkownicy uwierzytelniają się w ZITADEL. Automatyzuj swoje procesy, wzbogać metadane i tokeny użytkowników lub powiadamiaj zewnętrzne systemy.",
+      "SCRIPTS": {
+        "TITLE": "Skrypty",
+        "DESCRIPTION": "Napisz swój kod JavaScript raz i uruchom go w wielu przepływach."
+      },
+      "FLOWS": {
+        "TITLE": "Przepływy",
+        "DESCRIPTION": "Wybierz przepływ uwierzytelniania i wywołaj swoją akcję przy określonym zdarzeniu w tym przepływie."
+      }
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Ustawienia instancji",
+        "DESCRIPTION": "Ustawienia instancji są domyślnymi ustawieniami dla wszystkich organizacji. Z odpowiednimi uprawnieniami niektóre z nich mogą być nadpisywane w ustawieniach organizacji."
+      },
+      "ORG": {
+        "TITLE": "Ustawienia organizacji",
+        "DESCRIPTION": "Dostosuj ustawienia swojej organizacji."
+      },
+      "IDPS": {
+        "TITLE": "Dostawcy tożsamości",
+        "DESCRIPTION": "Utwórz i aktywuj zewnętrznych dostawców tożsamości. Wybierz znanego dostawcę lub skonfiguruj dowolnego innego dostawcę zgodnego z OIDC, OAuth lub SAML według własnego wyboru. Możesz nawet użyć istniejących tokenów JWT jako tożsamości federacyjnych, konfigurując dostawcę tożsamości JWT."
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Złożoność hasła",
+        "DESCRIPTION": "Upewnij się, że użytkownicy używają silnych haseł, definiując zasady złożoności."
+      },
+      "BRANDING": {
+        "TITLE": "Branding",
+        "DESCRIPTION": "Dostosuj wygląd i uczucie formularza logowania. Pamiętaj, aby zastosować swoją konfigurację po zakończeniu."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Linki zewnętrzne",
+        "DESCRIPTION": "Przekieruj użytkowników do niestandardowych zasobów zewnętrznych pokazanych na stronie logowania. Użytkownicy muszą zaakceptować Warunki korzystania z usługi i Politykę prywatności, zanim będą mogli się zarejestrować."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "Ustawienia SMTP",
+        "DESCRIPTION": "Skonfiguruj swój serwer SMTP, aby używał domeny dla adresu nadawcy, którą użytkownicy znają i ufają."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "Ustawienia SMS",
+        "DESCRIPTION": "Aby odblokować wszystkie funkcje ZITADEL, skonfiguruj Twilio do wysyłania wiadomości SMS do użytkowników."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Wydarzenia",
+        "DESCRIPTION": "Ta strona pokazuje wszystkie zmiany stanu w twojej instancji, tak daleko jak sięga ślad audytu twoich instancji. Filtruj listę według zakresu czasu dla celów debugowania lub filtruj ją według agregatu dla celów audytowych."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Nieudane Wydarzenia",
+        "DESCRIPTION": "Ta strona pokazuje wszystkie nieudane wydarzenia w twojej instancji. Jeśli ZITADEL nie zachowuje się zgodnie z oczekiwaniami, zawsze najpierw sprawdź tę listę."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Widoki",
+        "DESCRIPTION": "Ta strona pokazuje wszystkie twoje widoki bazy danych i kiedy przetworzyły swój ostatni event. Jeśli brakuje ci danych, sprawdź, czy widok jest aktualny."
+      },
+      "LANGUAGES": {
+        "TITLE": "Języki",
+        "DESCRIPTION": "Ogranicz języki, na które tłumaczone są formularz logowania i komunikaty powiadomień. Jeśli chcesz wyłączyć niektóre języki, przenieś je do sekcji Języki Niezalecane. Możesz określić dozwolony język jako język domyślny. Jeśli preferowany język użytkownika nie jest dozwolony, używany jest język domyślny."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Generatory Sekretów",
+        "DESCRIPTION": "Zdefiniuj złożoność i czas życia twoich sekretów. Wyższa złożoność i dłuższy czas życia poprawiają bezpieczeństwo, niższa złożoność i krótszy czas życia poprawiają wydajność deszyfrowania."
+      },
+      "SECURITY": {
+        "TITLE": "Ustawienia Bezpieczeństwa",
+        "DESCRIPTION": "Włącz funkcje ZITADEL, które mogą mieć wpływ na bezpieczeństwo. Naprawdę powinieneś wiedzieć, co robisz, zanim zmienisz te ustawienia."
+      },
+      "OIDC": {
+        "TITLE": "Ustawienia OpenID Connect",
+        "DESCRIPTION": "Konfiguruj czas życia tokenów OIDC. Użyj krótszych czasów życia, aby zwiększyć bezpieczeństwo użytkowników, użyj dłuższych czasów życia, aby zwiększyć wygodę użytkowników.",
+        "LABEL_HOURS": "Maksymalny czas życia w godzinach",
+        "LABEL_DAYS": "Maksymalny czas życia w dniach",
+        "ACCESS_TOKEN": {
+          "TITLE": "Token Dostępu",
+          "DESCRIPTION": "Token dostępu służy do uwierzytelniania użytkownika. Jest to krótkotrwały token używany do dostępu do danych użytkownika. Użyj krótkiego czasu życia, aby zminimalizować ryzyko nieautoryzowanego dostępu. Tokeny dostępu mogą być automatycznie odświeżane przy użyciu tokena odświeżania."
+        },
+        "ID_TOKEN": {
+          "TITLE": "Token ID",
+          "DESCRIPTION": "Token ID to JSON Web Token (JWT), który zawiera twierdzenia dotyczące użytkownika. Czas życia tokena ID nie powinien przekraczać czasu życia tokena dostępu."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Token Odświeżania",
+          "DESCRIPTION": "Token odświeżania służy do uzyskania nowego tokena dostępu. Jest to długotrwały token używany do odświeżania tokena dostępu. Użytkownik musi ponownie uwierzytelnić się ręcznie, gdy token odświeżania wygaśnie."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Bezczynny Token Odświeżania",
+          "DESCRIPTION": "Czas życia bezczynnego tokena odświeżania to maksymalny czas, przez który token odświeżania może pozostać nieużywany."
+        }
+      }
+    }
+  },
   "PAGINATOR": {
     "PREVIOUS": "Poprzedni",
     "NEXT": "Następny",

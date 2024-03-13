@@ -1,5 +1,163 @@
 {
   "APP_NAME": "ZITADEL",
+  "DESCRIPTIONS": {
+    "METADATA_TITLE": "Metadata",
+    "HOME": {
+      "TITLE": "Begin met ZITADEL",
+      "NEXT": {
+        "TITLE": "Je volgende stappen",
+        "DESCRIPTION": "Voltooi de volgende stappen om je applicatie te beveiligen.",
+        "CREATE_PROJECT": {
+          "TITLE": "Maak een project",
+          "DESCRIPTION": "Voeg een project toe en definieer de rollen en autorisaties."
+        }
+      },
+      "MORE_SHORTCUTS": {
+        "GET_STARTED": {
+          "TITLE": "Start",
+          "DESCRIPTION": "Volg de snelstartgids stap voor stap en begin onmiddellijk met bouwen."
+        },
+        "DOCS": {
+          "TITLE": "Documentatie",
+          "DESCRIPTION": "Verken de kennisbasis van ZITADEL om vertrouwd te raken met de kernconcepten en ideeën. Leer hoe ZITADEL werkt en hoe je het gebruikt."
+        },
+        "EXAMPLES": {
+          "TITLE": "Voorbeelden en Software Development Kits",
+          "DESCRIPTION": "Bekijk onze voorbeelden en SDK's om ZITADEL te gebruiken met je favoriete programmeertalen en tools."
+        }
+      }
+    },
+    "ORG": {
+      "TITLE": "Organisatie",
+      "DESCRIPTION": "Een organisatie host gebruikers, projecten met apps, identiteitsproviders en instellingen zoals bedrijfsbranding. Wil je instellingen delen over meerdere organisaties? Configureer standaardinstellingen.",
+      "METADATA": "Voeg aangepaste attributen toe aan de organisatie zoals de locatie of een identificatie in een ander systeem. Je kunt deze informatie gebruiken in je acties."
+    },
+    "PROJECTS": {
+      "TITLE": "Projecten",
+      "DESCRIPTION": "Een project host een of meer applicaties, die je kunt gebruiken om je gebruikers te authenticeren. Ook kun je je gebruikers autoriseren met projecten. Om gebruikers van andere organisaties in staat te stellen in te loggen op je applicaties, geef ze toegang tot je project.<br/><br/>Als je een project niet kunt vinden, neem dan contact op met de eigenaar van het project of iemand met de bijbehorende rechten om toegang te krijgen.",
+      "OWNED": {
+        "TITLE": "Eigen Projecten",
+        "DESCRIPTION": "Dit zijn de projecten die je bezit. Je kunt de instellingen van deze projecten, autorisaties en applicaties beheren."
+      },
+      "GRANTED": {
+        "TITLE": "Toegekende Projecten",
+        "DESCRIPTION": "Dit zijn de projecten die door andere organisaties aan jou zijn toegekend. Met toegekende projecten kun je je gebruikers toegang geven tot applicaties van andere organisaties."
+      }
+    },
+    "USERS": {
+      "TITLE": "Gebruikers",
+      "DESCRIPTION": "Een gebruiker is een mens of een machine die toegang kan krijgen tot je applicaties.",
+      "HUMANS": {
+        "TITLE": "Mensen",
+        "DESCRIPTION": "Mensen authenticeren interactief in een browsersessie met een loginprompt.",
+        "METADATA": "Voeg aangepaste attributen toe aan de gebruiker zoals de afdeling. Je kunt deze informatie gebruiken in je acties."
+      },
+      "MACHINES": {
+        "TITLE": "Machines",
+        "DESCRIPTION": "Machines authenticeren niet-interactief met een JWT bearer token ondertekend met een privésleutel. Ze kunnen ook een persoonlijke toegangstoken gebruiken.",
+        "METADATA": "Voeg aangepaste attributen toe aan de gebruiker zoals het authenticatiesysteem. Je kunt deze informatie gebruiken in je acties."
+      },
+      "SELF": {
+        "METADATA": "Voeg aangepaste attributen toe aan je gebruiker zoals je afdeling. Je kunt deze informatie gebruiken in de acties van je organisatie."
+      }
+    },
+    "AUTHORIZATIONS": {
+      "TITLE": "Autorisaties",
+      "DESCRIPTION": "Autorisaties bepalen de toegangsrechten van een gebruiker tot een project. Je kunt een gebruiker toegang verlenen tot een project en de rollen van de gebruikers binnen dat project definiëren."
+    },
+    "ACTIONS": {
+      "TITLE": "Acties",
+      "DESCRIPTION": "Voer aangepaste code uit bij gebeurtenissen die plaatsvinden terwijl je gebruikers zich authentiseren bij ZITADEL. Automatiseer je processen, verrijk de metadata en tokens van je gebruikers of meld externe systemen.",
+      "SCRIPTS": {
+        "TITLE": "Scripts",
+        "DESCRIPTION": "Schrijf je JavaScript-code eenmaal en activeer deze in meerdere stromen."
+      },
+      "FLOWS": {
+        "TITLE": "Stromen",
+        "DESCRIPTION": "Kies een authenticatiestroom en activeer je actie bij een specifieke gebeurtenis binnen deze stroom."
+      }
+    },
+    "SETTINGS": {
+      "INSTANCE": {
+        "TITLE": "Instellingsinstellingen",
+        "DESCRIPTION": "De instellingsinstellingen zijn de standaardinstellingen voor alle organisaties. Met de juiste toestemmingen kunnen sommige hiervan worden overschreven in organisatie-instellingen."
+      },
+      "ORG": {
+        "TITLE": "Organisatie-instellingen",
+        "DESCRIPTION": "Pas de instellingen van je organisatie aan."
+      },
+      "IDPS": {
+        "TITLE": "Identiteitsproviders",
+        "DESCRIPTION": "Maak en activeer externe identiteitsproviders. Kies een bekende provider of configureer een andere OIDC, OAuth of SAML compatibele provider naar keuze. Je kunt zelfs je bestaande JWT-tokens gebruiken als gefedereerde identiteiten door een JWT-identiteitsprovider te configureren."
+      },
+      "PW_COMPLEXITY": {
+        "TITLE": "Wachtwoordcomplexiteit",
+        "DESCRIPTION": "Zorg ervoor dat je gebruikers sterke wachtwoorden gebruiken door complexiteitsregels te definiëren."
+      },
+      "BRANDING": {
+        "TITLE": "Branding",
+        "DESCRIPTION": "Pas het uiterlijk en gevoel van je inlogformulier aan. Vergeet niet om je configuratie toe te passen wanneer je klaar bent."
+      },
+      "PRIVACY_POLICY": {
+        "TITLE": "Externe links",
+        "DESCRIPTION": "Leid je gebruikers naar aangepaste externe bronnen die worden getoond op de inlogpagina. Gebruikers moeten de Algemene Voorwaarden en het Privacybeleid accepteren voordat ze zich kunnen aanmelden."
+      },
+      "SMTP_PROVIDER": {
+        "TITLE": "SMTP-instellingen",
+        "DESCRIPTION": "Configureer je SMTP-server om een domein voor het afzenderadres te gebruiken dat je gebruikers kennen en vertrouwen."
+      },
+      "SMS_PROVIDER": {
+        "TITLE": "SMS-instellingen",
+        "DESCRIPTION": "Om alle ZITADEL-functies te ontgrendelen, configureer Twilio om SMS-berichten naar je gebruikers te sturen."
+      },
+      "IAM_EVENTS": {
+        "TITLE": "Evenementen",
+        "DESCRIPTION": "Deze pagina toont alle statuswijzigingen in je instantie zo ver als de audittrail van je instanties reikt. Filter de lijst op tijdreeks voor debugdoeleinden of filter het op een aggregaat voor auditdoeleinden."
+      },
+      "IAM_FAILED_EVENTS": {
+        "TITLE": "Mislukte Evenementen",
+        "DESCRIPTION": "Deze pagina toont alle mislukte evenementen in je instantie. Als ZITADEL zich niet gedraagt zoals je verwacht, controleer dan eerst deze lijst."
+      },
+      "IAM_VIEWS": {
+        "TITLE": "Weergaven",
+        "DESCRIPTION": "Deze pagina toont al je database weergaven en wanneer ze hun laatste evenement hebben verwerkt. Als je gegevens mist, controleer dan of de weergave up-to-date is."
+      },
+      "LANGUAGES": {
+        "TITLE": "Talen",
+        "DESCRIPTION": "Beperk de talen waarin het inlogformulier en de notificatieberichten worden vertaald. Als je sommige talen wilt uitschakelen, sleep ze dan naar de sectie Niet Toegestane Talen. Je kunt een toegestane taal specificeren als de standaardtaal. Als de voorkeurstaal van een gebruiker niet is toegestaan, wordt de standaardtaal gebruikt."
+      },
+      "SECRET_GENERATORS": {
+        "TITLE": "Geheime Generatoren",
+        "DESCRIPTION": "Definieer de complexiteiten en levensduur van je geheimen. Een hogere complexiteit en levensduur verbeteren de beveiliging, een lagere complexiteit en levensduur verbeteren de decryptieprestaties."
+      },
+      "SECURITY": {
+        "TITLE": "Beveiligingsinstellingen",
+        "DESCRIPTION": "Schakel ZITADEL-functies in die beveiligingsimpact kunnen hebben. Je moet echt weten wat je doet voordat je deze instellingen wijzigt."
+      },
+      "OIDC": {
+        "TITLE": "OpenID Connect Instellingen",
+        "DESCRIPTION": "Configureer de levensduur van je OIDC-tokens. Gebruik kortere levensduren om de beveiliging van je gebruikers te verhogen, gebruik langere levensduren om het gemak van je gebruikers te verhogen.",
+        "LABEL_HOURS": "Maximale Levensduur in uren",
+        "LABEL_DAYS": "Maximale Levensduur in dagen",
+        "ACCESS_TOKEN": {
+          "TITLE": "Toegangstoken",
+          "DESCRIPTION": "Het toegangstoken wordt gebruikt om een gebruiker te authenticeren. Het is een kortlevend token dat wordt gebruikt om toegang te krijgen tot de gegevens van de gebruiker. Gebruik een korte levensduur om het risico op ongeautoriseerde toegang te minimaliseren. Toegangstokens kunnen automatisch worden vernieuwd met behulp van een vernieuwingstoken."
+        },
+        "ID_TOKEN": {
+          "TITLE": "ID-token",
+          "DESCRIPTION": "Het ID-token is een JSON Web Token (JWT) dat claims over de gebruiker bevat. De levensduur van het ID-token mag de levensduur van het toegangstoken niet overschrijden."
+        },
+        "REFRESH_TOKEN": {
+          "TITLE": "Vernieuwingstoken",
+          "DESCRIPTION": "Het vernieuwingstoken wordt gebruikt om een nieuw toegangstoken te verkrijgen. Het is een langlevend token dat wordt gebruikt om het toegangstoken te vernieuwen. Een gebruiker moet handmatig opnieuw authenticeren wanneer het vernieuwingstoken verloopt."
+        },
+        "REFRESH_TOKEN_IDLE": {
+          "TITLE": "Inactief Vernieuwingstoken",
+          "DESCRIPTION": "De levensduur van het inactieve vernieuwingstoken is de maximale tijd dat een vernieuwingstoken ongebruikt kan zijn."
+        }
+      }
+    }
+  },
   "PAGINATOR": {
     "PREVIOUS": "Vorige",
     "NEXT": "Volgende",
