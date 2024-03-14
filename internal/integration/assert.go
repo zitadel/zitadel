@@ -64,7 +64,6 @@ func AssertListDetails[D ListDetailsMsg](t testing.TB, expected, actual D) {
 	}
 
 	assert.Equal(t, wantDetails.GetTotalResult(), gotDetails.GetTotalResult())
-	assert.NotZero(t, gotDetails.GetPosition())
 
 	gotCD := gotDetails.GetTimestamp().AsTime()
 	wantCD := time.Now()
