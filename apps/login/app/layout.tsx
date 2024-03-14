@@ -24,7 +24,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   // later only shown with dev mode enabled
-  const showNav = process.env.DEBUG === "true" ? true : false;
+  const showNav = process.env.DEBUG === "true";
 
   const branding = await getBrandingSettings(server);
   let partial: Partial<BrandingSettings> | undefined;
