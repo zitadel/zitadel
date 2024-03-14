@@ -27,7 +27,7 @@
               "src/favicon.ico",
               "src/assets",
               "src/manifest.webmanifest",
-              { "glob": "**/*", "input": "../docs/static/img", "output": "assets/docs/img" }
+              { "glob": "**/*", "input": "../docs/static/img/tech", "output": "assets/docs/img/tech" }
             ],
             "styles": ["src/styles.scss"],
             "scripts": ["./node_modules/tinycolor2/dist/tinycolor-min.js"],

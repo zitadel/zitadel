@@ -547,7 +547,16 @@ Errors:
     NotFound: Esecuzione non trovata
     IncludeNotFound: Includi non trovato
     NoTargets: Nessun obiettivo definito
-
+  UserSchema:
+    NotEnabled: La funzionalità "Schema utente" non è abilitata
+    Type:
+      Missing: Tipo di schema utente mancante
+      AlreadyExists: Il tipo di schema utente esiste già
+    Authenticator:
+      Invalid: Tipo di autenticatore non valido
+    NotActive: Schema utente non attivo
+    NotInactive: Schema utente non inattivo
+    NotExists: Lo schema utente non esiste
 
 AggregateTypes:
   action: Azione
@@ -561,6 +570,7 @@ AggregateTypes:
   feature: Funzionalità
   target: Bersaglio
   execution: Esecuzione
+  user_schema: Schema utente
 
 EventTypes:
   execution:
@@ -1067,6 +1077,12 @@ EventTypes:
     deactivated: Azione disattivata
     reactivated: Azione riattivata
     removed: Azione rimossa
+  user_schema:
+    created: Schema utente creato
+    updated: Schema utente aggiornato
+    deactivated: Schema utente disattivato
+    reactivated: Schema utente riattivato
+    deleted: Schema utente eliminato
 
 Application:
   OIDC:

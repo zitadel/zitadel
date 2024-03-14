@@ -535,6 +535,16 @@ Errors:
     NotFound: 実行が見つかりませんでした
     IncludeNotFound: 見つからないものを含める
     NoTargets: ターゲットが定義されていません
+  UserSchema:
+    NotEnabled: 機能「ユーザースキーマ」が有効になっていません
+    Type:
+      Missing: ユーザースキーマタイプがありません
+      AlreadyExists: ユーザースキーマタイプはすでに存在します
+    Authenticator:
+      Invalid: 無効な認証子のタイプ
+    NotActive: ユーザースキーマがアクティブではありません
+    NotInactive: ユーザースキーマが非アクティブではありません
+    NotExists: ユーザースキーマが存在しません
 
 AggregateTypes:
   action: アクション
@@ -548,6 +558,7 @@ AggregateTypes:
   feature: 特徴
   target: 目標
   execution: 実行
+  user_schema: ユーザースキーマ
 
 EventTypes:
   execution:
@@ -1225,6 +1236,12 @@ EventTypes:
         password:
           changed: SMTP構成パスワードの変更
         removed: SMTP構成の削除
+  user_schema:
+    created: ーザースキーマが作成されました
+    updated: ユーザースキーマが更新されました
+    deactivated: ユーザースキーマが非アクティブ化されました
+    reactivated: ユーザースキーマが再アクティブ化されました
+    deleted: ユーザースキーマが削除されました
 
 Application:
   OIDC:

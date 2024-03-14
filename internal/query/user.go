@@ -127,7 +127,7 @@ func (u *Users) RemoveNoPermission(ctx context.Context, permissionCheck domain.P
 	for i := range u.Users {
 		ctxData := authz.GetCtxData(ctx)
 		if ctxData.UserID != u.Users[i].ID {
-			if err := permissionCheck(ctx, domain.PermissionUserRead, ctxData.OrgID, u.Users[i].ID); err != nil {
+			if err := permissionCheck(ctx, domain.PermissionUserRead, u.Users[i].ResourceOwner, u.Users[i].ID); err != nil {
 				removableIndexes = append(removableIndexes, i)
 			}
 		}

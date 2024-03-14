@@ -27,12 +27,13 @@ import (
 )
 
 var (
-	CTX     context.Context
-	IamCTX  context.Context
-	UserCTX context.Context
-	ErrCTX  context.Context
-	Tester  *integration.Tester
-	Client  user.UserServiceClient
+	CTX       context.Context
+	IamCTX    context.Context
+	UserCTX   context.Context
+	SystemCTX context.Context
+	ErrCTX    context.Context
+	Tester    *integration.Tester
+	Client    user.UserServiceClient
 )
 
 func TestMain(m *testing.M) {
@@ -45,6 +46,7 @@ func TestMain(m *testing.M) {
 
 		UserCTX = Tester.WithAuthorization(ctx, integration.Login)
 		IamCTX = Tester.WithAuthorization(ctx, integration.IAMOwner)
+		SystemCTX = Tester.WithAuthorization(ctx, integration.SystemUser)
 		CTX, ErrCTX = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
 		Client = Tester.Client.UserV2
 		return m.Run()
@@ -552,6 +554,199 @@ func TestServer_AddHumanUser(t *testing.T) {
 	}
 }
 
+func TestServer_AddHumanUser_Permission(t *testing.T) {
+	newOrgOwnerEmail := fmt.Sprintf("%d@permission.com", time.Now().UnixNano())
+	newOrg := Tester.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
+	type args struct {
+		ctx context.Context
+		req *user.AddHumanUserRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *user.AddHumanUserResponse
+		wantErr bool
+	}{
+		{
+			name: "System, ok",
+			args: args{
+				SystemCTX,
+				&user.AddHumanUserRequest{
+					Organisation: &object.Organisation{
+						Org: &object.Organisation_OrgId{
+							OrgId: newOrg.GetOrganizationId(),
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Phone: &user.SetHumanPhone{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_Password{
+						Password: &user.Password{
+							Password:       "DifficultPW666!",
+							ChangeRequired: true,
+						},
+					},
+				},
+			},
+			want: &user.AddHumanUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: newOrg.GetOrganizationId(),
+				},
+			},
+		},
+		{
+			name: "Instance, ok",
+			args: args{
+				IamCTX,
+				&user.AddHumanUserRequest{
+					Organisation: &object.Organisation{
+						Org: &object.Organisation_OrgId{
+							OrgId: newOrg.GetOrganizationId(),
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Phone: &user.SetHumanPhone{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_Password{
+						Password: &user.Password{
+							Password:       "DifficultPW666!",
+							ChangeRequired: true,
+						},
+					},
+				},
+			},
+			want: &user.AddHumanUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: newOrg.GetOrganizationId(),
+				},
+			},
+		},
+		{
+			name: "Org, error",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organisation: &object.Organisation{
+						Org: &object.Organisation_OrgId{
+							OrgId: newOrg.GetOrganizationId(),
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Phone: &user.SetHumanPhone{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_Password{
+						Password: &user.Password{
+							Password:       "DifficultPW666!",
+							ChangeRequired: true,
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "User, error",
+			args: args{
+				UserCTX,
+				&user.AddHumanUserRequest{
+					Organisation: &object.Organisation{
+						Org: &object.Organisation_OrgId{
+							OrgId: newOrg.GetOrganizationId(),
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Phone: &user.SetHumanPhone{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_Password{
+						Password: &user.Password{
+							Password:       "DifficultPW666!",
+							ChangeRequired: true,
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for i, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			userID := fmt.Sprint(time.Now().UnixNano() + int64(i))
+			tt.args.req.UserId = &userID
+			if email := tt.args.req.GetEmail(); email != nil {
+				email.Email = fmt.Sprintf("%s@me.now", userID)
+			}
+
+			if tt.want != nil {
+				tt.want.UserId = userID
+			}
+
+			got, err := Client.AddHumanUser(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+
+			assert.Equal(t, tt.want.GetUserId(), got.GetUserId())
+			integration.AssertDetails(t, tt.want, got)
+		})
+	}
+}
+
 func TestServer_UpdateHumanUser(t *testing.T) {
 	type args struct {
 		ctx context.Context
@@ -902,6 +1097,89 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			}
 			if tt.want.GetPhoneCode() != "" {
 				assert.NotEmpty(t, got.GetPhoneCode())
+			}
+			integration.AssertDetails(t, tt.want, got)
+		})
+	}
+}
+
+func TestServer_UpdateHumanUser_Permission(t *testing.T) {
+	newOrgOwnerEmail := fmt.Sprintf("%d@permission.update.com", time.Now().UnixNano())
+	newOrg := Tester.CreateOrganization(IamCTX, fmt.Sprintf("UpdateHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
+	newUserID := newOrg.CreatedAdmins[0].GetUserId()
+	type args struct {
+		ctx context.Context
+		req *user.UpdateHumanUserRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *user.UpdateHumanUserResponse
+		wantErr bool
+	}{
+		{
+			name: "system, ok",
+			args: args{
+				SystemCTX,
+				&user.UpdateHumanUserRequest{
+					UserId:   newUserID,
+					Username: gu.Ptr(fmt.Sprint("system", time.Now().UnixNano()+1)),
+				},
+			},
+			want: &user.UpdateHumanUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: newOrg.GetOrganizationId(),
+				},
+			},
+		},
+		{
+			name: "instance, ok",
+			args: args{
+				IamCTX,
+				&user.UpdateHumanUserRequest{
+					UserId:   newUserID,
+					Username: gu.Ptr(fmt.Sprint("instance", time.Now().UnixNano()+1)),
+				},
+			},
+			want: &user.UpdateHumanUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: newOrg.GetOrganizationId(),
+				},
+			},
+		},
+		{
+			name: "org, error",
+			args: args{
+				CTX,
+				&user.UpdateHumanUserRequest{
+					UserId:   newUserID,
+					Username: gu.Ptr(fmt.Sprint("org", time.Now().UnixNano()+1)),
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "user, error",
+			args: args{
+				UserCTX,
+				&user.UpdateHumanUserRequest{
+					UserId:   newUserID,
+					Username: gu.Ptr(fmt.Sprint("user", time.Now().UnixNano()+1)),
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			got, err := Client.UpdateHumanUser(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
 			}
 			integration.AssertDetails(t, tt.want, got)
 		})

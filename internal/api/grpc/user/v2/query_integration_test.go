@@ -5,9 +5,10 @@ package user_test
 import (
 	"context"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
@@ -147,6 +148,158 @@ func TestServer_GetUserByID(t *testing.T) {
 				assert.Equal(ttt, tt.want.User, got.User)
 				integration.AssertDetails(t, tt.want, got)
 			}, retryDuration, time.Second)
+		})
+	}
+}
+
+func TestServer_GetUserByID_Permission(t *testing.T) {
+	timeNow := time.Now().UTC()
+	newOrgOwnerEmail := fmt.Sprintf("%d@permission.get.com", timeNow.UnixNano())
+	newOrg := Tester.CreateOrganization(IamCTX, fmt.Sprintf("GetHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
+	newUserID := newOrg.CreatedAdmins[0].GetUserId()
+	type args struct {
+		ctx context.Context
+		req *user.GetUserByIDRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *user.GetUserByIDResponse
+		wantErr bool
+	}{
+		{
+			name: "System, ok",
+			args: args{
+				SystemCTX,
+				&user.GetUserByIDRequest{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
+							OrgId: newOrg.GetOrganizationId(),
+						},
+					},
+					UserId: newUserID,
+				},
+			},
+			want: &user.GetUserByIDResponse{
+				User: &user.User{
+					State:              user.UserState_USER_STATE_ACTIVE,
+					Username:           "",
+					LoginNames:         nil,
+					PreferredLoginName: "",
+					Type: &user.User_Human{
+						Human: &user.HumanUser{
+							Profile: &user.HumanProfile{
+								GivenName:         "firstname",
+								FamilyName:        "lastname",
+								NickName:          gu.Ptr(""),
+								DisplayName:       gu.Ptr("firstname lastname"),
+								PreferredLanguage: gu.Ptr("und"),
+								Gender:            user.Gender_GENDER_UNSPECIFIED.Enum(),
+								AvatarUrl:         "",
+							},
+							Email: &user.HumanEmail{
+								Email: newOrgOwnerEmail,
+							},
+							Phone: &user.HumanPhone{},
+						},
+					},
+				},
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(timeNow),
+					ResourceOwner: newOrg.GetOrganizationId(),
+				},
+			},
+		},
+		{
+			name: "Instance, ok",
+			args: args{
+				IamCTX,
+				&user.GetUserByIDRequest{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
+							OrgId: newOrg.GetOrganizationId(),
+						},
+					},
+					UserId: newUserID,
+				},
+			},
+			want: &user.GetUserByIDResponse{
+				User: &user.User{
+					State:              user.UserState_USER_STATE_ACTIVE,
+					Username:           "",
+					LoginNames:         nil,
+					PreferredLoginName: "",
+					Type: &user.User_Human{
+						Human: &user.HumanUser{
+							Profile: &user.HumanProfile{
+								GivenName:         "firstname",
+								FamilyName:        "lastname",
+								NickName:          gu.Ptr(""),
+								DisplayName:       gu.Ptr("firstname lastname"),
+								PreferredLanguage: gu.Ptr("und"),
+								Gender:            user.Gender_GENDER_UNSPECIFIED.Enum(),
+								AvatarUrl:         "",
+							},
+							Email: &user.HumanEmail{
+								Email: newOrgOwnerEmail,
+							},
+							Phone: &user.HumanPhone{},
+						},
+					},
+				},
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(timeNow),
+					ResourceOwner: newOrg.GetOrganizationId(),
+				},
+			},
+		},
+		{
+			name: "Org, error",
+			args: args{
+				CTX,
+				&user.GetUserByIDRequest{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
+							OrgId: newOrg.GetOrganizationId(),
+						},
+					},
+					UserId: newUserID,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "User, error",
+			args: args{
+				UserCTX,
+				&user.GetUserByIDRequest{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
+							OrgId: newOrg.GetOrganizationId(),
+						},
+					},
+					UserId: newUserID,
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.GetUserByID(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				tt.want.User.UserId = tt.args.req.GetUserId()
+				tt.want.User.Username = newOrgOwnerEmail
+				tt.want.User.PreferredLoginName = newOrgOwnerEmail
+				tt.want.User.LoginNames = []string{newOrgOwnerEmail}
+				if human := tt.want.User.GetHuman(); human != nil {
+					human.Email.Email = newOrgOwnerEmail
+				}
+				assert.Equal(t, tt.want.User, got.User)
+			}
 		})
 	}
 }

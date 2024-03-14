@@ -8,6 +8,7 @@ const (
 	KeyLoginDefaultOrg
 	KeyTriggerIntrospectionProjections
 	KeyLegacyIntrospection
+	KeyUserSchema
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
@@ -27,4 +28,5 @@ type Features struct {
 	LoginDefaultOrg                 bool `json:"login_default_org,omitempty"`
 	TriggerIntrospectionProjections bool `json:"trigger_introspection_projections,omitempty"`
 	LegacyIntrospection             bool `json:"legacy_introspection,omitempty"`
+	UserSchema                      bool `json:"user_schema,omitempty"`
 }

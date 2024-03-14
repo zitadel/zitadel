@@ -1,0 +1,110 @@
+---
+title: How to Handle Session Validation
+sidebar_label: Session Validation
+---
+
+Sessions represent the state of a user session in ZITADEL. They can be aggregated and updated over time to reflect
+the changes.
+
+For example, a session could be started by checking a username and ZITADEL will return a new session
+with some information about the user like their id and loginName as well as details about the session itself.
+Later on, if the user's password was checked successfully, ZITADEL will update the session and provide the date and time
+when the password was verified.
+
+## Verification
+
+Since sessions just represent the current state, it's the responsibility of the client to check whether that state is
+sufficient. This also gives you some opportunities, e.g. if you have different requirements for different use cases.
+
+Let's jump into the example from above and assume you have a simple login UI, which just requires the user to verify
+their [username and password](./username-password#create-session-with-user-check).
+
+If a user successfully authenticated using username and password, a session could look like:
+
+```json
+{
+    "session": {
+        "id": "218480890961985793",
+        "creationDate": "2023-06-14T05:32:38.977954Z",
+        "changeDate": "2023-06-14T05:42:11.631901Z",
+        "sequence": "582",
+        "factors": {
+            "user": {
+                "verifiedAt": "2023-06-14T05:32:38.972712Z",
+                "id": "d654e6ba-70a3-48ef-a95d-37c8d8a7901a",
+                "loginName": "minnie-mouse@fabi.zitadel.app",
+                "displayName": "Minnie Mouse"
+            },
+            "password": {
+                "verifiedAt": "2023-06-14T05:42:11.619484Z"
+            }
+        }
+    }
+}
+```
+
+Your application would then need to check whether these `factors` are enough, esp. if the `verifiedAt` of both are within
+an acceptable time range.
+
+To get the current state of the session, you can call the [GetSession endpoint](/apis/resources/session_service/session-service-get-session),
+resp. you can get several by [searching sessions](/apis/resources/session_service/session-service-list-sessions).
+
+## Expiration
+
+The session API allows you to expire sessions. Like previous with the factor's `verfifiedAt`, you can check the
+`expirationDate` and decide if you want to accept the session or not.
+
+```json
+{
+    "session": {
+        "id": "218480890961985793",
+        "creationDate": "2023-06-14T05:32:38.977954Z",
+        "changeDate": "2023-06-14T05:42:11.631901Z",
+        "sequence": "582",
+        "factors": {
+            "user": {
+                "verifiedAt": "2023-06-14T05:32:38.972712Z",
+                "id": "d654e6ba-70a3-48ef-a95d-37c8d8a7901a",
+                "loginName": "minnie-mouse@fabi.zitadel.app",
+                "displayName": "Minnie Mouse"
+            },
+            "password": {
+                "verifiedAt": "2023-06-14T05:42:11.619484Z"
+            }
+        },
+        "expirationDate": "2023-06-14T10:42:11.619484Z"
+    }
+}
+```
+
+You may have some cases where you even want to make sure the session does not expire within few seconds or other cases,
+where you might use some information of an expired session like the user's `loginName` to automatically create a new
+session in your Login UI and let the user only provide their password.
+
+:::info
+Note that ZITADEL will reject any expired sessions automatically and that they cannot be updated anymore.
+:::
+
+### Set a lifetime
+
+In order to expire a session, a `lifetime` duration can be set when creating or updating a session.
+Note that each time a session is updated with a `lifetime` attribute set, the `expirationDate` will newly be calculated
+from this point in time. This give you the opportunity to change the expiration, based on the successful `factors` of
+the session.
+
+```json
+{
+  "lifetime": "18000.000000000s"
+}
+```
+
+:::info
+Note that if the `lifetime` was not set, the session will never expire.
+:::
+
+## Token Introspection
+
+If you're relying on OAuth Token Introspection in your API, Session Tokens can't be used directly, since they
+do not include all the necessary information for that. You'll need to exchange it first into an access token.
+You can do so by guiding your user through the Login UI, where a session token will be required to finalize the
+auth request. Check out the guide on [support for OIDC](./oidc-standard).
