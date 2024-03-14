@@ -12,6 +12,7 @@ export function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-zitadel-login-client", SERVICE_USER_ID);
 
+  // this is a workaround for the next.js server not forwarding the host header
   requestHeaders.set("x-zitadel-forwarded", `host="${request.nextUrl.host}"`);
 
   const responseHeaders = new Headers();

@@ -157,13 +157,13 @@ export async function GET(request: NextRequest) {
           } else {
             return NextResponse.json(
               { error: "No active session found" },
-              { status: 500 } // TODO: check for correct status code
+              { status: 400 } // TODO: check for correct status code
             );
           }
         } else {
           return NextResponse.json(
             { error: "No active session found" },
-            { status: 500 } // TODO: check for correct status code
+            { status: 400 } // TODO: check for correct status code
           );
         }
       } else {
