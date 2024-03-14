@@ -1,10 +1,15 @@
-The login policy can be configured on two levels. Once as default on the instance and this can be overwritten for each organization.
-The only difference is where you configure it. Go either to the settings page of a specific organization or to the settings page of your instance.
-Instance: $YOUR-DOMAIN/ui/console/instance?id=general
+The login policy can be configured on two levels. Once in the default settings and this can be overwritten for each organization.
+The only difference is where you configure it. Go either to the settings page of a specific organization or to the default settings page.
+Default Settings: $YOUR-DOMAIN/ui/console/instance?id=general
 Organization: Choose the organization in the menu and go to $YOUR-DOMAIN/ui/console/org-settings?id=login
 
 1. Go to the Settings
 2. Modify your login policy in the menu "Login Behavior and Security"
 3. Enable the attribute "External IDP allowed"
 
+You can also change the settings through the API directly either in the default settings or on a specific organization:
+- [Update Default Login Settings](/docs/apis/resources/admin/admin-service-update-login-policy)
+- [Update Organization Login Settings](/docs/apis/resources/mgmt/management-service-update-custom-login-policy)
+
 ![Allow External IDP](/img/guides/zitadel_allow_external_idp.png)
+
