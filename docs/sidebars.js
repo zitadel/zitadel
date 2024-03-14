@@ -342,7 +342,8 @@ module.exports = {
           collapsed: true,
           items: [
             "guides/integrate/identity-providers/google",
-            "guides/integrate/identity-providers/azure-ad",
+            "guides/integrate/identity-providers/azure-ad-oidc",
+            "guides/integrate/identity-providers/azure-ad-saml",
             "guides/integrate/identity-providers/github",
             "guides/integrate/identity-providers/gitlab",
             "guides/integrate/identity-providers/apple",
