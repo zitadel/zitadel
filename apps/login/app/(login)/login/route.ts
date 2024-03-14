@@ -16,7 +16,7 @@ async function loadSessions(ids: string[]): Promise<Session[]> {
   return response?.sessions ?? [];
 }
 
-const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]*)/g;
+const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/g;
 
 function findSession(
   sessions: Session[],
