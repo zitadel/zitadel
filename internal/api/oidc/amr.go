@@ -21,6 +21,9 @@ const (
 //
 // [RFC 8176, section 2]: https://datatracker.ietf.org/doc/html/rfc8176#section-2
 func AuthMethodTypesToAMR(methodTypes []domain.UserAuthMethodType) []string {
+	if methodTypes == nil {
+		return nil // make sure amr is omitted when not provided / supported
+	}
 	amr := make([]string, 0, 4)
 	var factors, otp int
 	for _, methodType := range methodTypes {

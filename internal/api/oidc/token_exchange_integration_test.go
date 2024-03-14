@@ -63,13 +63,17 @@ func createMachineUserPATWithMembership(t *testing.T, roles ...string) (userID, 
 	return userID, pat
 }
 
-func accessTokenVerifier(ctx context.Context, server rs.ResourceServer, subject string) func(t *testing.T, token string) {
+func accessTokenVerifier(ctx context.Context, server rs.ResourceServer, subject, actorSubject string) func(t *testing.T, token string) {
 	return func(t *testing.T, token string) {
 		resp, err := rs.Introspect[*oidc.IntrospectionResponse](ctx, server, token)
 		require.NoError(t, err)
 		assert.True(t, resp.Active)
 		if subject != "" {
 			assert.Equal(t, subject, resp.Subject)
+		}
+		if actorSubject != "" {
+			require.NotNil(t, resp.Actor)
+			assert.Equal(t, actorSubject, resp.Actor.Subject)
 		}
 	}
 }
@@ -219,8 +223,8 @@ func TestServer_TokenExchange(t *testing.T) {
 				tokenType:         oidc.BearerToken,
 				expiresIn:         43100,
 				scopes:            patScopes,
-				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, ""),
-				verifyIDToken:     idTokenVerifier(CTX, relyingParty, "", ""),
+				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, serviceUserID, ""),
+				verifyIDToken:     idTokenVerifier(CTX, relyingParty, serviceUserID, ""),
 			},
 		},
 		{
@@ -239,8 +243,8 @@ func TestServer_TokenExchange(t *testing.T) {
 				tokenType:         oidc.BearerToken,
 				expiresIn:         43100,
 				scopes:            patScopes,
-				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, ""),
-				verifyIDToken:     idTokenVerifier(CTX, relyingParty, "", ""),
+				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, serviceUserID, ""),
+				verifyIDToken:     idTokenVerifier(CTX, relyingParty, serviceUserID, ""),
 			},
 		},
 		{
@@ -259,8 +263,8 @@ func TestServer_TokenExchange(t *testing.T) {
 				tokenType:         oidc.BearerToken,
 				expiresIn:         43100,
 				scopes:            patScopes,
-				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, ""),
-				verifyIDToken:     idTokenVerifier(CTX, relyingParty, "", ""),
+				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, serviceUserID, ""),
+				verifyIDToken:     idTokenVerifier(CTX, relyingParty, serviceUserID, ""),
 			},
 		},
 		{
@@ -279,7 +283,7 @@ func TestServer_TokenExchange(t *testing.T) {
 				tokenType:         "N_A",
 				expiresIn:         43100,
 				scopes:            patScopes,
-				verifyAccessToken: idTokenVerifier(CTX, relyingParty, "", ""),
+				verifyAccessToken: idTokenVerifier(CTX, relyingParty, serviceUserID, ""),
 				verifyIDToken: func(t *testing.T, token string) {
 					assert.Empty(t, token)
 				},
@@ -315,7 +319,7 @@ func TestServer_TokenExchange(t *testing.T) {
 				tokenType:          oidc.BearerToken,
 				expiresIn:          43100,
 				scopes:             []string{oidc.ScopeOpenID, oidc.ScopeOfflineAccess, "profile"},
-				verifyAccessToken:  accessTokenVerifier(CTX, resourceServer, serviceUserID),
+				verifyAccessToken:  accessTokenVerifier(CTX, resourceServer, serviceUserID, ""),
 				verifyIDToken:      idTokenVerifier(CTX, relyingParty, serviceUserID, ""),
 				verifyRefreshToken: refreshTokenVerifier(CTX, relyingParty, "", ""),
 			},
@@ -395,7 +399,7 @@ func TestServer_TokenExchange(t *testing.T) {
 				tokenType:         oidc.BearerToken,
 				expiresIn:         43100,
 				scopes:            patScopes,
-				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, User.GetUserId()),
+				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, User.GetUserId(), iamUserID),
 				verifyIDToken:     idTokenVerifier(CTX, relyingParty, User.GetUserId(), iamUserID),
 			},
 		},
@@ -417,7 +421,7 @@ func TestServer_TokenExchange(t *testing.T) {
 				tokenType:         oidc.BearerToken,
 				expiresIn:         43100,
 				scopes:            patScopes,
-				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, User.GetUserId()),
+				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, User.GetUserId(), orgUserID),
 				verifyIDToken:     idTokenVerifier(CTX, relyingParty, User.GetUserId(), orgUserID),
 			},
 		},
@@ -439,7 +443,7 @@ func TestServer_TokenExchange(t *testing.T) {
 				tokenType:         oidc.BearerToken,
 				expiresIn:         43100,
 				scopes:            patScopes,
-				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, serviceUserID),
+				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, serviceUserID, orgUserID),
 				verifyIDToken:     idTokenVerifier(CTX, relyingParty, serviceUserID, orgUserID),
 			},
 		},
@@ -461,7 +465,7 @@ func TestServer_TokenExchange(t *testing.T) {
 				tokenType:         oidc.BearerToken,
 				expiresIn:         43100,
 				scopes:            patScopes,
-				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, serviceUserID),
+				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, serviceUserID, orgUserID),
 				verifyIDToken:     idTokenVerifier(CTX, relyingParty, serviceUserID, orgUserID),
 			},
 		},
@@ -493,7 +497,7 @@ func TestServer_TokenExchange(t *testing.T) {
 				tokenType:         oidc.BearerToken,
 				expiresIn:         43100,
 				scopes:            patScopes,
-				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, User.GetUserId()),
+				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, User.GetUserId(), orgUserID),
 				verifyIDToken:     idTokenVerifier(CTX, relyingParty, User.GetUserId(), orgUserID),
 			},
 		},
@@ -516,7 +520,7 @@ func TestServer_TokenExchange(t *testing.T) {
 				tokenType:          oidc.BearerToken,
 				expiresIn:          43100,
 				scopes:             []string{oidc.ScopeOpenID, oidc.ScopeOfflineAccess},
-				verifyAccessToken:  accessTokenVerifier(CTX, resourceServer, serviceUserID),
+				verifyAccessToken:  accessTokenVerifier(CTX, resourceServer, serviceUserID, orgUserID),
 				verifyIDToken:      idTokenVerifier(CTX, relyingParty, serviceUserID, orgUserID),
 				verifyRefreshToken: refreshTokenVerifier(CTX, relyingParty, serviceUserID, orgUserID),
 			},
@@ -570,13 +574,13 @@ func TestImpersonation_API_Call(t *testing.T) {
 		setImpersonationPolicy(t, false)
 	})
 
-	_, iamImpersonatorPAT := createMachineUserPATWithMembership(t, "IAM_ADMIN_IMPERSONATOR")
+	iamUserID, iamImpersonatorPAT := createMachineUserPATWithMembership(t, "IAM_ADMIN_IMPERSONATOR")
 	iamOwner := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.IAMOwner)
 
 	// impersonating the IAM owner!
 	resp, err := tokenexchange.ExchangeToken(CTX, exchanger, iamOwner.Token, oidc.AccessTokenType, iamImpersonatorPAT, oidc.AccessTokenType, nil, nil, nil, oidc.AccessTokenType)
 	require.NoError(t, err)
-	accessTokenVerifier(CTX, resourceServer, iamOwner.ID)
+	accessTokenVerifier(CTX, resourceServer, iamOwner.ID, iamUserID)
 
 	impersonatedCTX := Tester.WithAuthorizationToken(CTX, resp.AccessToken)
 	_, err = Tester.Client.Admin.GetAllowedLanguages(impersonatedCTX, &admin.GetAllowedLanguagesRequest{})
