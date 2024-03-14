@@ -16,6 +16,7 @@ import (
 	"golang.org/x/text/language"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
@@ -37,38 +38,41 @@ import (
 	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
+	schema "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 type Client struct {
-	CC          *grpc.ClientConn
-	Admin       admin.AdminServiceClient
-	Mgmt        mgmt.ManagementServiceClient
-	Auth        auth.AuthServiceClient
-	UserV2      user.UserServiceClient
-	SessionV2   session.SessionServiceClient
-	SettingsV2  settings.SettingsServiceClient
-	OIDCv2      oidc_pb.OIDCServiceClient
-	OrgV2       organisation.OrganizationServiceClient
-	System      system.SystemServiceClient
-	ExecutionV3 execution.ExecutionServiceClient
-	FeatureV2   feature.FeatureServiceClient
+	CC           *grpc.ClientConn
+	Admin        admin.AdminServiceClient
+	Mgmt         mgmt.ManagementServiceClient
+	Auth         auth.AuthServiceClient
+	UserV2       user.UserServiceClient
+	SessionV2    session.SessionServiceClient
+	SettingsV2   settings.SettingsServiceClient
+	OIDCv2       oidc_pb.OIDCServiceClient
+	OrgV2        organisation.OrganizationServiceClient
+	System       system.SystemServiceClient
+	ExecutionV3  execution.ExecutionServiceClient
+	FeatureV2    feature.FeatureServiceClient
+	UserSchemaV3 schema.UserSchemaServiceClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
 	return Client{
-		CC:          cc,
-		Admin:       admin.NewAdminServiceClient(cc),
-		Mgmt:        mgmt.NewManagementServiceClient(cc),
-		Auth:        auth.NewAuthServiceClient(cc),
-		UserV2:      user.NewUserServiceClient(cc),
-		SessionV2:   session.NewSessionServiceClient(cc),
-		SettingsV2:  settings.NewSettingsServiceClient(cc),
-		OIDCv2:      oidc_pb.NewOIDCServiceClient(cc),
-		OrgV2:       organisation.NewOrganizationServiceClient(cc),
-		System:      system.NewSystemServiceClient(cc),
-		ExecutionV3: execution.NewExecutionServiceClient(cc),
-		FeatureV2:   feature.NewFeatureServiceClient(cc),
+		CC:           cc,
+		Admin:        admin.NewAdminServiceClient(cc),
+		Mgmt:         mgmt.NewManagementServiceClient(cc),
+		Auth:         auth.NewAuthServiceClient(cc),
+		UserV2:       user.NewUserServiceClient(cc),
+		SessionV2:    session.NewSessionServiceClient(cc),
+		SettingsV2:   settings.NewSettingsServiceClient(cc),
+		OIDCv2:       oidc_pb.NewOIDCServiceClient(cc),
+		OrgV2:        organisation.NewOrganizationServiceClient(cc),
+		System:       system.NewSystemServiceClient(cc),
+		ExecutionV3:  execution.NewExecutionServiceClient(cc),
+		FeatureV2:    feature.NewFeatureServiceClient(cc),
+		UserSchemaV3: schema.NewUserSchemaServiceClient(cc),
 	}
 }
 
@@ -516,7 +520,7 @@ func (s *Tester) CreateProjectMembership(t *testing.T, ctx context.Context, proj
 }
 
 func (s *Tester) CreateTarget(ctx context.Context, t *testing.T) *execution.CreateTargetResponse {
-	target, err := s.Client.ExecutionV3.CreateTarget(ctx, &execution.CreateTargetRequest{
+	req := &execution.CreateTargetRequest{
 		Name: fmt.Sprint(time.Now().UnixNano() + 1),
 		TargetType: &execution.CreateTargetRequest_RestWebhook{
 			RestWebhook: &execution.SetRESTWebhook{
@@ -524,18 +528,60 @@ func (s *Tester) CreateTarget(ctx context.Context, t *testing.T) *execution.Crea
 			},
 		},
 		Timeout: durationpb.New(10 * time.Second),
-		ExecutionType: &execution.CreateTargetRequest_InterruptOnError{
-			InterruptOnError: true,
+	}
+	target, err := s.Client.ExecutionV3.CreateTarget(ctx, req)
+	require.NoError(t, err)
+	return target
+}
+
+func (s *Tester) CreateTargetWithNameAndType(ctx context.Context, t *testing.T, name string, async bool, interrupt bool) *execution.CreateTargetResponse {
+	req := &execution.CreateTargetRequest{
+		Name: name,
+		TargetType: &execution.CreateTargetRequest_RestWebhook{
+			RestWebhook: &execution.SetRESTWebhook{
+				Url: "https://example.com",
+			},
 		},
+		Timeout: durationpb.New(10 * time.Second),
+	}
+	if async {
+		req.ExecutionType = &execution.CreateTargetRequest_IsAsync{
+			IsAsync: true,
+		}
+	}
+	if interrupt {
+		req.ExecutionType = &execution.CreateTargetRequest_InterruptOnError{
+			InterruptOnError: true,
+		}
+	}
+	target, err := s.Client.ExecutionV3.CreateTarget(ctx, req)
+	require.NoError(t, err)
+	return target
+}
+
+func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution.Condition, targets []string, includes []string) *execution.SetExecutionResponse {
+	target, err := s.Client.ExecutionV3.SetExecution(ctx, &execution.SetExecutionRequest{
+		Condition: cond,
+		Targets:   targets,
+		Includes:  includes,
 	})
 	require.NoError(t, err)
 	return target
 }
 
-func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution.SetConditions, targets []string) *execution.SetExecutionResponse {
-	target, err := s.Client.ExecutionV3.SetExecution(ctx, &execution.SetExecutionRequest{
-		Condition: cond,
-		Targets:   targets,
+func (s *Tester) CreateUserSchema(ctx context.Context, t *testing.T) *schema.CreateUserSchemaResponse {
+	userSchema := new(structpb.Struct)
+	err := userSchema.UnmarshalJSON([]byte(`{
+		"$schema": "urn:zitadel:schema:v1",
+		"type": "object",
+		"properties": {}
+	}`))
+	require.NoError(t, err)
+	target, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &schema.CreateUserSchemaRequest{
+		Type: fmt.Sprint(time.Now().UnixNano() + 1),
+		DataType: &schema.CreateUserSchemaRequest_Schema{
+			Schema: userSchema,
+		},
 	})
 	require.NoError(t, err)
 	return target

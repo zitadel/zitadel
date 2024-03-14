@@ -1,5 +1,5 @@
-<h2>{{ 'IAM.FAILEDEVENTS.TITLE' | translate }}</h2>
-<p class="failed-events-desc cnsl-secondary-text">{{ 'IAM.FAILEDEVENTS.DESCRIPTION' | translate }}</p>
+<h2>{{ 'DESCRIPTIONS.SETTINGS.IAM_FAILED_EVENTS.TITLE' | translate }}</h2>
+<p class="failed-events-desc cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.IAM_FAILED_EVENTS.DESCRIPTION' | translate }}</p>
 
 <div class="table-wrapper">
   <cnsl-refresh-table (refreshed)="loadEvents()" [dataSize]="eventDataSource.data.length" [loading]="loading$ | async">

@@ -1,3 +1,22 @@
+.idps-title-row {
+  display: flex;
+  align-items: center;
+
+  h1 {
+    margin: 0;
+  }
+
+  a .icon {
+    font-size: 1.2rem;
+    height: 1.2rem;
+    line-height: 1.2rem;
+  }
+}
+
+.idps-description {
+  margin-top: 0;
+}
+
 @mixin idp-settings-theme($theme) {
   $primary: map-get($theme, primary);
   $primary-color: map-get($primary, 500);
@@ -10,6 +29,7 @@
   }
 
   .new-idp-wrapper {
+    margin-top: 2rem;
     display: grid;
     row-gap: 1.5rem;
     column-gap: 1.5rem;

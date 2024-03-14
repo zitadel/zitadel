@@ -216,7 +216,7 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 		userOrgID = authReq.UserOrgID
 	case *AuthRequestV2:
 		// trigger activity log for authentication for user
-		activity.Trigger(ctx, "", authReq.CurrentAuthRequest.UserID, activity.OIDCAccessToken)
+		activity.Trigger(ctx, "", authReq.CurrentAuthRequest.UserID, activity.OIDCAccessToken, o.eventstore.FilterToQueryReducer)
 		return o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.GetID())
 	case op.IDTokenRequest:
 		applicationID = authReq.GetClientID()
@@ -233,7 +233,7 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 	}
 
 	// trigger activity log for authentication for user
-	activity.Trigger(ctx, userOrgID, req.GetSubject(), activity.OIDCAccessToken)
+	activity.Trigger(ctx, userOrgID, req.GetSubject(), activity.OIDCAccessToken, o.eventstore.FilterToQueryReducer)
 	return resp.TokenID, resp.Expiration, nil
 }
 
@@ -248,11 +248,11 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 	switch tokenReq := req.(type) {
 	case *AuthRequestV2:
 		// trigger activity log for authentication for user
-		activity.Trigger(ctx, "", tokenReq.GetSubject(), activity.OIDCRefreshToken)
+		activity.Trigger(ctx, "", tokenReq.GetSubject(), activity.OIDCRefreshToken, o.eventstore.FilterToQueryReducer)
 		return o.command.AddOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.GetID())
 	case *RefreshTokenRequestV2:
 		// trigger activity log for authentication for user
-		activity.Trigger(ctx, "", tokenReq.GetSubject(), activity.OIDCRefreshToken)
+		activity.Trigger(ctx, "", tokenReq.GetSubject(), activity.OIDCRefreshToken, o.eventstore.FilterToQueryReducer)
 		return o.command.ExchangeOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.OIDCSessionWriteModel.AggregateID, refreshToken, tokenReq.RequestedScopes)
 	}
 
@@ -281,7 +281,7 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 	}
 
 	// trigger activity log for authentication for user
-	activity.Trigger(ctx, userOrgID, req.GetSubject(), activity.OIDCRefreshToken)
+	activity.Trigger(ctx, userOrgID, req.GetSubject(), activity.OIDCRefreshToken, o.eventstore.FilterToQueryReducer)
 	return resp.TokenID, token, resp.Expiration, nil
 }
 
@@ -315,7 +315,7 @@ func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken
 			return nil, err
 		}
 		// trigger activity log for authentication for user
-		activity.Trigger(ctx, "", oidcSession.UserID, activity.OIDCRefreshToken)
+		activity.Trigger(ctx, "", oidcSession.UserID, activity.OIDCRefreshToken, o.eventstore.FilterToQueryReducer)
 		return &RefreshTokenRequestV2{OIDCSessionWriteModel: oidcSession}, nil
 	}
 
@@ -325,7 +325,7 @@ func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken
 	}
 
 	// trigger activity log for use of refresh token for user
-	activity.Trigger(ctx, tokenView.ResourceOwner, tokenView.UserID, activity.OIDCRefreshToken)
+	activity.Trigger(ctx, tokenView.ResourceOwner, tokenView.UserID, activity.OIDCRefreshToken, o.eventstore.FilterToQueryReducer)
 	return RefreshTokenRequestFromBusiness(tokenView), nil
 }
 

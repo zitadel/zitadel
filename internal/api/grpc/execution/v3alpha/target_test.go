@@ -27,7 +27,6 @@ func Test_createTargetToCommand(t *testing.T) {
 			args: args{nil},
 			want: &command.AddTarget{
 				Name:             "",
-				TargetType:       domain.TargetTypeUnspecified,
 				URL:              "",
 				Timeout:          0,
 				Async:            false,

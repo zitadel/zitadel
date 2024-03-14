@@ -546,6 +546,16 @@ Errors:
     NotFound: Uitvoering niet gevonden
     IncludeNotFound: Inclusief niet gevonden
     NoTargets: Geen doelstellingen gedefinieerd
+  UserSchema:
+    NotEnabled: Functie "Gebruikersschema" is niet ingeschakeld
+    Type:
+      Missing: Type gebruikersschema ontbreekt
+      AlreadyExists: Type gebruikersschema bestaat al
+    Authenticator:
+      Invalid: Ongeldig authenticatortype
+    NotActive: Gebruikersschema niet actief
+    NotInactive: Gebruikersschema niet inactief
+    NotExists: Gebruikersschema bestaat niet
 
 AggregateTypes:
   action: Actie
@@ -559,6 +569,7 @@ AggregateTypes:
   feature: Functie
   target: Doel
   execution: Executie
+  user_schema: Gebruikersschema
 
 EventTypes:
   execution:
@@ -1236,6 +1247,12 @@ EventTypes:
         password:
           changed: Wachtwoord van SMTP-configuratie gewijzigd
         removed: SMTP-configuratie verwijderd
+  user_schema:
+    created: Gebruikersschema gemaakt
+    updated: Gebruikersschema bijgewerkt
+    deactivated: Gebruikersschema gedeactiveerd
+    reactivated: Gebruikersschema opnieuw geactiveerd
+    deleted: Gebruikersschema verwijderd
 
 Application:
   OIDC:
