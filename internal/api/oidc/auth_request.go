@@ -212,13 +212,13 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 		return o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.GetID())
 	}
 
-	userAgentID, applicationID, userOrgID, authTime, amr, reason := getInfoFromRequest(req)
+	userAgentID, applicationID, userOrgID, authTime, amr, reason, actor := getInfoFromRequest(req)
 	accessTokenLifetime, _, _, _, err := o.getOIDCSettings(ctx)
 	if err != nil {
 		return "", time.Time{}, err
 	}
 
-	resp, err := o.command.AddUserToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), amr, accessTokenLifetime, authTime, reason, nil)
+	resp, err := o.command.AddUserToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), amr, accessTokenLifetime, authTime, reason, actor)
 	if err != nil {
 		return "", time.Time{}, err
 	}
@@ -247,7 +247,7 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 		return o.command.ExchangeOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.OIDCSessionWriteModel.AggregateID, refreshToken, tokenReq.RequestedScopes)
 	}
 
-	userAgentID, applicationID, userOrgID, authTime, authMethodsReferences, reason := getInfoFromRequest(req)
+	userAgentID, applicationID, userOrgID, authTime, authMethodsReferences, reason, actor := getInfoFromRequest(req)
 	scopes, err := o.assertProjectRoleScopes(ctx, applicationID, req.GetScopes())
 	if err != nil {
 		return "", "", time.Time{}, zerrors.ThrowPreconditionFailed(err, "OIDC-Df2fq", "Errors.Internal")
@@ -263,7 +263,7 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 
 	resp, token, err := o.command.AddAccessAndRefreshToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(),
 		refreshToken, req.GetAudience(), scopes, authMethodsReferences, accessTokenLifetime,
-		refreshTokenIdleExpiration, refreshTokenExpiration, authTime, reason, nil) //PLANNED: lifetime from client
+		refreshTokenIdleExpiration, refreshTokenExpiration, authTime, reason, actor) //PLANNED: lifetime from client
 	if err != nil {
 		if zerrors.IsErrorInvalidArgument(err) {
 			err = oidc.ErrInvalidGrant().WithParent(err)
@@ -276,20 +276,20 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 	return resp.TokenID, token, resp.Expiration, nil
 }
 
-func getInfoFromRequest(req op.TokenRequest) (agentID string, clientID string, userOrgID string, authTime time.Time, amr []string, reason domain.TokenReason) {
+func getInfoFromRequest(req op.TokenRequest) (agentID string, clientID string, userOrgID string, authTime time.Time, amr []string, reason domain.TokenReason, actor *domain.TokenActor) {
 	switch r := req.(type) {
 	case *AuthRequest:
-		return r.AgentID, r.ApplicationID, r.UserOrgID, r.AuthTime, r.GetAMR(), domain.TokenReasonAuthRequest
+		return r.AgentID, r.ApplicationID, r.UserOrgID, r.AuthTime, r.GetAMR(), domain.TokenReasonAuthRequest, nil
 	case *RefreshTokenRequest:
-		return r.UserAgentID, r.ClientID, "", r.AuthTime, r.AuthMethodsReferences, domain.TokenReasonRefresh
+		return r.UserAgentID, r.ClientID, "", r.AuthTime, r.AuthMethodsReferences, domain.TokenReasonRefresh, r.Actor
 	case op.IDTokenRequest:
-		return "", r.GetClientID(), "", r.GetAuthTime(), r.GetAMR(), domain.TokenReasonAuthRequest
+		return "", r.GetClientID(), "", r.GetAuthTime(), r.GetAMR(), domain.TokenReasonAuthRequest, nil
 	case *oidc.JWTTokenRequest:
-		return "", "", "", r.GetAuthTime(), nil, domain.TokenReasonJWTProfile
+		return "", "", "", r.GetAuthTime(), nil, domain.TokenReasonJWTProfile, nil
 	case *clientCredentialsRequest:
-		return "", "", "", time.Time{}, nil, domain.TokenReasonClientCredentials
+		return "", "", "", time.Time{}, nil, domain.TokenReasonClientCredentials, nil
 	default:
-		return "", "", "", time.Time{}, nil, domain.TokenReasonAuthRequest
+		return "", "", "", time.Time{}, nil, domain.TokenReasonAuthRequest, nil
 	}
 }
 

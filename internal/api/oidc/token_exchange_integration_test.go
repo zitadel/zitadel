@@ -74,7 +74,7 @@ func accessTokenVerifier(ctx context.Context, server rs.ResourceServer, subject 
 	}
 }
 
-func idTokenVerifier(ctx context.Context, provider rp.RelyingParty, subject string) func(t *testing.T, token string) {
+func idTokenVerifier(ctx context.Context, provider rp.RelyingParty, subject, actorSubject string) func(t *testing.T, token string) {
 	return func(t *testing.T, token string) {
 		verifier := provider.IDTokenVerifier()
 		resp, err := rp.VerifyIDToken[*oidc.IDTokenClaims](ctx, token, verifier)
@@ -82,15 +82,27 @@ func idTokenVerifier(ctx context.Context, provider rp.RelyingParty, subject stri
 		if subject != "" {
 			assert.Equal(t, subject, resp.Subject)
 		}
+		if actorSubject != "" {
+			require.NotNil(t, resp.Actor)
+			assert.Equal(t, actorSubject, resp.Actor.Subject)
+		}
 	}
 }
 
-func refreshTokenVerifier(ctx context.Context, provider rp.RelyingParty) func(t *testing.T, token string) {
+func refreshTokenVerifier(ctx context.Context, provider rp.RelyingParty, subject, actorSubject string) func(t *testing.T, token string) {
 	return func(t *testing.T, token string) {
 		clientAssertion, err := client.SignedJWTProfileAssertion(provider.OAuthConfig().ClientID, []string{provider.Issuer()}, time.Hour, provider.Signer())
 		require.NoError(t, err)
-		_, err = rp.RefreshTokens[*oidc.IDTokenClaims](ctx, provider, token, clientAssertion, oidc.ClientAssertionTypeJWTAssertion)
+		tokens, err := rp.RefreshTokens[*oidc.IDTokenClaims](ctx, provider, token, clientAssertion, oidc.ClientAssertionTypeJWTAssertion)
 		require.NoError(t, err)
+
+		if subject != "" {
+			assert.Equal(t, subject, tokens.IDTokenClaims.Subject)
+		}
+		if actorSubject != "" {
+			require.NotNil(t, tokens.IDTokenClaims.Actor)
+			assert.Equal(t, actorSubject, tokens.IDTokenClaims.Actor.Subject)
+		}
 	}
 }
 
@@ -109,8 +121,8 @@ func TestServer_TokenExchange(t *testing.T) {
 
 	time.Sleep(time.Second)
 
-	_, iamImpersonatorPAT := createMachineUserPATWithMembership(t, "IAM_ADMIN_IMPERSONATOR")
-	_, orgImpersonatorPAT := createMachineUserPATWithMembership(t, "ORG_ADMIN_IMPERSONATOR")
+	iamUserID, iamImpersonatorPAT := createMachineUserPATWithMembership(t, "IAM_ADMIN_IMPERSONATOR")
+	orgUserID, orgImpersonatorPAT := createMachineUserPATWithMembership(t, "ORG_ADMIN_IMPERSONATOR")
 	serviceUserID, noPermPAT := createMachineUserPATWithMembership(t)
 
 	// exchange some tokens for later use
@@ -208,7 +220,7 @@ func TestServer_TokenExchange(t *testing.T) {
 				expiresIn:         43100,
 				scopes:            patScopes,
 				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, ""),
-				verifyIDToken:     idTokenVerifier(CTX, relyingParty, ""),
+				verifyIDToken:     idTokenVerifier(CTX, relyingParty, "", ""),
 			},
 		},
 		{
@@ -228,7 +240,7 @@ func TestServer_TokenExchange(t *testing.T) {
 				expiresIn:         43100,
 				scopes:            patScopes,
 				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, ""),
-				verifyIDToken:     idTokenVerifier(CTX, relyingParty, ""),
+				verifyIDToken:     idTokenVerifier(CTX, relyingParty, "", ""),
 			},
 		},
 		{
@@ -248,7 +260,7 @@ func TestServer_TokenExchange(t *testing.T) {
 				expiresIn:         43100,
 				scopes:            patScopes,
 				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, ""),
-				verifyIDToken:     idTokenVerifier(CTX, relyingParty, ""),
+				verifyIDToken:     idTokenVerifier(CTX, relyingParty, "", ""),
 			},
 		},
 		{
@@ -267,7 +279,7 @@ func TestServer_TokenExchange(t *testing.T) {
 				tokenType:         "N_A",
 				expiresIn:         43100,
 				scopes:            patScopes,
-				verifyAccessToken: idTokenVerifier(CTX, relyingParty, ""),
+				verifyAccessToken: idTokenVerifier(CTX, relyingParty, "", ""),
 				verifyIDToken: func(t *testing.T, token string) {
 					assert.Empty(t, token)
 				},
@@ -304,8 +316,8 @@ func TestServer_TokenExchange(t *testing.T) {
 				expiresIn:          43100,
 				scopes:             []string{oidc.ScopeOpenID, oidc.ScopeOfflineAccess, "profile"},
 				verifyAccessToken:  accessTokenVerifier(CTX, resourceServer, serviceUserID),
-				verifyIDToken:      idTokenVerifier(CTX, relyingParty, serviceUserID),
-				verifyRefreshToken: refreshTokenVerifier(CTX, relyingParty),
+				verifyIDToken:      idTokenVerifier(CTX, relyingParty, serviceUserID, ""),
+				verifyRefreshToken: refreshTokenVerifier(CTX, relyingParty, "", ""),
 			},
 		},
 		{
@@ -384,7 +396,7 @@ func TestServer_TokenExchange(t *testing.T) {
 				expiresIn:         43100,
 				scopes:            patScopes,
 				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, User.GetUserId()),
-				verifyIDToken:     idTokenVerifier(CTX, relyingParty, User.GetUserId()),
+				verifyIDToken:     idTokenVerifier(CTX, relyingParty, User.GetUserId(), iamUserID),
 			},
 		},
 		{
@@ -406,7 +418,7 @@ func TestServer_TokenExchange(t *testing.T) {
 				expiresIn:         43100,
 				scopes:            patScopes,
 				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, User.GetUserId()),
-				verifyIDToken:     idTokenVerifier(CTX, relyingParty, User.GetUserId()),
+				verifyIDToken:     idTokenVerifier(CTX, relyingParty, User.GetUserId(), orgUserID),
 			},
 		},
 		{
@@ -428,7 +440,7 @@ func TestServer_TokenExchange(t *testing.T) {
 				expiresIn:         43100,
 				scopes:            patScopes,
 				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, serviceUserID),
-				verifyIDToken:     idTokenVerifier(CTX, relyingParty, serviceUserID),
+				verifyIDToken:     idTokenVerifier(CTX, relyingParty, serviceUserID, orgUserID),
 			},
 		},
 		{
@@ -450,7 +462,7 @@ func TestServer_TokenExchange(t *testing.T) {
 				expiresIn:         43100,
 				scopes:            patScopes,
 				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, serviceUserID),
-				verifyIDToken:     idTokenVerifier(CTX, relyingParty, serviceUserID),
+				verifyIDToken:     idTokenVerifier(CTX, relyingParty, serviceUserID, orgUserID),
 			},
 		},
 		{
@@ -482,7 +494,31 @@ func TestServer_TokenExchange(t *testing.T) {
 				expiresIn:         43100,
 				scopes:            patScopes,
 				verifyAccessToken: accessTokenVerifier(CTX, resourceServer, User.GetUserId()),
-				verifyIDToken:     idTokenVerifier(CTX, relyingParty, User.GetUserId()),
+				verifyIDToken:     idTokenVerifier(CTX, relyingParty, User.GetUserId(), orgUserID),
+			},
+		},
+		{
+			name: "ORG IMPERSONATION: subject: access token, actor: access token, with refresh token, success",
+			settings: settings{
+				tokenExchangeFeature: true,
+				impersonationPolicy:  true,
+			},
+			args: args{
+				SubjectToken:       teResp.AccessToken,
+				SubjectTokenType:   oidc.AccessTokenType,
+				RequestedTokenType: oidc.AccessTokenType,
+				ActorToken:         orgImpersonatorPAT,
+				ActorTokenType:     oidc.AccessTokenType,
+				Scopes:             []string{oidc.ScopeOpenID, oidc.ScopeOfflineAccess},
+			},
+			want: result{
+				issuedTokenType:    oidc.AccessTokenType,
+				tokenType:          oidc.BearerToken,
+				expiresIn:          43100,
+				scopes:             []string{oidc.ScopeOpenID, oidc.ScopeOfflineAccess},
+				verifyAccessToken:  accessTokenVerifier(CTX, resourceServer, serviceUserID),
+				verifyIDToken:      idTokenVerifier(CTX, relyingParty, serviceUserID, orgUserID),
+				verifyRefreshToken: refreshTokenVerifier(CTX, relyingParty, serviceUserID, orgUserID),
 			},
 		},
 	}
