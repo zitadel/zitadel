@@ -124,7 +124,7 @@ type orgIDOfUser struct {
 
 func (u *orgIDOfUser) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		OrderAsc().
+		OrderDesc().
 		Limit(1).
 		AddQuery().
 		AggregateTypes(user.AggregateType).
