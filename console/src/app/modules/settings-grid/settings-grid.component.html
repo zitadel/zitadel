@@ -1,7 +1,12 @@
-<h2>{{ 'POLICY.TITLE' | translate }}</h2>
-
-<p class="top-desc cnsl-secondary-text">{{ 'POLICY.DESCRIPTION' | translate }}</p>
-
+<div class="org-title-row">
+  <h2>{{ 'DESCRIPTIONS.ORG.TITLE' | translate }}</h2>
+  <a mat-icon-button href="https://zitadel.com/docs/concepts/structure/organizations" rel="noreferrer" target="_blank">
+    <mat-icon class="icon">info_outline</mat-icon>
+  </a>
+</div>
+<p class="top-desc cnsl-secondary-text">
+  {{ 'DESCRIPTIONS.ORG.DESCRIPTION' | translate }}
+</p>
 <div class="row-lyt" [ngClass]="{ more: type === PolicyComponentServiceType.ADMIN }">
   <ng-container *ngFor="let setting of SETTINGS">
     <ng-template

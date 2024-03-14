@@ -13,6 +13,7 @@ export class MetadataComponent implements OnChanges {
   @Input() public metadata: Metadata.AsObject[] = [];
   @Input() public disabled: boolean = false;
   @Input() public loading: boolean = false;
+  @Input({ required: true }) public description!: string;
   @Output() public editClicked: EventEmitter<void> = new EventEmitter();
   @Output() public refresh: EventEmitter<void> = new EventEmitter();
 

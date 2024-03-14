@@ -4,6 +4,7 @@ sidebar_label: Service Users
 ---
 
 This is a guide on how to create service users in ZITADEL. You can read more about users [here](/concepts/structure/users.md).
+
 ## Create a Service User
 
 1. Navigate to Service Users
@@ -32,18 +33,22 @@ In this step we will authenticate a service user and receive an access_token to 
 
 ### 1. Generate a private-public key pair in ZITADEL
 
-Select your service user and in the section KEYS click **New**. Enter an expiration date and click **Add**. Make sure to download the json by clicking **Download**.
+Select your service user and in the section KEYS click **New**. Enter an optional expiration date and click **Add**. Make sure to download the json by clicking **Download**.
+
+:::note
+If you specify an expiration date, note that the key will expire at midnight that day
+:::
 
 ![Create private key](/img/console_serviceusers_new_key.gif)
 
-The downloaded json should look something like outlined below. The value of `key` contains the *private* key for your service account. Please make sure to keep this key securely stored and handle with care. The public key is automatically stored in ZITADEL.
+The downloaded json should look something like outlined below. The value of `key` contains the _private_ key for your service account. Please make sure to keep this key securely stored and handle with care. The public key is automatically stored in ZITADEL.
 
 ```json
 {
-    "type":"serviceaccount",
-    "keyId":"100509901696068329",
-    "key":"-----BEGIN RSA PRIVATE KEY----- [...] -----END RSA PRIVATE KEY-----\n",
-    "userId":"100507859606888466"
+  "type": "serviceaccount",
+  "keyId": "100509901696068329",
+  "key": "-----BEGIN RSA PRIVATE KEY----- [...] -----END RSA PRIVATE KEY-----\n",
+  "userId": "100507859606888466"
 }
 ```
 
@@ -55,8 +60,8 @@ Header
 
 ```json
 {
-    "alg": "RS256",
-    "kid":"100509901696068329"
+  "alg": "RS256",
+  "kid": "100509901696068329"
 }
 ```
 
@@ -74,11 +79,11 @@ Payload
 }
 ```
 
-* `iss` represents the requesting party, i.e. the owner of the private key. In this case the value of `userId` from the downloaded JSON.
-* `sub` represents the application. Set the value also to the value of `userId`
-* `aud` must be ZITADEL's issuing domain
-* `iat` is a unix timestamp of the creation signing time of the JWT, e.g. now and must not be older than 1 hour ago
-* `exp` is the unix timestamp of expiry of this assertion
+- `iss` represents the requesting party, i.e. the owner of the private key. In this case the value of `userId` from the downloaded JSON.
+- `sub` represents the application. Set the value also to the value of `userId`
+- `aud` must be ZITADEL's issuing domain
+- `iat` is a unix timestamp of the creation signing time of the JWT, e.g. now and must not be older than 1 hour ago
+- `exp` is the unix timestamp of expiry of this assertion
 
 Please refer to [JWT_with_Private_Key](/apis/openidoauth/authn-methods#jwt-with-private-key) in the documentation for further information.
 
@@ -99,11 +104,11 @@ curl --request POST \
 
 If you want to access the ZITADEL API with this access token, you have to add `urn:zitadel:iam:org:project:id:zitadel:aud` to the list of scopes.
 
-* `grant_type` should be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
-* `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile` and `email`
-* `assertion` is the encoded value of the JWT that was signed with your private key from the prior step
+- `grant_type` should be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
+- `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile` and `email`
+- `assertion` is the encoded value of the JWT that was signed with your private key from the prior step
 
-You should receive a successful response with `access_token`,  `token_type` and time to expiry in seconds as `expires_in`.
+You should receive a successful response with `access_token`, `token_type` and time to expiry in seconds as `expires_in`.
 
 ```bash
 HTTP/1.1 200 OK
@@ -142,11 +147,11 @@ Content-Type: application/json
 
 ## Summary
 
-* With service users you can secure machine-to-machine communication
-* Because there is no interactive logon, you need to use a JWT signed with your private key to authorize the user
-* After successful authorization you can use an access token like for human users
+- With service users you can secure machine-to-machine communication
+- Because there is no interactive logon, you need to use a JWT signed with your private key to authorize the user
+- After successful authorization you can use an access token like for human users
 
 Where to go from here:
 
-* Management API
-* Securing backend API
+- Management API
+- Securing backend API
