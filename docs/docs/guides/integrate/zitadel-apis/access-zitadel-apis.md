@@ -29,7 +29,7 @@ Accessing ZITADEL APIs, except for the Auth API and the System API, requires the
 
 1. **Create a service user**: A service user is a special type of account used to grant programmatic access to ZITADEL's functionalities. Unlike regular users who log in with a username and password, [service users rely on a more secure mechanism involving digital keys and tokens](../service-users/authenticate-service-users).
 2. **Give permission to access ZITADEL APIs**: Assign a Manager role to the service  user, giving it permission to make changes to certain resources in ZITADEL.
-3. **Authenticate the service user**: Like human users, service users must authenticate and request a OAuth token with the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to access ZITADEL APIs.
+3. **Authenticate the service user**: Like human users, service users must authenticate and request a OAuth token with the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to access ZITADEL APIs. Service users can be authenticated using private key JWT, client credentials, or personal access token.
 4. **Access ZITADEL APIs with the token**: The OAuth token must be included in the Authorization Header of calls to ZITADEL APIs.
 
 ### Auth API
@@ -43,7 +43,9 @@ Instead you call the Auth API with the token of the user.
 With the System API developers can manage different ZITADEL instances.
 The System API can't be accessed with service users and requires a special configuration and authentication that can be found in our [guide to access ZITADEL's System API](./access-zitadel-system-api).
 
-## ZITADEL Managers
+## 1. Create a service user
+
+## 2. Grant a Manager role to the service user
 
 ZITADEL Managers are Users who have permission to manage ZITADEL itself. There are some different levels for managers.
 
@@ -53,8 +55,6 @@ ZITADEL Managers are Users who have permission to manage ZITADEL itself. There a
 - **Project Grant Manager**: The project grant manager is for projects, which are granted of another organization.
 
 On each level we have some different Roles. Here you can find more about the different roles: [ZITADEL Manager Roles](/guides/manage/console/managers#roles)
-
-## Grant a Manager role to the service user
 
 To be able to access the ZITADEL APIs your service user needs permissions to ZITADEL.
 
@@ -74,12 +74,14 @@ Make sure you have a Service User with a Key. (For more detailed information abo
 
 ![Add Org Manager](/img/console_org_manager_add.gif)
 
-## Authenticating a service user
+## 3. Authenticate service user and request token
+
+### Private key JWT
 
 In ZITADEL we use the `urn:ietf:params:oauth:grant-type:jwt-bearer` (**“JWT bearer token with private key”**, [RFC7523](https://tools.ietf.org/html/rfc7523)) authorization grant for this non-interactive authentication.
 This is already described in the [Service User](./serviceusers), so make sure you follow this guide.
 
-### Request an OAuth token, with audience for ZITADEL
+Request an OAuth token, with audience for ZITADEL
 
 With the encoded JWT from the prior step, you will need to craft a POST request to ZITADEL's token endpoint:
 
@@ -115,6 +117,62 @@ Content-Type: application/json
 ```
 
 With this token you are allowed to access the [ZITADEL APIs](/apis/introduction) .
+
+### Client credentials
+
+In this step we will authenticate a service user and receive an access_token to use against the ZITADEL API.
+
+You will need to craft a POST request to ZITADEL's token endpoint:
+
+```bash
+curl --request POST \
+  --url https://$CUSTOM-DOMAIN/oauth/v2/token \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --header 'Authorization: Basic ${BASIC_AUTH}' \
+  --data grant_type=client_credentials \
+  --data scope='openid profile email urn:zitadel:iam:org:project:id:zitadel:aud'
+```
+
+* `grant_type` should be set to `client_credentials`
+* `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`, `email`
+  and `urn:zitadel:iam:org:project:id:zitadel:aud`. The latter provides access to the ZITADEL API.
+
+You should receive a successful response with `access_token`,  `token_type` and time to expiry in seconds as `expires_in`.
+
+```bash
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "access_token": "MtjHodGy4zxKylDOhg6kW90WeEQs2q...",
+  "token_type": "Bearer",
+  "expires_in": 43199
+}
+```
+
+Because the received Token includes the `urn:zitadel:iam:org:project:id:zitadel:aud` scope, we can send it in your requests to the ZITADEL API as Authorization Header.
+In this example we read the organization of the service user.
+
+```bash
+curl --request GET \
+  --url $CUSTOM-DOMAIN/management/v1/orgs/me \
+  --header 'Authorization: Bearer ${TOKEN}' 
+```
+
+### Personal access token (PAT)
+
+A Personal Access Token (PAT) is a ready to use token which can be used as _Authorization_ header.
+
+Because the PAT is a ready to use token, you can add it as Authorization Header and send it in your requests to the ZITADEL API.
+In this example we read the organization of the service user.
+
+```bash
+curl --request GET \
+  --url $CUSTOM-DOMAIN/management/v1/orgs/me \
+  --header 'Authorization: Bearer {PAT}' 
+```
+
+## 4. Include the access token in the authorization header
 
 ## Summary
 

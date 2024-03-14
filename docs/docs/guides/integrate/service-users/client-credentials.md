@@ -8,7 +8,9 @@ This guide demonstrates how developers can leverage Client Credential authentica
 
 In ZITADEL, the Client Credentials grant can be used for this [non-interactive authentication](authenticate-service-users) as alternative to the [JWT profile authentication](serviceusers).
 
-## Create a Service User with a client secret
+## Steps to authenticate a Service User with client credentials
+
+### 1. Create a Service User with a client secret
 
 1. Navigate to Service Users
 2. Click on **New**
@@ -24,9 +26,7 @@ If you lose it, you will have to generate a new one.
 
 ![Create new service user](/img/console_serviceusers_secret.gif)
 
-## Grant a manager role to the service user
-
-## Authenticating a service user
+## 2. Authenticating a service user and request a token
 
 In this step we will authenticate a service user and receive an access_token to use against the ZITADEL API.
 
@@ -38,12 +38,14 @@ curl --request POST \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header 'Authorization: Basic ${BASIC_AUTH}' \
   --data grant_type=client_credentials \
-  --data scope='openid profile email urn:zitadel:iam:org:project:id:zitadel:aud'
+  --data scope='openid profile email'
 ```
 
 * `grant_type` should be set to `client_credentials`
 * `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`, `email`
-  and `urn:zitadel:iam:org:project:id:zitadel:aud`. The latter provides access to the ZITADEL API.
+
+If you want to access ZITADEL APIs, make sure to include the required scopes `urn:zitadel:iam:org:project:id:zitadel:aud`.
+Read our guide [how to access ZITADEL APIs](../zitadel-apis/) to learn more.
 
 You should receive a successful response with `access_token`,  `token_type` and time to expiry in seconds as `expires_in`.
 
@@ -58,28 +60,34 @@ Content-Type: application/json
 }
 ```
 
+### 3. Include the access token in the authorization header
 
-## Accessing ZITADEL's Management API with client credentials
-
-
-
-
-## Call ZITADEL API with Token
-
-Because the received Token includes the `urn:zitadel:iam:org:project:id:zitadel:aud` scope, we can send it in your requests to the ZITADEL API as Authorization Header.
-In this example we read the organization of the service user.
+When making API requests on behalf of the service user, include the generated token in the "Authorization" header with the "Bearer" prefix.
 
 ```bash
-curl --request GET \
-  --url $CUSTOM-DOMAIN/management/v1/orgs/me \
-  --header 'Authorization: Bearer ${TOKEN}' 
+curl --request POST \
+  --url $YOUR_API_ENDOINT \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --header 'Authorization: Bearer MtjHodGy4zxKylDOhg6kW90WeEQs2q...'
 ```
 
-## Summary
+## Accessing ZITADEL APIs
 
-* With service users you can secure machine-to-machine communication
-* Client Credentials provide an alternative way to JWT Profile for service user authentication
-* After successful authorization you can use an access token like for human users
+You might want to access ZITADEL APIs to manage resources, such as users, or to validate tokens sent to your backend service.
+Follow our guides on [how to access ZITADEL API](../zitadel-apis/access-zitadel-apis) to use the ZITADEL APIs with your service user using client credentials.
+
+### Token introspection
+
+Your API endpoint might receive tokens from users and need to validate the token with ZITADEL.
+In this case your API needs to authenticate with ZITADEL and then do a token introspection.
+Follow our [guide on token introspection with client credentials](../token-introspection/basic-auth) to learn more.
+
+## Security considerations
+
+* **Store private keys securely:** **Never share or embed the private key in your code or application.** Consider using secure key management solutions.
+* **Set appropriate expiration times:** Limit the validity period of tokens to minimize the impact of potential compromise.
+
+By following these steps and adhering to security best practices, you can effectively secure service user and client application communication within ZITADEL using client credential authentication.
 
 ## Notes
 

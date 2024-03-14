@@ -150,7 +150,7 @@ Content-Type: application/json
 
 ### 5. Include the access token in the authorization header
 
-When making API requests on behalf of the service user, include the generated JWT in the "Authorization" header with the "Bearer" prefix.
+When making API requests on behalf of the service user, include the generated token in the "Authorization" header with the "Bearer" prefix.
 
 ```bash
 curl --request POST \
@@ -170,20 +170,19 @@ Your API endpoint might receive tokens from users and need to validate the token
 In this case your API needs to authenticate with ZITADEL and then do a token introspection.
 Follow our [guide on token introspection with private key JWT](../token-introspection/private-key-jwt) to learn more.
 
-## Client Application Authentication
+## Client application authentication
 
 The above steps demonstrate service user authentication.
 If your application also needs to authenticate itself, you can utilize [Client Credentials Grant](./client-credentials).
 Refer to ZITADEL documentation for details on this alternative method.
 
-## Security Considerations
+## Security considerations
 
 * **Store private keys securely:** **Never share or embed the private key in your code or application.** Consider using secure key management solutions.
 * **Set appropriate JWT expiration times:** Limit the validity period of tokens to minimize the impact of potential compromise.
 * **Implement proper error handling:** Handle situations where JWT verification fails or tokens are expired.
 
 By following these steps and adhering to security best practices, you can effectively secure service user and client application communication within ZITADEL using private key JWT authentication.
-Remember to consult the official ZITADEL documentation for detailed information and potential changes in the future.
 
 ## Notes
 
