@@ -2360,6 +2360,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 		})
 	}
 }
+
 func TestCommands_DeleteExecutionFunction(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore

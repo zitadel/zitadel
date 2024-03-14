@@ -3,7 +3,7 @@ package target
 import "github.com/zitadel/zitadel/internal/eventstore"
 
 func init() {
-	eventstore.RegisterFilterEventMapper(AggregateType, AddedEventType, AddedEventMapper)
-	eventstore.RegisterFilterEventMapper(AggregateType, ChangedEventType, ChangedEventMapper)
-	eventstore.RegisterFilterEventMapper(AggregateType, RemovedEventType, RemovedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, AddedEventType, eventstore.GenericEventMapper[AddedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, ChangedEventType, eventstore.GenericEventMapper[ChangedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, RemovedEventType, eventstore.GenericEventMapper[RemovedEvent])
 }
