@@ -86,7 +86,7 @@ This method is still available in ZITADEL but generally considered less secure t
 * **Granular access control:** Can be configured with specific scopes to limit access to defined resources.
 * **Currently available only for machine users** (service users) and not regular human users.
 
-Follow our guide on using [personal access tokens](./private-access-token.md) to get started authenticating service users and clients.
+Follow our guide on using [personal access tokens](./personal-access-token) to get started authenticating service users and clients.
 
 PAT offer some benefits, such as:
 

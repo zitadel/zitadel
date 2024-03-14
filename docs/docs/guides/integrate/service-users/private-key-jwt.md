@@ -8,6 +8,41 @@ This guide demonstrates how developers can leverage private key JWT authenticati
 
 In ZITADEL we use the `urn:ietf:params:oauth:grant-type:jwt-bearer` (**“JWT bearer token with private key”**, [RFC7523](https://tools.ietf.org/html/rfc7523)) authorization grant for this non-interactive authentication.
 
+Read more about the [different authentication methods for service users](authenticate-service-users) and their benefits, drawbacks, and security considerations.
+
+#### How private key JWT authentication works
+
+1. Generate a private/public key pair associated with the service user.
+2. The authorization server stores the public key; and
+3. returns the private key as a json file
+4. The developer configures the client in such a way, that 
+5. JWT assertion is created with the subject of the service user, and the JWT is signed by the private key
+6. Resource owner requests a token by sending the client_assertion
+7. Authorization server validates the signature using the service user's public key
+8. Authorization server returns an OAuth access_token
+9. Resource Owner calls a Resource Server by including the access_token in the Header
+10. Resource Server validates the JWT with [token introspection](../token-introspection/)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Admin AS Admin<br/>(Manager User)
+    participant ServiceUser AS Resource Owner<br/>(Client on-behalf<br/>of service user)
+    participant ZITADEL AS Authorization Server<br/>(ZITADEL)
+    participant RS AS Resource Server<br/>(API)
+    Admin->>ZITADEL: Generate private/public key (API or Console)
+    ZITADEL->>ZITADEL: Store public key
+    ZITADEL-->>Admin: private key
+    Admin->>ServiceUser: Configure with private key
+    ServiceUser->>ServiceUser: Generate JWT assertion with private key:<br /> payload (sub: serviceUser ID) x private key
+    ServiceUser->>+ZITADEL: Token request with the JWT as Client assertion
+    Note over ServiceUser,ZITADEL: POST /token HTTP/1.1 <br />...<br />client_assertion_type=urn:ietf:...:grant-type:jwt-bearer<br />client_assertion=eyJ....(JWT token)
+    ZITADEL->>ZITADEL: validate signature using service user's public key
+    ZITADEL->>+ServiceUser: Provide OAuth access_token
+    ServiceUser->>RS: Call API with access_token As Authorization Header
+    RS-->>ZITADEL: Token introspection
+```
+
 ## Prerequisites
 
 A code library/framework supporting JWT generation and verification (e.g., `pyjwt` for Python, `jsonwebtoken` for Node.js).
