@@ -165,6 +165,7 @@ module.exports = {
           items: [
             "guides/manage/user/reg-create-user",
             "guides/manage/customize/user-metadata",
+            "guides/manage/customize/user-schema",
           ],
         },
       ],
@@ -316,6 +317,7 @@ module.exports = {
           },
           collapsed: true,
           items: [
+            "guides/integrate/login-ui/session-validation",
             "guides/integrate/login-ui/username-password",
             "guides/integrate/login-ui/external-login",
             "guides/integrate/login-ui/passkey",
@@ -452,6 +454,7 @@ module.exports = {
             "examples/identity-proxy/oauth2-proxy",
           ],
         },
+        "guides/integrate/external-audit-log",
       ],
     },
     {
@@ -804,6 +807,7 @@ module.exports = {
       items: [
         "apis/actions/introduction",
         "apis/actions/modules",
+        "apis/actions/code-examples",
         "apis/actions/internal-authentication",
         "apis/actions/external-authentication",
         "apis/actions/complement-token",

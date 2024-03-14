@@ -124,7 +124,7 @@
       <div class="app-integrate-actions">
         <button
           mat-raised-button
-          [disabled]="loading"
+          [disabled]="loading || !framework()"
           class="create-button"
           color="primary"
           (click)="createApp()"

@@ -563,6 +563,16 @@ Errors:
     NotFound: Изпълнението не е намерено
     IncludeNotFound: Включването не е намерено
     NoTargets: Няма определени цели
+  UserSchema:
+    NotEnabled: Функцията „Потребителска схема“ не е активирана
+    Type:
+      Missing: Липсва тип потребителска схема
+      AlreadyExists: Типът потребителска схема вече съществува
+    Authenticator:
+      Invalid: Невалиден тип удостоверител
+    NotActive: Потребителската схема не е активна
+    NotInactive: Потребителската схема не е неактивна
+    NotExists: Потребителската схема не съществува
 
 AggregateTypes:
   action: Действие
@@ -576,6 +586,7 @@ AggregateTypes:
   feature: Особеност
   target: Целта
   execution: Екзекуция
+  user_schema: Потребителска схема
 
 EventTypes:
   execution:
@@ -1268,6 +1279,12 @@ EventTypes:
         password:
           changed: Паролата на SMTP конфигурацията е променена
         removed: Премахната SMTP конфигурация
+  user_schema:
+    created: Създадена е потребителска схема
+    updated: Потребителската схема е актуализирана
+    deactivated: Потребителската схема е деактивирана
+    reactivated: Потребителската схема е активирана отново
+    deleted: Потребителската схема е изтрита
 Application:
   OIDC:
     UnsupportedVersion: Вашата OIDC версия не се поддържа

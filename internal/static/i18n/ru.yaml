@@ -534,6 +534,16 @@ Errors:
     NotFound: Исполнение не найдено
     IncludeNotFound: Включить не найдено
     NoTargets: Цели не определены
+  UserSchema:
+    NotEnabled: Функция «Пользовательская схема» не включена
+    Type:
+      Missing: Тип пользовательской схемы отсутствует
+      AlreadyExists: Тип пользовательской схемы уже существует
+    Authenticator:
+      Invalid: Неверный тип аутентификатора
+    NotActive: Пользовательская схема не активна
+    NotInactive: Пользовательская схема не неактивна
+    NotExists: Пользовательская схема не существует
 
 AggregateTypes:
   action: Действие
@@ -547,6 +557,7 @@ AggregateTypes:
   feature: Особенность
   target: мишень
   execution: Исполнение
+  user_schema: Пользовательская схема
 
 EventTypes:
   execution:
@@ -1224,6 +1235,12 @@ EventTypes:
         password:
           changed: Изменен пароль конфигурации SMTP
         removed: Удалена конфигурация SMTP
+  user_schema:
+    created: Пользовательская схема создана
+    updated: Пользовательская схема обновлена
+    deactivated: Пользовательская схема деактивирована
+    reactivated: Пользовательская схема повторно активирована
+    deleted: Пользовательская схема удалена
 Application:
   OIDC:
     UnsupportedVersion: Ваша версия OIDC не поддерживается
