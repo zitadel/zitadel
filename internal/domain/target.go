@@ -3,11 +3,8 @@ package domain
 type TargetType uint
 
 const (
-	TargetTypeUnspecified TargetType = iota
-	TargetTypeWebhook
+	TargetTypeWebhook TargetType = iota
 	TargetTypeRequestResponse
-
-	TargetTypeStateCount
 )
 
 type TargetState int32
