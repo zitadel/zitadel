@@ -10,7 +10,6 @@ export default async function Layout({
   children: React.ReactNode;
   params: any;
 }) {
-  console.log(params);
   const branding = await getBrandingSettings(server);
   let partial: Partial<BrandingSettings> | undefined;
   if (branding) {
