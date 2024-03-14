@@ -16,7 +16,7 @@ async function loadSessions(ids: string[]): Promise<Session[]> {
   return response?.sessions ?? [];
 }
 
-const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/g;
+const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 
 function findSession(
   sessions: Session[],
@@ -91,8 +91,8 @@ export async function GET(request: NextRequest) {
       const orgId = authRequest.scope.find((s) => ORG_SCOPE_REGEX.test(s));
 
       if (orgId) {
-        const matched = orgId.replace("urn:zitadel:iam:org:id:", "");
-        organization = matched;
+        const matched = ORG_SCOPE_REGEX.exec(orgId);
+        organization = matched?.[1] ?? "";
       }
     }
 
