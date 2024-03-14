@@ -10,6 +10,7 @@ import CustomLoginPolicy from './_custom_login_policy.mdx';
 import IDPsOverview from './_idps_overview.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
+import PrefillAction from './_prefill_action.mdx';
 
 <Intro provider="MockSAML"/>
 
@@ -63,3 +64,11 @@ They are available under [https://{CUSTOMDOMAIN}/idps/{ID of the provider in ZIT
 ![SAML SP Button](/img/guides/zitadel_login_saml.png)
 
 ![SAML SP Login](/img/guides/mocksaml_login.png)
+
+## Optional: Add ZITADEL action to autofill userdata
+
+<PrefillAction fields="firstname, lastname, email, display name and username" provider="mockSaml"/>
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/post_auth_saml.js
+```

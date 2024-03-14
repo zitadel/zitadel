@@ -10,19 +10,24 @@
 >
   <div leftActions class="user-toggle-group">
     <cnsl-nav-toggle
-      label="{{ 'USER.TABLE.TYPES.HUMAN' | translate }}"
+      label="{{ 'DESCRIPTIONS.USERS.HUMANS.TITLE' | translate }}"
       (clicked)="setType(Type.TYPE_HUMAN)"
       [active]="type === Type.TYPE_HUMAN"
       data-e2e="list-humans"
     ></cnsl-nav-toggle>
     <cnsl-nav-toggle
-      label="{{ 'USER.TABLE.TYPES.MACHINE' | translate }}"
+      label="{{ 'DESCRIPTIONS.USERS.MACHINES.TITLE' | translate }}"
       (clicked)="setType(Type.TYPE_MACHINE)"
       [active]="type === Type.TYPE_MACHINE"
       data-e2e="list-machines"
     ></cnsl-nav-toggle>
   </div>
-
+  <p class="user-sub cnsl-secondary-text">
+    {{
+      (type === Type.TYPE_HUMAN ? 'DESCRIPTIONS.USERS.HUMANS.DESCRIPTION' : 'DESCRIPTIONS.USERS.MACHINES.DESCRIPTION')
+        | translate
+    }}
+  </p>
   <ng-template cnslHasRole [hasRole]="['user.write']" actions>
     <button
       (click)="deactivateSelectedUsers()"
