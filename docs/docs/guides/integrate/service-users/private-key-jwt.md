@@ -71,9 +71,13 @@ Make sure to save the key file. You won't be able to retrieve it again.
 If you lose it, you will have to generate a new one.
 :::
 
+:::note Expiration
+If you specify an expiration date, note that the key will expire at midnight that day
+:::
+
 ![Create private key](/img/console_serviceusers_new_key.gif)
 
-The downloaded json should look something like outlined below. The value of `key` contains the *private* key for your service account. Please make sure to keep this key securely stored and handle with care. The public key is automatically stored in ZITADEL.
+The downloaded json should look something like outlined below. The value of `key` contains the _private_ key for your service account. Please make sure to keep this key securely stored and handle with care. The public key is automatically stored in ZITADEL.
 
 ```json
 {
