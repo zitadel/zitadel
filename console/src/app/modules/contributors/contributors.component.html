@@ -30,7 +30,11 @@
         </ng-container>
       </ng-container>
       <ng-template #compact>
-        <div (click)="emitShowDetail()" class="contributor-avatar-circle" matTooltip="Click to show detail">
+        <div
+          (click)="emitShowDetail()"
+          class="contributor-avatar-circle"
+          matTooltip="{{ 'MEMBER.SHOWDETAILS' | translate }}"
+        >
           <span>{{ totalResult }}</span>
         </div>
       </ng-template>
@@ -40,6 +44,7 @@
         (click)="emitAddMember()"
         [disabled]="disabled"
         mat-icon-button
+        matTooltip="{{ 'MEMBER.ADD' | translate }}"
         aria-label="Add member"
         data-e2e="add-member-button"
       >
