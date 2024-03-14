@@ -55,6 +55,21 @@ As an alternative you can add the SAML identity provider through the API, either
 
 ![Add new SAML Application in OKTA](/img/guides/okta_add_saml_app.png)
 
+### Add Attribute Statements
+
+To send the user data from OKTA to ZITADEL you have to add some attribute mappings in your SAML Settings
+You can define the name by yourself, just ensure you use the same later on in the ZITADEL Action we will add.
+
+Add the following three mappings:
+
+| Name         | Name format | Value          |
+| ------------ | ----------- |--------------- |
+| givenname    | Basic       | user.firstName |
+| surname      | Basic       | user.lastName  |
+| emailaddress | Basic       | user.email     |
+
+![Add Attribute Mapping ](/img/guides/okta_saml_attribute_mapping.png)
+
 ### Assign Users to Application
 
 To allow users to authenticate with that app go to the "Assign" Tab.
@@ -88,6 +103,14 @@ You can also fill the optional fields if needed:
 <Activate/>
 
 ![Activate the OKTA Provider](/img/guides/zitadel_activate_okta_saml.png)
+
+### Add Action to map user attributes
+
+<PrefillAction fields="username, firstname, lastname, email and email verified" provider="OKTA"/>
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/okta_saml_prefil_register_form.js
+```
 
 ## Test the setup
 
