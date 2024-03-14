@@ -22,6 +22,41 @@ If you want to start automating the process of onboarding your users and let the
 
 ### Built-in register form
 
+#### Prompt registration form
+
+When users first access your application, they'll typically need to either log in or register.
+By default, redirecting from your application displays the login page.
+
+OpenID Connect (OIDC) allows you to control the initial screen by sending a [prompt](/docs/apis/openidoauth/endpoints#additional-parameters) parameter in the authorization request.
+With the `prompt=create`, the registration form/options will directly be shown to the user.
+You can test the impact of the different prompts on your login UI in our [OIDC Playground](/docs/apis/openidoauth/authrequest).
+
+Per default a user will be registered to the default organization.
+By sending the scope below in your authorization request you can choose the organization to which the user will be added.
+```
+urn:zitadel:iam:org:id:{id}
+```
+
+
+Unfortunately, SAML doesn't offer the same level of control over the initial screen.
+You won't be able to directly influence which page (login or registration) is shown through the SAML flow.
+
+#### Choose Registration Option
+
+If an organization allows local user registration as well as registration with a social or enterprise login, the user can choose an option to register.
+
+As soon as users click the "register" button, they will be presented with a screen showing the different registration options.
+
+<img src="/docs/img/guides/solution-scenarios/register-options.png" alt="Register Options"/>
+
+After that, the user can select either local user registration or an external provider.
+By pressing the button of an external provider, the user will directly be redirected to the provider for consent.
+
+:::info
+The options are dependent on the settings of the organization.
+If only one option is possible, the option will directly be selected and shown.
+:::
+
 #### Local User Registration
 
 To allow users to register themselves, you have to enable the "register allowed" in the login behavior settings.

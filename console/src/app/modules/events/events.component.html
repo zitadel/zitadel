@@ -1,5 +1,10 @@
-<h2>{{ 'IAM.EVENTS.TITLE' | translate }}</h2>
-<p class="events-desc cnsl-secondary-text">{{ 'IAM.EVENTS.DESCRIPTION' | translate }}</p>
+<div class="events-title-row">
+  <h2>{{ 'DESCRIPTIONS.SETTINGS.IAM_EVENTS.TITLE' | translate }}</h2>
+  <a mat-icon-button href="https://zitadel.com/docs/concepts/features/audit-trail" rel="noreferrer" target="_blank">
+    <mat-icon class="icon">info_outline</mat-icon>
+  </a>
+</div>
+<p class="events-desc cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.IAM_EVENTS.DESCRIPTION' | translate }}</p>
 
 <cnsl-refresh-table
   [hideRefresh]="true"

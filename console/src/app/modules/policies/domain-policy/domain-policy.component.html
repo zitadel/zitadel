@@ -2,9 +2,10 @@
   <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
 </div>
 
-<h2>{{ 'POLICY.DOMAIN_POLICY.TITLE' | translate }}</h2>
-<cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
+<h2>{{ 'DESCRIPTIONS.SETTINGS.DOMAINS.TITLE' | translate }}</h2>
+<p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.DOMAINS.DESCRIPTION' | translate }}</p>
 
+<cnsl-info-section *ngIf="isDefault"> {{ 'POLICY.DEFAULTLABEL' | translate }}</cnsl-info-section>
 <button
   *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
   matTooltip="{{ 'POLICY.RESET' | translate }}"
@@ -27,101 +28,113 @@
 </button>
 
 <div class="domain-policy-content" *ngIf="domainData">
-  <div class="row">
-    <mat-checkbox
-      color="primary"
-      name="hasNumber"
-      ngDefaultControl
-      [(ngModel)]="domainData.userLoginMustBeDomain"
-      [disabled]="
-        ([
-          serviceType === PolicyComponentServiceType.ADMIN
-            ? 'iam.policy.write'
-            : serviceType === PolicyComponentServiceType.MGMT
-              ? 'policy.write'
-              : ''
-        ]
-          | hasRole
-          | async) === false
-      "
-    >
-      {{ 'POLICY.DATA.USERLOGINMUSTBEDOMAIN' | translate }}
-    </mat-checkbox>
-  </div>
+  <cnsl-card
+    [title]="'DESCRIPTIONS.SETTINGS.DOMAINS.LOGIN_NAME_PATTERN.TITLE' | translate"
+    [description]="'DESCRIPTIONS.SETTINGS.DOMAINS.LOGIN_NAME_PATTERN.DESCRIPTION' | translate"
+  >
+    <div class="row">
+      <mat-checkbox
+        color="primary"
+        name="hasNumber"
+        ngDefaultControl
+        [(ngModel)]="domainData.userLoginMustBeDomain"
+        [disabled]="
+          ([
+            serviceType === PolicyComponentServiceType.ADMIN
+              ? 'iam.policy.write'
+              : serviceType === PolicyComponentServiceType.MGMT
+                ? 'policy.write'
+                : ''
+          ]
+            | hasRole
+            | async) === false
+        "
+      >
+        {{ 'POLICY.DATA.USERLOGINMUSTBEDOMAIN' | translate }}
+      </mat-checkbox>
+    </div>
 
-  <cnsl-info-section>
-    <div>
-      <span>{{ 'POLICY.DATA.USERLOGINMUSTBEDOMAIN_DESCRIPTION' | translate }}</span>
+    <cnsl-info-section>
+      <div>
+        <span>{{ 'POLICY.DATA.USERLOGINMUSTBEDOMAIN_DESCRIPTION' | translate }}</span>
 
-      <div class="loginname-preview">
-        <div class="left-right">
-          <div *ngIf="domainData.userLoginMustBeDomain"><small>domain</small><span>acme.com</span></div>
-          <div *ngIf="domainData.userLoginMustBeDomain"><small>username</small><span>john</span></div>
-          <div *ngIf="domainData.userLoginMustBeDomain"><small>loginname</small><span>john&#64;acme.com</span></div>
+        <div class="loginname-preview">
+          <div class="left-right">
+            <div *ngIf="domainData.userLoginMustBeDomain"><small>domain</small><span>acme.com</span></div>
+            <div *ngIf="domainData.userLoginMustBeDomain"><small>username</small><span>john</span></div>
+            <div *ngIf="domainData.userLoginMustBeDomain"><small>loginname</small><span>john&#64;acme.com</span></div>
 
-          <div *ngIf="!domainData.userLoginMustBeDomain"><small>domain</small><span>acme.com</span></div>
-          <div *ngIf="!domainData.userLoginMustBeDomain"><small>username</small><span>john&#64;acme.com</span></div>
-          <div *ngIf="!domainData.userLoginMustBeDomain"><small>loginname</small><span>john&#64;acme.com</span></div>
-        </div>
-        <i class="las la-arrow-right"></i>
-        <div class="left-right">
-          <div *ngIf="domainData.userLoginMustBeDomain"><small>domain</small><span>acme.com</span></div>
-          <div *ngIf="domainData.userLoginMustBeDomain"><small>username</small><span>john&#64;acme.com</span></div>
-          <div *ngIf="domainData.userLoginMustBeDomain"><small>loginname</small><span>john&#64;acme.com</span></div>
+            <div *ngIf="!domainData.userLoginMustBeDomain"><small>domain</small><span>acme.com</span></div>
+            <div *ngIf="!domainData.userLoginMustBeDomain"><small>username</small><span>john&#64;acme.com</span></div>
+            <div *ngIf="!domainData.userLoginMustBeDomain"><small>loginname</small><span>john&#64;acme.com</span></div>
+          </div>
+          <i class="las la-arrow-right"></i>
+          <div class="left-right">
+            <div *ngIf="domainData.userLoginMustBeDomain"><small>domain</small><span>acme.com</span></div>
+            <div *ngIf="domainData.userLoginMustBeDomain"><small>username</small><span>john&#64;acme.com</span></div>
+            <div *ngIf="domainData.userLoginMustBeDomain"><small>loginname</small><span>john&#64;acme.com</span></div>
 
-          <div *ngIf="!domainData.userLoginMustBeDomain"><small>domain</small><span>acme.com</span></div>
-          <div *ngIf="!domainData.userLoginMustBeDomain"><small>username</small><span>john</span></div>
-          <div *ngIf="!domainData.userLoginMustBeDomain"><small>loginname</small><span>john&#64;acme.com</span></div>
+            <div *ngIf="!domainData.userLoginMustBeDomain"><small>domain</small><span>acme.com</span></div>
+            <div *ngIf="!domainData.userLoginMustBeDomain"><small>username</small><span>john</span></div>
+            <div *ngIf="!domainData.userLoginMustBeDomain"><small>loginname</small><span>john&#64;acme.com</span></div>
+          </div>
         </div>
       </div>
+    </cnsl-info-section>
+  </cnsl-card>
+  <cnsl-card
+    [title]="'DESCRIPTIONS.SETTINGS.DOMAINS.DOMAIN_VERIFICATION.TITLE' | translate"
+    [description]="'DESCRIPTIONS.SETTINGS.DOMAINS.DOMAIN_VERIFICATION.DESCRIPTION' | translate"
+  >
+    <div class="row">
+      <mat-checkbox
+        color="primary"
+        name="hasNumber"
+        ngDefaultControl
+        [(ngModel)]="domainData.validateOrgDomains"
+        [disabled]="
+          ([
+            serviceType === PolicyComponentServiceType.ADMIN
+              ? 'iam.policy.write'
+              : serviceType === PolicyComponentServiceType.MGMT
+                ? 'policy.write'
+                : ''
+          ]
+            | hasRole
+            | async) === false
+        "
+      >
+        {{ 'POLICY.DATA.VALIDATEORGDOMAINS' | translate }}
+      </mat-checkbox>
     </div>
-  </cnsl-info-section>
-
-  <div class="row">
-    <mat-checkbox
-      color="primary"
-      name="hasNumber"
-      ngDefaultControl
-      [(ngModel)]="domainData.validateOrgDomains"
-      [disabled]="
-        ([
-          serviceType === PolicyComponentServiceType.ADMIN
-            ? 'iam.policy.write'
-            : serviceType === PolicyComponentServiceType.MGMT
-              ? 'policy.write'
-              : ''
-        ]
-          | hasRole
-          | async) === false
-      "
-    >
-      {{ 'POLICY.DATA.VALIDATEORGDOMAINS' | translate }}
-    </mat-checkbox>
-  </div>
-
-  <div class="row">
-    <mat-checkbox
-      color="primary"
-      name="hasNumber"
-      ngDefaultControl
-      [(ngModel)]="domainData.smtpSenderAddressMatchesInstanceDomain"
-      [disabled]="
-        ([
-          serviceType === PolicyComponentServiceType.ADMIN
-            ? 'iam.policy.write'
-            : serviceType === PolicyComponentServiceType.MGMT
-              ? 'policy.write'
-              : ''
-        ]
-          | hasRole
-          | async) === false
-      "
-    >
-      {{ 'POLICY.DATA.SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN' | translate }}
-    </mat-checkbox>
-  </div>
+  </cnsl-card>
+  <cnsl-card
+    [title]="'DESCRIPTIONS.SETTINGS.DOMAINS.SMTP_SENDER_ADDRESS.TITLE' | translate"
+    [description]="'DESCRIPTIONS.SETTINGS.DOMAINS.SMTP_SENDER_ADDRESS.DESCRIPTION' | translate"
+  >
+    <div class="row">
+      <mat-checkbox
+        color="primary"
+        name="hasNumber"
+        ngDefaultControl
+        [(ngModel)]="domainData.smtpSenderAddressMatchesInstanceDomain"
+        [disabled]="
+          ([
+            serviceType === PolicyComponentServiceType.ADMIN
+              ? 'iam.policy.write'
+              : serviceType === PolicyComponentServiceType.MGMT
+                ? 'policy.write'
+                : ''
+          ]
+            | hasRole
+            | async) === false
+        "
+      >
+        {{ 'POLICY.DATA.SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN' | translate }}
+      </mat-checkbox>
+    </div>
+  </cnsl-card>
 </div>
-
 <div class="btn-container">
   <button
     (click)="savePolicy()"
