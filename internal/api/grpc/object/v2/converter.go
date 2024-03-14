@@ -27,7 +27,6 @@ func ToListDetails(response query.SearchResponse) *object.ListDetails {
 		TotalResult:       response.Count,
 		ProcessedSequence: response.Sequence,
 		Timestamp:         timestamppb.New(response.EventCreatedAt),
-		Position:          uint64(response.Position),
 	}
 
 	return details

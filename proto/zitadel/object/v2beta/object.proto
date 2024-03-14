@@ -96,11 +96,6 @@ message ListDetails {
       description: "the last time the projection got updated"
     }
   ];
-  uint64 position = 4 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"267831\"";
-    }
-  ];
 }
 
 enum TextQueryMethod {
