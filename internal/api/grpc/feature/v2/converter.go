@@ -13,6 +13,7 @@ func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) *command.
 		LoginDefaultOrg:                 req.LoginDefaultOrg,
 		TriggerIntrospectionProjections: req.OidcTriggerIntrospectionProjections,
 		LegacyIntrospection:             req.OidcLegacyIntrospection,
+		UserSchema:                      req.UserSchema,
 	}
 }
 
@@ -22,6 +23,7 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		LoginDefaultOrg:                     featureSourceToFlagPb(&f.LoginDefaultOrg),
 		OidcTriggerIntrospectionProjections: featureSourceToFlagPb(&f.TriggerIntrospectionProjections),
 		OidcLegacyIntrospection:             featureSourceToFlagPb(&f.LegacyIntrospection),
+		UserSchema:                          featureSourceToFlagPb(&f.UserSchema),
 	}
 }
 
@@ -30,6 +32,7 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) *comm
 		LoginDefaultOrg:                 req.LoginDefaultOrg,
 		TriggerIntrospectionProjections: req.OidcTriggerIntrospectionProjections,
 		LegacyIntrospection:             req.OidcLegacyIntrospection,
+		UserSchema:                      req.UserSchema,
 	}
 }
 
@@ -39,6 +42,7 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		LoginDefaultOrg:                     featureSourceToFlagPb(&f.LoginDefaultOrg),
 		OidcTriggerIntrospectionProjections: featureSourceToFlagPb(&f.TriggerIntrospectionProjections),
 		OidcLegacyIntrospection:             featureSourceToFlagPb(&f.LegacyIntrospection),
+		UserSchema:                          featureSourceToFlagPb(&f.UserSchema),
 	}
 }
 
