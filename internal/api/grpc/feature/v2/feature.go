@@ -3,13 +3,10 @@ package feature
 import (
 	"context"
 
-	"github.com/zitadel/logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	"github.com/zitadel/zitadel/internal/query/projection"
 	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 )
 
@@ -46,9 +43,6 @@ func (s *Server) SetInstanceFeatures(ctx context.Context, req *feature.SetInstan
 	if err != nil {
 		return nil, err
 	}
-	_, err = projection.InstanceFeatureProjection.Trigger(ctx, handler.WithAwaitRunning())
-	logging.OnError(err).Warn("trigger instance feature projection")
-
 	return &feature.SetInstanceFeaturesResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
@@ -59,8 +53,6 @@ func (s *Server) ResetInstanceFeatures(ctx context.Context, req *feature.ResetIn
 	if err != nil {
 		return nil, err
 	}
-	_, err = projection.InstanceFeatureProjection.Trigger(ctx, handler.WithAwaitRunning())
-	logging.OnError(err).Warn("trigger instance feature projection")
 	return &feature.ResetInstanceFeaturesResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
