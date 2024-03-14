@@ -490,6 +490,14 @@ service ManagementService {
                     description: "OK";
                 }
             };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -512,6 +520,14 @@ service ManagementService {
                 value: {
                     description: "OK";
                 }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
             };
         };
     }
@@ -536,6 +552,14 @@ service ManagementService {
                     description: "OK";
                 }
             };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -558,6 +582,14 @@ service ManagementService {
                 value: {
                     description: "OK";
                 }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
             };
         };
     }
@@ -582,6 +614,14 @@ service ManagementService {
                     description: "OK";
                 }
             };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -603,6 +643,14 @@ service ManagementService {
                 value: {
                     description: "OK";
                 }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
             };
         };
     }
@@ -626,6 +674,14 @@ service ManagementService {
                 value: {
                     description: "OK";
                 }
+            };
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get a user from another organization include the header. Make sure the requesting user has permission in the requested organization.";
+                    type: STRING,
+                    required: false;
+                };
             };
         };
     }
