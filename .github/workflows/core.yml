@@ -38,7 +38,7 @@ jobs:
       cache_path: ${{ env.cache_path }}
     steps:
         - 
-          uses: actions/checkout@v3
+          uses: actions/checkout@v4
         - 
           uses: actions/cache/restore@v4
           timeout-minutes: 1
