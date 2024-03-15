@@ -1,0 +1,16 @@
+<div class="row">
+  <div class="item aside cnsl-secondary-text" [ngStyle]="{minWidth: labelMinWidth}">{{ label }}</div>
+  <button
+    class="item section"
+    [disabled]="copied === value"
+    [matTooltip]="(copied !== value ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
+    cnslCopyToClipboard
+    [valueToCopy]="value"
+    (copiedValue)="copied = $event"
+  >
+    {{ value }}
+  </button>
+  <div class="item aside">
+    <ng-content></ng-content>
+  </div>
+</div>

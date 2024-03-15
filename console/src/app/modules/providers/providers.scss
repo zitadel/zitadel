@@ -5,23 +5,6 @@
   $button-text-color: map-get($foreground, text);
   $button-disabled-text-color: map-get($foreground, disabled-button);
 
-.copy-url-button {
-  transition: opacity 0.15s ease-in-out;
-  background-color: #8795a110;
-  border: 1px solid #8795a160;
-  border-radius: 4px;
-  padding: 0.25rem 1rem;
-  margin: 0.25rem 0;
-  color: $button-text-color;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  cursor: copy;
-
-  &[disabled] {
-    color: $button-disabled-text-color;
-  }
-  }
-
   .identity-provider-desc {
     font-size: 14px;
   }

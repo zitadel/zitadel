@@ -466,7 +466,8 @@
     },
     "TABLE": {
       "SHOWUSER": "Pokaż użytkownika {{value}}"
-    }
+    },
+    "DOWNLOAD": "Pobierz"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Ma kontrolę nad całą instancją, włącznie z wszystkimi organizacjami",

@@ -90,8 +90,6 @@ export class EnvironmentService {
   }
 
   public get externalIDPCallbackUrl(): Observable<string> {
-    return this.env.pipe(
-      map((env) => `${env.issuer}/ui/login/login/externalidp/callback`),
-    );
+    return this.env.pipe(map((env) => `${env.issuer}/ui/login/login/externalidp/callback`));
   }
 }

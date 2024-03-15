@@ -7,7 +7,7 @@ import { ManagementService } from '../../../services/mgmt.service';
 import { AdminService } from '../../../services/admin.service';
 import { ToastService } from '../../../services/toast.service';
 import { GrpcAuthService } from '../../../services/grpc-auth.service';
-import {BehaviorSubject, Observable, switchMap, take} from 'rxjs';
+import { BehaviorSubject, Observable, switchMap, take } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from '../../../services/breadcrumb.service';
 import { atLeastOneIsFilled, requiredValidator } from '../../form-field/validators/validators';
@@ -21,9 +21,15 @@ import {
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
   UpdateSAMLProviderRequest as MgmtUpdateSAMLProviderRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import {EnvironmentService} from "../../../services/environment.service";
-import {map} from "rxjs/operators";
-import {HttpClient} from "@angular/common/http";
+import { EnvironmentService } from '../../../services/environment.service';
+import { map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+
+interface CopyRow {
+  label: string;
+  url: string;
+  downloadable?: boolean;
+}
 
 @Component({
   selector: 'cnsl-provider-saml-sp',
@@ -39,10 +45,8 @@ export class ProviderSamlSpComponent {
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
-  public metadataUrlCopied: string = "";
-  public metadataXmlCopied: string = "";
-  public metadataUrl$: Observable<string>;
-  public metadataXml$: Observable<string>;
+  public metadataUrlCopied: string = '';
+  public copyRows$: Observable<CopyRow[]>;
 
   bindingValues: string[] = Object.keys(SAMLBinding);
 
@@ -57,17 +61,29 @@ export class ProviderSamlSpComponent {
     private http: HttpClient,
   ) {
     this._buildBreadcrumbs();
-    if(!this.id) {
-      this.metadataXml$ = new Observable<string>();
-      this.metadataUrl$ = new Observable<string>();
-      return
+    if (!this.id) {
+      this.copyRows$ = new Observable<CopyRow[]>();
+      return;
     }
-    this.metadataUrl$ = this.envSvc.env.pipe(
+    this.copyRows$ = this.envSvc.env.pipe(
       take(1),
-      map(env => `${env.issuer}/idps/${this.id}/saml/metadata`),
-    );
-    this.metadataXml$ = this.metadataUrl$.pipe(
-      switchMap(url => this.http.get(url, {responseType: 'text'})),
+      map((env) => {
+        const idpBase = `${env.issuer}/idps/${this.id}/saml`;
+        return [{
+          label: 'ZITADEL Metadata',
+          url: `${idpBase}/metadata`,
+          downloadable: true,
+        }, {
+          label: 'ZITADEL ACS Intent',
+          url: `${idpBase}/acs`,
+        }, {
+          label: 'ZITADEL ACS Login Screen',
+          url: `${env.issuer}/ui/login/login/externalidp/saml/acs`,
+        }, {
+          label: 'ZITADEL Logout',
+          url: `${idpBase}/acs`,
+        }];
+      }),
     );
     this._initializeForm();
     this._checkFormPermissions();

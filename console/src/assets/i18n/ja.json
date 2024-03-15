@@ -467,7 +467,8 @@
     },
     "TABLE": {
       "SHOWUSER": "ユーザー {{value}} を表示する"
-    }
+    },
+    "DOWNLOAD": "ダウンロード"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "すべての組織を含むインスタンス全体を管理する権限を持ちます",

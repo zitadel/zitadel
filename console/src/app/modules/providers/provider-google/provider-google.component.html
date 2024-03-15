@@ -12,21 +12,23 @@
     <cnsl-card
       title="Configure Google (TRANSLATE)"
       description="Copy this URL and allow Google to redirect your users back here after they have authenticated. (TRANSLATE)"
+      *ngIf="env.externalIDPCallbackUrl | async as callbackUrl"
     >
-      <label>
-        ZITADEL Callback URL
-        <button
-          *ngIf="(env.externalIDPCallbackUrl | async) as callbackUrl"
-          class="copy-url-button"
-          [disabled]="copied === callbackUrl"
-          [matTooltip]="(copied !== callbackUrl ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
-          cnslCopyToClipboard
-          [valueToCopy]="callbackUrl"
-          (copiedValue)="copied = $event"
+      <cnsl-copy-row label="ZITADEL Callback URL" value="callbackUrl"></cnsl-copy-row>
+      <cnsl-card
+        title="Autofill user data (TRANSLATE)"
+        description="Use an Action to improve your users experience. You can pre-fill ZITADELs registration form with values they already submitted to Google. (TRANSLATE)"
+      >
+        <a
+          card-actions
+          mat-icon-button
+          href="https://zitadel.com/docs/guides/integrate/identity-providers/additional-information"
+          rel="noreferrer"
+          target="_blank"
         >
-          {{ callbackUrl }}
-        </button>
-      </label>
+          <mat-icon class="icon">info_outline</mat-icon>
+        </a>
+      </cnsl-card>
     </cnsl-card>
 
     <p class="identity-provider-desc cnsl-secondary-text">

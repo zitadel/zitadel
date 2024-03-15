@@ -4,7 +4,7 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import {Observable, take} from 'rxjs';
+import { Observable, take } from 'rxjs';
 import {
   AddGoogleProviderRequest as AdminAddGoogleProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -24,8 +24,8 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
-import {EnvironmentService} from "../../../services/environment.service";
-import {map} from "rxjs/operators";
+import { EnvironmentService } from '../../../services/environment.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'cnsl-provider-google',

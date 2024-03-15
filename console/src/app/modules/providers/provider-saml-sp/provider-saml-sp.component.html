@@ -9,43 +9,36 @@
       <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
     </div>
 
-    <cnsl-card
-      *ngIf="provider"
-      title="Configure Your SAML Provider (TRANSLATE)"
-      description="Copy the metadata link or the resolved ZITADEL metadata XML and upload it to your SAML service provider. (TRANSLATE, DOES THE XML CHANGE WHEN THE PROVIDER IS RECONFIGURED?)"
-    >
-      <label *ngIf="metadataUrl$ | async as metadataUrl">
-        ZITADEL Metadata URL
-        <button
-          class="copy-url-button"
-          [disabled]="metadataUrlCopied === metadataUrl"
-          [matTooltip]="(metadataUrlCopied !== metadataUrl ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
-          cnslCopyToClipboard
-          [valueToCopy]="metadataUrl"
-          (copiedValue)="metadataUrlCopied = $event"
+    <div *ngIf="provider">
+      <cnsl-card
+        title="Configure Your SAML Identity Provider (TRANSLATE)"
+        description="ZITADEL is configured. Now your SAML Identity Provider needs some configuration. Most providers allow you to just upload the whole ZITADEL metadata XML. Other providers ask you to provide some distict URLs only, like for example the Entity ID, the ACS URL or the Logout URL. (TRANSLATE)"
+        *ngIf="copyRows$ | async as copyRows"
+      >
+        <cnsl-copy-row *ngFor="let row of copyRows" [label]="row.label" [value]="row.url" labelMinWidth="200px">
+          <a *ngIf="row.downloadable" class="download-button" mat-stroked-button [href]="row.url" download>{{
+            'ACTIONS.DOWNLOAD' | translate
+          }}</a>
+        </cnsl-copy-row>
+      </cnsl-card>
+      <cnsl-card
+        title="Autofill user data (TRANSLATE)"
+        description="Use an Action to improve your users experience. You can pre-fill ZITADELs registration form with values they already submitted to the SAML identity provider. (TRANSLATE)"
+      >
+        <a
+          card-actions
+          mat-icon-button
+          href="https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml#optional-add-zitadel-action-to-autofill-userdata"
+          rel="noreferrer"
+          target="_blank"
         >
-          {{ metadataUrl }}
-        </button>
-      </label>
-      <label *ngIf="metadataXml$ | async as metadataXml">
-        ZITADEL Metadata XML
-        <button
-          class="copy-url-button"
-          [disabled]="metadataXmlCopied === metadataXml"
-          [matTooltip]="(metadataXmlCopied !== metadataXml ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
-          cnslCopyToClipboard
-          [valueToCopy]="metadataXml"
-          (copiedValue)="metadataXmlCopied = $event"
-        >
-          <pre>{{ metadataXml }}</pre>
-        </button>
-      </label>
-    </cnsl-card>
+          <mat-icon class="icon">info_outline</mat-icon>
+        </a>
+      </cnsl-card>
+    </div>
 
     <p class="identity-provider-desc cnsl-secondary-text">
       {{ !provider ? ('IDP.CREATE.SAML.DESCRIPTION' | translate) : ('IDP.DETAIL.DESCRIPTION' | translate) }}
-
-      <a href="https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml#optional-add-zitadel-action-to-autofill-userdata>">Add an Action to map fields to users (TRANSLATE, STYLE)</a>
     </p>
 
     <form [formGroup]="form" (ngSubmit)="submitForm()">
