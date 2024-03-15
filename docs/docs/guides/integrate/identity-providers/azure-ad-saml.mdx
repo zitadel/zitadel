@@ -78,7 +78,7 @@ Now we configure the identity provider on ZITADEL.
 
 ![Activate Azure SAML Provider](/img/guides/zitadel_activate_azure_saml.png)
 
-### Configure Basic SAML Configuration
+## Configure Basic SAML Configuration
 
 Now we set the links in Microsoft Entra
 
@@ -109,7 +109,7 @@ Click **Microsoft Entra**
 
 ### Add Action to map user attributes
 
-<PrefillAction fields="username, firstname, lastname, displayname, email and email verified" provider="OKTA"/>
+<PrefillAction fields="username, firstname, lastname, displayname, email and email verified" provider="Entra"/>
 
 ```js reference
 https://github.com/zitadel/actions/blob/main/examples/entra_id_saml_prefil_register_form.js
