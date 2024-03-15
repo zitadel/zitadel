@@ -6,7 +6,7 @@ sidebar_position: 3
 
 This guide demonstrates how developers can leverage Client Credential authentication to secure communication between [service users](/concepts/structure/users) and client applications within ZITADEL.
 
-In ZITADEL, the Client Credentials grant can be used for this [non-interactive authentication](authenticate-service-users) as alternative to the [JWT profile authentication](serviceusers).
+In ZITADEL, the Client Credentials Flow can be used for this [non-interactive authentication](authenticate-service-users) as alternative to the [JWT profile authentication](serviceusers).
 
 ## Steps to authenticate a Service User with client credentials
 
@@ -38,11 +38,11 @@ curl --request POST \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header 'Authorization: Basic ${BASIC_AUTH}' \
   --data grant_type=client_credentials \
-  --data scope='openid profile email'
+  --data scope='openid profile'
 ```
 
 * `grant_type` should be set to `client_credentials`
-* `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`, `email`
+* `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`
 
 If you want to access ZITADEL APIs, make sure to include the required scopes `urn:zitadel:iam:org:project:id:zitadel:aud`.
 Read our guide [how to access ZITADEL APIs](../zitadel-apis/) to learn more.

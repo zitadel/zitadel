@@ -28,7 +28,7 @@ For further details and in-depth exploration, you can refer to the [ZITADEL API 
 Accessing ZITADEL APIs, except for the Auth API and the System API, requires these basic steps:
 
 1. **Create a service user**: A service user is a special type of account used to grant programmatic access to ZITADEL's functionalities. Unlike regular users who log in with a username and password, [service users rely on a more secure mechanism involving digital keys and tokens](../service-users/authenticate-service-users).
-2. **Give permission to access ZITADEL APIs**: Assign a Manager role to the service  user, giving it permission to make changes to certain resources in ZITADEL.
+2. **Give permission to access ZITADEL APIs**: Assign a Manager role to the service user, giving it permission to make changes to certain resources in ZITADEL.
 3. **Authenticate the service user**: Like human users, service users must authenticate and request a OAuth token with the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to access ZITADEL APIs. [Service users can be authenticated](../service-users/authenticate-service-users) using private key JWT, client credentials, or personal access token.
 4. **Access ZITADEL APIs with the token**: The OAuth token must be included in the Authorization Header of calls to ZITADEL APIs.
 
@@ -112,14 +112,14 @@ curl --request POST \
   --url $CUSTOM-DOMAIN/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
-  --data scope='openid profile email urn:zitadel:iam:org:project:id:zitadel:aud' \
+  --data scope='openid profile urn:zitadel:iam:org:project:id:zitadel:aud' \
   --data assertion=eyJ0eXAiOiJKV1QiL...
 ```
 
 where 
 
 - `grant_type` must be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
-- `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid` and `urn:zitadel:iam:org:project:id:zitadel:aud` to acces the ZITADEL APIs. For this example include `profile` and `email`.
+- `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid` and `urn:zitadel:iam:org:project:id:zitadel:aud` to acces the ZITADEL APIs. For this example include `profile`.
 - `assertion` is the encoded value of the JWT that was signed with your private key from the prior step
 
 You should receive a successful response with `access_token`, `token_type` and time to expiry in seconds as `expires_in`.
@@ -185,13 +185,13 @@ curl --request POST \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header 'Authorization: Basic ${BASIC_AUTH}' \
   --data grant_type=client_credentials \
-  --data scope='openid profile email urn:zitadel:iam:org:project:id:zitadel:aud'
+  --data scope='openid profile urn:zitadel:iam:org:project:id:zitadel:aud'
 ```
 
 where
 
 * `grant_type` should be set to `client_credentials`
-* `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`, `email`
+* `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`
   and `urn:zitadel:iam:org:project:id:zitadel:aud`. The latter provides access to the ZITADEL API.
 
 You should receive a successful response with `access_token`,  `token_type` and time to expiry in seconds as `expires_in`.

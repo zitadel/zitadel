@@ -65,7 +65,7 @@ Follow our guide on using [private key JWT client authentication](./private-key-
 
 #### Security considerations when using private key JWT authentication
 
-* **Secure Key Storage:**  The private key used for signing must be stored with the highest level of security. Compromise could allow attackers to forge tokens.
+* **Secure Key Storage:** The private key used for signing must be stored with the highest level of security. Compromise could allow attackers to forge tokens.
 * **Short Expirations:** Implementing short expiration durations for JWTs helps limit the impact of stolen tokens.
 
 ### Client credentials grant
@@ -83,7 +83,6 @@ This method is still available in ZITADEL but generally considered less secure t
 ### Personal Access Tokens (PATs)
 
 * **Ready-to-use tokens:** Generated for specific service users and can be directly included in the authorization header of API requests.
-* **Granular access control:** Can be configured with specific scopes to limit access to defined resources.
 * **Currently available only for machine users** (service users) and not regular human users.
 
 Follow our guide on using [personal access tokens](./personal-access-token) to get started authenticating service users and clients.
@@ -91,7 +90,6 @@ Follow our guide on using [personal access tokens](./personal-access-token) to g
 PAT offer some benefits, such as:
 
 * **Ease of Use:** Ready-to-use tokens, eliminating the need for complex signing logic.
-* **Granular Scopes:** Can be configured with specific access permissions.
 
 However, PATs also come with limitations:
 
@@ -100,7 +98,7 @@ However, PATs also come with limitations:
 
 ## Using Service Users
 
-1. **Creation:** Access the ZITADEL administrative console and create a new service user. Assign a descriptive name that reflects its purpose. Follow our detailed guide on [how to create service users](../../manage/console/users).
+1. **Creation:** Access the ZITADEL management console and create a new service user. Assign a descriptive name that reflects its purpose. Follow our detailed guide on [how to create service users](../../manage/console/users).
 2. **Credentials:** Choose your preferred authentication method (JWT or Client Credentials) and securely store the generated credentials (private key, client secret).
 3. **Making API Calls:** When your service needs to make an API call:
     * **For JWT:** Generate and sign a JWT. Include it in the "Authorization" header of your API request.

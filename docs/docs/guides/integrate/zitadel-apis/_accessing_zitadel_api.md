@@ -11,13 +11,13 @@ curl --request POST \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header 'Authorization: Basic ${BASIC_AUTH}' \
   --data grant_type=client_credentials \
-  --data scope='openid profile email urn:zitadel:iam:org:project:id:zitadel:aud'
+  --data scope='openid urn:zitadel:iam:org:project:id:zitadel:aud'
 ```
 
 If you want to access the ZITADEL API with this access token, you have to add `urn:zitadel:iam:org:project:id:zitadel:aud` to the list of scopes.
 
 * `grant_type` should be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
-* `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile` and `email`
+* `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid` and `urn:zitadel:iam:org:project:id:zitadel:aud`
 * `assertion` is the encoded value of the JWT that was signed with your private key from the prior step
 
 You should receive a successful response with `access_token`,  `token_type` and time to expiry in seconds as `expires_in`.

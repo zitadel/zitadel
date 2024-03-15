@@ -54,16 +54,6 @@ curl --request GET \
   --header 'Authorization: Bearer {PAT}' 
 ```
 
-## Accessing ZITADEL APIs
-
-You might want to access ZITADEL APIs to manage resources, such as users, or to validate tokens sent to your backend service.
-Follow our guides on [how to access ZITADEL API](../zitadel-apis/access-zitadel-apis) to use the ZITADEL APIs with your service user.
-
-### Token introspection
-
-Your API endpoint might receive tokens from users and need to validate the token with ZITADEL.
-In this case your API needs to authenticate with ZITADEL and then do a token introspection.
-Follow our [guide on token introspection with private key JWT](../token-introspection/private-key-jwt) to learn more.
 
 ## Client application authentication
 
