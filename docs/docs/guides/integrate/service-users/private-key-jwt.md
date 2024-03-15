@@ -23,25 +23,8 @@ Read more about the [different authentication methods for service users](authent
 9. Resource Owner calls a Resource Server by including the access_token in the Header
 10. Resource Server validates the JWT with [token introspection](../token-introspection/)
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Admin AS Admin<br/>(Manager User)
-    participant ServiceUser AS Resource Owner<br/>(Client on-behalf<br/>of service user)
-    participant ZITADEL AS Authorization Server<br/>(ZITADEL)
-    participant RS AS Resource Server<br/>(API)
-    Admin->>ZITADEL: Generate private/public key (API or Console)
-    ZITADEL->>ZITADEL: Store public key
-    ZITADEL-->>Admin: private key
-    Admin->>ServiceUser: Configure with private key
-    ServiceUser->>ServiceUser: Generate JWT assertion with private key:<br /> payload (sub: serviceUser ID) x private key
-    ServiceUser->>+ZITADEL: Token request with the JWT as Client assertion
-    Note over ServiceUser,ZITADEL: POST /token HTTP/1.1 <br />...<br />client_assertion_type=urn:ietf:...:grant-type:jwt-bearer<br />client_assertion=eyJ....(JWT token)
-    ZITADEL->>ZITADEL: validate signature using service user's public key
-    ZITADEL->>+ServiceUser: Provide OAuth access_token
-    ServiceUser->>RS: Call API with access_token As Authorization Header
-    RS-->>ZITADEL: Token introspection
-```
+![private key jwt authentication sequence diagram](/img/guides/integrate/service-users/sequence-private-key-jwt.svg)
+
 
 ## Prerequisites
 
