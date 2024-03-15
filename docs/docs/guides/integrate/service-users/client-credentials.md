@@ -6,7 +6,7 @@ sidebar_position: 3
 
 This guide demonstrates how developers can leverage Client Credential authentication to secure communication between [service users](/concepts/structure/users) and client applications within ZITADEL.
 
-In ZITADEL, the Client Credentials Flow can be used for this [non-interactive authentication](authenticate-service-users) as alternative to the [JWT profile authentication](serviceusers).
+In ZITADEL, the Client Credentials Flow can be used for this [non-interactive authentication](authenticate-service-users) as alternative to the [JWT profile authentication](../service-users/authenticate-service-users).
 
 ## Steps to authenticate a Service User with client credentials
 
@@ -45,7 +45,7 @@ curl --request POST \
 * `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`
 
 If you want to access ZITADEL APIs, make sure to include the required scopes `urn:zitadel:iam:org:project:id:zitadel:aud`.
-Read our guide [how to access ZITADEL APIs](../zitadel-apis/) to learn more.
+Read our guide [how to access ZITADEL APIs](../zitadel-apis/access-zitadel-apis) to learn more.
 
 You should receive a successful response with `access_token`,  `token_type` and time to expiry in seconds as `expires_in`.
 
@@ -94,5 +94,5 @@ By following these steps and adhering to security best practices, you can effect
 * Read about the [different methods to authenticate service users](./authenticate-service-users)
 * [Service User API reference](/docs/category/apis/resources/mgmt/user-machine)
 * [OIDC client secret basic](/docs/apis/openidoauth/authn-methods#client-secret-basic) authentication method reference
-* [Access ZITADEL APIs](../zitadel-apis/)
+* [Access ZITADEL APIs](../zitadel-apis/access-zitadel-apis)
 * Validate access tokens with [token introspection with basic auth](../token-introspection/basic-auth)

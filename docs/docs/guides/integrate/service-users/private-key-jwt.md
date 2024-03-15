@@ -155,7 +155,7 @@ curl --request POST \
 * `assertion` is the encoded value of the JWT that was signed with your private key from the prior step
 
 If you want to access ZITADEL APIs, make sure to include the required scopes `urn:zitadel:iam:org:project:id:zitadel:aud`.
-Read our guide [how to access ZITADEL APIs](../zitadel-apis/) to learn more.
+Read our guide [how to access ZITADEL APIs](../zitadel-apis/access-zitadel-apis) to learn more.
 
 You should receive a successful response with `access_token`,  `token_type` and time to expiry in seconds as `expires_in`.
 

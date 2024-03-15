@@ -8,7 +8,7 @@ This guide explains what ZITADEL APIs are and how to access ZITADEL APIs using a
 
 ZITADEL exposes a variety of APIs that allow you to interact with its functionalities programmatically.
 These APIs are offered through different protocols including gRPC and REST.
-Additionally, ZITADEL provides [SDKs for popular languages](../../../sdk-examples/) and frameworks to simplify integration.
+Additionally, ZITADEL provides [SDKs for popular languages](/docs/sdk-examples/introduction) and frameworks to simplify integration.
 
 Here's a breakdown of some key points about ZITADEL APIs:
 
@@ -234,4 +234,4 @@ curl --request GET \
 - [Example application in Go](./example-zitadel-api-with-go) to access ZITADEL APIs
 - [Example application in .NET](./example-zitadel-api-with-dot-net) to access ZITADEL APIs
 - Learn how to use the [Event API](./event-api) to retrieve your audit trail
-- Read about the [different methods to authenticate service users](./authenticate-service-users)
+- Read about the [different methods to authenticate service users](../service-users/authenticate-service-users)

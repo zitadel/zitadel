@@ -28,7 +28,7 @@ Manage authorization for service users separately from human users, providing an
 
 Service users offer a secure way to authenticate and access various API endpoints and protected backend services.
 
-You can [use service users to access ZITADEL APIs](../zitadel-apis/), follow the guides to learn how to access the different ZITADEL APIs.
+You can [use service users to access ZITADEL APIs](../zitadel-apis/access-zitadel-apis), follow the guides to learn how to access the different ZITADEL APIs.
 While you can define the scopes and required information in your requests for your applications API endpoints, when using the ZITADEL APIs, you must include the scope `urn:zitadel:iam:org:project:id:zitadel:aud` to gain access.
 
 ### Improved auditability
@@ -129,7 +129,7 @@ However, [client credentials authentication](./client-credentials.md) might be c
 * Read about the [different methods to authenticate service users](./authenticate-service-users)
 * [Service User API reference](/docs/category/apis/resources/mgmt/user-machine)
 * [OIDC JWT with private key](/docs/apis/openidoauth/authn-methods#jwt-with-private-key) authentication method reference
-* [Access ZITADEL APIs](../zitadel-apis/)
+* [Access ZITADEL APIs](../zitadel-apis/access-zitadel-apis)
 * Validate access tokens with [token introspection with private key jwt](../token-introspection/private-key-jwt.mdx)
 
 import DocCardList from '@theme/DocCardList';
