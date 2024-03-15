@@ -178,9 +178,9 @@ If you want to ensure that the data of a user are always update you can automati
 - External Authentication
   - [Post Authentication](./external-authentication#post-authentication)
 
-### Fields provided by Okta
+### Fields provided by Okta as OIDC IdP
 
-If you use [Okta as an identity provider](/guides/integrate/identity-providers/okta) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+If you use [Okta as an identity provider](/guides/integrate/identity-providers/okta-oidc) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
 
 <details open="">
 <summary>Code example</summary>
@@ -226,6 +226,32 @@ If you use a [generic OIDC identity provider](/guides/integrate/identity-provide
 
 ```js reference
 https://github.com/zitadel/actions/blob/main/examples/set_idp_picture_metadata.js
+```
+
+</details>
+
+### Attributes provided by Okta as SAML IDP
+
+If you use [Okta as an identity provider](/guides/integrate/identity-providers/okta-saml#add-attribute-statements) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+
+<details open="">
+<summary>Code example</summary>
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/okta_saml_prefil_register_form.js
+```
+
+</details>
+
+### Attributes provided by Microsoft Entra as SAML IDP
+
+If you use [Microsoft Entra as SAML identity provider](/guides/integrate/identity-providers/azure-ad-saml) you can improve the onboarding experience of new users by prefilling some basic information during authentication.
+
+<details open="">
+<summary>Code example</summary>
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/entra_id_saml_prefil_register_form.js
 ```
 
 </details>
