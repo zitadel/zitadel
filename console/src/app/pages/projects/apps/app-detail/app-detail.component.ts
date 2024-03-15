@@ -105,6 +105,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     OIDCGrantType.OIDC_GRANT_TYPE_IMPLICIT,
     OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE,
     OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN,
+    OIDCGrantType.OIDC_GRANT_TYPE_TOKEN_EXCHANGE,
   ];
   public oidcAppTypes: OIDCAppType[] = [
     OIDCAppType.OIDC_APP_TYPE_WEB,
@@ -307,6 +308,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               this.breadcrumbService.setBreadcrumb(breadcrumbs);
 
               if (this.app.oidcConfig) {
+                console.log(this.app.oidcConfig)
                 this.getAuthMethodOptions('OIDC');
 
                 if (
