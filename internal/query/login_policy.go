@@ -30,8 +30,8 @@ type LoginPolicy struct {
 	AllowExternalIDPs          bool
 	ForceMFA                   bool
 	ForceMFALocalOnly          bool
-	SecondFactors              database.Array[domain.SecondFactorType]
-	MultiFactors               database.Array[domain.MultiFactorType]
+	SecondFactors              database.NumberArray[domain.SecondFactorType]
+	MultiFactors               database.NumberArray[domain.MultiFactorType]
 	PasswordlessType           domain.PasswordlessType
 	IsDefault                  bool
 	HidePasswordReset          bool
@@ -50,12 +50,12 @@ type LoginPolicy struct {
 
 type SecondFactors struct {
 	SearchResponse
-	Factors database.Array[domain.SecondFactorType]
+	Factors database.NumberArray[domain.SecondFactorType]
 }
 
 type MultiFactors struct {
 	SearchResponse
-	Factors database.Array[domain.MultiFactorType]
+	Factors database.NumberArray[domain.MultiFactorType]
 }
 
 var (

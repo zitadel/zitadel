@@ -13,7 +13,6 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	sq "github.com/Masterminds/squirrel"
-	"github.com/jackc/pgtype"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -386,15 +385,6 @@ func TestValidatePrepare(t *testing.T) {
 			}
 		})
 	}
-}
-
-func intervalDriverValue(t *testing.T, src time.Duration) pgtype.Interval {
-	interval := pgtype.Interval{}
-	err := interval.Set(src)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return interval
 }
 
 type prepareDB struct{}
