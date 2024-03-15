@@ -9,6 +9,26 @@
       <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
     </div>
 
+    <cnsl-card
+      title="Configure Google (TRANSLATE)"
+      description="Copy this URL and allow Google to redirect your users back here after they have authenticated. (TRANSLATE)"
+    >
+      <label>
+        ZITADEL Callback URL
+        <button
+          *ngIf="(env.externalIDPCallbackUrl | async) as callbackUrl"
+          class="copy-url-button"
+          [disabled]="copied === callbackUrl"
+          [matTooltip]="(copied !== callbackUrl ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
+          cnslCopyToClipboard
+          [valueToCopy]="callbackUrl"
+          (copiedValue)="copied = $event"
+        >
+          {{ callbackUrl }}
+        </button>
+      </label>
+    </cnsl-card>
+
     <p class="identity-provider-desc cnsl-secondary-text">
       {{ !provider ? ('IDP.CREATE.GOOGLE.DESCRIPTION' | translate) : ('IDP.DETAIL.DESCRIPTION' | translate) }}
     </p>

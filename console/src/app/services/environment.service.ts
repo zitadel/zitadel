@@ -88,4 +88,10 @@ export class EnvironmentService {
       shareReplay(1),
     );
   }
+
+  public get externalIDPCallbackUrl(): Observable<string> {
+    return this.env.pipe(
+      map((env) => `${env.issuer}/ui/login/login/externalidp/callback`),
+    );
+  }
 }

@@ -9,8 +9,43 @@
       <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
     </div>
 
+    <cnsl-card
+      *ngIf="provider"
+      title="Configure Your SAML Provider (TRANSLATE)"
+      description="Copy the metadata link or the resolved ZITADEL metadata XML and upload it to your SAML service provider. (TRANSLATE, DOES THE XML CHANGE WHEN THE PROVIDER IS RECONFIGURED?)"
+    >
+      <label *ngIf="metadataUrl$ | async as metadataUrl">
+        ZITADEL Metadata URL
+        <button
+          class="copy-url-button"
+          [disabled]="metadataUrlCopied === metadataUrl"
+          [matTooltip]="(metadataUrlCopied !== metadataUrl ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
+          cnslCopyToClipboard
+          [valueToCopy]="metadataUrl"
+          (copiedValue)="metadataUrlCopied = $event"
+        >
+          {{ metadataUrl }}
+        </button>
+      </label>
+      <label *ngIf="metadataXml$ | async as metadataXml">
+        ZITADEL Metadata XML
+        <button
+          class="copy-url-button"
+          [disabled]="metadataXmlCopied === metadataXml"
+          [matTooltip]="(metadataXmlCopied !== metadataXml ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
+          cnslCopyToClipboard
+          [valueToCopy]="metadataXml"
+          (copiedValue)="metadataXmlCopied = $event"
+        >
+          <pre>{{ metadataXml }}</pre>
+        </button>
+      </label>
+    </cnsl-card>
+
     <p class="identity-provider-desc cnsl-secondary-text">
       {{ !provider ? ('IDP.CREATE.SAML.DESCRIPTION' | translate) : ('IDP.DETAIL.DESCRIPTION' | translate) }}
+
+      <a href="https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml#optional-add-zitadel-action-to-autofill-userdata>">Add an Action to map fields to users (TRANSLATE, STYLE)</a>
     </p>
 
     <form [formGroup]="form" (ngSubmit)="submitForm()">

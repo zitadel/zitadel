@@ -4,7 +4,7 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import { take } from 'rxjs';
+import {Observable, take} from 'rxjs';
 import {
   AddGoogleProviderRequest as AdminAddGoogleProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -24,6 +24,8 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
+import {EnvironmentService} from "../../../services/environment.service";
+import {map} from "rxjs/operators";
 
 @Component({
   selector: 'cnsl-provider-google',
@@ -45,6 +47,8 @@ export class ProviderGoogleComponent {
   public provider?: Provider.AsObject;
   public updateClientSecret: boolean = false;
 
+  public copied: string = '';
+
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
@@ -52,6 +56,7 @@ export class ProviderGoogleComponent {
     private injector: Injector,
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
+    public env: EnvironmentService,
   ) {
     this.form = new FormGroup({
       name: new FormControl('', []),

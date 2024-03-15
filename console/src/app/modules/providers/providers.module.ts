@@ -30,6 +30,7 @@ import { ProviderOAuthComponent } from './provider-oauth/provider-oauth.componen
 import { ProviderOIDCComponent } from './provider-oidc/provider-oidc.component';
 import { ProvidersRoutingModule } from './providers-routing.module';
 import { ProviderSamlSpComponent } from './provider-saml-sp/provider-saml-sp.component';
+import {CopyToClipboardModule} from "../../directives/copy-to-clipboard/copy-to-clipboard.module";
 
 @NgModule({
   declarations: [
@@ -67,6 +68,7 @@ import { ProviderSamlSpComponent } from './provider-saml-sp/provider-saml-sp.com
     TranslateModule,
     ProviderOptionsModule,
     MatProgressSpinnerModule,
+    CopyToClipboardModule,
   ],
 })
 export default class ProvidersModule {}

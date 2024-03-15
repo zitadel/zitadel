@@ -7,7 +7,7 @@ import { ManagementService } from '../../../services/mgmt.service';
 import { AdminService } from '../../../services/admin.service';
 import { ToastService } from '../../../services/toast.service';
 import { GrpcAuthService } from '../../../services/grpc-auth.service';
-import { take } from 'rxjs';
+import {BehaviorSubject, Observable, switchMap, take} from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from '../../../services/breadcrumb.service';
 import { atLeastOneIsFilled, requiredValidator } from '../../form-field/validators/validators';
@@ -21,6 +21,9 @@ import {
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
   UpdateSAMLProviderRequest as MgmtUpdateSAMLProviderRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
+import {EnvironmentService} from "../../../services/environment.service";
+import {map} from "rxjs/operators";
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'cnsl-provider-saml-sp',
@@ -36,6 +39,10 @@ export class ProviderSamlSpComponent {
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
+  public metadataUrlCopied: string = "";
+  public metadataXmlCopied: string = "";
+  public metadataUrl$: Observable<string>;
+  public metadataXml$: Observable<string>;
 
   bindingValues: string[] = Object.keys(SAMLBinding);
 
@@ -46,8 +53,22 @@ export class ProviderSamlSpComponent {
     private route: ActivatedRoute,
     private injector: Injector,
     private breadcrumbService: BreadcrumbService,
+    private envSvc: EnvironmentService,
+    private http: HttpClient,
   ) {
     this._buildBreadcrumbs();
+    if(!this.id) {
+      this.metadataXml$ = new Observable<string>();
+      this.metadataUrl$ = new Observable<string>();
+      return
+    }
+    this.metadataUrl$ = this.envSvc.env.pipe(
+      take(1),
+      map(env => `${env.issuer}/idps/${this.id}/saml/metadata`),
+    );
+    this.metadataXml$ = this.metadataUrl$.pipe(
+      switchMap(url => this.http.get(url, {responseType: 'text'})),
+    );
     this._initializeForm();
     this._checkFormPermissions();
   }
