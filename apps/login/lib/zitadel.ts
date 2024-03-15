@@ -125,6 +125,23 @@ export async function createSession(
       );
 }
 
+export async function createSessionForUserIdAndIdpIntent(
+  server: ZitadelServer,
+  userId: string,
+  idpIntent: {
+    idpIntentId?: string | undefined;
+    idpIntentToken?: string | undefined;
+  }
+): Promise<CreateSessionResponse | undefined> {
+  const sessionService = session.getSession(server);
+  return sessionService.createSession(
+    {
+      checks: { user: { userId }, idpIntent },
+    },
+    {}
+  );
+}
+
 export async function setSession(
   server: ZitadelServer,
   sessionId: string,

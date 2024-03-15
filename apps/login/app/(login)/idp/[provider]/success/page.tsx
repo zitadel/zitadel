@@ -1,6 +1,7 @@
 import { ProviderSlug } from "#/lib/demos";
 import { server } from "#/lib/zitadel";
 import Alert, { AlertType } from "#/ui/Alert";
+import { createSessionForIdpAndUpdateCookie } from "#/utils/session";
 import {
   AddHumanUserRequest,
   IDPInformation,
@@ -96,21 +97,50 @@ export default async function Page({
     return retrieveIDP(id, token)
       .then((information) => {
         if (information) {
-          return createUser(provider, information).catch((error) => {
-            throw new Error(error.details);
-          });
+          console.log(information);
+
+          // handle login
+          if (information.userId) {
+            return createSessionForIdpAndUpdateCookie(
+              information.userId,
+              {
+                idpIntentId: id,
+                idpIntentToken: token,
+              },
+              undefined
+            )
+              .then((session) => {
+                return (
+                  <div className="flex flex-col items-center space-y-4">
+                    <h1>Login successful</h1>
+                    <div>You have successfully been loggedIn!</div>
+                  </div>
+                );
+              })
+              .catch((error) => {
+                throw new Error(error.details);
+              });
+          } else {
+            // handle register
+
+            return createUser(provider, information)
+              .then((userId) => {
+                return (
+                  <div className="flex flex-col items-center space-y-4">
+                    <h1>Register successful</h1>
+                    <div>You have successfully been registered!</div>
+                  </div>
+                );
+              })
+              .catch((error) => {
+                throw new Error(error.details);
+              });
+          }
         } else {
           throw new Error("Could not get user information.");
         }
       })
-      .then((userId) => {
-        return (
-          <div className="flex flex-col items-center space-y-4">
-            <h1>Register successful</h1>
-            <div>You have successfully been registered!</div>
-          </div>
-        );
-      })
+
       .catch((error: Error) => {
         return (
           <div className="flex flex-col items-center space-y-4">

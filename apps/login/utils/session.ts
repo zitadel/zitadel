@@ -1,4 +1,10 @@
-import { createSession, getSession, server, setSession } from "#/lib/zitadel";
+import {
+  createSession,
+  createSessionForUserIdAndIdpIntent,
+  getSession,
+  server,
+  setSession,
+} from "#/lib/zitadel";
 import {
   SessionCookie,
   addSessionToCookie,
@@ -17,6 +23,50 @@ export async function createSessionAndUpdateCookie(
     loginName,
     password,
     challenges
+  );
+
+  if (createdSession) {
+    return getSession(
+      server,
+      createdSession.sessionId,
+      createdSession.sessionToken
+    ).then((response) => {
+      if (response?.session && response.session?.factors?.user?.loginName) {
+        const sessionCookie: SessionCookie = {
+          id: createdSession.sessionId,
+          token: createdSession.sessionToken,
+          changeDate: response.session.changeDate?.toString() ?? "",
+          loginName: response.session?.factors?.user?.loginName ?? "",
+        };
+
+        if (authRequestId) {
+          sessionCookie.authRequestId = authRequestId;
+        }
+
+        return addSessionToCookie(sessionCookie).then(() => {
+          return response.session as Session;
+        });
+      } else {
+        throw "could not get session or session does not have loginName";
+      }
+    });
+  } else {
+    throw "Could not create session";
+  }
+}
+
+export async function createSessionForIdpAndUpdateCookie(
+  userId: string,
+  idpIntent: {
+    idpIntentId?: string | undefined;
+    idpIntentToken?: string | undefined;
+  },
+  authRequestId: string | undefined
+): Promise<Session> {
+  const createdSession = await createSessionForUserIdAndIdpIntent(
+    server,
+    userId,
+    idpIntent
   );
 
   if (createdSession) {

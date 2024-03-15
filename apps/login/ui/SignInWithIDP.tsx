@@ -40,8 +40,8 @@ export function SignInWithIDP({
       },
       body: JSON.stringify({
         idpId,
-        successUrl: `${host}/register/idp/${provider}/success`,
-        failureUrl: `${host}/register/idp/${provider}/failure`,
+        successUrl: `${host}/idp/${provider}/success`,
+        failureUrl: `${host}/idp/${provider}/failure`,
       }),
     });
 

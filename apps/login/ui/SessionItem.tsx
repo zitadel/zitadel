@@ -42,8 +42,12 @@ export default function SessionItem({
 
   const validPassword = session?.factors?.password?.verifiedAt;
   const validPasskey = session?.factors?.webAuthN?.verifiedAt;
+  const stillValid = session.expirationDate
+    ? session.expirationDate > new Date()
+    : true;
 
-  const validUser = validPassword || validPasskey;
+  const validDate = validPassword || validPasskey;
+  const validUser = (validPassword || validPasskey) && stillValid;
 
   return (
     <Link
@@ -92,7 +96,7 @@ export default function SessionItem({
         </span>
         {validUser && (
           <span className="text-xs opacity-80">
-            {moment(new Date(validUser)).fromNow()}
+            {validDate && moment(new Date(validDate)).fromNow()}
           </span>
         )}
       </div>
