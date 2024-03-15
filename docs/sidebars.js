@@ -317,6 +317,7 @@ module.exports = {
           },
           collapsed: true,
           items: [
+            "guides/integrate/login-ui/session-validation",
             "guides/integrate/login-ui/username-password",
             "guides/integrate/login-ui/external-login",
             "guides/integrate/login-ui/passkey",
@@ -348,7 +349,8 @@ module.exports = {
             "guides/integrate/identity-providers/ldap",
             "guides/integrate/identity-providers/openldap",
             "guides/integrate/identity-providers/migrate",
-            "guides/integrate/identity-providers/okta",
+            "guides/integrate/identity-providers/okta-oidc",
+            "guides/integrate/identity-providers/okta-saml",
             "guides/integrate/identity-providers/keycloak",
             "guides/integrate/identity-providers/mocksaml",
             "guides/integrate/identity-providers/additional-information",
@@ -806,6 +808,7 @@ module.exports = {
       items: [
         "apis/actions/introduction",
         "apis/actions/modules",
+        "apis/actions/code-examples",
         "apis/actions/internal-authentication",
         "apis/actions/external-authentication",
         "apis/actions/complement-token",

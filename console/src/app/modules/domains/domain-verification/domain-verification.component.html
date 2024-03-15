@@ -15,12 +15,12 @@
 
 <div mat-dialog-content cdkFocusInitial autofocus>
   <div *ngIf="showNew && !(dns || http)">
-    <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION' | translate }}</p>
-    <p class="desc">
+    <p class="domain-desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION' | translate }}</p>
+    <p class="domain-desc">
       {{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_HTML' | translate }}
     </p>
-    <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_DNS' | translate }}</p>
-    <p class="desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_SKIP' | translate }}</p>
+    <p class="domain-desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_DNS' | translate }}</p>
+    <p class="domain-desc">{{ 'ORG.PAGES.ORGDOMAIN.VERIFICATION_SKIP' | translate }}</p>
   </div>
 
   <cnsl-info-section [type]="InfoSectionType.WARN" *ngIf="showNew && !(dns || http)" class="desc">{{
