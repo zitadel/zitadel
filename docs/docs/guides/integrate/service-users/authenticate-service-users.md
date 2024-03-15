@@ -95,6 +95,7 @@ However, PATs also come with limitations:
 
 * **Centralized Validation:** Similar to Client Credentials, relying on the server for verification could impact performance under high load.
 * **Revocation:** Requires deleting the PAT directly, potentially causing downtime if not managed carefully.
+* **Leakage:** PATs are a long-lived tokens that can be readily used in API calls, if leaked the attacker can access all resources until the PAT is expired or deleted. Private key JWT and client credentials create a short-lived access token instead.
 
 ## Using Service Users
 

@@ -146,12 +146,12 @@ curl --request POST \
   --url https:/$CUSTOM-DOMAIN/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
-  --data scope='openid profile email' \
+  --data scope='openid' \
   --data assertion=eyJ0eXAiOiJKV1QiL...
 ```
 
 * `grant_type` should be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
-* `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile` and `email`
+* `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`.
 * `assertion` is the encoded value of the JWT that was signed with your private key from the prior step
 
 If you want to access ZITADEL APIs, make sure to include the required scopes `urn:zitadel:iam:org:project:id:zitadel:aud`.
