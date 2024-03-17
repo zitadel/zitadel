@@ -12,7 +12,7 @@
     <div *ngIf="provider">
       <cnsl-card
         title="Configure Your SAML Identity Provider (TRANSLATE)"
-        description="ZITADEL is configured. Now your SAML Identity Provider needs some configuration. Most providers allow you to just upload the whole ZITADEL metadata XML. Other providers ask you to provide some distict URLs only, like for example the Entity ID, the ACS URL or the Logout URL. (TRANSLATE)"
+        description="ZITADEL is configured. Now your SAML Identity Provider needs some configuration. Most providers allow you to just upload the whole ZITADEL metadata XML. Other providers ask you to provide some distict URLs only, like for example the entity ID (metadata URL), the Assertion Consumer Service (ACS) URL or the Single Logout URL. (TRANSLATE)"
         *ngIf="copyRows$ | async as copyRows"
       >
         <cnsl-copy-row *ngFor="let row of copyRows" [label]="row.label" [value]="row.url" labelMinWidth="200px">

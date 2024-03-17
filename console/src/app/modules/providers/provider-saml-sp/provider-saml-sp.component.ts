@@ -74,14 +74,14 @@ export class ProviderSamlSpComponent {
           url: `${idpBase}/metadata`,
           downloadable: true,
         }, {
-          label: 'ZITADEL ACS Intent',
+          label: 'ZITADEL Single Logout',
+          url: `${idpBase}/slo`,
+        }, {
+          label: 'ZITADEL ACS Intent API',
           url: `${idpBase}/acs`,
         }, {
-          label: 'ZITADEL ACS Login Screen',
+          label: 'ZITADEL ACS Login Form',
           url: `${env.issuer}/ui/login/login/externalidp/saml/acs`,
-        }, {
-          label: 'ZITADEL Logout',
-          url: `${idpBase}/acs`,
         }];
       }),
     );
