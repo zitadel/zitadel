@@ -574,7 +574,7 @@ func TestServer_AddHumanUser_Permission(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
+							OrgId: newOrg.GetOrganizationId(),
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -615,7 +615,7 @@ func TestServer_AddHumanUser_Permission(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
+							OrgId: newOrg.GetOrganizationId(),
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -656,7 +656,7 @@ func TestServer_AddHumanUser_Permission(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
+							OrgId: newOrg.GetOrganizationId(),
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -692,7 +692,7 @@ func TestServer_AddHumanUser_Permission(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
+							OrgId: newOrg.GetOrganizationId(),
 						},
 					},
 					Profile: &user.SetHumanProfile{
