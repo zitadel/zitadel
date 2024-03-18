@@ -38,7 +38,6 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/k3a/html2text v1.2.1
 	github.com/kevinburke/twilio-go v0.0.0-20231009225535-38b36b35294d
-	github.com/lib/pq v1.10.9
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/minio/minio-go/v7 v7.0.68
 	github.com/mitchellh/mapstructure v1.5.0
@@ -101,6 +100,7 @@ require (
 	github.com/google/s2a-go v0.1.7 // indirect
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
+	github.com/lib/pq v1.10.9 // indirect
 	github.com/mattermost/xml-roundtrip-validator v0.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
