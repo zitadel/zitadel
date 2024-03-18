@@ -6,6 +6,8 @@ export type SessionCookie = {
   id: string;
   token: string;
   loginName: string;
+  creationDate: string;
+  expirationDate: string;
   changeDate: string;
   authRequestId?: string; // if its linked to an OIDC flow
 };
@@ -135,25 +137,46 @@ export async function getSessionCookieByLoginName(
   }
 }
 
-export async function getAllSessionCookieIds(): Promise<any> {
+/**
+ *
+ * @param cleanup when true, removes all expired sessions, default true
+ * @returns Session Cookies
+ */
+export async function getAllSessionCookieIds(
+  cleanup: boolean = true
+): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
-    return sessions.map((session) => session.id);
+
+    return sessions
+      .filter((session) =>
+        cleanup ? new Date(session.expirationDate) > new Date() : true
+      )
+      .map((session) => session.id);
   } else {
     return [];
   }
 }
 
-export async function getAllSessions(): Promise<SessionCookie[]> {
+/**
+ *
+ * @param cleanup when true, removes all expired sessions, default true
+ * @returns Session Cookies
+ */
+export async function getAllSessions(
+  cleanup: boolean = true
+): Promise<SessionCookie[]> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
-    return sessions;
+    return sessions.filter((session) =>
+      cleanup ? new Date(session.expirationDate) > new Date() : true
+    );
   } else {
     return [];
   }

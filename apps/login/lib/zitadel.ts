@@ -115,12 +115,22 @@ export async function createSession(
         {
           checks: { user: { loginName }, password: { password } },
           challenges,
+          lifetime: {
+            seconds: 300,
+            nanos: 0,
+          },
         },
         {}
       )
     : sessionService.createSession(
-        { checks: { user: { loginName } }, challenges },
-
+        {
+          checks: { user: { loginName } },
+          challenges,
+          lifetime: {
+            seconds: 300,
+            nanos: 0,
+          },
+        },
         {}
       );
 }
@@ -137,6 +147,10 @@ export async function createSessionForUserIdAndIdpIntent(
   return sessionService.createSession(
     {
       checks: { user: { userId }, idpIntent },
+      lifetime: {
+        seconds: 300,
+        nanos: 0,
+      },
     },
     {}
   );

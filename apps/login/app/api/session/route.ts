@@ -64,9 +64,7 @@ export async function PUT(request: NextRequest) {
       .then((recent) => {
         console.log("setsession", webAuthN);
         return setSessionAndUpdateCookie(
-          recent.id,
-          recent.token,
-          recent.loginName,
+          recent,
           password,
           webAuthN,
           challenges,
