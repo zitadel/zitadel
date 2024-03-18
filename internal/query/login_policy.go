@@ -40,11 +40,11 @@ type LoginPolicy struct {
 	DisableLoginWithEmail      bool
 	DisableLoginWithPhone      bool
 	DefaultRedirectURI         string
-	PasswordCheckLifetime      time.Duration
-	ExternalLoginCheckLifetime time.Duration
-	MFAInitSkipLifetime        time.Duration
-	SecondFactorCheckLifetime  time.Duration
-	MultiFactorCheckLifetime   time.Duration
+	PasswordCheckLifetime      database.Duration
+	ExternalLoginCheckLifetime database.Duration
+	MFAInitSkipLifetime        database.Duration
+	SecondFactorCheckLifetime  database.Duration
+	MultiFactorCheckLifetime   database.Duration
 	IDPLinks                   []*IDPLoginPolicyLink
 }
 
