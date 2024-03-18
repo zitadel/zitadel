@@ -2,17 +2,15 @@ package database
 
 import (
 	"database/sql/driver"
-	"encoding/hex"
 	"testing"
 
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestMap_Scan(t *testing.T) {
 	type args struct {
-		src pgtype.UndecodedBytes
+		src []byte
 	}
 	type res[V any] struct {
 		want Map[V]
@@ -63,10 +61,7 @@ func TestMap_Scan(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// create valid payload
-			src := hex.AppendEncode([]byte("\\x"), tt.args.src)
-
-			if err := tt.m.Scan(src); (err != nil) != tt.res.err {
+			if err := tt.m.Scan(tt.args.src); (err != nil) != tt.res.err {
 				t.Errorf("Scan() error = %v, wantErr %v", err, tt.res.err)
 			}
 			assert.Equal(t, tt.res.want, tt.m)

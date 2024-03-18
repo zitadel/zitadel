@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"database/sql/driver"
+	"encoding/hex"
 	"encoding/json"
 	"reflect"
 
@@ -97,8 +98,12 @@ type Map[V any] map[string]V
 
 // Scan implements the [database/sql.Scanner] interface.
 func (m *Map[V]) Scan(src any) error {
+	if src == nil {
+		return nil
+	}
 	var arr []byte
-
+	// create valid payload
+	src = hex.AppendEncode([]byte("\\x"), src.([]byte))
 	err := pgtype.NewMap().SQLScanner(&arr).Scan(src)
 	if err != nil || len(arr) == 0 {
 		return err
