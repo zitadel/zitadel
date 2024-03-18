@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/database"
+	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -384,7 +385,7 @@ func Test_quotaProjection_IncrementUsage(t *testing.T) {
 			name: "",
 			fields: fields{
 				client: func() *database.DB {
-					db, mock, _ := sqlmock.New()
+					db, mock, _ := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.ArrayConverter)))
 					mock.ExpectQuery(regexp.QuoteMeta(incrementQuotaStatement)).
 						WithArgs(
 							"instance_id",
@@ -392,7 +393,7 @@ func Test_quotaProjection_IncrementUsage(t *testing.T) {
 							testNow,
 							2,
 						).
-						WillReturnRows(sqlmock.NewRows([]string{"key"}).
+						WillReturnRows(mock.NewRows([]string{"key"}).
 							AddRow(3))
 					return &database.DB{DB: db}
 				}(),

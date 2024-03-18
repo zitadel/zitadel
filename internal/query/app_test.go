@@ -1120,6 +1120,9 @@ func Test_AppsPrepare(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.name == "prepareAppsQuery oidc app" {
+				_ = tt.name
+			}
 			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}

@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"database/sql/driver"
-	"encoding/hex"
 	"encoding/json"
 	"reflect"
 
@@ -101,15 +100,13 @@ func (m *Map[V]) Scan(src any) error {
 	if src == nil {
 		return nil
 	}
-	var arr []byte
-	// create valid payload
-	src = hex.AppendEncode([]byte("\\x"), src.([]byte))
-	err := pgtype.NewMap().SQLScanner(&arr).Scan(src)
-	if err != nil || len(arr) == 0 {
-		return err
+
+	bytes := src.([]byte)
+	if len(bytes) == 0 {
+		return nil
 	}
 
-	return json.Unmarshal(arr, &m)
+	return json.Unmarshal(bytes, &m)
 }
 
 // Value implements the [database/sql/driver.Valuer] interface.

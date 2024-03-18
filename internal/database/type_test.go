@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"database/sql/driver"
 	"testing"
 
@@ -23,6 +24,15 @@ func TestMap_Scan(t *testing.T) {
 		res[V]
 	}
 	tests := []testCase[string]{
+		{
+			"nil",
+			Map[string]{},
+			args{src: nil},
+			res[string]{
+				want: Map[string]{},
+				err:  false,
+			},
+		},
 		{
 			"null",
 			Map[string]{},
@@ -118,27 +128,134 @@ func TestMap_Value(t *testing.T) {
 	}
 }
 
-func TestArray_ScanInt32(t *testing.T) {
+func TestNumberArray_Scan(t *testing.T) {
 	type args struct {
 		src any
 	}
-	type res[V numberField] struct {
-		want NumberArray[V]
+	type res struct {
+		want any
 		err  bool
 	}
-	type testCase[V numberField] struct {
+	type testCase struct {
 		name string
-		m    NumberArray[V]
+		m    sql.Scanner
+		args args
+		res  res
+	}
+	tests := []testCase{
+		{
+			name: "int8",
+			m:    new(NumberArray[int8]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[int8]{1, 2},
+			},
+		},
+		{
+			name: "uint8",
+			m:    new(NumberArray[uint8]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[uint8]{1, 2},
+			},
+		},
+		{
+			name: "int16",
+			m:    new(NumberArray[int16]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[int16]{1, 2},
+			},
+		},
+		{
+			name: "uint16",
+			m:    new(NumberArray[uint16]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[uint16]{1, 2},
+			},
+		},
+		{
+			name: "int32",
+			m:    new(NumberArray[int32]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[int32]{1, 2},
+			},
+		},
+		{
+			name: "uint32",
+			m:    new(NumberArray[uint32]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[uint32]{1, 2},
+			},
+		},
+		{
+			name: "int64",
+			m:    new(NumberArray[int64]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[int64]{1, 2},
+			},
+		},
+		{
+			name: "uint64",
+			m:    new(NumberArray[uint64]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[uint64]{1, 2},
+			},
+		},
+		{
+			name: "int",
+			m:    new(NumberArray[int]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[int]{1, 2},
+			},
+		},
+		{
+			name: "uint",
+			m:    new(NumberArray[uint]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[uint]{1, 2},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.m.Scan(tt.args.src); (err != nil) != tt.res.err {
+				t.Errorf("Scan() error = %v, wantErr %v", err, tt.res.err)
+			}
+
+			assert.Equal(t, tt.res.want, tt.m)
+		})
+	}
+}
+
+func TestTextArray_Scan(t *testing.T) {
+	type args struct {
+		src any
+	}
+	type res[V ~string] struct {
+		want TextArray[V]
+		err  bool
+	}
+	type testCase[V ~string] struct {
+		name string
+		m    TextArray[V]
 		args args
 		res[V]
 	}
-	tests := []testCase[int32]{
+	tests := []testCase[string]{
 		{
 			"number",
-			NumberArray[int32]{},
+			TextArray[string]{},
 			args{src: "{1,2}"},
-			res[int32]{
-				want: []int32{1, 2},
+			res[string]{
+				want: []string{"1", "2"},
 			},
 		},
 	}

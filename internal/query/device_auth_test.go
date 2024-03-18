@@ -17,6 +17,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
+	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
@@ -188,7 +189,7 @@ var (
 )
 
 func TestQueries_DeviceAuthRequestByUserCode(t *testing.T) {
-	client, mock, err := sqlmock.New()
+	client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.ArrayConverter)))
 	if err != nil {
 		t.Fatalf("failed to build mock client: %v", err)
 	}
@@ -196,7 +197,7 @@ func TestQueries_DeviceAuthRequestByUserCode(t *testing.T) {
 
 	mock.ExpectBegin()
 	mock.ExpectQuery(expectedDeviceAuthWhereUserCodeQuery).WillReturnRows(
-		sqlmock.NewRows(deviceAuthSelectColumns).AddRow(expectedDeviceAuthValues...),
+		mock.NewRows(deviceAuthSelectColumns).AddRow(expectedDeviceAuthValues...),
 	)
 	mock.ExpectCommit()
 	q := Queries{

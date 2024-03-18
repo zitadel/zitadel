@@ -17,6 +17,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/database"
+	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 )
 
 var (
@@ -34,7 +35,7 @@ var (
 func assertPrepare(t *testing.T, prepareFunc, expectedObject interface{}, sqlExpectation sqlExpectation, isErr checkErr, prepareArgs ...reflect.Value) bool {
 	t.Helper()
 
-	client, mock, err := sqlmock.New()
+	client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.ArrayConverter)))
 	if err != nil {
 		t.Fatalf("failed to build mock client: %v", err)
 	}
@@ -84,7 +85,7 @@ func mockQuery(stmt string, cols []string, row []driver.Value, args ...driver.Va
 		m.ExpectBegin()
 		q := m.ExpectQuery(stmt).WithArgs(args...)
 		m.ExpectCommit()
-		result := sqlmock.NewRows(cols)
+		result := m.NewRows(cols)
 		if len(row) > 0 {
 			result.AddRow(row...)
 		}
@@ -98,7 +99,7 @@ func mockQueryScanErr(stmt string, cols []string, row []driver.Value, args ...dr
 		m.ExpectBegin()
 		q := m.ExpectQuery(stmt).WithArgs(args...)
 		m.ExpectRollback()
-		result := sqlmock.NewRows(cols)
+		result := m.NewRows(cols)
 		if len(row) > 0 {
 			result.AddRow(row...)
 		}
@@ -112,7 +113,7 @@ func mockQueries(stmt string, cols []string, rows [][]driver.Value, args ...driv
 		m.ExpectBegin()
 		q := m.ExpectQuery(stmt).WithArgs(args...)
 		m.ExpectCommit()
-		result := sqlmock.NewRows(cols)
+		result := m.NewRows(cols)
 		count := uint64(len(rows))
 		for _, row := range rows {
 			if cols[len(cols)-1] == "count" {
@@ -131,7 +132,7 @@ func mockQueriesScanErr(stmt string, cols []string, rows [][]driver.Value, args 
 		m.ExpectBegin()
 		q := m.ExpectQuery(stmt).WithArgs(args...)
 		m.ExpectRollback()
-		result := sqlmock.NewRows(cols)
+		result := m.NewRows(cols)
 		count := uint64(len(rows))
 		for _, row := range rows {
 			if cols[len(cols)-1] == "count" {
@@ -156,7 +157,7 @@ func mockQueryErr(stmt string, err error, args ...driver.Value) func(m sqlmock.S
 }
 
 func execMock(t testing.TB, exp sqlExpectation, run func(db *sql.DB)) {
-	db, mock, err := sqlmock.New()
+	db, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.ArrayConverter)))
 	require.NoError(t, err)
 	defer db.Close()
 	mock = exp(mock)
