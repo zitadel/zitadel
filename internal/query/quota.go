@@ -8,7 +8,6 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -92,7 +91,7 @@ func prepareQuotaQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 			From(quotasTable.identifier()).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*Quota, error) {
 			q := new(Quota)
-			var interval database.Duration
+			var interval sql.Null[time.Duration]
 			var now time.Time
 			err := row.Scan(&q.ID, &q.From, &interval, &q.Amount, &q.Limit, &now)
 			if err != nil {
@@ -101,7 +100,7 @@ func prepareQuotaQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 				}
 				return nil, zerrors.ThrowInternal(err, "QUERY-LqySK", "Errors.Internal")
 			}
-			q.ResetInterval = time.Duration(interval)
+			q.ResetInterval = interval.V
 			q.CurrentPeriodStart = pushPeriodStart(q.From, q.ResetInterval, now)
 			return q, nil
 		}
