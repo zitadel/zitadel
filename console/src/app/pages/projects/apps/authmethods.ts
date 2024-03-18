@@ -221,7 +221,11 @@ export function getAuthMethodFromPartialConfig(config: {
 
     const codeWithRefreshAndExchange = JSON.stringify([
       [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
-      [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE, OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN, OIDCGrantType.OIDC_GRANT_TYPE_TOKEN_EXCHANGE].sort(),
+      [
+        OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE,
+        OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN,
+        OIDCGrantType.OIDC_GRANT_TYPE_TOKEN_EXCHANGE,
+      ].sort(),
       OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
     ]);
 
@@ -257,7 +261,11 @@ export function getAuthMethodFromPartialConfig(config: {
 
     const postWithRefreshAndExchange = JSON.stringify([
       [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
-      [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE, OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN, OIDCGrantType.OIDC_GRANT_TYPE_TOKEN_EXCHANGE].sort(),
+      [
+        OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE,
+        OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN,
+        OIDCGrantType.OIDC_GRANT_TYPE_TOKEN_EXCHANGE,
+      ].sort(),
       OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST,
     ]);
 
