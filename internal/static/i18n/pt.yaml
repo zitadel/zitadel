@@ -540,6 +540,16 @@ Errors:
     NotFound: Execução não encontrada
     IncludeNotFound: Incluir não encontrado
     NoTargets: Nenhuma meta definida
+  UserSchema:
+    NotEnabled: O recurso "Esquema do usuário" não está habilitado
+    Type:
+      Missing: Tipo de esquema de usuário ausente
+      AlreadyExists: O tipo de esquema de usuário já existe
+    Authenticator:
+      Invalid: Tipo de autenticador inválido
+    NotActive: Esquema do usuário não ativo
+    NotInactive: Esquema do usuário não inativo
+    NotExists: O esquema do usuário não existe
 
 AggregateTypes:
   action: Ação
@@ -553,6 +563,7 @@ AggregateTypes:
   feature: Recurso
   target: Objetivo
   execution: Execução
+  user_schema: Esquema do usuário
 
 EventTypes:
   execution:
@@ -1230,6 +1241,12 @@ EventTypes:
         password:
           changed: Senha da configuração SMTP alterada
         removed: Configuração SMTP removida
+  user_schema:
+    created: Esquema de usuário criado
+    updated: Esquema do usuário atualizado
+    deactivated: Esquema de usuário desativado
+    reactivated: Esquema do usuário reativado
+    deleted: Esquema do usuário excluído
 
 Application:
   OIDC:

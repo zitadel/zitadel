@@ -1,24 +1,32 @@
 <div class="max-width-container">
   <div class="enlarged-container actions-enlarged-container">
-    <h1>{{ 'FLOWS.TITLE' | translate }}</h1>
-    <p class="desc cnsl-secondary-text">{{ 'FLOWS.DESCRIPTION' | translate }}</p>
+    <div class="actions-title-row">
+      <h1>{{ 'DESCRIPTIONS.ACTIONS.TITLE' | translate }}</h1>
+      <a mat-icon-button href="https://zitadel.com/docs/concepts/features/actions" rel="noreferrer" target="_blank">
+        <mat-icon class="icon">info_outline</mat-icon>
+      </a>
+    </div>
+    <p class="desc cnsl-secondary-text">{{ 'DESCRIPTIONS.ACTIONS.DESCRIPTION' | translate }}</p>
 
     <cnsl-info-section class="max-actions" *ngIf="maxActions"
       >{{ 'FLOWS.ACTIONSMAX' | translate: { value: maxActions } }}
     </cnsl-info-section>
 
     <ng-template cnslHasRole [hasRole]="['org.action.read']">
-      <cnsl-card title="{{ 'FLOWS.ACTIONSTITLE' | translate }}" description="{{ 'FLOWS.ACTIONSDESCRIPTION' | translate }}">
+      <cnsl-card
+        title="{{ 'DESCRIPTIONS.ACTIONS.SCRIPTS.TITLE' | translate }}"
+        description="{{ 'DESCRIPTIONS.ACTIONS.SCRIPTS.DESCRIPTION' | translate }}"
+      >
         <cnsl-action-table (changedSelection)="selection = $event"></cnsl-action-table>
       </cnsl-card>
     </ng-template>
 
     <div class="title-section">
-      <h2>{{ 'FLOWS.FLOWSTITLE' | translate }}</h2>
+      <h2>{{ 'DESCRIPTIONS.ACTIONS.FLOWS.TITLE' | translate }}</h2>
       <i class="las la-exchange-alt"></i>
     </div>
 
-    <p class="desc cnsl-secondary-text">{{ 'FLOWS.FLOWSDESCRIPTION' | translate }}</p>
+    <p class="desc cnsl-secondary-text">{{ 'DESCRIPTIONS.ACTIONS.FLOWS.DESCRIPTION' | translate }}</p>
 
     <ng-template cnslHasRole [hasRole]="['org.flow.read']">
       <div class="actions-flow">

@@ -2,6 +2,7 @@ package projection
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"golang.org/x/text/language"
@@ -85,6 +86,64 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 							},
 						},
 					},
+				},
+			},
+		},
+		{
+			name: "project GrantMemberAddedType, error user not found",
+			args: args{
+				event: getEvent(
+					testEvent(
+						project.GrantMemberAddedType,
+						project.AggregateType,
+						[]byte(`{
+					"userId": "user-id",
+					"roles": ["role"],
+					"grantId": "grant-id"
+				}`),
+					), project.GrantMemberAddedEventMapper),
+			},
+			reduce: (&projectGrantMemberProjection{
+				es: newMockEventStore().appendFilterResponse([]eventstore.Event{}),
+			}).reduceAdded,
+			want: wantReduce{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "PROJ-cuvy6nu1tq", "Errors.NotFound"))
+				},
+			},
+		},
+		{
+			name: "project GrantMemberAddedType, error grant not found",
+			args: args{
+				event: getEvent(
+					testEvent(
+						project.GrantMemberAddedType,
+						project.AggregateType,
+						[]byte(`{
+					"userId": "user-id",
+					"roles": ["role"],
+					"grantId": "grant-id"
+				}`),
+					), project.GrantMemberAddedEventMapper),
+			},
+			reduce: (&projectGrantMemberProjection{
+				es: newMockEventStore().appendFilterResponse([]eventstore.Event{
+					user.NewHumanAddedEvent(context.Background(),
+						&user.NewAggregate("user-id", "org1").Aggregate,
+						"username1",
+						"firstname1",
+						"lastname1",
+						"nickname1",
+						"displayname1",
+						language.German,
+						domain.GenderMale,
+						"email1",
+						true,
+					)}),
+			}).reduceAdded,
+			want: wantReduce{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "PROJ-i178hq18k4", "Errors.NotFound"))
 				},
 			},
 		},

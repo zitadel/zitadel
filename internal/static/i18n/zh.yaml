@@ -546,6 +546,16 @@ Errors:
     NotFound: 未找到执行
     IncludeNotFound: 包括未找到的内容
     NoTargets: 没有定义目标
+  UserSchema:
+    NotEnabled: 未启用“用户架构”功能
+    Type:
+      Missing: 缺少用户架构类型
+      AlreadyExists: 用户架构类型已存在
+    Authenticator:
+      Invalid: 验证器类型无效
+    NotActive: 用户架构未激活
+    NotInactive: 用户架构未处于非活动状态
+    NotExists: 用户架构不存在
 
 AggregateTypes:
   action: 动作
@@ -559,6 +569,7 @@ AggregateTypes:
   feature: 特征
   target: 靶
   execution: 执行
+  user_schema: 用户模式
 
 EventTypes:
   execution:
@@ -1065,6 +1076,12 @@ EventTypes:
     deactivated: 停用动作
     reactivated: 启用动作
     removed: 删除动作
+  user_schema:
+    created: 已创建用户架构
+    updated: 用户架构已更新
+    deactivated: 用户架构已停用
+    reactivated: 用户架构已重新激活
+    deleted: 用户架构已删除
 
 Application:
   OIDC:

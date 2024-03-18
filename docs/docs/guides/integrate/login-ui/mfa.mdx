@@ -165,7 +165,7 @@ When the user has decided to register the phone number to get a code as a second
 If the user already has a verified phone number you can skip this step.
 
 When adding a new phone number, you can choose if you want ZITADEL to send the verification code to the number, or if you want to send it by yourself.
-If ZITADEL should do it, make sure that you have registered an [SMS Provider](/docs/guides/manage/console/instance-settings#sms) and send an empty sendCode object in the request.
+If ZITADEL should do it, make sure that you have registered an [SMS Provider](/docs/guides/manage/console/default-settings#sms) and send an empty sendCode object in the request.
 With an empty returnCode object in the request, ZITADEL will not send the code, but return it in the response.
 
 If you don't want the user to verify the phone number, you can also create it directly as verified, by sending the isVerified attribute.
