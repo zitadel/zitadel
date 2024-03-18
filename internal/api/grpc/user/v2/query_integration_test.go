@@ -675,6 +675,7 @@ func TestServer_ListUsers(t *testing.T) {
 						infos[i] = userAttr{resp.GetUserId(), username}
 					}
 					request.Queries = append(request.Queries, ResourceOwnerQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, InUserEmailsQuery(usernames))
 					return infos, nil
 				},
 			},
