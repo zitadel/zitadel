@@ -16,13 +16,15 @@ type InstanceFeatures struct {
 	TriggerIntrospectionProjections *bool
 	LegacyIntrospection             *bool
 	UserSchema                      *bool
+	Execution                       *bool
 }
 
 func (m *InstanceFeatures) isEmpty() bool {
 	return m.LoginDefaultOrg == nil &&
 		m.TriggerIntrospectionProjections == nil &&
 		m.LegacyIntrospection == nil &&
-		m.UserSchema == nil
+		m.UserSchema == nil &&
+		m.Execution == nil
 }
 
 func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures) (*domain.ObjectDetails, error) {

@@ -150,6 +150,24 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			},
 		},
 		{
+			name: "set Execution",
+			eventstore: expectEventstore(
+				expectFilter(),
+				expectPush(
+					feature_v2.NewSetEvent[bool](
+						ctx, aggregate,
+						feature_v2.InstanceExecutionEventType, true,
+					),
+				),
+			),
+			args: args{ctx, &InstanceFeatures{
+				Execution: gu.Ptr(true),
+			}},
+			want: &domain.ObjectDetails{
+				ResourceOwner: "instance1",
+			},
+		},
+		{
 			name: "push error",
 			eventstore: expectEventstore(
 				expectFilter(),
@@ -186,6 +204,10 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 						ctx, aggregate,
 						feature_v2.InstanceUserSchemaEventType, true,
 					),
+					feature_v2.NewSetEvent[bool](
+						ctx, aggregate,
+						feature_v2.InstanceExecutionEventType, true,
+					),
 				),
 			),
 			args: args{ctx, &InstanceFeatures{
@@ -193,6 +215,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 				TriggerIntrospectionProjections: gu.Ptr(false),
 				LegacyIntrospection:             gu.Ptr(true),
 				UserSchema:                      gu.Ptr(true),
+				Execution:                       gu.Ptr(true),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",

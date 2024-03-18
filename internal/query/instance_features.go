@@ -12,6 +12,7 @@ type InstanceFeatures struct {
 	TriggerIntrospectionProjections FeatureSource[bool]
 	LegacyIntrospection             FeatureSource[bool]
 	UserSchema                      FeatureSource[bool]
+	Execution                       FeatureSource[bool]
 }
 
 func (q *Queries) GetInstanceFeatures(ctx context.Context, cascade bool) (_ *InstanceFeatures, err error) {

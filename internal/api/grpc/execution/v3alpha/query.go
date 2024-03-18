@@ -14,6 +14,10 @@ import (
 )
 
 func (s *Server) ListTargets(ctx context.Context, req *execution.ListTargetsRequest) (*execution.ListTargetsResponse, error) {
+	if err := checkExecutionEnabled(ctx); err != nil {
+		return nil, err
+	}
+
 	queries, err := listTargetsRequestToModel(req)
 	if err != nil {
 		return nil, err
@@ -103,6 +107,10 @@ func targetInTargetIdsQueryToQuery(q *execution.InTargetIDsQuery) (query.SearchQ
 }
 
 func (s *Server) GetTargetByID(ctx context.Context, req *execution.GetTargetByIDRequest) (_ *execution.GetTargetByIDResponse, err error) {
+	if err := checkExecutionEnabled(ctx); err != nil {
+		return nil, err
+	}
+
 	resp, err := s.query.GetTargetByID(ctx, req.GetTargetId())
 	if err != nil {
 		return nil, err
@@ -146,6 +154,10 @@ func targetToPb(t *query.Target) *execution.Target {
 }
 
 func (s *Server) ListExecutions(ctx context.Context, req *execution.ListExecutionsRequest) (*execution.ListExecutionsResponse, error) {
+	if err := checkExecutionEnabled(ctx); err != nil {
+		return nil, err
+	}
+
 	queries, err := listExecutionsRequestToModel(req)
 	if err != nil {
 		return nil, err
