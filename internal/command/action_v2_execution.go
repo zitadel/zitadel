@@ -189,14 +189,7 @@ func (e *SetExecution) Existing(c *Commands, ctx context.Context, resourceOwner 
 	if len(e.Includes) > 0 && !c.existsExecutionsByIDs(ctx, e.Includes, resourceOwner) {
 		return zerrors.ThrowNotFound(nil, "COMMAND-slgj0l4cdz", "Errors.Execution.IncludeNotFound")
 	}
-	tempCache := make(map[string][]string)
-	get := func(s string) ([]string, bool) {
-		include, ok := tempCache[s]
-		return include, ok
-	}
-	set := func(s string, strings []string) {
-		tempCache[s] = strings
-	}
+	get, set := createIncludeCacheFunctions()
 	return checkForIncludeCircular(ctx, e.AggregateID, resourceOwner, e.Includes, c.getExecutionIncludes(get, set))
 }
 
@@ -290,6 +283,16 @@ func (c *Commands) getExecutionWriteModelByID(ctx context.Context, id string, re
 		return nil, err
 	}
 	return wm, nil
+}
+
+func createIncludeCacheFunctions() (func(s string) ([]string, bool), func(s string, strings []string)) {
+	tempCache := make(map[string][]string)
+	return func(s string) ([]string, bool) {
+			include, ok := tempCache[s]
+			return include, ok
+		}, func(s string, strings []string) {
+			tempCache[s] = strings
+		}
 }
 
 type includeCacheFunc func(ctx context.Context, id string, resourceOwner string) ([]string, error)
