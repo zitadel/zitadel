@@ -4,9 +4,13 @@ title: External Authentication Flow
 
 This flow is executed if the user logs in using an [identity provider](/guides/integrate/identity-providers) or using a [jwt token](/concepts/structure/jwt_idp).
 
+The flow is represented by the following Ids in the API: `FLOW_TYPE_EXTERNAL_AUTHENTICATION` and `1`
+
 ## Post Authentication
 
 A user has authenticated externally. ZITADEL retrieved and mapped the external information.
+
+The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_POST_AUTHENTICATION` or `1`.
 
 ### Parameters of Post Authentication Action
 
@@ -62,6 +66,8 @@ The first parameter contains the following fields
 
 A user selected **Register** on the overview page after external authentication. ZITADEL did not create the user yet.
 
+The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_PRE_CREATION` or `2`.
+
 ### Parameters of Pre Creation
 
 - `ctx`  
@@ -105,6 +111,8 @@ A user selected **Register** on the overview page after external authentication.
 ## Post Creation
 
 A user selected **Register** on the overview page after external authentication and ZITADEL successfully created the user.
+
+The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_POST_CREATION` or `3`.
 
 ### Parameters of Post Creation
 

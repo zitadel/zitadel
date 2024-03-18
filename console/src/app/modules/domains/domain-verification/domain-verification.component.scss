@@ -2,10 +2,6 @@
   $is-dark-theme: map-get($theme, is-dark);
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
 
-  .desc {
-    font-size: 0.9rem;
-  }
-
   .entry {
     margin: 0.5rem 0;
     display: inline-block;
