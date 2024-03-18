@@ -23,10 +23,9 @@ type exchangeToken struct {
 
 func (et *exchangeToken) nestedActor() *domain.TokenActor {
 	return &domain.TokenActor{
-		Actor:         et.actor,
-		UserID:        et.userID,
-		Issuer:        et.issuer,
-		ResourceOwner: et.resourceOwner,
+		Actor:  et.actor,
+		UserID: et.userID,
+		Issuer: et.issuer,
 	}
 }
 
@@ -61,12 +60,10 @@ func actorClaimsToDomain(actor *oidc.ActorClaims) *domain.TokenActor {
 	if actor == nil {
 		return nil
 	}
-	resourceOwner, _ := actor.Claims[ClaimResourceOwnerID].(string)
 	return &domain.TokenActor{
-		Actor:         actorClaimsToDomain(actor.Actor),
-		UserID:        actor.Subject,
-		Issuer:        actor.Issuer,
-		ResourceOwner: resourceOwner,
+		Actor:  actorClaimsToDomain(actor.Actor),
+		UserID: actor.Subject,
+		Issuer: actor.Issuer,
 	}
 }
 
@@ -78,7 +75,6 @@ func actorDomainToClaims(actor *domain.TokenActor) *oidc.ActorClaims {
 		Actor:   actorDomainToClaims(actor.Actor),
 		Subject: actor.UserID,
 		Issuer:  actor.Issuer,
-		Claims:  map[string]any{ClaimResourceOwnerID: actor.ResourceOwner},
 	}
 }
 
