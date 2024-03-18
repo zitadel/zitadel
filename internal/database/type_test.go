@@ -128,6 +128,8 @@ func TestMap_Value(t *testing.T) {
 	}
 }
 
+type typedInt int
+
 func TestNumberArray_Scan(t *testing.T) {
 	type args struct {
 		src any
@@ -143,6 +145,14 @@ func TestNumberArray_Scan(t *testing.T) {
 		res  res
 	}
 	tests := []testCase{
+		{
+			name: "typedInt",
+			m:    new(NumberArray[typedInt]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[typedInt]{1, 2},
+			},
+		},
 		{
 			name: "int8",
 			m:    new(NumberArray[int8]),
@@ -235,27 +245,37 @@ func TestNumberArray_Scan(t *testing.T) {
 	}
 }
 
+type typedText string
+
 func TestTextArray_Scan(t *testing.T) {
 	type args struct {
 		src any
 	}
-	type res[V ~string] struct {
-		want TextArray[V]
+	type res struct {
+		want sql.Scanner
 		err  bool
 	}
 	type testCase[V ~string] struct {
 		name string
-		m    TextArray[V]
+		m    sql.Scanner
 		args args
-		res[V]
+		res
 	}
 	tests := []testCase[string]{
 		{
-			"number",
-			TextArray[string]{},
-			args{src: "{1,2}"},
-			res[string]{
-				want: []string{"1", "2"},
+			"string",
+			new(TextArray[string]),
+			args{src: "{asdf,fdas}"},
+			res{
+				want: &TextArray[string]{"asdf", "fdas"},
+			},
+		},
+		{
+			"typedText",
+			new(TextArray[typedText]),
+			args{src: "{asdf,fdas}"},
+			res{
+				want: &TextArray[typedText]{"asdf", "fdas"},
 			},
 		},
 	}

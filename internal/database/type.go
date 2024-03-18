@@ -52,7 +52,8 @@ func (a *NumberArray[F]) Scan(src any) (err error) {
 	case reflect.Int8:
 		mapper, scanner = castedScan[int8](a)
 	case reflect.Uint8:
-		mapper, scanner = castedScan[uint8](a)
+		// we provide int16 is a workaround because pgx thinks we want to scan a byte array if we provide uint8
+		mapper, scanner = castedScan[int16](a)
 	case reflect.Int16:
 		mapper, scanner = castedScan[int16](a)
 	case reflect.Uint16:
@@ -79,16 +80,16 @@ func (a *NumberArray[F]) Scan(src any) (err error) {
 	return nil
 }
 
-func castedScan[T numberTypeField, F numberField](a *NumberArray[F]) (func(), sql.Scanner) {
+func castedScan[T numberTypeField, F numberField](a *NumberArray[F]) (mapper func(), scanner sql.Scanner) {
 	var typedArray []T
 
-	mapper := func() {
+	mapper = func() {
 		(*a) = make(NumberArray[F], len(typedArray))
 		for i, value := range typedArray {
 			(*a)[i] = F(value)
 		}
 	}
-	scanner := pgtype.NewMap().SQLScanner(&typedArray)
+	scanner = pgtype.NewMap().SQLScanner(&typedArray)
 
 	return mapper, scanner
 }
