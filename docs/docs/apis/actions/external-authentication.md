@@ -33,6 +33,8 @@ The first parameter contains the following fields
     - `providerInfo` *Any*  
       Returns the response of the provider. In case the provider is a Generic OAuth Provider, the information is accessible through:
       - `rawInfo`  *Any*
+    - `org`
+      - `getMetadata()` [*metadataResult*](./objects#metadata-result)
 - `api`  
   The second parameter contains the following fields
   - `v1`
@@ -76,6 +78,8 @@ The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_PRE_CR
     - `user` [*human*](./objects#human-user)
     - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
     - `httpRequest` [*http request*](/docs/apis/actions/objects#http-request)
+    - `org`
+      - `getMetadata()` [*metadataResult*](./objects#metadata-result)
 - `api`  
   The second parameter contains the following fields
   - `metadata`  
@@ -122,6 +126,8 @@ The trigger is represented by the following Ids in the API: `TRIGGER_TYPE_POST_C
     - `getUser()` [*user*](./objects#user)
     - `authRequest` [*auth request*](/docs/apis/actions/objects#auth-request)
     - `httpRequest` [*http request*](/docs/apis/actions/objects#http-request)
+    - `org`
+      - `getMetadata()` [*metadataResult*](./objects#metadata-result)
 - `api`  
   The second parameter contains the following fields
   - `userGrants` Array of [*userGrant*](./objects#user-grant)'s
