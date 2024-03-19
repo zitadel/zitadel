@@ -162,6 +162,7 @@ message HumanUser {
   HumanProfile profile = 6;
   HumanEmail email = 7;
   HumanPhone phone = 8;
+  bool password_change_required = 9;
 }
 
 message User {

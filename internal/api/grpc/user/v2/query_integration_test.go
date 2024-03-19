@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
@@ -18,6 +19,15 @@ import (
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
+
+func setOrgID(ctx context.Context, orgID string) context.Context {
+	md, ok := metadata.FromOutgoingContext(ctx)
+	if !ok {
+		return metadata.AppendToOutgoingContext(ctx, "x-zitadel-orgid", orgID)
+	}
+	md.Set("x-zitadel-orgid", orgID)
+	return metadata.NewOutgoingContext(ctx, md)
+}
 
 func TestServer_GetUserByID(t *testing.T) {
 	orgResp := Tester.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
@@ -93,6 +103,58 @@ func TestServer_GetUserByID(t *testing.T) {
 								Phone:      "+41791234567",
 								IsVerified: true,
 							},
+						},
+					},
+				},
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: orgResp.OrganizationId,
+				},
+			},
+		},
+		{
+			name: "user by ID, passwordChangeRequired, ok",
+			args: args{
+				IamCTX,
+				&user.GetUserByIDRequest{},
+				func(ctx context.Context, username string, request *user.GetUserByIDRequest) error {
+					resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
+					request.UserId = resp.GetUserId()
+					_, err := Client.SetPassword(setOrgID(ctx, orgResp.OrganizationId), &user.SetPasswordRequest{
+						UserId: resp.GetUserId(),
+						NewPassword: &user.Password{
+							Password:       integration.UserPassword,
+							ChangeRequired: true,
+						},
+					})
+					return err
+				},
+			},
+			want: &user.GetUserByIDResponse{
+				User: &user.User{
+					State:              user.UserState_USER_STATE_ACTIVE,
+					Username:           "",
+					LoginNames:         nil,
+					PreferredLoginName: "",
+					Type: &user.User_Human{
+						Human: &user.HumanUser{
+							Profile: &user.HumanProfile{
+								GivenName:         "Mickey",
+								FamilyName:        "Mouse",
+								NickName:          gu.Ptr("Mickey"),
+								DisplayName:       gu.Ptr("Mickey Mouse"),
+								PreferredLanguage: gu.Ptr("nl"),
+								Gender:            user.Gender_GENDER_MALE.Enum(),
+								AvatarUrl:         "",
+							},
+							Email: &user.HumanEmail{
+								IsVerified: true,
+							},
+							Phone: &user.HumanPhone{
+								Phone:      "+41791234567",
+								IsVerified: true,
+							},
+							PasswordChangeRequired: true,
 						},
 					},
 				},

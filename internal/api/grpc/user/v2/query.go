@@ -101,6 +101,7 @@ func humanToPb(userQ *query.Human, assetPrefix, owner string) *user.HumanUser {
 			Phone:      string(userQ.Phone),
 			IsVerified: userQ.IsPhoneVerified,
 		},
+		PasswordChangeRequired: userQ.PasswordChangeRequired,
 	}
 }
 
