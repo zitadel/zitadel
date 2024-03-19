@@ -674,7 +674,7 @@ func TestServer_ListUsers(t *testing.T) {
 						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 						infos[i] = userAttr{resp.GetUserId(), username}
 					}
-					request.Queries = append(request.Queries, ResourceOwnerQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserEmailsQuery(usernames))
 					return infos, nil
 				},
@@ -826,10 +826,10 @@ func UsernameQuery(username string) *user.SearchQuery {
 	}
 }
 
-func ResourceOwnerQuery(resourceowner string) *user.SearchQuery {
-	return &user.SearchQuery{Query: &user.SearchQuery_ResourceOwnerQuery{
-		ResourceOwnerQuery: &user.ResourceOwnerQuery{
-			ResourceOwner: resourceowner,
+func OrganizationIdQuery(resourceowner string) *user.SearchQuery {
+	return &user.SearchQuery{Query: &user.SearchQuery_OrganizationIdQuery{
+		OrganizationIdQuery: &user.OrganizationIdQuery{
+			OrganizationId: resourceowner,
 		},
 	},
 	}
