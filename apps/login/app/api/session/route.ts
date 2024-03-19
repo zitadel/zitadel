@@ -8,6 +8,7 @@ import {
 } from "#/utils/cookies";
 import {
   createSessionAndUpdateCookie,
+  createSessionForIdpAndUpdateCookie,
   setSessionAndUpdateCookie,
 } from "#/utils/session";
 import { RequestChallenges } from "@zitadel/server";
@@ -16,16 +17,26 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   const body = await request.json();
   if (body) {
-    const { loginName, password } = body;
+    const { userId, idpIntent, loginName, password, authRequestId } = body;
 
-    return createSessionAndUpdateCookie(
-      loginName,
-      password,
-      undefined,
-      undefined
-    ).then((session) => {
-      return NextResponse.json(session);
-    });
+    if (userId && idpIntent) {
+      return createSessionForIdpAndUpdateCookie(
+        userId,
+        idpIntent,
+        authRequestId
+      ).then((session) => {
+        return NextResponse.json(session);
+      });
+    } else {
+      return createSessionAndUpdateCookie(
+        loginName,
+        password,
+        undefined,
+        undefined
+      ).then((session) => {
+        return NextResponse.json(session);
+      });
+    }
   } else {
     return NextResponse.json(
       { details: "Session could not be created" },

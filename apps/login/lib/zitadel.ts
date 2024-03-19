@@ -103,7 +103,7 @@ export async function getPasswordComplexitySettings(
     .then((resp: GetPasswordComplexitySettingsResponse) => resp.settings);
 }
 
-export async function createSession(
+export async function createSessionForLoginname(
   server: ZitadelServer,
   loginName: string,
   password: string | undefined,
@@ -144,6 +144,7 @@ export async function createSessionForUserIdAndIdpIntent(
   }
 ): Promise<CreateSessionResponse | undefined> {
   const sessionService = session.getSession(server);
+
   return sessionService.createSession(
     {
       checks: { user: { userId }, idpIntent },

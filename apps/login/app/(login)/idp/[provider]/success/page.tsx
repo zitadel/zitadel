@@ -1,6 +1,7 @@
 import { ProviderSlug } from "#/lib/demos";
 import { server } from "#/lib/zitadel";
 import Alert, { AlertType } from "#/ui/Alert";
+import IdpSignin from "#/ui/IdpSignin";
 import { createSessionForIdpAndUpdateCookie } from "#/utils/session";
 import {
   AddHumanUserRequest,
@@ -8,7 +9,9 @@ import {
   RetrieveIdentityProviderIntentResponse,
   user,
   IDPLink,
+  Session,
 } from "@zitadel/server";
+import { ClientError } from "nice-grpc";
 
 const PROVIDER_MAPPING: {
   [provider: string]: (rI: IDPInformation) => Partial<AddHumanUserRequest>;
@@ -59,19 +62,15 @@ const PROVIDER_MAPPING: {
   },
 };
 
-function retrieveIDP(
+function retrieveIDPIntent(
   id: string,
   token: string
-): Promise<IDPInformation | undefined> {
+): Promise<RetrieveIdentityProviderIntentResponse> {
   const userService = user.getUser(server);
-  return userService
-    .retrieveIdentityProviderIntent(
-      { idpIntentId: id, idpIntentToken: token },
-      {}
-    )
-    .then((resp: RetrieveIdentityProviderIntentResponse) => {
-      return resp.idpInformation;
-    });
+  return userService.retrieveIdentityProviderIntent(
+    { idpIntentId: id, idpIntentToken: token },
+    {}
+  );
 }
 
 function createUser(
@@ -94,36 +93,26 @@ export default async function Page({
   const { provider } = params;
 
   if (provider && id && token) {
-    return retrieveIDP(id, token)
-      .then((information) => {
-        if (information) {
-          console.log(information);
-
+    return retrieveIDPIntent(id, token)
+      .then((resp) => {
+        const { idpInformation, userId } = resp;
+        if (idpInformation) {
           // handle login
-          if (information.userId) {
-            return createSessionForIdpAndUpdateCookie(
-              information.userId,
-              {
-                idpIntentId: id,
-                idpIntentToken: token,
-              },
-              undefined
-            )
-              .then((session) => {
-                return (
-                  <div className="flex flex-col items-center space-y-4">
-                    <h1>Login successful</h1>
-                    <div>You have successfully been loggedIn!</div>
-                  </div>
-                );
-              })
-              .catch((error) => {
-                throw new Error(error.details);
-              });
+          if (userId) {
+            return (
+              <div className="flex flex-col items-center space-y-4">
+                <h1>Login successful</h1>
+                <div>You have successfully been loggedIn!</div>
+
+                <IdpSignin
+                  userId={userId}
+                  idpIntent={{ idpIntentId: id, idpIntentToken: token }}
+                />
+              </div>
+            );
           } else {
             // handle register
-
-            return createUser(provider, information)
+            return createUser(provider, idpInformation)
               .then((userId) => {
                 return (
                   <div className="flex flex-col items-center space-y-4">
@@ -132,19 +121,29 @@ export default async function Page({
                   </div>
                 );
               })
-              .catch((error) => {
-                throw new Error(error.details);
+              .catch((error: ClientError) => {
+                return (
+                  <div className="flex flex-col items-center space-y-4">
+                    <h1>Register failed</h1>
+                    <div className="w-full">
+                      {
+                        <Alert type={AlertType.ALERT}>
+                          {JSON.stringify(error.message)}
+                        </Alert>
+                      }
+                    </div>
+                  </div>
+                );
               });
           }
         } else {
           throw new Error("Could not get user information.");
         }
       })
-
-      .catch((error: Error) => {
+      .catch((error) => {
         return (
           <div className="flex flex-col items-center space-y-4">
-            <h1>Register failed</h1>
+            <h1>An error occurred</h1>
             <div className="w-full">
               {
                 <Alert type={AlertType.ALERT}>

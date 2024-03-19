@@ -38,6 +38,7 @@ export default function PasswordForm({
   async function submitPassword(values: Inputs) {
     setError("");
     setLoading(true);
+
     const res = await fetch("/api/session", {
       method: "PUT",
       headers: {

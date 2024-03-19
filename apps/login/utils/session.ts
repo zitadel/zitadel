@@ -1,5 +1,7 @@
+"use server";
+
 import {
-  createSession,
+  createSessionForLoginname,
   createSessionForUserIdAndIdpIntent,
   getSession,
   server,
@@ -18,7 +20,7 @@ export async function createSessionAndUpdateCookie(
   challenges: RequestChallenges | undefined,
   authRequestId: string | undefined
 ): Promise<Session> {
-  const createdSession = await createSession(
+  const createdSession = await createSessionForLoginname(
     server,
     loginName,
     password,
