@@ -33,6 +33,7 @@ message SearchQuery {
     }
 }
 
+// Connect multiple sub-condition with and OR operator.
 message OrQuery {
     repeated SearchQuery queries = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -40,6 +41,8 @@ message OrQuery {
         }
     ];
 }
+
+// Connect multiple sub-condition with and AND operator.
 message AndQuery {
     repeated SearchQuery queries = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -48,6 +51,7 @@ message AndQuery {
     ];
 }
 
+// Negate the sub-condition.
 message NotQuery {
     SearchQuery query = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -56,7 +60,7 @@ message NotQuery {
     ];
 }
 
-// InUserIDQuery query for users with ID in list of IDs.
+// Query for users with ID in list of IDs.
 message InUserIDQuery {
     repeated string user_ids = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -66,7 +70,7 @@ message InUserIDQuery {
     ];
 }
 
-// UserNameQuery query for users with a specific user name.
+// Query for users with a specific user name.
 message UserNameQuery {
     string user_name = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -85,7 +89,7 @@ message UserNameQuery {
     ];
 }
 
-// FirstNameQuery query for users with a specific first name.
+// Query for users with a specific first name.
 message FirstNameQuery {
     string first_name = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -104,7 +108,7 @@ message FirstNameQuery {
     ];
 }
 
-// LastNameQuery query for users with a specific last name.
+// Query for users with a specific last name.
 message LastNameQuery {
     string last_name = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -123,7 +127,7 @@ message LastNameQuery {
     ];
 }
 
-// NickNameQuery query for users with a specific nickname.
+// Query for users with a specific nickname.
 message NickNameQuery {
     string nick_name = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -142,7 +146,7 @@ message NickNameQuery {
     ];
 }
 
-// DisplayNameQuery query for users with a specific display name.
+// Query for users with a specific display name.
 message DisplayNameQuery {
     string display_name = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -161,7 +165,7 @@ message DisplayNameQuery {
     ];
 }
 
-// EmailQuery query for users with a specific email.
+// Query for users with a specific email.
 message EmailQuery {
     string email_address = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200, email: true},
@@ -181,7 +185,7 @@ message EmailQuery {
     ];
 }
 
-// LoginNameQuery query for users with a specific state.
+// Query for users with a specific state.
 message LoginNameQuery {
     string login_name = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -200,7 +204,7 @@ message LoginNameQuery {
     ];
 }
 
-// StateQuery query for users with a specific state.
+// Query for users with a specific state.
 message StateQuery {
     UserState state = 1 [
         (validate.rules).enum.defined_only = true,
@@ -211,7 +215,7 @@ message StateQuery {
     ];
 }
 
-// TypeQuery query for users with a specific type.
+// Query for users with a specific type.
 message TypeQuery {
     Type type = 1 [
         (validate.rules).enum.defined_only = true,
@@ -222,7 +226,7 @@ message TypeQuery {
     ];
 }
 
-// InUserEmailsQuery query for users with email in list of emails.
+// Query for users with email in list of emails.
 message InUserEmailsQuery {
     repeated string user_emails = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -232,7 +236,7 @@ message InUserEmailsQuery {
     ];
 }
 
-// OrganizationIdQuery query for users under a specific organization as resource owner.
+// Query for users under a specific organization as resource owner.
 message OrganizationIdQuery {
     string organization_id = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
