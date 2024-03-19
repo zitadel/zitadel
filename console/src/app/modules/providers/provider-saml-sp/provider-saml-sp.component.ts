@@ -58,33 +58,28 @@ export class ProviderSamlSpComponent {
     private injector: Injector,
     private breadcrumbService: BreadcrumbService,
     private envSvc: EnvironmentService,
-    private http: HttpClient,
   ) {
     this._buildBreadcrumbs();
-    if (!this.id) {
-      this.copyRows$ = new Observable<CopyRow[]>();
-      return;
-    }
-    this.copyRows$ = this.envSvc.env.pipe(
-      take(1),
-      map((env) => {
-        const idpBase = `${env.issuer}/idps/${this.id}/saml`;
-        return [{
-          label: 'ZITADEL Metadata',
-          url: `${idpBase}/metadata`,
-          downloadable: true,
-        }, {
-          label: 'ZITADEL Single Logout',
-          url: `${idpBase}/slo`,
-        }, {
-          label: 'ZITADEL ACS Intent API',
-          url: `${idpBase}/acs`,
-        }, {
-          label: 'ZITADEL ACS Login Form',
-          url: `${env.issuer}/ui/login/login/externalidp/saml/acs`,
-        }];
-      }),
-    );
+      this.copyRows$ = !this.id ? new Observable<CopyRow[]>() : this.envSvc.env.pipe(
+        take(1),
+        map((env) => {
+          const idpBase = `${env.issuer}/idps/${this.id}/saml`;
+          return [{
+            label: 'ZITADEL Metadata',
+            url: `${idpBase}/metadata`,
+            downloadable: true,
+          }, {
+            label: 'ZITADEL Single Logout',
+            url: `${idpBase}/slo`,
+          }, {
+            label: 'ZITADEL ACS Intent API',
+            url: `${idpBase}/acs`,
+          }, {
+            label: 'ZITADEL ACS Login Form',
+            url: `${env.issuer}/ui/login/login/externalidp/saml/acs`,
+          }];
+        }),
+      );
     this._initializeForm();
     this._checkFormPermissions();
   }

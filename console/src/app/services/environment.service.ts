@@ -34,14 +34,14 @@ export class EnvironmentService {
   public admin!: AdminServiceClient;
 
   private environment$: Observable<Environment>;
-  private wellKnown$: Observable<WellKnown>;
+  private wellknown$: Observable<WellKnown>;
 
   constructor(
     private http: HttpClient,
     private exhaustedSvc: ExhaustedService,
   ) {
     this.environment$ = this.createEnvironment();
-    this.wellKnown$ = this.createWellKnown(this.environment$);
+    this.wellknown$ = this.createWellKnown(this.environment$);
   }
 
   // env returns an `Observable<Environment>` that can be subscribed to whenever needed.
@@ -51,10 +51,10 @@ export class EnvironmentService {
     return this.environment$;
   }
 
-  // wellKnown returns an `Observable<Environment>` that can be subscribed to whenever needed.
+  // wellknown returns an `Observable<Environment>` that can be subscribed to whenever needed.
   // It makes the HTTP call exactly once and replays the cached result.
-  get wellKnown() {
-    return this.wellKnown$;
+  get wellknown() {
+    return this.wellknown$;
   }
 
   private createEnvironment() {
