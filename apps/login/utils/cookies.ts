@@ -23,7 +23,10 @@ function setSessionHttpOnlyCookie(sessions: SessionCookie[]) {
   });
 }
 
-export async function addSessionToCookie(session: SessionCookie): Promise<any> {
+export async function addSessionToCookie(
+  session: SessionCookie,
+  cleanup: boolean = true
+): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -41,12 +44,21 @@ export async function addSessionToCookie(session: SessionCookie): Promise<any> {
     currentSessions = [...currentSessions, session];
   }
 
-  return setSessionHttpOnlyCookie(currentSessions);
+  if (cleanup) {
+    const now = new Date();
+    const filteredSessions = currentSessions.filter(
+      (session) => new Date(session.expirationDate) > now
+    );
+    return setSessionHttpOnlyCookie(filteredSessions);
+  } else {
+    return setSessionHttpOnlyCookie(currentSessions);
+  }
 }
 
 export async function updateSessionCookie(
   id: string,
-  session: SessionCookie
+  session: SessionCookie,
+  cleanup: boolean = true
 ): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -56,16 +68,26 @@ export async function updateSessionCookie(
     : [session];
 
   const foundIndex = sessions.findIndex((session) => session.id === id);
+
   if (foundIndex > -1) {
     sessions[foundIndex] = session;
-    return setSessionHttpOnlyCookie(sessions);
+    if (cleanup) {
+      const now = new Date();
+      const filteredSessions = sessions.filter(
+        (session) => new Date(session.expirationDate) > now
+      );
+      return setSessionHttpOnlyCookie(filteredSessions);
+    } else {
+      return setSessionHttpOnlyCookie(sessions);
+    }
   } else {
     throw "updateSessionCookie: session id now found";
   }
 }
 
 export async function removeSessionFromCookie(
-  session: SessionCookie
+  session: SessionCookie,
+  cleanup: boolean = true
 ): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -74,9 +96,16 @@ export async function removeSessionFromCookie(
     ? JSON.parse(stringifiedCookie?.value)
     : [session];
 
-  const filteredSessions = sessions.filter((s) => s.id !== session.id);
-
-  return setSessionHttpOnlyCookie(filteredSessions);
+  const reducedSessions = sessions.filter((s) => s.id !== session.id);
+  if (cleanup) {
+    const now = new Date();
+    const filteredSessions = reducedSessions.filter(
+      (session) => new Date(session.expirationDate) > now
+    );
+    return setSessionHttpOnlyCookie(filteredSessions);
+  } else {
+    return setSessionHttpOnlyCookie(reducedSessions);
+  }
 }
 
 export async function getMostRecentSessionCookie(): Promise<any> {
@@ -152,9 +181,10 @@ export async function getAllSessionCookieIds(
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
 
     return sessions
-      .filter((session) =>
-        cleanup ? new Date(session.expirationDate) > new Date() : true
-      )
+      .filter((session) => {
+        const now = new Date();
+        cleanup ? new Date(session.expirationDate) > now : true;
+      })
       .map((session) => session.id);
   } else {
     return [];
@@ -174,9 +204,10 @@ export async function getAllSessions(
 
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
-    return sessions.filter((session) =>
-      cleanup ? new Date(session.expirationDate) > new Date() : true
-    );
+    return sessions.filter((session) => {
+      const now = new Date();
+      cleanup ? new Date(session.expirationDate) > now : true;
+    });
   } else {
     return [];
   }
