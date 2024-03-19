@@ -61,8 +61,7 @@ const (
 )
 
 type TokenActor struct {
-	Actor         *TokenActor `json:"actor,omitempty"`
-	UserID        string      `json:"user_id,omitempty"`
-	Issuer        string      `json:"issuer,omitempty"`
-	ResourceOwner string      `json:"resource_owner,omitempty"`
+	Actor  *TokenActor `json:"actor,omitempty"`
+	UserID string      `json:"user_id,omitempty"`
+	Issuer string      `json:"issuer,omitempty"`
 }
