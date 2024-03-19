@@ -61,7 +61,6 @@ func CreateServer(
 				middleware.ValidationHandler(),
 				middleware.ServiceHandler(),
 				middleware.ActivityInterceptor(),
-				//	middleware.ExecutionInterceptor(queries),
 			),
 		),
 	}
