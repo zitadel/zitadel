@@ -19,7 +19,7 @@ type expectation func(m sqlmock.Sqlmock)
 func NewSQLMock(t *testing.T, expectations ...expectation) *SQLMock {
 	db, mock, err := sqlmock.New(
 		sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual),
-		sqlmock.ValueConverterOption(new(ArrayConverter)),
+		sqlmock.ValueConverterOption(new(TypeConverter)),
 	)
 	if err != nil {
 		t.Fatal("create mock failed", err)

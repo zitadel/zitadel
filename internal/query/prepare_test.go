@@ -35,7 +35,7 @@ var (
 func assertPrepare(t *testing.T, prepareFunc, expectedObject interface{}, sqlExpectation sqlExpectation, isErr checkErr, prepareArgs ...reflect.Value) bool {
 	t.Helper()
 
-	client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.ArrayConverter)))
+	client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
 	if err != nil {
 		t.Fatalf("failed to build mock client: %v", err)
 	}
@@ -157,7 +157,7 @@ func mockQueryErr(stmt string, err error, args ...driver.Value) func(m sqlmock.S
 }
 
 func execMock(t testing.TB, exp sqlExpectation, run func(db *sql.DB)) {
-	db, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.ArrayConverter)))
+	db, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
 	require.NoError(t, err)
 	defer db.Close()
 	mock = exp(mock)
@@ -172,6 +172,8 @@ var (
 )
 
 func execScan(t testing.TB, client *database.DB, builder sq.SelectBuilder, scan interface{}, errCheck checkErr) (object interface{}, ok bool, didScan bool) {
+	t.Helper()
+
 	scanType := reflect.TypeOf(scan)
 	err := validateScan(scanType)
 	if err != nil {

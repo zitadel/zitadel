@@ -100,7 +100,7 @@ func TestStatementHandler_handleLock(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.ArrayConverter)))
+			client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -210,7 +210,7 @@ func TestStatementHandler_renewLock(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.ArrayConverter)))
+			client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -284,7 +284,7 @@ func TestStatementHandler_Unlock(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.ArrayConverter)))
+			client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
 			if err != nil {
 				t.Fatal(err)
 			}

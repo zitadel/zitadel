@@ -189,7 +189,7 @@ var (
 )
 
 func TestQueries_DeviceAuthRequestByUserCode(t *testing.T) {
-	client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.ArrayConverter)))
+	client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
 	if err != nil {
 		t.Fatalf("failed to build mock client: %v", err)
 	}

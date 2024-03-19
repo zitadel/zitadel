@@ -901,7 +901,7 @@ func (m *dbMock) expectQueryErr(t *testing.T, expectedQuery string, args []drive
 
 func newMockClient(t *testing.T) *dbMock {
 	t.Helper()
-	db, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.ArrayConverter)))
+	db, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
 	if err != nil {
 		t.Errorf("unable to create mock client: %v", err)
 		t.FailNow()

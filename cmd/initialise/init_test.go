@@ -17,7 +17,7 @@ type db struct {
 
 func prepareDB(t *testing.T, expectations ...expectation) db {
 	t.Helper()
-	client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.ArrayConverter)))
+	client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
 	if err != nil {
 		t.Fatalf("unable to create sql mock: %v", err)
 	}

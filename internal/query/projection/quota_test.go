@@ -385,13 +385,13 @@ func Test_quotaProjection_IncrementUsage(t *testing.T) {
 			name: "",
 			fields: fields{
 				client: func() *database.DB {
-					db, mock, _ := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.ArrayConverter)))
+					db, mock, _ := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
 					mock.ExpectQuery(regexp.QuoteMeta(incrementQuotaStatement)).
 						WithArgs(
 							"instance_id",
-							1,
+							quota.Unit(1),
 							testNow,
-							2,
+							uint64(2),
 						).
 						WillReturnRows(mock.NewRows([]string{"key"}).
 							AddRow(3))

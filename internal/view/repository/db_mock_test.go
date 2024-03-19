@@ -130,7 +130,7 @@ func (db *dbMock) close() {
 
 func mockDB(t *testing.T) *dbMock {
 	mockDB := dbMock{}
-	db, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.ArrayConverter)))
+	db, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
 	if err != nil {
 		t.Fatalf("error occurred while creating stub db %v", err)
 	}

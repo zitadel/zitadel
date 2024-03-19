@@ -5,16 +5,21 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 )
 
-var _ driver.ValueConverter = (*ArrayConverter)(nil)
+var _ driver.ValueConverter = (*TypeConverter)(nil)
 
-type ArrayConverter struct{}
+type TypeConverter struct{}
 
 // ConvertValue converts a value to a driver Value.
-func (s ArrayConverter) ConvertValue(v any) (driver.Value, error) {
+func (s TypeConverter) ConvertValue(v any) (driver.Value, error) {
 	if driver.IsValue(v) {
 		return v, nil
+	}
+
+	if duration, ok := v.(time.Duration); ok {
+		return int64(duration), nil
 	}
 
 	value := reflect.ValueOf(v)

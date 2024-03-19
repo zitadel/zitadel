@@ -408,7 +408,7 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 	for _, tt := range tests {
 		client, mock, err := sqlmock.New(
 			sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual),
-			sqlmock.ValueConverterOption(new(db_mock.ArrayConverter)),
+			sqlmock.ValueConverterOption(new(db_mock.TypeConverter)),
 		)
 		if err != nil {
 			t.Fatalf("unable to mock db: %v", err)

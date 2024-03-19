@@ -5,6 +5,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -26,6 +27,17 @@ func (s *TextArray[T]) Scan(src any) error {
 	}
 
 	return nil
+}
+
+// Value implements the [database/sql/driver.Valuer] interface.
+func (s TextArray[T]) Value() (driver.Value, error) {
+	typed := make([]string, len(s))
+
+	for i, value := range s {
+		typed[i] = string(value)
+	}
+
+	return []byte("{" + strings.Join(typed, ",") + "}"), nil
 }
 
 type numberField interface {
