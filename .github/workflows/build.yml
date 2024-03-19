@@ -16,7 +16,7 @@ jobs:
     with:
       node_version: "20"
       buf_version: "latest"
-      go_version: "1.21"
+      go_version: "1.22"
 
   console:
     uses: ./.github/workflows/console.yml
@@ -34,7 +34,7 @@ jobs:
     needs: [core, console, version]
     uses: ./.github/workflows/compile.yml
     with:
-      go_version: "1.21"
+      go_version: "1.22"
       core_cache_key: ${{ needs.core.outputs.cache_key }}
       console_cache_key: ${{ needs.console.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
@@ -45,7 +45,7 @@ jobs:
     needs: core
     uses: ./.github/workflows/core-test.yml
     with:
-      go_version: "1.21"
+      go_version: "1.22"
       core_cache_key: ${{ needs.core.outputs.cache_key }}
       core_cache_path: ${{ needs.core.outputs.cache_path }}
 
@@ -53,7 +53,7 @@ jobs:
     needs: [core, console]
     uses: ./.github/workflows/lint.yml
     with:
-      go_version: "1.21"
+      go_version: "1.22"
       node_version: "18"
       buf_version: "latest"
       go_lint_version: "v1.55.2"
