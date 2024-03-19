@@ -898,7 +898,8 @@ service UserService {
 
 message AddHumanUserRequest{
   reserved 3;
-  // optionally set your own id unique for the user
+  reserved "organisation";
+  // optionally set your own id unique for the user.
   optional string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -907,7 +908,7 @@ message AddHumanUserRequest{
       example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
     }
   ];
-  // optionally set a unique username, if none is provided the email will be used
+  // optionally set a unique username, if none is provided the email will be used.
   optional string username = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -943,6 +944,7 @@ message AddHumanUserResponse {
 
 message GetUserByIDRequest {
   reserved 2;
+  reserved "organization";
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,

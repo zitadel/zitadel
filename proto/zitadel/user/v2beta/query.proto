@@ -29,7 +29,7 @@ message SearchQuery {
         AndQuery and_query = 12;
         NotQuery not_query = 13;
         InUserEmailsQuery in_user_emails_query = 14;
-        ResourceOwnerQuery resource_owner_query = 15;
+        OrganizationIdQuery organization_id_query = 15;
     }
 }
 
@@ -56,6 +56,7 @@ message NotQuery {
     ];
 }
 
+// InUserIDQuery query for users with ID in list of IDs.
 message InUserIDQuery {
     repeated string user_ids = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -65,10 +66,13 @@ message InUserIDQuery {
     ];
 }
 
+// UserNameQuery query for users with a specific user name.
 message UserNameQuery {
     string user_name = 1 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
             max_length: 200;
             example: "\"gigi-giraffe\"";
         }
@@ -81,10 +85,13 @@ message UserNameQuery {
     ];
 }
 
+// FirstNameQuery query for users with a specific first name.
 message FirstNameQuery {
     string first_name = 1 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
             max_length: 200;
             example: "\"Gigi\"";
         }
@@ -97,10 +104,13 @@ message FirstNameQuery {
     ];
 }
 
+// LastNameQuery query for users with a specific last name.
 message LastNameQuery {
     string last_name = 1 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
             max_length: 200;
             example: "\"Giraffe\"";
         }
@@ -113,8 +123,17 @@ message LastNameQuery {
     ];
 }
 
+// NickNameQuery query for users with a specific nickname.
 message NickNameQuery {
-    string nick_name = 1 [(validate.rules).string = {max_len: 200}];
+    string nick_name = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
+            example: "\"Gigi\"";
+        }
+    ];
     zitadel.object.v2beta.TextQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -123,10 +142,13 @@ message NickNameQuery {
     ];
 }
 
+// DisplayNameQuery query for users with a specific display name.
 message DisplayNameQuery {
     string display_name = 1 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
             max_length: 200;
             example: "\"Gigi Giraffe\"";
         }
@@ -139,11 +161,14 @@ message DisplayNameQuery {
     ];
 }
 
+// EmailQuery query for users with a specific email.
 message EmailQuery {
     string email_address = 1 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {min_len: 1, max_len: 200, email: true},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "email address of the user. (spec: https://tools.ietf.org/html/rfc2822#section-3.4.1)"
+            min_length: 1;
             max_length: 200;
             example: "\"gigi@zitadel.com\"";
         }
@@ -156,10 +181,13 @@ message EmailQuery {
     ];
 }
 
+// LoginNameQuery query for users with a specific state.
 message LoginNameQuery {
     string login_name = 1 [
-        (validate.rules).string = {max_len: 200},
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
             max_length: 200;
             example: "\"gigi@zitadel.cloud\"";
         }
@@ -172,26 +200,29 @@ message LoginNameQuery {
     ];
 }
 
-//UserStateQuery always equals
+// StateQuery query for users with a specific state.
 message StateQuery {
     UserState state = 1 [
         (validate.rules).enum.defined_only = true,
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "current state of the user";
         }
     ];
 }
 
-//UserTypeQuery always equals
+// TypeQuery query for users with a specific type.
 message TypeQuery {
     Type type = 1 [
         (validate.rules).enum.defined_only = true,
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "the type of the user";
         }
     ];
 }
 
+// InUserEmailsQuery query for users with email in list of emails.
 message InUserEmailsQuery {
     repeated string user_emails = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -201,11 +232,14 @@ message InUserEmailsQuery {
     ];
 }
 
-//ResourceOwnerQuery always equals
-message ResourceOwnerQuery {
-    string resource_owner = 1 [
-        (validate.rules).string = {max_len: 200},
+// OrganizationIdQuery query for users under a specific organization as resource owner.
+message OrganizationIdQuery {
+    string organization_id = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            min_length: 1;
+            max_length: 200;
             example: "\"69629023906488334\""
         }
     ];
