@@ -289,3 +289,39 @@ func TestTextArray_Scan(t *testing.T) {
 		})
 	}
 }
+
+func TestDuration_Scan(t *testing.T) {
+	duration := Duration(10)
+	type args struct {
+		src any
+	}
+	type res struct {
+		want sql.Scanner
+		err  bool
+	}
+	type testCase[V ~string] struct {
+		name string
+		m    sql.Scanner
+		args args
+		res
+	}
+	tests := []testCase[string]{
+		{
+			name: "int64",
+			m:    new(Duration),
+			args: args{src: int64(duration)},
+			res: res{
+				want: &duration,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.m.Scan(tt.args.src); (err != nil) != tt.res.err {
+				t.Errorf("Scan() error = %v, wantErr %v", err, tt.res.err)
+			}
+
+			assert.Equal(t, tt.res.want, tt.m)
+		})
+	}
+}

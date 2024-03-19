@@ -502,7 +502,7 @@ func scanAuthzInstance(host, domain string) (*authzInstance, func(row *sql.Row) 
 			lang                  string
 			enableIframeEmbedding sql.NullBool
 			enableImpersonation   sql.NullBool
-			auditLogRetention     database.NullDuration
+			auditLogRetention     sql.Null[database.Duration]
 			block                 sql.NullBool
 			features              []byte
 		)
@@ -528,7 +528,7 @@ func scanAuthzInstance(host, domain string) (*authzInstance, func(row *sql.Row) 
 		}
 		instance.defaultLang = language.Make(lang)
 		if auditLogRetention.Valid {
-			instance.auditLogRetention = &auditLogRetention.Duration
+			instance.auditLogRetention = (*time.Duration)(&auditLogRetention.V)
 		}
 		if block.Valid {
 			instance.block = &block.Bool
