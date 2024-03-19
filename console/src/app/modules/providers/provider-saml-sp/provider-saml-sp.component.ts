@@ -7,7 +7,7 @@ import { ManagementService } from '../../../services/mgmt.service';
 import { AdminService } from '../../../services/admin.service';
 import { ToastService } from '../../../services/toast.service';
 import { GrpcAuthService } from '../../../services/grpc-auth.service';
-import { BehaviorSubject, Observable, switchMap, take } from 'rxjs';
+import {forkJoin, Observable, take} from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from '../../../services/breadcrumb.service';
 import { atLeastOneIsFilled, requiredValidator } from '../../form-field/validators/validators';
@@ -23,13 +23,8 @@ import {
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { EnvironmentService } from '../../../services/environment.service';
 import { map } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
-
-interface CopyRow {
-  label: string;
-  url: string;
-  downloadable?: boolean;
-}
+import {Next} from "../provider-next/provider-next.component";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'cnsl-provider-saml-sp',
@@ -45,8 +40,7 @@ export class ProviderSamlSpComponent {
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
-  public metadataUrlCopied: string = '';
-  public copyRows$: Observable<CopyRow[]>;
+  public next$: Observable<Next>;
 
   bindingValues: string[] = Object.keys(SAMLBinding);
 
@@ -57,29 +51,37 @@ export class ProviderSamlSpComponent {
     private route: ActivatedRoute,
     private injector: Injector,
     private breadcrumbService: BreadcrumbService,
-    private envSvc: EnvironmentService,
+    env: EnvironmentService,
+    translateSvc: TranslateService,
   ) {
     this._buildBreadcrumbs();
-      this.copyRows$ = !this.id ? new Observable<CopyRow[]>() : this.envSvc.env.pipe(
-        take(1),
-        map((env) => {
-          const idpBase = `${env.issuer}/idps/${this.id}/saml`;
-          return [{
-            label: 'ZITADEL Metadata',
-            url: `${idpBase}/metadata`,
-            downloadable: true,
-          }, {
-            label: 'ZITADEL Single Logout',
-            url: `${idpBase}/slo`,
-          }, {
-            label: 'ZITADEL ACS Intent API',
-            url: `${idpBase}/acs`,
-          }, {
-            label: 'ZITADEL ACS Login Form',
-            url: `${env.issuer}/ui/login/login/externalidp/saml/acs`,
-          }];
-        }),
-      );
+    this.next$ = forkJoin([
+      env.env,
+      translateSvc.get('DESCRIPTIONS.SETTINGS.IDPS.SAML.TITLE'),
+      translateSvc.get('DESCRIPTIONS.SETTINGS.IDPS.SAML.DESCRIPTION'),
+    ]).pipe(
+      map(([environment, title, description]) => {
+        const idpBase = `${environment.issuer}/idps/${this.id}/saml`;
+        return {
+        copyUrls: [{
+          label: 'ZITADEL Metadata',
+          url: `${idpBase}/metadata`,
+          downloadable: true,
+        }, {
+          label: 'ZITADEL Single Logout',
+          url: `${idpBase}/slo`,
+        }, {
+          label: 'ZITADEL ACS Intent API',
+          url: `${idpBase}/acs`,
+        }, {
+          label: 'ZITADEL ACS Login Form',
+          url: `${environment.issuer}/ui/login/login/externalidp/saml/acs`,
+        }],
+        autofillLink: 'https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml#optional-add-zitadel-action-to-autofill-userdata',
+        configureTitle: title as string,
+        configureDescription: description as string,
+      }}),
+    )
     this._initializeForm();
     this._checkFormPermissions();
   }

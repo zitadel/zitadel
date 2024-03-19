@@ -32,6 +32,8 @@ import { ProvidersRoutingModule } from './providers-routing.module';
 import { ProviderSamlSpComponent } from './provider-saml-sp/provider-saml-sp.component';
 import { CopyToClipboardModule } from '../../directives/copy-to-clipboard/copy-to-clipboard.module';
 import { CopyRowComponent } from '../../components/copy-row/copy-row.component';
+import {ProviderNextComponent} from "./provider-next/provider-next.component";
+import {ProviderNextDialogComponent} from "./provider-next-dialog/provider-next-dialog.component";
 
 @NgModule({
   declarations: [
@@ -49,6 +51,8 @@ import { CopyRowComponent } from '../../components/copy-row/copy-row.component';
     ProviderLDAPComponent,
     ProviderAppleComponent,
     ProviderSamlSpComponent,
+    ProviderNextComponent,
+    ProviderNextDialogComponent,
   ],
   imports: [
     ProvidersRoutingModule,

@@ -1,0 +1,26 @@
+<cnsl-card
+  [title]="next.configureTitle"
+  [description]="next.configureDescription"
+  *ngIf="next.copyUrls.length"
+>
+  <cnsl-copy-row *ngFor="let row of next.copyUrls" [label]="row.label" [value]="row.url" labelMinWidth="200px">
+    <a *ngIf="row.downloadable" class="download-button" mat-stroked-button [href]="row.url" download>{{
+      'ACTIONS.DOWNLOAD' | translate
+      }}</a>
+  </cnsl-copy-row>
+</cnsl-card>
+<cnsl-card
+  [title]="'DESCRIPTIONS.SETTINGS.IDPS.AUTOFILL.TITLE' | translate"
+  [description]="'DESCRIPTIONS.SETTINGS.IDPS.AUTOFILL.DESCRIPTION' | translate"
+  *ngIf="next.autofillLink"
+>
+  <a
+    card-actions
+    mat-icon-button
+    [href]="next.autofillLink"
+    rel="noreferrer"
+    target="_blank"
+  >
+    <mat-icon class="icon">info_outline</mat-icon>
+  </a>
+</cnsl-card>

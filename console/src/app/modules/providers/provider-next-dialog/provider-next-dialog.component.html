@@ -1,0 +1,18 @@
+<h1 mat-dialog-title>
+  <span class="title">Next Steps (TRANSLATE)</span>
+</h1>
+<div mat-dialog-content>
+  <cnsl-provider-next *ngIf="next$ | async as next" [next]="next"></cnsl-provider-next>
+</div>
+<div mat-dialog-actions class="action">
+  <button
+    cdkFocusInitial
+    color="primary"
+    mat-raised-button
+    class="ok-button"
+    (click)="closeDialog()"
+    data-e2e="close-dialog"
+  >
+    {{ 'ACTIONS.CLOSE' | translate }}
+  </button>
+</div>
