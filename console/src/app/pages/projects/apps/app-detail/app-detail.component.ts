@@ -308,7 +308,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               this.breadcrumbService.setBreadcrumb(breadcrumbs);
 
               if (this.app.oidcConfig) {
-                console.log(this.app.oidcConfig)
                 this.getAuthMethodOptions('OIDC');
 
                 if (
