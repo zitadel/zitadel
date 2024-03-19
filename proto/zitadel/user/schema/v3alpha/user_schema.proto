@@ -79,6 +79,8 @@ message SearchQuery {
     TypeQuery type_query = 5;
     // Limit the result to a specific state of the schema.
     StateQuery state_query = 6;
+    // Limit the result to a specific schema ID.
+    IDQuery id_query = 7;
   }
 }
 
