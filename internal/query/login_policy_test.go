@@ -84,6 +84,7 @@ var (
 )
 
 func Test_LoginPolicyPrepares(t *testing.T) {
+	duration := 2 * time.Hour
 	type want struct {
 		sqlExpectations sqlExpectation
 		err             checkErr
@@ -139,11 +140,11 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						true,
 						true,
 						"https://example.com/redirect",
-						time.Duration(2 * time.Hour),
-						time.Duration(2 * time.Hour),
-						time.Duration(2 * time.Hour),
-						time.Duration(2 * time.Hour),
-						time.Duration(2 * time.Hour),
+						&duration,
+						&duration,
+						&duration,
+						&duration,
+						&duration,
 					},
 				),
 			},
@@ -167,11 +168,11 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				DisableLoginWithEmail:      true,
 				DisableLoginWithPhone:      true,
 				DefaultRedirectURI:         "https://example.com/redirect",
-				PasswordCheckLifetime:      database.Duration(time.Hour * 2),
-				ExternalLoginCheckLifetime: database.Duration(time.Hour * 2),
-				MFAInitSkipLifetime:        database.Duration(time.Hour * 2),
-				SecondFactorCheckLifetime:  database.Duration(time.Hour * 2),
-				MultiFactorCheckLifetime:   database.Duration(time.Hour * 2),
+				PasswordCheckLifetime:      database.Duration(duration),
+				ExternalLoginCheckLifetime: database.Duration(duration),
+				MFAInitSkipLifetime:        database.Duration(duration),
+				SecondFactorCheckLifetime:  database.Duration(duration),
+				MultiFactorCheckLifetime:   database.Duration(duration),
 			},
 		},
 		{

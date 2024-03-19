@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-	"time"
 )
 
 var _ driver.ValueConverter = (*TypeConverter)(nil)
@@ -16,10 +15,6 @@ type TypeConverter struct{}
 func (s TypeConverter) ConvertValue(v any) (driver.Value, error) {
 	if driver.IsValue(v) {
 		return v, nil
-	}
-
-	if duration, ok := v.(time.Duration); ok {
-		return int64(duration), nil
 	}
 
 	value := reflect.ValueOf(v)

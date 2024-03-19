@@ -135,10 +135,28 @@ type Duration time.Duration
 
 // Scan implements the [database/sql.Scanner] interface.
 func (d *Duration) Scan(src any) error {
+	switch duration := src.(type) {
+	case *time.Duration:
+		*d = Duration(*duration)
+		return nil
+	case time.Duration:
+		*d = Duration(duration)
+		return nil
+	case *pgtype.Interval:
+		*d = intervalToDuration(duration)
+		return nil
+	case pgtype.Interval:
+		*d = intervalToDuration(&duration)
+		return nil
+	}
 	interval := new(pgtype.Interval)
 	if err := interval.Scan(src); err != nil {
 		return err
 	}
-	*d = Duration(time.Duration(interval.Microseconds*1000) + time.Duration(interval.Days)*24*time.Hour + time.Duration(interval.Months)*30*24*time.Hour)
+	*d = intervalToDuration(interval)
 	return nil
+}
+
+func intervalToDuration(interval *pgtype.Interval) Duration {
+	return Duration(time.Duration(interval.Microseconds*1000) + time.Duration(interval.Days)*24*time.Hour + time.Duration(interval.Months)*30*24*time.Hour)
 }
