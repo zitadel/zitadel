@@ -102,7 +102,8 @@ clean:
 
 .PHONY: core_unit_test
 core_unit_test:
-	go test -race -coverprofile=profile.cov ./...
+	# remove nocoverageredesign after go 1.23 is released (https://github.com/golang/go/issues/65653)
+	GOEXPERIMENT=nocoverageredesign go test -race -coverprofile=profile.cov ./...
 
 .PHONY: core_integration_setup
 core_integration_setup:
@@ -113,7 +114,8 @@ core_integration_setup:
 
 .PHONY: core_integration_test
 core_integration_test: core_integration_setup
-	go test -tags=integration -race -p 1 -coverprofile=profile.cov -coverpkg=./internal/...,./cmd/... ./...
+	# remove nocoverageredesign after go 1.23 is released (https://github.com/golang/go/issues/65653)
+	GOEXPERIMENT=nocoverageredesign go test -tags=integration -race -p 1 -coverprofile=profile.cov -coverpkg=./internal/...,./cmd/... ./...
 
 .PHONY: console_lint
 console_lint:
