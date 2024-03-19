@@ -157,7 +157,6 @@ service UserService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "User by ID";
       description: "Returns the full user object (human or machine) including the profile, email, etc."
-      tags: "Users";
       responses: {
         key: "200"
         value: {
@@ -183,7 +182,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Users";
       summary: "Search Users";
       description: "Search for users. By default, we will return users of your organization. Make sure to include a limit and sorting for pagination."
       responses: {
