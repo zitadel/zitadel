@@ -332,15 +332,8 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Configure Identity Providers",
-          link: {
-            type: "generated-index",
-            title:
-              "Let Users Login with Preferred Identity Provider in ZITADEL",
-            slug: "/guides/integrate/identity-providers",
-            description:
-              "In the following guides you will learn how to configure and setup your preferred external identity provider in ZITADEL.",
-          },
+          label: "Login users with SSO",
+          link: { type: "doc", id: "guides/integrate/identity-providers/introduction" },
           collapsed: true,
           items: [
             "guides/integrate/identity-providers/google",
@@ -351,11 +344,12 @@ module.exports = {
             "guides/integrate/identity-providers/apple",
             "guides/integrate/identity-providers/ldap",
             "guides/integrate/identity-providers/openldap",
-            "guides/integrate/identity-providers/migrate",
             "guides/integrate/identity-providers/okta-oidc",
             "guides/integrate/identity-providers/okta-saml",
             "guides/integrate/identity-providers/keycloak",
             "guides/integrate/identity-providers/mocksaml",
+            "guides/integrate/identity-providers/jwt_idp",
+            "guides/integrate/identity-providers/migrate",
             "guides/integrate/identity-providers/additional-information",
           ],
         },
