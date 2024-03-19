@@ -101,7 +101,7 @@ func prepareQuotaQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 				}
 				return nil, zerrors.ThrowInternal(err, "QUERY-LqySK", "Errors.Internal")
 			}
-			q.ResetInterval = time.Duration(interval.Duration)
+			q.ResetInterval = interval.Duration
 			q.CurrentPeriodStart = pushPeriodStart(q.From, q.ResetInterval, now)
 			return q, nil
 		}
