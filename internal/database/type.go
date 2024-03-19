@@ -148,6 +148,9 @@ func (d *Duration) Scan(src any) error {
 	case pgtype.Interval:
 		*d = intervalToDuration(&duration)
 		return nil
+	case int64:
+		*d = Duration(duration)
+		return nil
 	}
 	interval := new(pgtype.Interval)
 	if err := interval.Scan(src); err != nil {
