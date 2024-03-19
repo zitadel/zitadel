@@ -28,7 +28,7 @@
         { "source": "/docs/guides/solution-scenarios/onboarding", "destination": "/docs/guides/integrate/onboarding", "permanent": true },
         { "source": "/docs/guides/solution-scenarios/onboarding/b2b", "destination": "/docs/guides/integrate/onboarding/b2b", "permanent": true },
         { "source": "/docs/guides/solution-scenarios/onboarding/end-users", "destination": "/docs/guides/integrate/onboarding/end-users", "permanent": true },
-        { "source": "/docs/concepts/structure/jwt_idp", "destination": "/docs/guides/integrate/identity-providers/jwt-idp", "permanent": true }
+        { "source": "/docs/concepts/structure/jwt_idp", "destination": "/docs/guides/integrate/identity-providers/jwt-idp", "permanent": true },
         { "source": "/docs/concepts/structure/jwt-idp", "destination": "/docs/guides/integrate/identity-providers/jwt-idp", "permanent": true }
     ]
 }
