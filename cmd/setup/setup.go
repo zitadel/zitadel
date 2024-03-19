@@ -173,7 +173,6 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 		steps.s20AddByUserSessionIndex,
 		steps.s22ActiveInstancesIndex,
 		steps.s23CorrectGlobalUniqueConstraints,
-		steps.s24AddLowerFieldsToVerifiedEmail,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
@@ -186,6 +185,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	for _, step := range []migration.Migration{
 		steps.s18AddLowerFieldsToLoginNames,
 		steps.s21AddBlockFieldToLimits,
+		steps.s24AddLowerFieldsToVerifiedEmail,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
