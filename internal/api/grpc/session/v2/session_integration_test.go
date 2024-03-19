@@ -390,6 +390,27 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 	verifyCurrentSession(t, createResp.GetSessionId(), updateResp.GetSessionToken(), updateResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, wantUserFactor, wantIntentFactor)
 }
 
+func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
+	idpID := Tester.AddGenericOAuthProvider(t)
+
+	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, idpID, User.GetUserId(), "id")
+	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+		Checks: &session.Checks{
+			User: &session.CheckUser{
+				Search: &session.CheckUser_UserId{
+					UserId: User.GetUserId(),
+				},
+			},
+			IdpIntent: &session.CheckIDPIntent{
+				IdpIntentId:    intentID,
+				IdpIntentToken: token,
+			},
+		},
+	})
+	require.NoError(t, err)
+	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, wantUserFactor, wantIntentFactor)
+}
+
 func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t)
 

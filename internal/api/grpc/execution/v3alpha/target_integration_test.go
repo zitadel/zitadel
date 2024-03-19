@@ -20,6 +20,7 @@ import (
 )
 
 func TestServer_CreateTarget(t *testing.T) {
+	ensureFeatureEnabled(t)
 	tests := []struct {
 		name    string
 		ctx     context.Context
@@ -170,6 +171,7 @@ func TestServer_CreateTarget(t *testing.T) {
 }
 
 func TestServer_UpdateTarget(t *testing.T) {
+	ensureFeatureEnabled(t)
 	type args struct {
 		ctx context.Context
 		req *execution.UpdateTargetRequest
@@ -338,6 +340,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 }
 
 func TestServer_DeleteTarget(t *testing.T) {
+	ensureFeatureEnabled(t)
 	target := Tester.CreateTarget(CTX, t)
 	tests := []struct {
 		name    string

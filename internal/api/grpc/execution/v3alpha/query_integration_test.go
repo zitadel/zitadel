@@ -18,6 +18,7 @@ import (
 )
 
 func TestServer_GetTargetByID(t *testing.T) {
+	ensureFeatureEnabled(t)
 	type args struct {
 		ctx context.Context
 		dep func(context.Context, *execution.GetTargetByIDRequest, *execution.GetTargetByIDResponse) error
@@ -178,6 +179,7 @@ func TestServer_GetTargetByID(t *testing.T) {
 }
 
 func TestServer_ListTargets(t *testing.T) {
+	ensureFeatureEnabled(t)
 	type args struct {
 		ctx context.Context
 		dep func(context.Context, *execution.ListTargetsRequest, *execution.ListTargetsResponse) error
@@ -421,6 +423,7 @@ func TestServer_ListTargets(t *testing.T) {
 }
 
 func TestServer_ListExecutions_Request(t *testing.T) {
+	ensureFeatureEnabled(t)
 	targetResp := Tester.CreateTarget(CTX, t)
 
 	type args struct {
