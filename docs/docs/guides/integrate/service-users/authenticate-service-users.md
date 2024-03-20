@@ -75,7 +75,7 @@ Follow our guide on using [private key JWT client authentication](./private-key-
 
 Follow our guide on using [client credentials grant](./client-credentials) to get started authenticating service users and clients.
 
-This method is still available in ZITADEL but generally considered less secure than JWT due to:
+This method is still available in ZITADEL but is generally considered less secure than JWT due to:
 
 * **Centralized Validation:** Relies on the server to verify credentials for every request, potentially impacting performance and requiring more server resources.
 * **Credentials Exposure:** Leaked client ID and secret could be used by attackers to impersonate the service user until rotation occurs.
