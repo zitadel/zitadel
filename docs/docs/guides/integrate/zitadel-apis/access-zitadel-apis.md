@@ -207,7 +207,7 @@ Content-Type: application/json
 }
 ```
 
-Because the received Token includes the `urn:zitadel:iam:org:project:id:zitadel:aud` scope, we can send it in your requests to the ZITADEL API as Authorization Header.
+Because the received token includes the `urn:zitadel:iam:org:project:id:zitadel:aud` scope, we can send it in your requests to the ZITADEL API as the Authorization Header.
 In this example we read the organization of the service user.
 
 ```bash
