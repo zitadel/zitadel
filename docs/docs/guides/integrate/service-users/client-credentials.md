@@ -60,6 +60,12 @@ Content-Type: application/json
 }
 ```
 
+Per default a service user will get an opaque access token.
+If you want to get a Jason Web Token (JWT) as an access token for your user, you can change the token type in the general settings of your service account.
+To learn more about opaque and JWT tokens read our [Opaque Tokens in ZITADEL: Enhancing Application Security](/docs/concepts/knowledge/opaque-tokens) Guide
+
+![Service User Token Type](/img/console_service_user_tokentype.png)
+
 ### 3. Include the access token in the authorization header
 
 When making API requests on behalf of the service user, include the generated token in the "Authorization" header with the "Bearer" prefix.
