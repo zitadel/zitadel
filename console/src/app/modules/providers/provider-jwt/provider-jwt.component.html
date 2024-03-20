@@ -6,10 +6,16 @@
     <div class="title-row">
       <mat-icon class="idp-logo" svgIcon="mdi_jwt" alt="jwt" />
       <h1>{{ 'IDP.CREATE.JWT.TITLE' | translate }}</h1>
+      <div
+        *ngIf="{isActive: id && !(activateLink$ | async) } as idp"
+        class="cnsl-state-dot"
+        [matTooltip]="(idp.isActive ? 'IDP.STATES.1' : 'IDP.STATES.2') | translate"
+        [ngClass]="{ active: idp.isActive, inactive: !idp.isActive }"
+      ></div>
       <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
     </div>
 
-    <cnsl-provider-next *ngIf="provider && next$ | async as next" [next]="next"></cnsl-provider-next>
+    <cnsl-provider-next  (activate)="activate(id!)"></cnsl-provider-next>
 
     <p class="identity-provider-desc cnsl-secondary-text">{{ 'IDP.CREATE.JWT.DESCRIPTION' | translate }}</p>
 

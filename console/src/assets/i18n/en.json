@@ -91,15 +91,22 @@
         "DESCRIPTION": "Create and activate external identity providers. Choose a well-known provider or configure any other OIDC, OAuth or SAML compatible provider of your choice. You can even use your existing JWT tokens as federated identities by configuring a JWT identity provider.",
         "SAML": {
           "TITLE": "Configure your SAML Identity Provider",
-          "DESCRIPTION": "ZITADEL is configured. Now your SAML Identity Provider needs some configuration. Most providers allow you to just upload the whole ZITADEL metadata XML. Other providers ask you to provide some distict URLs only, like for example the entity ID (metadata URL), the Assertion Consumer Service (ACS) URL or the Single Logout URL."
+          "DESCRIPTION": "ZITADEL is configured. Now your SAML Identity Provider needs some configuration. Most providers allow you to just upload the whole ZITADEL metadata XML. Other providers ask you to provide some distinct URLs only, like for example the entity ID (metadata URL), the Assertion Consumer Service (ACS) URL or the Single Logout URL."
+        },
+        "CALLBACK": {
+          "TITLE": "Configure {{ provider }}",
+          "DESCRIPTION": "Copy this URL to allow {{ provider }} to redirect your users browser back to ZITADEL after they are authenticated."
         },
         "AUTOFILL": {
           "TITLE": "Autofill user data",
           "DESCRIPTION": "Use an action to improve your users experience. You can pre-fill ZITADELs registration form with values from the identity provider."
         },
-        "CALLBACK": {
-          "TITLE": "Configure {{ provider }}",
-          "DESCRIPTION": "Copy this URL and allow {{ provider }} to redirect your users back here after they have authenticated."
+        "ACTIVATE": {
+          "TITLE": "Activate the IdP",
+          "DESCRIPTION": {
+            "ORG": "Activate the IdP by adding it to your login policy so your users can actually log in with it.",
+            "INSTANCE": "Activate the IdP in your default login policy so your users across all organizations can actually to log in with it."
+          }
         }
       },
       "PW_COMPLEXITY": {

@@ -7,10 +7,16 @@
       <img class="idp-logo apple dark" src="./assets/images/idp/apple-dark.svg" alt="apple" />
       <img class="idp-logo apple light" src="./assets/images/idp/apple.svg" alt="apple" />
       <h1>{{ 'IDP.CREATE.APPLE.TITLE' | translate }}</h1>
-      <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
+      <div
+        *ngIf="{isActive: id && !(activateLink$ | async) } as idp"
+        class="cnsl-state-dot"
+        [matTooltip]="(idp.isActive ? 'IDP.STATES.1' : 'IDP.STATES.2') | translate"
+        [ngClass]="{ active: idp.isActive, inactive: !idp.isActive }"
+      ></div>
+      <mat-spinner diameter="25" *ngIf="loading" color="primary" (activate)="activate(id!)"></mat-spinner>
     </div>
 
-    <cnsl-provider-next *ngIf="next$ | async as next" [next]="next"></cnsl-provider-next>
+    <cnsl-provider-next (activate)="activate(id!)"></cnsl-provider-next>
 
     <p class="identity-provider-desc cnsl-secondary-text">
       {{ !provider ? ('IDP.CREATE.APPLE.DESCRIPTION' | translate) : ('IDP.DETAIL.DESCRIPTION' | translate) }}

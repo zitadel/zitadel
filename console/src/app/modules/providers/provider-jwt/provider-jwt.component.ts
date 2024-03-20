@@ -9,7 +9,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateJWTProviderRequest as AdminUpdateJWTProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import {IDPOwnerType, Options, Provider} from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddJWTProviderRequest as MgmtAddJWTProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -26,7 +26,6 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 import { MatDialog } from '@angular/material/dialog';
 import { ProviderNextService } from '../provider-next/provider-next.service';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { Next } from '../provider-next/provider-next.component';
 import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
 
 @Component({
@@ -47,7 +46,7 @@ export class ProviderJWTComponent {
 
   public provider?: Provider.AsObject;
 
-  public next$: Observable<Next>;
+  public activateLink$ = new BehaviorSubject<string>('');
 
   constructor(
     private authService: GrpcAuthService,
@@ -59,14 +58,6 @@ export class ProviderJWTComponent {
     private dialog: MatDialog,
     nextSvc: ProviderNextService,
   ) {
-    this.next$ = nextSvc.next(
-      'JWT provider',
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
-      'https://zitadel.com/docs/guides/integrate/identity-providers/jwt-idp',
-      of('https://zitadel.com/docs/guides/integrate/identity-providers/additional-information'),
-      () => [],
-    );
 
     this.route.data.pipe(take(1)).subscribe((data) => {
       this.serviceType = data['serviceType'];
@@ -124,6 +115,19 @@ export class ProviderJWTComponent {
           this.form.disable();
         }
       });
+
+    this.setActive(false);
+    nextSvc.next(
+      'JWT provider',
+      this.activateLink$,
+      this.serviceType === PolicyComponentServiceType.ADMIN,
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
+      'https://zitadel.com/docs/guides/integrate/identity-providers/jwt-idp',
+      of('https://zitadel.com/docs/guides/integrate/identity-providers/additional-information'),
+      () => [],
+    );
+
   }
 
   private getData(id: string): void {
@@ -146,6 +150,13 @@ export class ProviderJWTComponent {
         this.toast.showError(error);
         this.loading = false;
       });
+    this.service.getLoginPolicy()
+      .then((policy) => {
+        this.setActive(!!policy.policy?.idpsList.find(idp => idp.idpId === this.id));
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public submitForm(): void {
@@ -167,17 +178,21 @@ export class ProviderJWTComponent {
     this.loading = true;
     this.service
       .addJWTProvider(req)
-      .then((idp) => {
-        const dialogRef = this.dialog.open(ProviderNextDialogComponent, { data: this.next$ });
-        dialogRef.afterClosed().subscribe(() => {
-          this.close();
-        });
+      .then((addedIDP) => {
         this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);
         this.loading = false;
       });
+  }
+
+  public activate(id: string) {
+    this.service.addIDPToLoginPolicy(id, this.serviceType === PolicyComponentServiceType.ADMIN ? IDPOwnerType.IDP_OWNER_TYPE_SYSTEM : IDPOwnerType.IDP_OWNER_TYPE_ORG).then(() => {
+      this.toast.showInfo('POLICY.TOAST.ADDIDP', true);
+      this.setActive(true);
+      this.id = id;
+    });
   }
 
   public updateJWTProvider(): void {
@@ -208,6 +223,10 @@ export class ProviderJWTComponent {
           this.loading = false;
         });
     }
+  }
+
+  private setActive(active: boolean) {
+    this.activateLink$.next(active ?'' :  'https://zitadel.com/docs/guides/integrate/identity-providers/okta-oidc#activate-idp' );
   }
 
   public close(): void {

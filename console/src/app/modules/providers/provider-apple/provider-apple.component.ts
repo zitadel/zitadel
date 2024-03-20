@@ -10,7 +10,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateAppleProviderRequest as AdminUpdateAppleProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import {IDPOwnerType, Options, Provider} from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddAppleProviderRequest as MgmtAddAppleProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -26,7 +26,6 @@ import { requiredValidator } from '../../form-field/validators/validators';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 import { MatDialog } from '@angular/material/dialog';
 import { ProviderNextService } from '../provider-next/provider-next.service';
-import { Next } from '../provider-next/provider-next.component';
 import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
 
 const MAX_ALLOWED_SIZE = 5 * 1024;
@@ -51,8 +50,8 @@ export class ProviderAppleComponent {
   public provider?: Provider.AsObject;
   public updatePrivateKey: boolean = false;
 
-  public next$: Observable<Next>;
   private autofillLink$ = new BehaviorSubject<string>('');
+  public activateLink$ = new BehaviorSubject<string>('');
 
   constructor(
     private authService: GrpcAuthService,
@@ -72,15 +71,6 @@ export class ProviderAppleComponent {
       privateKey: new FormControl('', [requiredValidator]),
       scopesList: new FormControl(['name', 'email'], []),
     });
-
-    this.next$ = nextSvc.next(
-      'Apple',
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
-      'https://zitadel.com/docs/guides/integrate/identity-providers/apple#apple-configuration',
-      this.autofillLink$,
-      nextSvc.callbackUrls,
-    );
 
     this.authService
       .isAllowed(
@@ -131,6 +121,18 @@ export class ProviderAppleComponent {
         this.getData(this.id);
       }
     });
+
+    this.setActive(false);
+    nextSvc.next(
+      'Apple',
+      this.activateLink$,
+      this.serviceType === PolicyComponentServiceType.ADMIN,
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
+      'https://zitadel.com/docs/guides/integrate/identity-providers/apple#apple-configuration',
+      this.autofillLink$,
+      () => [],
+    );
   }
 
   private getData(id: string): void {
@@ -152,6 +154,13 @@ export class ProviderAppleComponent {
       .catch((error) => {
         this.toast.showError(error);
         this.loading = false;
+      });
+    this.service.getLoginPolicy()
+      .then((policy) => {
+        this.setActive(!!policy.policy?.idpsList.find(idp => idp.idpId === this.id));
+      })
+      .catch((error) => {
+        this.toast.showError(error);
       });
   }
 
@@ -176,18 +185,22 @@ export class ProviderAppleComponent {
     this.loading = true;
     this.service
       .addAppleProvider(req)
-      .then((idp) => {
+      .then((addedIDP) => {
         this.showAutofillGuide();
-        const dialogRef = this.dialog.open(ProviderNextDialogComponent, { data: this.next$ });
-        dialogRef.afterClosed().subscribe(() => {
-          this.close();
-        });
         this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);
         this.loading = false;
       });
+  }
+
+  public activate(id: string) {
+    this.service.addIDPToLoginPolicy(id, this.serviceType === PolicyComponentServiceType.ADMIN ? IDPOwnerType.IDP_OWNER_TYPE_SYSTEM : IDPOwnerType.IDP_OWNER_TYPE_ORG).then(() => {
+      this.toast.showInfo('POLICY.TOAST.ADDIDP', true);
+      this.setActive(true);
+      this.id = id;
+    });
   }
 
   public updateAppleProvider(): void {
@@ -303,6 +316,10 @@ export class ProviderAppleComponent {
 
   private showAutofillGuide(): void {
     this.autofillLink$.next('https://zitadel.com/docs/guides/integrate/identity-providers/additional-information');
+  }
+
+  private setActive(active: boolean) {
+    this.activateLink$.next(active ? '' : 'https://zitadel.com/docs/guides/integrate/identity-providers/apple#activate-idp' );
   }
 
   public get name(): AbstractControl | null {

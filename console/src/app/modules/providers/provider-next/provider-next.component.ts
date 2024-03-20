@@ -1,5 +1,7 @@
-import { Component, Input } from '@angular/core';
-import { Observable } from 'rxjs';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ManagementService} from "../../../services/mgmt.service";
+import {AdminService} from "../../../services/admin.service";
+import {PolicyComponentServiceType} from "../../policies/policy-component-types.enum";
 
 export interface CopyUrl {
   label: string;
@@ -7,19 +9,21 @@ export interface CopyUrl {
   downloadable?: boolean;
 }
 
-export interface Next {
-  copyUrls: CopyUrl[];
-  autofillLink?: string;
-  configureTitle: string;
-  configureDescription: string;
-  configureLink: string;
-}
-
 @Component({
   selector: 'cnsl-provider-next',
   templateUrl: './provider-next.component.html',
 })
 export class ProviderNextComponent {
-  @Input({ required: true }) next!: Next;
+  @Input() copyUrls?: CopyUrl[] | null;
+  @Input() autofillLink?: string | null;
+  @Input() activateLink?: string | null;
+  @Input() configureProvider?: boolean | null;
+  @Input() configureTitle?: string;
+  @Input() configureDescription?: string;
+  @Input() configureLink?: string;
+  @Input() isInstance?: boolean;
+  @Input() expanded?: boolean;
+  @Output() activate = new EventEmitter<void>();
+
   constructor() {}
 }

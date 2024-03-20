@@ -4,13 +4,13 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, forkJoin, Observable, switchMap, take } from 'rxjs';
+import { BehaviorSubject, Observable, switchMap, take } from 'rxjs';
 import {
   AddGoogleProviderRequest as AdminAddGoogleProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateGoogleProviderRequest as AdminUpdateGoogleProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import {IDPOwnerType, Options, Provider} from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddGoogleProviderRequest as MgmtAddGoogleProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -24,11 +24,9 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
-import { map } from 'rxjs/operators';
-import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { Next } from '../provider-next/provider-next.component';
 import { ProviderNextService } from '../provider-next/provider-next.service';
+import {CopyUrl} from "../provider-next/provider-next.component";
 
 @Component({
   selector: 'cnsl-provider-google',
@@ -50,8 +48,13 @@ export class ProviderGoogleComponent {
   public provider?: Provider.AsObject;
   public updateClientSecret: boolean = false;
 
-  public next$: Observable<Next>;
-  private autofillLink$ = new BehaviorSubject<string>('');
+  public autofillLink$ = new BehaviorSubject<string>('');
+  public activateLink$ = new BehaviorSubject<string>('');
+  public isActive$ = new BehaviorSubject<boolean>(false)
+  public expandWhatNow$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public copyUrls$: Observable<CopyUrl[]> = this.nextSvc.callbackUrls();
+  public configureProvider$ = new BehaviorSubject<boolean>(false);
+  public isInstance: boolean = false;
 
   constructor(
     private authService: GrpcAuthService,
@@ -61,7 +64,7 @@ export class ProviderGoogleComponent {
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
     private dialog: MatDialog,
-    nextSvc: ProviderNextService,
+    private nextSvc: ProviderNextService,
   ) {
     this.form = new FormGroup({
       name: new FormControl('', []),
@@ -69,15 +72,6 @@ export class ProviderGoogleComponent {
       clientSecret: new FormControl('', [requiredValidator]),
       scopesList: new FormControl(['openid', 'profile', 'email'], []),
     });
-    this.next$ = nextSvc.next(
-      'Google',
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
-      'https://zitadel.com/docs/guides/integrate/identity-providers/google#google-configuration',
-      this.autofillLink$,
-      nextSvc.callbackUrls,
-    );
-
     this.authService
       .isAllowed(
         this.serviceType === PolicyComponentServiceType.ADMIN
@@ -110,6 +104,7 @@ export class ProviderGoogleComponent {
           this.breadcrumbService.setBreadcrumb([bread]);
           break;
         case PolicyComponentServiceType.ADMIN:
+          this.isInstance = true;
           this.service = this.injector.get(AdminService as Type<AdminService>);
 
           const iamBread = new Breadcrumb({
@@ -120,17 +115,19 @@ export class ProviderGoogleComponent {
           this.breadcrumbService.setBreadcrumb([iamBread]);
           break;
       }
-
       this.id = this.route.snapshot.paramMap.get('id');
       if (this.id) {
-        this.showAutofillGuide();
+        this.showAutofillLink();
         this.clientSecret?.setValidators([]);
         this.getData(this.id);
+      } else {
+        this.expandWhatNow$.next(true);
+        this.configureProvider$.next(true);
       }
     });
   }
 
-  private showAutofillGuide(): void {
+  private showAutofillLink(): void {
     this.autofillLink$.next('https://zitadel.com/docs/guides/integrate/identity-providers/additional-information');
   }
 
@@ -144,7 +141,6 @@ export class ProviderGoogleComponent {
       .getProviderByID(req)
       .then((resp) => {
         this.provider = resp.idp;
-
         this.loading = false;
         if (this.provider?.config?.google) {
           this.form.patchValue(this.provider.config.google);
@@ -154,6 +150,14 @@ export class ProviderGoogleComponent {
       .catch((error) => {
         this.toast.showError(error);
         this.loading = false;
+      });
+    this.service.getLoginPolicy()
+      .then((policy) => {
+        this.isActive$.next(!!policy.policy?.idpsList.find(idp => idp.idpId === this.id));
+        this.setActivateable(this.isActive$.value ? '' : id);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
       });
   }
 
@@ -176,18 +180,24 @@ export class ProviderGoogleComponent {
     this.loading = true;
     this.service
       .addGoogleProvider(req)
-      .then((idp) => {
-        this.showAutofillGuide();
-        const dialogRef = this.dialog.open(ProviderNextDialogComponent, { data: this.next$ });
-        dialogRef.afterClosed().subscribe(() => {
-          this.close();
-        });
+      .then((addedIDP) => {
+        this.showAutofillLink();
+        this.setActivateable(addedIDP.id);
+        this.configureProvider$.next(false);
         this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);
         this.loading = false;
       });
+  }
+
+  public activate() {
+    this.service.addIDPToLoginPolicy(this.id!, this.serviceType === PolicyComponentServiceType.ADMIN ? IDPOwnerType.IDP_OWNER_TYPE_SYSTEM : IDPOwnerType.IDP_OWNER_TYPE_ORG).then(() => {
+      this.toast.showInfo('POLICY.TOAST.ADDIDP', true);
+      this.isActive$.next(true);
+      this.setActivateable('');
+    });
   }
 
   public updateGoogleProvider(): void {
@@ -271,6 +281,14 @@ export class ProviderGoogleComponent {
       if (index !== undefined && index >= 0) {
         this.scopesList.value.splice(index, 1);
       }
+    }
+  }
+
+  private setActivateable(id: string) {
+    this.activateLink$.next(!id ? '' : 'https://zitadel.com/docs/guides/integrate/identity-providers/google#activate-idp');
+    if (id) {
+      this.expandWhatNow$.next(true);
+      this.id = id;
     }
   }
 

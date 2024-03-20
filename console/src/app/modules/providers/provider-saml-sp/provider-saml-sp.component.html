@@ -6,10 +6,27 @@
     <div class="title-row">
       <img class="idp-logo" src="./assets/images/idp/saml-icon.svg" alt="saml" />
       <h1>{{ 'IDP.CREATE.SAML.TITLE' | translate }}</h1>
+      <div
+        *ngIf="{isActive: id && !(activateLink$ | async) } as idp"
+        class="cnsl-state-dot"
+        [matTooltip]="(idp.isActive ? 'IDP.STATES.1' : 'IDP.STATES.2') | translate"
+        [ngClass]="{ active: idp.isActive, inactive: !idp.isActive }"
+      ></div>
       <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
     </div>
 
-    <cnsl-provider-next *ngIf="provider && next$ | async as next" [next]="next"></cnsl-provider-next>
+    <cnsl-provider-next
+      [configureProvider]="configureProvider$ | async"
+      [configureTitle]="'DESCRIPTIONS.SETTINGS.IDPS.SAML.TITLE' | translate: { provider: 'SAML SP' }"
+      [configureDescription]="'DESCRIPTIONS.SETTINGS.IDPS.SAML.DESCRIPTION' | translate: { provider: 'SAML SP' }"
+      configureLink="https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml"
+      [autofillLink]="autofillLink$ | async"
+      [activateLink]="activateLink$ | async"
+      [copyUrls]="copyUrls$ | async"
+      [expanded]="!!(expandWhatNow$ | async)"
+      [isInstance]="isInstance"
+      (activate)="activate()"
+    ></cnsl-provider-next>
 
     <p class="identity-provider-desc cnsl-secondary-text">
       {{ !provider ? ('IDP.CREATE.SAML.DESCRIPTION' | translate) : ('IDP.DETAIL.DESCRIPTION' | translate) }}

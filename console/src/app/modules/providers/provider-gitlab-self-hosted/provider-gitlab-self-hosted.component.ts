@@ -10,7 +10,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateGitLabSelfHostedProviderRequest as AdminUpdateGitLabSelfHostedProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import {IDPOwnerType, Options, Provider} from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddGitLabSelfHostedProviderRequest as MgmtAddGitLabSelfHostedProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -26,7 +26,6 @@ import { requiredValidator } from '../../form-field/validators/validators';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 import { MatDialog } from '@angular/material/dialog';
 import { ProviderNextService } from '../provider-next/provider-next.service';
-import { Next } from '../provider-next/provider-next.component';
 import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
 
 @Component({
@@ -49,8 +48,8 @@ export class ProviderGitlabSelfHostedComponent {
   public provider?: Provider.AsObject;
   public updateClientSecret: boolean = false;
 
-  public next$: Observable<Next>;
   private autofillLink$ = new BehaviorSubject<string>('');
+  public activateLink$ = new BehaviorSubject<string>('');
 
   constructor(
     private authService: GrpcAuthService,
@@ -62,14 +61,7 @@ export class ProviderGitlabSelfHostedComponent {
     private dialog: MatDialog,
     nextSvc: ProviderNextService,
   ) {
-    this.next$ = nextSvc.next(
-      'GitLab',
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
-      'https://zitadel.com/docs/guides/integrate/identity-providers/gitlab#gitlab-configuration',
-      this.autofillLink$,
-      nextSvc.callbackUrls,
-    );
+
 
     this.form = new FormGroup({
       name: new FormControl('', [requiredValidator]),
@@ -128,6 +120,17 @@ export class ProviderGitlabSelfHostedComponent {
         this.getData(this.id);
       }
     });
+    this.setActive(false);
+    nextSvc.next(
+      'GitLab',
+      this.activateLink$,
+      this.serviceType === PolicyComponentServiceType.ADMIN,
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
+      'https://zitadel.com/docs/guides/integrate/identity-providers/gitlab#gitlab-configuration',
+      this.autofillLink$,
+      () => [],
+    );
   }
 
   private getData(id: string): void {
@@ -149,6 +152,13 @@ export class ProviderGitlabSelfHostedComponent {
       .catch((error) => {
         this.toast.showError(error);
         this.loading = false;
+      });
+    this.service.getLoginPolicy()
+      .then((policy) => {
+        this.setActive(!!policy.policy?.idpsList.find(idp => idp.idpId === this.id));
+      })
+      .catch((error) => {
+        this.toast.showError(error);
       });
   }
 
@@ -172,18 +182,22 @@ export class ProviderGitlabSelfHostedComponent {
     this.loading = true;
     this.service
       .addGitLabSelfHostedProvider(req)
-      .then((idp) => {
+      .then((addedIDP) => {
         this.showAutofillGuide();
-        const dialogRef = this.dialog.open(ProviderNextDialogComponent, { data: this.next$ });
-        dialogRef.afterClosed().subscribe(() => {
-          this.close();
-        });
         this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);
         this.loading = false;
       });
+  }
+
+  public activate(id: string) {
+    this.service.addIDPToLoginPolicy(id, this.serviceType === PolicyComponentServiceType.ADMIN ? IDPOwnerType.IDP_OWNER_TYPE_SYSTEM : IDPOwnerType.IDP_OWNER_TYPE_ORG).then(() => {
+      this.toast.showInfo('POLICY.TOAST.ADDIDP', true);
+      this.setActive(true);
+      this.id = id;
+    });
   }
 
   public updateGitlabSelfHostedProvider(): void {
@@ -251,6 +265,10 @@ export class ProviderGitlabSelfHostedComponent {
     this.autofillLink$.next(
       'https://zitadel.com/docs/guides/integrate/identity-providers/gitlab#optional-add-zitadel-action-to-autofill-userdata',
     );
+  }
+
+  private setActive(active: boolean) {
+    this.activateLink$.next(active ? '' : 'https://zitadel.com/docs/guides/integrate/identity-providers/gitlab#activate-idp');
   }
 
   public get name(): AbstractControl | null {

@@ -2,7 +2,7 @@
   <span class="title">{{ 'NEXTSTEPS.TITLE' | translate }}</span>
 </h1>
 <div mat-dialog-content>
-  <cnsl-provider-next *ngIf="next$ | async as next" [next]="next"></cnsl-provider-next>
+  <cnsl-provider-next (activate)="activate.emit()"></cnsl-provider-next>
 </div>
 <div mat-dialog-actions class="action">
   <button

@@ -10,7 +10,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateGenericOIDCProviderRequest as AdminUpdateGenericOIDCProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import {IDPOwnerType, Options, Provider} from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddGenericOIDCProviderRequest as MgmtAddGenericOIDCProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -25,7 +25,6 @@ import { requiredValidator } from '../../form-field/validators/validators';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 import { MatDialog } from '@angular/material/dialog';
 import { ProviderNextService } from '../provider-next/provider-next.service';
-import { Next } from '../provider-next/provider-next.component';
 import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
 
 @Component({
@@ -48,8 +47,8 @@ export class ProviderOIDCComponent {
 
   public provider?: Provider.AsObject;
 
-  public next$: Observable<Next>;
   private autofillLink$ = new BehaviorSubject<string>('');
+  public activateLink$ = new BehaviorSubject<string>('');
 
   constructor(
     private route: ActivatedRoute,
@@ -69,14 +68,7 @@ export class ProviderOIDCComponent {
       isIdTokenMapping: new UntypedFormControl(),
     });
 
-    this.next$ = nextSvc.next(
-      'OIDC provider',
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
-      '',
-      this.autofillLink$,
-      nextSvc.callbackUrls,
-    );
+
 
     this.route.data.pipe(take(1)).subscribe((data) => {
       this.serviceType = data['serviceType'];
@@ -110,6 +102,18 @@ export class ProviderOIDCComponent {
         this.getData(this.id);
       }
     });
+
+    this.setActive(false);
+    nextSvc.next(
+      'Generic OIDC',
+      this.activateLink$,
+      this.serviceType === PolicyComponentServiceType.ADMIN,
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
+      '',
+      this.autofillLink$,
+      () => [],
+    );
   }
 
   private getData(id: string): void {
@@ -132,6 +136,13 @@ export class ProviderOIDCComponent {
       .catch((error) => {
         this.toast.showError(error);
         this.loading = false;
+      });
+    this.service.getLoginPolicy()
+      .then((policy) => {
+        this.setActive(!!policy.policy?.idpsList.find(idp => idp.idpId === this.id));
+      })
+      .catch((error) => {
+        this.toast.showError(error);
       });
   }
 
@@ -156,18 +167,22 @@ export class ProviderOIDCComponent {
     this.loading = true;
     this.service
       .addGenericOIDCProvider(req)
-      .then((idp) => {
+      .then((addedIDP) => {
         this.showAutofillGuide();
-        const dialogRef = this.dialog.open(ProviderNextDialogComponent, { data: this.next$ });
-        dialogRef.afterClosed().subscribe(() => {
-          this.close();
-        });
         this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);
         this.loading = false;
       });
+  }
+
+  public activate(id: string) {
+    this.service.addIDPToLoginPolicy(id, this.serviceType === PolicyComponentServiceType.ADMIN ? IDPOwnerType.IDP_OWNER_TYPE_SYSTEM : IDPOwnerType.IDP_OWNER_TYPE_ORG).then(() => {
+      this.toast.showInfo('POLICY.TOAST.ADDIDP', true);
+      this.setActive(true);
+      this.id = id;
+    });
   }
 
   public updateGenericOIDCProvider(): void {
@@ -231,6 +246,10 @@ export class ProviderOIDCComponent {
 
   private showAutofillGuide(): void {
     this.autofillLink$.next('https://zitadel.com/docs/guides/integrate/identity-providers/additional-information');
+  }
+
+  private setActive(active: boolean) {
+    this.activateLink$.next(active ?'' :  'https://zitadel.com/docs/guides/integrate/identity-providers/okta-oidc#activate-idp' );
   }
 
   public get name(): AbstractControl | null {
