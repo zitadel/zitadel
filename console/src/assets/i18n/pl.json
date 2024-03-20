@@ -2280,7 +2280,8 @@
         "0": "Kod autoryzacyjny",
         "1": "Implicite",
         "2": "Token odświeżający",
-        "3": "Device Code"
+        "3": "Device Code",
+        "4": "Wymiana tokenów"
       },
       "AUTHMETHOD": {
         "0": "Podstawowy",

@@ -2280,7 +2280,8 @@
         "0": "Code d'autorisation",
         "1": "Implicite",
         "2": "Rafraîchir le jeton",
-        "3": "Device Code"
+        "3": "Device Code",
+        "4": "Échange de jetons"
       },
       "AUTHMETHOD": {
         "0": "Basic",
