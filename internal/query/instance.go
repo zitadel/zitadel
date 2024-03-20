@@ -528,7 +528,7 @@ func scanAuthzInstance(host, domain string) (*authzInstance, func(row *sql.Row) 
 		}
 		instance.defaultLang = language.Make(lang)
 		if auditLogRetention.Valid {
-			instance.auditLogRetention = (*time.Duration)(&auditLogRetention.Duration)
+			instance.auditLogRetention = &auditLogRetention.Duration
 		}
 		if block.Valid {
 			instance.block = &block.Bool
