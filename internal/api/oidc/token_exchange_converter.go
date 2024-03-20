@@ -42,8 +42,7 @@ func accessToExchangeToken(token *accessToken, issuer string) *exchangeToken {
 	}
 }
 
-func idTokenClaimsToExchangeToken(claims *oidc.IDTokenClaims) *exchangeToken {
-	resourceOwner, _ := claims.Claims[ClaimResourceOwnerID].(string)
+func idTokenClaimsToExchangeToken(claims *oidc.IDTokenClaims, resourceOwner string) *exchangeToken {
 	return &exchangeToken{
 		tokenType:     oidc.IDTokenType,
 		userID:        claims.Subject,

@@ -122,7 +122,16 @@ func (s *Server) verifyExchangeToken(ctx context.Context, client *Client, token 
 		if err != nil {
 			return nil, zerrors.ThrowPermissionDenied(err, "OIDC-Rei0f", "Errors.TokenExchange.Token.Invalid")
 		}
-		return idTokenClaimsToExchangeToken(claims), nil
+		resourceOwner, ok := claims.Claims[ClaimResourceOwnerID].(string)
+		if !ok || resourceOwner == "" {
+			user, err := s.query.GetUserByID(ctx, false, token)
+			if err != nil {
+				return nil, zerrors.ThrowPermissionDenied(err, "OIDC-aD0Oo", "Errors.TokenExchange.Token.Invalid")
+			}
+			resourceOwner = user.ResourceOwner
+		}
+
+		return idTokenClaimsToExchangeToken(claims, resourceOwner), nil
 
 	case oidc.JWTTokenType:
 		resourceOwner := new(string)
