@@ -356,6 +356,7 @@ module.exports = {
             "guides/integrate/identity-providers/okta-saml",
             "guides/integrate/identity-providers/keycloak",
             "guides/integrate/identity-providers/mocksaml",
+            "guides/integrate/identity-providers/jwt-idp",
             "guides/integrate/identity-providers/additional-information",
           ],
         },
