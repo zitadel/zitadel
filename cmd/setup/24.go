@@ -10,18 +10,18 @@ import (
 
 var (
 	//go:embed 24.sql
-	addLowerFieldsToVerifiedEmail string
+	addTokenActor string
 )
 
-type AddLowerFieldsToVerifiedEmail struct {
+type AddActorToAuthTokens struct {
 	dbClient *database.DB
 }
 
-func (mig *AddLowerFieldsToVerifiedEmail) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, addLowerFieldsToVerifiedEmail)
+func (mig *AddActorToAuthTokens) Execute(ctx context.Context, _ eventstore.Event) error {
+	_, err := mig.dbClient.ExecContext(ctx, addTokenActor)
 	return err
 }
 
-func (mig *AddLowerFieldsToVerifiedEmail) String() string {
-	return "24_add_lower_fields_to_verified_email"
+func (mig *AddActorToAuthTokens) String() string {
+	return "24_add_actor_col_to_auth_tokens"
 }
