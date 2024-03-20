@@ -221,7 +221,7 @@ curl --request GET \
 A Personal Access Token (PAT) is a ready-to-use token which can be used as _Authorization_ header.
 
 Because the PAT is a ready to use token, you can add it as Authorization Header and send it in your requests to the ZITADEL API.
-In this example we read the organization of the service user.
+In this example, we read the organization of the service user.
 
 ```bash
 curl --request GET \
