@@ -56,7 +56,7 @@ Follow our guide on using [private key JWT client authentication](./private-key-
 
 * **Decentralized Verification:** No need for constant server calls, improving performance and scalability.
 * **Flexibility and Control:** Define scopes and expiration within the JWT itself for granular access control.
-* **Stateless:** The server doesn't need to maintain session state, simplifying server implementation.
+* **Stateless:** The server doesn't need to maintain a session state, simplifying server implementation.
 
 #### Drawbacks of private key JWT authentication
 
