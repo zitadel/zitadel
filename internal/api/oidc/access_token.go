@@ -11,6 +11,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/user/model"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -19,13 +20,17 @@ import (
 type accessToken struct {
 	tokenID         string
 	userID          string
+	resourceOwner   string
 	subject         string
 	clientID        string
 	audience        []string
 	scope           []string
+	authMethods     []domain.UserAuthMethodType
+	authTime        time.Time
 	tokenCreation   time.Time
 	tokenExpiration time.Time
 	isPAT           bool
+	actor           *domain.TokenActor
 }
 
 var ErrInvalidTokenFormat = errors.New("invalid token format")
@@ -67,6 +72,7 @@ func accessTokenV1(tokenID, subject string, token *model.TokenView) *accessToken
 	return &accessToken{
 		tokenID:         tokenID,
 		userID:          token.UserID,
+		resourceOwner:   token.ResourceOwner,
 		subject:         subject,
 		clientID:        token.ApplicationID,
 		audience:        token.Audience,
@@ -74,6 +80,7 @@ func accessTokenV1(tokenID, subject string, token *model.TokenView) *accessToken
 		tokenCreation:   token.CreationDate,
 		tokenExpiration: token.Expiration,
 		isPAT:           token.IsPAT,
+		actor:           token.Actor,
 	}
 }
 
@@ -81,17 +88,21 @@ func accessTokenV2(tokenID, subject string, token *query.OIDCSessionAccessTokenR
 	return &accessToken{
 		tokenID:         tokenID,
 		userID:          token.UserID,
+		resourceOwner:   token.ResourceOwner,
 		subject:         subject,
 		clientID:        token.ClientID,
 		audience:        token.Audience,
 		scope:           token.Scope,
+		authMethods:     token.AuthMethods,
+		authTime:        token.AuthTime,
 		tokenCreation:   token.AccessTokenCreation,
 		tokenExpiration: token.AccessTokenExpiration,
+		actor:           token.Actor,
 	}
 }
 
 func (s *Server) assertClientScopesForPAT(ctx context.Context, token *accessToken, clientID, projectID string) error {
-	token.audience = append(token.audience, clientID)
+	token.audience = append(token.audience, clientID, projectID)
 	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(projectID)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
