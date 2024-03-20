@@ -122,6 +122,24 @@ func (l *Login) runPostExternalAuthenticationActions(
 				actions.SetFields("authRequest", object.AuthRequestField(authRequest)),
 				actions.SetFields("httpRequest", object.HTTPRequestField(httpRequest)),
 				actions.SetFields("authError", authErrStr),
+				actions.SetFields("org",
+					actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
+						return func(goja.FunctionCall) goja.Value {
+							metadata, err := l.query.SearchOrgMetadata(
+								ctx,
+								true,
+								resourceOwner,
+								&query.OrgMetadataSearchQueries{},
+								false,
+							)
+							if err != nil {
+								logging.WithError(err).Info("unable to get org metadata in action")
+								panic(err)
+							}
+							return object.OrgMetadataListFromQuery(c, metadata)
+						}
+					}),
+				),
 			),
 		)
 
@@ -298,6 +316,24 @@ func (l *Login) runPreCreationActions(
 				}),
 				actions.SetFields("authRequest", object.AuthRequestField(authRequest)),
 				actions.SetFields("httpRequest", object.HTTPRequestField(httpRequest)),
+				actions.SetFields("org",
+					actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
+						return func(goja.FunctionCall) goja.Value {
+							metadata, err := l.query.SearchOrgMetadata(
+								ctx,
+								true,
+								resourceOwner,
+								&query.OrgMetadataSearchQueries{},
+								false,
+							)
+							if err != nil {
+								logging.WithError(err).Info("unable to get org metadata in action")
+								panic(err)
+							}
+							return object.OrgMetadataListFromQuery(c, metadata)
+						}
+					}),
+				),
 			),
 		)
 
@@ -356,6 +392,24 @@ func (l *Login) runPostCreationActions(
 				}),
 				actions.SetFields("authRequest", object.AuthRequestField(authRequest)),
 				actions.SetFields("httpRequest", object.HTTPRequestField(httpRequest)),
+				actions.SetFields("org",
+					actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
+						return func(goja.FunctionCall) goja.Value {
+							metadata, err := l.query.SearchOrgMetadata(
+								ctx,
+								true,
+								resourceOwner,
+								&query.OrgMetadataSearchQueries{},
+								false,
+							)
+							if err != nil {
+								logging.WithError(err).Info("unable to get org metadata in action")
+								panic(err)
+							}
+							return object.OrgMetadataListFromQuery(c, metadata)
+						}
+					}),
+				),
 			),
 		)
 
