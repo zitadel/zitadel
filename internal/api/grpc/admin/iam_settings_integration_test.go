@@ -23,6 +23,14 @@ func TestServer_GetSecurityPolicy(t *testing.T) {
 		EnableImpersonation:   true,
 	})
 	require.NoError(t, err)
+	t.Cleanup(func() {
+		_, err := Client.SetSecurityPolicy(AdminCTX, &admin_pb.SetSecurityPolicyRequest{
+			EnableIframeEmbedding: false,
+			AllowedOrigins:        []string{},
+			EnableImpersonation:   false,
+		})
+		require.NoError(t, err)
+	})
 
 	tests := []struct {
 		name    string
