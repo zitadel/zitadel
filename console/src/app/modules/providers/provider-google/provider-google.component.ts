@@ -4,7 +4,7 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import {forkJoin, Observable, switchMap, take} from 'rxjs';
+import { BehaviorSubject, forkJoin, Observable, switchMap, take } from 'rxjs';
 import {
   AddGoogleProviderRequest as AdminAddGoogleProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -12,8 +12,7 @@ import {
 } from 'src/app/proto/generated/zitadel/admin_pb';
 import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
-  AddAPIAppResponse,
-  AddGoogleProviderRequest as MgmtAddGoogleProviderRequest, AddOIDCAppResponse,
+  AddGoogleProviderRequest as MgmtAddGoogleProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
   UpdateGoogleProviderRequest as MgmtUpdateGoogleProviderRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
@@ -25,13 +24,11 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
-import { EnvironmentService } from '../../../services/environment.service';
-import {map} from "rxjs/operators";
-import {ProviderNextDialogComponent} from "../provider-next-dialog/provider-next-dialog.component";
-import {MatDialog} from "@angular/material/dialog";
-import {TranslateService} from "@ngx-translate/core";
-import {Next} from "../provider-next/provider-next.component";
-
+import { map } from 'rxjs/operators';
+import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { Next } from '../provider-next/provider-next.component';
+import { ProviderNextService } from '../provider-next/provider-next.service';
 
 @Component({
   selector: 'cnsl-provider-google',
@@ -54,6 +51,7 @@ export class ProviderGoogleComponent {
   public updateClientSecret: boolean = false;
 
   public next$: Observable<Next>;
+  private autofillLink$ = new BehaviorSubject<string>('');
 
   constructor(
     private authService: GrpcAuthService,
@@ -63,8 +61,7 @@ export class ProviderGoogleComponent {
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
     private dialog: MatDialog,
-    env: EnvironmentService,
-    translateSvc: TranslateService,
+    nextSvc: ProviderNextService,
   ) {
     this.form = new FormGroup({
       name: new FormControl('', []),
@@ -72,21 +69,14 @@ export class ProviderGoogleComponent {
       clientSecret: new FormControl('', [requiredValidator]),
       scopesList: new FormControl(['openid', 'profile', 'email'], []),
     });
-    this.next$ = forkJoin([
-      env.externalIDPCallbackUrl,
-      translateSvc.get('DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE', {provider: 'Google'}),
-      translateSvc.get('DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION', {provider: 'Google'}),
-    ]).pipe(
-      map(([url, title, description]) => ({
-        copyUrls: [{
-          label: 'ZITADEL Callback URL',
-          url:  url as string,
-        }],
-        autofillLink: 'https://zitadel.com/docs/guides/integrate/identity-providers/additional-information',
-        configureTitle: title as string,
-        configureDescription: description as string,
-      })),
-    )
+    this.next$ = nextSvc.next(
+      'Google',
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
+      'https://zitadel.com/docs/guides/integrate/identity-providers/google#google-configuration',
+      this.autofillLink$,
+      nextSvc.callbackUrls,
+    );
 
     this.authService
       .isAllowed(
@@ -133,10 +123,15 @@ export class ProviderGoogleComponent {
 
       this.id = this.route.snapshot.paramMap.get('id');
       if (this.id) {
+        this.showAutofillGuide();
         this.clientSecret?.setValidators([]);
         this.getData(this.id);
       }
     });
+  }
+
+  private showAutofillGuide(): void {
+    this.autofillLink$.next('https://zitadel.com/docs/guides/integrate/identity-providers/additional-information');
   }
 
   private getData(id: string): void {
@@ -149,6 +144,7 @@ export class ProviderGoogleComponent {
       .getProviderByID(req)
       .then((resp) => {
         this.provider = resp.idp;
+
         this.loading = false;
         if (this.provider?.config?.google) {
           this.form.patchValue(this.provider.config.google);
@@ -181,11 +177,12 @@ export class ProviderGoogleComponent {
     this.service
       .addGoogleProvider(req)
       .then((idp) => {
-                    this.loading = false;
-                    const dialogRef = this.dialog.open(ProviderNextDialogComponent, {data: this.next$});
-                    dialogRef.afterClosed().subscribe(() => {
-                        this.close()
-                      });
+        this.showAutofillGuide();
+        const dialogRef = this.dialog.open(ProviderNextDialogComponent, { data: this.next$ });
+        dialogRef.afterClosed().subscribe(() => {
+          this.close();
+        });
+        this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -236,10 +233,10 @@ export class ProviderGoogleComponent {
         (this.service as AdminService)
           .updateGoogleProvider(req)
           .then((idp) => {
-                        setTimeout(() => {
-                            this.loading = false;
-                            this.close();
-                          }, 2000);
+            setTimeout(() => {
+              this.loading = false;
+              this.close();
+            }, 2000);
           })
           .catch((error) => {
             this.loading = false;

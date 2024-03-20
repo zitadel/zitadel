@@ -23,6 +23,11 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
+import { MatDialog } from '@angular/material/dialog';
+import { ProviderNextService } from '../provider-next/provider-next.service';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { Next } from '../provider-next/provider-next.component';
+import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
 
 @Component({
   selector: 'cnsl-provider-jwt',
@@ -42,6 +47,8 @@ export class ProviderJWTComponent {
 
   public provider?: Provider.AsObject;
 
+  public next$: Observable<Next>;
+
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
@@ -49,7 +56,18 @@ export class ProviderJWTComponent {
     private injector: Injector,
     private _location: Location,
     breadcrumbService: BreadcrumbService,
+    private dialog: MatDialog,
+    nextSvc: ProviderNextService,
   ) {
+    this.next$ = nextSvc.next(
+      'JWT provider',
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
+      'https://zitadel.com/docs/guides/integrate/identity-providers/jwt-idp',
+      of('https://zitadel.com/docs/guides/integrate/identity-providers/additional-information'),
+      () => [],
+    );
+
     this.route.data.pipe(take(1)).subscribe((data) => {
       this.serviceType = data['serviceType'];
 
@@ -150,10 +168,11 @@ export class ProviderJWTComponent {
     this.service
       .addJWTProvider(req)
       .then((idp) => {
-        setTimeout(() => {
-          this.loading = false;
+        const dialogRef = this.dialog.open(ProviderNextDialogComponent, { data: this.next$ });
+        dialogRef.afterClosed().subscribe(() => {
           this.close();
-        }, 2000);
+        });
+        this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);

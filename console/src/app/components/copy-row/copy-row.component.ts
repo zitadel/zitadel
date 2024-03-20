@@ -13,8 +13,8 @@ import { CopyToClipboardModule } from '../../directives/copy-to-clipboard/copy-t
   imports: [CommonModule, TranslateModule, MatButtonModule, MatTooltipModule, CopyToClipboardModule],
 })
 export class CopyRowComponent {
-  @Input({required: true}) public label = '';
-  @Input({required: true}) public value = '';
+  @Input({ required: true }) public label = '';
+  @Input({ required: true }) public value = '';
   @Input() public labelMinWidth = '';
 
   public copied = '';

@@ -4,7 +4,7 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import { take } from 'rxjs';
+import { BehaviorSubject, Observable, take } from 'rxjs';
 import {
   AddAppleProviderRequest as AdminAddAppleProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -24,6 +24,10 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
+import { MatDialog } from '@angular/material/dialog';
+import { ProviderNextService } from '../provider-next/provider-next.service';
+import { Next } from '../provider-next/provider-next.component';
+import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
 
 const MAX_ALLOWED_SIZE = 5 * 1024;
 
@@ -47,6 +51,9 @@ export class ProviderAppleComponent {
   public provider?: Provider.AsObject;
   public updatePrivateKey: boolean = false;
 
+  public next$: Observable<Next>;
+  private autofillLink$ = new BehaviorSubject<string>('');
+
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
@@ -54,6 +61,8 @@ export class ProviderAppleComponent {
     private injector: Injector,
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
+    private dialog: MatDialog,
+    nextSvc: ProviderNextService,
   ) {
     this.form = new FormGroup({
       name: new FormControl('', []),
@@ -63,6 +72,15 @@ export class ProviderAppleComponent {
       privateKey: new FormControl('', [requiredValidator]),
       scopesList: new FormControl(['name', 'email'], []),
     });
+
+    this.next$ = nextSvc.next(
+      'Apple',
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
+      'https://zitadel.com/docs/guides/integrate/identity-providers/apple#apple-configuration',
+      this.autofillLink$,
+      nextSvc.callbackUrls,
+    );
 
     this.authService
       .isAllowed(
@@ -159,10 +177,12 @@ export class ProviderAppleComponent {
     this.service
       .addAppleProvider(req)
       .then((idp) => {
-        setTimeout(() => {
-          this.loading = false;
+        this.showAutofillGuide();
+        const dialogRef = this.dialog.open(ProviderNextDialogComponent, { data: this.next$ });
+        dialogRef.afterClosed().subscribe(() => {
           this.close();
-        }, 2000);
+        });
+        this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -279,6 +299,10 @@ export class ProviderAppleComponent {
         this.scopesList.value.splice(index, 1);
       }
     }
+  }
+
+  private showAutofillGuide(): void {
+    this.autofillLink$.next('https://zitadel.com/docs/guides/integrate/identity-providers/additional-information');
   }
 
   public get name(): AbstractControl | null {

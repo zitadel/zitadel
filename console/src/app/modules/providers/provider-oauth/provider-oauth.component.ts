@@ -4,7 +4,7 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import { take } from 'rxjs';
+import { BehaviorSubject, Observable, take } from 'rxjs';
 import {
   AddGenericOAuthProviderRequest as AdminAddGenericOAuthProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -24,6 +24,10 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
+import { MatDialog } from '@angular/material/dialog';
+import { ProviderNextService } from '../provider-next/provider-next.service';
+import { Next } from '../provider-next/provider-next.component';
+import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
 
 @Component({
   selector: 'cnsl-provider-oauth',
@@ -44,6 +48,9 @@ export class ProviderOAuthComponent {
 
   public provider?: Provider.AsObject;
 
+  public next$: Observable<Next>;
+  private autofillLink$ = new BehaviorSubject<string>('');
+
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
@@ -51,7 +58,18 @@ export class ProviderOAuthComponent {
     private injector: Injector,
     private _location: Location,
     breadcrumbService: BreadcrumbService,
+    private dialog: MatDialog,
+    nextSvc: ProviderNextService,
   ) {
+    this.next$ = nextSvc.next(
+      'OAuth provider',
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
+      '',
+      this.autofillLink$,
+      nextSvc.callbackUrls,
+    );
+
     this.form = new UntypedFormGroup({
       name: new UntypedFormControl('', [requiredValidator]),
       clientId: new UntypedFormControl('', [requiredValidator]),
@@ -161,10 +179,12 @@ export class ProviderOAuthComponent {
     this.service
       .addGenericOAuthProvider(req)
       .then((idp) => {
-        setTimeout(() => {
-          this.loading = false;
+        this.showAutofillGuide();
+        const dialogRef = this.dialog.open(ProviderNextDialogComponent, { data: this.next$ });
+        dialogRef.afterClosed().subscribe(() => {
           this.close();
-        }, 2000);
+        });
+        this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -231,6 +251,10 @@ export class ProviderOAuthComponent {
         this.scopesList.value.splice(index, 1);
       }
     }
+  }
+
+  private showAutofillGuide(): void {
+    this.autofillLink$.next('https://zitadel.com/docs/guides/integrate/identity-providers/additional-information');
   }
 
   public get name(): AbstractControl | null {

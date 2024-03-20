@@ -7,7 +7,7 @@ import { ManagementService } from '../../../services/mgmt.service';
 import { AdminService } from '../../../services/admin.service';
 import { ToastService } from '../../../services/toast.service';
 import { GrpcAuthService } from '../../../services/grpc-auth.service';
-import {forkJoin, Observable, take} from 'rxjs';
+import { BehaviorSubject, forkJoin, Observable, of, take } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from '../../../services/breadcrumb.service';
 import { atLeastOneIsFilled, requiredValidator } from '../../form-field/validators/validators';
@@ -21,10 +21,13 @@ import {
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
   UpdateSAMLProviderRequest as MgmtUpdateSAMLProviderRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import { EnvironmentService } from '../../../services/environment.service';
+import { Environment, EnvironmentService } from '../../../services/environment.service';
 import { map } from 'rxjs/operators';
-import {Next} from "../provider-next/provider-next.component";
-import {TranslateService} from "@ngx-translate/core";
+import { Next } from '../provider-next/provider-next.component';
+import { TranslateService } from '@ngx-translate/core';
+import { ProviderNextService } from '../provider-next/provider-next.service';
+import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'cnsl-provider-saml-sp',
@@ -41,6 +44,7 @@ export class ProviderSamlSpComponent {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
   public next$: Observable<Next>;
+  private autofillLink$ = new BehaviorSubject<string>('');
 
   bindingValues: string[] = Object.keys(SAMLBinding);
 
@@ -51,37 +55,41 @@ export class ProviderSamlSpComponent {
     private route: ActivatedRoute,
     private injector: Injector,
     private breadcrumbService: BreadcrumbService,
-    env: EnvironmentService,
-    translateSvc: TranslateService,
+    private dialog: MatDialog,
+    nextSvc: ProviderNextService,
   ) {
     this._buildBreadcrumbs();
-    this.next$ = forkJoin([
-      env.env,
-      translateSvc.get('DESCRIPTIONS.SETTINGS.IDPS.SAML.TITLE'),
-      translateSvc.get('DESCRIPTIONS.SETTINGS.IDPS.SAML.DESCRIPTION'),
-    ]).pipe(
-      map(([environment, title, description]) => {
+    this.next$ = nextSvc.next(
+      'SAML provider',
+      'DESCRIPTIONS.SETTINGS.IDPS.SAML.TITLE',
+      'DESCRIPTIONS.SETTINGS.IDPS.SAML.DESCRIPTION',
+      'https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml',
+      of(
+        'https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml#optional-add-zitadel-action-to-autofill-userdata',
+      ),
+      (environment: Environment) => {
         const idpBase = `${environment.issuer}/idps/${this.id}/saml`;
-        return {
-        copyUrls: [{
-          label: 'ZITADEL Metadata',
-          url: `${idpBase}/metadata`,
-          downloadable: true,
-        }, {
-          label: 'ZITADEL Single Logout',
-          url: `${idpBase}/slo`,
-        }, {
-          label: 'ZITADEL ACS Intent API',
-          url: `${idpBase}/acs`,
-        }, {
-          label: 'ZITADEL ACS Login Form',
-          url: `${environment.issuer}/ui/login/login/externalidp/saml/acs`,
-        }],
-        autofillLink: 'https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml#optional-add-zitadel-action-to-autofill-userdata',
-        configureTitle: title as string,
-        configureDescription: description as string,
-      }}),
-    )
+        return [
+          {
+            label: 'ZITADEL Metadata',
+            url: `${idpBase}/metadata`,
+            downloadable: true,
+          },
+          {
+            label: 'ZITADEL Single Logout',
+            url: `${idpBase}/slo`,
+          },
+          {
+            label: 'ZITADEL ACS Intent API',
+            url: `${idpBase}/acs`,
+          },
+          {
+            label: 'ZITADEL ACS Login Form',
+            url: `${environment.issuer}/ui/login/login/externalidp/saml/acs`,
+          },
+        ];
+      },
+    );
     this._initializeForm();
     this._checkFormPermissions();
   }
@@ -205,10 +213,11 @@ export class ProviderSamlSpComponent {
     this.service
       .addSAMLProvider(req)
       .then(() => {
-        setTimeout(() => {
-          this.loading = false;
+        const dialogRef = this.dialog.open(ProviderNextDialogComponent, { data: this.next$ });
+        dialogRef.afterClosed().subscribe(() => {
           this.close();
-        }, 2000);
+        });
+        this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);

@@ -425,24 +425,45 @@
             <cnsl-info-section *ngIf="(apiMap$ | async)?.issuer as issuer">
               <div
                 class="link"
-                [innerHtml]="
-                  'APP.OIDC.WELLKNOWN' | translate: { url: issuer + '/.well-known/openid-configuration' }
-                "
+                [innerHtml]="'APP.OIDC.WELLKNOWN' | translate: { url: issuer + '/.well-known/openid-configuration' }"
               ></div>
             </cnsl-info-section>
-            <cnsl-copy-row labelMinWidth="220px" *ngFor="let apiUrl of apiMap$ | async | keyvalue" [label]="apiUrl.key" [value]="apiUrl.value"></cnsl-copy-row>
+            <cnsl-copy-row
+              labelMinWidth="220px"
+              *ngFor="let apiUrl of apiMap$ | async | keyvalue"
+              [label]="apiUrl.key"
+              [value]="apiUrl.value"
+            ></cnsl-copy-row>
             <ng-container *ngIf="app?.samlConfig && samlMap$ | async as samlMap">
-              <cnsl-copy-row labelMinWidth="220px" *ngIf="samlMap['samlCertificateURL'] as url" [label]="'APP.SAML.CERTIFICATE' | translate" [value]="url">
-                <a class="download-button" mat-stroked-button [href]="url" download>{{
-                  'ACTIONS.DOWNLOAD' | translate
-                  }}</a>
+              <cnsl-copy-row
+                labelMinWidth="220px"
+                *ngIf="samlMap['samlCertificateURL'] as url"
+                [label]="'APP.SAML.CERTIFICATE' | translate"
+                [value]="url"
+              >
+                <a class="download-button" mat-stroked-button [href]="url" download>{{ 'ACTIONS.DOWNLOAD' | translate }}</a>
               </cnsl-copy-row>
-              <cnsl-copy-row labelMinWidth="220px" *ngIf="samlMap['samlSSO'] as url" label="Single Sign On (SSO)" [value]="url"></cnsl-copy-row>
-              <cnsl-copy-row labelMinWidth="220px" *ngIf="samlMap['samlSLO'] as url" label="Single Logout (SLO)" [value]="url"></cnsl-copy-row>
+              <cnsl-copy-row
+                labelMinWidth="220px"
+                *ngIf="samlMap['samlSSO'] as url"
+                label="Single Sign On (SSO)"
+                [value]="url"
+              ></cnsl-copy-row>
+              <cnsl-copy-row
+                labelMinWidth="220px"
+                *ngIf="samlMap['samlSLO'] as url"
+                label="Single Logout (SLO)"
+                [value]="url"
+              ></cnsl-copy-row>
             </ng-container>
             <ng-container *ngIf="!app?.samlConfig">
               <ng-container *ngFor="let wellknown of wellknownMap$ | async | keyvalue">
-                <cnsl-copy-row labelMinWidth="220px" *ngIf="wellknown.key.endsWith('endpoint') || wellknown.key.toString() === 'jwks_uri'" [label]="wellknown.key" [value]="wellknown.value"></cnsl-copy-row>
+                <cnsl-copy-row
+                  labelMinWidth="220px"
+                  *ngIf="wellknown.key.endsWith('endpoint') || wellknown.key.toString() === 'jwks_uri'"
+                  [label]="wellknown.key"
+                  [value]="wellknown.value"
+                ></cnsl-copy-row>
               </ng-container>
             </ng-container>
           </cnsl-card>

@@ -1,7 +1,7 @@
-import {Component, Inject, Input} from '@angular/core';
+import { Component, Inject, Input } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import {Observable} from "rxjs";
-import {Next} from "../provider-next/provider-next.component";
+import { Observable } from 'rxjs';
+import { Next } from './provider-next.component';
 
 @Component({
   templateUrl: './provider-next-dialog.component.html',

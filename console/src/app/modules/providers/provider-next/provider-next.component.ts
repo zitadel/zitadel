@@ -1,15 +1,18 @@
-import {Component, Input} from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 
+export interface CopyUrl {
+  label: string;
+  url: string;
+  downloadable?: boolean;
+}
+
 export interface Next {
-  copyUrls: {
-    label: string;
-    url: string;
-    downloadable?: boolean;
-  }[],
-  autofillLink?: string,
-  configureTitle: string,
-  configureDescription: string,
+  copyUrls: CopyUrl[];
+  autofillLink?: string;
+  configureTitle: string;
+  configureDescription: string;
+  configureLink: string;
 }
 
 @Component({
@@ -17,6 +20,6 @@ export interface Next {
   templateUrl: './provider-next.component.html',
 })
 export class ProviderNextComponent {
-  @Input({required: true}) next!: Next;
+  @Input({ required: true }) next!: Next;
   constructor() {}
 }

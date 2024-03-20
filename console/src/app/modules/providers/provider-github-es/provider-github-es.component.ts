@@ -4,7 +4,7 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import { take } from 'rxjs';
+import { BehaviorSubject, Observable, take } from 'rxjs';
 import {
   AddGitHubEnterpriseServerProviderRequest as AdminAddGitHubEnterpriseServerProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -24,6 +24,10 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
+import { MatDialog } from '@angular/material/dialog';
+import { ProviderNextService } from '../provider-next/provider-next.service';
+import { Next } from '../provider-next/provider-next.component';
+import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
 
 @Component({
   selector: 'cnsl-provider-github-es',
@@ -44,6 +48,9 @@ export class ProviderGithubESComponent {
 
   public provider?: Provider.AsObject;
 
+  public next$: Observable<Next>;
+  private autofillLink$ = new BehaviorSubject<string>('');
+
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
@@ -51,6 +58,8 @@ export class ProviderGithubESComponent {
     private injector: Injector,
     private _location: Location,
     breadcrumbService: BreadcrumbService,
+    private dialog: MatDialog,
+    nextSvc: ProviderNextService,
   ) {
     this.form = new UntypedFormGroup({
       name: new UntypedFormControl('', [requiredValidator]),
@@ -61,6 +70,15 @@ export class ProviderGithubESComponent {
       userEndpoint: new UntypedFormControl('', [requiredValidator]),
       scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
     });
+
+    this.next$ = nextSvc.next(
+      'GitHub',
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
+      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
+      'https://zitadel.com/docs/guides/integrate/identity-providers/github#github-configuration',
+      this.autofillLink$,
+      nextSvc.callbackUrls,
+    );
 
     this.authService
       .isAllowed(
@@ -159,10 +177,12 @@ export class ProviderGithubESComponent {
     this.service
       .addGitHubEnterpriseServerProvider(req)
       .then((idp) => {
-        setTimeout(() => {
-          this.loading = false;
+        this.showAutofillGuide();
+        const dialogRef = this.dialog.open(ProviderNextDialogComponent, { data: this.next$ });
+        dialogRef.afterClosed().subscribe(() => {
           this.close();
-        }, 2000);
+        });
+        this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -228,6 +248,12 @@ export class ProviderGithubESComponent {
         this.scopesList.value.splice(index, 1);
       }
     }
+  }
+
+  private showAutofillGuide(): void {
+    this.autofillLink$.next(
+      'https://zitadel.com/docs/guides/integrate/identity-providers/github#optional-add-zitadel-action-to-autofill-userdata',
+    );
   }
 
   public get name(): AbstractControl | null {

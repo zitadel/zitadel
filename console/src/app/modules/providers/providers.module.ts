@@ -32,8 +32,9 @@ import { ProvidersRoutingModule } from './providers-routing.module';
 import { ProviderSamlSpComponent } from './provider-saml-sp/provider-saml-sp.component';
 import { CopyToClipboardModule } from '../../directives/copy-to-clipboard/copy-to-clipboard.module';
 import { CopyRowComponent } from '../../components/copy-row/copy-row.component';
-import {ProviderNextComponent} from "./provider-next/provider-next.component";
-import {ProviderNextDialogComponent} from "./provider-next-dialog/provider-next-dialog.component";
+import { ProviderNextComponent } from './provider-next/provider-next.component';
+import { ProviderNextDialogComponent } from './provider-next/provider-next-dialog.component';
+import { ProviderNextService } from './provider-next/provider-next.service';
 
 @NgModule({
   declarations: [
@@ -75,5 +76,6 @@ import {ProviderNextDialogComponent} from "./provider-next-dialog/provider-next-
     MatProgressSpinnerModule,
     CopyRowComponent,
   ],
+  providers: [ProviderNextService],
 })
 export default class ProvidersModule {}
