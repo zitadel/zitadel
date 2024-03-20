@@ -136,6 +136,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s21AddBlockFieldToLimits = &AddBlockFieldToLimits{dbClient: queryDBClient}
 	steps.s22ActiveInstancesIndex = &ActiveInstanceEvents{dbClient: queryDBClient}
 	steps.s23CorrectGlobalUniqueConstraints = &CorrectGlobalUniqueConstraints{dbClient: esPusherDBClient}
+	steps.s24AddActorToAuthTokens = &AddActorToAuthTokens{dbClient: queryDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -172,6 +173,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 		steps.s20AddByUserSessionIndex,
 		steps.s22ActiveInstancesIndex,
 		steps.s23CorrectGlobalUniqueConstraints,
+		steps.s24AddActorToAuthTokens,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}

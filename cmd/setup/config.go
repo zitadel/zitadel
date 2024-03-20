@@ -102,6 +102,7 @@ type Steps struct {
 	s21AddBlockFieldToLimits          *AddBlockFieldToLimits
 	s22ActiveInstancesIndex           *ActiveInstanceEvents
 	s23CorrectGlobalUniqueConstraints *CorrectGlobalUniqueConstraints
+	s24AddActorToAuthTokens           *AddActorToAuthTokens
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

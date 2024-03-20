@@ -349,9 +349,9 @@ func Test_userInfoToOIDC(t *testing.T) {
 			},
 			want: &oidc.UserInfo{
 				Claims: map[string]any{
-					ClaimResourceOwner + "id":             "orgID",
-					ClaimResourceOwner + "name":           "orgName",
-					ClaimResourceOwner + "primary_domain": "orgDomain",
+					ClaimResourceOwnerID:            "orgID",
+					ClaimResourceOwnerName:          "orgName",
+					ClaimResourceOwnerPrimaryDomain: "orgDomain",
 				},
 			},
 		},
@@ -377,10 +377,10 @@ func Test_userInfoToOIDC(t *testing.T) {
 			},
 			want: &oidc.UserInfo{
 				Claims: map[string]any{
-					domain.OrgIDClaim:                     "orgID",
-					ClaimResourceOwner + "id":             "orgID",
-					ClaimResourceOwner + "name":           "orgName",
-					ClaimResourceOwner + "primary_domain": "orgDomain",
+					domain.OrgIDClaim:               "orgID",
+					ClaimResourceOwnerID:            "orgID",
+					ClaimResourceOwnerName:          "orgName",
+					ClaimResourceOwnerPrimaryDomain: "orgDomain",
 				},
 			},
 		},
