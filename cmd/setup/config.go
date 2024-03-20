@@ -103,6 +103,7 @@ type Steps struct {
 	s22ActiveInstancesIndex           *ActiveInstanceEvents
 	s23CorrectGlobalUniqueConstraints *CorrectGlobalUniqueConstraints
 	s24AddActorToAuthTokens           *AddActorToAuthTokens
+	s25AddLowerFieldsToVerifiedEmail  *AddLowerFieldsToVerifiedEmail
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
