@@ -1,7 +1,7 @@
 
 ## Accessing ZITADEL APIs
 
-In this step we will authenticate a service user and receive an access_token to use against the ZITADEL API.
+In this step, we will authenticate a service user and receive an access_token to use against the ZITADEL API.
 
 You will need to craft a POST request to ZITADEL's token endpoint:
 
