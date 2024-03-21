@@ -106,7 +106,7 @@ Payload
 
 Please refer to [JWT with private key](/apis/openidoauth/authn-methods#jwt-with-private-key) API reference for further information.
 
-If you use Go, you might want to use the [provided tool](https://github.com/zitadel/zitadel-tools) to generate a JWT from the downloaded json.
+If you use Go, you might want to use the [provided tool](https://github.com/zitadel/zitadel-tools) to generate a JWT from the downloaded JSON.
 There are many [libraries](https://jwt.io/#libraries-io) to generate and sign JWT.
 
 **Code Example (Python using `pyjwt`):**
