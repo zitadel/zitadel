@@ -9,12 +9,10 @@ import { Session, AuthRequest, Prompt, login } from "@zitadel/server";
 import { NextRequest, NextResponse } from "next/server";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
-  console.log("loadSessions", ids);
   const response = await listSessions(
     server,
     ids.filter((id: string | undefined) => !!id)
-  ).catch(console.error);
-  console.log("sessions:", response);
+  );
 
   return response?.sessions ?? [];
 }
@@ -40,6 +38,7 @@ function findSession(
   }
   return undefined;
 }
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const authRequestId = searchParams.get("authRequest");
@@ -47,6 +46,7 @@ export async function GET(request: NextRequest) {
 
   const sessionCookies: SessionCookie[] = await getAllSessions();
   const ids = sessionCookies.map((s) => s.id);
+  console.log("sessionIds", ids);
   let sessions: Session[] = [];
   if (ids && ids.length) {
     sessions = await loadSessions(ids);
