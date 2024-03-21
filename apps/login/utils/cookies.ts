@@ -25,7 +25,7 @@ function setSessionHttpOnlyCookie(sessions: SessionCookie[]) {
 
 export async function addSessionToCookie(
   session: SessionCookie,
-  cleanup: boolean = true
+  cleanup: boolean = false
 ): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -58,7 +58,7 @@ export async function addSessionToCookie(
 export async function updateSessionCookie(
   id: string,
   session: SessionCookie,
-  cleanup: boolean = true
+  cleanup: boolean = false
 ): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -87,7 +87,7 @@ export async function updateSessionCookie(
 
 export async function removeSessionFromCookie(
   session: SessionCookie,
-  cleanup: boolean = true
+  cleanup: boolean = false
 ): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -172,7 +172,7 @@ export async function getSessionCookieByLoginName(
  * @returns Session Cookies
  */
 export async function getAllSessionCookieIds(
-  cleanup: boolean = true
+  cleanup: boolean = false
 ): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -197,7 +197,7 @@ export async function getAllSessionCookieIds(
  * @returns Session Cookies
  */
 export async function getAllSessions(
-  cleanup: boolean = true
+  cleanup: boolean = false
 ): Promise<SessionCookie[]> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
