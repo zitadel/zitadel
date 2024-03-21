@@ -36,7 +36,7 @@ Accessing ZITADEL APIs, except for the Auth API and the System API, requires the
 
 The Auth API can be used for all operations on the requesting user, meaning the user id in the sub claim of the used token.
 Using this API doesn't require a service user to be authenticated.
-Instead you call the Auth API with the token of the user.
+Instead, you call the Auth API with the token of the user.
 
 [Reference documentation for authentication API](/docs/apis/introduction#authentication)
 
