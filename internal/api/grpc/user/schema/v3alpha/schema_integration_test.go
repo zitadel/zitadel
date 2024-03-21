@@ -810,3 +810,309 @@ func TestServer_DeleteUserSchema(t *testing.T) {
 		})
 	}
 }
+
+func TestServer_GetUserSchemaByID(t *testing.T) {
+	userSchema := new(structpb.Struct)
+	err := userSchema.UnmarshalJSON([]byte(`{
+		"$schema": "urn:zitadel:schema:v1",
+		"type": "object",
+		"properties": {}
+	}`))
+	require.NoError(t, err)
+	type args struct {
+		ctx     context.Context
+		req     *schema.GetUserSchemaByIDRequest
+		prepare func(request *schema.GetUserSchemaByIDRequest, resp *schema.GetUserSchemaByIDResponse) error
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *schema.GetUserSchemaByIDResponse
+		wantErr bool
+	}{
+		{
+			name: "missing permission",
+			args: args{
+				ctx: Tester.WithAuthorization(context.Background(), integration.OrgOwner),
+				req: &schema.GetUserSchemaByIDRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "not existing, error",
+			args: args{
+				ctx: CTX,
+				req: &schema.GetUserSchemaByIDRequest{
+					Id: "notexisting",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "get, ok",
+			args: args{
+				ctx: CTX,
+				req: &schema.GetUserSchemaByIDRequest{},
+				prepare: func(request *schema.GetUserSchemaByIDRequest, resp *schema.GetUserSchemaByIDResponse) error {
+					schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
+					createResp := Tester.CreateUserSchemaWithType(CTX, t, schemaType)
+					request.Id = createResp.GetId()
+
+					resp.Schema.Id = createResp.GetId()
+					resp.Schema.Type = schemaType
+					resp.Schema.Details = &object.Details{
+						Sequence:      createResp.GetDetails().GetSequence(),
+						ChangeDate:    createResp.GetDetails().GetChangeDate(),
+						ResourceOwner: createResp.GetDetails().GetResourceOwner(),
+					}
+					return nil
+				},
+			},
+			want: &schema.GetUserSchemaByIDResponse{
+				Schema: &schema.UserSchema{
+					State:                  schema.State_STATE_ACTIVE,
+					Revision:               0,
+					Schema:                 userSchema,
+					PossibleAuthenticators: nil,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ensureFeatureEnabled(t)
+			if tt.args.prepare != nil {
+				err := tt.args.prepare(tt.args.req, tt.want)
+				require.NoError(t, err)
+			}
+
+			retryDuration := 5 * time.Second
+			if ctxDeadline, ok := CTX.Deadline(); ok {
+				retryDuration = time.Until(ctxDeadline)
+			}
+
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := Client.GetUserSchemaByID(tt.args.ctx, tt.args.req)
+				if tt.wantErr {
+					require.Error(t, err)
+					return
+				}
+				assert.NoError(ttt, err)
+
+				integration.AssertDetails(t, tt.want.GetSchema(), got.GetSchema())
+				assert.Equal(t, tt.want.GetSchema(), got.GetSchema())
+
+			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user schema result")
+		})
+	}
+}
+
+func TestServer_ListUserSchemas(t *testing.T) {
+	userSchema := new(structpb.Struct)
+	err := userSchema.UnmarshalJSON([]byte(`{
+		"$schema": "urn:zitadel:schema:v1",
+		"type": "object",
+		"properties": {}
+	}`))
+	require.NoError(t, err)
+	type args struct {
+		ctx     context.Context
+		req     *schema.ListUserSchemasRequest
+		prepare func(request *schema.ListUserSchemasRequest, resp *schema.ListUserSchemasResponse) error
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *schema.ListUserSchemasResponse
+		wantErr bool
+	}{
+		{
+			name: "missing permission",
+			args: args{
+				ctx: Tester.WithAuthorization(context.Background(), integration.OrgOwner),
+				req: &schema.ListUserSchemasRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "not found, error",
+			args: args{
+				ctx: CTX,
+				req: &schema.ListUserSchemasRequest{
+					Queries: []*schema.SearchQuery{
+						{
+							Query: &schema.SearchQuery_IdQuery{
+								IdQuery: &schema.IDQuery{
+									Id: "notexisting",
+								},
+							},
+						},
+					},
+				},
+			},
+			want: &schema.ListUserSchemasResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+				},
+				Result: []*schema.UserSchema{},
+			},
+		},
+		{
+			name: "single (id), ok",
+			args: args{
+				ctx: CTX,
+				req: &schema.ListUserSchemasRequest{},
+				prepare: func(request *schema.ListUserSchemasRequest, resp *schema.ListUserSchemasResponse) error {
+					schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
+					createResp := Tester.CreateUserSchemaWithType(CTX, t, schemaType)
+					request.Queries = []*schema.SearchQuery{
+						{
+							Query: &schema.SearchQuery_IdQuery{
+								IdQuery: &schema.IDQuery{
+									Id: createResp.GetId(),
+								},
+							},
+						},
+					}
+
+					resp.Result[0].Id = createResp.GetId()
+					resp.Result[0].Type = schemaType
+					resp.Result[0].Details = &object.Details{
+						Sequence:      createResp.GetDetails().GetSequence(),
+						ChangeDate:    createResp.GetDetails().GetChangeDate(),
+						ResourceOwner: createResp.GetDetails().GetResourceOwner(),
+					}
+					return nil
+				},
+			},
+			want: &schema.ListUserSchemasResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+				},
+				Result: []*schema.UserSchema{
+					{
+						State:                  schema.State_STATE_ACTIVE,
+						Revision:               0,
+						Schema:                 userSchema,
+						PossibleAuthenticators: nil,
+					},
+				},
+			},
+		},
+		{
+			name: "single (type), ok",
+			args: args{
+				ctx: CTX,
+				req: &schema.ListUserSchemasRequest{},
+				prepare: func(request *schema.ListUserSchemasRequest, resp *schema.ListUserSchemasResponse) error {
+					schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
+					createResp := Tester.CreateUserSchemaWithType(CTX, t, schemaType)
+					request.Queries = []*schema.SearchQuery{
+						{
+							Query: &schema.SearchQuery_TypeQuery{
+								TypeQuery: &schema.TypeQuery{
+									Type: schemaType,
+								},
+							},
+						},
+					}
+
+					resp.Result[0].Id = createResp.GetId()
+					resp.Result[0].Type = schemaType
+					resp.Result[0].Details = &object.Details{
+						Sequence:      createResp.GetDetails().GetSequence(),
+						ChangeDate:    createResp.GetDetails().GetChangeDate(),
+						ResourceOwner: createResp.GetDetails().GetResourceOwner(),
+					}
+					return nil
+				},
+			},
+			want: &schema.ListUserSchemasResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+				},
+				Result: []*schema.UserSchema{
+					{
+						State:                  schema.State_STATE_ACTIVE,
+						Revision:               0,
+						Schema:                 userSchema,
+						PossibleAuthenticators: nil,
+					},
+				},
+			},
+		},
+		//{
+		//	name: "multiple (id), ok",
+		//	args: args{
+		//		ctx: CTX,
+		//		req: &schema.ListUserSchemasRequest{},
+		//		prepare: func(request *schema.ListUserSchemasRequest, resp *schema.ListUserSchemasResponse) error {
+		//			schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
+		//			createResp := Tester.CreateUserSchemaWithType(CTX, t, schemaType)
+		//			request.Queries = []*schema.SearchQuery{
+		//				{
+		//					Query: &schema.SearchQuery_StateQuery{
+		//						StateQuery: &schema.StateQuery{
+		//							State: schema.State_STATE_ACTIVE,
+		//						},
+		//					},
+		//				},
+		//			}
+		//
+		//			resp.Result[0].Id = createResp.GetId()
+		//			resp.Result[0].Type = schemaType
+		//			resp.Result[0].Details = &object.Details{
+		//				Sequence:      createResp.GetDetails().GetSequence(),
+		//				ChangeDate:    createResp.GetDetails().GetChangeDate(),
+		//				ResourceOwner: createResp.GetDetails().GetResourceOwner(),
+		//			}
+		//			return nil
+		//		},
+		//	},
+		//	want: &schema.ListUserSchemasResponse{
+		//		Details: &object.ListDetails{
+		//			TotalResult: 1,
+		//		},
+		//		Result: []*schema.UserSchema{
+		//			{
+		//				State:                  schema.State_STATE_ACTIVE,
+		//				Revision:               0,
+		//				Schema:                 userSchema,
+		//				PossibleAuthenticators: nil,
+		//			},
+		//		},
+		//	},
+		//},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ensureFeatureEnabled(t)
+			if tt.args.prepare != nil {
+				err := tt.args.prepare(tt.args.req, tt.want)
+				require.NoError(t, err)
+			}
+
+			retryDuration := 5 * time.Second
+			if ctxDeadline, ok := CTX.Deadline(); ok {
+				retryDuration = time.Until(ctxDeadline)
+			}
+
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, err := Client.ListUserSchemas(tt.args.ctx, tt.args.req)
+				if tt.wantErr {
+					require.Error(t, err)
+					return
+				}
+				assert.NoError(ttt, err)
+
+				// always first check length, otherwise its failed anyway
+				assert.Len(ttt, got.Result, len(tt.want.Result))
+				for i := range tt.want.Result {
+					assert.Contains(ttt, got.Result, tt.want.Result[i])
+				}
+				//assert.ElementsMatch(t, tt.want.GetResult(), got.GetResult())
+				integration.AssertListDetails(t, tt.want, got)
+			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user schema result")
+		})
+	}
+}

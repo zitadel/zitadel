@@ -504,6 +504,16 @@ func NewJSONCol(name string, value interface{}) Column {
 	return NewCol(name, marshalled)
 }
 
+func NewIncrementCol(column string, value interface{}) Column {
+	return Column{
+		Name:  column,
+		Value: value,
+		ParameterOpt: func(placeholder string) string {
+			return column + " + " + placeholder
+		},
+	}
+}
+
 type Condition func(param string) (string, []any)
 
 type NamespacedCondition func(namespace string) Condition

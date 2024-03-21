@@ -110,7 +110,7 @@ func (p *userSchemaProjection) reduceCreated(event eventstore.Event) (*handler.S
 			handler.NewCol(UserSchemaInstanceIDCol, event.Aggregate().InstanceID),
 			handler.NewCol(UserSchemaStateCol, domain.UserSchemaStateActive),
 			handler.NewCol(UserSchemaTypeCol, e.SchemaType),
-			handler.NewCol(UserSchemaRevisionCol, 0), // TODO: !
+			handler.NewCol(UserSchemaRevisionCol, 1),
 			handler.NewCol(UserSchemaSchemaCol, e.Schema),
 			handler.NewCol(UserSchemaPossibleAuthenticatorsCol, e.PossibleAuthenticators),
 		},
@@ -133,13 +133,12 @@ func (p *userSchemaProjection) reduceUpdated(event eventstore.Event) (*handler.S
 
 	if len(e.Schema) > 0 {
 		cols = append(cols, handler.NewCol(UserSchemaSchemaCol, e.Schema))
+		cols = append(cols, handler.NewIncrementCol(UserSchemaRevisionCol, 1))
 	}
 
 	if len(e.PossibleAuthenticators) > 0 {
 		cols = append(cols, handler.NewCol(UserSchemaPossibleAuthenticatorsCol, e.PossibleAuthenticators))
 	}
-
-	//handler.NewCol(UserSchemaRevisionCol, 0), // TODO: !
 
 	return handler.NewUpdateStatement(
 		event,

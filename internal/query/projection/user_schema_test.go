@@ -48,7 +48,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 								"instance-id",
 								domain.UserSchemaStateActive,
 								"type",
-								0,
+								1,
 								json.RawMessage(`{"$schema":"urn:zitadel:schema:v1","properties":{"name":{"type":"string","urn:zitadel:schema:permission":{"self":"rw"}}},"type":"object"}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername, domain.AuthenticatorTypePassword},
 							},
@@ -74,12 +74,13 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_schema SET (change_date, sequence, type, schema, possible_authenticators) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
+							expectedStmt: "UPDATE projections.user_schema SET (change_date, sequence, type, schema, revision, possible_authenticators) = ($1, $2, $3, $4, revision + $5, $6) WHERE (id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"type",
 								json.RawMessage(`{"$schema":"urn:zitadel:schema:v1","properties":{"name":{"type":"string","urn:zitadel:schema:permission":{"self":"rw"}}},"type":"object"}`),
+								1,
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername, domain.AuthenticatorTypePassword},
 								"agg-id",
 								"instance-id",
