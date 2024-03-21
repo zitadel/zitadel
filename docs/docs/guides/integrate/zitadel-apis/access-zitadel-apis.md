@@ -136,7 +136,7 @@ Content-Type: application/json
 ```
 
 Use the access_token in the Authorization header to make requests to the ZITADEL APIs.
-In the following example we read the organization of the service user.
+In the following example, we read the organization of the service user.
 
 ```bash
 curl --request GET \
