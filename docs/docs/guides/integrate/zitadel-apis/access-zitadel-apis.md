@@ -49,7 +49,7 @@ The System API can't be accessed by service users and requires a special configu
 
 ## 1. Create a service user
 
-First you need to create a new service user through the console or ZITADEL APIs.
+First, you need to create a new service user through the console or ZITADEL APIs.
 
 Via Console:
 
