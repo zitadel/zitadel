@@ -72,7 +72,7 @@ There are some different levels for managers.
 - **Project Managers**: At this level, the user is able to manage a project.
 - **Project Grant Manager**: The project grant manager is for projects, which are granted of another organization.
 
-On each level we have some different Roles. Here you can find more about the different roles: [ZITADEL Manager Roles](/guides/manage/console/managers#roles)
+On each level, we have some different Roles. Here you can find more about the different roles: [ZITADEL Manager Roles](/guides/manage/console/managers#roles)
 
 To be able to access the ZITADEL APIs your service user needs permissions to ZITADEL.
 
