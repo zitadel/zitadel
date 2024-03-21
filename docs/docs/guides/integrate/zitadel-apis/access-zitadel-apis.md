@@ -166,7 +166,7 @@ In this step we will authenticate a service user and receive an access_token to 
 
 #### Basic authentication
 
-When using `client_secret_basic` on token or introspection endpoints, provide an`Authorization` header with a Basic auth value in the following form:
+When using `client_secret_basic` on token or introspection endpoints, provide an `Authorization` header with a Basic auth value in the following form:
 
 ```markdown
 Authorization: "Basic " + base64( formUrlEncode(client_id) + ":" + formUrlEncode(client_secret) )
@@ -207,7 +207,7 @@ Content-Type: application/json
 }
 ```
 
-Because the received Token includes the `urn:zitadel:iam:org:project:id:zitadel:aud` scope, we can send it in your requests to the ZITADEL API as Authorization Header.
+Because the received token includes the `urn:zitadel:iam:org:project:id:zitadel:aud` scope, we can send it in your requests to the ZITADEL API as the Authorization Header.
 In this example we read the organization of the service user.
 
 ```bash
@@ -218,10 +218,10 @@ curl --request GET \
 
 ### Personal access token (PAT)
 
-A Personal Access Token (PAT) is a ready to use token which can be used as _Authorization_ header.
+A Personal Access Token (PAT) is a ready-to-use token which can be used as _Authorization_ header.
 
-Because the PAT is a ready to use token, you can add it as Authorization Header and send it in your requests to the ZITADEL API.
-In this example we read the organization of the service user.
+Because the PAT is a ready-to-use token, you can add it as Authorization Header and send it in your requests to the ZITADEL API.
+In this example, we read the organization of the service user.
 
 ```bash
 curl --request GET \

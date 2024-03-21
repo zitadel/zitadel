@@ -60,7 +60,7 @@ If you specify an expiration date, note that the key will expire at midnight tha
 
 ![Create private key](/img/console_serviceusers_new_key.gif)
 
-The downloaded json should look something like outlined below. The value of `key` contains the _private_ key for your service account. Please make sure to keep this key securely stored and handle with care. The public key is automatically stored in ZITADEL.
+The downloaded JSON should look something like outlined below. The value of `key` contains the _private_ key for your service account. Please make sure to keep this key securely stored and handled with care. The public key is automatically stored in ZITADEL.
 
 ```json
 {
