@@ -9,10 +9,13 @@ import { Session, AuthRequest, Prompt, login } from "@zitadel/server";
 import { NextRequest, NextResponse } from "next/server";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
+  console.log("loadSessions", ids);
   const response = await listSessions(
     server,
     ids.filter((id: string | undefined) => !!id)
   );
+  console.log("sessions:", response);
+
   return response?.sessions ?? [];
 }
 
