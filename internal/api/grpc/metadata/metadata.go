@@ -85,6 +85,6 @@ func UserMetadataQueryToQuery(metadataQuery *meta_pb.MetadataQuery) (query.Searc
 	case *meta_pb.MetadataQuery_KeyQuery:
 		return query.NewUserMetadataKeySearchQuery(q.KeyQuery.Key, object.TextMethodToQuery(q.KeyQuery.Method))
 	default:
-		return nil, zerrors.ThrowInvalidArgument(nil, "METAD-fdg23", "List.Query.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(nil, "METAD-Vn7qy", "List.Query.Invalid")
 	}
 }
