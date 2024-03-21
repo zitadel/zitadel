@@ -2,7 +2,6 @@
 title: JWT IDP
 ---
 
-
 # JWT IDP
 
 JSON Web Token Identity Provider (JWT IDP) gives you the possibility to use an (existing) JWT as federated identity.
@@ -17,7 +16,7 @@ All you need to provide is an endpoint where ZITADEL can receive a JWT and some 
 
 The authentication process then might look like the following:
 
-![JWT IDP Architecture](/img/concepts/objects/jwt_idp.png)
+![JWT IDP Architecture](/img/guides/jwt_idp.png)
 
 1. The user is logged into the existing application and the WAF holds the session information. It might even send a JWT to the application.
    The new application is opened by clicking on a link in the existing application.

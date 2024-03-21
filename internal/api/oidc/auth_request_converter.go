@@ -308,3 +308,7 @@ func (r *RefreshTokenRequest) GetSubject() string {
 func (r *RefreshTokenRequest) SetCurrentScopes(scopes []string) {
 	r.Scopes = scopes
 }
+
+func (r *RefreshTokenRequest) GetActor() *oidc.ActorClaims {
+	return actorDomainToClaims(r.Actor)
+}

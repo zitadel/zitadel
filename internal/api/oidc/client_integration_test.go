@@ -213,9 +213,9 @@ func assertIntrospection(
 	assertOIDCTime(t, introspection.UpdatedAt, User.GetDetails().GetChangeDate().AsTime())
 
 	require.NotNil(t, introspection.Claims)
-	assert.Equal(t, User.Details.ResourceOwner, introspection.Claims[oidc_api.ClaimResourceOwner+"id"])
-	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwner+"name"])
-	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwner+"primary_domain"])
+	assert.Equal(t, User.Details.ResourceOwner, introspection.Claims[oidc_api.ClaimResourceOwnerID])
+	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwnerName])
+	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwnerPrimaryDomain])
 }
 
 // TestServer_VerifyClient tests verification by running code flow tests

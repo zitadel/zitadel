@@ -2275,7 +2275,8 @@
         "0": "Código de Autorização",
         "1": "Implícito",
         "2": "Token de Atualização",
-        "3": "Código do Dispositivo"
+        "3": "Código do Dispositivo",
+        "4": "Troca de tokens"
       },
       "AUTHMETHOD": {
         "0": "Básico",
