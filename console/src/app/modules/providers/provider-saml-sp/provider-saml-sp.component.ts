@@ -7,7 +7,18 @@ import {ManagementService} from '../../../services/mgmt.service';
 import {AdminService} from '../../../services/admin.service';
 import {ToastService} from '../../../services/toast.service';
 import {GrpcAuthService} from '../../../services/grpc-auth.service';
-import {BehaviorSubject, combineLatestWith, from, Observable, of, Subject, switchMap, take} from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatestWith,
+  distinctUntilChanged,
+  from,
+  Observable,
+  of,
+  shareReplay,
+  Subject,
+  switchMap,
+  take
+} from 'rxjs';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Breadcrumb, BreadcrumbService, BreadcrumbType} from '../../../services/breadcrumb.service';
 import {atLeastOneIsFilled, requiredValidator} from '../../form-field/validators/validators';
@@ -40,18 +51,22 @@ export class ProviderSamlSpComponent {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   private service!: ManagementService | AdminService;
 
-  private created$: Subject<string> = new BehaviorSubject<string>('');
+  public created$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   private id$: Observable<string|null> = this.route.paramMap.pipe(
     // The ID observable should also emit when the IDP was just created
     combineLatestWith(this.created$),
     map(([params, created]) => created ? created : params.get('id')),
+    shareReplay(1),
   )
   public exists$: Observable<boolean> = this.id$.pipe(
     map(id => !!id),
+    shareReplay(1),
+    tap(console.log),
   )
   public autofillLink$ = this.id$.pipe(
     filter(id => !!id),
-    map(()=> `https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml#optional-add-zitadel-action-to-autofill-userdata`)
+    map(()=> `https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml#optional-add-zitadel-action-to-autofill-userdata`),
+    shareReplay(1),
   );
   public activated$ = new BehaviorSubject<boolean>(false);
   public activateLink$: Observable<string> = this.id$.pipe(
@@ -61,13 +76,15 @@ export class ProviderSamlSpComponent {
       map(policy => !policy.policy?.idpsList.find(idp => idp.idpId === id)),
     )).pipe(
       map((show) => !show ? '' : 'https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml#activate-idp'),
-      tap(console.log),
     ),
-  ))
+  ),
+  shareReplay(1),
+)
   // we expand initially if the IDP does not exist or if the idp was just created
   public expandWhatNow$ = this.id$.pipe(
     combineLatestWith(this.activateLink$, this.created$),
     map(([id, activateLink, created]) => !id || activateLink || created),
+    shareReplay(1),
   );
   public copyUrls$: Observable<CopyUrl[]> = this.id$.pipe(
     filter(id => !!id),
@@ -94,7 +111,8 @@ export class ProviderSamlSpComponent {
           },
         ];
       })
-    ))
+    )),
+    shareReplay(1),
   )
 
   public isInstance: boolean = false;
@@ -183,13 +201,13 @@ export class ProviderSamlSpComponent {
   }
 
   public updateSAMLProvider(): void {
-    if (this.provider) {
+    if (this.provider || this.created$.value) {
       const req =
         this.serviceType === PolicyComponentServiceType.MGMT
           ? new MgmtUpdateSAMLProviderRequest()
           : new AdminUpdateSAMLProviderRequest();
 
-      req.setId(this.provider.id);
+      req.setId(this.provider?.id || this.created$.value);
       req.setName(this.name?.value);
       if (this.metadataXml?.value) {
         req.setMetadataXml(this.metadataXml?.value);
@@ -246,7 +264,7 @@ export class ProviderSamlSpComponent {
   }
 
   public submitForm(): void {
-    this.provider ? this.updateSAMLProvider() : this.addSAMLProvider();
+    this.provider || this.created$.value ? this.updateSAMLProvider() : this.addSAMLProvider();
   }
 
   private getData(id: string): void {

@@ -77,7 +77,6 @@
           (optionsChanged)="options = $event"
         ></cnsl-provider-options>
       </div>
-
       <div class="identity-provider-create-actions">
         <button
           color="primary"
@@ -86,8 +85,7 @@
           [disabled]="form.invalid || form.disabled"
           type="submit"
         >
-          <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
-          <span *ngIf="!id">{{ 'ACTIONS.CREATE' | translate }}</span>
+          <span *ngIf="{exists: (exists$ | async)} as idp">{{ ( !!idp.exists ? 'ACTIONS.SAVE' : 'ACTIONS.CREATE') | translate }}</span>
         </button>
       </div>
     </form>
