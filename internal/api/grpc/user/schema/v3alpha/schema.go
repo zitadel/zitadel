@@ -145,7 +145,7 @@ func userSchemaToPb(userSchema *query.UserSchema) (*schema.UserSchema, error) {
 	}
 	return &schema.UserSchema{
 		Id:                     userSchema.ID,
-		Details:                nil,
+		Details:                object.DomainToDetailsPb(&userSchema.ObjectDetails),
 		Type:                   userSchema.Type,
 		State:                  userSchemaStateToPb(userSchema.State),
 		Revision:               userSchema.Revision,
@@ -226,8 +226,8 @@ func userSchemaFieldNameToSortingColumn(column schema.FieldName) query.Column {
 		return query.UserSchemaStateCol
 	case schema.FieldName_FIELD_NAME_REVISION:
 		return query.UserSchemaRevisionCol
-	case schema.FieldName_FIELD_NAME_CREATION_DATE:
-		return query.UserSchemaCreationDateCol
+	case schema.FieldName_FIELD_NAME_CHANGE_DATE:
+		return query.UserSchemaChangeDateCol
 	case schema.FieldName_FIELD_NAME_UNSPECIFIED:
 		return query.UserSchemaIDCol
 	default:

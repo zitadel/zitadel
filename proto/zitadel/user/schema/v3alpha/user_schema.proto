@@ -59,7 +59,7 @@ enum FieldName {
   FIELD_NAME_TYPE = 1;
   FIELD_NAME_STATE = 2;
   FIELD_NAME_REVISION = 3;
-  FIELD_NAME_CREATION_DATE = 4;
+  FIELD_NAME_CHANGE_DATE = 4;
 }
 
 message SearchQuery {

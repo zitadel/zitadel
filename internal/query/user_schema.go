@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
@@ -27,11 +26,8 @@ func (e *UserSchemas) SetState(s *State) {
 }
 
 type UserSchema struct {
-	ID                     string
-	CreationDate           time.Time
-	ChangeDate             time.Time
-	Sequence               uint64
-	InstanceID             string
+	ID string
+	domain.ObjectDetails
 	State                  domain.UserSchemaState
 	Type                   string
 	Revision               uint32
@@ -51,10 +47,6 @@ var (
 	}
 	UserSchemaIDCol = Column{
 		name:  projection.UserSchemaIDCol,
-		table: userSchemaTable,
-	}
-	UserSchemaCreationDateCol = Column{
-		name:  projection.UserSchemaCreationDateCol,
 		table: userSchemaTable,
 	}
 	UserSchemaChangeDateCol = Column{
@@ -139,7 +131,6 @@ func NewUserSchemaStateSearchQuery(value int32) (SearchQuery, error) {
 func prepareUserSchemaQuery() (sq.SelectBuilder, func(*sql.Row) (*UserSchema, error)) {
 	return sq.Select(
 			UserSchemaIDCol.identifier(),
-			UserSchemaCreationDateCol.identifier(),
 			UserSchemaChangeDateCol.identifier(),
 			UserSchemaSequenceCol.identifier(),
 			UserSchemaInstanceIDCol.identifier(),
@@ -155,10 +146,9 @@ func prepareUserSchemaQuery() (sq.SelectBuilder, func(*sql.Row) (*UserSchema, er
 			u := new(UserSchema)
 			err := row.Scan(
 				&u.ID,
-				&u.CreationDate,
-				&u.ChangeDate,
+				&u.EventDate,
 				&u.Sequence,
-				&u.InstanceID,
+				&u.ResourceOwner,
 				&u.State,
 				&u.Type,
 				&u.Revision,
@@ -179,7 +169,6 @@ func prepareUserSchemaQuery() (sq.SelectBuilder, func(*sql.Row) (*UserSchema, er
 func prepareUserSchemasQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserSchemas, error)) {
 	return sq.Select(
 			UserSchemaIDCol.identifier(),
-			UserSchemaCreationDateCol.identifier(),
 			UserSchemaChangeDateCol.identifier(),
 			UserSchemaSequenceCol.identifier(),
 			UserSchemaInstanceIDCol.identifier(),
@@ -198,10 +187,9 @@ func prepareUserSchemasQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserSchemas,
 				u := new(UserSchema)
 				err := rows.Scan(
 					&u.ID,
-					&u.CreationDate,
-					&u.ChangeDate,
+					&u.EventDate,
 					&u.Sequence,
-					&u.InstanceID,
+					&u.ResourceOwner,
 					&u.State,
 					&u.Type,
 					&u.Revision,
