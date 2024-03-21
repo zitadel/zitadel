@@ -166,7 +166,7 @@ In this step we will authenticate a service user and receive an access_token to 
 
 #### Basic authentication
 
-When using `client_secret_basic` on token or introspection endpoints, provide an `Authorization` header with a Basic auth value in the following form:
+When using `client_secret_basic` on the token or introspection endpoints, provide an `Authorization` header with a Basic auth value in the following form:
 
 ```markdown
 Authorization: "Basic " + base64( formUrlEncode(client_id) + ":" + formUrlEncode(client_secret) )
