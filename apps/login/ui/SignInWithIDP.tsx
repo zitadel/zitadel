@@ -15,6 +15,7 @@ export interface SignInWithIDPProps {
   children?: ReactNode;
   host: string;
   identityProviders: any[];
+  authRequestId?: string;
   startIDPFlowPath?: (idpId: string) => string;
 }
 
@@ -24,6 +25,7 @@ const START_IDP_FLOW_PATH = (idpId: string) =>
 export function SignInWithIDP({
   host,
   identityProviders,
+  authRequestId,
   startIDPFlowPath = START_IDP_FLOW_PATH,
 }: SignInWithIDPProps) {
   const [loading, setLoading] = useState<boolean>(false);
@@ -40,7 +42,10 @@ export function SignInWithIDP({
       },
       body: JSON.stringify({
         idpId,
-        successUrl: `${host}/idp/${provider}/success`,
+        successUrl: authRequestId
+          ? `${host}/idp/${provider}/success?` +
+            new URLSearchParams({ authRequestId })
+          : `${host}/idp/${provider}/success`,
         failureUrl: `${host}/idp/${provider}/failure`,
       }),
     });

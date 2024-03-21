@@ -22,7 +22,13 @@ function getIdentityProviders(
     });
 }
 
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Record<string | number | symbol, string | undefined>;
+}) {
+  const authRequestId = searchParams?.authRequestId;
+
   const legal = await getLegalAndSupportSettings(server);
 
   // TODO if org idps should be shown replace emptystring with the orgId.
@@ -43,6 +49,7 @@ export default async function Page() {
         <SignInWithIDP
           host={host}
           identityProviders={identityProviders}
+          authRequestId={authRequestId}
         ></SignInWithIDP>
       )}
     </div>

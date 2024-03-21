@@ -89,7 +89,7 @@ export default async function Page({
   searchParams: Record<string | number | symbol, string | undefined>;
   params: { provider: ProviderSlug };
 }) {
-  const { id, token } = searchParams;
+  const { id, token, authRequestId } = searchParams;
   const { provider } = params;
 
   if (provider && id && token) {
@@ -107,6 +107,7 @@ export default async function Page({
                 <IdpSignin
                   userId={userId}
                   idpIntent={{ idpIntentId: id, idpIntentToken: token }}
+                  authRequestId={authRequestId}
                 />
               </div>
             );
