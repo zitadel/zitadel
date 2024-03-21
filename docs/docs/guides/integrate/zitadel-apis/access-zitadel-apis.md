@@ -43,7 +43,7 @@ Instead you call the Auth API with the token of the user.
 ### Accessing System API
 
 With the System API developers can manage different ZITADEL instances.
-The System API can't be accessed with service users and requires a special configuration and authentication that can be found in our [guide to access ZITADEL's System API](./access-zitadel-system-api).
+The System API can't be accessed by service users and requires a special configuration and authentication that can be found in our [guide to access ZITADEL's System API](./access-zitadel-system-api).
 
 [Reference documentation for system API](/docs/apis/introduction#system)
 
