@@ -85,7 +85,7 @@ To be able to access the ZITADEL APIs your service user needs permissions to ZIT
 
 ## 3. Authenticate service user and request token
 
-Service users can be authenticated using private key JWT, client credentials, or personal access token.
+Service users can be authenticated using private key JWT, client credentials, or personal access tokens.
 The [service user authentication](../service-users/authenticate-service-users) can be used to make machine-to-machine requests to any Resource Server (eg, an backend service / API) by requesting a token from the Authorization Server (ZITADEL) and sending the short lived token (access token) in the Header of requests.
 
 This guide covers a specific case of service user authentication when requesting access to the [ZITADEL APIs](/docs/apis/introduction).
