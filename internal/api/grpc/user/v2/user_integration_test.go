@@ -70,8 +70,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddHumanUserRequest{
-					Organisation: &object.Organisation{
-						Org: &object.Organisation_OrgId{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
 							OrgId: Tester.Organisation.ID,
 						},
 					},
@@ -111,8 +111,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddHumanUserRequest{
-					Organisation: &object.Organisation{
-						Org: &object.Organisation_OrgId{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
 							OrgId: Tester.Organisation.ID,
 						},
 					},
@@ -156,8 +156,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddHumanUserRequest{
-					Organisation: &object.Organisation{
-						Org: &object.Organisation_OrgId{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
 							OrgId: Tester.Organisation.ID,
 						},
 					},
@@ -202,8 +202,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddHumanUserRequest{
-					Organisation: &object.Organisation{
-						Org: &object.Organisation_OrgId{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
 							OrgId: Tester.Organisation.ID,
 						},
 					},
@@ -249,8 +249,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddHumanUserRequest{
-					Organisation: &object.Organisation{
-						Org: &object.Organisation_OrgId{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
 							OrgId: Tester.Organisation.ID,
 						},
 					},
@@ -290,8 +290,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddHumanUserRequest{
-					Organisation: &object.Organisation{
-						Org: &object.Organisation_OrgId{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
 							OrgId: Tester.Organisation.ID,
 						},
 					},
@@ -321,8 +321,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddHumanUserRequest{
-					Organisation: &object.Organisation{
-						Org: &object.Organisation_OrgId{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
 							OrgId: Tester.Organisation.ID,
 						},
 					},
@@ -355,8 +355,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddHumanUserRequest{
-					Organisation: &object.Organisation{
-						Org: &object.Organisation_OrgId{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
 							OrgId: Tester.Organisation.ID,
 						},
 					},
@@ -402,8 +402,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddHumanUserRequest{
-					Organisation: &object.Organisation{
-						Org: &object.Organisation_OrgId{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
 							OrgId: Tester.Organisation.ID,
 						},
 					},
@@ -454,8 +454,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddHumanUserRequest{
-					Organisation: &object.Organisation{
-						Org: &object.Organisation_OrgId{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
 							OrgId: Tester.Organisation.ID,
 						},
 					},
@@ -493,8 +493,8 @@ func TestServer_AddHumanUser(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddHumanUserRequest{
-					Organisation: &object.Organisation{
-						Org: &object.Organisation_OrgId{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
 							OrgId: Tester.Organisation.ID,
 						},
 					},
@@ -572,8 +572,8 @@ func TestServer_AddHumanUser_Permission(t *testing.T) {
 			args: args{
 				SystemCTX,
 				&user.AddHumanUserRequest{
-					Organisation: &object.Organisation{
-						Org: &object.Organisation_OrgId{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
 							OrgId: newOrg.GetOrganizationId(),
 						},
 					},
@@ -613,8 +613,8 @@ func TestServer_AddHumanUser_Permission(t *testing.T) {
 			args: args{
 				IamCTX,
 				&user.AddHumanUserRequest{
-					Organisation: &object.Organisation{
-						Org: &object.Organisation_OrgId{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
 							OrgId: newOrg.GetOrganizationId(),
 						},
 					},
@@ -654,8 +654,8 @@ func TestServer_AddHumanUser_Permission(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddHumanUserRequest{
-					Organisation: &object.Organisation{
-						Org: &object.Organisation_OrgId{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
 							OrgId: newOrg.GetOrganizationId(),
 						},
 					},
@@ -690,8 +690,8 @@ func TestServer_AddHumanUser_Permission(t *testing.T) {
 			args: args{
 				UserCTX,
 				&user.AddHumanUserRequest{
-					Organisation: &object.Organisation{
-						Org: &object.Organisation_OrgId{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
 							OrgId: newOrg.GetOrganizationId(),
 						},
 					},
