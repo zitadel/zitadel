@@ -37,11 +37,6 @@ func TestServer_GetUserByID(t *testing.T) {
 			args: args{
 				IamCTX,
 				&user.GetUserByIDRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 					UserId: "",
 				},
 				func(ctx context.Context, username string, request *user.GetUserByIDRequest) error {
@@ -55,11 +50,6 @@ func TestServer_GetUserByID(t *testing.T) {
 			args: args{
 				IamCTX,
 				&user.GetUserByIDRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
 					UserId: "unknown",
 				},
 				func(ctx context.Context, username string, request *user.GetUserByIDRequest) error {
@@ -72,13 +62,7 @@ func TestServer_GetUserByID(t *testing.T) {
 			name: "user by ID, ok",
 			args: args{
 				IamCTX,
-				&user.GetUserByIDRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.ID,
-						},
-					},
-				},
+				&user.GetUserByIDRequest{},
 				func(ctx context.Context, username string, request *user.GetUserByIDRequest) error {
 					resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 					request.UserId = resp.GetUserId()
@@ -172,11 +156,6 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 			args: args{
 				SystemCTX,
 				&user.GetUserByIDRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: newOrg.GetOrganizationId(),
-						},
-					},
 					UserId: newUserID,
 				},
 			},
@@ -215,11 +194,6 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 			args: args{
 				IamCTX,
 				&user.GetUserByIDRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: newOrg.GetOrganizationId(),
-						},
-					},
 					UserId: newUserID,
 				},
 			},
@@ -258,11 +232,6 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 			args: args{
 				CTX,
 				&user.GetUserByIDRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: newOrg.GetOrganizationId(),
-						},
-					},
 					UserId: newUserID,
 				},
 			},
@@ -273,11 +242,6 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 			args: args{
 				UserCTX,
 				&user.GetUserByIDRequest{
-					Organization: &object.Organization{
-						Org: &object.Organization_OrgId{
-							OrgId: newOrg.GetOrganizationId(),
-						},
-					},
 					UserId: newUserID,
 				},
 			},
@@ -316,7 +280,7 @@ func TestServer_ListUsers(t *testing.T) {
 		ctx   context.Context
 		count int
 		req   *user.ListUsersRequest
-		dep   func(ctx context.Context, org string, usernames []string, request *user.ListUsersRequest) ([]userAttr, error)
+		dep   func(ctx context.Context, usernames []string, request *user.ListUsersRequest) ([]userAttr, error)
 	}
 	tests := []struct {
 		name    string
@@ -330,7 +294,7 @@ func TestServer_ListUsers(t *testing.T) {
 				UserCTX,
 				0,
 				&user.ListUsersRequest{},
-				func(ctx context.Context, org string, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
+				func(ctx context.Context, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
 					request.Queries = append(request.Queries, InUserIDsQuery([]string{userResp.UserId}))
 					return []userAttr{}, nil
 				},
@@ -350,7 +314,7 @@ func TestServer_ListUsers(t *testing.T) {
 				IamCTX,
 				1,
 				&user.ListUsersRequest{},
-				func(ctx context.Context, org string, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
+				func(ctx context.Context, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
 					infos := make([]userAttr, len(usernames))
 					userIDs := make([]string, len(usernames))
 					for i, username := range usernames {
@@ -400,7 +364,7 @@ func TestServer_ListUsers(t *testing.T) {
 				IamCTX,
 				3,
 				&user.ListUsersRequest{},
-				func(ctx context.Context, org string, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
+				func(ctx context.Context, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
 					infos := make([]userAttr, len(usernames))
 					userIDs := make([]string, len(usernames))
 					for i, username := range usernames {
@@ -492,7 +456,7 @@ func TestServer_ListUsers(t *testing.T) {
 				IamCTX,
 				1,
 				&user.ListUsersRequest{},
-				func(ctx context.Context, org string, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
+				func(ctx context.Context, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
 					infos := make([]userAttr, len(usernames))
 					userIDs := make([]string, len(usernames))
 					for i, username := range usernames {
@@ -542,7 +506,7 @@ func TestServer_ListUsers(t *testing.T) {
 				IamCTX,
 				1,
 				&user.ListUsersRequest{},
-				func(ctx context.Context, org string, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
+				func(ctx context.Context, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
 					infos := make([]userAttr, len(usernames))
 					for i, username := range usernames {
 						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
@@ -590,7 +554,7 @@ func TestServer_ListUsers(t *testing.T) {
 				IamCTX,
 				3,
 				&user.ListUsersRequest{},
-				func(ctx context.Context, org string, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
+				func(ctx context.Context, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
 					infos := make([]userAttr, len(usernames))
 					for i, username := range usernames {
 						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
@@ -683,7 +647,7 @@ func TestServer_ListUsers(t *testing.T) {
 					InUserEmailsQuery([]string{"notfound"}),
 				},
 				},
-				func(ctx context.Context, org string, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
+				func(ctx context.Context, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
 					return []userAttr{}, nil
 				},
 			},
@@ -696,6 +660,99 @@ func TestServer_ListUsers(t *testing.T) {
 				Result:        []*user.User{},
 			},
 		},
+		{
+			name: "list user resourceowner multiple, ok",
+			args: args{
+				IamCTX,
+				3,
+				&user.ListUsersRequest{},
+				func(ctx context.Context, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
+					orgResp := Tester.CreateOrganization(ctx, fmt.Sprintf("ListUsersResourceowner%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+
+					infos := make([]userAttr, len(usernames))
+					for i, username := range usernames {
+						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
+						infos[i] = userAttr{resp.GetUserId(), username}
+					}
+					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
+					request.Queries = append(request.Queries, InUserEmailsQuery(usernames))
+					return infos, nil
+				},
+			},
+			want: &user.ListUsersResponse{
+				Details: &object.ListDetails{
+					TotalResult: 3,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*user.User{
+					{
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									Phone:      "+41791234567",
+									IsVerified: true,
+								},
+							},
+						},
+					}, {
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									Phone:      "+41791234567",
+									IsVerified: true,
+								},
+							},
+						},
+					}, {
+						State: user.UserState_USER_STATE_ACTIVE,
+						Type: &user.User_Human{
+							Human: &user.HumanUser{
+								Profile: &user.HumanProfile{
+									GivenName:         "Mickey",
+									FamilyName:        "Mouse",
+									NickName:          gu.Ptr("Mickey"),
+									DisplayName:       gu.Ptr("Mickey Mouse"),
+									PreferredLanguage: gu.Ptr("nl"),
+									Gender:            user.Gender_GENDER_MALE.Enum(),
+								},
+								Email: &user.HumanEmail{
+									IsVerified: true,
+								},
+								Phone: &user.HumanPhone{
+									Phone:      "+41791234567",
+									IsVerified: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -703,7 +760,7 @@ func TestServer_ListUsers(t *testing.T) {
 			for i := 0; i < tt.args.count; i++ {
 				usernames[i] = fmt.Sprintf("%d%d@mouse.com", time.Now().UnixNano(), i)
 			}
-			infos, err := tt.args.dep(tt.args.ctx, orgResp.OrganizationId, usernames, tt.args.req)
+			infos, err := tt.args.dep(tt.args.ctx, usernames, tt.args.req)
 			require.NoError(t, err)
 			retryDuration := time.Minute
 			if ctxDeadline, ok := CTX.Deadline(); ok {
@@ -764,6 +821,15 @@ func UsernameQuery(username string) *user.SearchQuery {
 	return &user.SearchQuery{Query: &user.SearchQuery_UserNameQuery{
 		UserNameQuery: &user.UserNameQuery{
 			UserName: username,
+		},
+	},
+	}
+}
+
+func OrganizationIdQuery(resourceowner string) *user.SearchQuery {
+	return &user.SearchQuery{Query: &user.SearchQuery_OrganizationIdQuery{
+		OrganizationIdQuery: &user.OrganizationIdQuery{
+			OrganizationId: resourceowner,
 		},
 	},
 	}
