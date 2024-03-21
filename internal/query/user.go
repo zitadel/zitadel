@@ -324,6 +324,10 @@ var (
 		table:          notifyTable,
 		isOrderByLower: true,
 	}
+	NotifyVerifiedEmailLowerCaseCol = Column{
+		name:  projection.NotifyVerifiedEmailLowerCol,
+		table: notifyTable,
+	}
 	NotifyPhoneCol = Column{
 		name:  projection.NotifyLastPhoneCol,
 		table: notifyTable,
@@ -714,8 +718,8 @@ func NewUserPhoneSearchQuery(value string, comparison TextComparison) (SearchQue
 	return NewTextQuery(HumanPhoneCol, value, comparison)
 }
 
-func NewUserVerifiedEmailSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(NotifyVerifiedEmailCol, value, comparison)
+func NewUserVerifiedEmailSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(NotifyVerifiedEmailLowerCaseCol, strings.ToLower(value), TextEquals)
 }
 
 func NewUserVerifiedPhoneSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {

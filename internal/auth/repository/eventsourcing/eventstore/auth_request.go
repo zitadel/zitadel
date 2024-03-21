@@ -558,8 +558,7 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 	if err != nil {
 		return err
 	}
-	request.UserID = human.AggregateID
-	request.UserOrgID = human.ResourceOwner
+	request.SetUserInfo(human.AggregateID, human.Username, human.PreferredLoginName, human.DisplayName, "", human.ResourceOwner)
 	request.SelectedIDPConfigID = externalIDP.IDPConfigID
 	request.LinkingUsers = nil
 	err = repo.Command.UserIDPLoginChecked(ctx, request.UserOrgID, request.UserID, request.WithCurrentInfo(info))
