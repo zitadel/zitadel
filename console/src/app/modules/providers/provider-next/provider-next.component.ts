@@ -12,6 +12,7 @@ export interface CopyUrl {
 @Component({
   selector: 'cnsl-provider-next',
   templateUrl: './provider-next.component.html',
+  styleUrls: ['./provider-next.component.scss'],
 })
 export class ProviderNextComponent {
   @Input() copyUrls?: CopyUrl[] | null;

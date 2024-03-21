@@ -97,6 +97,10 @@
           "TITLE": "Configure {{ provider }}",
           "DESCRIPTION": "Copy this URL to allow {{ provider }} to redirect your users browser back to ZITADEL after they are authenticated."
         },
+        "JWT": {
+          "TITLE": "Configure your JWT Identity Provider",
+          "DESCRIPTION": "The JWT Identity Provider enables you to use your existing JWT tokens as federated identities. This feature is handy if you already have an issuer for JWTs. With a JWT IdP, you can use these JWTs to create and update users in ZITADEL on-the-fly."
+        },
         "AUTOFILL": {
           "TITLE": "Autofill user data",
           "DESCRIPTION": "Use an action to improve your users experience. You can pre-fill ZITADELs registration form with values from the identity provider."
@@ -104,8 +108,8 @@
         "ACTIVATE": {
           "TITLE": "Activate the IdP",
           "DESCRIPTION": {
-            "ORG": "Activate the IdP by adding it to your login policy so your users can actually log in with it.",
-            "INSTANCE": "Activate the IdP in your default login policy so your users across all organizations can actually to log in with it."
+            "ORG": "Your IdP is not active yet. Activate it to allow your users to log in.",
+            "INSTANCE": "Your IdP is not active yet. Activate it to allow your users across all organizations to log in."
           }
         }
       },

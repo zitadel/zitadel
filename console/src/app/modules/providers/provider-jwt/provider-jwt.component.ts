@@ -27,6 +27,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ProviderNextService } from '../provider-next/provider-next.service';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
+import {CopyUrl} from "../provider-next/provider-next.component";
 
 @Component({
   selector: 'cnsl-provider-jwt',
@@ -46,7 +47,12 @@ export class ProviderJWTComponent {
 
   public provider?: Provider.AsObject;
 
+  public autofillLink$ = new BehaviorSubject<string>('');
   public activateLink$ = new BehaviorSubject<string>('');
+  public isActive$ = new BehaviorSubject<boolean>(false)
+  public expandWhatNow$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public configureProvider$ = new BehaviorSubject<boolean>(false);
+  public isInstance: boolean = false;
 
   constructor(
     private authService: GrpcAuthService,
@@ -55,8 +61,7 @@ export class ProviderJWTComponent {
     private injector: Injector,
     private _location: Location,
     breadcrumbService: BreadcrumbService,
-    private dialog: MatDialog,
-    nextSvc: ProviderNextService,
+    private nextSvc: ProviderNextService,
   ) {
 
     this.route.data.pipe(take(1)).subscribe((data) => {
@@ -74,6 +79,7 @@ export class ProviderJWTComponent {
           breadcrumbService.setBreadcrumb([bread]);
           break;
         case PolicyComponentServiceType.ADMIN:
+          this.isInstance = true;
           this.service = this.injector.get(AdminService as Type<AdminService>);
 
           const iamBread = new Breadcrumb({
@@ -88,6 +94,9 @@ export class ProviderJWTComponent {
       this.id = this.route.snapshot.paramMap.get('id');
       if (this.id) {
         this.getData(this.id);
+      }else {
+        this.expandWhatNow$.next(true);
+        this.configureProvider$.next(true);
       }
     });
 
@@ -115,19 +124,26 @@ export class ProviderJWTComponent {
           this.form.disable();
         }
       });
+  }
 
-    this.setActive(false);
-    nextSvc.next(
-      'JWT provider',
-      this.activateLink$,
-      this.serviceType === PolicyComponentServiceType.ADMIN,
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
-      'https://zitadel.com/docs/guides/integrate/identity-providers/jwt-idp',
-      of('https://zitadel.com/docs/guides/integrate/identity-providers/additional-information'),
-      () => [],
-    );
+  private showAutofillLink(): void {
+    this.autofillLink$.next('https://zitadel.com/docs/guides/integrate/identity-providers/additional-information');
+  }
 
+  private setActivateable(id: string) {
+    this.activateLink$.next(!id ? '' : 'https://zitadel.com/docs/guides/integrate/identity-providers/okta-oidc#activate-idp');
+    if (id) {
+      this.expandWhatNow$.next(true);
+      this.id = id;
+    }
+  }
+
+  public activate() {
+    this.service.addIDPToLoginPolicy(this.id!, this.serviceType === PolicyComponentServiceType.ADMIN ? IDPOwnerType.IDP_OWNER_TYPE_SYSTEM : IDPOwnerType.IDP_OWNER_TYPE_ORG).then(() => {
+      this.toast.showInfo('POLICY.TOAST.ADDIDP', true);
+      this.isActive$.next(true);
+      this.setActivateable('');
+    });
   }
 
   private getData(id: string): void {
@@ -142,6 +158,7 @@ export class ProviderJWTComponent {
         this.provider = resp.idp;
         this.loading = false;
         if (this.provider?.config?.jwt) {
+          this.showAutofillLink();
           this.form.patchValue(this.provider.config.jwt);
           this.name?.setValue(this.provider.name);
         }
@@ -152,7 +169,8 @@ export class ProviderJWTComponent {
       });
     this.service.getLoginPolicy()
       .then((policy) => {
-        this.setActive(!!policy.policy?.idpsList.find(idp => idp.idpId === this.id));
+        this.isActive$.next(!!policy.policy?.idpsList.find(idp => idp.idpId === this.id));
+        this.setActivateable(this.isActive$.value ? '' : id);
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -179,20 +197,15 @@ export class ProviderJWTComponent {
     this.service
       .addJWTProvider(req)
       .then((addedIDP) => {
+        this.showAutofillLink();
+        this.setActivateable(addedIDP.id);
+        this.configureProvider$.next(false);
         this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);
         this.loading = false;
       });
-  }
-
-  public activate(id: string) {
-    this.service.addIDPToLoginPolicy(id, this.serviceType === PolicyComponentServiceType.ADMIN ? IDPOwnerType.IDP_OWNER_TYPE_SYSTEM : IDPOwnerType.IDP_OWNER_TYPE_ORG).then(() => {
-      this.toast.showInfo('POLICY.TOAST.ADDIDP', true);
-      this.setActive(true);
-      this.id = id;
-    });
   }
 
   public updateJWTProvider(): void {
@@ -223,10 +236,6 @@ export class ProviderJWTComponent {
           this.loading = false;
         });
     }
-  }
-
-  private setActive(active: boolean) {
-    this.activateLink$.next(active ?'' :  'https://zitadel.com/docs/guides/integrate/identity-providers/okta-oidc#activate-idp' );
   }
 
   public close(): void {

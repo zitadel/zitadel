@@ -63,7 +63,6 @@ export class ProviderGoogleComponent {
     private injector: Injector,
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
-    private dialog: MatDialog,
     private nextSvc: ProviderNextService,
   ) {
     this.form = new FormGroup({
@@ -117,7 +116,6 @@ export class ProviderGoogleComponent {
       }
       this.id = this.route.snapshot.paramMap.get('id');
       if (this.id) {
-        this.showAutofillLink();
         this.clientSecret?.setValidators([]);
         this.getData(this.id);
       } else {
@@ -131,6 +129,21 @@ export class ProviderGoogleComponent {
     this.autofillLink$.next('https://zitadel.com/docs/guides/integrate/identity-providers/additional-information');
   }
 
+  private setActivateable(id: string) {
+    this.activateLink$.next(!id ? '' : 'https://zitadel.com/docs/guides/integrate/identity-providers/google#activate-idp');
+    if (id) {
+      this.expandWhatNow$.next(true);
+      this.id = id;
+    }
+  }
+
+  public activate() {
+    this.service.addIDPToLoginPolicy(this.id!, this.serviceType === PolicyComponentServiceType.ADMIN ? IDPOwnerType.IDP_OWNER_TYPE_SYSTEM : IDPOwnerType.IDP_OWNER_TYPE_ORG).then(() => {
+      this.toast.showInfo('POLICY.TOAST.ADDIDP', true);
+      this.isActive$.next(true);
+      this.setActivateable('');
+    });
+  }
   private getData(id: string): void {
     const req =
       this.serviceType === PolicyComponentServiceType.ADMIN
@@ -145,6 +158,7 @@ export class ProviderGoogleComponent {
         if (this.provider?.config?.google) {
           this.form.patchValue(this.provider.config.google);
           this.name?.setValue(this.provider.name);
+          this.showAutofillLink();
         }
       })
       .catch((error) => {
@@ -190,14 +204,6 @@ export class ProviderGoogleComponent {
         this.toast.showError(error);
         this.loading = false;
       });
-  }
-
-  public activate() {
-    this.service.addIDPToLoginPolicy(this.id!, this.serviceType === PolicyComponentServiceType.ADMIN ? IDPOwnerType.IDP_OWNER_TYPE_SYSTEM : IDPOwnerType.IDP_OWNER_TYPE_ORG).then(() => {
-      this.toast.showInfo('POLICY.TOAST.ADDIDP', true);
-      this.isActive$.next(true);
-      this.setActivateable('');
-    });
   }
 
   public updateGoogleProvider(): void {
@@ -281,14 +287,6 @@ export class ProviderGoogleComponent {
       if (index !== undefined && index >= 0) {
         this.scopesList.value.splice(index, 1);
       }
-    }
-  }
-
-  private setActivateable(id: string) {
-    this.activateLink$.next(!id ? '' : 'https://zitadel.com/docs/guides/integrate/identity-providers/google#activate-idp');
-    if (id) {
-      this.expandWhatNow$.next(true);
-      this.id = id;
     }
   }
 

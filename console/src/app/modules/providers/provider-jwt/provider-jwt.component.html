@@ -15,7 +15,17 @@
       <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
     </div>
 
-    <cnsl-provider-next  (activate)="activate(id!)"></cnsl-provider-next>
+    <cnsl-provider-next
+      [configureProvider]="configureProvider$ | async"
+      [configureTitle]="'DESCRIPTIONS.SETTINGS.IDPS.JWT.TITLE' | translate"
+      [configureDescription]="'DESCRIPTIONS.SETTINGS.IDPS.JWT.DESCRIPTION' | translate"
+      configureLink="https://zitadel.com/docs/guides/integrate/identity-providers/jwt-idp"
+      [autofillLink]="autofillLink$ | async"
+      [activateLink]="activateLink$ | async"
+      [expanded]="!!(expandWhatNow$ | async)"
+      [isInstance]="isInstance"
+      (activate)="activate()"
+    ></cnsl-provider-next>
 
     <p class="identity-provider-desc cnsl-secondary-text">{{ 'IDP.CREATE.JWT.DESCRIPTION' | translate }}</p>
 
