@@ -133,15 +133,6 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	if err != nil {
 		return nil, err
 	}
-	projectIDQuery, err := query.NewAppProjectIDSearchQuery(project.ID)
-	if err != nil {
-		return nil, err
-	}
-	appIDs, err := repo.Query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
-	if err != nil {
-		return nil, err
-	}
-	request.Audience = appIDs
 	request.AppendAudIfNotExisting(project.ID)
 	request.ApplicationResourceOwner = project.ResourceOwner
 	request.PrivateLabelingSetting = project.PrivateLabelingSetting

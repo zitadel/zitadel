@@ -297,8 +297,6 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 		cmds = append(cmds, user.NewUserImpersonatedEvent(ctx, userAgg, clientID, actor))
 	}
 
-	audience = domain.AddAudScopeToAudience(ctx, audience, scopes)
-
 	preferredLanguage := ""
 	existingHuman, err := c.getHumanWriteModelByID(ctx, userWriteModel.AggregateID, userWriteModel.ResourceOwner)
 	if err != nil {
