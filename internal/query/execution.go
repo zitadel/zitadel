@@ -3,14 +3,18 @@ package query
 import (
 	"context"
 	"database/sql"
+	_ "embed"
 	"errors"
+	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/lib/pq"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -51,6 +55,10 @@ var (
 		name:  projection.ExecutionIncludesCol,
 		table: executionTable,
 	}
+)
+var (
+	//go:embed execution_targets.sql
+	executionTargetsQuery string
 )
 
 type Executions struct {
@@ -114,6 +122,27 @@ func NewExecutionTargetSearchQuery(value string) (SearchQuery, error) {
 
 func NewExecutionIncludeSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(ExecutionColumnIncludes, value, TextListContains)
+}
+
+func (q *Queries) ExecutionTargets(ctx context.Context, id string) (execution *executionTargets, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("unable to get execution with includes %s: %w", id, err)
+		}
+		span.EndWithError(err)
+	}()
+
+	err = q.client.QueryRowContext(ctx,
+		func(row *sql.Row) error {
+			execution, err = scanExecutionTargets(row)
+			return err
+		},
+		executionTargetsQuery,
+		authz.GetInstance(ctx).InstanceID(),
+		id,
+	)
+	return execution, err
 }
 
 func prepareExecutionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*Executions, error)) {
@@ -188,4 +217,28 @@ func prepareExecutionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			}
 			return execution, nil
 		}
+}
+
+type executionTargets struct {
+	id      string
+	targets []string
+}
+
+func (e *executionTargets) Targets() []string {
+	return e.targets
+}
+
+func scanExecutionTargets(row *sql.Row) (*executionTargets, error) {
+	execution := new(executionTargets)
+	err := row.Scan(
+		&execution.id,
+		(*pq.StringArray)(&execution.targets),
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, zerrors.ThrowNotFound(err, "QUERY-7k422g4pgw", "Errors.Execution.NotFound")
+		}
+		return nil, zerrors.ThrowInternal(err, "QUERY-37ardr0pki", "Errors.Internal")
+	}
+	return execution, nil
 }
