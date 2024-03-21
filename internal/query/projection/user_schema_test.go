@@ -29,7 +29,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 					testEvent(
 						schema.CreatedType,
 						schema.AggregateType,
-						[]byte(`{"schemaType": "type", "schema": "{}", "possibleAuthenticators": [1,2]}`),
+						[]byte(`{"schemaType": "type", "schema": {"$schema":"urn:zitadel:schema:v1","properties":{"name":{"type":"string","urn:zitadel:schema:permission":{"self":"rw"}}},"type":"object"}, "possibleAuthenticators": [1,2]}`),
 					), eventstore.GenericEventMapper[schema.CreatedEvent]),
 			},
 			reduce: (&userSchemaProjection{}).reduceCreated,
@@ -39,7 +39,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.user_schema_test (id, creation_date, change_date, sequence, instance_id, state, type, schema, possible_authenticators) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.user_schema (id, creation_date, change_date, sequence, instance_id, state, type, revision, schema, possible_authenticators) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -48,7 +48,8 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 								"instance-id",
 								domain.UserSchemaStateActive,
 								"type",
-								json.RawMessage("{}"),
+								0,
+								json.RawMessage(`{"$schema":"urn:zitadel:schema:v1","properties":{"name":{"type":"string","urn:zitadel:schema:permission":{"self":"rw"}}},"type":"object"}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername, domain.AuthenticatorTypePassword},
 							},
 						},
@@ -63,7 +64,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 					testEvent(
 						schema.CreatedType,
 						schema.AggregateType,
-						[]byte(`{"schemaType": "type", "schema": "{}", "possibleAuthenticators": [1,2]}`),
+						[]byte(`{"schemaType": "type", "schema": {"$schema":"urn:zitadel:schema:v1","properties":{"name":{"type":"string","urn:zitadel:schema:permission":{"self":"rw"}}},"type":"object"}, "possibleAuthenticators": [1,2]}`),
 					), eventstore.GenericEventMapper[schema.UpdatedEvent]),
 			},
 			reduce: (&userSchemaProjection{}).reduceUpdated,
@@ -73,12 +74,12 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_schema_test SET (change_date, sequence, type, schema, possible_authenticators) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
+							expectedStmt: "UPDATE projections.user_schema SET (change_date, sequence, type, schema, possible_authenticators) = ($1, $2, $3, $4, $5) WHERE (id = $6) AND (instance_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"type",
-								json.RawMessage("{}"),
+								json.RawMessage(`{"$schema":"urn:zitadel:schema:v1","properties":{"name":{"type":"string","urn:zitadel:schema:permission":{"self":"rw"}}},"type":"object"}`),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername, domain.AuthenticatorTypePassword},
 								"agg-id",
 								"instance-id",
@@ -105,7 +106,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_schema_test SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.user_schema SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -135,7 +136,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_schema_test SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.user_schema SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -165,7 +166,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_schema_test WHERE (id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.user_schema WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -192,7 +193,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_schema_test WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_schema WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

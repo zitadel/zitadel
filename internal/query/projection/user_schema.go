@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	UserSchemaTable = "projections.user_schema_test2" // TODO!
+	UserSchemaTable = "projections.user_schema"
 
 	UserSchemaIDCol                     = "id"
 	UserSchemaCreationDateCol           = "creation_date"

@@ -17,12 +17,12 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type UserSchemaList struct {
+type UserSchemas struct {
 	SearchResponse
-	Schemas []*UserSchema
+	UserSchemas []*UserSchema
 }
 
-func (e *UserSchemaList) SetState(s *State) {
+func (e *UserSchemas) SetState(s *State) {
 	e.State = s
 }
 
@@ -104,7 +104,7 @@ func (q *Queries) GetUserSchemaByID(ctx context.Context, id string) (userSchema 
 	return genericRowQuery[*UserSchema](ctx, q.client, query.Where(eq), scan)
 }
 
-func (q *Queries) SearchUserSchema(ctx context.Context, queries *UserSchemaSearchQueries) (userSchemas *UserSchemaList, err error) {
+func (q *Queries) SearchUserSchema(ctx context.Context, queries *UserSchemaSearchQueries) (userSchemas *UserSchemas, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -112,8 +112,8 @@ func (q *Queries) SearchUserSchema(ctx context.Context, queries *UserSchemaSearc
 		UserSchemaInstanceIDCol.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
 
-	query, scan := prepareUserSchemaListQuery()
-	return genericRowsQueryWithState[*UserSchemaList](ctx, q.client, userSchemaTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
+	query, scan := prepareUserSchemasQuery()
+	return genericRowsQueryWithState[*UserSchemas](ctx, q.client, userSchemaTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
 }
 
 func (q *UserSchemaSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -176,7 +176,7 @@ func prepareUserSchemaQuery() (sq.SelectBuilder, func(*sql.Row) (*UserSchema, er
 		}
 }
 
-func prepareUserSchemaListQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserSchemaList, error)) {
+func prepareUserSchemasQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserSchemas, error)) {
 	return sq.Select(
 			UserSchemaIDCol.identifier(),
 			UserSchemaCreationDateCol.identifier(),
@@ -191,7 +191,7 @@ func prepareUserSchemaListQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserSchem
 			countColumn.identifier()).
 			From(userSchemaTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*UserSchemaList, error) {
+		func(rows *sql.Rows) (*UserSchemas, error) {
 			schema := make([]*UserSchema, 0)
 			var count uint64
 			for rows.Next() {
@@ -220,8 +220,8 @@ func prepareUserSchemaListQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserSchem
 				return nil, zerrors.ThrowInternal(err, "QUERY-Lwj2e", "Errors.Query.CloseRows")
 			}
 
-			return &UserSchemaList{
-				Schemas: schema,
+			return &UserSchemas{
+				UserSchemas: schema,
 				SearchResponse: SearchResponse{
 					Count: count,
 				},

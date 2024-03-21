@@ -100,7 +100,7 @@ func (s *Server) ListUserSchemas(ctx context.Context, req *schema.ListUserSchema
 	if err != nil {
 		return nil, err
 	}
-	userSchemas, err := userSchemasToPb(res.Schemas)
+	userSchemas, err := userSchemasToPb(res.UserSchemas)
 	if err != nil {
 		return nil, err
 	}
