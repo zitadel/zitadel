@@ -85,7 +85,7 @@ Follow our guides on [how to access ZITADEL API](../zitadel-apis/access-zitadel-
 ### Token introspection
 
 Your API endpoint might receive tokens from users and need to validate the token with ZITADEL.
-In this case your API needs to authenticate with ZITADEL and then do a token introspection.
+In this case, your API needs to authenticate with ZITADEL and then do a token introspection.
 Follow our [guide on token introspection with client credentials](../token-introspection/basic-auth) to learn more.
 
 ## Security considerations
