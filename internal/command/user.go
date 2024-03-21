@@ -273,10 +273,11 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-1d6Gg", "Errors.User.NotFound")
 	}
 
-	audience = domain.AddAudScopeToAudience(ctx, audience, scopes)
-
 	preferredLanguage := ""
 	existingHuman, err := c.getHumanWriteModelByID(ctx, userWriteModel.AggregateID, userWriteModel.ResourceOwner)
+	if err != nil {
+		return nil, nil, err
+	}
 	if existingHuman != nil {
 		preferredLanguage = existingHuman.PreferredLanguage.String()
 	}

@@ -101,7 +101,7 @@ func AuthRequestFromBusiness(authReq *domain.AuthRequest) (_ op.AuthRequest, err
 	return &AuthRequest{authReq}, nil
 }
 
-func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest, userAgentID, userID string) *domain.AuthRequest {
+func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest, userAgentID, userID string, audience []string) *domain.AuthRequest {
 	return &domain.AuthRequest{
 		CreationDate:        time.Now(),
 		AgentID:             userAgentID,
@@ -117,6 +117,7 @@ func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest,
 		MaxAuthAge:          MaxAgeToBusiness(authReq.MaxAge),
 		UserID:              userID,
 		InstanceID:          authz.GetInstance(ctx).InstanceID(),
+		Audience:            audience,
 		Request: &domain.AuthRequestOIDC{
 			Scopes:        authReq.Scopes,
 			ResponseType:  ResponseTypeToBusiness(authReq.ResponseType),
