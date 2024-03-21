@@ -91,6 +91,7 @@ const (
 	OIDCGrantTypeImplicit
 	OIDCGrantTypeRefreshToken
 	OIDCGrantTypeDeviceCode
+	OIDCGrantTypeTokenExchange
 )
 
 type OIDCApplicationType int32

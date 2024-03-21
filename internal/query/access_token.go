@@ -28,6 +28,8 @@ type OIDCSessionAccessTokenReadModel struct {
 	AccessTokenID         string
 	AccessTokenCreation   time.Time
 	AccessTokenExpiration time.Time
+	Reason                domain.TokenReason
+	Actor                 *domain.TokenActor
 }
 
 func newOIDCSessionAccessTokenReadModel(id string) *OIDCSessionAccessTokenReadModel {
@@ -84,6 +86,8 @@ func (wm *OIDCSessionAccessTokenReadModel) reduceAccessTokenAdded(e *oidcsession
 	wm.AccessTokenID = e.ID
 	wm.AccessTokenCreation = e.CreationDate()
 	wm.AccessTokenExpiration = e.CreationDate().Add(e.Lifetime)
+	wm.Reason = e.Reason
+	wm.Actor = e.Actor
 }
 
 func (wm *OIDCSessionAccessTokenReadModel) reduceTokenRevoked(e eventstore.Event) {
