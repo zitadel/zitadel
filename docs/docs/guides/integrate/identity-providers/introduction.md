@@ -165,7 +165,7 @@ Deciding whether to configure an external Identity Provider (IdP) at the organiz
 
 ### Create an external IdP as default
 
-- **Unified authentication strategy**: When you aim to provide a consistent authentication experience across all organizations within your ZITADEL instance. Configuring an IdP at the instance level applies the same authentication mechanism universally, simplifying management and user experience.
+- **Unified authentication strategy**: When you aim to provide a consistent authentication experience across all organizations within your ZITADEL instance. Configuring an IdP in the default settings applies the same authentication mechanism universally, simplifying management and user experience.
 
 - **Centralized management**: Setting up an IdP at the instance level is ideal for scenarios where a single administrative body oversees user authentication across all organizations. This approach centralizes the management of external IdPs, making it easier to maintain and update authentication policies.
 
