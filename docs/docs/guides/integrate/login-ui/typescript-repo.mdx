@@ -27,15 +27,23 @@ It fetches policies and settings from your instance and is able to autenticate u
 The new login app consists of a confidential (backend) part and a browser (client side) part.
 In addition to that, the OIDC specification builds upon a proxy which is set up in the Next.js middleware. It rewrites requests of the paths `/.well-known/:path*`, `/oauth/:path*`, `/oidc/:path*` to ZITADEL.
 The login requires to register its host as custom domain of your instance. We refer to [installing domain](/docs/apis/resources/system/system-service-add-domain) for self hosters or the [guide for cloud users](/docs/guides/manage/cloud/instances#add-custom-domain), to setup domains.
+You can read more information about it in [how to setup domains](./typescript-repo#how-to-setup-domains).
 
-The following illustration shows a potential authentication code flow starting from an application implementing the host of the login as OIDC issuer.
+The backend side of the application is authorized using a machine user and a personal access token.
+This token is used to fetch policies and settings from your instances or organization which define how users are authenticated and how the login is displayed.
+
+The frontend side of the application communicates to the backend side by using a cookie which is set by the server.
+The cookie consists of an id and a token and is bound to a session which is updated continuously.
+
+The following illustration shows the architecture of the login and a potential authentication code flow starting from an application which implements the OIDC specification respectively.
 
 ![Next.js Login Architecture](/img/typescript-login-architecture.png)
 
 The flow starts by the `/authorize` endpoint which is intercepted by the login and forwarded to ZITADEL.
 ZITADEL interprets the request and specifically redirects back to the login app.
 It does so by redirecting to `/login`.
-The login is then able to load an [AuthRequest](/docs/apis/resources/oidc_service/oidc-service-get-auth-request#get-oidc-auth-request-details)
+The login is then able to load an [AuthRequest](/docs/apis/resources/oidc_service/oidc-service-get-auth-request#get-oidc-auth-request-details).
+
 The Auth Request defines how users proceed to authenticate. If no special prompts or scopes are set, the login brings up the `/loginname` page.
 The /loginname page allows to enter loginname or email of a user. User discovery is implemented at /api/loginname and if the user is found, redirected to the available authentication method page.
 Right after the user is found, a session is created and set as cookie.
@@ -44,7 +52,9 @@ The OIDC Auth request is always passed in the url to have a context to the ongoi
 If enough user information is retrieved and the user is authenticated, the flow is finalized by [requesting a the callback url](/docs/apis/resources/oidc_service/oidc-service-create-callback) for the auth request and the user is redirected back to the application.
 The application can then request a token calling the /token endpoint of the login which is proxied to the ZITADEL API.
 
-### Implemented features of OIDC Standard
+### Implemented features
+
+#### OIDC Standard
 
 - [x] Authorization Code Flow with PKCE
 - [x] AuthRequest `hintUserId`
@@ -80,8 +90,21 @@ The application can then request a token calling the /token endpoint of the logi
     - [ ] Azure
     - [ ] Apple
 - Register
+
   - [x] Email Password
   - [x] Passkey
+
+#### Self service
+
+The self service part of the application allows to load the login without an OIDC flow.
+After authenticating, or with a valid session, users are able to self service their account.
+
+- [ ] Change user information
+- [ ] Password Change
+- [x] Setup Passkey
+- [ ] Setup Multifactor TOTP
+- [ ] Setup Multifactor Passkey (U2F)
+- [ ] Validate Account (email verification)
 
 ## How to setup domains
 
