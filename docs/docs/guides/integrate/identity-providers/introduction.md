@@ -42,9 +42,6 @@ The benefits of integrating ZITADEL for managing external IdPs are multiple:
 - **Simplified account linking**: ZITADEL can link identities from multiple IdPs to a single user profile, facilitating a cohesive user experience across different authentication methods.
 
 
-- **Enhanced group and policy management**: With support for group synchronization and detailed policy configurations, ZITADEL offers granular control over user access and authentication processes.
-
-
 
 ## The user journey 
 
@@ -62,7 +59,7 @@ The benefits of integrating ZITADEL for managing external IdPs are multiple:
 
 - **Account linking for new users**: If the user's identity from the external IdP does not exist in ZITADEL, they're presented with two options before moving forward:
   - **Create a new account**: Choosing this option creates a new ZITADEL account linked to the external IdP.
-  - **Autolinking with an existing local account**: Users have the option to link their new external identity to an existing local account in ZITADEL, enabling future logins with either their local account or the external IdP.
+  - **Linking with an existing local account**: Users have the option to link their new external identity to an existing local account in ZITADEL, enabling future logins with either their local account or the external IdP.
 
 
 - **Profile pre-filling from external IdP**: ZITADEL uses information from the external IdP to pre-fill the user's profile, simplifying the account creation or linking process.
@@ -86,7 +83,7 @@ In ZITADEL, you have the flexibility to link an external Identity Provider (IdP)
 The login policy can be set as a default at the instance level and can be customized for each organization. The configuration process varies slightly depending on your focus:
 
 
-- **For instance-wide settings**, navigate to: `$YOUR-DOMAIN/ui/console/instance?id=general`
+- **For default settings**, navigate to: `$YOUR-DOMAIN/ui/console/instance?id=general`
 - **For specific organization settings**, select the organization from the menu and visit: `$YOUR-DOMAIN/ui/console/org-settings?id=login`
 
 
@@ -109,9 +106,9 @@ The ZITADEL Console will display a list of all the IdPs you've configured, along
 ![Identity Provider Overview](/img/guides/zitadel_identity_provider_overview.png)
 
 
-## Available templates
+## Available guides
 
-In the guides below, you'll learn how to configure and set up your preferred external Identity Provider (IdP) in ZITADEL.
+In the guides below, some of which utilize the Generic OIDC or SAML templates for configuration, you'll learn how to configure and set up your preferred external Identity Provider (IdP) in ZITADEL. 
 
 - [Google](./google)
 - [Entra ID (OIDC)](./azure-ad-oidc)
