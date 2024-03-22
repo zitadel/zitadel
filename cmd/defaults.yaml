@@ -1412,7 +1412,7 @@ InternalAuthZ:
 # This can prevent serving outdated data after a version upgrade, but might require a longer setup / upgrade process:
 # https://zitadel.com/docs/self-hosting/manage/updating_scaling
 InitProjections:
-  Enabled: false # ZITADEL_INITPROJECTIONS_ENABLED
+  Enabled: true # ZITADEL_INITPROJECTIONS_ENABLED
   RetryFailedAfter: 100ms # ZITADEL_INITPROJECTIONS_RETRYFAILEDAFTER
   MaxFailureCount: 2 # ZITADEL_INITPROJECTIONS_MAXFAILURECOUNT
   BulkLimit: 1000 # ZITADEL_INITPROJECTIONS_BULKLIMIT
