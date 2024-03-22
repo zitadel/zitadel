@@ -153,7 +153,7 @@ When configuring external IdP templates in ZITADEL, several common settings enab
 
 
 
-## Configure external IdPs at the organization level or at the instance level
+## Configure external IdPs at the organization level or on the default settings
 
 Deciding whether to configure an external Identity Provider (IdP) at the organization level or the instance level in ZITADEL depends on the scope of access and management you intend to provide. Here’s when to choose each option:
 
