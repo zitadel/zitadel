@@ -63,12 +63,13 @@ func executeTargetsForGRPCFullMethod(ctx context.Context, queries *query.Queries
 		}
 
 		ctxData := authz.GetCtxData(ctx)
-		info := &execution.ContextInfo[interface{}]{
+		info := &execution.ContextInfo{
 			FullMethod: fullMethod,
 			InstanceID: authz.GetInstance(ctx).InstanceID(),
 			ProjectID:  ctxData.ProjectID,
 			OrgID:      ctxData.OrgID,
 			UserID:     ctxData.UserID,
+			Request:    request,
 		}
 
 		request, err = execution.CallTargets(ctx, targets.Targets, info)

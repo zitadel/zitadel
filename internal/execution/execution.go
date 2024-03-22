@@ -13,19 +13,19 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type ContextInfo[R any] struct {
-	FullMethod string `json:"fullMethod"`
-	InstanceID string `json:"instanceID"`
-	OrgID      string `json:"orgID"`
-	ProjectID  string `json:"projectID"`
-	UserID     string `json:"userID"`
-	Request    R      `json:"request"`
+type ContextInfo struct {
+	FullMethod string      `json:"fullMethod"`
+	InstanceID string      `json:"instanceID"`
+	OrgID      string      `json:"orgID"`
+	ProjectID  string      `json:"projectID"`
+	UserID     string      `json:"userID"`
+	Request    interface{} `json:"request"`
 }
 
-func CallTargets[R any](ctx context.Context,
+func CallTargets(ctx context.Context,
 	targets []*query.Target,
-	info *ContextInfo[R],
-) (r R, err error) {
+	info *ContextInfo,
+) (r interface{}, err error) {
 	r = info.Request
 	for _, target := range targets {
 		if target.Async {
@@ -40,14 +40,13 @@ func CallTargets[R any](ctx context.Context,
 	return r, err
 }
 
-func CallTarget[R any](ctx context.Context,
+func CallTarget(ctx context.Context,
 	target *query.Target,
-	info *ContextInfo[R],
-) (R, error) {
-	var rnil R
+	info *ContextInfo,
+) (res interface{}, err error) {
 	data, err := json.Marshal(info)
 	if err != nil {
-		return rnil, err
+		return nil, err
 	}
 
 	switch target.TargetType {
@@ -56,15 +55,16 @@ func CallTarget[R any](ctx context.Context,
 	case domain.TargetTypeRequestResponse:
 		response, err := call(ctx, target.URL, target.Timeout, data)
 		if err != nil {
-			return rnil, err
+			return nil, err
 		}
 
-		if err := json.Unmarshal(response, rnil); err != nil {
-			return rnil, err
+		r := info.Request
+		if err := json.Unmarshal(response, r); err != nil {
+			return nil, err
 		}
-		return rnil, nil
+		return r, nil
 	default:
-		return rnil, zerrors.ThrowInternal(nil, "EXEC-auqnansr2m", "Errors.Execution.Unknown")
+		return nil, zerrors.ThrowInternal(nil, "EXEC-auqnansr2m", "Errors.Execution.Unknown")
 	}
 }
 
@@ -77,20 +77,23 @@ func call(ctx context.Context, url string, timeout time.Duration, body []byte) (
 	contextWithCancel, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(contextWithCancel, "POST", url, bytes.NewBuffer(body))
+	req, err := http.NewRequestWithContext(contextWithCancel, http.MethodPost, url, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	resp, err := http.DefaultClient.Do(req)
+	client := &http.Client{
+		Transport: &http.Transport{},
+	}
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		return nil, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk9g", "Errors.Execution.Failed")
 	}
-	defer resp.Body.Close()
 
 	return io.ReadAll(resp.Body)
 }
