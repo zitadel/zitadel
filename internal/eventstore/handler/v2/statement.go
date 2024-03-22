@@ -504,7 +504,7 @@ func NewJSONCol(name string, value interface{}) Column {
 	return NewCol(name, marshalled)
 }
 
-func NewIncrementCol(column string, value interface{}) Column {
+func NewIncrementCol[Int constraints.Integer](column string, value Int) Column {
 	return Column{
 		Name:  column,
 		Value: value,
