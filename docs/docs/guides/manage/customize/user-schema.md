@@ -131,5 +131,101 @@ curl -X PUT "https://$CUSTOM-DOMAIN/v3alpha/user_schemas/$SCHEMA_ID" \
       }
     }
   }
+}'
+```
+
+## Retrieve the Existing Schemas
+
+To check the state of existing schemas you can simply [list them](/apis/resources/user_schema_service_v3/user-schema-service-list-user-schemas).
+In this case we will query for the one with state `active`. Check out the api documentation for detailed information on possible filters.
+The API also allows to retrieve a single [schema by ID](/apis/resources/user_schema_service_v3/user-schema-service-get-user-schema-by-id).
+
+```bash
+curl -X POST "http://localhost:8080/v3alpha/user_schemas/search" \
+-H 'Content-Type: application/json' \
+-H 'Accept: application/json' \
+-H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTI1OTUyMzMxNzg5MTQ5MiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJzdWIiOiIyMjQzMTMxODg1Njc1OTM1MTciLCJhdWQiOlsiMjI0MzEzMTkwNTgwNzkzOTAxQHppdGFkZWwiLCIyMjQzMTMxOTA1ODA4NTk0MzdAeml0YWRlbCIsIjIyNDMxMzE5MDU4MDkyNDk3M0B6aXRhZGVsIiwiMjI0MzEzMTkwNTgwOTkwNTA5QHppdGFkZWwiLCIyMjQzMTMxODg1Njc2NTkwNTMiXSwiZXhwIjoxNzExMDgxODQ4LCJpYXQiOjE3MTEwMzg2NDcsIm5iZiI6MTcxMTAzODY0NywianRpIjoiMjU5Mjc5NTQwMTgwNzQ2NjYwIn0.rq5uPUIZADMplk5UKxEm-makKglGPEh2P20i85gg9Zp21xI8plrb9e9CftEOd4FqxfV9fOPqvqk9cE9ljmbRuOnGuEuFEjSXSVrBnMGiTZoMHKyD3mZUwmvkEvbBi720YtxBG4rHPeB0Z7fEJh5Gdc_6vYT57IrHQtM99tvdfVJ38hlWJwGkSpUS0G6HH1MeVjFw2DT-gPeCLBWisptlyEZntPIePCxmlhabC7rQlYUV_LGBx_-yj2GWNdIqFx4vubkiGQM74Ufc1cKBPWWhPPnME1gqBl_iLnwXBqnB8E_Xj-tO22zA8GIQkqkSh53yhwWyvISnoCaWTxSZEc5ANg" \
+--data-raw '{
+  "query": {
+    "offset": "0",
+    "limit": 100,
+    "asc": true
+  },
+  "sortingColumn": "FIELD_NAME_TYPE",
+  "queries": [
+    {
+      "stateQuery": {
+        "state": "STATE_ACTIVE"
+      }
+    }
+  ]
+}'
+```
+
+If you've followed this guide, it should list you a singe schema:
+
+```json
+{
+  "details": {
+    "totalResult": "1",
+    "timestamp": "2024-03-21T16:35:19.685700Z"
+  },
+  "result": [
+    {
+      "id": "259279890237358500",
+      "details": {
+        "sequence": "2",
+        "changeDate": "2024-03-21T16:35:19.685700Z",
+        "resourceOwner": "224313188550750765"
+      },
+      "type": "user",
+      "state": "STATE_ACTIVE",
+      "revision": 2,
+      "schema": {
+        "$schema": "urn:zitadel:schema:v1",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "urn:zitadel:schema:permission": {
+              "owner": "rw"
+            }
+          },
+          "familyName": {
+            "type": "string",
+            "urn:zitadel:schema:permission": {
+              "owner": "rw",
+              "self": "rw"
+            }
+          },
+          "givenName": {
+            "type": "string",
+            "urn:zitadel:schema:permission": {
+              "owner": "rw",
+              "self": "rw"
+            }
+          },
+          "profileUri": {
+            "format": "uri",
+            "type": "string",
+            "urn:zitadel:schema:permission": {
+              "owner": "rw",
+              "self": "r"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "possibleAuthenticators": [
+        "AUTHENTICATOR_TYPE_USERNAME",
+        "AUTHENTICATOR_TYPE_PASSWORD"
+      ]
+    }
+  ]
 }
 ```
+
+### Revision
+
+Note the `revision` property, which is currently `2`. Each update to the JSON Schema (`schema` property) will increase
+it by `1`. The revision will later be reflected on the managed users to state based on which revision of the schema
+they were last updated on.
