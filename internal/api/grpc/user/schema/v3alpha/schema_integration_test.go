@@ -836,6 +836,12 @@ func TestServer_GetUserSchemaByID(t *testing.T) {
 			args: args{
 				ctx: Tester.WithAuthorization(context.Background(), integration.OrgOwner),
 				req: &schema.GetUserSchemaByIDRequest{},
+				prepare: func(request *schema.GetUserSchemaByIDRequest, resp *schema.GetUserSchemaByIDResponse) error {
+					schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
+					createResp := Tester.CreateUserSchemaWithType(CTX, t, schemaType)
+					request.Id = createResp.GetId()
+					return nil
+				},
 			},
 			wantErr: true,
 		},
@@ -1088,6 +1094,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 				// always first check length, otherwise its failed anyway
 				assert.Len(ttt, got.Result, len(tt.want.Result))
 				for i := range tt.want.Result {
+					//
 					grpc.AllFieldsEqual(t, tt.want.Result[i].ProtoReflect(), got.Result[i].ProtoReflect(), grpc.CustomMappers)
 				}
 				integration.AssertListDetails(t, tt.want, got)
