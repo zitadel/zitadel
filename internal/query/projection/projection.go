@@ -76,6 +76,7 @@ var (
 	InstanceFeatureProjection           *handler.Handler
 	TargetProjection                    *handler.Handler
 	ExecutionProjection                 *handler.Handler
+	UserSchemaProjection                *handler.Handler
 )
 
 type projection interface {
@@ -156,6 +157,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	InstanceFeatureProjection = newInstanceFeatureProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_features"]))
 	TargetProjection = newTargetProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["targets"]))
 	ExecutionProjection = newExecutionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["executions"]))
+	UserSchemaProjection = newUserSchemaProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_schemas"]))
 	newProjectionsList()
 	return nil
 }
@@ -269,5 +271,6 @@ func newProjectionsList() {
 		InstanceFeatureProjection,
 		ExecutionProjection,
 		TargetProjection,
+		UserSchemaProjection,
 	}
 }
