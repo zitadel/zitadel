@@ -166,7 +166,7 @@ Deciding whether to configure an external Identity Provider (IdP) at the organiz
 
 - **Delegated administration**: Enabling organizations to manage their own IdPs empowers them to administer their authentication mechanisms independently. This is beneficial in scenarios where organizations have the autonomy to choose their preferred IdPs or when they manage their user base directly.
 
-### Create an external IdP on an instance
+### Create an external IdP as default
 
 - **Unified authentication strategy**: When you aim to provide a consistent authentication experience across all organizations within your ZITADEL instance. Configuring an IdP at the instance level applies the same authentication mechanism universally, simplifying management and user experience.
 
