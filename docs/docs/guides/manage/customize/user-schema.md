@@ -226,6 +226,6 @@ If you've followed this guide, it should list you a singe schema:
 
 ### Revision
 
-Note the `revision` property, which is currently `2`. Each update to the JSON Schema (`schema` property) will increase
+Note the `revision` property, which is currently `2`. Each update to the `schema`-property will increase
 it by `1`. The revision will later be reflected on the managed users to state based on which revision of the schema
 they were last updated on.
