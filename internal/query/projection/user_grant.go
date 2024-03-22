@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	UserGrantProjectionTable = "projections.user_grants4"
+	UserGrantProjectionTable = "projections.user_grants5"
 
 	UserGrantID                   = "id"
 	UserGrantCreationDate         = "creation_date"
@@ -445,7 +445,8 @@ func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, u
 			EventData(map[string]interface{}{
 				"grantId": grantID,
 			})
-	} else if projectID != "" {
+	}
+	if projectID != "" {
 		builder = builder.Or().
 			AggregateTypes(project.AggregateType).
 			AggregateIDs(projectID).
