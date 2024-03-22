@@ -172,7 +172,7 @@ Deciding whether to configure an external Identity Provider (IdP) at the organiz
 
 - **Centralized management**: Setting up an IdP at the instance level is ideal for scenarios where a single administrative body oversees user authentication across all organizations. This approach centralizes the management of external IdPs, making it easier to maintain and update authentication policies.
 
-- **Broad access needs**: If all users, regardless of their organization, require access to external IdPs for authentication, configuring the IdP at the instance level ensures that these options are available universally. This is particularly useful for platforms that serve a wide range of users with common access requirements.
+- **Broad access needs**: If all users, regardless of their organization, require access to external IdPs for authentication, configuring the IdP in the default settings ensures that these options are available universally. This is particularly useful for platforms that serve a wide range of users with common access requirements.
 
 
 ## References
