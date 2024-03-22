@@ -60,7 +60,6 @@ Errors:
   Notification:
     NoDomain: Aucun domaine trouvé pour le message
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: L'utilisateur n'a pas été trouvé
     AlreadyExists: L'utilisateur existe déjà
     NotFoundOnOrg: L'utilisateur n'a pas été trouvé dans l'organisation choisie
@@ -479,6 +478,7 @@ Errors:
     CloseRows: L'instruction SQL n'a pas pu être terminée
     SQLStatement: L'instruction SQL n'a pas pu être créée
     InvalidRequest: La requête n'est pas valide
+    TooManyNestingLevels: Trop de niveaux d'imbrication de requêtes (maximum 20)
   Quota:
     AlreadyExists: Contingent existe déjà pour cette unité
     NotFound: Contingent non trouvé pour cette unité
