@@ -39,10 +39,9 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.user_schema (id, creation_date, change_date, sequence, instance_id, state, type, revision, schema, possible_authenticators) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.user_schemas (id, change_date, sequence, instance_id, state, type, revision, schema, possible_authenticators) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
-								anyArg{},
 								anyArg{},
 								uint64(15),
 								"instance-id",
@@ -74,7 +73,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_schema SET (change_date, sequence, type, schema, revision, possible_authenticators) = ($1, $2, $3, $4, revision + $5, $6) WHERE (id = $7) AND (instance_id = $8)",
+							expectedStmt: "UPDATE projections.user_schemas SET (change_date, sequence, type, schema, revision, possible_authenticators) = ($1, $2, $3, $4, revision + $5, $6) WHERE (id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -107,7 +106,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_schema SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.user_schemas SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -137,7 +136,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_schema SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.user_schemas SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -167,7 +166,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_schema WHERE (id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.user_schemas WHERE (id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -194,7 +193,7 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.user_schema WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_schemas WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

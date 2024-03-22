@@ -316,7 +316,7 @@ func userSchemaQueriesToQuery(queries []*schema.SearchQuery, level uint8) (_ []q
 func userSchemaQueryToQuery(query *schema.SearchQuery, level uint8) (query.SearchQuery, error) {
 	if level > 20 {
 		// can't go deeper than 20 levels of nesting.
-		return nil, zerrors.ThrowInvalidArgument(nil, "SCHEMA-zsQ97", "Errors.Query.TooManyNestingLevels") // TODO: !
+		return nil, zerrors.ThrowInvalidArgument(nil, "SCHEMA-zsQ97", "Errors.Query.TooManyNestingLevels")
 	}
 	switch q := query.Query.(type) {
 	case *schema.SearchQuery_StateQuery:
