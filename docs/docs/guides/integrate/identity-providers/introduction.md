@@ -22,6 +22,8 @@ ZITADEL positions itself as the central hub or the identity broker in the intera
 
 With ZITADEL, you can enhance your application's accessibility by integrating social login IdPs such as Google or other IdPs such as EntraID (formerly known as AzureAD) and Auth0. For organizations with bespoke identity solutions, ZITADEL supports integration with custom-built IdPs that adhere to OpenID Connect or SAML protocols. By default, ZITADEL can serve as the primary user store for your applications. This centralizes user management and simplifies the authentication process, allowing users to sign in with their email and password, or via the external IdPs you've integrated.
 
+ZITADEL excels in B2B scenarios by offering the flexibility to configure different IdPs for distinct customers, enhancing ease of use and customization. For instance, you could have Customer A utilize EntraID for authentication, while Customer B uses Okta. This versatility enables you to tailor authentication solutions to meet the specific needs of each customer, streamlining their access while maintaining a centralized management system.
+
 
 ## The advantages of using ZITADEL
 
