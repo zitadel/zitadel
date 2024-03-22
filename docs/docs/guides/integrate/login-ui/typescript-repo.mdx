@@ -36,12 +36,13 @@ The flow starts by the `/authorize` endpoint which is intercepted by the login a
 ZITADEL interprets the request and specifically redirects back to the login app.
 It does so by redirecting to `/login`.
 The login is then able to load an [AuthRequest](/docs/apis/resources/oidc_service/oidc-service-get-auth-request#get-oidc-auth-request-details)
-The Auth Request defines how users proceed to authenticate. If no special prompts or scopes are set, the login brings um the `/loginname` page.
+The Auth Request defines how users proceed to authenticate. If no special prompts or scopes are set, the login brings up the `/loginname` page.
 The /loginname page allows to enter loginname or email of a user. User discovery is implemented at /api/loginname and if the user is found, redirected to the available authentication method page.
-Once the user is found, a session is created and set as cookie.
+Right after the user is found, a session is created and set as cookie.
 This cookie is then hydrated with more information once the users continues.
-
-At the end, the flow is finalized by [requesting a the callback url](/docs/apis/resources/oidc_service/oidc-service-create-callback) for your clientId.
+The OIDC Auth request is always passed in the url to have a context to the ongoing authentication flow.
+If enough user information is retrieved and the user is authenticated, the flow is finalized by [requesting a the callback url](/docs/apis/resources/oidc_service/oidc-service-create-callback) for the auth request and the user is redirected back to the application.
+The application can then request a token calling the /token endpoint of the login which is proxied to the ZITADEL API.
 
 ### Implemented features of OIDC Standard
 
