@@ -60,7 +60,6 @@ Errors:
   Notification:
     NoDomain: メッセージのドメインが見つかりません
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: ユーザーが見つかりません
     AlreadyExists: 既に存在するユーザーです
     NotFoundOnOrg: ユーザーが選択した組織内で見つかりません
@@ -468,6 +467,7 @@ Errors:
     CloseRows: SQLステートメントの終了に失敗しました
     SQLStatement: SQLステートメントの作成に失敗しました
     InvalidRequest: 無効なリクエストです
+    TooManyNestingLevels: クエリのネスト レベルが多すぎます (最大 20)
   Quota:
     AlreadyExists: このユニットにはすでにクォータが存在しています
     NotFound: このユニットにはクォータが見つかりません

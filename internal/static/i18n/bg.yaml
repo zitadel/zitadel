@@ -62,7 +62,6 @@ Errors:
   Notification:
     NoDomain: Няма намерен домейн за съобщение
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: Потребителят не може да бъде намерен
     AlreadyExists: Вече съществува потребител
     NotFoundOnOrg: Потребителят не може да бъде намерен в избраната организация
@@ -493,6 +492,7 @@ Errors:
     CloseRows: SQL изразът не можа да бъде завършен
     SQLStatement: SQL изразът не може да бъде създаден
     InvalidRequest: Заявката е невалидна
+    TooManyNestingLevels: Твърде много нива на влагане на заявката (макс. 20)
   Quota:
     AlreadyExists: Вече съществува квота за тази единица
     NotFound: Не е намерена квота за тази единица

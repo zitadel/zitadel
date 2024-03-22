@@ -1017,6 +1017,7 @@ InternalAuthZ:
         - "execution.read"
         - "execution.write"
         - "execution.delete"
+        - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
     - Role: "IAM_OWNER_VIEWER"
@@ -1051,6 +1052,7 @@ InternalAuthZ:
         - "milestones.read"
         - "execution.target.read"
         - "execution.read"
+        - "userschema.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:
         - "org.read"
