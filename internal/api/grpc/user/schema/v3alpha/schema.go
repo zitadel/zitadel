@@ -302,6 +302,19 @@ func authenticatorTypeToDomain(authenticator schema.AuthenticatorType) domain.Au
 	}
 }
 
+func userSchemaStateToDomain(state schema.State) domain.UserSchemaState {
+	switch state {
+	case schema.State_STATE_ACTIVE:
+		return domain.UserSchemaStateActive
+	case schema.State_STATE_INACTIVE:
+		return domain.UserSchemaStateInactive
+	case schema.State_STATE_UNSPECIFIED:
+		return domain.UserSchemaStateUnspecified
+	default:
+		return domain.UserSchemaStateUnspecified
+	}
+}
+
 func userSchemaQueriesToQuery(queries []*schema.SearchQuery, level uint8) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
@@ -337,7 +350,7 @@ func userSchemaQueryToQuery(query *schema.SearchQuery, level uint8) (query.Searc
 }
 
 func stateQueryToQuery(q *schema.StateQuery) (query.SearchQuery, error) {
-	return query.NewUserSchemaStateSearchQuery(int32(q.GetState()))
+	return query.NewUserSchemaStateSearchQuery(userSchemaStateToDomain(q.GetState()))
 }
 
 func typeQueryToQuery(q *schema.TypeQuery) (query.SearchQuery, error) {

@@ -124,7 +124,7 @@ func NewUserSchemaIDSearchQuery(value string, comparison TextComparison) (Search
 	return NewTextQuery(UserSchemaIDCol, value, comparison)
 }
 
-func NewUserSchemaStateSearchQuery(value int32) (SearchQuery, error) {
+func NewUserSchemaStateSearchQuery(value domain.UserSchemaState) (SearchQuery, error) {
 	return NewNumberQuery(UserSchemaStateCol, value, NumberEquals)
 }
 
