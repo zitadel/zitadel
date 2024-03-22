@@ -5,11 +5,10 @@ sidebar_label: Typescript Repository
 
 To replace our current golang built login UI and showcase the use of our new resource, session and OIDC APIs, we've created the [Typescript Repository](https://github.com/zitadel/typescript).
 The typescript repository contains all TypeScript and JavaScript packages and applications you need to create your own Login UI using the ZITADEL APIs.
-The repo implements the [OIDC standard](./oidc-standard)
 
 ## Included Apps And Packages
 
-- `login`: The future login UI used by ZITADEL Cloud, powered by Next.js
+- **[login](./typescript-repo#new-login-ui)**: The future login UI used by ZITADEL Cloud, powered by Next.js
 - `@zitadel/server`: core components for establishing node client connection, grpc stub
 - `@zitadel/client`: core components for establishing web client connection, grpc stub
 - `@zitadel/react`: shared React utilities and components built with Tailwind CSS
@@ -17,7 +16,34 @@ The repo implements the [OIDC standard](./oidc-standard)
 - `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
 - `eslint-config-zitadel`: ESLint preset
 
-## Implemented features of OIDC Standard
+## Login UI
+
+The new implementation of the login is based on Next.js and implements the [OIDC standard](./oidc-standard) by proxying requests to the ZITADEL backend and using the session API.
+The confidential side of the application is autenticated with a service user.
+It fetches policies and settings from your instance and is able to autenticate users without a OIDC context to allow them to self service their account.
+
+### Architectural Overview
+
+The new login app consists of a confidential (backend) part and a browser (client side) part.
+In addition to that, the OIDC specification builds upon a proxy which is set up in the Next.js middleware. It rewrites requests of the paths `/.well-known/:path*`, `/oauth/:path*`, `/oidc/:path*` to ZITADEL.
+The login requires to register its host as custom domain of your instance. We refer to [installing domain](/docs/apis/resources/system/system-service-add-domain) for self hosters or the [guide for cloud users](/docs/guides/manage/cloud/instances#add-custom-domain), to setup domains.
+
+The following illustration shows a potential authentication code flow starting from an application implementing the host of the login as OIDC issuer.
+
+![Next.js Login Architecture](/img/typescript-login-architecture.png)
+
+The flow starts by the `/authorize` endpoint which is intercepted by the login and forwarded to ZITADEL.
+ZITADEL interprets the request and specifically redirects back to the login app.
+It does so by redirecting to `/login`.
+The login is then able to load an [AuthRequest](/docs/apis/resources/oidc_service/oidc-service-get-auth-request#get-oidc-auth-request-details)
+The Auth Request defines how users proceed to authenticate. If no special prompts or scopes are set, the login brings um the `/loginname` page.
+The /loginname page allows to enter loginname or email of a user. User discovery is implemented at /api/loginname and if the user is found, redirected to the available authentication method page.
+Once the user is found, a session is created and set as cookie.
+This cookie is then hydrated with more information once the users continues.
+
+At the end, the flow is finalized by [requesting a the callback url](/docs/apis/resources/oidc_service/oidc-service-create-callback) for your clientId.
+
+### Implemented features of OIDC Standard
 
 - [x] Authorization Code Flow with PKCE
 - [x] AuthRequest `hintUserId`
@@ -63,3 +89,11 @@ If you are using a self hosted instance, [install](/docs/apis/resources/system/s
 
 The login using our cloud service is still experimental, but you can purchase your domain on zitadel.com, install it on your domain following [our guide](/docs/guides/manage/cloud/instances#add-custom-domain).
 After your domain has been verified, you can reconfigure your DNS settings in order to deploy the login on your own.
+
+## Setup
+
+### Proxy / Next.js middleware
+
+Make sure the host of the login is set in your instance.
+To detect the proxy, `x-zitadel-login-client` and `x-zitadel-forwarded` must be set as request headers.
+`x-zitadel-login-client` is the ID of the service user, `x-zitadel-forwarded` falls back to the host.
