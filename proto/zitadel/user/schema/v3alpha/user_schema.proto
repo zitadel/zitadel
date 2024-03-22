@@ -32,7 +32,7 @@ message UserSchema {
       example: "\"STATE_ACTIVE\""
     }
   ];
-  // Revision is a read only version of the schema, each update of the JSON schema increases the revision.
+  // Revision is a read only version of the schema, each update of the `schema`-field increases the revision.
   uint32 revision = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2\""
