@@ -1532,7 +1532,8 @@
       "DESCRIPTIONCREATEADMIN": "Gebruikers kunnen kiezen uit de beschikbare identiteitsproviders hieronder.",
       "DESCRIPTIONCREATEMGMT": "Gebruikers kunnen kiezen uit de beschikbare identiteitsproviders hieronder. Opmerking: U kunt systeem ingestelde providers gebruiken evenals providers die alleen voor uw organisatie zijn ingesteld.",
       "LIFETIME_INVALID": "Formulier bevat ongeldige waarde(n).",
-      "SAVED": "Succesvol opgeslagen!"
+      "SAVED": "Succesvol opgeslagen!",
+      "PROVIDER_ADDED": "Identiteitsprovider geactiveerd."
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "Stel uw Privacybeleid en Algemene Voorwaarden Links in",

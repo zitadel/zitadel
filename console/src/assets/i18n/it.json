@@ -1531,7 +1531,8 @@
       "DESCRIPTIONCREATEADMIN": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto.",
       "DESCRIPTIONCREATEMGMT": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto. Nota: puoi usare i provider impostati nel sistema e quelli impostati della tua organizzazione.",
       "LIFETIME_INVALID": "Login Lifetimes non sono validi",
-      "SAVED": "Salvato con successo!"
+      "SAVED": "Salvato con successo!",
+      "PROVIDER_ADDED": "Fornitore di identità attivato."
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "Imposta i tuoi link all'informativa sulla privacy e ai termini di servizio",

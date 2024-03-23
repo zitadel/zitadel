@@ -1530,7 +1530,8 @@
       "DESCRIPTIONCREATEADMIN": "用户可以从以下可用的身份提供者中进行选择。",
       "DESCRIPTIONCREATEMGMT": "用户可以从以下可用的身份提供者中进行选择。注意：您可为系统设置提供者也可以仅为您的组织单独设置提供者。",
       "LIFETIME_INVALID": "表单包含无效值。",
-      "SAVED": "保存成功！"
+      "SAVED": "保存成功！",
+      "PROVIDER_ADDED": "身份提供商已激活。"
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "设置您的隐私政策和服务条款链接",

@@ -1529,7 +1529,8 @@
       "DESCRIPTIONCREATEADMIN": "ユーザーは、以下の利用可能なIDプロバイダーから選択できます。",
       "DESCRIPTIONCREATEMGMT": "ユーザーは、以下の利用可能なIDプロバイダーから選択できます。注：システムセットプロバイダーと、組織用に設定されたプロバイダーのみを使用できます。",
       "LIFETIME_INVALID": "フォームに無効な値が含まれています。",
-      "SAVED": "正常に保存されました！"
+      "SAVED": "正常に保存されました！",
+      "PROVIDER_ADDED": "IDプロバイダーが有効化されました。"
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "プライバシーポリシーと利用規約リンクを設定します。",

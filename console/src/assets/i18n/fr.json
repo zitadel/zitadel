@@ -1531,7 +1531,8 @@
       "DESCRIPTIONCREATEADMIN": "Les utilisateurs peuvent choisir parmi les fournisseurs d'identité disponibles ci-dessous.",
       "DESCRIPTIONCREATEMGMT": "Les utilisateurs peuvent choisir parmi les fournisseurs d'identité disponibles ci-dessous. Note",
       "LIFETIME_INVALID": "Le formulaire contient des valeurs non valides.",
-      "SAVED": "Enregistré avec succès !"
+      "SAVED": "Enregistré avec succès !",
+      "PROVIDER_ADDED": "Fournisseur d'identité activé."
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "Définissez vos liens vers la politique de confidentialité et les conditions de service",

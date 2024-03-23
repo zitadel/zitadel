@@ -1532,7 +1532,8 @@
       "DESCRIPTIONCREATEADMIN": "Uživatelé si mohou vybrat z dostupných poskytovatelů identity níže.",
       "DESCRIPTIONCREATEMGMT": "Uživatelé si mohou vybrat z dostupných poskytovatelů identity níže. Poznámka: Můžete použít poskytovatele nastavené systémem, jakož i poskytovatele nastavené pouze pro vaši organizaci.",
       "LIFETIME_INVALID": "Formulář obsahuje neplatné hodnoty.",
-      "SAVED": "Úspěšně uloženo!"
+      "SAVED": "Úspěšně uloženo!",
+      "PROVIDER_ADDED": "Poskytovatel identity aktivován."
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "Nastavte odkazy na vaše Zásady ochrany osobních údajů a Podmínky služby",

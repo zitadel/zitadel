@@ -1531,7 +1531,8 @@
       "DESCRIPTIONCREATEADMIN": "Nutzer können sich mit den verfügbaren Idps authentifizieren.",
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
       "LIFETIME_INVALID": "Login Lifetimes sind ungültig.",
-      "SAVED": "Erfolgreich gespeichert."
+      "SAVED": "Erfolgreich gespeichert.",
+      "PROVIDER_ADDED": "Identitätsanbieter aktiviert."
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "Legen Sie Ihre Datenschutzrichtlinien und Nutzungsbedingungen fest",

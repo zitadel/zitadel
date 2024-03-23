@@ -1533,7 +1533,8 @@
       "DESCRIPTIONCREATEADMIN": "Los usuarios pueden elegir entre los siguientes proveedores de identidad disponibles.",
       "DESCRIPTIONCREATEMGMT": "Los usuarios pueden elegir entre los siguientes proveedores de identidad. Nota: Puedes usar los proveedores integrados en el sistema así como sólo los proveedores configurados para tu organización.",
       "LIFETIME_INVALID": "El formulario contiene valores no válidos.",
-      "SAVED": "¡Guardado con éxito!"
+      "SAVED": "¡Guardado con éxito!",
+      "PROVIDER_ADDED": "Proveedor de identidad activado."
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "Establece tu Política de privacidad y los enlaces a los Términos de Servicio (TDS)",

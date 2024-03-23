@@ -1531,7 +1531,8 @@
       "DESCRIPTIONCREATEADMIN": "Użytkownicy mogą wybrać z dostępnych poniżej dostawców tożsamości.",
       "DESCRIPTIONCREATEMGMT": "Użytkownicy mogą wybrać z dostępnych poniżej dostawców tożsamości. Uwaga: Możesz korzystać z dostawców ustawionych przez system lub tylko dla twojej organizacji.",
       "LIFETIME_INVALID": "Formularz zawiera nieprawidłowe wartości.",
-      "SAVED": "Pomyślnie zapisano!"
+      "SAVED": "Pomyślnie zapisano!",
+      "PROVIDER_ADDED": "Dostawca tożsamości aktywowany."
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "Ustaw swoje linki polityki prywatności i warunków korzystania",
