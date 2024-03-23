@@ -12,6 +12,15 @@ import TestSetup from './_test_setup.mdx';
 
 <Intro provider="Google"/>
 
+## Open the Google Identity Provider Template
+
+<IDPsOverview templates="Google"/>
+
+Click on the ZITADEL Callback URL to copy it to your clipboard.
+You will have to paste it in the Google Cloud Platform later.
+
+![Google Provider](/img/guides/zitadel_google_create_provider.png)
+
 ## Google Configuration
 
 ### Register a new client
@@ -19,9 +28,7 @@ import TestSetup from './_test_setup.mdx';
 1. Go to the Google Cloud Platform and choose your project: [https://console.cloud.google.com/apis/credentials](https://console.cloud.google.com/apis/credentials)
 2. Click on "+ CREATE CREDENTIALS" and choose "OAuth client ID"
 3. Choose "Web application" as application type and give a name
-4. Add the redirect uri
- - {your-domain}/ui/login/login/externalidp/callback
- - Example redirect url for the domain `https://acme-gzoe4x.zitadel.cloud` would look like this:  `https://acme-gzoe4x.zitadel.cloud/ui/login/login/externalidp/callback`
+4. Paste the callback URL you copied before to the Authorised redirect URIs
 5. Save the Client ID and Client secret
 
 ![Google OAuth App Registration](/img/guides/google_oauth_app_registration.png)
@@ -30,33 +37,27 @@ import TestSetup from './_test_setup.mdx';
 
 ## ZITADEL Configuration
 
-### Add custom login policy
-
-<CustomLoginPolicy/>
-
-### Go to the IdP Providers Overview
-
-<IDPsOverview templates="Google"/>
-
-### Create a new Google Provider
-
-The Google provider template has everything you need preconfigured.
+Go back to the Google provider template you opened before.
+It has as much as possible preconfigured.
 Add the client ID and secret created before on your Google App.
 
 You can configure the following settings if you like, a useful default will be filled if you don't change anything:
 
-**Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled. This information will be taken to create/update the user within ZITADEL. ZITADEL ensures that at least the `openid`-scope is always sent.
-
+**Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
+This information will be taken to create/update the user within ZITADEL.
+ZITADEL ensures that at least the `openid`-scope is always sent.
 
 <GeneralConfigDescription provider_account="Google account" />
-
-![Google Provider](/img/guides/zitadel_google_create_provider.png)
 
 ### Activate IdP
 
 <Activate/>
 
 ![Activate the Google Provider](/img/guides/zitadel_activate_google.png)
+
+### Ensure your Login Policy allows External IDPs
+
+<CustomLoginPolicy/>
 
 ## Test the setup
 
