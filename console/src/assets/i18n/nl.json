@@ -2325,7 +2325,8 @@
         "0": "Authorization Code",
         "1": "Implicit",
         "2": "Refresh Token",
-        "3": "Device Code"
+        "3": "Device Code",
+        "4": "Token Exchange"
       },
       "AUTHMETHOD": {
         "0": "Basic",

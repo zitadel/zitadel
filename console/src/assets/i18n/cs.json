@@ -2316,7 +2316,8 @@
         "0": "Autorizační kód",
         "1": "Implicitní",
         "2": "Obnovovací Token",
-        "3": "Kód zařízení"
+        "3": "Kód zařízení",
+        "4": "Výměna tokenů"
       },
       "AUTHMETHOD": {
         "0": "Základní",

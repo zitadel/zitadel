@@ -2304,7 +2304,8 @@
         "0": "Código de autorización",
         "1": "Implícito",
         "2": "Token de refresco",
-        "3": "Device Code"
+        "3": "Device Code",
+        "4": "Intercambio de tokens"
       },
       "AUTHMETHOD": {
         "0": "Básico",
