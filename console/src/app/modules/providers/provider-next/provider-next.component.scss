@@ -1,3 +1,13 @@
 .cnsl-secondary-text {
   margin-block-start: 0;
 }
+
+.box {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  .right {
+    flex-shrink: 0;
+    align-self: flex-end;
+  }
+}

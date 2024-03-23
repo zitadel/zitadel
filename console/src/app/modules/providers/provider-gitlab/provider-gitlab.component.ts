@@ -10,7 +10,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateGitLabProviderRequest as AdminUpdateGitLabProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import {IDPOwnerType, Options, Provider} from 'src/app/proto/generated/zitadel/idp_pb';
+import { IDPOwnerType, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddGitLabProviderRequest as MgmtAddGitLabProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -35,9 +35,13 @@ import { ProviderNextDialogComponent } from '../provider-next/provider-next-dial
 export class ProviderGitlabComponent {
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
+  // DEPRECATED: use id$ instead
   public id: string | null = '';
+  // DEPRECATED: assert service$ instead
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  // DEPRECATED: use service$ instead
   private service!: ManagementService | AdminService;
+
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
@@ -48,8 +52,24 @@ export class ProviderGitlabComponent {
   public provider?: Provider.AsObject;
   public updateClientSecret: boolean = false;
 
-  private autofillLink$ = new BehaviorSubject<string>('');
-  public activateLink$ = new BehaviorSubject<string>('');
+  public justCreated$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  public justActivated$ = new BehaviorSubject<boolean>(false);
+
+  private service$ = this.nextSvc.service(this.route.data);
+  private id$ = this.nextSvc.id(this.route.paramMap, this.justCreated$);
+  public exists$ = this.nextSvc.exists(this.id$);
+  public autofillLink$ = this.nextSvc.autofillLink(
+    this.id$,
+    `https://zitadel.com/docs/guides/integrate/identity-providers/gitlab#optional-add-zitadel-action-to-autofill-userdata`,
+  );
+  public activateLink$ = this.nextSvc.activateLink(
+    this.id$,
+    this.justActivated$,
+    'https://zitadel.com/docs/guides/integrate/identity-providers/gitlab#activate-idp',
+    this.service$,
+  );
+  public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
+  public copyUrls$ = this.nextSvc.callbackUrls();
 
   constructor(
     private authService: GrpcAuthService,
@@ -58,11 +78,8 @@ export class ProviderGitlabComponent {
     private injector: Injector,
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
-    private dialog: MatDialog,
-    nextSvc: ProviderNextService,
+    private nextSvc: ProviderNextService,
   ) {
-
-
     this.form = new FormGroup({
       name: new FormControl('', []),
       clientId: new FormControl('', [requiredValidator]),
@@ -119,18 +136,10 @@ export class ProviderGitlabComponent {
         this.getData(this.id);
       }
     });
+  }
 
-    this.setActive(false);
-    nextSvc.next(
-      'GitLab',
-      this.activateLink$,
-      this.serviceType === PolicyComponentServiceType.ADMIN,
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
-      'https://zitadel.com/docs/guides/integrate/identity-providers/gitlab#gitlab-configuration',
-      this.autofillLink$,
-      () => [],
-    );
+  public activate() {
+    this.nextSvc.activate(this.id$, this.justActivated$, this.service$);
   }
 
   private getData(id: string): void {
@@ -153,17 +162,10 @@ export class ProviderGitlabComponent {
         this.toast.showError(error);
         this.loading = false;
       });
-    this.service.getLoginPolicy()
-      .then((policy) => {
-        this.setActive(!!policy.policy?.idpsList.find(idp => idp.idpId === this.id));
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
   }
 
   public submitForm(): void {
-    this.provider ? this.updateGitlabProvider() : this.addGitlabProvider();
+    this.provider  || this.justCreated$.value ? this.updateGitlabProvider() : this.addGitlabProvider();
   }
 
   public addGitlabProvider(): void {
@@ -182,7 +184,7 @@ export class ProviderGitlabComponent {
     this.service
       .addGitLabProvider(req)
       .then((addedIDP) => {
-        this.showAutofillGuide();
+        this.justCreated$.next(addedIDP.id);
         this.loading = false;
       })
       .catch((error) => {
@@ -191,21 +193,13 @@ export class ProviderGitlabComponent {
       });
   }
 
-  public activate(id: string) {
-    this.service.addIDPToLoginPolicy(id, this.serviceType === PolicyComponentServiceType.ADMIN ? IDPOwnerType.IDP_OWNER_TYPE_SYSTEM : IDPOwnerType.IDP_OWNER_TYPE_ORG).then(() => {
-      this.toast.showInfo('POLICY.TOAST.ADDIDP', true);
-      this.setActive(true);
-      this.id = id;
-    });
-  }
-
   public updateGitlabProvider(): void {
-    if (this.provider) {
+    if (this.provider  || this.justCreated$.value) {
       const req =
         this.serviceType === PolicyComponentServiceType.MGMT
           ? new MgmtUpdateGitLabProviderRequest()
           : new AdminUpdateGitLabProviderRequest();
-      req.setId(this.provider.id);
+      req.setId(this.provider?.id  || this.justCreated$.value);
       req.setName(this.name?.value);
       req.setClientId(this.clientId?.value);
       req.setScopesList(this.scopesList?.value);
@@ -257,16 +251,6 @@ export class ProviderGitlabComponent {
         this.scopesList.value.splice(index, 1);
       }
     }
-  }
-
-  private showAutofillGuide(): void {
-    this.autofillLink$.next(
-      'https://zitadel.com/docs/guides/integrate/identity-providers/gitlab#optional-add-zitadel-action-to-autofill-userdata',
-    );
-  }
-
-  private setActive(active: boolean) {
-    this.activateLink$.next(active ? '' : 'https://zitadel.com/docs/guides/integrate/identity-providers/gitlab#activate-idp' );
   }
 
   public get name(): AbstractControl | null {

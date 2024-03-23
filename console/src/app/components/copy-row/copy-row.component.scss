@@ -1,14 +1,8 @@
 .row {
   display: flex;
   align-items: center;
-  .item {
-    margin: 0.25rem;
-  }
-  .aside {
+  .right {
     flex-shrink: 0;
-  }
-  .left {
-    min-with: 200px;
   }
 }
 

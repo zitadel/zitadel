@@ -10,7 +10,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateAppleProviderRequest as AdminUpdateAppleProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import {IDPOwnerType, Options, Provider} from 'src/app/proto/generated/zitadel/idp_pb';
+import { IDPOwnerType, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddAppleProviderRequest as MgmtAddAppleProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -37,8 +37,11 @@ const MAX_ALLOWED_SIZE = 5 * 1024;
 export class ProviderAppleComponent {
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
+  // DEPRECATED: use id$ instead
   public id: string | null = '';
+  // DEPRECATED: assert service$ instead
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  // DEPRECATED: use service$ instead
   private service!: ManagementService | AdminService;
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
@@ -50,8 +53,24 @@ export class ProviderAppleComponent {
   public provider?: Provider.AsObject;
   public updatePrivateKey: boolean = false;
 
-  private autofillLink$ = new BehaviorSubject<string>('');
-  public activateLink$ = new BehaviorSubject<string>('');
+  public justCreated$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  public justActivated$ = new BehaviorSubject<boolean>(false);
+
+  private service$ = this.nextSvc.service(this.route.data);
+  private id$ = this.nextSvc.id(this.route.paramMap, this.justCreated$);
+  public exists$ = this.nextSvc.exists(this.id$);
+  public autofillLink$ = this.nextSvc.autofillLink(
+    this.id$,
+    `https://zitadel.com/docs/guides/integrate/identity-providers/additional-information`,
+  );
+  public activateLink$ = this.nextSvc.activateLink(
+    this.id$,
+    this.justActivated$,
+    'https://zitadel.com/docs/guides/integrate/identity-providers/apple#activate-idp',
+    this.service$,
+  );
+  public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
+  public copyUrls$ = this.nextSvc.callbackUrls();
 
   constructor(
     private authService: GrpcAuthService,
@@ -60,8 +79,7 @@ export class ProviderAppleComponent {
     private injector: Injector,
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
-    private dialog: MatDialog,
-    nextSvc: ProviderNextService,
+    private nextSvc: ProviderNextService,
   ) {
     this.form = new FormGroup({
       name: new FormControl('', []),
@@ -121,18 +139,10 @@ export class ProviderAppleComponent {
         this.getData(this.id);
       }
     });
+  }
 
-    this.setActive(false);
-    nextSvc.next(
-      'Apple',
-      this.activateLink$,
-      this.serviceType === PolicyComponentServiceType.ADMIN,
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
-      'https://zitadel.com/docs/guides/integrate/identity-providers/apple#apple-configuration',
-      this.autofillLink$,
-      () => [],
-    );
+  public activate() {
+    this.nextSvc.activate(this.id$, this.justActivated$, this.service$);
   }
 
   private getData(id: string): void {
@@ -155,17 +165,10 @@ export class ProviderAppleComponent {
         this.toast.showError(error);
         this.loading = false;
       });
-    this.service.getLoginPolicy()
-      .then((policy) => {
-        this.setActive(!!policy.policy?.idpsList.find(idp => idp.idpId === this.id));
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
   }
 
   public submitForm(): void {
-    this.provider ? this.updateAppleProvider() : this.addAppleProvider();
+    this.provider  || this.justCreated$.value ? this.updateAppleProvider() : this.addAppleProvider();
   }
 
   public addAppleProvider(): void {
@@ -186,7 +189,7 @@ export class ProviderAppleComponent {
     this.service
       .addAppleProvider(req)
       .then((addedIDP) => {
-        this.showAutofillGuide();
+        this.justCreated$.next(addedIDP.id);
         this.loading = false;
       })
       .catch((error) => {
@@ -195,19 +198,11 @@ export class ProviderAppleComponent {
       });
   }
 
-  public activate(id: string) {
-    this.service.addIDPToLoginPolicy(id, this.serviceType === PolicyComponentServiceType.ADMIN ? IDPOwnerType.IDP_OWNER_TYPE_SYSTEM : IDPOwnerType.IDP_OWNER_TYPE_ORG).then(() => {
-      this.toast.showInfo('POLICY.TOAST.ADDIDP', true);
-      this.setActive(true);
-      this.id = id;
-    });
-  }
-
   public updateAppleProvider(): void {
-    if (this.provider) {
+    if (this.provider  || this.justCreated$.value) {
       if (this.serviceType === PolicyComponentServiceType.MGMT) {
         const req = new MgmtUpdateAppleProviderRequest();
-        req.setId(this.provider.id);
+        req.setId(this.provider?.id  || this.justCreated$.value);
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
         req.setTeamId(this.teamId?.value);
@@ -234,7 +229,7 @@ export class ProviderAppleComponent {
           });
       } else if (PolicyComponentServiceType.ADMIN) {
         const req = new AdminUpdateAppleProviderRequest();
-        req.setId(this.provider.id);
+        req.setId(this.provider?.id || this.justCreated$.value);
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
         req.setTeamId(this.teamId?.value);
@@ -312,14 +307,6 @@ export class ProviderAppleComponent {
         this.scopesList.value.splice(index, 1);
       }
     }
-  }
-
-  private showAutofillGuide(): void {
-    this.autofillLink$.next('https://zitadel.com/docs/guides/integrate/identity-providers/additional-information');
-  }
-
-  private setActive(active: boolean) {
-    this.activateLink$.next(active ? '' : 'https://zitadel.com/docs/guides/integrate/identity-providers/apple#activate-idp' );
   }
 
   public get name(): AbstractControl | null {

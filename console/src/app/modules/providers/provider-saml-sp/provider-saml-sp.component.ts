@@ -1,27 +1,16 @@
-import {Component, Injector, Type} from '@angular/core';
-import {Location} from '@angular/common';
-import {IDPOwnerType, Options, Provider, SAMLBinding} from '../../../proto/generated/zitadel/idp_pb';
-import {AbstractControl, FormGroup, UntypedFormControl, UntypedFormGroup} from '@angular/forms';
-import {PolicyComponentServiceType} from '../../policies/policy-component-types.enum';
-import {ManagementService} from '../../../services/mgmt.service';
-import {AdminService} from '../../../services/admin.service';
-import {ToastService} from '../../../services/toast.service';
-import {GrpcAuthService} from '../../../services/grpc-auth.service';
-import {
-  BehaviorSubject,
-  combineLatestWith,
-  distinctUntilChanged,
-  from,
-  Observable,
-  of,
-  shareReplay,
-  Subject,
-  switchMap,
-  take
-} from 'rxjs';
-import {ActivatedRoute, Router} from '@angular/router';
-import {Breadcrumb, BreadcrumbService, BreadcrumbType} from '../../../services/breadcrumb.service';
-import {atLeastOneIsFilled, requiredValidator} from '../../form-field/validators/validators';
+import { Component, Injector, Type } from '@angular/core';
+import { Location } from '@angular/common';
+import { IDPOwnerType, Options, Provider, SAMLBinding } from '../../../proto/generated/zitadel/idp_pb';
+import { AbstractControl, FormGroup, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
+import { ManagementService } from '../../../services/mgmt.service';
+import { AdminService } from '../../../services/admin.service';
+import { ToastService } from '../../../services/toast.service';
+import { GrpcAuthService } from '../../../services/grpc-auth.service';
+import { BehaviorSubject, combineLatestWith, from, Observable, of, shareReplay, switchMap, take } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from '../../../services/breadcrumb.service';
+import { atLeastOneIsFilled, requiredValidator } from '../../form-field/validators/validators';
 import {
   AddSAMLProviderRequest as AdminAddSAMLProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -32,9 +21,10 @@ import {
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
   UpdateSAMLProviderRequest as MgmtUpdateSAMLProviderRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
-import {Environment, EnvironmentService} from '../../../services/environment.service';
-import {CopyUrl} from "../provider-next/provider-next.component";
-import {combineLatest, filter, map, tap,} from "rxjs/operators";
+import { Environment, EnvironmentService } from '../../../services/environment.service';
+import { CopyUrl } from '../provider-next/provider-next.component';
+import { combineLatest, filter, map, tap } from 'rxjs/operators';
+import { ProviderNextService } from '../provider-next/provider-next.service';
 
 @Component({
   selector: 'cnsl-provider-saml-sp',
@@ -42,92 +32,76 @@ import {combineLatest, filter, map, tap,} from "rxjs/operators";
   styleUrls: ['./provider-saml-sp.component.scss'],
 })
 export class ProviderSamlSpComponent {
+  // DEPRECATED: use id$ instead
   public id: string | null = '';
   public loading: boolean = false;
   public provider?: Provider.AsObject;
   public form!: FormGroup;
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
+  // DEPRECATED: assert service$ instead
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  // DEPRECATED: use service$ instead
   private service!: ManagementService | AdminService;
-
-  public created$: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  private id$: Observable<string|null> = this.route.paramMap.pipe(
-    // The ID observable should also emit when the IDP was just created
-    combineLatestWith(this.created$),
-    map(([params, created]) => created ? created : params.get('id')),
-    shareReplay(1),
-  )
-  public exists$: Observable<boolean> = this.id$.pipe(
-    map(id => !!id),
-    shareReplay(1),
-    tap(console.log),
-  )
-  public autofillLink$ = this.id$.pipe(
-    filter(id => !!id),
-    map(()=> `https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml#optional-add-zitadel-action-to-autofill-userdata`),
-    shareReplay(1),
-  );
-  public activated$ = new BehaviorSubject<boolean>(false);
-  public activateLink$: Observable<string> = this.id$.pipe(
-    combineLatestWith(this.activated$),
-    // Because we also want to emit when the IDP is not active, we return an empty string if the IDP does not exist
-    switchMap(([id, activated]) =>     (!id || activated ? of(false) : from(this.service.getLoginPolicy()).pipe(
-      map(policy => !policy.policy?.idpsList.find(idp => idp.idpId === id)),
-    )).pipe(
-      map((show) => !show ? '' : 'https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml#activate-idp'),
-    ),
-  ),
-  shareReplay(1),
-)
-  // we expand initially if the IDP does not exist or if the idp was just created
-  public expandWhatNow$ = this.id$.pipe(
-    combineLatestWith(this.activateLink$, this.created$),
-    map(([id, activateLink, created]) => !id || activateLink || created),
-    shareReplay(1),
-  );
-  public copyUrls$: Observable<CopyUrl[]> = this.id$.pipe(
-    filter(id => !!id),
-    switchMap(id => this.envSvc.env.pipe(
-      map((environment: Environment) => {
-        const idpBase = `${environment.issuer}/idps/${id}/saml`;
-        return [
-          {
-            label: 'ZITADEL Metadata',
-            url: `${idpBase}/metadata`,
-            downloadable: true,
-          },
-          {
-            label: 'ZITADEL Single Logout',
-            url: `${idpBase}/slo`,
-          },
-          {
-            label: 'ZITADEL ACS Login Form',
-            url: `${environment.issuer}/ui/login/login/externalidp/saml/acs`,
-          },
-          {
-            label: 'ZITADEL ACS Intent API',
-            url: `${idpBase}/acs`,
-          },
-        ];
-      })
-    )),
-    shareReplay(1),
-  )
-
-  public isInstance: boolean = false;
-
   bindingValues: string[] = Object.keys(SAMLBinding);
+
+  public justCreated$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  public justActivated$ = new BehaviorSubject<boolean>(false);
+
+  private service$ = this.nextSvc.service(this.route.data);
+  private id$ = this.nextSvc.id(this.route.paramMap, this.justCreated$);
+  public exists$ = this.nextSvc.exists(this.id$);
+  public autofillLink$ = this.nextSvc.autofillLink(
+    this.id$,
+    `https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml#optional-add-zitadel-action-to-autofill-userdata`,
+  );
+  public activateLink$ = this.nextSvc.activateLink(
+    this.id$,
+    this.justActivated$,
+    'https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml#activate-idp',
+    this.service$,
+  );
+  public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
+  public copyUrls$ = this.id$.pipe(
+    filter((id) => !!id),
+    switchMap((id) =>
+      this.envSvc.env.pipe(
+        map((environment: Environment) => {
+          const idpBase = `${environment.issuer}/idps/${id}/saml`;
+          return [
+            {
+              label: 'ZITADEL Metadata',
+              url: `${idpBase}/metadata`,
+              downloadable: true,
+            },
+            {
+              label: 'ZITADEL Single Logout',
+              url: `${idpBase}/slo`,
+            },
+            {
+              label: 'ZITADEL ACS Login Form',
+              url: `${environment.issuer}/ui/login/login/externalidp/saml/acs`,
+            },
+            {
+              label: 'ZITADEL ACS Intent API',
+              url: `${idpBase}/acs`,
+            },
+          ];
+        }),
+      ),
+    ),
+    shareReplay(1),
+  );
 
   constructor(
     private _location: Location,
     private toast: ToastService,
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
-    private router: Router,
     private injector: Injector,
     private breadcrumbService: BreadcrumbService,
     private envSvc: EnvironmentService,
+    private nextSvc: ProviderNextService,
   ) {
     this._buildBreadcrumbs();
     this._initializeForm();
@@ -181,7 +155,6 @@ export class ProviderSamlSpComponent {
           this.breadcrumbService.setBreadcrumb([bread]);
           break;
         case PolicyComponentServiceType.ADMIN:
-          this.isInstance = true
           this.service = this.injector.get(AdminService as Type<AdminService>);
 
           const iamBread = new Breadcrumb({
@@ -197,17 +170,21 @@ export class ProviderSamlSpComponent {
       if (this.id) {
         this.getData(this.id);
       }
-   });
+    });
+  }
+
+  public activate() {
+    this.nextSvc.activate(this.id$, this.justActivated$, this.service$);
   }
 
   public updateSAMLProvider(): void {
-    if (this.provider || this.created$.value) {
+    if (this.provider || this.justCreated$.value) {
       const req =
         this.serviceType === PolicyComponentServiceType.MGMT
           ? new MgmtUpdateSAMLProviderRequest()
           : new AdminUpdateSAMLProviderRequest();
 
-      req.setId(this.provider?.id || this.created$.value);
+      req.setId(this.provider?.id || this.justCreated$.value);
       req.setName(this.name?.value);
       if (this.metadataXml?.value) {
         req.setMetadataXml(this.metadataXml?.value);
@@ -254,7 +231,7 @@ export class ProviderSamlSpComponent {
     this.service
       .addSAMLProvider(req)
       .then((addedIDP) => {
-        this.created$.next(addedIDP.id);
+        this.justCreated$.next(addedIDP.id);
         this.loading = false;
       })
       .catch((error) => {
@@ -264,7 +241,7 @@ export class ProviderSamlSpComponent {
   }
 
   public submitForm(): void {
-    this.provider || this.created$.value ? this.updateSAMLProvider() : this.addSAMLProvider();
+    this.provider || this.justCreated$.value ? this.updateSAMLProvider() : this.addSAMLProvider();
   }
 
   private getData(id: string): void {
@@ -298,19 +275,6 @@ export class ProviderSamlSpComponent {
       return value === Object.keys(SAMLBinding)[index];
     }
     return false;
-  }
-
-  public activate() {
-    this.id$.pipe(
-      take(1),
-      switchMap(id => from(this.service.addIDPToLoginPolicy(id!, this.serviceType === PolicyComponentServiceType.ADMIN ? IDPOwnerType.IDP_OWNER_TYPE_SYSTEM : IDPOwnerType.IDP_OWNER_TYPE_ORG))),
-    ).subscribe({
-      next: () => {
-        this.toast.showInfo('POLICY.TOAST.ADDIDP', true);
-        this.activated$.next(true)
-      },
-      error: error => this.toast.showError(error),
-    })
   }
 
   private get name(): AbstractControl | null {

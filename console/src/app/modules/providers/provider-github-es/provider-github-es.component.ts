@@ -10,7 +10,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateGitHubEnterpriseServerProviderRequest as AdminUpdateGitHubEnterpriseServerProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import {IDPOwnerType, Options, Provider} from 'src/app/proto/generated/zitadel/idp_pb';
+import { IDPOwnerType, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddGitHubEnterpriseServerProviderRequest as MgmtAddGitHubEnterpriseServerProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -36,9 +36,12 @@ export class ProviderGithubESComponent {
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
 
+  // DEPRECATED: use id$ instead
   public id: string | null = '';
   public updateClientSecret: boolean = false;
+  // DEPRECATED: assert service$ instead
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  // DEPRECATED: use service$ instead
   private service!: ManagementService | AdminService;
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
   public form!: UntypedFormGroup;
@@ -47,8 +50,24 @@ export class ProviderGithubESComponent {
 
   public provider?: Provider.AsObject;
 
-  private autofillLink$ = new BehaviorSubject<string>('');
-  public activateLink$ = new BehaviorSubject<string>('');
+  public justCreated$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  public justActivated$ = new BehaviorSubject<boolean>(false);
+
+  private service$ = this.nextSvc.service(this.route.data);
+  private id$ = this.nextSvc.id(this.route.paramMap, this.justCreated$);
+  public exists$ = this.nextSvc.exists(this.id$);
+  public autofillLink$ = this.nextSvc.autofillLink(
+    this.id$,
+    `https://zitadel.com/docs/guides/integrate/identity-providers/github#optional-add-zitadel-action-to-autofill-userdata`,
+  );
+  public activateLink$ = this.nextSvc.activateLink(
+    this.id$,
+    this.justActivated$,
+    'https://zitadel.com/docs/guides/integrate/identity-providers/github#activate-idp',
+    this.service$,
+  );
+  public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
+  public copyUrls$ = this.nextSvc.callbackUrls();
 
   constructor(
     private authService: GrpcAuthService,
@@ -57,8 +76,7 @@ export class ProviderGithubESComponent {
     private injector: Injector,
     private _location: Location,
     breadcrumbService: BreadcrumbService,
-    private dialog: MatDialog,
-    nextSvc: ProviderNextService,
+    private nextSvc: ProviderNextService,
   ) {
     this.form = new UntypedFormGroup({
       name: new UntypedFormControl('', [requiredValidator]),
@@ -69,8 +87,6 @@ export class ProviderGithubESComponent {
       userEndpoint: new UntypedFormControl('', [requiredValidator]),
       scopesList: new UntypedFormControl(['openid', 'profile', 'email'], []),
     });
-
-
 
     this.authService
       .isAllowed(
@@ -121,18 +137,10 @@ export class ProviderGithubESComponent {
         this.getData(this.id);
       }
     });
+  }
 
-    this.setActive(false);
-    nextSvc.next(
-      'GitHub',
-      this.activateLink$,
-      this.serviceType === PolicyComponentServiceType.ADMIN,
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
-      'https://zitadel.com/docs/guides/integrate/identity-providers/github#github-configuration',
-      this.autofillLink$,
-      () => [],
-    );
+  public activate() {
+    this.nextSvc.activate(this.id$, this.justActivated$, this.service$);
   }
 
   private getData(id: string): void {
@@ -156,17 +164,10 @@ export class ProviderGithubESComponent {
         this.toast.showError(error);
         this.loading = false;
       });
-    this.service.getLoginPolicy()
-      .then((policy) => {
-        this.setActive(!!policy.policy?.idpsList.find(idp => idp.idpId === this.id));
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
   }
 
   public submitForm(): void {
-    this.provider ? this.updateGenericOAuthProvider() : this.addGenericOAuthProvider();
+    this.provider  || this.justCreated$.value ? this.updateGenericOAuthProvider() : this.addGenericOAuthProvider();
   }
 
   public addGenericOAuthProvider(): void {
@@ -188,7 +189,7 @@ export class ProviderGithubESComponent {
     this.service
       .addGitHubEnterpriseServerProvider(req)
       .then((addedIDP) => {
-        this.showAutofillGuide();
+        this.justCreated$.next(addedIDP.id);
         this.loading = false;
       })
       .catch((error) => {
@@ -197,21 +198,13 @@ export class ProviderGithubESComponent {
       });
   }
 
-  public activate(id: string) {
-    this.service.addIDPToLoginPolicy(id, this.serviceType === PolicyComponentServiceType.ADMIN ? IDPOwnerType.IDP_OWNER_TYPE_SYSTEM : IDPOwnerType.IDP_OWNER_TYPE_ORG).then(() => {
-      this.toast.showInfo('POLICY.TOAST.ADDIDP', true);
-      this.setActive(true);
-      this.id = id;
-    });
-  }
-
   public updateGenericOAuthProvider(): void {
-    if (this.provider) {
+    if (this.provider  || this.justCreated$.value) {
       const req =
         this.serviceType === PolicyComponentServiceType.MGMT
           ? new MgmtUpdateGitHubEnterpriseServerProviderRequest()
           : new AdminUpdateGitHubEnterpriseServerProviderRequest();
-      req.setId(this.provider.id);
+      req.setId(this.provider?.id  || this.justCreated$.value);
       req.setName(this.name?.value);
       req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
       req.setTokenEndpoint(this.tokenEndpoint?.value);
@@ -263,16 +256,6 @@ export class ProviderGithubESComponent {
         this.scopesList.value.splice(index, 1);
       }
     }
-  }
-
-  private showAutofillGuide(): void {
-    this.autofillLink$.next(
-      'https://zitadel.com/docs/guides/integrate/identity-providers/github#optional-add-zitadel-action-to-autofill-userdata',
-    );
-  }
-
-  private setActive(active: boolean) {
-    this.activateLink$.next(active ? '' : 'https://zitadel.com/docs/guides/integrate/identity-providers/github#activate-idp');
   }
 
   public get name(): AbstractControl | null {

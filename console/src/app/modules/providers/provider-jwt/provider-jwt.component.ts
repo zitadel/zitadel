@@ -9,7 +9,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateJWTProviderRequest as AdminUpdateJWTProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import {IDPOwnerType, Options, Provider} from 'src/app/proto/generated/zitadel/idp_pb';
+import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddJWTProviderRequest as MgmtAddJWTProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -23,11 +23,8 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
-import { MatDialog } from '@angular/material/dialog';
-import { ProviderNextService } from '../provider-next/provider-next.service';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
-import {CopyUrl} from "../provider-next/provider-next.component";
+import { ProviderNextService } from '../provider-next/provider-next.service';
 
 @Component({
   selector: 'cnsl-provider-jwt',
@@ -37,8 +34,11 @@ export class ProviderJWTComponent {
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
 
+  // DEPRECATED: use id$ instead
   public id: string | null = '';
+  // DEPRECATED: assert service$ instead
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  // DEPRECATED: use service$ instead
   private service!: ManagementService | AdminService;
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
@@ -47,12 +47,23 @@ export class ProviderJWTComponent {
 
   public provider?: Provider.AsObject;
 
-  public autofillLink$ = new BehaviorSubject<string>('');
-  public activateLink$ = new BehaviorSubject<string>('');
-  public isActive$ = new BehaviorSubject<boolean>(false)
-  public expandWhatNow$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  public configureProvider$ = new BehaviorSubject<boolean>(false);
-  public isInstance: boolean = false;
+  public justCreated$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  public justActivated$ = new BehaviorSubject<boolean>(false);
+
+  private service$ = this.nextSvc.service(this.route.data);
+  private id$ = this.nextSvc.id(this.route.paramMap, this.justCreated$);
+  public exists$ = this.nextSvc.exists(this.id$);
+  public autofillLink$ = this.nextSvc.autofillLink(
+    this.id$,
+    `https://zitadel.com/docs/guides/integrate/identity-providers/additional-information`,
+  );
+  public activateLink$ = this.nextSvc.activateLink(
+    this.id$,
+    this.justActivated$,
+    'https://zitadel.com/docs/guides/integrate/identity-providers/okta-oidc#activate-idp',
+    this.service$,
+  );
+  public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
 
   constructor(
     private authService: GrpcAuthService,
@@ -63,7 +74,6 @@ export class ProviderJWTComponent {
     breadcrumbService: BreadcrumbService,
     private nextSvc: ProviderNextService,
   ) {
-
     this.route.data.pipe(take(1)).subscribe((data) => {
       this.serviceType = data['serviceType'];
 
@@ -79,7 +89,6 @@ export class ProviderJWTComponent {
           breadcrumbService.setBreadcrumb([bread]);
           break;
         case PolicyComponentServiceType.ADMIN:
-          this.isInstance = true;
           this.service = this.injector.get(AdminService as Type<AdminService>);
 
           const iamBread = new Breadcrumb({
@@ -94,9 +103,6 @@ export class ProviderJWTComponent {
       this.id = this.route.snapshot.paramMap.get('id');
       if (this.id) {
         this.getData(this.id);
-      }else {
-        this.expandWhatNow$.next(true);
-        this.configureProvider$.next(true);
       }
     });
 
@@ -126,24 +132,8 @@ export class ProviderJWTComponent {
       });
   }
 
-  private showAutofillLink(): void {
-    this.autofillLink$.next('https://zitadel.com/docs/guides/integrate/identity-providers/additional-information');
-  }
-
-  private setActivateable(id: string) {
-    this.activateLink$.next(!id ? '' : 'https://zitadel.com/docs/guides/integrate/identity-providers/okta-oidc#activate-idp');
-    if (id) {
-      this.expandWhatNow$.next(true);
-      this.id = id;
-    }
-  }
-
   public activate() {
-    this.service.addIDPToLoginPolicy(this.id!, this.serviceType === PolicyComponentServiceType.ADMIN ? IDPOwnerType.IDP_OWNER_TYPE_SYSTEM : IDPOwnerType.IDP_OWNER_TYPE_ORG).then(() => {
-      this.toast.showInfo('POLICY.TOAST.ADDIDP', true);
-      this.isActive$.next(true);
-      this.setActivateable('');
-    });
+    this.nextSvc.activate(this.id$, this.justActivated$, this.service$);
   }
 
   private getData(id: string): void {
@@ -158,7 +148,6 @@ export class ProviderJWTComponent {
         this.provider = resp.idp;
         this.loading = false;
         if (this.provider?.config?.jwt) {
-          this.showAutofillLink();
           this.form.patchValue(this.provider.config.jwt);
           this.name?.setValue(this.provider.name);
         }
@@ -167,18 +156,10 @@ export class ProviderJWTComponent {
         this.toast.showError(error);
         this.loading = false;
       });
-    this.service.getLoginPolicy()
-      .then((policy) => {
-        this.isActive$.next(!!policy.policy?.idpsList.find(idp => idp.idpId === this.id));
-        this.setActivateable(this.isActive$.value ? '' : id);
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
   }
 
   public submitForm(): void {
-    this.provider ? this.updateJWTProvider() : this.addJWTProvider();
+    this.provider  || this.justCreated$.value ? this.updateJWTProvider() : this.addJWTProvider();
   }
 
   public addJWTProvider(): void {
@@ -197,9 +178,7 @@ export class ProviderJWTComponent {
     this.service
       .addJWTProvider(req)
       .then((addedIDP) => {
-        this.showAutofillLink();
-        this.setActivateable(addedIDP.id);
-        this.configureProvider$.next(false);
+        this.justCreated$.next(addedIDP.id);
         this.loading = false;
       })
       .catch((error) => {
@@ -209,12 +188,12 @@ export class ProviderJWTComponent {
   }
 
   public updateJWTProvider(): void {
-    if (this.provider) {
+    if (this.provider  || this.justCreated$.value) {
       const req =
         this.serviceType === PolicyComponentServiceType.MGMT
           ? new MgmtUpdateJWTProviderRequest()
           : new AdminUpdateJWTProviderRequest();
-      req.setId(this.provider.id);
+      req.setId(this.provider?.id  || this.justCreated$.value);
       req.setName(this.name?.value);
       req.setHeaderName(this.headerName?.value);
       req.setIssuer(this.issuer?.value);

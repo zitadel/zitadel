@@ -89,17 +89,22 @@
       "IDPS": {
         "TITLE": "Identity Providers",
         "DESCRIPTION": "Create and activate external identity providers. Choose a well-known provider or configure any other OIDC, OAuth or SAML compatible provider of your choice. You can even use your existing JWT tokens as federated identities by configuring a JWT identity provider.",
+        "NEXT": "What now?",
         "SAML": {
           "TITLE": "Configure your SAML Identity Provider",
           "DESCRIPTION": "ZITADEL is configured. Now your SAML Identity Provider needs some configuration. Most providers allow you to just upload the whole ZITADEL metadata XML. Other providers ask you to provide some distinct URLs only, like for example the entity ID (metadata URL), the Assertion Consumer Service (ACS) URL or the Single Logout URL."
         },
         "CALLBACK": {
-          "TITLE": "Configure {{ provider }}",
-          "DESCRIPTION": "Copy this URL to allow {{ provider }} to redirect your users browser back to ZITADEL after they are authenticated."
+          "TITLE": "Configure your {{ provider }} Identity Provider",
+          "DESCRIPTION": "Before you can configure ZITADEL, pass this URL to your Identity Provider to enable the browser redirection back to ZITADEL after authentication."
         },
         "JWT": {
-          "TITLE": "Configure your JWT Identity Provider",
+          "TITLE": "Use JWTs as federated Identities",
           "DESCRIPTION": "The JWT Identity Provider enables you to use your existing JWT tokens as federated identities. This feature is handy if you already have an issuer for JWTs. With a JWT IdP, you can use these JWTs to create and update users in ZITADEL on-the-fly."
+        },
+        "LDAP": {
+          "TITLE": "Configure ZITADEL to connect to your LDAP Identity Provider",
+          "DESCRIPTION": "Provide the connection details to your LDAP server and configure the mapping of your LDAP attributes to ZITADEL attributes."
         },
         "AUTOFILL": {
           "TITLE": "Autofill user data",
@@ -107,10 +112,7 @@
         },
         "ACTIVATE": {
           "TITLE": "Activate the IdP",
-          "DESCRIPTION": {
-            "ORG": "Your IdP is not active yet. Activate it to allow your users to log in.",
-            "INSTANCE": "Your IdP is not active yet. Activate it to allow your users across all organizations to log in."
-          }
+          "DESCRIPTION": "Your IdP is not active yet. Activate it to allow your users to log in."
         }
       },
       "PW_COMPLEXITY": {
@@ -1530,7 +1532,8 @@
       "DESCRIPTIONCREATEADMIN": "Users can choose from the available identity providers below.",
       "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organization only.",
       "LIFETIME_INVALID": "Form contains invalid value(s).",
-      "SAVED": "Saved successfully!"
+      "SAVED": "Saved successfully!",
+      "PROVIDER_ADDED": "Identity provider activated."
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "Set your Privacy Policy and Terms of Service Links",

@@ -1,7 +1,7 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {ManagementService} from "../../../services/mgmt.service";
-import {AdminService} from "../../../services/admin.service";
-import {PolicyComponentServiceType} from "../../policies/policy-component-types.enum";
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ManagementService } from '../../../services/mgmt.service';
+import { AdminService } from '../../../services/admin.service';
+import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 export interface CopyUrl {
   label: string;
@@ -22,7 +22,6 @@ export class ProviderNextComponent {
   @Input() configureTitle?: string;
   @Input() configureDescription?: string;
   @Input() configureLink?: string;
-  @Input() isInstance?: boolean;
   @Input() expanded?: boolean;
   @Output() activate = new EventEmitter<void>();
 

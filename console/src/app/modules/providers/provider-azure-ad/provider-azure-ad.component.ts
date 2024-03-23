@@ -10,13 +10,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateAzureADProviderRequest as AdminUpdateAzureADProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import {
-  AzureADTenant,
-  AzureADTenantType,
-  IDPOwnerType,
-  Options,
-  Provider
-} from 'src/app/proto/generated/zitadel/idp_pb';
+import { AzureADTenant, AzureADTenantType, IDPOwnerType, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddAzureADProviderRequest as MgmtAddAzureADProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -41,9 +35,13 @@ import { ProviderNextDialogComponent } from '../provider-next/provider-next-dial
 export class ProviderAzureADComponent {
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
+  // DEPRECATED: use id$ instead
   public id: string | null = '';
+  // DEPRECATED: assert service$ instead
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  // DEPRECATED: use service$ instead
   private service!: ManagementService | AdminService;
+
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
@@ -62,8 +60,24 @@ export class ProviderAzureADComponent {
     AzureADTenantType.AZURE_AD_TENANT_TYPE_CONSUMERS,
   ];
 
-  private autofillLink$ = new BehaviorSubject<string>('');
-  public activateLink$ = new BehaviorSubject<string>('');
+  public justCreated$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  public justActivated$ = new BehaviorSubject<boolean>(false);
+
+  private service$ = this.nextSvc.service(this.route.data);
+  private id$ = this.nextSvc.id(this.route.paramMap, this.justCreated$);
+  public exists$ = this.nextSvc.exists(this.id$);
+  public autofillLink$ = this.nextSvc.autofillLink(
+    this.id$,
+    `https://zitadel.com/docs/guides/integrate/identity-providers/additional-information`,
+  );
+  public activateLink$ = this.nextSvc.activateLink(
+    this.id$,
+    this.justActivated$,
+    'https://zitadel.com/docs/guides/integrate/identity-providers/azure-ad-oidc#activate-idp',
+    this.service$,
+  );
+  public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
+  public copyUrls$ = this.nextSvc.callbackUrls();
 
   constructor(
     private authService: GrpcAuthService,
@@ -72,10 +86,8 @@ export class ProviderAzureADComponent {
     private injector: Injector,
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
-    private dialog: MatDialog,
-    nextSvc: ProviderNextService,
+    private nextSvc: ProviderNextService,
   ) {
-
     this.form = new FormGroup({
       name: new FormControl('', []),
       clientId: new FormControl('', [requiredValidator]),
@@ -135,19 +147,10 @@ export class ProviderAzureADComponent {
         this.getData(this.id);
       }
     });
+  }
 
-    this.setActive(false);
-    nextSvc.next(
-      'Microsoft',
-      this.activateLink$,
-      this.serviceType === PolicyComponentServiceType.ADMIN,
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE',
-      'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION',
-      'https://zitadel.com/docs/guides/integrate/identity-providers/azure-ad-oidc#entra-id-configuration',
-      this.autofillLink$,
-      () => [],
-    );
-
+  public activate() {
+    this.nextSvc.activate(this.id$, this.justActivated$, this.service$);
   }
 
   private getData(id: string): void {
@@ -191,17 +194,10 @@ export class ProviderAzureADComponent {
         this.toast.showError(error);
         this.loading = false;
       });
-    this.service.getLoginPolicy()
-      .then((policy) => {
-        this.setActive(!!policy.policy?.idpsList.find(idp => idp.idpId === this.id));
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
   }
 
   public submitForm(): void {
-    this.provider ? this.updateAzureADProvider() : this.addAzureADProvider();
+    this.provider  || this.justCreated$.value ? this.updateAzureADProvider() : this.addAzureADProvider();
   }
 
   public addAzureADProvider(): void {
@@ -230,7 +226,7 @@ export class ProviderAzureADComponent {
     this.service
       .addAzureADProvider(req)
       .then((addedIDP) => {
-        this.showAutofillGuide();
+        this.justCreated$.next(addedIDP.id);
         this.loading = false;
       })
       .catch((error) => {
@@ -239,22 +235,14 @@ export class ProviderAzureADComponent {
       });
   }
 
-  public activate(id: string) {
-    this.service.addIDPToLoginPolicy(id, this.serviceType === PolicyComponentServiceType.ADMIN ? IDPOwnerType.IDP_OWNER_TYPE_SYSTEM : IDPOwnerType.IDP_OWNER_TYPE_ORG).then(() => {
-      this.toast.showInfo('POLICY.TOAST.ADDIDP', true);
-      this.setActive(true);
-      this.id = id;
-    });
-  }
-
   public updateAzureADProvider(): void {
-    if (this.provider) {
+    if (this.provider  || this.justCreated$.value) {
       const req =
         this.serviceType === PolicyComponentServiceType.MGMT
           ? new MgmtUpdateAzureADProviderRequest()
           : new AdminUpdateAzureADProviderRequest();
 
-      req.setId(this.provider.id);
+      req.setId(this.provider?.id  || this.justCreated$.value);
       req.setName(this.name?.value);
       req.setClientId(this.clientId?.value);
       req.setEmailVerified(this.emailVerified?.value);
@@ -316,14 +304,6 @@ export class ProviderAzureADComponent {
         this.scopesList.value.splice(index, 1);
       }
     }
-  }
-
-  private showAutofillGuide(): void {
-    this.autofillLink$.next('https://zitadel.com/docs/guides/integrate/identity-providers/additional-information');
-  }
-
-  private setActive(active: boolean) {
-    this.activateLink$.next(active ? '' : 'https://zitadel.com/docs/guides/integrate/identity-providers/azure-ad-oidc#activate-idp');
   }
 
   public get name(): AbstractControl | null {

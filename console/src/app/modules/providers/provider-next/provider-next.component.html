@@ -1,25 +1,40 @@
-<cnsl-card title="What now? (Translate)" [expanded]="!!expanded" *ngIf="configureProvider || autofillLink || activateLink">
+<cnsl-card [title]="'DESCRIPTIONS.SETTINGS.IDPS.NEXT' | translate" [expanded]="!!expanded" *ngIf="configureProvider || autofillLink || activateLink">
   <cnsl-info-section *ngIf="activateLink">
-    <div class="row">
-      <h2>{{ 'DESCRIPTIONS.SETTINGS.IDPS.ACTIVATE.TITLE' | translate }}</h2>
-      <a mat-icon-button *ngIf="activateLink" card-actions mat-icon-button [href]="activateLink" rel="noreferrer" target="_blank">
-        <mat-icon class="icon">info_outline</mat-icon>
-      </a>
-      <button
-        color="primary"
-        mat-raised-button
-        class="continue-button"
-        (click)="activate.emit()"
-      >
-        {{ 'ACTIONS.ACTIVATE' | translate }}
-      </button>
+    <div class="row box">
+      <div class="row left">
+        <h2>{{ 'DESCRIPTIONS.SETTINGS.IDPS.ACTIVATE.TITLE' | translate }}</h2>
+        <a
+          mat-icon-button
+          *ngIf="activateLink"
+          card-actions
+          mat-icon-button
+          [href]="activateLink"
+          rel="noreferrer"
+          target="_blank"
+        >
+          <mat-icon class="icon">info_outline</mat-icon>
+        </a>
+      </div>
+      <div class="right">
+        <button color="primary" mat-raised-button class="continue-button" (click)="activate.emit()">
+          {{ 'ACTIONS.ACTIVATE' | translate }}
+        </button>
+      </div>
     </div>
-    <p class="cnsl-secondary-text">{{ (isInstance ? 'DESCRIPTIONS.SETTINGS.IDPS.ACTIVATE.DESCRIPTION.INSTANCE' : 'DESCRIPTIONS.SETTINGS.IDPS.ACTIVATE.DESCRIPTION.ORG') | translate }}</p>
+    <p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.IDPS.ACTIVATE.DESCRIPTION' | translate }}</p>
   </cnsl-info-section>
   <div class="section" *ngIf="configureProvider">
     <div class="row">
       <h2>{{ configureTitle }}</h2>
-      <a mat-icon-button *ngIf="configureLink" card-actions mat-icon-button [href]="configureLink" rel="noreferrer" target="_blank">
+      <a
+        mat-icon-button
+        *ngIf="configureLink"
+        card-actions
+        mat-icon-button
+        [href]="configureLink"
+        rel="noreferrer"
+        target="_blank"
+      >
         <mat-icon class="icon">info_outline</mat-icon>
       </a>
     </div>
@@ -27,16 +42,24 @@
     <cnsl-copy-row *ngFor="let row of copyUrls" [label]="row.label" [value]="row.url" labelMinWidth="200px">
       <a *ngIf="row.downloadable" class="download-button" mat-stroked-button [href]="row.url" download>{{
         'ACTIONS.DOWNLOAD' | translate
-        }}</a>
+      }}</a>
     </cnsl-copy-row>
   </div>
   <div class="section" *ngIf="autofillLink">
     <div class="row">
-    <h2>{{ 'DESCRIPTIONS.SETTINGS.IDPS.AUTOFILL.TITLE' | translate }}</h2>
-    <a mat-icon-button *ngIf="autofillLink" card-actions mat-icon-button [href]="autofillLink" rel="noreferrer" target="_blank">
-      <mat-icon class="icon">info_outline</mat-icon>
-    </a>
-      </div>
+      <h2>{{ 'DESCRIPTIONS.SETTINGS.IDPS.AUTOFILL.TITLE' | translate }}</h2>
+      <a
+        mat-icon-button
+        *ngIf="autofillLink"
+        card-actions
+        mat-icon-button
+        [href]="autofillLink"
+        rel="noreferrer"
+        target="_blank"
+      >
+        <mat-icon class="icon">info_outline</mat-icon>
+      </a>
+    </div>
     <p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.IDPS.AUTOFILL.DESCRIPTION' | translate }}</p>
   </div>
 </cnsl-card>

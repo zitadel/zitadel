@@ -196,16 +196,16 @@
 }
 
 .cnsl-state-dot {
-              height: 8px;
-              width: 8px;
-              border-radius: 50%;
-              flex-shrink: 0;
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
 
-              &.active {
-                background-color: var(--success);
-              }
+  &.active {
+    background-color: var(--success);
+  }
 
-              &.inactive {
-                background-color: var(--warn);
-              }
-            }
+  &.inactive {
+    background-color: var(--warn);
+  }
+}
