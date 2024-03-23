@@ -114,15 +114,15 @@ If you are using a self hosted instance, [install](/docs/apis/resources/system/s
 The login using our cloud service is still experimental, but you can purchase your domain on zitadel.com, install it on your domain following [our guide](/docs/guides/manage/cloud/instances#add-custom-domain).
 After your domain has been verified, you can reconfigure your DNS settings in order to deploy the login on your own.
 
-## Setup
+### Setup
 
-### Proxy / Next.js middleware
+#### Proxy / Next.js middleware
 
 Make sure the host of the login is set in your instance.
 To detect the proxy, `x-zitadel-login-client` and `x-zitadel-forwarded` must be set as request headers.
 `x-zitadel-login-client` is the ID of the service user, `x-zitadel-forwarded` falls back to the host.
 
-### Deploy to Vercel
+#### Deploy to Vercel
 
 To deploy your own version on Vercel, navigate to your instance and create a service user.
 Copy its id from the overview and set it as ZITADEL_SERVICE_USER_ID.
