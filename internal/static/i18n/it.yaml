@@ -60,7 +60,6 @@ Errors:
   Notification:
     NoDomain: Nessun dominio trovato per il messaggio
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: L'utente non è stato trovato
     AlreadyExists: L'utente già esistente
     NotFoundOnOrg: L'utente non è stato trovato nell'organizzazione scelta
@@ -480,6 +479,7 @@ Errors:
     CloseRows: Lo statement SQL non può essere terminato
     SQLStatement: Lo statement SQL non può essere creato
     InvalidRequest: La richiesta non è valida
+    TooManyNestingLevels: Troppi livelli di nidificazione delle query (massimo 20)
   Quota:
     AlreadyExists: La quota esiste già per questa unità
     NotFound: Quota non trovata per questa unità
@@ -547,7 +547,27 @@ Errors:
     NotFound: Esecuzione non trovata
     IncludeNotFound: Includi non trovato
     NoTargets: Nessun obiettivo definito
-
+  UserSchema:
+    NotEnabled: La funzionalità "Schema utente" non è abilitata
+    Type:
+      Missing: Tipo di schema utente mancante
+      AlreadyExists: Il tipo di schema utente esiste già
+    Authenticator:
+      Invalid: Tipo di autenticatore non valido
+    NotActive: Schema utente non attivo
+    NotInactive: Schema utente non inattivo
+    NotExists: Lo schema utente non esiste
+  TokenExchange:
+    FeatureDisabled: La funzionalità di scambio token è disabilitata per la tua istanza. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Manca il gettone
+      Invalid: Il token non è valido
+      TypeMissing: Manca il tipo di token
+      TypeNotAllowed: Il tipo di token non è consentito
+      TypeNotSupported: Il tipo di token non è supportato
+      NotForAPI: Token rappresentati non consentiti per l'API
+    Impersonation:
+      PolicyDisabled: La rappresentazione è disabilitata nella policy di sicurezza dell'istanza
 
 AggregateTypes:
   action: Azione
@@ -561,6 +581,7 @@ AggregateTypes:
   feature: Funzionalità
   target: Bersaglio
   execution: Esecuzione
+  user_schema: Schema utente
 
 EventTypes:
   execution:
@@ -582,6 +603,7 @@ EventTypes:
         failed: Controllo dell'inizializzazione fallito
     token:
       added: Access Token creato
+    impersonated: Utente impersonificato
     username:
       reserved: Nome utente riservato
       released: Nome utente rilasciato
@@ -1067,6 +1089,12 @@ EventTypes:
     deactivated: Azione disattivata
     reactivated: Azione riattivata
     removed: Azione rimossa
+  user_schema:
+    created: Schema utente creato
+    updated: Schema utente aggiornato
+    deactivated: Schema utente disattivato
+    reactivated: Schema utente riattivato
+    deleted: Schema utente eliminato
 
 Application:
   OIDC:

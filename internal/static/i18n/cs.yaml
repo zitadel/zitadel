@@ -478,6 +478,7 @@ Errors:
     CloseRows: SQL příkaz nemohl být dokončen
     SQLStatement: SQL příkaz nemohl být vytvořen
     InvalidRequest: Požadavek je neplatný
+    TooManyNestingLevels: Příliš mnoho úrovní vnoření dotazů (max. 20)
   Quota:
     AlreadyExists: Kvóta pro tuto jednotku již existuje
     NotFound: Kvóta pro tuto jednotku nenalezena
@@ -543,6 +544,27 @@ Errors:
     NotFound: Provedení nenalezeno
     IncludeNotFound: Zahrnout nenalezeno
     NoTargets: Nejsou definovány žádné cíle
+  UserSchema:
+    NotEnabled: Funkce "Uživatelské schéma" není povolena
+    Type:
+      Missing: Chybí typ uživatelského schématu
+      AlreadyExists: Typ uživatelského schématu již existuje
+    Authenticator:
+      Invalid: Neplatný typ ověřovače
+    NotActive: Uživatelské schéma není aktivní
+    NotInactive: Uživatelské schéma není neaktivní
+    NotExists: Uživatelské schéma neexistuje
+  TokenExchange:
+    FeatureDisabled: Funkce Token Exchange je pro vaši instanci zakázána. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Token chybí
+      Invalid: Token je neplatný
+      TypeMissing: Chybí typ tokenu
+      TypeNotAllowed: Typ tokenu není povolen
+      TypeNotSupported: Typ tokenu není podporován
+      NotForAPI: Zosobněné tokeny nejsou pro API povoleny
+    Impersonation:
+      PolicyDisabled: Zosobnění je zakázáno v zásadách zabezpečení instance
 
 AggregateTypes:
   action: Akce
@@ -556,6 +578,7 @@ AggregateTypes:
   feature: Funkce
   target: Cíl
   execution: Provedení
+  user_schema: Uživatelské schéma
 
 EventTypes:
   execution:
@@ -578,6 +601,7 @@ EventTypes:
     token:
       added: Přístupový token vytvořen
       removed: Přístupový token odstraněn
+    impersonated: Usuario suplantado
     username:
       reserved: Uživatelské jméno rezervováno
       released: Uživatelské jméno uvolněno
@@ -1233,6 +1257,12 @@ EventTypes:
         password:
           changed: Heslo konfigurace SMTP změněno
         removed: Konfigurace SMTP odstraněna
+  user_schema:
+    created: Vytvořeno uživatelské schéma
+    updated: Uživatelské schéma bylo aktualizováno
+    deactivated: Uživatelské schéma deaktivováno
+    reactivated: Uživatelské schéma bylo znovu aktivováno
+    deleted: Uživatelské schéma bylo smazáno
 
 Application:
   OIDC:

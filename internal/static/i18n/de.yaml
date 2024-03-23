@@ -60,7 +60,6 @@ Errors:
   Notification:
     NoDomain: Keine Domäne für Nachricht gefunden
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: Benutzer konnte nicht gefunden werden
     AlreadyExists: Benutzer existiert bereits
     NotFoundOnOrg: Benutzer konnte in der gewünschten Organisation nicht gefunden werden
@@ -479,6 +478,7 @@ Errors:
     CloseRows: SQL Statement konnte nicht abgeschlossen werden
     SQLStatement: SQL Statement konnte nicht erstellt werden
     InvalidRequest: Anfrage ist ungültig
+    TooManyNestingLevels: Zu viele Abfrageverschachtelungsebenen (maximal 20)
   Quota:
     AlreadyExists: Das Kontingent existiert bereits für diese Einheit
     NotFound: Kontingent für diese Einheit nicht gefunden
@@ -546,6 +546,27 @@ Errors:
     NotFound: Ausführung nicht gefunden
     IncludeNotFound: Einschließen nicht gefunden
     NoTargets: Keine Ziele definiert
+  UserSchema:
+    NotEnabled: Funktion Benutzerschema ist nicht aktiviert
+    Type:
+      Missing: Benutzerschematyp fehlt
+      AlreadyExists: Benutzerschematyp existiert bereits
+    Authenticator:
+      Invalid: Ungültiger Authentifizierungstyp
+    NotActive: Benutzerschema nicht aktiv
+    NotInactive: Benutzerschema nicht inaktiv
+    NotExists: Benutzerschema existiert nicht
+  TokenExchange:
+    FeatureDisabled: Die Token-Austauschfunktion ist für Ihre Instanz deaktiviert. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Token fehlt
+      Invalid: Token ist ungültig
+      TypeMissing: Der Tokentyp fehlt
+      TypeNotAllowed: Der Tokentyp ist nicht zulässig
+      TypeNotSupported: Der Tokentyp wird nicht unterstützt
+      NotForAPI: Imitierte Token sind für die API nicht zulässig
+    Impersonation:
+      PolicyDisabled: Der Identitätswechsel ist in der Sicherheitsrichtlinie der Instanz deaktiviert
 
 AggregateTypes:
   action: Action
@@ -559,6 +580,7 @@ AggregateTypes:
   feature: Feature
   target: Ziel
   execution: Ausführung
+  user_schema: Benutzerschema
 
 EventTypes:
   execution:
@@ -581,6 +603,7 @@ EventTypes:
     token:
       added: Access Token ausgestellt
       removed: Access Token gelöscht
+    impersonated: Benutzer hat sich als Benutzer ausgegeben
     username:
       reserved: Benutzername reserviert
       released: Benutzername freigegeben
@@ -1236,6 +1259,12 @@ EventTypes:
         password:
           changed: Passwort von SMTP Konfiguration geändert
         removed: SMTP Konfiguration gelöscht
+  user_schema:
+    created: Benutzerschema erstellt
+    updated: Benutzerschema geändert
+    deactivated: Benutzerschema deaktiviert
+    reactivated: Benutzerschema reaktiviert
+    deleted: Benutzerschema gelöscht
 
 Application:
   OIDC:

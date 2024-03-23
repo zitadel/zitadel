@@ -1440,14 +1440,18 @@ func TestCommandSide_AddUserToken(t *testing.T) {
 	}
 	type (
 		args struct {
-			ctx      context.Context
-			orgID    string
-			agentID  string
-			clientID string
-			userID   string
-			audience []string
-			scopes   []string
-			lifetime time.Duration
+			ctx                   context.Context
+			orgID                 string
+			agentID               string
+			clientID              string
+			userID                string
+			audience              []string
+			scopes                []string
+			authMethodsReferences []string
+			lifetime              time.Duration
+			authTime              time.Time
+			reason                domain.TokenReason
+			actor                 *domain.TokenActor
 		}
 	)
 	type res struct {
@@ -1500,7 +1504,7 @@ func TestCommandSide_AddUserToken(t *testing.T) {
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			got, err := r.AddUserToken(tt.args.ctx, tt.args.orgID, tt.args.agentID, tt.args.clientID, tt.args.userID, tt.args.audience, tt.args.scopes, tt.args.lifetime)
+			got, err := r.AddUserToken(tt.args.ctx, tt.args.orgID, tt.args.agentID, tt.args.clientID, tt.args.userID, tt.args.audience, tt.args.scopes, tt.args.authMethodsReferences, tt.args.lifetime, tt.args.authTime, tt.args.reason, tt.args.actor)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1565,7 +1569,11 @@ func TestCommands_RevokeAccessToken(t *testing.T) {
 								"refreshTokenID",
 								[]string{"clientID"},
 								[]string{"openid"},
+								[]string{"password"},
 								time.Now(),
+								time.Now(),
+								domain.TokenReasonAuthRequest,
+								nil,
 							),
 						),
 					),
@@ -1597,7 +1605,11 @@ func TestCommands_RevokeAccessToken(t *testing.T) {
 								"refreshTokenID",
 								[]string{"clientID"},
 								[]string{"openid"},
+								[]string{"password"},
+								time.Now(),
 								time.Now().Add(5*time.Hour),
+								domain.TokenReasonAuthRequest,
+								nil,
 							),
 						),
 					),
