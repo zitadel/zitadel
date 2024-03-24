@@ -1,9 +1,6 @@
-The login policy can be configured on two levels. Once in the default settings and this can be overwritten for each organization.
-The only difference is where you configure it. Go either to the settings page of a specific organization or to the default settings page.
-Default Settings: $YOUR-DOMAIN/ui/console/instance?id=general
-Organization: Choose the organization in the menu and go to $YOUR-DOMAIN/ui/console/org-settings?id=login
-
 1. Go to the Settings
+    - To allow external IdP logins by default, go to your instance default settings at `$YOUR-DOMAIN/ui/console/instance?id=general`
+    - To allow external IdP logins on an organization, go to `$YOUR-DOMAIN/ui/console/org-settings?id=login` and ensure you have the right org context.
 2. Modify your login policy in the menu "Login Behavior and Security"
 3. Enable the attribute "External IDP allowed"
 

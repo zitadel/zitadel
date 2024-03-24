@@ -16,7 +16,7 @@ import PrefillAction from './_prefill_action.mdx';
 
 ## Open the GitHub Identity Provider Template
 
-<IDPsOverview templates="Google"/>
+<IDPsOverview templates="GitHub or GitHub Enterprise Server"/>
 
 Click on the ZITADEL Callback URL to copy it to your clipboard.
 You will have to paste it to the GitHub OAuth application later.
@@ -36,7 +36,7 @@ You will have to paste it to the GitHub OAuth application later.
 
 ![Register an OAuth application](/img/guides/github_oauth_app_registration.png)
 
-### Client ID and Secret
+### Client ID and secret
 
 After clicking "Register application", you see the detail page of the application you have just created.
 Copy the client ID directly from the detail page.
@@ -48,13 +48,14 @@ Make sure to save the secret, as you will not be able to show it again.
 ## ZITADEL Configuration
 
 Go back to the GitHub provider template you [opened before in ZITADEL](#open-the-github-identity-provider-template).
-Add the [client ID and secret you created before when you registered your GitHub OAuth application](#client-id-and-client-secret).
+Add the [client ID and secret you created before when you registered your GitHub OAuth application](#client-id-and-secret).
 
 You can optionally configure the following settings.
 A useful default will be filled if you don't change anything.
 
 **Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
-This information is used to create and/or update the user within ZITADEL. ZITADEL ensures that at least the `openid`-scope is always sent.
+This information is used to create and/or update the user within ZITADEL.
+ZITADEL ensures that at least the `openid`-scope is always sent.
 
 <GeneralConfigDescription provider_account="GitHub account" />
 
