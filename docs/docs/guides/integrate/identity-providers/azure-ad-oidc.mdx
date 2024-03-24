@@ -29,7 +29,7 @@ You need to have access to an Entra ID Tenant. If you do not yet have one follow
 
 1. Browse to the [App registration menus create dialog](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/CreateApplicationBlade/quickStartType~/null/isMSAApp~/false) to create a new app.
 2. Give the application a name and choose who should be able to login (Single-Tenant, Multi-Tenant, Personal Accounts, etc.) This setting will also have an impact on how to configure the provider later on in ZITADEL.
-3. Choose "Web" in the redirect uri field and paste the ZITADEL Callback URL you copied before.
+3. Choose "Web" in the redirect uri field and [paste the ZITADEL Callback URL you copied before](#open-the-microsoft-identity-provider-template).
 4. Save the Application (client) ID and the Directory (tenant) ID from the detail page
 5. Register the application
 
@@ -69,8 +69,8 @@ To be able to get all the information that ZITADEL needs, you have to configure 
 
 ## ZITADEL Configuration
 
-Go back to the Microsoft provider template you opened before.
-Add the client ID and secret created before on your Entra ID application.
+Go back to the Microsoft provider template you [opened before in ZITADEL](#open-the-microsoft-identity-provider-template).
+Add the client ID and secret [created before on your Entra ID application](#add-client-secret).
 
 You can optionally configure the following settings.
 A useful default will be filled if you don't change anything.
