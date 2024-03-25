@@ -11,13 +11,15 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { firstname, lastname, email } = searchParams;
+  const { firstname, lastname, email, organization, authRequestId } =
+    searchParams;
 
   const setPassword = !!(firstname && lastname && email);
 
   const legal = await getLegalAndSupportSettings(server);
   const passwordComplexitySettings = await getPasswordComplexitySettings(
-    server
+    server,
+    organization
   );
 
   return setPassword ? (
@@ -31,6 +33,8 @@ export default async function Page({
           email={email}
           firstname={firstname}
           lastname={lastname}
+          organization={organization}
+          authRequestId={authRequestId}
         ></SetPasswordForm>
       )}
     </div>
@@ -42,6 +46,8 @@ export default async function Page({
       {legal && passwordComplexitySettings && (
         <RegisterFormWithoutPassword
           legal={legal}
+          organization={organization}
+          authRequestId={authRequestId}
         ></RegisterFormWithoutPassword>
       )}
     </div>

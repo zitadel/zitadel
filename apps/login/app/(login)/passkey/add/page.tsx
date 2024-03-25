@@ -9,22 +9,25 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName, prompt, organization } = searchParams;
+  const { loginName, promptPasswordless, organization } = searchParams;
 
   const sessionFactors = await loadSession(loginName);
 
   async function loadSession(loginName?: string) {
-    const recent = await getMostRecentCookieWithLoginname(loginName);
+    const recent = await getMostRecentCookieWithLoginname(
+      loginName,
+      organization
+    );
     return getSession(server, recent.id, recent.token).then((response) => {
       if (response?.session) {
         return response.session;
       }
     });
   }
-  const title = !!prompt
+  const title = !!promptPasswordless
     ? "Authenticate with a passkey"
     : "Use your passkey to confirm it's really you";
-  const description = !!prompt
+  const description = !!promptPasswordless
     ? "When set up, you will be able to authenticate without a password."
     : "Your device will ask for your fingerprint, face, or screen lock";
 
@@ -65,7 +68,10 @@ export default async function Page({
       )}
 
       {sessionFactors?.id && (
-        <RegisterPasskey sessionId={sessionFactors.id} isPrompt={!!prompt} />
+        <RegisterPasskey
+          sessionId={sessionFactors.id}
+          isPrompt={!!promptPasswordless}
+        />
       )}
     </div>
   );

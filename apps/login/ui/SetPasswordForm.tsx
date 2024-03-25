@@ -15,6 +15,7 @@ import {
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
+import { AuthRequest } from "@zitadel/server";
 
 type Inputs =
   | {
@@ -28,6 +29,8 @@ type Props = {
   email: string;
   firstname: string;
   lastname: string;
+  organization?: string;
+  authRequestId?: string;
 };
 
 export default function SetPasswordForm({
@@ -35,6 +38,8 @@ export default function SetPasswordForm({
   email,
   firstname,
   lastname,
+  organization,
+  authRequestId,
 }: Props) {
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onBlur",
@@ -56,6 +61,8 @@ export default function SetPasswordForm({
         email: email,
         firstName: firstname,
         lastName: lastname,
+        organization: organization,
+        authRequestId: authRequestId,
         password: values.password,
       }),
     });
@@ -79,7 +86,8 @@ export default function SetPasswordForm({
       body: JSON.stringify({
         loginName: loginName,
         password: password,
-        // authRequestId, register does not need an oidc callback
+        organization: organization,
+        authRequestId, //, register does not need an oidc callback
       }),
     });
 

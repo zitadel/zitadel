@@ -148,7 +148,8 @@ export async function getSessionCookieById(id: string): Promise<SessionCookie> {
 }
 
 export async function getSessionCookieByLoginName(
-  loginName: string
+  loginName: string,
+  organization?: string
 ): Promise<SessionCookie> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
@@ -156,7 +157,11 @@ export async function getSessionCookieByLoginName(
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
 
-    const found = sessions.find((s) => s.loginName === loginName);
+    const found = sessions.find((s) =>
+      s.loginName === loginName && organization
+        ? s.organization === organization
+        : true
+    );
     if (found) {
       return found;
     } else {

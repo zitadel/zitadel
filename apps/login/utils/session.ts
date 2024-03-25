@@ -19,7 +19,8 @@ export async function createSessionAndUpdateCookie(
   loginName: string,
   password: string | undefined,
   challenges: RequestChallenges | undefined,
-  authRequestId: string | undefined
+  organization?: string,
+  authRequestId?: string
 ): Promise<Session> {
   const createdSession = await createSessionForLoginname(
     server,
@@ -47,6 +48,10 @@ export async function createSessionAndUpdateCookie(
 
         if (authRequestId) {
           sessionCookie.authRequestId = authRequestId;
+        }
+
+        if (organization) {
+          sessionCookie.organization = organization;
         }
 
         return addSessionToCookie(sessionCookie).then(() => {
@@ -95,6 +100,8 @@ export async function createSessionForUserIdAndUpdateCookie(
           sessionCookie.authRequestId = authRequestId;
         }
 
+        if ()
+
         return addSessionToCookie(sessionCookie).then(() => {
           return response.session as Session;
         });
@@ -113,6 +120,7 @@ export async function createSessionForIdpAndUpdateCookie(
     idpIntentId?: string | undefined;
     idpIntentToken?: string | undefined;
   },
+  organization: string | undefined,
   authRequestId: string | undefined
 ): Promise<Session> {
   const createdSession = await createSessionForUserIdAndIdpIntent(
@@ -140,6 +148,10 @@ export async function createSessionForIdpAndUpdateCookie(
 
         if (authRequestId) {
           sessionCookie.authRequestId = authRequestId;
+        }
+
+        if (organization) {
+          sessionCookie.organization = organization;
         }
 
         return addSessionToCookie(sessionCookie).then(() => {

@@ -17,12 +17,20 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   const body = await request.json();
   if (body) {
-    const { userId, idpIntent, loginName, password, authRequestId } = body;
+    const {
+      userId,
+      idpIntent,
+      loginName,
+      password,
+      organization,
+      authRequestId,
+    } = body;
 
     if (userId && idpIntent) {
       return createSessionForIdpAndUpdateCookie(
         userId,
         idpIntent,
+        organization,
         authRequestId
       ).then((session) => {
         return NextResponse.json(session);
@@ -32,7 +40,8 @@ export async function POST(request: NextRequest) {
         loginName,
         password,
         undefined,
-        undefined
+        organization,
+        authRequestId
       ).then((session) => {
         return NextResponse.json(session);
       });
@@ -54,11 +63,11 @@ export async function PUT(request: NextRequest) {
   const body = await request.json();
 
   if (body) {
-    const { loginName, password, webAuthN, authRequestId } = body;
+    const { loginName, organization, password, webAuthN, authRequestId } = body;
     const challenges: RequestChallenges = body.challenges;
 
     const recentPromise: Promise<SessionCookie> = loginName
-      ? getSessionCookieByLoginName(loginName).catch((error) => {
+      ? getSessionCookieByLoginName(loginName, organization).catch((error) => {
           return Promise.reject(error);
         })
       : getMostRecentSessionCookie().catch((error) => {

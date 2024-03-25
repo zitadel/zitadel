@@ -94,12 +94,18 @@ export async function getLegalAndSupportSettings(
 }
 
 export async function getPasswordComplexitySettings(
-  server: ZitadelServer
+  server: ZitadelServer,
+  organization?: string
 ): Promise<PasswordComplexitySettings | undefined> {
   const settingsService = settings.getSettings(server);
 
   return settingsService
-    .getPasswordComplexitySettings({}, {})
+    .getPasswordComplexitySettings(
+      organization
+        ? { ctx: { orgId: organization } }
+        : { ctx: { instance: true } },
+      {}
+    )
     .then((resp: GetPasswordComplexitySettingsResponse) => resp.settings);
 }
 

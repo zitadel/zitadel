@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 
 type Props = {
   userId: string;
+  organization: string;
   idpIntent: {
     idpIntentId: string;
     idpIntentToken: string;
@@ -31,6 +32,7 @@ export default function IdpSignin(props: Props) {
         userId: props.userId,
         idpIntent: props.idpIntent,
         authRequestId: props.authRequestId,
+        organization: props.organization,
       }),
     });
 

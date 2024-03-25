@@ -14,6 +14,7 @@ type Inputs = {
 
 type Props = {
   loginName?: string;
+  organization?: string;
   authRequestId?: string;
   isAlternative?: boolean; // whether password was requested as alternative auth method
   promptPasswordless?: boolean;
@@ -21,6 +22,7 @@ type Props = {
 
 export default function PasswordForm({
   loginName,
+  organization,
   authRequestId,
   promptPasswordless,
   isAlternative,
@@ -46,6 +48,7 @@ export default function PasswordForm({
       },
       body: JSON.stringify({
         loginName,
+        organization,
         password: values.password,
         authRequestId,
       }),
@@ -69,36 +72,45 @@ export default function PasswordForm({
         promptPasswordless && // if explicitly prompted due policy
         !isAlternative // escaped if password was used as an alternative method
       ) {
-        return router.push(
-          `/passkey/add?` +
-            new URLSearchParams({
-              loginName: resp.factors.user.loginName,
-              promptPasswordless: "true",
-            })
-        );
+        const params = new URLSearchParams({
+          loginName: resp.factors.user.loginName,
+          promptPasswordless: "true",
+        });
+
+        if (organization) {
+          params.append("organization", organization);
+        }
+
+        return router.push(`/passkey/add?` + params);
       } else {
         if (authRequestId && resp && resp.sessionId) {
-          return router.push(
-            `/login?` +
-              new URLSearchParams({
-                sessionId: resp.sessionId,
-                authRequest: authRequestId,
-              })
-          );
+          const params = new URLSearchParams({
+            sessionId: resp.sessionId,
+            authRequest: authRequestId,
+          });
+
+          if (organization) {
+            params.append("organization", organization);
+          }
+
+          return router.push(`/login?` + params);
         } else {
-          return router.push(
-            `/signedin?` +
-              new URLSearchParams(
-                authRequestId
-                  ? {
-                      loginName: resp.factors.user.loginName,
-                      authRequestId,
-                    }
-                  : {
-                      loginName: resp.factors.user.loginName,
-                    }
-              )
+          const params = new URLSearchParams(
+            authRequestId
+              ? {
+                  loginName: resp.factors.user.loginName,
+                  authRequestId,
+                }
+              : {
+                  loginName: resp.factors.user.loginName,
+                }
           );
+
+          if (organization) {
+            params.append("organization", organization);
+          }
+
+          return router.push(`/signedin?` + params);
         }
       }
     });

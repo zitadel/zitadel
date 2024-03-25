@@ -23,9 +23,15 @@ type Inputs =
 
 type Props = {
   legal: LegalAndSupportSettings;
+  organization?: string;
+  authRequestId?: string;
 };
 
-export default function RegisterFormWithoutPassword({ legal }: Props) {
+export default function RegisterFormWithoutPassword({
+  legal,
+  organization,
+  authRequestId,
+}: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
@@ -66,7 +72,8 @@ export default function RegisterFormWithoutPassword({ legal }: Props) {
       },
       body: JSON.stringify({
         loginName: loginName,
-        // authRequestId, register does not need an oidc callback at the end
+        organization: organization,
+        authRequestId: authRequestId,
       }),
     });
 

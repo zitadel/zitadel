@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
     const userId = session?.session?.factors?.user?.id;
 
     if (userId) {
+      // TODO: add org context
       return createPasskeyRegistrationLink(userId)
         .then((resp) => {
           const code = resp.code;

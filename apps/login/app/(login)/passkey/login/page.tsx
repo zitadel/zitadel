@@ -13,12 +13,15 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName, altPassword, authRequestId } = searchParams;
+  const { loginName, altPassword, authRequestId, organization } = searchParams;
 
-  const sessionFactors = await loadSession(loginName);
+  const sessionFactors = await loadSession(loginName, organization);
 
-  async function loadSession(loginName?: string) {
-    const recent = await getMostRecentCookieWithLoginname(loginName);
+  async function loadSession(loginName?: string, organization?: string) {
+    const recent = await getMostRecentCookieWithLoginname(
+      loginName,
+      organization
+    );
     return getSession(server, recent.id, recent.token).then((response) => {
       if (response?.session) {
         return response.session;
@@ -50,6 +53,7 @@ export default async function Page({
           loginName={loginName}
           authRequestId={authRequestId}
           altPassword={altPassword === "true"}
+          organization={organization}
         />
       )}
     </div>

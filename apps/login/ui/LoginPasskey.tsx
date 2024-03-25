@@ -11,12 +11,14 @@ type Props = {
   loginName: string;
   authRequestId?: string;
   altPassword: boolean;
+  organization?: string;
 };
 
 export default function LoginPasskey({
   loginName,
   authRequestId,
   altPassword,
+  organization,
 }: Props) {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -64,6 +66,7 @@ export default function LoginPasskey({
       },
       body: JSON.stringify({
         loginName,
+        organization,
         challenges: {
           webAuthN: {
             domain: "",
@@ -91,6 +94,7 @@ export default function LoginPasskey({
       },
       body: JSON.stringify({
         loginName,
+        organization,
         webAuthN: { credentialAssertionData: data },
         authRequestId,
       }),
