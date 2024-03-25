@@ -27,7 +27,7 @@ jobs:
         RUN_ID: '8415972802'
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
       run: |
-        gh workflow run -R zitadel/homebrew-tap update.yml -f runId=${RUN_ID} -f version=${VERSION}
+        gh workflow -R zitadel/homebrew-tap run update.yml -f runId=${RUN_ID} -f version=${VERSION}
 
 
   core:
