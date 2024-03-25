@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
-
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"

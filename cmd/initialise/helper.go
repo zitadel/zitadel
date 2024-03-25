@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/jackc/pgconn"
+
 	"github.com/zitadel/zitadel/internal/database"
 )
 

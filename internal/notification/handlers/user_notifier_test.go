@@ -7,10 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/repository/session"
-
-	"github.com/zitadel/zitadel/internal/notification/messages"
-
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
@@ -24,9 +20,11 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	"github.com/zitadel/zitadel/internal/notification/handlers/mock"
+	"github.com/zitadel/zitadel/internal/notification/messages"
 	"github.com/zitadel/zitadel/internal/notification/senders"
 	"github.com/zitadel/zitadel/internal/notification/types"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 

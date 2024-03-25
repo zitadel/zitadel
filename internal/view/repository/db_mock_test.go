@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/domain"
-
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/gorm"
+
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 var (

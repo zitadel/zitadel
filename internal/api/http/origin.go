@@ -22,7 +22,7 @@ func IsOriginAllowed(allowList []string, origin string) bool {
 	return false
 }
 
-//IsOrigin checks if provided string is an origin (scheme://hostname[:port]) without path, query or fragment
+// IsOrigin checks if provided string is an origin (scheme://hostname[:port]) without path, query or fragment
 func IsOrigin(rawOrigin string) bool {
 	parsedUrl, err := url.Parse(rawOrigin)
 	if err != nil {

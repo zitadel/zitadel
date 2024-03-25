@@ -2,9 +2,9 @@ package auth
 
 import (
 	"context"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/i18n"
-
 	auth_pb "github.com/zitadel/zitadel/pkg/grpc/auth"
 )
 

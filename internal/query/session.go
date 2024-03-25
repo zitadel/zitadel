@@ -9,7 +9,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"

@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	http_util "github.com/zitadel/zitadel/internal/api/http"
-
 	"github.com/zitadel/zitadel/internal/api/assets"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/notification/templates"
 	"github.com/zitadel/zitadel/internal/query"

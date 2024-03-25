@@ -3,8 +3,9 @@ package model
 import (
 	"testing"
 
-	user_model "github.com/zitadel/zitadel/internal/user/model"
 	"golang.org/x/text/language"
+
+	user_model "github.com/zitadel/zitadel/internal/user/model"
 )
 
 func TestProfileChanges(t *testing.T) {
