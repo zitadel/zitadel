@@ -131,5 +131,101 @@ curl -X PUT "https://$CUSTOM-DOMAIN/v3alpha/user_schemas/$SCHEMA_ID" \
       }
     }
   }
+}'
+```
+
+## Retrieve the Existing Schemas
+
+To check the state of existing schemas you can simply [list them](/apis/resources/user_schema_service_v3/user-schema-service-list-user-schemas).
+In this case we will query for the one with state `active`. Check out the api documentation for detailed information on possible filters.
+The API also allows to retrieve a single [schema by ID](/apis/resources/user_schema_service_v3/user-schema-service-get-user-schema-by-id).
+
+```bash
+curl -X POST "https://$CUSTOM-DOMAIN/v3alpha/user_schemas/search" \
+-H 'Content-Type: application/json' \
+-H 'Accept: application/json' \
+-H "Authorization: Bearer $ACCESS_TOKEN" \
+--data-raw '{
+  "query": {
+    "offset": "0",
+    "limit": 100,
+    "asc": true
+  },
+  "sortingColumn": "FIELD_NAME_TYPE",
+  "queries": [
+    {
+      "stateQuery": {
+        "state": "STATE_ACTIVE"
+      }
+    }
+  ]
+}'
+```
+
+If you've followed this guide, it should list you a singe schema:
+
+```json
+{
+  "details": {
+    "totalResult": "1",
+    "timestamp": "2024-03-21T16:35:19.685700Z"
+  },
+  "result": [
+    {
+      "id": "259279890237358500",
+      "details": {
+        "sequence": "2",
+        "changeDate": "2024-03-21T16:35:19.685700Z",
+        "resourceOwner": "224313188550750765"
+      },
+      "type": "user",
+      "state": "STATE_ACTIVE",
+      "revision": 2,
+      "schema": {
+        "$schema": "urn:zitadel:schema:v1",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "urn:zitadel:schema:permission": {
+              "owner": "rw"
+            }
+          },
+          "familyName": {
+            "type": "string",
+            "urn:zitadel:schema:permission": {
+              "owner": "rw",
+              "self": "rw"
+            }
+          },
+          "givenName": {
+            "type": "string",
+            "urn:zitadel:schema:permission": {
+              "owner": "rw",
+              "self": "rw"
+            }
+          },
+          "profileUri": {
+            "format": "uri",
+            "type": "string",
+            "urn:zitadel:schema:permission": {
+              "owner": "rw",
+              "self": "r"
+            }
+          }
+        },
+        "type": "object"
+      },
+      "possibleAuthenticators": [
+        "AUTHENTICATOR_TYPE_USERNAME",
+        "AUTHENTICATOR_TYPE_PASSWORD"
+      ]
+    }
+  ]
 }
 ```
+
+### Revision
+
+Note the `revision` property, which is currently `2`. Each update to the `schema`-property will increase
+it by `1`. The revision will later be reflected on the managed users to state based on which revision of the schema
+they were last updated on.

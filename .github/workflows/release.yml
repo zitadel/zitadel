@@ -19,6 +19,12 @@ on:
       GCR_JSON_KEY_BASE64:
         description: 'base64 endcrypted key to connect to Google'
         required: true
+      APP_ID:
+        description: 'GH App ID to request token for homebrew update'
+        required: true
+      APP_PRIVATE_KEY:
+        description: 'GH App Private Key to request token for homebrew update'
+        required: true
 
 jobs:
   version:
@@ -73,3 +79,23 @@ jobs:
         docker buildx imagetools create \
           --tag ${{ inputs.image_name }}:latest-debug \
           ${{ inputs.build_image_name }}-debug
+
+  homebrew-tap:
+    runs-on: ubuntu-22.04
+    needs: version
+    if: ${{ github.ref_name == 'next' }}
+    continue-on-error: true
+    steps:
+    - name: generate token
+      uses: tibdex/github-app-token@v2
+      id: generate-token
+      with:
+        app_id: ${{ secrets.APP_ID }}
+        private_key: ${{ secrets.APP_PRIVATE_KEY }}
+    - name: Trigger Homebrew
+      env:
+        VERSION: ${{ needs.version.outputs.version }}
+        RUN_ID: ${{ github.run_id }}
+        GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+      run: |
+        gh workflow -R zitadel/homebrew-tap run update.yml -f runId=${RUN_ID} -f version=${VERSION}
