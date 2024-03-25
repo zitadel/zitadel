@@ -9,11 +9,11 @@ permissions:
   packages: write
   issues: write
   pull-requests: write
+  actions: write
 
 jobs:
   homebrew-tap:
     runs-on: ubuntu-22.04
-    needs: version
     steps:
     - name: generate token
       uses: tibdex/github-app-token@v2
