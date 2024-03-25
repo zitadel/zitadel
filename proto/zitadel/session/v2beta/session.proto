@@ -60,7 +60,7 @@ message Factors {
 
 message UserFactor {
   reserved 5;
-  reserved "organization_id";
+  reserved "organisation_id";
   google.protobuf.Timestamp verified_at = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"time when the user was last checked\"";
