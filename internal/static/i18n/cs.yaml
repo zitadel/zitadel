@@ -478,6 +478,7 @@ Errors:
     CloseRows: SQL příkaz nemohl být dokončen
     SQLStatement: SQL příkaz nemohl být vytvořen
     InvalidRequest: Požadavek je neplatný
+    TooManyNestingLevels: Příliš mnoho úrovní vnoření dotazů (max. 20)
   Quota:
     AlreadyExists: Kvóta pro tuto jednotku již existuje
     NotFound: Kvóta pro tuto jednotku nenalezena

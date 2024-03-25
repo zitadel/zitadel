@@ -60,7 +60,6 @@ Errors:
   Notification:
     NoDomain: 未找到对应的域名
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: 找不到用户
     AlreadyExists: 用户已存在
     NotFoundOnOrg: 在所选组织中找不到用户
@@ -479,6 +478,7 @@ Errors:
     CloseRows: SQL 语句无法完成
     SQLStatement: 无法创建 SQL 语句
     InvalidRequest: 请求无效
+    TooManyNestingLevels: 查询嵌套级别过多（最多 20 个）
   Quota:
     AlreadyExists: 这个单位的配额已经存在
     NotFound: 没有找到该单位的配额
