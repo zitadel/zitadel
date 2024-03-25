@@ -12,24 +12,6 @@ permissions:
   actions: write
 
 jobs:
-  homebrew-tap:
-    runs-on: ubuntu-22.04
-    steps:
-    - name: generate token
-      uses: tibdex/github-app-token@v2
-      id: generate-token
-      with:
-        app_id: ${{ secrets.APP_ID }}
-        private_key: ${{ secrets.APP_PRIVATE_KEY }}
-    - name: Trigger Homebrew
-      env:
-        VERSION: 'v2.48.2'
-        RUN_ID: '8415972802'
-        GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-      run: |
-        gh workflow -R zitadel/homebrew-tap run update.yml -f runId=${RUN_ID} -f version=${VERSION}
-
-
   core:
     uses: ./.github/workflows/core.yml
     with:
