@@ -6,6 +6,7 @@ export type SessionCookie = {
   id: string;
   token: string;
   loginName: string;
+  organization: string;
   creationDate: string;
   expirationDate: string;
   changeDate: string;
@@ -226,16 +227,23 @@ export async function getAllSessions(
  * @returns most recent session
  */
 export async function getMostRecentCookieWithLoginname(
-  loginName?: string
+  loginName?: string,
+  organization?: string
 ): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
-    const filtered = sessions.filter((cookie) => {
+    let filtered = sessions.filter((cookie) => {
       return !!loginName ? cookie.loginName === loginName : true;
     });
+
+    if (organization) {
+      filtered = filtered.filter((cookie) => {
+        return cookie.organization === organization;
+      });
+    }
 
     const latest =
       filtered && filtered.length

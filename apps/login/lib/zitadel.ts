@@ -135,6 +135,38 @@ export async function createSessionForLoginname(
       );
 }
 
+export async function createSessionForUserId(
+  server: ZitadelServer,
+  userId: string,
+  password: string | undefined,
+  challenges: RequestChallenges | undefined
+): Promise<CreateSessionResponse | undefined> {
+  const sessionService = session.getSession(server);
+  return password
+    ? sessionService.createSession(
+        {
+          checks: { user: { userId }, password: { password } },
+          challenges,
+          // lifetime: {
+          //   seconds: 300,
+          //   nanos: 0,
+          // },
+        },
+        {}
+      )
+    : sessionService.createSession(
+        {
+          checks: { user: { userId } },
+          challenges,
+          // lifetime: {
+          //   seconds: 300,
+          //   nanos: 0,
+          // },
+        },
+        {}
+      );
+}
+
 export async function createSessionForUserIdAndIdpIntent(
   server: ZitadelServer,
   userId: string,
@@ -247,10 +279,13 @@ export async function addHumanUser(
     });
 }
 
-export async function listUsers(userName: string): Promise<ListUsersResponse> {
-  // TODO limit for organization
+export async function listUsers(
+  userName: string,
+  organizationId: string
+): Promise<ListUsersResponse> {
   const userService = user.getUser(server);
 
+  console.log("listUsers", userName, organizationId);
   return userService.listUsers(
     {
       queries: [
@@ -259,6 +294,11 @@ export async function listUsers(userName: string): Promise<ListUsersResponse> {
             userName,
             method: TextQueryMethod.TEXT_QUERY_METHOD_EQUALS,
           },
+          organizationIdQuery: organizationId
+            ? {
+                organizationId,
+              }
+            : undefined,
         },
       ],
     },

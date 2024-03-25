@@ -9,7 +9,7 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName, prompt } = searchParams;
+  const { loginName, prompt, organization } = searchParams;
 
   const sessionFactors = await loadSession(loginName);
 

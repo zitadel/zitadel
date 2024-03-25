@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button, ButtonVariants } from "./Button";
 import { TextInput } from "./Input";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import { LoginSettings } from "@zitadel/server";
@@ -51,12 +51,16 @@ export default function UsernameForm({
       body.organization = organization;
     }
 
+    if (authRequestId) {
+      body.authRequestId = authRequestId;
+    }
+
     const res = await fetch("/api/loginname", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(authRequestId ? { ...body, authRequestId } : body),
+      body: JSON.stringify(body),
     });
 
     setLoading(false);
@@ -78,7 +82,13 @@ export default function UsernameForm({
         const method = response.authMethodTypes[0];
         switch (method) {
           case 1: // user has only password as auth method
-            const paramsPassword: any = { loginName: values.loginName };
+            const paramsPassword: any = {
+              loginName: response.factors.user.loginName,
+            };
+
+            if (organization) {
+              paramsPassword.organization = organization;
+            }
 
             if (loginSettings?.passkeysType === 1) {
               paramsPassword.promptPasswordless = `true`; // PasskeysType.PASSKEYS_TYPE_ALLOWED,

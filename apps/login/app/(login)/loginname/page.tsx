@@ -40,8 +40,7 @@ export default async function Page({
   const loginSettings = await getLoginSettings(server, organization);
   const legal = await getLegalAndSupportSettings(server);
 
-  // TODO if org idps should be shown replace emptystring with the orgId.
-  const identityProviders = await getIdentityProviders(server, "");
+  const identityProviders = await getIdentityProviders(server, organization);
 
   const host = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`

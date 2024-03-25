@@ -2,6 +2,7 @@
 
 import {
   createSessionForLoginname,
+  createSessionForUserId,
   createSessionForUserIdAndIdpIntent,
   getSession,
   server,
@@ -40,7 +41,54 @@ export async function createSessionAndUpdateCookie(
           creationDate: response.session.creationDate?.toString() ?? "",
           expirationDate: (response.session.expirationDate ?? "")?.toString(),
           changeDate: response.session.changeDate?.toString() ?? "",
-          loginName: response.session?.factors?.user?.loginName ?? "",
+          loginName: response.session.factors.user.loginName ?? "",
+          organization: response.session.factors.user.organizationId ?? "",
+        };
+
+        if (authRequestId) {
+          sessionCookie.authRequestId = authRequestId;
+        }
+
+        return addSessionToCookie(sessionCookie).then(() => {
+          return response.session as Session;
+        });
+      } else {
+        throw "could not get session or session does not have loginName";
+      }
+    });
+  } else {
+    throw "Could not create session";
+  }
+}
+
+export async function createSessionForUserIdAndUpdateCookie(
+  userId: string,
+  password: string | undefined,
+  challenges: RequestChallenges | undefined,
+  authRequestId: string | undefined
+): Promise<Session> {
+  const createdSession = await createSessionForUserId(
+    server,
+    userId,
+    password,
+    challenges
+  );
+
+  if (createdSession) {
+    return getSession(
+      server,
+      createdSession.sessionId,
+      createdSession.sessionToken
+    ).then((response) => {
+      if (response?.session && response.session?.factors?.user?.loginName) {
+        const sessionCookie: SessionCookie = {
+          id: createdSession.sessionId,
+          token: createdSession.sessionToken,
+          creationDate: response.session.creationDate?.toString() ?? "",
+          expirationDate: (response.session.expirationDate ?? "")?.toString(),
+          changeDate: response.session.changeDate?.toString() ?? "",
+          loginName: response.session.factors.user.loginName ?? "",
+          organization: response.session.factors.user.organizationId ?? "",
         };
 
         if (authRequestId) {
@@ -86,7 +134,8 @@ export async function createSessionForIdpAndUpdateCookie(
           creationDate: response.session.creationDate?.toString() ?? "",
           expirationDate: (response.session.expirationDate ?? "")?.toString(),
           changeDate: response.session.changeDate?.toString() ?? "",
-          loginName: response.session?.factors?.user?.loginName ?? "",
+          loginName: response.session.factors.user.loginName ?? "",
+          organization: response.session.factors.user.organizationId ?? "",
         };
 
         if (authRequestId) {
@@ -132,6 +181,7 @@ export async function setSessionAndUpdateCookie(
         expirationDate: recentCookie.expirationDate,
         changeDate: updatedSession.details?.changeDate?.toString() ?? "",
         loginName: recentCookie.loginName,
+        organization: recentCookie.organization,
       };
 
       if (authRequestId) {
@@ -154,6 +204,7 @@ export async function setSessionAndUpdateCookie(
                 expirationDate: sessionCookie.expirationDate,
                 changeDate: session.changeDate?.toString() ?? "",
                 loginName: session.factors?.user?.loginName ?? "",
+                organization: session.factors?.user?.organizationId ?? "",
               };
 
               if (sessionCookie.authRequestId) {
