@@ -283,6 +283,7 @@ module.exports = {
             "guides/integrate/token-introspection/basic-auth",
           ],
         },
+        "guides/integrate/token-exchange",
         {
           type: "category",
           label: "Authenticate Service Users",
