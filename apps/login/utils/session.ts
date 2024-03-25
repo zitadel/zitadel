@@ -93,14 +93,16 @@ export async function createSessionForUserIdAndUpdateCookie(
           expirationDate: (response.session.expirationDate ?? "")?.toString(),
           changeDate: response.session.changeDate?.toString() ?? "",
           loginName: response.session.factors.user.loginName ?? "",
-          organization: response.session.factors.user.organizationId ?? "",
         };
 
         if (authRequestId) {
           sessionCookie.authRequestId = authRequestId;
         }
 
-        if ()
+        if (response.session.factors.user.organizationId) {
+          sessionCookie.organization =
+            response.session.factors.user.organizationId;
+        }
 
         return addSessionToCookie(sessionCookie).then(() => {
           return response.session as Session;

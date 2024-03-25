@@ -6,7 +6,7 @@ export type SessionCookie = {
   id: string;
   token: string;
   loginName: string;
-  organization: string;
+  organization?: string;
   creationDate: string;
   expirationDate: string;
   changeDate: string;
