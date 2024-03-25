@@ -32,7 +32,7 @@ This API offers granular control through various filters, enabling you to:
 - **Target Aggregates**: Narrow down the data scope by filtering for events related to particular organizations, projects, or users.
 - **Define Time Frames**: Retrieve audit logs for precise time periods, allowing you to schedule data retrieval at desired intervals (e.g., hourly) and analyze activity within specific windows.
 
-You can find a comprehensive guide on how to use the events API for different use cases here: [Get Events from ZITADEL](/docs/guides/integrate/event-api)
+You can find a comprehensive guide on how to use the events API for different use cases here: [Get Events from ZITADEL](/docs/guides/integrate/zitadel-apis/event-api)
 
 ### Cockroach Change Data Capture
 
