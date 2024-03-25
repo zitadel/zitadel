@@ -93,7 +93,6 @@ jobs:
         app_id: ${{ secrets.APP_ID }}
         private_key: ${{ secrets.APP_PRIVATE_KEY }}
     - name: Trigger Homebrew
-      if: ${{ github.ref_name == 'next' }}
       env:
         VERSION: ${{ needs.version.outputs.version }}
         RUN_ID: ${{ github.run_id }}
