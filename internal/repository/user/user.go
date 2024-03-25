@@ -303,8 +303,8 @@ func NewUserImpersonatedEvent(
 	aggregate *eventstore.Aggregate,
 	applicationID string,
 	actor *domain.TokenActor,
-) *UserTokenAddedEvent {
-	return &UserTokenAddedEvent{
+) *UserImpersonatedEvent {
+	return &UserImpersonatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
