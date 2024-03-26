@@ -4,13 +4,13 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, Observable, take } from 'rxjs';
+import { BehaviorSubject, take } from 'rxjs';
 import {
   AddGitHubProviderRequest as AdminAddGithubProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateGitHubProviderRequest as AdminUpdateGithubProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { IDPOwnerType, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddGitHubProviderRequest as MgmtAddGithubProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -24,9 +24,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
-import { MatDialog } from '@angular/material/dialog';
 import { ProviderNextService } from '../provider-next/provider-next.service';
-import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
 
 @Component({
   selector: 'cnsl-provider-github',
@@ -41,7 +39,6 @@ export class ProviderGithubComponent {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   // DEPRECATED: use service$ instead
   private service!: ManagementService | AdminService;
-
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
@@ -165,7 +162,7 @@ export class ProviderGithubComponent {
   }
 
   public submitForm(): void {
-    this.provider  || this.justCreated$.value ? this.updateGithubProvider() : this.addGithubProvider();
+    this.provider || this.justCreated$.value ? this.updateGithubProvider() : this.addGithubProvider();
   }
 
   public addGithubProvider(): void {
@@ -194,12 +191,12 @@ export class ProviderGithubComponent {
   }
 
   public updateGithubProvider(): void {
-    if (this.provider  || this.justCreated$.value) {
+    if (this.provider || this.justCreated$.value) {
       const req =
         this.serviceType === PolicyComponentServiceType.MGMT
           ? new MgmtUpdateGithubProviderRequest()
           : new AdminUpdateGithubProviderRequest();
-      req.setId(this.provider?.id  || this.justCreated$.value);
+      req.setId(this.provider?.id || this.justCreated$.value);
       req.setName(this.name?.value);
       req.setClientId(this.clientId?.value);
       req.setScopesList(this.scopesList?.value);

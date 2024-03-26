@@ -10,7 +10,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateAppleProviderRequest as AdminUpdateAppleProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { IDPOwnerType, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddAppleProviderRequest as MgmtAddAppleProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -24,9 +24,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
-import { MatDialog } from '@angular/material/dialog';
 import { ProviderNextService } from '../provider-next/provider-next.service';
-import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
 
 const MAX_ALLOWED_SIZE = 5 * 1024;
 
@@ -168,7 +166,7 @@ export class ProviderAppleComponent {
   }
 
   public submitForm(): void {
-    this.provider  || this.justCreated$.value ? this.updateAppleProvider() : this.addAppleProvider();
+    this.provider || this.justCreated$.value ? this.updateAppleProvider() : this.addAppleProvider();
   }
 
   public addAppleProvider(): void {
@@ -199,10 +197,10 @@ export class ProviderAppleComponent {
   }
 
   public updateAppleProvider(): void {
-    if (this.provider  || this.justCreated$.value) {
+    if (this.provider || this.justCreated$.value) {
       if (this.serviceType === PolicyComponentServiceType.MGMT) {
         const req = new MgmtUpdateAppleProviderRequest();
-        req.setId(this.provider?.id  || this.justCreated$.value);
+        req.setId(this.provider?.id || this.justCreated$.value);
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
         req.setTeamId(this.teamId?.value);

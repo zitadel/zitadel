@@ -30,10 +30,8 @@ import { ProviderOAuthComponent } from './provider-oauth/provider-oauth.componen
 import { ProviderOIDCComponent } from './provider-oidc/provider-oidc.component';
 import { ProvidersRoutingModule } from './providers-routing.module';
 import { ProviderSamlSpComponent } from './provider-saml-sp/provider-saml-sp.component';
-import { CopyToClipboardModule } from '../../directives/copy-to-clipboard/copy-to-clipboard.module';
 import { CopyRowComponent } from '../../components/copy-row/copy-row.component';
 import { ProviderNextComponent } from './provider-next/provider-next.component';
-import { ProviderNextDialogComponent } from './provider-next/provider-next-dialog.component';
 import { ProviderNextService } from './provider-next/provider-next.service';
 
 @NgModule({
@@ -53,7 +51,6 @@ import { ProviderNextService } from './provider-next/provider-next.service';
     ProviderAppleComponent,
     ProviderSamlSpComponent,
     ProviderNextComponent,
-    ProviderNextDialogComponent,
   ],
   imports: [
     ProvidersRoutingModule,

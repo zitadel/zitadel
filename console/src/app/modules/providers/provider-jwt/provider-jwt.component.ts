@@ -23,7 +23,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { ProviderNextService } from '../provider-next/provider-next.service';
 
 @Component({
@@ -159,7 +159,7 @@ export class ProviderJWTComponent {
   }
 
   public submitForm(): void {
-    this.provider  || this.justCreated$.value ? this.updateJWTProvider() : this.addJWTProvider();
+    this.provider || this.justCreated$.value ? this.updateJWTProvider() : this.addJWTProvider();
   }
 
   public addJWTProvider(): void {
@@ -188,12 +188,12 @@ export class ProviderJWTComponent {
   }
 
   public updateJWTProvider(): void {
-    if (this.provider  || this.justCreated$.value) {
+    if (this.provider || this.justCreated$.value) {
       const req =
         this.serviceType === PolicyComponentServiceType.MGMT
           ? new MgmtUpdateJWTProviderRequest()
           : new AdminUpdateJWTProviderRequest();
-      req.setId(this.provider?.id  || this.justCreated$.value);
+      req.setId(this.provider?.id || this.justCreated$.value);
       req.setName(this.name?.value);
       req.setHeaderName(this.headerName?.value);
       req.setIssuer(this.issuer?.value);

@@ -1,4 +1,8 @@
-<cnsl-card [title]="'DESCRIPTIONS.SETTINGS.IDPS.NEXT' | translate" [expanded]="!!expanded" *ngIf="configureProvider || autofillLink || activateLink">
+<cnsl-card
+  [title]="'DESCRIPTIONS.SETTINGS.IDPS.NEXT' | translate"
+  [expanded]="!!expanded"
+  *ngIf="configureProvider || autofillLink || activateLink"
+>
   <cnsl-info-section *ngIf="activateLink">
     <div class="row box">
       <div class="row left">

@@ -3,7 +3,7 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
-import {BehaviorSubject, take} from 'rxjs';
+import { BehaviorSubject, take } from 'rxjs';
 import {
   AddLDAPProviderRequest as AdminAddLDAPProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -23,7 +23,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { minArrayLengthValidator, requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
-import {ProviderNextService} from "../provider-next/provider-next.service";
+import { ProviderNextService } from '../provider-next/provider-next.service';
 
 @Component({
   selector: 'cnsl-provider-ldap',

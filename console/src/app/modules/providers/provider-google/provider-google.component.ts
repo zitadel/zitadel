@@ -4,7 +4,7 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, Observable, of, take } from 'rxjs';
+import { BehaviorSubject, take } from 'rxjs';
 import {
   AddGoogleProviderRequest as AdminAddGoogleProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,

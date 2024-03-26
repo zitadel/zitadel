@@ -4,13 +4,13 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, Observable, take } from 'rxjs';
+import { BehaviorSubject, take } from 'rxjs';
 import {
   AddGenericOAuthProviderRequest as AdminAddGenericOAuthProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateGenericOAuthProviderRequest as AdminUpdateGenericOAuthProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { IDPOwnerType, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddGenericOAuthProviderRequest as MgmtAddGenericOAuthProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -24,9 +24,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
-import { MatDialog } from '@angular/material/dialog';
 import { ProviderNextService } from '../provider-next/provider-next.service';
-import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
 
 @Component({
   selector: 'cnsl-provider-oauth',
@@ -205,7 +203,7 @@ export class ProviderOAuthComponent {
         this.serviceType === PolicyComponentServiceType.MGMT
           ? new MgmtUpdateGenericOAuthProviderRequest()
           : new AdminUpdateGenericOAuthProviderRequest();
-      req.setId(this.provider?.id  || this.justCreated$.value);
+      req.setId(this.provider?.id || this.justCreated$.value);
       req.setName(this.name?.value);
       req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
       req.setIdAttribute(this.idAttribute?.value);

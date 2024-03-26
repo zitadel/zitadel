@@ -4,7 +4,7 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, Observable, take } from 'rxjs';
+import { BehaviorSubject, take } from 'rxjs';
 import {
   AddAzureADProviderRequest as AdminAddAzureADProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -24,9 +24,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
-import { MatDialog } from '@angular/material/dialog';
 import { ProviderNextService } from '../provider-next/provider-next.service';
-import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
 
 @Component({
   selector: 'cnsl-provider-azure-ad',
@@ -41,7 +39,6 @@ export class ProviderAzureADComponent {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   // DEPRECATED: use service$ instead
   private service!: ManagementService | AdminService;
-
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
@@ -197,7 +194,7 @@ export class ProviderAzureADComponent {
   }
 
   public submitForm(): void {
-    this.provider  || this.justCreated$.value ? this.updateAzureADProvider() : this.addAzureADProvider();
+    this.provider || this.justCreated$.value ? this.updateAzureADProvider() : this.addAzureADProvider();
   }
 
   public addAzureADProvider(): void {
@@ -236,13 +233,13 @@ export class ProviderAzureADComponent {
   }
 
   public updateAzureADProvider(): void {
-    if (this.provider  || this.justCreated$.value) {
+    if (this.provider || this.justCreated$.value) {
       const req =
         this.serviceType === PolicyComponentServiceType.MGMT
           ? new MgmtUpdateAzureADProviderRequest()
           : new AdminUpdateAzureADProviderRequest();
 
-      req.setId(this.provider?.id  || this.justCreated$.value);
+      req.setId(this.provider?.id || this.justCreated$.value);
       req.setName(this.name?.value);
       req.setClientId(this.clientId?.value);
       req.setEmailVerified(this.emailVerified?.value);

@@ -4,13 +4,13 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, Observable, take } from 'rxjs';
+import { BehaviorSubject, take } from 'rxjs';
 import {
   AddGitHubEnterpriseServerProviderRequest as AdminAddGitHubEnterpriseServerProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateGitHubEnterpriseServerProviderRequest as AdminUpdateGitHubEnterpriseServerProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { IDPOwnerType, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddGitHubEnterpriseServerProviderRequest as MgmtAddGitHubEnterpriseServerProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -24,9 +24,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
-import { MatDialog } from '@angular/material/dialog';
 import { ProviderNextService } from '../provider-next/provider-next.service';
-import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
 
 @Component({
   selector: 'cnsl-provider-github-es',
@@ -167,7 +165,7 @@ export class ProviderGithubESComponent {
   }
 
   public submitForm(): void {
-    this.provider  || this.justCreated$.value ? this.updateGenericOAuthProvider() : this.addGenericOAuthProvider();
+    this.provider || this.justCreated$.value ? this.updateGenericOAuthProvider() : this.addGenericOAuthProvider();
   }
 
   public addGenericOAuthProvider(): void {
@@ -199,12 +197,12 @@ export class ProviderGithubESComponent {
   }
 
   public updateGenericOAuthProvider(): void {
-    if (this.provider  || this.justCreated$.value) {
+    if (this.provider || this.justCreated$.value) {
       const req =
         this.serviceType === PolicyComponentServiceType.MGMT
           ? new MgmtUpdateGitHubEnterpriseServerProviderRequest()
           : new AdminUpdateGitHubEnterpriseServerProviderRequest();
-      req.setId(this.provider?.id  || this.justCreated$.value);
+      req.setId(this.provider?.id || this.justCreated$.value);
       req.setName(this.name?.value);
       req.setAuthorizationEndpoint(this.authorizationEndpoint?.value);
       req.setTokenEndpoint(this.tokenEndpoint?.value);

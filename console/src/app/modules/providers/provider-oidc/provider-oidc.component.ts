@@ -4,13 +4,13 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, Observable, take } from 'rxjs';
+import { BehaviorSubject, take } from 'rxjs';
 import {
   AddGenericOIDCProviderRequest as AdminAddGenericOIDCProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateGenericOIDCProviderRequest as AdminUpdateGenericOIDCProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { IDPOwnerType, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddGenericOIDCProviderRequest as MgmtAddGenericOIDCProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -23,9 +23,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
-import { MatDialog } from '@angular/material/dialog';
 import { ProviderNextService } from '../provider-next/provider-next.service';
-import { ProviderNextDialogComponent } from '../provider-next/provider-next-dialog.component';
 
 @Component({
   selector: 'cnsl-provider-oidc',
