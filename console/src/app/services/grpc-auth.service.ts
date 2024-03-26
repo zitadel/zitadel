@@ -311,7 +311,7 @@ export class GrpcAuthService {
     return this.fetchedZitadelPermissions.pipe(
       withLatestFrom(this.zitadelPermissions),
       filter(([hL, p]) => {
-        return hL === true && !!p.length;
+        return hL === true;
       }),
       map(([_, zroles]) => {
         return objects.filter((obj) => {
