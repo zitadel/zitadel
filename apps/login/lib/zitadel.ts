@@ -300,6 +300,8 @@ export async function listUsers(
             userName,
             method: TextQueryMethod.TEXT_QUERY_METHOD_EQUALS,
           },
+        },
+        {
           organizationIdQuery: organizationId
             ? {
                 organizationId,
