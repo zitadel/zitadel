@@ -1,14 +1,14 @@
 import { Component, Injector, Type } from '@angular/core';
 import { Location } from '@angular/common';
-import { IDPOwnerType, Options, Provider, SAMLBinding } from '../../../proto/generated/zitadel/idp_pb';
+import { Options, Provider, SAMLBinding } from '../../../proto/generated/zitadel/idp_pb';
 import { AbstractControl, FormGroup, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 import { ManagementService } from '../../../services/mgmt.service';
 import { AdminService } from '../../../services/admin.service';
 import { ToastService } from '../../../services/toast.service';
 import { GrpcAuthService } from '../../../services/grpc-auth.service';
-import { BehaviorSubject, combineLatestWith, from, Observable, of, shareReplay, switchMap, take } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { BehaviorSubject, shareReplay, switchMap, take } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from '../../../services/breadcrumb.service';
 import { atLeastOneIsFilled, requiredValidator } from '../../form-field/validators/validators';
 import {
@@ -22,8 +22,7 @@ import {
   UpdateSAMLProviderRequest as MgmtUpdateSAMLProviderRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { Environment, EnvironmentService } from '../../../services/environment.service';
-import { CopyUrl } from '../provider-next/provider-next.component';
-import { combineLatest, filter, map, tap } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { ProviderNextService } from '../provider-next/provider-next.service';
 
 @Component({
@@ -75,16 +74,16 @@ export class ProviderSamlSpComponent {
               downloadable: true,
             },
             {
-              label: 'ZITADEL Single Logout',
-              url: `${idpBase}/slo`,
-            },
-            {
               label: 'ZITADEL ACS Login Form',
               url: `${environment.issuer}/ui/login/login/externalidp/saml/acs`,
             },
             {
               label: 'ZITADEL ACS Intent API',
               url: `${idpBase}/acs`,
+            },
+            {
+              label: 'ZITADEL Single Logout',
+              url: `${idpBase}/slo`,
             },
           ];
         }),
