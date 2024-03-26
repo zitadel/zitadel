@@ -51,6 +51,7 @@ export default async function Page({
       <PasswordForm
         loginName={loginName}
         authRequestId={authRequestId}
+        organization={organization}
         promptPasswordless={promptPasswordless === "true"}
         isAlternative={alt === "true"}
       />
