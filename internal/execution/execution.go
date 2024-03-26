@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -32,7 +33,7 @@ func CallTargets(ctx context.Context,
 		if target.Async {
 			go func(target query.Target) {
 				if _, err := CallTarget(ctx, &target, info); err != nil {
-					// TODO: log if error on async action?
+					fmt.Errorf("error in async execution: %w", err)
 				}
 			}(*target)
 		} else {
