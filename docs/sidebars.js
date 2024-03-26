@@ -278,6 +278,7 @@ module.exports = {
             },
           ],
         },
+        "guides/integrate/token-exchange",
         {
           type: "category",
           label: "Service Users",
