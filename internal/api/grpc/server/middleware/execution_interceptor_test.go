@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type mockExecutionQueries struct {
@@ -67,12 +68,10 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 	type args struct {
 		ctx context.Context
 
-		queries       *mockExecutionQueries
-		targets       []target
-		fullMethod    string
-		req           interface{}
-		resp          interface{}
-		executionType domain.ExecutionType
+		queries    *mockExecutionQueries
+		targets    []target
+		fullMethod string
+		req        interface{}
 	}
 	type res struct {
 		want    interface{}
@@ -83,6 +82,38 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 		args args
 		res  res
 	}{
+		{
+			"target, targets not found",
+			args{
+				ctx:        context.Background(),
+				fullMethod: "/service/method",
+				queries: &mockExecutionQueries{
+					executionTargets: &query.ExecutionTargets{
+						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
+						Targets: []string{"target"},
+					},
+					tError: zerrors.ThrowNotFound(nil, "error", "NotFound"),
+				},
+				req: newMockContentRequest("request"),
+			},
+			res{
+				want: newMockContentRequest("request"),
+			},
+		},
+		{
+			"target, not found",
+			args{
+				ctx:        context.Background(),
+				fullMethod: "/service/method",
+				queries: &mockExecutionQueries{
+					etError: zerrors.ThrowNotFound(nil, "error", "NotFound"),
+				},
+				req: newMockContentRequest("request"),
+			},
+			res{
+				want: newMockContentRequest("request"),
+			},
+		},
 		{
 			"target, not found",
 			args{
@@ -104,9 +135,8 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						},
 					},
 				},
-				targets:       []target{},
-				executionType: domain.ExecutionTypeRequest,
-				req:           newMockContentRequest("content"),
+				targets: []target{},
+				req:     newMockContentRequest("content"),
 			},
 			res{
 				want:    newMockContentRequest("content"),
@@ -137,12 +167,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
 						respBody:   newMockContentRequest("content1"),
-						sleep:      time.Second,
+						sleep:      0,
 						statusCode: http.StatusBadRequest,
 					},
 				},
-				executionType: domain.ExecutionTypeRequest,
-				req:           newMockContentRequest("content"),
+				req: newMockContentRequest("content"),
 			},
 			res{
 				want: newMockContentRequest("content"),
@@ -173,12 +202,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
 						respBody:   newMockContentRequest("content1"),
-						sleep:      time.Second,
+						sleep:      0,
 						statusCode: http.StatusBadRequest,
 					},
 				},
-				executionType: domain.ExecutionTypeRequest,
-				req:           newMockContentRequest("content"),
+				req: newMockContentRequest("content"),
 			},
 			res{
 				want:    newMockContentRequest("content"),
@@ -214,8 +242,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						statusCode: http.StatusOK,
 					},
 				},
-				executionType: domain.ExecutionTypeRequest,
-				req:           newMockContentRequest("content"),
+				req: newMockContentRequest("content"),
 			},
 			res{
 				want:    newMockContentRequest("content"),
@@ -246,8 +273,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				targets: []target{
 					{reqBody: newMockContextInfoRequest("/service/method", "wrong")},
 				},
-				executionType: domain.ExecutionTypeRequest,
-				req:           newMockContentRequest("content"),
+				req: newMockContentRequest("content"),
 			},
 			res{
 				want:    newMockContentRequest("content"),
@@ -279,12 +305,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
 						respBody:   newMockContentRequest("content1"),
-						sleep:      time.Second,
+						sleep:      0,
 						statusCode: http.StatusOK,
 					},
 				},
-				executionType: domain.ExecutionTypeRequest,
-				req:           newMockContentRequest("content"),
+				req: newMockContentRequest("content"),
 			},
 			res{
 				want: newMockContentRequest("content1"),
@@ -319,8 +344,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						statusCode: http.StatusOK,
 					},
 				},
-				executionType: domain.ExecutionTypeRequest,
-				req:           newMockContentRequest("content"),
+				req: newMockContentRequest("content"),
 			},
 			res{
 				want: newMockContentRequest("content"),
@@ -351,12 +375,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
 						respBody:   newMockContentRequest("content1"),
-						sleep:      time.Second,
+						sleep:      0,
 						statusCode: http.StatusOK,
 					},
 				},
-				executionType: domain.ExecutionTypeRequest,
-				req:           newMockContentRequest("content"),
+				req: newMockContentRequest("content"),
 			},
 			res{
 				want: newMockContentRequest("content"),
@@ -386,12 +409,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				targets: []target{
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						sleep:      time.Second,
+						sleep:      0,
 						statusCode: http.StatusInternalServerError,
 					},
 				},
-				executionType: domain.ExecutionTypeRequest,
-				req:           newMockContentRequest("content"),
+				req: newMockContentRequest("content"),
 			},
 			res{
 				want:    newMockContentRequest("content"),
@@ -427,8 +449,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						statusCode: http.StatusOK,
 					},
 				},
-				executionType: domain.ExecutionTypeRequest,
-				req:           newMockContentRequest("content"),
+				req: newMockContentRequest("content"),
 			},
 			res{
 				want:    newMockContentRequest("content"),
@@ -460,12 +481,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
 						respBody:   newMockContentRequest("content1"),
-						sleep:      time.Second,
+						sleep:      0,
 						statusCode: http.StatusOK,
 					},
 				},
-				executionType: domain.ExecutionTypeRequest,
-				req:           newMockContentRequest("content"),
+				req: newMockContentRequest("content"),
 			},
 			res{
 				want: newMockContentRequest("content"),
@@ -506,24 +526,23 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
 						respBody:   newMockContentRequest("content1"),
-						sleep:      time.Second,
+						sleep:      0,
 						statusCode: http.StatusOK,
 					},
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content1"),
 						respBody:   newMockContentRequest("content2"),
-						sleep:      time.Second,
+						sleep:      0,
 						statusCode: http.StatusBadRequest,
 					},
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content2"),
 						respBody:   newMockContentRequest("content3"),
-						sleep:      time.Second,
+						sleep:      0,
 						statusCode: http.StatusOK,
 					},
 				},
-				executionType: domain.ExecutionTypeRequest,
-				req:           newMockContentRequest("content"),
+				req: newMockContentRequest("content"),
 			},
 			res{
 				want:    newMockContentRequest("content1"),
@@ -565,7 +584,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
 						respBody:   newMockContentRequest("content1"),
-						sleep:      time.Second,
+						sleep:      0,
 						statusCode: http.StatusOK,
 					},
 					{
@@ -581,8 +600,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						statusCode: http.StatusOK,
 					},
 				},
-				executionType: domain.ExecutionTypeRequest,
-				req:           newMockContentRequest("content"),
+				req: newMockContentRequest("content"),
 			},
 			res{
 				want:    newMockContentRequest("content1"),
@@ -624,24 +642,23 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
 						respBody:   newMockContentRequest("content1"),
-						sleep:      time.Second,
+						sleep:      0,
 						statusCode: http.StatusOK,
 					},
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content1"),
 						respBody:   newMockContentRequest("content2"),
-						sleep:      time.Second,
+						sleep:      0,
 						statusCode: http.StatusOK,
 					},
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content2"),
 						respBody:   newMockContentRequest("content3"),
-						sleep:      time.Second,
+						sleep:      0,
 						statusCode: http.StatusOK,
 					},
 				},
-				executionType: domain.ExecutionTypeRequest,
-				req:           newMockContentRequest("content"),
+				req: newMockContentRequest("content"),
 			},
 			res{
 				want: newMockContentRequest("content3"),
@@ -663,13 +680,11 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				closeFuncs[i] = closeF
 			}
 
-			resp, err := executeTargetsForGRPCFullMethod(
+			resp, err := executeTargetsForRequest(
 				tt.args.ctx,
 				tt.args.queries,
 				tt.args.fullMethod,
 				tt.args.req,
-				tt.args.resp,
-				tt.args.executionType,
 			)
 
 			if tt.res.wantErr {
@@ -723,7 +738,10 @@ func testServerCall(
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}
-		io.WriteString(w, string(resp))
+		if _, err := io.WriteString(w, string(resp)); err != nil {
+			http.Error(w, "error", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(handler))
@@ -741,12 +759,11 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 	type args struct {
 		ctx context.Context
 
-		queries       *mockExecutionQueries
-		targets       []target
-		fullMethod    string
-		req           interface{}
-		resp          interface{}
-		executionType domain.ExecutionType
+		queries    *mockExecutionQueries
+		targets    []target
+		fullMethod string
+		req        interface{}
+		resp       interface{}
 	}
 	type res struct {
 		want    interface{}
@@ -757,6 +774,40 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 		args args
 		res  res
 	}{
+		{
+			"target, targets not found",
+			args{
+				ctx:        context.Background(),
+				fullMethod: "/service/method",
+				queries: &mockExecutionQueries{
+					executionTargets: &query.ExecutionTargets{
+						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
+						Targets: []string{"target"},
+					},
+					tError: zerrors.ThrowNotFound(nil, "error", "NotFound"),
+				},
+				req:  newMockContentRequest("request"),
+				resp: newMockContentRequest("response"),
+			},
+			res{
+				want: newMockContentRequest("response"),
+			},
+		},
+		{
+			"target, not found",
+			args{
+				ctx:        context.Background(),
+				fullMethod: "/service/method",
+				queries: &mockExecutionQueries{
+					etError: zerrors.ThrowNotFound(nil, "error", "NotFound"),
+				},
+				req:  newMockContentRequest("request"),
+				resp: newMockContentRequest("response"),
+			},
+			res{
+				want: newMockContentRequest("response"),
+			},
+		},
 		{
 			"target, ok",
 			args{
@@ -782,13 +833,12 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 					{
 						reqBody:    newMockContextInfoResponse("/service/method", "request", "response"),
 						respBody:   newMockContentRequest("response1"),
-						sleep:      time.Second,
+						sleep:      0,
 						statusCode: http.StatusOK,
 					},
 				},
-				executionType: domain.ExecutionTypeResponse,
-				req:           newMockContentRequest("request"),
-				resp:          newMockContentRequest("response"),
+				req:  newMockContentRequest("request"),
+				resp: newMockContentRequest("response"),
 			},
 			res{
 				want: newMockContentRequest("response1"),
@@ -810,13 +860,12 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				closeFuncs[i] = closeF
 			}
 
-			resp, err := executeTargetsForGRPCFullMethod(
+			resp, err := executeTargetsForResponse(
 				tt.args.ctx,
 				tt.args.queries,
 				tt.args.fullMethod,
 				tt.args.req,
 				tt.args.resp,
-				tt.args.executionType,
 			)
 
 			if tt.res.wantErr {

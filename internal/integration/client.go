@@ -534,6 +534,21 @@ func (s *Tester) CreateTarget(ctx context.Context, t *testing.T) *execution.Crea
 	return target
 }
 
+func (s *Tester) CreateTargetURL(ctx context.Context, t *testing.T, url string) *execution.CreateTargetResponse {
+	req := &execution.CreateTargetRequest{
+		Name: fmt.Sprint(time.Now().UnixNano() + 1),
+		TargetType: &execution.CreateTargetRequest_RestWebhook{
+			RestWebhook: &execution.SetRESTWebhook{
+				Url: url,
+			},
+		},
+		Timeout: durationpb.New(10 * time.Second),
+	}
+	target, err := s.Client.ExecutionV3.CreateTarget(ctx, req)
+	require.NoError(t, err)
+	return target
+}
+
 func (s *Tester) CreateTargetWithNameAndType(ctx context.Context, t *testing.T, name string, async bool, interrupt bool) *execution.CreateTargetResponse {
 	req := &execution.CreateTargetRequest{
 		Name: name,

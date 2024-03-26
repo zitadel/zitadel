@@ -11,11 +11,12 @@ import (
 	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/query"
 	exec_rp "github.com/zitadel/zitadel/internal/repository/execution"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		request, err := executeTargetsForGRPCFullMethod(ctx, queries, info.FullMethod, req, nil, domain.ExecutionTypeRequest)
+		request, err := executeTargetsForRequest(ctx, queries, info.FullMethod, req)
 		if err != nil {
 			return nil, err
 		}
@@ -25,8 +26,24 @@ func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
 			return nil, err
 		}
 
-		return executeTargetsForGRPCFullMethod(ctx, queries, info.FullMethod, req, resp, domain.ExecutionTypeResponse)
+		return executeTargetsForResponse(ctx, queries, info.FullMethod, req, resp)
 	}
+}
+
+func executeTargetsForRequest(ctx context.Context, queries ExecutionQueries, fullMethod string, req interface{}) (interface{}, error) {
+	request, err := executeTargetsForGRPCFullMethod(ctx, queries, fullMethod, req, nil, domain.ExecutionTypeRequest)
+	if zerrors.IsNotFound(err) {
+		return req, nil
+	}
+	return request, err
+}
+
+func executeTargetsForResponse(ctx context.Context, queries ExecutionQueries, fullMethod string, req, resp interface{}) (interface{}, error) {
+	response, err := executeTargetsForGRPCFullMethod(ctx, queries, fullMethod, req, resp, domain.ExecutionTypeResponse)
+	if zerrors.IsNotFound(err) {
+		return resp, nil
+	}
+	return response, err
 }
 
 type ExecutionQueries interface {
@@ -42,8 +59,6 @@ func executeTargetsForGRPCFullMethod(
 	resp interface{},
 	executionType domain.ExecutionType,
 ) (interface{}, error) {
-	request := req
-
 	exectargets, err := queries.ExecutionTargetsRequestResponse(ctx, exec_rp.ID(executionType, fullMethod), exec_rp.ID(executionType, serviceFromFullMethod(fullMethod)), exec_rp.IDAll(executionType))
 	if err != nil {
 		return nil, err
@@ -66,7 +81,7 @@ func executeTargetsForGRPCFullMethod(
 		ProjectID:  ctxData.ProjectID,
 		OrgID:      ctxData.OrgID,
 		UserID:     ctxData.UserID,
-		Request:    request,
+		Request:    req,
 		Response:   resp,
 	}
 

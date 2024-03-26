@@ -138,7 +138,10 @@ func testServerCall(
 		time.Sleep(timeout)
 
 		w.Header().Set("Content-Type", "application/json")
-		io.WriteString(w, string(respBody))
+		if _, err := io.WriteString(w, string(respBody)); err != nil {
+			http.Error(w, "error", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(handler))

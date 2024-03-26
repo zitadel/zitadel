@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
-	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
@@ -126,12 +125,7 @@ func NewExecutionIncludeSearchQuery(value string) (SearchQuery, error) {
 
 func (q *Queries) ExecutionTargetsRequestResponse(ctx context.Context, fullMethod, service, all string) (execution *ExecutionTargets, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() {
-		if err != nil {
-			err = fmt.Errorf("unable to get execution with includes %s: %w", fullMethod, err)
-		}
-		span.EndWithError(err)
-	}()
+	defer func() { span.End() }()
 
 	err = q.client.QueryRowContext(ctx,
 		func(row *sql.Row) error {
