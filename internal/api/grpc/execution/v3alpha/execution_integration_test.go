@@ -168,12 +168,12 @@ func TestServer_SetExecution_Request(t *testing.T) {
 
 func TestServer_SetExecution_Request_Include(t *testing.T) {
 	targetResp := Tester.CreateTarget(CTX, t)
-	executionCond := "request"
+	executionCond := "response"
 	Tester.SetExecution(CTX, t,
 		&execution.Condition{
-			ConditionType: &execution.Condition_Request{
-				Request: &execution.RequestExecution{
-					Condition: &execution.RequestExecution_All{
+			ConditionType: &execution.Condition_Response{
+				Response: &execution.ResponseExecution{
+					Condition: &execution.ResponseExecution_All{
 						All: true,
 					},
 				},
