@@ -43,15 +43,15 @@ func newMockContentRequest(content string) *mockContentRequest {
 	}
 }
 
-func newMockContextInfoRequest(fullMethod, request string) *execution.ContextInfo {
-	return &execution.ContextInfo{
+func newMockContextInfoRequest(fullMethod, request string) *execution.ContextInfoRequest {
+	return &execution.ContextInfoRequest{
 		FullMethod: fullMethod,
 		Request:    newMockContentRequest(request),
 	}
 }
 
-func newMockContextInfoResponse(fullMethod, request, response string) *execution.ContextInfo {
-	return &execution.ContextInfo{
+func newMockContextInfoResponse(fullMethod, request, response string) *execution.ContextInfoResponse {
+	return &execution.ContextInfoResponse{
 		FullMethod: fullMethod,
 		Request:    newMockContentRequest(request),
 		Response:   newMockContentRequest(response),
@@ -60,7 +60,7 @@ func newMockContextInfoResponse(fullMethod, request, response string) *execution
 
 func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 	type target struct {
-		reqBody    *execution.ContextInfo
+		reqBody    *execution.ContextInfoRequest
 		sleep      time.Duration
 		statusCode int
 		respBody   interface{}
@@ -788,7 +788,7 @@ func testServerCall(
 
 func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 	type target struct {
-		reqBody    *execution.ContextInfo
+		reqBody    *execution.ContextInfoResponse
 		sleep      time.Duration
 		statusCode int
 		respBody   interface{}
