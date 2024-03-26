@@ -213,6 +213,22 @@ export function getAuthMethodFromPartialConfig(config: {
       OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
     ]);
 
+    const codeWithExchange = JSON.stringify([
+      [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+      [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE, OIDCGrantType.OIDC_GRANT_TYPE_TOKEN_EXCHANGE].sort(),
+      OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
+    ]);
+
+    const codeWithRefreshAndExchange = JSON.stringify([
+      [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+      [
+        OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE,
+        OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN,
+        OIDCGrantType.OIDC_GRANT_TYPE_TOKEN_EXCHANGE,
+      ].sort(),
+      OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_BASIC,
+    ]);
+
     const pkce = JSON.stringify([
       [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
       [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE],
@@ -234,6 +250,22 @@ export function getAuthMethodFromPartialConfig(config: {
     const postWithRefresh = JSON.stringify([
       [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
       [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE, OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN].sort(),
+      OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST,
+    ]);
+
+    const postWithExchange = JSON.stringify([
+      [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+      [OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE, OIDCGrantType.OIDC_GRANT_TYPE_TOKEN_EXCHANGE].sort(),
+      OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST,
+    ]);
+
+    const postWithRefreshAndExchange = JSON.stringify([
+      [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+      [
+        OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE,
+        OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN,
+        OIDCGrantType.OIDC_GRANT_TYPE_TOKEN_EXCHANGE,
+      ].sort(),
       OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_POST,
     ]);
 
@@ -260,6 +292,33 @@ export function getAuthMethodFromPartialConfig(config: {
         OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE,
         OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN,
       ],
+      OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
+    ]);
+
+    const deviceCodeWithCodeAndExchange = JSON.stringify([
+      [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+      [
+        OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE,
+        OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE,
+        OIDCGrantType.OIDC_GRANT_TYPE_TOKEN_EXCHANGE,
+      ],
+      OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
+    ]);
+
+    const deviceCodeWithCodeAndRefreshAndExchange = JSON.stringify([
+      [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+      [
+        OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE,
+        OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE,
+        OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN,
+        OIDCGrantType.OIDC_GRANT_TYPE_TOKEN_EXCHANGE,
+      ],
+      OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
+    ]);
+
+    const deviceCodeWithExchange = JSON.stringify([
+      [OIDCResponseType.OIDC_RESPONSE_TYPE_CODE],
+      [OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE, OIDCGrantType.OIDC_GRANT_TYPE_TOKEN_EXCHANGE],
       OIDCAuthMethodType.OIDC_AUTH_METHOD_TYPE_NONE,
     ]);
 
@@ -292,6 +351,10 @@ export function getAuthMethodFromPartialConfig(config: {
         return CODE_METHOD.key;
       case codeWithRefresh:
         return CODE_METHOD.key;
+      case codeWithExchange:
+        return CODE_METHOD.key;
+      case codeWithRefreshAndExchange:
+        return CODE_METHOD.key;
 
       case pkce:
         return PKCE_METHOD.key;
@@ -302,6 +365,10 @@ export function getAuthMethodFromPartialConfig(config: {
         return POST_METHOD.key;
       case postWithRefresh:
         return POST_METHOD.key;
+      case postWithExchange:
+        return POST_METHOD.key;
+      case postWithRefreshAndExchange:
+        return POST_METHOD.key;
 
       case deviceCode:
         return DEVICE_CODE_METHOD.key;
@@ -309,7 +376,13 @@ export function getAuthMethodFromPartialConfig(config: {
         return DEVICE_CODE_METHOD.key;
       case deviceCodeWithRefresh:
         return DEVICE_CODE_METHOD.key;
+      case deviceCodeWithExchange:
+        return DEVICE_CODE_METHOD.key;
       case deviceCodeWithCodeAndRefresh:
+        return DEVICE_CODE_METHOD.key;
+      case deviceCodeWithCodeAndExchange:
+        return DEVICE_CODE_METHOD.key;
+      case deviceCodeWithCodeAndRefreshAndExchange:
         return DEVICE_CODE_METHOD.key;
 
       case pkjwt:

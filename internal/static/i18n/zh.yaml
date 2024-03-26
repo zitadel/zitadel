@@ -60,7 +60,6 @@ Errors:
   Notification:
     NoDomain: 未找到对应的域名
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: 找不到用户
     AlreadyExists: 用户已存在
     NotFoundOnOrg: 在所选组织中找不到用户
@@ -479,6 +478,7 @@ Errors:
     CloseRows: SQL 语句无法完成
     SQLStatement: 无法创建 SQL 语句
     InvalidRequest: 请求无效
+    TooManyNestingLevels: 查询嵌套级别过多（最多 20 个）
   Quota:
     AlreadyExists: 这个单位的配额已经存在
     NotFound: 没有找到该单位的配额
@@ -556,6 +556,17 @@ Errors:
     NotActive: 用户架构未激活
     NotInactive: 用户架构未处于非活动状态
     NotExists: 用户架构不存在
+  TokenExchange:
+    FeatureDisabled: 您的实例已禁用令牌交换功能。 https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: 令牌丢失
+      Invalid: 令牌无效
+      TypeMissing: 缺少令牌类型
+      TypeNotAllowed: 不允许的令牌类型
+      TypeNotSupported: 不支持令牌类型
+      NotForAPI: API 不允许使用模拟令牌
+    Impersonation:
+      PolicyDisabled: 实例安全策略中禁用模拟
 
 AggregateTypes:
   action: 动作
@@ -591,6 +602,7 @@ EventTypes:
         failed: 初始化检查失败
     token:
       added: 已创建访问令牌
+    impersonated: 用户冒充
     username:
       reserved: 保留用户名
       released: 用户名已发布

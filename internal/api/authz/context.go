@@ -182,7 +182,7 @@ func checkOrigin(ctx context.Context, origins []string) error {
 func extractBearerToken(token string) (part string, err error) {
 	parts := strings.Split(token, BearerPrefix)
 	if len(parts) != 2 {
-		return "", zerrors.ThrowUnauthenticated(nil, "AUTH-7fs1e", "invalid auth header")
+		return "", zerrors.ThrowUnauthenticated(nil, "AUTH-toLo1", "invalid auth header")
 	}
 	return parts[1], nil
 }
