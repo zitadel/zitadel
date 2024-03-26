@@ -28,6 +28,8 @@ func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner str
 			return nil, err
 		}
 	}
+	// We ignore the deprecation warning here because we still need to support the deprecated field.
+	//nolint:staticcheck
 	event, err := addLink(ctx, c.eventstore.Filter, user.NewAggregate(existingUser.AggregateID, existingUser.ResourceOwner), link)
 	if err != nil {
 		return nil, err
