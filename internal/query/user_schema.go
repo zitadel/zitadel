@@ -32,7 +32,7 @@ type UserSchema struct {
 	Type                   string
 	Revision               uint32
 	Schema                 json.RawMessage
-	PossibleAuthenticators database.Array[domain.AuthenticatorType]
+	PossibleAuthenticators database.NumberArray[domain.AuthenticatorType]
 }
 
 type UserSchemaSearchQueries struct {
