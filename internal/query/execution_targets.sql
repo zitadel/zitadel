@@ -25,5 +25,7 @@ select id, array_agg(target) as targets
 from (SELECT id,
              unnest(targets) AS target
       FROM rel_tree) x
-where id = $2
-group by id;
+where id IN ($2, $3, $4)
+group by id
+order by id DESC
+LIMIT 1;

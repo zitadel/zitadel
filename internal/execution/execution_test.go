@@ -102,8 +102,8 @@ func Test_Call(t *testing.T) {
 	}
 }
 
-func testCall(ctx context.Context, timeout time.Duration, body []byte) func(string) ([]byte, error) {
-	return func(url string) (bytes []byte, err error) {
+func testCall(ctx context.Context, timeout time.Duration, body []byte) func(string) (interface{}, error) {
+	return func(url string) (interface{}, error) {
 		return call(ctx, url, timeout, body)
 	}
 }
@@ -118,15 +118,15 @@ func testTargetCall(ctx context.Context,
 	}
 }
 
-func testServerCall[R any](
+func testServerCall(
 	t *testing.T,
 	method string,
 	body []byte,
 	timeout time.Duration,
 	statusCode int,
 	respBody []byte,
-	call func(string) (R, error),
-) (R, error) {
+	call func(string) (interface{}, error),
+) (interface{}, error) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		checkRequest(t, r, method, body)
 

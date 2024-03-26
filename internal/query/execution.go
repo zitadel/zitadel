@@ -124,11 +124,11 @@ func NewExecutionIncludeSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(ExecutionColumnIncludes, value, TextListContains)
 }
 
-func (q *Queries) ExecutionTargets(ctx context.Context, id string) (execution *executionTargets, err error) {
+func (q *Queries) ExecutionTargetsRequestResponse(ctx context.Context, fullMethod, service, all string) (execution *ExecutionTargets, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("unable to get execution with includes %s: %w", id, err)
+			err = fmt.Errorf("unable to get execution with includes %s: %w", fullMethod, err)
 		}
 		span.EndWithError(err)
 	}()
@@ -140,7 +140,9 @@ func (q *Queries) ExecutionTargets(ctx context.Context, id string) (execution *e
 		},
 		executionTargetsQuery,
 		authz.GetInstance(ctx).InstanceID(),
-		id,
+		fullMethod,
+		service,
+		all,
 	)
 	return execution, err
 }
@@ -219,20 +221,16 @@ func prepareExecutionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 		}
 }
 
-type executionTargets struct {
-	id      string
-	targets []string
+type ExecutionTargets struct {
+	ID      string
+	Targets []string
 }
 
-func (e *executionTargets) Targets() []string {
-	return e.targets
-}
-
-func scanExecutionTargets(row *sql.Row) (*executionTargets, error) {
-	execution := new(executionTargets)
+func scanExecutionTargets(row *sql.Row) (*ExecutionTargets, error) {
+	execution := new(ExecutionTargets)
 	err := row.Scan(
-		&execution.id,
-		(*pq.StringArray)(&execution.targets),
+		&execution.ID,
+		(*pq.StringArray)(&execution.Targets),
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

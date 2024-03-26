@@ -15,7 +15,7 @@ import (
 
 func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		request, err := executeTargetsForGRPCFullMethod(ctx, queries, info.FullMethod, req, domain.ExecutionTypeRequest)
+		request, err := executeTargetsForGRPCFullMethod(ctx, queries, info.FullMethod, req, nil, domain.ExecutionTypeRequest)
 		if err != nil {
 			return nil, err
 		}
@@ -25,69 +25,52 @@ func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
 			return nil, err
 		}
 
-		return executeTargetsForGRPCFullMethod(ctx, queries, info.FullMethod, resp, domain.ExecutionTypeResponse)
+		return executeTargetsForGRPCFullMethod(ctx, queries, info.FullMethod, req, resp, domain.ExecutionTypeResponse)
 	}
 }
 
-func executeTargetsForGRPCFullMethod(ctx context.Context, queries *query.Queries, fullMethod string, req interface{}, executionType domain.ExecutionType) (interface{}, error) {
+type ExecutionQueries interface {
+	ExecutionTargetsRequestResponse(ctx context.Context, fullMethod, service, all string) (execution *query.ExecutionTargets, err error)
+	SearchTargets(ctx context.Context, queries *query.TargetSearchQueries) (targets *query.Targets, err error)
+}
+
+func executeTargetsForGRPCFullMethod(
+	ctx context.Context,
+	queries ExecutionQueries,
+	fullMethod string,
+	req interface{},
+	resp interface{},
+	executionType domain.ExecutionType,
+) (interface{}, error) {
 	request := req
-	typeQuery, err := query.NewExecutionTypeSearchQuery(executionType)
+
+	exectargets, err := queries.ExecutionTargetsRequestResponse(ctx, exec_rp.ID(executionType, fullMethod), exec_rp.ID(executionType, serviceFromFullMethod(fullMethod)), exec_rp.IDAll(executionType))
 	if err != nil {
 		return nil, err
 	}
 
-	idQuery, err := inIDsQuery(executionType, fullMethod)
+	targetIDsQuery, err := query.NewTargetInIDsSearchQuery(exectargets.Targets)
 	if err != nil {
 		return nil, err
 	}
 
-	execs, err := queries.SearchExecutions(ctx, &query.ExecutionSearchQueries{Queries: []query.SearchQuery{typeQuery, idQuery}})
+	targets, err := queries.SearchTargets(ctx, &query.TargetSearchQueries{Queries: []query.SearchQuery{targetIDsQuery}})
 	if err != nil {
 		return nil, err
 	}
 
-	for _, exec := range execs.Executions {
-		exectargets, err := queries.ExecutionTargets(ctx, exec.ID)
-		if err != nil {
-			return nil, err
-		}
-
-		targetIDsQuery, err := query.NewTargetInIDsSearchQuery(exectargets.Targets())
-		if err != nil {
-			return nil, err
-		}
-
-		targets, err := queries.SearchTargets(ctx, &query.TargetSearchQueries{Queries: []query.SearchQuery{targetIDsQuery}})
-		if err != nil {
-			return nil, err
-		}
-
-		ctxData := authz.GetCtxData(ctx)
-		info := &execution.ContextInfo{
-			FullMethod: fullMethod,
-			InstanceID: authz.GetInstance(ctx).InstanceID(),
-			ProjectID:  ctxData.ProjectID,
-			OrgID:      ctxData.OrgID,
-			UserID:     ctxData.UserID,
-			Request:    request,
-		}
-
-		request, err = execution.CallTargets(ctx, targets.Targets, info)
-		if err != nil {
-			return nil, err
-		}
+	ctxData := authz.GetCtxData(ctx)
+	info := &execution.ContextInfo{
+		FullMethod: fullMethod,
+		InstanceID: authz.GetInstance(ctx).InstanceID(),
+		ProjectID:  ctxData.ProjectID,
+		OrgID:      ctxData.OrgID,
+		UserID:     ctxData.UserID,
+		Request:    request,
+		Response:   resp,
 	}
-	return request, nil
-}
 
-func inIDsQuery(t domain.ExecutionType, fullMethod string) (query.SearchQuery, error) {
-	return query.NewExecutionInIDsSearchQuery(
-		[]string{
-			exec_rp.IDAll(t),
-			exec_rp.ID(t, serviceFromFullMethod(fullMethod)),
-			exec_rp.ID(t, fullMethod),
-		},
-	)
+	return execution.CallTargets(ctx, targets.Targets, info)
 }
 
 func serviceFromFullMethod(s string) string {

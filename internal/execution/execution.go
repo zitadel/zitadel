@@ -14,30 +14,35 @@ import (
 )
 
 type ContextInfo struct {
-	FullMethod string      `json:"fullMethod"`
-	InstanceID string      `json:"instanceID"`
-	OrgID      string      `json:"orgID"`
-	ProjectID  string      `json:"projectID"`
-	UserID     string      `json:"userID"`
-	Request    interface{} `json:"request"`
+	FullMethod string      `json:"fullMethod,omitempty"`
+	InstanceID string      `json:"instanceID,omitempty"`
+	OrgID      string      `json:"orgID,omitempty"`
+	ProjectID  string      `json:"projectID,omitempty"`
+	UserID     string      `json:"userID,omitempty"`
+	Request    interface{} `json:"request,omitempty"`
+	Response   interface{} `json:"response,omitempty"`
 }
 
 func CallTargets(ctx context.Context,
 	targets []*query.Target,
 	info *ContextInfo,
-) (r interface{}, err error) {
-	r = info.Request
+) (interface{}, error) {
+	ret := info.Request
 	for _, target := range targets {
 		if target.Async {
 			go CallTarget(ctx, target, info)
 		} else {
-			r, err = CallTarget(ctx, target, info)
+			resp, err := CallTarget(ctx, target, info)
 			if err != nil && target.InterruptOnError {
-				return r, err
+				return ret, err
+			}
+			if resp != nil {
+				ret = resp
+				info.Request = resp
 			}
 		}
 	}
-	return r, err
+	return ret, nil
 }
 
 func CallTarget(ctx context.Context,
@@ -49,16 +54,15 @@ func CallTarget(ctx context.Context,
 		return nil, err
 	}
 
+	r := info.Request
 	switch target.TargetType {
 	case domain.TargetTypeWebhook:
-		return info.Request, webhook(ctx, target.URL, target.Timeout, data)
+		return r, webhook(ctx, target.URL, target.Timeout, data)
 	case domain.TargetTypeRequestResponse:
 		response, err := call(ctx, target.URL, target.Timeout, data)
 		if err != nil {
 			return nil, err
 		}
-
-		r := info.Request
 		if err := json.Unmarshal(response, r); err != nil {
 			return nil, err
 		}
