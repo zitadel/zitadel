@@ -27,8 +27,8 @@
     </div>
     <p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.IDPS.ACTIVATE.DESCRIPTION' | translate }}</p>
   </cnsl-info-section>
-  <div class="section" *ngIf="configureProvider">
-    <div class="row">
+  <div class="next-section" *ngIf="configureProvider">
+    <div class="next-row">
       <h2>{{ configureTitle }}</h2>
       <a
         mat-icon-button
@@ -49,9 +49,9 @@
       }}</a>
     </cnsl-copy-row>
   </div>
-  <div class="section" *ngIf="autofillLink">
-    <div class="row">
-      <h2>{{ 'DESCRIPTIONS.SETTINGS.IDPS.AUTOFILL.TITLE' | translate }}</h2>
+  <div class="next-section" *ngIf="autofillLink">
+    <div class="next-row">
+      <h2 class="next-title">{{ 'DESCRIPTIONS.SETTINGS.IDPS.AUTOFILL.TITLE' | translate }}</h2>
       <a
         mat-icon-button
         *ngIf="autofillLink"
@@ -64,6 +64,6 @@
         <mat-icon class="icon">info_outline</mat-icon>
       </a>
     </div>
-    <p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.IDPS.AUTOFILL.DESCRIPTION' | translate }}</p>
+    <p class="next-description cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.IDPS.AUTOFILL.DESCRIPTION' | translate }}</p>
   </div>
 </cnsl-card>

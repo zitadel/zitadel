@@ -1,7 +1,4 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ManagementService } from '../../../services/mgmt.service';
-import { AdminService } from '../../../services/admin.service';
-import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 export interface CopyUrl {
   label: string;

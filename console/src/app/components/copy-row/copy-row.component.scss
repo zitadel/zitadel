@@ -12,7 +12,7 @@
   $button-text-color: map-get($foreground, text);
   $button-disabled-text-color: map-get($foreground, disabled-button);
 
-  .section {
+  .copy-btn {
     flex-grow: 1;
     text-align: left;
     transition: opacity 0.15s ease-in-out;

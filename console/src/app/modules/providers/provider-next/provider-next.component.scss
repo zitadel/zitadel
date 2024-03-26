@@ -11,3 +11,26 @@
     align-self: flex-end;
   }
 }
+
+.next-section {
+  margin-top: -1rem;
+
+  .next-row {
+    display: flex;
+    align-items: center;
+
+    .next-title {
+      margin: 0;
+    }
+
+    .icon {
+      font-size: 1.2rem;
+      height: 1.2rem;
+      width: 1.2rem;
+    }
+  }
+
+  .description {
+    font-size: 14px;
+  }
+}
