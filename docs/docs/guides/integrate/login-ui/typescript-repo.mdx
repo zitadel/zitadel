@@ -19,15 +19,14 @@ The typescript repository contains all TypeScript and JavaScript packages and ap
 ## Login UI
 
 The new implementation of the login is based on Next.js and implements the [OIDC standard](./oidc-standard) by proxying requests to the ZITADEL backend and using the session API.
-The confidential side of the application is autenticated with a service user.
-It fetches policies and settings from your instance and is able to autenticate users without a OIDC context to allow them to self service their account.
+The UI shows branding and behaves based on the policies and settings your instance or organization (when using an org scope) has.
+It is also able to autenticate users without an OIDC context by navigating to the host of the login, to allow them to self service their account.
+It's set of features will increase with time and its progress will be tracked [here](./typescript-repo#implemented-features).
 
 ### Architectural Overview
 
 The new login app consists of a confidential (backend) part and a browser (client side) part.
 In addition to that, the OIDC specification builds upon a proxy which is set up in the Next.js middleware. It rewrites requests of the paths `/.well-known/:path*`, `/oauth/:path*`, `/oidc/:path*` to ZITADEL.
-The login requires to register its host as custom domain of your instance. We refer to [installing domain](/docs/apis/resources/system/system-service-add-domain) for self hosters or the [guide for cloud users](/docs/guides/manage/cloud/instances#add-custom-domain), to setup domains.
-You can read more information about it in [how to setup domains](./typescript-repo#how-to-setup-domains).
 
 The backend side of the application is authorized using a machine user and a personal access token.
 This token is used to fetch policies and settings from your instances or organization which define how users are authenticated and how the login is displayed.
@@ -62,8 +61,9 @@ The application can then request a token calling the /token endpoint of the logi
 - [ ] AuthRequest `prompt`
   - [x] Login
   - [x] Select Account
-  - [ ] Consent
   - [x] Create
+  - [x] None
+  - [ ] Consent
 - Scopes
   - [x] `openid email profile address``
   - [x] `offline access`
@@ -106,27 +106,23 @@ After authenticating, or with a valid session, users are able to self service th
 - [ ] Setup Multifactor Passkey (U2F)
 - [ ] Validate Account (email verification)
 
-## How to setup domains
-
-In order to use the new login app, the domain must be registered on your instance and use https.
-If you are using a self hosted instance, [install](/docs/apis/resources/system/system-service-add-domain) your domain on your instance using the system service.
-
-The login using our cloud service is still experimental, but you can purchase your domain on zitadel.com, install it on your domain following [our guide](/docs/guides/manage/cloud/instances#add-custom-domain).
-After your domain has been verified, you can reconfigure your DNS settings in order to deploy the login on your own.
-
 ### Setup
 
-#### Proxy / Next.js middleware
+In order to run the new login app, make sure to follow the instructions in the [Readme](https://github.com/zitadel/typescript/blob/main/README.md#run-login-ui).
 
-Make sure the host of the login is set in your instance.
-To detect the proxy, `x-zitadel-login-client` and `x-zitadel-forwarded` must be set as request headers.
-`x-zitadel-login-client` is the ID of the service user, `x-zitadel-forwarded` falls back to the host.
+#### How to setup domains for OIDC
+
+When setting up the new login app for OIDC, the domain must be registered on your instance and use https.
+If you are using a self hosted instance, [install](/docs/apis/resources/system/system-service-add-domain) your domain on your instance using the system service.
+
+If you want to use the login with your cloud instance, you can purchase your domain on zitadel.com, install it on your domain following [our guide](/docs/guides/manage/cloud/instances#add-custom-domain).
+After your domain has been verified, you can reconfigure your DNS settings in order to deploy the login on your own.
 
 #### Deploy to Vercel
 
-To deploy your own version on Vercel, navigate to your instance and create a service user.
-Copy its id from the overview and set it as ZITADEL_SERVICE_USER_ID.
-Then create a personal access token (PAT), copy and set it as ZITADEL_SERVICE_USER_TOKEN, then navigate to your instance settings and make sure it gets IAM_OWNER permissions.
-Finally set your instance url as ZITADEL_API_URL. Make sure to set it without trailing slash.
-
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzitadel%2Ftypescript&env=ZITADEL_API_URL,ZITADEL_SERVICE_USER_ID,ZITADEL_SERVICE_USER_TOKEN&root-directory=apps/login&envDescription=Setup%20a%20service%20account%20with%20IAM_OWNER%20membership%20on%20your%20instance%20and%20provide%20its%20id%20and%20personal%20access%20token.&project-name=zitadel-login&repository-name=zitadel-login)
+
+To deploy your own version on Vercel, navigate to your instance and create a service user.
+Copy its id from the overview and set it as `ZITADEL_SERVICE_USER_ID`.
+Then create a personal access token (PAT), copy and set it as `ZITADEL_SERVICE_USER_TOKEN`, then navigate to your instance settings and make sure it gets `IAM_OWNER` permissions.
+Finally set your instance url as `ZITADEL_API_URL`. Make sure to set it without trailing slash.
