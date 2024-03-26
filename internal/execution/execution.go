@@ -30,11 +30,11 @@ func CallTargets(ctx context.Context,
 	ret := info.Request
 	for _, target := range targets {
 		if target.Async {
-			go func() {
-				if _, err := CallTarget(ctx, target, info); err != nil {
+			go func(target query.Target) {
+				if _, err := CallTarget(ctx, &target, info); err != nil {
 					// TODO: log if error on async action?
 				}
-			}()
+			}(*target)
 		} else {
 			resp, err := CallTarget(ctx, target, info)
 			if err != nil && target.InterruptOnError {
