@@ -1,6 +1,6 @@
 ---
 title: Get Events from ZITADEL
-sidebar_label: Events
+sidebar_label: Event API
 ---
 
 ZITADEL leverages the power of eventsourcing, meaning every action and change within the system generates a corresponding event that is stored in the database. 
@@ -9,7 +9,7 @@ This API allows you to easily retrieve and utilize the events generated within t
 
 You need to give a user the [manager role](https://zitadel.com/docs/guides/manage/console/managers) IAM_OWNER_VIEWER or IAM_OWNER to access the Event API.
 
-If you like to know more about eventsourcing/eventstore and how this works in ZITADEL, head over to our [concepts](../../concepts/eventstore/overview).
+If you like to know more about eventsourcing/eventstore and how this works in ZITADEL, head over to our [concepts](/docs/concepts/eventstore/overview).
 ## Request Events
 
 Call the [ListEvents](/apis/resources/admin) enpoint in the Administration API to get all the events you need.

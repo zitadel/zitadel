@@ -60,7 +60,6 @@ Errors:
   Notification:
     NoDomain: Geen domein gevonden voor bericht
   User:
-    TooManyNestingLevels: Te veel query nesting niveaus (Max 20).
     NotFound: Gebruiker kon niet worden gevonden
     AlreadyExists: Gebruiker bestaat al
     NotFoundOnOrg: Gebruiker kon niet worden gevonden op gekozen organisatie
@@ -479,6 +478,7 @@ Errors:
     CloseRows: SQL Statement kon niet worden voltooid
     SQLStatement: SQL Statement kon niet worden gemaakt
     InvalidRequest: Verzoek is ongeldig
+    TooManyNestingLevels: Te veel query nesting niveaus (Max 20)
   Quota:
     AlreadyExists: Quota bestaat al voor deze eenheid
     NotFound: Quota niet gevonden voor deze eenheid
