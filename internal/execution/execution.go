@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -33,7 +34,7 @@ func CallTargets(ctx context.Context,
 		if target.Async {
 			go func(target query.Target) {
 				if _, err := CallTarget(ctx, &target, info); err != nil {
-					fmt.Errorf("error in async execution: %w", err)
+					logging.OnError(err).Error(err)
 				}
 			}(*target)
 		} else {
