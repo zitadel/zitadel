@@ -38,6 +38,8 @@ The following illustration shows the architecture of the login and a potential a
 
 ![Next.js Login Architecture](/img/typescript-login-architecture.png)
 
+_Note that the illustration is just a representation of the architecture and may not specify actual values._
+
 The flow starts by the `/authorize` endpoint which is intercepted by the login and forwarded to ZITADEL.
 ZITADEL interprets the request and specifically redirects back to the login app.
 It does so by redirecting to `/login`.
