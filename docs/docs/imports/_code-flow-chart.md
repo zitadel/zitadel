@@ -5,7 +5,7 @@ sequenceDiagram
     participant App
     participant AS as Authorization Server (ZITADEL)
     RO-->>App: Open App
-    App->>AS: Authorization Rrequest to /authorize
+    App->>AS: Authorization Request to /authorize
     AS->>RO: redirect to login
     RO->>AS: user authentication
     AS->>App: authorization code response

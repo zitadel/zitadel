@@ -19,6 +19,12 @@ on:
       GCR_JSON_KEY_BASE64:
         description: 'base64 endcrypted key to connect to Google'
         required: true
+      APP_ID:
+        description: 'GH App ID to request token for homebrew update'
+        required: true
+      APP_PRIVATE_KEY:
+        description: 'GH App Private Key to request token for homebrew update'
+        required: true
 
 jobs:
   version:
@@ -87,10 +93,9 @@ jobs:
         app_id: ${{ secrets.APP_ID }}
         private_key: ${{ secrets.APP_PRIVATE_KEY }}
     - name: Trigger Homebrew
-      if: ${{ github.ref_name == 'next' }}
       env:
         VERSION: ${{ needs.version.outputs.version }}
         RUN_ID: ${{ github.run_id }}
         GH_TOKEN: ${{ steps.generate-token.outputs.token }}
       run: |
-        gh workflow run -R zitadel/homebrew-tap update.yml -f runId=${RUN_ID} -f version=${VERSION}
+        gh workflow -R zitadel/homebrew-tap run update.yml -f runId=${RUN_ID} -f version=${VERSION}
