@@ -237,7 +237,6 @@ func userFactorToPb(factor query.SessionUserFactor) *session.UserFactor {
 		Id:             factor.UserID,
 		LoginName:      factor.LoginName,
 		DisplayName:    factor.DisplayName,
-		OrganisationId: factor.ResourceOwner,
 		OrganizationId: factor.ResourceOwner,
 	}
 }
