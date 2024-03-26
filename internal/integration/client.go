@@ -585,6 +585,10 @@ func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution
 }
 
 func (s *Tester) CreateUserSchema(ctx context.Context, t *testing.T) *schema.CreateUserSchemaResponse {
+	return s.CreateUserSchemaWithType(ctx, t, fmt.Sprint(time.Now().UnixNano()+1))
+}
+
+func (s *Tester) CreateUserSchemaWithType(ctx context.Context, t *testing.T, schemaType string) *schema.CreateUserSchemaResponse {
 	userSchema := new(structpb.Struct)
 	err := userSchema.UnmarshalJSON([]byte(`{
 		"$schema": "urn:zitadel:schema:v1",
@@ -593,7 +597,7 @@ func (s *Tester) CreateUserSchema(ctx context.Context, t *testing.T) *schema.Cre
 	}`))
 	require.NoError(t, err)
 	target, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &schema.CreateUserSchemaRequest{
-		Type: fmt.Sprint(time.Now().UnixNano() + 1),
+		Type: schemaType,
 		DataType: &schema.CreateUserSchemaRequest_Schema{
 			Schema: userSchema,
 		},
