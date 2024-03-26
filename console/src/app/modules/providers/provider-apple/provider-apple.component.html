@@ -19,7 +19,7 @@
     </div>
 
     <cnsl-provider-next
-      [configureProvider]="!(exists$ | async)"
+      [configureProvider]="(exists$ | async) === false"
       [configureTitle]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE' | translate: { provider: 'Apple' }"
       [configureDescription]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION' | translate: { provider: 'Apple' }"
       configureLink="https://zitadel.com/docs/guides/integrate/identity-providers/apple#apple-configuration"

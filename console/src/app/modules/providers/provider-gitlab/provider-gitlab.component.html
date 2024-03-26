@@ -18,7 +18,7 @@
     </div>
 
     <cnsl-provider-next
-      [configureProvider]="!(exists$ | async)"
+      [configureProvider]="(exists$ | async) === false"
       [configureTitle]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE' | translate: { provider: 'GitLab' }"
       [configureDescription]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION' | translate: { provider: 'GitLab' }"
       configureLink="https://zitadel.com/docs/guides/integrate/identity-providers/gitlab#gitlab-configuration"

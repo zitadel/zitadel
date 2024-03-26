@@ -18,7 +18,7 @@
     </div>
 
     <cnsl-provider-next
-      [configureProvider]="!(exists$ | async)"
+      [configureProvider]="(exists$ | async) === false"
       [configureTitle]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE' | translate: { provider: 'Microsoft' }"
       [configureDescription]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION' | translate: { provider: 'Microsoft' }"
       configureLink="https://zitadel.com/docs/guides/integrate/identity-providers/azure-ad-oidc#entra-id-configuration"

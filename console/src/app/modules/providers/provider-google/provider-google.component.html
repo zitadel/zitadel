@@ -18,7 +18,7 @@
     </div>
 
     <cnsl-provider-next
-      [configureProvider]="!(exists$ | async)"
+      [configureProvider]="(exists$ | async) === false"
       [configureTitle]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE' | translate: { provider: 'Google' }"
       [configureDescription]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION' | translate: { provider: 'Google' }"
       configureLink="https://zitadel.com/docs/guides/integrate/identity-providers/google#google-configuration"
