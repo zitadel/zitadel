@@ -31,17 +31,58 @@ func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
 }
 
 func executeTargetsForRequest(ctx context.Context, queries ExecutionQueries, fullMethod string, req interface{}) (interface{}, error) {
-	request, err := executeTargetsForGRPCFullMethod(ctx, queries, fullMethod, req, nil, domain.ExecutionTypeRequest)
-	if zerrors.IsNotFound(err) {
-		return req, nil
+	targets, err := queryTargets(ctx, queries, fullMethod, domain.ExecutionTypeRequest)
+	if err != nil {
+		// if no targets are found, return without any calls
+		if zerrors.IsNotFound(err) {
+			return req, nil
+		}
+		return nil, err
+	}
+
+	ctxData := authz.GetCtxData(ctx)
+	info := &execution.ContextInfoRequest{
+		FullMethod: fullMethod,
+		InstanceID: authz.GetInstance(ctx).InstanceID(),
+		ProjectID:  ctxData.ProjectID,
+		OrgID:      ctxData.OrgID,
+		UserID:     ctxData.UserID,
+		Request:    req,
+	}
+
+	request, err := execution.CallTargetsRequest(ctx, targets, info)
+	if err != nil {
+		// if an error is returned still return also the original request
+		return req, err
 	}
 	return request, err
 }
 
 func executeTargetsForResponse(ctx context.Context, queries ExecutionQueries, fullMethod string, req, resp interface{}) (interface{}, error) {
-	response, err := executeTargetsForGRPCFullMethod(ctx, queries, fullMethod, req, resp, domain.ExecutionTypeResponse)
-	if zerrors.IsNotFound(err) {
-		return resp, nil
+	targets, err := queryTargets(ctx, queries, fullMethod, domain.ExecutionTypeResponse)
+	if err != nil {
+		// if no targets are found, return without any calls
+		if zerrors.IsNotFound(err) {
+			return resp, nil
+		}
+		return nil, err
+	}
+
+	ctxData := authz.GetCtxData(ctx)
+	info := &execution.ContextInfoResponse{
+		FullMethod: fullMethod,
+		InstanceID: authz.GetInstance(ctx).InstanceID(),
+		ProjectID:  ctxData.ProjectID,
+		OrgID:      ctxData.OrgID,
+		UserID:     ctxData.UserID,
+		Request:    req,
+		Response:   resp,
+	}
+
+	response, err := execution.CallTargetsResponse(ctx, targets, info)
+	if err != nil {
+		// if an error is returned still return also the original response
+		return resp, err
 	}
 	return response, err
 }
@@ -51,17 +92,18 @@ type ExecutionQueries interface {
 	SearchTargets(ctx context.Context, queries *query.TargetSearchQueries) (targets *query.Targets, err error)
 }
 
-func executeTargetsForGRPCFullMethod(
+func queryTargets(
 	ctx context.Context,
 	queries ExecutionQueries,
 	fullMethod string,
-	req interface{},
-	resp interface{},
 	executionType domain.ExecutionType,
-) (interface{}, error) {
+) ([]*query.Target, error) {
 	exectargets, err := queries.ExecutionTargetsRequestResponse(ctx, exec_rp.ID(executionType, fullMethod), exec_rp.ID(executionType, serviceFromFullMethod(fullMethod)), exec_rp.IDAll(executionType))
 	if err != nil {
 		return nil, err
+	}
+	if exectargets == nil || len(exectargets.Targets) == 0 {
+		return nil, zerrors.ThrowNotFound(err, "EXEC-m70fpc7a9q", "Errors.Execution.NotFound")
 	}
 
 	targetIDsQuery, err := query.NewTargetInIDsSearchQuery(exectargets.Targets)
@@ -73,19 +115,10 @@ func executeTargetsForGRPCFullMethod(
 	if err != nil {
 		return nil, err
 	}
-
-	ctxData := authz.GetCtxData(ctx)
-	info := &execution.ContextInfo{
-		FullMethod: fullMethod,
-		InstanceID: authz.GetInstance(ctx).InstanceID(),
-		ProjectID:  ctxData.ProjectID,
-		OrgID:      ctxData.OrgID,
-		UserID:     ctxData.UserID,
-		Request:    req,
-		Response:   resp,
+	if targets == nil || len(targets.Targets) == 0 {
+		return nil, zerrors.ThrowNotFound(err, "EXEC-x2r3cnfadi", "Errors.Execution.NotFound")
 	}
-
-	return execution.CallTargets(ctx, targets.Targets, info)
+	return targets.Targets, nil
 }
 
 func serviceFromFullMethod(s string) string {

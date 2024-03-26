@@ -83,6 +83,37 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 		res  res
 	}{
 		{
+			"target, not found",
+			args{
+				ctx:        context.Background(),
+				fullMethod: "/service/method",
+				queries: &mockExecutionQueries{
+					etError: zerrors.ThrowNotFound(nil, "error", "NotFound"),
+				},
+				req: newMockContentRequest("request"),
+			},
+			res{
+				want: newMockContentRequest("request"),
+			},
+		},
+		{
+			"target, not existing",
+			args{
+				ctx:        context.Background(),
+				fullMethod: "/service/method",
+				queries: &mockExecutionQueries{
+					executionTargets: &query.ExecutionTargets{
+						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
+						Targets: []string{},
+					},
+				},
+				req: newMockContentRequest("request"),
+			},
+			res{
+				want: newMockContentRequest("request"),
+			},
+		},
+		{
 			"target, targets not found",
 			args{
 				ctx:        context.Background(),
@@ -101,12 +132,18 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			},
 		},
 		{
-			"target, not found",
+			"target, targets empty",
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
 				queries: &mockExecutionQueries{
-					etError: zerrors.ThrowNotFound(nil, "error", "NotFound"),
+					executionTargets: &query.ExecutionTargets{
+						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
+						Targets: []string{"target"},
+					},
+					targets: &query.Targets{
+						Targets: []*query.Target{},
+					},
 				},
 				req: newMockContentRequest("request"),
 			},
