@@ -287,7 +287,7 @@ export class GrpcAuthService {
       return this.fetchedZitadelPermissions.pipe(
         withLatestFrom(this.zitadelPermissions),
         filter(([hasLoaded, p]) => {
-          return hasLoaded === true && !!p.length;
+          return hasLoaded === true;
         }),
         map(([_, zroles]) => this.hasRoles(zroles, roles, requiresAll)),
         distinctUntilChanged(),
@@ -311,7 +311,7 @@ export class GrpcAuthService {
     return this.fetchedZitadelPermissions.pipe(
       withLatestFrom(this.zitadelPermissions),
       filter(([hL, p]) => {
-        return hL === true;
+        return hL === true && !!p.length;
       }),
       map(([_, zroles]) => {
         return objects.filter((obj) => {
