@@ -1,6 +1,6 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component, Injector, Type } from '@angular/core';
+import {ChangeDetectorRef, Component, Injector, OnInit, signal, Type, WritableSignal} from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
@@ -24,13 +24,14 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
-import { ProviderNextService } from '../provider-next/provider-next.service';
+import { ProviderNextServiceV2 } from '../provider-next/provider-next.v2.service';
+import {tap} from "rxjs/operators";
 
 @Component({
   selector: 'cnsl-provider-google',
   templateUrl: './provider-google.component.html',
 })
-export class ProviderGoogleComponent {
+export class ProviderGoogleComponent implements OnInit{
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
   // DEPRECATED: use id$ instead
@@ -49,8 +50,8 @@ export class ProviderGoogleComponent {
   public provider?: Provider.AsObject;
   public updateClientSecret: boolean = false;
 
-  public justCreated$: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  public justActivated$ = new BehaviorSubject<boolean>(false);
+  public justCreated$ = signal('');
+  public justActivated$ = signal(false);
 
   private service$ = this.nextSvc.service(this.route.data);
   private id$ = this.nextSvc.id(this.route.paramMap, this.justCreated$);
@@ -64,9 +65,15 @@ export class ProviderGoogleComponent {
     this.justActivated$,
     'https://zitadel.com/docs/guides/integrate/identity-providers/google#activate-idp',
     this.service$,
+  ).pipe(
+    tap((link)=>console.log("emitted", link)),
   );
   public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
   public copyUrls$ = this.nextSvc.callbackUrls();
+
+  ngOnInit() {
+    this.activateLink$.subscribe((activateLink)=>console.log("manual subscription", activateLink));
+  }
 
   constructor(
     private authService: GrpcAuthService,
@@ -75,7 +82,8 @@ export class ProviderGoogleComponent {
     private injector: Injector,
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
-    private nextSvc: ProviderNextService,
+    private nextSvc: ProviderNextServiceV2,
+    private cdr: ChangeDetectorRef,
   ) {
     this.form = new FormGroup({
       name: new FormControl('', []),
@@ -160,7 +168,7 @@ export class ProviderGoogleComponent {
   }
 
   public submitForm(): void {
-    this.provider || this.justCreated$.value ? this.updateGoogleProvider() : this.addGoogleProvider();
+    this.provider || this.justCreated$() ? this.updateGoogleProvider() : this.addGoogleProvider();
   }
 
   public addGoogleProvider(): void {
@@ -179,8 +187,13 @@ export class ProviderGoogleComponent {
     this.service
       .addGoogleProvider(req)
       .then((addedIDP) => {
-        this.justCreated$.next(addedIDP.id);
+        this.justCreated$.set(addedIDP.id);
         this.loading = false;
+        this.cdr.markForCheck()
+        setTimeout(() => {
+          console.log("cdr")
+          this.cdr.detectChanges()
+        }, 2000);
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -189,10 +202,10 @@ export class ProviderGoogleComponent {
   }
 
   public updateGoogleProvider(): void {
-    if (this.provider || this.justCreated$.value) {
+    if (this.provider || this.justCreated$()) {
       if (this.serviceType === PolicyComponentServiceType.MGMT) {
         const req = new MgmtUpdateGoogleProviderRequest();
-        req.setId(this.provider?.id || this.justCreated$.value);
+        req.setId(this.provider?.id || this.justCreated$());
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
         req.setScopesList(this.scopesList?.value);
@@ -217,7 +230,7 @@ export class ProviderGoogleComponent {
           });
       } else if (PolicyComponentServiceType.ADMIN) {
         const req = new AdminUpdateGoogleProviderRequest();
-        req.setId(this.provider?.id || this.justCreated$.value);
+        req.setId(this.provider?.id || this.justCreated$());
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
         req.setScopesList(this.scopesList?.value);

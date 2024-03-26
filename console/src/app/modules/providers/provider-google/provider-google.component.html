@@ -6,7 +6,7 @@
     <div class="title-row">
       <img class="idp-logo" src="./assets/images/idp/google.png" alt="google" />
       <h1>{{ 'IDP.CREATE.GOOGLE.TITLE' | translate }}</h1>
-      <ng-container *ngIf="exists$ | async">
+      <ng-container *ngIf="exists$()">
         <div
           *ngIf="{ isNotActive: (activateLink$ | async) } as idp"
           class="cnsl-state-dot"
@@ -17,15 +17,17 @@
       <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
     </div>
 
+    <h1>{{activateLink$ | async}}</h1>
+
     <cnsl-provider-next
-      [configureProvider]="(exists$ | async) === false"
+      [configureProvider]="!exists$()"
       [configureTitle]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE' | translate: { provider: 'Google' }"
       [configureDescription]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION' | translate: { provider: 'Google' }"
       configureLink="https://zitadel.com/docs/guides/integrate/identity-providers/google#google-configuration"
-      [autofillLink]="autofillLink$ | async"
+      [autofillLink]="autofillLink$()"
       [activateLink]="activateLink$ | async"
-      [copyUrls]="copyUrls$ | async"
-      [expanded]="!!(expandWhatNow$ | async)"
+      [copyUrls]="copyUrls$()"
+      [expanded]="expandWhatNow$()"
       (activate)="activate()"
     ></cnsl-provider-next>
 
@@ -108,7 +110,7 @@
           [disabled]="form.invalid || form.disabled"
           type="submit"
         >
-          <span *ngIf="{ exists: (exists$ | async) } as idp">{{
+          <span *ngIf="{ exists: exists$() } as idp">{{
             (!!idp.exists ? 'ACTIONS.SAVE' : 'ACTIONS.CREATE') | translate
           }}</span>
         </button>
