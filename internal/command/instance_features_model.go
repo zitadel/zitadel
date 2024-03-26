@@ -98,5 +98,5 @@ func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *Instan
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LegacyIntrospection, f.LegacyIntrospection, feature_v2.InstanceLegacyIntrospectionEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.UserSchema, f.UserSchema, feature_v2.InstanceUserSchemaEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.UserSchema, f.Execution, feature_v2.InstanceExecutionEventType)
-	return cmds
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.Execution, f.Execution, feature_v2.InstanceExecutionEventType)
 }
