@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"reflect"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -73,6 +74,14 @@ func convertBytes(array []byte) string {
 	var builder strings.Builder
 	builder.Grow(hex.EncodedLen(len(array)) + 4)
 	builder.WriteString(`\x`)
-	builder.Write(hex.AppendEncode(nil, array))
+	builder.Write(AppendEncode(nil, array))
 	return builder.String()
+}
+
+// TODO: remove function after we compile using go 1.22 and use function of hex package `hex.AppendEncode`
+func AppendEncode(dst, src []byte) []byte {
+	n := hex.EncodedLen(len(src))
+	dst = slices.Grow(dst, n)
+	hex.Encode(dst[len(dst):][:n], src)
+	return dst[:len(dst)+n]
 }
