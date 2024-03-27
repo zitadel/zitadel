@@ -7,7 +7,7 @@ import { Config } from './config.js';
 
 export default async function Setup(accessToken) {
     const org = await createOrg(accessToken);
-    const user = await createUser('gigi', org, accessToken);
+    const user = await createHuman('gigi', org, accessToken);
     return {org, user};
 }
 
@@ -18,7 +18,7 @@ export function createOrg(accessToken) {
             'POST', 
             url('/v2beta/organizations'), 
             JSON.stringify({
-                name: 'load-test-' + new Date(Date.now()).toISOString() + `-${__VU}`
+                name: `load-test-${new Date(Date.now()).toISOString()}`
             }), 
             {
                 headers: {
@@ -41,8 +41,8 @@ export function createOrg(accessToken) {
     })
 }
 
-const createUserTrend = new Trend('setup_create_user_duration', true);
-export function createUser(username, org, accessToken){
+const createHumanTrend = new Trend('setup_create_human_duration', true);
+export function createHuman(username, org, accessToken){
     return new Promise((resolve, reject) => {
         let response = http.asyncRequest(
             'POST',
@@ -79,7 +79,7 @@ export function createUser(username, org, accessToken){
                 "create user is status ok": (r) => r.status === 201
             }) || reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
         
-            createUserTrend.add(res.timings.duration);
+            createHumanTrend.add(res.timings.duration);
         
             resolve(http.get(
                 url(`/v2beta/users/${res.json().userId}`), 
@@ -93,4 +93,70 @@ export function createUser(username, org, accessToken){
             ).json().user);
         })
     })
+}
+
+const createMachineTrend = new Trend('setup_create_machine_duration', true);
+export function createMachine(username, org, accessToken){
+    return new Promise((resolve, reject) => {
+        let response = http.asyncRequest(
+            'POST',
+            url('/management/v1/users/machine'), 
+            JSON.stringify({
+                userName: username,
+                name: username,
+                // bearer
+                access_token_type: 0
+            }), 
+            {
+                headers: {
+                    authorization: `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                    'x-zitadel-orgid': org.organizationId
+                }
+            }
+        );
+    
+        response.then((res) => {
+            check(res, {
+                "create user is status ok": (r) => r.status === 200
+            }) || reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
+        
+            createHumanTrend.add(res.timings.duration);
+        
+            resolve(http.get(
+                url(`/v2beta/users/${res.json().userId}`), 
+                {
+                    headers: {
+                        authorization: `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json',
+                        'x-zitadel-orgid': org.organizationId
+                    }
+                }
+            ).json().user);
+        });
+    })
+}
+
+const addMachinePatTrend = new Trend('setup_add_machine_pat_duration', true);
+export function addMachinePat(userId, org, accessToken){
+    return new Promise((resolve, reject) => {
+        let response = http.asyncRequest(
+            'POST',
+            url(`/management/v1/users/${userId}/pats`), 
+            null, 
+            {
+                headers: {
+                    authorization: `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                    'x-zitadel-orgid': org.organizationId
+                }
+            }
+        );
+        response.then((res) => {
+            check(res, {
+                "add pat status ok": (r) => r.status === 200
+            }) || reject(`unable to add pat (user id: ${userId}) status: ${res.status} body: ${res.body}`);
+            resolve(res.json());
+        });
+    });
 }

@@ -7,7 +7,11 @@ import url from './url.js';
 export const Config = {
   host: __ENV.ZITADEL_HOST || 'http://localhost:8080',
   orgId: __ENV.ZITADEL_ORG_ID || '',
-  codeVerifier: __ENV.CODE_VERIFIER || randomString(10)
+  codeVerifier: __ENV.CODE_VERIFIER || randomString(10),
+  admin: {
+    loginName: __ENV.ADMIN_LOGIN_NAME || 'zitadel-admin@zitadel.localhost',
+    password: __ENV.ADMIN_PASSWORD || 'Password1!'
+  }
 };
 
 const client = {
