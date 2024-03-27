@@ -19,8 +19,7 @@ type MachineWriteModel struct {
 	Description     string
 	UserState       domain.UserState
 	AccessTokenType domain.OIDCTokenType
-
-	ClientSecret *crypto.CryptoValue
+	EncodedHash     string
 }
 
 func NewMachineWriteModel(userID, resourceOwner string) *MachineWriteModel {
@@ -72,9 +71,11 @@ func (wm *MachineWriteModel) Reduce() error {
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
 		case *user.MachineSecretSetEvent:
-			wm.ClientSecret = e.ClientSecret
+			wm.EncodedHash = crypto.SecretOrEncodedHash(e.ClientSecret, e.EncodedHash)
 		case *user.MachineSecretRemovedEvent:
-			wm.ClientSecret = nil
+			wm.EncodedHash = ""
+		case *user.MachineSecretHashUpdatedEvent:
+			wm.EncodedHash = e.EncodedHash
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -95,8 +96,9 @@ func (wm *MachineWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserReactivatedType,
 			user.UserRemovedType,
 			user.MachineSecretSetType,
-			user.MachineSecretRemovedType).
-		Builder()
+			user.MachineSecretRemovedType,
+			user.MachineSecretHashUpdatedType,
+		).Builder()
 }
 
 func (wm *MachineWriteModel) NewChangedEvent(

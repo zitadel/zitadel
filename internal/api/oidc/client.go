@@ -1040,8 +1040,13 @@ func (s *Server) verifyClientSecret(ctx context.Context, client *query.OIDCClien
 	if secret == "" {
 		return oidc.ErrInvalidClient().WithDescription("empty client secret")
 	}
-	if err = crypto.CompareHash(client.ClientSecret, []byte(secret), s.hashAlg); err != nil {
+	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
+	updated, err := s.hasher.Verify(client.EncodedHash, secret)
+	spanPasswordComparison.EndWithError(err)
+	if err != nil {
+		s.command.OIDCSecretCheckFailed(ctx, client.AppID, client.ProjectID, client.Settings.ResourceOwner)
 		return oidc.ErrInvalidClient().WithParent(err).WithDescription("invalid secret")
 	}
+	s.command.OIDCSecretCheckSucceeded(ctx, client.AppID, client.ProjectID, client.Settings.ResourceOwner, updated)
 	return nil
 }

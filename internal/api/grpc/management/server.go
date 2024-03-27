@@ -5,6 +5,9 @@ import (
 
 	"google.golang.org/grpc"
 
+	"github.com/zitadel/passwap"
+	"github.com/zitadel/passwap/bcrypt"
+
 	"github.com/zitadel/zitadel/internal/api/assets"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
@@ -23,13 +26,13 @@ var _ management.ManagementServiceServer = (*Server)(nil)
 
 type Server struct {
 	management.UnimplementedManagementServiceServer
-	command         *command.Commands
-	query           *query.Queries
-	systemDefaults  systemdefaults.SystemDefaults
-	assetAPIPrefix  func(context.Context) string
-	passwordHashAlg crypto.HashAlgorithm
-	userCodeAlg     crypto.EncryptionAlgorithm
-	externalSecure  bool
+	command        *command.Commands
+	query          *query.Queries
+	systemDefaults systemdefaults.SystemDefaults
+	assetAPIPrefix func(context.Context) string
+	passwordHash   *passwap.Swapper
+	userCodeAlg    crypto.EncryptionAlgorithm
+	externalSecure bool
 }
 
 func CreateServer(
@@ -40,13 +43,13 @@ func CreateServer(
 	externalSecure bool,
 ) *Server {
 	return &Server{
-		command:         command,
-		query:           query,
-		systemDefaults:  sd,
-		assetAPIPrefix:  assets.AssetAPI(externalSecure),
-		passwordHashAlg: crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
-		userCodeAlg:     userCodeAlg,
-		externalSecure:  externalSecure,
+		command:        command,
+		query:          query,
+		systemDefaults: sd,
+		assetAPIPrefix: assets.AssetAPI(externalSecure),
+		passwordHash:   passwap.NewSwapper(bcrypt.New(sd.SecretGenerators.PasswordSaltCost), bcrypt.Verifier),
+		userCodeAlg:    userCodeAlg,
+		externalSecure: externalSecure,
 	}
 }
 

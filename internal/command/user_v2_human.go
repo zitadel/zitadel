@@ -373,7 +373,7 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 
 	// Either have a code to set the password
 	if password.PasswordCode != nil {
-		if err := crypto.VerifyCodeWithAlgorithm(wm.PasswordCodeCreationDate, wm.PasswordCodeExpiry, wm.PasswordCode, *password.PasswordCode, alg); err != nil {
+		if err := crypto.VerifyCode(wm.PasswordCodeCreationDate, wm.PasswordCodeExpiry, wm.PasswordCode, *password.PasswordCode, alg); err != nil {
 			return cmds, err
 		}
 	}

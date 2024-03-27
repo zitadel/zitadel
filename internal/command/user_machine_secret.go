@@ -15,9 +15,9 @@ type GenerateMachineSecret struct {
 	ClientSecret string
 }
 
-func (c *Commands) GenerateMachineSecret(ctx context.Context, userID string, resourceOwner string, generator crypto.Generator, set *GenerateMachineSecret) (*domain.ObjectDetails, error) {
+func (c *Commands) GenerateMachineSecret(ctx context.Context, userID string, resourceOwner string, set *GenerateMachineSecret) (*domain.ObjectDetails, error) {
 	agg := user.NewAggregate(userID, resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareGenerateMachineSecret(agg, generator, set))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareGenerateMachineSecret(agg, c.secretHasher, set))
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (c *Commands) GenerateMachineSecret(ctx context.Context, userID string, res
 	}, nil
 }
 
-func prepareGenerateMachineSecret(a *user.Aggregate, generator crypto.Generator, set *GenerateMachineSecret) preparation.Validation {
+func prepareGenerateMachineSecret(a *user.Aggregate, hasher *crypto.PasswordHasher, set *GenerateMachineSecret) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if a.ResourceOwner == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-x0992n", "Errors.ResourceOwnerMissing")
@@ -50,15 +50,14 @@ func prepareGenerateMachineSecret(a *user.Aggregate, generator crypto.Generator,
 			if !isUserStateExists(writeModel.UserState) {
 				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-x8910n", "Errors.User.NotExisting")
 			}
-
-			clientSecret, secretString, err := domain.NewMachineClientSecret(generator)
+			encodedHash, plain, err := newHashedSecret(ctx, filter, hasher)
 			if err != nil {
 				return nil, err
 			}
-			set.ClientSecret = secretString
+			set.ClientSecret = plain
 
 			return []eventstore.Command{
-				user.NewMachineSecretSetEvent(ctx, &a.Aggregate, clientSecret),
+				user.NewMachineSecretSetEvent(ctx, &a.Aggregate, encodedHash),
 			}, nil
 		}, nil
 	}
@@ -99,7 +98,7 @@ func prepareRemoveMachineSecret(a *user.Aggregate) preparation.Validation {
 			if !isUserStateExists(writeModel.UserState) {
 				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-x7s802", "Errors.User.NotExisting")
 			}
-			if writeModel.ClientSecret == nil {
+			if writeModel.EncodedHash == "" {
 				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-coi82n", "Errors.User.Machine.Secret.NotExisting")
 			}
 			return []eventstore.Command{
@@ -109,9 +108,16 @@ func prepareRemoveMachineSecret(a *user.Aggregate) preparation.Validation {
 	}
 }
 
-func (c *Commands) MachineSecretCheckSucceeded(ctx context.Context, userID, resourceOwner string) {
+func (c *Commands) MachineSecretCheckSucceeded(ctx context.Context, userID, resourceOwner, updated string) {
 	agg := user.NewAggregate(userID, resourceOwner)
-	c.asyncPush(ctx, user.NewMachineSecretCheckSucceededEvent(ctx, &agg.Aggregate))
+	cmds := append(
+		make([]eventstore.Command, 0, 2),
+		user.NewMachineSecretCheckSucceededEvent(ctx, &agg.Aggregate),
+	)
+	if updated != "" {
+		user.NewMachineSecretHashUpdatedEvent(ctx, &agg.Aggregate, updated)
+	}
+	c.asyncPush(ctx, cmds...)
 }
 
 func (c *Commands) MachineSecretCheckFailed(ctx context.Context, userID, resourceOwner string) {

@@ -50,7 +50,7 @@ type Commands struct {
 	smsEncryption                   crypto.EncryptionAlgorithm
 	userEncryption                  crypto.EncryptionAlgorithm
 	userPasswordHasher              *crypto.PasswordHasher
-	codeAlg                         crypto.HashAlgorithm
+	secretHasher                    *crypto.PasswordHasher
 	machineKeySize                  int
 	applicationKeySize              int
 	domainVerificationAlg           crypto.EncryptionAlgorithm
@@ -147,7 +147,10 @@ func StartCommands(
 		ActionFunctionExisting: domain.FunctionExists(),
 	}
 
-	repo.codeAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
+	repo.secretHasher, err = defaults.SecretHasher.PasswordHasher()
+	if err != nil {
+		return nil, err
+	}
 	repo.userPasswordHasher, err = defaults.PasswordHasher.PasswordHasher()
 	if err != nil {
 		return nil, err

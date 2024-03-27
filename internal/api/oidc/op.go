@@ -9,6 +9,8 @@ import (
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
+	"github.com/zitadel/passwap"
+	"github.com/zitadel/passwap/bcrypt"
 
 	"github.com/zitadel/zitadel/internal/api/assets"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
@@ -133,7 +135,7 @@ func NewServer(
 		defaultAccessTokenLifetime: config.DefaultAccessTokenLifetime,
 		defaultIdTokenLifetime:     config.DefaultIdTokenLifetime,
 		fallbackLogger:             fallbackLogger,
-		hashAlg:                    crypto.NewBCrypt(10), // as we are only verifying in oidc, the cost is already part of the hash string and the config here is irrelevant.
+		hasher:                     passwap.NewSwapper(bcrypt.New(10)), // as we are only verifying in oidc, the cost is already part of the hash string and the config here is irrelevant.
 		signingKeyAlgorithm:        config.SigningKeyAlgorithm,
 		assetAPIPrefix:             assets.AssetAPI(externalSecure),
 	}

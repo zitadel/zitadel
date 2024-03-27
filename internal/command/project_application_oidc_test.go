@@ -23,9 +23,9 @@ func TestAddOIDCApp(t *testing.T) {
 		idGenerator id.Generator
 	}
 	type args struct {
-		app             *addOIDCApp
-		clientSecretAlg crypto.HashAlgorithm
-		filter          preparation.FilterToQueryReducer
+		app           *addOIDCApp
+		hashGenerator *crypto.HashGenerator
+		filter        preparation.FilterToQueryReducer
 	}
 
 	ctx := context.Background()
@@ -156,7 +156,7 @@ func TestAddOIDCApp(t *testing.T) {
 						domain.OIDCVersionV1,
 						"id",
 						"clientID@project",
-						nil,
+						"",
 						[]string{"https://test.ch"},
 						[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 						[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -221,7 +221,7 @@ func TestAddOIDCApp(t *testing.T) {
 						domain.OIDCVersionV1,
 						"id",
 						"clientID@project",
-						nil,
+						"",
 						nil,
 						[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 						[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -250,7 +250,7 @@ func TestAddOIDCApp(t *testing.T) {
 				context.Background(),
 				c.AddOIDCAppCommand(
 					tt.args.app,
-					tt.args.clientSecretAlg,
+					tt.args.hashGenerator,
 				), tt.args.filter, tt.want)
 		})
 	}
@@ -262,10 +262,9 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 		idGenerator id.Generator
 	}
 	type args struct {
-		ctx             context.Context
-		oidcApp         *domain.OIDCApp
-		resourceOwner   string
-		secretGenerator crypto.Generator
+		ctx           context.Context
+		oidcApp       *domain.OIDCApp
+		resourceOwner string
 	}
 	type res struct {
 		want *domain.OIDCApp
@@ -370,12 +369,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 							domain.OIDCVersionV1,
 							"app1",
 							"client1@project",
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("a"),
-							},
+							"secret",
 							[]string{"https://test.ch"},
 							[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 							[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -418,8 +412,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					AdditionalOrigins:        []string{" https://sub.test.ch "},
 					SkipNativeAppSuccessPage: true,
 				},
-				resourceOwner:   "org1",
-				secretGenerator: GetMockSecretGenerator(t),
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.OIDCApp{
@@ -475,12 +468,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 							domain.OIDCVersionV1,
 							"app1",
 							"client1@project",
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("a"),
-							},
+							"secret",
 							[]string{"https://test.ch"},
 							[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 							[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -523,8 +511,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					AdditionalOrigins:        []string{"https://sub.test.ch"},
 					SkipNativeAppSuccessPage: true,
 				},
-				resourceOwner:   "org1",
-				secretGenerator: GetMockSecretGenerator(t),
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.OIDCApp{
@@ -563,7 +550,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			got, err := r.AddOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner, tt.args.secretGenerator)
+			got, err := r.AddOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -709,12 +696,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 								domain.OIDCVersionV1,
 								"app1",
 								"client1@project",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("a"),
-								},
+								"secret",
 								[]string{"https://test.ch"},
 								[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 								[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -783,12 +765,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 								domain.OIDCVersionV1,
 								"app1",
 								"client1@project",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("a"),
-								},
+								"secret",
 								[]string{"https://test.ch"},
 								[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 								[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -857,12 +834,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 								domain.OIDCVersionV1,
 								"app1",
 								"client1@project",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("a"),
-								},
+								"secret",
 								[]string{"https://test.ch"},
 								[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 								[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -968,11 +940,10 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx             context.Context
-		appID           string
-		projectID       string
-		resourceOwner   string
-		secretGenerator crypto.Generator
+		ctx           context.Context
+		appID         string
+		projectID     string
+		resourceOwner string
 	}
 	type res struct {
 		want *domain.OIDCApp
@@ -1054,12 +1025,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 								domain.OIDCVersionV1,
 								"app1",
 								"client1@project",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("a"),
-								},
+								"secret",
 								[]string{"https://test.ch"},
 								[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 								[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -1081,22 +1047,16 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 						project.NewOIDCConfigSecretChangedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
 							"app1",
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("a"),
-							},
+							"secret",
 						),
 					),
 				),
 			},
 			args: args{
-				ctx:             context.Background(),
-				projectID:       "project1",
-				appID:           "app1",
-				resourceOwner:   "org1",
-				secretGenerator: GetMockSecretGenerator(t),
+				ctx:           context.Background(),
+				projectID:     "project1",
+				appID:         "app1",
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.OIDCApp{
@@ -1133,7 +1093,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeOIDCApplicationSecret(tt.args.ctx, tt.args.projectID, tt.args.appID, tt.args.resourceOwner, tt.args.secretGenerator)
+			got, err := r.ChangeOIDCApplicationSecret(tt.args.ctx, tt.args.projectID, tt.args.appID, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

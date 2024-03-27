@@ -15,14 +15,20 @@ const (
 	APIConfigSecretChangedType        = applicationEventTypePrefix + "config.api.secret.changed"
 	APIClientSecretCheckSucceededType = applicationEventTypePrefix + "api.secret.check.succeeded"
 	APIClientSecretCheckFailedType    = applicationEventTypePrefix + "api.secret.check.failed"
+	APIConfigSecretHashUpdatedType    = applicationEventTypePrefix + "config.api.secret.updated"
 )
 
 type APIConfigAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AppID          string                   `json:"appId"`
-	ClientID       string                   `json:"clientId,omitempty"`
-	ClientSecret   *crypto.CryptoValue      `json:"clientSecret,omitempty"`
+	AppID    string `json:"appId"`
+	ClientID string `json:"clientId,omitempty"`
+
+	// New events only use EncodedHash. However, the ClientSecret field
+	// is preserved to handle events older than the switch to Passwap.
+	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	EncodedHash  string              `json:"encodedHash,omitempty"`
+
 	AuthMethodType domain.APIAuthMethodType `json:"authMethodType,omitempty"`
 }
 
@@ -39,7 +45,7 @@ func NewAPIConfigAddedEvent(
 	aggregate *eventstore.Aggregate,
 	appID,
 	clientID string,
-	clientSecret *crypto.CryptoValue,
+	encodedHash string,
 	authMethodType domain.APIAuthMethodType,
 ) *APIConfigAddedEvent {
 	return &APIConfigAddedEvent{
@@ -50,7 +56,7 @@ func NewAPIConfigAddedEvent(
 		),
 		AppID:          appID,
 		ClientID:       clientID,
-		ClientSecret:   clientSecret,
+		EncodedHash:    encodedHash,
 		AuthMethodType: authMethodType,
 	}
 }
@@ -90,7 +96,14 @@ func APIConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error)
 type APIConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AppID          string                    `json:"appId"`
+	AppID string `json:"appId"`
+
+	// TBD IN REVIEW:
+	// I did not find any callers that set the ClientSecret field.
+	// It is not reduced in the writeModel.
+	// It is reduced in the projection.
+	// Do we have legacy events that might have this field set,
+	// or is it safe to remove this field?
 	ClientSecret   *crypto.CryptoValue       `json:"clientSecret,omitempty"`
 	AuthMethodType *domain.APIAuthMethodType `json:"authMethodType,omitempty"`
 }
@@ -151,8 +164,12 @@ func APIConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, erro
 type APIConfigSecretChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AppID        string              `json:"appId"`
+	AppID string `json:"appId"`
+
+	// New events only use EncodedHash. However, the ClientSecret field
+	// is preserved to handle events older than the switch to Passwap.
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	EncodedHash  string              `json:"encodedHash,omitempty"`
 }
 
 func (e *APIConfigSecretChangedEvent) Payload() interface{} {
@@ -167,7 +184,7 @@ func NewAPIConfigSecretChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	appID string,
-	clientSecret *crypto.CryptoValue,
+	encodedHash string,
 ) *APIConfigSecretChangedEvent {
 	return &APIConfigSecretChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -175,8 +192,8 @@ func NewAPIConfigSecretChangedEvent(
 			aggregate,
 			APIConfigSecretChangedType,
 		),
-		AppID:        appID,
-		ClientSecret: clientSecret,
+		AppID:       appID,
+		EncodedHash: encodedHash,
 	}
 }
 
@@ -275,4 +292,40 @@ func APIConfigSecretCheckFailedEventMapper(event eventstore.Event) (eventstore.E
 	}
 
 	return e, nil
+}
+
+type APIConfigSecretHashUpdatedEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+
+	AppID       string `json:"appId"`
+	EncodedHash string `json:"encodedHash,omitempty"`
+}
+
+func NewAPIConfigSecretHashUpdatedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	appID string,
+	encoded string,
+) *APIConfigSecretHashUpdatedEvent {
+	return &APIConfigSecretHashUpdatedEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			APIConfigSecretHashUpdatedType,
+		),
+		AppID:       appID,
+		EncodedHash: encoded,
+	}
+}
+
+func (e *APIConfigSecretHashUpdatedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+	e.BaseEvent = b
+}
+
+func (e *APIConfigSecretHashUpdatedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *APIConfigSecretHashUpdatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
 }

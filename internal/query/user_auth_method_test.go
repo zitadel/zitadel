@@ -39,38 +39,38 @@ var (
 		"method_type",
 		"count",
 	}
-	prepareActiveAuthMethodTypesStmt = `SELECT projections.users10_notifications.password_set,` +
+	prepareActiveAuthMethodTypesStmt = `SELECT projections.users12_notifications.password_set,` +
 		` auth_method_types.method_type,` +
 		` user_idps_count.count` +
-		` FROM projections.users10` +
-		` LEFT JOIN projections.users10_notifications ON projections.users10.id = projections.users10_notifications.user_id AND projections.users10.instance_id = projections.users10_notifications.instance_id` +
+		` FROM projections.users12` +
+		` LEFT JOIN projections.users12_notifications ON projections.users12.id = projections.users12_notifications.user_id AND projections.users12.instance_id = projections.users12_notifications.instance_id` +
 		` LEFT JOIN (SELECT DISTINCT(auth_method_types.method_type), auth_method_types.user_id, auth_method_types.instance_id FROM projections.user_auth_methods4 AS auth_method_types` +
 		` WHERE auth_method_types.state = $1) AS auth_method_types` +
-		` ON auth_method_types.user_id = projections.users10.id AND auth_method_types.instance_id = projections.users10.instance_id` +
+		` ON auth_method_types.user_id = projections.users12.id AND auth_method_types.instance_id = projections.users12.instance_id` +
 		` LEFT JOIN (SELECT user_idps_count.user_id, user_idps_count.instance_id, COUNT(user_idps_count.user_id) AS count FROM projections.idp_user_links3 AS user_idps_count` +
 		` GROUP BY user_idps_count.user_id, user_idps_count.instance_id) AS user_idps_count` +
-		` ON user_idps_count.user_id = projections.users10.id AND user_idps_count.instance_id = projections.users10.instance_id` +
+		` ON user_idps_count.user_id = projections.users12.id AND user_idps_count.instance_id = projections.users12.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms`
 	prepareActiveAuthMethodTypesCols = []string{
 		"password_set",
 		"method_type",
 		"idps_count",
 	}
-	prepareAuthMethodTypesRequiredStmt = `SELECT projections.users10_notifications.password_set,` +
+	prepareAuthMethodTypesRequiredStmt = `SELECT projections.users12_notifications.password_set,` +
 		` auth_method_types.method_type,` +
 		` user_idps_count.count,` +
 		` auth_methods_force_mfa.force_mfa,` +
 		` auth_methods_force_mfa.force_mfa_local_only` +
-		` FROM projections.users10` +
-		` LEFT JOIN projections.users10_notifications ON projections.users10.id = projections.users10_notifications.user_id AND projections.users10.instance_id = projections.users10_notifications.instance_id` +
+		` FROM projections.users12` +
+		` LEFT JOIN projections.users12_notifications ON projections.users12.id = projections.users12_notifications.user_id AND projections.users12.instance_id = projections.users12_notifications.instance_id` +
 		` LEFT JOIN (SELECT DISTINCT(auth_method_types.method_type), auth_method_types.user_id, auth_method_types.instance_id FROM projections.user_auth_methods4 AS auth_method_types` +
 		` WHERE auth_method_types.state = $1) AS auth_method_types` +
-		` ON auth_method_types.user_id = projections.users10.id AND auth_method_types.instance_id = projections.users10.instance_id` +
+		` ON auth_method_types.user_id = projections.users12.id AND auth_method_types.instance_id = projections.users12.instance_id` +
 		` LEFT JOIN (SELECT user_idps_count.user_id, user_idps_count.instance_id, COUNT(user_idps_count.user_id) AS count FROM projections.idp_user_links3 AS user_idps_count` +
 		` GROUP BY user_idps_count.user_id, user_idps_count.instance_id) AS user_idps_count` +
-		` ON user_idps_count.user_id = projections.users10.id AND user_idps_count.instance_id = projections.users10.instance_id` +
+		` ON user_idps_count.user_id = projections.users12.id AND user_idps_count.instance_id = projections.users12.instance_id` +
 		` LEFT JOIN (SELECT auth_methods_force_mfa.force_mfa, auth_methods_force_mfa.force_mfa_local_only, auth_methods_force_mfa.instance_id, auth_methods_force_mfa.aggregate_id FROM projections.login_policies5 AS auth_methods_force_mfa ORDER BY auth_methods_force_mfa.is_default) AS auth_methods_force_mfa` +
-		` ON (auth_methods_force_mfa.aggregate_id = projections.users10.instance_id OR auth_methods_force_mfa.aggregate_id = projections.users10.resource_owner) AND auth_methods_force_mfa.instance_id = projections.users10.instance_id` +
+		` ON (auth_methods_force_mfa.aggregate_id = projections.users12.instance_id OR auth_methods_force_mfa.aggregate_id = projections.users12.resource_owner) AND auth_methods_force_mfa.instance_id = projections.users12.instance_id` +
 		` AS OF SYSTEM TIME '-1 ms
 `
 	prepareAuthMethodTypesRequiredCols = []string{

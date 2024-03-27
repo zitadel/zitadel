@@ -9,6 +9,7 @@ import (
 type SystemDefaults struct {
 	SecretGenerators   SecretGenerators
 	PasswordHasher     crypto.PasswordHashConfig
+	SecretHasher       crypto.PasswordHashConfig
 	Multifactors       MultifactorConfig
 	DomainVerification DomainVerification
 	Notifications      Notifications

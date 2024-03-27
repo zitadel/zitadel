@@ -65,10 +65,10 @@ func TestQueries_GetIntrospectionClientByID(t *testing.T) {
 				[]driver.Value{"clientID", encSecret, "projectID", nil},
 				"instanceID", "clientID", false),
 			want: &IntrospectionClient{
-				ClientID:     "clientID",
-				ClientSecret: secret,
-				ProjectID:    "projectID",
-				PublicKeys:   nil,
+				ClientID:    "clientID",
+				EncodedHash: "",
+				ProjectID:   "projectID",
+				PublicKeys:  nil,
 			},
 		},
 		{
@@ -82,10 +82,10 @@ func TestQueries_GetIntrospectionClientByID(t *testing.T) {
 				[]driver.Value{"clientID", nil, "projectID", encPubkeys},
 				"instanceID", "clientID", true),
 			want: &IntrospectionClient{
-				ClientID:     "clientID",
-				ClientSecret: nil,
-				ProjectID:    "projectID",
-				PublicKeys:   pubkeys,
+				ClientID:    "clientID",
+				EncodedHash: "",
+				ProjectID:   "projectID",
+				PublicKeys:  pubkeys,
 			},
 		},
 	}
