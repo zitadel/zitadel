@@ -86,6 +86,8 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
       GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
+      APP_ID: ${{ secrets.APP_ID }}
+      APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
     with:
       build_image_name: ${{ needs.container.outputs.build_image }}
       semantic_version: "19.0.2"
