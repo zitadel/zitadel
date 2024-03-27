@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/query"
-	exec_rp "github.com/zitadel/zitadel/internal/repository/execution"
+	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -98,7 +98,7 @@ func queryTargets(
 	fullMethod string,
 	executionType domain.ExecutionType,
 ) ([]*query.Target, error) {
-	exectargets, err := queries.ExecutionTargetsRequestResponse(ctx, exec_rp.ID(executionType, fullMethod), exec_rp.ID(executionType, serviceFromFullMethod(fullMethod)), exec_rp.IDAll(executionType))
+	exectargets, err := queries.ExecutionTargetsRequestResponse(ctx, exec_repo.ID(executionType, fullMethod), exec_repo.ID(executionType, serviceFromFullMethod(fullMethod)), exec_repo.IDAll(executionType))
 	if err != nil {
 		return nil, err
 	}
