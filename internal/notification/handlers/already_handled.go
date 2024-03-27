@@ -19,7 +19,9 @@ func (a *alreadyHandled) Reduce() error {
 }
 
 func (a *alreadyHandled) AppendEvents(event ...eventstore.Event) {
-	a.handled = true
+	if len(event) > 0 {
+		a.handled = true
+	}
 }
 
 func (a *alreadyHandled) Query() *eventstore.SearchQueryBuilder {
