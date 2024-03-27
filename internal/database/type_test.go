@@ -1,9 +1,9 @@
 package database
 
 import (
+	"database/sql"
 	"database/sql/driver"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -11,7 +11,7 @@ import (
 
 func TestMap_Scan(t *testing.T) {
 	type args struct {
-		src any
+		src []byte
 	}
 	type res[V any] struct {
 		want Map[V]
@@ -25,9 +25,18 @@ func TestMap_Scan(t *testing.T) {
 	}
 	tests := []testCase[string]{
 		{
+			"nil",
+			Map[string]{},
+			args{src: nil},
+			res[string]{
+				want: Map[string]{},
+				err:  false,
+			},
+		},
+		{
 			"null",
 			Map[string]{},
-			args{src: "invalid"},
+			args{src: []byte("invalid")},
 			res[string]{
 				want: Map[string]{},
 				err:  true,
@@ -119,83 +128,109 @@ func TestMap_Value(t *testing.T) {
 	}
 }
 
-func TestNullDuration_Scan(t *testing.T) {
+type typedInt int
+
+func TestNumberArray_Scan(t *testing.T) {
 	type args struct {
 		src any
 	}
 	type res struct {
-		want NullDuration
+		want any
 		err  bool
 	}
 	type testCase struct {
 		name string
+		m    sql.Scanner
 		args args
 		res  res
 	}
 	tests := []testCase{
 		{
-			"invalid",
-			args{src: "invalid"},
-			res{
-				want: NullDuration{
-					Valid: false,
-				},
-				err: true,
+			name: "typedInt",
+			m:    new(NumberArray[typedInt]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[typedInt]{1, 2},
 			},
 		},
 		{
-			"null",
-			args{src: nil},
-			res{
-				want: NullDuration{
-					Valid: false,
-				},
-				err: false,
+			name: "int8",
+			m:    new(NumberArray[int8]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[int8]{1, 2},
 			},
 		},
 		{
-			"valid",
-			args{src: "1:0:0"},
-			res{
-				want: NullDuration{
-					Valid:    true,
-					Duration: time.Hour,
-				},
+			name: "uint8",
+			m:    new(NumberArray[uint8]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[uint8]{1, 2},
 			},
 		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			d := new(NullDuration)
-			if err := d.Scan(tt.args.src); (err != nil) != tt.res.err {
-				t.Errorf("Scan() error = %v, wantErr %v", err, tt.res.err)
-			}
-			assert.Equal(t, tt.res.want, *d)
-		})
-	}
-}
-
-func TestArray_ScanInt32(t *testing.T) {
-	type args struct {
-		src any
-	}
-	type res[V arrayField] struct {
-		want Array[V]
-		err  bool
-	}
-	type testCase[V arrayField] struct {
-		name string
-		m    Array[V]
-		args args
-		res[V]
-	}
-	tests := []testCase[int32]{
 		{
-			"number",
-			Array[int32]{},
-			args{src: "{1,2}"},
-			res[int32]{
-				want: []int32{1, 2},
+			name: "int16",
+			m:    new(NumberArray[int16]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[int16]{1, 2},
+			},
+		},
+		{
+			name: "uint16",
+			m:    new(NumberArray[uint16]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[uint16]{1, 2},
+			},
+		},
+		{
+			name: "int32",
+			m:    new(NumberArray[int32]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[int32]{1, 2},
+			},
+		},
+		{
+			name: "uint32",
+			m:    new(NumberArray[uint32]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[uint32]{1, 2},
+			},
+		},
+		{
+			name: "int64",
+			m:    new(NumberArray[int64]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[int64]{1, 2},
+			},
+		},
+		{
+			name: "uint64",
+			m:    new(NumberArray[uint64]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[uint64]{1, 2},
+			},
+		},
+		{
+			name: "int",
+			m:    new(NumberArray[int]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[int]{1, 2},
+			},
+		},
+		{
+			name: "uint",
+			m:    new(NumberArray[uint]),
+			args: args{src: "{1,2}"},
+			res: res{
+				want: &NumberArray[uint]{1, 2},
 			},
 		},
 	}
@@ -210,42 +245,80 @@ func TestArray_ScanInt32(t *testing.T) {
 	}
 }
 
-func TestArray_Value(t *testing.T) {
+type typedText string
+
+func TestTextArray_Scan(t *testing.T) {
+	type args struct {
+		src any
+	}
+	type res struct {
+		want sql.Scanner
+		err  bool
+	}
+	type testCase struct {
+		name string
+		m    sql.Scanner
+		args args
+		res
+	}
+	tests := []testCase{
+		{
+			"string",
+			new(TextArray[string]),
+			args{src: "{asdf,fdas}"},
+			res{
+				want: &TextArray[string]{"asdf", "fdas"},
+			},
+		},
+		{
+			"typedText",
+			new(TextArray[typedText]),
+			args{src: "{asdf,fdas}"},
+			res{
+				want: &TextArray[typedText]{"asdf", "fdas"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.m.Scan(tt.args.src); (err != nil) != tt.res.err {
+				t.Errorf("Scan() error = %v, wantErr %v", err, tt.res.err)
+			}
+
+			assert.Equal(t, tt.res.want, tt.m)
+		})
+	}
+}
+
+func TestTextArray_Value(t *testing.T) {
 	type res struct {
 		want driver.Value
 		err  bool
 	}
-	type testCase[V arrayField] struct {
+	type testCase struct {
 		name string
-		a    Array[V]
+		m    driver.Valuer
 		res  res
 	}
-	tests := []testCase[int32]{
-		{
-			"nil",
-			nil,
-			res{
-				want: nil,
-			},
-		},
+	tests := []testCase{
 		{
 			"empty",
-			Array[int32]{},
+			TextArray[string]{},
 			res{
 				want: nil,
 			},
 		},
 		{
 			"set",
-			Array[int32]([]int32{1, 2}),
+			TextArray[string]{"a", "s", "d", "f"},
 			res{
-				want: driver.Value(string([]byte(`{1,2}`))),
+				want: driver.Value([]byte("{a,s,d,f}")),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.a.Value()
+			got, err := tt.m.Value()
 			if tt.res.err {
 				assert.Error(t, err)
 			}
@@ -253,6 +326,129 @@ func TestArray_Value(t *testing.T) {
 				require.NoError(t, err)
 				assert.Equalf(t, tt.res.want, got, "Value()")
 			}
+		})
+	}
+}
+
+type typedByte byte
+
+func TestByteArray_Scan(t *testing.T) {
+	wantedBytes := []byte("asdf")
+	wantedTypedBytes := []typedByte("asdf")
+	type args struct {
+		src any
+	}
+	type res struct {
+		want sql.Scanner
+		err  bool
+	}
+	type testCase struct {
+		name string
+		m    sql.Scanner
+		args args
+		res
+	}
+	tests := []testCase{
+		{
+			"bytes",
+			new(ByteArray[byte]),
+			args{src: []byte("asdf")},
+			res{
+				want: (*ByteArray[byte])(&wantedBytes),
+			},
+		},
+		{
+			"typed",
+			new(ByteArray[typedByte]),
+			args{src: []byte("asdf")},
+			res{
+				want: (*ByteArray[typedByte])(&wantedTypedBytes),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.m.Scan(tt.args.src); (err != nil) != tt.res.err {
+				t.Errorf("Scan() error = %v, wantErr %v", err, tt.res.err)
+			}
+
+			assert.Equal(t, tt.res.want, tt.m)
+		})
+	}
+}
+
+func TestByteArray_Value(t *testing.T) {
+	type res struct {
+		want driver.Value
+		err  bool
+	}
+	type testCase struct {
+		name string
+		m    driver.Valuer
+		res  res
+	}
+	tests := []testCase{
+		{
+			"empty",
+			ByteArray[byte]{},
+			res{
+				want: nil,
+			},
+		},
+		{
+			"set",
+			ByteArray[byte]([]byte("{\"type\": \"object\", \"$schema\": \"urn:zitadel:schema:v1\"}")),
+			res{
+				want: driver.Value([]byte("{\"type\": \"object\", \"$schema\": \"urn:zitadel:schema:v1\"}")),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.m.Value()
+			if tt.res.err {
+				assert.Error(t, err)
+			}
+			if !tt.res.err {
+				require.NoError(t, err)
+				assert.Equalf(t, tt.res.want, got, "Value()")
+			}
+		})
+	}
+}
+
+func TestDuration_Scan(t *testing.T) {
+	duration := Duration(10)
+	type args struct {
+		src any
+	}
+	type res struct {
+		want sql.Scanner
+		err  bool
+	}
+	type testCase[V ~string] struct {
+		name string
+		m    sql.Scanner
+		args args
+		res
+	}
+	tests := []testCase[string]{
+		{
+			name: "int64",
+			m:    new(Duration),
+			args: args{src: int64(duration)},
+			res: res{
+				want: &duration,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.m.Scan(tt.args.src); (err != nil) != tt.res.err {
+				t.Errorf("Scan() error = %v, wantErr %v", err, tt.res.err)
+			}
+
+			assert.Equal(t, tt.res.want, tt.m)
 		})
 	}
 }
