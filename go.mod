@@ -24,6 +24,7 @@ require (
 	github.com/drone/envsubst v1.0.3
 	github.com/envoyproxy/protoc-gen-validate v1.0.4
 	github.com/fatih/color v1.16.0
+	github.com/gabriel-vasile/mimetype v1.4.3
 	github.com/go-jose/go-jose/v3 v3.0.3
 	github.com/go-ldap/ldap/v3 v3.4.6
 	github.com/go-webauthn/webauthn v0.10.1
