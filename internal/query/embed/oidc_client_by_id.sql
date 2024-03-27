@@ -7,8 +7,8 @@ with client as (
 		c.application_type, c.auth_method_type, c.post_logout_redirect_uris, c.is_dev_mode,
 		c.access_token_type, c.access_token_role_assertion, c.id_token_role_assertion,
 		c.id_token_userinfo_assertion, c.clock_skew, c.additional_origins, a.project_id, a.state
-	from projections.apps6_oidc_configs c
-	join projections.apps6 a on a.id = c.app_id and a.instance_id = c.instance_id
+	from projections.apps7_oidc_configs c
+	join projections.apps7 a on a.id = c.app_id and a.instance_id = c.instance_id
 	where c.instance_id = $1
 		and c.client_id = $2
 ),

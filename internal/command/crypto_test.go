@@ -19,7 +19,7 @@ import (
 )
 
 func mockCode(code string, exp time.Duration) cryptoCodeFunc {
-	return func(ctx context.Context, filter preparation.FilterToQueryReducer, _ domain.SecretGeneratorType, alg crypto.Crypto) (*CryptoCode, error) {
+	return func(ctx context.Context, filter preparation.FilterToQueryReducer, _ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm) (*CryptoCode, error) {
 		return &CryptoCode{
 			Crypted: &crypto.CryptoValue{
 				CryptoType: crypto.TypeEncryption,
@@ -34,7 +34,7 @@ func mockCode(code string, exp time.Duration) cryptoCodeFunc {
 }
 
 func mockCodeWithDefault(code string, exp time.Duration) cryptoCodeWithDefaultFunc {
-	return func(ctx context.Context, filter preparation.FilterToQueryReducer, _ domain.SecretGeneratorType, alg crypto.Crypto, _ *crypto.GeneratorConfig) (*CryptoCode, error) {
+	return func(ctx context.Context, filter preparation.FilterToQueryReducer, _ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, _ *crypto.GeneratorConfig) (*CryptoCode, error) {
 		return &CryptoCode{
 			Crypted: &crypto.CryptoValue{
 				CryptoType: crypto.TypeEncryption,
@@ -74,7 +74,7 @@ func testSecretGeneratorAddedEvent(typ domain.SecretGeneratorType) *instance.Sec
 func Test_newCryptoCode(t *testing.T) {
 	type args struct {
 		typ domain.SecretGeneratorType
-		alg crypto.Crypto
+		alg crypto.EncryptionAlgorithm
 	}
 	tests := []struct {
 		name       string
@@ -87,7 +87,7 @@ func Test_newCryptoCode(t *testing.T) {
 			eventstore: eventstoreExpect(t, expectFilterError(io.ErrClosedPipe)),
 			args: args{
 				typ: domain.SecretGeneratorTypeVerifyEmailCode,
-				alg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				alg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			wantErr: io.ErrClosedPipe,
 		},
@@ -98,7 +98,7 @@ func Test_newCryptoCode(t *testing.T) {
 			)),
 			args: args{
 				typ: domain.SecretGeneratorTypeVerifyEmailCode,
-				alg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+				alg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 		},
 	}
@@ -120,12 +120,12 @@ func Test_verifyCryptoCode(t *testing.T) {
 	es := eventstoreExpect(t, expectFilter(
 		eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypeVerifyEmailCode)),
 	))
-	code, err := newCryptoCode(context.Background(), es.Filter, domain.SecretGeneratorTypeVerifyEmailCode, crypto.CreateMockHashAlg(gomock.NewController(t)))
+	code, err := newCryptoCode(context.Background(), es.Filter, domain.SecretGeneratorTypeVerifyEmailCode, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 	require.NoError(t, err)
 
 	type args struct {
 		typ     domain.SecretGeneratorType
-		alg     crypto.Crypto
+		alg     crypto.EncryptionAlgorithm
 		expiry  time.Duration
 		crypted *crypto.CryptoValue
 		plain   string
@@ -141,7 +141,7 @@ func Test_verifyCryptoCode(t *testing.T) {
 			eventsore: eventstoreExpect(t, expectFilterError(io.ErrClosedPipe)),
 			args: args{
 				typ:     domain.SecretGeneratorTypeVerifyEmailCode,
-				alg:     crypto.CreateMockHashAlg(gomock.NewController(t)),
+				alg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				expiry:  code.Expiry,
 				crypted: code.Crypted,
 				plain:   code.Plain,
@@ -155,7 +155,7 @@ func Test_verifyCryptoCode(t *testing.T) {
 			)),
 			args: args{
 				typ:     domain.SecretGeneratorTypeVerifyEmailCode,
-				alg:     crypto.CreateMockHashAlg(gomock.NewController(t)),
+				alg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				expiry:  code.Expiry,
 				crypted: code.Crypted,
 				plain:   code.Plain,
@@ -168,7 +168,7 @@ func Test_verifyCryptoCode(t *testing.T) {
 			)),
 			args: args{
 				typ:     domain.SecretGeneratorTypeVerifyEmailCode,
-				alg:     crypto.CreateMockHashAlg(gomock.NewController(t)),
+				alg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				expiry:  code.Expiry,
 				crypted: code.Crypted,
 				plain:   "wrong",
@@ -188,10 +188,10 @@ func Test_verifyCryptoCode(t *testing.T) {
 	}
 }
 
-func Test_secretGenerator(t *testing.T) {
+func Test_cryptoCodeGenerator(t *testing.T) {
 	type args struct {
 		typ           domain.SecretGeneratorType
-		alg           crypto.Crypto
+		alg           crypto.EncryptionAlgorithm
 		defaultConfig *crypto.GeneratorConfig
 	}
 	tests := []struct {
@@ -207,23 +207,10 @@ func Test_secretGenerator(t *testing.T) {
 			eventsore: eventstoreExpect(t, expectFilterError(io.ErrClosedPipe)),
 			args: args{
 				typ:           domain.SecretGeneratorTypeVerifyEmailCode,
-				alg:           crypto.CreateMockHashAlg(gomock.NewController(t)),
+				alg:           crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 				defaultConfig: emptyConfig,
 			},
 			wantErr: io.ErrClosedPipe,
-		},
-		{
-			name: "hash generator",
-			eventsore: eventstoreExpect(t, expectFilter(
-				eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypeVerifyEmailCode)),
-			)),
-			args: args{
-				typ:           domain.SecretGeneratorTypeVerifyEmailCode,
-				alg:           crypto.CreateMockHashAlg(gomock.NewController(t)),
-				defaultConfig: emptyConfig,
-			},
-			want:     crypto.NewHashGenerator(testGeneratorConfig, crypto.CreateMockHashAlg(gomock.NewController(t))),
-			wantConf: &testGeneratorConfig,
 		},
 		{
 			name: "encryption generator",
@@ -236,17 +223,6 @@ func Test_secretGenerator(t *testing.T) {
 				defaultConfig: emptyConfig,
 			},
 			want:     crypto.NewEncryptionGenerator(testGeneratorConfig, crypto.CreateMockEncryptionAlg(gomock.NewController(t))),
-			wantConf: &testGeneratorConfig,
-		},
-		{
-			name:      "hash generator with default config",
-			eventsore: eventstoreExpect(t, expectFilter()),
-			args: args{
-				typ:           domain.SecretGeneratorTypeVerifyEmailCode,
-				alg:           crypto.CreateMockHashAlg(gomock.NewController(t)),
-				defaultConfig: &testGeneratorConfig,
-			},
-			want:     crypto.NewHashGenerator(testGeneratorConfig, crypto.CreateMockHashAlg(gomock.NewController(t))),
 			wantConf: &testGeneratorConfig,
 		},
 		{
@@ -275,7 +251,7 @@ func Test_secretGenerator(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, gotConf, err := secretGenerator(context.Background(), tt.eventsore.Filter, tt.args.typ, tt.args.alg, tt.args.defaultConfig)
+			got, gotConf, err := cryptoCodeGenerator(context.Background(), tt.eventsore.Filter, tt.args.typ, tt.args.alg, tt.args.defaultConfig)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.IsType(t, tt.want, got)
 			assert.Equal(t, tt.wantConf, gotConf)

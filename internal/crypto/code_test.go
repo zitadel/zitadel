@@ -102,25 +102,10 @@ func TestVerifyCode(t *testing.T) {
 			},
 			false,
 		},
-		{
-			"hash alg ok",
-			args{
-				creationDate: time.Now(),
-				expiry:       5 * time.Minute,
-				cryptoCode: &CryptoValue{
-					CryptoType: TypeHash,
-					Algorithm:  "hash",
-					Crypted:    []byte("code"),
-				},
-				verificationCode: "code",
-				g:                createMockGenerator(t, CreateMockHashAlg(gomock.NewController(t))),
-			},
-			false,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := VerifyCode(tt.args.creationDate, tt.args.expiry, tt.args.cryptoCode, tt.args.verificationCode, tt.args.g); (err != nil) != tt.wantErr {
+			if err := VerifyCode(tt.args.creationDate, tt.args.expiry, tt.args.cryptoCode, tt.args.verificationCode, tt.args.g.Alg()); (err != nil) != tt.wantErr {
 				t.Errorf("VerifyCode() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -218,88 +203,6 @@ func Test_verifyEncryptedCode(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := verifyEncryptedCode(tt.args.cryptoCode, tt.args.verificationCode, tt.args.alg); (err != nil) != tt.wantErr {
 				t.Errorf("verifyEncryptedCode() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func Test_verifyHashedCode(t *testing.T) {
-	type args struct {
-		cryptoCode       *CryptoValue
-		verificationCode string
-		alg              HashAlgorithm
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-
-		{
-			"nil error",
-			args{
-				cryptoCode:       nil,
-				verificationCode: "",
-				alg:              CreateMockHashAlg(gomock.NewController(t)),
-			},
-			true,
-		},
-		{
-			"wrong cryptotype error",
-			args{
-				cryptoCode: &CryptoValue{
-					CryptoType: TypeEncryption,
-					Crypted:    nil,
-				},
-				verificationCode: "",
-				alg:              CreateMockHashAlg(gomock.NewController(t)),
-			},
-			true,
-		},
-		{
-			"wrong algorithm error",
-			args{
-				cryptoCode: &CryptoValue{
-					CryptoType: TypeHash,
-					Algorithm:  "hash2",
-					Crypted:    nil,
-				},
-				verificationCode: "",
-				alg:              CreateMockHashAlg(gomock.NewController(t)),
-			},
-			true,
-		},
-		{
-			"wrong verification code error",
-			args{
-				cryptoCode: &CryptoValue{
-					CryptoType: TypeHash,
-					Algorithm:  "hash",
-					Crypted:    []byte("code"),
-				},
-				verificationCode: "wrong",
-				alg:              CreateMockHashAlg(gomock.NewController(t)),
-			},
-			true,
-		},
-		{
-			"verification code ok",
-			args{
-				cryptoCode: &CryptoValue{
-					CryptoType: TypeHash,
-					Algorithm:  "hash",
-					Crypted:    []byte("code"),
-				},
-				verificationCode: "code",
-				alg:              CreateMockHashAlg(gomock.NewController(t)),
-			},
-			false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := verifyHashedCode(tt.args.cryptoCode, tt.args.verificationCode, tt.args.alg); (err != nil) != tt.wantErr {
-				t.Errorf("verifyHashedCode() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

@@ -5,6 +5,7 @@
 //
 //	mockgen -source code.go -destination ./code_mock.go -package crypto
 //
+
 // Package crypto is a generated GoMock package.
 package crypto
 
@@ -39,10 +40,10 @@ func (m *MockGenerator) EXPECT() *MockGeneratorMockRecorder {
 }
 
 // Alg mocks base method.
-func (m *MockGenerator) Alg() Crypto {
+func (m *MockGenerator) Alg() EncryptionAlgorithm {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Alg")
-	ret0, _ := ret[0].(Crypto)
+	ret0, _ := ret[0].(EncryptionAlgorithm)
 	return ret0
 }
 

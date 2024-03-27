@@ -13,7 +13,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -93,7 +92,7 @@ type Phone struct {
 type Machine struct {
 	Name            string               `json:"name,omitempty"`
 	Description     string               `json:"description,omitempty"`
-	Secret          *crypto.CryptoValue  `json:"secret,omitempty"`
+	EncodedHash     string               `json:"encoded_hash,omitempty"`
 	AccessTokenType domain.OIDCTokenType `json:"access_token_type,omitempty"`
 }
 
@@ -820,7 +819,7 @@ func scanUser(row *sql.Row) (*User, error) {
 	machineID := sql.NullString{}
 	name := sql.NullString{}
 	description := sql.NullString{}
-	var secret *crypto.CryptoValue
+	encodedHash := sql.NullString{}
 	accessTokenType := sql.NullInt32{}
 
 	err := row.Scan(
@@ -849,7 +848,7 @@ func scanUser(row *sql.Row) (*User, error) {
 		&machineID,
 		&name,
 		&description,
-		&secret,
+		&encodedHash,
 		&accessTokenType,
 		&count,
 	)
@@ -881,7 +880,7 @@ func scanUser(row *sql.Row) (*User, error) {
 		u.Machine = &Machine{
 			Name:            name.String,
 			Description:     description.String,
-			Secret:          secret,
+			EncodedHash:     encodedHash.String,
 			AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
 		}
 	}
@@ -1348,7 +1347,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 				machineID := sql.NullString{}
 				name := sql.NullString{}
 				description := sql.NullString{}
-				secret := new(crypto.CryptoValue)
+				encodedHash := sql.NullString{}
 				accessTokenType := sql.NullInt32{}
 
 				err := rows.Scan(
@@ -1377,7 +1376,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 					&machineID,
 					&name,
 					&description,
-					secret,
+					&encodedHash,
 					&accessTokenType,
 					&count,
 				)
@@ -1408,7 +1407,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 					u.Machine = &Machine{
 						Name:            name.String,
 						Description:     description.String,
-						Secret:          secret,
+						EncodedHash:     encodedHash.String,
 						AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
 					}
 				}

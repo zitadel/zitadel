@@ -55,7 +55,7 @@ func (c *Commands) ResendUserPhoneCodeReturnCode(ctx context.Context, userID str
 }
 
 func (c *Commands) changeUserPhoneWithCode(ctx context.Context, userID, phone string, alg crypto.EncryptionAlgorithm, returnCode bool) (*domain.Phone, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode)
+	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (c *Commands) changeUserPhoneWithCode(ctx context.Context, userID, phone st
 }
 
 func (c *Commands) resendUserPhoneCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, returnCode bool) (*domain.Phone, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode) //nolint:staticcheck
+	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (c *Commands) resendUserPhoneCodeWithGenerator(ctx context.Context, userID 
 }
 
 func (c *Commands) VerifyUserPhone(ctx context.Context, userID, code string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode)
+	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode)
 	if err != nil {
 		return nil, err
 	}
@@ -216,7 +216,7 @@ func (c *UserPhoneEvents) VerifyCode(ctx context.Context, code string, gen crypt
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty")
 	}
 
-	err := crypto.VerifyCode(c.model.CodeCreationDate, c.model.CodeExpiry, c.model.Code, code, gen)
+	err := crypto.VerifyCode(c.model.CodeCreationDate, c.model.CodeExpiry, c.model.Code, code, gen.Alg())
 	if err == nil {
 		c.events = append(c.events, user.NewHumanPhoneVerifiedEvent(ctx, c.aggregate))
 		return nil

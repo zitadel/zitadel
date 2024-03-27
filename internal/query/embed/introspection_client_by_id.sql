@@ -1,11 +1,11 @@
 with config as (
-		select app_id, client_id, client_secret
-		from projections.apps6_api_configs
+		select app_id, client_id, client_secret, 'api' as app_type
+		from projections.apps7_api_configs
 		where instance_id = $1
 			and client_id = $2
 	union
-		select app_id, client_id, client_secret
-		from projections.apps6_oidc_configs
+		select app_id, client_id, client_secret, 'oidc' as app_type
+		from projections.apps7_oidc_configs
 		where instance_id = $1
 			and client_id = $2
 ),
@@ -18,6 +18,7 @@ keys as (
 		and expiration > current_timestamp
 	group by identifier
 )
-select config.client_id, config.client_secret, apps.project_id, keys.public_keys from config
-join projections.apps6 apps on apps.id = config.app_id
+select config.app_id, config.client_id, config.client_secret, config.app_type, apps.project_id, apps.resource_owner, keys.public_keys
+from config
+join projections.apps7 apps on apps.id = config.app_id
 left join keys on keys.client_id = config.client_id;

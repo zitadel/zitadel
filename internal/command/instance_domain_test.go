@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -141,12 +140,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 								domain.OIDCVersionV1,
 								"consoleApplicationID",
 								"client1@project",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("a"),
-								},
+								"secret",
 								[]string{"https://test.ch"},
 								[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 								[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},

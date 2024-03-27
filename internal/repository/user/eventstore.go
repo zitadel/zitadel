@@ -135,4 +135,5 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, MachineSecretRemovedType, MachineSecretRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, MachineSecretCheckSucceededType, MachineSecretCheckSucceededEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, MachineSecretCheckFailedType, MachineSecretCheckFailedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, MachineSecretHashUpdatedType, eventstore.GenericEventMapper[MachineSecretHashUpdatedEvent])
 }

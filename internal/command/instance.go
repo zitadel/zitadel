@@ -457,7 +457,6 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 			},
-			nil,
 		),
 
 		commands.AddAPIAppCommand(
@@ -469,7 +468,6 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 			},
-			nil,
 		),
 
 		commands.AddAPIAppCommand(
@@ -481,7 +479,6 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 			},
-			nil,
 		),
 
 		commands.AddOIDCAppCommand(cnsl, nil),

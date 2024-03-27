@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -335,11 +336,13 @@ func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQue
 			return err
 		}
 
-		secret, err := hasher.Hash(human.Password)
+		_, spanHash := tracing.NewNamedSpan(ctx, "passwap.Hash")
+		encodedHash, err := hasher.Hash(human.Password)
+		spanHash.EndWithError(err)
 		if err != nil {
 			return err
 		}
-		createCmd.AddPasswordData(secret, human.PasswordChangeRequired)
+		createCmd.AddPasswordData(encodedHash, human.PasswordChangeRequired)
 		return nil
 	}
 
@@ -589,7 +592,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 
 	human.EnsureDisplayName()
 	if human.Password != nil {
-		if err := human.HashPasswordIfExisting(pwPolicy, c.userPasswordHasher, human.Password.ChangeRequired); err != nil {
+		if err := human.HashPasswordIfExisting(ctx, pwPolicy, c.userPasswordHasher, human.Password.ChangeRequired); err != nil {
 			return nil, nil, err
 		}
 	}

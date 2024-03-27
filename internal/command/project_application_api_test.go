@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -114,7 +113,7 @@ func TestAddAPIConfig(t *testing.T) {
 					project.NewAPIConfigAddedEvent(ctx, &agg.Aggregate,
 						"appID",
 						"clientID@project",
-						nil,
+						"",
 						domain.APIAuthMethodTypePrivateKeyJWT,
 					),
 				},
@@ -137,7 +136,6 @@ func TestAddAPIConfig(t *testing.T) {
 						},
 						AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 					},
-					nil,
 				), tt.args.filter, tt.want)
 		})
 	}
@@ -149,10 +147,9 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 		idGenerator id.Generator
 	}
 	type args struct {
-		ctx             context.Context
-		apiApp          *domain.APIApp
-		resourceOwner   string
-		secretGenerator crypto.Generator
+		ctx           context.Context
+		apiApp        *domain.APIApp
+		resourceOwner string
 	}
 	type res struct {
 		want *domain.APIApp
@@ -256,12 +253,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 							&project.NewAggregate("project1", "org1").Aggregate,
 							"app1",
 							"client1@project",
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("a"),
-							},
+							"secret",
 							domain.APIAuthMethodTypeBasic),
 					),
 				),
@@ -276,8 +268,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 					AppName:        "app",
 					AuthMethodType: domain.APIAuthMethodTypeBasic,
 				},
-				resourceOwner:   "org1",
-				secretGenerator: GetMockSecretGenerator(t),
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.APIApp{
@@ -317,7 +308,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 							&project.NewAggregate("project1", "org1").Aggregate,
 							"app1",
 							"client1@project",
-							nil,
+							"",
 							domain.APIAuthMethodTypePrivateKeyJWT),
 					),
 				),
@@ -355,7 +346,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			got, err := r.AddAPIApplication(tt.args.ctx, tt.args.apiApp, tt.args.resourceOwner, tt.args.secretGenerator)
+			got, err := r.AddAPIApplication(tt.args.ctx, tt.args.apiApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -475,7 +466,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"app1",
 								"client1@project",
-								nil,
+								"",
 								domain.APIAuthMethodTypePrivateKeyJWT),
 						),
 					),
@@ -515,12 +506,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"app1",
 								"client1@project",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("a"),
-								},
+								"secret",
 								domain.APIAuthMethodTypeBasic),
 						),
 					),
@@ -584,11 +570,10 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx             context.Context
-		appID           string
-		projectID       string
-		resourceOwner   string
-		secretGenerator crypto.Generator
+		ctx           context.Context
+		appID         string
+		projectID     string
+		resourceOwner string
 	}
 	type res struct {
 		want *domain.APIApp
@@ -669,12 +654,7 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 								&project.NewAggregate("project1", "org1").Aggregate,
 								"app1",
 								"client1@project",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("a"),
-								},
+								"secret",
 								domain.APIAuthMethodTypeBasic),
 						),
 					),
@@ -682,22 +662,16 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 						project.NewAPIConfigSecretChangedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
 							"app1",
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("a"),
-							},
+							"secret",
 						),
 					),
 				),
 			},
 			args: args{
-				ctx:             context.Background(),
-				projectID:       "project1",
-				appID:           "app1",
-				resourceOwner:   "org1",
-				secretGenerator: GetMockSecretGenerator(t),
+				ctx:           context.Background(),
+				projectID:     "project1",
+				appID:         "app1",
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.APIApp{
@@ -720,7 +694,7 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeAPIApplicationSecret(tt.args.ctx, tt.args.projectID, tt.args.appID, tt.args.resourceOwner, tt.args.secretGenerator)
+			got, err := r.ChangeAPIApplicationSecret(tt.args.ctx, tt.args.projectID, tt.args.appID, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
