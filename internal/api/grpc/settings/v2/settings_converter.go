@@ -1,6 +1,8 @@
 package settings
 
 import (
+	"time"
+
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/internal/command"
@@ -32,11 +34,11 @@ func loginSettingsToPb(current *query.LoginPolicy) *settings.LoginSettings {
 		DisableLoginWithEmail:      current.DisableLoginWithEmail,
 		DisableLoginWithPhone:      current.DisableLoginWithPhone,
 		DefaultRedirectUri:         current.DefaultRedirectURI,
-		PasswordCheckLifetime:      durationpb.New(current.PasswordCheckLifetime),
-		ExternalLoginCheckLifetime: durationpb.New(current.ExternalLoginCheckLifetime),
-		MfaInitSkipLifetime:        durationpb.New(current.MFAInitSkipLifetime),
-		SecondFactorCheckLifetime:  durationpb.New(current.SecondFactorCheckLifetime),
-		MultiFactorCheckLifetime:   durationpb.New(current.MultiFactorCheckLifetime),
+		PasswordCheckLifetime:      durationpb.New(time.Duration(current.PasswordCheckLifetime)),
+		ExternalLoginCheckLifetime: durationpb.New(time.Duration(current.ExternalLoginCheckLifetime)),
+		MfaInitSkipLifetime:        durationpb.New(time.Duration(current.MFAInitSkipLifetime)),
+		SecondFactorCheckLifetime:  durationpb.New(time.Duration(current.SecondFactorCheckLifetime)),
+		MultiFactorCheckLifetime:   durationpb.New(time.Duration(current.MultiFactorCheckLifetime)),
 		SecondFactors:              second,
 		MultiFactors:               multi,
 		ResourceOwnerType:          isDefaultToResourceOwnerTypePb(current.IsDefault),
