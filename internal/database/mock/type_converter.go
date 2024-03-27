@@ -2,6 +2,8 @@ package mock
 
 import (
 	"database/sql/driver"
+	"encoding/hex"
+	"encoding/json"
 	"reflect"
 	"strconv"
 	"strings"
@@ -16,8 +18,12 @@ func (s TypeConverter) ConvertValue(v any) (driver.Value, error) {
 	if driver.IsValue(v) {
 		return v, nil
 	}
-
 	value := reflect.ValueOf(v)
+
+	if rawMessage, ok := v.(json.RawMessage); ok {
+		return convertBytes(rawMessage), nil
+	}
+
 	if value.Kind() == reflect.Slice {
 		//nolint: exhaustive
 		// only defined types
@@ -61,4 +67,12 @@ func convertText(array reflect.Value) string {
 	}
 
 	return "{" + strings.Join(slice, ",") + "}"
+}
+
+func convertBytes(array []byte) string {
+	var builder strings.Builder
+	builder.Grow(hex.EncodedLen(len(array)) + 4)
+	builder.WriteString(`\x`)
+	builder.Write(hex.AppendEncode(nil, array))
+	return builder.String()
 }

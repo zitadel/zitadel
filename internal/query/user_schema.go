@@ -144,6 +144,7 @@ func prepareUserSchemaQuery() (sq.SelectBuilder, func(*sql.Row) (*UserSchema, er
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*UserSchema, error) {
 			u := new(UserSchema)
+			var schema database.ByteArray[byte]
 			err := row.Scan(
 				&u.ID,
 				&u.EventDate,
@@ -152,7 +153,7 @@ func prepareUserSchemaQuery() (sq.SelectBuilder, func(*sql.Row) (*UserSchema, er
 				&u.State,
 				&u.Type,
 				&u.Revision,
-				&u.Schema,
+				&schema,
 				&u.PossibleAuthenticators,
 			)
 
@@ -162,6 +163,9 @@ func prepareUserSchemaQuery() (sq.SelectBuilder, func(*sql.Row) (*UserSchema, er
 				}
 				return nil, zerrors.ThrowInternal(err, "QUERY-WRB2Q", "Errors.Internal")
 			}
+
+			u.Schema = json.RawMessage(schema)
+
 			return u, nil
 		}
 }
@@ -181,8 +185,12 @@ func prepareUserSchemasQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserSchemas,
 			From(userSchemaTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*UserSchemas, error) {
-			schema := make([]*UserSchema, 0)
-			var count uint64
+			schemas := make([]*UserSchema, 0)
+			var (
+				schema database.ByteArray[byte]
+				count  uint64
+			)
+
 			for rows.Next() {
 				u := new(UserSchema)
 				err := rows.Scan(
@@ -193,7 +201,7 @@ func prepareUserSchemasQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserSchemas,
 					&u.State,
 					&u.Type,
 					&u.Revision,
-					&u.Schema,
+					&schema,
 					&u.PossibleAuthenticators,
 					&count,
 				)
@@ -201,7 +209,8 @@ func prepareUserSchemasQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserSchemas,
 					return nil, err
 				}
 
-				schema = append(schema, u)
+				u.Schema = json.RawMessage(schema)
+				schemas = append(schemas, u)
 			}
 
 			if err := rows.Close(); err != nil {
@@ -209,7 +218,7 @@ func prepareUserSchemasQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserSchemas,
 			}
 
 			return &UserSchemas{
-				UserSchemas: schema,
+				UserSchemas: schemas,
 				SearchResponse: SearchResponse{
 					Count: count,
 				},

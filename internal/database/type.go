@@ -40,6 +40,40 @@ func (s TextArray[T]) Value() (driver.Value, error) {
 	return []byte("{" + strings.Join(typed, ",") + "}"), nil
 }
 
+type ByteArray[T ~byte] pgtype.FlatArray[T]
+
+// Scan implements the [database/sql.Scanner] interface.
+func (s *ByteArray[T]) Scan(src any) error {
+	var typedArray []byte
+	err := pgtype.NewMap().SQLScanner(&typedArray).Scan(src)
+	if err != nil {
+		return err
+	}
+
+	(*s) = make(ByteArray[T], len(typedArray))
+	for i, value := range typedArray {
+		(*s)[i] = T(value)
+	}
+
+	return nil
+}
+
+// Value implements the [database/sql/driver.Valuer] interface.
+func (s ByteArray[T]) Value() (driver.Value, error) {
+	typed := make([]byte, len(s))
+
+	var builder strings.Builder
+	builder.Grow(len(typed)*2 + 2)
+	builder.WriteString("{")
+	for i, value := range s {
+		typed[i] = byte(value)
+		builder.WriteByte(byte(value))
+		builder.WriteString(",")
+	}
+	builder.WriteString("}")
+	return []byte(builder.String()), nil
+}
+
 type numberField interface {
 	~int8 | ~uint8 | ~int16 | ~uint16 | ~int32 | ~uint32 | ~int64 | ~uint64 | ~int | ~uint
 }
