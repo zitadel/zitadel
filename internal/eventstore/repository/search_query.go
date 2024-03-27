@@ -227,7 +227,7 @@ func instanceIDsFilter(builder *eventstore.SearchQueryBuilder, query *SearchQuer
 	if builder.GetInstanceIDs() == nil {
 		return nil
 	}
-	query.InstanceIDs = NewFilter(FieldInstanceID, builder.GetInstanceIDs(), OperationIn)
+	query.InstanceIDs = NewFilter(FieldInstanceID, database.TextArray[string](builder.GetInstanceIDs()), OperationIn)
 	return query.InstanceIDs
 }
 
@@ -256,11 +256,7 @@ func eventTypeFilter(query *eventstore.SearchQuery) *Filter {
 	if len(query.GetEventTypes()) == 1 {
 		return NewFilter(FieldEventType, query.GetEventTypes()[0], OperationEquals)
 	}
-	eventTypes := make(database.TextArray[eventstore.EventType], len(query.GetEventTypes()))
-	for i, eventType := range query.GetEventTypes() {
-		eventTypes[i] = eventType
-	}
-	return NewFilter(FieldEventType, eventTypes, OperationIn)
+	return NewFilter(FieldEventType, database.TextArray[eventstore.EventType](query.GetEventTypes()), OperationIn)
 }
 
 func aggregateTypeFilter(query *eventstore.SearchQuery) *Filter {
@@ -270,11 +266,7 @@ func aggregateTypeFilter(query *eventstore.SearchQuery) *Filter {
 	if len(query.GetAggregateTypes()) == 1 {
 		return NewFilter(FieldAggregateType, query.GetAggregateTypes()[0], OperationEquals)
 	}
-	aggregateTypes := make(database.TextArray[eventstore.AggregateType], len(query.GetAggregateTypes()))
-	for i, aggregateType := range query.GetAggregateTypes() {
-		aggregateTypes[i] = aggregateType
-	}
-	return NewFilter(FieldAggregateType, aggregateTypes, OperationIn)
+	return NewFilter(FieldAggregateType, database.TextArray[eventstore.AggregateType](query.GetAggregateTypes()), OperationIn)
 }
 
 func eventDataFilter(query *eventstore.SearchQuery) *Filter {

@@ -42,8 +42,8 @@ type App struct {
 
 type OIDCApp struct {
 	RedirectURIs             database.TextArray[string]
-	ResponseTypes            database.Array[domain.OIDCResponseType]
-	GrantTypes               database.Array[domain.OIDCGrantType]
+	ResponseTypes            database.NumberArray[domain.OIDCResponseType]
+	GrantTypes               database.NumberArray[domain.OIDCGrantType]
 	AppType                  domain.OIDCApplicationType
 	ClientID                 string
 	AuthMethodType           domain.OIDCAuthMethodType
@@ -835,8 +835,8 @@ type sqlOIDCConfig struct {
 	iDTokenUserinfoAssertion sql.NullBool
 	clockSkew                sql.NullInt64
 	additionalOrigins        database.TextArray[string]
-	responseTypes            database.Array[domain.OIDCResponseType]
-	grantTypes               database.Array[domain.OIDCGrantType]
+	responseTypes            database.NumberArray[domain.OIDCResponseType]
+	grantTypes               database.NumberArray[domain.OIDCGrantType]
 	skipNativeAppSuccessPage sql.NullBool
 }
 
