@@ -65,7 +65,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "231965491734773762",
 			},
-			mock:    mockQueryErr(expQuery, sql.ErrConnDone, "231965491734773762", "instanceID", nil),
+			mock:    mockQueryErr(expQuery, sql.ErrConnDone, "231965491734773762", "instanceID", database.TextArray[string](nil)),
 			wantErr: sql.ErrConnDone,
 		},
 		{
@@ -73,7 +73,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "231965491734773762",
 			},
-			mock:    mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoNotFound}, "231965491734773762", "instanceID", nil),
+			mock:    mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoNotFound}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
 			wantErr: zerrors.ThrowNotFound(nil, "QUERY-ahs4S", "Errors.User.NotFound"),
 		},
 		{
@@ -81,7 +81,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "231965491734773762",
 			},
-			mock: mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoHumanNoMD}, "231965491734773762", "instanceID", nil),
+			mock: mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoHumanNoMD}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
 			want: &OIDCUserInfo{
 				User: &User{
 					ID:                 "231965491734773762",
@@ -120,7 +120,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "231965491734773762",
 			},
-			mock: mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoHuman}, "231965491734773762", "instanceID", nil),
+			mock: mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoHuman}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
 			want: &OIDCUserInfo{
 				User: &User{
 					ID:                 "231965491734773762",
@@ -277,7 +277,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "240707570677841922",
 			},
-			mock: mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoMachine}, "240707570677841922", "instanceID", nil),
+			mock: mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoMachine}, "240707570677841922", "instanceID", database.TextArray[string](nil)),
 			want: &OIDCUserInfo{
 				User: &User{
 					ID:                 "240707570677841922",

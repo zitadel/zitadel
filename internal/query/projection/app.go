@@ -490,8 +490,8 @@ func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(AppOIDCConfigColumnClientID, e.ClientID),
 				handler.NewCol(AppOIDCConfigColumnClientSecret, crypto.SecretOrEncodedHash(e.ClientSecret, e.EncodedHash)),
 				handler.NewCol(AppOIDCConfigColumnRedirectUris, database.TextArray[string](e.RedirectUris)),
-				handler.NewCol(AppOIDCConfigColumnResponseTypes, database.Array[domain.OIDCResponseType](e.ResponseTypes)),
-				handler.NewCol(AppOIDCConfigColumnGrantTypes, database.Array[domain.OIDCGrantType](e.GrantTypes)),
+				handler.NewCol(AppOIDCConfigColumnResponseTypes, database.NumberArray[domain.OIDCResponseType](e.ResponseTypes)),
+				handler.NewCol(AppOIDCConfigColumnGrantTypes, database.NumberArray[domain.OIDCGrantType](e.GrantTypes)),
 				handler.NewCol(AppOIDCConfigColumnApplicationType, e.ApplicationType),
 				handler.NewCol(AppOIDCConfigColumnAuthMethodType, e.AuthMethodType),
 				handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, database.TextArray[string](e.PostLogoutRedirectUris)),
@@ -533,10 +533,10 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnRedirectUris, database.TextArray[string](*e.RedirectUris)))
 	}
 	if e.ResponseTypes != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnResponseTypes, database.Array[domain.OIDCResponseType](*e.ResponseTypes)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnResponseTypes, database.NumberArray[domain.OIDCResponseType](*e.ResponseTypes)))
 	}
 	if e.GrantTypes != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnGrantTypes, database.Array[domain.OIDCGrantType](*e.GrantTypes)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnGrantTypes, database.NumberArray[domain.OIDCGrantType](*e.GrantTypes)))
 	}
 	if e.ApplicationType != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnApplicationType, *e.ApplicationType))

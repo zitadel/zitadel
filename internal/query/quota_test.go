@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgtype"
+
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -70,7 +72,9 @@ func Test_QuotaPrepare(t *testing.T) {
 					[]driver.Value{
 						"quota-id",
 						dayNow,
-						intervalDriverValue(t, time.Hour*24),
+						&pgtype.Interval{
+							Days: 1,
+						},
 						uint64(1000),
 						true,
 						testNow,

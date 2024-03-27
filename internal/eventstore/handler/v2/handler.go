@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
 
 	"github.com/zitadel/logging"
 
@@ -331,7 +331,7 @@ func (ai *existingInstances) AppendEvents(events ...eventstore.Event) {
 		case instance.InstanceAddedEventType:
 			*ai = append(*ai, event.Aggregate().InstanceID)
 		case instance.InstanceRemovedEventType:
-			slices.DeleteFunc(*ai, func(s string) bool {
+			*ai = slices.DeleteFunc(*ai, func(s string) bool {
 				return s == event.Aggregate().InstanceID
 			})
 		}

@@ -27,6 +27,7 @@ import (
 )
 
 const (
+	ClaimPrefix                     = "urn:zitadel:iam"
 	ScopeProjectRolePrefix          = "urn:zitadel:iam:org:project:role:"
 	ScopeProjectsRoles              = "urn:zitadel:iam:org:projects:roles"
 	ClaimProjectRoles               = "urn:zitadel:iam:org:project:roles"
@@ -522,6 +523,9 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, user *query.User, userGra
 			actions.SetFields("v1",
 				actions.SetFields("userinfo",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
+						if strings.HasPrefix(key, ClaimPrefix) {
+							return
+						}
 						if userInfo.Claims[key] == nil {
 							userInfo.AppendClaims(key, value)
 							return
@@ -534,6 +538,9 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, user *query.User, userGra
 				),
 				actions.SetFields("claims",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
+						if strings.HasPrefix(key, ClaimPrefix) {
+							return
+						}
 						if userInfo.Claims[key] == nil {
 							userInfo.AppendClaims(key, value)
 							return
@@ -739,6 +746,9 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userG
 			actions.SetFields("v1",
 				actions.SetFields("claims",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
+						if strings.HasPrefix(key, ClaimPrefix) {
+							return
+						}
 						if _, ok := claims[key]; !ok {
 							claims = appendClaim(claims, key, value)
 							return

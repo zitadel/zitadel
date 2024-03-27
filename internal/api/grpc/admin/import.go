@@ -1149,11 +1149,11 @@ func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.Impor
 			if err != nil {
 				return nil, err
 			}
-			org.LoginPolicy.ExternalLoginCheckLifetime = durationpb.New(defaultLoginPolicy.ExternalLoginCheckLifetime)
-			org.LoginPolicy.MultiFactorCheckLifetime = durationpb.New(defaultLoginPolicy.MultiFactorCheckLifetime)
-			org.LoginPolicy.SecondFactorCheckLifetime = durationpb.New(defaultLoginPolicy.SecondFactorCheckLifetime)
-			org.LoginPolicy.PasswordCheckLifetime = durationpb.New(defaultLoginPolicy.PasswordCheckLifetime)
-			org.LoginPolicy.MfaInitSkipLifetime = durationpb.New(defaultLoginPolicy.MFAInitSkipLifetime)
+			org.LoginPolicy.ExternalLoginCheckLifetime = durationpb.New(time.Duration(defaultLoginPolicy.ExternalLoginCheckLifetime))
+			org.LoginPolicy.MultiFactorCheckLifetime = durationpb.New(time.Duration(defaultLoginPolicy.MultiFactorCheckLifetime))
+			org.LoginPolicy.SecondFactorCheckLifetime = durationpb.New(time.Duration(defaultLoginPolicy.SecondFactorCheckLifetime))
+			org.LoginPolicy.PasswordCheckLifetime = durationpb.New(time.Duration(defaultLoginPolicy.PasswordCheckLifetime))
+			org.LoginPolicy.MfaInitSkipLifetime = durationpb.New(time.Duration(defaultLoginPolicy.MFAInitSkipLifetime))
 
 			if orgV1.SecondFactors != nil {
 				org.LoginPolicy.SecondFactors = make([]policy.SecondFactorType, len(orgV1.SecondFactors))

@@ -1,0 +1,11 @@
+| Parameter            | Description                                                                                                                                                      |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| grant_type           | Must be `urn:ietf:params:oauth:grant-type:token-exchange`                                                                                                        |
+| subject_token        | A token that represents the identity of the party on behalf of whom the request is being made.                                                                   |
+| subject_token_type   | An identifier that indicates the type of the token in the subject_token parameter.                                                                               |
+| actor_token          | Optional. A token that represents the identity of the acting party. In ZITADEL this the impersonator.                                                            |
+| actor_token_type     | An identifier that indicates the type of the token in the actor_token parameter. Required when actor_token is provided                                           |
+| requested_token_type | Optional. An identifier that indicates the type of the token requested. Defaults to access token if not provided.                                                |
+| scope                | [Scopes](/docs/apis/openidoauth/scopes) you would like to request from ZITADEL for the requested token. Scopes are space delimited, e.g. `openid email profile`. |
+| audience             | Optional. Must be a subset of the combined audiences from both subject and actor tokens.                                                                         |
+| resource             | Currently not supported                                                                                                                                          |
