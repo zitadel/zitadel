@@ -145,7 +145,7 @@ func (*userProjection) Init() *old_handler.Check {
 			handler.NewPrimaryKey(NotifyInstanceIDCol, NotifyUserIDCol),
 			UserNotifySuffix,
 			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
-			handler.WithIndex(handler.NewIndex("notifications_email_search", []string{NotifyInstanceIDCol, NotifyVerifiedEmailLowerCol})),
+			handler.WithIndex(handler.NewIndex("email_search", []string{NotifyInstanceIDCol, NotifyVerifiedEmailLowerCol})),
 		),
 	)
 }

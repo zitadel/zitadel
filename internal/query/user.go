@@ -1316,6 +1316,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 			HumanIsEmailVerifiedCol.identifier(),
 			HumanPhoneCol.identifier(),
 			HumanIsPhoneVerifiedCol.identifier(),
+			HumanPasswordChangeRequiredCol.identifier(),
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
@@ -1354,6 +1355,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 				isEmailVerified := sql.NullBool{}
 				phone := sql.NullString{}
 				isPhoneVerified := sql.NullBool{}
+				passwordChangeRequired := sql.NullBool{}
 
 				machineID := sql.NullString{}
 				name := sql.NullString{}
@@ -1384,6 +1386,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 					&isEmailVerified,
 					&phone,
 					&isPhoneVerified,
+					&passwordChangeRequired,
 					&machineID,
 					&name,
 					&description,
@@ -1402,17 +1405,18 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 
 				if humanID.Valid {
 					u.Human = &Human{
-						FirstName:         firstName.String,
-						LastName:          lastName.String,
-						NickName:          nickName.String,
-						DisplayName:       displayName.String,
-						AvatarKey:         avatarKey.String,
-						PreferredLanguage: language.Make(preferredLanguage.String),
-						Gender:            domain.Gender(gender.Int32),
-						Email:             domain.EmailAddress(email.String),
-						IsEmailVerified:   isEmailVerified.Bool,
-						Phone:             domain.PhoneNumber(phone.String),
-						IsPhoneVerified:   isPhoneVerified.Bool,
+						FirstName:              firstName.String,
+						LastName:               lastName.String,
+						NickName:               nickName.String,
+						DisplayName:            displayName.String,
+						AvatarKey:              avatarKey.String,
+						PreferredLanguage:      language.Make(preferredLanguage.String),
+						Gender:                 domain.Gender(gender.Int32),
+						Email:                  domain.EmailAddress(email.String),
+						IsEmailVerified:        isEmailVerified.Bool,
+						Phone:                  domain.PhoneNumber(phone.String),
+						IsPhoneVerified:        isPhoneVerified.Bool,
+						PasswordChangeRequired: passwordChangeRequired.Bool,
 					}
 				} else if machineID.Valid {
 					u.Machine = &Machine{
