@@ -159,7 +159,7 @@ func prepareUserSchemaQuery() (sq.SelectBuilder, func(*sql.Row) (*UserSchema, er
 
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
-					return nil, zerrors.ThrowNotFound(err, "QUERY-SAF3t", "Errors.Metadata.NotFound")
+					return nil, zerrors.ThrowNotFound(err, "QUERY-SAF3t", "Errors.UserSchema.NotExists")
 				}
 				return nil, zerrors.ThrowInternal(err, "QUERY-WRB2Q", "Errors.Internal")
 			}
