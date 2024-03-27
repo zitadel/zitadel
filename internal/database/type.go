@@ -31,6 +31,10 @@ func (s *TextArray[T]) Scan(src any) error {
 
 // Value implements the [database/sql/driver.Valuer] interface.
 func (s TextArray[T]) Value() (driver.Value, error) {
+	if len(s) == 0 {
+		return nil, nil
+	}
+
 	typed := make([]string, len(s))
 
 	for i, value := range s {
@@ -45,9 +49,13 @@ type ByteArray[T ~byte] pgtype.FlatArray[T]
 // Scan implements the [database/sql.Scanner] interface.
 func (s *ByteArray[T]) Scan(src any) error {
 	var typedArray []byte
-	err := pgtype.NewMap().SQLScanner(&typedArray).Scan(src)
-	if err != nil {
-		return err
+	typedArray, ok := src.([]byte)
+	if !ok {
+		// tests use a different src type
+		err := pgtype.NewMap().SQLScanner(&typedArray).Scan(src)
+		if err != nil {
+			return err
+		}
 	}
 
 	(*s) = make(ByteArray[T], len(typedArray))
@@ -60,18 +68,16 @@ func (s *ByteArray[T]) Scan(src any) error {
 
 // Value implements the [database/sql/driver.Valuer] interface.
 func (s ByteArray[T]) Value() (driver.Value, error) {
+	if len(s) == 0 {
+		return nil, nil
+	}
 	typed := make([]byte, len(s))
 
-	var builder strings.Builder
-	builder.Grow(len(typed)*2 + 2)
-	builder.WriteString("{")
 	for i, value := range s {
 		typed[i] = byte(value)
-		builder.WriteByte(byte(value))
-		builder.WriteString(",")
 	}
-	builder.WriteString("}")
-	return []byte(builder.String()), nil
+
+	return typed, nil
 }
 
 type numberField interface {

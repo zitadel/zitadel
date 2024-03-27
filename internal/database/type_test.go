@@ -255,13 +255,13 @@ func TestTextArray_Scan(t *testing.T) {
 		want sql.Scanner
 		err  bool
 	}
-	type testCase[V ~string] struct {
+	type testCase struct {
 		name string
 		m    sql.Scanner
 		args args
 		res
 	}
-	tests := []testCase[string]{
+	tests := []testCase{
 		{
 			"string",
 			new(TextArray[string]),
@@ -286,6 +286,133 @@ func TestTextArray_Scan(t *testing.T) {
 			}
 
 			assert.Equal(t, tt.res.want, tt.m)
+		})
+	}
+}
+
+func TestTextArray_Value(t *testing.T) {
+	type res struct {
+		want driver.Value
+		err  bool
+	}
+	type testCase struct {
+		name string
+		m    driver.Valuer
+		res  res
+	}
+	tests := []testCase{
+		{
+			"empty",
+			TextArray[string]{},
+			res{
+				want: nil,
+			},
+		},
+		{
+			"set",
+			TextArray[string]{"a", "s", "d", "f"},
+			res{
+				want: driver.Value([]byte("{a,s,d,f}")),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.m.Value()
+			if tt.res.err {
+				assert.Error(t, err)
+			}
+			if !tt.res.err {
+				require.NoError(t, err)
+				assert.Equalf(t, tt.res.want, got, "Value()")
+			}
+		})
+	}
+}
+
+type typedByte byte
+
+func TestByteArray_Scan(t *testing.T) {
+	wantedBytes := []byte("asdf")
+	wantedTypedBytes := []typedByte("asdf")
+	type args struct {
+		src any
+	}
+	type res struct {
+		want sql.Scanner
+		err  bool
+	}
+	type testCase struct {
+		name string
+		m    sql.Scanner
+		args args
+		res
+	}
+	tests := []testCase{
+		{
+			"bytes",
+			new(ByteArray[byte]),
+			args{src: []byte("asdf")},
+			res{
+				want: (*ByteArray[byte])(&wantedBytes),
+			},
+		},
+		{
+			"typed",
+			new(ByteArray[typedByte]),
+			args{src: []byte("asdf")},
+			res{
+				want: (*ByteArray[typedByte])(&wantedTypedBytes),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.m.Scan(tt.args.src); (err != nil) != tt.res.err {
+				t.Errorf("Scan() error = %v, wantErr %v", err, tt.res.err)
+			}
+
+			assert.Equal(t, tt.res.want, tt.m)
+		})
+	}
+}
+
+func TestByteArray_Value(t *testing.T) {
+	type res struct {
+		want driver.Value
+		err  bool
+	}
+	type testCase struct {
+		name string
+		m    driver.Valuer
+		res  res
+	}
+	tests := []testCase{
+		{
+			"empty",
+			ByteArray[byte]{},
+			res{
+				want: nil,
+			},
+		},
+		{
+			"set",
+			ByteArray[byte]([]byte("{\"type\": \"object\", \"$schema\": \"urn:zitadel:schema:v1\"}")),
+			res{
+				want: driver.Value([]byte("{\"type\": \"object\", \"$schema\": \"urn:zitadel:schema:v1\"}")),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.m.Value()
+			if tt.res.err {
+				assert.Error(t, err)
+			}
+			if !tt.res.err {
+				require.NoError(t, err)
+				assert.Equalf(t, tt.res.want, got, "Value()")
+			}
 		})
 	}
 }
