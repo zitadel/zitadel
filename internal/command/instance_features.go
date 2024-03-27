@@ -16,6 +16,7 @@ type InstanceFeatures struct {
 	TriggerIntrospectionProjections *bool
 	LegacyIntrospection             *bool
 	UserSchema                      *bool
+	TokenExchange                   *bool
 	Execution                       *bool
 }
 
@@ -24,6 +25,7 @@ func (m *InstanceFeatures) isEmpty() bool {
 		m.TriggerIntrospectionProjections == nil &&
 		m.LegacyIntrospection == nil &&
 		m.UserSchema == nil &&
+		m.TokenExchange == nil &&
 		m.Execution == nil
 }
 

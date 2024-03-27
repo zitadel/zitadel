@@ -55,6 +55,7 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceTriggerIntrospectionProjectionsEventType,
 			feature_v2.InstanceLegacyIntrospectionEventType,
 			feature_v2.InstanceUserSchemaEventType,
+			feature_v2.InstanceTokenExchangeEventType,
 			feature_v2.InstanceExecutionEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
@@ -65,6 +66,7 @@ func (m *InstanceFeaturesWriteModel) reduceReset() {
 	m.TriggerIntrospectionProjections = nil
 	m.LegacyIntrospection = nil
 	m.UserSchema = nil
+	m.TokenExchange = nil
 	m.Execution = nil
 }
 
@@ -82,6 +84,8 @@ func (m *InstanceFeaturesWriteModel) reduceBoolFeature(event *feature_v2.SetEven
 		m.TriggerIntrospectionProjections = &event.Value
 	case feature.KeyLegacyIntrospection:
 		m.LegacyIntrospection = &event.Value
+	case feature.KeyTokenExchange:
+		m.TokenExchange = &event.Value
 	case feature.KeyUserSchema:
 		m.UserSchema = &event.Value
 	case feature.KeyExecution:
@@ -96,7 +100,8 @@ func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *Instan
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LoginDefaultOrg, f.LoginDefaultOrg, feature_v2.InstanceLoginDefaultOrgEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TriggerIntrospectionProjections, f.TriggerIntrospectionProjections, feature_v2.InstanceTriggerIntrospectionProjectionsEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LegacyIntrospection, f.LegacyIntrospection, feature_v2.InstanceLegacyIntrospectionEventType)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TokenExchange, f.TokenExchange, feature_v2.InstanceTokenExchangeEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.UserSchema, f.UserSchema, feature_v2.InstanceUserSchemaEventType)
-	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.UserSchema, f.Execution, feature_v2.InstanceExecutionEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.Execution, f.Execution, feature_v2.InstanceExecutionEventType)
+	return cmds
 }

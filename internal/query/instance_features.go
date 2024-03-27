@@ -12,6 +12,7 @@ type InstanceFeatures struct {
 	TriggerIntrospectionProjections FeatureSource[bool]
 	LegacyIntrospection             FeatureSource[bool]
 	UserSchema                      FeatureSource[bool]
+	TokenExchange                   FeatureSource[bool]
 	Execution                       FeatureSource[bool]
 }
 

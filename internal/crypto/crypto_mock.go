@@ -5,6 +5,7 @@
 //
 //	mockgen -source crypto.go -destination ./crypto_mock.go -package crypto
 //
+
 // Package crypto is a generated GoMock package.
 package crypto
 

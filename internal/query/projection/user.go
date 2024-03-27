@@ -61,14 +61,15 @@ const (
 	MachineAccessTokenTypeCol = "access_token_type"
 
 	// notify
-	UserNotifySuffix       = "notifications"
-	NotifyUserIDCol        = "user_id"
-	NotifyInstanceIDCol    = "instance_id"
-	NotifyLastEmailCol     = "last_email"
-	NotifyVerifiedEmailCol = "verified_email"
-	NotifyLastPhoneCol     = "last_phone"
-	NotifyVerifiedPhoneCol = "verified_phone"
-	NotifyPasswordSetCol   = "password_set"
+	UserNotifySuffix            = "notifications"
+	NotifyUserIDCol             = "user_id"
+	NotifyInstanceIDCol         = "instance_id"
+	NotifyLastEmailCol          = "last_email"
+	NotifyVerifiedEmailCol      = "verified_email"
+	NotifyVerifiedEmailLowerCol = "verified_email_lower"
+	NotifyLastPhoneCol          = "last_phone"
+	NotifyVerifiedPhoneCol      = "verified_phone"
+	NotifyPasswordSetCol        = "password_set"
 )
 
 type userProjection struct{}

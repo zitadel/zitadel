@@ -471,6 +471,7 @@ Errors:
     CloseRows: SQL-запрос не удалось завершить
     SQLStatement: SQL-запрос не может быть создан
     InvalidRequest: Запрос недействителен
+    TooManyNestingLevels: слишком много уровней вложенности запросов (максимум 20)
   Quota:
     AlreadyExists: Квота для данного объекта уже существует
     NotFound: Квота для данного объекта не найдена
@@ -544,6 +545,17 @@ Errors:
     NotActive: Пользовательская схема не активна
     NotInactive: Пользовательская схема не неактивна
     NotExists: Пользовательская схема не существует
+  TokenExchange:
+    FeatureDisabled: Функция обмена токенами отключена для вашего экземпляра. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Токен отсутствует
+      Invalid: Токен недействителен
+      TypeMissing: Тип токена отсутствует
+      TypeNotAllowed: Тип токена недопустим.
+      TypeNotSupported: Тип токена не поддерживается
+      NotForAPI: Олицетворенные токены не разрешены для API.
+    Impersonation:
+      PolicyDisabled: Олицетворение отключено в политике безопасности экземпляра.
 
 AggregateTypes:
   action: Действие
@@ -580,6 +592,7 @@ EventTypes:
     token:
       added: Токен доступа создан
       removed: Токен доступа удалён
+    impersonated: Пользователь олицетворяет себя
     username:
       reserved: Имя пользователя зарезервировано
       released: Имя пользователя опубликовано

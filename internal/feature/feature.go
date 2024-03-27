@@ -9,6 +9,7 @@ const (
 	KeyTriggerIntrospectionProjections
 	KeyLegacyIntrospection
 	KeyUserSchema
+	KeyTokenExchange
 	KeyExecution
 )
 
@@ -30,5 +31,6 @@ type Features struct {
 	TriggerIntrospectionProjections bool `json:"trigger_introspection_projections,omitempty"`
 	LegacyIntrospection             bool `json:"legacy_introspection,omitempty"`
 	UserSchema                      bool `json:"user_schema,omitempty"`
+	TokenExchange                   bool `json:"token_exchange,omitempty"`
 	Execution                       bool `json:"execution,omitempty"`
 }

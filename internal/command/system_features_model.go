@@ -50,6 +50,7 @@ func (m *SystemFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemTriggerIntrospectionProjectionsEventType,
 			feature_v2.SystemLegacyIntrospectionEventType,
 			feature_v2.SystemUserSchemaEventType,
+			feature_v2.SystemTokenExchangeEventType,
 			feature_v2.SystemExecutionEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
@@ -59,6 +60,7 @@ func (m *SystemFeaturesWriteModel) reduceReset() {
 	m.LoginDefaultOrg = nil
 	m.TriggerIntrospectionProjections = nil
 	m.LegacyIntrospection = nil
+	m.TokenExchange = nil
 	m.UserSchema = nil
 	m.Execution = nil
 }
@@ -79,6 +81,8 @@ func (m *SystemFeaturesWriteModel) reduceBoolFeature(event *feature_v2.SetEvent[
 		m.LegacyIntrospection = &event.Value
 	case feature.KeyUserSchema:
 		m.UserSchema = &event.Value
+	case feature.KeyTokenExchange:
+		m.TokenExchange = &event.Value
 	case feature.KeyExecution:
 		m.Execution = &event.Value
 	}
@@ -92,6 +96,7 @@ func (wm *SystemFeaturesWriteModel) setCommands(ctx context.Context, f *SystemFe
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TriggerIntrospectionProjections, f.TriggerIntrospectionProjections, feature_v2.SystemTriggerIntrospectionProjectionsEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LegacyIntrospection, f.LegacyIntrospection, feature_v2.SystemLegacyIntrospectionEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.UserSchema, f.UserSchema, feature_v2.SystemUserSchemaEventType)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TokenExchange, f.TokenExchange, feature_v2.SystemTokenExchangeEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.Execution, f.Execution, feature_v2.SystemExecutionEventType)
 	return cmds
 }

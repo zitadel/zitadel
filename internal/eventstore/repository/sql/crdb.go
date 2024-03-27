@@ -10,8 +10,7 @@ import (
 	"strings"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
-	"github.com/jackc/pgconn"
-	"github.com/lib/pq"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -438,11 +437,6 @@ func (db *CRDB) placeholder(query string) string {
 }
 
 func (db *CRDB) isUniqueViolationError(err error) bool {
-	if pqErr, ok := err.(*pq.Error); ok {
-		if pqErr.Code == "23505" {
-			return true
-		}
-	}
 	if pgxErr, ok := err.(*pgconn.PgError); ok {
 		if pgxErr.Code == "23505" {
 			return true

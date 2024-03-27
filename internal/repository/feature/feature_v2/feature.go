@@ -16,6 +16,7 @@ var (
 	SystemTriggerIntrospectionProjectionsEventType = setEventTypeFromFeature(feature.LevelSystem, feature.KeyTriggerIntrospectionProjections)
 	SystemLegacyIntrospectionEventType             = setEventTypeFromFeature(feature.LevelSystem, feature.KeyLegacyIntrospection)
 	SystemUserSchemaEventType                      = setEventTypeFromFeature(feature.LevelSystem, feature.KeyUserSchema)
+	SystemTokenExchangeEventType                   = setEventTypeFromFeature(feature.LevelSystem, feature.KeyTokenExchange)
 	SystemExecutionEventType                       = setEventTypeFromFeature(feature.LevelSystem, feature.KeyExecution)
 
 	InstanceResetEventType                           = resetEventTypeFromFeature(feature.LevelInstance)
@@ -23,6 +24,7 @@ var (
 	InstanceTriggerIntrospectionProjectionsEventType = setEventTypeFromFeature(feature.LevelInstance, feature.KeyTriggerIntrospectionProjections)
 	InstanceLegacyIntrospectionEventType             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLegacyIntrospection)
 	InstanceUserSchemaEventType                      = setEventTypeFromFeature(feature.LevelInstance, feature.KeyUserSchema)
+	InstanceTokenExchangeEventType                   = setEventTypeFromFeature(feature.LevelInstance, feature.KeyTokenExchange)
 	InstanceExecutionEventType                       = setEventTypeFromFeature(feature.LevelInstance, feature.KeyExecution)
 )
 

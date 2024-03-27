@@ -68,6 +68,10 @@ func (*systemFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceSystemSetFeature[bool],
 			},
 			{
+				Event:  feature_v2.SystemTokenExchangeEventType,
+				Reduce: reduceSystemSetFeature[bool],
+			},
+			{
 				Event:  feature_v2.SystemExecutionEventType,
 				Reduce: reduceSystemSetFeature[bool],
 			},

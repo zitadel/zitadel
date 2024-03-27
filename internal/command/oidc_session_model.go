@@ -23,6 +23,8 @@ type OIDCSessionWriteModel struct {
 	AccessTokenID              string
 	AccessTokenCreation        time.Time
 	AccessTokenExpiration      time.Time
+	AccessTokenReason          domain.TokenReason
+	AccessTokenActor           *domain.TokenActor
 	RefreshTokenID             string
 	RefreshToken               string
 	RefreshTokenExpiration     time.Time
@@ -100,6 +102,8 @@ func (wm *OIDCSessionWriteModel) reduceAdded(e *oidcsession.AddedEvent) {
 func (wm *OIDCSessionWriteModel) reduceAccessTokenAdded(e *oidcsession.AccessTokenAddedEvent) {
 	wm.AccessTokenID = e.ID
 	wm.AccessTokenExpiration = e.CreationDate().Add(e.Lifetime)
+	wm.AccessTokenReason = e.Reason
+	wm.AccessTokenActor = e.Actor
 }
 
 func (wm *OIDCSessionWriteModel) reduceAccessTokenRevoked(e *oidcsession.AccessTokenRevokedEvent) {

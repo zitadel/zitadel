@@ -12,6 +12,7 @@ type SystemFeatures struct {
 	LoginDefaultOrg                 *bool
 	TriggerIntrospectionProjections *bool
 	LegacyIntrospection             *bool
+	TokenExchange                   *bool
 	UserSchema                      *bool
 	Execution                       *bool
 }
@@ -21,6 +22,7 @@ func (m *SystemFeatures) isEmpty() bool {
 		m.TriggerIntrospectionProjections == nil &&
 		m.LegacyIntrospection == nil &&
 		m.UserSchema == nil &&
+		m.TokenExchange == nil &&
 		m.Execution == nil
 }
 
