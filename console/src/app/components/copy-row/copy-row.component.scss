@@ -1,7 +1,7 @@
-.row {
+.cnsl-cr-row {
   display: flex;
   align-items: center;
-  .right {
+  .cnsl-cr-right {
     flex-shrink: 0;
   }
 }
@@ -12,7 +12,7 @@
   $button-text-color: map-get($foreground, text);
   $button-disabled-text-color: map-get($foreground, disabled-button);
 
-  .copy-btn {
+  .cnsl-cr-copy {
     flex-grow: 1;
     text-align: left;
     transition: opacity 0.15s ease-in-out;
@@ -20,7 +20,7 @@
     border: 1px solid #8795a160;
     border-radius: 4px;
     padding: 0.25rem 1rem;
-    margin: 0.25rem 0;
+    margin: 0.25rem 0rem;
     color: $button-text-color;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -29,5 +29,13 @@
     &[disabled] {
       color: $button-disabled-text-color;
     }
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  .right {
+    flex-shrink: 0;
   }
 }

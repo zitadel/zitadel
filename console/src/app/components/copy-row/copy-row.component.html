@@ -1,7 +1,7 @@
-<div class="row">
-  <div class="cnsl-secondary-text" [ngStyle]="{ minWidth: labelMinWidth }">{{ label }}</div>
+<div class="cnsl-cr-row">
+  <div class="cnsl-cr-secondary-text" [ngStyle]="{ minWidth: labelMinWidth }">{{ label }}</div>
   <button
-    class="copy-btn"
+    class="cnsl-cr-copy"
     [disabled]="copied === value"
     [matTooltip]="(copied !== value ? 'ACTIONS.COPY' : 'ACTIONS.COPIED') | translate"
     cnslCopyToClipboard
@@ -10,7 +10,7 @@
   >
     {{ value }}
   </button>
-  <div class="item">
+  <div class="cnsl-cr-item">
     <ng-content></ng-content>
   </div>
 </div>

@@ -44,7 +44,6 @@ export class ProviderNextService {
       combineLatestWith(justCreated$),
       map(([params, created]) => (created ? created : params.get('id'))),
       shareReplay(1),
-      tap(console.info),
     );
   }
 
@@ -52,7 +51,6 @@ export class ProviderNextService {
     return id$.pipe(
       map((id) => !!id),
       shareReplay(1),
-      tap(console.info),
     );
   }
   autofillLink(id$: Observable<string | null>, link: string): Observable<string> {
