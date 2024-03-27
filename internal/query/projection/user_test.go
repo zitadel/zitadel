@@ -1265,7 +1265,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users11_notifications SET (verified_email, verified_email_lower) = (last_email, lower(last_email)) WHERE (user_id = $1) AND (instance_id = $2)",
+							expectedStmt: "UPDATE projections.users11_notifications SET verified_email = last_email WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -1309,7 +1309,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE projections.users11_notifications SET (verified_email, verified_email_lower) = (last_email, lower(last_email)) WHERE (user_id = $1) AND (instance_id = $2)",
+							expectedStmt: "UPDATE projections.users11_notifications SET verified_email = last_email WHERE (user_id = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",

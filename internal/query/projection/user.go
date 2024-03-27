@@ -137,7 +137,6 @@ func (*userProjection) Init() *old_handler.Check {
 			handler.NewColumn(NotifyInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(NotifyLastEmailCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(NotifyVerifiedEmailCol, handler.ColumnTypeText, handler.Nullable()),
-			handler.NewColumn(NotifyVerifiedEmailLowerCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(NotifyLastPhoneCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(NotifyVerifiedPhoneCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(NotifyPasswordSetCol, handler.ColumnTypeBool, handler.Default(false)),
@@ -145,7 +144,6 @@ func (*userProjection) Init() *old_handler.Check {
 			handler.NewPrimaryKey(NotifyInstanceIDCol, NotifyUserIDCol),
 			UserNotifySuffix,
 			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
-			handler.WithIndex(handler.NewIndex("email_search", []string{NotifyInstanceIDCol, NotifyVerifiedEmailLowerCol})),
 		),
 	)
 }
@@ -833,7 +831,6 @@ func (p *userProjection) reduceHumanEmailVerified(event eventstore.Event) (*hand
 		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCopyCol(NotifyVerifiedEmailCol, NotifyLastEmailCol),
-				handler.NewCopyCol(NotifyVerifiedEmailLowerCol, "lower("+NotifyLastEmailCol+")"),
 			},
 			[]handler.Condition{
 				handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
