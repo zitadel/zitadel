@@ -1,5 +1,6 @@
 "use server";
 
+import { login } from "@zitadel/server";
 import { cookies } from "next/headers";
 
 export type SessionCookie = {
@@ -156,15 +157,12 @@ export async function getSessionCookieByLoginName(
 
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
-    console.log("getSessionCookieByLoginName", loginName, organization);
     const found = sessions.find((s) =>
-      s.loginName === loginName && organization
-        ? s.organization === organization
-        : true
+      organization
+        ? s.organization === organization && s.loginName === loginName
+        : s.loginName === loginName
     );
     if (found) {
-      console.log("getSessionCookieByLoginName found", found);
-
       return found;
     } else {
       return Promise.reject("no cookie found with loginName: " + loginName);
