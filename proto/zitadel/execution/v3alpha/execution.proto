@@ -21,10 +21,15 @@ message Execution {
   ];
   // Details provide some base information (such as the last change date) of the target.
   zitadel.object.v2beta.Details details = 2;
-  // Targets which are called in the defined conditions.
-  repeated string targets = 3;
-  // Included executions with the same condition-types.
-  repeated string includes = 4;
+  // List of ordered list of targets/includes called during the execution.
+  repeated ExecutionType executions = 3;
+}
+
+message ExecutionType {
+  oneof type {
+    string target = 1;
+    string include = 2;
+  }
 }
 
 message Condition {
@@ -37,87 +42,70 @@ message Condition {
     // Condition-type to execute on response if a request on the defined API point happens.
     ResponseExecution response = 2;
     // Condition-type to execute if function is used, replaces actions v1.
-    string function = 3;
+    FunctionExecution function = 3;
     // Condition-type to execute if an event is created in the system.
     EventExecution event = 4;
   }
 }
 
-message RequestExecution {
-  // Condition for the request execution, only one possible.
-  oneof condition{
-    // GRPC-method as condition.
-    string method = 1 [
-      (validate.rules).string = {min_len: 1, max_len: 1000},
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        min_length: 1,
-        max_length: 1000,
-        example: "\"/zitadel.session.v2beta.SessionService/ListSessions\"";
+
+
+/*
+{
+  call: {
+    service: {
+      name: "zitadel.session.v2beta.SessionService",
+      method: {
+        name: "ListSessions"
       }
-    ];
-    // GRPC-service as condition.
-    string service = 2 [
-      (validate.rules).string = {min_len: 1, max_len: 1000},
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        min_length: 1,
-        max_length: 1000,
-        example: "\"zitadel.session.v2beta.SessionService\"";
-      }
-    ];
-    // All calls to any available service and endpoint as condition.
-    bool all = 3;
+    }
   }
+}
+
+*/
+
+message RequestExecution {
+  // if the service is not defined the execution is made on every request
+  optional Service service = 1;
 }
 
 message ResponseExecution {
-  // Condition for the response execution, only one possible.
-  oneof condition{
-    // GRPC-method as condition.
-    string method = 1 [
-      (validate.rules).string = {min_len: 1, max_len: 1000},
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        min_length: 1,
-        max_length: 1000,
-        example: "\"/zitadel.session.v2beta.SessionService/ListSessions\"";
-      }
-    ];
-    // GRPC-service as condition.
-    string service = 2 [
-      (validate.rules).string = {min_len: 1, max_len: 1000},
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        min_length: 1,
-        max_length: 1000,
-        example: "\"zitadel.session.v2beta.SessionService\"";
-      }
-    ];
-    // All calls to any available service and endpoint as condition.
-    bool all = 3;
-  }
+    // if the service is not defined the execution is made on every response
+    optional Service service = 1;
 }
 
+// Executed on all methods of the defined service
+message Service {
+  string name = 1 [(validate.rules).string = {min_len: 1, max_len: 1000}];
+  // If set executed on the specified method
+  optional Method method = 2;
+}
+
+// Executed on a specifc grpc method
+message Method {
+  string name = 1 [(validate.rules).string = {min_len: 1, max_len: 1000}];
+}
+
+// Executed on all events
 message EventExecution{
-  // Condition for the event execution, only one possible.
-  oneof condition{
-    // Event name as condition.
-    string event = 1 [
-      (validate.rules).string = {min_len: 1, max_len: 1000},
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        min_length: 1,
-        max_length: 1000,
-        example: "\"user.human.added\"";
-      }
-    ];
-    // Event group as condition, all events under this group.
-    string group = 2 [
-      (validate.rules).string = {min_len: 1, max_len: 1000},
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        min_length: 1,
-        max_length: 1000,
-        example: "\"user.human\"";
-      }
-    ];
-    // all events as condition.
-    bool all = 3;
-  }
+  // If set executed on specified aggregate type
+  optional AggregateTypeExecution aggregate_type = 1;
 }
 
+// Executed on a specific aggregate type
+message AggregateTypeExecution {
+  string type = 1 [(validate.rules).string = {min_len: 1, max_len: 1000}];
+  // If set executed on specified event type
+  optional EventTypeExecution event_type = 2;
+}
+
+// Executed on a specific event type
+message EventTypeExecution {
+  string type = 1 [(validate.rules).string = {min_len: 1, max_len: 1000}];
+}
+
+// Executed on the specified function
+// TODO: wouldn't an enum work here?
+message FunctionExecution {
+  string name = 1 [(validate.rules).string = {min_len: 1, max_len: 1000}];
+}
