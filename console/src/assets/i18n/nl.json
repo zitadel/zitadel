@@ -88,7 +88,32 @@
       },
       "IDPS": {
         "TITLE": "Identiteitsproviders",
-        "DESCRIPTION": "Maak en activeer externe identiteitsproviders. Kies een bekende provider of configureer een andere OIDC, OAuth of SAML compatibele provider naar keuze. Je kunt zelfs je bestaande JWT-tokens gebruiken als gefedereerde identiteiten door een JWT-identiteitsprovider te configureren."
+        "DESCRIPTION": "Maak en activeer externe identiteitsproviders. Kies een bekende provider of configureer een andere OIDC, OAuth of SAML compatibele provider naar keuze. Je kunt zelfs je bestaande JWT-tokens gebruiken als gefedereerde identiteiten door een JWT-identiteitsprovider te configureren.",
+        "NEXT": "Wat nu?",
+        "SAML": {
+          "TITLE": "Configureer je SAML-identiteitsprovider",
+          "DESCRIPTION": "ZITADEL is geconfigureerd. Nu heeft je SAML-identiteitsprovider enige configuratie nodig. De meeste providers staan je toe om gewoon de volledige ZITADEL-metadata XML te uploaden. Andere providers vragen je om enkele specifieke URL's te verstrekken, zoals bijvoorbeeld de entiteits-ID (metadata-URL), de Assertion Consumer Service (ACS) URL of de Single Logout URL."
+        },
+        "CALLBACK": {
+          "TITLE": "Configureer je {{ provider }}-identiteitsprovider",
+          "DESCRIPTION": "Voordat je ZITADEL kunt configureren, geef deze URL door aan je identiteitsprovider om de browseromleiding terug naar ZITADEL na authenticatie mogelijk te maken."
+        },
+        "JWT": {
+          "TITLE": "Gebruik JWT's als gefedereerde identiteiten",
+          "DESCRIPTION": "De JWT-identiteitsprovider stelt je in staat om je bestaande JWT-tokens te gebruiken als gefedereerde identiteiten. Deze functie is handig als je al een uitgever voor JWT's hebt. Met een JWT IdP kun je deze JWT's gebruiken om gebruikers in ZITADEL on-the-fly te creëren en bij te werken."
+        },
+        "LDAP": {
+          "TITLE": "Configureer ZITADEL om te verbinden met je LDAP-identiteitsprovider",
+          "DESCRIPTION": "Geef de verbindingsdetails voor je LDAP-server op en configureer de toewijzing van je LDAP-attributen aan ZITADEL-attributen."
+        },
+        "AUTOFILL": {
+          "TITLE": "Gebruikersgegevens automatisch invullen",
+          "DESCRIPTION": "Gebruik een actie om de ervaring van je gebruikers te verbeteren. Je kunt het registratieformulier van ZITADEL vooraf invullen met waarden van de identiteitsprovider."
+        },
+        "ACTIVATE": {
+          "TITLE": "Activeer de IdP",
+          "DESCRIPTION": "Je IdP is nog niet actief. Activeer het om je gebruikers in te laten loggen."
+        }
       },
       "PW_COMPLEXITY": {
         "TITLE": "Wachtwoordcomplexiteit",
@@ -467,7 +492,8 @@
     },
     "TABLE": {
       "SHOWUSER": "Toon gebruiker {{value}}"
-    }
+    },
+    "DOWNLOAD": "Download"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Heeft controle over de hele instantie, inclusief alle organisaties",
@@ -1506,7 +1532,8 @@
       "DESCRIPTIONCREATEADMIN": "Gebruikers kunnen kiezen uit de beschikbare identiteitsproviders hieronder.",
       "DESCRIPTIONCREATEMGMT": "Gebruikers kunnen kiezen uit de beschikbare identiteitsproviders hieronder. Opmerking: U kunt systeem ingestelde providers gebruiken evenals providers die alleen voor uw organisatie zijn ingesteld.",
       "LIFETIME_INVALID": "Formulier bevat ongeldige waarde(n).",
-      "SAVED": "Succesvol opgeslagen!"
+      "SAVED": "Succesvol opgeslagen!",
+      "PROVIDER_ADDED": "Identiteitsprovider geactiveerd."
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "Stel uw Privacybeleid en Algemene Voorwaarden Links in",
