@@ -93,7 +93,26 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       };
     }),
   );
-  public wellKnownMap$ = this.envSvc.wellKnown;
+  public apiMap$ = this.envSvc.env.pipe(
+    map((env) => {
+      return {
+        issuer: env.issuer,
+        adminServiceUrl: `${env.api}/admin/v1`,
+        mgmtServiceUrl: `${env.api}/management/v1`,
+        authServiceUrl: `${env.api}/auth/v1`,
+      };
+    }),
+  );
+  public samlMap$ = this.envSvc.env.pipe(
+    map((env) => {
+      return {
+        samlCertificateURL: `${env.issuer}/saml/v2/certificate`,
+        samlSSO: `${env.issuer}/saml/v2/SSO`,
+        samlSLO: `${env.issuer}/saml/v2/SLO`,
+      };
+    }),
+  );
+  public wellknownMap$ = this.envSvc.wellknown;
 
   public oidcResponseTypes: OIDCResponseType[] = [
     OIDCResponseType.OIDC_RESPONSE_TYPE_CODE,
@@ -105,6 +124,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     OIDCGrantType.OIDC_GRANT_TYPE_IMPLICIT,
     OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE,
     OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN,
+    OIDCGrantType.OIDC_GRANT_TYPE_TOKEN_EXCHANGE,
   ];
   public oidcAppTypes: OIDCAppType[] = [
     OIDCAppType.OIDC_APP_TYPE_WEB,

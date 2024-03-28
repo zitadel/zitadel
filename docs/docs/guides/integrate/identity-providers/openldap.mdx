@@ -150,10 +150,6 @@ ldapadd -x -h localhost -D "cn=admin,dc=example,dc=com" -f example.ldif -w 'Pass
 
 ## ZITADEL Configuration
 
-### Add custom login policy
-
-<CustomLoginPolicy/>
-
 ### Go to the IdP Providers Overview
 
 <IDPsOverview templates="Active Directory / LDAP"/>
@@ -194,6 +190,10 @@ Fill in the template fields with the exact values listed below. The fields are d
 <Activate/>
 
 ![Activate the LDAP Provider](/img/guides/zitadel_activate_ldap.png)
+
+### Ensure your Login Policy allows External IDPs
+
+<CustomLoginPolicy/>
 
 ## Test the setup
 

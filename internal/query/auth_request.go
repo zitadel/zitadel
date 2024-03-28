@@ -61,7 +61,7 @@ func (q *Queries) AuthRequestByID(ctx context.Context, shouldTriggerBulk bool, i
 
 	var (
 		scope   database.TextArray[string]
-		prompt  database.Array[domain.Prompt]
+		prompt  database.NumberArray[domain.Prompt]
 		locales database.TextArray[string]
 	)
 

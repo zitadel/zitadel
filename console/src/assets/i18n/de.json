@@ -88,7 +88,32 @@
       },
       "IDPS": {
         "TITLE": "Identitätsanbieter",
-        "DESCRIPTION": "Erstelle und aktiviere externe Identitätsanbieter. Wähle einen bekannten Anbieter oder konfiguriere jeden anderen OIDC-, OAuth- oder SAML-kompatiblen Anbieter deiner Wahl. Du kannst sogar deine bestehenden JWT-Token als föderierte Identitäten verwenden, indem du einen JWT-Identitätsanbieter konfigurierst."
+        "DESCRIPTION": "Erstelle und aktiviere externe Identitätsanbieter. Wähle einen bekannten Anbieter aus oder konfiguriere einen anderen OIDC-, OAuth- oder SAML-kompatiblen Anbieter deiner Wahl. Du kannst sogar deine vorhandenen JWT-Tokens als föderierte Identitäten verwenden, indem du einen JWT-Identitätsanbieter konfigurierst.",
+        "NEXT": "Was nun?",
+        "SAML": {
+          "TITLE": "Konfiguriere deinen SAML-Identitätsanbieter",
+          "DESCRIPTION": "ZITADEL ist konfiguriert. Jetzt benötigt dein SAML-Identitätsanbieter eine Konfiguration. Die meisten Anbieter erlauben es dir, einfach die gesamte ZITADEL-Metadaten-XML hochzuladen. Andere Anbieter bitten dich, nur einige bestimmte URLs anzugeben, wie zum Beispiel die Entity-ID (Metadaten-URL), die Assertion Consumer Service (ACS)-URL oder die Single Logout-URL."
+        },
+        "CALLBACK": {
+          "TITLE": "Konfiguriere deinen {{ provider }}-Identitätsanbieter",
+          "DESCRIPTION": "Bevor du ZITADEL konfigurieren kannst, gib diese URL an deinen Identitätsanbieter weiter, um die Browserumleitung zurück zu ZITADEL nach der Authentifizierung zu ermöglichen."
+        },
+        "JWT": {
+          "TITLE": "Verwende JWTs als föderierte Identitäten",
+          "DESCRIPTION": "Der JWT-Identitätsanbieter ermöglicht es dir, deine vorhandenen JWT-Tokens als föderierte Identitäten zu nutzen. Diese Funktion ist praktisch, wenn du bereits einen Aussteller für JWTs hast. Mit einem JWT-IdP kannst du diese JWTs nutzen, um Benutzer in ZITADEL on-the-fly zu erstellen und zu aktualisieren."
+        },
+        "LDAP": {
+          "TITLE": "Konfiguriere ZITADEL, um eine Verbindung zu deinem LDAP-Identitätsanbieter herzustellen",
+          "DESCRIPTION": "Gib die Verbindungsdetails zu deinem LDAP-Server an und konfiguriere die Zuordnung deiner LDAP-Attribute zu ZITADEL-Attributen."
+        },
+        "AUTOFILL": {
+          "TITLE": "Benutzerdaten automatisch ausfüllen",
+          "DESCRIPTION": "Verwende eine Aktion, um das Benutzererlebnis zu verbessern. Du kannst das Registrierungsformular von ZITADEL mit Werten vom Identitätsanbieter vorab ausfüllen."
+        },
+        "ACTIVATE": {
+          "TITLE": "Aktiviere den IdP",
+          "DESCRIPTION": "Dein IdP ist noch nicht aktiv. Aktiviere ihn, um deinen Benutzern das Einloggen zu ermöglichen."
+        }
       },
       "PW_COMPLEXITY": {
         "TITLE": "Passwortkomplexität",
@@ -466,7 +491,8 @@
     },
     "TABLE": {
       "SHOWUSER": "Zeige Benutzer {{value}}"
-    }
+    },
+    "DOWNLOAD": "Herunterladen"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Hat die Kontrolle über die gesamte Instanz, einschließlich aller Organisationen",
@@ -1505,7 +1531,8 @@
       "DESCRIPTIONCREATEADMIN": "Nutzer können sich mit den verfügbaren Idps authentifizieren.",
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
       "LIFETIME_INVALID": "Login Lifetimes sind ungültig.",
-      "SAVED": "Erfolgreich gespeichert."
+      "SAVED": "Erfolgreich gespeichert.",
+      "PROVIDER_ADDED": "Identitätsanbieter aktiviert."
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "Legen Sie Ihre Datenschutzrichtlinien und Nutzungsbedingungen fest",
@@ -2279,7 +2306,8 @@
         "0": "Authorization Code",
         "1": "Implicit",
         "2": "Refresh Token",
-        "3": "Device Code"
+        "3": "Device Code",
+        "4": "Token Exchange"
       },
       "AUTHMETHOD": {
         "0": "Basic",

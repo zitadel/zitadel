@@ -60,7 +60,6 @@ Errors:
   Notification:
     NoDomain: No Domain found for message
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: User could not be found
     AlreadyExists: User already exists
     NotFoundOnOrg: User could not be found on chosen organization
@@ -479,6 +478,7 @@ Errors:
     CloseRows: SQL Statement could not be finished
     SQLStatement: SQL Statement could not be created
     InvalidRequest: Request is invalid
+    TooManyNestingLevels: Too many query nesting levels (Max 20)
   Quota:
     AlreadyExists: Quota already exists for this unit
     NotFound: Quota not found for this unit
@@ -556,6 +556,17 @@ Errors:
     NotActive: User Schema not active
     NotInactive: User Schema not inactive
     NotExists: User Schema does not exist
+  TokenExchange:
+    FeatureDisabled: Token Exchange feature is disabled for your instance. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Token is missing
+      Invalid: Token is invalid
+      TypeMissing: Token type is missing
+      TypeNotAllowed: Token type is not allowed
+      TypeNotSupported: Token type is not supported
+      NotForAPI: Impersonated tokens not allowed for API
+    Impersonation:
+      PolicyDisabled: Impersonation is disabled in the instance security policy
 
 AggregateTypes:
   action: Action
@@ -592,6 +603,7 @@ EventTypes:
     token:
       added: Access Token created
       removed: Access Token removed
+    impersonated: User impersonated
     username:
       reserved: Username reserved
       released: Username released

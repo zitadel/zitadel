@@ -101,6 +101,7 @@ func humanToPb(userQ *query.Human, assetPrefix, owner string) *user.HumanUser {
 			Phone:      string(userQ.Phone),
 			IsVerified: userQ.IsPhoneVerified,
 		},
+		PasswordChangeRequired: userQ.PasswordChangeRequired,
 	}
 }
 
@@ -218,7 +219,7 @@ func userQueriesToQuery(queries []*user.SearchQuery, level uint8) (_ []query.Sea
 func userQueryToQuery(query *user.SearchQuery, level uint8) (query.SearchQuery, error) {
 	if level > 20 {
 		// can't go deeper than 20 levels of nesting.
-		return nil, zerrors.ThrowInvalidArgument(nil, "USER-zsQ97", "Errors.User.TooManyNestingLevels")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-zsQ97", "Errors.Query.TooManyNestingLevels")
 	}
 	switch q := query.Query.(type) {
 	case *user.SearchQuery_UserNameQuery:
@@ -239,8 +240,8 @@ func userQueryToQuery(query *user.SearchQuery, level uint8) (query.SearchQuery, 
 		return typeQueryToQuery(q.TypeQuery)
 	case *user.SearchQuery_LoginNameQuery:
 		return loginNameQueryToQuery(q.LoginNameQuery)
-	case *user.SearchQuery_ResourceOwner:
-		return resourceOwnerQueryToQuery(q.ResourceOwner)
+	case *user.SearchQuery_OrganizationIdQuery:
+		return resourceOwnerQueryToQuery(q.OrganizationIdQuery)
 	case *user.SearchQuery_InUserIdsQuery:
 		return inUserIdsQueryToQuery(q.InUserIdsQuery)
 	case *user.SearchQuery_OrQuery:
@@ -292,8 +293,8 @@ func loginNameQueryToQuery(q *user.LoginNameQuery) (query.SearchQuery, error) {
 	return query.NewUserLoginNameExistsQuery(q.LoginName, object.TextMethodToQuery(q.Method))
 }
 
-func resourceOwnerQueryToQuery(q *user.ResourceOwnerQuery) (query.SearchQuery, error) {
-	return query.NewUserResourceOwnerSearchQuery(q.OrgID, query.TextEquals)
+func resourceOwnerQueryToQuery(q *user.OrganizationIdQuery) (query.SearchQuery, error) {
+	return query.NewUserResourceOwnerSearchQuery(q.OrganizationId, query.TextEquals)
 }
 
 func inUserIdsQueryToQuery(q *user.InUserIDQuery) (query.SearchQuery, error) {

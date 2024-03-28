@@ -30,10 +30,12 @@ The trigger is represented by the following Ids in the API: `4`
     - `userinfo`  
       This function is deprecated, please use `api.v1.claims`
       - `setClaim(string, Any)`  
-        Sets any value if the key is not already present. If it's already present there is a message added to `urn:zitadel:iam:action:${action.name}:log`
+        Sets any value if the key is not already present. If it's already present there is a message added to `urn:zitadel:iam:action:${action.name}:log` 
+        Note that keys with prefix `urn:zitadel:iam` will be ignored.
     - `claims`
       - `setClaim(string, Any)`  
         Sets any value if the key is not already present. If it's already present there is a message added to `urn:zitadel:iam:action:${action.name}:log`
+        Note that keys with prefix `urn:zitadel:iam` will be ignored.
     - `user`
       - `setMetadata(string, Any)`  
         Key of the metadata and any value
@@ -62,6 +64,7 @@ The trigger is represented by the following Ids in the API: `5`
     - `claims`
       - `setClaim(string, Any)`  
         Sets any value if the key is not already present. If it's already present there is a message added to `urn:zitadel:iam:action:${action.name}:log`
+        Note that keys with prefix `urn:zitadel:iam` will be ignored.
       - `appendLogIntoClaims(string)`  
         Appends the entry into the claim `urn:zitadel:action:{action.name}:log` the value of the claim is an Array of *string*
     - `user`

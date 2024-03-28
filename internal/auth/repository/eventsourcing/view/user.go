@@ -50,7 +50,7 @@ func (v *View) UserByLoginNameAndResourceOwner(ctx context.Context, loginName, r
 }
 
 func (v *View) UserByEmail(ctx context.Context, email, instanceID string) (*model.UserView, error) {
-	emailQuery, err := query.NewUserVerifiedEmailSearchQuery(email, query.TextEqualsIgnoreCase)
+	emailQuery, err := query.NewUserVerifiedEmailSearchQuery(email)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (v *View) UserByEmail(ctx context.Context, email, instanceID string) (*mode
 }
 
 func (v *View) UserByEmailAndResourceOwner(ctx context.Context, email, resourceOwner, instanceID string) (*model.UserView, error) {
-	emailQuery, err := query.NewUserVerifiedEmailSearchQuery(email, query.TextEquals)
+	emailQuery, err := query.NewUserVerifiedEmailSearchQuery(email)
 	if err != nil {
 		return nil, err
 	}

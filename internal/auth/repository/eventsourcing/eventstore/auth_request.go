@@ -133,15 +133,6 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	if err != nil {
 		return nil, err
 	}
-	projectIDQuery, err := query.NewAppProjectIDSearchQuery(project.ID)
-	if err != nil {
-		return nil, err
-	}
-	appIDs, err := repo.Query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
-	if err != nil {
-		return nil, err
-	}
-	request.Audience = appIDs
 	request.AppendAudIfNotExisting(project.ID)
 	request.ApplicationResourceOwner = project.ResourceOwner
 	request.PrivateLabelingSetting = project.PrivateLabelingSetting
@@ -567,8 +558,7 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 	if err != nil {
 		return err
 	}
-	request.UserID = human.AggregateID
-	request.UserOrgID = human.ResourceOwner
+	request.SetUserInfo(human.AggregateID, human.Username, human.PreferredLoginName, human.DisplayName, "", human.ResourceOwner)
 	request.SelectedIDPConfigID = externalIDP.IDPConfigID
 	request.LinkingUsers = nil
 	err = repo.Command.UserIDPLoginChecked(ctx, request.UserOrgID, request.UserID, request.WithCurrentInfo(info))
@@ -922,11 +912,11 @@ func queryLoginPolicyToDomain(policy *query.LoginPolicy) *domain.LoginPolicy {
 		IgnoreUnknownUsernames:     policy.IgnoreUnknownUsernames,
 		AllowDomainDiscovery:       policy.AllowDomainDiscovery,
 		DefaultRedirectURI:         policy.DefaultRedirectURI,
-		PasswordCheckLifetime:      policy.PasswordCheckLifetime,
-		ExternalLoginCheckLifetime: policy.ExternalLoginCheckLifetime,
-		MFAInitSkipLifetime:        policy.MFAInitSkipLifetime,
-		SecondFactorCheckLifetime:  policy.SecondFactorCheckLifetime,
-		MultiFactorCheckLifetime:   policy.MultiFactorCheckLifetime,
+		PasswordCheckLifetime:      time.Duration(policy.PasswordCheckLifetime),
+		ExternalLoginCheckLifetime: time.Duration(policy.ExternalLoginCheckLifetime),
+		MFAInitSkipLifetime:        time.Duration(policy.MFAInitSkipLifetime),
+		SecondFactorCheckLifetime:  time.Duration(policy.SecondFactorCheckLifetime),
+		MultiFactorCheckLifetime:   time.Duration(policy.MultiFactorCheckLifetime),
 		DisableLoginWithEmail:      policy.DisableLoginWithEmail,
 		DisableLoginWithPhone:      policy.DisableLoginWithPhone,
 	}

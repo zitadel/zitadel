@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
+	"golang.org/x/exp/constraints"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -502,6 +503,16 @@ func NewJSONCol(name string, value interface{}) Column {
 	}
 
 	return NewCol(name, marshalled)
+}
+
+func NewIncrementCol[Int constraints.Integer](column string, value Int) Column {
+	return Column{
+		Name:  column,
+		Value: value,
+		ParameterOpt: func(placeholder string) string {
+			return column + " + " + placeholder
+		},
+	}
 }
 
 type Condition func(param string) (string, []any)
