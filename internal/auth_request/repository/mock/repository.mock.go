@@ -5,6 +5,7 @@
 //
 //	mockgen -package mock -destination ./mock/repository.mock.go github.com/zitadel/zitadel/internal/auth_request/repository AuthRequestCache
 //
+
 // Package mock is a generated GoMock package.
 package mock
 

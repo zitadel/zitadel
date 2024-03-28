@@ -14,6 +14,10 @@ import (
 )
 
 func (s *Server) CreateTarget(ctx context.Context, req *execution.CreateTargetRequest) (*execution.CreateTargetResponse, error) {
+	if err := checkExecutionEnabled(ctx); err != nil {
+		return nil, err
+	}
+
 	add := createTargetToCommand(req)
 	details, err := s.command.AddTarget(ctx, add, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
@@ -26,6 +30,10 @@ func (s *Server) CreateTarget(ctx context.Context, req *execution.CreateTargetRe
 }
 
 func (s *Server) UpdateTarget(ctx context.Context, req *execution.UpdateTargetRequest) (*execution.UpdateTargetResponse, error) {
+	if err := checkExecutionEnabled(ctx); err != nil {
+		return nil, err
+	}
+
 	details, err := s.command.ChangeTarget(ctx, updateTargetToCommand(req), authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
@@ -36,6 +44,10 @@ func (s *Server) UpdateTarget(ctx context.Context, req *execution.UpdateTargetRe
 }
 
 func (s *Server) DeleteTarget(ctx context.Context, req *execution.DeleteTargetRequest) (*execution.DeleteTargetResponse, error) {
+	if err := checkExecutionEnabled(ctx); err != nil {
+		return nil, err
+	}
+
 	details, err := s.command.DeleteTarget(ctx, req.GetTargetId(), authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err

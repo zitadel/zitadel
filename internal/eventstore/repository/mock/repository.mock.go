@@ -5,6 +5,7 @@
 //
 //	mockgen -package mock -destination ./repository.mock.go github.com/zitadel/zitadel/internal/eventstore Querier,Pusher
 //
+
 // Package mock is a generated GoMock package.
 package mock
 

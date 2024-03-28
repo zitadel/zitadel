@@ -29,6 +29,10 @@ func (s *Server) ListExecutionServices(_ context.Context, _ *execution.ListExecu
 }
 
 func (s *Server) SetExecution(ctx context.Context, req *execution.SetExecutionRequest) (*execution.SetExecutionResponse, error) {
+	if err := checkExecutionEnabled(ctx); err != nil {
+		return nil, err
+	}
+
 	set := &command.SetExecution{
 		Targets:  req.GetTargets(),
 		Includes: req.GetIncludes(),
@@ -79,6 +83,10 @@ func (s *Server) SetExecution(ctx context.Context, req *execution.SetExecutionRe
 }
 
 func (s *Server) DeleteExecution(ctx context.Context, req *execution.DeleteExecutionRequest) (*execution.DeleteExecutionResponse, error) {
+	if err := checkExecutionEnabled(ctx); err != nil {
+		return nil, err
+	}
+
 	var err error
 	var details *domain.ObjectDetails
 	switch t := req.GetCondition().GetConditionType().(type) {

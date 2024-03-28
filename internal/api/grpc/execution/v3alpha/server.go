@@ -1,12 +1,15 @@
 package execution
 
 import (
+	"context"
+
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
 )
 
@@ -57,4 +60,11 @@ func (s *Server) AuthMethods() authz.MethodMapping {
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
 	return execution.RegisterExecutionServiceHandler
+}
+
+func checkExecutionEnabled(ctx context.Context) error {
+	if authz.GetInstance(ctx).Features().Execution {
+		return nil
+	}
+	return zerrors.ThrowPreconditionFailed(nil, "SCHEMA-141bwx3lef", "Errors.Execution.NotEnabled")
 }

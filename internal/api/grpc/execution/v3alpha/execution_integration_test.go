@@ -15,6 +15,7 @@ import (
 )
 
 func TestServer_SetExecution_Request(t *testing.T) {
+	ensureFeatureEnabled(t)
 	targetResp := Tester.CreateTarget(CTX, t)
 
 	tests := []struct {
@@ -167,6 +168,8 @@ func TestServer_SetExecution_Request(t *testing.T) {
 }
 
 func TestServer_SetExecution_Request_Include(t *testing.T) {
+	ensureFeatureEnabled(t)
+
 	targetResp := Tester.CreateTarget(CTX, t)
 	executionCond := "request"
 	Tester.SetExecution(CTX, t,
@@ -272,6 +275,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 }
 
 func TestServer_DeleteExecution_Request(t *testing.T) {
+	ensureFeatureEnabled(t)
 	targetResp := Tester.CreateTarget(CTX, t)
 
 	tests := []struct {
@@ -436,6 +440,7 @@ func TestServer_DeleteExecution_Request(t *testing.T) {
 }
 
 func TestServer_SetExecution_Response(t *testing.T) {
+	ensureFeatureEnabled(t)
 	targetResp := Tester.CreateTarget(CTX, t)
 
 	tests := []struct {
@@ -588,6 +593,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 }
 
 func TestServer_DeleteExecution_Response(t *testing.T) {
+	ensureFeatureEnabled(t)
 	targetResp := Tester.CreateTarget(CTX, t)
 
 	tests := []struct {
@@ -754,6 +760,7 @@ func TestServer_DeleteExecution_Response(t *testing.T) {
 }
 
 func TestServer_SetExecution_Event(t *testing.T) {
+	ensureFeatureEnabled(t)
 	targetResp := Tester.CreateTarget(CTX, t)
 
 	tests := []struct {
@@ -916,6 +923,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 }
 
 func TestServer_DeleteExecution_Event(t *testing.T) {
+	ensureFeatureEnabled(t)
 	targetResp := Tester.CreateTarget(CTX, t)
 
 	tests := []struct {
@@ -1106,6 +1114,7 @@ func TestServer_DeleteExecution_Event(t *testing.T) {
 }
 
 func TestServer_SetExecution_Function(t *testing.T) {
+	ensureFeatureEnabled(t)
 	targetResp := Tester.CreateTarget(CTX, t)
 
 	tests := []struct {
@@ -1189,6 +1198,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 }
 
 func TestServer_DeleteExecution_Function(t *testing.T) {
+	ensureFeatureEnabled(t)
 	targetResp := Tester.CreateTarget(CTX, t)
 
 	tests := []struct {
