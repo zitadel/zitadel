@@ -50,7 +50,7 @@ The /loginname page allows to enter loginname or email of a user. User discovery
 Right after the user is found, a session is created and set as cookie.
 This cookie is then hydrated with more information once the users continues.
 The OIDC Auth request is always passed in the url to have a context to the ongoing authentication flow.
-If enough user information is retrieved and the user is authenticated, the flow is finalized by [requesting a the callback url](/docs/apis/resources/oidc_service/oidc-service-create-callback) for the auth request and the user is redirected back to the application.
+If enough user information is retrieved and the user is authenticated according to the policies, the flow is finalized by [requesting a the callback url](/docs/apis/resources/oidc_service/oidc-service-create-callback) for the auth request and the user is redirected back to the application.
 The application can then request a token calling the /token endpoint of the login which is proxied to the ZITADEL API.
 
 ### Implemented features
