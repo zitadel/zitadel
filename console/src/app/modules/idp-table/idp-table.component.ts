@@ -36,7 +36,7 @@ import { ContextChangedWorkflowOverlays } from 'src/app/services/overlay/workflo
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
-import { ActivateIdpService } from '../../services/activate-idp.service';
+import { LoginPolicyService } from '../../services/login-policy.service';
 import { first } from 'rxjs/operators';
 
 @Component({
@@ -72,7 +72,7 @@ export class IdpTableComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private dialog: MatDialog,
     private router: Router,
-    private activateIdpSvc: ActivateIdpService,
+    private loginPolicySvc: LoginPolicyService,
   ) {
     this.selection.changed.subscribe(() => {
       this.changedSelection.emit(this.selection.selected);
@@ -302,7 +302,7 @@ export class IdpTableComponent implements OnInit, OnDestroy {
   }
 
   public addIdp(idp: Provider.AsObject): Promise<any> {
-    return firstValueFrom(this.activateIdpSvc.activateIdp(this.service, idp.id, idp.owner, this.loginPolicy))
+    return firstValueFrom(this.loginPolicySvc.activateIdp(this.service, idp.id, idp.owner, this.loginPolicy))
       .then(() => {
         this.toast.showInfo('IDP.TOAST.ADDED', true);
         setTimeout(() => {
@@ -328,8 +328,8 @@ export class IdpTableComponent implements OnInit, OnDestroy {
         switch (this.serviceType) {
           case PolicyComponentServiceType.MGMT:
             if (this.isDefault) {
-              this.activateIdpSvc
-                .addLoginPolicy(this.service as ManagementService, this.loginPolicy)
+              this.loginPolicySvc
+                .createCustomLoginPolicy(this.service as ManagementService, this.loginPolicy)
                 .then(() => {
                   this.loginPolicy.isDefault = false;
                   return (this.service as ManagementService)
