@@ -23,14 +23,14 @@ var (
 			", projections.user_grants5.roles" +
 			", projections.user_grants5.state" +
 			", projections.user_grants5.user_id" +
-			", projections.users10.username" +
-			", projections.users10.type" +
-			", projections.users10.resource_owner" +
-			", projections.users10_humans.first_name" +
-			", projections.users10_humans.last_name" +
-			", projections.users10_humans.email" +
-			", projections.users10_humans.display_name" +
-			", projections.users10_humans.avatar_key" +
+			", projections.users11.username" +
+			", projections.users11.type" +
+			", projections.users11.resource_owner" +
+			", projections.users11_humans.first_name" +
+			", projections.users11_humans.last_name" +
+			", projections.users11_humans.email" +
+			", projections.users11_humans.display_name" +
+			", projections.users11_humans.avatar_key" +
 			", projections.login_names3.login_name" +
 			", projections.user_grants5.resource_owner" +
 			", projections.orgs1.name" +
@@ -41,11 +41,11 @@ var (
 			", granted_orgs.name" +
 			", granted_orgs.primary_domain" +
 			" FROM projections.user_grants5" +
-			" LEFT JOIN projections.users10 ON projections.user_grants5.user_id = projections.users10.id AND projections.user_grants5.instance_id = projections.users10.instance_id" +
-			" LEFT JOIN projections.users10_humans ON projections.user_grants5.user_id = projections.users10_humans.user_id AND projections.user_grants5.instance_id = projections.users10_humans.instance_id" +
+			" LEFT JOIN projections.users11 ON projections.user_grants5.user_id = projections.users11.id AND projections.user_grants5.instance_id = projections.users11.instance_id" +
+			" LEFT JOIN projections.users11_humans ON projections.user_grants5.user_id = projections.users11_humans.user_id AND projections.user_grants5.instance_id = projections.users11_humans.instance_id" +
 			" LEFT JOIN projections.orgs1 ON projections.user_grants5.resource_owner = projections.orgs1.id AND projections.user_grants5.instance_id = projections.orgs1.instance_id" +
 			" LEFT JOIN projections.projects4 ON projections.user_grants5.project_id = projections.projects4.id AND projections.user_grants5.instance_id = projections.projects4.instance_id" +
-			" LEFT JOIN projections.orgs1 AS granted_orgs ON projections.users10.resource_owner = granted_orgs.id AND projections.users10.instance_id = granted_orgs.instance_id" +
+			" LEFT JOIN projections.orgs1 AS granted_orgs ON projections.users11.resource_owner = granted_orgs.id AND projections.users11.instance_id = granted_orgs.instance_id" +
 			" LEFT JOIN projections.login_names3 ON projections.user_grants5.user_id = projections.login_names3.user_id AND projections.user_grants5.instance_id = projections.login_names3.instance_id" +
 			` AS OF SYSTEM TIME '-1 ms' ` +
 			" WHERE projections.login_names3.is_primary = $1")
@@ -85,14 +85,14 @@ var (
 			", projections.user_grants5.roles" +
 			", projections.user_grants5.state" +
 			", projections.user_grants5.user_id" +
-			", projections.users10.username" +
-			", projections.users10.type" +
-			", projections.users10.resource_owner" +
-			", projections.users10_humans.first_name" +
-			", projections.users10_humans.last_name" +
-			", projections.users10_humans.email" +
-			", projections.users10_humans.display_name" +
-			", projections.users10_humans.avatar_key" +
+			", projections.users11.username" +
+			", projections.users11.type" +
+			", projections.users11.resource_owner" +
+			", projections.users11_humans.first_name" +
+			", projections.users11_humans.last_name" +
+			", projections.users11_humans.email" +
+			", projections.users11_humans.display_name" +
+			", projections.users11_humans.avatar_key" +
 			", projections.login_names3.login_name" +
 			", projections.user_grants5.resource_owner" +
 			", projections.orgs1.name" +
@@ -104,11 +104,11 @@ var (
 			", granted_orgs.primary_domain" +
 			", COUNT(*) OVER ()" +
 			" FROM projections.user_grants5" +
-			" LEFT JOIN projections.users10 ON projections.user_grants5.user_id = projections.users10.id AND projections.user_grants5.instance_id = projections.users10.instance_id" +
-			" LEFT JOIN projections.users10_humans ON projections.user_grants5.user_id = projections.users10_humans.user_id AND projections.user_grants5.instance_id = projections.users10_humans.instance_id" +
+			" LEFT JOIN projections.users11 ON projections.user_grants5.user_id = projections.users11.id AND projections.user_grants5.instance_id = projections.users11.instance_id" +
+			" LEFT JOIN projections.users11_humans ON projections.user_grants5.user_id = projections.users11_humans.user_id AND projections.user_grants5.instance_id = projections.users11_humans.instance_id" +
 			" LEFT JOIN projections.orgs1 ON projections.user_grants5.resource_owner = projections.orgs1.id AND projections.user_grants5.instance_id = projections.orgs1.instance_id" +
 			" LEFT JOIN projections.projects4 ON projections.user_grants5.project_id = projections.projects4.id AND projections.user_grants5.instance_id = projections.projects4.instance_id" +
-			" LEFT JOIN projections.orgs1 AS granted_orgs ON projections.users10.resource_owner = granted_orgs.id AND projections.users10.instance_id = granted_orgs.instance_id" +
+			" LEFT JOIN projections.orgs1 AS granted_orgs ON projections.users11.resource_owner = granted_orgs.id AND projections.users11.instance_id = granted_orgs.instance_id" +
 			" LEFT JOIN projections.login_names3 ON projections.user_grants5.user_id = projections.login_names3.user_id AND projections.user_grants5.instance_id = projections.login_names3.instance_id" +
 			` AS OF SYSTEM TIME '-1 ms' ` +
 			" WHERE projections.login_names3.is_primary = $1")
