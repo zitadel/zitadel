@@ -47,7 +47,7 @@ func TestMain(m *testing.M) {
 
 		CTX, _ = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
 		User = Tester.CreateHumanUser(CTX)
-		Tester.SetUserPassword(CTX, User.GetUserId(), integration.UserPassword)
+		Tester.SetUserPassword(CTX, User.GetUserId(), integration.UserPassword, false)
 		Tester.RegisterUserPasskey(CTX, User.GetUserId())
 		CTXLOGIN, _ = Tester.WithAuthorization(ctx, integration.Login), errCtx
 		return m.Run()
@@ -321,7 +321,7 @@ func Test_ZITADEL_API_terminated_session_user_disabled(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			disabledUser := Tester.CreateHumanUser(CTX)
-			Tester.SetUserPassword(CTX, disabledUser.GetUserId(), integration.UserPassword)
+			Tester.SetUserPassword(CTX, disabledUser.GetUserId(), integration.UserPassword, false)
 			authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess, zitadelAudienceScope)
 			sessionID, sessionToken, startTime, changeTime := Tester.CreatePasswordSession(t, CTXLOGIN, disabledUser.GetUserId(), integration.UserPassword)
 			linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{

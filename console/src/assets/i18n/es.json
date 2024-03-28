@@ -88,7 +88,32 @@
       },
       "IDPS": {
         "TITLE": "Proveedores de Identidad",
-        "DESCRIPTION": "Crea y activa proveedores de identidad externos. Elige un proveedor conocido o configura cualquier otro proveedor compatible con OIDC, OAuth o SAML de tu elección. Incluso puedes usar tus tokens JWT existentes como identidades federadas configurando un proveedor de identidad JWT."
+        "DESCRIPTION": "Crea y activa proveedores de identidad externos. Elige un proveedor conocido o configura cualquier otro proveedor compatible con OIDC, OAuth o SAML de tu elección. Incluso puedes usar tus tokens JWT existentes como identidades federadas configurando un proveedor de identidad JWT.",
+        "NEXT": "¿Qué ahora?",
+        "SAML": {
+          "TITLE": "Configura tu Proveedor de Identidad SAML",
+          "DESCRIPTION": "ZITADEL está configurado. Ahora tu Proveedor de Identidad SAML necesita algo de configuración. La mayoría de los proveedores te permiten subir todo el XML de metadatos de ZITADEL. Otros proveedores te piden que proporciones solo algunas URL distintas, como por ejemplo la ID de entidad (URL de metadatos), la URL del Servicio de Consumo de Aserción (ACS) o la URL de Cierre de Sesión Único."
+        },
+        "CALLBACK": {
+          "TITLE": "Configura tu Proveedor de Identidad {{ provider }}",
+          "DESCRIPTION": "Antes de que puedas configurar ZITADEL, pasa esta URL a tu Proveedor de Identidad para habilitar la redirección del navegador de vuelta a ZITADEL después de la autenticación."
+        },
+        "JWT": {
+          "TITLE": "Usa JWTs como identidades federadas",
+          "DESCRIPTION": "El Proveedor de Identidad JWT te permite usar tus tokens JWT existentes como identidades federadas. Esta característica es útil si ya tienes un emisor para JWTs. Con un IdP JWT, puedes usar estos JWTs para crear y actualizar usuarios en ZITADEL al vuelo."
+        },
+        "LDAP": {
+          "TITLE": "Configura ZITADEL para conectar con tu Proveedor de Identidad LDAP",
+          "DESCRIPTION": "Proporciona los detalles de conexión a tu servidor LDAP y configura el mapeo de tus atributos LDAP a los atributos de ZITADEL."
+        },
+        "AUTOFILL": {
+          "TITLE": "Autocompletar datos de usuario",
+          "DESCRIPTION": "Usa una acción para mejorar la experiencia de tus usuarios. Puedes pre-rellenar el formulario de registro de ZITADEL con valores del proveedor de identidad."
+        },
+        "ACTIVATE": {
+          "TITLE": "Activa el IdP",
+          "DESCRIPTION": "Tu IdP aún no está activo. Actívalo para permitir a tus usuarios iniciar sesión."
+        }
       },
       "PW_COMPLEXITY": {
         "TITLE": "Complejidad de la Contraseña",
@@ -467,7 +492,8 @@
     },
     "TABLE": {
       "SHOWUSER": "Mostrar usuario {{value}}"
-    }
+    },
+    "DOWNLOAD": "Descargar"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Tiene control sobre toda la instancia, incluyendo todas las organizaciones",
@@ -1507,7 +1533,8 @@
       "DESCRIPTIONCREATEADMIN": "Los usuarios pueden elegir entre los siguientes proveedores de identidad disponibles.",
       "DESCRIPTIONCREATEMGMT": "Los usuarios pueden elegir entre los siguientes proveedores de identidad. Nota: Puedes usar los proveedores integrados en el sistema así como sólo los proveedores configurados para tu organización.",
       "LIFETIME_INVALID": "El formulario contiene valores no válidos.",
-      "SAVED": "¡Guardado con éxito!"
+      "SAVED": "¡Guardado con éxito!",
+      "PROVIDER_ADDED": "Proveedor de identidad activado."
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "Establece tu Política de privacidad y los enlaces a los Términos de Servicio (TDS)",
