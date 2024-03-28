@@ -1734,7 +1734,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create Key for machine user";
-            description: "A new key is generated and will be returned in the response. Make sure to store the returned key. Machine keys are used to authenticate with jwt profile."
+            description: "If a public key is not supplied, a new key is generated and will be returned in the response. Make sure to store the returned key. If an RSA public key is supplied, the private key is omitted from the response. Machine keys are used to authenticate with jwt profile."
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -8504,6 +8504,7 @@ message AddMachineKeyRequest {
             description: "The date the key will expire and no logins will be possible";
         }
     ];
+    bytes pubkey = 4;
 }
 
 message AddMachineKeyResponse {
