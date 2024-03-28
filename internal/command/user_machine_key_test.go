@@ -168,7 +168,7 @@ func TestCommands_AddMachineKey(t *testing.T) {
 				want: &domain.ObjectDetails{
 					ResourceOwner: "org1",
 				},
-				key: true,
+				key: false,
 			},
 		},
 		{
@@ -217,7 +217,7 @@ func TestCommands_AddMachineKey(t *testing.T) {
 				want: &domain.ObjectDetails{
 					ResourceOwner: "org1",
 				},
-				key: true,
+				key: false,
 			},
 		},
 	}
@@ -237,9 +237,8 @@ func TestCommands_AddMachineKey(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.want, got)
-				if tt.res.key {
-					assert.NotEqual(t, "", tt.args.key.PrivateKey)
-				}
+				receivedKey := len(tt.args.key.PrivateKey) > 0
+				assert.Equal(t, tt.res.key, receivedKey)
 			}
 		})
 	}
