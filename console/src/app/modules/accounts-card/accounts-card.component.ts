@@ -63,7 +63,6 @@ export class AccountsCardComponent implements OnInit {
       customQueryParams: {
         prompt: 'login',
       } as any,
-      scope: 'openid profile email urn:zitadel:iam:org:id:256088845584504464',
     };
     this.authService.authenticate(configWithPrompt);
   }
