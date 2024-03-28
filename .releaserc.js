@@ -9,6 +9,7 @@ module.exports = {
     [
       "@semantic-release/github",
       {
+        successComment: false,
         assets: [
           {
             path: ".artifacts/zitadel-linux-amd64/zitadel-linux-amd64.tar.gz",
