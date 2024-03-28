@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"encoding/json"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -41,7 +42,7 @@ func executeTargetsForRequest(ctx context.Context, queries ExecutionQueries, ful
 	}
 
 	ctxData := authz.GetCtxData(ctx)
-	info := &execution.ContextInfoRequest{
+	info := &ContextInfoRequest{
 		FullMethod: fullMethod,
 		InstanceID: authz.GetInstance(ctx).InstanceID(),
 		ProjectID:  ctxData.ProjectID,
@@ -50,7 +51,7 @@ func executeTargetsForRequest(ctx context.Context, queries ExecutionQueries, ful
 		Request:    req,
 	}
 
-	request, err := execution.CallTargetsRequest(ctx, targets, info)
+	request, err := execution.CallTargets(ctx, targets, info)
 	if err != nil {
 		// if an error is returned still return also the original request
 		return req, err
@@ -69,7 +70,7 @@ func executeTargetsForResponse(ctx context.Context, queries ExecutionQueries, fu
 	}
 
 	ctxData := authz.GetCtxData(ctx)
-	info := &execution.ContextInfoResponse{
+	info := &ContextInfoResponse{
 		FullMethod: fullMethod,
 		InstanceID: authz.GetInstance(ctx).InstanceID(),
 		ProjectID:  ctxData.ProjectID,
@@ -79,7 +80,7 @@ func executeTargetsForResponse(ctx context.Context, queries ExecutionQueries, fu
 		Response:   resp,
 	}
 
-	response, err := execution.CallTargetsResponse(ctx, targets, info)
+	response, err := execution.CallTargets(ctx, targets, info)
 	if err != nil {
 		// if an error is returned still return also the original response
 		return resp, err
@@ -124,4 +125,59 @@ func queryTargets(
 func serviceFromFullMethod(s string) string {
 	parts := strings.Split(s, "/")
 	return parts[1]
+}
+
+var _ execution.ContextInfo = &ContextInfoRequest{}
+
+type ContextInfoRequest struct {
+	FullMethod string      `json:"fullMethod,omitempty"`
+	InstanceID string      `json:"instanceID,omitempty"`
+	OrgID      string      `json:"orgID,omitempty"`
+	ProjectID  string      `json:"projectID,omitempty"`
+	UserID     string      `json:"userID,omitempty"`
+	Request    interface{} `json:"request,omitempty"`
+}
+
+func (c *ContextInfoRequest) GetHTTPRequestBody() []byte {
+	data, err := json.Marshal(c)
+	if err != nil {
+		return nil
+	}
+	return data
+}
+
+func (c *ContextInfoRequest) SetHTTPResponseBody(resp []byte) error {
+	return json.Unmarshal(resp, c.Request)
+}
+
+func (c *ContextInfoRequest) GetContent() interface{} {
+	return c.Request
+}
+
+var _ execution.ContextInfo = &ContextInfoResponse{}
+
+type ContextInfoResponse struct {
+	FullMethod string      `json:"fullMethod,omitempty"`
+	InstanceID string      `json:"instanceID,omitempty"`
+	OrgID      string      `json:"orgID,omitempty"`
+	ProjectID  string      `json:"projectID,omitempty"`
+	UserID     string      `json:"userID,omitempty"`
+	Request    interface{} `json:"request,omitempty"`
+	Response   interface{} `json:"response,omitempty"`
+}
+
+func (c *ContextInfoResponse) GetHTTPRequestBody() []byte {
+	data, err := json.Marshal(c)
+	if err != nil {
+		return nil
+	}
+	return data
+}
+
+func (c *ContextInfoResponse) SetHTTPResponseBody(resp []byte) error {
+	return json.Unmarshal(resp, c.Response)
+}
+
+func (c *ContextInfoResponse) GetContent() interface{} {
+	return c.Response
 }

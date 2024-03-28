@@ -2,6 +2,7 @@ package execution
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -13,8 +14,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 )
 
 func Test_Call(t *testing.T) {
@@ -103,19 +102,23 @@ func Test_Call(t *testing.T) {
 	}
 }
 
-func testCall(ctx context.Context, timeout time.Duration, body []byte) func(string) (interface{}, error) {
-	return func(url string) (interface{}, error) {
+func testCall(ctx context.Context, timeout time.Duration, body []byte) func(string) ([]byte, error) {
+	return func(url string) ([]byte, error) {
 		return call(ctx, url, timeout, body)
 	}
 }
 
-func testCallTargetRequest(ctx context.Context,
+func testCallTarget(ctx context.Context,
 	target *query.Target,
-	info *ContextInfoRequest,
-) func(string) (interface{}, error) {
-	return func(url string) (r interface{}, err error) {
+	info ContextInfoRequest,
+) func(string) ([]byte, error) {
+	return func(url string) (r []byte, err error) {
 		target.URL = url
-		return CallTargetRequest(ctx, target, info)
+		callf, err := CallTargetFunc(target)
+		if err != nil {
+			return nil, err
+		}
+		return callf(ctx, info)
 	}
 }
 
@@ -126,8 +129,8 @@ func testServerCall(
 	timeout time.Duration,
 	statusCode int,
 	respBody []byte,
-	call func(string) (interface{}, error),
-) (interface{}, error) {
+	call func(string) ([]byte, error),
+) ([]byte, error) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		checkRequest(t, r, method, body)
 
@@ -158,13 +161,37 @@ func checkRequest(t *testing.T, sent *http.Request, method string, expectedBody 
 	require.Equal(t, method, sent.Method)
 }
 
-func Test_CallTargetRequest(t *testing.T) {
+var _ ContextInfoRequest = &mockContextInfoRequest{}
+
+type request struct {
+	Request string `json:"request"`
+}
+
+type mockContextInfoRequest struct {
+	Request *request `json:"request"`
+}
+
+func newMockContextInfoRequest(s string) *mockContextInfoRequest {
+	return &mockContextInfoRequest{&request{s}}
+}
+
+func (c *mockContextInfoRequest) GetHTTPRequestBody() []byte {
+	data, _ := json.Marshal(c)
+	return data
+}
+
+func (c *mockContextInfoRequest) GetContent() []byte {
+	data, _ := json.Marshal(c.Request)
+	return data
+}
+
+func Test_CallTarget(t *testing.T) {
 	type args struct {
 		ctx    context.Context
 		target *query.Target
 		sleep  time.Duration
 
-		info *ContextInfoRequest
+		info ContextInfoRequest
 
 		method string
 		body   []byte
@@ -173,7 +200,7 @@ func Test_CallTargetRequest(t *testing.T) {
 		statusCode int
 	}
 	type res struct {
-		body    interface{}
+		body    []byte
 		wantErr bool
 	}
 	tests := []struct {
@@ -182,49 +209,37 @@ func Test_CallTargetRequest(t *testing.T) {
 		res  res
 	}{
 		{
-			"marshal error",
+			" error",
 			args{
-				ctx: context.Background(),
-				info: &ContextInfoRequest{
-					FullMethod: "method",
-					InstanceID: "instance",
-					OrgID:      "org",
-					ProjectID:  "project",
-					UserID:     "user",
-					Request:    make(chan int),
-				},
+				ctx:    context.Background(),
+				sleep:  time.Second,
+				method: http.MethodPost,
+				info:   newMockContextInfoRequest("content1"),
 				target: &query.Target{
-					TargetType: domain.TargetTypeWebhook,
-					Timeout:    time.Minute,
+					TargetType: 3,
 				},
+				body:       []byte("{\"request\":{\"request\":\"content1\"}}"),
+				respBody:   []byte("{\"request\":\"content2\"}"),
+				statusCode: http.StatusInternalServerError,
 			},
 			res{
 				wantErr: true,
 			},
 		},
 		{
-			"request response, unmarshall error",
+			"webhook, error",
 			args{
 				ctx:    context.Background(),
 				sleep:  time.Second,
 				method: http.MethodPost,
-				info: &ContextInfoRequest{
-					FullMethod: "method",
-					InstanceID: "instance",
-					OrgID:      "org",
-					ProjectID:  "project",
-					UserID:     "user",
-					Request: &execution.SetExecutionRequest{
-						Targets: []string{"target"},
-					},
-				},
+				info:   newMockContextInfoRequest("content1"),
 				target: &query.Target{
-					TargetType: domain.TargetTypeRequestResponse,
+					TargetType: domain.TargetTypeWebhook,
 					Timeout:    time.Minute,
 				},
-				body:       []byte("{\"fullMethod\":\"method\",\"instanceID\":\"instance\",\"orgID\":\"org\",\"projectID\":\"project\",\"userID\":\"user\",\"request\":{\"targets\":[\"target\"]}}"),
-				respBody:   []byte("{\"unavailable\":[\"no\"]"),
-				statusCode: http.StatusOK,
+				body:       []byte("{\"request\":{\"request\":\"content1\"}}"),
+				respBody:   []byte("{\"request\":\"content2\"}"),
+				statusCode: http.StatusInternalServerError,
 			},
 			res{
 				wantErr: true,
@@ -236,28 +251,36 @@ func Test_CallTargetRequest(t *testing.T) {
 				ctx:    context.Background(),
 				sleep:  time.Second,
 				method: http.MethodPost,
-				info: &ContextInfoRequest{
-					FullMethod: "method",
-					InstanceID: "instance",
-					OrgID:      "org",
-					ProjectID:  "project",
-					UserID:     "user",
-					Request: &execution.SetExecutionRequest{
-						Targets: []string{"target"},
-					},
-				},
+				info:   newMockContextInfoRequest("content1"),
 				target: &query.Target{
 					TargetType: domain.TargetTypeWebhook,
 					Timeout:    time.Minute,
 				},
-				body:       []byte("{\"fullMethod\":\"method\",\"instanceID\":\"instance\",\"orgID\":\"org\",\"projectID\":\"project\",\"userID\":\"user\",\"request\":{\"targets\":[\"target\"]}}"),
-				respBody:   []byte("{\"targets\":[\"target\"]}"),
+				body:       []byte("{\"request\":{\"request\":\"content1\"}}"),
+				respBody:   []byte("{\"request\":\"content2\"}"),
 				statusCode: http.StatusOK,
 			},
 			res{
-				body: &execution.SetExecutionRequest{
-					Targets: []string{"target"},
+				body: nil,
+			},
+		},
+		{
+			"request response, error",
+			args{
+				ctx:    context.Background(),
+				sleep:  time.Second,
+				method: http.MethodPost,
+				info:   newMockContextInfoRequest("content1"),
+				target: &query.Target{
+					TargetType: domain.TargetTypeRequestResponse,
+					Timeout:    time.Minute,
 				},
+				body:       []byte("{\"request\":{\"request\":\"content1\"}}"),
+				respBody:   []byte("{\"request\":\"content2\"}"),
+				statusCode: http.StatusInternalServerError,
+			},
+			res{
+				wantErr: true,
 			},
 		},
 		{
@@ -266,28 +289,17 @@ func Test_CallTargetRequest(t *testing.T) {
 				ctx:    context.Background(),
 				sleep:  time.Second,
 				method: http.MethodPost,
-				info: &ContextInfoRequest{
-					FullMethod: "method",
-					InstanceID: "instance",
-					OrgID:      "org",
-					ProjectID:  "project",
-					UserID:     "user",
-					Request: &execution.SetExecutionRequest{
-						Targets: []string{"target"},
-					},
-				},
+				info:   newMockContextInfoRequest("content1"),
 				target: &query.Target{
 					TargetType: domain.TargetTypeRequestResponse,
 					Timeout:    time.Minute,
 				},
-				body:       []byte("{\"fullMethod\":\"method\",\"instanceID\":\"instance\",\"orgID\":\"org\",\"projectID\":\"project\",\"userID\":\"user\",\"request\":{\"targets\":[\"target\"]}}"),
-				respBody:   []byte("{\"targets\":[\"target\"]}"),
+				body:       []byte("{\"request\":{\"request\":\"content1\"}}"),
+				respBody:   []byte("{\"request\":\"content2\"}"),
 				statusCode: http.StatusOK,
 			},
 			res{
-				body: &execution.SetExecutionRequest{
-					Targets: []string{"target"},
-				},
+				body: []byte("{\"request\":\"content2\"}"),
 			},
 		},
 	}
@@ -299,178 +311,14 @@ func Test_CallTargetRequest(t *testing.T) {
 				tt.args.sleep,
 				tt.args.statusCode,
 				tt.args.respBody,
-				testCallTargetRequest(tt.args.ctx, tt.args.target, tt.args.info),
+				testCallTarget(tt.args.ctx, tt.args.target, tt.args.info),
 			)
 			if tt.res.wantErr {
 				assert.Error(t, err)
-				assert.Nil(t, respBody)
 			} else {
 				assert.NoError(t, err)
-				assert.Equal(t, tt.res.body, respBody)
 			}
-		})
-	}
-}
-
-func testCallTargetResponse(ctx context.Context,
-	target *query.Target,
-	info *ContextInfoResponse,
-) func(string) (interface{}, error) {
-	return func(url string) (r interface{}, err error) {
-		target.URL = url
-		return CallTargetResponse(ctx, target, info)
-	}
-}
-func Test_CallTargetResponse(t *testing.T) {
-	type args struct {
-		ctx    context.Context
-		target *query.Target
-		sleep  time.Duration
-
-		info *ContextInfoResponse
-
-		method string
-		body   []byte
-
-		respBody   []byte
-		statusCode int
-	}
-	type res struct {
-		body    interface{}
-		wantErr bool
-	}
-	tests := []struct {
-		name string
-		args args
-		res  res
-	}{
-		{
-			"marshal error",
-			args{
-				ctx: context.Background(),
-				info: &ContextInfoResponse{
-					FullMethod: "method",
-					InstanceID: "instance",
-					OrgID:      "org",
-					ProjectID:  "project",
-					UserID:     "user",
-					Request:    make(chan int),
-					Response:   make(chan int),
-				},
-				target: &query.Target{
-					TargetType: domain.TargetTypeWebhook,
-					Timeout:    time.Minute,
-				},
-			},
-			res{
-				wantErr: true,
-			},
-		},
-		{
-			"request response, unmarshall error",
-			args{
-				ctx:    context.Background(),
-				sleep:  time.Second,
-				method: http.MethodPost,
-				info: &ContextInfoResponse{
-					FullMethod: "method",
-					InstanceID: "instance",
-					OrgID:      "org",
-					ProjectID:  "project",
-					UserID:     "user",
-					Request: &execution.SetExecutionRequest{
-						Targets: []string{"target"},
-					},
-					Response: &execution.SetExecutionResponse{Details: &object.Details{Sequence: 1}},
-				},
-				target: &query.Target{
-					TargetType: domain.TargetTypeRequestResponse,
-					Timeout:    time.Minute,
-				},
-				body:       []byte("{\"fullMethod\":\"method\",\"instanceID\":\"instance\",\"orgID\":\"org\",\"projectID\":\"project\",\"userID\":\"user\",\"request\":{\"targets\":[\"target\"]},\"response\":{\"details\":{\"sequence\":1}}}"),
-				respBody:   []byte("{\"unavailable\":[\"no\"]"),
-				statusCode: http.StatusOK,
-			},
-			res{
-				wantErr: true,
-			},
-		},
-		{
-			"webhook, ok",
-			args{
-				ctx:    context.Background(),
-				sleep:  time.Second,
-				method: http.MethodPost,
-				info: &ContextInfoResponse{
-					FullMethod: "method",
-					InstanceID: "instance",
-					OrgID:      "org",
-					ProjectID:  "project",
-					UserID:     "user",
-					Request: &execution.SetExecutionRequest{
-						Targets: []string{"target"},
-					},
-					Response: &execution.SetExecutionResponse{Details: &object.Details{Sequence: 1}},
-				},
-				target: &query.Target{
-					TargetType: domain.TargetTypeWebhook,
-					Timeout:    time.Minute,
-				},
-				body:       []byte("{\"fullMethod\":\"method\",\"instanceID\":\"instance\",\"orgID\":\"org\",\"projectID\":\"project\",\"userID\":\"user\",\"request\":{\"targets\":[\"target\"]},\"response\":{\"details\":{\"sequence\":1}}}"),
-				respBody:   []byte("{\"details\":{\"sequence\":2}}"),
-				statusCode: http.StatusOK,
-			},
-			res{
-				body: &execution.SetExecutionResponse{Details: &object.Details{Sequence: 1}},
-			},
-		},
-		{
-			"request response, ok",
-			args{
-				ctx:    context.Background(),
-				sleep:  time.Second,
-				method: http.MethodPost,
-				info: &ContextInfoResponse{
-					FullMethod: "method",
-					InstanceID: "instance",
-					OrgID:      "org",
-					ProjectID:  "project",
-					UserID:     "user",
-					Request: &execution.SetExecutionRequest{
-						Targets: []string{"target"},
-					},
-					Response: &execution.SetExecutionResponse{Details: &object.Details{Sequence: 1}},
-				},
-				target: &query.Target{
-					TargetType: domain.TargetTypeRequestResponse,
-					Timeout:    time.Minute,
-				},
-				body:       []byte("{\"fullMethod\":\"method\",\"instanceID\":\"instance\",\"orgID\":\"org\",\"projectID\":\"project\",\"userID\":\"user\",\"request\":{\"targets\":[\"target\"]},\"response\":{\"details\":{\"sequence\":1}}}"),
-				respBody:   []byte("{\"details\":{\"sequence\":2}}"),
-				statusCode: http.StatusOK,
-			},
-			res{
-				body: &execution.SetExecutionResponse{Details: &object.Details{Sequence: 2}},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			respBody, err := testServerCall(t,
-				tt.args.method,
-				tt.args.body,
-				tt.args.sleep,
-				tt.args.statusCode,
-				tt.args.respBody,
-				testCallTargetResponse(tt.args.ctx, tt.args.target, tt.args.info),
-			)
-			if tt.res.wantErr {
-				assert.Error(t, err)
-				assert.Nil(t, respBody)
-			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tt.res.body, respBody)
-			}
+			assert.Equal(t, tt.res.body, respBody)
 		})
 	}
 }
