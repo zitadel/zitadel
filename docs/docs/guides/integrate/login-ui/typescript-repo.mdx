@@ -46,7 +46,7 @@ It does so by redirecting to `/login`.
 The login is then able to load an [AuthRequest](/docs/apis/resources/oidc_service/oidc-service-get-auth-request#get-oidc-auth-request-details).
 
 The Auth Request defines how users proceed to authenticate. If no special prompts or scopes are set, the login brings up the `/loginname` page.
-The /loginname page allows to enter loginname or email of a user. User discovery is implemented at /api/loginname and if the user is found, redirected to the available authentication method page.
+The /loginname page allows to enter loginname or email of a user. User discovery is implemented at /api/loginname and if the user is found, they will be redirected to the available authentication method page.
 Right after the user is found, a session is created and set as cookie.
 This cookie is then hydrated with more information once the users continues.
 The OIDC Auth request is always passed in the url to have a context to the ongoing authentication flow.
