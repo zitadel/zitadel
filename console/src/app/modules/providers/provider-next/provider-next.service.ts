@@ -18,7 +18,7 @@ export class ProviderNextService {
   constructor(
     private env: EnvironmentService,
     private toast: ToastService,
-    private createCustomLoginPolicySvc: LoginPolicyService,
+    private loginPolicySvc: LoginPolicyService,
     private injector: Injector,
   ) {}
 
@@ -117,7 +117,7 @@ export class ProviderNextService {
           if (!id) {
             throw new Error('No ID');
           }
-          return this.createCustomLoginPolicySvc.activateIdp(
+          return this.loginPolicySvc.activateIdp(
             service,
             id,
             service instanceof AdminService ? IDPOwnerType.IDP_OWNER_TYPE_SYSTEM : IDPOwnerType.IDP_OWNER_TYPE_ORG,
