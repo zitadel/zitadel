@@ -28,7 +28,7 @@ Its set of features will increase with time and its progress will be tracked [he
 The new login app consists of a confidential (backend) part and a browser (client side) part.
 In addition to that, the OIDC specification builds upon a proxy which is set up in the Next.js middleware. It rewrites requests of the paths `/.well-known/:path*`, `/oauth/:path*`, `/oidc/:path*` to ZITADEL.
 
-The backend side of the application is authorized using a machine user and a personal access token.
+The backend side of the application is authorized using a machine user's personal access token.
 This token is used to fetch policies and settings from your instances or organization which define how users are authenticated and how the login is displayed.
 
 The frontend side of the application communicates to the backend side by using a cookie which is set by the server.
