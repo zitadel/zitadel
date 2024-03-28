@@ -294,21 +294,28 @@ export async function listUsers(
   console.log("listUsers", userName, organizationId);
   return userService.listUsers(
     {
-      queries: [
-        {
-          userNameQuery: {
-            userName,
-            method: TextQueryMethod.TEXT_QUERY_METHOD_EQUALS,
-          },
-        },
-        {
-          organizationIdQuery: organizationId
-            ? {
+      queries: organizationId
+        ? [
+            {
+              userNameQuery: {
+                userName,
+                method: TextQueryMethod.TEXT_QUERY_METHOD_EQUALS,
+              },
+            },
+            {
+              organizationIdQuery: {
                 organizationId,
-              }
-            : undefined,
-        },
-      ],
+              },
+            },
+          ]
+        : [
+            {
+              userNameQuery: {
+                userName,
+                method: TextQueryMethod.TEXT_QUERY_METHOD_EQUALS,
+              },
+            },
+          ],
     },
     {}
   );
