@@ -262,8 +262,7 @@ Ensure `my-realm-users-0.json` is in the same directory for the tool to process 
 Now copy the following portion to a separate file and name the file `zitadel-users-file.json`.
 
 ```bash
-"userId": "826731b2-bf17-4bd9-b45c-6a26c76ddaae",
-"user": {
+{
   "userName": "test-user",
   "profile": {
     "firstName": "John",
