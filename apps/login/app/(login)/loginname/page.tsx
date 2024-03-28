@@ -63,6 +63,7 @@ export default async function Page({
         <SignInWithIDP
           host={host}
           identityProviders={identityProviders}
+          authRequestId={authRequestId}
         ></SignInWithIDP>
       )}
     </div>
