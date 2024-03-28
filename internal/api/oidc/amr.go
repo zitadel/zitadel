@@ -21,6 +21,9 @@ const (
 //
 // [RFC 8176, section 2]: https://datatracker.ietf.org/doc/html/rfc8176#section-2
 func AuthMethodTypesToAMR(methodTypes []domain.UserAuthMethodType) []string {
+	if methodTypes == nil {
+		return nil // make sure amr is omitted when not provided / supported
+	}
 	amr := make([]string, 0, 4)
 	var factors, otp int
 	for _, methodType := range methodTypes {
@@ -34,7 +37,8 @@ func AuthMethodTypesToAMR(methodTypes []domain.UserAuthMethodType) []string {
 		case domain.UserAuthMethodTypeU2F:
 			amr = append(amr, UserPresence)
 			factors++
-		case domain.UserAuthMethodTypeTOTP,
+		case domain.UserAuthMethodTypeOTP,
+			domain.UserAuthMethodTypeTOTP,
 			domain.UserAuthMethodTypeOTPSMS,
 			domain.UserAuthMethodTypeOTPEmail:
 			// a user could use multiple (t)otp, which is a factor, but still will be returned as a single `otp` entry
@@ -54,4 +58,34 @@ func AuthMethodTypesToAMR(methodTypes []domain.UserAuthMethodType) []string {
 		amr = append(amr, MFA)
 	}
 	return amr
+}
+
+func AMRToAuthMethodTypes(amr []string) []domain.UserAuthMethodType {
+	authMethods := make([]domain.UserAuthMethodType, 0, len(amr))
+	var (
+		userPresence bool
+		mfa          bool
+	)
+
+	for _, entry := range amr {
+		switch entry {
+		case Password, PWD:
+			authMethods = append(authMethods, domain.UserAuthMethodTypePassword)
+		case OTP:
+			authMethods = append(authMethods, domain.UserAuthMethodTypeOTP)
+		case UserPresence:
+			userPresence = true
+		case MFA:
+			mfa = true
+		}
+	}
+
+	if userPresence {
+		if mfa {
+			authMethods = append(authMethods, domain.UserAuthMethodTypePasswordless)
+		} else {
+			authMethods = append(authMethods, domain.UserAuthMethodTypeU2F)
+		}
+	}
+	return authMethods
 }

@@ -52,7 +52,7 @@ func TestMain(m *testing.M) {
 			UserId:           User.GetUserId(),
 			VerificationCode: User.GetPhoneCode(),
 		})
-		Tester.SetUserPassword(CTX, User.GetUserId(), integration.UserPassword)
+		Tester.SetUserPassword(CTX, User.GetUserId(), integration.UserPassword, false)
 		Tester.RegisterUserPasskey(CTX, User.GetUserId())
 		DeactivatedUser = Tester.CreateHumanUser(CTX)
 		Tester.Client.UserV2.DeactivateUser(CTX, &user.DeactivateUserRequest{UserId: DeactivatedUser.GetUserId()})
@@ -717,11 +717,11 @@ func TestServer_DeleteSession_token(t *testing.T) {
 func TestServer_DeleteSession_own_session(t *testing.T) {
 	// create two users for the test and a session each to get tokens for authorization
 	user1 := Tester.CreateHumanUser(CTX)
-	Tester.SetUserPassword(CTX, user1.GetUserId(), integration.UserPassword)
+	Tester.SetUserPassword(CTX, user1.GetUserId(), integration.UserPassword, false)
 	_, token1, _, _ := Tester.CreatePasswordSession(t, CTX, user1.GetUserId(), integration.UserPassword)
 
 	user2 := Tester.CreateHumanUser(CTX)
-	Tester.SetUserPassword(CTX, user2.GetUserId(), integration.UserPassword)
+	Tester.SetUserPassword(CTX, user2.GetUserId(), integration.UserPassword, false)
 	_, token2, _, _ := Tester.CreatePasswordSession(t, CTX, user2.GetUserId(), integration.UserPassword)
 
 	// create a new session for the first user
