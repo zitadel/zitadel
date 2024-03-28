@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
@@ -41,7 +41,7 @@ import { EnvironmentService } from 'src/app/services/environment.service';
   templateUrl: './instance.component.html',
   styleUrls: ['./instance.component.scss'],
 })
-export class InstanceComponent {
+export class InstanceComponent implements OnInit, OnDestroy {
   public instance?: InstanceDetail.AsObject;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
