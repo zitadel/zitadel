@@ -67,8 +67,8 @@ export default function UsernameForm({
     if (!res.ok) {
       const response = await res.json();
 
-      setError(response.details);
-      return Promise.reject(response.details);
+      setError(response.message ?? "An internal error occurred");
+      return Promise.reject(response.message ?? "An internal error occurred");
     }
     return res.json();
   }

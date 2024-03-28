@@ -1,9 +1,5 @@
 import { listAuthenticationMethodTypes, listUsers } from "#/lib/zitadel";
-import {
-  createSessionAndUpdateCookie,
-  createSessionForUserIdAndUpdateCookie,
-} from "#/utils/session";
-import { U } from "@zitadel/server/dist/index-79b5dba4";
+import { createSessionForUserIdAndUpdateCookie } from "#/utils/session";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
