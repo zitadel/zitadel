@@ -110,14 +110,14 @@ func (repo *TokenVerifierRepo) verifyAccessTokenV1(ctx context.Context, tokenID,
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	_, tokenSpan := tracing.NewNamedSpan(ctx, "token")
+	_, tokenSpan := tracing.NewNamedSpan(ctx, "tokenByID")
 	token, err := repo.tokenByID(ctx, tokenID, subject)
-	if token.Actor != nil {
-		return "", "", "", "", "", zerrors.ThrowPermissionDenied(nil, "APP-wai8O", "Errors.TokenExchange.Token.NotForAPI")
-	}
 	tokenSpan.EndWithError(err)
 	if err != nil {
 		return "", "", "", "", "", zerrors.ThrowUnauthenticated(err, "APP-BxUSiL", "invalid token")
+	}
+	if token.Actor != nil {
+		return "", "", "", "", "", zerrors.ThrowPermissionDenied(nil, "APP-wai8O", "Errors.TokenExchange.Token.NotForAPI")
 	}
 	if !token.Expiration.After(time.Now().UTC()) {
 		return "", "", "", "", "", zerrors.ThrowUnauthenticated(err, "APP-k9KS0", "invalid token")
