@@ -266,8 +266,9 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(),
-					expectFilter(),
+					expectFilter(), // reduce login policy
+					expectFilter(), // check if is org idp
+					expectFilter(), // check if is instance idp
 				),
 			},
 			args: args{
@@ -308,6 +309,7 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(

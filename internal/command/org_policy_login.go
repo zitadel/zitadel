@@ -416,7 +416,7 @@ func prepareAddLoginPolicy(a *org.Aggregate, policy *AddLoginPolicy) preparation
 				return nil, zerrors.ThrowAlreadyExists(nil, "Org-Dgfb2", "Errors.Org.LoginPolicy.AlreadyExists")
 			}
 			for _, idp := range policy.IDPProviders {
-				exists, err := idpExists(ctx, filter, idp)
+				exists, err := ExistsIDP(ctx, filter, idp.ConfigID, authz.GetCtxData(ctx).OrgID)
 				if !exists || err != nil {
 					return nil, zerrors.ThrowPreconditionFailed(err, "Org-FEd32", "Errors.IDPConfig.NotExisting")
 				}
@@ -492,11 +492,4 @@ func prepareChangeLoginPolicy(a *org.Aggregate, policy *ChangeLoginPolicy) prepa
 			return []eventstore.Command{changedEvent}, nil
 		}, nil
 	}
-}
-
-func idpExists(ctx context.Context, filter preparation.FilterToQueryReducer, idp *AddLoginPolicyIDP) (bool, error) {
-	if idp.Type == domain.IdentityProviderTypeSystem {
-		return exists(ctx, filter, NewInstanceIDPConfigWriteModel(ctx, idp.ConfigID))
-	}
-	return exists(ctx, filter, NewOrgIDPConfigWriteModel(idp.ConfigID, authz.GetCtxData(ctx).ResourceOwner))
 }
