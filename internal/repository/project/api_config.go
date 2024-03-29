@@ -27,7 +27,7 @@ type APIConfigAddedEvent struct {
 	// New events only use EncodedHash. However, the ClientSecret field
 	// is preserved to handle events older than the switch to Passwap.
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	EncodedHash  string              `json:"encodedHash,omitempty"`
+	HashedSecret string              `json:"hashedSecret,omitempty"`
 
 	AuthMethodType domain.APIAuthMethodType `json:"authMethodType,omitempty"`
 }
@@ -45,7 +45,7 @@ func NewAPIConfigAddedEvent(
 	aggregate *eventstore.Aggregate,
 	appID,
 	clientID string,
-	encodedHash string,
+	hashedSecret string,
 	authMethodType domain.APIAuthMethodType,
 ) *APIConfigAddedEvent {
 	return &APIConfigAddedEvent{
@@ -56,7 +56,7 @@ func NewAPIConfigAddedEvent(
 		),
 		AppID:          appID,
 		ClientID:       clientID,
-		EncodedHash:    encodedHash,
+		HashedSecret:   hashedSecret,
 		AuthMethodType: authMethodType,
 	}
 }
@@ -169,7 +169,7 @@ type APIConfigSecretChangedEvent struct {
 	// New events only use EncodedHash. However, the ClientSecret field
 	// is preserved to handle events older than the switch to Passwap.
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	EncodedHash  string              `json:"encodedHash,omitempty"`
+	HashedSecret string              `json:"hashedSecret,omitempty"`
 }
 
 func (e *APIConfigSecretChangedEvent) Payload() interface{} {
@@ -184,7 +184,7 @@ func NewAPIConfigSecretChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	appID string,
-	encodedHash string,
+	hashedSecret string,
 ) *APIConfigSecretChangedEvent {
 	return &APIConfigSecretChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -192,8 +192,8 @@ func NewAPIConfigSecretChangedEvent(
 			aggregate,
 			APIConfigSecretChangedType,
 		),
-		AppID:       appID,
-		EncodedHash: encodedHash,
+		AppID:        appID,
+		HashedSecret: hashedSecret,
 	}
 }
 
@@ -297,15 +297,15 @@ func APIConfigSecretCheckFailedEventMapper(event eventstore.Event) (eventstore.E
 type APIConfigSecretHashUpdatedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	AppID       string `json:"appId"`
-	EncodedHash string `json:"encodedHash,omitempty"`
+	AppID        string `json:"appId"`
+	HashedSecret string `json:"hashedSecret,omitempty"`
 }
 
 func NewAPIConfigSecretHashUpdatedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	appID string,
-	encoded string,
+	hashedSecret string,
 ) *APIConfigSecretHashUpdatedEvent {
 	return &APIConfigSecretHashUpdatedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
@@ -313,8 +313,8 @@ func NewAPIConfigSecretHashUpdatedEvent(
 			aggregate,
 			APIConfigSecretHashUpdatedType,
 		),
-		AppID:       appID,
-		EncodedHash: encoded,
+		AppID:        appID,
+		HashedSecret: hashedSecret,
 	}
 }
 

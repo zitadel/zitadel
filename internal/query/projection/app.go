@@ -359,7 +359,7 @@ func (p *appProjection) reduceAPIConfigAdded(event eventstore.Event) (*handler.S
 				handler.NewCol(AppAPIConfigColumnAppID, e.AppID),
 				handler.NewCol(AppAPIConfigColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(AppAPIConfigColumnClientID, e.ClientID),
-				handler.NewCol(AppAPIConfigColumnClientSecret, crypto.SecretOrEncodedHash(e.ClientSecret, e.EncodedHash)),
+				handler.NewCol(AppAPIConfigColumnClientSecret, crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)),
 				handler.NewCol(AppAPIConfigColumnAuthMethod, e.AuthMethodType),
 			},
 			handler.WithTableSuffix(appAPITableSuffix),
@@ -424,7 +424,7 @@ func (p *appProjection) reduceAPIConfigSecretChanged(event eventstore.Event) (*h
 		e,
 		handler.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(AppAPIConfigColumnClientSecret, crypto.SecretOrEncodedHash(e.ClientSecret, e.EncodedHash)),
+				handler.NewCol(AppAPIConfigColumnClientSecret, crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)),
 			},
 			[]handler.Condition{
 				handler.NewCond(AppAPIConfigColumnAppID, e.AppID),
@@ -454,7 +454,7 @@ func (p *appProjection) reduceAPIConfigSecretHashUpdated(event eventstore.Event)
 		e,
 		handler.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(AppAPIConfigColumnClientSecret, e.EncodedHash),
+				handler.NewCol(AppAPIConfigColumnClientSecret, e.HashedSecret),
 			},
 			[]handler.Condition{
 				handler.NewCond(AppAPIConfigColumnAppID, e.AppID),
@@ -488,7 +488,7 @@ func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(AppOIDCConfigColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(AppOIDCConfigColumnVersion, e.Version),
 				handler.NewCol(AppOIDCConfigColumnClientID, e.ClientID),
-				handler.NewCol(AppOIDCConfigColumnClientSecret, crypto.SecretOrEncodedHash(e.ClientSecret, e.EncodedHash)),
+				handler.NewCol(AppOIDCConfigColumnClientSecret, crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)),
 				handler.NewCol(AppOIDCConfigColumnRedirectUris, database.TextArray[string](e.RedirectUris)),
 				handler.NewCol(AppOIDCConfigColumnResponseTypes, database.NumberArray[domain.OIDCResponseType](e.ResponseTypes)),
 				handler.NewCol(AppOIDCConfigColumnGrantTypes, database.NumberArray[domain.OIDCGrantType](e.GrantTypes)),
@@ -608,7 +608,7 @@ func (p *appProjection) reduceOIDCConfigSecretChanged(event eventstore.Event) (*
 		e,
 		handler.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(AppOIDCConfigColumnClientSecret, crypto.SecretOrEncodedHash(e.ClientSecret, e.EncodedHash)),
+				handler.NewCol(AppOIDCConfigColumnClientSecret, crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)),
 			},
 			[]handler.Condition{
 				handler.NewCond(AppOIDCConfigColumnAppID, e.AppID),
@@ -638,7 +638,7 @@ func (p *appProjection) reduceOIDCConfigSecretHashUpdated(event eventstore.Event
 		e,
 		handler.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(AppOIDCConfigColumnClientSecret, e.EncodedHash),
+				handler.NewCol(AppOIDCConfigColumnClientSecret, e.HashedSecret),
 			},
 			[]handler.Condition{
 				handler.NewCond(AppOIDCConfigColumnAppID, e.AppID),

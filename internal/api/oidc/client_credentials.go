@@ -41,11 +41,11 @@ func (s *Server) clientCredentialsAuth(ctx context.Context, clientID, clientSecr
 	if err != nil {
 		return nil, err // defaults to server error
 	}
-	if user.Machine == nil || user.Machine.EncodedHash == "" {
+	if user.Machine == nil || user.Machine.EncodedSecret == "" {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-pieP8", "Errors.User.Machine.Secret.NotExisting")
 	}
 	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
-	updated, err := s.hasher.Verify(user.Machine.EncodedHash, clientSecret)
+	updated, err := s.hasher.Verify(user.Machine.EncodedSecret, clientSecret)
 	spanPasswordComparison.EndWithError(err)
 	if err != nil {
 		s.command.MachineSecretCheckFailed(ctx, user.ID, user.ResourceOwner)

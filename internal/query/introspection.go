@@ -39,7 +39,7 @@ const (
 type IntrospectionClient struct {
 	AppID         string
 	ClientID      string
-	EncodedHash   string
+	HashedSecret  string
 	AppType       AppType
 	ProjectID     string
 	ResourceOwner string
@@ -62,7 +62,7 @@ func (q *Queries) GetIntrospectionClientByID(ctx context.Context, clientID strin
 		return row.Scan(
 			&client.AppID,
 			&client.ClientID,
-			&client.EncodedHash,
+			&client.HashedSecret,
 			&client.AppType,
 			&client.ProjectID,
 			&client.ResourceOwner,

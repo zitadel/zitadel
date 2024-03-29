@@ -93,7 +93,7 @@ type Phone struct {
 type Machine struct {
 	Name            string               `json:"name,omitempty"`
 	Description     string               `json:"description,omitempty"`
-	EncodedHash     string               `json:"encoded_hash,omitempty"`
+	EncodedSecret   string               `json:"encoded_hash,omitempty"`
 	AccessTokenType domain.OIDCTokenType `json:"access_token_type,omitempty"`
 }
 
@@ -889,7 +889,7 @@ func scanUser(row *sql.Row) (*User, error) {
 		u.Machine = &Machine{
 			Name:            name.String,
 			Description:     description.String,
-			EncodedHash:     encodedHash.String,
+			EncodedSecret:   encodedHash.String,
 			AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
 		}
 	}
@@ -1421,7 +1421,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 					u.Machine = &Machine{
 						Name:            name.String,
 						Description:     description.String,
-						EncodedHash:     encodedHash.String,
+						EncodedSecret:   encodedHash.String,
 						AccessTokenType: domain.OIDCTokenType(accessTokenType.Int32),
 					}
 				}

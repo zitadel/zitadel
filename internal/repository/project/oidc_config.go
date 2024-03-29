@@ -29,7 +29,7 @@ type OIDCConfigAddedEvent struct {
 	// New events only use EncodedHash. However, the ClientSecret field
 	// is preserved to handle events older than the switch to Passwap.
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	EncodedHash  string              `json:"encodedHash,omitempty"`
+	HashedSecret string              `json:"hashedSecret,omitempty"`
 
 	RedirectUris             []string                   `json:"redirectUris,omitempty"`
 	ResponseTypes            []domain.OIDCResponseType  `json:"responseTypes,omitempty"`
@@ -61,7 +61,7 @@ func NewOIDCConfigAddedEvent(
 	version domain.OIDCVersion,
 	appID string,
 	clientID string,
-	encodedHash string,
+	hashedSecret string,
 	redirectUris []string,
 	responseTypes []domain.OIDCResponseType,
 	grantTypes []domain.OIDCGrantType,
@@ -86,7 +86,7 @@ func NewOIDCConfigAddedEvent(
 		Version:                  version,
 		AppID:                    appID,
 		ClientID:                 clientID,
-		EncodedHash:              encodedHash,
+		HashedSecret:             hashedSecret,
 		RedirectUris:             redirectUris,
 		ResponseTypes:            responseTypes,
 		GrantTypes:               grantTypes,
@@ -368,7 +368,7 @@ type OIDCConfigSecretChangedEvent struct {
 	// New events only use EncodedHash. However, the ClientSecret field
 	// is preserved to handle events older than the switch to Passwap.
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	EncodedHash  string              `json:"encodedHash,omitempty"`
+	HashedSecret string              `json:"hashedSecret,omitempty"`
 }
 
 func (e *OIDCConfigSecretChangedEvent) Payload() interface{} {
@@ -383,7 +383,7 @@ func NewOIDCConfigSecretChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	appID string,
-	encodedHash string,
+	hashedSecret string,
 ) *OIDCConfigSecretChangedEvent {
 	return &OIDCConfigSecretChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -391,8 +391,8 @@ func NewOIDCConfigSecretChangedEvent(
 			aggregate,
 			OIDCConfigSecretChangedType,
 		),
-		AppID:       appID,
-		EncodedHash: encodedHash,
+		AppID:        appID,
+		HashedSecret: hashedSecret,
 	}
 }
 
@@ -496,15 +496,15 @@ func OIDCConfigSecretCheckFailedEventMapper(event eventstore.Event) (eventstore.
 type OIDCConfigSecretHashUpdatedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	AppID       string `json:"appId"`
-	EncodedHash string `json:"encodedHash,omitempty"`
+	AppID        string `json:"appId"`
+	HashedSecret string `json:"hashedSecret,omitempty"`
 }
 
 func NewOIDCConfigSecretHashUpdatedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	appID string,
-	encoded string,
+	hashedSecret string,
 ) *OIDCConfigSecretHashUpdatedEvent {
 	return &OIDCConfigSecretHashUpdatedEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
@@ -512,8 +512,8 @@ func NewOIDCConfigSecretHashUpdatedEvent(
 			aggregate,
 			OIDCConfigSecretHashUpdatedType,
 		),
-		AppID:       appID,
-		EncodedHash: encoded,
+		AppID:        appID,
+		HashedSecret: hashedSecret,
 	}
 }
 

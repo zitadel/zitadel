@@ -73,7 +73,7 @@ func MachineToPb(view *query.Machine) *user_pb.Machine {
 	return &user_pb.Machine{
 		Name:            view.Name,
 		Description:     view.Description,
-		HasSecret:       view.EncodedHash != "",
+		HasSecret:       view.EncodedSecret != "",
 		AccessTokenType: AccessTokenTypeToPb(view.AccessTokenType),
 	}
 }

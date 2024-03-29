@@ -23,7 +23,7 @@ type MachineSecretSetEvent struct {
 	// New events only use EncodedHash. However, the ClientSecret field
 	// is preserved to handle events older than the switch to Passwap.
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	EncodedHash  string              `json:"encodedHash,omitempty"`
+	HashedSecret string              `json:"hashedSecret,omitempty"`
 }
 
 func (e *MachineSecretSetEvent) Payload() interface{} {
@@ -37,7 +37,7 @@ func (e *MachineSecretSetEvent) UniqueConstraints() []*eventstore.UniqueConstrai
 func NewMachineSecretSetEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	encodedHash string,
+	hashedSecret string,
 ) *MachineSecretSetEvent {
 	return &MachineSecretSetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -45,7 +45,7 @@ func NewMachineSecretSetEvent(
 			aggregate,
 			MachineSecretSetType,
 		),
-		EncodedHash: encodedHash,
+		HashedSecret: hashedSecret,
 	}
 }
 
@@ -174,7 +174,7 @@ func MachineSecretCheckFailedEventMapper(event eventstore.Event) (eventstore.Eve
 
 type MachineSecretHashUpdatedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
-	EncodedHash           string `json:"encodedHash,omitempty"`
+	HashedSecret          string `json:"hashedSecret,omitempty"`
 }
 
 func NewMachineSecretHashUpdatedEvent(
@@ -188,7 +188,7 @@ func NewMachineSecretHashUpdatedEvent(
 			aggregate,
 			MachineSecretHashUpdatedType,
 		),
-		EncodedHash: encoded,
+		HashedSecret: encoded,
 	}
 }
 

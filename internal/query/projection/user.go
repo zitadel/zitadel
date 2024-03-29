@@ -957,7 +957,7 @@ func (p *userProjection) reduceMachineSecretSet(event eventstore.Event) (*handle
 		),
 		handler.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(MachineSecretCol, crypto.SecretOrEncodedHash(e.ClientSecret, e.EncodedHash)),
+				handler.NewCol(MachineSecretCol, crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)),
 			},
 			[]handler.Condition{
 				handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
@@ -987,7 +987,7 @@ func (p *userProjection) reduceMachineSecretHashUpdated(event eventstore.Event) 
 		),
 		handler.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(MachineSecretCol, e.EncodedHash),
+				handler.NewCol(MachineSecretCol, e.HashedSecret),
 			},
 			[]handler.Condition{
 				handler.NewCond(MachineUserIDCol, e.Aggregate().ID),

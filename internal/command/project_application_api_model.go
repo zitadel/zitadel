@@ -16,7 +16,7 @@ type APIApplicationWriteModel struct {
 	AppID              string
 	AppName            string
 	ClientID           string
-	EncodedHash        string
+	HashedSecret       string
 	ClientSecretString string
 	AuthMethodType     domain.APIAuthMethodType
 	State              domain.AppState
@@ -120,9 +120,9 @@ func (wm *APIApplicationWriteModel) Reduce() error {
 		case *project.APIConfigChangedEvent:
 			wm.appendChangeAPIEvent(e)
 		case *project.APIConfigSecretChangedEvent:
-			wm.EncodedHash = crypto.SecretOrEncodedHash(e.ClientSecret, e.EncodedHash)
+			wm.HashedSecret = crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)
 		case *project.APIConfigSecretHashUpdatedEvent:
-			wm.EncodedHash = e.EncodedHash
+			wm.HashedSecret = e.HashedSecret
 		case *project.ProjectRemovedEvent:
 			wm.State = domain.AppStateRemoved
 		}
@@ -135,7 +135,7 @@ func (wm *APIApplicationWriteModel) appendAddAPIEvent(e *project.APIConfigAddedE
 	wm.ClientID = e.ClientID
 
 	if e.ClientSecret != nil {
-		wm.EncodedHash = crypto.SecretOrEncodedHash(e.ClientSecret, e.EncodedHash)
+		wm.HashedSecret = crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)
 	}
 	wm.AuthMethodType = e.AuthMethodType
 }

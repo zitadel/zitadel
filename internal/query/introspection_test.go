@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	_ "embed"
-	"encoding/json"
 	"regexp"
 	"testing"
 
@@ -12,20 +11,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 )
 
 func TestQueries_GetIntrospectionClientByID(t *testing.T) {
-	secret := &crypto.CryptoValue{
-		CryptoType: crypto.TypeHash,
-		Algorithm:  "alg",
-		KeyID:      "keyID",
-		Crypted:    []byte("secret"),
-	}
-	encSecret, err := json.Marshal(secret)
-	require.NoError(t, err)
-
 	pubkeys := database.Map[[]byte]{
 		"key1": {1, 2, 3},
 		"key2": {4, 5, 6},
@@ -61,14 +50,17 @@ func TestQueries_GetIntrospectionClientByID(t *testing.T) {
 				getKeys:  false,
 			},
 			mock: mockQuery(expQuery,
-				[]string{"client_id", "client_secret", "project_id", "public_keys"},
-				[]driver.Value{"clientID", encSecret, "projectID", nil},
+				[]string{"app_id", "client_id", "client_secret", "app_type", "project_id", "resource_owner", "public_keys"},
+				[]driver.Value{"appID", "clientID", "secret", "oidc", "projectID", "orgID", nil},
 				"instanceID", "clientID", false),
 			want: &IntrospectionClient{
-				ClientID:    "clientID",
-				EncodedHash: "",
-				ProjectID:   "projectID",
-				PublicKeys:  nil,
+				AppID:         "appID",
+				ClientID:      "clientID",
+				HashedSecret:  "secret",
+				AppType:       AppTypeOIDC,
+				ProjectID:     "projectID",
+				ResourceOwner: "orgID",
+				PublicKeys:    nil,
 			},
 		},
 		{
@@ -78,14 +70,17 @@ func TestQueries_GetIntrospectionClientByID(t *testing.T) {
 				getKeys:  true,
 			},
 			mock: mockQuery(expQuery,
-				[]string{"client_id", "client_secret", "project_id", "public_keys"},
-				[]driver.Value{"clientID", nil, "projectID", encPubkeys},
+				[]string{"app_id", "client_id", "client_secret", "app_type", "project_id", "resource_owner", "public_keys"},
+				[]driver.Value{"appID", "clientID", "", "oidc", "projectID", "orgID", encPubkeys},
 				"instanceID", "clientID", true),
 			want: &IntrospectionClient{
-				ClientID:    "clientID",
-				EncodedHash: "",
-				ProjectID:   "projectID",
-				PublicKeys:  pubkeys,
+				AppID:         "appID",
+				ClientID:      "clientID",
+				HashedSecret:  "",
+				AppType:       AppTypeOIDC,
+				ProjectID:     "projectID",
+				ResourceOwner: "orgID",
+				PublicKeys:    pubkeys,
 			},
 		},
 	}

@@ -97,7 +97,7 @@ func prepareRemoveMachineSecret(a *user.Aggregate) preparation.Validation {
 			if !isUserStateExists(writeModel.UserState) {
 				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-x7s802", "Errors.User.NotExisting")
 			}
-			if writeModel.EncodedHash == "" {
+			if writeModel.HashedSecret == "" {
 				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-coi82n", "Errors.User.Machine.Secret.NotExisting")
 			}
 			return []eventstore.Command{

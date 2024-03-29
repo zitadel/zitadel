@@ -148,7 +148,7 @@ func (s *Server) introspectionClientAuth(ctx context.Context, cc *op.ClientCrede
 			return client.ClientID, client.ProjectID, nil
 
 		}
-		if client.EncodedHash != "" {
+		if client.HashedSecret != "" {
 			if err := s.introspectionClientSecretAuth(ctx, client, cc.ClientSecret); err != nil {
 				return "", "", oidc.ErrUnauthorizedClient().WithParent(err)
 			}
@@ -185,7 +185,7 @@ func (s *Server) introspectionClientSecretAuth(ctx context.Context, client *quer
 	}
 
 	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
-	updated, err := s.hasher.Verify(client.EncodedHash, secret)
+	updated, err := s.hasher.Verify(client.HashedSecret, secret)
 	spanPasswordComparison.EndWithError(err)
 	if err != nil {
 		failedCommand(ctx, client.AppID, client.ProjectID, client.ResourceOwner)

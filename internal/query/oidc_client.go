@@ -19,7 +19,7 @@ type OIDCClient struct {
 	AppID                    string                     `json:"app_id,omitempty"`
 	State                    domain.AppState            `json:"state,omitempty"`
 	ClientID                 string                     `json:"client_id,omitempty"`
-	EncodedHash              string                     `json:"encoded_hash,omitempty"`
+	HashedSecret             string                     `json:"client_secret,omitempty"`
 	RedirectURIs             []string                   `json:"redirect_uris,omitempty"`
 	ResponseTypes            []domain.OIDCResponseType  `json:"response_types,omitempty"`
 	GrantTypes               []domain.OIDCGrantType     `json:"grant_types,omitempty"`

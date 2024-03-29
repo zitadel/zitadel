@@ -236,13 +236,13 @@ func (c *Commands) VerifyAPIClientSecret(ctx context.Context, projectID, appID, 
 	if !app.IsAPI() {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-Bf3fw", "Errors.Project.App.IsNotAPI")
 	}
-	if app.EncodedHash == "" {
+	if app.HashedSecret == "" {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-D3t5g", "Errors.Project.App.APIConfigInvalid")
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&app.WriteModel)
 	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
-	updated, err := c.secretHasher.Verify(app.EncodedHash, secret)
+	updated, err := c.secretHasher.Verify(app.HashedSecret, secret)
 	spanPasswordComparison.EndWithError(err)
 	if err == nil {
 		c.apiSecretCheckSucceeded(ctx, projectAgg, app.AppID, updated)

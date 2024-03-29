@@ -1051,7 +1051,7 @@ func (s *Server) verifyClientSecret(ctx context.Context, client *query.OIDCClien
 		return oidc.ErrInvalidClient().WithDescription("empty client secret")
 	}
 	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
-	updated, err := s.hasher.Verify(client.EncodedHash, secret)
+	updated, err := s.hasher.Verify(client.HashedSecret, secret)
 	spanPasswordComparison.EndWithError(err)
 	if err != nil {
 		s.command.OIDCSecretCheckFailed(ctx, client.AppID, client.ProjectID, client.Settings.ResourceOwner)

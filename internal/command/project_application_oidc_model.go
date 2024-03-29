@@ -17,7 +17,7 @@ type OIDCApplicationWriteModel struct {
 	AppID                    string
 	AppName                  string
 	ClientID                 string
-	EncodedHash              string
+	HashedSecret             string
 	ClientSecretString       string
 	RedirectUris             []string
 	ResponseTypes            []domain.OIDCResponseType
@@ -136,9 +136,9 @@ func (wm *OIDCApplicationWriteModel) Reduce() error {
 		case *project.OIDCConfigChangedEvent:
 			wm.appendChangeOIDCEvent(e)
 		case *project.OIDCConfigSecretChangedEvent:
-			wm.EncodedHash = crypto.SecretOrEncodedHash(e.ClientSecret, e.EncodedHash)
+			wm.HashedSecret = crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)
 		case *project.OIDCConfigSecretHashUpdatedEvent:
-			wm.EncodedHash = e.EncodedHash
+			wm.HashedSecret = e.HashedSecret
 		case *project.ProjectRemovedEvent:
 			wm.State = domain.AppStateRemoved
 		}
@@ -149,7 +149,7 @@ func (wm *OIDCApplicationWriteModel) Reduce() error {
 func (wm *OIDCApplicationWriteModel) appendAddOIDCEvent(e *project.OIDCConfigAddedEvent) {
 	wm.oidc = true
 	wm.ClientID = e.ClientID
-	wm.EncodedHash = crypto.SecretOrEncodedHash(e.ClientSecret, e.EncodedHash)
+	wm.HashedSecret = crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)
 	wm.RedirectUris = e.RedirectUris
 	wm.ResponseTypes = e.ResponseTypes
 	wm.GrantTypes = e.GrantTypes

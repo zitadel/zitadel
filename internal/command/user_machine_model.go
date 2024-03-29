@@ -19,7 +19,7 @@ type MachineWriteModel struct {
 	Description     string
 	UserState       domain.UserState
 	AccessTokenType domain.OIDCTokenType
-	EncodedHash     string
+	HashedSecret    string
 }
 
 func NewMachineWriteModel(userID, resourceOwner string) *MachineWriteModel {
@@ -71,11 +71,11 @@ func (wm *MachineWriteModel) Reduce() error {
 		case *user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
 		case *user.MachineSecretSetEvent:
-			wm.EncodedHash = crypto.SecretOrEncodedHash(e.ClientSecret, e.EncodedHash)
+			wm.HashedSecret = crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)
 		case *user.MachineSecretRemovedEvent:
-			wm.EncodedHash = ""
+			wm.HashedSecret = ""
 		case *user.MachineSecretHashUpdatedEvent:
-			wm.EncodedHash = e.EncodedHash
+			wm.HashedSecret = e.HashedSecret
 		}
 	}
 	return wm.WriteModel.Reduce()
