@@ -49,15 +49,11 @@ Configure the sign-on method of the app.
 
 ## ZITADEL Configuration
 
-### Add custom login policy
-
-<CustomLoginPolicy/>
-
 ### Go to the IdP Providers Overview
 
 <IDPsOverview templates="SAML SP"/>
 
-### Create a new SAML SP
+### Create a new SAML Service Provider (SP)
 
 Now we configure the identity provider on ZITADEL.
 
@@ -72,24 +68,40 @@ Now we configure the identity provider on ZITADEL.
 
 ![Azure SAML App Creation](/img/guides/zitadel_azure_saml_provider.png)
 
+## Configure Basic SAML Configuration
+
+After you created the SAML SP in ZITADEL, you can copy the URLs you need to configure in your Entra ID application.
+
+![Azure SAML App URLs](/img/guides/zitadel_azure_saml_provider_urls.png)
+
+1. Go to Microsoft Entra > Manage > Single sign-on
+2. Edit the "Basic SAML Configuration"
+3. **Identifier (Entity ID)**: Paste the *ZITADEL Metadata URL*.
+4. **Reply URL (Assertion Consumer Service URL)**: Paste the *ZITADEL ACS Login Form URL*
+5. **Sign on URL**: Paste the *ZITADEL ACS Login Form URL*
+5. **Logout URL**: Optionally paste the *ZITADEL Single Logout URL*
+6. Click Save
+
+:::info
+You can ignore the ZITADEL ACS Intent API URL for now.
+This is relevant if you want to [programmatically sign users in at ZITADEL via a SAML Service Provider](/guides/integrate/login-ui/external-login).
+:::
+
+![Azure Entra configuration overview](/img/guides/azure_saml_overview2.png)
+
+## Enable the Microsoft Entra Button in ZITADELs Login Page
+
+Go back to ZITADEL and activate the IdP.
+
 ### Activate IdP
 
 <Activate/>
 
 ![Activate Azure SAML Provider](/img/guides/zitadel_activate_azure_saml.png)
 
-## Configure Basic SAML Configuration
+### Ensure your Login Policy allows External IDPs
 
-Now we set the links in Microsoft Entra
-
-1. Go to Microsoft Entra > Manage > Single sign-on
-2. Edit the "Basic SAML Configuration"
-3. Enter the following URL in "Identifier (Entity ID)": `<YOUR-ZITADEL-DOMAIN>/idps/<IDP-ID>/saml/metadata`
-4. Enter the following URL in "Reply URL (Assertion Consumer Service URL)": `<YOUR-ZITADEL-DOMAIN>/ui/login/login/externalidp/saml/acs`
-5. Enter the following URL in "Sign on URL": `<YOUR-ZITADEL-DOMAIN>/ui/login/login/externalidp/saml/acs`
-6. Hit Save
-
-![Azure Entra configuration overview](/img/guides/azure_saml_overview2.png)
+<CustomLoginPolicy/>
 
 ## Test the setup
 

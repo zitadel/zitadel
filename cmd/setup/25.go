@@ -13,15 +13,15 @@ var (
 	addLowerFieldsToVerifiedEmail string
 )
 
-type AddLowerFieldsToVerifiedEmail struct {
+type User11AddLowerFieldsToVerifiedEmail struct {
 	dbClient *database.DB
 }
 
-func (mig *AddLowerFieldsToVerifiedEmail) Execute(ctx context.Context, _ eventstore.Event) error {
+func (mig *User11AddLowerFieldsToVerifiedEmail) Execute(ctx context.Context, _ eventstore.Event) error {
 	_, err := mig.dbClient.ExecContext(ctx, addLowerFieldsToVerifiedEmail)
 	return err
 }
 
-func (mig *AddLowerFieldsToVerifiedEmail) String() string {
-	return "25_add_lower_fields_to_verified_email"
+func (mig *User11AddLowerFieldsToVerifiedEmail) String() string {
+	return "25_user11_add_lower_fields_to_verified_email"
 }

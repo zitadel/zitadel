@@ -88,7 +88,32 @@
       },
       "IDPS": {
         "TITLE": "Poskytovatelé identity",
-        "DESCRIPTION": "Vytvořte a aktivujte externí poskytovatele identity. Vyberte známého poskytovatele nebo nakonfigurujte jakýkoliv jiný OIDC, OAuth nebo SAML kompatibilní poskytovatel podle vašeho výběru. Můžete dokonce použít vaše stávající JWT tokeny jako federované identity konfigurací JWT poskytovatele identity."
+        "DESCRIPTION": "Vytvořte a aktivujte externí poskytovatele identity. Vyberte známého poskytovatele nebo nakonfigurujte jakýkoliv jiný OIDC, OAuth nebo SAML kompatibilní poskytovatel podle vašeho výběru. Můžete dokonce použít vaše stávající JWT tokeny jako federované identity konfigurací JWT poskytovatele identity.",
+        "NEXT": "Co teď?",
+        "SAML": {
+          "TITLE": "Nakonfiguruj svého SAML Identity Provider",
+          "DESCRIPTION": "ZITADEL je nakonfigurován. Nyní je třeba nakonfigurovat tvého SAML Identity Provider. Většina poskytovatelů ti umožní nahrát celý ZITADEL metadata XML. Jiní poskytovatelé požadují, abys poskytl jen některé specifické URL, jako je například entity ID (metadata URL), URL Assertion Consumer Service (ACS) nebo Single Logout URL."
+        },
+        "CALLBACK": {
+          "TITLE": "Nakonfiguruj svého {{ provider }} Identity Provider",
+          "DESCRIPTION": "Před konfigurací ZITADEL, předej tuto URL svému Identity Provider, aby bylo možné povolit přesměrování prohlížeče zpět na ZITADEL po autentizaci."
+        },
+        "JWT": {
+          "TITLE": "Použij JWT jako federované identity",
+          "DESCRIPTION": "Identity Provider JWT ti umožňuje používat existující JWT tokeny jako federované identity. Tato funkce je praktická, pokud již máš vystavitele JWT. S JWT IdP můžeš tyto JWT použít k vytváření a aktualizaci uživatelů v ZITADEL na počkání."
+        },
+        "LDAP": {
+          "TITLE": "Nakonfiguruj ZITADEL pro připojení k tvému LDAP Identity Provider",
+          "DESCRIPTION": "Poskytni údaje pro připojení k tvému LDAP serveru a nakonfiguruj mapování tvých LDAP atributů na atributy ZITADEL."
+        },
+        "AUTOFILL": {
+          "TITLE": "Automatické vyplnění údajů uživatele",
+          "DESCRIPTION": "Vylepši zážitek svých uživatelů pomocí akce. Můžeš automaticky vyplnit registrační formulář ZITADEL hodnotami z identity provider."
+        },
+        "ACTIVATE": {
+          "TITLE": "Aktivuj IdP",
+          "DESCRIPTION": "Tvůj IdP ještě není aktivní. Aktivuj ho, aby tvoji uživatelé mohli přihlásit."
+        }
       },
       "PW_COMPLEXITY": {
         "TITLE": "Složitost hesla",
@@ -467,7 +492,8 @@
     },
     "TABLE": {
       "SHOWUSER": "Zobrazit uživatele {{value}}"
-    }
+    },
+    "DOWNLOAD": "Stáhnout"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Má kontrolu nad celou instancí, včetně všech organizací",
@@ -1506,7 +1532,8 @@
       "DESCRIPTIONCREATEADMIN": "Uživatelé si mohou vybrat z dostupných poskytovatelů identity níže.",
       "DESCRIPTIONCREATEMGMT": "Uživatelé si mohou vybrat z dostupných poskytovatelů identity níže. Poznámka: Můžete použít poskytovatele nastavené systémem, jakož i poskytovatele nastavené pouze pro vaši organizaci.",
       "LIFETIME_INVALID": "Formulář obsahuje neplatné hodnoty.",
-      "SAVED": "Úspěšně uloženo!"
+      "SAVED": "Úspěšně uloženo!",
+      "PROVIDER_ADDED": "Poskytovatel identity aktivován."
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "Nastavte odkazy na vaše Zásady ochrany osobních údajů a Podmínky služby",

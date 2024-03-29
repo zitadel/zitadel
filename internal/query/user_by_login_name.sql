@@ -94,6 +94,7 @@ SELECT
   , h.is_email_verified
   , h.phone
   , h.is_phone_verified
+  , h.password_change_required
   , m.user_id
   , m.name
   , m.description

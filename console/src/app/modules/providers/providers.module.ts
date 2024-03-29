@@ -30,6 +30,9 @@ import { ProviderOAuthComponent } from './provider-oauth/provider-oauth.componen
 import { ProviderOIDCComponent } from './provider-oidc/provider-oidc.component';
 import { ProvidersRoutingModule } from './providers-routing.module';
 import { ProviderSamlSpComponent } from './provider-saml-sp/provider-saml-sp.component';
+import { CopyRowComponent } from '../../components/copy-row/copy-row.component';
+import { ProviderNextComponent } from './provider-next/provider-next.component';
+import { ProviderNextService } from './provider-next/provider-next.service';
 
 @NgModule({
   declarations: [
@@ -47,6 +50,7 @@ import { ProviderSamlSpComponent } from './provider-saml-sp/provider-saml-sp.com
     ProviderLDAPComponent,
     ProviderAppleComponent,
     ProviderSamlSpComponent,
+    ProviderNextComponent,
   ],
   imports: [
     ProvidersRoutingModule,
@@ -67,6 +71,8 @@ import { ProviderSamlSpComponent } from './provider-saml-sp/provider-saml-sp.com
     TranslateModule,
     ProviderOptionsModule,
     MatProgressSpinnerModule,
+    CopyRowComponent,
   ],
+  providers: [ProviderNextService],
 })
 export default class ProvidersModule {}

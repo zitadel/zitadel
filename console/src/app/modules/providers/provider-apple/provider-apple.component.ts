@@ -4,7 +4,7 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import { take } from 'rxjs';
+import { BehaviorSubject, Observable, take } from 'rxjs';
 import {
   AddAppleProviderRequest as AdminAddAppleProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -24,6 +24,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
+import { ProviderNextService } from '../provider-next/provider-next.service';
 
 const MAX_ALLOWED_SIZE = 5 * 1024;
 
@@ -34,8 +35,11 @@ const MAX_ALLOWED_SIZE = 5 * 1024;
 export class ProviderAppleComponent {
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
+  // DEPRECATED: use id$ instead
   public id: string | null = '';
+  // DEPRECATED: assert service$ instead
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  // DEPRECATED: use service$ instead
   private service!: ManagementService | AdminService;
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
@@ -47,6 +51,25 @@ export class ProviderAppleComponent {
   public provider?: Provider.AsObject;
   public updatePrivateKey: boolean = false;
 
+  public justCreated$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  public justActivated$ = new BehaviorSubject<boolean>(false);
+
+  private service$ = this.nextSvc.service(this.route.data);
+  private id$ = this.nextSvc.id(this.route.paramMap, this.justCreated$);
+  public exists$ = this.nextSvc.exists(this.id$);
+  public autofillLink$ = this.nextSvc.autofillLink(
+    this.id$,
+    `https://zitadel.com/docs/guides/integrate/identity-providers/additional-information`,
+  );
+  public activateLink$ = this.nextSvc.activateLink(
+    this.id$,
+    this.justActivated$,
+    'https://zitadel.com/docs/guides/integrate/identity-providers/apple#activate-idp',
+    this.service$,
+  );
+  public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
+  public copyUrls$ = this.nextSvc.callbackUrls();
+
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
@@ -54,6 +77,7 @@ export class ProviderAppleComponent {
     private injector: Injector,
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
+    private nextSvc: ProviderNextService,
   ) {
     this.form = new FormGroup({
       name: new FormControl('', []),
@@ -115,6 +139,10 @@ export class ProviderAppleComponent {
     });
   }
 
+  public activate() {
+    this.nextSvc.activate(this.id$, this.justActivated$, this.service$);
+  }
+
   private getData(id: string): void {
     const req =
       this.serviceType === PolicyComponentServiceType.ADMIN
@@ -138,7 +166,7 @@ export class ProviderAppleComponent {
   }
 
   public submitForm(): void {
-    this.provider ? this.updateAppleProvider() : this.addAppleProvider();
+    this.provider || this.justCreated$.value ? this.updateAppleProvider() : this.addAppleProvider();
   }
 
   public addAppleProvider(): void {
@@ -158,11 +186,9 @@ export class ProviderAppleComponent {
     this.loading = true;
     this.service
       .addAppleProvider(req)
-      .then((idp) => {
-        setTimeout(() => {
-          this.loading = false;
-          this.close();
-        }, 2000);
+      .then((addedIDP) => {
+        this.justCreated$.next(addedIDP.id);
+        this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -171,10 +197,10 @@ export class ProviderAppleComponent {
   }
 
   public updateAppleProvider(): void {
-    if (this.provider) {
+    if (this.provider || this.justCreated$.value) {
       if (this.serviceType === PolicyComponentServiceType.MGMT) {
         const req = new MgmtUpdateAppleProviderRequest();
-        req.setId(this.provider.id);
+        req.setId(this.provider?.id || this.justCreated$.value);
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
         req.setTeamId(this.teamId?.value);
@@ -201,7 +227,7 @@ export class ProviderAppleComponent {
           });
       } else if (PolicyComponentServiceType.ADMIN) {
         const req = new AdminUpdateAppleProviderRequest();
-        req.setId(this.provider.id);
+        req.setId(this.provider?.id || this.justCreated$.value);
         req.setName(this.name?.value);
         req.setClientId(this.clientId?.value);
         req.setTeamId(this.teamId?.value);

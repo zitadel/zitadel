@@ -4,7 +4,7 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import { take } from 'rxjs';
+import { BehaviorSubject, take } from 'rxjs';
 import {
   AddGenericOIDCProviderRequest as AdminAddGenericOIDCProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -23,6 +23,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
+import { ProviderNextService } from '../provider-next/provider-next.service';
 
 @Component({
   selector: 'cnsl-provider-oidc',
@@ -33,9 +34,12 @@ export class ProviderOIDCComponent {
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
 
+  // DEPRECATED: use id$ instead
   public id: string | null = '';
   public updateClientSecret: boolean = false;
+  // DEPRECATED: assert service$ instead
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  // DEPRECATED: use service$ instead
   private service!: ManagementService | AdminService;
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
   public form!: UntypedFormGroup;
@@ -44,12 +48,32 @@ export class ProviderOIDCComponent {
 
   public provider?: Provider.AsObject;
 
+  public justCreated$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  public justActivated$ = new BehaviorSubject<boolean>(false);
+
+  private service$ = this.nextSvc.service(this.route.data);
+  private id$ = this.nextSvc.id(this.route.paramMap, this.justCreated$);
+  public exists$ = this.nextSvc.exists(this.id$);
+  public autofillLink$ = this.nextSvc.autofillLink(
+    this.id$,
+    `https://zitadel.com/docs/guides/integrate/identity-providers/additional-information`,
+  );
+  public activateLink$ = this.nextSvc.activateLink(
+    this.id$,
+    this.justActivated$,
+    'https://zitadel.com/docs/guides/integrate/identity-providers/okta-oidc#activate-idp',
+    this.service$,
+  );
+  public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
+  public copyUrls$ = this.nextSvc.callbackUrls();
+
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
     private _location: Location,
     breadcrumbService: BreadcrumbService,
+    private nextSvc: ProviderNextService,
   ) {
     this.form = new UntypedFormGroup({
       name: new UntypedFormControl('', [requiredValidator]),
@@ -94,6 +118,10 @@ export class ProviderOIDCComponent {
     });
   }
 
+  public activate() {
+    this.nextSvc.activate(this.id$, this.justActivated$, this.service$);
+  }
+
   private getData(id: string): void {
     this.loading = true;
     const req =
@@ -118,7 +146,7 @@ export class ProviderOIDCComponent {
   }
 
   public submitForm(): void {
-    this.provider ? this.updateGenericOIDCProvider() : this.addGenericOIDCProvider();
+    this.provider || this.justCreated$.value ? this.updateGenericOIDCProvider() : this.addGenericOIDCProvider();
   }
 
   public addGenericOIDCProvider(): void {
@@ -138,11 +166,9 @@ export class ProviderOIDCComponent {
     this.loading = true;
     this.service
       .addGenericOIDCProvider(req)
-      .then((idp) => {
-        setTimeout(() => {
-          this.loading = false;
-          this.close();
-        }, 2000);
+      .then((addedIDP) => {
+        this.justCreated$.next(addedIDP.id);
+        this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -151,12 +177,12 @@ export class ProviderOIDCComponent {
   }
 
   public updateGenericOIDCProvider(): void {
-    if (this.provider) {
+    if (this.provider || this.justCreated$.value) {
       const req =
         this.serviceType === PolicyComponentServiceType.MGMT
           ? new MgmtUpdateGenericOIDCProviderRequest()
           : new AdminUpdateGenericOIDCProviderRequest();
-      req.setId(this.provider.id);
+      req.setId(this.provider?.id || this.justCreated$.value);
       req.setName(this.name?.value);
       req.setClientId(this.clientId?.value);
       req.setClientSecret(this.clientSecret?.value);

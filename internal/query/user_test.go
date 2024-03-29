@@ -169,6 +169,7 @@ var (
 		` projections.users12_humans.is_email_verified,` +
 		` projections.users12_humans.phone,` +
 		` projections.users12_humans.is_phone_verified,` +
+		` projections.users12_humans.password_change_required,` +
 		` projections.users12_machines.user_id,` +
 		` projections.users12_machines.name,` +
 		` projections.users12_machines.description,` +
@@ -209,6 +210,7 @@ var (
 		"is_email_verified",
 		"phone",
 		"is_phone_verified",
+		"password_change_required",
 		// machine
 		"user_id",
 		"name",
@@ -393,6 +395,7 @@ var (
 		` projections.users12_humans.is_email_verified,` +
 		` projections.users12_humans.phone,` +
 		` projections.users12_humans.is_phone_verified,` +
+		` projections.users12_humans.password_change_required,` +
 		` projections.users12_machines.user_id,` +
 		` projections.users12_machines.name,` +
 		` projections.users12_machines.description,` +
@@ -433,6 +436,7 @@ var (
 		"is_email_verified",
 		"phone",
 		"is_phone_verified",
+		"password_change_required",
 		// machine
 		"user_id",
 		"name",
@@ -503,6 +507,7 @@ func Test_UserPrepares(t *testing.T) {
 						true,
 						"phone",
 						true,
+						true,
 						// machine
 						nil,
 						nil,
@@ -525,17 +530,18 @@ func Test_UserPrepares(t *testing.T) {
 				LoginNames:         database.TextArray[string]{"login_name1", "login_name2"},
 				PreferredLoginName: "login_name1",
 				Human: &Human{
-					FirstName:         "first_name",
-					LastName:          "last_name",
-					NickName:          "nick_name",
-					DisplayName:       "display_name",
-					AvatarKey:         "avatar_key",
-					PreferredLanguage: language.German,
-					Gender:            domain.GenderUnspecified,
-					Email:             "email",
-					IsEmailVerified:   true,
-					Phone:             "phone",
-					IsPhoneVerified:   true,
+					FirstName:              "first_name",
+					LastName:               "last_name",
+					NickName:               "nick_name",
+					DisplayName:            "display_name",
+					AvatarKey:              "avatar_key",
+					PreferredLanguage:      language.German,
+					Gender:                 domain.GenderUnspecified,
+					Email:                  "email",
+					IsEmailVerified:        true,
+					Phone:                  "phone",
+					IsPhoneVerified:        true,
+					PasswordChangeRequired: true,
 				},
 			},
 		},
@@ -558,6 +564,7 @@ func Test_UserPrepares(t *testing.T) {
 						database.TextArray[string]{"login_name1", "login_name2"},
 						"login_name1",
 						// human
+						nil,
 						nil,
 						nil,
 						nil,
@@ -618,6 +625,7 @@ func Test_UserPrepares(t *testing.T) {
 						database.TextArray[string]{"login_name1", "login_name2"},
 						"login_name1",
 						// human
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1217,6 +1225,7 @@ func Test_UserPrepares(t *testing.T) {
 							true,
 							"phone",
 							true,
+							true,
 							// machine
 							nil,
 							nil,
@@ -1244,17 +1253,18 @@ func Test_UserPrepares(t *testing.T) {
 						LoginNames:         database.TextArray[string]{"login_name1", "login_name2"},
 						PreferredLoginName: "login_name1",
 						Human: &Human{
-							FirstName:         "first_name",
-							LastName:          "last_name",
-							NickName:          "nick_name",
-							DisplayName:       "display_name",
-							AvatarKey:         "avatar_key",
-							PreferredLanguage: language.German,
-							Gender:            domain.GenderUnspecified,
-							Email:             "email",
-							IsEmailVerified:   true,
-							Phone:             "phone",
-							IsPhoneVerified:   true,
+							FirstName:              "first_name",
+							LastName:               "last_name",
+							NickName:               "nick_name",
+							DisplayName:            "display_name",
+							AvatarKey:              "avatar_key",
+							PreferredLanguage:      language.German,
+							Gender:                 domain.GenderUnspecified,
+							Email:                  "email",
+							IsEmailVerified:        true,
+							Phone:                  "phone",
+							IsPhoneVerified:        true,
+							PasswordChangeRequired: true,
 						},
 					},
 				},
@@ -1292,6 +1302,7 @@ func Test_UserPrepares(t *testing.T) {
 							true,
 							"phone",
 							true,
+							true,
 							// machine
 							nil,
 							nil,
@@ -1311,6 +1322,7 @@ func Test_UserPrepares(t *testing.T) {
 							database.TextArray[string]{"login_name1", "login_name2"},
 							"login_name1",
 							// human
+							nil,
 							nil,
 							nil,
 							nil,
@@ -1350,17 +1362,18 @@ func Test_UserPrepares(t *testing.T) {
 						LoginNames:         database.TextArray[string]{"login_name1", "login_name2"},
 						PreferredLoginName: "login_name1",
 						Human: &Human{
-							FirstName:         "first_name",
-							LastName:          "last_name",
-							NickName:          "nick_name",
-							DisplayName:       "display_name",
-							AvatarKey:         "avatar_key",
-							PreferredLanguage: language.German,
-							Gender:            domain.GenderUnspecified,
-							Email:             "email",
-							IsEmailVerified:   true,
-							Phone:             "phone",
-							IsPhoneVerified:   true,
+							FirstName:              "first_name",
+							LastName:               "last_name",
+							NickName:               "nick_name",
+							DisplayName:            "display_name",
+							AvatarKey:              "avatar_key",
+							PreferredLanguage:      language.German,
+							Gender:                 domain.GenderUnspecified,
+							Email:                  "email",
+							IsEmailVerified:        true,
+							Phone:                  "phone",
+							IsPhoneVerified:        true,
+							PasswordChangeRequired: true,
 						},
 					},
 					{

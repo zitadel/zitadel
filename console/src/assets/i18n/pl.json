@@ -88,7 +88,32 @@
       },
       "IDPS": {
         "TITLE": "Dostawcy tożsamości",
-        "DESCRIPTION": "Utwórz i aktywuj zewnętrznych dostawców tożsamości. Wybierz znanego dostawcę lub skonfiguruj dowolnego innego dostawcę zgodnego z OIDC, OAuth lub SAML według własnego wyboru. Możesz nawet użyć istniejących tokenów JWT jako tożsamości federacyjnych, konfigurując dostawcę tożsamości JWT."
+        "DESCRIPTION": "Utwórz i aktywuj zewnętrznych dostawców tożsamości. Wybierz znanego dostawcę lub skonfiguruj dowolnego innego dostawcę zgodnego z OIDC, OAuth lub SAML według własnego wyboru. Możesz nawet użyć istniejących tokenów JWT jako tożsamości federacyjnych, konfigurując dostawcę tożsamości JWT.",
+        "NEXT": "Co teraz?",
+        "SAML": {
+          "TITLE": "Skonfiguruj swojego dostawcę tożsamości SAML",
+          "DESCRIPTION": "ZITADEL jest skonfigurowany. Teraz potrzebna jest konfiguracja twojego dostawcy tożsamości SAML. Większość dostawców pozwala na załadowanie całego pliku metadanych ZITADEL XML. Inni dostawcy wymagają podania tylko niektórych konkretnych adresów URL, takich jak na przykład identyfikator podmiotu (URL metadanych), URL usługi odbiorczej asercji (ACS) lub URL wylogowania pojedynczego."
+        },
+        "CALLBACK": {
+          "TITLE": "Skonfiguruj swojego dostawcę tożsamości {{ provider }}",
+          "DESCRIPTION": "Zanim będziesz mógł skonfigurować ZITADEL, przekaż ten URL do swojego dostawcy tożsamości, aby umożliwić przekierowanie przeglądarki z powrotem do ZITADEL po uwierzytelnieniu."
+        },
+        "JWT": {
+          "TITLE": "Użyj JWT jako federacyjnych tożsamości",
+          "DESCRIPTION": "Dostawca tożsamości JWT umożliwia używanie istniejących tokenów JWT jako federacyjnych tożsamości. Ta funkcjonalność jest przydatna, jeśli masz już wydawcę tokenów JWT. Dzięki IdP JWT możesz używać tych JWT do tworzenia i aktualizowania użytkowników w ZITADEL na bieżąco."
+        },
+        "LDAP": {
+          "TITLE": "Skonfiguruj ZITADEL do połączenia z twoim dostawcą tożsamości LDAP",
+          "DESCRIPTION": "Podaj szczegóły połączenia z twoim serwerem LDAP i skonfiguruj mapowanie atrybutów LDAP do atrybutów ZITADEL."
+        },
+        "AUTOFILL": {
+          "TITLE": "Automatyczne wypełnianie danych użytkownika",
+          "DESCRIPTION": "Użyj akcji, aby poprawić doświadczenie użytkowników. Możesz wstępnie wypełnić formularz rejestracyjny ZITADEL wartościami z dostawcy tożsamości."
+        },
+        "ACTIVATE": {
+          "TITLE": "Aktywuj IdP",
+          "DESCRIPTION": "Twój IdP nie jest jeszcze aktywny. Aktywuj go, aby umożliwić użytkownikom logowanie."
+        }
       },
       "PW_COMPLEXITY": {
         "TITLE": "Złożoność hasła",
@@ -466,7 +491,8 @@
     },
     "TABLE": {
       "SHOWUSER": "Pokaż użytkownika {{value}}"
-    }
+    },
+    "DOWNLOAD": "Pobierz"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Ma kontrolę nad całą instancją, włącznie z wszystkimi organizacjami",
@@ -1505,7 +1531,8 @@
       "DESCRIPTIONCREATEADMIN": "Użytkownicy mogą wybrać z dostępnych poniżej dostawców tożsamości.",
       "DESCRIPTIONCREATEMGMT": "Użytkownicy mogą wybrać z dostępnych poniżej dostawców tożsamości. Uwaga: Możesz korzystać z dostawców ustawionych przez system lub tylko dla twojej organizacji.",
       "LIFETIME_INVALID": "Formularz zawiera nieprawidłowe wartości.",
-      "SAVED": "Pomyślnie zapisano!"
+      "SAVED": "Pomyślnie zapisano!",
+      "PROVIDER_ADDED": "Dostawca tożsamości aktywowany."
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "Ustaw swoje linki polityki prywatności i warunków korzystania",

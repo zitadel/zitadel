@@ -40,7 +40,8 @@ func TestUserProjection_reduces(t *testing.T) {
 						"preferredLanguage": "ch-DE",
 						"gender": 1,
 						"email": "email@zitadel.com",
-						"phone": "+41 00 000 00 00"
+						"phone": "+41 00 000 00 00",
+						"changeRequired": true
 					}`),
 					), user.HumanAddedEventMapper),
 			},
@@ -65,7 +66,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users12_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.users12_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone, password_change_required) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -77,6 +78,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
 								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
+								true,
 							},
 						},
 						{
@@ -134,7 +136,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users12_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.users12_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone, password_change_required) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -146,6 +148,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
 								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
+								false,
 							},
 						},
 						{
@@ -198,7 +201,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users12_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.users12_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone, password_change_required) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -210,6 +213,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullInt16{},
 								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{},
+								false,
 							},
 						},
 						{
@@ -242,7 +246,8 @@ func TestUserProjection_reduces(t *testing.T) {
 						"preferredLanguage": "ch-DE",
 						"gender": 1,
 						"email": "email@zitadel.com",
-						"phone": "+41 00 000 00 00"
+						"phone": "+41 00 000 00 00",
+						"changeRequired": true
 					}`),
 					), user.HumanRegisteredEventMapper),
 			},
@@ -267,7 +272,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users12_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.users12_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone, password_change_required) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -279,6 +284,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
 								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
+								true,
 							},
 						},
 						{
@@ -336,7 +342,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users12_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.users12_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone, password_change_required) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -348,6 +354,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
 								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
+								false,
 							},
 						},
 						{
@@ -400,7 +407,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.users12_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.users12_humans (user_id, instance_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone, password_change_required) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"instance-id",
@@ -412,6 +419,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullInt16{},
 								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{},
+								false,
 							},
 						},
 						{
@@ -1379,6 +1387,82 @@ func TestUserProjection_reduces(t *testing.T) {
 							expectedStmt: "UPDATE projections.users12_humans SET avatar_key = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								nil,
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceHumanPasswordChanged",
+			args: args{
+				event: getEvent(
+					testEvent(
+						user.HumanPasswordChangedType,
+						user.AggregateType,
+						[]byte(`{
+						"changeRequired": true
+					}`),
+					), user.HumanPasswordChangedEventMapper),
+			},
+			reduce: (&userProjection{}).reduceHumanPasswordChanged,
+			want: wantReduce{
+				aggregateType: user.AggregateType,
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.users12_humans SET password_change_required = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								true,
+								"agg-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.users12_notifications SET password_set = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								true,
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceHumanPasswordChanged, false",
+			args: args{
+				event: getEvent(
+					testEvent(
+						user.HumanPasswordChangedType,
+						user.AggregateType,
+						[]byte(`{
+						"changeRequired": false
+					}`),
+					), user.HumanPasswordChangedEventMapper),
+			},
+			reduce: (&userProjection{}).reduceHumanPasswordChanged,
+			want: wantReduce{
+				aggregateType: user.AggregateType,
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.users12_humans SET password_change_required = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								false,
+								"agg-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.users12_notifications SET password_set = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								true,
 								"agg-id",
 								"instance-id",
 							},

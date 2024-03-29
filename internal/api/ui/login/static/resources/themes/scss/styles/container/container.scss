@@ -46,6 +46,12 @@ $lgn-container-bottom-margin: 50px;
       flex-direction: row-reverse;
     }
 
+    // this is used to center content within the actions container
+    // required when there is only one element within a lgn-actions container
+    &.lgn-justify-center {
+      justify-content: center;
+    }
+
     .fill-space {
       flex: 1;
     }
