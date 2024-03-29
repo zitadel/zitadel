@@ -126,7 +126,6 @@ type SetQuotas struct {
 }
 
 type SecretGenerators struct {
-	PasswordSaltCost         uint
 	ClientSecret             *crypto.GeneratorConfig
 	InitializeUserCode       *crypto.GeneratorConfig
 	EmailVerificationCode    *crypto.GeneratorConfig

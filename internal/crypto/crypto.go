@@ -13,12 +13,8 @@ const (
 	TypeHash                  // Depcrecated: use [passwap.Swapper] instead
 )
 
-type Crypto interface {
-	Algorithm() string
-}
-
 type EncryptionAlgorithm interface {
-	Crypto
+	Algorithm() string
 	EncryptionKeyID() string
 	DecryptionKeyIDs() []string
 	Encrypt(value []byte) ([]byte, error)

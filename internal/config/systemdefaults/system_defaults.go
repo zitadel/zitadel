@@ -17,7 +17,6 @@ type SystemDefaults struct {
 }
 
 type SecretGenerators struct {
-	PasswordSaltCost   int
 	MachineKeySize     uint32
 	ApplicationKeySize uint32
 }

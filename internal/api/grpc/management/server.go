@@ -5,9 +5,6 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/zitadel/passwap"
-	"github.com/zitadel/passwap/bcrypt"
-
 	"github.com/zitadel/zitadel/internal/api/assets"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
@@ -30,7 +27,6 @@ type Server struct {
 	query          *query.Queries
 	systemDefaults systemdefaults.SystemDefaults
 	assetAPIPrefix func(context.Context) string
-	passwordHash   *passwap.Swapper
 	userCodeAlg    crypto.EncryptionAlgorithm
 	externalSecure bool
 }
@@ -47,7 +43,6 @@ func CreateServer(
 		query:          query,
 		systemDefaults: sd,
 		assetAPIPrefix: assets.AssetAPI(externalSecure),
-		passwordHash:   passwap.NewSwapper(bcrypt.New(sd.SecretGenerators.PasswordSaltCost), bcrypt.Verifier),
 		userCodeAlg:    userCodeAlg,
 		externalSecure: externalSecure,
 	}

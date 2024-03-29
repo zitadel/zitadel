@@ -15,43 +15,6 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockCrypto is a mock of Crypto interface.
-type MockCrypto struct {
-	ctrl     *gomock.Controller
-	recorder *MockCryptoMockRecorder
-}
-
-// MockCryptoMockRecorder is the mock recorder for MockCrypto.
-type MockCryptoMockRecorder struct {
-	mock *MockCrypto
-}
-
-// NewMockCrypto creates a new mock instance.
-func NewMockCrypto(ctrl *gomock.Controller) *MockCrypto {
-	mock := &MockCrypto{ctrl: ctrl}
-	mock.recorder = &MockCryptoMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockCrypto) EXPECT() *MockCryptoMockRecorder {
-	return m.recorder
-}
-
-// Algorithm mocks base method.
-func (m *MockCrypto) Algorithm() string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Algorithm")
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// Algorithm indicates an expected call of Algorithm.
-func (mr *MockCryptoMockRecorder) Algorithm() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Algorithm", reflect.TypeOf((*MockCrypto)(nil).Algorithm))
-}
-
 // MockEncryptionAlgorithm is a mock of EncryptionAlgorithm interface.
 type MockEncryptionAlgorithm struct {
 	ctrl     *gomock.Controller
