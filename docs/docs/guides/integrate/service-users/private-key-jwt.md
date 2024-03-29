@@ -118,21 +118,27 @@ import datetime
 # Replace with your service user ID and private key
 service_user_id = "your_service_user_id"
 private_key = "-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY\n-----END PRIVATE KEY-----"
+key_id = "your_key_id"
 
 # ZITADEL API URL (replace if needed)
 api_url = "your_custom_domain"
 
 # Generate JWT claims
 payload = {
-    "iss": "your_zitadel_instance_id",
+    "iss": service_user_id,
     "sub": service_user_id,
     "aud": api_url,
-    "exp": datetime.utcnow() + datetime.timedelta(minutes=5),
-    "iat": datetime.utcnow()
+    "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=5),
+    "iat": datetime.datetime.now(datetime.timezone.utc)
+}
+
+header = {
+    "alg": "RS256",
+    "kid": key['keyId']
 }
 
 # Sign the JWT using RS256 algorithm
-encoded_jwt = jwt.encode(payload, private_key, algorithm="RS256")
+encoded_jwt = jwt.encode(payload, private_key, algorithm="RS256", headers=header)
 
 print(f"Generated JWT: {encoded_jwt}")
 ```
