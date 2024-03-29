@@ -133,10 +133,7 @@ func (wm *APIApplicationWriteModel) Reduce() error {
 func (wm *APIApplicationWriteModel) appendAddAPIEvent(e *project.APIConfigAddedEvent) {
 	wm.api = true
 	wm.ClientID = e.ClientID
-
-	if e.ClientSecret != nil {
-		wm.HashedSecret = crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)
-	}
+	wm.HashedSecret = crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)
 	wm.AuthMethodType = e.AuthMethodType
 }
 

@@ -231,7 +231,7 @@ func (c *Commands) VerifyAPIClientSecret(ctx context.Context, projectID, appID, 
 		return err
 	}
 	if !app.State.Exists() {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-DFnbf", "Errors.Project.App.NoExisting")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-DFnbf", "Errors.Project.App.NotExisting")
 	}
 	if !app.IsAPI() {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-Bf3fw", "Errors.Project.App.IsNotAPI")

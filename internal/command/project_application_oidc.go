@@ -312,7 +312,7 @@ func (c *Commands) VerifyOIDCClientSecret(ctx context.Context, projectID, appID,
 		return err
 	}
 	if !app.State.Exists() {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-D6hba", "Errors.Project.App.NotExisting")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-D8hba", "Errors.Project.App.NotExisting")
 	}
 	if !app.IsOIDC() {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-BHgn2", "Errors.Project.App.IsNotOIDC")
