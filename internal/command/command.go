@@ -33,9 +33,10 @@ type Commands struct {
 
 	jobs sync.WaitGroup
 
-	checkPermission    domain.PermissionCheck
-	newCode            cryptoCodeFunc
-	newCodeWithDefault cryptoCodeWithDefaultFunc
+	checkPermission             domain.PermissionCheck
+	newEncryptedCode            encrypedCodeFunc
+	newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
+	newHashedSecret             hashedSecretFunc
 
 	eventstore     *eventstore.Eventstore
 	static         static.Storage
@@ -106,6 +107,11 @@ func StartCommands(
 	idGenerator := id.SonyFlakeGenerator()
 	// reuse the oidcEncryption to be able to handle both tokens in the interceptor later on
 	sessionAlg := oidcEncryption
+
+	secretHasher, err := defaults.SecretHasher.PasswordHasher()
+	if err != nil {
+		return nil, err
+	}
 	repo = &Commands{
 		eventstore:                      es,
 		static:                          staticStore,
@@ -129,8 +135,10 @@ func StartCommands(
 		webauthnConfig:                  webAuthN,
 		httpClient:                      httpClient,
 		checkPermission:                 permissionCheck,
-		newCode:                         newCryptoCode,
-		newCodeWithDefault:              newCryptoCodeWithDefaultConfig,
+		newEncryptedCode:                newEncryptedCode,
+		newEncryptedCodeWithDefault:     newEncryptedCodeWithDefaultConfig,
+		secretHasher:                    secretHasher,
+		newHashedSecret:                 newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret),
 		sessionTokenCreator:             sessionTokenCreator(idGenerator, sessionAlg),
 		sessionTokenVerifier:            sessionTokenVerifier,
 		defaultAccessTokenLifetime:      defaultAccessTokenLifetime,
@@ -147,10 +155,6 @@ func StartCommands(
 		ActionFunctionExisting: domain.FunctionExists(),
 	}
 
-	repo.secretHasher, err = defaults.SecretHasher.PasswordHasher()
-	if err != nil {
-		return nil, err
-	}
 	repo.userPasswordHasher, err = defaults.PasswordHasher.PasswordHasher()
 	if err != nil {
 		return nil, err

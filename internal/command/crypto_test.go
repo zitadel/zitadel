@@ -15,12 +15,11 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func mockCode(code string, exp time.Duration) cryptoCodeFunc {
-	return func(ctx context.Context, filter preparation.FilterToQueryReducer, _ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm) (*CryptoCode, error) {
-		return &CryptoCode{
+func mockEncryptedCode(code string, exp time.Duration) encrypedCodeFunc {
+	return func(ctx context.Context, filter preparation.FilterToQueryReducer, _ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm) (*EncryptedCode, error) {
+		return &EncryptedCode{
 			Crypted: &crypto.CryptoValue{
 				CryptoType: crypto.TypeEncryption,
 				Algorithm:  "enc",
@@ -33,9 +32,9 @@ func mockCode(code string, exp time.Duration) cryptoCodeFunc {
 	}
 }
 
-func mockCodeWithDefault(code string, exp time.Duration) cryptoCodeWithDefaultFunc {
-	return func(ctx context.Context, filter preparation.FilterToQueryReducer, _ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, _ *crypto.GeneratorConfig) (*CryptoCode, error) {
-		return &CryptoCode{
+func mockEncryptedCodeWithDefault(code string, exp time.Duration) encryptedCodeWithDefaultFunc {
+	return func(ctx context.Context, filter preparation.FilterToQueryReducer, _ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, _ *crypto.GeneratorConfig) (*EncryptedCode, error) {
+		return &EncryptedCode{
 			Crypted: &crypto.CryptoValue{
 				CryptoType: crypto.TypeEncryption,
 				Algorithm:  "enc",
@@ -45,6 +44,12 @@ func mockCodeWithDefault(code string, exp time.Duration) cryptoCodeWithDefaultFu
 			Plain:  code,
 			Expiry: exp,
 		}, nil
+	}
+}
+
+func mockHashedSecret(secret string) hashedSecretFunc {
+	return func(_ context.Context, _ preparation.FilterToQueryReducer) (encodedHash string, plain string, err error) {
+		return secret, secret, nil
 	}
 }
 
@@ -104,7 +109,7 @@ func Test_newCryptoCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := newCryptoCode(context.Background(), tt.eventstore.Filter, tt.args.typ, tt.args.alg)
+			got, err := newEncryptedCode(context.Background(), tt.eventstore.Filter, tt.args.typ, tt.args.alg)
 			require.ErrorIs(t, err, tt.wantErr)
 			if tt.wantErr == nil {
 				require.NotNil(t, got)
@@ -120,7 +125,7 @@ func Test_verifyCryptoCode(t *testing.T) {
 	es := eventstoreExpect(t, expectFilter(
 		eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypeVerifyEmailCode)),
 	))
-	code, err := newCryptoCode(context.Background(), es.Filter, domain.SecretGeneratorTypeVerifyEmailCode, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+	code, err := newEncryptedCode(context.Background(), es.Filter, domain.SecretGeneratorTypeVerifyEmailCode, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 	require.NoError(t, err)
 
 	type args struct {
@@ -178,7 +183,7 @@ func Test_verifyCryptoCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := verifyCryptoCode(context.Background(), tt.eventsore.Filter, tt.args.typ, tt.args.alg, time.Now(), tt.args.expiry, tt.args.crypted, tt.args.plain)
+			err := verifyEncryptedCode(context.Background(), tt.eventsore.Filter, tt.args.typ, tt.args.alg, time.Now(), tt.args.expiry, tt.args.crypted, tt.args.plain)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
@@ -236,22 +241,10 @@ func Test_cryptoCodeGenerator(t *testing.T) {
 			want:     crypto.NewEncryptionGenerator(testGeneratorConfig, crypto.CreateMockEncryptionAlg(gomock.NewController(t))),
 			wantConf: &testGeneratorConfig,
 		},
-		{
-			name: "unsupported type",
-			eventsore: eventstoreExpect(t, expectFilter(
-				eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypeVerifyEmailCode)),
-			)),
-			args: args{
-				typ:           domain.SecretGeneratorTypeVerifyEmailCode,
-				alg:           nil,
-				defaultConfig: emptyConfig,
-			},
-			wantErr: zerrors.ThrowInternalf(nil, "COMMA-RreV6", "Errors.Internal unsupported crypto algorithm type %T", nil),
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, gotConf, err := cryptoCodeGenerator(context.Background(), tt.eventsore.Filter, tt.args.typ, tt.args.alg, tt.args.defaultConfig)
+			got, gotConf, err := encryptedCodeGenerator(context.Background(), tt.eventsore.Filter, tt.args.typ, tt.args.alg, tt.args.defaultConfig)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.IsType(t, tt.want, got)
 			assert.Equal(t, tt.wantConf, gotConf)

@@ -481,7 +481,7 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 			},
 		),
 
-		commands.AddOIDCAppCommand(cnsl, nil),
+		commands.AddOIDCAppCommand(cnsl),
 		SetIAMConsoleID(instanceAgg, &cnsl.ClientID, &ids.consoleAppID),
 	)
 }

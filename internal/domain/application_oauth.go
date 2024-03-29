@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/id"
 )
 
@@ -34,11 +33,11 @@ func NewClientID(idGenerator id.Generator, projectName string) (string, error) {
 	return fmt.Sprintf("%s@%s", rndID, strings.ReplaceAll(strings.ToLower(projectName), " ", "_")), nil
 }
 
-func SetNewClientSecretIfNeeded(a oAuthApplication, generator *crypto.HashGenerator) (string, error) {
+func SetNewClientSecretIfNeeded(a oAuthApplication, generate func() (encodedHash, plain string, err error)) (string, error) {
 	if !a.requiresClientSecret() {
 		return "", nil
 	}
-	encodedHash, plain, err := generator.NewCode()
+	encodedHash, plain, err := generate()
 	if err != nil {
 		return "", err
 	}

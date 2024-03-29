@@ -35,7 +35,7 @@ type SessionCommands struct {
 	intentAlg   crypto.EncryptionAlgorithm
 	totpAlg     crypto.EncryptionAlgorithm
 	otpAlg      crypto.EncryptionAlgorithm
-	createCode  cryptoCodeWithDefaultFunc
+	createCode  encryptedCodeWithDefaultFunc
 	createToken func(sessionID string) (id string, token string, err error)
 	now         func() time.Time
 }
@@ -49,7 +49,7 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 		intentAlg:         c.idpConfigEncryption,
 		totpAlg:           c.multifactors.OTP.CryptoMFA,
 		otpAlg:            c.userEncryption,
-		createCode:        c.newCodeWithDefault,
+		createCode:        c.newEncryptedCodeWithDefault,
 		createToken:       c.sessionTokenCreator,
 		now:               time.Now,
 	}

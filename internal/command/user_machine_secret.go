@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -17,7 +16,7 @@ type GenerateMachineSecret struct {
 
 func (c *Commands) GenerateMachineSecret(ctx context.Context, userID string, resourceOwner string, set *GenerateMachineSecret) (*domain.ObjectDetails, error) {
 	agg := user.NewAggregate(userID, resourceOwner)
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareGenerateMachineSecret(agg, c.secretHasher, set))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareGenerateMachineSecret(agg, set))
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +33,7 @@ func (c *Commands) GenerateMachineSecret(ctx context.Context, userID string, res
 	}, nil
 }
 
-func prepareGenerateMachineSecret(a *user.Aggregate, hasher *crypto.PasswordHasher, set *GenerateMachineSecret) preparation.Validation {
+func (c *Commands) prepareGenerateMachineSecret(a *user.Aggregate, set *GenerateMachineSecret) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if a.ResourceOwner == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-x0992n", "Errors.ResourceOwnerMissing")
@@ -50,7 +49,7 @@ func prepareGenerateMachineSecret(a *user.Aggregate, hasher *crypto.PasswordHash
 			if !isUserStateExists(writeModel.UserState) {
 				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-x8910n", "Errors.User.NotExisting")
 			}
-			encodedHash, plain, err := newHashedSecret(ctx, filter, hasher)
+			encodedHash, plain, err := c.newHashedSecret(ctx, filter)
 			if err != nil {
 				return nil, err
 			}

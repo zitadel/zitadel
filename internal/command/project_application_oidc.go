@@ -7,7 +7,6 @@ import (
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	project_repo "github.com/zitadel/zitadel/internal/repository/project"
@@ -39,7 +38,7 @@ type addOIDCApp struct {
 }
 
 // AddOIDCAppCommand prepares the commands to add an oidc app. The ClientID will be set during the CreateCommands
-func (c *Commands) AddOIDCAppCommand(app *addOIDCApp, generator *crypto.HashGenerator) preparation.Validation {
+func (c *Commands) AddOIDCAppCommand(app *addOIDCApp) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if app.ID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "PROJE-NnavI", "Errors.Invalid.Argument")
@@ -75,7 +74,7 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp, generator *crypto.HashGene
 			}
 
 			if app.AuthMethodType == domain.OIDCAuthMethodTypeBasic || app.AuthMethodType == domain.OIDCAuthMethodTypePost {
-				app.ClientSecret, app.ClientSecretPlain, err = generator.NewCode()
+				app.ClientSecret, app.ClientSecretPlain, err = c.newHashedSecret(ctx, filter)
 				if err != nil {
 					return nil, err
 				}
@@ -154,7 +153,6 @@ func (c *Commands) AddOIDCApplication(ctx context.Context, oidcApp *domain.OIDCA
 }
 
 func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain.OIDCApp, resourceOwner string, project *domain.Project, appID string) (_ *domain.OIDCApp, err error) {
-
 	addedApplication := NewOIDCApplicationWriteModel(oidcApp.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
 
@@ -169,11 +167,9 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	if err != nil {
 		return nil, err
 	}
-	generator, err := hashedSecretGenerator(ctx, c.eventstore.Filter, c.secretHasher)
-	if err != nil {
-		return nil, err
-	}
-	plain, err = domain.SetNewClientSecretIfNeeded(oidcApp, generator)
+	plain, err = domain.SetNewClientSecretIfNeeded(oidcApp, func() (string, string, error) {
+		return c.newHashedSecret(ctx, c.eventstore.Filter)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -286,7 +282,7 @@ func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, a
 	if !existingOIDC.IsOIDC() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Ghrh3", "Errors.Project.App.IsNotOIDC")
 	}
-	encodedHash, plain, err := newHashedSecret(ctx, c.eventstore.Filter, c.secretHasher)
+	encodedHash, plain, err := c.newHashedSecret(ctx, c.eventstore.Filter)
 	if err != nil {
 		return nil, err
 	}

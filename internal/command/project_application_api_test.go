@@ -143,7 +143,7 @@ func TestAddAPIConfig(t *testing.T) {
 
 func TestCommandSide_AddAPIApplication(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
+		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 	}
 	type args struct {
@@ -164,9 +164,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 		{
 			name: "no aggregate id, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -180,8 +178,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 		{
 			name: "project not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -203,8 +200,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 		{
 			name: "invalid app, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -233,8 +229,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 		{
 			name: "create api app basic, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -279,7 +274,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 					AppID:              "app1",
 					AppName:            "app",
 					ClientID:           "client1@project",
-					ClientSecretString: "a",
+					ClientSecretString: "secret",
 					AuthMethodType:     domain.APIAuthMethodTypeBasic,
 					State:              domain.AppStateActive,
 				},
@@ -288,8 +283,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 		{
 			name: "create api app jwt, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -343,8 +337,12 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
+				eventstore:      tt.fields.eventstore(t),
+				idGenerator:     tt.fields.idGenerator,
+				newHashedSecret: mockHashedSecret("secret"),
+				defaultSecretGenerators: &SecretGenerators{
+					ClientSecret: emptyConfig,
+				},
 			}
 			got, err := r.AddAPIApplication(tt.args.ctx, tt.args.apiApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -362,7 +360,7 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 
 func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -382,9 +380,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 		{
 			name: "missing appid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -405,9 +401,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 		{
 			name: "missing aggregateid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -428,8 +422,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 		{
 			name: "app not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -451,8 +444,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 		{
 			name: "no changes, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewApplicationAddedEvent(context.Background(),
@@ -491,8 +483,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 		{
 			name: "change api app, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewApplicationAddedEvent(context.Background(),
@@ -549,7 +540,11 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
+				newHashedSecret: mockHashedSecret("secret"),
+				defaultSecretGenerators: &SecretGenerators{
+					ClientSecret: emptyConfig,
+				},
 			}
 			got, err := r.ChangeAPIApplication(tt.args.ctx, tt.args.apiApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -567,7 +562,7 @@ func TestCommandSide_ChangeAPIApplication(t *testing.T) {
 
 func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -588,9 +583,7 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 		{
 			name: "no projectid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -604,9 +597,7 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 		{
 			name: "no appid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -621,8 +612,7 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 		{
 			name: "app not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -639,8 +629,7 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 		{
 			name: "change secret, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewApplicationAddedEvent(context.Background(),
@@ -682,7 +671,7 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 					AppID:              "app1",
 					AppName:            "app",
 					ClientID:           "client1@project",
-					ClientSecretString: "a",
+					ClientSecretString: "secret",
 					AuthMethodType:     domain.APIAuthMethodTypeBasic,
 					State:              domain.AppStateActive,
 				},
@@ -692,7 +681,11 @@ func TestCommandSide_ChangeAPIApplicationSecret(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
+				newHashedSecret: mockHashedSecret("secret"),
+				defaultSecretGenerators: &SecretGenerators{
+					ClientSecret: emptyConfig,
+				},
 			}
 			got, err := r.ChangeAPIApplicationSecret(tt.args.ctx, tt.args.projectID, tt.args.appID, tt.args.resourceOwner)
 			if tt.res.err == nil {

@@ -16,7 +16,7 @@ import (
 
 func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -38,9 +38,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 		{
 			name: "user invalid, invalid argument error userID",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -55,9 +53,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 		{
 			name: "user invalid, invalid argument error resourceowner",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -72,8 +68,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 		{
 			name: "user not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -90,8 +85,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 		{
 			name: "add machine secret, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
@@ -123,7 +117,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 					ResourceOwner: "org1",
 				},
 				secret: &GenerateMachineSecret{
-					ClientSecret: "a",
+					ClientSecret: "secret",
 				},
 			},
 		},
@@ -131,7 +125,11 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
+				newHashedSecret: mockHashedSecret("secret"),
+				defaultSecretGenerators: &SecretGenerators{
+					ClientSecret: emptyConfig,
+				},
 			}
 			got, err := r.GenerateMachineSecret(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.set)
 			if tt.res.err == nil {

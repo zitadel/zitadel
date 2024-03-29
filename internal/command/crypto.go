@@ -9,24 +9,24 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
-type cryptoCodeFunc func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm) (*CryptoCode, error)
+type encrypedCodeFunc func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm) (*EncryptedCode, error)
 
-type cryptoCodeWithDefaultFunc func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (*CryptoCode, error)
+type encryptedCodeWithDefaultFunc func(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (*EncryptedCode, error)
 
 var emptyConfig = &crypto.GeneratorConfig{}
 
-type CryptoCode struct {
+type EncryptedCode struct {
 	Crypted *crypto.CryptoValue
 	Plain   string
 	Expiry  time.Duration
 }
 
-func newCryptoCode(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm) (*CryptoCode, error) {
-	return newCryptoCodeWithDefaultConfig(ctx, filter, typ, alg, emptyConfig)
+func newEncryptedCode(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm) (*EncryptedCode, error) {
+	return newEncryptedCodeWithDefaultConfig(ctx, filter, typ, alg, emptyConfig)
 }
 
-func newCryptoCodeWithDefaultConfig(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (*CryptoCode, error) {
-	gen, config, err := cryptoCodeGenerator(ctx, filter, typ, alg, defaultConfig)
+func newEncryptedCodeWithDefaultConfig(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (*EncryptedCode, error) {
+	gen, config, err := encryptedCodeGenerator(ctx, filter, typ, alg, defaultConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -34,22 +34,22 @@ func newCryptoCodeWithDefaultConfig(ctx context.Context, filter preparation.Filt
 	if err != nil {
 		return nil, err
 	}
-	return &CryptoCode{
+	return &EncryptedCode{
 		Crypted: crypted,
 		Plain:   plain,
 		Expiry:  config.Expiry,
 	}, nil
 }
 
-func verifyCryptoCode(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, creation time.Time, expiry time.Duration, crypted *crypto.CryptoValue, plain string) error {
-	gen, _, err := cryptoCodeGenerator(ctx, filter, typ, alg, emptyConfig)
+func verifyEncryptedCode(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, creation time.Time, expiry time.Duration, crypted *crypto.CryptoValue, plain string) error {
+	gen, _, err := encryptedCodeGenerator(ctx, filter, typ, alg, emptyConfig)
 	if err != nil {
 		return err
 	}
 	return crypto.VerifyCode(creation, expiry, crypted, plain, gen.Alg())
 }
 
-func cryptoCodeGenerator(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (crypto.Generator, *crypto.GeneratorConfig, error) {
+func encryptedCodeGenerator(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType, alg crypto.EncryptionAlgorithm, defaultConfig *crypto.GeneratorConfig) (crypto.Generator, *crypto.GeneratorConfig, error) {
 	config, err := cryptoGeneratorConfigWithDefault(ctx, filter, typ, defaultConfig)
 	if err != nil {
 		return nil, nil, err
@@ -57,28 +57,17 @@ func cryptoCodeGenerator(ctx context.Context, filter preparation.FilterToQueryRe
 	return crypto.NewEncryptionGenerator(*config, alg), config, nil
 }
 
-func newHashedSecret(ctx context.Context, filter preparation.FilterToQueryReducer, hasher *crypto.PasswordHasher) (encodedHash, plain string, err error) {
-	return newHashedSecretWithDefaultConfig(ctx, filter, hasher, emptyConfig)
-}
+type hashedSecretFunc func(ctx context.Context, filter preparation.FilterToQueryReducer) (encodedHash, plain string, err error)
 
-func newHashedSecretWithDefaultConfig(ctx context.Context, filter preparation.FilterToQueryReducer, hasher *crypto.PasswordHasher, defaultConfig *crypto.GeneratorConfig) (encodedHash, plain string, err error) {
-	generator, err := hashedSecretGeneratorWithDefaultConfig(ctx, filter, hasher, defaultConfig)
-	if err != nil {
-		return "", "", err
+func newHashedSecretWithDefault(hasher *crypto.PasswordHasher, defaultConfig *crypto.GeneratorConfig) hashedSecretFunc {
+	return func(ctx context.Context, filter preparation.FilterToQueryReducer) (encodedHash string, plain string, err error) {
+		config, err := cryptoGeneratorConfigWithDefault(ctx, filter, domain.SecretGeneratorTypeAppSecret, defaultConfig)
+		if err != nil {
+			return "", "", err
+		}
+		generator := crypto.NewHashGenerator(*config, hasher)
+		return generator.NewCode()
 	}
-	return generator.NewCode()
-}
-
-func hashedSecretGenerator(ctx context.Context, filter preparation.FilterToQueryReducer, hasher *crypto.PasswordHasher) (*crypto.HashGenerator, error) {
-	return hashedSecretGeneratorWithDefaultConfig(ctx, filter, hasher, emptyConfig)
-}
-
-func hashedSecretGeneratorWithDefaultConfig(ctx context.Context, filter preparation.FilterToQueryReducer, hasher *crypto.PasswordHasher, defaultConfig *crypto.GeneratorConfig) (*crypto.HashGenerator, error) {
-	config, err := cryptoGeneratorConfigWithDefault(ctx, filter, domain.SecretGeneratorTypeAppSecret, defaultConfig)
-	if err != nil {
-		return nil, err
-	}
-	return crypto.NewHashGenerator(*config, hasher), nil
 }
 
 func cryptoGeneratorConfig(ctx context.Context, filter preparation.FilterToQueryReducer, typ domain.SecretGeneratorType) (*crypto.GeneratorConfig, error) {

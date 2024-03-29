@@ -41,7 +41,7 @@ func (c *Commands) AddAPIAppCommand(app *addAPIApp) preparation.Validation {
 			}
 
 			if app.AuthMethodType == domain.APIAuthMethodTypeBasic {
-				app.EncodedHash, app.ClientSecretPlain, err = newHashedSecret(ctx, filter, c.secretHasher)
+				app.EncodedHash, app.ClientSecretPlain, err = c.newHashedSecret(ctx, filter)
 				if err != nil {
 					return nil, err
 				}
@@ -119,11 +119,9 @@ func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 	if err != nil {
 		return nil, err
 	}
-	generator, err := hashedSecretGenerator(ctx, c.eventstore.Filter, c.secretHasher)
-	if err != nil {
-		return nil, err
-	}
-	plain, err = domain.SetNewClientSecretIfNeeded(apiApp, generator)
+	plain, err = domain.SetNewClientSecretIfNeeded(apiApp, func() (string, string, error) {
+		return c.newHashedSecret(ctx, c.eventstore.Filter)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -203,7 +201,7 @@ func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, ap
 	if !existingAPI.IsAPI() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-aeH4", "Errors.Project.App.IsNotAPI")
 	}
-	encodedHash, plain, err := newHashedSecret(ctx, c.eventstore.Filter, c.secretHasher)
+	encodedHash, plain, err := c.newHashedSecret(ctx, c.eventstore.Filter)
 	if err != nil {
 		return nil, err
 	}
