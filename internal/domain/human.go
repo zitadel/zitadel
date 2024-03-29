@@ -103,7 +103,7 @@ func (u *Human) EnsureDisplayName() {
 	u.DisplayName = u.Username
 }
 
-func (u *Human) HashPasswordIfExisting(ctx context.Context, policy *PasswordComplexityPolicy, hasher *crypto.PasswordHasher, onetime bool) error {
+func (u *Human) HashPasswordIfExisting(ctx context.Context, policy *PasswordComplexityPolicy, hasher *crypto.Hasher, onetime bool) error {
 	if u.Password != nil {
 		u.Password.ChangeRequired = onetime
 		return u.Password.HashPasswordIfExisting(ctx, policy, hasher)

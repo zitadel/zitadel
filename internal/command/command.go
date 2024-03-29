@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	"fmt"
 	"math/big"
 	"net/http"
 	"strconv"
@@ -50,8 +51,8 @@ type Commands struct {
 	smtpEncryption                  crypto.EncryptionAlgorithm
 	smsEncryption                   crypto.EncryptionAlgorithm
 	userEncryption                  crypto.EncryptionAlgorithm
-	userPasswordHasher              *crypto.PasswordHasher
-	secretHasher                    *crypto.PasswordHasher
+	userPasswordHasher              *crypto.Hasher
+	secretHasher                    *crypto.Hasher
 	machineKeySize                  int
 	applicationKeySize              int
 	domainVerificationAlg           crypto.EncryptionAlgorithm
@@ -108,9 +109,13 @@ func StartCommands(
 	// reuse the oidcEncryption to be able to handle both tokens in the interceptor later on
 	sessionAlg := oidcEncryption
 
-	secretHasher, err := defaults.SecretHasher.PasswordHasher()
+	secretHasher, err := defaults.SecretHasher.NewHasher()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("secret hasher: %w", err)
+	}
+	userPasswordHasher, err := defaults.PasswordHasher.NewHasher()
+	if err != nil {
+		return nil, fmt.Errorf("password hasher: %w", err)
 	}
 	repo = &Commands{
 		eventstore:                      es,
@@ -129,7 +134,13 @@ func StartCommands(
 		smtpEncryption:                  smtpEncryption,
 		smsEncryption:                   smsEncryption,
 		userEncryption:                  userEncryption,
+		userPasswordHasher:              userPasswordHasher,
+		secretHasher:                    secretHasher,
+		machineKeySize:                  int(defaults.SecretGenerators.MachineKeySize),
+		applicationKeySize:              int(defaults.SecretGenerators.ApplicationKeySize),
 		domainVerificationAlg:           domainVerificationEncryption,
+		domainVerificationGenerator:     crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, domainVerificationEncryption),
+		domainVerificationValidator:     api_http.ValidateDomain,
 		keyAlgorithm:                    oidcEncryption,
 		certificateAlgorithm:            samlEncryption,
 		webauthnConfig:                  webAuthN,
@@ -137,7 +148,6 @@ func StartCommands(
 		checkPermission:                 permissionCheck,
 		newEncryptedCode:                newEncryptedCode,
 		newEncryptedCodeWithDefault:     newEncryptedCodeWithDefaultConfig,
-		secretHasher:                    secretHasher,
 		newHashedSecret:                 newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret),
 		sessionTokenCreator:             sessionTokenCreator(idGenerator, sessionAlg),
 		sessionTokenVerifier:            sessionTokenVerifier,
@@ -153,24 +163,13 @@ func StartCommands(
 		GrpcServiceExisting:    func(service string) bool { return false },
 		GrpcMethodExisting:     func(method string) bool { return false },
 		ActionFunctionExisting: domain.FunctionExists(),
-	}
-
-	repo.userPasswordHasher, err = defaults.PasswordHasher.PasswordHasher()
-	if err != nil {
-		return nil, err
-	}
-	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
-	repo.applicationKeySize = int(defaults.SecretGenerators.ApplicationKeySize)
-
-	repo.multifactors = domain.MultifactorConfigs{
-		OTP: domain.OTPConfig{
-			CryptoMFA: otpEncryption,
-			Issuer:    defaults.Multifactors.OTP.Issuer,
+		multifactors: domain.MultifactorConfigs{
+			OTP: domain.OTPConfig{
+				CryptoMFA: otpEncryption,
+				Issuer:    defaults.Multifactors.OTP.Issuer,
+			},
 		},
 	}
-
-	repo.domainVerificationGenerator = crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, repo.domainVerificationAlg)
-	repo.domainVerificationValidator = api_http.ValidateDomain
 	return repo, nil
 }
 

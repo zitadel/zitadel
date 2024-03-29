@@ -59,7 +59,7 @@ func encryptedCodeGenerator(ctx context.Context, filter preparation.FilterToQuer
 
 type hashedSecretFunc func(ctx context.Context, filter preparation.FilterToQueryReducer) (encodedHash, plain string, err error)
 
-func newHashedSecretWithDefault(hasher *crypto.PasswordHasher, defaultConfig *crypto.GeneratorConfig) hashedSecretFunc {
+func newHashedSecretWithDefault(hasher *crypto.Hasher, defaultConfig *crypto.GeneratorConfig) hashedSecretFunc {
 	return func(ctx context.Context, filter preparation.FilterToQueryReducer) (encodedHash string, plain string, err error) {
 		config, err := cryptoGeneratorConfigWithDefault(ctx, filter, domain.SecretGeneratorTypeAppSecret, defaultConfig)
 		if err != nil {

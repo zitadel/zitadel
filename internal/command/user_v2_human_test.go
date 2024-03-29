@@ -25,7 +25,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 	type fields struct {
 		eventstore         func(t *testing.T) *eventstore.Eventstore
 		idGenerator        id.Generator
-		userPasswordHasher *crypto.PasswordHasher
+		userPasswordHasher *crypto.Hasher
 		newCode            encrypedCodeFunc
 		checkPermission    domain.PermissionCheck
 	}
@@ -1247,7 +1247,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 func TestCommandSide_ChangeUserHuman(t *testing.T) {
 	type fields struct {
 		eventstore         func(t *testing.T) *eventstore.Eventstore
-		userPasswordHasher *crypto.PasswordHasher
+		userPasswordHasher *crypto.Hasher
 		newCode            encrypedCodeFunc
 		checkPermission    domain.PermissionCheck
 	}

@@ -66,10 +66,10 @@ func NewEncryptionGenerator(config GeneratorConfig, algorithm EncryptionAlgorith
 
 type HashGenerator struct {
 	generator
-	hasher *PasswordHasher
+	hasher *Hasher
 }
 
-func NewHashGenerator(config GeneratorConfig, hasher *PasswordHasher) *HashGenerator {
+func NewHashGenerator(config GeneratorConfig, hasher *Hasher) *HashGenerator {
 	return &HashGenerator{
 		newGenerator(config),
 		hasher,

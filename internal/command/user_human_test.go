@@ -28,7 +28,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 	type fields struct {
 		eventstore         func(t *testing.T) *eventstore.Eventstore
 		idGenerator        id.Generator
-		userPasswordHasher *crypto.PasswordHasher
+		userPasswordHasher *crypto.Hasher
 		codeAlg            crypto.EncryptionAlgorithm
 		newCode            encrypedCodeFunc
 	}
@@ -1266,7 +1266,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 	type fields struct {
 		eventstore         *eventstore.Eventstore
 		idGenerator        id.Generator
-		userPasswordHasher *crypto.PasswordHasher
+		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
 		ctx                  context.Context
@@ -2483,7 +2483,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 	type fields struct {
 		eventstore         *eventstore.Eventstore
 		idGenerator        id.Generator
-		userPasswordHasher *crypto.PasswordHasher
+		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
 		ctx             context.Context
@@ -4328,7 +4328,7 @@ func TestAddHumanCommand(t *testing.T) {
 	type args struct {
 		human         *AddHuman
 		orgID         string
-		hasher        *crypto.PasswordHasher
+		hasher        *crypto.Hasher
 		filter        preparation.FilterToQueryReducer
 		codeAlg       crypto.EncryptionAlgorithm
 		allowInitMail bool

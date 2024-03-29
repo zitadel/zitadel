@@ -297,7 +297,7 @@ func Test_newHashedSecretWithDefault(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			hasher := &crypto.PasswordHasher{
+			hasher := &crypto.Hasher{
 				Swapper: passwap.NewSwapper(bcrypt.New(4)),
 			}
 			defaultConfig := &crypto.GeneratorConfig{

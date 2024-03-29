@@ -32,7 +32,7 @@ type PasswordCode struct {
 	NotificationType NotificationType
 }
 
-func (p *Password) HashPasswordIfExisting(ctx context.Context, policy *PasswordComplexityPolicy, hasher *crypto.PasswordHasher) error {
+func (p *Password) HashPasswordIfExisting(ctx context.Context, policy *PasswordComplexityPolicy, hasher *crypto.Hasher) error {
 	if p.SecretString == "" {
 		return nil
 	}

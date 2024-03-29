@@ -78,7 +78,7 @@ type AddLink struct {
 	IDPExternalID string
 }
 
-func (h *AddHuman) Validate(hasher *crypto.PasswordHasher) (err error) {
+func (h *AddHuman) Validate(hasher *crypto.Hasher) (err error) {
 	if err := h.Email.Validate(); err != nil {
 		return err
 	}
@@ -165,7 +165,7 @@ type humanCreationCommand interface {
 }
 
 //nolint:gocognit
-func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *crypto.PasswordHasher, codeAlg crypto.EncryptionAlgorithm, allowInitMail bool) preparation.Validation {
+func (c *Commands) AddHumanCommand(human *AddHuman, orgID string, hasher *crypto.Hasher, codeAlg crypto.EncryptionAlgorithm, allowInitMail bool) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if err := human.Validate(hasher); err != nil {
 			return nil, err
@@ -330,7 +330,7 @@ func (c *Commands) addHumanCommandCheckID(ctx context.Context, filter preparatio
 	return nil
 }
 
-func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQueryReducer, createCmd humanCreationCommand, human *AddHuman, hasher *crypto.PasswordHasher) (err error) {
+func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQueryReducer, createCmd humanCreationCommand, human *AddHuman, hasher *crypto.Hasher) (err error) {
 	if human.Password != "" {
 		if err = humanValidatePassword(ctx, filter, human.Password); err != nil {
 			return err
