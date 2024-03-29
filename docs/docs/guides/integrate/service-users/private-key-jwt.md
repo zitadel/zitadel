@@ -134,7 +134,7 @@ payload = {
 
 header = {
     "alg": "RS256",
-    "kid": key['keyId']
+    "kid": key_id
 }
 
 # Sign the JWT using RS256 algorithm
