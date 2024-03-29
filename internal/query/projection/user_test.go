@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -1705,14 +1704,14 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceMachineSecretSet",
+			name: "reduceMachineSecretSet v1 value",
 			args: args{
 				event: getEvent(
 					testEvent(
 						user.MachineSecretSetType,
 						user.AggregateType,
 						[]byte(`{
-							"clientSecret": {"CryptoType":1,"Algorithm":"bcrypt","Crypted":"deadbeef"}
+							"clientSecret": {"CryptoType":1,"Algorithm":"bcrypt","Crypted":"c2VjcmV0"}
 					}`),
 					), user.MachineSecretSetEventMapper),
 			},
@@ -1734,11 +1733,85 @@ func TestUserProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPDATE projections.users12_machines SET secret = $1 WHERE (user_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeHash,
-									Algorithm:  "bcrypt",
-									Crypted:    []byte{117, 230, 157, 109, 231, 159},
-								},
+								"secret",
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceMachineSecretSet v2 value",
+			args: args{
+				event: getEvent(
+					testEvent(
+						user.MachineSecretSetType,
+						user.AggregateType,
+						[]byte(`{
+							"hashedSecret": "secret"
+					}`),
+					), user.MachineSecretSetEventMapper),
+			},
+			reduce: (&userProjection{}).reduceMachineSecretSet,
+			want: wantReduce{
+				aggregateType: user.AggregateType,
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.users12 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"agg-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.users12_machines SET secret = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"secret",
+								"agg-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceMachineSecretHashUpdated",
+			args: args{
+				event: getEvent(
+					testEvent(
+						user.MachineSecretHashUpdatedType,
+						user.AggregateType,
+						[]byte(`{
+							"hashedSecret": "secret"
+					}`),
+					), eventstore.GenericEventMapper[user.MachineSecretHashUpdatedEvent]),
+			},
+			reduce: (&userProjection{}).reduceMachineSecretHashUpdated,
+			want: wantReduce{
+				aggregateType: user.AggregateType,
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.users12 SET (change_date, sequence) = ($1, $2) WHERE (id = $3) AND (instance_id = $4)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"agg-id",
+								"instance-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.users12_machines SET secret = $1 WHERE (user_id = $2) AND (instance_id = $3)",
+							expectedArgs: []interface{}{
+								"secret",
 								"agg-id",
 								"instance-id",
 							},
