@@ -8,13 +8,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/mock/gomock"
-
+	"github.com/zitadel/passwap"
+	"github.com/zitadel/passwap/bcrypt"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"go.uber.org/mock/gomock"
 )
 
 func mockEncryptedCode(code string, exp time.Duration) encrypedCodeFunc {
@@ -248,6 +249,72 @@ func Test_cryptoCodeGenerator(t *testing.T) {
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.IsType(t, tt.want, got)
 			assert.Equal(t, tt.wantConf, gotConf)
+		})
+	}
+}
+
+func Test_newHashedSecretWithDefault(t *testing.T) {
+	tests := []struct {
+		name       string
+		eventstore func(*testing.T) *eventstore.Eventstore
+		wantLen    int
+		wantErr    bool
+	}{
+		{
+			name: "filter error",
+			eventstore: expectEventstore(
+				expectFilterError(io.ErrClosedPipe),
+			),
+			wantErr: true,
+		},
+		{
+			name: "default config",
+			eventstore: expectEventstore(
+				expectFilter(),
+			),
+			wantLen: 32,
+		},
+		{
+			name: "instance config",
+			eventstore: expectEventstore(
+				expectFilter(
+					eventFromEventPusher(
+						instance.NewSecretGeneratorAddedEvent(context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							domain.SecretGeneratorTypeAppSecret,
+							24,
+							time.Hour*1,
+							true,
+							true,
+							true,
+							true,
+						),
+					),
+				),
+			),
+			wantLen: 24,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			hasher := &crypto.PasswordHasher{
+				Swapper: passwap.NewSwapper(bcrypt.New(4)),
+			}
+			defaultConfig := &crypto.GeneratorConfig{
+				Length:              32,
+				Expiry:              time.Minute,
+				IncludeLowerLetters: true,
+			}
+			generate := newHashedSecretWithDefault(hasher, defaultConfig)
+			encodedHash, plain, err := generate(context.Background(), tt.eventstore(t).Filter)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.Len(t, plain, tt.wantLen)
+			_, err = hasher.Verify(encodedHash, plain)
+			require.NoError(t, err)
 		})
 	}
 }
